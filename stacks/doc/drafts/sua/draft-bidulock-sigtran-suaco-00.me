@@ -1,0 +1,433 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-suaco-00.me,v 0.9.2.1 2004/03/16 05:10:24 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2004/03/16 05:10:24 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.0
+.ds expiry January\ 2004
+.ds date \*(td
+.so ../draft.me
+.bp
+.sz \n(tp
+.he 'Internet Draft'SUA-CO'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+.sz \n(tp
+\fB\
+Connection-Oriented Support for the
+SS7 SCCP User Adaptation Layer
+(SUA-CO)
+
+<draft-bidulock-sigtran-suaco-00.\*(|x>
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet-Draft describes parameters and procedures in extension to
+the SS7 SCCP User Adaptiation Layer
+.[
+sua-09
+.]
+that permits seamless Connection-Oriented operation with Network Service
+Users not possible in the existing protocol.
+.sh 1 "Introduction"
+.lp
+SCCP,
+.[
+q.711
+.]
+and the OSI Network Services Definition
+.[
+x.213
+.]
+upon which SCCP is based,
+provides primitives at the SCCP to SCCP-User boundary.  Although SUA
+.[
+sua-09
+.]
+claims seamless operation with SCCP and SCCP-Users, SUA does not provide the
+following:
+.bu
+Mapping of the Connection-Oriented SCCP/SCCP-User primitive interface to SUA messages.
+.bu
+Procedures for local management (binding, listening and accepting) of SCCP connections.
+.bu
+Procedures for operation in multiple SG as STP configurations.
+.bu
+Procedures for operation without coupling at the SG.
+.bu
+Procedures for GTT support at the ASP/IPSP.
+.lp
+This document provides for these capabilities allowing seamless interworking
+between the SS7 and IP networks with SUA-CO.
+
+.sh 2 "Scope"
+.sh 2 "Terminology"
+.lp
+The terminology of SUA
+.[
+sua-09
+.]
+also applies in this document.  This document provides additional terminology
+as follows:
+.sh 2 "Overview"
+.sh 2 "Functional Areas"
+.sh 3 "Definition of the SCCP-User Boundary"
+.sh 4 "Mapping of SCCP Primitives"
+.(b
+.#t "Mapping of SCCP Primitives"
+.TS
+center tab(:);
+lblblblb
+l3|l3|l3|l.
+Mode:Primitive:Name:SUA Msg
+_
+Connection-:N-UNITDATA:Request:CLDT
+Less::Indication:
+:_:_:_
+:N-NOTICE:Indication:CLDR
+_
+Connection:N-CONNECT:Request:CORE
+Oriented::Indication:
+:::_
+::Response:COAK
+::Confirmation:
+:_:_:_
+:N-DATA:Request:
+::Indication:
+:_:_:CODT
+:N-EXDATA:Request:
+::Indication:
+:_:_:_
+:N-RESET:Request:RESRE
+::Indication:
+:::_
+::Response:RESCO
+::Confirmation:
+:_:_:_
+:N-DISCONNECT:Request:COREF
+::Indication:RELRE
+:_:_:_
+:N-INFORM:Indication:COERR
+_
+Management:N-STATE:Indication:
+:_:_:SSNM
+:N-PCSTATE:Indication:
+_
+.TE
+.)b
+.sh 2 "Sample Configurations"
+.lp
+.sh 1 "Conventions"
+.lp
+.sh 1 "Protocol Elements"
+.lp
+.sh 2 "Messages"
+.lp
+.sh 3 "Connectionless (CL) Messages"
+.lp
+.sh 4 "Connectionless Data Transfer (CLDT)"
+.lp
+.sh 4 "Connectionless Data Response (CLDR)"
+.lp
+.sh 3 "Connection-Oriented (CO) Messages"
+.lp
+.sh 4 "Connection Request(CORE)"
+.lp
+.(b
+.#t "Mapping of N-CONNECT Request Parameters"
+.TS
+center tab(:);
+cbscbs
+lbs|lbs
+ll|ll.
+N-CONNECT Request:CORE ASP->SG
+Parameter:Parameter
+_
+Called Address:M:Destination Address:M
+_
+Calling Address:U*1:Source Address:O
+_
+Expedited Data Selection:U:Protocol Class:M
+_
+Quality of Service:M:Protocol Class:M
+::Sequence Control:M
+::Sequence Number:O
+::SS7 Hop Count:O
+::Message Priority:O
+::Credit:O
+_
+User Data:U:Data:O
+_
+Importance:O:Importance:O:
+_
+Connection Identification:U:Routing Context:M
+::Source Reference Number:M
+_
+.TE
+.)b
+.lp
+.(b
+.#t "Mapping of N-CONNECT Indication Parameters"
+.TS
+center tab(:);
+cbscbs
+lbs|lbs
+ll|ll.
+N-CONNECT Indication:CORE SG->ASP
+Parameter:Parameter
+_
+Called Address:M:Destination Address:M
+_
+Calling Address:C*1:Source Address:O
+_
+Quality of Service:M:Protocol Class:M
+::Message Priority:O
+::Sequence Control:M
+::SS7 Hop Count:O
+::Credit:O
+_
+User Data:C(=)*2:Data:O
+_
+Importance:U:Importance:O:
+_
+Connection Identification:O:Routing Context:M
+::Source Reference Number:M
+_
+\-:\-:Sequence Number:O
+_
+.TE
+.)b
+.sh 4 "Connection Acknowledge (COAK)"
+.lp
+.lp
+.(b
+.#t "Mapping of N-CONNECT Response Parameters"
+.TS
+center tab(:);
+cbsscbs
+cbss|cbs
+l2l1c|l2l.
+N-CONNECT Response:CORE SG->ASP
+Parameter:Parameter
+_
+Called Address:\-::Destination Address:O
+_
+Calling Address:\-::\-:\-
+_
+Resonding Address:U:*1:Source Address:\-
+_
+Expedited Data Selection:U::Protocol Class:M
+_
+Quality of Service:M::Protocol Class:M
+:::Message Priority:O
+:::Sequence Control:M
+:::SS7 Hop Count:O
+:::Credit:O
+_
+User Data:U::Data:O
+_
+Connection Identification:O::Routing Context:M
+:::Source Reference Number:M
+:::Destination Reference Number:M
+_
+Importance:O::Importance:O:
+_
+.TE
+.ip "Note 1:" 8
+The parameter is associated with the SCCP service access point at which this
+primitive is issued if the responding address is absent.
+.)b
+.lp
+.(b
+.#t "Mapping of N-CONNECT Confirm Parameters"
+.TS
+center tab(:);
+cbsscbs
+cbss|cbs
+l2l1c|l2l.
+N-CONNECT Confirm:CORE SG->ASP
+Parameter:Parameter
+_
+Called Address:\-::Destination Address:O
+_
+Calling Address:\-::\-:O
+_
+Resonding Address:C:*1:Source Address:\-
+_
+Expedited Data Selection:\-::\-:\-
+_
+Quality of Service:M(=)::Protocol Class:M
+:::Message Priority:O
+:::Sequence Control:M
+:::SS7 Hop Count:O
+:::Credit:O
+_
+User Data:C(=):*2:Data:O
+_
+Connection Identification:O::Routing Context:M
+:::Source Reference Number:M
+:::Destination Reference Number:M
+_
+Importance:O::Importance:O:
+_
+.TE
+.ip "Note 1:" 8
+The parameter is associated with the SCCP service access point at which this
+primitive is issued if the responding address is absent.
+.ip "Note 2:" 8
+If present in the received SCCP message.
+.)b
+.sh 4 "Connection Refused (COREF)"
+.lp
+.sh 4 "Release Request (RELRE)"
+.lp
+.sh 4 "Release Complete (RELCO)"
+.lp
+.sh 4 "Reset Confirm (RESCO)"
+.lp
+.sh 4 "Reset Request (RESRE)"
+.lp
+.sh 4 "Connection Oriented Data Transfer (CODT)"
+.lp
+.sh 4 "Connection Oriented Data Acknowledge (CODA)"
+.lp
+.sh 4 "Connection Oriented Error (COERR)"
+.lp
+.sh 4 "Inactivity Test (COIT)"
+.lp
+.sh 3 "SS7 Signalling Network Management (SSNM) Messages"
+.lp
+.sh 4 "Destination Unavailable (DUNA)"
+.lp
+.sh 4 "Destination Available (DAVA)"
+.lp
+.sh 4 "Destination Status Audit (DAUD)"
+.lp
+.sh 4 "Network Congestion (SCON)"
+.lp
+.sh 4 "Destination User Part Unavailable (DUPU)"
+.lp
+.sh 4 "Destination Restricted (DRST)"
+.lp
+.sh 2 "Parameters"
+.lp
+.sh 1 "Procedures"
+.lp
+.sh 1 "Security"
+.lp
+.sh 1 "IANA Considerations"
+.lp
+.\"
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.\"
+.\"
+.(b M
+.#v
+.sh 1 "Acknowledgements"
+.lp
+.sh 1 "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-972-839-4489
+OpenSS7 Corporation;Email: bidulock@openss7.org
+4701 Preston Park Boulevard;URL: http://www.openss7.org/
+Suite 424;
+Plano, TX  75093;
+USA;
+.TE
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2003

@@ -1,0 +1,22 @@
+<book>
+<title>OpenSS7 SCTP Book 4</title>
+<bookinfo>
+<corpauthor>OpenSS7 Corporation</corpauthor>
+</bookinfo>
+<chapter label="1" id="chap4-1">
+<title>Chapter number uno</title>
+<epigraph>
+<attribution>William Safire</attribution>
+<para>
+Knowing how thinks work is the basis for appreciation, and is
+thus a source of civilized thought.
+</para>
+</epigraph>
+<sect1>
+<title>Top Level Section</title>
+<para>
+This is a paragraph.
+</para>
+</sect1>
+</chapter>
+</book>

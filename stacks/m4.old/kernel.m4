@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/12 02:36:30 $
+# @(#) kernel.m4,v LiS-2_16_18-1(1.1.2.1) 2004/01/13 16:11:34
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,15 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/12 02:36:30 $ by $Author: brian $
+# Last Modified 2004/01/13 16:11:34 by brian
 #
 # =============================================================================
 
 # =============================================================================
 # AC_LINUX_KERNEL
 # -----------------------------------------------------------------------------
-AC_DEFUN(AC_LINUX_KERNEL,
-[
+AC_DEFUN([AC_LINUX_KERNEL], [
     _LINUX_KERNEL_OPTIONS
     AC_REQUIRE([AC_CANONICAL_TARGET])
     # move user flags out of the way temporarily
@@ -78,8 +77,7 @@ AC_DEFUN(AC_LINUX_KERNEL,
 # =============================================================================
 # _LINUX_KERNEL_OPTIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN(_LINUX_KERNEL_OPTIONS,
-[
+AC_DEFUN([_LINUX_KERNEL_OPTIONS], [
     AC_ARG_WITH([k-release],
                 AC_HELP_STRING([--with-k-release=UTSRELEASE],
                                [specify the UTS release of the linux kernel for
@@ -158,8 +156,7 @@ AC_DEFUN(_LINUX_KERNEL_OPTIONS,
 # =============================================================================
 # _LINUX_KERNEL_SETUP
 # -----------------------------------------------------------------------------
-AC_DEFUN(_LINUX_KERNEL_SETUP,
-[
+AC_DEFUN([_LINUX_KERNEL_SETUP], [
     _LINUX_CHECK_KERNEL_RELEASE
     _LINUX_CHECK_KERNEL_MODULES
     _LINUX_CHECK_KERNEL_BUILD
@@ -185,8 +182,7 @@ AC_DEFUN(_LINUX_KERNEL_SETUP,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_RELEASE
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_RELEASE,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
     AC_CACHE_CHECK([for kernel release], [linux_cv_k_release], [dnl
         if test :"${with_k_release:-no}" = :no
         then
@@ -265,8 +261,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_RELEASE,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_MODULES
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_MODULES,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
     AC_CACHE_CHECK([for kernel modules directory], [linux_cv_k_modules], [dnl
         if test :"$prefix" = :NONE
         then
@@ -348,8 +343,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_MODULES,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_BUILD
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_BUILD,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [
     AC_CACHE_CHECK([for kernel build directory], [linux_cv_k_build], [dnl
         if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
         then
@@ -415,8 +409,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_BUILD,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_SYSMAP
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_SYSMAP,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [
     AC_CACHE_CHECK([for kernel system map], [linux_cv_k_sysmap], [dnl
         if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
         then
@@ -453,8 +446,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_SYSMAP,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_HEADERS
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_HEADERS,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [
     AC_CACHE_CHECK([for kernel headers], [linux_cv_k_includes], [dnl
         if test :"${with_k_includes:-no}" = :no
         then
@@ -480,8 +472,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_HEADERS,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_MARCH
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_MARCH,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [
     AC_CACHE_CHECK([for kernel machine], [linux_cv_march], [dnl
         linux_cv_march="$target_cpu"
         case "$target_cpu" in
@@ -509,8 +500,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_MARCH,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_RHBOOT
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_RHBOOT,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [
     AC_CACHE_CHECK([for kernel Red Hat boot], [linux_cv_rh_boot_kernel], [dnl
         linux_cv_rh_boot_kernel=no
         if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
@@ -536,7 +526,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_RHBOOT,
     ])
     if test :"${linux_cv_rh_boot_kernel:-no}" != :no
     then
-        AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H], [], [Define for Red Hat kernel.])
+        AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for Red Hat kernel.])
         case "${linux_cv_rh_boot_kernel:-no}" in
             BOOT)
                 AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for Red Hat BOOT kernel.])
@@ -575,8 +565,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_RHBOOT,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_ARCHDIR
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_ARCHDIR,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [
     AC_CACHE_CHECK([for kernel arch directory], [linux_cv_k_archdir], [dnl
         if test :"${with_k_archdir:-no}" = :no
         then
@@ -599,8 +588,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_ARCHDIR,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_MACHDIR
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_MACHDIR,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [
     AC_CACHE_CHECK([for kernel mach directory], [linux_cv_k_machdir], [dnl
         if test :"${with_k_machdir:-no}" = :no
         then
@@ -641,8 +629,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_MACHDIR,
 # =========================================================================
 # _LINUX_SETUP_KERNEL_CFLAGS
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_SETUP_KERNEL_CFLAGS,
-[
+AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [
     #
     # FIXME: we need to check what is in CFLAGS before we go adding stuff to
     # CFLAGS, that way the user can override these settings for better tuning.
@@ -745,7 +732,13 @@ AC_DEFUN(_LINUX_SETUP_KERNEL_CFLAGS,
             ;;
         hppa*)
             linux_k_defs="${linux_k_defs}${linux_k_defs:+ }-D__linux__"
-            CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -mno-space-regs -mfast-indirect-calls -mschedule=7200 -mdisable-fpregs"
+            CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -mno-space-regs -mfast-indirect-calls -mdisable-fpregs"
+            case "$linux_cv_march" in
+                *1.1*) CFLAGS="${CFLAGS}${CFLAGS:+ }-march=1.1" ;;
+                *2.0*) CFLAGS="${CFLAGS}${CFLAGS:+ }-march=2.0 -mschedule=8000" ;;
+                *64*)  : ;;
+                *)     : ;;
+            esac
             ;;
         ppc* | powerpc*)
             linux_k_defs="${linux_k_defs}${linux_k_defs:+ }-D__powerpc__"
@@ -806,8 +799,7 @@ AC_DEFUN(_LINUX_SETUP_KERNEL_CFLAGS,
 # =========================================================================
 # _LINUX_CHECK_KERNEL_VERSIONS
 # -------------------------------------------------------------------------
-AC_DEFUN(_LINUX_CHECK_KERNEL_VERSIONS,
-[
+AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [
     AC_CACHE_CHECK([for kernel symbol versioning], [linux_cv_k_versions], [dnl
         AC_EGREP_CPP([\<yes_we_have_kernel_versions\>], [
 #include <linux/version.h>
@@ -832,8 +824,7 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_VERSIONS,
 # =============================================================================
 # _LINUX_KERNEL_
 # -----------------------------------------------------------------------------
-AC_DEFUN(_LINUX_KERNEL_,
-[
+AC_DEFUN([_LINUX_KERNEL_], [
 ])# _LINUX_KERNEL_
 # =============================================================================
 

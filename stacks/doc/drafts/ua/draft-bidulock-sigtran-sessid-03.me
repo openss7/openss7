@@ -1,0 +1,227 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-sessid-03.me,v 0.9.2.1 2004/03/16 05:10:45 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2004/03/16 05:10:45 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.3
+.ds date February\ 21,\ 2004
+.ds expiry August\ 2004
+.nr levels 0
+.so ../draft.me
+.bp
+.he 'Internet Draft'UA SESSID'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+\fB\
+Session Identification Registration (SESSID)
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-sessid-03.\*(|x>
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.pp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Internet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.pp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Copyright"
+.pp
+Copyright \(co The Internet Society (2003).  All Rights Reserved.
+.uh "Abstract"
+.pp
+This memo describes \fI\)Session Id Registration (SESSID)\fR that
+provides the ability for one (listening) Application Server to indicate that a
+session should be established with another (accepting) Application Server for
+connection- and transaction-oriented messaging in the SS7 Signalling User
+Adaptation Layers.
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+Extension parameters and procedures are added by this memo in extension to
+those of the User Adaptation layers to provide a closer model to that of the
+XNS/XTI interfaces, where one interface may be designated as a `listener' and
+another designated as an `acceptor'.  This permits ISO compliant interfaces
+for SCCP to maintain the same semantic for SUA and TUA.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.sh 2 "Terminology"
+.sh 2 "Overview"
+.sh 3 "Multiple SGs"
+.sh 4 "Fail-over of routesets between SGs"
+.sh 4 "Redirection of routesets between SGs"
+.sh 2 "Sample Configurations"
+.#e
+.sh 1 "Conventions"
+.pp
+The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
+\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
+\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in.
+.[
+key words
+.]
+.#e
+.sh 1 "Protocol Elements"
+.sh 2 "Parameters"
+.sh 2 "Messages"
+.#e
+.sh 1 "Procedures"
+.sh 2 "AS and ASP State Maintenance"
+.sh 3 "ASP State"
+.sh 3 "AS State"
+.sh 3 "ASP Up Procedures"
+.sh 3 "ASP Down Procedures"
+.sh 3 "ASP Active Procedures"
+.sh 3 "ASP Inactive Procedures"
+.sh 3 "Notify Procedures"
+.#e
+.sh 1 "Examples"
+.#e
+.sh 1 "Security"
+.#e
+.sh 1 "IANA Considerations"
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Change History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.sh 2 "Version 0.0" 0 0
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-3\
+$Log: draft-bidulock-sigtran-sessid-03.me,v $
+Revision 0.9.2.1  2004/03/16 05:10:45  brian
+- Added drafts and figures.
+
+Revision 0.8.2.1  2003/07/28 13:12:21  brian
+Reformatting.
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.\"
+.\"
+.(b M
+.#v
+.\".uh "Acknowledgments"
+.\".pp
+.\"The authors would like to thank
+.\"for their valuable comments and suggestions.
+.uh "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-780-490-1141
+OpenSS7 Corporation;Email: bidulock@openss7.org
+1469 Jeffreys Crescent;URL: http//www.openss7.org/
+Edmonton, AB  T6L 6T1;
+Canada;
+.TE
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2003

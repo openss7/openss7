@@ -1,0 +1,624 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-regext-00.me,v 0.9.2.1 2004/03/16 05:10:44 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2004/03/16 05:10:44 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X lp
+move-punctuation
+discard YZ
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+search-truncate 10
+separate-label-second-parts ""
+bracket-label " [" "]" ", "
+# abbreviate-label-ranges "..."
+# sort A+
+# reverse A
+.R2
+.de $0
+.if \\$3>0 \{\
+.if \\$3<4 \{\
+.(x 0
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.\"'
+.)x
+.\}
+.\}
+..
+.if '\*(.T'ascii' \{\
+.\"'
+.fo 'B. Bidulock'Version 0.0'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii 3n
+.nr pi 3n
+.nr po 3n
+.nr bi 2n
+.nr qi 4n
+.nr ps 1v
+.de #v
+.ad l
+.hy 0
+..
+.\}
+.if '\*(.T'ps' \{\
+.\"'
+.fo 'B. Bidulock'Version 0.0'Page %'
+.ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii 0.25i
+.nr pi 0.25i
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr pp 10
+.nr qp 9
+.nr fp 8
+.nr gp 8
+.nr sp 12
+.nr tp 10
+.de #v
+.ad b
+.hy 6
+..
+.\}
+.dn &a
+.dn &b
+.dn &n
+.dn &p
+.nr &a 1
+.nr &b 0
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.ds &t Table\ 
+\".de $1
+.\".ds &f Figure \\n($1-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $2
+.\".ds &f Figure \\n($1.\\n($2-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $3
+.\".ds &f Figure \\n($1.\\n($2.\\n($3-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.de #f
+.(l C F
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+\\*(&f\\n(&n \\$1
+.)x
+.)l
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #t
+.ce 1
+\fI\\*(&t\\n(&a.\fR \\$1
+.(x 3
+\\*(&t\\n(&a \\$1
+.)x
+.nr &b \\n(&a
+.nr &a +1
+..
+.de #e
+.if \\n($d>1 \{\
+.uh "Endnotes for Section \\\\n($1"
+.pd
+.\}
+..
+.ds a \a
+.bp
+.he 'Internet Draft'SESSID'\\\\*(td'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 2
+Expires in six months;;\*(td
+.bl 2
+.TE
+.(l C
+\fB\
+Session Identification Registration (SESSID)
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-regext-00.\*(|x>
+
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.pp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Internet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.pp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.pp
+This memo describes \fB\)Registration Extensions\fR that provides the ability
+for an Application Server Process (ASP) to modify existing Routing Keys (RKs)
+with a Signalling Gateway (SG).
+.pp
+Current procedures in the SS7 Signalling User Adaptation Layers (UAs) do not
+provide for the modification of Routing Keys (RKs) without deactivation of the
+Application Server (AS).  This causes problems in making changes to live
+systems.
+.pp
+The extensions described in this memo permit modification of Signalling Link
+membership in Application Servers for SS7 MTP2-User Adaptation Layer,
+.[
+m2ua-12
+.]
+modification of Circuit Identification Code (CIC) ranges for the SS7 MTP3-User
+Adaptation Layer,
+.[
+m3ua-11
+.]
+modificiation of Destination Local Reference (DLR) ranges for SS7 SCCP-User
+Adaptation Layer,
+.[
+sua-10
+.]
+and modification of Transaction Identifier (TID) ranges for SS7 TCAP-User
+Adaptation Layer.
+.[
+tua-01
+.]
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft provides parameters and procedures in extension to the
+parameters and procedures of the SS7 Signalling User Adaptation Layers (UAs),
+.[
+m2ua-12
+.]
+.[
+m3ua-11
+.]
+.[
+sua-10
+.]
+.[
+tua-01
+.]
+for the purpose of supporting changed to Routing Keys to be made in live
+systems.
+.pp
+UA implementations with \fI\)REGEXT\fR are intended to be compatible with UA
+implementations not supporting this extension.
+.sh 2 "Terminology"
+.pp
+\fI\)REGEXT\fR adds the following terms to the terminology presented in the UA
+documents:
+.lp
+\fI\)Registration Extension\fR \-
+.ix +\n(iiu
+The parameters and procedures described by this memo.
+.lp
+\fI\)Signalling Peer Process\fR \-
+.ix +\n(iiu
+refers to an ASP, SGP or IPSP.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+RFC 2960
+.]
+SS7 Signalling User Adaptation Layers
+.[
+m2ua-12
+.]
+.[
+m3ua-11
+.]
+.[
+sua-10
+.]
+.[
+tua-01
+.]
+supporting Registration.
+.sh 2 "Overview"
+.pp
+Existing registration mangement procedures do not provide for the alteration
+of Routing Keys on live systems.  This can lead to significant operational
+difficulties in large scale deployments.  This memo provides extension
+procedures that permit this modification.
+.sh 3 "Limitations of Existing Registration Management"
+.pp
+Each of the UAs
+.[
+m2ua-12
+.]
+.[
+m3ua-11
+.]
+.[
+sua-10
+.]
+.[
+tua-01
+.]
+provides procedures for registration and deregistration of Routing (Link)
+Keys.  None of these procedures currently provides for alteration of Routing
+Keys for a Application Server (AS) in the active state.
+.pp
+In SS7 MTP2-User Adaptation Layer
+.[
+m2ua-12
+.]
+registration of a Link Key associates a signalling link with an Interface
+Identifier (IID).  However, registration does not provide a mechanism for
+associating groups of Interface Identifiers (IID) together into Application
+Servers (AS), nor does it provide a mechanism for altering the membership of
+signalling links associated with an Application Server.
+.pp
+The SS7 MTP3-User Adaptation Layer
+.[
+m3ua-11
+.]
+registration of a Routing Key associates a range of tranffic with an
+Application Server through a Routing Context.  However, it does not provide
+procedures for changing the range of traffic associated with an Application
+Server and Routing Context without deactivating the Application Server and
+deregistering the Routing Key.  This can cause difficulties when M3UA is used
+in support of ISUP MTP3-Users where normal circuit management expects to add
+and remove specific circuits or ranges of circuits (circuit groups) to and
+from Application Servers.
+.pp
+The SS7 SCCP-User Adaptation Layer
+.[
+sua-10
+.]
+registration of a Routing Key associates a range of traffic with an
+Application Server through a Routing Context and the Address Mapping Fucntion.
+However, it does not provide procedures for changing the range of traffic
+associated with an Application Server and Routing Context without deactivating
+the Application Server and deregistering the Routing Key.  This can cause
+difficulties when SUA is used in the connection-oriented environment and the
+ASP wishes to dynamically assign connections to Application Servers.
+.pp
+The SS7 TCAP-User Adapatation Layer
+.[
+tua-01
+.]
+registration of a Routing Key associates a range of traffic wtih an
+Application Server through a Routing Context and the Transaction Mapping
+Function.  However, it does not provide procedures for changing the range of
+traffic associated with an Application Server and Routing Context without
+deactivating the Application Server and deregistering the Routing Key.  This
+can cause difficulties when TUA is used in operations class 1, 2 and 3
+(dialogues) and the ASP wishes to dynamically assign dialogues to Application
+Servers.
+.sh 3 "Registration Extension"
+.pp
+This memo provides extensions for the UA registration and dregistration
+procedures which addresses these limitations in the existing prcoedures.
+\fI\)REGEXT\fR provide the following
+.sh 4 "M2UA"
+.sh 4 "M3UA"
+.sh 4 "SUA"
+.sh 4 "TUA"
+.sh 1 "Conventions"
+.pp
+The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
+\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
+\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in.
+.[
+key words
+.]
+.sh 1 "Protocol Elements"
+.pp
+The following subsections describe the parameters which are added or whose use
+is modified by this extension, their format and the messages in which they are
+used.
+.sh 2 "Parameters"
+.pp
+\fI\)Registration Extensions\fR\) does not add any new parameters, but permits
+the use of the \fI\)Routing Context\fR\) parameter within a \fI\)Routing
+Key\fR\) parameter.  It also allows the use of the \fI\)Routing Key\fR\)
+parameter within a \fI\)DEREG REQ\fR\) message.
+.sh 3 "Routing Key"
+.pp
+\fI\)REGEXT\fR\) augments the \fI\)Link Key\fR\) parameter of M2UA
+.[
+m2ua-12
+.]
+and the \fI\)Routing Key\fR\) parameters of M3UA, SUA, and TUA.
+.[
+m3ua-11
+.]
+.[
+sua-10
+.]
+.[
+tua-01
+.]
+.sh 4 "M2UA Link Key"
+.sh 4 "M3UA Routing Key"
+.pp
+The \fI\)Routing Key\fR\) parameter is used in the \fI\)REG REQ\fR\) and
+\fI\)DEREG REQ\fR\) messages.  It is used to identify the portion of traffic
+for which an ASP is registering or deregistering.
+.pp
+The \fI\)Routing Key\fR\) parameter is formatted as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Tag = 0x0207         |            Length             |
++-------------------------------+-------------------------------+
+|                      Local-RK-Identifier                      |
++---------------------------------------------------------------+
+|                 Traffic Mode Type (optional)                  |
++---------------------------------------------------------------+
+|                  Routing Context (optional)                   |
++---------------------------------------------------------------+
+|                 Network Appearance (optional)                 |
++---------------------------------------------------------------+
+|                     Destination Point Code                    |
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                 Service Indicators (optional)                 |
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|               Originating Point Code (optional)               |
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                 Circuit Range List (optional)                 |
++---------------------------------------------------------------+
+\\                                                               \\
+/                              ...                              /
+\\                                                               \\
++---------------------------------------------------------------+
+|                     Destination Point Code                    |
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                 Service Indicators (optional)                 |
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|               Originating Point Code (optional)               |
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                 Circuit Range List (optional)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.lp
+The \fI\)Routing Key\fR parameter contains the following sub-parameters:
+.ip "\fB\)Local-RK-Identifier parameter: TLV\fR" 2
+
+The mandatory Locak-RK-Identifier parameter is used to uniquely identify the
+registration request.  The Local-RK-Identifier value is assigned by the ASP,
+and is used to correlate the response in an REG RSP message with the original
+registration request.  THe Locak-RK-Identifier value must remain unique until
+the REG RSP message is received.
+
+The format of the Local-RK-Identifier is as follows:
+.(b
+.sz -2
+.nf
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Tag = 0x020a         |            Length = 8         |
++-------------------------------+-------------------------------+
+|                      Local-RK-Identifier                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)b
+
+.sh 4 "SUA Routing Key"
+.sh 4 "TUA Routing Key"
+
+
+\fB\)Routing Key\fR\)
+.sh 2 "Messages"
+.sh 1 "Procedures"
+.sh 2 "Regsitration"
+.sh 3 "Registration Procedures"
+.sh 3 "Deregistration Procedures"
+
+.sh 2 "AS and ASP State Maintenance"
+.sh 3 "ASP State"
+.sh 3 "AS State"
+.sh 3 "ASP Up Procedures"
+.sh 3 "ASP Down Procedures"
+.sh 3 "ASP Active Procedures"
+.sh 3 "ASP Inactive Procedures"
+.sh 3 "Notify Procedures"
+.sh 1 "Examples"
+.sh 1 "Security"
+.sh 1 "IANA Considerations"
+.uh "Acknowledgments"
+.pp
+The authors would like to thank
+for their valuable comments and suggestions.
+.nr ii 0.5i
+.uh "Notes"
+.pd
+.de ]<
+.uh "References"
+.rm (f )f
+..
+.[
+$LIST$
+.]
+.(b
+.uh "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-972-839-4489
+OpenSS7 Corporation;Email: bidulock@openss7.org
+4701 Preston Park Boulevard;URL: http//www.openss7.org/
+Suite 424;
+Plano, TX  75093;
+USA;
+.TE
+.bl 3
+.lp
+This Internet draft expires July, 2002.
+.)b
+.bp
+.\".ce 1
+.\".uh "List of Tables"
+.\".(l I
+.\".xp 3
+.\".)l
+.(b
+.ce 1
+.uh "List of Illustrations"
+.(l I
+.xp 2
+.)l
+.)b
+.(b
+.ce 1
+.uh "Table of Contents"
+.(l I
+.xp 0
+.)l
+.)b
+.bp
+.uh "Copyright Statement"
+.lp
+\fBCopyright \(co The Internet Society (2002).  All Rights Reserved.\fR
+.pp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.pp
+The limited permission granted above are perpetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.pp
+This document and the information contained herein is provided on an "AS IS"
+basis and \fB\)THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS
+OR ANY IMPLIED WARRANTIES OF MECHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.

@@ -1,0 +1,1645 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-datamodel-00.me,v 0.9.2.1 2004/03/16 05:10:40 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2004/03/16 05:10:40 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X pp
+move-punctuation
+discard YZ
+join-authors ", " ", " ", "
+et-al " et al" 1 2
+# reverse A
+.R2
+.de $0
+.(x 0
+\\$2 \\$1
+.)x
+..
+.if '\*(.T'ascii' \{\
+.fo 'Bidulock'Version 0.0'FORMFEED[Page %]'
+.ds |x txt
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii 6n
+.nr pi 4n
+.nr po 3n
+.nr bi 2n
+.nr bs 0
+.\}
+.if '\*(.T'ps' \{\
+.fo 'Bidulock'Version 0.0'Page %'
+.ds |x ps
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii 0.5i
+.nr pi 0.5i
+.nr po 0.25i
+.nr bi 0.25i
+.nr hi 0.5i
+.\}
+.dn &n
+.dn &p
+.nr &n 1
+.nr &p 0
+.bp
+.he 'Internet Draft'Data Models'July 28, 2001'
+.(l C
+\fCNetwork Working Group                                     Brian Bidulock
+\fCINTERNET-DRAFT                                       OpenSS7 Corporation
+
+
+\fCExpires in six months                                      July 28, 2001
+
+
+\fR\fBData Models
+\fR\fBfor use with SS7 User Adaptation Layers
+\fR\fB<draft-bidulock-sigtran-datamodel-00.\*(|x>
+
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents of
+the Inetnet Engineering Task Force (IETF), its areas, and its working groups.
+Note that other groups may also distribute working documents as Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may be
+updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them other
+than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow Directories
+on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au (Pacific Rim),
+ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet-Draft is for information purposes only and provides information
+to the Internet Community regarding data models used in the OpenSS7
+impelementation of the SS7 User Adaptation Protocols
+M2UA,
+.[
+m2ua-11
+.]
+M3UA,
+.[
+m3ua-10
+.]
+SUA,
+.[
+sua-09
+.]
+TUA,
+.[
+tua-01
+.]
+and IUA.
+.[
+RFC 3057
+.]
+.sh 1 "Introduction"
+.lp
+
+
+
+
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+    |       |       |        |       |       |
+ ___|___ ___|___ ___|___  ___|___ ___|___ ___|___
+|       |       |       ||       |       |       |
+| SS7-U | Xport | Xport || Xport | Xport | SS7-U |
+|_______|_______|_______||_______|_______|_______|
+ ___|___ ___|___ ___|___  ___|___ ___|___ ___|___
+|       |       |       ||       |       |       |
+|  ASP  |  ASP  |  ASP  ||  ASP  |  ASP  |  ASP  |
+|_______|_______|_______||_______|_______|_______|
+    |_____  |  _____|        |_____  |  _____|      ___   ___
+         _|_|_|_                  _|_|_|_          |   | | X |
+        |       |                |       |_________|   | | p |
+   + - -|  AS   |                |  AS   |        _|SPP|-| o |--
+   |    |_______|                |_______|\\      / |   | | r |
+           | |                      | |    \\    /  |___| |_t_|
+   |       | |__________  __________| |     \\  /
+Complex    |            \\/            |      \\/
+Relationship  __________/\\__________  |      /\\
+   |       | |                      | |     /  \\    ___   ___
+         __|_|__                  __|_|__  /    \\  |   | | X |
+   |    |       |                |       |/      \\_|   | | p |
+        |  SG   |                |  SG   |_________|SPP|-| o |--
+   |    |_______|                |_______|         |   | | r |
+     _____| | |_____          _____| | |_____      |___| |_t_|
+ __||___ ___|___ ___|___  ___|___ ___|___ ___|___
+|       |       |       ||       |       |       |
+|  SGP  |  SGP  |  SGP  ||  SGP  |  SGP  |  SGP  |
+|_______|_______|_______||_______|_______|_______|
+ ___|___ ___|___ ___|___  ___|___ ___|___ ___|___
+|       |       |       ||       |       |       |
+| SS7-P | Xport | Xport || Xport | Xport | SS7-P |
+|_______|_______|_______||_______|_______|_______|
+    |       |       |        |       |       |
+    |       |       |        |       |       |
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  General Overview
+.(x 2
+Figure \n(&n.  General Overview
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+
+
+
+
+
+
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+    |                               |
+ ___|___                         ___|___
+|       |                       |       |
+| SS7U  |                       | SS7U  |
+|_______|                       |_______|
+    |                               |
+ ___|___                         ___|___
+|       |                       |       |
+|  AS   |                       |  AS   |
+|_______|                       |_______|
+   ||| ____________________________|||
+   ||||____________________________ ||
+   ||_|____________   _____________|||
+   |  |            | |             | |
+ __|__|_         __|_|__         __|_|__
+|       |       |       |       |       |
+|  SG   |       |  SG   |       |  SG   |
+|_______|       |_______|       |_______|
+    ||              ||              |
+    ||______        ||______        |
+    |       |       |       |       |
+ ___|___ ___|___ ___|___ ___|___ ___|___
+|       |       |       |       |       |
+|  SGP  | SS7P  |  SGP  | SS7P  |  SGP  |
+|_______|_______|_______|_______|_______|
+ ___|___    |    ___|___    |    ___|___
+|       |   |   |       |   |   |       |
+| Xport |   |   | Xport |   |   | Xport |
+|_______|   |   |_______|   |   |_______|
+    |       |       |       |       |
+    |       |       |       |       |
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Application Server Process Data Model Overview
+.(x 2
+Figure \n(&n.  Application Server Process Data Model Overview
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+\fIFigure \n(&p\fR illustrates an overview of the data model for the Application
+Server.  Each SS7 user can send and receive message via multiple gateways\*#.
+.(d
+.ip \*#
+There is a minor difference here for M2UA, which does not have the concept of
+being able to bind to multiple gateways.  This is because SS7 links are
+terminated on a single gateway for M2UA.  Nevertheless, the model which works
+for mulitple gateways will also work for M2UA's single gateway case.
+.)d 7
+Each gateway is composed of multiple Signalling Gateway Processes, but each
+Signalling Gateway Process can only belong to one Signalling Gateway.  Each
+Signalling Gateway Process (SGP) is associated with one and only one Transport
+Provider connection.
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+    |      ___|___     ___|___      |
+    |     |       |   |       |     |
+    |     | Xport |   | Xport |     |
+    |     |_______|   |_______|     |
+ ___|___   ___|___     ___|___   ___|___
+|       | |       |   |       | |       |
+| SS7P  | |  SGP  |   |  SGP  | | SS7P  |
+|_______| |_______|   |_______| |_______|
+    |  _______|           |_______  |
+ ___|_|_                         _|_|___
+|       |                       |       |
+|  SG   |                       |  SG   |
+|_______| Multiple      Single  |_______|
+   | |    Binds           Bind      |
+   | |______________                |
+ __|____         ___|___         ___|___
+|       |       |       |       |       |
+|  AS   |       |  AS   |       |  AS   |
+|_______|       |_______|       |_______|
+   |||             |||             |||
+   || \\            |||            / ||
+   | \\ \\           |||           / / |
+   |  \\ \\         / | \\         / /  |
+   | __\\_\\_______/  |  \\_______/_/__ |
+   || __\\_\\_________|_________/ /   ||
+   |||   \\ \\________|__________/___ ||
+   |||    \\________ | ________/    |||
+   |||             |||             |||
+ __|||__         __|||__         __|||__
+|       |       |       |       |       |
+|  ASP  |       |  ASP  |       |  ASP  |
+|_______|       |_______|       |_______|
+ ___|___         ___|___         ___|___
+|       |       |       |       |       |
+| Xport |       | Xport |       | Xport |
+|_______|       |_______|       |_______|
+    |               |               |
+    |               |               |
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Signalling Gateway Process Data Model Overview
+.(x 2
+Figure \n(&n.  Signalling Gateway Process Data Model Overview
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+\fIFigure \n(&p\fR illustrates the situation at the Signalling Gateway.  Each
+SS7 Provider is associated with one or more\*#
+.(d
+.ip \*#
+There is no need to associate more than one SS7 Provider with an Application
+Server, except in the case of M2UA.  Even this, however, can be avoid in M2UA,
+where the assignment of multiple IIDs per Application Server is just as a
+convenience for activating multiple linksets.
+.)d 7
+Application Servers.  An
+Application Server has a unique Routing Key associated with it.  There is one
+Routing Context assignment per Application Server Process.  Each Application
+Server can be represented through multiple Application Server Processes, each
+of which correspond directly to a Transport Provider connection.
+.sh 1 "Local Management"
+.lp
+Before an SS7 User can use the services of an SS7 Provider, the User must be
+sasociated with the Provider.  This is accomplished by attaching or binding
+the SS7 User to an SS7 Provider.  The attach or bind is performed at the
+discretion of the SS7 User.
+.sh 2 "Local Management of the SS7 User Interface"
+.lp
+.sh 3 "Openining an SS7 User Interface"
+.lp
+When an SS7 User Interface is created, it is treated similar to an Application
+Server Process (ASP) Proxy.  Two datastructures are created:
+.ip "\f(TI\)SS7 User Interface Structure\f(TR\)"
+
+.ip "\f(TI\)ASP Proxy Structure\f(TR\)"
+
+.sh 3 "Binding an SS7 User Interface"
+.lp
+SS7 Users attach or bind using a Routing (Link) Key.
+.lp
+For example, an M2UA
+.[
+m2ua-11
+.]
+SS7 Signalling Link User attaches using a Signalling Data Terminal Identifier
+and a Signalling Data Link Identifier.  These two identifiers can be combined
+into a single 32-bit identifier which uniquely describes the signalling link.
+.lp
+When the SS7 Signalling Link User attaches, it provides a Signalling Link
+Interface Identifier (SDTI/SDLI) as an argument of the attach.
+.lp
+As another example, an M3UA
+.[
+m3ua-10
+.]
+SS7 User binds its interface using a Bind request that includes the local
+address (NI/PC/UP) to which the SS7 User is binding.  This is equivalent to an
+M3UA
+.[
+m3ua-10
+.]
+Routing Key.
+.lp
+SUA and TUA are similar.
+.lp
+The sequence of events that follow the attach request are as follows:
+.np
+The SS7 User issues the Attach or Bind request and provides the parameters
+necessary to build a Routing (Link) Key.
+.np
+The RK is compared against the RKs of statically and dynamically provisioned
+Application Servers (AS).
+.np
+If a statically or dynamically provisioned AS exists that has a matching key,
+the SS7 User Interface is associated with that Application Server.
+.np
+If no Application Server exists with the necessary key, and the implementation
+permits dynamic registration, then an Application Server (AS) is dynamically
+allocated, and an attempt is make to register the associated Routing (Link)
+key with all the configured Signalling Gateways that wild-card match against
+that key.
+.lp
+Note that it is not necessary to wait for a successful registration before
+returning success on the attach or bind.
+.ip "M2UA" 6
+For M2UA, the attach succeeds and registration is only necessary before an
+enable is confirmed.
+.ip "M3UA" 6
+For M3UA, the bind succeeds.  Only once registration and activation is
+complete and a successful audit has occured will the MTP User be permitted to
+send messages.
+.ip "SUA" 6
+For SUA, the bind succeeds.  Only once registration and activation is complete
+and successful will the SCCP User be permitted to send messages.
+.ip "TUA" 6
+For TUA, the bind succeeds.  Only once registration and activation is complete
+and successful will the TCAP User be permitted to begin transctions.
+.lp
+The result of the attach or bind operation is that the SS7 User Interface is
+associated with an Application Server and that Application Server is
+associated with one or more Signalling Gateways.
+.lp
+For this operation to be peformed, the Application Server Process (ASP) needs
+to have a number of things provisioned:
+.np a
+Signalling Gateways must be configured and the transport connections to SGP
+that make up the SG established.
+.np
+Each SG that supports dynamic registration must have a wildcard mask or list
+of supported RKs associated with it when it is configured at the ASP, or, a
+control stream must be listening for queries based on RK to determine the SG
+to which the SS7 User Interface should be associated.\*#
+.(d
+.ip \*#
+This last one is much better.  There is little difference between the
+registration process at the SG and the registration process at the ASP.  At
+the SG, the RK in the registration request must be resolved to a RC that
+identifiers an SS7 Provider.  At the ASP, the RK that will go in a
+registration request must be resolved to an SG to which to send the request.
+.)d
+.np
+Each SG that is statically configured must have a list of RKs and RCs
+associated wtih it (i.e, the Application Server datastructures as
+pre-configured against the SG), or, a control stream can be listening for
+registration requests in the same fashion as for dynamic registration above.
+.lp
+Placing registration under the control of the Layer Manager (control stream),
+the attach/bind process would look like this:
+.np
+The local SS7 User Interface issues an attach/bind request.
+.np
+The kernel searches the list of existing Application Server structures and
+determines if a match exists for the routing key.  If a match exists, the SS7
+User Interface is associated with the Application Server.
+
+If the AS is for M2UA, that is all that is done.  Activation does not occur
+until the link is enabled.
+If the AS is for another UA, activation is initiated.
+.np
+If an existing Application Server match is not found, the kernel creates a new
+Application Server structure and then formulates a registration request to
+layer management on the control stream.
+
+The layer management process takes the registration request and examines it.
+.nr |p \n($p
+.nr $p 0
+.ba +\w'\0(000)\0'u
+.np
+Test
+.np
+Test
+.ba -\w'\0(000)\0'u
+.nr $p \n(|p
+.rr |p
+.np
+
+.sh 2 "Local Management of Transport Endpoints"
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+    |
+ ___|___
+|       |
+| Xport |
+|_______|
+ ___|___
+|       |
+|  ASP  |
+|_______|         ___   ___
+__  |  __        |   | | X |
+ _|_|_|_         |   | | p |
+|       |________|SPP|_| o |__
+|  AS   |        |   | | r |
+|_______|\\      /|   | | t |
+__| | |__ \\    / |___| |___|
+    |      \\  /
+    |       \\/
+    |       /\\
+__  |  __  /  \\   ___   ___
+ _|_|_|_  /    \\ |   | | X |
+|       |/      \\|   | | p |
+|  SG   |________|SPP|_| o |__
+|_______|        |   | | r |
+__| | |__        |   | | t |
+ ___|___         |___| |___|
+|       |
+|  SGP  |
+|_______|
+ ___|___
+|       |
+| Xport |
+|_______|
+    |
+    |
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Forming or Accepting a Transport Connection
+.(x 2
+Figure \n(&n.  Forming or Accepting a Transport Connection
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.sh 3 "Forming or Accepting a Transport Connection"
+.lp
+\fIFigure \n(&p\fR illustrates the situation when a transport connection is
+either formed or accepted by layer management.
+.sh 4 "Forming Transport Connections"
+.lp
+When layer management forms a transport connection, it performs the following
+actions:
+.np
+The Layer Manager forms the transport connection to the distant endpoint.
+.np
+The LM passes the transport connection to the kernel.  For OpenSS7, this is
+performed by \f(CR\)I_LINK\f(TR\)ing or \f(CR\)I_PLINK\f(TR\)ing the transport
+STREAM under the UA multiplexing driver.  The multiplexing driver does not
+know at this time whether the transport connection is an ASP or and SGP mode
+connection.
+.np
+The Layer Manager is aware of the aspect of the transport connection from
+internal configuration.  That is, the LM knows if the transport connection is
+a connection to an SGP.\*#
+.(d
+The LM does not normally form connections to ASP, normally the LM listens for
+connection from ASP.
+.)d
+.np
+The LM indicates to the kernel, the mode of the transport connection along
+with an ASP Identifier.  This is performed using the
+\f(CR\)LM_LINK_ADD_REQ\f(TR\) primitive.
+.np
+The \f(CR\)LM_LINK_ADD_REQ\f(TR\) primitve cause the multiplexing driver to
+set the mode of the linked transport connection.  An SGP proxy structure is
+located.  If no SGP proxy structure can be located, the request fails.  The LM
+must ensure that an SGP proxy structure exists and is associated with an SG
+structure before issuing the \f(CR\)LM_LINK_ADD_REQ\f(TR\) primitive.
+.lp
+The driver then initiates the following sequence of events:
+.np
+The driver sends an \f(CR\)ASPUP REQ\f(TR\) message on the transport
+connection.  If the ASP Identifier in the associated SG structure was set to
+'0', no ASP Identifier is sent in the \f(CR\)ASPUP REQ\f(TR\) message; if it
+is non-zero, the ASP Identifier from the SG structure is used as the ASP
+Identifier in the \f(CR\)ASPUP REQ\f(TR\) message.  The driver must receive a
+successful \f(CR\)ASPUP ACK\f(TR\) message for the connection and move to the
+\f(CR\)ASP-INACTIVE\f(CR\) state before other actions are performed.
+.np
+When the above procedure has completed successfully, the driver commences
+registration of all AS that are defined in the driver and associated with the
+associated SG structure if the SG structure is marked for dynamic
+registration.  For each AS configured against the SG, a \f(CR\)REG REQ\f(TR\)
+message is send and a successful \f(CR\)REG RSP\f(TR\) message expected.
+.np
+When the above procedure has completed successfully for a given AS, the driver
+commences activation of the AS.  There are several circumstances, however, in
+which activation is not performed automatically:
+.(l
+.ad l
+.hy 0
+.nr |p \n($p
+.nr $p 0
+.ba +\w'\0(000)\0'u
+.bu
+The AS is an over-ride AS and there is already an SGP that is ACTIVE for this
+AS.  In this case, the driver determines whether the newly available SGP is of
+a lower cost than the existing ACTIVE ASP.  If this is the case, the driver
+may activate the newly available SGP.  Before performing such a switch-over;
+however, the HEARTBEAT procedure should be used to clear messages to the old
+SGP before starting traffic on the new SGP.
+.bl
+.bu
+The AS already has an SGP that is ACTIVE for this AS in the same load
+selection group.
+.ba -\w'\0(000)\0'u
+.nr $p \n(|p
+.rr |p
+.)l
+.np
+When activation completes successfully, the SGP is marked ACTIVE for the AS
+which has activated and the SGP takes part in the traffic mode selection for
+the AS.
+.lp
+There are a number of messages that the driver may receive on the transport
+connection before it has completed any of the above procedures.  These are:
+.(l
+.ba +\w'\0(000)\0'u
+.ip "\f(CR\)UA_MGMT_ERR\f(TR\)"
+.ip "\f(CR\)UA_MGMT_NTFY\f(TR\)"
+.ip "\f(CR\)UA_ASPS_ASPUP_ACK\f(TR\)"
+.ip "\f(CR\)UA_ASPS_ASPDN_ACK\f(TR\)"
+.ip "\f(CR\)UA_ASPS_HBEAT_REQ\f(TR\)"
+.ip "\f(CR\)UA_ASPS_HBEAT_ACK\f(TR\)"
+.ip "\f(CR\)UA_ASPT_ASPIA_ACK\f(TR\)"
+.ip "\f(CR\)UA_ASPT_ASPAC_ACK\f(TR\)"
+.ba -\w'\0(000)\0'u
+.)l
+.sh 4 "Accepting Transport Connection"
+.lp
+When the layer manager accepts a transport connection, it performs the
+following actions:
+.np
+The Layer Manager accepts the transport connection from the distant endpoint.
+.np
+The Layer Manager might or might not be aware of the aspect of the transport
+connection from internal configuration.  If the LM is aware of the aspect, it
+is solely from transport endpoint information (e.g, remote IP address and
+port number, local IP address and port number).
+.ba +\w'\0(000)\0'u
+.ip "ASP"
+The LM accepts transport connections from ASP on demand.
+.ip "SGP"
+The LM does not normally accept transport connections from SGP.  The LM
+normally forms transport connections to an SGP.
+.ip "SPP"
+The LM accepts transport connection from SPP (peers) when the remote SPP
+starts up or recovers.
+.ba -\w'\0(000)\0'u
+.np
+.np
+.np
+
+
+.sh 4 "Accepting an ASP Transport Connection"
+.lp
+\fIFigure \n(&p\fR illustrates the configuration when accepting an ASP
+transport connection.  At the time that the transport connection is formed, it
+may not be know what aspect (ASP, SGP or SPP\*#) the transport connection
+represents.
+.(d
+.ip \*#
+An SPP is a combination of an ASP and SGP which acts in the capacity
+of both.  This can be accomplished by associating both an ASP and and
+SGP datastructure with the SPP and discriminating messages to one or
+the other.  The SIGTRAN UAs
+.[
+m2ua-11
+.]
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+are such that, except for data messages, it can always be determined
+to which aspect (ASP or SGP) a message corresponds.  Data messages
+will cause some problems.  It might be necessary to require that a
+separate transport connection be established for each aspect, if only
+to determine whether the data messages are bound for the ASP or SGP
+component.  This is related to much of the discussion on ISPS and
+peer-to-peer operation that occurred on the SIGTRAN WG list.
+.)d
+Because the datastructures are similar (almost identical) for ASP and SGP;
+however, it is possible to allocate an SPP datastructure when the transport
+connection is accepted/connected by local management.  For OpenSS7 this is
+when the transport \fISTREAM\fR is \fCI_LINK\fRed or \fCI_PLINK\fRed under the
+UA multiplexing driver.
+
+.sh 4 "Accepting an SGP Transport Connection"
+.sh 4 "Accepting an IPC Transport Connection"
+.sh 1 "Transfer of Data Messages"
+.lp
+When Data Transfer Messages are exchanged between Signalling Gateway Processes
+and Application Server Processes, any loadsharing which is involved is always
+performed on the basis of the Signalling Link Selection field in the message.
+This is because no other rational basis for loadsharing can be used which does
+not disrupt the sequenced characteristics of an SLS flow.
+.lp
+Signalling Link Selection loadsharing for one User to Provider or Provider to
+User flow does not have to be done is such a fashion that the entity selected
+on the basis of SLS is the same entity which would be selected for another
+User or Provider.  This is because the messages within an SLS flow only need
+be sequence between User and Provider and not between Users nor between
+Providers.
+.lp
+If traffic routing is changed due to outage situations (e.g. loss of a
+Transport Connection, the prohibiting of a route), then the sender, whether
+User or Provider, must either flush messages from the old flow using the BEAT
+and BEAT ACK UA messages or withold traffic for a time period, before
+restarting traffic on the new route.  This is to ensure that misequencing does
+not occur at the distant end.  That is, it ensures that the head of traffic on
+the new route does not overtake the tail of the traffic on the old route at
+the receiver.
+.lp
+It is always the User or Provider function which is performing selection based
+on Signalling Link Selection value which must perform this flushing or
+withholding of traffic.
+.sh 2 "Outgoing Data Messages"
+.lp
+Outgoing Data Messages must be dealt with both at the Application Server and
+at the Signalling Gateway.  The data models described here are based on the
+presumption that the Routing Context has been included in the message.  This
+is true for many of the messages in SUA
+.[
+sua-09
+.]
+but not all of the messages.  If current proposals are followed\*#,
+.(d
+.ip \*# 6
+The proposals to place RC in DATA and SNMM for M3UA were followed after the
+initial writing of this draft.
+.)d
+it will be true for M3UA.
+.[
+m3ua-10
+.]
+M2UA
+.[
+m2ua-11
+.]
+already includes the Interface Identifier (M2UA's equivalent to a Routing
+Context) in each message.
+.sh 3 "Outgoing Data Messages at the Application Server"
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+                            ________      _______    _______
+                           |        |    |       |  |       |
+                        +->|   SG   |-+  |  SGP  |->| Xport |->
+                        |  |________| |  |_______|  |_______|
+   _______    ________  |   ________  |   _______    _______
+  |       |  |        | |  |        | |  |       |  |       |
+->|  ASP  |->|   AS   |-+  |   SG   | |  |  SGP  |->| Xport |->
+  |_______|  |________|    |________| |  |_______|  |_______|
+           |            |   ________  |   _______    _______
+                           |        | |  |       |  |       |
+(1)  Msg.  |            |  |   SG   | |  |  SGP  |->| Xport |->
+                           |________| |  |_______|  |_______|
+(2)  AS is selected     |             |   _______    _______
+     depending on                     |  |       |  |       |
+     AS activity.       |             +->|  SGP  |->| Xport |->
+                                         |_______|  |_______|
+(3)  SG is selected - - +             |           |
+     based on load-sharing (SLS)
+     and routset status.              |           |
+
+(4)  SGP selected based on load - - - +           |
+     sharing (SLS), SGP activity,
+     and routeset status.                         |
+
+(5)  QOS (stream) is  - - - - - - - - - - - - - - +
+     selected based on
+     RC/IID and SLS
+     value.
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Outgoing Data Transfer, Application Server
+.(x 2
+Figure \n(&n.  Outgoing Data Transfer, Application Server
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+As illustrated in \fIFigure \n(&p\fR, the Application Server performs the
+following functions on outgoing Data Transfer messages:
+.np
+The SS7 User supplies a Data Transfer message for delivery within the SS7
+newtork.
+.np
+The SS7 User Interface selects an Application Server to process the outgoing
+message.  For each SS7 interface there is one and only one Application Server.
+When the SS7 User Interface is bound or attached and enabled, an Application
+Server is associated with the user interface.  Each SS7 User Interface has an
+associated Interface Id (IID) or Routing Context (RC) which was assigned to it
+at the time that it was attached or bound.
+.np
+The UA checks the availability of outgoing routes via Signalling Gateways
+which it has at its disposal and which it is registered with.  This is the
+same set of Signalling Gateways with which the User was bound when the
+interface (RC) was activated.  The selection of Signalling Gateway is on the
+basis of loadsharing and routeset status.  If no Signalling Gateway has an
+available route, the User is returned an immediate error message.  Loadsharing
+is perfomed on the basis of the SLS value in the message (as SLS is the only
+rational basis for loadsharing).  SG route availability is considered as the
+aggregation of Signalling Gateway Process route availability.
+
+In selecting a Signalling Gateway, the User associates the Routing Context it
+uses via that Signalling Gateway\*#
+.(d
+.ip \*#
+The Routing Context used here is the same Routing Context with with the User
+registered with the Signalling Gateway to \fIreceive\fR traffic.
+.)d 7
+with the message.  This has no use within the Application Server, but is used
+at the Signalling Gateway to screen and authorize outgoing messaging.
+.np
+After selecting a Signalling Gateway, the AS selects amongst the Signalling
+Gateway Processes associated with that Signalling Gateway.  This selection is
+based on loadsharing on SLS value, but may also be based on the availability
+of routes via the different SGP.
+.np
+Once an SGP has been selected, there is a specific Transport Provider which is
+associated with each SGP.  If the Transport Provider is an SCTP provider, the
+stream used is selected on the basis of adding 1 to the SLS value in the
+message.
+.lp
+For OpenSS7 Application Servers, this model does not reduce (except that the
+SGP and Transport collapse into a single STREAM head), due to the need
+to support multiple Signalling Gateways per User and multiple Signalling
+Gateway Processes per SG.
+.sh 3 "Outgoing Data Messages at the Signalling Gateway"
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+                     ________       ________     ________
+                    |        |     |        |   |        |
+                 /->|   AS   |__   |  ASP   |___|Transport_____
+                 |  |        |  |  |        |   |        |
+      RK --> RC  |  |________|  |  |________|   |________|
+      ________   |   ________   |   ________     ________
+     |        |  |  |        |  |  |        |   |        |
+_____|Provider|__|  |   AS   |  |  |  ASP   |___|Transport_____
+     |        |     |        |  |  |        |   |        |
+     |________|     |________|  |  |________|   |________|
+                     ________   |   ________     ________
+                    |        |  |  |        |   |        |
+                    |   AS   |  \\->|  ASP   |___|Transport_____
+                    |        |     |        |   |        |
+                    |________|     |________|   |________|
+
+                  AS Selelected   ASP Selected Select Stream
+                      by RC           by            by
+                                  Traffic Mode   SLS Value
+                                      and
+                                   ASP State
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Outgoing Data Transfer, Signalling Gateway
+.(x 2
+Figure \n(&n.  Outgoing Data Transfer, Signalling Gateway
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+As illustrated in \fIFigure \n(&p\fR, the Signalling Gateway performs the
+following functions on outgoing Data Transfer messages:
+.np 1
+The provider applies the Routing Key to the traffic which results in a Routing
+Context value.  For providers which bind specific Routing Keys at the
+SS7-Provider level, there will be no need to apply the Routing Key, as the
+SS7-Provider will perform that function.  The Routing Context will be
+associated with the binding and will be associated with the message before
+starting.
+.np
+The Routing Context associated with the message is used to select the
+Application Server to which the message applies.  Each Routing Key binding
+has exactly on Application Server.  For SS7 providers which bind, the
+Application Server can be associated with the binding and there is no need to
+index Application Server by Routing Context: the Routing Context is merely an
+attribute of the Application Server, which is bound to the provider with the
+Routing Key.
+.np
+The Application Server has a number of Application Server Processes associated
+with it.  The Application Server selects the appropriate Application Server
+Process by performing a selection algorithm according to the Application
+Server's Traffic Mode Type and the state of each of the Application Server
+Processes \fBwithin\fR the Application Server.
+.np
+The Application Server Process has one Transport Provider connection associated
+with it.  The Application Server Process structure can be one and the same
+with the Transport Provider structure.  When the Transport Provider is an SCTP
+association, the stream selected can be based on the SLS value in the message.
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+                         ____
+                     -->|____|
+     ________            ____               ________
+    |        |     +--->|____|------+      |        |
+--->|   AS   |     |     ____       +----->|  ASP   |---->
+    |        |-----+ -->|____|             |________|
+    |________|           ____               ________
+     ________        -->|____|             |        |
+    |        |                         +-->|  ASP   |---->
+--->|   AS   |                  ____   |   |________|
+    |        |-----------+  -->|____|  |    ________
+    |________|           |      ____   |   |        |
+     ________      ____  +---->|____|--+   |  ASP   |---->
+    |        | -->|____|        ____    +->|________|
+--->|   AS   |+    ____     -->|____|   |   ________
+    |        ||-->|____|        ____    |  |        |
+    |________||    ____     -->|____|   |  |  ASP   |---->
+              +-->|____|----------------+  |________|
+                   ____
+               -->|____|
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Outgoing Data Transfer, SG (simplified)
+.(x 2
+Figure \n(&n.  Outgoing Data Transfer, SG (simplified)
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+For the OpenSS7 Signalling Gateway, the above model reduces to that shown in
+\fIFigure \n(&p\fR.  Where each SS7-Provider STREAM is bound to the Routing Key
+and the Routing Context is an attribute (identifier) of the Application
+Server.  Messages coming off the SS7-Provider STREAM are immediately
+associated with an Application Server structure.  The SG peforms the
+Application Server's distribution algorithm by keeping the states of ASPs in
+graph nodes between the AS structures and the ASP structures.  The only
+rational basis for the Load-sharing algorithm is SLS value, so if Load-sharing
+is required, the SLS value in the message is used to select an active ASP.  If
+Override algorithm is being used, the message is routed to the current master
+ASP, and if Broadcast algorithm is being used, the message is sent to each of
+the Active ASPs.
+.lp
+For the OpenSS7 SG, the ASP structure is associated with the Transport Service
+Provider STREAM, and the STREAM to use is immediately discernable.  The
+message is put on the queue associated with the ASP.  The stream selected (if
+the transport provider is an SCTP provider) is the SLS contained in the
+message + 1.  (Stream `0' is reserved for ASP manaagement messages.)
+.sh 2 "Incoming Data Messages"
+.lp
+Incoming Data Messages must be dealt with both at the Application Server and
+at the Signalling Gateway.  The data models described here are based on the
+presumption that the Routing Context has been included in the message.  This
+is true for many of the messages in SUA
+.[
+sua-09
+.]
+but not all of the messages.  If current proposals are follows, it will be
+true for M3UA.
+.[
+m3ua-10
+.]
+M2UA
+.[
+m2ua-11
+.]
+already includes the Interface Identifier (M2UA's equivalent to a Routing
+Context) in each message.
+.sh 3 "Incoming Data Messages at the Application Server"
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+       _______   _______                             _______
+      |       | |       |                           |       |
+----->| Xport |-|  SGP  |------+                +-->| User  |
+      |_______| |_______|      |                |   |_______|
+       _______   _______       |     _______    |    _______
+      |       | |       |      |    |       |   |   |       |
+----->| Xport |-|  SGP  |---+  +--->|  SG   |---+   | User  |
+      |_______| |_______|   +------>|       |       |_______|
+       _______   _______    +------>|_______|        _______
+      |       | |       |   |        _______        |       |
+----->| Xport |-|  SGP  |---+       |       |       | User  |
+      |_______| |_______|  +------->|  SG   |       |_______|
+       _______   _______   | +----->|       |        _______
+      |       | |       |  | |      |_______|       |       |
+----->| Xport |-|  SGP  |--+ |       _______        | User  |
+      |_______| |_______|    |      |       |       |_______|
+       _______   _______     |      |  SG   |        _______
+      |       | |       |    |  +-->|       |       |       |
+----->| Xport |-|  SGP  |----+  |   |_______|       | User  |
+      |_______| |_______|       |                   |_______|
+       _______   _______        |                    _______
+      |       | |       |       |                   |       |
+----->| Xport |-|  SGP  |-------+                   | User  |
+      |_______| |_______|                           |_______|
+                                    Follow        Selected based
+                                      Pointer        on RC for
+                                                   Specific SG
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Incoming Data Transfer, Application Server
+.(x 2
+Figure \n(&n.  Incoming Data Transfer, Application Server
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+As illustrated in \fIFigure \n(&p\fR, the Application Server performs the
+following functions on incoming Data Transfer messages:
+.np
+The Transport Provider connection upon which the Data Transfer message is
+received determines both the Signalling Gateway Process (SGP) and Signalling
+Gateway (SG) which are to be used for the message.
+.np
+Once the Signalling Gateway (SG) which the message has arrived from has been
+determined by the Application Server, the AS choses the SS7 User to send
+the message to based on the Routing Context which appears in the message.
+Note, however, that the Routing Context must be considered in the context of
+the Signalling Gateway upon which it was received.
+.lp
+For OpenSS7 Application Servers, this model does not collapse except at the
+Transport Provider and SGP.
+.sh 3 "Incoming Data Messages at the Signalling Gateway"
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |------+       +-->| AS  |-|Provider
+      |_______| |_______|      |       |   |_____| |_______|
+       _______   _______       |       |    _____   _______
+      |       | |       |      |       |   |     | |       |
+----->| Xport |-|  ASP  |-->   +--->---+   | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+                                            Selected based
+                                                 on RC
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Incoming Data Transfer, Signalling Gateway
+.(x 2
+Figure \n(&n.  Incoming Data Transfer, Signalling Gateway
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+As illustrated in \fIFigure \n(&p\fR, the Signalling Gateway performs the
+following functions on incoming Data Transfer messages:
+.np
+The Transport Provider connection upon which the Data Transfer message is
+received determines the Application Server Process (ASP) associated with the
+message.
+.np
+The Signalling Gateway then uses the Routing Context associated with the
+message to select an Application Server with that Routing Context.
+.np
+The Application Server maps directly to an SS7 provider.
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+                         ____
+                     -->|____|
+     ________            ____               ________
+    |        |     +--->|____|------+      |        |
+--->|  ASP   |     |     ____       +----->|   AS   |---->
+    |        |-----+ -->|____|             |________|
+    |________|           ____               ________
+     ________        -->|____|             |        |
+    |        |                         +-->|   AS   |---->
+--->|  ASP   |                  ____   |   |________|
+    |        |-----------+  -->|____|  |    ________
+    |________|           |      ____   |   |        |
+     ________      ____  +---->|____|--+   |   AS   |---->
+    |        | -->|____|        ____    +->|________|
+--->|  ASP   |+    ____     -->|____|   |   ________
+    |        ||-->|____|        ____    |  |        |
+    |________||    ____     -->|____|   |  |   AS   |---->
+              +-->|____|----------------+  |________|
+                   ____
+               -->|____|
+
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Incoming Data Transfer, SG (Simplified)
+.(x 2
+Figure \n(&n.  Incoming Data Transfer, SG (Simplified)
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+For OpenSS7, this simplifies greatly at the Signalling Gateway because the
+Transport Provider connection and the Application Server Process (ASP) can be
+collapse in to the same STREAM queue-pair.  Also the Application Server and
+the SS7 Provider can also be collapsed into the same STREAM queue-pair.  A
+directed graph is used between the two.
+.lp
+As illustrated in \fIFigure \n(&p\fR, for OpenSS7, the ASP structure is
+associated with the Transport Service Provider STREAM, and a graph is used to
+look up the Routing Context associated with the message to select the
+appropriate Application Server.
+.lp
+For OpenSS7, the Application Server is bound directly to the SS7 Provider
+STREAM and the message is transfer to the SS7-Provider.
+.sh 1 "Transfer of Signalling Network Management Messages"
+.lp
+Signalling Network Management Messages (SNMM)\*#
+.(d
+.ip \*#
+Or, in the case of M2UA, link control messages.
+.)d 7
+must be performed in both
+directions: from Signalling Gatewa to Application Server, and visa versa.
+The majority of SNMM messages, however, are sent from Signalling Gateway to
+Application Server.
+.lp
+In SUA
+.[
+sua-09
+.]
+and M3UA
+.[
+m3ua-10
+.]
+these messages apply to one or more Routing Contexts.  In M2UA,
+.[
+m2ua-11
+.]
+link control messages apply to a single Interface Identifier\*#.
+.(d
+.ip \*#
+The Interface Identifier in M2UA
+.[
+m2ua-11
+.]
+is a direct equivalent for Routing Context in the other UAs.
+.)d 7
+.sh 2 "Outgoing SNMM at the Signalling Gateway"
+.lp
+Outgoing Signalling Network Management Messages (SNMM) may apply to more than
+one Routing Context.  Because of this, a list of Routing Contexts is included
+in the message\*#.
+.(d
+.ip \*#
+This is true of SUA
+.[
+sua-09
+.]
+and M2UA,
+.[
+m2ua-11
+.]
+but not as of yet for M3UA.
+.[
+m3ua-10
+.]
+There are currently proposals to make M3UA also place Routing Context lists in
+Signalling Network Management Messages.
+.)d 7
+Under the current OpenSS7 mode, however, multiple Routing Contexts will never
+be included in the message.  Instead, mutliple SNMM messages, one for each
+Routing Context will be sent.  The nature of the STREAMS model is such that
+a Transport Provider will have the ablity to bundle these messages together
+into a single transmission.
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+                     ________       ________     ________
+                    |        |     |        |   |        |
+                 /->|   AS   |__   |  ASP   |___|Transport_____
+                 |  |        |  |  |        |   |        |
+      RK --> RC  |  |________|  |  |________|   |________|
+      ________   |   ________   |   ________     ________
+     |        |  |  |        |  |  |        |   |        |
+_____|Provider|__|  |   AS   |  +->|  ASP   |___|Transport_____
+     |        |     |        |  |  |        |   |        |
+     |________|     |________|  |  |________|   |________|
+                     ________   |   ________     ________
+                    |        |  |  |        |   |        |
+                    |   AS   |  +->|  ASP   |___|Transport_____
+                    |        |     |        |   |        |
+                    |________|     |________|   |________|
+                  AS Selelected   ASP Selected Select Stream
+                      by RC           by         based on
+                                   ASP State    SNMM type
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Outgoing SNM Messages, Signalling Gateway
+.(x 2
+Figure \n(&n.  Outgoing SNM Messages, Signalling Gateway
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+\fIFigure \n(&p\fR illustrates the steps that the Signalling Gateway goes through
+to generate an SNM message and transfer it to the Application Server.
+The process is almost identical to the process used for outgoing data
+transfer; however, it differs in the selection of ASP.
+The Signalling Gateway performs the following functional steps on the message:
+.np
+The provider determines the Signalling Point Management Cluster to which the
+SNMM message corresponds.  The provider then looks up the list of Application
+Servers which belong to the Signalling Point Management Cluster.  It compiles
+a list of Routing Contexts which it uses for sending the SNM message.
+
+For providers which are bound to a Routing Key, the provider will determine
+the list of Application Servers automatically and provide an SNMM indication
+to each of the Application Servers.
+.np
+The Routing Context(s) associated now with the message is used to select the
+Application Server(s) to which the message applies.  Each Routing Context has
+exactly one Application Server.  For SS7 providers which bind, the Application
+Server is associated with the binding and there is no need to index the
+Application Server by Routing Context.  Each Application Server will receive
+the appropriate SNMM indication with its Routing Context as a key.
+.np
+The Application Server(s) have a number of Application Server Processes
+associated with them.  Each Application Server selects the appropriate
+Application Server Processes by considering the selection algorithm according
+to the Application Server's Trafic Mode Type and the state of each of the
+Application Server Processes \fBwithin\fR each Application Server.
+
+It is important to note that SNM messages should be sent to all Active
+Application Server Processes, regardless of whether the ASP is in standby or
+not.  This is because of restart procedures.  ASPs are given all pertinent
+SNM messages when they move to the Active state, but after that point, they
+must keep their management configuration up to date by receiving managemnt
+messages.  For M2UA,
+.[
+m2ua-11
+.]
+only one Application Server Process is active at one time.
+.np
+The Application Server Process has only one Transport Provider connection
+associated with it.  The Application Server Process structure can be one and
+the same with the Transport Provider structure.  When the Transport Provider
+is an SCTP association, the stream selected and whether the Unordered bit is
+set on the message is determined.  Transport Providers supporting expedited
+data transfer to the medium may be invoked with expedited data for some SNM
+messages.
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+                     ________       ________     ________
+               RC   |        |     |        |   |        |
+                 +->|   SG   |---->|  SGP   |___|Transport_____
+                 |  |        |__   |        |   |        |
+                 |  |________|  |  |________|   |________|
+      ________   |   ________   |   ________     ________
+     |        |  |  |        |  |  |        |   |        |
+_____|  User  |__|  |   SG   |  |  |  SGP   |___|Transport_____
+     |        |__   |        |  +->|        |   |        |
+     |________|  |  |________|     |________|   |________|
+                 |   ________       ________     ________
+                 |  |        |     |        |   |        |
+                 |  |   SG   |     |  SGP   |___|Transport_____
+                 +->|        |---->|        |   |        |
+                    |________|     |________|   |________|
+                  SG Selelected   SGP Selected Select Stream
+                   by activity     by activity      by
+                                                  SNM type
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Outgoing SNM Messages, Application Server
+.(x 2
+Figure \n(&n.  Outgoing SNM Messages, Application Server
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+\fIFigure \n(&p\fR illustrates the steps that the Application Server goes through
+to generate an SNM message and transfer it to the Signalling Gateway.
+At the Application Server, the processing of outgoing SNM messages is almost
+identical to that for Data Transfer messages, with the exception being SGP
+selection.
+The Application Server performs the following functional steps on the message:
+.np
+The Application Server receiving a SNM from a User checks the activity of all
+registered SGs and selectes each of the SGs which are actively transferring
+traffic to the User\*#.
+.(d
+.ip \*#
+Note that for M2UA
+.[
+m2ua-11
+.]
+there is only ever one SG and one SGP which are active for a given Interface
+Identifier.
+.)d 7
+The AS associates the Routing Context of each SG and
+associates it with the message.
+.np
+After selection of Signalling Gateway(s), the AS selects amongst the
+Signalling Gateway Processes associated with those Signalling Gateways.  This
+selection is based on activity: that is, all SGPs which are actively
+transferring traffic to the AS are selected.
+.np
+Once the set of SGP have been selected, there is a specific Transport Provider
+associated with each of the SGP selected.  The message is transmitted with the
+associated Routing Context to each of the Transport Providers selected.  If
+the Transport Provider is an SCTP provider, the stream used and the decision
+to use the Unordered bit is based upon the type of the SNM message.
+.sh 2 "Incoming SNMM at the Application Server"
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |------+       +-->| AS  |-|Provider
+      |_______| |_______|      |       |   |_____| |_______|
+       _______   _______       |       |    _____   _______
+      |       | |       |      |       |   |     | |       |
+----->| Xport |-|  ASP  |-->   +--->---+   | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+       _______   _______                    _____   _______
+      |       | |       |                  |     | |       |
+----->| Xport |-|  ASP  |-->               | AS  |-|Provider
+      |_______| |_______|                  |_____| |_______|
+                                            Selected based
+                                                 on RC
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Incoming SNM Messages, Signalling Gateway
+.(x 2
+Figure \n(&n.  Incoming SNM Messages, Signalling Gateway
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+\fIFigure \n(&p\fR illustrates the steps that the Signalling Gateway goes through
+when it receives an SNM message from the Application Server.
+The Signalling Gateway performs the following functional steps on the message:
+.np
+The Transport Provider connection upon which the Data Transfer message is
+received determines the Aplication Server Process (ASP) associated with the
+message.
+.np
+The Signalling Gateway then uses the Routing Context associated with the
+message to select an Application Server with that Routing Context.
+.np
+The Application Server maps directly to an SS7 provider.
+.np
+If so equipped, the SS7 provider deals with the Management message\*#.
+.(d
+.ip \*#
+Only the M2UA SG is equipped to deal with management messages.  SCONs from
+received from the AS are purely advisory, and ill advised.  SCTP congestion
+towards the User process (from the User process failing to service its SCTP
+receive buffer, resulting in a small receive window) is a far better
+indication of User congestion.  User congestion will be signalled in that case
+back to the SS7 Provider because the queues will back up that far.  The SS7
+provider can then determine the appropriate action (probably sending TFC for
+the affected users upon receipt of messages below a given priority.)
+.)d 7
+.lp
+.(z
+.(c
+.nf
+.sz -2
+\f(CR\)\
+       _______   _______                             _______
+      |       | |       |                           |       |
+----->| Xport |-|  SGP  |------+                +-->| User  |
+      |_______| |_______|      |                |   |_______|
+       _______   _______       |     _______    |    _______
+      |       | |       |      |    |       |   |   |       |
+----->| Xport |-|  SGP  |---+  +--->|  SG   |---+   | User  |
+      |_______| |_______|   +------>|       |       |_______|
+       _______   _______    +------>|_______|        _______
+      |       | |       |   |        _______        |       |
+----->| Xport |-|  SGP  |---+       |       |       | User  |
+      |_______| |_______|  +------->|  SG   |       |_______|
+       _______   _______   | +----->|       |        _______
+      |       | |       |  | |      |_______|       |       |
+----->| Xport |-|  SGP  |--+ |       _______        | User  |
+      |_______| |_______|    |      |       |       |_______|
+       _______   _______     |      |  SG   |        _______
+      |       | |       |    |  +-->|       |       |       |
+----->| Xport |-|  SGP  |----+  |   |_______|       | User  |
+      |_______| |_______|       |                   |_______|
+       _______   _______        |                    _______
+      |       | |       |       |                   |       |
+----->| Xport |-|  SGP  |-------+                   | User  |
+      |_______| |_______|                           |_______|
+                                    Follow        Selected based
+                                      Pointer        on RC for
+                                                   Specific SG
+.fi
+.sz +2
+.)c
+.sp
+.(c
+\fBFigure \n(&n.\fR  Incoming SNM Messages, Application Server
+.(x 2
+Figure \n(&n.  Incoming SNM Messages, Application Server
+.)x
+.nr &p \n(&n
+.nr &n \n(&n+1
+.)c
+.)z
+.lp
+\fIFigure \n(&p\fR illustrates the steps that the Application Server goes through
+when it receives an SNM message from the Signalling Gateway.
+The process is almost identical to the Data Transfer process.
+The Application Server performs the following functional steps on the message:
+.np
+The Transport Provider connection upon which the SNM Message is receive
+determines both the Signalling Gateway Process (SGP) and the Signalling
+Gateway (SG) which are to be used for the message.
+.np
+The AS, upon determining the SGP and SG, store whatever state information
+concerning the Management message that is necessary as this may have a bearing
+on routeing of outgoing data messages.
+.np
+Once the Signalling Gateway upon which the message has arrived has been
+determined by the Application Server, the AS choses the SS7 User to send the
+message to based on the Routing Context which appears in the message.  Note,
+however, that the Routing Context must be considered in the context of the
+Signalling Gateway upon which it was received.
+.np
+.np
+.uh "Security Considerations"
+.uh "Acknowledgements"
+.pa
+.(l L
+.uh "Endnotes"
+.bl
+.if '\*(.T'ascii' \{\
+.ad l
+.hy 0
+.\}
+.pd
+.)l
+.pa
+.de ]<
+.uh "References"
+.if '\*(.T'ascii' \{\
+.ad l
+.hy 0
+.\}
+.rm (f )f
+..
+.(l L
+.[
+$LIST$
+.]
+.)l
+.(k
+.uh "Author's  Addresses"
+.lp
+.(l L
+\fCBrian F. G. Bidulock                             Tel: +1-972-839-4489
+\fCOpenSS7 Corporation                       EMail: bidulock@openss7.org
+\fC4701 Preston Park Boulevard, Suite 424
+\fCPlano, TX 75093
+\fCUSA
+.)l
+.)k
+.bl 2
+.lp
+This Internet Draft expires January 2002.
+.ba +4
+.bp
+.(l I
+.ce 1
+.uh "List of Illustrations"
+.bl 2
+.xp 2
+.)l
+.(l I
+.ce 1
+.uh "Table of Contents"
+.bl 2
+.xp 0
+.)l
+.ba -4
+.bp
+.uh "Copyright Statement"
+.lp
+.(l I F
+.lp
+\fBCopyright (C) The Internet Society (2001).  All Rights Reserved.\fR
+.lp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.lp
+The limited permission granted above are prepetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.lp
+This document and the information contained herein is provided on an "AS IS"
+basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS
+OR ANY IMPLIED WARRANTIES OF MECHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.
+.)l
