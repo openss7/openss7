@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.7 $) $Date: 2005/03/17 11:22:33 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/03/22 19:44:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 11:22:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/22 19:44:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -222,8 +222,6 @@ architectures, but should build and install for other architectures as well.
 %prep
 # ---------------------------------------------------------------------------
 
-[ -L %{name} ] && rm -f %{name}
-ln -sf %{name}-%{version} %{name}
 %setup -q -n %{name}-%{version}
 
 %build
@@ -1064,9 +1062,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.7  2005/03/17 11:22:33  brian
-# - Updated change logs.
+# Revision 1.1.6.8  2005/03/22 19:44:13  brian
+# - do not need symbolic link in prep anymore
 #
+
+* Thu Mar 17 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.7  2005/03/17 11:22:33  brian
+- Updated change logs.
 
 * Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.6  2005/03/16 11:58:23  brian

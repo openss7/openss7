@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/17 11:22:33 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/22 19:44:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 11:22:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/22 19:44:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -249,8 +249,6 @@ for other architectures as well.
 %prep
 # ---------------------------------------------------------------------------
 
-[ -L %{name} ] && rm -f %{name}
-ln -sf %{name}-%{version} %{name}
 %setup -q -n %{name}-%{version}
 
 %build
@@ -1343,9 +1341,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.20  2005/03/17 11:22:33  brian
-# - Updated change logs.
+# Revision 0.9.2.21  2005/03/22 19:44:12  brian
+# - do not need symbolic link in prep anymore
 #
+
+* Thu Mar 17 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.20  2005/03/17 11:22:33  brian
+- Updated change logs.
 
 * Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.19  2005/03/16 11:58:15  brian
