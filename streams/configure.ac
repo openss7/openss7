@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.20 2004/06/27 03:06:30 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.21 2004/08/16 11:45:31 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/27 03:06:30 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/16 11:45:31 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.20 2004/06/27 03:06:30 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.21 2004/08/16 11:45:31 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
@@ -156,6 +156,9 @@ AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gettimeofday inet_ntoa localtime_r mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul])
 
+PACKAGE_TITLE='OpenSS7 Linux Fast-STREAMS'
+AC_SUBST([PACKAGE_TITLE])
+
 AC_LFS
 
 AC_CONFIG_FILES([Makefile
@@ -163,6 +166,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
+		 doc/manual/args.texi
 		 src/modules/Config
 		 src/drivers/Config])
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 08:48:12 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 11:39:58 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 08:48:12 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/08/16 11:39:58 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.3  2004/08/16 11:39:58  brian
+ - Documetnation updates and copying options.
+
  Revision 0.9.2.2  2004/08/06 08:48:12  brian
  - Header file corrections.
 
@@ -106,9 +109,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 08:48:12 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 11:39:58 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/06 08:48:12 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 11:39:58 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -4011,15 +4014,16 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argv[])
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 XNS 5.2/TPI Rev 2 - OpenSS7 INET Driver - UDP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -4061,6 +4065,7 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
 }
 
@@ -4070,12 +4075,16 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -4089,6 +4098,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -4098,34 +4108,39 @@ help(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
     -l, --list [RANGE]\n\
-        List test case names within a range [default: all] and exit.\n\
+        list test case names within a range [default: all] and exit.\n\
     -f, --fast [SCALE]\n\
-        Increase speed of tests by scaling timers [default: 50]\n\
+        increase speed of tests by scaling timers [default: 50]\n\
     -s, --summary\n\
-        Print a test case summary at end of testing [default: off]\n\
+        print a test case summary at end of testing [default: off]\n\
     -o, --onetest [TESTCASE]\n\
-        Run a single test case.\n\
+        run a single test case.\n\
     -t, --tests [RANGE]\n\
-        Run a range of test cases.\n\
+        run a range of test cases.\n\
     -m, --messages\n\
-        Display messages. [default: off]\n\
+        display messages. [default: off]\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permission and exit\n\
+\n\
 ", argv[0]);
 }
 
@@ -4158,12 +4173,14 @@ main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "l::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
+		c = getopt(argc, argv, "l::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -4275,6 +4292,9 @@ main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			copying(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -4304,7 +4324,7 @@ main(int argc, char *argv[])
 		}
 		exit(2);
 	}
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }
