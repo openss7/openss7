@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/12/30 07:42:57 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/01/10 09:03:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 07:42:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/10 09:03:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -771,7 +771,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
             BOOT)
                 AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for RedHat/Mandrake BOOT kernel.])
                 case "$linux_cv_march" in
-                    i586 | i686 | athlon)
+                    i586 | i686 | k6 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
@@ -785,14 +785,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
             bigmem)
                 AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for RedHat/Mandrake BIGMEM kernel.])
                 case "$linux_cv_march" in
-                    i386 | i586 | athlon)
+                    i386 | i586 | k6 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
             hugemem)
                 AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for RedHat/Mandrake HUGEMEM kernel.])
                 case "$linux_cv_march" in
-                    i386 | i586 | athlon)
+                    i386 | i586 | k6 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
@@ -806,16 +806,16 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
                 AC_DEFINE([__BOOT_KERNEL_SECURE], [1], [Define for RedHat/Mandrake SECURE kernel.])
                 ;;
             i686-up-4GB)
-                AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for RedHat/Mandrake BIGMEM kernel.])
+                AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for Mandrake I686_UP_4GB kernel.])
                 case "$linux_cv_march" in
-                    i386 | i586 | athlon)
+                    i386 | i586 | k6 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
             p3-smp-64GB)
-                AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for RedHat/Mandrake HUGEMEM kernel.])
+                AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for Mandrake P3_SMP_64GB  kernel.])
                 case "$linux_cv_march" in
-                    i386 | i586 | athlon)
+                    i386 | i586 | k6 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
@@ -1504,7 +1504,7 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
         linux_tmp='no'
         if test -n "$linux_cv_k_ksyms" -a -r "$linux_cv_k_ksyms"
         then
-            if ( $EGREP -q  '(\<$1_R........\>|\<$1\>)' $linux_cv_k_ksyms 2>/dev/null )
+            if ( $EGREP -q  '(\<$1_R(smp_)?........\>|\<$1\>)' $linux_cv_k_ksyms 2>/dev/null )
             then
                 linux_tmp="yes ($linux_cv_k_ksyms)"
             fi
@@ -1573,9 +1573,9 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL], [dnl
     _LINUX_KERNEL_SYMBOL_EXPORT([$1], [dnl
         AS_VAR_SET([linux_symbol], ['no'])], [dnl
         AS_VAR_SET([linux_symbol], ['yes'])])
-    if test :AS_VAR_GET([linux_symbol]) != :yes
+    if test :AS_VAR_GET([linux_symbol]) = :yes
     then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_SYMBOL), [], [The symbol $1
-            is not exported by most kernels.  Define this is the symbol $1 is
+            is not exported by most kernels.  Define this if the symbol $1 is
             either exported by your kernel, or can be stripped from the symbol
             map, so that kernel modules can be supported properly.])
 $2
