@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 18:49:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:44 $"
 
-static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $";
+static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:44 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.
 #define INLINE			/* let compiler do its job */
 
 #define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:44 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -162,9 +162,9 @@ typedef struct mtp {
 	struct mtp_addr dst;		/* dest address */
 	struct T_info_ack prot;
 	struct {
-		t_uscalar_t sls;	/* default options */
-		t_uscalar_t mp;		/* default options */
-		t_uscalar_t debug;	/* default options */
+		ulong sls;	/* default options */
+		ulong mp;		/* default options */
+		ulong debug;	/* default options */
 	} options;
 } mtp_t;
 
@@ -186,15 +186,15 @@ STATIC void mtp_free_priv(queue_t *q);
  */
 typedef struct mtp_opts {
 	uint flags;			/* success flags */
-	t_uscalar_t *sls;
-	t_uscalar_t *mp;
-	t_uscalar_t *debug;
+	ulong *sls;
+	ulong *mp;
+	ulong *debug;
 } mtp_opts_t;
 
 struct {
-	t_uscalar_t sls;
-	t_uscalar_t mp;
-	t_uscalar_t debug;
+	ulong sls;
+	ulong mp;
+	ulong debug;
 } opt_defaults = {
 0, 0, 0};
 

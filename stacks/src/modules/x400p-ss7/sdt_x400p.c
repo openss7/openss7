@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:46 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:24:36 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:46 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:46 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -66,6 +66,8 @@ static char const ident[] =
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -377,8 +379,10 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
+#ifdef CONFIG_PM
 STATIC int xp_suspend(struct pci_dev *pdev, u32 state);
 STATIC int xp_resume(struct pci_dev *pdev);
+#endif
 
 STATIC struct pci_driver xp_driver = {
 	name:		"x400p-ss7",
@@ -4987,7 +4991,7 @@ STATIC void xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					sp->ifbpv += cp->xlb[base + 0x01] + (cp->xlb[base + 0x00] << 8);
 				}
 		}
-		if (xchg(&cp->eval_syncsrc, 0)) {
+		if (xchg((int *)&cp->eval_syncsrc, 0)) {
 			int src, syncsrc = 0;
 			for (src = 0; src < SDL_SYNCS; src++) {
 				if (cp->ifsyncsrc[src] && cp->spans[syncsrc - 1]
@@ -5122,7 +5126,7 @@ STATIC void xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 					sp->ifbpv += cp->xlb[base + 0x24] + (cp->xlb[base + 0x23] << 8);
 				}
 		}
-		if (xchg(&cp->eval_syncsrc, 0)) {
+		if (xchg((int *)&cp->eval_syncsrc, 0)) {
 			int src, syncsrc = 0;
 			for (src = 0; src < SDL_SYNCS; src++) {
 				if (cp->ifsyncsrc[src] && cp->spans[syncsrc - 1]
@@ -6083,6 +6087,7 @@ STATIC void __devexit xp_remove(struct pci_dev *dev)
 	xp_free_card(cp);
 }
 
+#ifdef CONFIG_PM
 /*
  *  X400P-SS7 Suspend
  *  -----------------------------------
@@ -6102,6 +6107,7 @@ STATIC int xp_resume(struct pci_dev *pdev)
 	fixme(("Write a resume routine.\n"));
 	return 0;
 }
+#endif
 
 /* 
  *  X400P-SS7 PCI Init

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 18:49:29 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $"
 
-static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $";
+static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:29 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:41 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2146,8 +2146,8 @@ STATIC INLINE int
 cc_setup_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_setup_ind *p;
@@ -2186,7 +2186,6 @@ cc_setup_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_SETUP_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2194,8 +2193,6 @@ cc_setup_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2206,8 +2203,8 @@ STATIC INLINE int
 cc_setup_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto efault);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (-EFAULT));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_setup_con *p;
@@ -2235,8 +2232,6 @@ cc_setup_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2248,8 +2243,8 @@ STATIC INLINE int
 cc_more_info_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
@@ -2268,7 +2263,6 @@ cc_more_info_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_MORE_INFO_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2276,8 +2270,6 @@ cc_more_info_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2299,8 +2291,8 @@ STATIC INLINE int
 cc_information_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_information_ind *p;
@@ -2327,7 +2319,6 @@ cc_information_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_INFORMATION_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2335,8 +2326,6 @@ cc_information_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2348,8 +2337,8 @@ STATIC INLINE int
 cc_info_timeout_ind(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_info_timeout_ind *p;
@@ -2360,7 +2349,6 @@ cc_info_timeout_ind(queue_t *q, struct cr *cr)
 			p->cc_call_ref = cr->cref;
 			printd(("%s: %p: <- CC_INFO_TIMEOUT_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2368,8 +2356,6 @@ cc_info_timeout_ind(queue_t *q, struct cr *cr)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2381,8 +2367,8 @@ STATIC INLINE int
 cc_error_ind(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_error_ind *p;
@@ -2393,7 +2379,6 @@ cc_error_ind(queue_t *q, struct cr *cr)
 			p->cc_call_ref = cr->cref;
 			printd(("%s: %p: <- CC_ERROR_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2401,8 +2386,6 @@ cc_error_ind(queue_t *q, struct cr *cr)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2414,8 +2397,8 @@ STATIC INLINE int
 cc_proceeding_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_proceeding_ind *p;
@@ -2436,7 +2419,6 @@ cc_proceeding_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_PROCEEDING_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2444,8 +2426,6 @@ cc_proceeding_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2457,8 +2437,8 @@ STATIC INLINE int
 cc_alerting_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_alerting_ind *p;
@@ -2479,7 +2459,6 @@ cc_alerting_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_ALERTING_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2487,8 +2466,6 @@ cc_alerting_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2500,8 +2477,8 @@ STATIC INLINE int
 cc_progress_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_progress_ind *p;
@@ -2524,7 +2501,6 @@ cc_progress_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_PROGRESS_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2532,8 +2508,6 @@ cc_progress_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2545,8 +2519,8 @@ STATIC INLINE int
 cc_disconnect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_disconnect_ind *p;
@@ -2567,7 +2541,6 @@ cc_disconnect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_DISCONNECT_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2575,8 +2548,6 @@ cc_disconnect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2588,8 +2559,8 @@ STATIC INLINE int
 cc_connect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_connect_ind *p;
@@ -2610,7 +2581,6 @@ cc_connect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_CONNECT_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2618,8 +2588,6 @@ cc_connect_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2630,8 +2598,8 @@ STATIC INLINE int
 cc_setup_complete_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_setup_complete_ind *p;
@@ -2650,7 +2618,6 @@ cc_setup_complete_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_SETUP_COMPLETE_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2658,8 +2625,6 @@ cc_setup_complete_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2671,8 +2636,8 @@ STATIC INLINE int
 cc_notify_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_notify_ind *p;
@@ -2682,7 +2647,6 @@ cc_notify_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			p->cc_primitive = CC_NOTIFY_IND;
 			printd(("%s: %p: <- CC_NOTIFY_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2690,8 +2654,6 @@ cc_notify_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2702,8 +2664,8 @@ STATIC INLINE int
 cc_suspend_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_suspend_ind *p;
@@ -2724,7 +2686,6 @@ cc_suspend_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_SUSPEND_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2732,8 +2693,6 @@ cc_suspend_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2745,8 +2704,8 @@ STATIC INLINE int
 cc_suspend_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_suspend_con *p;
@@ -2765,7 +2724,6 @@ cc_suspend_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_SUSPEND_CON\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2773,8 +2731,6 @@ cc_suspend_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2785,8 +2741,8 @@ STATIC INLINE int
 cc_suspend_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_suspend_reject_ind *p;
@@ -2807,7 +2763,6 @@ cc_suspend_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_SUSPEND_REJECT_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2815,8 +2770,6 @@ cc_suspend_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2828,8 +2781,8 @@ STATIC INLINE int
 cc_resume_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_resume_ind *p;
@@ -2850,7 +2803,6 @@ cc_resume_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_RESUME_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2858,8 +2810,6 @@ cc_resume_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2871,8 +2821,8 @@ STATIC INLINE int
 cc_resume_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_resume_con *p;
@@ -2891,7 +2841,6 @@ cc_resume_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_RESUME_CON\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2899,8 +2848,6 @@ cc_resume_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2911,8 +2858,8 @@ STATIC INLINE int
 cc_resume_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_resume_reject_ind *p;
@@ -2933,7 +2880,6 @@ cc_resume_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_RESUME_REJECT_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2941,8 +2887,6 @@ cc_resume_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2954,8 +2898,8 @@ STATIC INLINE int
 cc_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_reject_ind *p;
@@ -2976,7 +2920,6 @@ cc_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_REJECT_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -2984,8 +2927,6 @@ cc_reject_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -2998,8 +2939,8 @@ STATIC INLINE int
 cc_release_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_release_ind *p;
@@ -3021,7 +2962,6 @@ cc_release_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_RELEASE_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -3029,8 +2969,6 @@ cc_release_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -3042,8 +2980,8 @@ STATIC INLINE int
 cc_release_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_release_con *p;
@@ -3063,7 +3001,6 @@ cc_release_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			}
 			printd(("%s: %p: <- CC_RELEASE_CON\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -3071,8 +3008,6 @@ cc_release_con(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -3083,8 +3018,8 @@ STATIC INLINE int
 cc_restart_con(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_restart_con *p;
@@ -3094,7 +3029,6 @@ cc_restart_con(queue_t *q, struct cr *cr)
 			p->cc_primitive = CC_RESTART_CON;
 			printd(("%s: %p: <- CC_RESTART_CON\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -3102,8 +3036,6 @@ cc_restart_con(queue_t *q, struct cr *cr)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -3115,8 +3047,8 @@ STATIC INLINE int
 cc_status_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_status_ind *p;
@@ -3126,7 +3058,6 @@ cc_status_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 			p->cc_primitive = CC_STATUS_IND;
 			printd(("%s: %p: <- CC_STATUS_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -3134,8 +3065,6 @@ cc_status_ind(queue_t *q, struct cr *cr, isdn_msg_t * m)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -3146,8 +3075,8 @@ STATIC INLINE int
 cc_datalink_failure_ind(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
-	ensure(cc, goto done);
-	ensure(cc->oq, goto efault);
+	ensure(cc, return (QR_DONE));
+	ensure(cc->oq, return (-EFAULT));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_datalink_failure_ind *p;
@@ -3159,7 +3088,6 @@ cc_datalink_failure_ind(queue_t *q, struct cr *cr)
 			p->cc_call_ref = cr->cref;
 			printd(("%s: %p: <- CC_DATALINK_FAILURE_IND\n", ISDN_DRV_NAME, cc));
 			ss7_oput(cc->oq, mp);
-		      done:
 			return (QR_DONE);
 		}
 		rare();
@@ -3167,8 +3095,6 @@ cc_datalink_failure_ind(queue_t *q, struct cr *cr)
 	}
 	rare();
 	return (-EBUSY);
-      efault:
-	return (-EFAULT);
 }
 
 /*
@@ -15419,8 +15345,10 @@ STATIC struct ch *
 isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 {
 	struct ch *ch, **chp;
+#ifndef _NONE
 	struct eg *eg = fg->eg.eg;
 	assure(eg == tg->eg.eg);
+#endif
 	printd(("%s: %s: create ch->id = %ld\n", ISDN_DRV_NAME, __FUNCTION__, id));
 	if ((ch = kmem_cache_alloc(isdn_ch_cachep, SLAB_ATOMIC))) {
 		bzero(ch, sizeof(*ch));

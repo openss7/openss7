@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:24:36 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:36 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -66,6 +66,8 @@ static char const ident[] =
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -124,8 +126,12 @@ MODULE_LICENSE(X400P_LICENSE);
  *  =======================================================================
  */
 
+#ifndef X400P_DRV_ID
 #define X400P_DRV_ID	SDL_X400P_DRV_ID
+#endif
+#ifndef X400P_DRV_NAME
 #define X400P_DRV_NAME	SDL_X400P_DRV_NAME
+#endif
 
 STATIC struct module_info xp_rinfo = {
 	mi_idnum:X400P_DRV_ID,			/* Module ID number */

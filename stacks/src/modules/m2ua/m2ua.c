@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:08 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $"
 
-static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $";
+static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include "allocb.h"
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:43 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -656,9 +656,9 @@ typedef struct m2ua_msg {
 #define UA_SIZE(__phdr)		(__constant_htonl(__phdr)&0xffff)
 #define UA_TAG(__phdr)		((__constant_htonl(__phdr)>>16)&0xffff)
 #define UA_PHDR(__phdr, __length) \
-	(((__phdr)&UA_TAG_MASK)|htonl((__length)+sizeof(uint32_t)))
+	(htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
 #define UA_CONST_PHDR(__phdr, __length) \
-	(((__phdr)&UA_TAG_MASK)|__constant_htonl((__length)+sizeof(uint32_t)))
+	(__constant_htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
 
 /*
  *  COMMON PARAMETERS:-

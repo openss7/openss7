@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/17 06:24:35 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:44 $"
 
-static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $";
+static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -84,7 +84,7 @@ static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2
 #include "timer.h"
 
 #define SDL_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/17 06:24:35 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:44 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1078,7 +1078,7 @@ n_data_ind(sdl_t * sp, mblk_t *mp)
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-	N_data_ind_t *p = (N_data_ind_t *) mp->b_rptr;
+	// N_data_ind_t *p = (N_data_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	ensure(mlen >= sizeof(*p), return (-EFAULT));
@@ -1115,7 +1115,7 @@ n_exdata_ind(sdl_t * sp, mblk_t *mp)
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-	N_exdata_ind_t *p = (N_exdata_ind_t *) mp->b_rptr;
+	// N_exdata_ind_t *p = (N_exdata_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	ensure(mlen >= sizeof(*p), return (-EFAULT));

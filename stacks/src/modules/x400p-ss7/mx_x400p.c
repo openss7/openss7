@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 18:49:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 18:29:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:45 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 18:49:30 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 18:29:45 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -61,6 +61,8 @@ static char const ident[] =
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -119,8 +121,12 @@ MODULE_LICENSE(MX_LICENSE);
  *  =========================================================================
  */
 
+#ifndef MX_MOD_ID
 #define MX_MOD_ID   MX__MOD_ID
+#endif
+#ifndef MX_MOD_NAME
 #define MX_MOD_NAME MX__MOD_NAME
+#endif
 
 static struct module_info mx_minfo = {
 	mi_idnum:MX_MOD_ID,			/* Module ID number */
