@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/24 04:16:31 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 21:07:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 21:07:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/24 04:16:31 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 21:07:33 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/24 04:16:31 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 21:07:33 $";
 
 #define __NO_VERSION__
 
@@ -300,8 +300,8 @@ STATIC struct devnode *__node_search(const struct cdevsw *cdev, const char *name
 STATIC struct cdevsw *__cdev_lookup_locked(major_t major, int load)
 {
 	struct cdevsw *cdev = NULL;
-	int reload;
 #ifdef CONFIG_KMOD
+	int reload;
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[64];
@@ -347,8 +347,8 @@ STATIC struct cdevsw *__cdev_lookup_locked(major_t major, int load)
 STATIC struct cdevsw *__cdrv_lookup_locked(modID_t modid, int load)
 {
 	struct cdevsw *cdev = NULL;
-	int reload;
 #ifdef CONFIG_KMOD
+	int reload;
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char modname[64];
@@ -382,8 +382,8 @@ STATIC struct cdevsw *__cdrv_lookup_locked(modID_t modid, int load)
 STATIC struct fmodsw *__fmod_lookup_locked(modID_t modid, int load)
 {
 	struct fmodsw *fmod = NULL;
-	int reload;
 #ifdef CONFIG_KMOD
+	int reload;
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char modname[64];
@@ -553,7 +553,9 @@ STATIC struct devnode *node_lookup(const struct cdevsw *cdev, minor_t minor)
 STATIC struct cdevsw *cdev_search(const char *name, int load)
 {
 	struct cdevsw *cdev = NULL;
+#ifdef CONFIG_KMOD
 	int reload;
+#endif
 	read_lock(&cdevsw_lock);
 #ifdef CONFIG_KMOD
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
@@ -600,7 +602,9 @@ STATIC struct cdevsw *cdev_search(const char *name, int load)
 STATIC struct fmodsw *fmod_search(const char *name, int load)
 {
 	struct fmodsw *fmod = NULL;
+#ifdef CONFIG_KMOD
 	int reload;
+#endif
 	read_lock(&fmodsw_lock);
 #ifdef CONFIG_KMOD
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
