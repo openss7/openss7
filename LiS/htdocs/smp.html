@@ -1,0 +1,456 @@
+<html>
+
+
+
+<head>
+
+<title>LiS SMP Implementation</title>
+<meta name="title" content="">
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>LiS SMP Implementation</h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+    <td width="600" height="100%" align="left" valign="top"> 
+      <h3><a name="top"></a>Introduction</h3>
+      <p>Beginning with LiS-2.12, LiS makes aggressive use of multiple CPUs in 
+        SMP kernels. It is useful for the STREAMS programmer to have some insight 
+        into this design in order to know whether, or which, locking techniques 
+        must be used in driver code.</p>
+      <hr>
+      <h3>Contents</h3>
+      <table width="75%">
+        <tr> 
+          <td width="8%">&nbsp;</td>
+          <td width="92%"><a href="#cpu_scheduling">CPU Scheduling</a></td>
+        </tr>
+        <tr> 
+          <td width="8%">&nbsp;</td>
+          <td width="92%"><a href="#queue_locking">Queue Locking</a></td>
+        </tr>
+        <tr> 
+          <td width="8%">&nbsp;</td>
+          <td width="92%"><a href="#service_procedure_context">Service Procedure 
+            Context</a></td>
+        </tr>
+        <tr> 
+          <td width="8%">&nbsp;</td>
+          <td width="92%"><a href="#scheduling_statistics">Scheduling Statistics</a></td>
+        </tr>
+      </table>
+      <hr>
+      <h3><a name="cpu_scheduling"></a>CPU Scheduling</h3>
+      <p>LiS starts up a kernel thread for each CPU on the system. In the output 
+        of a <font face="Courier New, Courier, mono">ps</font> display each thread 
+        will show as a process with a name such as &quot;<font face="Courier New, Courier, mono">LiS-2.12:0</font>&quot;. 
+        This notation means that an LiS kernel thread is running and is bound 
+        to CPU 0 (&quot;<font face="Courier New, Courier, mono">:0</font>&quot;).</p>
+      <p>LiS maintains a single global list of queues whose service procedures 
+        need to be run. A queue is place into this list by calling the function 
+        <font face="Courier New, Courier, mono">qenable</font>, whether directly 
+        or indirectly. A given queue can only be in this list once. The read queue 
+        and write queue of a queue-pair are considered two different queues for 
+        scheduling purposes and both can be scheduled simultaneously.</p>
+      <p>At &quot;certain points in time&quot; LiS performs an operation that 
+        makes a decision concerning the manner in which service procedures are 
+        to be invoked via the list of scheduled queues. There are several factors 
+        which influence this decision.</p>
+      <ul>
+        <li>If the decision is being made just prior to LiS exiting back to user 
+          mode from a system call, if the LiS kernel thread for this CPU is inactive 
+          and if there are few enough entries in the list of scheduled queues 
+          then LiS calls the routine that processes queues directly without waking 
+          up any of its kernel threads.</li>
+        <li>If the decision is being made from an interrupt routine then the queue 
+          processing routine is not to be called directly.</li>
+        <li>If the decision is being made from a call on the routine qenable then 
+          the queue processing routine is not to be called directly.</li>
+        <li>The number of queues in the scheduling list affects the decision making 
+          process.</li>
+        <li>The number of LiS kernel threads running affects the decision making 
+          process.</li>
+        <li>Whether or not LiS is executing a system call affects the decision 
+          making process. In this case LiS may defer any queue processing action 
+          until the system call is about to exit.</li>
+      </ul>
+      <p>In the case that the queue processing routine does not get called directly, 
+        LiS needs to decide whether to wake up a kernel thread process or whether 
+        to defer queue processing until an LiS system call is about to exit.</p>
+      <p>LiS tries to enlist one CPU for every four queues that are scheduled. 
+        This number is based on considerations of CPU loading and average queue 
+        lengths from queueing theory. If the number of CPUs currently processing 
+        queues is not enough to meet this target then the scheduling process seeks 
+        to enlist more CPUs until the number of CPUs is sufficient to meet this 
+        target value. Of course, sometimes there are simply too may queues schedule 
+        for processing for the number of available CPUs. In that case, all available 
+        CPUs run their queue processing threads.</p>
+      <p>When making the decision as to whether or not to wake up a kernel thread, 
+        LiS gives precedence to the CPU that it is running on. If the scheduling 
+        algorithm is called from a point just prior to executing back to the user, 
+        and if the kernel thread for the active CPU is sleeping, then LiS will 
+        simply call the queue processing routine without waking up the kernel 
+        thread. This saves the wakeup and context switch overhead.</p>
+      <p>The routine that actually runs the queues removes one element at a time 
+        from the list of scheduled queues and calls the service procedure pointed 
+        to by the queue. The routine continues until the list of scheduled queues 
+        is empty. Thus, when a kernel thread is actively processing queues, and 
+        if the number of scheduled queues does not exceed the estimated capacity 
+        of the running threads, it is quite efficient to simply add a queue to 
+        the list and let the already running threads process them in due course.</p>
+      <p><a href="#top">Back to Top</a></p>
+      <hr>
+      <h3><a name="queue_locking"></a>Queue Locking</h3>
+      <p>The <font face="Courier New, Courier, mono">queue_t</font> structure 
+        in LiS contains a spin lock that is used by LiS to ensure that <font face="Courier New, Courier, mono">service</font> 
+        procedures are not reentered for the same queue. This lock is not to be 
+        used by driver code.</p>
+      <p>When the LiS queue running routine removes a queue from the list of scheduled 
+        queues it acquires this lock prior to calling the service procedure.</p>
+      <p>LiS also acquires this lock when calling the <font face="Courier New, Courier, mono">put</font> 
+        procedure associated with a queue. Thus, execution of the <font face="Courier New, Courier, mono">put</font> 
+        and <font face="Courier New, Courier, mono">service</font> procedure are 
+        excluded for the same queue.</p>
+      <p>In a multi-CPU environment, it can happen that one CPU is calling the 
+        <font face="Courier New, Courier, mono">put</font> procedure while a second 
+        CPU is calling the <font face="Courier New, Courier, mono">service</font> 
+        procedure for the same queue. In this case, one or the other spins until 
+        the first CPU finishes the operation and releases the spin lock.</p>
+      <p>When LiS is about to call the <font face="Courier New, Courier, mono">put</font> 
+        procedure of a queue from the <font face="Courier New, Courier, mono">put</font> 
+        or <font face="Courier New, Courier, mono">service</font> procedure of 
+        a neighboring queue (because the driver called the <font face="Courier New, Courier, mono">putnext</font> 
+        function), it continues to hold the lock for the calling queue while acquiring 
+        the lock for the destination queue. The locks are acquired sequentially 
+        as the chain of <font face="Courier New, Courier, mono">putnext</font> 
+        calls traverse the stream. The locks are released in reverse order as 
+        the <font face="Courier New, Courier, mono">put</font> procedures return. 
+        This has the effect of incrementally locking the entire stream as messages 
+        are passed from one module to another.</p>
+      <p>This behavior is only of interest when modules are <font face="Courier New, Courier, mono">I_PUSH</font>ed 
+        on top of a driver. Otherwise, it is just the stream head write queue 
+        and the driver write queue that need to be locked (or other pairwise combinations 
+        such as the driver read queue and stream head read queue, or queues involving 
+        multiplexors).</p>
+      <p>The lock that LiS uses has the effect of excluding multiple entries from 
+        different threads into the <font face="Courier New, Courier, mono">put</font> 
+        or <font face="Courier New, Courier, mono">service</font> procedure for 
+        a given queue. The other queue in the queue pair is unaffected by this 
+        locking. Therefore, if there are data structures shared between the read 
+        and write <font face="Courier New, Courier, mono">put</font> and <font face="Courier New, Courier, mono">service</font> 
+        procedures of a driver or module, it is up to the driver writer to protect 
+        these structures with spin locks.</p>
+      <p><a href="#top">Back to Top</a></p>
+      <hr>
+      <h3><a name="service_procedure_context"></a>Service Procedure Context</h3>
+      <p>Due to the manner in which <font face="Courier New, Courier, mono">service</font> 
+        procedures are called, sometimes from the LiS queue runner threads and 
+        sometimes from a &quot;borrowed&quot; system call, <font face="Courier New, Courier, mono">service</font> 
+        procedures may or may not have some user context present when they run. 
+        <font face="Courier New, Courier, mono">Service</font> procedures should 
+        always assume that there is no user context. Even in the cases where there 
+        is some user context, the identity of the user process is unpredictable.</p>
+      <p>LiS does, however, maintain a copy of the credentials of the process 
+        that opened the stream when it calls <font face="Courier New, Courier, mono">service</font> 
+        procedures on the stream. LiS saves the user and group identifiers plus 
+        the capability masks (credentials) of the running process in the stream 
+        head structure at the time that the STREAMS file is opened. These identifiers 
+        are restored to the task structure before calling a <font face="Courier New, Courier, mono">service</font> 
+        procedure on that stream. </p>
+      <p>When calling <font face="Courier New, Courier, mono">put</font> procedures, 
+        however, no such identity restoration occurs. So the credentials in place 
+        when a driver or module <font face="Courier New, Courier, mono">put</font> 
+        procedure is invoked are those of the invoking entity. Because the queue 
+        runner theads always begin driver entry with a call to the <font face="Courier New, Courier, mono">service</font> 
+        procedure, entries into the <font face="Courier New, Courier, mono">put</font> 
+        procedures of subsequent drivers will have the credentials of the stream 
+        whose <font face="Courier New, Courier, mono">service</font> procedure 
+        was called in the first instance. When a driver's <font face="Courier New, Courier, mono">put</font> 
+        procedure is entered from a system call the credentials will be that of 
+        the user process which issued the system call.</p>
+      <p><a href="#top">Back to Top</a></p>
+      <hr>
+      <h3><a name="scheduling_statistics"></a>Scheduling Statistics</h3>
+      <p>LiS gathers statistics on its queue scheduling algorithm. They can be 
+        printed out with the command <font face="Courier New, Courier, mono">streams 
+        -S</font>. The output looks like the following.</p>
+      <pre>N-CPUs N-Qrunners N-Running N-Requested
+     2          2         0          0
+
+CPU   Qsched-Cnts Qsched-ISR Svc-Q-Cnts Qrun-Cnts Active Thread-PID
+  0     540752204  175753842  459587537 239611835      0        857
+  1     540683832  175833424  459150290 239672683      0        858
+</pre>
+      <p>The fields have the following meanings.</p>
+      <table width="90%">
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">N-CPUs</td>
+          <td width="73%" valign="top">Number of CPUs on the system.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">N-Qrunners</td>
+          <td width="73%" valign="top">Number of queue runner kernel threads. 
+            These are the processes that appear as LiS-2.12:0 in a <font face="Courier New, Courier, mono">ps</font> 
+            display.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">N-Running</td>
+          <td width="73%" valign="top">Number of qeuue runner threads that are 
+            currently active.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">N-Requested</td>
+          <td width="73%" valign="top">The number of queues that are in the list 
+            of scheduled queues.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">CPU</td>
+          <td width="73%" valign="top">The remainder of the statistics are kept 
+            on a per-CPU basis.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">Qsched-Cnts</td>
+          <td width="73%" valign="top">This is the number times the routine (lis_setqsched) 
+            that decides whether or not to wake up a queue runner process or to 
+            directly process scheduled queues has been called. This routine is 
+            called whenever a queue is added to the scheduling list. The counter 
+            reflects which CPU made the call to the routine.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">Qsched-ISR</td>
+          <td width="73%" valign="top">The number of times lis_setqsched was called 
+            from an interrupt routine and from which CPU.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">Svc-Q-Cnts</td>
+          <td width="73%" valign="top">The number of callouts to service procedures 
+            on a per-CPU basis.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">Qrun-Cnts</td>
+          <td width="73%" valign="top">The number of times the routine (queurun) 
+            that removes queues from the schedule list was called. This routine 
+            does not return until the queue scheduling list is empty. It can be 
+            running on multiple CPUs simultaneously. It is typically called from 
+            the queue runner threads but can also be called from an LiS system 
+            call either just prior to returning to the user or just prior to sleeping 
+            on some event such as the arrival of messages at the stream head.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">Active</td>
+          <td width="73%" valign="top">Displays as 0 or 1 depending upon whether 
+            there is a queue runner thread running on the particular CPU at the 
+            time that the statistics were sampled.</td>
+        </tr>
+        <tr> 
+          <td width="7%">&nbsp;</td>
+          <td width="20%" valign="top">Thread-PID</td>
+          <td width="73%" valign="top">The process id of the queue runner thread 
+            assaigned to eachCPU.</td>
+        </tr>
+      </table>
+      <p><a href="#top">Back to Top</a></p>
+      <p>&nbsp;</p>
+      <p>&nbsp; </p>
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
