@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_open_comm.9.man,v 0.9.2.5 2004/03/16 11:37:10 brian Exp $
+.\" @(#) $Id: mi_open_comm.9.man,v 0.9.2.6 2004/03/18 09:13:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 11:37:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_OPEN_COMM 9 "$Date: 2004/03/16 11:37:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MI_OPEN_COMM 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -252,41 +252,42 @@ Following is an example of a module
 .BR qopen (9)
 procedure using
 .BR mi_open_comm ():
-.RS
+.PP
 .nf
 \fC\s-1
 static caddr_t xxx_state = NULL;
 
 typedef struct {
-        dev_t my_dev;
-        queue_t *rq;
-        long some_data;
-        long some_more_data;
+    dev_t my_dev;
+    queue_t *rq;
+    long some_data;
+    long some_more_data;
 } xxx_priv_t;
 
 int
-xxx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+xxx_open(queue_t *q, dev_t *devp, int oflag, int sflag,
+	 cred_t *crp)
 {
-        int err;
-        xxx_priv_t *priv;
+    int err;
+    xxx_priv_t *priv;
 
-        err = mi_open_comm(&xxx_state, sizeof(xxx_priv_t), q, devp, oflag, sflag, crp);
-        if (err != 0) {
-                return (err);
-        }
+    err = mi_open_comm(&xxx_state, sizeof(xxx_priv_t),
+		       q, devp, oflag, sflag, crp);
+    if (err != 0) {
+	return (err);
+    }
 
-        priv = q->q_ptr;
+    priv = q->q_ptr;
 
-        priv->my_dev = *devp;
-        priv->rq = q;
-        priv->some_data = SOME_DATA_INITIALIZER;
-        priv->some_more_data = SOME_MORE_DATA_INITIALIZER;
+    priv->my_dev = *devp;
+    priv->rq = q;
+    priv->some_data = SOME_DATA_INITIALIZER;
+    priv->some_more_data = SOME_MORE_DATA_INITIALIZER;
 
-        return (0);
+    return (0);
 }
 \s+1\fP
 .fi
-.RE
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: weldq.9.man,v 0.9.2.4 2004/03/16 08:01:18 brian Exp $
+.\" @(#) $Id: weldq.9.man,v 0.9.2.5 2004/03/18 09:13:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:18 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WELDQ 9 "$Date: 2004/03/16 08:01:18 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WELDQ 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -98,7 +98,7 @@ queue_t *\fIq4\fR, weld_fcn_t \fIfunc\fR, weld_arg_t \fIarg\fR, queue_t
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'protect_q\(em'u
 .I q1
 the first queue to weld.
 .TP
@@ -248,7 +248,7 @@ error number.
 When
 .BR weldq ()
 encounters and error, it returns an appropriate error number as follows:
-.TP
+.TP \w'[EAGAIN]\(em'u
 .RB [ EAGAIN ]
 The request could not be completed.  The caller may try again.  This occurs
 from a failure to allocate the
@@ -475,6 +475,11 @@ first appeared in a number of implementations of
 .BR "SVR 4 MP" .
 .[
 svr4
+.]
+.\"
+.\"
+.[
+$LIST$
 .]
 .\"
 .\"

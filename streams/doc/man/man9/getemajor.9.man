@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getemajor.9.man,v 0.9.2.2 2004/03/16 08:01:17 brian Exp $
+.\" @(#) $Id: getemajor.9.man,v 0.9.2.3 2004/03/18 09:13:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:17 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,21 +71,21 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETEMAJOR 9 "$Date: 2004/03/16 08:01:17 $" "$Name:  $" "Linux Fast-STREAMS UWDDI"
+.TH GETEMAJOR 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS UWDDI"
 .\"
 .\"
 .SH NAME
 .B getemajor
-\- get the external major device number
+\- get the external (real) major device number
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/stream.h>
+.B #define _UW7_SOURCE
+.br
+.B #include <sys/types.h>
 .br
 .B #include <sys/ddi.h>
-.br
-.B #include <sys/uwddi.h>
 .HP
 .BI "major_t getemajor(dev_t " dev );
 .\"
@@ -94,13 +94,24 @@ sort-adjacent-labels
 .PP
 .TP
 .I dev
-the device number to convert to an external major.
+the device number to convert to an external (real) major.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.BR getemajor (9),
+.BR geteminor (9)
+and
+.BR makedev (9)
+functions intended to supplement the
+.BR getmajor (9),
+.BR getminor (9)
+and
+.BR makedevice (9)
+functions.
+.PP
 .BR getemajor ()
-gets the external device major number associated with the extern
+gets the external (real) device major number associated with the external
 .B dev_t
 device number,
 .IR dev .
@@ -115,12 +126,77 @@ device number; however,
 is often implemented as an architecture dependent macro, whereas
 .BR getmajor ()
 is an architecture independent function call.
+.PP
+.BR getemajor ()
+is an architecture independent function that obtains the external (real) major
+device number associated with device
+.IR dev .
+.BR getmajor (9),
+on the other hand,
+will return the external
+.I base
+major device number associated with the device
+.I dev .
+.PP
+.BR getmajor (9)
+supports the concept of extended minor device numbers.  Under extended minor
+device number, a device has a single
+.I base
+major device number and an extended range of minor device numbers (exceeding
+255).  Real device numbers consist of a number of major devices numbers and a
+range of minor device numbers associated with each major device number from 0
+to 255.
+.PP
+Following is an example contrasting the mapping of external major and minor
+device numbers to a based major device number and an extended minor device
+number:
+.RS
+.TS
+center tab(:);
+nn|nn.
+_
+\fBgetemajor\fR():\fBgeteminor\fR():\fBgetmajor\fR():\fBgetminor\fR()
+_
+32:0:32:0
+":255:":255
+35:0:":256
+":255:":511
+37:0:":512
+":255:":766
+_
+.TE
+.RE
+.\"
+.\"
+.SH USAGE
+.PP
+.BR getemajor ()
+is used by drivers and modules that require knowledge of the external (real)
+major device number and for use internal to the
+.I STREAMS
+executive.
+.PP
+Normally, a
+.I STREAMS
+module or driver
+.BR qopen (9)
+procedure will use the
+.BR getmajor (9)
+function to obtain the external
+.I base
+major device number and deal with the assignment of extended minor device
+numbers using the
+.BR getminor (9)
+and
+.BR makedevice (9)
+functions.
 .\"
 .\"
 .SH RETURN
 .PP
 .BR getemajor ()
-returns the external major device number.
+returns the external (real) major device number associated with device
+.IR dev .
 .\"
 .\"
 .SH ERRORS
@@ -129,7 +205,38 @@ returns the external major device number.
 always succeeds.
 .\"
 .\"
+.SH CONTEXT
+.PP
+.BR getemajor ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR getemajor ()
+is MP-safe.
+.\"
+.\"
 .SH NOTICES
+.PP
+.BR getemajor ()
+is a
+.IR UnixWare \(rg-
+and
+.IR Super-UX \(rg-specific
+macro:
+.B _UW7_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_UW7
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
 .PP
 .BR getemajor ()
 uses
@@ -139,9 +246,27 @@ to obtain the external major device number.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR MAJOR (9),
+.BR MINOR (9),
+.BR MKDEV (9),
+.BR major (9),
+.BR minor (9),
+.BR makedev (9),
+.BR emajor (9),
+.BR eminor (9),
+.BR mkdev (9),
 .BR getmajor (9),
-.BR ddi_getimajor (9),
-.BR MAJOR (9).
+.BR getminor (9),
+.BR makedevice (9),
+.BR getemajor (9),
+.BR geteminor (9),
+.BR etoimajor (9),
+.BR itoemajor (9),
+.BR ddi_driver_major (9),
+.BR ddi_getiminor (9),
+.BR ddi_create_minor_node (9),
+.BR ddi_remove_minor_node (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -153,31 +278,83 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR getemajor ()
+is compatible with
+.IR UnixWare \(rg
+and
+.IR Super-UX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR getemajor ()
+is implemented as an
+.B extern inline
+function.  Under
+.IR UnixWare \(rg
+.BR getemajor ()
+is normally implemented as a architecture dependent macro.
+.IP \(em
+.BR getemajor ()
 is provided for source level compatibility with
 .IR UnixWare \(rg
+and
+.IR Super-UX \(rg
 for the purpose of porting
 .IR UnixWare \(rg
+or
+.IR Super-UX \(rg
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because the
 .BR dev_t
 structure for
-.IR Linux \(rg
+.B Linux
 differs from that of
-.IR UnixWare \(rg,
+.IR UnixWare \(rg
+and
+.IR Super-UX \(rg,
 binaries are incompatible.
-.PP
+.IP \(em
+.BR getemajor ()
+only provides functionality comparable to
+.IR UnixWare \(rg
+and
+.IR Super-UX \(rg
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR getemajor ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.IP \(em
 LiS
 .[
 LiS
 .]
 does not provide this function.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 .IR UnixWare \(rg
+and
+.IR Super-UX \(rg
 DDI documentation.
+.[
+uw7doc
+.]
+.[
+uw7spg
+.]
+.[
+suxdoc
+.]
+.[
+suxspg
+.]
 .\"
 .\"
 .SH HISTORY

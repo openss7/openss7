@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mod_remove.9.man,v 0.9.2.4 2004/03/16 11:37:10 brian Exp $
+.\" @(#) $Id: mod_remove.9.man,v 0.9.2.5 2004/03/18 09:13:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 11:37:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MOD_REMOVE 9 "$Date: 2004/03/16 11:37:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MOD_REMOVE 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -157,26 +157,25 @@ Following is an example of the canonical
 .BR _fini (9)
 function using
 .BR mod_remove ():
-.RS
+.PP
 .nf
 \fC\s-1
 int
 _fini(void)
 {
-        int result;
+    int result;
 
-        result = mod_remove(&xxx_modlinkage);
-        if (result != 0) {
-                return (result);
-        }
+    result = mod_remove(&xxx_modlinkage);
+    if (result != 0) {
+        return (result);
+    }
 
-        ddi_soft_state_fini(&xxx_statep);
+    ddi_soft_state_fini(&xxx_statep);
 
-        return (0);
+    return (0);
 }
 \s+1\fP
 .fi
-.RE
 .\"
 .\"
 .SH "SEE ALSO"

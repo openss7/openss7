@@ -1,0 +1,294 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: itoemajor.9.man,v 0.9.2.2 2004/03/18 09:13:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ITOEMAJOR 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B itoemajor
+\- convert an internal major device number to an external major device number
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _UW7_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "int itoemajor(major_t " imajor ", int " prevmajor );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I imajor
+The internal major device number to convert to an external major device
+number.
+.TP
+.I prevmajor
+The previous external major device number obtained by calling
+.BR itoemajor (),
+or
+.B NODEV
+if
+.BR itoemajor ()
+is being called to obtain the first external major device number.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR itoemajor ()
+returns an external major device number associated with the internal major
+device number,
+.IR imajor .
+When
+.I prevmajor
+is set to
+.BR NODEV ,
+.BR itoemajor ()
+returns the first major device number associated wtih the internal major
+device number,
+.IR imajor .
+When
+.I prevmajor
+is set to the external major device number returned from a previous invocation
+of
+.BR itoemajor (),
+the call returns the next external major device number associated with the
+internal major device number, or
+.BR NODEV ,
+if no subsequent external major device number is associated.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR itoemajor ()
+is intended to be called iteratively, passing the previously returned external
+major device number as the
+.I prevmajor
+argument of each subsequent call until
+.B NODEV
+is returned.  In this way, all of the external major device numbers associated
+with a particular internal major device number can be obtained.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR itoemajor ()
+succeeds, it returns 
+the first or next external major device number associated with the internal
+major device number
+.IR imajor ;
+when it fails, it returns
+.BR NODEV .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR itoemajor ()
+fails when there is no subsequent external major device number associated with
+.IR imajor ,
+or when the supplied internal major device number,
+.IR imajor ,
+is invalid.
+An invalid internal major device number is an internal major device number
+that has no external major device number associated with it.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR itoemajor ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR itoemajor ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR itoemajor ()
+is a
+.IR UnixWare \(rg-specific
+function:
+.B _UW7_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_UW7
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR MAJOR (9),
+.BR MINOR (9),
+.BR MKDEV (9),
+.BR major (9),
+.BR minor (9),
+.BR makedev (9),
+.BR emajor (9),
+.BR eminor (9),
+.BR makedevice (9),
+.BR getmajor (9),
+.BR getminor (9),
+.BR getemajor (9),
+.BR geteminor (9),
+.BR etoimajor (9),
+.BR itoemajor (9),
+.BR ddi_driver_major (9),
+.BR ddi_getiminor (9),
+.BR ddi_create_minor_node (9),
+.BR ddi_remove_minor_node (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR itoemajor ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR itoemajor ()
+is compatible with
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\ \(em\ 'u
+.BR itoemajor ()
+is provided for source level compatibility with
+.IR UnixWare \(rg
+for the purpose of porting
+.IR UnixWare \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR UnixWare \(rg
+binaries are incompatible.
+.IP \(em
+.BR itoemajor ()
+only provides functionality comparable to
+.IR UnixWare \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR itoemajor ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR UnixWare \(rg.
+.[
+uw7doc
+.]
+.[
+uw7spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR itoemajor ()
+first appeared in
+.IR UnixWare \(rg.
+.[
+uw7doc
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
