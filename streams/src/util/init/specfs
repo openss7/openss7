@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/14 12:47:56 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/02/14 23:39:04 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -52,19 +52,16 @@ SPECFS_MOUNTPOINT="/dev/streams"
 SPECFS_UID=
 SPECFS_GID=
 SPECFS_MODE=
+SPECFS_OPTIONS=
 
 # Source redhat and/or debian config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
-# Build up the options string
-
 RETVAL=0
 
 umask 077
-
-SPECFS_OPTIONS=
 
 start() {
     if [ -n "$SPECFS_MOUNTPOINT" ] ; then
@@ -84,12 +81,28 @@ start() {
     return $RETVAL
 }
 
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing STREAMS modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
+}
+
 stop() {
     mount | grep ' on [^[:space:]]* type specfs' 2>/dev/null | \
     while read -a tokens ; do
 	action $"Unmounting SPECFS filesystem from ${tokens[2]}: " \
 	    umount -- ${tokens[2]}
     done
+    egrep '^(streams|specfs[[:space:]])' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL
@@ -114,6 +127,7 @@ reload() {
 
 case "$1" in
     (start|stop|reload|restart)
+	# Build up the options string
 	[ -n "$SPECFS_UID" ] && \
 	    SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
 	[ -n "$SPECFS_GID" ] && \
@@ -173,7 +187,7 @@ case "$1" in
 			if [ -f $file -a $file -nt $lockfile ] ; then
 			    # configuration file updated, need to reload
 			    echo 'reload'
-			    break;
+			    break
 			fi
 		    done
 		fi
@@ -205,7 +219,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/14 12:47:56 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/02/14 23:39:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -251,7 +265,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 12:47:56 $ by $Author: brian $
+# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/14 06:47:18 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/14 23:39:04 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -44,108 +44,188 @@
 # Source init script functions library.
 . /etc/init.d/functions
 
-if [ -x /sbin/streams_mknod ] ; then
-    STREAMS_MKNOD='/sbin/streams_mknod'
-elif [ -x /usr/bin/streams_mknod ]; then
-    STREAMS_MKNOD='/usr/sbin/streams_mknod'
-else
-    STREAMS_MKNOD=''
-fi
+name='streams'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+
+[ -f /proc/modules ] || exit 0
+
+for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
+    if [ -x $STREAMS_MKNOD ] ; then
+	break
+    else
+	STREAMS_MKNOD=
+    fi
+done
 
 # Specify defaults
 
-MAKEDEVICES="no"
-REMOVEDEVICES="no"
-MOUNTSPECFS="yes"
-MOUNTPOINT="/dev/streams"
+STREAMS_MAKEDEVICES="no"
+STREAMS_REMOVEDEVICES="no"
+STREAMS_MOUNTSPECFS="yes"
+STREAMS_MOUNTPOINT="/dev/streams"
 
 # Source redhat and/or debian config file
-[ -f /etc/streams.conf ] && . /etc/streams.conf
-[ -f /etc/default/streams ] && . /etc/default/streams
-[ -f /etc/sysconfig/streams.conf ] && . /etc/sysconfig/streams
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES='no'
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES='no'
 
 RETVAL=0
 
 umask 077
 
 start() {
-    echo "Starting STREAMS subsystem: "
+    for module in streams streams-clone streams-sth ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	    action $"Loading kernel module $module: " \
+		modprobe -q $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
+    if grep '^[[:space:]]*streams[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+	action $"Reconfiguring kernel parameters: " \
+	    sysctl -e -p /etc/sysctl.conf || :
+    fi
+    if [ -f /etc/streams.conf ] ; then
+	action $"Configuring STREAMS parameters: " \
+	    sysctl -e -p /etc/streams.conf || :
+    fi
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	action $"Making STREAMS devices: " \
+	    $STREAMS_MKNOD
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing STREAMS modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
 }
 
 stop() {
-}
-
-rhstatus() {
-}
-
-reload() {
-    stop
-    start
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	action $"Removing STREAMS devices: " \
+	    $STREAMS_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-]?' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
 }
 
 restart() {
     stop
     start
+    return $?
 }
 
-probe() {
-#
-#   subsystem unlocked, need to start
-#
-    [ ! -f /var/log/subsys/streams ] && { echo 'start' ; return 0 }
-#
-#   streams unloaded but subsystem locked, need to restart
-#
-    grep -q '\<streams\>' /proc/modules 2>/dev/null || { echo 'restart' ; return 0 }
-#
-#   configuration files updated, need to reload
-#
-    [ -f /etc/sysconfig/streams -a /etc/sysconfig/streams -nt /var/lock/subsys/streams ] \
-    && { echo 'reload' ; return 0 }
-    [ -f /etc/default/streams   -a /etc/default/streams   -nt /var/lock/subsys/streams ] \
-    && { echo 'reload' ; return 0 }
-    [ -f /etc/streams.conf      -a /etc/streams.conf      -nt /var/lock/subsys/streams ] \
-    && { echo 'reload' ; return 0 }
-#
-#   do not need to do anything
-#
+reload() {
+    stop
+    start
     return $?
 }
 
 case "$1" in
-    (start)
-	start
-	;;
-    (stop)
-	stop
+    (start|stop|reload|restart)
+	$1 || RETVAL=$?
 	;;
     (status)
-	rhstatus
-	;;
-    (restart)
-	restart
-	;;
-    (reload)
-	reload
+	LOADED='yes'
+	for module in streams streams-clone streams-sth ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    if true ; then
+		echo $"$name is running..."
+		RETVAL=0
+	    fi
+	else
+	    if [ -f $lockfile ] ; then
+		echo $"$name is stopped but sybsys locked"
+		RETVAL=2
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
 	;;
     (condrestart)
-	[ -f /var/log/subsys/streams ] && restart || :
+	[ -f $lockfile ] && restart || RETVAL=$?
 	;;
     (probe)
-	probe
+	LOADED='yes'
+	for module in streams streams-clone streams-sth ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    # loaded
+	    if true ; then
+		if [ ! -f $lockfile ] ; then
+		    # loaded, but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # loaded and subsystem locked
+		    for file in $config /etc/$name.conf ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updeated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# loaded, but with wrong options, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unloaded
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if true ; then
+		    # unloaded but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
 	;;
     (*)
-	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)\n"
+	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
 	;;
 esac
 
-exit $?
+[ "${0##*/}" = "$name" ] && exit $RETVAL
 
-
-#
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/14 06:47:18 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/14 23:39:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -191,7 +271,7 @@ exit $?
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 06:47:18 $ by $Author: brian $
+# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/14 06:44:31 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/14 23:39:04 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -10,10 +10,9 @@
 
 exit $?
 
-
 # =============================================================================
 # 
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/14 06:44:31 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/14 23:39:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -59,7 +58,7 @@ exit $?
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/14 06:44:31 $ by $Author: brian $
+# Last Modified $Date: 2005/02/14 23:39:04 $ by $Author: brian $
 #
 # =============================================================================
 
