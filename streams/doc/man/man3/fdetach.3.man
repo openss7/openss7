@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fdetach.3.man,v 0.9.2.7 2005/01/19 07:35:16 brian Exp $
+.\" @(#) $Id: fdetach.3.man,v 0.9.2.8 2005/01/21 00:14:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/19 07:35:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 00:14:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FDETACH 3 "$Date: 2005/01/19 07:35:16 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH FDETACH 3 "$Date: 2005/01/21 00:14:06 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
@@ -152,6 +152,8 @@ given as an argument.
 .\"
 .\"
 .SH "APPLICATION USAGE"
+.PP
+.SH NOTICES
 .PP
 Applications wishing to use the version of the
 .BR fdetach "() "

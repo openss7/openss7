@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.2.man,v 0.9.2.8 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: fattach.2.man,v 0.9.2.9 2005/01/21 00:14:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 00:14:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FATTACH 2 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH FATTACH 2 "$Date: 2005/01/21 00:14:06 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -90,16 +90,49 @@ sort-adjacent-labels
 .PP
 .TP
 .I fd
+the file descriptor to attach to a path.
 .TP
 .I path
+the filesystem path to which to attach the file descriptor.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B fattach
+attaches the open
+.I STREAMS
+special device file described by the file descriptor
+.I fd
+to the filesystem path specified by
+.IR path .
+All file operations on file descriptors subsequently opened on
+.IR path
+will operate on the attached
+.I STREAMS
+special device file instead of the file or directory that origianally corresponded to
+.IR path .
+This continues until the
+.I STREAMS
+special device file is detached from
+.I path
+using the
+.BR fdetach (3)
+utility.
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
+Upon success,
+.BR fattach ()
+will return zero (0).
+.PP
+Upon failure,
+.BR fattach ()
+will return -1 and set
+.I errno
+as described under
+.RB \(lq ERRORS \(rq,
+below.
 .\"
 .\"
 .SH ERRORS
@@ -157,10 +190,19 @@ special file.
 .\"
 .SH NOTICES
 .PP
+.SS "Multi-Threading"
+.PP
+.BR fattach ()
+is thread-safe; however, performing
+.BR fattach ()
+on a filesystem path will affect other processes or thread using that path.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR fattach (8),
+.BR fdetach (3),
+.BR fdetach (8).
 .\"
 .\"
 .SH BUGS
@@ -194,16 +236,20 @@ with the following exceptions:
 can be performed on any file to which the caller has ownership, write
 permission and sufficient privilege to execute
 .BR fattach ().
+.IP \(em
 Under
 .BR LiS ,
 root privilege or
 .B CAP_SYS_ADMIN
 is required.
+.B Linux Fast-STREAMS
+does not have this restriction.
 .IP \(em
 .BR fattach ()
 makes no additional limitation on the number of
 .I STREAMS
 files that are attached.
+.IP \(em
 Under
 .BR LiS ,
 .BR fattach ()
@@ -212,10 +258,22 @@ limits number of
 files attached to less than 256, because that is the maximum number of unnamed
 devices allowed by
 .BR mount (2).
-.IP \(em
-.IP \(em
-.IP \(em
-.IP \(em
+The same is true for
+.BR "Linux Fast-STREAMS" .
+.PP
+.B Linux Fast-STREAMS
+provide a system call for
+.I __NR_fattach
+that is used to implement this system call.  (glibc has prototypes for this system call.)
+In addition,
+.B Linux Fast-STREAMS
+recognizes the
+.B I_LIS_FATTACH
+.BR streamio (7)
+input-output control used by LiS to emulate the
+.I __NR_fattach
+system call, permitting LiS libraries to be used with
+.BR "Linux Fast-STREAMS" .
 .\"
 .\"
 .SH CONFORMANCE

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strsetup.conf.5.man,v 0.9.2.4 2004/08/22 06:17:42 brian Exp $
+.\" @(#) $Id: strsetup.conf.5.man,v 0.9.2.6 2005/01/21 06:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:42 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 06:37:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRSETUP.CONF 5 "$Date: 2004/08/22 06:17:42 $" "$Name:  $" "Linux Fast-STREAMS System File Formats"
+.TH STRSETUP.CONF 5 "$Date: 2005/01/21 06:37:45 $" "$Name:  $" "Linux Fast-STREAMS System File Formats"
 .\"
 .\"
 .SH NAME
@@ -252,14 +252,54 @@ configuration.
 .\"
 .SH COMPATIBILITY
 .PP
+.BR strsetup (8)
+is an
+.IR OSF/1 \(rg-specific
+function and the
+.B strsetup.conf
+file format is also
+.IR OSF/1 \(rg-specific.
+.B Linux Fast-STREAMS
+provides
+.BR strsetup (8)
+and the
+.B strsetup.conf
+file format for compatibility with
+.IR OSF/1 \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR OSF/1 \(rg
+.BR printf (3)
+conventions might not match those of
+.BR Linux .
+See
+.BR printf (3)
+and
+.IR OSF/1 \(rg
+documentation
+.[
+osfdoc
+.]
+for more information.
+
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR OSF/1 \(rg
+documentation.
+.[
+osfdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR strsetup (8)
+and the
+.B strsetup.conf
+file format first appeared in
+.IR OSF/1 \(rg.
 .\"
 .\"
 .[

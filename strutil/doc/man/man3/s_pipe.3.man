@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: s_pipe.3.man,v 0.9.2.8 2005/01/20 07:28:16 brian Exp $
+.\" @(#) $Id: s_pipe.3.man,v 0.9.2.9 2005/01/21 00:14:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/20 07:28:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/21 00:14:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PIPE 2 "$Date: 2005/01/20 07:28:16 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PIPE 2 "$Date: 2005/01/21 00:14:06 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -205,7 +205,8 @@ primitives instead of
 .BR read "(2) "
 and
 .BR write "(2). "
-.sp
+.SH NOTICES
+.PP
 Applications wishing to use the
 .I STREAMS
 version of the

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 0.9.2.8 2005/01/20 00:52:50 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.9 2005/01/21 00:15:00 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/20 00:52:50 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/21 00:15:00 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -83,9 +83,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_ARG_WITH([cooked-manpages],
         AS_HELP_STRING([--with-cooked-manpages],
             [convert manual pages to remove macro dependencies and grefer
-            references.  @<:@default=yes@:>@]),
+            references.  @<:@default=no@:>@]),
         [with_cooked_manpages="$withval"],
-        [with_cooked_manpages='yes'])
+        [with_cooked_manpages='no'])
     if test :"${with_cooked_manpages:-yes}" != :no ; then
         AC_MSG_RESULT([yes])
         AC_ARG_VAR([SOELIM], [Roff source elminiation command])
@@ -102,7 +102,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_MSG_CHECKING([for manpage compression])
     AC_ARG_ENABLE([compress-manpages],
         AS_HELP_STRING([--disable-compress-manpages],
-            [compress manpges with gzip -9 or leave them uncompressed.
+            [compress manpages with gzip or bzip2 or leave them uncompressed.
             @<:@default=yes@:>@]),
         [enable_compress_manpages="$enableval"],
         [enable_compress_manpages='yes'])
