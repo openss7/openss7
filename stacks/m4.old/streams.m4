@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.3 2004/04/15 10:19:09 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.4 2004/04/25 08:49:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/15 10:19:09 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/25 08:49:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -92,17 +92,17 @@ AC_DEFUN([AC_LINUX_STREAMS],
 AC_DEFUN([_LINUX_STREAMS_OPTIONS],
 [
     AC_ARG_WITH([lis],
-        AC_HELP_STRING([--with-lis=HEADERS], [specify the LiS header file
+        AS_HELP_STRING([--with-lis=HEADERS], [specify the LiS header file
             directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
             [with_lis=$withval],
             [with_lis=''])
     AC_ARG_WITH([lfs],
-        AC_HELP_STRING([--with-lfs=HEADERS], [specify the LfS header file
+        AS_HELP_STRING([--with-lfs=HEADERS], [specify the LfS header file
             directory. @<:@default=INCLUDEDIR/LfS@:>@]),
             [with_lfs=$withval],
             [with_lfs=''])
     AC_ARG_WITH([base-major],
-        AC_HELP_STRING([--with-base-major=MAJOR], [specify the base major
+        AS_HELP_STRING([--with-base-major=MAJOR], [specify the base major
             device number for static major device numbering.
             @<:@default=185@:>@]),
             [with_base_major=$withval],

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.14 2004/04/23 04:02:06 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.15 2004/04/25 08:47:39 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/23 04:02:06 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/25 08:47:39 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -101,43 +101,43 @@ AC_DEFUN([AC_LFS], [
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_OPTIONS], [
     AC_ARG_ENABLE([compat-svr4],
-                  AC_HELP_STRING([--enable-compat-svr4],
+                  AS_HELP_STRING([--enable-compat-svr4],
                                  [enable source compatibility with SVR 4.2 MP
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_svr4=$enableval],
                   [enable_compat_svr4=''])
     AC_ARG_ENABLE([compat-sol8],
-                  AC_HELP_STRING([--enable-compat-sol8],
+                  AS_HELP_STRING([--enable-compat-sol8],
                                  [enable source compatibility with Solaris 8
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_sol8=$enableval],
                   [enable_compat_sol8=''])
     AC_ARG_ENABLE([compat-uw7],
-                  AC_HELP_STRING([--enable-compat-uw7],
+                  AS_HELP_STRING([--enable-compat-uw7],
                                  [enable source compatibility with UnixWare 7
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_uw7=$enableval],
                   [enable_compat_uw7=''])
     AC_ARG_ENABLE([compat-osf],
-                  AC_HELP_STRING([--enable-compat-osf],
+                  AS_HELP_STRING([--enable-compat-osf],
                                  [enable source compatibility with OSF/1.2
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_osf=$enableval],
                   [enable_compat_osf=''])
     AC_ARG_ENABLE([compat-aix],
-                  AC_HELP_STRING([--enable-compat-aix],
+                  AS_HELP_STRING([--enable-compat-aix],
                                  [enable source compatibility with AIX 4
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_aix=$enableval],
                   [enable_compat_aix=''])
     AC_ARG_ENABLE([compat-hpux],
-                  AC_HELP_STRING([--enable-compat-hpux],
+                  AS_HELP_STRING([--enable-compat-hpux],
                                  [enable source compatibility with HPUX
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_hpux=$enableval],
                   [enable_compat_hpux=''])
     AC_ARG_ENABLE([compat-lis],
-                  AC_HELP_STRING([--enable-compat-lis],
+                  AS_HELP_STRING([--enable-compat-lis],
                                  [enable source compatibility with LiS
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_lis=$enableval],
