@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: npi.texi,v 0.9.2.3 2005/01/24 11:57:54 brian Exp $
+% @(#) $Id: npi.texi,v 0.9.2.4 2005/02/17 20:00:14 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/01/24 11:57:54 $ by $Author: brian $
+% Last Modified $Date: 2005/02/17 20:00:14 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -130,7 +130,7 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Distributed with Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@subtitle Distributed with Package @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>

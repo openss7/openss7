@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: voip.texi,v 0.9.2.2 2005/01/24 11:57:53 brian Exp $
+% @(#) $Id: voip.texi,v 0.9.2.3 2005/02/17 20:00:13 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/01/24 11:57:53 $ by $Author: brian $
+% Last Modified $Date: 2005/02/17 20:00:13 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -120,7 +120,7 @@ no obligation to provide any feature listed herein.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Distributed with Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@subtitle Distributed with Package @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
 @sp 2
 @subtitle Copyright @copyright{} 2004  OpenSS7 Corporation
 @subtitle All Rights Reserved.
@@ -418,6 +418,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: voip.texi,v $
+Revision 0.9.2.3  2005/02/17 20:00:13  brian
+- Fixes for texi documentation.
+
 Revision 0.9.2.2  2005/01/24 11:57:53  brian
 - Updated texinfo headers.
 

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.12 2005/01/24 11:57:59 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.13 2005/02/17 20:00:27 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/01/24 11:57:59 $ by $Author: brian $
+% Last Modified $Date: 2005/02/17 20:00:27 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -67,7 +67,7 @@
 
 @dircategory Kernel
 @direntry
-* OpenSS7 XNS: (@value{PACKAGE}).	An Open STREAMS XNS Networking Package.
+* OpenSS7 XNS: (@value{PACKAGE_TARNAME}).	An Open STREAMS XNS Networking Package.
 @end direntry
 
 @defindex op
@@ -123,7 +123,7 @@ another language, under the above conditions for modified versions.
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
-@subtitle Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@subtitle Package @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
@@ -142,7 +142,7 @@ Canada @*
 
 @noindent
 This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
-documentation, and is consistent with @value{PACKAGE} @value{PACKAGE_VERSION}.
+documentation, and is consistent with @value{PACKAGE_TARNAME} @value{PACKAGE_VERSION}.
 This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
 Project} and was funded in part by
 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
@@ -339,7 +339,7 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @section Notice
 @cindex notice
 
-This version of  @command{@value{PACKAGE}} is a version modified by
+This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
 @uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and
 modules previously part of
 @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS) Installation and Reference Manual}.}.

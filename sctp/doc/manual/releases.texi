@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.2 2004/12/21 22:20:23 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.3 2005/02/17 20:00:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2004/12/21 22:20:23 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 20:00:06 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -134,7 +134,7 @@ The sections that follow provide information on OpenSS7 releases of the
 @subsection sctp-0.2.20-1
 @cindex sctp-0.2.20-1
 
-Initial autoconf/RPM packaging of the OpenSS7 @command{@value{PACKAGE}} release.
+Initial autoconf/RPM packaging of the OpenSS7 @command{@value{PACKAGE_TARNAME}} release.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.2 2005/01/24 11:57:59 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.3 2005/02/17 20:00:08 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,18 +53,18 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/01/24 11:57:59 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 20:00:08 $ by $Author: brian $
 @c
 @c =========================================================================
 
-@value{PACKAGE} places the following kernel modules files in the kernel
+@value{PACKAGE_UCNAME} places the following kernel modules files in the kernel
 modules directory @file{lib/modules/2.4.20-28.7/}:
 
 @table @file
 @item modules.strxns
 @end table
 
-@value{PACKAGE} places the following kernel modules files in the kernel
+@value{PACKAGE_UCNAME} places the following kernel modules files in the kernel
 modules directory @file{lib/modules/2.4.20-28.7/strxns/}:
 
 @table @file
@@ -76,7 +76,7 @@ This kernel module contains the IP to DLPI module.
 This kernle module contains the Linux DL module.
 @end table
 
-@value{PACKAGE} places the following header files in the system include
+@value{PACKAGE_UCNAME} places the following header files in the system include
 directory @file{usr/include/strxns/}:
 
 @table @file
@@ -90,7 +90,7 @@ This file contains the Linux DL header file.
 This file contains the NPI header file.
 @end table
 
-@value{PACKAGE} places the following test programs in the system libexec
+@value{PACKAGE_UCNAME} places the following test programs in the system libexec
 directory @file{usr/libexec/}:
 
 @table @file
@@ -98,7 +98,7 @@ directory @file{usr/libexec/}:
 This binary contins a test program for the Linux DL driver.
 @end table
 
-@value{PACKAGE} places the following utility programs in the system
+@value{PACKAGE_UCNAME} places the following utility programs in the system
 binary directory @file{usr/sbin/}:
 
 @table @file
@@ -106,10 +106,10 @@ binary directory @file{usr/sbin/}:
 This binary contains a configuration utility for the Linux DL driver.
 @item strxns_mknod
 This binary conatins a script for making device nodes for the
-@value{PACKAGE} package.
+@value{PACKAGE_UCNAME} package.
 @end table
 
-@value{PACKAGE} places the following info files in the system info
+@value{PACKAGE_UCNAME} places the following info files in the system info
 directory @file{usr/share/info/}:
 
 @table @file
@@ -121,7 +121,7 @@ directory @file{usr/share/info/}:
 These files contain this manual in info format.
 @end table
 
-@value{PACKAGE} places the following manpage macro and reference
+@value{PACKAGE_UCNAME} places the following manpage macro and reference
 database files in the system man directory @file{usr/share/man/}:
 
 @table @file
@@ -133,7 +133,7 @@ This file contains a reference database referenced by the manual pages
 included in the package.
 @end table
 
-@value{PACKAGE} places the following CDI manual pages in the system man
+@value{PACKAGE_UCNAME} places the following CDI manual pages in the system man
 directory @file{usr/share/man/man7/}:
 
 @noindent
@@ -190,7 +190,7 @@ directory @file{usr/share/man/man7/}:
 These are CDI manual pages.
 @end display
 
-@value{PACKAGE} places the following DLPI manual pages in the system man
+@value{PACKAGE_UCNAME} places the following DLPI manual pages in the system man
 directory @file{usr/share/man/man7/}:
 
 @noindent
@@ -309,7 +309,7 @@ directory @file{usr/share/man/man7/}:
 These are DLPI manual pages.
 @end display
 
-@value{PACKAGE} places the following NPI manual pages in the system man
+@value{PACKAGE_UCNAME} places the following NPI manual pages in the system man
 directory @file{usr/share/man/man7/}:
 
 @noindent
