@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/03 10:12:16 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/06 09:47:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:16 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/03 10:12:16 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/06 09:47:53 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/03 10:12:16 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/06 09:47:53 $";
 
 #define __NO_VERSION__
 
@@ -91,7 +91,6 @@ static char const ident[] =
 #include "strdebug.h"
 #include "strargs.h"		/* for struct str_args */
 #include "sth.h"		/* for stream operations */
-#include "strsched.h"		/* for di_alloc and di_put */
 #include "strlookup.h"		/* cdevsw_list, etc. */
 #include "strspecfs.h"		/* for specfs_get and specfs_put */
 #include "strreg.h"		/* extern verification */
@@ -324,13 +323,13 @@ EXPORT_SYMBOL_GPL(unregister_strdrv);
  *  only one character major device number will be allocated.  If @major is zero on each call, a new
  *  available major device number will be allocated on each call.
  */
-STATIC int register_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t major, struct file_operations *fops)
+STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major, struct file_operations *fops)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
 	do {
 		err = -EINVAL;
-		if (!cdev || !cdev->d_name || !cdev->d_name[0] || !devi) {
+		if (!cdev || !cdev->d_name || !cdev->d_name[0] || !cmaj) {
 			ptrace(("invalid argument\n"));
 			break;
 		}
@@ -346,7 +345,7 @@ STATIC int register_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t ma
 			break;
 		}
 		err = -EBUSY;
-		if (major && __devi_lookup(major)) {
+		if (major && __cmaj_lookup(major)) {
 			ptrace(("major %hu already registered\n", major));
 			break;
 		}
@@ -357,7 +356,7 @@ STATIC int register_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t ma
 		}
 		if (err > 0 && major == 0)
 			major = err;
-		devi_add(devi, cdev, major);
+		cmaj_add(cmaj, cdev, major);
 		err = major;
 		printd(("STREAMS: registered driver %s, major %hu\n", cdev->d_name, major));
 	} while (0);
@@ -382,12 +381,12 @@ STATIC int register_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t ma
  *  call to register_xinode()
  *  or the call will fail.
  */
-STATIC int unregister_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t major)
+STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
 	do {
-		struct devinfo *d;
+		struct devnode *d;
 		err = -EINVAL;
 		if (!cdev || !cdev->d_name || !cdev->d_name[0]) {
 			ptrace(("invalid arguments\n"));
@@ -401,12 +400,12 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t 
 		if (major) {
 			/* deregister one specific major device number */
 			err = -ENXIO;
-			if (!(d = __devi_lookup(major))) {
+			if (!(d = __cmaj_lookup(major))) {
 				ptrace(("major not registered\n"));
 				break;
 			}
 			err = -EPERM;
-			if (d != devi) {
+			if (d != cmaj) {
 				ptrace(("major registered to another device\n"));
 				break;
 			}
@@ -414,16 +413,16 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t 
 				pswerr(("could not unregister character device, errno=%d\n", -err));
 				break;
 			}
-			devi_del(devi, cdev);
-			printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name, devi->major));
+			cmaj_del(cmaj, cdev);
+			printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name, cmaj->n_major));
 		} else {
 			struct list_head *pos;
 			/* deregister all major device numbers */
 			list_for_each(pos, &cdev->d_majors) {
-				devi = list_entry(pos, struct devinfo, di_list);
-				unregister_chrdev(devi->major, cdev->d_name);
-				devi_del(devi, cdev);
-				printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name, devi->major));
+				cmaj = list_entry(pos, struct devnode, n_list);
+				unregister_chrdev(cmaj->n_major, cdev->d_name);
+				cmaj_del(cmaj, cdev);
+				printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name, cmaj->n_major));
 			}
 		}
 		err = 0;
@@ -435,19 +434,19 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t 
 int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
 {
 	int err;
-	struct devinfo *devi;
+	struct devnode *cmaj;
 	if ((err = register_strdrv(cdev)) < 0 && err != -EBUSY)
 		goto no_strdrv;
 	err = -ENOMEM;
-	if (!(devi = kmalloc(sizeof(*devi), GFP_ATOMIC)))
-		goto no_devi;
-	memset(devi, 0, sizeof(*devi));
-	if ((err = register_xinode(cdev, devi, major, fops)) < 0)
+	if (!(cmaj = kmalloc(sizeof(*cmaj), GFP_ATOMIC)))
+		goto no_cmaj;
+	memset(cmaj, 0, sizeof(*cmaj));
+	if ((err = register_xinode(cdev, cmaj, major, fops)) < 0)
 		goto no_xinode;
 	return (err);
       no_xinode:
-	kfree(devi);
-      no_devi:
+	kfree(cmaj);
+      no_cmaj:
 	unregister_strdrv(cdev);
       no_strdrv:
 	return (err);
@@ -458,12 +457,12 @@ EXPORT_SYMBOL_GPL(register_cmajor);
 int unregister_cmajor(struct cdevsw *cdev, major_t major)
 {
 	int err;
-	struct devinfo *devi;
-	if (!(devi = devi_get(cdev, major)))
+	struct devnode *cmaj;
+	if (!(cmaj = cmaj_get(cdev, major)))
 		return (-ENXIO);
-	if ((err = unregister_xinode(cdev, devi, major)) < 0)
+	if ((err = unregister_xinode(cdev, cmaj, major)) < 0)
 		return (err);
-	kfree(devi);
+	kfree(cmaj);
 	if ((err = unregister_strdrv(cdev)) < 0 && err != -EBUSY)
 		return (err);
 	return (0);
@@ -474,10 +473,10 @@ EXPORT_SYMBOL_GPL(unregister_cmajor);
 /**
  *  register_strnod: - register a minor device node
  *  @cdev: character device switch structure pointer
- *  @node: minor device node structure pointer
+ *  @cmin: minor device node structure pointer
  *  @minor: minor device number
  */
-int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor)
+int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
@@ -489,7 +488,7 @@ int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor)
 			break;
 		}
 		err = -EINVAL;
-		if (!node || !node->n_name || !node->n_name[0]) {
+		if (!cmin || !cmin->n_name || !cmin->n_name[0]) {
 			ptrace(("invalid argument\n"));
 			break;
 		}
@@ -509,22 +508,22 @@ int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor)
 			break;
 		}
 #endif
-		/* check name for another node */
+		/* check name for another cmin */
 		if (!cdev->d_minors.next)
 			INIT_LIST_HEAD(&cdev->d_minors);
-		if ((n = __node_search(cdev, node->n_name))) {
+		if ((n = __cmin_search(cdev, cmin->n_name))) {
 			err = -EPERM;
-			if (n != node) {
-				ptrace(("name %s registered to another\n", node->n_name));
+			if (n != cmin) {
+				ptrace(("name %s registered to another\n", cmin->n_name));
 				break;
 			}
 			err = -EBUSY;
-			ptrace(("name %s already registered to us\n", node->n_name));
+			ptrace(("name %s already registered to us\n", cmin->n_name));
 			break;
 		}
 		if ((minor == (minor_t) (-1UL))) {
 			/* find a free minor */
-			for (minor = 0; (minor != (minor_t) (-1UL)) && __node_lookup(cdev, minor);
+			for (minor = 0; (minor != (minor_t) (-1UL)) && __cmin_lookup(cdev, minor);
 			     minor++) ;
 			err = -ENXIO;
 			if ((minor == (minor_t) (-1UL))) {
@@ -533,9 +532,9 @@ int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor)
 			}
 		} else {
 			/* use specified minor */
-			if ((n = __node_lookup(cdev, minor))) {
+			if ((n = __cmin_lookup(cdev, minor))) {
 				err = -EPERM;
-				if (n != node) {
+				if (n != cmin) {
 					ptrace(("minor %hu registered to another\n", minor));
 					break;
 				}
@@ -544,13 +543,13 @@ int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor)
 				break;
 			}
 		}
-		if ((err = node_add(node, cdev, minor))) {
+		if ((err = cmin_add(cmin, cdev, minor))) {
 			ptrace(("couldn't allocate dentry\n"));
 			break;
 		}
 		err = minor;
 		printd(("STREAMS: registered driver %s, minor %hu, %s\n", cdev->d_name, minor,
-			node->n_name));
+			cmin->n_name));
 	} while (0);
 	write_unlock(&cdevsw_lock);
 	return (err);
@@ -561,7 +560,7 @@ EXPORT_SYMBOL_GPL(register_strnod);
 /**
  *  unregister_strnod: - unregister a minor device node
  *  @cdev: character device switch structure pointer
- *  @node: minor device node structure pointer
+ *  @cmin: minor device node structure pointer
  *  @minor: minor device number
  */
 int unregister_strnod(struct cdevsw *cdev, minor_t minor)
@@ -569,7 +568,7 @@ int unregister_strnod(struct cdevsw *cdev, minor_t minor)
 	int err = 0;
 	write_lock(&cdevsw_lock);
 	do {
-		struct devnode *node;
+		struct devnode *cmin;
 		err = -EINVAL;
 		if (!cdev) {
 			ptrace(("invalid arguments\n"));
@@ -578,13 +577,13 @@ int unregister_strnod(struct cdevsw *cdev, minor_t minor)
 		if (minor != (minor_t) (-1UL)) {
 			/* deregister one specific minor device number */
 			err = -ENXIO;
-			if (!(node = __node_lookup(cdev, minor))) {
+			if (!(cmin = __cmin_lookup(cdev, minor))) {
 				ptrace(("minor not registered\n"));
 				break;
 			}
-			node_del(node, cdev);
+			cmin_del(cmin, cdev);
 			printd(("STREAMS: unregistered driver %s, minor %hu, %s\n", cdev->d_name,
-				node->n_minor, node->n_name));
+				cmin->n_minor, cmin->n_name));
 		} else {
 			/* deregister all minor devices */
 			struct list_head *pos;
@@ -592,10 +591,10 @@ int unregister_strnod(struct cdevsw *cdev, minor_t minor)
 				INIT_LIST_HEAD(&cdev->d_minors);
 			/* deregister all minor device numbers */
 			list_for_each(pos, &cdev->d_minors) {
-				node = list_entry(pos, struct devnode, n_list);
-				node_del(node, cdev);
+				cmin = list_entry(pos, struct devnode, n_list);
+				cmin_del(cmin, cdev);
 				printd(("STEAMS: unregistered driver %s, minor %hu, %s\n",
-					cdev->d_name, node->n_minor, node->n_name));
+					cdev->d_name, cmin->n_minor, cmin->n_name));
 			}
 			INIT_LIST_HEAD(&cdev->d_minors);
 		}
@@ -698,8 +697,8 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 	struct inode *inode = ext_inode;	/* next inode to use */
 	int err;
 	struct cdevsw *cdev;
-	struct devnode *node;
-	struct str_args *argp = file->private_data;
+	struct devnode *cmin;
+	struct str_args *argp = ext_file->private_data;
 	err = ENXIO;
 	if (!(cdev = cdrv_get(getmajor(argp->dev))))
 		goto exit;
@@ -714,8 +713,8 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 		goto pput_exit;
 	if ((err = down_interruptible(&inode->i_sem)) < 0)
 		goto pput_exit;
-	if ((node = node_get(cdev, getminor(argp->dev)))) {
-		dentry = dget(node->n_dentry);
+	if ((cmin = cmin_get(cdev, getminor(argp->dev)))) {
+		dentry = dget(cmin->n_dentry);
 	} else {
 		char buf[32];
 		struct qstr name;

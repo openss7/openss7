@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:13 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -77,12 +77,11 @@ static char const ident[] =
 #include "strdebug.h"
 #include "strargs.h"		/* for struct str_args */
 #include "strreg.h"		/* for spec_open() */
-#include "strsched.h"		/* for di_alloc()/di_put() */
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -264,15 +263,15 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
 int register_clone(struct cdevsw *cdev)
 {
 	int err;
-	struct devnode *node;
-	if (!(node = kmalloc(sizeof(*node), GFP_ATOMIC)))
+	struct devnode *cmin;
+	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC)))
 		return (-ENOMEM);
-	memset(node, 0, sizeof(*node));
-	node->n_name = cdev->d_name;
-	node->n_flag = clone_cdev.d_flag;
-	node->n_mode = clone_cdev.d_mode;
-	if ((err = register_strnod(&clone_cdev, node, cdev->d_modid)) < 0) {
-		kfree(node);
+	memset(cmin, 0, sizeof(*cmin));
+	cmin->n_name = cdev->d_name;
+	cmin->n_flag = clone_cdev.d_flag;
+	cmin->n_mode = clone_cdev.d_mode;
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0) {
+		kfree(cmin);
 		return (err);
 	}
 	return (err);
@@ -283,12 +282,12 @@ EXPORT_SYMBOL_GPL(register_clone);
 int unregister_clone(struct cdevsw *cdev)
 {
 	int err;
-	struct devnode *node;
-	if (!(node = node_get(&clone_cdev, cdev->d_modid)))
+	struct devnode *cmin;
+	if (!(cmin = cmin_get(&clone_cdev, cdev->d_modid)))
 		return (-ENXIO);
 	if ((err = unregister_strnod(&clone_cdev, cdev->d_modid)))
 		return (err);
-	kfree(node);
+	kfree(cmin);
 	return (err);
 }
 

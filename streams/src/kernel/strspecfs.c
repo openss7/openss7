@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:17 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/06 09:47:53 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -327,11 +327,12 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 {
 	struct inode *inode;
 	struct cdevsw *cdev;
-	struct devnode *node = NULL;
+	struct devnode *cmin = NULL;
 	struct dentry *dentry = NULL;
 	const char *name = new->d_name.name;
 	ptrace(("specfs: lookup dentry %p, %s in directory %p\n", new, new->d_name.name, dir));
 	if ((cdev = dir->u.generic_ip)) {
+#if 0
 		/* if the name length is zero, the hash *is* the inode number */
 		if (new->d_name.len == 0) {
 			minor_t minor = getminor(new->d_name.hash);
@@ -341,6 +342,7 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 			ptrace(("specfs: can't get inode\n"));
 			goto enomem;
 		}
+#endif
 		/* check if the name is a valid number */
 		if (*name != '\0') {
 			char *tail = (char *) name;
@@ -355,9 +357,9 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 		}
 		/* check if the name is registered as a minor device node name */
 		/* this is unlikely, it should have been in the dentry hashes */
-		if ((node = node_find(cdev, name))) {
-			printd(("specfs: name is a device node\n"));
-			if ((dentry = dget(node->n_dentry)))
+		if ((cmin = cmin_find(cdev, name))) {
+			printd(("specfs: name is a device cmin\n"));
+			if ((dentry = dget(cmin->n_dentry)))
 				goto exit;
 			swerr();
 			goto enoent;
@@ -366,8 +368,8 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 	goto enoent;
       done:
 	if (!is_bad_inode(inode)) {
-		if ((node = inode->u.generic_ip)) {
-			if ((dentry = dget(node->n_dentry)))
+		if ((cmin = inode->u.generic_ip)) {
+			if ((dentry = dget(cmin->n_dentry)))
 				goto exit;
 			swerr();
 			goto enoent;
@@ -386,8 +388,8 @@ STATIC struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 	goto exit;
       exit:
 #if 0
-	if (node)
-		node_put(node);
+	if (cmin)
+		cmin_put(cmin);
 #endif
 	return (dentry);
 }
@@ -447,13 +449,13 @@ STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 			/* start writing */
 			for (; err >= 0 && pos != &cdev->d_minors;
 			     pos = pos->next, nr++, file->f_pos++) {
-				struct devnode *node = list_entry(pos, struct devnode, n_list);
-				if (node->n_dentry && node->n_dentry->d_inode) {
+				struct devnode *cmin = list_entry(pos, struct devnode, n_list);
+				if (cmin->n_dentry && cmin->n_dentry->d_inode) {
 					read_unlock(&cdevsw_lock);
-					err = filldir(dirent, node->n_name,
-						      strnlen(node->n_name, FMNAMESZ), file->f_pos,
-						      node->n_dentry->d_inode->i_ino,
-						      node->n_dentry->d_inode->i_mode >> 12);
+					err = filldir(dirent, cmin->n_name,
+						      strnlen(cmin->n_name, FMNAMESZ), file->f_pos,
+						      cmin->n_dentry->d_inode->i_ino,
+						      cmin->n_dentry->d_inode->i_mode >> 12);
 					read_lock(&cdevsw_lock);
 				}
 			}
@@ -546,7 +548,7 @@ STATIC int spec_dir_d_revalidate(struct dentry *dentry, int flags)
 		goto invalid;
 	switch (inode->i_mode & S_IFMT) {
 		struct cdevsw *cdev;
-		struct devnode *node;
+		struct devnode *cmin;
 	case S_IFDIR:
 		/* If the inode is a directory, then the inode corresponds to a module directory
 		   inode.  In this case, the driver may have unloaded while the dentry was still
@@ -557,8 +559,8 @@ STATIC int spec_dir_d_revalidate(struct dentry *dentry, int flags)
 			goto valid;
 		break;
 	case S_IFCHR:
-		if ((node = inode->u.generic_ip) && node->n_dentry
-		    && node->n_dentry->d_inode == inode)
+		if ((cmin = inode->u.generic_ip) && cmin->n_dentry
+		    && cmin->n_dentry->d_inode == inode)
 			goto valid;
 		break;
 #ifdef CONFIG_STREAMS_FIFO
@@ -681,6 +683,7 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 	struct dentry *dentry = NULL;
 	const char *name = new->d_name.name;
 	ptrace(("specfs: lookup dentry %p, %s in root dir inode %p\n", new, new->d_name.name, dir));
+#if 0
 	/* if the name length is zero, the hash *is* the inode number */
 	if (new->d_name.len == 0) {
 		printd(("specfs: name length is zero\n"));
@@ -689,6 +692,7 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		ptrace(("specfs: can't get inode\n"));
 		goto enomem;
 	}
+#endif
 	/* check if the name is a valid number */
 	if (*name != '\0') {
 		char *tail = (char *) name;
@@ -836,7 +840,7 @@ STATIC int spec_root_d_revalidate(struct dentry *dentry, int flags)
 		goto invalid;
 	switch (inode->i_mode & S_IFMT) {
 		struct cdevsw *cdev;
-		struct devnode *node;
+		struct devnode *cmin;
 	case S_IFDIR:
 		/* If the inode is a directory, then the inode corresponds to a module directory
 		   inode.  In this case, the driver may have unloaded while the dentry was still
@@ -847,8 +851,8 @@ STATIC int spec_root_d_revalidate(struct dentry *dentry, int flags)
 			goto valid;
 		break;
 	case S_IFCHR:
-		if ((node = inode->u.generic_ip) && node->n_dentry
-		    && node->n_dentry->d_inode == inode)
+		if ((cmin = inode->u.generic_ip) && cmin->n_dentry
+		    && cmin->n_dentry->d_inode == inode)
 			goto valid;
 		break;
 #ifdef CONFIG_STREAMS_FIFO
@@ -870,6 +874,7 @@ STATIC int spec_root_d_revalidate(struct dentry *dentry, int flags)
 }
 #endif
 
+#if 0
 /**
  *  spec_root_d_hash: - hash a directory entry name
  *  @dentry:	directory entry
@@ -938,6 +943,7 @@ STATIC int spec_root_d_delete(struct dentry *dentry)
 		dentry->d_inode, dentry->d_inode ? dentry->d_inode->i_ino : 0));
 	return (1);
 }
+#endif
 
 #if 0
 /**
@@ -973,18 +979,22 @@ STATIC void spec_root_d_release(struct dentry *dentry)
 }
 #endif
 
+#if 0
 STATIC struct dentry_operations spec_root_d_ops ____cacheline_aligned = {
 #if 0
 	d_revalidate:spec_root_d_revalidate,
 #endif
+#if 0
 	d_hash:spec_root_d_hash,
 	d_compare:spec_root_d_compare,
 	d_delete:spec_root_d_delete,
+#endif
 #if 0
 	d_release:spec_root_d_release,
 	d_iput:spec_root_d_iput,
 #endif
 };
+#endif
 
 /* 
  *  =========================================================================
@@ -1160,12 +1170,12 @@ STATIC void spec_read_inode2(struct inode *inode, void *opaque)
 		return spec_read_inode(inode);
 	ptrace(("specfs: reading specific inode %p (%ld)\n", inode, inode->i_ino));
 	if (getmajor(inode->i_ino)) {
-		struct devnode *node = opaque;
+		struct devnode *cmin = opaque;
 		/* for device nodes, the major component of the i_ino is the module id */
 		__kernel_dev_t dev = MKDEV(getmajor(inode->i_ino), getminor(inode->i_ino) & MAX_CHRDEV);
 		printd(("specfs: reading device node %p (%ld)\n", inode, inode->i_ino));
 		inode->u.generic_ip = opaque;
-		inode->i_mode = sbi->sbi_mode | node->n_mode;
+		inode->i_mode = sbi->sbi_mode | cmin->n_mode;
 		inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
 		inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
 		inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
@@ -1230,7 +1240,7 @@ STATIC void spec_delete_inode(struct inode *inode)
 	ptrace(("specfs: deleting inode %p (%ld), geenric %p\n", inode, inode->i_ino, inode->u.generic_ip));
 	switch (inode->i_mode & S_IFMT) {
 		struct cdevsw *cdev;
-		struct devnode *node;
+		struct devnode *cmin;
 //              struct stdata *sd;
 	case S_IFDIR:
 		/* directory inodes potentially have a cdevsw structure hanging off of the
@@ -1252,10 +1262,10 @@ STATIC void spec_delete_inode(struct inode *inode)
 		   a reference count on the inode.  We should never get here with either the
 		   u.generic_ip pointer set or the n_dentry reference still held.  Forced deletions
 		   might get us here anyway. */
-		if ((node = inode->u.generic_ip)) {
+		if ((cmin = inode->u.generic_ip)) {
 			swerr();
 			inode->u.generic_ip = NULL;
-			// node->d_entry = NULL;
+			// cmin->d_entry = NULL;
 		}
 		/* fall through */
 	default:
@@ -1425,7 +1435,9 @@ STATIC struct super_block *specfs_read_super(struct super_block *sb, void *data,
 	inode->i_fop = &spec_root_f_ops;
 	if (!(root = d_alloc_root(inode)))
 		goto iput_fail;
+#if 0
 	root->d_op = &spec_root_d_ops;
+#endif
 #endif
 	sb->s_root = root;
 	sb->u.generic_sbp = sbi;
@@ -1442,7 +1454,6 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
 
 STATIC struct vfsmount *specfs_mnt = NULL;
 STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
-STATIC int specfs_count = 0;
 
 struct vfsmount *specfs_get(void)
 {

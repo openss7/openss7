@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.9 2004/06/03 10:12:13 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.10 2004/06/06 09:47:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:13 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/03 10:12:13 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/06 09:47:42 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -359,7 +359,7 @@ extern int lis_unregister_strmod(struct streamtab *strtab);
 #warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
-extern int register_strnod(struct cdevsw *cdev, struct devnode *node, minor_t minor);
+extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
 extern int register_strdev(struct cdevsw *cdev, major_t major);
 extern int register_strdrv(struct cdevsw *cdev);
 extern int register_strmod(struct fmodsw *fmod);

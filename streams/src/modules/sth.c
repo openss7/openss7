@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:17 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $";
 
 //#define __NO_VERSION__
 
@@ -88,7 +88,7 @@ static char const ident[] =
 #include "strsched.h"		/* for allocsd */
 #include "strargs.h"		/* for str_args */
 #include "strreg.h"		/* for spec_open() */
-#include "strlookup.h"		/* for node_search() */
+#include "strlookup.h"		/* for cmin_get() */
 #include "sth.h"		/* extern verification */
 #include "strsysctl.h"		/* for sysctls */
 #include "strsad.h"		/* for autopush */
@@ -99,7 +99,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/06 09:47:56 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3413,7 +3413,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	int err;
 	struct str_args args;
 	struct cdevsw *cdev;
-	struct devnode *node;
+	struct devnode *cmin;
 	major_t major;
 	minor_t minor;
 	modID_t modid;
@@ -3429,8 +3429,8 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	modid = cdev->d_modid;
 	args.dev = makedevice(modid, minor);
 	args.oflag = make_oflag(file);
-	args.sflag = (node = node_get(cdev, minor)) ?
-	    ((node->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN) :
+	args.sflag = (cmin = cmin_get(cdev, minor)) ?
+	    ((cmin->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN) :
 	    ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
 	args.crp = current_creds;
 	file->private_data = &args;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/03 10:12:16 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/06 09:47:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/03 10:12:16 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/03 10:12:16 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/06 09:47:53 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/03 10:12:16 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/06 09:47:53 $";
 
 #define __NO_VERSION__
 
@@ -89,7 +89,6 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"		/* for stream operations */
-#include "strsched.h"		/* for di_alloc and di_put */
 #include "strspecfs.h"		/* for specfs_get and specfs_put */
 #include "strlookup.h"		/* extern verification */
 
@@ -125,7 +124,7 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 	(cdevsw_hash + (((_major) + ((_major) >> STRDEV_HASH_ORDER) + ((_major) >> 2 * STRDEV_HASH_ORDER)) & STRDEV_HASH_MASK))
 
 #define strnod_hash_slot(_minor) \
-	(nodesw_hash + (((_minor) + ((_minor) >> STRNOD_HASH_ORDER) + ((_minor) >> 2 * STRNOD_HASH_ORDER)) & STRNOD_HASH_MASK))
+	(cminsw_hash + (((_minor) + ((_minor) >> STRNOD_HASH_ORDER) + ((_minor) >> 2 * STRNOD_HASH_ORDER)) & STRNOD_HASH_MASK))
 
 rwlock_t cdevsw_lock = RW_LOCK_UNLOCKED;
 rwlock_t fmodsw_lock = RW_LOCK_UNLOCKED;
@@ -133,7 +132,7 @@ rwlock_t nodesw_lock = RW_LOCK_UNLOCKED;
 
 struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here */
 struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
-struct list_head nodesw_list = LIST_HEAD_INIT(nodesw_list);	/* Minors go here */
+struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
 
 #if	defined CONFIG_STREAMS_SC_MODULE
 EXPORT_SYMBOL_GPL(cdevsw_list);
@@ -142,21 +141,21 @@ EXPORT_SYMBOL_GPL(cdevsw_list);
 EXPORT_SYMBOL_GPL(fmodsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE
-EXPORT_SYMBOL_GPL(nodesw_list);
+EXPORT_SYMBOL_GPL(cminsw_list);
 #endif
 
 struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
 struct list_head cdevsw_hash[STRDEV_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
-struct list_head nodesw_hash[STRNOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
+struct list_head cminsw_hash[STRNOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
 
 int cdev_count = 0;
 int fmod_count = 0;
-int node_count = 0;
+int cmin_count = 0;
 
 #if defined CONFIG_STREAMS_SC_MODULE
 EXPORT_SYMBOL_GPL(cdev_count);
 EXPORT_SYMBOL_GPL(fmod_count);
-EXPORT_SYMBOL_GPL(node_count);
+EXPORT_SYMBOL_GPL(cmin_count);
 #endif
 
 /*
@@ -187,39 +186,39 @@ STATIC INLINE void init_cdev_hash(void)
 }
 
 /**
- *  init_node_hash: - initialize the list_head structures in the node hash
+ *  init_cmin_hash: - initialize the list_head structures in the cmin hash
  */
-STATIC INLINE void init_node_hash(void)
+STATIC INLINE void init_cmin_hash(void)
 {
 	int i;
 	for (i = 0; i < STRNOD_HASH_SIZE; i++)
-		INIT_LIST_HEAD((nodesw_hash + i));
+		INIT_LIST_HEAD((cminsw_hash + i));
 }
 
 /**
- *  __devi_lookup: - look up a devi by major device number in devi hashes
+ *  __cmaj_lookup: - look up a cmaj by major device number in cmaj hashes
  *  @major: major device number to look up
  *
- *  Look up a STREAMS device information structure by external major device number in the devinfo
+ *  Look up a STREAMS device information structure by external major device number in the devnode
  *  hashes without locking or acquisition of the result.  This function can be called multiple times
  *  with the same @major with very little performance impact.
  */
-struct devinfo *__devi_lookup(major_t major)
+struct devnode *__cmaj_lookup(major_t major)
 {
 	struct list_head *pos, *slot = strdev_hash_slot(major);
 	list_for_each(pos, slot) {
-		struct devinfo *devi = list_entry(pos, struct devinfo, di_hash);
-		if (devi->major == major) {
+		struct devnode *cmaj = list_entry(pos, struct devnode, n_hash);
+		if (cmaj->n_major == major) {
 			/* cache to front */
-			list_del(&devi->di_hash);
-			list_add(&devi->di_hash, slot);
-			return (devi);
+			list_del(&cmaj->n_hash);
+			list_add(&cmaj->n_hash, slot);
+			return (cmaj);
 		}
 	}
 	return (NULL);
 }
 
-EXPORT_SYMBOL_GPL(__devi_lookup);
+EXPORT_SYMBOL_GPL(__cmaj_lookup);
 
 /**
  *  __cdev_lookup: - look up a cdev by major device number in cdev hashes
@@ -231,9 +230,9 @@ EXPORT_SYMBOL_GPL(__devi_lookup);
  */
 struct cdevsw *__cdev_lookup(major_t major)
 {
-	struct devinfo *devi;
-	if ((devi = __devi_lookup(major)))
-		return (devi->di_dev);
+	struct devnode *cmaj;
+	if ((cmaj = __cmaj_lookup(major)))
+		return (cmaj->n_dev);
 	return (NULL);
 }
 
@@ -265,26 +264,26 @@ struct cdevsw *__cdrv_lookup(modID_t modid)
 EXPORT_SYMBOL_GPL(__cdrv_lookup);
 
 /**
- *  __node_lookup: - look up a node by cdev and minor device number in node hashes
+ *  __cmin_lookup: - look up a node by cdev and minor device number in node hashes
  *  @cdev: pointer to character device switch entry
  *  @minor: minor device number
  */
-struct devnode *__node_lookup(struct cdevsw *cdev, minor_t minor)
+struct devnode *__cmin_lookup(struct cdevsw *cdev, minor_t minor)
 {
 	struct list_head *pos, *slot = strnod_hash_slot(minor);
 	list_for_each(pos, slot) {
-		struct devnode *node = list_entry(pos, struct devnode, n_hash);
-		if (node->n_dev == cdev && node->n_minor == minor) {
+		struct devnode *cmin = list_entry(pos, struct devnode, n_hash);
+		if (cmin->n_dev == cdev && cmin->n_minor == minor) {
 			/* pull to head of slot */
-			list_del(&node->n_hash);
-			list_add(&node->n_hash, slot);
-			return (node);
+			list_del(&cmin->n_hash);
+			list_add(&cmin->n_hash, slot);
+			return (cmin);
 		}
 	}
 	return (NULL);
 }
 
-EXPORT_SYMBOL_GPL(__node_lookup);
+EXPORT_SYMBOL_GPL(__cmin_lookup);
 
 /**
  *  __fmod_lookup: - look up a fmod by module identifier in fmod hashes
@@ -345,22 +344,22 @@ struct fmodsw *__fmod_search(const char *name)
 
 EXPORT_SYMBOL_GPL(__fmod_search);
 
-struct devnode *__node_search(struct cdevsw *cdev, const char *name)
+struct devnode *__cmin_search(struct cdevsw *cdev, const char *name)
 {
 	struct list_head *pos, *slot = &cdev->d_minors;
 	list_for_each(pos, slot) {
-		struct devnode *node = list_entry(pos, struct devnode, n_list);
-		if (!strncmp(node->n_name, name, FMNAMESZ)) {
+		struct devnode *cmin = list_entry(pos, struct devnode, n_list);
+		if (!strncmp(cmin->n_name, name, FMNAMESZ)) {
 			/* pull to head of slot */
-			list_del(&node->n_list);
-			list_add(&node->n_list, slot);
-			return (node);
+			list_del(&cmin->n_list);
+			list_add(&cmin->n_list, slot);
+			return (cmin);
 		}
 	}
 	return (NULL);
 }
 
-EXPORT_SYMBOL_GPL(__node_search);
+EXPORT_SYMBOL_GPL(__cmin_search);
 
 void *__smod_search(const char *name)
 {
@@ -504,49 +503,49 @@ STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
 }
 
 /**
- *  devi_lookup: - look up a devinfo by device and major device number
+ *  cmaj_lookup: - look up a devnode by device and major device number
  *  @cdev:	cdevsw structure for the driver
  *  @major:	major device number to look up
  */
-STATIC struct devinfo *devi_lookup(const struct cdevsw *cdev, major_t major)
+STATIC struct devnode *cmaj_lookup(const struct cdevsw *cdev, major_t major)
 {
-	struct devinfo *devi = NULL;
+	struct devnode *cmaj = NULL;
 	read_lock(&cdevsw_lock);
 	if (cdev && cdev->d_majors.next) {
 		register struct list_head *pos;
 		list_for_each(pos, &cdev->d_majors) {
-			struct devinfo *d = list_entry(pos, struct devinfo, di_list);
-			if (d->major == major) {
-				devi = d;
+			struct devnode *d = list_entry(pos, struct devnode, n_list);
+			if (d->n_major == major) {
+				cmaj = d;
 				break;
 			}
 		}
 	}
 	read_unlock(&cdevsw_lock);
-	return (devi);
+	return (cmaj);
 }
 
 /*
- *  node_lookup: - look up a devnode by device and minor device number
+ *  cmin_lookup: - look up a devnode by device and minor device number
  *  @cdev:	cdevsw structure for the driver
  *  @minor:	minor device number to look up
  */
-STATIC struct devnode *node_lookup(const struct cdevsw *cdev, minor_t minor)
+STATIC struct devnode *cmin_lookup(const struct cdevsw *cdev, minor_t minor)
 {
-	struct devnode *node = NULL;
+	struct devnode *cmin = NULL;
 	read_lock(&cdevsw_lock);
 	if (cdev && cdev->d_minors.next) {
 		register struct list_head *pos;
 		list_for_each(pos, &cdev->d_minors) {
 			struct devnode *n = list_entry(pos, struct devnode, n_list);
 			if (n->n_minor == minor) {
-				node = n;
+				cmin = n;
 				break;
 			}
 		}
 	}
 	read_unlock(&cdevsw_lock);
-	return (node);
+	return (cmin);
 }
 
 /**
@@ -640,26 +639,26 @@ STATIC struct fmodsw *fmod_search(const char *name, int load)
 }
 
 /*
- *  node_search: - looke up a minor device node by name
+ *  cmin_search: - looke up a minor device node by name
  *  @cdev: character device major structure
  *  @name: name to look up
  */
-STATIC struct devnode *node_search(const struct cdevsw *cdev, const char *name)
+STATIC struct devnode *cmin_search(const struct cdevsw *cdev, const char *name)
 {
-	struct devnode *node = NULL;
+	struct devnode *cmin = NULL;
 	read_lock(&cdevsw_lock);
 	if (cdev && cdev->d_minors.next) {
 		register struct list_head *pos;
 		list_for_each(pos, &cdev->d_minors) {
 			struct devnode *n = list_entry(pos, struct devnode, n_list);
 			if (!strncmp(n->n_name, name, FMNAMESZ)) {
-				node = n;
+				cmin = n;
 				break;
 			}
 		}
 	}
 	read_unlock(&cdevsw_lock);
-	return (node);
+	return (cmin);
 }
 
 #if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
@@ -808,28 +807,28 @@ EXPORT_SYMBOL_GPL(fmod_put);
 #endif
 
 /**
- *  devi_get: - get a reference to a major device node (devinfo)
+ *  cmaj_get: - get a reference to a major device node (devnode)
  *  @cdev:	cdevsw structure for device
  *  @major:	major device number
  */
-struct devinfo *devi_get(const struct cdevsw *cdev, major_t major)
+struct devnode *cmaj_get(const struct cdevsw *cdev, major_t major)
 {
-	return devi_lookup(cdev, major);
+	return cmaj_lookup(cdev, major);
 }
 
-EXPORT_SYMBOL_GPL(devi_get);
+EXPORT_SYMBOL_GPL(cmaj_get);
 
 /**
- *  node_get: - get a reference to a minor device node (devnode)
+ *  cmin_get: - get a reference to a minor device node (devnode)
  *  @cdev:	cdevsw structure for device
  *  @minor:	minor device number
  */
-struct devnode *node_get(const struct cdevsw *cdev, minor_t minor)
+struct devnode *cmin_get(const struct cdevsw *cdev, minor_t minor)
 {
-	return node_lookup(cdev, minor);
+	return cmin_lookup(cdev, minor);
 }
 
-EXPORT_SYMBOL_GPL(node_get);
+EXPORT_SYMBOL_GPL(cmin_get);
 
 /**
  *  cdev_find: - find a STREAMS device by its name
@@ -900,12 +899,12 @@ struct fmodsw *fmod_find(const char *name)
 EXPORT_SYMBOL_GPL(fmod_find);
 #endif
 
-struct devnode *node_find(const struct cdevsw *cdev, const char *name)
+struct devnode *cmin_find(const struct cdevsw *cdev, const char *name)
 {
-	return node_search(cdev, name);
+	return cmin_search(cdev, name);
 }
 
-EXPORT_SYMBOL_GPL(node_find);
+EXPORT_SYMBOL_GPL(cmin_find);
 
 /**
  *  cdev_minor: - get extended minor number from kernel device type
@@ -918,8 +917,8 @@ minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 	struct list_head *pos;
 	ensure(!cdev->d_majors.next || list_empty(&cdev->d_majors), return (minor));
 	list_for_each(pos, &cdev->d_majors) {
-		struct devinfo *devi = list_entry(pos, struct devinfo, di_list);
-		if (major == devi->major)
+		struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
+		if (major == cmaj->n_major)
 			break;
 		minor += (1U << MINORBITS);
 	}
@@ -1049,80 +1048,80 @@ void cdev_del(struct cdevsw *cdev)
 
 EXPORT_SYMBOL_GPL(cdev_del);
 
-void devi_add(struct devinfo *devi, struct cdevsw *cdev, major_t major)
+void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major)
 {
-	devi->major = major;
-	devi->minor = 0;	/* FIXME */
+	cmaj->n_major = major;
+	cmaj->n_minor = 0;	/* FIXME */
 	/* add to list and hash */
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
 	if (list_empty(&cdev->d_majors))
 		cdev->d_major = major;
-	list_add_tail(&devi->di_list, &cdev->d_majors);
-	list_add_tail(&devi->di_hash, strdev_hash_slot(major));
+	list_add_tail(&cmaj->n_list, &cdev->d_majors);
+	list_add_tail(&cmaj->n_hash, strdev_hash_slot(major));
 }
 
-EXPORT_SYMBOL_GPL(devi_add);
+EXPORT_SYMBOL_GPL(cmaj_add);
 
-void devi_del(struct devinfo *devi, struct cdevsw *cdev)
+void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev)
 {
 	ensure(cdev->d_majors.next, INIT_LIST_HEAD(&cdev->d_majors));
-	list_del_init(&devi->di_list);	/* not necessary - see di_put() */
-	list_del_init(&devi->di_hash);	/* not necessary - see di_put() */
+	list_del_init(&cmaj->n_list);
+	list_del_init(&cmaj->n_hash);
 	if (list_empty(&cdev->d_majors))
 		cdev->d_major = 0;
 }
 
-EXPORT_SYMBOL_GPL(devi_del);
+EXPORT_SYMBOL_GPL(cmaj_del);
 
-int node_add(struct devnode *node, struct cdevsw *cdev, minor_t minor)
+int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 {
-	node->n_dev = cdev;
-	node->n_modid = cdev->d_modid;
-	node->n_minor = minor;
+	cmin->n_dev = cdev;
+	cmin->n_modid = cdev->d_modid;
+	cmin->n_minor = minor;
 	/* get dentry if required */
-	if (!node->n_dentry
-	    && !(node->n_dentry =
-		 spec_dir_alloc(cdev->d_dentry, node->n_name,
-				makedevice(node->n_modid, node->n_minor), node))) {
+	if (!cmin->n_dentry
+	    && !(cmin->n_dentry =
+		 spec_dir_alloc(cdev->d_dentry, cmin->n_name,
+				makedevice(cmin->n_modid, cmin->n_minor), cmin))) {
 		ptrace(("couldn't allocate dentry\n"));
 		return (-ENOMEM);
 	}
-	if (!node->n_str)
-		node->n_str = cdev->d_str;
-	if (!node->n_mode & S_IFMT)
-		node->n_mode = cdev->d_mode;
-	if (!node->n_mode & S_IFMT)
-		node->n_mode = S_IFCHR;
+	if (!cmin->n_str)
+		cmin->n_str = cdev->d_str;
+	if (!cmin->n_mode & S_IFMT)
+		cmin->n_mode = cdev->d_mode;
+	if (!cmin->n_mode & S_IFMT)
+		cmin->n_mode = S_IFCHR;
 	/* add to list and hash */
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
-	list_add(&node->n_list, &cdev->d_minors);
-	list_add(&node->n_hash, strnod_hash_slot(minor));
-	node_count++;
+	list_add(&cmin->n_list, &cdev->d_minors);
+	list_add(&cmin->n_hash, strnod_hash_slot(minor));
+	cmin_count++;
 	return (0);
 }
 
-EXPORT_SYMBOL_GPL(node_add);
+EXPORT_SYMBOL_GPL(cmin_add);
 
-void node_del(struct devnode *node, struct cdevsw *cdev)
+void cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
 	/* put away dentry if required */
-	spec_dir_delete(xchg(&node->n_dentry, NULL));
-	node->n_dev = NULL;
-	node->n_modid = -1;
-	node->n_minor = -1;
+	spec_dir_delete(xchg(&cmin->n_dentry, NULL));
+	cmin->n_dev = NULL;
+	cmin->n_modid = -1;
+	cmin->n_minor = -1;
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
-	list_del_init(&node->n_list);
-	list_del_init(&node->n_hash);
-	node_count--;
+	list_del_init(&cmin->n_list);
+	list_del_init(&cmin->n_hash);
+	cmin_count--;
 }
 
-EXPORT_SYMBOL_GPL(node_del);
+EXPORT_SYMBOL_GPL(cmin_del);
 
 int strlookup_init(void)
 {
 	init_fmod_hash();
 	init_cdev_hash();
-	init_node_hash();
+	init_cmin_hash();
 	return (0);
 }
 

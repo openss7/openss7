@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.18 2004/06/01 12:04:02 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.19 2004/06/06 09:47:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:42 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:02 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/06 09:47:42 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -599,10 +599,11 @@ struct devnode {
 	struct syncq *n_syncq;		/* synchronization queue */
 	struct module *n_kmod;		/* kernel module */
 	/* above must match fmodsw */
-	int n_minor;			/* node minor device number */
+	int n_major;			/* node major device number */
 	struct dentry *n_dentry;	/* specfs directory entry */
 	mode_t n_mode;			/* inode mode */
 	/* above must match cdevsw */
+	int n_minor;			/* node minor device number */
 	struct cdevsw *n_dev;		/* character device */
 };
 #define N_MAJOR		0x01	/* major device node */

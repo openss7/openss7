@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/02 12:09:39 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/06 09:47:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/02 12:09:39 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/06 09:47:53 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/02 12:09:39 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/06 09:47:53 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -328,7 +328,7 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL_GPL(fmod_get);	/* strsubr.h, strreg.c */
 //EXPORT_SYMBOL_GPL(fmod_put);	/* strsubr.h, strreg.c */
 //EXPORT_SYMBOL_GPL(fmod_find);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(node_find);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL_GPL(cmin_find);	/* strsubr.h, strreg.c */
 //EXPORT_SYMBOL_GPL(vcmn_err);	/* cmn_err.h */
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
 //EXPORT_SYMBOL_GPL(do_fattach);	/* strattach.h */

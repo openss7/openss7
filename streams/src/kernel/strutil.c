@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/06 09:47:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/01 12:04:39 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/06 09:47:53 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/01 12:04:39 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/06 09:47:53 $";
 
 #define __NO_VERSION__
 
@@ -1350,7 +1350,9 @@ static void _put(queue_t *q, mblk_t *mp)
 #if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
 	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
 #endif
-	if ((isq = q->q_syncq)) {
+	if (!(isq = q->q_syncq))
+		__put(q, mp);
+	else {
 		struct syncq *osq = isq->sq_outer;
 		if (enter_shared(osq, &flags)) {
 			if (isq->sq_flag & D_MTPUTSHARED) {
