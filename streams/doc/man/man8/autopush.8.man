@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.10 2004/08/24 08:42:36 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.11 2005/01/17 05:33:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/17 05:33:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH 8 "$Date: 2004/08/24 08:42:36 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH AUTOPUSH 8 "$Date: 2005/01/17 05:33:18 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -99,7 +99,7 @@ sort-adjacent-labels
 .HP
 \fBautopush \fR{\fP-v\fR|\fP--version\fR}\fP
 .HP
-\fBautopush --copying
+\fBautopush \fR{\fP-C\fR|\fP--copying\fR}\fP
 .PD
 .\"
 .\"
@@ -319,18 +319,18 @@ options.
 .PP
 Additional options:
 .TP
+\fB-d\fR, \fB--debug\fR [\fIlevel\fR]
+Increases verbosity of output to debug level.  This is for debugging
+.B autopush
+and for gaining additional diagnostic information as to what caused an error
+exit status.
+.TP
 .BR -q ", " --quiet
 Suppresses normal output to both
 .I stdout
 and
 .IR stderr .
 Option and command line syntax errors are still reported.
-.TP
-.BR -d ", " --debug
-Increases verbosity of output to debug level.  This is for debugging
-.B autopush
-and for gaining additional diagnostic information as to what caused an error
-exit status.
 .\"
 .\"
 .SH "FILE FORMAT"
@@ -642,7 +642,7 @@ and
 .[
 LiS
 .]
-with the following caveats:
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .B autopush
 options
@@ -729,6 +729,12 @@ command.
 LfS
 .]
 provides for this deficiency.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ", " --debug ", " --verbose " and " --quiet ,
+OpenSS7 coding standards.
 .PP
 .B Linux Fast-STREAMS
 provides a number of additional options.  Portable configurations should use

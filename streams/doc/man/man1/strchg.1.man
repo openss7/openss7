@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strchg.1.man,v 0.9.2.5 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: strchg.1.man,v 0.9.2.6 2005/01/17 05:32:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/17 05:32:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCHG 1 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
+.TH STRCHG 1 "$Date: 2005/01/17 05:32:46 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
 .\"
 .\"
 .SH NAME
@@ -82,11 +82,19 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBstrchg\fR [\fIoptions\fR] \fB-h\fR, \fB--push\fI module\fR[,\fImodule\fR ...]
+\fBstrchg\fR [\fIoptions\fR] {\fB-h\fR|\fB--push\fR}\fI module\fR[,\fImodule\fR ...]
+.PD 0
 .HP 12
-\fBstrchg\fR [\fIoptions\fR] \fB-p\fR, \fB--pop\fR [\fB-a\fR, \fB--all\fR | \fB-u\fR, \fB--upto\fI module\fR]
+\fBstrchg\fR [\fIoptions\fR] {\fB-p\fR|\fB--pop\fR} [{\fB-a\fR|\fB--all\fR} | {\fB-u\fR|\fB--upto\fR}\fI module\fR]
 .HP 12
-\fBstrchg\fR [\fIoptions\fR] \fB-f\fR, \fB--file\fI filename\fR
+\fBstrchg\fR [\fIoptions\fR] {\fB-f\fR|\fB--file\fR}\fI filename\fR
+.HP 12
+\fBstrchg\fR {\fB-H\fR|\fB--help\fR}
+.HP 12
+\fBstrchg\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrchg\fR {\fB-C\fR|\fB--copying\fR}
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -116,6 +124,15 @@ Pops a module off of a stream.  Used along, the
 option pops the topmost module from the stream.  May also be combined with the
 .BR -u " or " -a
 options below.
+.RS
+.TP
+\fB-a\fR, \fB--all\fR
+Pops all modules above the topmost driver off of a stream.
+The
+.B -p
+option must be used in front of the
+.B -a
+flag.
 .TP
 \fB-u\fR, \fB--upto\fI module\fR
 Pops all modules above the specified
@@ -126,14 +143,7 @@ The
 option must be used in front of the
 .B -u
 flag.
-.TP
-\fB-a\fR, \fB--all\fR
-Pops all modules above the topmost driver off of a stream.
-The
-.B -p
-option must be used in front of the
-.B -a
-flag.
+.RE
 .TP
 \fB-f\fR, \fB--file\fI filename\fR
 Pushes and pops the necessary modules to conform the stream to the
@@ -142,6 +152,38 @@ configuration given in the specified file.
 Only one of
 .BR -h ", " -p " or " -f
 options may be specified.
+.PP
+The following options are non-portable:
+.TP
+\fB-d\fR, \fB--debug\fR [\fIlevel\fR]
+Increases or sets to \fIlevel\fR the debug verbosity, typically for debugging purposes.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increases or sets to \fIlevel\fR the output verbosity, typically for diagnostic purposes.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-H\fR, \fB--help\fR
+When this option is encountered,
+.B strchg
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B strchg
+displays version information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B strchg
+displays copyright and copying information on
+.I stdout
+and exits.
 .\"
 .\"
 .SH "FILE FORMAT"
@@ -229,7 +271,18 @@ has no known bugs.
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg
 and
-.IR UXP/VP \(rg.
+.IR UXP/VP \(rg,
+with the following portability considerations:
+.IP \(em
+.I SVR 4.2
+does not document long options.
+The use of long options should be avoided by portable programs.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ", " --debug ", " --verbose " and " --quiet ,
+OpenSS7 coding standards.
 .\"
 .\"
 .SH CONFORMANCE

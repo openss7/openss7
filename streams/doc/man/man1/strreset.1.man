@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strreset.1.man,v 0.9.2.5 2004/08/22 06:17:40 brian Exp $
+.\" @(#) $Id: strreset.1.man,v 0.9.2.6 2005/01/17 05:32:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/17 05:32:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRRESET 1 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
+.TH STRRESET 1 "$Date: 2005/01/17 05:32:46 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
 .\"
 .\"
 .SH NAME
@@ -82,14 +82,22 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBstrreset\fR [ \fB-M\fI major \fR] [ \fB-m\fI minor \fR]
+\fBstrreset\fR [\fIoptions\fR] [ \fB-M\fI major \fR] [ \fB-m\fI minor \fR]
+.PD 0
+.HP 12
+\fBstrreset\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrreset\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrreset\fR {\fB-C\fR|\fB--copying\fR}
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 The
 .B strreset
-command reset an open stream by generating a
+command resets an open stream by generating a
 .BR M_FLUSH (9)
 message to the stream head.  You use it mainly to reset blocked streams.  When
 it is impossible to reopen the stream, issue an
@@ -111,6 +119,38 @@ stream to be reset.
 \fR[\fB-m\fR, \fB--minor\fR \fIminor\fR]
 Specifies the minor device number for the special file associated with the
 stream to be reset.
+.PP
+The following options are non-portable:
+.TP
+\fB-d\fR, \fB--debug\fR [\fIlevel\fR]
+Increases or sets debugging verbosity, typically for debugging purposes.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increases or sets output verbosity, typically for diagnostic purposes.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B strreset
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B strreset
+displays version information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B strreset
+displays copyright and copying information on
+.I stdout
+and exits.
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -164,7 +204,18 @@ has no known bugs.
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg
 and
-.IR UXP/V \(rg.
+.IR UXP/V \(rg,
+with the following portability considerations:
+.IP \(em
+.I SVR 4.2
+does not document long options.
+The use of long options should be avoided by portable programs.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ", " --debug ", " --verbose " and " --quiet ,
+OpenSS7 coding standards.
 .\"
 .\"
 .SH CONFORMANCE

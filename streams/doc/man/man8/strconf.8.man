@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strconf.8.man,v 0.9.2.6 2004/08/24 08:42:37 brian Exp $
+.\" @(#) $Id: strconf.8.man,v 0.9.2.7 2005/01/17 05:33:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/24 08:42:37 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/17 05:33:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,13 +71,31 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCONF 8 "$Date: 2004/08/24 08:42:37 $" "$Name:  $" "Linux STREAMS"
+.TH STRCONF 8 "$Date: 2005/01/17 05:33:19 $" "$Name:  $" "Linux STREAMS"
+.\"
+.\"
 .SH NAME
 .B strconf \-
 STREAMS configuration utility
+.\"
+.\"
 .SH SYNOPSIS
+.\"
+.\"
 .SH DESCRIPTION
+.\"
+.\"
 .SH OPTIONS
+.HP 12
+\fBstrconf\fR ...
+.PD 0
+.HP 12
+\fBstrconf\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrconf\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrconf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
 .TP
 .BI "-b " number
 Set the base major number for automatic assignment of major device numbers.
@@ -109,10 +127,30 @@ for major device numbers.
 .BI "-p " perm
 .TP
 .BI "-r " name
-
+.\"
+.\"
 .SH "SEE ALSO"
 .BR strconf (5).
+.\"
+.\"
 .SH CAVEATS
 .PP
 This man page was shamelessly stolen directly from the
 .BR "LiS htdocs" .
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strclean
+is compatible with
+.B LiS
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
