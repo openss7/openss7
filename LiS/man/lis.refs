@@ -3180,14 +3180,14 @@ Part 1: Protocol Specification
 %O 4th Edition
 
 %K lis
-%L LIS 2.16
-%R LIS 2.16
-%A Gcom
-%Q Gcom
-%T Linux STREAMS (LiS) 2.16.18 Source Code
-%E Dave Goethe
-%I Gcom
-%U http://www.gcom.com/
+%L LIS 2.18
+%R LIS 2.18
+%A OpenSS7
+%Q OpenSS7
+%T Linux STREAMS (LiS) 2.18.1 Source Code
+%E Brian Bidulock
+%I OpenSS7 Corporation
+%U http://www.openss7.org/
 
 %K lfs
 %L LfS 0.9

@@ -569,4 +569,13 @@ MODULE_DESCRIPTION("STREAMS-based FIFO pseudo-driver");
 #endif
 
 #endif				/* !defined __NO_VERSION__ */
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(FIFO__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(FIFO__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-" __stringify(FIFO__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(FIFO__CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/fifo");
+MODULE_ALIAS("/dev/fifo.0");
+#endif
 #endif

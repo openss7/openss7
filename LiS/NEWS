@@ -3,9 +3,27 @@ Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
-* Major changes in LiS-2.18.1-1
+* Major changes in LiS-2.18.1
+
+  This is a port forward of most of the build and patches from 2.16.19 forward
+  and applied over 2.18.0.  This is our first LiS-2.18 release.  All further
+  development on 2.16.19 will now cease.  2.18.1 is maintained on both 2.4 and
+  2.6 kernels.  No active development will be performed on 2.18.1, only
+  maintenance.  For an active development release, see the Linux Fast-STREAMS
+  releases.
+
+  Major changes from LiS-2.18.0 include all of the autoconf build system, manual
+  pages and texi/pdf manual for LiS that were applied on the 2.16.19 release.
+  This includes a number of 64 bit, HPPA, PARISC, printf, atomic stats, HZ
+  calculations for 64bit machines, DMA patch for mblk buffer alignment, flush
+  handling patch, panic patch, smp patch, parisc syscall patch, appq patch, and
+  multithreaded test program patches, POSIX threads compilant library functions.
+
+  Please note that the entire package is released under GPL.
 
 * Major changes in LiS-2.16.19-1
+
+  Not publicly released.
 
 * Major changes in LiS-2.16.18-22
 
@@ -14,6 +32,8 @@ See the end for copying conditions.
   OpenSS7 release packages.  Maintenance is easier as one correction will
   propagate across all items.  Performed similar function with texinfo
   documentation pieces.
+
+  Not publicly released.
 
 * Major changes in LiS-2.16.18-21
 

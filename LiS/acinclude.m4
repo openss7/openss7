@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/03/11 22:19:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/03/12 22:34:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/12 22:34:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -269,7 +269,6 @@ AC_DEFUN([_LIS_LINUX_SETUP], [dnl
     AC_MSG_NOTICE([-----------------------------------])
     _LINUX_KERNEL
     _GENKSYMS
-    _LIS_CONFIG_SYSCALLS
     _LIS_SETUP_LIS
     AC_MSG_NOTICE([-----------------------------------])
     AC_MSG_NOTICE([complete linux kernel configuration])
@@ -289,6 +288,8 @@ AC_DEFUN([_LIS_LINUX_SETUP], [dnl
 # _LIS_SETUP_LIS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SETUP_LIS], [dnl
+    _LIS_CONFIG_SYSCALLS
+    _LIS_CHECK_KERNEL
     LIS_KSRC="${kbuilddir}"
     LIS_KINCL="${kincludedir}"
     LIS_NOKSRC=0
@@ -385,6 +386,216 @@ dnl
     LIS_KSYMVERS="${MODPOST_SYSVER}"
     _LIS_ARCH_DEFINES
 ])# _LIS_SETUP_LIS
+# =============================================================================
+
+# =============================================================================
+# _LIS_CHECK_KERNEL
+# -----------------------------------------------------------------------------
+# This is kernel configuration above and beyond the LiS config files.  In many
+# places, LiS checks KERNEL_2_ something.  Using the kernel version is
+# unreliable because some distros patch forward (from 2.6 into 2.4) and the
+# kernel version is insufficient.  Availability of symbols is more practical and
+# makes the resulting configuration script applicable to a wider range of
+# kernels and distributions.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
+			  linux/cpumask.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+])
+    _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
+			process_group cpu_raise_softirq check_region pcibios_init \
+			pcibios_find_class pcibios_find_device pcibios_present \
+			pcibios_read_config_byte pcibios_read_config_dword \
+			pcibios_read_config_word pcibios_write_config_byte \
+			pcibios_write_config_dword pcibios_write_config_word \
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
+			num_online_cpus generic_delete_inode], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+])
+    _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
+			 num_online_cpus], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#include <linux/ioport.h>	/* for check_region */
+#include <linux/pci.h>		/* for pci checks */
+])
+    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+])
+    _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
+			  struct file_operations.flush,
+			  struct super_operations.drop_inode,
+			  struct super_block.s_fs_info,
+			  struct super_block.u.generic_sbp,
+			  struct file_system_type.read_super,
+			  struct file_system_type.get_sb,
+			  struct super_operations.read_inode2,
+			  struct kstatfs.f_type], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+])
+	_LINUX_KERNEL_ENV([dnl
+	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
+			   [linux_cv_have_iop_lookup_nameidata], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif]],
+			[[struct inode_operations temp;
+(*temp.lookup)((struct inode *)0, (struct dentry *)0, (struct nameidata *)0);]]) ],
+		    [linux_cv_have_iop_lookup_nameidata='yes'],
+		    [linux_cv_have_iop_lookup_nameidata='no'])
+	    ])
+	    if test :$linux_cv_have_iop_lookup_nameidata = :yes ; then
+		AC_DEFINE([HAVE_INODE_OPERATIONS_LOOKUP_NAMEIDATA], [1],
+		    [Set if inode_operation lookup function takes nameidata pointer.])
+	    fi
+	    AC_CACHE_CHECK([for kernel do_settimeofday with timespec],
+			   [linux_cv_have_timespec_settimeofday], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */]],
+			[[struct timespec ts;
+int retval;
+retval = do_settimeofday(&ts);]]) ],
+		[linux_cv_have_timespec_settimeofday='yes'],
+		[linux_cv_have_timespec_settimeofday='no'])
+	    ])
+	    if test :$linux_cv_have_timespec_settimeofday = :yes ; then
+		AC_DEFINE([HAVE_TIMESPEC_DO_SETTIMEOFDAY], [1],
+		    [Define if do_settimeofday takes struct timespec and returns int.])
+	    fi
+	])
+])# _LIS_CHECK_KERNEL
 # =============================================================================
 
 # =============================================================================
@@ -540,26 +751,14 @@ AC_DEFUN([_LIS_RH_71_KLUDGE], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
-    AH_TEMPLATE([SIGMASKLOCK], [This is necessary due to RedHat mangling of
+    AH_TEMPLATE([SIGMASKLOCK], [This is necessary due to RedHat 2.6 patches to
 	kernel header files.  RedHat changes some of the use of sigmask_lock.
 	Autoconf will check your header files.  The code will lock sigmask_lock
 	when required.])
-    AC_CACHE_CHECK([for sigmask_lock], [lis_cv_sigmask_lock], [dnl
-	_LINUX_KERNEL_ENV([dnl
-	    AC_EGREP_CPP([\<sigmask_lock(_R(smp_)?........)?\>], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/spinlock.h>
-#include <linux/sched.h>
-	    ], [lis_cv_sigmask_lock=yes], [lis_cv_sigmask_lock=no]) ]) ])
-    if test :"$lis_cv_sigmask_lock" = :yes
-    then
+    _LINUX_KERNEL_SYMBOL([sigmask_lock], [dnl
 	LIS_SIGMASKLOCK='y'
-	AC_DEFINE([SIGMASKLOCK], [1])
-    else
-	LIS_SIGMASKLOCK='n'
-    fi dnl
+	AC_DEFINE([SIGMASKLOCK], [1])], [dnl
+	LIS_SIGMASKLOCK='n'])
 ])# _LIS_SIGMASKLOCK
 # =============================================================================
 
@@ -568,37 +767,16 @@ AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_RCVOID], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
-    AH_TEMPLATE([RCVOID], [This is necessary due to RedHat mangling of kernel
+    AH_TEMPLATE([RCVOID], [This is necessary due to RedHat 2.6 patches ot kernel
 	header files.  RedHat changes recalc_sigpending to take void instead of
 	a task_struct pointer and defines a new recalc_sigpending_tsk to take
 	the other's place.  Autoconf will check your header files.  The code
 	will try to use recalc_sigpending() if this is defined, or
 	recalc_sigpending(current) otherwise.])
-    AC_CACHE_CHECK([for recalc_sigpending_tsk() function], [lis_cv_rctsk], [dnl
-	_LINUX_KERNEL_ENV([dnl
-	    AC_EGREP_CPP([\<recalc_sigpending_tsk(_R(smp_)?........)?\>[(][^()]*[)]], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/spinlock.h>
-#include <linux/sched.h>
-	    ], [lis_cv_rctsk=yes], [lis_cv_rctsk=no]) ]) ])
-    AC_CACHE_CHECK([for recalc_sigpending(void)], [lis_cv_rcvoid], [dnl
-	_LINUX_KERNEL_ENV([dnl
-	    AC_EGREP_CPP([\<recalc_sigpending(_R(smp_)?........)?\>[(]void[)]], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/spinlock.h>
-#include <linux/sched.h>
-	    ], [lis_cv_rcvoid=yes], [lis_cv_rcvoid=no]) ]) ])
-    if test :"$lis_cv_rcvoid" = :yes -o :"$lis_cv_rctsk" = :yes
-    then
-	LIS_RCVOID='y'
-	AC_DEFINE([RCVOID], [1])
-    else
-	LIS_RCVOID='n'
-    fi dnl
+    _LINUX_KERNEL_SYMBOL([recalc_sigpending_tsk], [dnl
+	LIS_RCVOID=y
+	AC_DEFINE([RCVOID], [1])], [dnl
+	LIS_RCVOID=n])
 ])# _LIS_RCVOID
 # =============================================================================
 
@@ -657,31 +835,11 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_GET_EMPTY_INODE], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
-    AC_CACHE_CHECK([for new_inode() function], [lis_cv_have_new_inode], [dnl
-	_LINUX_KERNEL_ENV([dnl
-	    AC_EGREP_CPP([\<new_inode(_R(smp_)?........)?\>([^()]*)], [
-#include <linux/version.h>
-#include <linux/config.h>
-#include <linux/types.h>
-#include <linux/fs.h>
-	    ], [lis_cv_have_new_inode=yes], [lis_cv_have_new_inode=no]) ]) ])
-    AC_CACHE_CHECK([for get_empty_inode() function], [lis_cv_have_get_empty_inode], [dnl
-	_LINUX_KERNEL_ENV([dnl
-	    AC_EGREP_CPP([\<get_empty_inode(_R(smp_)?........)?([^()]*)], [
-#include <linux/version.h>
-#include <linux/config.h>
-#include <linux/types.h>
-#include <linux/fs.h>
-	    ], [lis_cv_have_get_empty_inode=yes], [lis_cv_have_get_empty_inode=no]) ]) ])
-    if test :"$lis_cv_have_new_inode" = :yes
+    _LINUX_KERNEL_SYMBOL([new_inode], [LIS_GET_EMPTY_INODE='new_inode((_sb))'])
+    _LINUX_KERNEL_SYMBOL([get_empty_inode], [LIS_GET_EMPTY_INODE='get_empty_inode()'])
+    if test :"$LIS_GET_EMPTY_INODE" = :
     then
-	LIS_GET_EMPTY_INODE='new_inode((_sb))'
-    else
-	if test :"$lis_cv_have_get_empty_inode" = :yes
-	then
-	    LIS_GET_EMPTY_INODE='get_empty_inode()'
-	else
-	    AC_MSG_ERROR([
+	AC_MSG_ERROR([
 *** 
 *** You have really mangled kernel header files: the headers should include
 *** either new_inode() or get_new_inode().  Some kernel versions and distros
@@ -691,23 +849,19 @@ AC_DEFUN([_LIS_GET_EMPTY_INODE], [dnl
 *** that <linux/fs.h> defines neither.  Please check your kernel headers and
 *** source and try again.
 *** ])
-	fi
     fi dnl
 dnl
 dnl This definition goes in include/sys/LiS/genconf.h
 dnl
-dnl AC_DEFINE_UNQUOTED([GET_EMPTY_INODE], [$LIS_GET_EMPTY_INODE], [This is
-dnl                     necessary due to RedHat mangling of kernel header
-dnl                     files. RedHat removes get_empty_inode() from
-dnl                     <linux/fs.h> and makes new_inode() non-inline and
-dnl                     removes it from the header file (now a function call).
-dnl                     Autoconf will check your header files.  The code will
-dnl                     try to use whatever is defined here to get an empty
-dnl                     inode.  Neither a check of the header files nor a
-dnl                     running kernel symbol table will guarantee that those
-dnl                     symbols are exported and usable by LiS.  If you get
-dnl                     depmod errors on instalation mentioning either of
-dnl                     these functions, then this is probably the cause.])
+dnl AC_DEFINE_UNQUOTED([GET_EMPTY_INODE], [$LIS_GET_EMPTY_INODE], [This is necessary
+dnl     due to RedHat mangling of kernel header files. RedHat removes
+dnl     get_empty_inode() from <linux/fs.h> and makes new_inode() non-inline and
+dnl     removes it from the header file (now a function call).  Autoconf will check
+dnl     your header files.  The code will try to use whatever is defined here to get
+dnl     an empty inode.  Neither a check of the header files nor a running kernel
+dnl     symbol table will guarantee that those symbols are exported and usable by
+dnl     LiS.  If you get depmod errors on instalation mentioning either of these
+dnl     functions, then this is probably the cause.])
 ])# _LIS_GET_EMPTY_INODE
 # =============================================================================
 

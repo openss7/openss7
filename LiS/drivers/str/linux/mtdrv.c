@@ -363,7 +363,7 @@ static int _RP mtdrv_close(queue_t * q, int dummy, cred_t * credp)
 }
 
 
-#ifdef MODULE
+#if !defined __NO_VERSION__
 
 #ifdef KERNEL_2_5
 int mtdrv_init_module(void)
@@ -411,4 +411,18 @@ MODULE_AUTHOR("David Grothe");
 MODULE_DESCRIPTION("multi-threaded open test helper driver");
 #endif
 
+#endif
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-1");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-2");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-3");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-4");
+MODULE_ALIAS("/dev/mtdrv_clone");
+MODULE_ALIAS("/dev/mtdrv.1");
+MODULE_ALIAS("/dev/mtdrv.2");
+MODULE_ALIAS("/dev/mtdrv.3");
+MODULE_ALIAS("/dev/mtdrv.4");
 #endif

@@ -714,3 +714,13 @@ mux_lrsrv (queue_t *q)
 } /* mux_lrsrv  */
 #endif
 
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-" __stringify(MUX__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0) "-1");
+MODULE_ALIAS("char-major-" __stringify(MUX__CMAJOR_0) "-2");
+MODULE_ALIAS("/dev/mux_clone");
+MODULE_ALIAS("/dev/minimux.1");
+MODULE_ALIAS("/dev/minimux.2");
+#endif

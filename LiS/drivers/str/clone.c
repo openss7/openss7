@@ -139,3 +139,9 @@ void _RP clone_init(void)
     LIS_DEVFLAGS(LIS_CLONE) |= LIS_MODFLG_CLONE;
 }
 
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/clone_drvr");
+#endif

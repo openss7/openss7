@@ -1,3 +1,810 @@
+2005-03-12  brian  <bidulock@openss7.org>
+	* Changes from GCOM 2.18.0 release:
+	* (drivers/str/clone.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/dlpidriver.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/fifo.c):
+	- changed #ident string to CVS revision
+	- corrected FIFO_ to FIFO__DRV
+	- removed vermagic module info (done by modpost)
+	- added <linux/errno.h> include
+	- changed checks on MODULE to checks on __NO_VERSION__
+	* (drivers/str/log.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/loop.c):
+	- changed #ident string to CVS revision
+	- changed checks on MODULE to checks on __NO_VERSION__
+	- changed to GPL license
+	* (drivers/str/minimux.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/module-skeleton.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/nullstrm.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/pipemod.c):
+	- changed #ident string to CVS revision
+	- corrected PIPEMOD_ to PIPEMOD__MOD
+	- removed vermagic module info (done by modpost)
+	- added <linux/errno.h> include
+	- changed to GPL license
+	* (drivers/str/printk.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/putst.c):
+	- changed #ident string to CVS revision
+	* (drivers/str/relay.c):
+	- changed #ident string to CVS revision
+	- changed checks on MODULE to checks on __NO_VERSION__
+	- changed to GPL license
+	* (drivers/str/sad.c):
+	- corrected SAD_ to SAD__DRV
+	- changed checks on MODULE to checks on __NO_VERSION__
+	- changed to GPL license
+	* (drivers/str/timod.c):
+	- old broken version, removed from release
+	* (drivers/str/tirdwr.c):
+	- old broken version, removed from release
+	- corrected CONNLD_ to CONNLD__MOD
+	- corrected printf error
+	- changed checks on MODULE to checks on __NO_VERSION__
+	- changed to GPL license
+	* (drivers/str/linux/ip_strm_mod.c):
+	- removed deprecated define "SAFE"
+	* (drivers/str/linux/ip_to_dlpi.c):
+	- changed to GPL license
+	* (drivers/str/linux/liskmod.c):
+	- added <linux/config.h> include
+	- removed define of KERNEL_VERSION, no longer applicable
+	- included <linux/module.h> and <linux/init.h>
+	- removed modversions.h and module.h conditional includes
+	- removed vermagic module info (done by modpost)
+	* (drivers/str/linux/mtdrv.c):
+	- changed to GPL license
+	* (head/cmn_err.c):
+	- printf patch
+	* (head/head.c):
+	- removed deprecard poll stuff.
+	- corrected typo include <errnos.h>
+	- corrected error returned (ENXIO) when stream hung up
+	- stats patches
+	- flush patches
+	* (head/linux-mdep.c):
+	- panic patch
+	- smp patch
+	- parisc syscall patches
+	- HZ calculation correction patches
+	- atomic stats patches
+	- stripped CCREGPARM and STREAMS_REGPARM (we always get it
+	  right 'cause we take CFLAGS directly from makefile invocation.
+	- hppa patches
+	- lp64 patches
+	- changed to GPL license
+	- removed vermagic module info (done by modpost)
+	- corrected CONFIG_DEV checks to USE_KMEM_TIMER checks
+	* (head/mod.c):
+	- corrections to uninitialized modules
+	- corrected printf warnings
+	* (head/osif.c):
+	- hppa patches
+	- add check_mem request_mem functions
+	- printf patch
+	- HZ calculation correction patches
+	* (head/queue.c):
+	- corrected printf warnings
+	- changed appq to return success or failure like insq
+	* (head/stream.c):
+	- corrected printf warnings
+	- panic patch
+	* (head/strmdbg.c):
+	- DMA patch
+	- printf patch
+	* (head/version.c):
+	- added proper set of initial linux includes
+	* (head/linux/exports.c):
+	- removed improper modversion.h and module.h includes
+	- ensure EXPORT_SYMTAB is defined
+	- remove deprecated linux poll defines
+	- changed all symbol exports to versioned GPL exports
+	* (head/linux/lismem.c):
+	- DMA patch
+	* (head/user/port.c):
+	- printf patch
+	* *include/stropts.h):
+	- replaced with OpenSS7 Linux Fast-STREAMS include file
+	* (include/sys/cmn_err.h):
+	- printf patch
+	- removed deprecated lis_print_trace
+	* (include/sys/osif.h):
+	- hppa patch
+	- printf patch
+	- added check_mem_region, request_mem_region and release_mem_region
+	* (include/sys/strconfig.h):
+	- removed deprecated debugging defines
+	* (include/sys/stream.h):
+	- removed deprecated debugging defines
+	* (include/sys/stropts.h):
+	- corrected erroneous prototypes for getmsg and putmsg
+	* (include/sys/LiS/linux-mdep.h):
+	- added proper linux includes
+	- defined _RP to nothing when undefined
+	- added sys/types include
+	- removed erroneous modversions.h and module.h includes
+	- added KERNEL_2_6 define
+	* (include/sys/LiS/mod.h):
+	- stats patch
+	* (include/sys/LiS/port-mdep.h):
+	- printf patch
+	* (include/sys/LiS/queue.h):
+	- corrected appq prototype
+	* (include/sys/LiS/strlog.h):
+	- printf patch
+	* (include/sys/LiS/strmdbg.h):
+	- printf patch
+	* (libc/fattach.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/fdetach.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/getmsg.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/getpmsg.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/isastream.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/pipe.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/putmsg.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (libc/putpmsg.c):
+	- replaced with Linux Fast-STREAMS thread-safe function
+	* (scripts/lis-down):
+	- replaced with full script
+	* (scripts/lis-status):
+	- replaced with full script
+	* (scripts/lis-up):
+	- replaced with full script
+	* (util/strconf.c):
+	- printf patch
+	- removed from release (scripts/strconf.sh does job)
+	* (util/streams.c):
+	- full argument handling
+	* (util/strtst.c):
+	- full argument handling
+	- multiple threaded tests patch
+	* (util/timetst.c):
+	- full argument handling
+	* (util/fattach.c):
+	- full argument handling
+	* (util/fdetach.c):
+	- full argument handling
+	* (util/mkfifo.c):
+	- full argument handling
+	* (util/linux/oc.c):
+	- full argument handling
+	* (util/linux/pafd.c):
+	- full argument handling
+	* (util/linux/psfd.c):
+	- full argument handling
+	* (util/linux/rwf.c):
+	- full argument handling
+	* (util/linux/test.c):
+	- full argument handling
+	* (util/linux/test2.c):
+	- full argument handling
+	* (util/linux/thrtst.c):
+	- full argument handling
+	- multithreaded test patch
+	* (.debepoch): added: autoconf control files
+	* (.debrelease): added: autoconf control files
+	* (.gnupguser): added: autoconf control files
+	* (.pkgepoch): added: autoconf control files
+	* (.pkgrelease): added: autoconf control files
+	* (.rpmepoch): added: autoconf control files
+	* (.rpmrelease): added: autoconf control files
+	* (AUTHORS): added for gnits compliance
+	* (ChangeLog): added for gnits compliance
+	* (NEWS): added for gnits compliance
+	* (THANKS): added for gnits compliance
+	* (COPYING): replaced with GPL
+	* (LiS.lsm.in): lsm input file
+	* (LiS.gif): added rpm spec input files
+	* (LiS.spec.in): added rpm spec input files
+	* (LiS.tif): added rpm spec input files
+	* (LiS.xcf): added rpm spec input files
+	* (LiS.xpm): added rpm spec input files
+	* (config.in.in): added autoconf input files for old GCOM config files
+	* (include/sys/LiS/genconf.h.in): added autoconf input files for old GCOM config files
+	* (Makefile.am): added autoconf/automake primary files
+	* (acinclude.m4): added autoconf/automake primary files
+	* (configure.ac): added autoconf/automake primary files
+	* (configure.nexusware): added autoconf/automake primary files
+	* (include/Makefile.am): added autoconf/automake primary files
+	* (man/Makefile.am): added autoconf/automake primary files
+	* (gettext.h): added GNU gettext include
+	* (strms_down): readded old scripts
+	* (strms_status): readded old scripts
+	* (strms_up): readded old scripts
+	* (util/linux/ldlconfig.c): removed to strxns package
+	* (util/linux/ldltest.c): removed to strxns package
+	* (m4/Makefile.am): added autoconf local includes
+	* (m4/autotest.m4): added autoconf local includes
+	* (m4/deb.m4): added autoconf local includes
+	* (m4/dist.m4): added autoconf local includes
+	* (m4/genksyms.m4): added autoconf local includes
+	* (m4/inet.m4): added autoconf local includes
+	* (m4/init.m4): added autoconf local includes
+	* (m4/kernel.m4): added autoconf local includes
+	* (m4/libraries.m4): added autoconf local includes
+	* (m4/man.m4): added autoconf local includes
+	* (m4/openss7.m4): added autoconf local includes
+	* (m4/public.m4): added autoconf local includes
+	* (m4/rpm.m4): added autoconf local includes
+	* (m4/sctp.m4): added autoconf local includes
+	* (m4/strconf.m4): added autoconf local includes
+	* (m4/streams.m4): added autoconf local includes
+	* (m4/xns.m4): added autoconf local includes
+	* (m4/xopen.m4): added autoconf local includes
+	* (m4/xti.m4): added autoconf local includes
+	* (am/archive.am): added automake fragments
+	* (am/deb.am): added automake fragments
+	* (am/genksyms.am): added automake fragments
+	* (am/info.am): added automake fragments
+	* (am/init.am): added automake fragments
+	* (am/kernel.am): added automake fragments
+	* (am/libraries.am): added automake fragments
+	* (am/lsm.am): added automake fragments
+	* (am/man.am): added automake fragments
+	* (am/openss7.am): added automake fragments
+	* (am/rpm.am): added automake fragments
+	* (am/sctp.am): added automake fragments
+	* (am/strconf.am): added automake fragments
+	* (scripts/cflagcheck): added autoconf/automake helper scripts
+	* (scripts/check_commands): added autoconf/automake helper scripts
+	* (scripts/check_libs): added autoconf/automake helper scripts
+	* (scripts/check_mans): added autoconf/automake helper scripts
+	* (scripts/check_modules): added autoconf/automake helper scripts
+	* (scripts/chkconfig): added autoconf/automake helper scripts
+	* (scripts/inet_mkdev): added autoconf/automake helper scripts
+	* (scripts/inet_rmdev): added autoconf/automake helper scripts
+	* (scripts/install_initd): added autoconf/automake helper scripts
+	* (scripts/modpost.sh): added autoconf/automake helper scripts
+	* (scripts/modsyms.sh): added autoconf/automake helper scripts
+	* (scripts/remove_initd): added autoconf/automake helper scripts
+	* (scripts/strconf-sh): added autoconf/automake helper scripts
+	* (scripts/texinfo.cnf): added autoconf/automake helper scripts
+	* (scripts/texi/args.texi.in): added autoconf/automake helper scripts
+	* (scripts/texi/fdl.texi): added autoconf/automake helper scripts
+	* (scripts/texi/gpl.texi): added autoconf/automake helper scripts
+	* (scripts/texi/install.texi): added autoconf/automake helper scripts
+	* (scripts/texi/lesser.texi): added autoconf/automake helper scripts
+	* (tests/Makefile.am): added autotest stub
+	* (tests/atlocal.in): added autotest stub
+	* (tests/dummy1.m4): added autotest stub
+	* (tests/dummy2.m4): added autotest stub
+	* (tests/dummy3.m4): added autotest stub
+	* (tests/dummy4.m4): added autotest stub
+	* (tests/kernel.at): added autotest stub
+	* (tests/testsuite.at): added autotest stub
+	* (testsuite/Makefile.am): added DEJAGNU stub
+	* (testsuite/README): added DEJAGNU stub
+	* (testsuite/config/default.exp): added DEJAGNU stub
+	* (testsuite/netperf/netperf.diff): added DEJAGNU stub
+	* (testsuite/netperf/netperf.exp): added DEJAGNU stub
+	* (testsuite/strtst/strtst.exp): added DEJAGNU stub
+	* (testsuite/wrapper/.cvsignore): added DEJAGNU stub
+	* (testsuite/wrapper/Makefile.am): added DEJAGNU stub
+	* (testsuite/wrapper/wrapper.c): added DEJAGNU stub
+	* (debian/changelog): added debian build files
+	* (debian/control.in): added debian build files
+	* (debian/copyright): added debian build files
+	* (debian/rules.in): added debian build files
+	* (drivers/str/Config, drivers/str/Config.in):
+	- Config replaced with Config.in input file
+	* (include/sys/dlpi.h): removed
+	* (include/sys/ldl.h): removed
+	* (include/sys/npi.h): removed
+	* (include/sys/sockio.h): removed
+	* (include/sys/LiS/dlpidriver.h): removed
+	* (include/sys/LiS/tpicommon.h): removed
+	* (man/man3/fattach.3, man/man3/fattach.3.man): replaced
+	* (man/man3/fdetach.3, man/man3/fdetach.3.man): replaced
+	* (man/man3/isastream.3, man/man3/isastream.3.man): replaced
+	* (man/man3/pipe.3, man/man3/pipe.3.man): replaced
+	* (man/man8/fattach.8, man/man8/fattach.8.man): replaced
+	* (man/man8/fdetach.8, man/man8/fdetach.8.man): replaced
+	* (man/man9/connld.9, man/man9/connld.9.man): replaced
+	* (man/man9/fifo.9, man/man9/fifo.9.man): replaced
+	* (man/man9/pipemod.9, man/man9/pipemod.9.man): replaced
+	* (man/lis.macros): added manual pages
+	* (man/lis.refs): added manual pages
+	* (man/man1/oc.1.man): added manual pages
+	* (man/man1/pafd.1.man): added manual pages
+	* (man/man1/psfd.1.man): added manual pages
+	* (man/man1/rwf.1.man): added manual pages
+	* (man/man2/getmsg.2.man): added manual pages
+	* (man/man2/getpmsg.2s.man): added manual pages
+	* (man/man2/pipe.2s.man): added manual pages
+	* (man/man2/poll.2s.man): added manual pages
+	* (man/man2/putmsg.2.man): added manual pages
+	* (man/man2/putpmsg.2s.man): added manual pages
+	* (man/man2/streamio.2.man): added manual pages
+	* (man/man4/clone.4.man): added manual pages
+	* (man/man4/connld.4.man): added manual pages
+	* (man/man4/fifo.4s.man): added manual pages
+	* (man/man4/pipemod.4.man): added manual pages
+	* (man/man4/sad.4.man): added manual pages
+	* (man/man4/soon.4.man): added manual pages
+	* (man/man5/soon.5.man): added manual pages
+	* (man/man5/strconf_config.5.man): added manual pages
+	* (man/man7/streamio.7.man): added manual pages
+	* (man/man8/mkfifo.8s.man): added manual pages
+	* (man/man8/streams.8.man): added manual pages
+	* (man/man8/strmakenodes.8.man): added manual pages
+	* (man/man8/strms_down.8.man): added manual pages
+	* (man/man8/strms_status.8.man): added manual pages
+	* (man/man8/strms_up.8.man): added manual pages
+	* (man/man9/Intro.9.man): added manual pages
+	* (man/man9/LiS.9.man): added manual pages
+	* (man/man9/OTHER.9.man): added manual pages
+	* (man/man9/OTHERQ.9.man): added manual pages
+	* (man/man9/RD.9.man): added manual pages
+	* (man/man9/SAMESTR.9.man): added manual pages
+	* (man/man9/WR.9.man): added manual pages
+	* (man/man9/adjmsg.9.man): added manual pages
+	* (man/man9/allocb.9.man): added manual pages
+	* (man/man9/allocb_physreq.9.man): added manual pages
+	* (man/man9/allocq.9.man): added manual pages
+	* (man/man9/appq.9.man): added manual pages
+	* (man/man9/backq.9.man): added manual pages
+	* (man/man9/bcanput.9.man): added manual pages
+	* (man/man9/bcanputnext.9.man): added manual pages
+	* (man/man9/bcopy.9.man): added manual pages
+	* (man/man9/bufcall.9.man): added manual pages
+	* (man/man9/bzero.9.man): added manual pages
+	* (man/man9/canenable.9.man): added manual pages
+	* (man/man9/canput.9.man): added manual pages
+	* (man/man9/canputnext.9.man): added manual pages
+	* (man/man9/cmn_err.9.man): added manual pages
+	* (man/man9/copyb.9.man): added manual pages
+	* (man/man9/copymsg.9.man): added manual pages
+	* (man/man9/datamsg.9.man): added manual pages
+	* (man/man9/dupb.9.man): added manual pages
+	* (man/man9/dupmsg.9.man): added manual pages
+	* (man/man9/enableok.9.man): added manual pages
+	* (man/man9/esballoc.9.man): added manual pages
+	* (man/man9/esbbcall.9.man): added manual pages
+	* (man/man9/flushband.9.man): added manual pages
+	* (man/man9/flushq.9.man): added manual pages
+	* (man/man9/freeb.9.man): added manual pages
+	* (man/man9/freemsg.9.man): added manual pages
+	* (man/man9/freeq.9.man): added manual pages
+	* (man/man9/getmajor.9.man): added manual pages
+	* (man/man9/getminor.9.man): added manual pages
+	* (man/man9/getq.9.man): added manual pages
+	* (man/man9/insq.9.man): added manual pages
+	* (man/man9/isdatablk.9.man): added manual pages
+	* (man/man9/isdatamsg.9.man): added manual pages
+	* (man/man9/kmem_alloc.9.man): added manual pages
+	* (man/man9/kmem_free.9.man): added manual pages
+	* (man/man9/kmem_zalloc.9.man): added manual pages
+	* (man/man9/linkb.9.man): added manual pages
+	* (man/man9/lis_OTHER.9.man): added manual pages
+	* (man/man9/lis_OTHERQ.9.man): added manual pages
+	* (man/man9/lis_RD.9.man): added manual pages
+	* (man/man9/lis_SAMESTR.9.man): added manual pages
+	* (man/man9/lis_WR.9.man): added manual pages
+	* (man/man9/lis__kfree.9.man): added manual pages
+	* (man/man9/lis__kmalloc.9.man): added manual pages
+	* (man/man9/lis_add_timer.9.man): added manual pages
+	* (man/man9/lis_adjmsg.9.man): added manual pages
+	* (man/man9/lis_alloc_atomic_fcn.9.man): added manual pages
+	* (man/man9/lis_alloc_dma_fcn.9.man): added manual pages
+	* (man/man9/lis_alloc_kernel_fcn.9.man): added manual pages
+	* (man/man9/lis_allocb.9.man): added manual pages
+	* (man/man9/lis_allocb_physreq.9.man): added manual pages
+	* (man/man9/lis_allocq.9.man): added manual pages
+	* (man/man9/lis_appq.9.man): added manual pages
+	* (man/man9/lis_apush_get.9.man): added manual pages
+	* (man/man9/lis_apush_set.9.man): added manual pages
+	* (man/man9/lis_apushm.9.man): added manual pages
+	* (man/man9/lis_assert_fail.9.man): added manual pages
+	* (man/man9/lis_atomic_add.9.man): added manual pages
+	* (man/man9/lis_atomic_dec.9.man): added manual pages
+	* (man/man9/lis_atomic_dec_and_test.9.man): added manual pages
+	* (man/man9/lis_atomic_inc.9.man): added manual pages
+	* (man/man9/lis_atomic_read.9.man): added manual pages
+	* (man/man9/lis_atomic_set.9.man): added manual pages
+	* (man/man9/lis_atomic_sub.9.man): added manual pages
+	* (man/man9/lis_backq.9.man): added manual pages
+	* (man/man9/lis_backq_fcn.9.man): added manual pages
+	* (man/man9/lis_basename.9.man): added manual pages
+	* (man/man9/lis_bcanput.9.man): added manual pages
+	* (man/man9/lis_bcanputnext.9.man): added manual pages
+	* (man/man9/lis_bcanputnext_anyband.9.man): added manual pages
+	* (man/man9/lis_bcopy.9.man): added manual pages
+	* (man/man9/lis_bprintf.9.man): added manual pages
+	* (man/man9/lis_bufcall.9.man): added manual pages
+	* (man/man9/lis_bzero.9.man): added manual pages
+	* (man/man9/lis_can_unload.9.man): added manual pages
+	* (man/man9/lis_canenable.9.man): added manual pages
+	* (man/man9/lis_canput.9.man): added manual pages
+	* (man/man9/lis_canputnext.9.man): added manual pages
+	* (man/man9/lis_check_guard.9.man): added manual pages
+	* (man/man9/lis_check_mem.9.man): added manual pages
+	* (man/man9/lis_check_mem_region.9.man): added manual pages
+	* (man/man9/lis_check_q_magic.9.man): added manual pages
+	* (man/man9/lis_check_region.9.man): added manual pages
+	* (man/man9/lis_check_umem.9.man): added manual pages
+	* (man/man9/lis_clone_major.9.man): added manual pages
+	* (man/man9/lis_cmn_err.9.man): added manual pages
+	* (man/man9/lis_copyb.9.man): added manual pages
+	* (man/man9/lis_copyin.9.man): added manual pages
+	* (man/man9/lis_copymsg.9.man): added manual pages
+	* (man/man9/lis_copyout.9.man): added manual pages
+	* (man/man9/lis_datamsg.9.man): added manual pages
+	* (man/man9/lis_date.9.man): added manual pages
+	* (man/man9/lis_debug_mask.9.man): added manual pages
+	* (man/man9/lis_debug_mask2.9.man): added manual pages
+	* (man/man9/lis_dec_mod_cnt_fcn.9.man): added manual pages
+	* (man/man9/lis_del_timer.9.man): added manual pages
+	* (man/man9/lis_disable_irq.9.man): added manual pages
+	* (man/man9/lis_dobufcall.9.man): added manual pages
+	* (man/man9/lis_doclose.9.man): added manual pages
+	* (man/man9/lis_down_fcn.9.man): added manual pages
+	* (man/man9/lis_dsecs.9.man): added manual pages
+	* (man/man9/lis_dupb.9.man): added manual pages
+	* (man/man9/lis_dupmsg.9.man): added manual pages
+	* (man/man9/lis_enable_intr.9.man): added manual pages
+	* (man/man9/lis_enable_irq.9.man): added manual pages
+	* (man/man9/lis_enableok.9.man): added manual pages
+	* (man/man9/lis_esballoc.9.man): added manual pages
+	* (man/man9/lis_esbbcall.9.man): added manual pages
+	* (man/man9/lis_fattach.9.man): added manual pages
+	* (man/man9/lis_fdetach.9.man): added manual pages
+	* (man/man9/lis_fdetach_all.9.man): added manual pages
+	* (man/man9/lis_fdetach_stream.9.man): added manual pages
+	* (man/man9/lis_fifo_close_sync.9.man): added manual pages
+	* (man/man9/lis_fifo_open_sync.9.man): added manual pages
+	* (man/man9/lis_fifo_write_sync.9.man): added manual pages
+	* (man/man9/lis_file_inode.9.man): added manual pages
+	* (man/man9/lis_file_str.9.man): added manual pages
+	* (man/man9/lis_find_strdev.9.man): added manual pages
+	* (man/man9/lis_flush_print_buffer.9.man): added manual pages
+	* (man/man9/lis_flushband.9.man): added manual pages
+	* (man/man9/lis_flushq.9.man): added manual pages
+	* (man/man9/lis_fmod_sw.9.man): added manual pages
+	* (man/man9/lis_free.9.man): added manual pages
+	* (man/man9/lis_free_dma.9.man): added manual pages
+	* (man/man9/lis_free_irq.9.man): added manual pages
+	* (man/man9/lis_free_mem_fcn.9.man): added manual pages
+	* (man/man9/lis_free_pages_fcn.9.man): added manual pages
+	* (man/man9/lis_free_passfp.9.man): added manual pages
+	* (man/man9/lis_freeb.9.man): added manual pages
+	* (man/man9/lis_freedb.9.man): added manual pages
+	* (man/man9/lis_freemsg.9.man): added manual pages
+	* (man/man9/lis_freeq.9.man): added manual pages
+	* (man/man9/lis_fstr_sw.9.man): added manual pages
+	* (man/man9/lis_get_fifo.9.man): added manual pages
+	* (man/man9/lis_get_free_pages_atomic_fcn.9.man): added manual pages
+	* (man/man9/lis_get_free_pages_fcn.9.man): added manual pages
+	* (man/man9/lis_get_free_pages_kernel_fcn.9.man): added manual pages
+	* (man/man9/lis_get_passfp.9.man): added manual pages
+	* (man/man9/lis_get_pipe.9.man): added manual pages
+	* (man/man9/lis_getint.9.man): added manual pages
+	* (man/man9/lis_getq.9.man): added manual pages
+	* (man/man9/lis_gettimeofday.9.man): added manual pages
+	* (man/man9/lis_hitime.9.man): added manual pages
+	* (man/man9/lis_in_syscall.9.man): added manual pages
+	* (man/man9/lis_inc_mod_cnt_fcn.9.man): added manual pages
+	* (man/man9/lis_init_bufcall.9.man): added manual pages
+	* (man/man9/lis_insq.9.man): added manual pages
+	* (man/man9/lis_interruptible_sleep_on.9.man): added manual pages
+	* (man/man9/lis_ioc_fattach.9.man): added manual pages
+	* (man/man9/lis_ioc_fdetach.9.man): added manual pages
+	* (man/man9/lis_ioc_pipe.9.man): added manual pages
+	* (man/man9/lis_ioremap.9.man): added manual pages
+	* (man/man9/lis_ioremap_nocache.9.man): added manual pages
+	* (man/man9/lis_iounmap.9.man): added manual pages
+	* (man/man9/lis_isdatablk.9.man): added manual pages
+	* (man/man9/lis_isdatamsg.9.man): added manual pages
+	* (man/man9/lis_jiffies.9.man): added manual pages
+	* (man/man9/lis_kernel_down.9.man): added manual pages
+	* (man/man9/lis_kernel_up.9.man): added manual pages
+	* (man/man9/lis_kernel_version.9.man): added manual pages
+	* (man/man9/lis_kfree.9.man): added manual pages
+	* (man/man9/lis_kill_pg.9.man): added manual pages
+	* (man/man9/lis_kill_proc.9.man): added manual pages
+	* (man/man9/lis_kmalloc.9.man): added manual pages
+	* (man/man9/lis_linkb.9.man): added manual pages
+	* (man/man9/lis_loadable_load.9.man): added manual pages
+	* (man/man9/lis_maj_min_name.9.man): added manual pages
+	* (man/man9/lis_major.9.man): added manual pages
+	* (man/man9/lis_malloc.9.man): added manual pages
+	* (man/man9/lis_max_mem.9.man): added manual pages
+	* (man/man9/lis_membar.9.man): added manual pages
+	* (man/man9/lis_milli_to_ticks.9.man): added manual pages
+	* (man/man9/lis_mknod.9.man): added manual pages
+	* (man/man9/lis_mount.9.man): added manual pages
+	* (man/man9/lis_msecs.9.man): added manual pages
+	* (man/man9/lis_msg_type_name.9.man): added manual pages
+	* (man/man9/lis_msgdsize.9.man): added manual pages
+	* (man/man9/lis_msgpullup.9.man): added manual pages
+	* (man/man9/lis_msgsize.9.man): added manual pages
+	* (man/man9/lis_msgutil.9.man): added manual pages
+	* (man/man9/lis_noenable.9.man): added manual pages
+	* (man/man9/lis_num_cpus.9.man): added manual pages
+	* (man/man9/lis_old_inode.9.man): added manual pages
+	* (man/man9/lis_open_cnt.9.man): added manual pages
+	* (man/man9/lis_osif_cli.9.man): added manual pages
+	* (man/man9/lis_osif_do_gettimeofday.9.man): added manual pages
+	* (man/man9/lis_osif_do_settimeofday.9.man): added manual pages
+	* (man/man9/lis_osif_pci_alloc_consistent.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dac_dma_supported.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dac_dma_sync_single.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dac_dma_to_offset.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dac_dma_to_page.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dac_page_to_dma.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dac_set_dma_mask.9.man): added manual pages
+	* (man/man9/lis_osif_pci_disable_device.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dma_supported.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dma_sync_sg.9.man): added manual pages
+	* (man/man9/lis_osif_pci_dma_sync_single.9.man): added manual pages
+	* (man/man9/lis_osif_pci_enable_device.9.man): added manual pages
+	* (man/man9/lis_osif_pci_find_class.9.man): added manual pages
+	* (man/man9/lis_osif_pci_find_device.9.man): added manual pages
+	* (man/man9/lis_osif_pci_find_slot.9.man): added manual pages
+	* (man/man9/lis_osif_pci_free_consistent.9.man): added manual pages
+	* (man/man9/lis_osif_pci_map_page.9.man): added manual pages
+	* (man/man9/lis_osif_pci_map_sg.9.man): added manual pages
+	* (man/man9/lis_osif_pci_map_single.9.man): added manual pages
+	* (man/man9/lis_osif_pci_module_init.9.man): added manual pages
+	* (man/man9/lis_osif_pci_read_config_byte.9.man): added manual pages
+	* (man/man9/lis_osif_pci_read_config_dword.9.man): added manual pages
+	* (man/man9/lis_osif_pci_read_config_word.9.man): added manual pages
+	* (man/man9/lis_osif_pci_set_dma_mask.9.man): added manual pages
+	* (man/man9/lis_osif_pci_set_master.9.man): added manual pages
+	* (man/man9/lis_osif_pci_unmap_page.9.man): added manual pages
+	* (man/man9/lis_osif_pci_unmap_sg.9.man): added manual pages
+	* (man/man9/lis_osif_pci_unmap_single.9.man): added manual pages
+	* (man/man9/lis_osif_pci_unregister_driver.9.man): added manual pages
+	* (man/man9/lis_osif_pci_write_config_byte.9.man): added manual pages
+	* (man/man9/lis_osif_pci_write_config_dword.9.man): added manual pages
+	* (man/man9/lis_osif_pci_write_config_word.9.man): added manual pages
+	* (man/man9/lis_osif_sg_dma_address.9.man): added manual pages
+	* (man/man9/lis_osif_sg_dma_len.9.man): added manual pages
+	* (man/man9/lis_osif_sti.9.man): added manual pages
+	* (man/man9/lis_own_spl.9.man): added manual pages
+	* (man/man9/lis_pci_alloc_consistent.9.man): added manual pages
+	* (man/man9/lis_pci_cleanup.9.man): added manual pages
+	* (man/man9/lis_pci_disable_device.9.man): added manual pages
+	* (man/man9/lis_pci_dma_handle_to_32.9.man): added manual pages
+	* (man/man9/lis_pci_dma_handle_to_64.9.man): added manual pages
+	* (man/man9/lis_pci_dma_supported.9.man): added manual pages
+	* (man/man9/lis_pci_dma_sync_single.9.man): added manual pages
+	* (man/man9/lis_pci_enable_device.9.man): added manual pages
+	* (man/man9/lis_pci_find_class.9.man): added manual pages
+	* (man/man9/lis_pci_find_device.9.man): added manual pages
+	* (man/man9/lis_pci_find_slot.9.man): added manual pages
+	* (man/man9/lis_pci_free_consistent.9.man): added manual pages
+	* (man/man9/lis_pci_map_single.9.man): added manual pages
+	* (man/man9/lis_pci_read_config_byte.9.man): added manual pages
+	* (man/man9/lis_pci_read_config_dword.9.man): added manual pages
+	* (man/man9/lis_pci_read_config_word.9.man): added manual pages
+	* (man/man9/lis_pci_set_dma_mask.9.man): added manual pages
+	* (man/man9/lis_pci_set_master.9.man): added manual pages
+	* (man/man9/lis_pci_unmap_single.9.man): added manual pages
+	* (man/man9/lis_pci_write_config_byte.9.man): added manual pages
+	* (man/man9/lis_pci_write_config_dword.9.man): added manual pages
+	* (man/man9/lis_pci_write_config_word.9.man): added manual pages
+	* (man/man9/lis_pcibios_find_class.9.man): added manual pages
+	* (man/man9/lis_pcibios_find_device.9.man): added manual pages
+	* (man/man9/lis_pcibios_init.9.man): added manual pages
+	* (man/man9/lis_pcibios_present.9.man): added manual pages
+	* (man/man9/lis_pcibios_read_config_byte.9.man): added manual pages
+	* (man/man9/lis_pcibios_read_config_dword.9.man): added manual pages
+	* (man/man9/lis_pcibios_read_config_word.9.man): added manual pages
+	* (man/man9/lis_pcibios_strerror.9.man): added manual pages
+	* (man/man9/lis_pcibios_write_config_byte.9.man): added manual pages
+	* (man/man9/lis_pcibios_write_config_dword.9.man): added manual pages
+	* (man/man9/lis_pcibios_write_config_word.9.man): added manual pages
+	* (man/man9/lis_phys_to_virt.9.man): added manual pages
+	* (man/man9/lis_pipe.9.man): added manual pages
+	* (man/man9/lis_poll_2_1.9.man): added manual pages
+	* (man/man9/lis_poll_bits.9.man): added manual pages
+	* (man/man9/lis_poll_events.9.man): added manual pages
+	* (man/man9/lis_poll_file.9.man): added manual pages
+	* (man/man9/lis_print_block.9.man): added manual pages
+	* (man/man9/lis_print_data.9.man): added manual pages
+	* (man/man9/lis_print_mem.9.man): added manual pages
+	* (man/man9/lis_print_msg.9.man): added manual pages
+	* (man/man9/lis_print_queue.9.man): added manual pages
+	* (man/man9/lis_print_queues.9.man): added manual pages
+	* (man/man9/lis_print_spl_track.9.man): added manual pages
+	* (man/man9/lis_print_stream.9.man): added manual pages
+	* (man/man9/lis_printk.9.man): added manual pages
+	* (man/man9/lis_pullupmsg.9.man): added manual pages
+	* (man/man9/lis_putbq.9.man): added manual pages
+	* (man/man9/lis_putbyte.9.man): added manual pages
+	* (man/man9/lis_putctl.9.man): added manual pages
+	* (man/man9/lis_putctl1.9.man): added manual pages
+	* (man/man9/lis_putnext.9.man): added manual pages
+	* (man/man9/lis_putnextctl.9.man): added manual pages
+	* (man/man9/lis_putnextctl1.9.man): added manual pages
+	* (man/man9/lis_putq.9.man): added manual pages
+	* (man/man9/lis_qattach.9.man): added manual pages
+	* (man/man9/lis_qclose.9.man): added manual pages
+	* (man/man9/lis_qcountstrm.9.man): added manual pages
+	* (man/man9/lis_qdetach.9.man): added manual pages
+	* (man/man9/lis_qenable.9.man): added manual pages
+	* (man/man9/lis_qopen.9.man): added manual pages
+	* (man/man9/lis_qprocsoff.9.man): added manual pages
+	* (man/man9/lis_qprocson.9.man): added manual pages
+	* (man/man9/lis_qreply.9.man): added manual pages
+	* (man/man9/lis_qsize.9.man): added manual pages
+	* (man/man9/lis_queue_name.9.man): added manual pages
+	* (man/man9/lis_queuerun_cnts.9.man): added manual pages
+	* (man/man9/lis_queues_running.9.man): added manual pages
+	* (man/man9/lis_recvfd.9.man): added manual pages
+	* (man/man9/lis_register_strdev.9.man): added manual pages
+	* (man/man9/lis_register_strmod.9.man): added manual pages
+	* (man/man9/lis_release_mem_region.9.man): added manual pages
+	* (man/man9/lis_release_region.9.man): added manual pages
+	* (man/man9/lis_request_dma.9.man): added manual pages
+	* (man/man9/lis_request_irq.9.man): added manual pages
+	* (man/man9/lis_request_mem_region.9.man): added manual pages
+	* (man/man9/lis_request_region.9.man): added manual pages
+	* (man/man9/lis_rmvb.9.man): added manual pages
+	* (man/man9/lis_rmvq.9.man): added manual pages
+	* (man/man9/lis_runq_cnts.9.man): added manual pages
+	* (man/man9/lis_runq_req_cnt.9.man): added manual pages
+	* (man/man9/lis_rw_lock_alloc_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_lock_free_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_lock_init_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_read_lock_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_read_lock_irq_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_read_lock_irqsave_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_read_unlock_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_read_unlock_irq_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_read_unlock_irqrestore_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_write_lock_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_write_lock_irq_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_write_lock_irqsave_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_write_unlock_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_write_unlock_irq_fcn.9.man): added manual pages
+	* (man/man9/lis_rw_write_unlock_irqrestore_fcn.9.man): added manual pages
+	* (man/man9/lis_safe_OTHERQ.9.man): added manual pages
+	* (man/man9/lis_safe_RD.9.man): added manual pages
+	* (man/man9/lis_safe_SAMESTR.9.man): added manual pages
+	* (man/man9/lis_safe_WR.9.man): added manual pages
+	* (man/man9/lis_safe_canenable.9.man): added manual pages
+	* (man/man9/lis_safe_enableok.9.man): added manual pages
+	* (man/man9/lis_safe_noenable.9.man): added manual pages
+	* (man/man9/lis_safe_putmsg.9.man): added manual pages
+	* (man/man9/lis_safe_putnext.9.man): added manual pages
+	* (man/man9/lis_safe_qreply.9.man): added manual pages
+	* (man/man9/lis_secs.9.man): added manual pages
+	* (man/man9/lis_sem_alloc.9.man): added manual pages
+	* (man/man9/lis_sem_destroy.9.man): added manual pages
+	* (man/man9/lis_sem_init.9.man): added manual pages
+	* (man/man9/lis_sendfd.9.man): added manual pages
+	* (man/man9/lis_seq_cntr.9.man): added manual pages
+	* (man/man9/lis_set_file_str.9.man): added manual pages
+	* (man/man9/lis_setq.9.man): added manual pages
+	* (man/man9/lis_setqsched.9.man): added manual pages
+	* (man/man9/lis_setqsched_cnts.9.man): added manual pages
+	* (man/man9/lis_setqsched_isr_cnts.9.man): added manual pages
+	* (man/man9/lis_sleep_on.9.man): added manual pages
+	* (man/man9/lis_spin_is_locked_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_lock_alloc_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_lock_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_lock_free_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_lock_init_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_lock_irq_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_lock_irqsave_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_trylock_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_unlock_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_unlock_irq_fcn.9.man): added manual pages
+	* (man/man9/lis_spin_unlock_irqrestore_fcn.9.man): added manual pages
+	* (man/man9/lis_spl0_fcn.9.man): added manual pages
+	* (man/man9/lis_splstr_fcn.9.man): added manual pages
+	* (man/man9/lis_splx_fcn.9.man): added manual pages
+	* (man/man9/lis_sprintf.9.man): added manual pages
+	* (man/man9/lis_stdata_cnt.9.man): added manual pages
+	* (man/man9/lis_strclose.9.man): added manual pages
+	* (man/man9/lis_strcount.9.man): added manual pages
+	* (man/man9/lis_stream_utils.9.man): added manual pages
+	* (man/man9/lis_strgetpmsg.9.man): added manual pages
+	* (man/man9/lis_strioctl.9.man): added manual pages
+	* (man/man9/lis_strm_name.9.man): added manual pages
+	* (man/man9/lis_strm_name_from_queue.9.man): added manual pages
+	* (man/man9/lis_stropen.9.man): added manual pages
+	* (man/man9/lis_stropts_file.9.man): added manual pages
+	* (man/man9/lis_strputpmsg.9.man): added manual pages
+	* (man/man9/lis_strqget.9.man): added manual pages
+	* (man/man9/lis_strqset.9.man): added manual pages
+	* (man/man9/lis_strread.9.man): added manual pages
+	* (man/man9/lis_strstats.9.man): added manual pages
+	* (man/man9/lis_strwrite.9.man): added manual pages
+	* (man/man9/lis_testb.9.man): added manual pages
+	* (man/man9/lis_thread_start.9.man): added manual pages
+	* (man/man9/lis_thread_stop.9.man): added manual pages
+	* (man/man9/lis_timeout.9.man): added manual pages
+	* (man/man9/lis_timeout_fcn.9.man): added manual pages
+	* (man/man9/lis_udelay.9.man): added manual pages
+	* (man/man9/lis_umount.9.man): added manual pages
+	* (man/man9/lis_umount2.9.man): added manual pages
+	* (man/man9/lis_unbufcall.9.man): added manual pages
+	* (man/man9/lis_undoc.9.man): added manual pages
+	* (man/man9/lis_unlink.9.man): added manual pages
+	* (man/man9/lis_unlinkb.9.man): added manual pages
+	* (man/man9/lis_unregister_strdev.9.man): added manual pages
+	* (man/man9/lis_unregister_strmod.9.man): added manual pages
+	* (man/man9/lis_untimeout.9.man): added manual pages
+	* (man/man9/lis_up_fcn.9.man): added manual pages
+	* (man/man9/lis_usecs.9.man): added manual pages
+	* (man/man9/lis_usectohz.9.man): added manual pages
+	* (man/man9/lis_valid_mod_list.9.man): added manual pages
+	* (man/man9/lis_version.9.man): added manual pages
+	* (man/man9/lis_vfree.9.man): added manual pages
+	* (man/man9/lis_virt_to_phys.9.man): added manual pages
+	* (man/man9/lis_vmalloc.9.man): added manual pages
+	* (man/man9/lis_vremap.9.man): added manual pages
+	* (man/man9/lis_vsprintf.9.man): added manual pages
+	* (man/man9/lis_wake_up.9.man): added manual pages
+	* (man/man9/lis_wake_up_interruptible.9.man): added manual pages
+	* (man/man9/lis_xmsgsize.9.man): added manual pages
+	* (man/man9/lis_zmalloc.9.man): added manual pages
+	* (man/man9/makedevice.9.man): added manual pages
+	* (man/man9/mknod.9.man): added manual pages
+	* (man/man9/mount.9.man): added manual pages
+	* (man/man9/msgdsize.9.man): added manual pages
+	* (man/man9/msgpullup.9.man): added manual pages
+	* (man/man9/msgsize.9.man): added manual pages
+	* (man/man9/msgutil.9.man): added manual pages
+	* (man/man9/noenable.9.man): added manual pages
+	* (man/man9/pullupmsg.9.man): added manual pages
+	* (man/man9/putbq.9.man): added manual pages
+	* (man/man9/putctl.9.man): added manual pages
+	* (man/man9/putctl1.9.man): added manual pages
+	* (man/man9/putnext.9.man): added manual pages
+	* (man/man9/putnextctl.9.man): added manual pages
+	* (man/man9/putnextctl1.9.man): added manual pages
+	* (man/man9/putq.9.man): added manual pages
+	* (man/man9/qattach.9.man): added manual pages
+	* (man/man9/qbufcall.9.man): added manual pages
+	* (man/man9/qclose.9.man): added manual pages
+	* (man/man9/qdetach.9.man): added manual pages
+	* (man/man9/qenable.9.man): added manual pages
+	* (man/man9/qopen.9.man): added manual pages
+	* (man/man9/qprocsoff.9.man): added manual pages
+	* (man/man9/qprocson.9.man): added manual pages
+	* (man/man9/qreply.9.man): added manual pages
+	* (man/man9/qsize.9.man): added manual pages
+	* (man/man9/rmvb.9.man): added manual pages
+	* (man/man9/rmvq.9.man): added manual pages
+	* (man/man9/stream_utils.9.man): added manual pages
+	* (man/man9/strlog.9.man): added manual pages
+	* (man/man9/strqget.9.man): added manual pages
+	* (man/man9/strqset.9.man): added manual pages
+	* (man/man9/testb.9.man): added manual pages
+	* (man/man9/timeout.9.man): added manual pages
+	* (man/man9/umount.9.man): added manual pages
+	* (man/man9/umount2.9.man): added manual pages
+	* (man/man9/unbufcall.9.man): added manual pages
+	* (man/man9/unlink.9.man): added manual pages
+	* (man/man9/unlinkb.9.man): added manual pages
+	* (man/man9/untimeout.9.man): added manual pages
+	* (man/man9/xmsgsize.9.man): added manual pages
+	* (manual/LiS.texi): added LiS texi manual
+	* (manual/Makefile.am): added LiS texi manual
+	* (manual/configure.texi): added LiS texi manual
+	* (manual/releases.texi): added LiS texi manual
+	* (manual/rpm.texi): added LiS texi manual
+	* (manual/texi/args.texi.in): added LiS texi manual
+	* (manual/texi/fdl.texi): added LiS texi manual
+	* (manual/texi/gpl.texi): added LiS texi manual
+	* (manual/texi/install.texi): added LiS texi manual
+	* (manual/texi/lesser.texi): added LiS texi manual
+
 2004-11-09  brian  <bidulock@openss7.org>
 	* .rpmrelease:
 	- Build system updates.

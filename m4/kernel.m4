@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/03/11 22:19:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/03/12 22:33:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/12 22:33:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1311,6 +1311,72 @@ AC_DEFUN([_LINUX_CHECK_MEMBERS], [dnl
     _LINUX_KERNEL_ENV([dnl
 	_LINUX_CHECK_MEMBERS_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_MEMBERS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MACRO_internal(MACRO, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_FUNC for macros
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MACRO_internal],
+    [AS_VAR_PUSHDEF([linux_Macro], [linux_cv_macro_$1])dnl
+    AC_CACHE_CHECK([for kernel macro $1], linux_Macro,
+	[AC_EGREP_CPP([\<yes_we_have_$1_defined\>], [
+[$4]
+
+#ifdef $1
+    yes_we_have_$1_defined
+#endif
+	],
+	[AS_VAR_SET(linux_Macro, yes)],
+	[AS_VAR_SET(linux_Macro, no)])])
+    AS_IF([test :AS_VAR_GET(linux_Macro) = :yes], [$2], [$3])dnl
+    AS_VAR_POPDEF([linux_Macro])dnl
+])# _LINUX_CHECK_MACRO_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MACROS_internal(MACROS, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_FUNCS for macros
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MACROS_internal],
+[AC_FOREACH([LK_Macro], [$1],
+  [AH_TEMPLATE(AS_TR_CPP(HAVE_KMACRO_[]LK_Macro),
+	       [Define to 1 if kernel macro ]LK_Macro[() exists.])])dnl
+for lk_macro in $1
+do
+    _LINUX_CHECK_MACRO_internal($lk_macro,
+	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KMACRO_$lk_macro]), 1)
+$2],
+	[$3],
+	[$4])dnl
+done
+])# _LINUX_CHECK_MACROS_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MACRO(MACRO, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent to AC_CHECK_FUNC for macros
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MACRO], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+	_LINUX_CHECK_MACRO_internal([$1], [$2], [$3], [$4])])
+])# _LINUX_CHECK_MACRO
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MACROS(MACROS, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_FUNCS for macros
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MACROS], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+	_LINUX_CHECK_MACROS_internal([$1], [$2], [$3], [$4])])
+])# _LINUX_CHECK_MACROS
 # =============================================================================
 
 # =============================================================================

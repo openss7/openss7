@@ -469,3 +469,10 @@ MODULE_DESCRIPTION("STREAMS Administrative Driver");
 #endif
 
 #endif					/* !defined  __NO_VERSION__ */
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(SAD__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(SAD__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-" __stringify(SAD__CMAJOR_0));
+MODULE_ALIAS("/dev/sad");
+#endif

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:13:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/12 22:32:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:54 $ by $Author: brian $
+# Last Modified $Date: 2005/03/12 22:32:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -179,10 +179,12 @@ man_MANS = \
 	man9/lis_debug_mask.9 \
 	man9/lis_dec_mod_cnt_fcn.9 \
 	man9/lis_del_timer.9 \
+	man9/lis_deprec.9 \
 	man9/lis_disable_irq.9 \
 	man9/lis_dobufcall.9 \
 	man9/lis_doclose.9 \
 	man9/lis_down_fcn.9 \
+	man9/lis_down_nosig_fcn.9 \
 	man9/lis_dsecs.9 \
 	man9/lis_dupb.9 \
 	man9/lis_dupmsg.9 \
@@ -215,28 +217,35 @@ man_MANS = \
 	man9/lis_free_pages_fcn.9 \
 	man9/lis_free_passfp.9 \
 	man9/lis_freeq.9 \
+	man9/lis_freezestr.9 \
 	man9/lis_fstr_sw.9 \
 	man9/lis_get_fifo.9 \
 	man9/lis_get_free_pages_atomic_fcn.9 \
 	man9/lis_get_free_pages_fcn.9 \
 	man9/lis_get_free_pages_kernel_fcn.9 \
 	man9/lis_getint.9 \
+	man9/lis_getmajor.9 \
+	man9/lis_getminor.9 \
 	man9/lis_get_passfp.9 \
 	man9/lis_get_pipe.9 \
 	man9/lis_getq.9 \
 	man9/lis_gettimeofday.9 \
 	man9/lis_hitime.9 \
 	man9/lis_inc_mod_cnt_fcn.9 \
+	man9/lis_in_interrupt.9 \
 	man9/lis_init_bufcall.9 \
 	man9/lis_insq.9 \
 	man9/lis_in_syscall.9 \
 	man9/lis_interruptible_sleep_on.9 \
+	man9/lis_interruptible_sleep_on_timeout.9 \
 	man9/lis_ioc_fattach.9 \
 	man9/lis_ioc_fdetach.9 \
 	man9/lis_ioc_pipe.9 \
 	man9/lis_ioremap.9 \
 	man9/lis_ioremap_nocache.9 \
 	man9/lis_iounmap.9 \
+	man9/lis_irqreturn_handled.9 \
+	man9/lis_irqreturn_not_handled.9 \
 	man9/lis_isdatablk.9 \
 	man9/lis_isdatamsg.9 \
 	man9/lis_jiffies.9 \
@@ -253,7 +262,10 @@ man_MANS = \
 	man9/lis_loadable_load.9 \
 	man9/lis_maj_min_name.9 \
 	man9/lis_major.9 \
+	man9/lis_makedevice.9 \
 	man9/lis_malloc.9 \
+	man9/lis_mark_mem.9 \
+	man9/lis_mark_mem_fcn.9 \
 	man9/lis_max_mem.9 \
 	man9/lis_membar.9 \
 	man9/lis_milli_to_ticks.9 \
@@ -360,6 +372,7 @@ man_MANS = \
 	man9/lis_print_stream.9 \
 	man9/lis_pullupmsg.9 \
 	man9/lis_putbq.9 \
+	man9/lis_putbqf.9 \
 	man9/lis_putbyte.9 \
 	man9/lis_putctl1.9 \
 	man9/lis_putctl.9 \
@@ -367,6 +380,7 @@ man_MANS = \
 	man9/lis_putnextctl1.9 \
 	man9/lis_putnextctl.9 \
 	man9/lis_putq.9 \
+	man9/lis_putqf.9 \
 	man9/lis_qattach.9 \
 	man9/lis_qclose.9 \
 	man9/lis_qcountstrm.9 \
@@ -382,6 +396,8 @@ man_MANS = \
 	man9/lis_queues_running.9 \
 	man9/lis_RD.9 \
 	man9/lis_recvfd.9 \
+	man9/lis_register_driver_qlock_option.9 \
+	man9/lis_register_module_qlock_option.9 \
 	man9/lis_register_strdev.9 \
 	man9/lis_register_strmod.9 \
 	man9/lis_release_mem_region.9 \
@@ -432,6 +448,7 @@ man_MANS = \
 	man9/lis_setqsched_cnts.9 \
 	man9/lis_setqsched_isr_cnts.9 \
 	man9/lis_sleep_on.9 \
+	man9/lis_sleep_on_timeout.9 \
 	man9/lis_spin_is_locked_fcn.9 \
 	man9/lis_spin_lock_alloc_fcn.9 \
 	man9/lis_spin_lock_fcn.9 \
@@ -473,6 +490,7 @@ man_MANS = \
 	man9/lis_umount.9 \
 	man9/lis_unbufcall.9 \
 	man9/lis_undoc.9 \
+	man9/lis_unfreezestr.9 \
 	man9/lis_unlink.9 \
 	man9/lis_unlinkb.9 \
 	man9/lis_unregister_strdev.9 \
@@ -488,6 +506,8 @@ man_MANS = \
 	man9/lis_vmalloc.9 \
 	man9/lis_vremap.9 \
 	man9/lis_vsprintf.9 \
+	man9/lis_wait_event.9 \
+	man9/lis_wait_event_interruptible.9 \
 	man9/lis_wake_up.9 \
 	man9/lis_wake_up_interruptible.9 \
 	man9/lis_WR.9 \
@@ -538,6 +558,20 @@ man_MANS = \
 	man9/unlinkb.9 \
 	man9/untimeout.9 \
 	man9/WR.9 \
+	man9/__wrap_memcmp.9 \
+	man9/__wrap_memcpy.9 \
+	man9/__wrap_memset.9 \
+	man9/__wrap_strcat.9 \
+	man9/__wrap_strchr.9 \
+	man9/__wrap_strcmp.9 \
+	man9/__wrap_strcpy.9 \
+	man9/__wrap_strlen.9 \
+	man9/__wrap_strncat.9 \
+	man9/__wrap_strncmp.9 \
+	man9/__wrap_strncpy.9 \
+	man9/__wrap_strnicmp.9 \
+	man9/__wrap_strrchr.9 \
+	man9/__wrap_strstr.9 \
 	man9/xmsgsize.9
 
 dist_noinst_MANS = \
@@ -665,10 +699,12 @@ dist_noinst_MANS = \
 	man9/lis_debug_mask.9.man \
 	man9/lis_dec_mod_cnt_fcn.9.man \
 	man9/lis_del_timer.9.man \
+	man9/lis_deprec.9.man \
 	man9/lis_disable_irq.9.man \
 	man9/lis_dobufcall.9.man \
 	man9/lis_doclose.9.man \
 	man9/lis_down_fcn.9.man \
+	man9/lis_down_nosig_fcn.9.man \
 	man9/lis_dsecs.9.man \
 	man9/lis_dupb.9.man \
 	man9/lis_dupmsg.9.man \
@@ -701,28 +737,35 @@ dist_noinst_MANS = \
 	man9/lis_free_pages_fcn.9.man \
 	man9/lis_free_passfp.9.man \
 	man9/lis_freeq.9.man \
+	man9/lis_freezestr.9.man \
 	man9/lis_fstr_sw.9.man \
 	man9/lis_get_fifo.9.man \
 	man9/lis_get_free_pages_atomic_fcn.9.man \
 	man9/lis_get_free_pages_fcn.9.man \
 	man9/lis_get_free_pages_kernel_fcn.9.man \
 	man9/lis_getint.9.man \
+	man9/lis_getmajor.9.man \
+	man9/lis_getminor.9.man \
 	man9/lis_get_passfp.9.man \
 	man9/lis_get_pipe.9.man \
 	man9/lis_getq.9.man \
 	man9/lis_gettimeofday.9.man \
 	man9/lis_hitime.9.man \
 	man9/lis_inc_mod_cnt_fcn.9.man \
+	man9/lis_in_interrupt.9.man \
 	man9/lis_init_bufcall.9.man \
 	man9/lis_insq.9.man \
 	man9/lis_in_syscall.9.man \
 	man9/lis_interruptible_sleep_on.9.man \
+	man9/lis_interruptible_sleep_on_timeout.9.man \
 	man9/lis_ioc_fattach.9.man \
 	man9/lis_ioc_fdetach.9.man \
 	man9/lis_ioc_pipe.9.man \
 	man9/lis_ioremap.9.man \
 	man9/lis_ioremap_nocache.9.man \
 	man9/lis_iounmap.9.man \
+	man9/lis_irqreturn_handled.9.man \
+	man9/lis_irqreturn_not_handled.9.man \
 	man9/lis_isdatablk.9.man \
 	man9/lis_isdatamsg.9.man \
 	man9/lis_jiffies.9.man \
@@ -739,7 +782,10 @@ dist_noinst_MANS = \
 	man9/lis_loadable_load.9.man \
 	man9/lis_maj_min_name.9.man \
 	man9/lis_major.9.man \
+	man9/lis_makedevice.9.man \
 	man9/lis_malloc.9.man \
+	man9/lis_mark_mem.9.man \
+	man9/lis_mark_mem_fcn.9.man \
 	man9/lis_max_mem.9.man \
 	man9/lis_membar.9.man \
 	man9/lis_milli_to_ticks.9.man \
@@ -846,6 +892,7 @@ dist_noinst_MANS = \
 	man9/lis_print_stream.9.man \
 	man9/lis_pullupmsg.9.man \
 	man9/lis_putbq.9.man \
+	man9/lis_putbqf.9.man \
 	man9/lis_putbyte.9.man \
 	man9/lis_putctl1.9.man \
 	man9/lis_putctl.9.man \
@@ -853,6 +900,7 @@ dist_noinst_MANS = \
 	man9/lis_putnextctl1.9.man \
 	man9/lis_putnextctl.9.man \
 	man9/lis_putq.9.man \
+	man9/lis_putqf.9.man \
 	man9/lis_qattach.9.man \
 	man9/lis_qclose.9.man \
 	man9/lis_qcountstrm.9.man \
@@ -868,6 +916,8 @@ dist_noinst_MANS = \
 	man9/lis_queues_running.9.man \
 	man9/lis_RD.9.man \
 	man9/lis_recvfd.9.man \
+	man9/lis_register_driver_qlock_option.9.man \
+	man9/lis_register_module_qlock_option.9.man \
 	man9/lis_register_strdev.9.man \
 	man9/lis_register_strmod.9.man \
 	man9/lis_release_mem_region.9.man \
@@ -918,6 +968,7 @@ dist_noinst_MANS = \
 	man9/lis_setqsched_cnts.9.man \
 	man9/lis_setqsched_isr_cnts.9.man \
 	man9/lis_sleep_on.9.man \
+	man9/lis_sleep_on_timeout.9.man \
 	man9/lis_spin_is_locked_fcn.9.man \
 	man9/lis_spin_lock_alloc_fcn.9.man \
 	man9/lis_spin_lock_fcn.9.man \
@@ -959,6 +1010,7 @@ dist_noinst_MANS = \
 	man9/lis_umount.9.man \
 	man9/lis_unbufcall.9.man \
 	man9/lis_undoc.9.man \
+	man9/lis_unfreezestr.9.man \
 	man9/lis_unlink.9.man \
 	man9/lis_unlinkb.9.man \
 	man9/lis_unregister_strdev.9.man \
@@ -974,6 +1026,8 @@ dist_noinst_MANS = \
 	man9/lis_vmalloc.9.man \
 	man9/lis_vremap.9.man \
 	man9/lis_vsprintf.9.man \
+	man9/lis_wait_event.9.man \
+	man9/lis_wait_event_interruptible.9.man \
 	man9/lis_wake_up.9.man \
 	man9/lis_wake_up_interruptible.9.man \
 	man9/lis_WR.9.man \
@@ -1024,6 +1078,20 @@ dist_noinst_MANS = \
 	man9/unlinkb.9.man \
 	man9/untimeout.9.man \
 	man9/WR.9.man \
+	man9/__wrap_memcmp.9.man \
+	man9/__wrap_memcpy.9.man \
+	man9/__wrap_memset.9.man \
+	man9/__wrap_strcat.9.man \
+	man9/__wrap_strchr.9.man \
+	man9/__wrap_strcmp.9.man \
+	man9/__wrap_strcpy.9.man \
+	man9/__wrap_strlen.9.man \
+	man9/__wrap_strncat.9.man \
+	man9/__wrap_strncmp.9.man \
+	man9/__wrap_strncpy.9.man \
+	man9/__wrap_strnicmp.9.man \
+	man9/__wrap_strrchr.9.man \
+	man9/__wrap_strstr.9.man \
 	man9/xmsgsize.9.man
 
 include ../am/man.am
