@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgb.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: msgb.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,36 +71,404 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MSGB 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MSGB 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
 .B msgb, mblk_t
-\- \fISTREAMS\fP message block
+\- \fISTREAMS\fP message block structure
 .\"
 .\"
 .SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.nf
+\fC\s-1
+typedef struct msgb {
+    struct msgb *b_next;        /* next msgb on queue */
+    struct msgb *b_prev;        /* prev msgb on queue */
+    struct msgb *b_cont;        /* next msgb in message */
+    unsigned char *b_rptr;      /* rd pointer into datab */
+    unsigned char *b_wptr;      /* wr pointer into datab */
+    struct datab *b_datap;      /* pointer to datab */
+    unsigned char b_band;       /* band of this message */
+    unsigned char b_pad1;       /* padding */
+    unsigned short b_flag;      /* message flags */
+    long b_pad2;                /* padding */
+    /* private Linux Fast-STREAMS specific members */
+    struct queue *b_queue;      /* queue for this message */
+    struct qband *b_bandp;      /* band for this message */
+    size_t b_size;              /* size of this message on queue */
+} mblk_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The following members correspond to
+.I SVR 4.2 EFT
+members:
+.TP \w'\ b_bandp\ 'u
+.I b_next
+the next
+.B msgb
+structure on a
+.BR queue (9)
+.TP
+.I b_prev
+the previous
+.B msgb
+structure on a
+.BR queue (9)
+.TP
+.I b_cont
+next
+.B msgb
+structure in the chain representing a single message
+.TP
+.I b_rptr
+a pointer into the data from which to read
+.TP
+.I b_wptr
+a pointer into the data to which to write
+.TP
+.I b_datap
+a pointtner to the
+.B datab
+structure representing the actual data
+.TP
+.I b_band
+the
+.BR qband (9)
+to which this message belongs
+.TP
+.I b_pad1
+padding
+.TP
+.I b_flag
+message flags:
+.RS
+.TP \w'\ MSGNOTMARKNEXT\ 'u
+.B MSGMARK
+last byte of message is marked
+.PD 0
+.TP
+.B MSGNOLOOP
+done't loop message at stream head
+.TP
+.B MSGDELIM
+message is delimited
+.TP
+.B MSGNOGET
+UnixWare/Solaris/Mac OT/ UXP/V
+getq does not return message
+.TP
+.B MSGATTEN
+UXP/V attention to on read side */
+.TP
+.B MSGMARKNEXT
+Solaris */
+.TP
+.B MSGLOG
+UnixWare */
+.TP
+.B MSGNOTMARKNEXT
+Solaris */
+.TP
+.B MSGCOMPRESS
+OSF/1: compress like messages as space allows */
+.TP
+.B MSGNOTIFY
+OSF/1: notify when message consumed */
+.PD
+.RE
+.TP
+.I b_pad2
+padding
+.PP
+The following members are
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+specific members:
+.TP \w'\ b_bandp\ 'u
+.I b_queue
+the
+.BR queue (9)
+upon which this message is queued,
+.B NULL
+otherwise
+.TP
+.I b_bandp
+the
+.BR qband (9)
+upon which this message is queued,
+.BR NULL
+otherwise
+.TP
+.I b_size
+the size of the message (in bytes) when it was placed on the
+.BR queue (9)
+indicated by
+.I b_queue
 .\"
 .\"
 .SH DESCRIPTION
+.PP
+The following message block utility functions are provided:
+.TP \w'\ msgpullup_physreq(9)\ \-\ 'u
+.BR adjmsg (9)\ \-
+.PD 0
+.TP
+.BR allocb (9)\ \-
+.TP
+.BR allocb_physreq (9)\ \-
+.TP
+.BR alloc_proto (9)\ \-
+.TP
+.BR appq (9)\ \-
+.TP
+.BR bcopy (9)\ \-
+.TP
+.BR bufcall (9)\ \-
+.TP
+.BR bzero (9)\ \-
+.TP
+.BR copyb (9)\ \-
+.TP
+.BR copyin (9)\ \-
+.TP
+.BR copymsg (9)\ \-
+.TP
+.BR copyout (9)\ \-
+.TP
+.BR datamsg (9)\ \-
+.TP
+.BR dupb (9)\ \-
+.TP
+.BR dupmsg (9)\ \-
+.TP
+.BR esballoc (9)\ \-
+.TP
+.BR esbbcall (9)\ \-
+.TP
+.BR freeb (9)\ \-
+.TP
+.BR freemsg (9)\ \-
+.TP
+.BR getq (9)\ \-
+.TP
+.BR insq (9)\ \-
+.TP
+.BR isdatablk (9)\ \-
+.TP
+.BR isdatamsg (9)\ \-
+.TP
+.BR linkb (9)\ \-
+.TP
+.BR linkmsg (9)\ \-
+.TP
+.BR mi_bufcall (9)\ \-
+.TP
+.BR msgdsize (9)\ \-
+.TP
+.BR msgphysreq (9)\ \-
+.TP
+.BR msgpullup (9)\ \-
+.TP
+.BR msgpullup_physreq (9)\ \-
+.TP
+.BR msgscgth (9)\ \-
+.TP
+.BR msgsize (9)\ \-
+.TP
+.BR msgutil (9)\ \-
+.TP
+.BR pcmsg (9)\ \-
+.TP
+.BR pullupmsg (9)\ \-
+.TP
+.BR put (9)\ \-
+.TP
+.BR putbq (9)\ \-
+.TP
+.BR putctl1 (9)\ \-
+.TP
+.BR putctl2 (9)\ \-
+.TP
+.BR putctl (9)\ \-
+.TP
+.BR puthere (9)\ \-
+.TP
+.BR putnext (9)\ \-
+.TP
+.BR putnextctl1 (9)\ \-
+.TP
+.BR putnextctl2 (9)\ \-
+.TP
+.BR putnextctl (9)\ \-
+.TP
+.BR putq (9)\ \-
+.TP
+.BR qbufcall (9)\ \-
+.TP
+.BR queclass (9)\ \-
+.TP
+.BR qunbufcall (9)\ \-
+.TP
+.BR rmvb (9)\ \-
+.TP
+.BR rmvq (9)\ \-
+.TP
+.BR testb (9)\ \-
+.TP
+.BR unbufcall (9)\ \-
+.TP
+.BR unlinkb (9)\ \-
+.TP
+.BR wantmsg (9)\ \-
+.TP
+.BR xmsgsize (9)\ \-
+.PD
+
+
+
+.PD
+.\"
+.\"
+.SH CONTEXT
+.PP
+Functions that operate on a message or data block can be called from any
+context.  However, it is the caller's responsibility to ensure that the
+calling thread has exclusive access to the message block.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
 .\"
 .\"
 .SH NOTICES
-.\"
-.\"
-.SH NOTICES
+.PP
+Members of the
+.B msgb
+structure should not be accessed directly by
+.I STREAMS
+modules or drivers.  Portable
+.I STREAMS
+modules and drivers should, where possible, use the facilities provided for
+implementation and architectural independence.
 .\"
 .\"
 .SH "SEE ALSO"
+
+.BR adjmsg (9),
+.BR allocb (9),
+.BR allocb_physreq (9),
+.BR alloc_proto (9),
+.BR appq (9),
+.BR bcopy (9),
+.BR bufcall (9),
+.BR bzero (9),
+.BR copyb (9),
+.BR copyin (9),
+.BR copymsg (9),
+.BR copyout (9),
+.BR datamsg (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR esballoc (9),
+.BR esbbcall (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR getq (9),
+.BR insq (9),
+.BR isdatablk (9),
+.BR isdatamsg (9),
+.BR linkb (9),
+.BR linkmsg (9),
+.BR mi_bufcall (9),
+.BR msgdsize (9),
+.BR msgphysreq (9),
+.BR msgpullup (9),
+.BR msgpullup_physreq (9),
+.BR msgscgth (9),
+.BR msgsize (9),
+.BR msgutil (9),
+.BR pcmsg (9),
+.BR pullupmsg (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR putctl (9),
+.BR puthere (9),
+.BR putnext (9),
+.BR putnextctl1 (9),
+.BR putnextctl2 (9),
+.BR putnextctl (9),
+.BR putq (9),
+.BR qbufcall (9),
+.BR queclass (9),
+.BR qunbufcall (9),
+.BR rmvb (9),
+.BR rmvq (9),
+.BR testb (9),
+.BR unbufcall (9),
+.BR unlinkb (9),
+.BR wantmsg (9),
+.BR xmsgsize (9).
 .\"
 .\"
-.SH BUGS
+.SH COMPATIBILITY
+.PP
+The
+.B msgb
+structure is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+The flags defined for the
+.I b_flag
+member of the
+.B msgb
+structure are not necessarily binary compatible with any given implementation.
+.IP ""
+.IP ""
+.IP ""
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
+.PP
+.IR "SVR 4.2 EFT MP" .
+.[
+svr42
+.]
 .\"
 .\"
 .SH HISTORY
+.PP
+The
+.B msgb
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .TI

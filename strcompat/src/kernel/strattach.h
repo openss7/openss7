@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: strattach.h,v 0.9 2004/03/01 00:08:40 brian Exp $
+ @(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,23 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/01 00:08:40 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRATTACH_H__
 #define __LOCAL_STRATTACH_H__
-
-/*
-   The following symbols have to be ripped.
- */
-#ifndef HAVE_TASK_NAMESPACE_SEM
-extern struct semaphore mount_sem;
-#endif
-struct vfsmount *clone_mnt(struct vfsmount *old, struct dentry *root);
-int check_mnt(struct vfsmount *mnt);
-int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
-int do_umount(struct vfsmount *mnt, int flags);
 
 long do_fattach(const struct file *file, const char *file_name);
 long do_fdetach(const char *file_name);

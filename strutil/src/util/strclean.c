@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $
+ @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $"
+#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $"
 
 static char const ident[] =
-    "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $";
+    "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $";
 
 /*
  *  AIX Utility: strclean - Cleans up the STREAMS error logger.

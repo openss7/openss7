@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlookup.h,v 0.9 2004/06/01 12:04:38 brian Exp $
+ @(#) $Id: strlookup.h,v 0.9.2.1 2004/08/22 06:17:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -63,12 +63,12 @@ extern struct list_head fmodsw_list;
 
 extern void fmod_add(struct fmodsw *fmod, modID_t modid);
 extern void fmod_del(struct fmodsw *fmod);
-extern int cdev_add(struct dentry *root, struct cdevsw *cdev, modID_t modid);
-extern void cdev_del(struct dentry *root, struct cdevsw *cdev);
-extern void devi_add(struct devinfo *devi, struct cdevsw *cdev, major_t major);
-extern void devi_del(struct devinfo *devi, struct cdevsw *cdev);
-extern int node_add(struct devnode *node, struct cdevsw *cdev, minor_t minor);
-extern void node_del(struct devnode *node, struct cdevsw *cdev);
+extern int cdev_add(struct cdevsw *cdev, modID_t modid);
+extern void cdev_del(struct cdevsw *cdev);
+extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
+extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
+extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 
 #if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
  || defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE

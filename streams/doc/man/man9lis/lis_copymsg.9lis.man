@@ -1,1 +1,1 @@
-.so man9/copymsg.9
+.so man9/copymsg.9.man

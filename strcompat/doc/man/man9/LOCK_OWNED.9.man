@@ -1,0 +1,289 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: LOCK_OWNED.9.man,v 0.9.2.1 2004/08/22 06:17:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LOCK_OWNED 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B LOCK_OWNED
+\- determine whether a basic lock is held by the caller
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/ksynch.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "int LOCK_OWNED(lock_t *" lockp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I lockp
+A pointer to the
+.B lock_t
+basic lock structure to test for ownership.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR LOCK_ALLOC (9),
+.BR LOCK_DEALLOC (9),
+.BR LOCK (9),
+.BR LOCK_OWNED (9),
+.BR TRYLOCK (9)
+and
+.BR UNLOCK (9)
+are a set of primitive functions for allocating, deallocating, locking,
+testing, attempting to lock and unlocking a basic lock of type
+.BR lock_t .
+.PP
+.BR LOCK_OWNED ()
+test the basic lock specified by
+.I lockp
+for ownership by the calling process.  A basic lock is owned by a process if
+the process has acquired and not released the basic lock.
+.\"
+.\"
+.SH RETURN
+.PP
+When the lock specified by
+.I lockp
+is owned by the calling process,
+.BR LOCK_OWNED ()
+returns true (1); otherwise it returns false (0).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR LOCK_OWNED ()
+is always successful.  If passed invalid or uninitialized arguments, the
+results will be indeterminate.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR LOCK_OWNED ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR LOCK_OWNED ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR LOCK_OWNED ()
+is not completely implemented in
+.B Linux Fast-STREAMS
+and should not be called by portable
+.I STREAMS
+modules or drivers.
+.PP
+Basic locks of type
+.B lock_t
+are not recursive.  Calling
+.BR LOCK (9)
+for a basic lock that has been acquired by the calling processor with
+.BR LOCK (9)
+or
+.BR TRYLOCK (9)
+will result in single party deadlock.
+.PP
+.BR LOCK_OWNED ()
+is a
+.IR "SVR 4.2" -specific
+function:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR LOCK_OWNED ()
+could be implemented by simply comparing the
+.B task_struct
+pointer in a locked basic lock with the current
+.B task_struct
+pointer,
+.BR current .
+Because this is only a debugging primitive,
+.BR LOCK_OWNED ()
+always returns true (1).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR LOCK (9),
+.BR LOCK_ALLOC (9),
+.BR LOCK_DEALLOC (9),
+.BR LOCK_OWNED (9),
+.BR TRYLOCK (9),
+.BR UNLOCK (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR LOCK_OWNED ()
+always returns true (1).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR LOCK_OWNED ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR LOCK_OWNED ()
+is intended as a debugging primitive only to be used with
+.BR ASSERT (9).
+Because separate debugging functions are provided under
+.BR Linux ,
+.BR LOCK_OWNED ()
+always returns true (1).
+.IP \(em
+.BR LOCK_OWNED ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR LOCK_OWNED ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR LOCK_OWNED ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR LOCK_OWNED ()
+first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

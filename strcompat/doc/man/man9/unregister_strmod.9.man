@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_strmod.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: unregister_strmod.9.man,v 0.9.2.1 2004/08/22 06:17:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,16 +71,123 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXXX 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Under Construction"
+.TH UNREGISTER_STRMOD 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B xxx
-\- incomplete man page
+.B unregister_strmod
+\- unregister a \fISTREAMS\fR module
+.\"
+.\"
 .SH SYNOPSIS
-none
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int unregister_strmod(modID_t " modid ", struct fmodsw *" fmod );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I modid
+the module identification number indicating the
+.I STREAMS
+module to deregister.
+.TP
+.I fmod
+A pointer to a
+.BR fmodsw (9)
+structure indicating the characteristics of the module.  Thw following members
+of the
+.BR fmodsw (9)
+structure, pointed to by
+.IR fmod ,
+are significant:
+.RS
+.TP
+.I f_name
+.TP
+.I f_str
+.TP
+.I f_flag
+.TP
+.I f_kmod
+.RE
+.\"
+.\"
 .SH DESCRIPTION
-This manpage is under construction.
+.PP
+.BR unregister_strmod ()
+deallocates a module node
+.IR modid ,
+within the
+.I STREAMS
+shadow special filesystem
+.BR specfs (5)
+and deregisters the
+.I STREAMS
+module
+.IR fmod ,
+from that module node.
+Once a
+.I STREAMS
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
 .SH BUGS
-Not done yet.
+.PP
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
 .TI

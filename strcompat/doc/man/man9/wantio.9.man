@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: wantio.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: wantio.9.man,v 0.9.2.1 2004/08/22 06:17:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WANTIO 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WANTIO 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -129,27 +129,104 @@ structure is formatted as follows:
 .nf
 \fC\s-2
 struct wantio {
-        unsigned int (*poll) ();
-        ssize_t (*read)();
-        ssize_t (*write) ();
-        ssize_t (*readv) ();
-        ssize_t (*writev) ();
-        ssize_t (*sendpage) ();
+	unsigned int (*poll)();
+	ssize_t (*read)();
+	ssize_t (*write)();
+	ssize_t (*readv)();
+	ssize_t (*writev)();
+	ssize_t (*sendpage)();
+	int (*getpmsg)();
+	int (*putpmsg)();
 };
 \s+2\fP
 .fi
-.TP
+.TP \w'getpmsg()\(em'u
 .IR poll ()
+A pointer to a poll procedure for direct I/O or
+.B NULL
+if no poll procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+poll file operation.
 .TP
 .IR read ()
+A pointer to a read procedure for direct I/O or
+.B NULL
+if no read procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+read file operation.
 .TP
 .IR write ()
+A pointer to a write procedure for direct I/O or
+.B NULL
+if no write procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+write file operation.
 .TP
 .IR readv ()
+A pointer to a readv procedure for direct I/O or
+.B NULL
+if no readv procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+readv file operation.
 .TP
 .IR writev ()
+A pointer to a writev procedure for direct I/O or
+.B NULL
+if no writev procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+writev file operation.
 .TP
 .IR sendpage ()
+A pointer to a sendpage procedure for direct I/O or
+.B NULL
+if no sendpage procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+sendpage file operation.
+.TP
+.IR getpmsg ()
+A pointer to a getpmsg procedure for direct I/O or
+.B NULL
+if no getpmsg procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+getpmsg file operation.
+.TP
+.IR putpmsg ()
+A pointer to a putpmsg procedure for direct I/O or
+.B NULL
+if no putpmsg procedure is specified.
+The prototype for this function is the same as the
+.B Linux
+putpmsg file operation.
+.PP
+When the
+.B wantio
+structure is provided to the
+.BR wantio ()
+call, each
+.RB non- NULL
+element of the
+.B wantio
+structure will be used instead of the corresponding element in the file operations for the stream
+head.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR wantio ()
+is useful for
+.I STREAMS
+drivers that need direct I/O operations for efficiency or other special applications.  Zero-copy
+write operations can be accomplished by replacing the
+.BR sendpage ()
+file operation which is invoked by
+.BR sendfile (2).
 .\"
 .\"
 .SH RETURN
@@ -182,7 +259,7 @@ Before calling
 .BR wantio ()
 for an active stream,
 the following steps should be performed by the driver:
-.IP (1)
+.IP (1) \w'(0)\(em'u
 Send a
 .B M_LETSPLAY
 message upstream with a
@@ -199,7 +276,7 @@ struct strlp {
 };
 \s+2\fP
 .fi
-.TP
+.TP \w'lp_count\(em'u
 .I lp_count
 Initially set to zero by the driver, this count is incremented by each module
 that recognizes the
@@ -268,30 +345,59 @@ has no known bugs.
 .PP
 .BR wantio ()
 is an
-.BR AIX \(rg-specific
+.IR AIX \(rg-specific
 .I STREAMS
 utility function.
 .BR wantio ()
-is source-level compatible with
-.BR AIX \(rg
+is compatible with
+.IR AIX \(rg
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\(em\(em'u
+.BR wantio ()
+is an
+.IR AIX \(rg-specific
+function and it should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
 The
-.BR wantio
+.B wantio
+structure does not appear in
+.IR AIX \(rg
+documentation.
+Therefore, the
+.B wantio
 structure bears no resemblance to that of
-.BR AIX \(rg.
+.IR AIX \(rg.
+Because of structural differences, source-level compatibility with
+.IR AIX \(rg
+is not guaranteed.
+.IP \(em
+The
+.B strlp
+structure does not appear in
+.IR AIX \(rg
+documentation.
+Therefore, the
+.B strlp
+structure described above bease no resemblance to thaqt of
+.IR AIX \(rg.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 .BR wantio ()
 is an
-.BR AIX \(rg-specific
+.IR AIX \(rg-specific
 .I STREAMS
 utility function.
 .BR wantio ()
 is compliant with
-.BR AIX \(rg
+.IR AIX \(rg
 documentation.
 .[
 aixdoc
@@ -302,12 +408,12 @@ aixdoc
 .PP
 .BR wantio ()
 is an
-.BR AIX \(rg-specific
+.IR AIX \(rg-specific
 .I STREAMS
 utility function.
 .BR wantio ()
 first appeared in
-.BR AIX \(rg.
+.IR AIX \(rg.
 .\"
 .\"
 .[

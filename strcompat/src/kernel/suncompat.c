@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) suncompat.c,v (1.1.2.7) 2003/10/28 08:00:05
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,16 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:05 by brian
+ Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) suncompat.c,v (1.1.2.7) 2003/10/28 08:00:05"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 
-static char const ident[] = "suncompat.c,v (1.1.2.7) 2003/10/28 08:00:05";
+static char const ident[] =
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -97,24 +104,28 @@ static char const ident[] = "suncompat.c,v (1.1.2.7) 2003/10/28 08:00:05";
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _SUN_SOURCE
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
-#include <linux/sunddi.h>
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
 
-#include "strdebug.h"
+#define _SUN_SOURCE
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+#include <sys/sunddi.h>
+
+#include "sys/config.h"
 #include "strsched.h"
 #include "strutil.h"
-#include "strhead.h"
+#include "sth.h"
+#include "strreg.h"
 #include "strsad.h"
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS suncompat.c,v (1.1.2.7) 2003/10/28 08:00:05"
+#define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -126,14 +137,21 @@ static char const ident[] = "suncompat.c,v (1.1.2.7) 2003/10/28 08:00:05";
 #define SUNCOMP_SPLASH		SUNCOMP_DEVICE		" - " \
 				SUNCOMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 MODULE_AUTHOR(SUNCOMP_CONTACT);
 MODULE_DESCRIPTION(SUNCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SUNCOMP_DEVICE);
 MODULE_LICENSE(SUNCOMP_LICENSE);
+#endif
 
-/* 
- *  QWAIT
- *  -------------------------------------------------------------------------
+__SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q);
+EXPORT_SYMBOL(freezestr_SUN);
+__SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
+EXPORT_SYMBOL(unfreezestr_SUN);
+
+/**
+ *  qwait:  - wait for a procedure to be called on a queue pair
+ *  @rq:    a pointer to the read queue of the queue pair
  */
 void qwait(queue_t *rq)
 {
@@ -144,9 +162,11 @@ void qwait(queue_t *rq)
 	sleep_on(&qu->qu_qwait);
 }
 
-/* 
- *  QWAIT_SIG
- *  -------------------------------------------------------------------------
+EXPORT_SYMBOL(qwait);		/* sunddi.h */
+
+/**
+ *  qwait_sig: - wait for a procedure on a queue pair or signal
+ *  @rq:    a pointer to the read queue of the queue pair
  */
 int qwait_sig(queue_t *rq)
 {
@@ -158,14 +178,34 @@ int qwait_sig(queue_t *rq)
 	return (!signal_pending(current));
 }
 
+EXPORT_SYMBOL(qwait_sig);	/* sunddi.h */
+
+__SUN_EXTERN_INLINE bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg);
+EXPORT_SYMBOL(qbufcall);	/* sunddi.h */
+__SUN_EXTERN_INLINE timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
+EXPORT_SYMBOL(qtimeout);	/* sunddi.h */
+__SUN_EXTERN_INLINE void qunbufcall(queue_t *q, bufcall_id_t bcid);
+EXPORT_SYMBOL(qunbufcall);	/* sunddi.h */
+__SUN_EXTERN_INLINE clock_t quntimeout(queue_t *q, timeout_id_t toid);
+EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
+EXPORT_SYMBOL(queclass);	/* sunddi.h */
+__SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+EXPORT_SYMBOL(qwriter);		/* sunddi.h */
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void);
+EXPORT_SYMBOL(ddi_get_cred);	/* sunddi.h */
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void);
+EXPORT_SYMBOL(ddi_get_lbolt);	/* sunddi.h */
 __SUN_EXTERN_INLINE pid_t ddi_get_pid(void);
+EXPORT_SYMBOL(ddi_get_pid);	/* sunddi.h */
 __SUN_EXTERN_INLINE time_t ddi_get_time(void);
+EXPORT_SYMBOL(ddi_get_time);	/* sunddi.h */
 __SUN_EXTERN_INLINE unsigned short ddi_getiminor(dev_t dev);
+EXPORT_SYMBOL(ddi_getiminor);	/* sunddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep);
+EXPORT_SYMBOL(ddi_umem_alloc);	/* sunddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep);
+EXPORT_SYMBOL(ddi_umem_free);
 
 #if 0
 extern int ddi_add_intr(void);
@@ -437,11 +477,16 @@ extern int ddi_unmap_regs(void);
  */
 
 struct mod_ops mod_strmops = { MODREV_1, 0, };
+EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
 __SUN_EXTERN_INLINE int nodev();
+EXPORT_SYMBOL(nodev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nulldev();
+EXPORT_SYMBOL(nulldev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nochpoll();
+EXPORT_SYMBOL(nochpoll);	/* strconf.h */
 __SUN_EXTERN_INLINE int ddi_prop_op();
+EXPORT_SYMBOL(ddi_prop_op);
 
 int mod_install(struct modlinkage *ml)
 {
@@ -457,10 +502,21 @@ int mod_install(struct modlinkage *ml)
 		/* registering a module */
 		struct fmodsw *fmod;
 		int err;
-		(void) mod;
-		(void) fmod;
-		(void) err;
 		/* FIXME: write this */
+		if ((fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP))) {
+			fmod->f_name = mod->strmod_fmodsw->f_str->st_rdinit->qi_minfo->mi_idname;
+			fmod->f_str = mod->strmod_fmodsw->f_str;
+			fmod->f_flag = mod->strmod_fmodsw->f_flag;
+			fmod->f_kmod = NULL;
+			atomic_set(&fmod->f_count, 0);
+			/* FIXME: Solaris uses flags to indicate syncq levels, dig 'em out and
+			   populate syncq level */
+			if ((err = register_strmod(fmod)) < 0) {
+				kmem_free(fmod, sizeof(*fmod));
+				return (-err);
+			}
+			return (DDI_SUCCESS);
+		}
 	} else {
 		struct modldrv *drv = ml->ml_linkage[0];
 		/* registering a driver */
@@ -474,29 +530,69 @@ int mod_install(struct modlinkage *ml)
 			cdev->d_flag = drv->drv_dev_ops->devo_cb_ops->cb_flag;	/* convert these? */
 			cdev->d_kmod = NULL;
 			atomic_set(&cdev->d_count, 0);
+			INIT_LIST_HEAD(&cdev->d_majors);
+			INIT_LIST_HEAD(&cdev->d_minors);
 			INIT_LIST_HEAD(&cdev->d_apush);
-			if ((err = register_strdev_major(0, cdev)) < 0) {
+			INIT_LIST_HEAD(&cdev->d_stlist);
+			/* FIXME: Solaris uses flags to indicate syncq levels, dig 'em out and
+			   populate syncq level */
+			if ((err = register_strdev(cdev, 0)) < 0)
 				kmem_free(cdev, sizeof(*cdev));
-				return (-err);
-			}
+			return (-err);
 		}
-		return (ENOMEM);
 	}
-	return (ENXIO);
+	return (ENOMEM);
 }
+
+EXPORT_SYMBOL(mod_install);	/* strconf.h */
 int mod_remove(struct modlinkage *ml)
 {
 	/* FIXME: this is our unregister function, write it! */
+	if (ml->ml_rev != MODREV_1)
+		return (DDI_FAILURE);
+	if (ml->ml_linkage[1] != NULL)
+		return (DDI_FAILURE);
+	if (ml->ml_linkage[0] == NULL)
+		return (DDI_FAILURE);
+	if (ml->ml_linkage[0] == (void *) &mod_strmops) {
+		/* was a module */
+		struct modlstrmod *mod = ml->ml_linkage[0];
+		struct fmodsw *fmod;
+		int err;
+		if ((fmod = fmod_str(mod->strmod_fmodsw->f_str))) {
+			printd(("%s: %s: streams module\n", __FUNCTION__, fmod->f_name));
+			err = unregister_strmod(fmod);
+			printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
+			fmod_put(fmod);
+			if (err >= 0)
+				kmem_free(fmod, sizeof(*fmod));
+			return (-err);
+		}
+	} else {
+		/* was a driver */
+		struct modldrv *drv = ml->ml_linkage[0];
+		struct cdevsw *cdev;
+		int err;
+		if ((cdev = cdev_str(drv->drv_dev_ops->devo_cb_ops->cb_str))) {
+			if ((err = unregister_strdev(cdev, 0)) == 0)
+				kmem_free(cdev, sizeof(*cdev));
+			return (-err);
+		}
+	}
 	return (ENXIO);
 }
+
+EXPORT_SYMBOL(mod_remove);	/* strconf.h */
 int mod_info(struct modlinkage *ml, struct modinfo *mi)
 {
 	return (0);		/* never called */
 }
 
+EXPORT_SYMBOL(mod_info);	/* strconf.h */
+
 static int __init suncomp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 	printk(KERN_INFO SUNCOMP_BANNER);
 #else
 	printk(KERN_INFO SUNCOMP_SPLASH);
@@ -508,5 +604,7 @@ static void __exit suncomp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 module_init(suncomp_init);
 module_exit(suncomp_exit);
+#endif

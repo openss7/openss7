@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_umem_free.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: ddi_umem_free.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,54 +71,148 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXX 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_UMEM_FREE 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
+.B ddi_umem_free
+\-
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+int \fBddi_umem_free\fR(int \fIyyy\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I yyy
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.BR ddi_umem_free ()
 .\"
 .\"
 .SH RETURN
 .PP
+When
+.BR ddi_umem_free ()
+succeeds, it returns 
+.BR DDI_SUCCESS ;
+when it fails, it returns
+.BR DDI_FAILURE .
 .\"
 .\"
 .SH ERRORS
 .PP
+.BR ddi_umem_free ()
+fails when 
 .\"
 .\"
-.SH NOTICES
+.SH CONTEXT
+.PP
+.BR ddi_umem_free ()
+can be called from
+.\"
+.\"
+.SH MP-STREAMS
 .PP
 .\"
 .\"
 .SH NOTICES
 .PP
+.BR ddi_umem_free ()
+is a
+.IR Solaris \(rg-specific
+function:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+defined.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR suncompat (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR ddi_umem_free ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR ddi_umem_free ()
+is compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+.IP \(em
+.BR ddi_umem_free ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.IP \(em
+.BR ddi_umem_free ()
+only provides functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR ddi_umem_free ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR suncompat (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR Solaris \(rg
+SUNDDI documentation.
+.[
+soldoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR ddi_umem_free ()
+first appeared in
+.IR Solaris \(rg
+2.5.
 .\"
 .\"
+.[
+$LIST$
+.]
 .TI

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.10 2004/06/06 09:47:42 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.11 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/06 09:47:42 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

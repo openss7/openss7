@@ -1,1 +1,1 @@
-.so man9/qenable.9
+.so man9/qenable.9.man

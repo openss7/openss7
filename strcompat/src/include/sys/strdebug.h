@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strdebug.h,v 1.1.2.2 2003/10/27 12:23:15 brian Exp
+ @(#) $Id: strdebug.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/27 12:23:15 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRDEBUG_H__
-#define __LOCAL_STRDEBUG_H__
+#ifndef __SYS_STRDEBUG_H__
+#define __SYS_STRDEBUG_H__
+
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -75,6 +77,9 @@ do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FIL
 
 #define __ensure(__exp,__sta) \
 do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
+
+#define __unless(__exp,__sta) \
+__ensure(!(__exp),__sta)
 
 #define __trace() \
 do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -115,13 +120,38 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  assert(__exp)		__assert(__exp)
 #define  assure(__exp)		__assure(__exp)
 #define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define  unless(__exp,__sta)	__unless(__exp,__sta)
 #define   trace()		__trace()
 #define  ptrace(__pks)		__ptrace(__pks)
 #define  ctrace(__fnc)		__ctrace(__fnc)
 #define   fixme(__pks)		__fixme(__pks)
 #define    todo(__pks)		__todo(__pks)
 #define  printd(__pks)		__printd(__pks)
+#define   swerr()		__swerr()
+#define  pswerr(__pks)		__pswerr(__pks)
+
+#elif defined(CONFIG_STREAMS_TEST)
+
+#define STATIC static
+#define INLINE inline
+
+#define   never()		__never()
+#define    rare()		__rare()
+#define  seldom()		__seldom()
+#define   usual(__exp)		__usual(__exp)
+#define unusual(__exp)		__usual(!(__exp))
+#define  normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__noemal(!(__exp))
+#define  assert(__exp)		__assert(__exp)
+#define  assure(__exp)		__assure(__exp)
+#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define  unless(__exp,__sta)	__unless(__exp,__sta)
+#define   trace()		do { } while(0)
+#define  ptrace(__pks)		do { } while(0)
+#define  ctrace(__fnc)		(__fnc)
+#define   fixme(__pks)		__fixme(__pks)
+#define    todo(__pks)		__todo(__pks)
+#define  printd(__pks)		do { } while(0)
 #define   swerr()		__swerr()
 #define  pswerr(__pks)		__pswerr(__pks)
 
@@ -140,7 +170,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define  assert(__exp)		__assert(__exp)
 #define  assure(__exp)		__assure(__exp)
 #define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define  unless(__exp,__sta)	__unless(__exp,__sta)
 #define   trace()		do { } while(0)
 #define  ptrace(__pks)		do { } while(0)
 #define  ctrace(__fnc)		(__fnc)
@@ -148,7 +178,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    todo(__pks)		__todo(__pks)
 #define  printd(__pks)		do { } while(0)
 #define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
+#define  pswerr(__pks)		__swerr()
 
 #else
 
@@ -173,8 +203,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    todo(__pks)		do { } while(0)
 #define  printd(__pks)		do { } while(0)
 #define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
+#define  pswerr(__pks)		__swerr()
 
 #endif
 
-#endif				/* __LOCAL_STRDEBUG_H__ */
+#endif				/* __SYS_STRDEBUG_H__ */

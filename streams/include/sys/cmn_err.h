@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.4 2004/05/04 21:36:56 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.5 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_CMN_ERR_H__
 #define __SYS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/04 21:36:56 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not include kernel header files in user space programs."

@@ -1,4 +1,8 @@
-* Major changes for STREAMS-0.7a-2
+* Major changes for streams-0.9.2-1
+
+  Updated to common build process.
+
+* Major changes for streams-0.7a-2
 
   Removed all XTI/TLI and Linux networking code, headers and documentation
   from streams distribution and set epoch at 0.  Linux networking code has
@@ -7,7 +11,7 @@
   Fast-STREAMS as well as Linux STREAMS and is a preparation for phasing out
   LiS and phasing in LfS.
 
-* Major changes for STREAMS-0.7a-1
+* Major changes for streams-0.7a-1
 
   This is the initial release of the Linux Fast-STREAMS package for Linux.
   This is intended as a high-performance, production replacement for Linux

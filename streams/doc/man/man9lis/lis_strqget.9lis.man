@@ -1,1 +1,1 @@
-.so man9/strqget.9
+.so man9/strqget.9.man

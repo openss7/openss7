@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strmod.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: register_strmod.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,16 +71,300 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXXX 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Under Construction"
+.TH REGISTER_STRMOD 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B xxx
-\- incomplete man page
+.B register_strmod
+\- register a \fISTREAMS\fR module
+.\"
+.\"
 .SH SYNOPSIS
-none
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int \fRregister_strmod\fP(modID_t " modid ", struct fmodsw *" fmod );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'modid\(em'u
+.I modid
+a module identification number containing the module identifier to register.
+.TP
+.I fmod
+A pointer to a
+.BR fmodsw (9)
+structure indicating the characteristics of the module.
+The following members of the
+.BR fmodsw (9)
+structure, pointed to by
+.IR fmod ,
+are significant:
+.RS
+.TP \w'f_name\(em'u
+.I f_name
+the name of the module.  This name is use to register the
+.I STREAMS
+module.
+.TP
+.I f_str
+a pointer to the
+.BR streamtab (9)
+structure describing the
+.I STREAMS
+module.
+.TP
+.I f_flag
+flags indicating options associated with the module.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_kmod
+a pointer to the kernel module
+.RB "(typically " THIS_MODULE )
+to be incremented when a the module is opened or
+.I STREAMS
+subsystem resource allocations are made,
+and decremented when the module is close or
+.I STREAMS
+subsystems resources are freed.
+.RE
+.\"
+.\"
 .SH DESCRIPTION
-This manpage is under construction.
+.PP
+.BR register_strmod ()
+resgisters the
+.I STREAMS
+module described by the
+.BR fmodsw (9)
+structure,
+.IR fmod ,
+agains the module identification number specified by
+.IR modid .
+.PP
+When
+.IR modid
+is non-zero, the specified module id will be used for registration.
+The
+.IR modid
+can also be set to zero (0) to indicate that the
+.I STREAMS
+executive should assign an available module identification number.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR register_strmod ()
+is provided to register
+.I STREAMS
+modules written for
+.BR Linux Fast-STREAMS .
+.BR register_strmod ()
+is also used internally to support the other
+.I STREAMS
+configuration and initialization mechanisms.  For other implementation
+specific module registration functions provided by
+.BR "Linux Fast-STREAMS" ,
+see
+.BR str_install_AIX (9),
+.BR str_install_HPUX (9),
+.BR lis_register_strmod (9),
+.BR strmod_add (9).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_strmod ()
+registers the
+.I STREAMS
+module described by
+.I fmod
+and returns a positive number returning the specified or assigned module
+identification number.  Upon failure,
+.BR register_strmod ()
+does not effect registration and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_strmod ()
+fails to register the specified
+.I STREAMS
+module, it returns an appropriate negative error number as follows:
+.TP \w'[EINVAL]\(em'u
+.RB [ EINVAL ]
+.I fmod
+is
+.BR NULL .
+.TP
+.RB [ EINVAL ]
+.I fmod->f_name
+is
+.BR NULL .
+.TP
+.RB [ EINVAL ]
+.I fmod->f_name
+contains an invalid name.
+.TP
+.RB [ EBUSY ]
+the requested module identification number
+.I modid
+already has a 
+.BR fmodsw (9)
+structure other than
+.I fmod
+registered against it.
+.TP
+.RB [ ENXIO ]
+.I modid
+was zero (0) requesting dynamic allocation of a module identification number
+and no module identification numbers are available for allocation.
+.\"
+.\"
+.SH CONTEXT
+.PP
+register_strmod ()
+can be called from any context.  Consideration for impact on performance and
+latency should be given before calling
+.BR register_strmod ()
+from soft or hard interrupt context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strmod ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_strmod ()
+when loading must call
+.BR unregister_strmod (9)
+before unloading.
+.BR unregister_strmod (9)
+must be called with the same value of
+.I fmod
+with which
+.BR register_strmod ()
+was called.
+.PP
+Modules registered with
+.BR register_strmod ()
+will appear in
+.BR /proc/streams/modules .
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR unregister_strmod (9),
+.BR register_strdev (9),
+.BR unregister_strdev (9),
+.BR str_install_AIX (9),
+.BR str_install_HPUX (9),
+.BR lis_register_strmod (9),
+.BR strmod_add (9).
+.\"
+.\"
 .SH BUGS
-Not done yet.
+.PP
+.BR register_strmod ()
+has no known bugs.
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+.BR register_strmod ()
+is a
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation specific function, with the following compatibility
+considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixspg
+.]
+uses the function
+.BR str_install_AIX (9)
+with the
+.B STR_LOAD_MOD
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+uses the function
+.BR str_install_HPUX (9)
+with the
+.B STR_IS_MODULE
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.I LiS
+.[
+lis
+.]
+uses the function
+.BR lis_register_strmod (9)
+to register modules.
+.IP \(em
+.IR OSF/1 \(rg
+uses the function
+.BR strmod_add (9)
+with the
+.B STR_IS_MODULE
+flag to register
+.I STREAMS
+modules.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and deregistration of
+.I STREAMS
+modules is implementation specific and not subject to standardization.
+.BR register_strmod ()
+is a
+.BR Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strmod ()
+first appeared in
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
 .TI

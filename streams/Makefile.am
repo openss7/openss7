@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2004/08/04 06:02:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2004/08/22 09:20:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/04 06:02:54 $ by $Author: brian $
+# Last Modified $Date: 2004/08/22 09:20:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -464,25 +464,25 @@ EXPORT_SRCFILES = \
 	src/modules/sth.c
 
 EXPORT_VERFILES = \
-	include/sys/streams/versions/aixcompat.ver \
-	include/sys/streams/versions/hpuxcompat.ver \
-	include/sys/streams/versions/liscompat.ver \
-	include/sys/streams/versions/osfcompat.ver \
-	include/sys/streams/versions/suncompat.ver \
-	include/sys/streams/versions/svr4compat.ver \
-	include/sys/streams/versions/uw7compat.ver \
-	include/sys/streams/versions/clone.ver \
-	include/sys/streams/versions/strattach.ver \
-	include/sys/streams/versions/strlookup.ver \
-	include/sys/streams/versions/strpipe.ver \
-	include/sys/streams/versions/strreg.ver \
-	include/sys/streams/versions/strsad.ver \
-	include/sys/streams/versions/strsched.ver \
-	include/sys/streams/versions/strspecfs.ver \
-	include/sys/streams/versions/strsysctl.ver \
-	include/sys/streams/versions/strutil.ver \
-	include/sys/streams/versions/strsyms.ver \
-	include/sys/streams/versions/sth.ver
+	include/sys/@PACKAGE_NAME@/versions/aixcompat.ver \
+	include/sys/@PACKAGE_NAME@/versions/hpuxcompat.ver \
+	include/sys/@PACKAGE_NAME@/versions/liscompat.ver \
+	include/sys/@PACKAGE_NAME@/versions/osfcompat.ver \
+	include/sys/@PACKAGE_NAME@/versions/suncompat.ver \
+	include/sys/@PACKAGE_NAME@/versions/svr4compat.ver \
+	include/sys/@PACKAGE_NAME@/versions/uw7compat.ver \
+	include/sys/@PACKAGE_NAME@/versions/clone.ver \
+	include/sys/@PACKAGE_NAME@/versions/strattach.ver \
+	include/sys/@PACKAGE_NAME@/versions/strlookup.ver \
+	include/sys/@PACKAGE_NAME@/versions/strpipe.ver \
+	include/sys/@PACKAGE_NAME@/versions/strreg.ver \
+	include/sys/@PACKAGE_NAME@/versions/strsad.ver \
+	include/sys/@PACKAGE_NAME@/versions/strsched.ver \
+	include/sys/@PACKAGE_NAME@/versions/strspecfs.ver \
+	include/sys/@PACKAGE_NAME@/versions/strsysctl.ver \
+	include/sys/@PACKAGE_NAME@/versions/strutil.ver \
+	include/sys/@PACKAGE_NAME@/versions/strsyms.ver \
+	include/sys/@PACKAGE_NAME@/versions/sth.ver
 
 PKGINCL = include/sys/$(PACKAGE_NAME)
 

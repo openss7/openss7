@@ -1,2 +1,1 @@
-.so lisbcm.9
-.so man9/lisbcm.9
+.so lisbcm.9.man

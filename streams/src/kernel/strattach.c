@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/12 23:20:20 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/12 23:20:20 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:54 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/12 23:20:20 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:54 $";
 
 #define __NO_VERSION__
 

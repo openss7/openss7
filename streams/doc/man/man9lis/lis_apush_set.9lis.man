@@ -1,1 +1,1 @@
-.so man9/apush_set.9
+.so man9/apush_set.9.man

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/27 03:07:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/08/22 09:20:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 03:07:06 $ by $Author: brian $
+# Last Modified $Date: 2004/08/22 09:20:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,26 +79,26 @@ nobase_pkginclude_HEADERS = \
 	sys/uw7ddi.h
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/streams/modversions.h
+	sys/@PACKAGE_NAME@/modversions.h
 
 if KERNEL_VERSIONS
 nobase_nodist_pkginclude_HEADERS += \
-	sys/streams/versions/aixcompat.ver \
-	sys/streams/versions/hpuxcompat.ver \
-	sys/streams/versions/liscompat.ver \
-	sys/streams/versions/osfcompat.ver \
-	sys/streams/versions/suncompat.ver \
-	sys/streams/versions/svr4compat.ver \
-	sys/streams/versions/uw7compat.ver \
-	sys/streams/versions/strattach.ver \
-	sys/streams/versions/strreg.ver \
-	sys/streams/versions/strsad.ver \
-	sys/streams/versions/strsched.ver \
-	sys/streams/versions/strspecfs.ver \
-	sys/streams/versions/strsysctl.ver \
-	sys/streams/versions/strutil.ver \
-	sys/streams/versions/strsyms.ver \
-	sys/streams/versions/sth.ver
+	sys/@PACKAGE_NAME@/versions/aixcompat.ver \
+	sys/@PACKAGE_NAME@/versions/hpuxcompat.ver \
+	sys/@PACKAGE_NAME@/versions/liscompat.ver \
+	sys/@PACKAGE_NAME@/versions/osfcompat.ver \
+	sys/@PACKAGE_NAME@/versions/suncompat.ver \
+	sys/@PACKAGE_NAME@/versions/svr4compat.ver \
+	sys/@PACKAGE_NAME@/versions/uw7compat.ver \
+	sys/@PACKAGE_NAME@/versions/strattach.ver \
+	sys/@PACKAGE_NAME@/versions/strreg.ver \
+	sys/@PACKAGE_NAME@/versions/strsad.ver \
+	sys/@PACKAGE_NAME@/versions/strsched.ver \
+	sys/@PACKAGE_NAME@/versions/strspecfs.ver \
+	sys/@PACKAGE_NAME@/versions/strsysctl.ver \
+	sys/@PACKAGE_NAME@/versions/strutil.ver \
+	sys/@PACKAGE_NAME@/versions/strsyms.ver \
+	sys/@PACKAGE_NAME@/versions/sth.ver
 endif
 
 # vim: ft=automake

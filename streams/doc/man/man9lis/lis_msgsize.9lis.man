@@ -1,1 +1,1 @@
-.so man9/msgsize.9
+.so man9/msgsize.9.man

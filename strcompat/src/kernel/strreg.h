@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) strreg.h,v 1.1.2.8 2003/10/26 17:25:55 brian Exp
+ @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,38 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/26 17:25:55 by brian
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRREG_H__
 #define __LOCAL_STRREG_H__
 
-/* arguments definition */
-typedef struct str_args {
-	struct file *file;
-	dev_t dev;
-	int oflag;
-	int sflag;
-	cred_t *crp;
-	struct qstr name;
-	char buf[32];
-} str_args_t;
-
-extern rwlock_t cdevsw_lock;
-extern rwlock_t fmodsw_lock;
-
-extern struct list_head cdevsw_list;
-extern struct list_head fmodsw_list;
-
-extern struct cdevsw *cdevsw[MAX_STRDEV];
-extern struct fmodsw *fmodsw[MAX_STRMOD];
-
-extern int strm_open(struct inode *, struct file *);
-extern int sdev_open(struct inode *i, struct file *f, struct vfsmount *mnt, struct str_args *argp);
-
-/* initialization for main */
-extern int strreg_init(void);
-extern void strreg_exit(void);
+extern int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag);
 
 #endif				/* __LOCAL_STRREG_H__ */

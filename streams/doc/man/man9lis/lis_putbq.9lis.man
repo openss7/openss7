@@ -1,1 +1,1 @@
-.so man9/putbq.9
+.so man9/putbq.9.man

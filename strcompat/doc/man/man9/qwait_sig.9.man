@@ -1,1 +1,1 @@
-.so qwait.9
+.so qwait.9.man

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:56 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:56 $";
 
 /* 
  *  AIX Utility: strace - Prints STREAMS trace messages.

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9 2004/02/29 19:10:45 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/29 19:10:45 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SUNDDI_H__
-#define __SUNDDI_H__
+#ifndef __SYS_SUNDDI_H__
+#define __SYS_SUNDDI_H__
+
+#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -60,7 +62,7 @@
 #define __SUN_EXTERN_INLINE extern __inline__
 #endif				/* __SUN_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _SUN_SOURCE
 #warning "_SUN_SOURCE not defined but $RCSfile: sunddi.h,v $ included"
@@ -70,18 +72,95 @@
 #define PERIM_OUTER	2	/* Solaris used with qwriter() */
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *),
-			     void *arg);
-extern timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
 extern void qprocsoff(queue_t *q);
 extern void qprocson(queue_t *q);
-extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
-extern void qunbufcall(queue_t *q, bufcall_id_t bcid);
-extern void qwriter(queue_t *q, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+
+__SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
+{
+	freezestr(q);
+}
+
+#undef freezestr
+#define freezestr freezestr_SUN
+
+__SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q)
+{
+	unfreezestr(q, -1UL);
+}
+
+#undef unfreezestr
+#define unfreezestr unfreezestr_SUN
+
+/**
+ *  qbufcall:	- schedule a buffer callout
+ *  @q:		queue used for synchronization
+ *  @size:	the number of bytes of data buffer needed
+ *  @priority:	the priority of the buffer allocation (ignored)
+ *  @function:	the callback function when bytes and headers are available
+ *  @arg:	a client argument to pass to the callback function
+ */
+__SUN_EXTERN_INLINE bufcall_id_t qbufcall(queue_t *q, size_t size, int priority,
+					  void (*function) (void *), void *arg)
+{
+	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
+	// queue_t *rq = RD(q);
+	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
+	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
+}
+
+__SUN_EXTERN_INLINE timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg,
+					  long ticks)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+				unsigned long pl, int cpu);
+	// queue_t *rq = RD(q);
+	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
+	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());
+}
+
+/**
+ *  qunbufcall: - cancel a buffer callout
+ *  @q:		queue used for synchronization
+ *  @bcid:	buffer call id returned by qbufcall()
+ *  Notices:	Don't ever call this function with an expired bufcall id.
+ */
+__SUN_EXTERN_INLINE void qunbufcall(queue_t *q, bufcall_id_t bcid)
+{
+	unbufcall(bcid);
+}
+
+__SUN_EXTERN_INLINE clock_t quntimeout(queue_t *q, timeout_id_t toid)
+{
+	return untimeout(toid);
+}
 
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp)
 {
 	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
+}
+
+/**
+ *  qwriter:	- deferred call to a callback function.
+ *  @qp:	a pointer to the RD() queue of a queue pair
+ *  @mp:	message pointer to pass to writer function
+ *  @func:	writer function
+ *  @perimeter:	perimeter to enter
+ *
+ *  qwriter() will defer the function @func until it can enter @perimeter associated with queue pair
+ *  @qp.  Once the @perimeter has been entered, the STREAMS executive will call the callback
+ *  function @func with arguments @qp and @mp.  qwriter() is closely related to streams_put() above.
+ *
+ *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
+ *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
+ */
+__SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp),
+				 int perimeter)
+{
+	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
+			      int perim, int type);
+	if (defer_func((void (*)(void *, mblk_t *)) func, qp, mp, qp, perimeter, SE_WRITER) == 0)
+		return;
+	// never();
 }
 
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void)
@@ -414,4 +493,4 @@ extern int ddi_unmap_regs(void);
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
 #endif				/* CONFIG_STREAMS_COMPAT_SUN */
 
-#endif				/* __SUNDDI_H__ */
+#endif				/* __SYS_SUNDDI_H__ */

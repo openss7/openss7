@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:34:09 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/20 20:34:09 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: test-streams.c,v $
- Revision 0.9.2.5  2004/06/20 20:34:09  brian
- - Further debugging.
+ Revision 0.9.2.6  2004/08/22 06:17:56  brian
+ - Checkin on new working branch.
+
+ Revision 0.9.2.1  2004/08/22 06:17:56  brian
+ - Checkin on new working branch.
 
  Revision 1.5  2004/06/20 20:34:09  brian
  - Further debugging.
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:34:09 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:34:09 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $";
 
 #include <stropts.h>
 #include <stdlib.h>

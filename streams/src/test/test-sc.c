@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:59 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:32:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: test-sc.c,v $
- Revision 0.9.2.2  2004/06/09 08:32:59  brian
- - Open works fine but don't want to hold dentries in cache.
+ Revision 0.9.2.3  2004/08/22 06:17:56  brian
+ - Checkin on new working branch.
+
+ Revision 0.9.2.1  2004/08/22 06:17:56  brian
+ - Checkin on new working branch.
 
  Revision 1.2  2004/06/09 08:32:59  brian
  - Open works fine but don't want to hold dentries in cache.
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:59 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:56 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/09 08:32:59 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:56 $";
 
 #include <stropts.h>
 #include <stdlib.h>

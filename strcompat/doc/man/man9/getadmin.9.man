@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getadmin.9.man,v 0.9 2004/03/13 05:46:34 brian Exp $
+.\" @(#) $Id: getadmin.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/13 05:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETADMIN 9 "$Date: 2004/03/13 05:46:34 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETADMIN 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -126,6 +126,17 @@ fails when there is no module or driver for the given module Id.
 .PP
 .BR getadmin ()
 can be called from any context.
+When called from a blocking context,
+.BR getadmin ()
+has the side-effect that the identified module may be loaded by module
+identifier.  The kernel module demand loaded will have the module name or
+alias
+.RB \*(lq streams-modid-\fI%u\fP \*(rq,
+where
+.RI \*(lq %u \*(rq
+is the identifier of the
+.I STREAMS
+module.
 .\"
 .\"
 .SH MP-STREAMS
@@ -175,20 +186,20 @@ has no known bugs.
 .PP
 .BR getadmin ()
 is compatible with
-.B "SVR 4.2"
+.I "SVR 4.2"
 .[
 svr4spg
 .]
 and systems based on
-.B "SVR 4.2"
+.I "SVR 4.2"
 such as
 .IR AIX \(rg,
-.IR HPUX \(rg,
+.IR HP-UX \(rg,
 .IR UnixWare \(rg,
 and
-.IR UX/P \(rg,
+.IR UXP/V \(rg,
 with the following portability considerations:
-.IP \(em
+.IP \(em \w'\(em\(em'u
 .IR UnixWare \(rg
 show the
 .I mid
@@ -196,20 +207,20 @@ argument of type
 .BR ushort_t .
 .IP \(em
 .IR AIX \(rg,
-.IR HPUX \(rg,
+.IR HP-UX \(rg,
 .IR UnixWare \(rg
 and
-.IR UX/P \(rg
+.IR UXP/V \(rg
 document this function with
 .I mid
 of type
 .BR ushort .
 .IP \(em
 .IR LiS \(rg,
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg
 and
-.IR Super/UX \(rg
+.IR SUPER-UX \(rg
 do not document this function.
 .IP \(em
 Under
@@ -226,7 +237,12 @@ which reduces to
 .BR getadmin ()
 is provided for source compatibility with older versions of
 .IR STREAMS .
+.IP \(em
 Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -237,10 +253,10 @@ svr42spg
 .]
 and
 .IR AIX \(rg ,
-.IR HPUX \(rg ,
+.IR HP-UX \(rg ,
 .IR UnixWare \(rg 
 and
-.IR UX/P \(rg
+.IR UXP/V \(rg
 documentation.
 .[
 aixspg

@@ -1,1 +1,1 @@
-.so man9/insq.9
+.so man9/insq.9.man

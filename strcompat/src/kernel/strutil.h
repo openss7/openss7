@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) strutil.h,v 1.1.2.6 2003/10/28 08:00:05 brian Exp
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:05 by brian
+ Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -55,53 +56,51 @@
 /* common inlines */
 
 /* queue structure read/write locks */
-static __inline__ void qrlock(queue_t *q, ulong *flagp)
+static __inline__ void qrlock(queue_t *q, ulong *flagsp)
 {
-	local_irq_save(flagp);
-	if (q->q_owner != current)
-		read_lock(&q->q_rwlock);
-	else {
-		assure(!in_interrupt() || in_streams());
+	if (flagsp)
+		local_irq_save(*flagsp);
+	if (q->q_owner == current)
 		q->q_nest++;
-	}
+	else
+		read_lock(&q->q_rwlock);
 	return;
 }
-static __inline__ void qrunlock(queue_t *q, ulong *flagp)
+static __inline__ void qrunlock(queue_t *q, ulong *flagsp)
 {
-	if (q->q_owner != current)
-		read_unlock(&q->q_rwlock);
-	else {
-		assure(!in_interrupt() || in_streams());
+	if (q->q_owner == current)
 		q->q_nest--;
-	}
-	local_irq_restore(flagp);
+	else
+		read_unlock(&q->q_rwlock);
+	if (flagsp)
+		local_irq_restore(*flagsp);
 	return;
 }
-static __inline__ void qwlock(queue_t *q, ulong *flagp)
+static __inline__ void qwlock(queue_t *q, ulong *flagsp)
 {
-	local_irq_save(flagp);
-	if (q->q_owner != current) {
+	if (flagsp)
+		local_irq_save(*flagsp);
+	if (q->q_owner == current)
+		q->q_nest++;
+	else {
 		write_lock(&q->q_rwlock);
 		q->q_owner = current;
 		q->q_nest = 0;
-	} else {
-		assure(!in_interrupt() || in_streams());
-		q->q_nest++;
 	}
 	return;
 }
-static __inline__ void qwunlock(queue_t *q, ulong *flagp)
+static __inline__ void qwunlock(queue_t *q, ulong *flagsp)
 {
 	if (q->q_owner == current) {
-		if (q->q_nest <= 0) {
+		if (q->q_nest > 0)
+			q->q_nest--;
+		else {
 			q->q_owner = NULL;
 			q->q_nest = 0;
 			write_unlock(&q->q_rwlock);
-		} else {
-			assure(!in_interrupt() || in_streams());
-			q->q_nest--;
 		}
-		local_irq_restore(flagp);
+		if (flagsp)
+			local_irq_restore(*flagsp);
 		return;
 	}
 	swerr();
@@ -117,35 +116,30 @@ static __inline__ void qlockinit(queue_t *q)
 static __inline__ void qprlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
-	if (qu->qu_owner != current)
-		read_lock(&qu->qu_lock);
-	else {
-		assure(!in_interrupt() || in_streams());
+	if (qu->qu_owner == current)
 		qu->qu_nest++;
-	}
+	else
+		read_lock(&qu->qu_lock);
 	return;
 }
 static __inline__ void qprunlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
-	if (qu->qu_owner != current)
-		read_unlock(&qu->qu_lock);
-	else {
-		assure(!in_interrupt() || in_streams());
+	if (qu->qu_owner == current)
 		qu->qu_nest--;
-	}
+	else
+		read_unlock(&qu->qu_lock);
 	return;
 }
 static __inline__ void qpwlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
-	if (qu->qu_owner != current) {
+	if (qu->qu_owner == current)
+		qu->qu_nest++;
+	else {
 		write_lock(&qu->qu_lock);
 		qu->qu_nest = 0;
 		qu->qu_owner = current;
-	} else {
-		assure(!in_interrupt() || in_streams());
-		qu->qu_nest++;
 	}
 	return;
 }
@@ -153,30 +147,16 @@ static __inline__ void qpwunlock(queue_t *rq)
 {
 	struct queinfo *qu = (struct queinfo *) rq;
 	if (qu->qu_owner == current) {
-		if (qu->qu_nest <= 0) {
+		if (qu->qu_nest > 0)
+			qu->qu_nest--;
+		else {
 			qu->qu_owner = NULL;
 			qu->qu_nest = 0;
 			write_unlock(&qu->qu_lock);
-		} else {
-			assure(!in_interrupt() || in_streams());
-			qu->qu_nest--;
 		}
 		return;
 	}
 	swerr();
-}
-static __inline__ void qpupgrade(queue_t *rq)
-{
-	struct queinfo *qu = (struct queinfo *) rq;
-	if (qu->qu_owner == current) {
-		assure(!in_interrupt() || in_streams());
-		return;
-	}
-	read_unlock(&qu->qu_lock);
-	/* this is not a fully atomic upgrade - but that's ok too */
-	write_lock(&qu->qu_lock);
-	qu->qu_nest = 0;
-	qu->qu_owner = current;
 }
 static __inline__ void qplockinit(queue_t *rq)
 {
@@ -186,16 +166,29 @@ static __inline__ void qplockinit(queue_t *rq)
 	rwlock_init(&qu->qu_lock);
 }
 
+#if 0
+static __inline__ void qpupgrade(queue_t *rq)
+{
+	struct queinfo *qu = (struct queinfo *) rq;
+	if (qu->qu_owner == current) {
+		return;
+	}
+	read_unlock(&qu->qu_lock);
+	/* this is not a fully atomic upgrade - but that's ok too */
+	write_lock(&qu->qu_lock);
+	qu->qu_nest = 0;
+	qu->qu_owner = current;
+}
+#endif
+
 /* stream head wread/write locks */
 static __inline__ void srlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current) {
-			assure(!in_interrupt() || in_streams());
+		if (sd->sd_owner == current)
 			sd->sd_nest++;
-			return;
-		}
-		read_lock(&sd->sd_qlock);
+		else
+			read_lock(&sd->sd_qlock);
 		return;
 	}
 	swerr();
@@ -203,12 +196,10 @@ static __inline__ void srlock(struct stdata *sd)
 static __inline__ void srunlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current) {
-			assure(!in_interrupt() || in_streams());
+		if (sd->sd_owner == current)
 			sd->sd_nest--;
-			return;
-		}
-		read_unlock(&sd->sd_qlock);
+		else
+			read_unlock(&sd->sd_qlock);
 		return;
 	}
 	swerr();
@@ -216,14 +207,13 @@ static __inline__ void srunlock(struct stdata *sd)
 static __inline__ void swlock(struct stdata *sd, unsigned long *flagsp)
 {
 	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current) {
-			assure(!in_interrupt() || in_streams());
+		if (sd->sd_owner == current)
 			sd->sd_nest++;
-			return;
+		else {
+			write_lock_irqsave(&sd->sd_qlock, *flagsp);
+			sd->sd_nest = 0;
+			sd->sd_owner = current;
 		}
-		write_lock_irqsave(&sd->sd_qlock, flagsp);
-		sd->sd_nest = 0;
-		sd->sd_owner = current;
 		return;
 	}
 	swerr();
@@ -231,14 +221,12 @@ static __inline__ void swlock(struct stdata *sd, unsigned long *flagsp)
 static __inline__ void swunlock(struct stdata *sd, unsigned long *flagsp)
 {
 	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current) {
-			assure(!in_interrupt() || in_streams());
+		if (sd->sd_owner == current)
 			if (--sd->sd_nest > 0)
 				return;
-		}
 		sd->sd_owner = NULL;
 		sd->sd_nest = 0;
-		write_unlock_irqrestore(&sd->sd_qlock, flagsp);
+		write_unlock_irqrestore(&sd->sd_qlock, *flagsp);
 		return;
 	}
 	swerr();
@@ -246,14 +234,13 @@ static __inline__ void swunlock(struct stdata *sd, unsigned long *flagsp)
 static __inline__ void __swlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current) {
-			assure(!in_interrupt() || in_streams());
+		if (sd->sd_owner == current)
 			sd->sd_nest++;
-			return;
+		else {
+			write_lock(&sd->sd_qlock);
+			sd->sd_nest = 0;
+			sd->sd_owner = current;
 		}
-		write_lock(&sd->sd_qlock);
-		sd->sd_nest = 0;
-		sd->sd_owner = current;
 		return;
 	}
 	swerr();
@@ -261,11 +248,9 @@ static __inline__ void __swlock(struct stdata *sd)
 static __inline__ void __swunlock(struct stdata *sd)
 {
 	if (likely(sd != NULL)) {
-		if (sd->sd_owner == current) {
-			assure(!in_interrupt() || in_streams());
+		if (sd->sd_owner == current)
 			if (--sd->sd_nest > 0)
 				return;
-		}
 		sd->sd_owner = NULL;
 		sd->sd_nest = 0;
 		write_unlock(&sd->sd_qlock);
@@ -279,23 +264,30 @@ static __inline__ void slockinit(struct stdata *sd)
 		rwlock_init(&sd->sd_qlock);
 		sd->sd_nest = 0;
 		sd->sd_owner = NULL;
+		return;
 	}
 	swerr();
 }
 static __inline__ void hrlock(queue_t *rq)
 {
+	trace();
+	ensure(rq, return);
 	srlock(((struct queinfo *) rq)->qu_str);
 }
 static __inline__ void hrunlock(queue_t *rq)
 {
+	trace();
+	ensure(rq, return);
 	srunlock(((struct queinfo *) rq)->qu_str);
 }
 static __inline__ void hwlock(queue_t *rq, unsigned long *flagsp)
 {
+	trace();
 	swlock(((struct queinfo *) rq)->qu_str, flagsp);
 }
 static __inline__ void hwunlock(queue_t *rq, unsigned long *flagsp)
 {
+	trace();
 	swunlock(((struct queinfo *) rq)->qu_str, flagsp);
 }
 static __inline__ void __hwlock(queue_t *rq)
@@ -310,8 +302,11 @@ static __inline__ void __hwunlock(queue_t *rq)
 /* queue band gets and puts */
 static __inline__ qband_t *bget(qband_t *qb)
 {
+	struct qbinfo *qbi;
 	if (qb) {
-		struct qbinfo *qbi = (typeof(qbi)) qb;
+		qbi = (typeof(qbi)) qb;
+		if (atomic_read(&qbi->qbi_refs) < 1)
+			swerr();
 		atomic_inc(&qbi->qbi_refs);
 	}
 	return (qb);
@@ -321,28 +316,46 @@ static __inline__ void bput(qband_t **bp)
 	qband_t *qb;
 	if ((qb = xchg(bp, NULL))) {
 		struct qbinfo *qbi = (typeof(qbi)) qb;
-		if (atomic_dec_and_test(&qbi->qbi_refs))
-			freeqb(qb);
+		if (atomic_read(&qbi->qbi_refs) >= 1) {
+			if (atomic_dec_and_test(&qbi->qbi_refs))
+				freeqb(qb);
+		} else
+			swerr();
 	}
 }
 
 /* queue gets and puts */
 static __inline__ queue_t *qget(queue_t *q)
 {
+	struct queinfo *qu;
+	ptrace(("%s: getting queue %p\n", __FUNCTION__, q));
 	if (q) {
-		struct queinfo *qu = (typeof(qu)) RD(q);
+		qu = (typeof(qu)) RD(q);
+		if (atomic_read(&qu->qu_refs) < 1)
+			swerr();
 		atomic_inc(&qu->qu_refs);
+		printd(("%s: queue %p count is now %d\n", __FUNCTION__, qu,
+			atomic_read(&qu->qu_refs)));
 	}
 	return (q);
 }
 static __inline__ void qput(queue_t **qp)
 {
 	queue_t *q;
+	ptrace(("%s: putting queue %p\n", __FUNCTION__, *qp));
+	ensure(qp, return);
 	if ((q = xchg(qp, NULL))) {
 		queue_t *rq = RD(q);
 		struct queinfo *qu = (typeof(qu)) rq;
-		if (atomic_dec_and_test(&qu->qu_refs))
-			freeq(rq);
+		if (atomic_read(&qu->qu_refs) >= 1) {
+			if (atomic_dec_and_test(&qu->qu_refs)) {
+				printd(("%s: queue %p is being freed\n", __FUNCTION__, qu));
+				freeq(rq);
+			} else
+				printd(("%s: queue %p count is now %d\n", __FUNCTION__, qu,
+					atomic_read(&qu->qu_refs)));
+		} else
+			swerr();
 	}
 }
 
@@ -356,7 +369,11 @@ static __inline__ int shared_tryentersq(queue_t *q)
 		unsigned long flags;
 		int result = 0;
 		spin_lock_irqsave(&sq->sq_lock, flags);
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		if (sq->sq_count >= 0) {
+			sq->sq_count++;
+			result = 1;
+		}
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 		return (result);
 	}
 	return (1);
@@ -372,11 +389,12 @@ static __inline__ int exclus_tryentersq(queue_t *q)
 			sq->sq_count = -1;
 			result = 1;
 		}
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 		return (result);
 	}
 	return (1);
 }
+
 #if 0
 static __inline__ void shared_leavesq(queue_t *q)
 {
@@ -402,11 +420,13 @@ static __inline__ void shared_leavesq(queue_t *q)
 					/* if not in streams; run them later */
 					qschedevents(q);
 			}
+#if 0
 			if (waitqueue_active(&sq->sq_waitq))
 				wake_up_all(&sq->sq_waitq);
+#endif
 			sq->sq_count = 0;
 		}
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 		return;
 	}
 }
@@ -432,10 +452,12 @@ static __inline__ void exclus_leavesq(queue_t *q)
 				/* if not in streams; run them later */
 				qschedevents(q);
 		}
+#if 0
 		if (waitqueue_active(&sq->sq_waitq))
 			wake_up_all(&sq->sq_waitq);
+#endif
 		sq->sq_count = 0;
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 	}
 }
 

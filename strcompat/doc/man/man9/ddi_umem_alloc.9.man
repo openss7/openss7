@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_umem_alloc.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: ddi_umem_alloc.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,54 +71,219 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXX 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_UMEM_ALLOC 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
+.B ddi_umem_alloc
+\- allocate page aligned kernel memory
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+void \fBddi_umem_alloc\fR(size_t \fIsize\fR, int \fIflag\fR, ddi_umem_cookie_t *\fIcookiep\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I size
+Number of bytes to allocate.
+.TP
+.I flag
+Determines type of memory requiest.  A combination of:
+.RS
+.TP
+.B DDI_UMEM_SLEEP
+Sleep waiting for memory.
+.TP
+.B DDI_UMEM_NOSLEEP
+Don't sleep waiting for memory.
+.TP
+.B DDI_UMEM_PAGEABLE
+Allocated non-locked memory.
+.RE
+.TP
+.I cookiep
+Pointer to kernel memory cookie.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.BR ddi_umem_alloc ()
+allocates page-aligned kernel memory and returns a pointer to the allocated
+memory.  The number of bytes allocated is a multiple of the system page size
+(roundup of
+.IR size ).
+The allocated memory can be used in the kernel and can be exported to user
+space.  See
+.BR devmap (9)
+and
+.BR devmap_umem_setup (9)
+for further information.
+.PP
+The
+.I flag
+argument determines whether the caller can sleep for memory and whether the
+allocated memory is locked or not.
+.B DDI_UMEM_SLEEP
+allocations may sleep but are guaranteed to succeed.
+.B DDI_UMEM_NOSLEEP
+allocations do not sleep but may fail (return
+.BR NULL )
+if memory is currently unavailable.  If
+.B DDI_UMEM_PAGEABLE
+is set, pageable memory will be allocated.  These pages can be swapped out to
+secondary memory devices.  The initial contents of memory allocated using
+.BR ddi_umem_alloc ()
+is zero-filled.
+.PP
+The
+.I cookiep
+argument is a pointer to a kernel memory cookie that describes the kernel
+memory being allocated.  A typical use of
+.I cookiep
+is in
+.BR devmap_umem_setup (9)
+when the drivers want to export the kernel memory to a user application.
+.PP
+To free the allocated memory, a driver calls
+.BR ddi_umem_free (9)
+with the cookie obtained from
+.BR ddi_umem_alloc ().
+.BR ddi_umem_free (9)
+releases the entire buffer.
 .\"
 .\"
 .SH RETURN
 .PP
+When
+.BR ddi_umem_alloc ()
+succeeds, it returns  a pointer to the allocated memory;
+when it fails, it returns
+.BR NULL .
 .\"
 .\"
 .SH ERRORS
 .PP
+.BR ddi_umem_alloc ()
+fails when 
+.I flag
+is set to
+.B DDI_UMEM_NOSLEEP
+and memory is not immediately available.
 .\"
 .\"
-.SH NOTICES
+.SH CONTEXT
+.PP
+.BR ddi_umem_alloc ()
+can be called from any context with
+.B DDI_UMEM_NOSLEEP
+but user context only with
+.BR DDI_UMEM_SLEEP .
+.\"
+.\"
+.SH MP-STREAMS
 .PP
 .\"
 .\"
 .SH NOTICES
 .PP
+\fBddi_umem_alloc\fR(0, \fIflag\fR, \fIcookiep\fR)
+always returns
+.BR NULL .
+.PP
+.BR ddi_umem_alloc ()
+is a
+.IR Solaris \(rg-specific
+function:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+defined.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ddi_umem_free (9),
+.BR suncompat (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR ddi_umem_alloc ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR ddi_umem_alloc ()
+is compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+.IP \(em
+.BR ddi_umem_alloc ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.IP \(em
+.BR ddi_umem_alloc ()
+only provides functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR ddi_umem_alloc ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR suncompat (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR Solaris \(rg
+SUNDDI documentation.
+.[
+soldoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR ddi_umem_alloc ()
+first appeared in
+.IR Solaris \(rg
+2.5.
 .\"
 .\"
+.[
+$LIST$
+.]
 .TI

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) aixcompat.c,v (1.1.2.6) 2003/10/28 08:00:04
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,17 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:04 by brian
+ Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) aixcompat.c,v (1.1.2.6) 2003/10/28 08:00:04"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 
 static char const ident[] =
-    "aixcompat.c,v (1.1.2.6) 2003/10/28 08:00:04";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -96,25 +102,28 @@ static char const ident[] =
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
+
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
 
 #define _AIX_SOURCE
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
 
-#include "strdebug.h"
+#include "sys/config.h"
 #include "strsched.h"
 #include "strutil.h"
-#include "strhead.h"
+#include "sth.h"
 #include "strreg.h"
 #include "strsad.h"
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS aixcompat.c,v (1.1.2.6) 2003/10/28 08:00:04"
+#define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -126,10 +135,12 @@ static char const ident[] =
 #define AIXCOMP_SPLASH		AIXCOMP_DEVICE		" - " \
 				AIXCOMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 MODULE_AUTHOR(AIXCOMP_CONTACT);
 MODULE_DESCRIPTION(AIXCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(AIXCOMP_DEVICE);
 MODULE_LICENSE(AIXCOMP_LICENSE);
+#endif
 
 struct mi_comm {
 	struct mi_comm **mi_prev;	/* must be first */
@@ -149,7 +160,8 @@ struct mi_comm {
  *  MI_BUFCALL
  *  -------------------------------------------------------------------------
  */
-extern void mi_bufcall(queue_t *q, int size, int priority);	/* see strsched.c */
+__AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority);
+EXPORT_SYMBOL(mi_bufcall);
 
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
 /* 
@@ -160,8 +172,8 @@ int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *devp, int flag,
 		 cred_t *credp)
 {
 	struct mi_comm *mi, **mip = (struct mi_comm **) mi_list;
-	int cmajor = getmajor(*devp);
-	int cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN) {
@@ -185,13 +197,12 @@ int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *devp, int flag,
 	default:
 	case DRVOPEN:
 	{
-		int dmajor = cmajor;
+		major_t dmajor = cmajor;
 		for (; *(mip) && (dmajor = getmajor((*mip - 1)->mi_dev)) < cmajor;
 		     mip = &(*mip - 1)->mi_next) ;
 		for (; *(mip) && dmajor == getmajor((*mip - 1)->mi_dev) &&
-		     cminor == getminor(makedevice(0, cminor));
-		     mip = &(*mip - 1)->mi_next, cminor++) {
-			int dminor = getminor((*mip - 1)->mi_dev);
+		     getminor(makedevice(0, cminor)) != 0; mip = &(*mip - 1)->mi_next, cminor++) {
+			minor_t dminor = getminor((*mip - 1)->mi_dev);
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor)
@@ -201,7 +212,7 @@ int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *devp, int flag,
 					return (ENXIO);
 				}
 		}
-		if (cminor != getminor(makedevice(0, cminor))) {	/* no minors left */
+		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&mi_list_lock);
 			kmem_free(mi, sizeof(*mi) + size);
 			return (EAGAIN);
@@ -226,6 +237,8 @@ int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *devp, int flag,
 	spin_unlock(&mi_list_lock);
 	return (0);
 }
+
+EXPORT_SYMBOL(mi_open_comm);	/* aixddi.h */
 
 /* 
  *  MI_CLOSE_COMM
@@ -253,6 +266,8 @@ int mi_close_comm(caddr_t *mi_list, queue_t *q)
 	return (0);
 }
 
+EXPORT_SYMBOL(mi_close_comm);	/* aixddi.h */
+
 /* 
  *  MI_NEXT_PTR
  *  -------------------------------------------------------------------------
@@ -262,6 +277,8 @@ caddr_t mi_next_ptr(caddr_t priv)
 	struct mi_comm *mi = ((struct mi_comm *) priv) - 1;
 	return ((caddr_t) mi->mi_next);
 }
+
+EXPORT_SYMBOL(mi_next_ptr);	/* aixddi.h */
 
 /* 
  *  MI_PREV_PTR
@@ -276,6 +293,8 @@ caddr_t mi_prev_ptr(caddr_t priv)
 	return (NULL);
 }
 
+EXPORT_SYMBOL(mi_prev_ptr);	/* aixddi.h */
+
 /* 
  *  WANTIO
  *  -------------------------------------------------------------------------
@@ -285,25 +304,29 @@ int wantio(queue_t *q, struct wantio *w)
 	queue_t *wq = WR(q);
 	struct stdata *sd = ((struct queinfo *) (wq - 1))->qu_str;
 	if (w) {
-		qget(wq);
+		ctrace(qget(wq));
 		xchg(&sd->sd_directio, w);
 	} else {
 		xchg(&sd->sd_directio, w);
-		qput(&wq);
+		ctrace(qput(&wq));
 	}
 	return (0);
 }
+
+EXPORT_SYMBOL(wantio);		/* aixddi.h */
 
 /* 
  *  WANTMSG
  *  -------------------------------------------------------------------------
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *));
+EXPORT_SYMBOL(wantmsg);		/* aixddi.h */
 
 /* 
  *  STR_INSTALL
  *  -------------------------------------------------------------------------
  */
+EXPORT_SYMBOL(str_install_AIX);	/* strconf.h */
 int str_install_AIX(int cmd, strconf_t * sc)
 {
 	if (!sc)
@@ -363,21 +386,22 @@ int str_install_AIX(int cmd, strconf_t * sc)
 			cdev->d_flag |= D_MTPERMOD;
 			break;
 		}
-		if ((err = register_strdev_major(makedevice(sc->sc_major, 0), cdev)) < 0)
+		if ((err = register_strdev(cdev, sc->sc_major)) < 0)
 			kmem_free(cdev, sizeof(*cdev));
 		return (-err);
 	}
 	case STR_UNLOAD_DEV:
 	{
 		struct cdevsw *cdev;
-		dev_t dev = makedevice(sc->sc_major, 0);
 		int err;
 		if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
 			return (EINVAL);
-		if ((cdev = sdev_get(dev)) == NULL)
+		if ((cdev = cdev_get(sc->sc_major)) == NULL)
 			return (ENOENT);
-		sdev_put(cdev);
-		if ((err = unregister_strdev_major(dev, cdev)) == 0)
+		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+		cdev_put(cdev);
+		if ((err = unregister_strdev(cdev, sc->sc_major)) == 0)
 			kmem_free(cdev, sizeof(*cdev));
 		return (-err);
 	}
@@ -438,22 +462,17 @@ int str_install_AIX(int cmd, strconf_t * sc)
 			fmod->f_flag |= D_MTPERMOD;
 			break;
 		}
-		if ((err = register_strmod(fmod->f_str->st_rdinit->qi_minfo->mi_idnum, fmod)) < 0)
+		if ((err = register_strmod(fmod)) < 0)
 			kmem_free(fmod, sizeof(*fmod));
 		return (-err);
 	}
 	case STR_UNLOAD_MOD:
 	{
 		struct fmodsw *fmod;
-		int modid;
 		int err;
-		for (modid = MAX_STRMOD - 1; modid > 0; modid--)
-			if (fmodsw[modid] && fmodsw[modid]->f_str == sc->sc_str)
-				break;
-		if (modid)
+		if (!(fmod = fmod_str(sc->sc_str)))
 			return (ENOENT);
-		fmod = fmodsw[modid];
-		if ((err = unregister_strmod(modid, fmod)) == 0)
+		if ((err = unregister_strmod(fmod)) == 0)
 			kmem_free(fmod, sizeof(fmod));
 		return (-err);
 	}
@@ -463,7 +482,7 @@ int str_install_AIX(int cmd, strconf_t * sc)
 
 static int __init aixcomp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 	printk(KERN_INFO AIXCOMP_BANNER);
 #else
 	printk(KERN_INFO AIXCOMP_SPLASH);
@@ -475,5 +494,7 @@ static void __exit aixcomp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 module_init(aixcomp_init);
 module_exit(aixcomp_exit);
+#endif

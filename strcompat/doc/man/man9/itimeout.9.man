@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: itimeout.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: itimeout.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DTIMEOUT 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DTIMEOUT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -289,18 +289,18 @@ has no known bugs.
 .PP
 .BR itimeout ()
 is compatible with
-.B "SVR 4.2 MP DDI/DKI"
+.I "SVR 4.2 MP DDI/DKI"
 .[
 usldk
 .]
 and systems based on
-.B "SVR 4"
+.I "SVR 4"
 .[
 svr4spg
 .]
 with the following portability considerations:
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
 .[
 uw7doc
 .]
@@ -309,11 +309,11 @@ allows a
 flag to be logically OR'ed with the
 .I ticks
 argument to indicate a periodic timer.
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -323,7 +323,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2 MP DDI/DKI" .
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
@@ -333,7 +333,7 @@ usldk
 .PP
 .BR itimeout ()
 first appeared in
-.BR "SVR 4 MP" .
+.IR "SVR 4 MP" .
 .[
 svr4
 .]

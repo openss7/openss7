@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: wantmsg.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: wantmsg.9.man,v 0.9.2.1 2004/08/22 06:17:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WANTMSG 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WANTMSG 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -94,50 +94,206 @@ sort-adjacent-labels
 .\"
 .SH ARGUMENTS
 .PP
+.TP
+.I q
+a pointer to the queue for which filtering is to be performed or cancelled.
+.TP
+.I f
+a pointer to a filter function that accepts a message block pointer as an argument and returns an
+integer filter result.  To remove an existing filter,
+.I f
+is set to
+.BR NULL .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.BR wantmsg ()
+is used for modules with queues without a service procedure to filter the messages calling the put
+procedure of the queue.
+.BR wantmsg ()
+either installs a filter function for this purpose when the filter function pointer,
+.I f ,
+is
+.RB non- NULL ,
+or removes an existing filter function when
+.I f
+is
+.BR NULL .
+.PP
+When a filter program has been installed with
+.BR wantmsg (),
+all messages passed to the queue's put procedure will first be passed to the supplied filter
+function.
+.PP
+If the filter function returns true (1), then the message is passed to the queue's put p
+rocedure; if it returns false (0), then the message is passed to the next module in the stream
+bypassing the current queue.
+.PP
+In a multiprocessing kernel,
+the filter program is called before attempting to sychronize the queue,
+.IR q .
+This permits concurrent processing of the filter function and high performance bypass of the queue
+processing and queue sychronization for messages that do not need to be processed by the queue.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR wantmsg ()
+is particularly useful for optimizing
+.I STREAMS
+modules with no service proceedure that are solely intended to intercept IO controls such as
+.BR pipemod (4),
+.BR sockmod (4),
+and
+.BR timod (4).
+These modules do not operate on data messages and can install a filter function with
+.BR wantmsg ()
+that bypasses all messages other than IO control related messages for increased MP performance in
+the data stream.
 .\"
 .\"
 .SH RETURN
 .PP
+When
+.BR wantmsg ()
+succeeds, it returns true (1);
+when it fails, it returns
+false (0).
 .\"
 .\"
 .SH ERRORS
 .PP
+.BR wantmsg ()
+fails when the specified queue,
+.IR q ,
+has a service procedure associated with the queue.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR wantmsg ()
+can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR wantmsg ()
+is MP-safe.
+.BR wantmsg ()
+provides increased performance for MP-STREAMS modules and drivers by determining whether a message
+should be processed by a module outside of the sycnrhonization queues for the module.
 .\"
 .\"
 .SH NOTICES
 .PP
+.BR wantmsg ()
+is a
+.IR AIX \(rg-specific
+function:
+.B _AIX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_AIX
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR wantmsg ()
+is implemented in
+.B Linux Fast-STREAMS
+by placing a
+.IR q_ftmsg
+function pointer member in the
+.BR queue (9)
+structure.  This pointer is examined by the
+.BR put (9)
+function in the
+.I STREAMS
+executive and called when it exists outside before the sycnhronization queue for the queue.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR wantio (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR wantmsg ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR wantmsg ()
+is compatible with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR wantmsg ()
+is an
+.IR AIX \(rg-specific
+function and it should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR wantmsg ()
+is provided for source level compatibility with
+.IR AIX \(rg
+for the purpose of porting
+.IR AIX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR AIX \(rg,
+binaries are incompatible.
+.IP \(em
+.BR wantmsg ()
+only provides functionality comparable to
+.IR AIX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR wantmsg ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR AIX \(rg
+DDI documentation.
+.[
+aixdoc
+.]
+.[
+aixspg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR wantmsg ()
+first appeared in
+.IR AIX \(rg.
 .\"
 .\"
+.[
+$LIST$
+.]
 .TI

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) aixddi.h,v 1.1.2.5 2003/10/28 08:00:06 brian Exp
+ @(#) $Id: ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:06 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __AXIDDI_H__
-#define __AXIDDI_H__
+#ifndef __SYS_AXIDDI_H__
+#define __SYS_AXIDDI_H__
+
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -60,7 +62,7 @@
 #define __AIX_EXTERN_INLINE extern __inline__
 #endif				/* __AIX_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _AIX_SOURCE
 #warning "_AIX_SOURCE not defined but aixddi.h,v included"
@@ -68,7 +70,10 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
 
-extern void mi_bufcall(queue_t *q, int size, int priority);
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
+
 extern int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *dev, int flag, int sflag,
 			cred_t *credp);
 extern int mi_close_comm(caddr_t *mi_list, queue_t *q);
@@ -76,6 +81,14 @@ extern caddr_t mi_next_ptr(caddr_t strptr);
 extern caddr_t mi_prev_ptr(caddr_t strptr);
 
 extern int wantio(queue_t *q, struct wantio *w);
+
+__AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
+{
+	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
+	// queue_t *rq = RD(q);
+	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
+	__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q);
+}
 
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
 {
@@ -90,4 +103,4 @@ __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
 #warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
 #endif
 
-#endif				/* __AXIDDI_H__ */
+#endif				/* __SYS_AXIDDI_H__ */

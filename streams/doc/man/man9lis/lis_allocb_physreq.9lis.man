@@ -1,1 +1,1 @@
-.so man9/allocb_physreq.9
+.so man9/allocb_physreq.9.man

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) osfddi.h,v 1.1.2.5 2003/10/28 08:00:07 brian Exp
+ @(#) $Id: ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:07 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __OSFDDI_H__
-#define __OSFDDI_H__
+#ifndef __SYS_OSFDDI_H__
+#define __SYS_OSFDDI_H__
+
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -60,13 +62,17 @@
 #define __OSF_EXTERN_INLINE extern __inline__
 #endif				/* __OSF_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _OSF_SOURCE
 #warning "_OSF_SOURCE not defined but osfddi.h,v included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 extern int streams_close_comm(queue_t *, int, cred_t *);
 extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);
@@ -91,4 +97,4 @@ __OSF_EXTERN_INLINE time_t time(void)
 #warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
 #endif
 
-#endif				/* __OSFDDI_H__ */
+#endif				/* __SYS_OSFDDI_H__ */

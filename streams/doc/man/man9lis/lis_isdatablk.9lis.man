@@ -1,1 +1,1 @@
-.so man9/isdatablk.9
+.so man9/isdatablk.9.man

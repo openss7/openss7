@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) hpuxddi.h,v 1.1.2.5 2003/10/28 08:00:06 brian Exp
+ @(#) $Id: hpuxddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:06 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __HPUXDDI_H__
-#define __HPUXDDI_H__
+#ifndef __SYS_HPUXDDI_H__
+#define __SYS_HPUXDDI_H__
+
+#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -60,7 +62,7 @@
 #define __HPUX_EXTERN_INLINE extern __inline__
 #endif				/* __HPUX_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _HPUX_SOURCE
 #warning "_HPUX_SOURCE not defined but hpuxddi.h,v included"
@@ -68,12 +70,45 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
 
+#ifndef _SVR4_SOURCE
+#define _SVR4_SOURCE
+#endif
+#include <sys/svr4ddi.h>	/* for lock_t */
+
+extern lock_t *get_sleep_lock(caddr_t event);
+
 typedef void (*streams_put_t) (void *, mblk_t *);
-extern void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
-extern spinlock_t *get_sleep_lock(void);
+/**
+ *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
+ *  @func:  put function (often the put() function)
+ *  @q:	    queue against which to defer the call
+ *  @mp:    message block to pass to the callback function
+ *  @priv:  private data to pass to the callback function (often @q)
+ *
+ *  streams_put() will defer the function @func until it can synchronize with @q.  Once the @q has
+ *  been syncrhonized, the STREAMS scheduler will call the callback function @func with arguments
+ *  @priv and @mp.  streams_put() is closely related to qwrite() below.
+ *
+ *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
+ *  streams_put().  @func is guarateed not to run until the caller exits or preempts.
+ *
+ *  Usage: streams_put() is intended to be called from contexts outside of the STREAMS scheduler
+ *  (e.g. interrupt service routines) where @func is intended to run under the STREAMS scheduler.
+ *
+ *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
+ *  guaranteed to be executed within the STREAMS scheduler.
+ */
+__HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
+{
+	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
+			      int perim, int type);
+	if (defer_func(func, q, mp, priv, 0, SE_STRPUT) == 0)
+		return;
+	// never();
+}
 
 #elif defined(_HPUX_SOURCE)
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"
 #endif				/* CONFIG_STREAMS_COMPAT_HPUX */
 
-#endif				/* __HPUXDDI_H__ */
+#endif				/* __SYS_HPUXDDI_H__ */

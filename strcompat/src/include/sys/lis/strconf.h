@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strconf.h,v 1.1.2.6 2003/10/26 17:25:59 brian Exp
+ @(#) $Id: strconf.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,19 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/26 17:25:59 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __STRCONF_H__
-#define __STRCONF_H__
+#ifndef __SYS_STRCONF_H__
+#define __SYS_STRCONF_H__
+
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
 #include <linux/fs.h>		/* for file_operations */
-#include <linux/sad.h>		/* for strapush */
+
+#include <sys/sad.h>		/* for strapush */
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 #ifndef __EXTERN_INLINE
 #define __EXTERN_INLINE extern __inline__
@@ -268,15 +275,15 @@ typedef struct dev_info dev_info_t;
 struct dev_ops {
 	int devo_rev;
 	int devo_refcnt;
-	int (*devo_getinfo)(dev_info_t *dip, ddi_info_cmn_t cmd, void *arg, void **result);
-	int (*devo_identify)(dev_info_t *dip);
-	int (*devo_probe)(dev_info_t *dip);
-	int (*devo_attach)(dev_info_t *dip, ddi_attach_cmn_t cmd);
-	int (*devo_detach)(dev_info_t *dip, ddi_detach_cmn_t cmd);
-	int (*devo_reset)(dev_info_t *dip, ddi_reset_cmn_t cmd);
+	int (*devo_getinfo) (dev_info_t * dip, ddi_info_cmn_t cmd, void *arg, void **result);
+	int (*devo_identify) (dev_info_t * dip);
+	int (*devo_probe) (dev_info_t * dip);
+	int (*devo_attach) (dev_info_t * dip, ddi_attach_cmn_t cmd);
+	int (*devo_detach) (dev_info_t * dip, ddi_detach_cmn_t cmd);
+	int (*devo_reset) (dev_info_t * dip, ddi_reset_cmn_t cmd);
 	struct cb_ops *devo_cb_ops;
 	struct bus_ops *devo_bus_ops;
-	int (*devo_power)(dev_info_t *dip, int component, int level);
+	int (*devo_power) (dev_info_t * dip, int component, int level);
 };
 
 __SUN_EXTERN_INLINE int nodev()
@@ -328,8 +335,8 @@ struct modlstrmod {
 #define MODREV_1 1
 
 struct modlinkage {
-	int ml_rev; /* revision, must be MODREV_1 */
-	void *ml_linkage[4]; /* null terminated array of linkage structures */
+	int ml_rev;			/* revision, must be MODREV_1 */
+	void *ml_linkage[4];		/* null terminated array of linkage structures */
 };
 
 struct modinfo;
@@ -352,20 +359,14 @@ extern int lis_unregister_strmod(struct streamtab *strtab);
 #warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
-extern int register_inode(dev_t dev, struct cdevsw *cdev, struct file_operations *fops);
-extern int register_inode_major(dev_t dev, struct cdevsw *cdev, struct file_operations *fops);
-extern int register_inode_minor(dev_t dev, struct cdevsw *cdev);
-extern int register_strdev(dev_t dev, struct cdevsw *cdev);
-extern int register_strdev_major(dev_t dev, struct cdevsw *cdev);
-extern int register_strdev_minor(dev_t dev, struct cdevsw *cdev);
-extern int register_strmod(modID_t modi, struct fmodsw *fmod);
-extern int unregister_inode(dev_t dev, struct cdevsw *cdev);
-extern int unregister_inode_major(dev_t dev, struct cdevsw *cdev);
-extern int unregister_inode_minor(dev_t dev, struct cdevsw *cdev);
-extern int unregister_strdev(dev_t dev, struct cdevsw *cdev);
-extern int unregister_strdev_major(dev_t dev, struct cdevsw *cdev);
-extern int unregister_strdev_minor(dev_t dev, struct cdevsw *cdev);
-extern int unregister_strmod(modID_t modi, struct fmodsw *fmod);
+extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
+extern int register_strdev(struct cdevsw *cdev, major_t major);
+extern int register_strdrv(struct cdevsw *cdev);
+extern int register_strmod(struct fmodsw *fmod);
+extern int unregister_strnod(struct cdevsw *cdev, minor_t minor);
+extern int unregister_strdev(struct cdevsw *cdev, major_t major);
+extern int unregister_strdrv(struct cdevsw *cdev);
+extern int unregister_strmod(struct fmodsw *fmod);
 
 extern int autopush_add(struct strapush *sap);
 extern int autopush_del(struct strapush *sap);
@@ -376,4 +377,4 @@ extern int apush_get(struct strapush *sap);
 extern int apush_set(struct strapush *sap);
 extern int apush_vml(struct str_list *slp);
 
-#endif				/* __STRCONF_H__ */
+#endif				/* __SYS_STRCONF_H__ */

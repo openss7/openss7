@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.6 2004/06/04 17:34:33 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.7 2004/08/22 06:17:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/06/04 17:34:33 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SPG 9 "$Date: 2004/06/04 17:34:33 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
+.TH SPG 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS Programmers Guide"
 .\"
 .\"
 .SH NAME

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mod_info.9.man,v 0.9 2004/03/10 08:45:54 brian Exp $
+.\" @(#) $Id: mod_info.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/10 08:45:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MOD_INFO 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MOD_INFO 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -194,8 +194,8 @@ has no known bugs.
 .BR mod_info ()
 is compatible with
 .IR Solaris \(rg
-with the following portablity considerations:
-.IP \(em
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
 .IP \(em
 .IP \(em
 .IP \(em
@@ -205,9 +205,9 @@ is provided for source level compatibility with
 for the purpose of porting
 .IR Solaris \(rg
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because internal structures and definitions for
-.B Lnux Fast-STREAMS
+.B Linux Fast-STREAMS
 .[
 lfs
 .]
@@ -226,6 +226,10 @@ Any and all functionality provided by
 in support of
 .RI non- STREAMS
 devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

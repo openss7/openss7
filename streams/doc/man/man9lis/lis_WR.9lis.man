@@ -1,1 +1,1 @@
-.so man9/WR.9
+.so man9/WR.9.man

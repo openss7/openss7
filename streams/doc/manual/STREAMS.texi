@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.4 2004/08/15 19:59:29 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.6 2004/08/22 07:28:53 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/15 19:59:29 $ by $Author: brian $
+% Last Modified $Date: 2004/08/22 07:28:53 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -252,11 +252,11 @@ Linux Fast-STREAMS.
 
 @node Copying, Documentation License, , Appendices
 @unnumbered Copying
-@include gpl.texi
+@include texi/gpl.texi
 
 @node Documentation License, Indices, Copying, Appendices
 @unnumbered Documentation License
-@include fdl.texi
+@include texi/fdl.texi
 
 @node Indices, , Documentation License, Appendices
 @unnumbered Indices

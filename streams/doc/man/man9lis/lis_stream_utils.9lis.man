@@ -1,1 +1,1 @@
-.so man9/stream_utils.9
+.so man9/stream_utils.9.man

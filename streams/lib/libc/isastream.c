@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/14 08:00:04 $
+ @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/14 08:00:04 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/14 08:00:04 $"
+#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $"
 
-static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/14 08:00:04 $";
+static char const ident[] = "$RCSfile: isastream.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT

@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) strsysctl.h,v 1.1.2.4 2003/10/20 11:22:58 brian Exp
+ @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,12 +46,41 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/20 11:22:58 by brian
+ Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSYSCTL_H__
 #define __LOCAL_STRSYSCTL_H__
+
+/* /proc/streams */
+enum {
+	CTL_STREAMS = 11,		/* STREAMS */
+};
+
+/* /proc/sys/streams */
+enum {
+	STREAMS_MAXPSZ = 1,
+	STREAMS_MINPSZ = 2,
+	STREAMS_HIWAT = 3,
+	STREAMS_LOWAT = 4,
+	STREAMS_CLTIME = 5,
+	STREAMS_RTIME = 6,
+	STREAMS_NSTRPUSH = 7,
+	STREAMS_STRTHRESH = 8,
+	STREAMS_STRHOLD = 9,
+	STREAMS_STRCTLSZ = 10,
+	STREAMS_STRMSGSZ = 11,
+	STREAMS_NSTRMSGS = 12,
+	STREAMS_NBAND = 13,
+	STREAMS_REUSE_FMODSW = 14,
+	STREAMS_MAX_APUSH = 15,
+	STREAMS_MAX_STRAMOD = 16,
+	STREAMS_MAX_STRDEV = 17,
+	STREAMS_MAX_STRMOD = 18,
+	STREAMS_MAX_MBLK = 19,
+	STREAMS_MSG_PRIORITY = 20,
+};
 
 extern int sysctl_str_maxpsz;		/* stream head default max packet size */
 extern int sysctl_str_minpsz;		/* stream head default min packet size */
@@ -72,11 +102,6 @@ extern int sysctl_str_max_strdev;	/* max streams devices */
 extern int sysctl_str_max_strmod;	/* max streams modules */
 extern int sysctl_str_max_mblk;		/* max of headers on free list */
 extern int sysctl_str_msg_priority;	/* observer message allocation priority */
-
-#define sysctl_str_maxpsz	str_minfo.mi_maxpsz
-#define sysctl_str_minpsz	str_minfo.mi_minpsz
-#define sysctl_str_hiwat	str_minfo.mi_hiwat
-#define sysctl_str_lowat	str_minfo.mi_lowat
 
 /* initialization for main */
 extern int strsysctl_init(void);

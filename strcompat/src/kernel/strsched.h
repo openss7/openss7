@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) strsched.h,v 1.1.2.10 2003/10/27 12:23:16 brian Exp
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/27 12:23:16 by brian
+ Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -56,7 +57,11 @@
 #include <linux/interrupt.h>	/* for in_irq() and friends */
 
 #ifndef __SCHED_EXTERN_INLINE
-#define __SCHED_EXTERN_INLINE extern inline
+#define __SCHED_EXTERN_INLINE extern __inline__
+#endif
+
+#ifndef STREAMS_SOFTIRQ
+#define STREAMS_SOFTIRQ (TASKLET_SOFTIRQ+1)
 #endif
 
 /* ctors and dtors for mdbblocks */
@@ -74,20 +79,20 @@ extern struct stdata *sd_get(struct stdata *sd);
 extern void sd_put(struct stdata *sd);
 
 /* ctors and dtors for autopush entries */
-extern struct apinfo *ap_get(struct strapush *sap);
-extern struct apinfo *ap_grab(struct apinfo *api);
+extern struct apinfo *ap_alloc(struct strapush *sap);
+extern struct apinfo *ap_get(struct apinfo *api);
 extern void ap_put(struct apinfo *api);
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
 /* ctors and dtors for devinfo */
-extern struct devinfo *di_get(struct cdevsw *cdev);
-extern struct devinfo *di_grab(struct devinfo *di);
+extern struct devinfo *di_alloc(struct cdevsw *cdev);
+extern struct devinfo *di_get(struct devinfo *di);
 extern void di_put(struct devinfo *di);
 
 /* ctors and dtors for modinfo */
-extern struct modinfo *mi_get(struct fmodsw *fmod);
-extern struct modinfo *mi_grab(struct modinfo *mi);
+extern struct modinfo *mi_alloc(struct fmodsw *fmod);
+extern struct modinfo *mi_get(struct modinfo *mi);
 extern void mi_put(struct modinfo *mi);
 
 /* ctors and dtors for linkblk */
@@ -95,8 +100,8 @@ extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
 
 /* ctors and dtors for syncq */
-extern struct syncq *sq_get(void);
-extern struct syncq *sq_grab(struct syncq *sq);
+extern struct syncq *sq_alloc(void);
+extern struct syncq *sq_get(struct syncq *sq);
 extern void sq_put(struct syncq **sqp);
 
 /* freeing chains of message blocks */

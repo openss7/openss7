@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_getiminor.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: ddi_getiminor.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_GETIMINOR 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS SUNDDI"
+.TH DDI_GETIMINOR 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS SUNDDI"
 .\"
 .\"
 .SH NAME
@@ -175,14 +175,18 @@ is provided for source level compatibility with
 for the purpose of porting
 .IR Solaris \(rg
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because the
 .BR dev_t
 structure for
-.IR Linux \(rg
+.B Linux
 differs from that of
 .IR Solaris \(rg,
 binaries are incompatible.
+.PP
+See
+.BR suncompat (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

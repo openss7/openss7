@@ -1,1 +1,314 @@
-.so soon.9
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: unregister_strdev.9.man,v 0.9.2.1 2004/08/22 06:17:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/08/22 06:17:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNREGISTER_STRDEV 9 "$Date: 2004/08/22 06:17:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B unregister_strdev
+\- unregister a \fISTREAMS\fR device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "unregister_strdev(struct cdevsw *" cdev ", major_t " major );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'major\(em'u
+.I cdev
+a pointer to a
+.BR cdevsw (9)
+structure indicating the characteristics for the driver.
+All members of the
+.BR cdevsw (9)
+structure, pointed to by
+.IR cdev ,
+are significant.
+.I cdev
+must point to a 
+.BR cdevsw (9)
+structure previously registered with
+.BR register_strdev (9).
+.TP
+.I major
+the (external) character major device number to deregister, or zero (0),
+inidicating that all registered character major device numbers for this driver
+are to be deregistered.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR unregister_strdev ()
+deregisters the
+.I STREAMS
+device described by the
+.BR cdevsw (9)
+structure,
+.IR cdev ,
+from the character major device number specified by
+.IR major .
+.PP
+.I major
+can also be set to zero (0)
+to indicate that the
+.I STREAMS
+executive should deregister all character major device numbers currently
+associated with the
+.I STREAMS
+device,
+.IR cdev .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR unregister_strdev ()
+can be called multiple times for the same device driver with different
+selections of the
+.I major
+device number.  This has the effect that multiple (external) character major
+device numbers will be disassociated with the
+.I STREAMS
+device.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR unregister_strdev ()
+deregisters the
+.I STREAMS
+driver described by
+.I cdev
+and returns zero (0).
+Upon failure,
+.BR unregister_strdev ()
+does not effect deregistration and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR unregister_strdev ()
+fails to deregister the specified
+.I STREAMS
+driver, it returns an appropriate negative error number as follows:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EINVAL ]
+.I cdev
+was
+.BR NULL ,
+or the
+.BR cdevsw (9)
+structure referenced contained invalid information.
+.TP
+.RB [ EINVAL ]
+.I major
+is invalid
+.RB ( ">= MAX_CHRDEV" ).
+.TP
+.RB [ ENXIO ]
+.I cdev
+does not reference a registered
+.I STREAMS
+driver.
+.TP
+.RB [ ENXIO ]
+.I major
+is not registered to a device.
+.TP
+.RB [ EPERM ]
+.I major
+is registered to a driver other than that referenced by
+.IR cdev .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unregister_strdev ()
+can be called from any blockable context.  Consideration for import on
+performance and latency should be given before calling
+.BR unregister_strdev ()
+from soft or hard interrupt context.  Typically,
+.BR unregister_strdev ()
+is called from the
+.BR module_exit (9)
+procedure of a kernel module associated with a
+.I STREAMS
+device.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR unregister_strdev ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR regsiter_strdev (9)
+when loading must call
+.BR unregister_strdev ()
+before unloading.
+.BR unregister_strdev ()
+must be called with the same value of
+.I cdev
+with which
+.BR regsiter_strdev (9)
+was called.
+.PP
+Drivers unregistered with
+.BR unregister_strdev ()
+will no longer appear in
+.BR /proc/streams/devices .
+.PP
+Drivers unregsitered with
+.BR unregister_strdev ()
+will also disappear as a device directory in
+.BR /dev/streams ,
+when the
+.BR specfs (5)
+filesystem has been mounted on
+.BR /dev/streams .
+
+
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR register_strdev (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR unregister_strdev ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unregister_strdev ()
+is a
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation specific function.  Registration of
+.I STREAMS
+drivers and modules in inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implementations
+and additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and deregistration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR unregister_strdev ()
+is a
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unregister_strdev ()
+first appeared in
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

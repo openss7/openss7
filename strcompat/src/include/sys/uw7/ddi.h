@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) uw7ddi.h,v 1.1.2.5 2003/10/28 08:00:08 brian Exp
+ @(#) $Id: ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:08 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __UW7DDI_H__
-#define __UW7DDI_H__
+#ifndef __SYS_UW7DDI_H__
+#define __SYS_UW7DDI_H__
+
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -60,7 +62,7 @@
 #define __UW7_EXTERN_INLINE extern __inline__
 #endif				/* __UW7_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _UW7_SOURCE
 #warning "_UW7_SOURCE not defined but uw7ddi.h,v included"
@@ -71,7 +73,7 @@
 #ifndef _SVR4_SOURCE
 #define _SVR4_SOURCE
 #endif
-#include <linux/svr4ddi.h>
+#include <sys/svr4ddi.h>
 
 /* don't use these functions, they are way too dangerous */
 struct stdata;
@@ -118,42 +120,44 @@ typedef struct {
 	unsigned char sg_format;
 } scgth_t;
 
-extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t *prp);
-extern mblk_t *msgphysreq(mblk_t *mp, physreq_t *prp);
-extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t *prp);
-extern mblk_t *msgscgth(mblk_t *mp, physreq_t *prp, scgth_t *sgp);
+extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
+extern mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
+extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
+extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
 
 typedef int processorid_t;
-toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
+__UW7_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, processor);
+}
+__UW7_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
+}
 
-int strioccall(int (*func)(void *), void *arg, uint iocid, queue_t *q);
+int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
 
 __UW7_EXTERN_INLINE major_t getemajor(dev_t dev)
 {
-	return (MAJOR(dev));
+	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
 __UW7_EXTERN_INLINE minor_t geteminor(dev_t dev)
 {
-	return (MINOR(dev));
+	return (MINOR(getminor(dev)));
 }
 __UW7_EXTERN_INLINE major_t emajor(dev_t dev)
 {
-	return (MAJOR(dev));
+	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
 __UW7_EXTERN_INLINE minor_t eminor(dev_t dev)
 {
-	return (MINOR(dev));
+	return (MINOR(getminor(dev)));
 }
-__UW7_EXTERN_INLINE int etoimajor(major_t emajor)
-{
-	return major(to_kdev_t(makedevice(emajor, 0)));
-}
-__UW7_EXTERN_INLINE int itoemajor(major_t imajor, int prevemaj)
-{
-	if (prevemaj)
-		return (NODEV);
-	return MAJOR(kdev_t_to_nr(mk_kdev(imajor, 0)));
-}
+
+extern int etoimajor(major_t emajor);
+extern int itoemajor(major_t imajor, int prevemaj);
 
 __UW7_EXTERN_INLINE int printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 __UW7_EXTERN_INLINE int printf(char *fmt, ...)
@@ -193,23 +197,33 @@ __UW7_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 }
 __UW7_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
-	/* this will jam up sometimes */
 	pl_t old_pl = spl(pl);
+#ifdef HAVE_READ_TRYLOCK
+	if (read_trylock(lockp))
+		return (old_pl);
+#else
+	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
 		read_lock(lockp);
 		return (old_pl);
 	}
+#endif
 	splx(old_pl);
 	return (invpl);
 }
 __UW7_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
-	/* this will jam up sometimes */
 	pl_t old_pl = spl(pl);
+#ifdef HAVE_WRITE_TRYLOCK
+	if (write_trylock(lockp))
+		return (old_pl);
+#else
+	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
 		write_lock(lockp);
 		return (old_pl);
 	}
+#endif
 	splx(old_pl);
 	return (invpl);
 }
@@ -235,7 +249,7 @@ __UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag)
 {
 	atomic_int_t *counter;
 	if ((counter = kmem_alloc(sizeof(*counter), flag)))
-		*counter = (atomic_int_t)ATOMIC_INIT(0);
+		*counter = (atomic_int_t) ATOMIC_INIT(0);
 	return (counter);
 }
 __UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter)
@@ -309,9 +323,8 @@ __UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp)
 	up(lockp);
 }
 
-
 #elif defined(_UW7_SOURCE)
 #warning "_UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7"
 #endif				/* CONFIG_STREAMS_COMPAT_UW7 */
 
-#endif				/* __UW7DDI_H__ */
+#endif				/* __SYS_UW7DDI_H__ */

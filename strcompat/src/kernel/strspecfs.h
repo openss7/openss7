@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) strspecfs.h,v 1.1.2.2 2003/10/07 18:58:45 brian Exp
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,17 +46,33 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/07 18:58:45 by brian
+ Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCCAL_STRSPECFS_H__
 #define __LOCCAL_STRSPECFS_H__
 
-extern struct vfsmount *specfs_mnt;
+#define SPEC_SBI_MAGIC 0XFEEDDEAF
+struct spec_sb_info {
+	u32 sbi_magic;
+	int sbi_setuid;
+	int sbi_setgid;
+	int sbi_setmod;
+	uid_t sbi_uid;
+	gid_t sbi_gid;
+	umode_t sbi_mode;
+};
 
+extern struct file_operations spec_dev_f_ops;
+
+extern struct vfsmount *specfs_get(void);
+extern void specfs_put(void);
+
+#if 0
 /* initialization for main */
 extern int strspecfs_init(void);
 extern void strspecfs_exit(void);
+#endif
 
 #endif				/* __LOCCAL_STRSPECFS_H__ */

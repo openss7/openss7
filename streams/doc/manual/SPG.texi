@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.4 2004/05/29 08:28:01 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.6 2004/08/22 07:28:53 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/05/29 08:28:01 $ by $Author: brian $
+% Last Modified $Date: 2004/08/22 07:28:53 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -1715,11 +1715,11 @@ assignment of device names and number and are useful in boot scripts:
 
 @node Copying, Documentation License, Portability, Top
 @unnumbered Copying
-@include gpl.texi
+@include texi/gpl.texi
 
 @node Documentation License, Indices, Copying, Top
 @unnumbered Documentation License
-@include fdl.texi
+@include texi/fdl.texi
 
 @node Indices, , Documentation License, Top
 @unnumbered Indices

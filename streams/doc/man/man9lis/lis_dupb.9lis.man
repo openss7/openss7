@@ -1,1 +1,1 @@
-.so man9/dupb.9
+.so man9/dupb.9.man

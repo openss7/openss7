@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) ddi.h,v 1.1.2.8 2003/10/26 17:25:59 brian Exp
+ @(#) $Id: ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/26 17:25:59 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __DDI_H__
-#define __DDI_H__ 1
+#ifndef __SYS_DDI_H__
+#define __SYS_DDI_H__ 1
+
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,22 +63,43 @@
 #endif				/* __EXTERN_INLINE */
 
 #include <asm/uaccess.h>	/* for copy_[to|from]_user */
+#if 0
 #include <linux/compile.h>	/* for UTS_VERSION */
+#else
+#define UTS_VERSION ""
+#endif
 #include <linux/version.h>	/* for UTS_RELEASE */
 #include <asm/delay.h>		/* for udelay */
-#include <linux/dki.h>
+#include <sys/dki.h>
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 __EXTERN_INLINE major_t getmajor(dev_t dev)
 {
-	return (major(to_kdev_t(dev)));
+	ulong major = ((dev >> 16) & 0x0000ffff);
+#if 0
+	if (!major)
+		major = MAJOR(dev);
+#endif
+	return (major);
 }
 __EXTERN_INLINE minor_t getminor(dev_t dev)
 {
-	return (minor(to_kdev_t(dev)));
+	ulong minor = (dev & 0x0000ffff);
+#if 0
+	ulong major = ((dev >> 16) & 0x0000ffff);
+	if (!major)
+		minor = MINOR(dev);
+#endif
+	return (minor);
 }
-__EXTERN_INLINE dev_t makedevice(unsigned char major, unsigned char minor)
+__EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor)
 {
-	return (MKDEV(major, minor));
+	ulong maj = major & 0x0000ffff;
+	ulong min = minor & 0x0000ffff;
+	return ((maj << 16) | min);
 }
 
 typedef void timo_fcn_t (caddr_t arg);
@@ -281,7 +304,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _SVR4_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
-#include <linux/svr4ddi.h>
+#include <sys/svr4ddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4
 #endif
@@ -289,7 +312,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _OSF_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
-#include <linux/osfddi.h>
+#include <sys/osfddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF
 #endif
@@ -297,7 +320,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _AIX_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-#include <linux/aixddi.h>
+#include <sys/aixddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX
 #endif
@@ -305,7 +328,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _HPUX_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
-#include <linux/hpuxddi.h>
+#include <sys/hpuxddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX
 #endif
@@ -313,7 +336,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _UW7_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-#include <linux/uw7ddi.h>
+#include <sys/uw7ddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7
 #endif
@@ -321,7 +344,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _SUN_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-#include <linux/sunddi.h>
+#include <sys/sunddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN
 #endif
@@ -329,10 +352,10 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _LIS_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
-#include <linux/lisddi.h>
+#include <sys/lisddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS
 #endif
 #endif
 
-#endif				/* __DDI_H__ */
+#endif				/* __SYS_DDI_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/12 23:20:21 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/08/22 06:17:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/12 23:20:21 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/08/22 06:17:55 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/12 23:20:21 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/08/22 06:17:55 $";
 
 #define __NO_VERSION__
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lisddi.h,v 0.9.2.4 2004/06/01 12:04:02 brian Exp $
+ @(#) $Id: lisddi.h,v 0.9.2.5 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/01 12:04:02 $"
+#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pipe.2.man,v 0.9.2.5 2004/06/20 20:32:44 brian Exp $
+.\" @(#) $Id: pipe.2.man,v 0.9.2.6 2004/08/22 06:17:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/06/20 20:32:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PIPE 2 "$Date: 2004/06/20 20:32:44 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PIPE 2 "$Date: 2004/08/22 06:17:40 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .SH NAME
 .B pipe
 \- create a \fISTREAMS\fR \fIpipe\fR

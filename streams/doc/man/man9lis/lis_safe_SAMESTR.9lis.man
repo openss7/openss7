@@ -1,1 +1,1 @@
-.so man9/SAMESTR.9
+.so man9/SAMESTR.9.man

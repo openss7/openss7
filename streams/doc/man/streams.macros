@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: streams.macros,v 0.9.2.6 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: streams.macros,v 0.9.2.7 2004/08/22 06:17:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -262,7 +262,7 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.6 $); $Date: 2004/04/17 18:52:13 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2004/08/22 06:17:39 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -275,7 +275,7 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.6 $); $Date: 2004/04/17 18:52:13 $.
+OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.7 $); $Date: 2004/08/22 06:17:39 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -290,7 +290,7 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.6 $); $Date: 2004/04/17 18:52:13 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2004/08/22 06:17:39 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -305,7 +305,7 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.6 $); $Date: 2004/04/17 18:52:13 $.
+OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.7 $); $Date: 2004/08/22 06:17:39 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -318,7 +318,7 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.6 $); $Date: 2004/04/17 18:52:13 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2004/08/22 06:17:39 $.
 ..
 .de AU
 .SH "AUTHOR"

@@ -1,1 +1,1 @@
-.so man9/qsize.9
+.so man9/qsize.9.man

@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyout.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: copyout.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH COPYOUT 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH COPYOUT 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -127,7 +127,7 @@ does nothing but return a negative error number.
 Upon failure,
 .BR copyout ()
 does nothing but return an appropriate negative error number as follows:
-.TP
+.TP \w'\ [EFAULT]\ 'u
 .RB [ EFAULT ]
 the buffer specified by
 .IR from " and " len
@@ -179,7 +179,7 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\(em\(em'u
 .BR copyout ()
 runs faster than the LiS equivalent.
 .PP
@@ -191,10 +191,12 @@ is provided for binary compatibility with LiS.  See
 calls
 .BR copyout ()
 directly.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
-Binary compatibility with SVR 4.2 MP DDI/DKI and
-.IR Solaris \(rg
-is not guaranteed.
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

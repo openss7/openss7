@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strargs.h,v 0.9 2004/06/01 12:04:38 brian Exp $
+ @(#) $Id: strargs.h,v 0.9.2.1 2004/08/22 06:17:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,15 +54,10 @@
 
 /* arguments definition */
 typedef struct str_args {
-	struct vfsmount *mnt;
-	struct inode *inode;
-	struct file *file;
 	dev_t dev;
 	int oflag;
 	int sflag;
 	cred_t *crp;
-	struct qstr name;
-	char buf[32];
 } str_args_t;
 
 #endif				/* __LOCAL_STRARGS_H__ */

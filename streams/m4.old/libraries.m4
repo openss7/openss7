@@ -58,34 +58,30 @@ dnl
 dnl =========================================================================
 
 # =========================================================================
-# AC_LDCONFIG
+# _LDCONFIG
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_LDCONFIG], [
+AC_DEFUN([_LDCONFIG], [dnl
     _LDCONFIG_SPEC_OPTIONS
     _LDCONFIG_SPEC_SETUP
     _LDCONFIG_SPEC_OUTPUT
-])# AC_LDCONFIG
+])# _LDCONFIG
 # =========================================================================
 
 # =========================================================================
 # _LDCONFIG_SPEC_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [
+AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 ])# _LDCONFIG_SPEC_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_LDCONFIG_SPEC_SETUP], [
+AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
     AC_ARG_VAR([LDCONFIG], [Configure loader command])
     AC_PATH_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${LDCONFIG:-no}" = :no ; then
-        AC_MSG_WARN([
-***
-*** Could not find ldconfig program in PATH.
-***
-        ])
+        AC_MSG_WARN([Could not find ldconfig program in PATH.])
     fi
 ])# _LDCONFIG_SPEC_SETUP
 # =========================================================================
@@ -93,7 +89,7 @@ AC_DEFUN([_LDCONFIG_SPEC_SETUP], [
 # =========================================================================
 # _LDCONFIG_SPEC_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [
+AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [dnl
 ])# _LDCONFIG_SPEC_OUTPUT
 # =========================================================================
 

@@ -1,1 +1,1 @@
-.so man9/putnext.9
+.so man9/putnext.9.man

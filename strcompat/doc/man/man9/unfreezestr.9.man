@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unfreezestr.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: unfreezestr.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNFREEZESTR 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNFREEZESTR 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -81,15 +81,22 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #undef _SOL_SOURCE
+.br
 .B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
+.HP
+void \fBunfreezestr\fR(queue_t *\fIq\fR, pl_t \fIpl\fR);
+.sp 2
 .PP
-.PD 0
+.B #define _SOL_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
 .HP
-.BI "void unfreezestr(queue_t *" q );
-.HP
-.BI "void unfreezestr(queue_t *" q ", pl_t " pl );
+void \fBunfreezestr\fR(queue_t *\fIq\fR);
 .PD
 .\"
 .\"
@@ -143,8 +150,8 @@ always succeeds.
 .SH CONTEXT
 .PP
 .BR unfreezestr ()
-can be calle from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures,
+call outs, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH "MP-STREAMS"
@@ -155,7 +162,7 @@ reference
 .IR q .
 References to
 .I q
-from a procedure, callout or callback predicated on the queue pair to which
+from a procedure, call out or callback predicated on the queue pair to which
 .I q
 belongs are guaranteed valid.  The caller must guarantee the validity from
 call outs, callbacks, soft interrupts and interrupt service routines not
@@ -247,83 +254,83 @@ has no known bugs.
 .PP
 .BR unfreezestr ()
 is compatible with
-.BR "SVR 4.2 MP DDI/DKI" ,
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
 and systems based on
-.BR "SVR 4" ,
+.IR "SVR 4" ,
 with the following portability considerations:
-.IP \(bu
-.BR Solaris \(rg,
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg,
 .[
 solspg
 .]
-.BR SUPER-UX \(rg,
+.IR SUPER-UX \(rg,
 .[
 suxspg
 .]
 and
-.BR UnixWare \(rg,
+.IR UnixWare \(rg,
 .[
 uw7spg
 .]
 provide this function.
-.IP \(bu
-.BR AIX \(rg,
+.IP \(em
+.IR AIX \(rg,
 .[
 aixspg
 .]
-.BR HP-UP \(rg,
+.IR HP-UX \(rg,
 .[
 hpuxspg
 .]
-.BR OSF \(rg,
+.IR OSF/1 \(rg,
 .[
 osfspg
 .]
-.BR UXP/V \(rg
+.IR UXP/V \(rg
 .[
 uxpspg
 .]
 and
-.BR LiS
+.IR LiS
 .[
 lis
 .]
 do not provide this function.
-.RB ( HP-UX \(rg
+.RI ( HP-UX \(rg
 provides the symbols, but they do nothing.)
-.IP \(bu
+.IP \(em
 LiS
 .[
 LiS
 .]
 does not provide this DDI/DKI function.
-.IP \(bu
-.BR Solaris \(rg
+.IP \(em
+.IR Solaris \(rg
 .[
 solspg
 .]
 provides the function prototype:
 .BI "void unfreezestr(queue_t *" q ).
-.BR HP-UX \(rg,
+.IR HP-UX \(rg,
 .[
 hpuxspg
 .]
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 provide the prototype
 .BR "void unfreezestr(queue_t *" q ", pl_t " pl ).
-.IP \(bu
-.B "SVR 4.2 MP DDI/DKI"
+.IP \(em
+.I "SVR 4.2 MP DDI/DKI"
 specifies that the following functions cannot be called on a frozen stream:
 .BR bcanput (9),
 .BR bcanputnext (9),
@@ -343,15 +350,15 @@ specifies that the following functions cannot be called on a frozen stream:
 .BR qreply (9),
 .BR qsize (9),
 .BR SAMESTR (9).
-.IP \(bu
-.BR "SVR 4.2 MP DDI/DKI"
+.IP \(em
+.IR "SVR 4.2 MP DDI/DKI"
 specifies that the following functions must have the stream frozen across the
 call:
 .BR insq (9),
 .BR rmvq (9),
 .BR strqget (9),
 .BR strqset (9).
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -361,7 +368,7 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2 MP DDI/DKI" .
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) hpuxcompat.c,v (1.1.2.6) 2003/10/28 08:00:04
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,17 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:04 by brian
+ Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) hpuxcompat.c,v (1.1.2.6) 2003/10/28 08:00:04"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 
 static char const ident[] =
-    "hpuxcompat.c,v (1.1.2.6) 2003/10/28 08:00:04";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -97,23 +103,26 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _HPUX_SOURCE
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
 
-#include "strdebug.h"
+#define _HPUX_SOURCE
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+
+#include "sys/config.h"
 #include "strsched.h"
 #include "strutil.h"
-#include "strhead.h"
+#include "sth.h"
 #include "strsad.h"
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS hpuxcompat.c,v (1.1.2.6) 2003/10/28 08:00:04"
+#define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -125,20 +134,37 @@ static char const ident[] =
 #define HPUXCOMP_SPLASH		HPUXCOMP_DEVICE		" - " \
 				HPUXCOMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 MODULE_AUTHOR(HPUXCOMP_CONTACT);
 MODULE_DESCRIPTION(HPUXCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(HPUXCOMP_DEVICE);
 MODULE_LICENSE(HPUXCOMP_LICENSE);
+#endif
 
-static spinlock_t sleep_lock = SPIN_LOCK_UNLOCKED;
-spinlock_t *get_sleep_lock(void)
+static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
+/**
+ *  get_sleep_lock: - acquire the global sleep lock
+ *  @event:	the event which will be later passed to sleep
+ *
+ *  get_sleep_lock() provides access to a global spinlock_t that may be used
+ *  by all threads entering a wait queue to avoid race conditions between
+ *  threads entering the wait queue.
+ *
+ *  Return Value:get_sleep_lock() returns a pointer to the global sleep lock.
+ */
+lock_t *get_sleep_lock(caddr_t event)
 {
+	(void) event;
 	return &sleep_lock;
 }
+EXPORT_SYMBOL(get_sleep_lock);	/* hpuxddi.h */
+
+__HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
+EXPORT_SYMBOL(streams_put);	/* hpuxddi.h */
 
 static int __init hpuxcomp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 	printk(KERN_INFO HPUXCOMP_BANNER);
 #else
 	printk(KERN_INFO HPUXCOMP_SPLASH);
@@ -150,5 +176,7 @@ static void __exit hpuxcomp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 module_init(hpuxcomp_init);
 module_exit(hpuxcomp_exit);
+#endif

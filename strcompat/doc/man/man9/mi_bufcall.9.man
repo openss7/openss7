@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_bufcall.9.man,v 0.9 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_BUFCALL 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
+.TH MI_BUFCALL 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -94,36 +94,136 @@ sort-adjacent-labels
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'\ priority\ 'u
 .I q
+Specifies the queue which is to be passed to
+.BR qenable (9).
 .TP
 .I size
+Specifies the required buffer size.
 .TP
 .I priority
+Specifies the priority as used by the standard STREAMS
+.BR bufcall (9)
+mechanism.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.BR mi_bufcall ()
+provides a reliable alternative to
+.BR bufcall (9).
+Standard
+.I STREAMS
+.BR bufcall (9)
+is intended to be called when
+.BR allocb (9)
+is unable to allocate a block for a message, and invokes a specified callback
+function (typically
+.BR qenable (9))
+with a given queue when a large enough block becomes available.  This can
+cause system problems if the stream closes so that that queue becomes invalid
+before the callback function is invoked.
+.PP
+The
+.BR mi_bufcall ()
+is a reliable alternative, as the queue is not deallocated until the call is
+complete.  It uses the standard
+.BR bufcall (9)
+mechanism with its own internal callback routine.  The callback routine
+either invokes
+.BR qenable (9)
+with the specified
+.I q
+parameter, or simply deallocates the instance data associated with the stream
+if the queue has already been closed.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH RETURN
 .PP
+.BR mi_bufcall ()
+returns
+.BR void .
 .\"
 .\"
 .SH ERRORS
 .PP
+When
+.BR mi_bufcall ()
+fails, it fails silently (because it returns
+.BR void ).
+Having
+.BR mi_bufcall ()
+return
+.B void
+was not a particularly good idea.
+.BR mi_bufcall ()
+fails when there is insufficient memory available to allocate the necessary
+internal datastructures to represent the buffer call.  Because
+.BR mi_bufcall ()
+returns void, it is not possible to determine whether the call was successful
+or whether it failed, rendering the function rather useles.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR mi_bufcall ()
+can be called in any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_bufcall ()
+is MP-safe.
 .\"
 .\"
 .SH NOTICES
 .PP
+.BR mi_bufcall ()
+is an
+.IR AIX \(rg-specific
+function:
+.B _AIX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_AIX
+defined.
+.PP
+.BR mi_bufcall ()
+is an
+.IR AIX \(rg-specific
+function that should not be used by portable
+.I STREAMS
+drivers or modules.
+A similar, and equally non-portable function, is the
+.IR Solaris \(rg-specific
+.BR qbufcall (9)
+facility.
+Portable
+.I STREAMS
+drivers and modules should use the more standard
+.BR bufcall (9)
+function directly.
+.PP
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+provdes enhancements to the
+.BR bufcall (9)
+facility that permit it to function similar to
+.BR mi_bufcall ()
+without changing the
+.BR bufcall (9)
+function prototype.
+See
+.BR bufcall (9)
+for more details.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -131,7 +231,8 @@ sort-adjacent-labels
 .BR bufcall (9),
 .BR qbufcall (9),
 .BR unbufcall (9),
-.BR qunbufcall (9).
+.BR qunbufcall (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -143,31 +244,69 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR mi_bufcall ()
+is compatible with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_bufcall ()
 is an
-.BR AIX \(rg
-specific function
-provided for source level compatibility with
-.BR AIX \(rg.
-This symbol is only available when the kernel is compiled with configuration
-parameter
-.B CONFIG_STREAMS_AIXCOMPAT
-set.
+.IR AIX \(rg-specific
+function and it should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR mi_bufcall ()
+is provided for source level compatibility with
+.IR AIX \(rg
+for the purpose of porting
+.IR AIX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR AIX \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_bufcall ()
+only provides functionality comparable to
+.IR AIX \(rg
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR mi_bufcall ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR aixcompat (9)
+for more compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.BR AIX \(rg
+.IR AIX \(rg
 documentation.
+.[
+aixdoc
+.]
+.[
+aixspg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR mi_bufcall ()
 is an
-.BR AIX \(rg
-specific function
-that first appeared in
-.B AIX 4.1.
+.IR AIX \(rg-specific
+function that first appeared in
+.IR AIX \(rg
+4.1.
 .\"
 .\"
 .TI

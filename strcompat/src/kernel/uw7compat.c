@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) uw7compat.c,v (1.1.2.6) 2003/10/28 08:00:05
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,16 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:05 by brian
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) uw7compat.c,v (1.1.2.6) 2003/10/28 08:00:05"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $"
 
-static char const ident[] = "uw7compat.c,v (1.1.2.6) 2003/10/28 08:00:05";
+static char const ident[] =
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -95,24 +102,27 @@ static char const ident[] = "uw7compat.c,v (1.1.2.6) 2003/10/28 08:00:05";
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
+
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
 
 #define _UW7_SOURCE
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
 
-#include "strdebug.h"
+#include "sys/config.h"
 #include "strsched.h"
 #include "strutil.h"
-#include "strhead.h"
+#include "sth.h"
 #include "strsad.h"
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS uw7compat.c,v (1.1.2.6) 2003/10/28 08:00:05"
+#define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -124,10 +134,18 @@ static char const ident[] = "uw7compat.c,v (1.1.2.6) 2003/10/28 08:00:05";
 #define UW7COMP_SPLASH		UW7COMP_DEVICE		" - " \
 				UW7COMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 MODULE_AUTHOR(UW7COMP_CONTACT);
 MODULE_DESCRIPTION(UW7COMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(UW7COMP_DEVICE);
 MODULE_LICENSE(UW7COMP_LICENSE);
+#endif
+
+
+__UW7_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
+EXPORT_SYMBOL(dtimeout);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
+EXPORT_SYMBOL(itimeout);	/* uw7ddi.h */
 
 /* don't use these functions, they are way too dangerous */
 long MPSTR_QLOCK(queue_t *q)
@@ -136,22 +154,36 @@ long MPSTR_QLOCK(queue_t *q)
 	qwlock(q, &flags);
 	return (flags);
 }
+
+EXPORT_SYMBOL(MPSTR_QLOCK);	/* uw7ddi.h */
 void MPSTR_QRELE(queue_t *q, long s)
 {
 	qwunlock(q, (unsigned long *) &s);
 }
+
+EXPORT_SYMBOL(MPSTR_QRELE);	/* uw7ddi.h */
 long MPSTR_STPLOCK(struct stdata *stp)
 {
 	unsigned long flags;
 	swlock(stp, &flags);
 	return (flags);
 }
+
+EXPORT_SYMBOL(MPSTR_STPLOCK);	/* uw7ddi.h */
 void MPSTR_STPRELE(struct stdata *stp, long s)
 {
 	swunlock(stp, (unsigned long *) &s);
 }
 
+EXPORT_SYMBOL(MPSTR_STPRELE);	/* uw7ddi.h */
+
 /* don't use these - these are fakes */
+/**
+ *  allocb_physreq:	- allocate a message block with physical requirements
+ *  @size:		number of bytes to allocate
+ *  @priority:		priority of the allocation
+ *  @physreq_ptr:	physical requirements of the message block
+ */
 mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
@@ -164,6 +196,8 @@ mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
 		return (NULL);
 	return (allocb(size, priority));
 }
+
+EXPORT_SYMBOL(allocb_physreq);	/* uw7ddi.h */
 mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
@@ -176,6 +210,8 @@ mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
 		return (NULL);
 	return (mp);
 }
+
+EXPORT_SYMBOL(msgphysreq);	/* uw7ddi.h */
 mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
@@ -188,52 +224,119 @@ mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 		return (NULL);
 	return msgpullup(mp, len);
 }
+
+EXPORT_SYMBOL(msgpullup_physreq);	/* uw7ddi.h */
 mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
 {
 	return (NULL);
 }
 
-__UW7_EXTERN_INLINE major_t getemajor(dev_t dev);
-__UW7_EXTERN_INLINE minor_t geteminor(dev_t dev);
-__UW7_EXTERN_INLINE major_t emajor(dev_t dev);
-__UW7_EXTERN_INLINE minor_t eminor(dev_t dev);
-__UW7_EXTERN_INLINE int etoimajor(major_t emajor);
-__UW7_EXTERN_INLINE int itoemajor(major_t imajor, int prevemaj);
+EXPORT_SYMBOL(msgscgth);	/* uw7ddi.h */
 
-__UW7_EXTERN_INLINE int printf(char *fmt, ...);
+__UW7_EXTERN_INLINE major_t getemajor(dev_t dev);
+EXPORT_SYMBOL(getemajor);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE minor_t geteminor(dev_t dev);
+EXPORT_SYMBOL(geteminor);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE major_t emajor(dev_t dev);
+EXPORT_SYMBOL(emajor);		/* uw7ddi.h */
+__UW7_EXTERN_INLINE minor_t eminor(dev_t dev);
+EXPORT_SYMBOL(eminor);		/* uw7ddi.h */
+
+int etoimajor(major_t emajor)
+{
+	struct cdevsw *cdev;
+	major_t major = NODEV;
+	if ((cdev = cdev_get(emajor))) {
+		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+		major = cdev->d_modid;
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+		cdev_put(cdev);
+	}
+	return (major);
+}
+
+EXPORT_SYMBOL(etoimajor);	/* uw7ddi.h */
+int itoemajor(major_t imajor, int prevemaj)
+{
+	struct cdevsw *cdev;
+	if ((cdev = cdrv_get(imajor)) && cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
+		struct list_head *pos;
+		int found_previous = (prevemaj == NODEV) ? 1 : 0;
+		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+		list_for_each(pos, &cdev->d_majors) {
+			struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
+			if (found_previous)
+				return (cmaj->n_major);
+			if (prevemaj == cmaj->n_major)
+				found_previous = 1;
+		}
+	}
+	return (NODEV);
+}
+
+EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */
+
+//__UW7_EXTERN_INLINE int printf(char *fmt, ...);
+//EXPORT_SYMBOL(printf);                        /* uw7ddi.h */
 
 __UW7_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp);
+EXPORT_SYMBOL(LOCK_OWNED);	/* uw7ddi.h */
 
-__UW7_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag);
+__UW7_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
+				       int flag);
+EXPORT_SYMBOL(RW_ALLOC);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp);
+EXPORT_SYMBOL(RW_DEALLOC);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_RDLOCK);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_TRYRDLOCK);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_TRYWRLOCK);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_UNLOCK);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *, pl_t pl);
+EXPORT_SYMBOL(RW_WRLOCK);	/* uw7ddi.h */
 
-__UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t *counter, int value);
+__UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t * counter, int value);
+EXPORT_SYMBOL(ATOMIC_INT_ADD);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag);
-__UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t *counter);
-__UW7_EXTERN_INLINE int ATOMIC_INT_DECR(atomic_int_t *counter);
-__UW7_EXTERN_INLINE void ATOMIC_INT_INCR(atomic_int_t *counter);
-__UW7_EXTERN_INLINE void ATOMIC_INT_INIT(atomic_int_t *counter, int value);
-__UW7_EXTERN_INLINE int ATOMIC_INT_READ(atomic_int_t *counter);
-__UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t *counter, int value);
-__UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t *counter, int value);
+EXPORT_SYMBOL(ATOMIC_INT_ALLOC);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter);
+EXPORT_SYMBOL(ATOMIC_INT_DEALLOC);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE int ATOMIC_INT_DECR(atomic_int_t * counter);
+EXPORT_SYMBOL(ATOMIC_INT_DECR);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void ATOMIC_INT_INCR(atomic_int_t * counter);
+EXPORT_SYMBOL(ATOMIC_INT_INCR);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void ATOMIC_INT_INIT(atomic_int_t * counter, int value);
+EXPORT_SYMBOL(ATOMIC_INT_INIT);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE int ATOMIC_INT_READ(atomic_int_t * counter);
+EXPORT_SYMBOL(ATOMIC_INT_READ);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t * counter, int value);
+EXPORT_SYMBOL(ATOMIC_INT_SUB);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value);
+EXPORT_SYMBOL(ATOMIC_INT_WRITE);	/* uw7ddi.h */
 
-__UW7_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t *lkinfop, int flag);
-__UW7_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t *lockp);
-__UW7_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t *lockp);
-__UW7_EXTERN_INLINE void SLEEP_LOCK(sleep_t *lockp, int priority);
-__UW7_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t *lockp);
-__UW7_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t *lockp, int priority);
-__UW7_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t *lockp);
-__UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t *lockp);
+__UW7_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag);
+EXPORT_SYMBOL(SLEEP_ALLOC);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_DEALLOC);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_LOCKAVAIL);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void SLEEP_LOCK(sleep_t * lockp, int priority);
+EXPORT_SYMBOL(SLEEP_LOCK);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_LOCKOWNED);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t * lockp, int priority);
+EXPORT_SYMBOL(SLEEP_LOCK_SIG);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_TRYLOCK);	/* uw7ddi.h */
+__UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_UNLOCK);	/* uw7ddi.h */
 
 static int __init uw7comp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 	printk(KERN_INFO UW7COMP_BANNER);
 #else
 	printk(KERN_INFO UW7COMP_SPLASH);
@@ -245,6 +348,7 @@ static void __exit uw7comp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 module_init(uw7comp_init);
 module_exit(uw7comp_exit);
-
+#endif

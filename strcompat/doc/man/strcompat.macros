@@ -1,10 +1,10 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strcompat.macros,v 0.9 2004/03/01 02:44:05 brian Exp $
+.\" @(#) $Id: strcompat.macros,v 0.9.2.1 2004/08/22 06:17:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:05 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -64,7 +64,7 @@
 Trademarks mentioned are the property of their owners.
 ..
 .de ]-
-.IP "\\fR[\\fB\\*([F\\fR]\\ \\fP"
+.IP "\\fR[\\fB\\*([F\\fR]\\ \\fP" \\w'[00]00'u
 .\"\\fR[\\fB\\*([F\\fR]\\fP
 .\".IP \\*([F. \\w'(00.)'u
 .\".IP [\\fB\\*([F\\fR] 5
@@ -145,7 +145,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1997-2003 OpenSS7 Corporation.
+\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -207,7 +207,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright \(co 1997-2003 OpenSS7 Corporation.
+\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -240,26 +240,85 @@ source, must acknowledge the copyright and authors of this work.
 .I (See roff source for permission notice.)
 .\}
 ..
+.de C3
+.SH "COPYRIGHT"
+.PP
+\f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
+.br
+.I (See roff source for permission notice.)
+..
 .de BG
 .SH "BUGS"
 .PP
 No known bugs.
 ..
+.de AU
+.SH "AUTHOR"
+.PP
+Brian F. G. Bidulock <bidulock@openss7.org>
+.br
+The OpenSS7 Project http://www.openss7.org/
+..
 .de ID
 .SH IDENTIFICATION
 .HP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9 $); $Date: 2004/03/01 02:44:05 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
 .PP
-\f(HRCopyright \(co 1997-2003 OpenSS7 Corp.
+\f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
 All Rights Reserved.
+.br
+.I (See roff source for permission notice.)
+..
+.de I2
+.SH IDENTIFICATION
+.HP
+OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+.PP
+\f(HRCopyright \(co 1992 UNIX International, Inc.
+.br
+\f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
+.if (\n[.l]u < 80n) \{\
+.br
+.\}
+All Rights Reserved.
+.br
+.I (See roff source for permission notice.)
+..
+.de I3
+.SH IDENTIFICATION
+.HP
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+.PP
+\f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
+.br
+\f(HRCopyright \(co 2001-2004 OpenSS7 Corp.
+.if (\n[.l]u < 80n) \{\
+.br
+.\}
+All Rights Reserved.
+.br
+.I (See roff source for permission notice.)
+..
+.de I4
+.SH IDENTIFICATION
+.HP
+OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+.PP
+\f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
+.if (\n[.l]u < 80n) \{\
+.br
+.\}
+All Rights Reserved.
+.br
+.I (See roff source for permission notice.)
 ..
 .de VR
 .SH "VERSIONS"
 .PP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9 $); $Date: 2004/03/01 02:44:05 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
 ..
 .de AU
 .SH "AUTHOR"
@@ -292,10 +351,19 @@ Other trademarks are the property of their respective owners.
 .TM
 ..
 .de T2
-.VR
-.AU
-.C2
-.TM
+.\".VR
+.\".AU
+.\".C2
+.\".TM
+.I2
+..
+.de T3
+.\".C3
+.\".TM
+.I3
+..
+.de T4
+.I4
 ..
 .de TI
 .ID

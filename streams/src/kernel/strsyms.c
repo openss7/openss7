@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/12 23:20:21 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/12 23:20:21 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:55 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/12 23:20:21 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:55 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB

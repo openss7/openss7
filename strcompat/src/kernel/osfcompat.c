@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) osfcompat.c,v (1.1.2.6) 2003/10/28 08:00:04
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,17 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:04 by brian
+ Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) osfcompat.c,v (1.1.2.6) 2003/10/28 08:00:04"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 
 static char const ident[] =
-    "osfcompat.c,v (1.1.2.6) 2003/10/28 08:00:04";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -97,23 +103,26 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _OSF_SOURCE
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
 
-#include "strdebug.h"
+#define _OSF_SOURCE
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+
+#include "sys/config.h"
 #include "strsched.h"
 #include "strutil.h"
-#include "strhead.h"
+#include "sth.h"
 #include "strsad.h"
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS osfcompat.c,v (1.1.2.6) 2003/10/28 08:00:04"
+#define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -125,14 +134,19 @@ static char const ident[] =
 #define OSFCOMP_SPLASH		OSFCOMP_DEVICE		" - " \
 				OSFCOMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 MODULE_AUTHOR(OSFCOMP_CONTACT);
 MODULE_DESCRIPTION(OSFCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(OSFCOMP_DEVICE);
 MODULE_LICENSE(OSFCOMP_LICENSE);
+#endif
 
 __OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp);
+EXPORT_SYMBOL(puthere);
 __OSF_EXTERN_INLINE time_t lbolt(void);
+EXPORT_SYMBOL(lbolt);
 __OSF_EXTERN_INLINE time_t time(void);
+EXPORT_SYMBOL(time);
 
 struct str_comm {
 	struct str_comm **prev;		/* must be first */
@@ -153,8 +167,8 @@ static struct str_comm *str_list = NULL;
 int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct str_comm *sp, **spp = &str_list;
-	int cmajor = getmajor(*devp);
-	int cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN) {
@@ -178,11 +192,11 @@ int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int
 	default:
 	case DRVOPEN:
 	{
-		int dmajor = cmajor;
+		major_t dmajor = cmajor;
 		for (; *(spp) && (dmajor = getmajor((*spp)->dev)) < cmajor; spp = &(*spp)->next) ;
 		for (; *(spp) && dmajor == getmajor((*spp)->dev) &&
-		     cminor == getminor(makedevice(0, cminor)); spp = &(*spp)->next, cminor++) {
-			int dminor = getminor((*spp)->dev);
+		     getminor(makedevice(0, cminor)) != 0; spp = &(*spp)->next, cminor++) {
+			minor_t dminor = getminor((*spp)->dev);
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor)
@@ -192,7 +206,7 @@ int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int
 					return (ENXIO);
 				}
 		}
-		if (cminor != getminor(makedevice(0, cminor))) {	/* no minors left */
+		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&str_list_lock);
 			kmem_free(sp, sizeof(*sp) + size);
 			return (EBUSY);
@@ -217,6 +231,8 @@ int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int
 	return (0);
 }
 
+EXPORT_SYMBOL(streams_open_comm);
+
 /* 
  *  STREAMS_OPEN_OCOMM
  *  -------------------------------------------------------------------------
@@ -232,6 +248,8 @@ int streams_open_ocomm(dev_t dev, unsigned int size, queue_t *q, dev_t *devp, in
 	*devp = mydev;
 	return (0);
 }
+
+EXPORT_SYMBOL(streams_open_ocomm);
 
 /* 
  *  STREAMS_CLOSE_COMM
@@ -257,9 +275,11 @@ int streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
+EXPORT_SYMBOL(streams_close_comm);
+
 static int __init osfcomp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 	printk(KERN_INFO OSFCOMP_BANNER);
 #else
 	printk(KERN_INFO OSFCOMP_SPLASH);
@@ -271,5 +291,7 @@ static void __exit osfcomp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 module_init(osfcomp_init);
 module_exit(osfcomp_exit);
+#endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: spec_fs_i.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: spec_fs_i.h,v 0.9.2.4 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SPEC_FS_I_H__
 #define __SYS_SPEC_FS_I_H__
 
-#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/22 06:17:51 $"
 
  /* Note: this is identical layout to a socket (rearranged for validation).  The minor exception is 
     that the the sock pointer points to an stdata and the proto_ops pointer points to a stream_ops

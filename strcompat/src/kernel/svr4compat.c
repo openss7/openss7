@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) svr4compat.c,v (1.1.2.3) 2003/10/28 08:00:05
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,16 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:05 by brian
+ Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) svr4compat.c,v (1.1.2.3) 2003/10/28 08:00:05"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $"
 
-static char const ident[] = "svr4compat.c,v (1.1.2.3) 2003/10/28 08:00:05";
+static char const ident[] =
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
+#include <linux/init.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -98,23 +105,26 @@ static char const ident[] = "svr4compat.c,v (1.1.2.3) 2003/10/28 08:00:05";
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _SVR4_SOURCE
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#ifndef __GENKSYMS__
+#include <sys/streams/modversions.h>
+#endif
 
-#include "strdebug.h"
+#define _SVR4_SOURCE
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+
+#include "sys/config.h"
 #include "strsched.h"
 #include "strutil.h"
-#include "strhead.h"
+#include "sth.h"
 #include "strsad.h"
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS svr4compat.c,v (1.1.2.3) 2003/10/28 08:00:05"
+#define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -126,10 +136,12 @@ static char const ident[] = "svr4compat.c,v (1.1.2.3) 2003/10/28 08:00:05";
 #define SVR4COMP_SPLASH		SVR4COMP_DEVICE		" - " \
 				SVR4COMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 MODULE_AUTHOR(SVR4COMP_CONTACT);
 MODULE_DESCRIPTION(SVR4COMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SVR4COMP_DEVICE);
 MODULE_LICENSE(SVR4COMP_LICENSE);
+#endif
 
 static pl_t current_spl[NR_CPUS] __cacheline_aligned;
 
@@ -141,6 +153,8 @@ pl_t spl0(void)
 	return (old_level);
 }
 
+EXPORT_SYMBOL(spl0);		/* svr4ddi.h */
+
 pl_t spl1(void)
 {
 	pl_t old_level = xchg(&current_spl[smp_processor_id()], 1);
@@ -148,6 +162,8 @@ pl_t spl1(void)
 	local_bh_enable();
 	return (old_level);
 }
+
+EXPORT_SYMBOL(spl1);		/* svr4ddi.h */
 
 pl_t spl2(void)
 {
@@ -157,6 +173,8 @@ pl_t spl2(void)
 	return (old_level);
 }
 
+EXPORT_SYMBOL(spl2);		/* svr4ddi.h */
+
 pl_t spl3(void)
 {
 	pl_t old_level = xchg(&current_spl[smp_processor_id()], 3);
@@ -164,6 +182,8 @@ pl_t spl3(void)
 	local_irq_enable();
 	return (old_level);
 }
+
+EXPORT_SYMBOL(spl3);		/* svr4ddi.h */
 
 pl_t spl4(void)
 {
@@ -173,6 +193,8 @@ pl_t spl4(void)
 	return (old_level);
 }
 
+EXPORT_SYMBOL(spl4);		/* svr4ddi.h */
+
 pl_t spl5(void)
 {
 	pl_t old_level = xchg(&current_spl[smp_processor_id()], 5);
@@ -180,6 +202,8 @@ pl_t spl5(void)
 	local_bh_disable();
 	return (old_level);
 }
+
+EXPORT_SYMBOL(spl5);		/* svr4ddi.h */
 
 pl_t spl6(void)
 {
@@ -189,6 +213,8 @@ pl_t spl6(void)
 	return (old_level);
 }
 
+EXPORT_SYMBOL(spl6);		/* svr4ddi.h */
+
 pl_t spl7(void)
 {
 	pl_t old_level = xchg(&current_spl[smp_processor_id()], 7);
@@ -196,6 +222,8 @@ pl_t spl7(void)
 	local_bh_disable();
 	return (old_level);
 }
+
+EXPORT_SYMBOL(spl7);		/* svr4ddi.h */
 
 pl_t spl(const pl_t level)
 {
@@ -220,14 +248,42 @@ pl_t spl(const pl_t level)
 	swerr();
 	return (invpl);
 }
+
+EXPORT_SYMBOL(spl);		/* svr4ddi.h */
 void splx(const pl_t level)
 {
 	return (void) spl(level);
 }
 
+EXPORT_SYMBOL(splx);		/* svr4ddi.h */
+
+//__SVR4_EXTERN_INLINE pl_t LOCK(lock_t * lockp, pl_t pl);
+//EXPORT_SYMBOL(LOCK);          /* svr4ddi.h */
+__SVR4_EXTERN_INLINE lock_t *LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
+					int flag);
+EXPORT_SYMBOL(LOCK_ALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void LOCK_DEALLOC(lock_t * lockp);
+EXPORT_SYMBOL(LOCK_DEALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE pl_t TRYLOCK(lock_t * lockp, pl_t pl);
+EXPORT_SYMBOL(TRYLOCK);		/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl);
+EXPORT_SYMBOL(UNLOCK);		/* svr4ddi.h */
+__SVR4_EXTERN_INLINE sv_t *SV_ALLOC(int flag);
+EXPORT_SYMBOL(SV_ALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SV_BROADCAST(sv_t * svp, int flags);
+EXPORT_SYMBOL(SV_BROADCAST);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
+EXPORT_SYMBOL(SV_DEALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SV_SIGNAL(sv_t * svp);
+EXPORT_SYMBOL(SV_SIGNAL);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
+EXPORT_SYMBOL(SV_WAIT);		/* svr4ddi.h */
+__SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
+EXPORT_SYMBOL(SV_WAIT_SIG);	/* svr4ddi.h */
+
 static int __init svr4comp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 	printk(KERN_INFO SVR4COMP_BANNER);
 #else
 	printk(KERN_INFO SVR4COMP_SPLASH);
@@ -239,5 +295,7 @@ static void __exit svr4comp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 module_init(svr4comp_init);
 module_exit(svr4comp_exit);
+#endif

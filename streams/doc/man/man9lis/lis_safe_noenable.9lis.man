@@ -1,1 +1,1 @@
-.so man9/noenable.9
+.so man9/noenable.9.man

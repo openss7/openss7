@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_inode.9.man,v 0.9 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: register_inode.9.man,v 0.9.2.1 2004/08/22 06:17:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH REGISTER_INODE 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Under Construction"
+.TH REGISTER_INODE 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Under Construction"
 .\"
 .\"
 .SH NAME
@@ -336,7 +336,7 @@ and
 have no known bugs.
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 .BR register_inode (),
 .BR register_inode_major (),
@@ -348,6 +348,10 @@ and
 are
 .B Linux Fast-STREAMS
 specific functions.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE

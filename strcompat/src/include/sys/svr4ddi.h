@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) svr4ddi.h,v 1.1.2.2 2003/10/28 08:00:08 brian Exp
+ @(#) $Id: svr4ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:08 by brian
+ Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SVR4DDI_H__
-#define __SVR4DDI_H__
+#ifndef __SYS_SVR4DDI_H__
+#define __SYS_SVR4DDI_H__
+
+#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -60,7 +62,7 @@
 #define __SVR4_EXTERN_INLINE extern __inline__
 #endif				/* __SVR4_EXTERN_INLINE */
 
-#include <linux/strconf.h>
+#include <sys/strconf.h>
 
 #ifndef _SVR4_SOURCE
 #warning "_SVR4_SOURCE not defined but svr4ddi.h,v included"
@@ -68,7 +70,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 
-#include <linux/kmem.h>		/* for kmem_alloc/free */
+#include <sys/kmem.h>		/* for kmem_alloc/free */
 
 typedef spinlock_t lock_t;
 
@@ -121,6 +123,7 @@ __SVR4_EXTERN_INLINE lock_t *LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lk
 		spin_lock_init(lockp);
 	return (lockp);
 }
+
 #ifdef LOCK_DEALLOC
 #undef LOCK_DEALLOC
 #endif
@@ -128,6 +131,7 @@ __SVR4_EXTERN_INLINE void LOCK_DEALLOC(lock_t * lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
 }
+
 #ifdef TRYLOCK
 #undef TRYLOCK
 #endif
@@ -139,6 +143,7 @@ __SVR4_EXTERN_INLINE pl_t TRYLOCK(lock_t * lockp, pl_t pl)
 	splx(old_pl);
 	return (invpl);
 }
+
 #ifdef UNLOCK
 #undef UNLOCK
 #endif
@@ -147,6 +152,7 @@ __SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl)
 	spin_unlock(lockp);
 	splx(pl);
 }
+
 #ifdef LOCK
 #undef LOCK
 #endif
@@ -175,7 +181,7 @@ __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp)
 {
 	kmem_free(svp, sizeof(*svp));
 }
-__SVR4_EXTERN_INLINE void SV_SIGNAL(sv_t *svp)
+__SVR4_EXTERN_INLINE void SV_SIGNAL(sv_t * svp)
 {
 	svp->sv_condv = 1;
 	wake_up_interruptible_sync(&svp->sv_waitq);
@@ -233,4 +239,4 @@ do { if (!(__exp)) { panic("assertion failed: " #__exp ", file: " __FILE__ ", li
 #warning "_SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4"
 #endif				/* CONFIG_STREAMS_COMPAT_SVR4 */
 
-#endif				/* __SVR4DDI_H__ */
+#endif				/* __SYS_SVR4DDI_H__ */

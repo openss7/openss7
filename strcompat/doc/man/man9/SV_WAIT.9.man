@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SV_WAIT.9.man,v 0.9 2004/03/14 07:18:42 brian Exp $
+.\" @(#) $Id: SV_WAIT.9.man,v 0.9.2.1 2004/08/22 06:17:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/14 07:18:42 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SV_WAIT 9 "$Date: 2004/03/14 07:18:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH SV_WAIT 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -91,7 +91,7 @@ sort-adjacent-labels
 .HP
 void \fBSV_WAIT\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
 .HP
-void \fBSV_WAIT_SIG\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
+int \fBSV_WAIT_SIG\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
 .\"
 .\"
 .SH ARGUMENTS
@@ -253,14 +253,23 @@ remains a possibility that the process will sleep forever, then
 .BR SV_WAIT_SIG ()
 is a better choice than
 .BR SV_WAIT ().
+When
+.BR SV_WAIT_SIG ()
+is interrupted by a signal in the
+.I STREAMS
+module
+.BR qopen (9)
+procedure, the caller should exit the procedure with the error
+.RB [ EINTR ].
 .\"
 .\"
 .SH RETURN
 .PP
 .BR SV_WAIT ()
-and
+returns void.
 .BR SV_WAIT_SIG ()
-return void.
+returns false (zero) if the call was not interrupted by a signal and
+true (one) if the call was interrupted by a signal.
 .\"
 .\"
 .SH ERRORS
@@ -363,9 +372,9 @@ are compatible with
 usldk
 .]
 and systems based on
-.BR "SVR 4.2 MP" ,
-with the following portablity considerations:
-.IP \(em
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
 .IR HP-UX \(rg
 .[
 hpuxspg
@@ -383,6 +392,15 @@ documentation
 hpuxdoc
 .]
 for more information.
+.IP \(em
+.I LiS
+does not provide these functions.
+.IP \(em
+.IR Solaris \(rg
+provides the related functions
+.BR qwait (9)
+and
+.BR qwait_sig (9).
 .IP \(em
 Under
 .B Linux Fast-STREAMS
@@ -410,7 +428,7 @@ are provided for source level compatibility with
 for the purpose of porting
 .IR "SVR 4.2"
 drivers to
-.IR Linux \(rg.
+.BR Linux .
 Because internal structures and definitions for
 .B Linux Fast-STREAMS
 .[
@@ -435,6 +453,10 @@ and
 in support of
 .RI non- STREAMS
 devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
