@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:39 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/11/12 17:33:55 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:39 $ by $Author: brian $
+ Last Modified $Date: 2004/11/12 17:33:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:39 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/11/12 17:33:55 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/30 21:52:39 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/11/12 17:33:55 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -1706,8 +1706,8 @@ __xp_timer_stop(struct xp *xp, const uint t)
 		if (single)
 			break;
 		/* fall through */
-		break;
 #endif
+		break;
 	default:
 		swerr();
 		break;
