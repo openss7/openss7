@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:52 $ by $Author: brian $
+ Last Modified $Date: 2005/01/27 06:24:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -399,11 +399,15 @@ typedef struct cp {
 	struct sccp_stats_cp stats;	/* cp statistics */
 } cp_t;
 
+#if 0
 STATIC struct cp *sccp_alloc_cp(ulong, struct sp *, ulong, ulong);
 STATIC struct cp *cp_get(struct cp *);
+#endif
 STATIC struct cp *cp_lookup(ulong);
+#if 0
 STATIC struct cp *sccp_lookup_cp(struct sp *, ulong, const int);
 STATIC ulong cp_get_id(ulong);
+#endif
 STATIC void sccp_free_cp(struct cp *);
 STATIC void cp_put(struct cp *);
 
@@ -6505,6 +6509,7 @@ sccp_send_msg(queue_t *q, mblk_t *msg)
  *  Encode, decode, send message functions
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC int
 sccp_send(queue_t *q, struct sr *sr, ulong pri, ulong sls, mblk_t *dp)
 {
@@ -6523,6 +6528,7 @@ sccp_send(queue_t *q, struct sr *sr, ulong pri, ulong sls, mblk_t *dp)
 	freemsg(dp);
 	return (err);
 }
+#endif
 
 STATIC struct sccp_msg *
 sccp_enc_msg(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls)
@@ -8001,6 +8007,7 @@ sccp_notice_ind(queue_t *q, struct sc *sc, ulong cause, struct sccp_addr *dst,
 	}
 }
 
+#if 0
 STATIC int
 sccp_inform_ind(queue_t *q, struct sc *sc, N_qos_sel_infr_sccp_t * qos, ulong reason)
 {
@@ -8056,6 +8063,7 @@ sccp_coord_con(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong smi)
 		return (-EFAULT);
 	}
 }
+#endif
 
 STATIC int
 sccp_state_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong status, ulong smi)
@@ -8179,6 +8187,7 @@ sccp_pcstate_lbr(queue_t *q, struct mtp_addr *add, ulong status)
 	return (err);
 }
 
+#if 0
 STATIC int
 sccp_traffic_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong tmix)
 {
@@ -8200,6 +8209,7 @@ sccp_traffic_ind(queue_t *q, struct sc *sc, struct sccp_addr *add, ulong tmix)
 		return (-EFAULT);
 	}
 }
+#endif
 
 STATIC INLINE void
 sccp_release(struct sc *sc)
@@ -10960,6 +10970,7 @@ sccp_recv_scmg(queue_t *q, struct sp *sp, mblk_t *mp, struct sccp_msg *m)
  *  SCCP GTT ROUTING
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC int
 sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 {
@@ -11134,7 +11145,9 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 		return (err);
 	return (QR_DONE);
 }
+#endif
 
+#if 0
 STATIC int
 sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 {
@@ -11356,12 +11369,14 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 	pswerr(("%s: SWERR: RoE procedure no UDTS\n", DRV_NAME));
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  SCCP GTT ROUTING
  *  -------------------------------------------------------------------------
  *  Process the result of a global title translation.
  */
+#if 0 
 STATIC int
 sccp_grte_msg(queue_t *q, mblk_t *mp)
 {
@@ -11379,6 +11394,7 @@ sccp_grte_msg(queue_t *q, mblk_t *mp)
 	swerr();
 	return (QR_DISABLE);	/* FIXME: should be hangup */
 }
+#endif
 
 /*
  *  SCCP O/G ROUTING
@@ -14258,11 +14274,10 @@ n_conn_req(queue_t *q, struct sc *sc, mblk_t *mp)
 STATIC INLINE mblk_t *
 n_seq_check(struct sc *sc, ulong seq)
 {
-	psw_t flags;
 	mblk_t *mp;
-	bufq_lock(&sc->conq, &flags);
+	bufq_lock(&sc->conq);
 	for (mp = bufq_head(&sc->conq); mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
-	bufq_unlock(&sc->conq, &flags);
+	bufq_unlock(&sc->conq);
 	usual(mp);
 	return (mp);
 }
@@ -15184,11 +15199,10 @@ t_seq_check(struct sc *sc, ulong seq)
 	   indication queue looking for an mblk with the same address as the sequence number.
 	   Sequence numbers are only valid on the stream for which the connection indication is
 	   queued. */
-	psw_t flags;
 	mblk_t *mp;
-	bufq_lock(&sc->conq, &flags);
+	bufq_lock(&sc->conq);
 	for (mp = bufq_head(&sc->conq); mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
-	bufq_unlock(&sc->conq, &flags);
+	bufq_unlock(&sc->conq);
 	usual(mp);
 	return (mp);
 }
@@ -20419,6 +20433,7 @@ na_put(struct na *na)
  *  CP allocation and deallocation
  *  -------------------------------------------------------------------------
  */
+#if 0
 STATIC struct cp *
 sccp_alloc_cp(ulong id, struct sp *sp, ulong slr0, ulong slr1)
 {
@@ -20454,6 +20469,7 @@ sccp_alloc_cp(ulong id, struct sp *sp, ulong slr0, ulong slr1)
 	}
 	return (cp);
 }
+#endif
 STATIC void
 sccp_free_cp(struct cp *cp)
 {
@@ -20487,12 +20503,14 @@ sccp_free_cp(struct cp *cp)
 	cp_put(cp);		/* final put */
 	return;
 }
+#if 0
 STATIC struct cp *
 cp_get(struct cp *cp)
 {
 	atomic_inc(&cp->refcnt);
 	return (cp);
 }
+#endif
 STATIC void
 cp_put(struct cp *cp)
 {
@@ -20509,6 +20527,7 @@ cp_lookup(ulong id)
 		for (cp = master.cp.list; cp && cp->id != id; cp = cp->next) ;
 	return (cp);
 }
+#if 0
 STATIC ulong
 cp_get_id(ulong id)
 {
@@ -20526,6 +20545,7 @@ sccp_lookup_cp(struct sp *sp, ulong slr, const int create)
 	     cp = cp->sp.next) ;
 	return (cp);
 }
+#endif
 
 /*
  *  SS allocation and deallocation

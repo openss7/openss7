@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:54 $
+ @(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:30 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 18:14:54 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/27 06:24:30 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:54 $"
+#ident "@(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:30 $"
 
 static char const ident[] =
-    "$RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:54 $";
+    "$RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:30 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -167,12 +167,14 @@ static struct {
 	sdl_config_t sdl;
 } ptconf;
 
+#if 0
 static struct {
 	lmi_option_t opt;
 	sl_config_t sl;
 	sdt_config_t sdt;
 	sdl_config_t sdl;
 } iutconf;
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -194,6 +196,7 @@ typedef struct timer_range {
 
 enum { t1 = 0, t2, t3, t4n, t4e, t5, t6, t7, tmax };
 
+#if 0
 static timer_range_t timer[tmax] = {
 	{40000, 50000},		/* Timer T1 30000 */
 	{5000, 150000},		/* Timer T2 5000 */
@@ -204,9 +207,11 @@ static timer_range_t timer[tmax] = {
 	{3000, 6000},		/* Timer T6 300 */
 	{500, 2000}		/* Timer T7 50 */
 };
+#endif
 
 long test_start = 0;
 
+#if 0
 /* 
  *  Return the current time in milliseconds.
  */
@@ -318,6 +323,7 @@ stop_tt(void)
 	sigprocmask(SIG_BLOCK, &mask, NULL);
 	return SUCCESS;
 }
+#endif
 
 #define SIO             LSSU_SIO	/* PT events and signals */
 #define SIN             LSSU_SIN
@@ -393,8 +399,10 @@ static int tries = 0;
 static int expand = 1;
 static long beg_time = 0;
 
+#if 0
 static unsigned long iut_options = 0;
 static unsigned long iut_t7 = 1 * HZ;
+#endif
 static unsigned long pt_flags = SDT_FLAGS_ONE;
 
 int pt_fd = 0;
@@ -946,6 +954,7 @@ send(int msg)
 
 #define signal iut_signal
 
+#if 0
 static int
 signal(int action)
 {
@@ -1215,7 +1224,9 @@ pt_decode_data(void)
 	}
 	return ret;
 }
+#endif
 
+#if 0
 static int
 pt_decode_msg(unsigned char *buf)
 {
@@ -1515,7 +1526,9 @@ wait_event(int wait)
 		}
 	}
 }
+#endif
 
+#if 0
 static int
 get_event(void)
 {
@@ -1532,6 +1545,7 @@ check_snibs(unsigned char bsnib, unsigned char fsnib)
 	FFLUSH(stdout);
 	return ret;
 }
+#endif
 
 static int
 test_1_1a(void)
@@ -1559,6 +1573,7 @@ test_1_1a(void)
 	}
 }
 
+#if 0
 static int
 test_1_1b(void)
 {
@@ -8339,6 +8354,7 @@ test_10_3(void)
 		}
 	}
 }
+#endif
 
 int iut_showmsg(struct strbuf *ctrl, struct strbuf *data);
 
@@ -8722,6 +8738,7 @@ pt_end(void)
 
 #define IUT_SL_DEVICE "/dev/x400p-sl"
 
+#if 0
 static int
 iut_open(void)
 {
@@ -8948,11 +8965,13 @@ iut_disable(void)
 #endif
 	return SUCCESS;
 }
+#endif
 
 #ifndef HZ
 #define HZ 100
 #endif
 
+#if 0
 static int
 iut_config(void)
 {
@@ -9185,6 +9204,7 @@ iut_config(void)
 #endif
 	return SUCCESS;
 }
+#endif
 
 static int
 iut_power_off(void)
@@ -9232,6 +9252,7 @@ link_power_off(void)
 	return SUCCESS;
 }
 
+#if 0
 static int
 link_out_of_service(void)
 {
@@ -9386,6 +9407,7 @@ link_in_service_pcr_long_ack(void)
 	iut_t7 = 8 * HZ;
 	return link_in_service();
 }
+#endif
 
 typedef struct test_case {
 	int (*test) (void);		/* test case function */
@@ -10391,6 +10413,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

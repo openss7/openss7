@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
+ Last Modified $Date: 2005/01/27 06:24:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $";
 
 #include "compat.h"
+#include <linux/kmod.h>
 /*
  *  It is not necessary to use this module for Linux Fast-STREAMS.  Linux
  *  Fast-STREAMS has the Named STREAMS Device which, among other mechanisms,
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.4 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.5 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -168,6 +169,7 @@ STATIC const char *dl_modules[256] = {
  *
  *  =========================================================================
  */
+#ifdef LIS
 STATIC int
 dl_find_strdev(const char *devname)
 {
@@ -178,6 +180,16 @@ dl_find_strdev(const char *devname)
 				return (i);
 	return (-1);
 }
+#endif
+#ifdef LFS
+STATIC int
+dl_find_strdev(const char *devname)
+{
+	if (__cdev_search(devname) != NULL)
+		return (1);
+	return (-1);
+}
+#endif
 
 /*
  *  Open
@@ -195,9 +207,13 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	const char *devname;
 	struct streamtab *stab = NULL;
 	int err;
+#ifdef LFS
+	struct cdevsw *cdev;
+#endif
 	if (cminor == 0)
 		return (ENOENT);	/* would loop */
 	if ((cmajor = dl_majors[cminor])) {
+#ifdef LIS
 		if (!(stab = lis_find_strdev(dl_majors[cminor])))
 			cmajor = dl_majors[cminor] = 0;
 		else if (strncmp(dl_modules[cminor], lis_fstr_sw[cmajor].f_name, FMNAMESZ) != 0) {
@@ -206,22 +222,46 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			stab = NULL;
 			cmajor = dl_majors[cminor] = 0;
 		}
+#endif
+#ifdef LFS
+		if ((cdev = __cdev_lookup(dl_majors[cminor])))
+			stab = cdev->d_str;
+		if (!stab)
+			cmajor = dl_majors[cminor] = 0;
+		else if (strncmp(dl_modules[cminor], cdev->d_name, FMNAMESZ) != 0) {
+			/* 
+			   name changed */
+			stab = NULL;
+			cmajor = dl_majors[cminor] = 0;
+		}
+#endif
 	}
 	if (!cmajor) {
 		if (!(devname = dl_modules[cminor]))
 			return (ENOENT);
 		if ((err = dl_find_strdev(devname)) < 0) {
+#ifdef CONFIG_KMOD
 			sprintf(drvname, "streams-%s", devname);
 			if ((err = request_module(drvname)))
 				return (err < 0 ? -err : err);
 			if ((err = dl_find_strdev(devname)) < 0)
 				return (ENOENT);
+#else
+			return (ENOENT);
+#endif
 		}
 		cmajor = err;
 	}
+#ifdef LIS
 	if (!(stab = lis_find_strdev(cmajor)))
 		return (ENOENT);
 	lis_setq(q, stab->st_rdinit, stab->st_wrinit);
+#endif
+#ifdef LFS
+	if (!(cdev = __cdev_lookup(cmajor)))
+		return (ENOENT);
+	setq(q, stab->st_rdinit, stab->st_wrinit);
+#endif
 	if (!q->q_qinfo->qi_qopen) {
 		swerr();
 		return (EIO);

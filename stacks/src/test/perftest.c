@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:02 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:15:02 $ by $Author: brian $
+ Last Modified $Date: 2005/01/27 06:24:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:02 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $"
 
-static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:02 $";
+static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -72,6 +72,10 @@ static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+
+#ifdef HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -144,8 +148,8 @@ read_child(int fd)
 		if (timer_timeout) {
 			avg_msgs = (avg_msgs + count) / 2;
 			avg_tput = (avg_tput + (count * msgsize / report)) / 2;
-			fprintf(stdout, "%d Msgs read: %5ld, throughput: %10ld\n", fd, avg_msgs,
-				avg_tput);
+			fprintf(stdout, "%d Msgs read: %5ld, throughput: %10ld\n", fd, (long)avg_msgs,
+				(long)avg_tput);
 			count = 0;
 			if (start_timer()) {
 				if (verbose)
@@ -226,8 +230,8 @@ write_child(int fd)
 		if (timer_timeout) {
 			avg_msgs = (avg_msgs + count) / 2;
 			avg_tput = (avg_tput + (count * msgsize / report)) / 2;
-			fprintf(stdout, "%d Msgs sent: %5ld, throughput: %10ld\n", fd, avg_msgs,
-				avg_tput);
+			fprintf(stdout, "%d Msgs sent: %5ld, throughput: %10ld\n", fd, (long)avg_msgs,
+				(long)avg_tput);
 			count = 0;
 			if (start_timer()) {
 				if (verbose)
@@ -589,6 +593,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/27 06:24:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:52 $ by $Author: brian $
+ Last Modified $Date: 2005/01/27 06:24:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/27 06:24:28 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/27 06:24:28 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -74,7 +74,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/31 07:19:52 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/27 06:24:28 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -275,12 +275,14 @@ mtp_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t 
 		return (TBADOPT);
 	return (0);
 }
+#if 0
 STATIC int
 mtp_parse_qos(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t len)
 {
 	fixme(("Write this function\n"));
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  =========================================================================

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 09:10:55 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $
 
  -----------------------------------------------------------------------------
 
@@ -47,14 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 09:10:55 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/27 06:24:29 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 09:10:55 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 09:10:55 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -16182,6 +16182,7 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

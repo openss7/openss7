@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/01/26 21:52:09 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/01/27 06:43:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 21:52:09 $ by $Author: brian $
+# Last Modified $Date: 2005/01/27 06:43:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,8 +94,11 @@ EXTRA_KERNEL_MODULES	=
 EXTRA_DOCS		=
 EXTRA_TEX		=
 
-@MAINTAINER_MODE_TRUE@MAINTAINER_MODE = yes
-@MAINTAINER_MODE_FALSE@MAINTAINER_MODE = no
+if MAINTAINER_MODE
+MAINTAINER_MODE = yes
+else
+MAINTAINER_MODE = no
+endif
 
 if PERFORM_CHECKS
 dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
@@ -130,6 +133,10 @@ libtool: $(LIBTOOL_DEPS)
 # targets for making vim tags files along with emacs TAGS files.
 #
 CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SYMBOL,EXPORT_SYMBOL_NOVERS,EXPORT_SYMBOL_GPL
+
+# if MAINTAINER_MODE
+# ALL_LOCAL += TAGS CTAGS
+# endif
 
 #
 # A rule to generate an ifnames.log file
