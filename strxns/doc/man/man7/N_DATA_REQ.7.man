@@ -1,0 +1,287 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: N_DATA_REQ.7.man,v 0.9.2.1 2004/07/04 01:13:15 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/07/04 01:13:15 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH N_DATA_REQ 7 "$Date: 2004/07/04 01:13:15 $" "$Name:  $" "Network Provider Interface (NPI)"
+.SH NAME
+.BR N_DATA_REQ " (" N_data_req_t )
+\- normal data transfer request
+.SH SYNOPSIS
+The format of the message is one or more
+.B M_DATA
+blocks.  Use of a
+.B M_PROTO
+message block is optional.
+.PP
+The structure of the
+.B M_PROTO
+message block, if present, is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    ulong PRIM_type;            /* always N_DATA_REQ */
+    ulong DATA_xfer_flags;      /* bit masking for data xfer
+                                   flags */
+} N_data_req_t;
+
+/* Data Transfer Flags */
+#define N_MORE_DATA_FLAG    0x00000001L
+#define N_RC_FLAG           0x00000002L
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This user-originated primitive indicates to the NS provider that this message
+contains NS user data.  It allows the transfer of NS user data between NS users,
+without modification by the NS provider.  The NS user must send any integral
+number of octets of data greater than zero.  In a case where the size of the
+NSDU exceeds the NIDU (as specified by the size of the
+.I NIDU_size
+parameter of the
+.BR N_INFO_ACK (7)
+primitive), the NSDU may be broken up into more than one NIDU.  When an NSDU
+is broken up into more than one NIDU, the
+.B N_MORE_DATA_FLAG
+will be set on each NIDU except the last one.  The
+.B RC_flag
+may only be set on the last NIDU.
+.PP
+The
+.B M_PROTO
+message block is used for two reasons:
+.IP "i." 5
+to indicate that the NSDU is broken into more than one NIDUs, and that the
+data carried in the following
+.B M_DATA
+message block constitutes one NIDU;
+.IP ii.
+to indicate whether receipt confirmation is desired for the NSDU.  Guidelines
+for use of
+.BR M_PROTO :
+The following guidelines must be followed with respect to the
+use of the
+.B M_PROTO
+message block:
+.RS
+.IP "1." 4
+The
+.B M_PROTO
+message block need not be present when the NSDU size is less than or equal to
+the NIDU size and one of the following is true:
+.RS
+.IP \- 4
+receipt confirmation has been negotiated for non-use (via the
+.B N_CONN
+primitives); or
+.IP \-
+receipt confirmation has been successfully negotiated for use or non-use
+and the default selection as specified via the
+.B N_OPTMGMT
+primitive is to be used.
+.RE
+.IP 2.
+The
+.B M_PROTO
+message block must be present when:
+.RS
+.IP \- 4
+the NSDU size is greater than the NIDU size;
+.IP \-
+receipt confirmation has been successfully negotiated for use and the
+default selection as specified via
+.BR N_OPTMGMT_REQ (7)
+primitive needs to be overridden.
+.SH PARAMETERS
+.TP
+.I PRIM_type
+Indicates the primitive type.
+
+.TP
+.I DATA_xfer_flags
+.RS
+
+.TP
+.B N_MORE_DATA_FLAG
+When set, the
+.B MORE_DATA_FLAG indicates thatthe next
+.B N_DATA_REQ
+message (NIDU) is also part of this NSDU.
+
+.TP
+.B N_RC_FLAG
+By setting this flag on the
+.BR N_DATA_REQ ,
+the originating NS user can request confirmation of receipt of the
+.B N_DATA
+primitive.  The receipt is provided by the
+.B N_DATACK
+primitives.  The parameter may only be present if use of Receipt Confirmation
+was agreed by both NS users and the NS provider during NC establishment.
+.SH STATE
+This primitive is valid in the
+.B NS_DATA_XFER
+state.
+.SH "NEW STATE"
+The resulting state remains the same
+.RB ( NS_DATA_XFER ).
+.SH RESPONSE
+This primitive does not require any acknowledgments, although it may generate
+a fatal error.  This is indicated to the NS user via a
+.B M_ERROR
+.I STREAMS
+message type (specifying an
+.IR errno (3)
+value of
+.BR EPROTO )
+which results in the failure of all system calls on that stream.
+.SH ERRORS
+The applicable errors are defined as follows:
+.TP
+.B [ EPROTO ]
+This indicates one of the following unrecoverable protocol conditions:
+.RS
+.IP \- 4
+The network interface was found to be in an incorrect state.
+.IP \-
+The amount of NS user data associated with the primitive is outside the range
+supported by the NS provider (as specified by the
+.I NIDU_size
+parameter of
+.BR N_INFO_ACK (7)
+primitive).
+.IP \-
+The options requested are either not supported by the NS provider or its use
+not specified with the
+.BR N_CONN_REQ (7)
+primitive.
+.IP \-
+The
+.B M_PROTO
+message block was not followed by one or more
+.B M_DATA
+message blocks.
+.IP \-
+The amount of NS user data associated with the current NSDU is outside the
+range supported by the NS provider (as specified by the
+.I NSDU_size
+parameter in the
+.BR N_INFO_ACK (7)
+primitive.)
+.IP \-
+The
+.B N_RC_FLAG
+and
+.B N_MORE_DATA_FLAG
+were both set in the primitive, or the flags field contained an unknown value.
+.RE
+.PP
+.B Note:
+If the interface is in the
+.B NS_IDLE
+or
+.B NS_WRES_RIND
+states when the provider receives the
+.B N_DATA_REQ
+primitive, then the NS provider should discard the request without generating
+a fatal error.
+.SH "SEE ALSO"
+.BR N_CONN_REQ (7),
+.BR N_DATACK_IND (7),
+.BR N_DATACK_REQ (7),
+.BR N_DATA_IND (7),
+.BR N_DATA_REQ (7),
+.BR N_INFO_ACK (7)
+.BR N_OPTMGMT_REQ (7),
+.BR errno (3).
+.SH HISTORY
+.PP
+The Network Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to NPI Revision 2.
+.[
+npi
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

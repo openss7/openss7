@@ -1,0 +1,1 @@
+.so N_CONN_RES.7.man

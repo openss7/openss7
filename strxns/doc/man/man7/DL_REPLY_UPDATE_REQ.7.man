@@ -1,0 +1,160 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: DL_REPLY_UPDATE_REQ.7.man,v 0.9.2.1 2004/07/04 01:13:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/07/04 01:13:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DL_REPLY_UPDATE_REQ 7 "$Date: 2004/07/04 01:13:14 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_REPLY_UPDATE_REQ (dl_reply_update_req_t)
+\- conveys a DLSDU to the DLS Provider from the DLS User to be held by the
+DLS Provider and sent out at a later time when requested to do so by the
+peer DLS Provider.
+.SH SYNOPSIS
+Consists of one 
+.B M_PROTO
+message block containing the structure shown below, followed by one or more
+.B M_DATA
+blocks.
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_correlation;
+    t_uscalar_t  dl_src_addr_length;
+    t_uscalar_t  dl_src_addr_offset;
+} dl_reply_update_req_t;
+\fR\s+1
+.fi
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_REPLY_UPDATE_REQ .
+.TP
+.I dl_correlation
+conveys context specific information to be returned in the
+.BR DL_REPLY_UPDATE_STATUS_IND (7)
+primitive to allow the DLS User correlate the status to the appropriate
+previous request.
+.TP
+.I dl_src_addr_length
+conveys the length of the DLSAP address of the source DLS User.
+.TP
+.I dl_src_addr_offset
+conveys the offset from the beginning of the
+.B M_PROTO
+message block where the source DLSAP address begins.
+.SH STATE
+This primitive is valid in state
+.BR DL_IDLE .
+.SH "NEW STATE"
+The resulting state is unchanged.
+.SH RESPONSE
+If the request is erroneous, a
+.BR DL_ERROR_ACK (7)
+is returned with the appropriate error code.  Otherwise, a
+.BR DL_REPLY_UPDATE_STATUS_IND (7)
+is returned, which indicates the success or failure of the
+.BR DL_REPLY_UPDATE_REQ .
+.SH ERRORS
+.TP
+.B DL_BADDATA
+The amount of data in the DLSDU exceeded the DLS Provider's DLSDU limit.
+.TP
+.B DL_NOTSUPPORTED
+Primitive is known, but not supported.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

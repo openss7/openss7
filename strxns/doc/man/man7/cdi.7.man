@@ -1,0 +1,243 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: cdi.7.man,v 0.9.2.1 2004/07/04 01:13:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/07/04 01:13:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CDI 7 "$Date: 2004/07/04 01:13:14 $" "$Name:  $" "Communications Device Interface (CDI)"
+.SH NAME
+.B CDI
+\- Communications Device Interface
+.SH DESCRIPTION
+The Communications Device Interface (CDI) is a low-level device interface that
+is defined between a
+.I user
+and a
+.I provider
+using
+.IR STREAMS (4)
+and the
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system calls.
+.SS "Local Manaement Primitives"
+The following management primitives are common to all styles of communication
+providers and devices.
+.TP
+.BR CD_INFO_REQ (7)
+Requests information concerning the communications device, provider limits, styles and features.
+.TP
+.BR CD_INFO_ACK (7)
+Provides information concerning the communications device, provider limits, styles and features.
+.TP
+.BR CD_ATTACH_REQ (7)
+Requests that a Style 2 communications device provider be attached to the
+speciifed physical point of appearance (PPA).
+.TP
+.BR CD_DETACH_REQ (7)
+Requests that a Style 2 communications device provider be detached from the
+attached physical point of appearance (PPA).
+.TP
+.BR CD_OK_ACK (7)
+Provides positive acknowledgment of request primitives that require
+acknowledgment.
+.TP
+.BR CD_ERROR_ACK (7).
+Provides negative acknowledgment of request primitives that require
+acknowledgment.
+.SS "Device Connection Primitives"
+The following primitves enable and disable the communications device for
+transmission.
+.TP
+.BR CD_ENABLE_REQ (7)
+Requests that the communications device be enabled on the attached physical
+point of appearance and with an optional dial string.
+.TP
+.BR CD_ENABLE_CON (7)
+Provides confirmation of the
+.BR CD_ENABLE_REQ (7)
+primitive.
+.TP
+.BR CD_DISABLE_REQ (7)
+Requests that the communications device be disabled on the attached physical
+point of appearance.
+.TP
+.BR CD_DISABLE_CON (7).
+Provides confirmation of the
+.BR CD_DISABLE_REQ (7)
+primitive.
+.SS "Device Data Transfer Primitives"
+.PP
+The following primitives provide for the indication of errors associated with
+received or transmitted data.
+.TP
+.BR CD_ERROR_IND (7)
+Provides indication of an error in the input or output section.
+.TP
+.BR CD_BAD_FRAME_IND (7)
+Provides indication of a frame received in error.
+.PP
+The following primitives provide for the reception of data.
+.TP
+.BR CD_READ_REQ (7)
+Requests that the communications device read received data within the timeout
+specified, and then convert the input section to output.
+.TP
+.BR CD_ALLOW_INPUT_REQ (7)
+Requests that the input section be enabled until the next
+.BR CD_HALT_INPUT_REQ (7).
+.TP
+.BR CD_HALT_INPUT_REQ (7)
+Requests that the input section be disabled until the next
+.BR CD_ALLOW_INPUT_REQ (7).
+.TP
+.BR CD_UNITDATA_IND (7)
+Provides indication of received data.
+.PP
+The following primitives provide for the transmission of data.
+.TP
+.BR CD_UNITDATA_REQ (7)
+Requests the transmission of data.
+.TP
+.BR CD_UNITDATA_ACK (7)
+Acknowledges the transmission of data or provides timing clues for paced
+output.
+.TP
+.BR CD_ABORT_OUTPUT_REQ (7)
+Aborts the output of data.
+.PP
+The following primitives provide for the synchronized transmission and
+reception of data on half-duplex communications devices.
+.TP
+.BR CD_WRITE_READ_REQ (7).
+Requests that a combination of write and read be performed.
+.SS "Leads and Signals"
+The following primitives provide the CD user with the ability to manage modem
+leads and signals.
+.TP
+.BR CD_MODEM_SIG_IND (7)
+Provides an indication of the current state of leads and signals.
+.TP
+.BR CD_MODEM_SIG_POLL (7)
+Requests that the communications device provider reply with a
+.BR CD_MODEM_SIG_IND (7)
+indicating the current state of modem leads and signals.
+.TP
+.BR CD_MODEM_SIG_REQ (7)
+Requests that the specified leads and signals be asserted or deasserted.
+.SS "Miscellaneous"
+.BR CD_MUX_NAME_REQ (7)
+Not documented.
+.SH "SEE ALSO"
+.BR CD_ABORT_OUTPUT_REQ (7),
+.BR CD_ALLOW_INPUT_REQ (7),
+.BR CD_ATTACH_REQ (7),
+.BR CD_BAD_FRAME_IND (7),
+.BR CD_DETACH_REQ (7),
+.BR CD_DISABLE_CON (7),
+.BR CD_DISABLE_REQ (7),
+.BR CD_ENABLE_CON (7),
+.BR CD_ENABLE_REQ (7),
+.BR CD_ERROR_ACK (7),
+.BR CD_ERROR_IND (7),
+.BR CD_HALT_INPUT_REQ (7),
+.BR CD_INFO_ACK (7),
+.BR CD_INFO_REQ (7),
+.BR CD_MODEM_SIG_IND (7),
+.BR CD_MODEM_SIG_POLL (7),
+.BR CD_MODEM_SIG_REQ (7),
+.BR CD_MUX_NAME_REQ (7),
+.BR CD_OK_ACK (7),
+.BR CD_READ_REQ (7),
+.BR CD_UNITDATA_ACK (7),
+.BR CD_UNITDATA_IND (7),
+.BR CD_UNITDATA_REQ (7),
+.BR CD_WRITE_READ_REQ (7).
+.SH HISTORY
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to CDI with Gcom extensions.
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.TI

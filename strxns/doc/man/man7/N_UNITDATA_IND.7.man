@@ -1,0 +1,169 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: N_UNITDATA_IND.7.man,v 0.9.2.1 2004/07/04 01:13:15 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/07/04 01:13:15 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH N_UNITDATA_IND 7 "$Date: 2004/07/04 01:13:15 $" "$Name:  $" "Network Provider Interface (NPI)"
+.SH NAME
+.BR N_UNITDATA_IND " (" N_unitdata_ind_t )
+\- unit data indication
+.SH DESCRIPTION
+This primitive indicates to the NS user that a datagram has been received from
+the specified source address.
+.SH SYNOPSIS
+The format of the message is one
+.B M_PROTO
+message block followed by one or more
+.B M_DATA
+blocks containing at least one byte of data.  The format of the
+.B M_PROTO
+is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    ulong PRIM_type;            /* always N_UNITDATA_IND */
+    ulong DEST_length;          /* destination address length */
+    ulong DEST_offset;          /* destination address offset */
+    ulong SRC_length;           /* source address length */
+    ulong SRC_offset;           /* source address offset */
+    ulong ERROR_type;           /* specifies the reason for the 
+                                   error */
+} N_unitdata_ind_t;
+\fR\s+1
+.fi
+.SH PARAMETERS
+.TP
+.I PRIM_type
+Indicates the primitive type.
+
+.TP
+.I DEST_length
+Indicates the length of the destination address.  The address is the same as in
+the corresponding
+.BR N_UNITDATA_REQ (7)
+primitive.
+
+.TP
+.I DEST_offset
+Indicates the offset of the destination address from the beginning of the
+.B M_PROTO
+message block.
+
+.TP
+.I SRC_length
+Indicates the length of the source network address.  This address is the same
+as the value associated with the stream on which the
+.BR N_UNITDATA_REQ (7) was issued.
+
+.TP
+.I SRC_offset
+Indicates the offset of the source address from the beginning of the
+.B M_PROTO
+message block.
+
+.TP
+.I ERROR_type
+Specifies the reason for the error.  The possible values are:
+.RS
+
+.TP
+.B N_UD_CONGESTION
+This packet experienced congestion during its delivery.
+.RE
+.SH STATES
+This primitive is valid in state
+.BR NS_IDLE .
+.SH "NEW STATE"
+The resulting state remains unchanged.
+.SH HISTORY
+.PP
+The Network Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to NPI Revision 2.
+.[
+npi
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

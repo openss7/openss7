@@ -1,0 +1,232 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CD_ERROR_IND.7.man,v 0.9.2.1 2004/07/04 01:13:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/07/04 01:13:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CD_ERROR_IND 7 "$Date: 2004/07/04 01:13:14 $" "$Name:  $" "Communications Device Interface (CDI)"
+.SH NAME
+.B CD_ERROR_IND
+\- error indication
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+or
+.B M_PCPROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    cd_ulong cd_primitive;
+    cd_ulong cd_state;
+    cd_ulong cd_errno;
+    cd_ulong cd_explanation;
+} cd_error_ind_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This provider originated primitives indicates that an asynchronous error has
+occured and indicates the error number and new state of the CD provider.
+.SS Parameters
+This primitive contains the following parameters:
+.TP
+.I cd_primitive
+Indicates the primitives type.
+.TP
+.I cd_state
+Indicates the state of the CD provider following the
+.BR CD_ERROR_IND .
+.I cd_state
+can be one of the following values:
+.RS
+.TP
+.B CD_UNATTACHED
+No PPA attached.
+.TP
+.B CD_UNUSABLE
+PPA cannot be used.
+.TP
+.B CD_DISABLED
+PPA attached.
+.TP
+.B CD_ENABLE_PENDING
+Waiting ack of enable req.
+.TP
+.B CD_ENABLED
+Awaiting use.
+.TP
+.B CD_READ_ACTIVE
+Input section enabled; disabled after data arrives.
+.TP
+.B CD_INPUT_ALLOWED
+Input section permanently enabled.
+.TP
+.B CD_DISABLE_PENDING
+Waiting ack of disable req.
+.TP
+.B CD_OUTPUT_ACTIVE
+Output section active only.
+.TP
+.B CD_XRAY
+Xray-ing another ppa.
+.RE
+.TP
+.I cd_errno
+Indicates the reason for the error.
+.I cd_errno
+can be one of the following values:
+.RS
+.\".TP
+.\".RB [ CD_BADADDRESS ]
+.\"Address was invalid.
+.\".TP
+.\".RB [ CD_BADADDRTYPE ]
+.\"Invalid address type.
+.\".TP
+.\".RB [ CD_BADDIAL ]
+.\"Dial information was invalid.
+.\".TP
+.\".RB [ CD_BADDIALTYPE ]
+.\"Invalid dial information type.
+.\".TP
+.\".RB [ CD_BADDISPOSAL ]
+.\"Invalid disposal parameter.
+.TP
+.RB [ CD_BADFRAME ]
+Defective SDU received.
+.\".TP
+.\".RB [ CD_BADPPA ]
+.\"Invalid PPA identifier.
+.\".TP
+.\".RB [ CD_BADPRIM ]
+.\"Unrecognized primitive.
+.TP
+.RB [ CD_DISC ]
+Disconnected.
+.TP
+.RB [ CD_EVENT ]
+Protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+Device has become unusable.
+.\".TP
+.\".RB [ CD_INITFAILED ]
+.\"Line initialization failed.
+.\".TP
+.\".RB [ CD_NOTSUPP ]
+.\"Primitive not supported by this device.
+.\".TP
+.\".RB [ CD_OUTSTATE ]
+.\"Primitive was issued from an invalid state.
+.\".TP
+.\".RB [ CD_PROTOSHORT ]
+.\"M_PROTO block too short.
+.TP
+.RB [ CD_READTIMEOUT ]
+Read request timed out before data arrived.
+.TP
+.RB [ CD_SYSERR ]
+UNIX system error.
+.TP
+.RB [ CD_WRITEFAIL ]
+Unitdata request failed.
+.RE
+.TP
+.I cd_explanation
+not documented.
+.SS State
+This primitive is valid in any state where data transmission is valid.  The
+new state is indicated in the primitive.
+.SH FILES
+<sys/cdi.h>
+.SH "SEE ALSO"
+.BR CD_ERROR_ACK (7),
+.BR CD_UNITDATA_REQ (7).
+.SH HISTORY
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to CDI with Gcom extensions.
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.TI
