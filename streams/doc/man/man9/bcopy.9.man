@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcopy.9.man,v 0.9.2.4 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: bcopy.9.man,v 0.9.2.5 2004/04/19 02:58:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BCOPY 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH BCOPY 9 "$Date: 2004/04/19 02:58:16 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -181,6 +181,10 @@ is source-level compatible with
 .IR UnixWare \(rg
 and
 .IR LiS .
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.6 2004/04/19 02:58:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QENABLE 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QENABLE 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -193,7 +193,6 @@ procedure will not reschedule the service procedure.
 .SH "SEE ALSO"
 .PP
 .BR canenable (9),
-.BR qdisable (9),
 .BR noenable (9),
 .BR enableok (9).
 .\"
@@ -217,7 +216,7 @@ is source-level compatible with
 and
 .IR LiS ,
 with the following considerations:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .BR qenable ()
 only schedules the queue for later service.
 .IP \(em

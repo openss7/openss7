@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgsize.9.man,v 0.9.2.4 2004/03/16 08:01:17 brian Exp $
+.\" @(#) $Id: msgsize.9.man,v 0.9.2.5 2004/04/19 02:58:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:17 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MSGSIZE 9 "$Date: 2004/03/16 08:01:17 $" "$Name:  $" "Linux Fast-STREAMS DDI"
+.TH MSGSIZE 9 "$Date: 2004/04/19 02:58:19 $" "$Name:  $" "Linux Fast-STREAMS DDI"
 .\"
 .\"
 .SH NAME
@@ -161,7 +161,7 @@ is compatible with LiS
 LiS
 .]
 with the following exceptions:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .BR msgsize ()
 counts the size
 .RI ( b_wptr  " - " b_rptr )
@@ -174,6 +174,10 @@ Symbol
 .BR lis_msgsize ()
 is provided for binary compatibility with LiS.  See
 .BR lisbcm (9).
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmvq.9.man,v 0.9.2.5 2004/03/16 08:01:17 brian Exp $
+.\" @(#) $Id: rmvq.9.man,v 0.9.2.6 2004/04/19 02:58:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:17 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH RMVQ 9 "$Date: 2004/03/16 08:01:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH RMVQ 9 "$Date: 2004/04/19 02:58:20 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -173,7 +173,7 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .BR rmvq ()
 is always successful.
 .IP "" 4
@@ -251,6 +251,10 @@ simply calls
 Binary compatibility with SVR 4.2 MP DDI/DKI and
 .IR Solaris \(rg
 are not guarantted.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE

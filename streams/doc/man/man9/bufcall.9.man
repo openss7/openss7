@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bufcall.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: bufcall.9.man,v 0.9.2.6 2004/04/19 02:58:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BUFCALL 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH BUFCALL 9 "$Date: 2004/04/19 02:58:16 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -391,7 +391,7 @@ and systems based on
 svr4spg
 .]
 with the folllowing portability considerations:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .BR bufcall ()
 allocates a
 .B strevent
@@ -420,7 +420,7 @@ starts a timer.  When the timer expires, the ability to allocate the necessary
 buffers is checked and the callback function invoked if it is now possible to
 allocate the necessary structures and buffers.  This is not entirely
 consistent with
-.B SVR 4.2
+.I SVR 4.2
 .[
 svr42
 .]

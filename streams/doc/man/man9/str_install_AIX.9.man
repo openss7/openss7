@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.5 2004/04/17 23:14:57 brian Exp $
+.\" @(#) $Id: str_install_AIX.9.man,v 0.9.2.6 2004/04/19 02:58:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:57 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STR_INSTALL 9 "$Date: 2004/04/17 23:14:57 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STR_INSTALL 9 "$Date: 2004/04/19 02:58:21 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -394,7 +394,7 @@ has no known bugs.
 is compatible with
 .IR AIX \(rg
 with the following portability considerations:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 Under
 .IR AIX \(rg
 to support dynamic loading and unloading of kernel modules, each
@@ -507,6 +507,10 @@ Any and all functionality provided by
 in support of
 .RI non- STREAMS
 devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: RD.9.man,v 0.9.2.6 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: RD.9.man,v 0.9.2.7 2004/04/19 02:58:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -72,7 +72,7 @@ no-label-in-text
 .R2
 .\"
 .\"
-.TH RD 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH RD 9 "$Date: 2004/04/19 02:58:15 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -214,7 +214,7 @@ argument to
 If a read queue pointer is passed to
 .BR RD (),
 then the passed in read queue pointer is returned.
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .IR AIX \(rg,
 .[
 aixspg

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unbufcall.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: unbufcall.9.man,v 0.9.2.6 2004/04/19 02:58:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNBUFCALL 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNBUFCALL 9 "$Date: 2004/04/19 02:58:21 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -212,12 +212,12 @@ is compatible with
 usldk
 .]
 and systems based on
-.B SVR 4
+.I SVR 4
 .[
 svr4spg
 .]
 with the folllowing portability considerations:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .BR unbufcall ()
 uses an efficient packed outdating pointer for
 .BR bcid_t .
@@ -233,7 +233,7 @@ in the list of buffer callbacks.  As buffer callbacks should be rare in most
 module and driver designs, this is of little moment.
 .IP \(em
 In
-.B SVR 4
+.I SVR 4
 .[
 svr4spg
 .]

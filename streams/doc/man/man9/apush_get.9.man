@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: apush_get.9.man,v 0.9.2.4 2004/03/16 08:01:17 brian Exp $
+.\" @(#) $Id: apush_get.9.man,v 0.9.2.5 2004/04/19 02:58:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:17 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH APUSH_GET 9 "$Date: 2004/03/16 08:01:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH APUSH_GET 9 "$Date: 2004/04/19 02:58:16 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -277,7 +277,7 @@ is compatible with
 LiS
 .]
 with the following portability considerations:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 Symbol
 .BR lis_apush_get ()
 is provided for compatibility with LiS.  See
@@ -287,13 +287,13 @@ simply calls
 .BR apush_get ()
 directly.
 .IP \(em
-.B SVR 4.2 MP DDI/DKI
+.I SVR 4.2 MP DDI/DKI
 .[
 usldk
 .]
 and
 systems based on
-.B SVR 4
+.I SVR 4
 do not export this function.
 .IP \(em
 Binary compatibility is not guaranteed.

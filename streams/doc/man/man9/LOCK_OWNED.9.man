@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LOCK_OWNED.9.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: LOCK_OWNED.9.man,v 0.9.2.4 2004/04/19 02:58:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LOCK_OWNED 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH LOCK_OWNED 9 "$Date: 2004/04/19 02:58:15 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -220,7 +220,7 @@ usldk
 and systems based on
 .IR "SVR 4.2 MP" ,
 with the following portability considerations:
-.IP \(em \w'\ \(em\ 'u
+.IP \(em \w'\(em\(em'u
 .BR LOCK_OWNED ()
 is intended as a debugging primitive only to be used with
 .BR ASSERT (9).

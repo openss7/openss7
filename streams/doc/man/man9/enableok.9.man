@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: enableok.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: enableok.9.man,v 0.9.2.6 2004/04/19 02:58:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/19 02:58:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ENABLEOK 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH ENABLEOK 9 "$Date: 2004/04/19 02:58:04 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -125,13 +125,29 @@ flag clear will enable the service procedure under all normal queue enabling
 situations, as follows:
 .IP \- 3
 the queue has been backenabled.
+.PD 0
 .IP \- 3
 a normal message arrives at an empty queue.
 .IP \- 3
 a priority message arrives at a queue.
+.PD
 .PP
 See also
 .BR noenable (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR enableok ()
+can be used in conjunction with
+.BR noenable (9)
+to temporarily suspend queue service procedure processing for a queue for
+normal priority messages.
+.BR noenable (9)
+permits data messages to be enqueued without invoking the queue's service
+procedure.  A call to
+.BR enableok ()
+will then reverse the situation and restore normal queue scheduling.
 .\"
 .\"
 .SH RETURN
@@ -184,7 +200,7 @@ does not place the queue on the current
 .BR runqueues (9)
 schedule list.  It only clears the
 .B QNOENB
-flag to indicate whether the queue should be subsequently schedule.  To add a
+flag to indicate whether the queue should be subsequently scheduled.  To add a
 queue to the current run list, use
 .BR qenable (9).
 .\"
@@ -220,10 +236,12 @@ to do that.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR noneable (9),
 .BR canenable (9),
+.BR enableok (9),
+.BR freezestr (9),
+.BR noenable (9),
+.BR noneable (9),
 .BR qenable (9),
-.BR qdisable (9),
 .BR runqueues (9).
 .\"
 .\"
@@ -238,15 +256,13 @@ has no known bugs.
 .BR enableok ()
 is source-level compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.IR LiS ,
-with the following considerations:
-.IP \(em \w'\ \(em\ 'u
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
 .BR enableok ()
 uses atomic bit operations and does not take the queue write lock.
 This makes
@@ -254,45 +270,76 @@ This makes
 safe to call while the queue is locked (e.g. while the queue is frozen
 with
 .BR freezestr (9)).
-Under LiS,
+Under
+.IR LiS ,
 .BR enableok ()
 takes the queue spin lock and uses normal bit operations to set the flag.
-.IP \(em
-.BR enableok ()
-called with an invalid
-.I q
-argument will have an undefined result.
-In referenced versions of LiS
+.IR "SVR 4.2MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
-the result is undefined in the same situations due to an LiS coding error.
-Repaired versions of LiS will make
-.BR enableok ()
-fail silently in these situations.
-.IP \(em
-Symbol
-.BR lis_safe_enableok ()
-is provided for binary compatibility with LiS.  See
-.BR lisbcm (9).
-.BR lis_safe_enableok ()
-calls
-.BR enableok ()
-directly.
-.IP \(em
-.IR UnixWare \(rg
-.[
-uw7spg
-.]
-and
 .IR SUPER-UX \(rg
 .[
 suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
 .]
 do not permit
 .BR enableok ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.IR Solaris \(rg
+.[
+solspg
+.]
+permits
+.BR enableok ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not invoke
+.BR enableok ()
+on a stream that has previously been frozen with
+.BR freezestr (9).
+.IP \(em
+.BR enableok ()
+called with an invalid
+.I q
+argument will have an undefined result.
+In referenced versions of
+.I LiS
+.[
+LiS
+.]
+the result is undefined in the same situations due to an
+.I LiS
+coding error.  Repaired versions of
+.I LiS
+will make
+.BR enableok ()
+fail silently in these situations.
+Portable
+.I STREAMS
+drivers and modules should never invoke
+.BR enableok ()
+with an invalid
+.I q
+argument.
+.IP \(em
+Symbol
+.BR lis_safe_enableok ()
+is provided for binary compatibility with
+.IR LiS .
+See
+.BR lisbcm (9).
+.BR lis_safe_enableok ()
+calls
+.BR enableok ()
+directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -303,37 +350,9 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 4.2 MP DDI/DKI" ;
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
-.]
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg
-and
-.IR UnixWare \(rg
-documentation;
-.[
-aixdoc
-.]
-.[
-hpuxdoc
-.]
-.[
-osfdoc
-.]
-.[
-soldoc
-.]
-.[
-uw7doc
-.]
-and
-.IR LiS 
-source code.
-.[
-LiS
 .]
 .\"
 .\"
