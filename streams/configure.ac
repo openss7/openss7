@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.14 2004/05/20 18:20:31 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.15 2004/05/22 10:22:05 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,15 +51,23 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/20 18:20:31 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/22 10:22:05 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.14 2004/05/20 18:20:31 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.15 2004/05/22 10:22:05 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
+
+# Need to adjust directories if default
+ac_default_prefix='/usr'
+if test :"$sysconfdir" = :'${prefix}/etc' ; then sysconfdir='/etc' ; fi
+if test :"$localstatedir" = :'${prefix}/var' ; then localstatedir='/var' ; fi
+if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; fi
+if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
+
 AC_CONFIG_SRCDIR([src/modules/timod.c])
 AC_CONFIG_HEADER([config.h])
 
