@@ -233,7 +233,7 @@ dnl              with_gpg_user="`whoami`"
 dnl          fi
          fi])
     AC_MSG_CHECKING([for gpg user])
-    GNUPGUSER="$with_gpg_user"
+    GNUPGUSER="${with_gpg_user:-`whoami`}"
     AC_MSG_RESULT([${GNUPGUSER:-no}])
 dnl ---------------------------------------------------------
     AC_ARG_VAR([GNUPGHOME], [GPG home directory])
@@ -254,7 +254,7 @@ dnl              with_gpg_home='~/.gnupg'
 dnl          fi
          fi])
     AC_MSG_CHECKING([for gpg home])
-    GNUPGHOME="$with_gpg_home"
+    GNUPGHOME="${with_gpg_home:-~/.gnupg}"
     AC_MSG_RESULT([${GNUPGHOME:-no}])
 ])# _RPM_SPEC_SETUP_SIGN
 # =========================================================================
