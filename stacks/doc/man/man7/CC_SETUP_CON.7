@@ -1,0 +1,224 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: CC_SETUP_CON.7,v 0.9 2004/01/17 08:01:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_SETUP_CON 7 "$Date: 2004/01/17 08:01:16 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_SETUP_CON
+\- call setup confirmation
+.\"
+.\"
+.SH SYNOPSIS
+The format of this message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_setup_con {
+    ulong cc_primitive;         /* always CC_SETUP_CON */
+    ulong cc_user_ref;          /* user call reference */
+    ulong cc_call_ref;          /* call reference */
+    ulong cc_addr_length;       /* connecting address length */
+    ulong cc_addr_offset;       /* connecting address offset */
+} CC_setup_con_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This primitive indicates to the calling CCS user that the call control setup
+request has been sent on the specified call control address (circuit, circuit
+group).  For calls that were requested setup with the
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+flag set in the
+.BR CC_SETUP_REQ (7),
+or for which the CCS provider has otherwise decide to perform continuity
+check, this also confirms that the continuity check was successful.
+.\"
+.\"
+.SS Parameters
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+indicates the primitive type.  Always
+.BR CC_SETUP_CON (7).
+.TP
+.I cc_user_ref
+Indicates the CCS user call attempt reference value which was provided by the
+CCS user in the
+.BR CC_SETUP_REQ (7)
+message.  This permits the CCS user to associate this
+.BR CC_SETUP_CON (7)
+primitive with the previous
+.BR CC_SETUP_REQ (7)
+primitive and permits multiple outstanding
+.BR CC_SETUP_REQ (7)
+primitives.
+.TP
+.I cc_call_ref
+Indicates the CCS provider assigned call reference.  If the CCS user wishes to
+establish more than one simultaneous call on a given stream, the CCS user must
+use this CCS provider indicated call reference in subsequent call control
+primitives sent to the CCS provider.  This permits the CCS provider to
+associate a CCS user primitive with one of multiple simultaneous calls
+associated with a given stream.
+.TP
+.I cc_addr_length
+Indicates the length of the connecting address parameter that conveys the call
+control address of the CCS user entity (circuit) on which the call is being
+established.  The semantics of the values in the
+.BR CC_SETUP_CON (7)
+is identical to the values in the
+.BR CC_BIND_REQ (7).
+.TP
+.I cc_addr_offset
+Indicates the offset of the connecting address from the beginning of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.\" .SS Rules
+.\"
+.\"
+.SS State
+This primitive is valid in state
+.B CCS_WCON_SREQ
+and state
+.BR CCS_WREQ_CCREP .
+The new state depends on whether an end-of-pulsing signal was present in the
+called party number in the associated
+.BR CC_SETUP_REQ (7)
+primitive.  If an ST signal was present, the new state is
+.BR CCS_WREQ_PROCEED ,
+otherwise the new state is
+.BR CCS_WREQ_MORE .
+In either case, the call enters the Call Establishment Phase.
+.\"
+.\"
+.SS Modes
+.\"
+.\"
+.SS Originator
+This primitive is issued by the CC Provider.
+.\"
+.\"
+.SH NOTES
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,337 @@
+'\" t
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: sdl_udp.8,v 0.9 2004/01/17 08:02:21 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997-2001  Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/01/17 08:02:21 $ by $Author: brian $
+.\"
+.\" $Log: sdl_udp.8,v $
+.\" Revision 0.9  2004/01/17 08:02:21  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.1  2003/07/20 21:45:23  brian
+.\" Minor formatting.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:38  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7.8.1  2001/12/11 15:28:44  brian
+.\" Changed name of sdludp and sdlacb.
+.\"
+.\" Revision 0.7  2001/01/17 00:28:38  brian
+.\" Added sdl_udp man page.
+.\"
+.\" Revision 0.7.2.1  2001/01/14 11:07:55  brian
+.\" Changed headers back to GPL.
+.\"
+.\" Revision 0.7  2000/11/29 02:11:01  brian
+.\" Added man pages for drivers.
+.\"
+.\" =========================================================================
+.TH SDL_UDP 8 "$Date: 2004/01/17 08:02:21 $" "OpenSS7 Man Page" "OpenSS7 Programmer's Manual"
+.SH "NAME"
+sdl_udp \- SDL emulation using User Datagram Protocol (UDP)
+.SH "SYNOPSIS"
+.PP
+.B #include <sys/streams.h>
+.br
+.B #include <ss7/sdli.h>
+.br
+.B #include <ss7/sdli_ioctl.h>
+.HP
+.BI "int " fd " = open(" /dev/ss7-sdl-udp0 ", " flags );
+.HP
+.BI "int " ret " = ioctl(" fd ", " cmd ", ... /* " arg " */ );"
+.fi
+.SH "DESCRIPTION"
+.PP
+SDL_UDP emulates a Signalling Data Link using a Linux kernel UDP socket to
+emulate the physical communications channel.  Because a UDP communications
+channel does not exhibit the lower level characteristics of a real
+communications data link, and because certain line conditions (such as loss of
+sychronization with flags) are not applicable to the emulation, the emulation
+is not complete.
+.PP
+The purpose of the SDL_UDP is to provide sufficient simulation of a real
+signalling link to permit testing and experimentation with the \fIOpenSS7\fR
+protocol stack.  SDL_UDP permits quick and easy configuration of simulated
+signalling links between multiple hosts and permits the formation of
+complicated networks over an Ethernet LAN.
+.PP
+In every other respect, SDL_UDP is equivalent to a real Signalling Data Link
+device driver and can be configured and used in conjunction with the other
+modules and protocol layers within the \fIOpenSS7\fR stack just as any other
+SDLI driver.
+
+.SS "STREAMS Interfaces"
+.PP
+The STREAMS interface provided by the SDL_UDP driver conforms to the
+Signalling Data Link Interface (SDLI) as detailed in \fBsdli\fR(7), the
+Local Management Interface (LMI) as detailed in \fBlmi\fR(7) and the Device
+Control Interface (DEVI) as detail in \fBdevi\fR(7).
+
+.SS "Module"
+.PP
+SDL_UDP is provided by the \fIstreams-sdl-udp\fR kernel module.
+This module and modules upon which it depends is automatically loaded when
+the \fI/dev/ss7-sdl-udp0\fR device is opened in a properly configured system.
+There should be an entry in the \fI/etc/conf.modules\fR or
+\fI/etc/modules.conf\fR file such as:
+.sp
+.RS
+.nf
+alias char-major-252 streams-sdl-udp # driver ss7 sdl udp
+.fi
+.RE
+.PP
+Where \fI252\fR is the character device major number of the
+\fI/dev/ss7-sdl-udp0\fR device special file.
+.PP
+The \fIstreams-sdl-udp\fR module is compatible with \fIOpenSS7\fR upper layer
+modules and can push the \fIstreams-sdt\fR and \fIstreams-sl\fR modules.
+
+.SS "Operation"
+.PP
+SDL_UDP is a Signalling Data Link Interface \fBsdli\fR(7) compliant driver
+which emulates an SS7 signalling link using Linux UDP sockets.  It includes
+traffic shaping algorithms which limit the effective ABR to a user-specified
+rate.  Because the driver is unable to detect frame errors, signal unit and
+framing errors will never be reported to the SUERM/AERM or EIM.  Recommended
+traffic shaping rates are 56 kbps, 64 kbps, 1.544 Mbps and 2.0 Mbps.  The
+driver uses FISU/LSSU compression schemes on both sides of the connection to
+avoid sending duplicate FISU/LSSUs except in two cases: LSSU SIB are always
+sent when requested, and the first two LSSU SINs or SIEs are sent to trigger
+movement of the L2 state machines from proving to alignment.
+
+.SH "PROTOCOL INTERFACE"
+.PP
+SDL_UDP supports the Signalling Data Link Interface (SDLI) as detailed in
+\fBsdli\fR(7).
+SDL_UDP supports both \fBM_PROTO\fR and \fBM_PCPROTO\fR requests and
+indications using the \fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls.
+
+.SS "Configuration"
+.PP
+SDL_UDP supports all protocol variants and options.  Line based errors case
+will not be reported (because they are not reported to the UDP socket unless
+it represents socket failure).  Level 2 state machines are left repsonsible to
+determine whether packets have been mis-sequenced or lost.
+.PP
+Because SDL_UDP does not perform line synchronization, the setting of \fIN\fR
+(the number of octets per SU during octet-counting mode) has no effect on
+state machine operation.  The setting of \fIm\fR (the maximum SIF size) is
+respected as long as it is less than the MTU of the UDP socket.
+
+.SS "State"
+.PP
+As it does not monitor line sychnronization, SDL_UDP will never enter
+octet-counting mode.
+
+.SS "Statistics"
+.PP
+Because SDL_UDP only emulates the line, some statistics with respect to line
+synchronization and errors will not be pegged.
+
+.SS "Primitives"
+.PP
+SDL_UDP supports the complete set of Protocol Service Primitives which are
+described in detail in \fBsdli\fR(7).
+
+.SH "LOCAL MANAGEMENT INTERFACE"
+.PP
+SDL_UDP supports the Local Management Interface (LMI) as detailed in
+\fBlmi\fR(7).  SDL_UDP supports both \fBM_PROTO\fR and \fBM_PCPROTO\fR requests
+and indications using the \fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls.
+
+.SS "PPA Addressing"
+.PP
+SDL_UDP is a \fIStyle 2\fR driver which must be attached to a
+communications channel before it is enabled.
+The format of the Point of Physical Appearance (PPA) address is a pair of IP
+addresses and port numbers which form a local and a remote UDP address in a
+structure such as follows:
+.sp
+.RS
+.nf
+typedef struct ppa {
+    struct sockaddr_in loc;
+    struct sockaddr_in rem;
+} ppa_t;
+.fi
+.RE
+.PP
+Local and remote addresses are established by using this PPA address in the
+\fBLMI_ATTACH_REQ\fR for a \fIStyle 2\fR driver as documented in \fBlmi\fR(7).
+This PPA address will also be returned in response to a \fBLMI_INFO_REQ\fR
+request.
+.PP
+The local address and port and the remote address and port must be agreed upon
+by both sides of the connection through some other mechanism (i.e, static
+configuration, management system).  The local side of the connection will be
+prepared to both transmit and recieve packets starting after the
+\fBLMI_ENABLE_REQ\fR has been confirmed.
+
+.SS "Errors"
+.PP
+The only Local Management Interface errors which are reported by SDL_UDP are
+as follows:
+
+.TP
+.B LMI_BADPPA
+.TP
+.B LMI_INITFAILED
+
+.SH "DEVICE CONTROL INTERFACE"
+.PP
+SDL_UDP supports the Device Control Interface (DEVI) as detail in
+\fBdevi\fR(7).  SDL_UDP only supports \fBI_STR\fR IOCTLs as
+described in \fBstreamio\fR(2) and does not support transparent IOCTLs.
+
+.SS "IOCTLS"
+.PP
+The
+following DEVI IOCTLs are applicable to SDL_UDP:
+
+.TP
+.BR DEV_IOCGIFTYPE ", " DEV_IOCSIFTYPE
+Gets or sets the interface type.  Only the \fBDEV_TYPE_PACKET\fR interface
+type is valid for SDL_UDP.
+.TP
+.BR DEV_IOCGGRPTYPE ", " DEV_IOCSGRPTYPE
+Gets or sets the interface group type.  Only the \fBDEV_GTYPE_UDP\fR interface
+group type is valid for SDL_UDP.
+.TP
+.BR DEV_IOCGIFMODE ", " DEV_IOCSIFMODE
+Gets or sets the interface mode.  Only the \fBDEV_GTYPE_PEER\fR interface mode
+is valid for SDL_UDP.
+.TP
+.BR DEV_IOCGIFRATE ", " DEV_IOCSIFRATE
+Gets or sets the interface rate.  SDL_UDP accepts bit rates in the
+range from \fI800\fR bps to \fI10\fR Mbps.  The default rate is \fI1.544\fR
+Mbps.  Changing the interface rate changes traffic shaper parameters to effect
+the new shaped effective bit rate.
+.TP
+.BR DEV_IOCGIFCLOCK ", " DEV_IOCSIFCLOCK
+Gets or sets the interface clocking.  Only the \fBDEV_CLOCK_SHAPER\fR
+interface clocking is valid for SDL_UDP.
+.TP
+.BR DEV_IOCGIFCODING ", " DEV_IOCSIFCODING
+Gets or sets the interface bit coding.  Only the \fBDEV_CODING_NONE\fR
+interface bit coding is valid for SDL_UDP.
+.TP
+.BR DEV_IOCGIFLEADS ", " DEV_IOCSIFLEADS ", " DEV_IOCCIFLEADS
+Gets or sets the interface leads.  These controls have no effect on SDL_UDP.
+.TP
+.BR DEV_IOCCDISCTX ", " DEV_IOCCCONNTX
+Disconnects or connects the transmit path.  For SDL_UDP this merely
+suppresses and reestablishes the delivery of packets and does not perform a
+shutdown on the write side of the Linux UDP socket.
+.TP
+.B DEV_PRIVATE
+There are no device private IOCTLs for SDL_UDP.
+
+.\" .SH "ERROR HANDLING"
+
+.SH "CAVEATS"
+.PP
+SDL_UDP was never intended to be used as, or in conjunction with, a real SS7
+signalling network.  It is intended for laboratory use and experimentation
+only.  SDL_UDP makes no attempt to perform all of the Level 2 functions of
+SS7.  It is mostly intended as a simple way of providing a large number of
+L2 links for testing upper level protocol modules (such as MTP).
+
+.SH "SEE ALSO"
+.PP
+.BR devi (7),
+.BR getmsg (2),
+.BR ioctl (2),
+.BR lmi (7),
+.BR mtpi (7),
+.BR putmsg (2),
+.BR read (2),
+.BR sdti (7),
+.BR sl (8),
+.BR sl (8),
+.BR sli (7),
+.BR slsi (7),
+.BR ss7d (8),
+.BR streamio (2),
+.BR write (2)
+
+.SH "BUGS"
+.PP
+No known bugs.
+
+.SH "AUTHOR"
+.PP
+Brian F. G. Bidulock, <bidulock@openss7.org>
+
+.SH "HISTORY"
+.PP
+This STREAMS interface for SS7 is an original part of the \fIOpenSS7\fR package.
+
+.SH "REFERENCES"
+.PP
+.TS
+tab(:);
+l 1 li.
+.TH
+[Q702]:ITU-T Rec. Q.702 Signalling Data Link
+[Q703]:ITU-T Rec. Q.703 Signalling Link
+[Q704]:ITU-T Rec. Q.704 Message Transfer Part
+.TE
+
+.SH "COPYRIGHT NOTICE"
+.PP
+Copyright \(co 1997-2001  Brian Bidulock.  All Rights Reserved.
+.sp
+.ce 1
+PERMISSION NOTICE
+.PP
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+.PP
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copyring, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+.PP
+Since the Linux kernel and libraries are constantly changing, this manual page
+may be incorrect or out-of-date.  The author(s) assume no responsibility for
+errors or omissions, or for damage resulting from the use of the information
+contained herein.  The author(s) may not have taken the same level of care in
+the production of this manual, which is licensed free of charge, as they might
+when working professionally.
+.PP
+Formatted or processed versions of this manual, if unaccompanied by the
+source, must acknowledge the copyright and authors of this work.
+

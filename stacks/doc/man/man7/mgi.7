@@ -1,0 +1,492 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: mgi.7,v 0.9 2004/01/17 08:01:27 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:27 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MGI 7 "$Date: 2004/01/17 08:01:27 $" "$Name:  $" "Media Gateway Interface"
+.SH NAME
+.B mgi
+\- Media Gateway Interface
+.SH SYNOPSIS
+.PP
+.B #include <ss7/mgi.h>
+.br
+.B #include <ss7/mgi_ioctl.h>
+.HP
+.BI "int " mg_stream " = open(" mg_device ", " flags );
+.SH DESCRIPTION
+.PP
+The Media Gateway Interface,
+.BR MGI ,
+specifies a
+.IR STREAMS (4)-based
+kernel-level instantiation of a Media Gateway Control interface definition
+compatible with SGCP, MGCP, MEGACO H.248.1, ITU-T H.245, and other media
+control and switching protocols.  The Media Gateway Interface (MGI) enables
+the user of a media gateway service to access and use any variety of
+conforming media gateway control service providers without specific knowledge
+of the provider's protocol.  The service interface is designed to support any
+media gateway control service providers, and does not address issues
+concerning media gateway circuit management, protocol performance, and
+performance analysis tools.  The specification assumes that the reader is
+familiar with the ITU-T state machines and media gateway control interface
+(e.g. H.248.1), and
+.IR STREAMS (4).
+.PP
+.B MGI
+specifies an interface that supports the services provided by the Media
+Gateway Control Protocol (MGCP),
+.BR mgcp (4),
+ITU-T H.248.1 Media Gateway Control (MEGACO),
+.BR h248 (4),
+and local media switching using the Media Gateway drivers,
+.BR mg (4).
+See
+.BR MG (4)
+for a description of appropriate drivers and auxiliary modules.
+These specifications are targeted for use by developers and testers of
+protocol modules that require media gateway control service.
+.SS "The Media Gateway Control Layer"
+.PP
+The Media Gateway Control Layer provides the means to manage the connection
+and disconnection of channels (or termination points) within multi-party
+communications sessions.  It is a local control protocol in the sense that
+there are no remote peers entities.  Communications is between the local user
+entity and the local provider entity only.
+.SS "Model of the MGI"
+.PP
+The MGI defines the services provided by the media gateway control layer to
+media gateway controller at the boundary between the media gateway control
+layer and the media gateway controller entity.
+The interface consists of a set of primitives defined as
+.IR STREAMS (4)
+messages that provides access to the media gateway control layer services, and
+are transferred between the MGC (MGS user) entity and the MG (MGS provider)
+entity.  These primitives are of two types; ones that originate from the MGC,
+and others that originate from the MG.  The primitives that originate from the
+MGC make requests to the MG, or respond to an indication of an event of the
+MG.  The primitives that originate from the MG ar either confirmation of a
+request or are indications to the MGC that the event has occured.
+.PP
+The MGI allows the MG to be configured with any media gateway controller
+(such as ISDN or H.225.0 call control) that also conforms to the MGI.
+A media gateway controller can also be a user program (such as the
+.B OpenSwitch
+call framework) that conforms to the MGI and accesses the MG via
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system call.s
+.TP
+.B "MGI Services"
+The features of the MGI are defined in terms of services provided by the MG,
+and the individual primitives that may flow between the MGC and the MG.
+.TP
+.B "Local Management"
+The MGI specification also defines a set of local management functions.  These
+services have significance only to the local stream.
+.PP
+Tables 1, 2 and 3 summarizes the MGI service primitives by their state and
+service.
+.SH "MGI SERVICES DEFINITION"
+.PP
+The
+.B MGI
+services are categorized as
+.IR "Local Management Services" ,
+.IR "Session Services" ,
+.IR "Connection Services" ,
+.IR "Action Services" ,
+.IR "Event Services" " or " "Media Services"
+as follows:
+.SS "Local Management Services"
+.PP
+The media gateway provides the following local management services:
+.PP
+.B Information Serivce
+The information service provides the media gateway controller with the ability
+to query the media gateway concerning options and parameters specific to the
+media gateway and associated with attached multiplex and channels.
+The information service uses the following primitives:
+.IP \(em 4
+.BR MG_INFO_REQ (7):
+Requests information about the associated media gateway session and attached channels.
+This primitive requires local acknowledgment with the
+.BR MG_INFO_ACK (7)
+primitive.
+.IP \(em 4
+.BR MG_INFO_ACK (7):
+Indicates information about the associated media gateway session and attached
+channels.
+.PP
+.B Options Management Service.
+The options management service provides a mechanism whereby the media gateway
+controller can query and change parameters associated with the attached
+channels and manage options associated with the media gateway.
+The options management service uses the following primitives:
+.IP \(em 4
+.BR MG_OPTMGMT_REQ (7):
+Requests management of the specified options.
+This primitive requires local acknowledgment with the
+.BR MG_OPTMGMT_ACK (7)
+primitive.
+.IP \(em 4
+.BR MG_OPTMGMT_ACK (7):
+Acknowledges that the management of previously specified options is complete.
+.PP
+.B Channel Attachment Service.
+The channel attachement service provides the media gateway controller with the
+ability to attach a specified channel to a participant slot in the session
+associated with the requesting stream.
+The channel attachement service uses the following primitives:
+.IP \(em 4
+.BR MG_ATTACH_REQ (7):
+Requests that the specified channels be attached to the specified participant
+slots within the specified media gateway session.
+This primitive requires local acknowledgment with the
+.BR MG_ATTACH_ACK (7)
+primitive.
+.IP \(em 4
+.BR MG_ATTACH_ACK (7):
+Acknowledges successful attachment of the indicated channels to the indicated
+participant slots within the indicated media gateway session.
+.PP
+.B Channel Detachment Service.
+The channel detachment service provides the media gateway controller with the
+ability to detach a specified channel from a participant slot in the session
+associated with the requesting stream.
+The channel detachment service uses the following primitives:
+.IP \(em 4
+.BR MG_DETACH_REQ (7):
+Requests that the specified channels be detached from the media gateway
+session to which they are currently attached.
+This primitive requires local acknowledgment with the
+.BR MG_OK_ACK (7)
+primitive.
+.IP \(em 4
+.BR MG_OK_ACK (7):
+Acknowledges successful receipt of the channel detach request primitive.
+.PP
+.B Receipt Acknowledgement Service.
+The receipt acknowledgement service provide an indication to the media gateway
+controller of the positive or negative acknowledgment of the previous
+primitive issued by the media gateway controller requiring local
+acknowledgment.
+The receipt acknowledgment service uses the following primitives:
+.IP \(em 4
+.BR MG_OK_ACK (7):
+Acknowledges the successful receipt and processing of the previous request
+primitive for which a local acknowledgment is outstanding, that has no other
+means of local acknowledgment.
+.IP \(em 4
+.BR MG_ERROR_ACK (7):
+Acknowledges the unsuccessful (non-fatal error) receipt of the previous
+request primitive for which a local acknowledgment is outstanding.
+.SS "Session Services"
+.PP
+The media gateway provides the following session services:
+.PP
+.B Session Join Service.
+The session join service provides the media gateway controller with the
+ability to add a participant to the session associated with the requesting
+stream, or any other session under the control of the media gateway.
+The session join service uses the following primitives:
+.IP \(em 4
+.BR MG_JOIN_REQ (7):
+Requests that the specified channels join the specified media gateway
+communications session at the specified termination point (participant slot).
+.IP \(em 4
+.BR MG_JOIN_CON (7):
+Confirmst that the indicated channels have joined the indicated media gateway
+communication session at the indicated termination point (participant slot).
+.PP
+.B Session Leave Service.
+The session leave service provides the media gateway controller with the
+ability to remove a participant from the session associated with the
+requesting stream, or any other session under the control of the media
+gateway.
+In addition, it is possible that an autonomous exit from a communication
+session occurs without the request of the media gateway controller.  In this
+case, the session leave service is used to indicated to the media gateway
+controller that an autonomous exit from the communications session has
+occurred.
+The session leave service uses the following primitives:
+.IP \(em 4
+.BR MG_LEAVE_REQ (7):
+Requests that the specified termination point (participant) leave the
+specified media gateway communications session.
+.IP \(em 4
+.BR MG_LEAVE_CON (7):
+Confirms that the indicated termination point (participant) has left the
+indicated media gateway communication session.
+.IP \(em 4
+.BR MG_LEAVE_IND (7):
+Indicats that the indicated termination point (participant) has autonomously
+left the indicated media gateway communications session.
+.SS "Connection Services"
+.PP
+The media gateway provides the following connection services:
+.PP
+.B Media Connection Service.
+The media connection service provides the media gateway controller with the
+ability to connect a channel in the receive and/or transmit directions within
+a joined session.
+The media connection service uses the following primitives:
+.IP \(em 4
+.BR MG_CONN_REQ (7):
+Requests that the specified termination point (participant) be connected into
+the specified media gateway communications session in the transmit or receive
+directions, or with the specified topology, and with the specified digital
+padding.
+.IP \(em 4
+.BR MG_CONN_CON (7):
+Confirms that the indicated termination point (participant) has been connected
+into the indicated media gateway communications session in the directions
+indicated, or with the topology indicated.
+.PP
+.B Media Disconnection Service.
+The media disconnection service provides the media gateway controller with the
+ability to disconnect a channel from the receive and/or transmit directions
+within a joined session.
+In addition, it is possible that an autonomous disconnect from a
+communications session occurs without the request of the media gateway
+controller.  In this case, the media disconnection service is used to indicate
+to the media gateway controller that an autnomous disconnect from the
+communications session has occured.
+The media disconnection service uses the following primitives:
+.IP \(em 4
+.BR MG_DISCON_REQ (7):
+Requests that the specified termination point (participant) be disconnected
+from the specified media gateway communications session in the directions
+specified, or with the topology specified.
+.IP \(em 4
+.BR MG_DISCON_CON (7):
+Confirmst that the indicated termination point (participant) has been
+disconnected from the indicated media gateway communications session in the
+directions indicated, or with the topology indicated.
+.IP \(em 4
+.BR MG_DISCON_IND (7):
+Indicates that the indicated termination point (participant) has autonomously
+disconnected from the indicated media gateway communications session in the
+directions indicated, or with the topology indicated.
+.SS "Action Services"
+.PP
+The media gateway provides the following action services:
+.PP
+.B Termination Point Action Service.
+The action service provides the media gateway controller with the ability to
+perform a specified action on a specified channel within a joined session.
+The termination point action service uses the following primitives:
+.IP \(em 4
+.BR MG_ACTION_REQ (7):
+Requests that the specified action be invoked on the specified termination
+point (participant) in the specified communications session.
+.IP \(em 4
+.BR MG_ACTION_CON (7):
+Confirmst that the indicated action has begun.
+.IP \(em 4
+.BR MG_ACTION_IND (7):
+Indicates that the indicated action has completed.
+.PP
+.B Termination Point Action Abort Service.
+The action abort service provides the media gateway controller with the
+ability to abort a previously invoked action on a channel associated with a
+joined session.
+The termination point action abort service uses the following primitives:
+.IP \(em 4
+.BR MG_ABORT_REQ (7):
+Requests that the specified action be aborted.
+.SS "Event Services"
+.PP
+The media gateway provides the following event services:
+.PP
+.B Termination Point Notification Service.
+The event service provides the media gateway with the ability to indicate to
+the media gateway controller when an event has occurred.
+The termination point notificiation service uses the following primitives:
+.IP \(em 4
+.BR MG_NOTIFY_REQ (7):
+Requests that the specified events generate an event notification.
+.IP \(em 4
+.BR MG_NOTIFY_IND (7):
+Indicates that the event for which notification was requested has occurred.
+.SS "Media Services"
+.PP
+The media gateway provides the following media services:
+.PP
+.B Data Transfer Service.
+The data transfer service is used by the media gateway controller to request
+the transmission of session media data on the specified channel within a
+joined session.  It is also used by the media gateway to indicate the
+reception of session media data on the indicated stream.
+The data transfer service uses the following primitives:
+.IP \(em 4
+.BR MG_DATA_REQ (7):
+Requests that the specified media data be transmitted to the communications
+session on the multiplex slot associated with the requesting stream.
+.IP \(em 4
+.BR MG_DATA_IND (7):
+Indicates that the indicated media data was received from the communications
+session on the indicated multiplex slot associated with the stream upon which
+the indication was issued.
+.SH OPTIONS
+.PP
+.nf
+typedef struct MG_channel_opt {
+    ulong mg_obj_type;          /* always MG_OBJ_TYPE_CH */
+    ulong mg_obj_id;            /* channel id */
+    ulong ch_type;              /* channel media type */
+    ulong ch_flags;             /* channel media options flags */
+    ulong ch_block_size;        /* data block size (bits) */
+    ulong ch_encoding;          /* encoding */
+    ulong ch_sample_size;       /* sample size (bits) */
+    ulong ch_rate;              /* clock rate (Hz) */
+    ulong ch_tx_channels;       /* number of tx channels */
+    ulong ch_rx_channels;       /* number of rx channels */
+    ulong ch_opt_flags;         /* options flags */
+} MG_channel_opt_t;
+
+typedef struct MG_connleg_opt {
+    ulong mg_obj_type;          /* always MG_OBJ_TYPE_LG */
+    ulong mg_obj_id;            /* channel id */
+    ulong lg_type;              /* conn leg media type */
+    ulong lg_flags;             /* conn leg media options flags */
+    ulong lg_block_size;        /* data block size (bits) */
+    ulong lg_encoding;          /* encoding */
+    ulong lg_sample_size;       /* sample size (bits) */
+    ulong lg_rate;              /* clock rate (Hz) */
+    ulong lg_tx_channels;       /* number of tx channels */
+    ulong lg_rx_channels;       /* number of rx channels */
+    ulong lg_opt_flags;         /* options flags */
+} MG_connleg_opt_t;
+
+typedef struct MG_session_opt {
+    ulong mg_obj_type;          /* always MG_OBJ_TYPE_SE */
+    ulong mg_obj_id;            /* session id */
+    ulong se_type;              /* session media type */
+    ulong se_flags;             /* session media options flags */
+    ulong se_block_size;        /* data block size (bits) */
+    ulong se_encoding;          /* encoding */
+    ulong se_sample_size;       /* sample size (bits) */
+    ulong se_rate;              /* clock rate (Hz) */
+    ulong se_tx_channels;       /* number of tx channels */
+    ulong se_rx_channels;       /* number of rx channels */
+    ulong se_opt_flags;         /* options flags */
+} MG_session_opt_t;
+
+#define SEF_INTERWORKING        0x01    /* encoding interworking */
+#define SEF_CONFERENCING        0x02    /* conferencing in effect */
+#define SEF_CLEARCHANNEL        0x04    /* clear channel enforced */
+
+typedef union MG_options {
+    struct {
+        ulong mg_obj_type;      /* object type */
+        ulong mg_obj_id;        /* object id */
+    } obj;
+    struct MG_channel_opt ch;   /* channel options */
+    struct MG_connleg_opt lg;   /* conn leg options */
+    struct MG_session_opt se;   /* session options */
+} MG_options_t;
+
+#define MG_SE_OPT_AUTO_GAIN_CONTROL     0x01    /* perform Automatic Gain Control */
+#define MG_SE_OPT_LIMITING              0x02    /* perform limiting */
+#define MG_SE_OPT_COMPRESSION           0x04    /* perform compression */
+.fi
+.SH CAVEATS
+.PP
+.SH FILES
+.PP
+.SH DEVICES
+.PP
+.SH "SEE ALSO"
+.PP
+.BR MG_ABORT_REQ (7),
+.BR MG_ACTION_CON (7),
+.BR MG_ACTION_IND (7),
+.BR MG_ACTION_REQ (7),
+.BR MG_ATTACH_ACK (7),
+.BR MG_ATTACH_REQ (7),
+.BR MG_CONN_CON (7),
+.BR MG_CONN_REQ (7),
+.BR MG_DATA_IND (7),
+.BR MG_DATA_REQ (7),
+.BR MG_DETACH_REQ (7),
+.BR MG_DISCON_CON (7),
+.BR MG_DISCON_IND (7),
+.BR MG_DISCON_REQ (7),
+.BR MG_ERROR_ACK (7),
+.BR MG_INFO_ACK (7),
+.BR MG_INFO_REQ (7),
+.BR MG_JOIN_CON (7),
+.BR MG_JOIN_REQ (7),
+.BR MG_LEAVE_CON (7),
+.BR MG_LEAVE_IND (7),
+.BR MG_LEAVE_REQ (7),
+.BR MG_NOTIFY_IND (7),
+.BR MG_NOTIFY_REQ (7),
+.BR MG_OK_ACK (7),
+.BR MG_OPTMGMT_ACK (7),
+.BR MG_OPTMGMT_REQ (7).
+.SH VERSIONS
+.PP
+This manpage was written for CCI Version 1.
+.XX
+.[
+mgi
+.]
+.[
+rfc3435
+.]
+.[
+h248.1
+.]
+.[
+$LIST$
+.]
+.TA

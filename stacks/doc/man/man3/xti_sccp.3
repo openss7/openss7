@@ -1,0 +1,1270 @@
+'\" tr
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: xti_sccp.3,v 0.9 2004/01/17 07:57:47 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 07:57:47 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR [\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH XTI-SCCP 3 "$Date: 2004/01/17 07:57:47 $" "$Name:  $" "X/Open Transport Interface"
+.\"
+.\"
+.SH NAME
+.B XTI-SCCP
+\- X/Open Transport Interface \- Corrigendum for Signalling Connection Control Part (SCCP)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ss7.h>
+.br
+.B #include <xti_mtp.h>
+.br
+.B #include <xti_sccp.h>
+.HP
+.BI "int " sccp_xtistr " = t_open(" \fR/dev/sccp-tpi-cl\fR ", " flags );
+.HP
+.BI "int " sccp_xtistr " = t_open(" \fR/dev/sccp-tpi-co\fR ", " flags );
+.\"
+.\"
+.SH "DESCRIPTION"
+.PP
+This manual section describes the protocol-specific information that is
+relevant for SCCP
+.[
+q714
+.]
+.[
+sccpv4
+.]
+.[
+t1.112
+.]
+.[
+jtq714
+.]
+transport providers.  This section also describes the
+protocol-specific information that is relevant when SCCP services
+.[
+q711
+.]
+are provided
+over an IP network using SUA
+.[
+sua15
+.]
+.RB ( sua (4))
+or TALI
+.[
+TALI
+.]
+.RB ( tali (4)).
+.PP
+This section also defines the data structures and constants required for SCCP
+transport providers that are exposed through the XTI
+.[
+xti
+.]
+.[
+xns
+.]
+.B <xti_sccp.h>
+header file.
+.\"
+.\"
+.SH "ADDRESS FORMAT"
+.PP
+The SCCP address format is structured as follows:
+.\"
+.\"
+.sp
+.nf
+\fC\s-1\
+typedef struct sockaddr_sccp {
+    sa_family_t sccp_family;	/* Address family */
+    uint16_t sccp_ni;		/* Network indicator */
+    uint16_t sccp_ri;		/* Routing indicator */
+    uint32_t sccp_pc;		/* Point code */
+    uint8_t sccp_ssn;		/* Subsystem number (0 not present) */
+    uint8_t sccp_gtt;		/* Global title translation type */
+    uint8_t sccp_tt;		/* Translation type */
+    uint8_t sccp_es;		/* Encoding scheme */
+    uint8_t sccp_nplan;		/* Numbering plan */
+    uint8_t sccp_nai;		/* Nature of address indicator */
+    uint8_t sccp_alen;		/* Address length */
+    uint8_t sccp_addr[SCCP_MAX_SADDR_LENGTH];	/* address digits */
+    uint8_t sccp_zero[sizeof(struct sockaddr) -
+		      sizeof(sa_family_t) -
+		      sizeof(uint16_t) * 2 -
+		      sizeof(uint32_t) -
+		      sizeof(uint8_t) *
+		      (7 + SCCP_MAX_SADDR_LENGTH)];
+} t_sccp_addr_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+The SCCP address format is a
+.B t_sccp_addr_t
+structure containing the following members:
+.\"
+.\"
+.TP
+.I sccp_family
+This field is for compatability with
+.BR sockets (3)
+library and is not used by XTI and is ignored by the SCCP provider.
+.\"
+.\"
+.TP
+.I sccp_ni
+conveys the Network Indicator.  The Network Indicator is an implementation
+specific indication of the numbering space in which the
+.I sccp_pc
+is relevant.  Network Indicators are assigned by the system administrator.
+.\"
+.\"
+.TP
+.I sccp_ri
+conveys the Routing Indicator.  The Routing Indicator determines which
+elements of the SCCP address will be used for routing and can be one of the
+following values:
+.\"
+.\"
+.RS
+.TP 24
+\fISCCP_RI_DPC_SSN\fR
+route on DPC/SSN.
+.TP
+\fISCCP_RI_GT\fR
+route on Global Title.
+.RE
+.\"
+.\"
+.TP
+.I sccp_pc
+conveys the SCCP Signalling Point Code.  The format of the signalling point
+code is network dependent.  Signalling Point Codes are least significant bit
+aligned in a 32-bit long word.
+.\"
+.\"
+.TP
+.I sccp_ssn
+conveys the SCCP Subsystem Number.  The format of the subsystem number is one
+octet.  Subsystem Numbers fill a complete 8-bit byte.
+.\"
+.\"
+.RS
+.TP 24
+\fISCCP_SSN_UNKNOWN\fR
+unknown or unspecified.
+.TP
+\fISCCP_SSN_SCMG\fR
+SCCP Management.
+.TP
+\fISCCP_SSN_RESERVED\fR
+reserved.
+.TP
+\fISCCP_SSN_ISUP\fR
+ISUP end-to-end signalling.
+.TP
+\fISCCP_SSN_OMAP\fR
+Operations, Maintenance and Adminstration Part.
+.TP
+\fISCCP_SSN_MAP\fR
+Mobile Application Part.
+.TP
+\fISCCP_SSN_HLR\fR
+Home Location Register.
+.TP
+\fISCCP_SSN_VLR\fR
+Visitor Location Register.
+.TP
+\fISCCP_SSN_MSC\fR
+Mobile Switching Center.
+.TP
+\fISCCP_SSN_EIC\fR
+Equipment Identity Center.
+.TP
+\fISCCP_SSN_AUC\fR
+Authentication Center.
+.TP
+\fISCCP_SSN_ISDN_SS\fR
+ISUP supplementary services.
+.TP
+\fISCCP_SSN_RESERVED2\fR
+reserved.
+.TP
+\fISCCP_SSN_BISDN\fR
+Broadband ISDN.
+.TP
+\fISCCP_SSN_TC_TEST\fR
+TC test.
+.RE
+.\"
+.\"
+.TP
+.I sccp_gtt
+conveys the Global Title type.
+.\"
+.\"
+.RS
+.TP 24
+\fISCCP_GTTTYPE_NONE\fR
+no GT.
+.TP
+\fISCCP_GTTTYPE_NAI\fR
+NAI only.
+.TP
+\fISCCP_GTTTYPE_TT\fR
+TT only.
+.TP
+\fISCCP_GTTTYPE_NP\fR
+TT, ES and NPLAN.
+.TP
+\fISCCP_GTTTYPE_NP_NAI\fR
+TT, ES, NPLAN and NAI.
+.RE
+.\"
+.\"
+.TP
+.I sccp_tt
+conveys the Translation type.
+.\"
+.\"
+.TP
+.I sccp_es
+conveys the Encoding Scheme.
+.\"
+.\"
+.RS
+.TP 24
+\fISCCP_ES_UNKNOWN\fR
+unknown.
+.TP
+\fISCCP_ES_BCD_ODD\fR
+BCD, odd number of digits.
+.TP
+\fISCCP_ES_BCD_EVEN\fR
+BCD, even number of digits.
+.TP
+\fISCCP_ES_NATIONAL\fR
+National specific.
+.RE
+.\"
+.\"
+.TP
+.I sccp_nplan
+conveys the Numbering Plan.
+.\"
+.\"
+.RS
+.TP 24
+\fISCCP_NPLAN_UNKNOWN\fR
+unknown or unspecified.
+.TP
+\fISCCP_NPLAN_ISDN\fR
+E.164 ISDN.
+.TP
+\fISCCP_NPLAN_GENERIC\fR
+generic.
+.TP
+\fISCCP_NPLAN_DATA\fR
+X.121.
+.TP
+\fISCCP_NPLAN_TELEX\fR
+telex.
+.TP
+\fISCCP_NPLAN_MARITIME\fR
+maritime.
+.TP
+\fISCCP_NPLAN_LAND_MOBILE\fR
+PLMN.
+.TP
+\fISCCP_NPLAN_ISDN_MOBILE\fR
+ISDN PLMN.
+.TP
+\fISCCP_NPLAN_PRIVATE\fR
+private.
+.RE
+.\"
+.\"
+.TP
+.I sccp_nai
+conveys the Nature of Address Indicator.
+.\"
+.\"
+.TP
+.I sccp_alen
+conveys the address length.
+.\"
+.\"
+.TP
+.I sccp_addr
+conveys the address.
+.\"
+.\"
+.TP
+.I sccp_zero
+This field is for compatability with the
+.BR sockets (3)
+library and is not used by XTI and is ignored by the SCCP provider.
+.\"
+.\"
+.PP
+The combination of
+.IR sccp_ni ", " sccp_pc " and " sccp_ssn ", or "
+.IR sccp_ni ,
+.IR sccp_gtt ,
+.IR sccp_tt ,
+.IR sccp_es ,
+.IR sccp_nplan ,
+.IR sccp_nai ,
+.IR sccp_alen " and "
+.IR sccp_addr ,
+define the SCCP Service Access Point (SCCP-SAP).
+.\"
+.\"
+.PP
+The network indicator can be
+\(lqwildcarded\(rq
+by setting
+.I sccp_ni
+to -1.  The signalling point code can be
+\(lqwildcarded\(rq
+by setting
+.I sccp_pc
+to -1.
+The subsystem can be
+\(lqwildcarded\(rq
+by setting
+.I sccp_ssn
+to 0, or -1.
+.\"
+.\"
+.\"
+.SH "OPTIONS"
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An SCCP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in the privileged or
+read-only mode.  M3UA and TALI transport providers only support a subset of
+the options defined here.
+.\"
+.\"
+.PP
+An SCCP conforming transport provider supports three levels of options.  These
+three levels are described below.
+.SS T_SS7_SS7
+.PP
+Options within this level are specific to Signalling System No. 7 (SS7) and
+are common to the all protocol levels in SS7.  For more information see
+.BR xti_ss7 (3).
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_SS7_SS7
+are as follows:
+.\"
+.\"
+.TP
+.B T_SS7_PVAR
+the protocol variant provided by the SCCP provider.  This option has a
+.B t_uscalar_t
+option value.  The option value can be one of the following values:
+.\"
+.\"
+.RS
+.TP 24
+\fIT_INVALID\fR
+not known because not bound to a specific network indicator.
+.TP
+\fIT_SS7_PVAR_ITUT88\fR
+ITU-T Recommendation Q.714, 1988
+.TP
+\fIT_SS7_PVAR_ITUT93\fR
+ITU-T Recommendation Q.714, 1993
+.TP
+\fIT_SS7_PVAR_ITUT96\fR
+ITU-T Recommendation Q.714, 1996
+.TP
+\fIT_SS7_PVAR_ITUT00\fR
+ITU-T Recommendation Q.714, 2000
+.TP
+\fIT_SS7_PVAR_ETSI88\fR
+ETSI ETS 300 009 1988.
+.TP
+\fIT_SS7_PVAR_ETSI93\fR
+ETSI ETS 300 009 1993.
+.TP
+\fIT_SS7_PVAR_ETSI96\fR
+ETSI EN 300 009-1, 1996.
+.TP
+\fIT_SS7_PVAR_ETSI00\fR
+ETSI EN 300 009-1, 2000.
+.TP
+\fIT_SS7_PVAR_ANSI88\fR
+ANSI T1.112/1988.
+.TP
+\fIT_SS7_PVAR_ANSI92\fR
+ANSI T1.112/1992.
+.TP
+\fIT_SS7_PVAR_ANSI96\fR
+ANSI T1.112/1996.
+.TP
+\fIT_SS7_PVAR_ANSI00\fR
+ANSI T1.112/2000.
+.TP
+\fIT_SS7_PVAR_JTTC92\fR
+JTTC JQ.714 1992.
+.TP
+\fIT_SS7_PVAR_JTTC97\fR
+JTTC JQ.714 1997.
+.TP
+\fIT_SS7_PVAR_JTTC00\fR
+JTTC JQ.714 2000.
+.TP
+\fIT_SS7_PVAR_NICC00\fR
+NICC ND1005:2000/08.
+.RE
+.\"
+.\"
+.TP
+.B T_SS7_DEBUG
+.\"
+.\"
+.SS T_SS7_MTP
+.PP
+Options within this level are specific to the Message Transfer Part (MTP) yet
+are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_SS7_MTP
+are as follows:
+.\"
+.\"
+.TP
+.B T_MTP_MPLEV
+.TP
+.B T_MTP_CLUSTER
+.TP
+.B T_MTP_SLS
+.TP
+.B T_MTP_MP
+.\"
+.\"
+.SS T_SS7_SCCP
+.PP
+Options within this level are specific to the Signalling Connection Control
+Part (SCCP) yet are used by SS7 protocol levels representing SCCP Users.
+.\"
+.\"
+.PP
+The options defined with the option level
+.B T_SS7_SCCP
+are as follows:
+.TP
+.B T_SCCP_PCLASS
+the protocol class of the SCCP provider. This is a
+.B t_uscalar_t
+that can take on the following values:
+.RS
+.TP 24
+\fIT_SCCP_PCLASS_0\fR
+.RB ( T_CLTS )
+protocol class 0
+(no assurance of sequence).
+.TP
+\fIT_SCCP_PCLASS_1\fR
+.RB ( T_CLTS )
+protocol class 1
+(assurance of sequence).
+.TP
+\fIT_SCCP_PCLASS_2\fR
+.RB ( T_COTS )
+protocol class 2
+(connection without flow control, or expedited data).
+.TP
+\fIT_SCCP_PCLASS_3\fR
+.RB ( T_COTS )
+protocol class 3
+(connection with flow control, and expedited data).
+.TP
+\fIT_SCCP_PCLASS_ALL\fR
+a bit mask representing all of the above values.
+.TE
+.RE
+.TP
+.B T_SCCP_IMPORTANCE
+the importance (or restricted importance level) associated with a message or a
+subsystem.
+.TP
+.B T_SCCP_RET_ERROR
+return on error option.   Messages with this option set will be returned if
+they encounter an error.
+.\"
+.\"
+.SH "FUNCTIONS"
+.PP
+.\"
+.\"
+.SS t_accept\fR(3)
+.PP
+.PP
+.B SCCP
+only supports the
+.BR t_accept ()
+function for connection oriented stream (of service type
+.BR T_COTS )
+at
+.B SCCP 
+protocol classses 2 or 3.  Otherwise the
+.B t_accept ()
+call is an error and the
+.IR errno (3)
+will be set to
+.RB [ EOPNOTSUPPORT ].
+.\"
+.\"
+.SS t_bind\fR(3)
+.PP
+.PP
+For SCCP conforming transport providers, the
+.I req->addr
+field contains the SCCP-SAP address as described above under
+.IR \(lqADDRESS FORMAT\(rq.  If the
+.IR sccp_ni ,
+.IR sccp_pc ,
+or
+.I sccp_ssn
+components of the address are \(lqwildcarded\(rq, the SCCP conforming
+transport provider may assign a value to the \(lqwildcarded\(rq fields.  If
+the SCCP conforming transport provider completes a \(lqwildcarded\(rq field,
+it must return the resulting bound address in the
+.I ret->addr
+parameter.
+.PP
+SCCP supports connectionless and connection-oriented modes.  To bind a
+connectionless stream,
+.I req->qlen
+should be set to zero (0).  To bind a connection-oriented stream,
+.I req->qlen
+should be set to a non-zero positive integer.  Because SCCP supports
+connection-oriented mode, on return from
+.BR t_bind (3),
+SCCP conforming transport providers will return a
+.I ret->qlen
+of non-zero if
+.I req->qlen
+was non-zero, but must return a
+.I ret->qlen
+of zero (0), if
+.I req->qlen
+was zero (0).
+.\"
+.\"
+.SS t_close\fR(3)
+.PP
+.PP
+This function operates as described in
+.BR t_close (3)
+without change.
+.\"
+.\"
+.SS t_connect\fR(3)
+.PP
+.PP
+For connection-oriented service providers, this XTI
+.[
+XTI
+.]
+.[
+XNS
+.]
+call associates the local SCCP endpoint wtih a remote SCCP endpoint to form a
+network connection.  For connectionless service providers, this XTI call will
+fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOSUPPORT ].
+.PP
+For connection-oriented service providers supporting SCCP protocol classes 2
+and 3, the
+.I sndcall->addr
+parameter contains the address to which to from the SCCP network connection.
+This address can be of any of the forms permitted by
+.IR \(lqADDRESS\ FORMATS\(rq ,
+above.
+.I sndcall->opt
+contains the options associated with the network connection.  The
+.I T_SCCP_PCLASS
+option can be used to select protocol class
+.BR T_SCCP_PLCASS_2 " or " T_SCCP_PCLASS_3 .
+If the
+.I T_SCCP_PCLASS
+option is not specified, a
+.I T_SCCP_PCLASS_2
+network connection will be formed.
+.I sndcall->udata
+can be used to transfer a limitied amount of user data with the SCCP
+connection request.
+.PP
+If the connection is formed, the SCCP conforming transport provider will
+always return the
+.IR rcvcall->addr ", " rcvcall->opt " and " rcvcall->udata
+structures as appropriate.
+.I rcvcall->addr
+contains the responding address,
+.I rcvcall->opt
+contains the responding options and
+.I rcvcall->udata
+contains any data that was included by the SCCP peer in the connection
+response.
+.\"
+.\"
+.SS t_getinfo\fR(3)
+.PP
+.PP
+.TP
+.I addr
+For compatibility with the
+.BR sockets (3)
+library, the SCCP uses a
+.B sockaddr
+structured address.  This size will always be the size of a
+.B sockaddr
+structure.
+.TP
+.I options
+The maximum size of options is provider specific.  The
+.B OpenSS7
+SCCP implementation
+.RB ( sccp (4))
+returns the maximum size of an options structure containing all SCCP options.
+.TP
+.I tsdu
+The maximum size of a transport service data unit.  For SCCP this is the
+maximum size of the data payload that will fit in a single SCCP [XL]UDT
+.RB ( T_CLTS ),
+DT1 or DT2
+.RB ( T_COTS ),
+message.  This varies depending on the protocol variant and options supported
+as well as the protocol class of the provider.  Also, for a specific SCCP
+provider, this value may be different depending on the limitations of the
+underlying MTP.  The maximum value that will be reported here for SCCP is
+guaranteed to be less than 3094.  For a typical SCCP provider using narrow
+band MTP, this value will be as small as 248 bytes.  For
+.BR sua "(4) or " tali (4),
+this value could be
+.BR T_INFINITE .
+.TP
+.I etsdu
+Only SCCP protocol class 3
+.RB ( T_SCCP_PCLASS_3 )
+supports the concept of expedited data.  SCCP conforming transport providers
+always return
+.B T_INVALID
+for any protocol class other than 3.  For protocol class 3, this value will be
+comparible in size to the
+.IR tsdu .
+.TP
+.I connect
+SCCP protocol classes 2 and 3 support the concept of connection data.  SCCP
+conforming transport providers always return
+.B T_INVALID
+for protocol classes 0 or 1.  For protocol classes 2 and 3, this value will be
+comparible in size to (but slightly smaller than) the
+.IR tsdu .
+.TP
+.I discon
+SCCP protocol classes 2 and 3 support the concept of disconnection data.  SCCP
+conforming transport providers always return
+.B T_INVALID
+for protocol classes 0 or 1.  For protocol classses 2 and 3, this value will
+be comparible in size to (but slightly smaller than) the
+.IR tsdu .
+.TP
+.I servtype
+SCCP supports both connectionless and connection-oriented modes.  SCCP
+conforming transport providers may return
+.BR T_CLTS " or " T_COTS .
+SCCP conforming transport providers will not return
+.BR T_COTS_ORD .
+Only protocol classes 0 and 1 are supported by a SCCP provider returning
+.B T_CLTS
+in this field.  Only protocol classes 2 and 3 are supported by a SCCP provider
+returning
+.B T_COTS
+in this field.
+.TP
+.I flags
+SCCP does not support orderly release or orderly release with disconnection
+data.  SCCP conforming transport providers will not return
+.BR T_ORDRELDATA " or " T_SNDZERO
+flags. SCCP conforming providers may return
+.BR XPG4_1 .
+.\"
+.\"
+.SS t_listen\fR(3)
+.PP
+.B SCCP
+supports connection indications in connect-oriented mode.  If this XTI call is
+issued on a connectionless service provider, the XTI call will fail, return -1
+and
+.IR t_errno (3)
+will be set to 
+.RB [ TNOTSUPPORT ].
+.B SCCP
+connection-oriented service providers will support all fields in the
+.I call
+parameter:
+.IR call->addr ", " call->opt ", " call->udata " and " call->sequence .
+Options returned in
+.I call->opt
+will include the
+.I T_SCCP_PCLASS
+which can have values
+.BR T_SCCP_PCLASS_2 " or " T_SCCP_PCLASS_3 .
+The
+.I call->addr
+parameter contains the address, including any global title information, that
+was provided by the calling party.  If connection data is sent by the peer, it
+will be included in the
+.I call->udata
+parameter.
+.\"
+.\"
+.SS t_open\fR(3)
+.PP
+.B SCCP
+conforming transport service providers will return in the
+.B t_info
+structure the same information as returned to the
+.BR t_getinfo (3)
+XTI library call as described above.  Otherwise, this function operates as
+described in
+.BR t_open (3).
+.\"
+.\"
+.SS t_optmgmt\fR(3)
+.PP
+.B SCCP
+conforming transport providers suppor the options described under
+.IR \(lqOPTIONS\(rq ,
+above.
+.\"
+.\"
+.SS t_rcvconnect\fR(3)
+.PP
+.B SCCP
+supports receiving connection confirmations in connection-oriented protocol
+classes.
+The SCCP provider will always provide the responding address in the
+.I call->addr
+parameter, pertinent options in the
+.I call->opt
+parameter, and connection response peer SCCP user data in the
+.I call->udata
+parameter.
+Options passed by the SCCP provider include:
+.BR T_SCCP_SEQ_CTRL ,
+that represent the sequence control value of the peer; and
+.BR T_SCCP_PCLASS ,
+that represents the negotiated protocol class for the connection.
+.PP
+Otherwise, this XTI library call functions as decribed in
+.BR t_rcvconnect (3).
+.\"
+.\"
+.SS t_rcvdis\fR(3)
+.PP
+.B SCCP
+supports disconnection indications with reason codes.  For SCCP conforming
+transport service providers, the
+.I dis->reason
+field will be completed and will contain one of the following values:
+.PP
+When an existing transport connection is being disconnected, one of the
+following
+.I dis->reason
+values apply:
+.TP
+.I T_SCCP_RELC_END_USER_ORIGINATED
+the remote SCCP peer user released the transport connection.
+.TP
+.I T_SCCP_RELC_END_USER_BUSY
+the remote SCCP peer user released the transport connection due to user congestion.
+.TP
+.I T_SCCP_RELC_END_USER_FAILURE
+the remote SCCP peer user release the transport connection due to a failure at
+the remote user.
+.TP
+.I T_SCCP_RELC_SCCP_USER_ORIGINATED
+the remote SCCP peer user release the transport connection.
+.TP
+.I T_SCCP_RELC_REMOTE_PROCEDURE_ERROR
+the remote SCCP provider released the transport connection due to a procedural error.
+.TP
+.I T_SCCP_RELC_INCONSISTENT_CONNECTION_DATA
+the local SCCP provider released the transport connection due to inconsistent
+connection data returned by the remote peer in response to an inactivity test.
+.TP
+.I T_SCCP_RELC_ACCESS_FAILURE
+the remote SCCP provider released the transport connection due to the
+inaccessibility of the remote SCCP user.
+.TP
+.I T_SCCP_RELC_ACCESS_CONGESTION
+the remote SCCP provider released the transport connection due to congestion
+at the remote SCCP user.
+.TP
+.I T_SCCP_RELC_SUBSYSTEM_FAILURE
+the SCCP provider released the transport connection due to failure of the
+remote subsystem.
+.TP
+.I T_SCCP_RELC_SUBSYSTEM_CONGESTION
+the SCCP provider released the transport connection due to congestion of the
+remote subsystem.
+.TP
+.I T_SCCP_RELC_MTP_FAILURE
+the SCCP provider released the transport connection due to failure of the
+remote MTP.
+.TP
+.I T_SCCP_RELC_NETWORK_CONGESTION
+the SCCP provider released the transport connnection due to network
+congestion.
+.TP
+.I T_SCCP_RELC_EXPIRATION_OF_RESET_TIMER
+the SCCP provider released the transport connection due to
+expiration of the reset timer.
+.TP
+.I T_SCCP_RELC_EXPIRATION_OF_RECEIVE_INACTIVITY_TIMER
+the SCCP provider released the transport connection due to
+expiration of the receive inactivity timer.
+.TP
+.I T_SCCP_RELC_RESERVED
+this value is reserved.
+.TP
+.I T_SCCP_RELC_UNQUALIFIED
+the SCCP provider released the transport connection due to
+an unqualified (unspecified or unknown) reason.
+.TP
+.I T_SCCP_RELC_SCCP_FAILURE
+the SCCP provider released the transport connection due to
+failure of the remote SCCP.
+.PP
+When a transport connection request is being refused, one of the following
+.I dis->reason
+values apply:
+.TP
+.I T_SCCP_REFC_END_USER_ORIGINATED
+the remote SCCP peer user refused the transport connection.
+.TP
+.I T_SCCP_REFC_END_USER_CONGESTION
+the remote SCCP peer user refused the transport connection due to congestion.
+.TP
+.I T_SCCP_REFC_END_USER_FAILURE
+the remote SCCP peer user refused the transport connection due to failure.
+.TP
+.I T_SCCP_REFC_SCCP_USER_ORIGINATED
+the remote SCCP peer user refused the transport connection.
+.TP
+.I T_SCCP_REFC_DESTINATION_ADDRESS_UNKNOWN
+the SCCP provider refused the transport connection because the
+destination SCCP endpoint address was unknown.
+.TP
+.I T_SCCP_REFC_DESTINATION_INACCESSIBLE
+the SCCP provider refused the transport connection because the destination
+SCCP endpoint was inaccessible.
+.TP
+.I T_SCCP_REFC_NETWORK_RESOURCE_QOS_NOT_AVAIL_PERM
+the SCCP provider refused the transport connection because the requested QoS
+(protocol class) was is not available (permanent).
+.TP
+.I T_SCCP_REFC_NETWORK_RESOURCE_QOS_NOT_AVAIL_TRANS
+the SCCP provider refused the transport connection because the requested QoS
+(protocol class) was is not available (transient).
+.TP
+.I T_SCCP_REFC_ACCESS_FAILURE
+the remote SCCP provider refused the transport connection due to user access
+failure.
+.TP
+.I T_SCCP_REFC_ACCESS_CONGESTION
+the remote SCCP provider refused the transport connection due to user access
+congestion.
+.TP
+.I T_SCCP_REFC_SUBSYSTEM_FAILURE
+the SCCP provider refused the transport connection due to remote subsystem
+failure.
+.TP
+.I T_SCCP_REFC_SUBSYSTEM_CONGESTION
+the SCCP provider refused the transport connection due to remote subsystem
+congestion.
+.TP
+.I T_SCCP_REFC_EXPIRATION_OF_NC_ESTAB_TIMER
+the SCCP provider refused the transport connection due to timeout.
+.TP
+.I T_SCCP_REFC_INCOMPATIBLE_USER_DATA
+the SCCP provider refused the transport connection due to incompatible user
+data.
+.TP
+.I T_SCCP_REFC_RESERVED
+this value is reserved.
+.TP
+.I T_SCCP_REFC_UNQUALIFIED
+the SCCP provider refused the transport connection due to an unqualified
+(unspecified or unknown) reason.
+.TP
+.I T_SCCP_REFC_SCCP_HOP_COUNTER_VIOLATION
+the network refused the transport connection due to a hop counter violation.
+.TP
+.I T_SCCP_REFC_SCCP_FAILURE
+the SCCP provider refused the transport connectino due to remote SCCP failure.
+.TP
+.I T_SCCP_REFC_NO_ADDRESS_TYPE_TRANSLATION
+the network refused the transport connection due to the inability to translate
+the remote SCCP endpoint address.
+.TP
+.I T_SCCP_REFC_UNEQUIPPED_USER
+the SCCP provider refused the transport connection due to an unequipped remote
+SCCP user.
+.\"
+.\"
+.SS t_rcv\fR(3), \fBt_rcvv\fR(3)
+.PP
+For connection-oriented SCCP transport service providers, these XTI library
+calls receive data from the remote SCCP peer on a connected transport stream.
+For connectionless modes, these XTI library calls will fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_rcvreldata\fR(3)
+.PP
+.B SCCP
+does not support orderly release indications with user data.  The
+.BR t_rcvreldata (3)
+XTI library call will fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_rcvrel\fR(3)
+.PP
+.B SCCP
+does not support orderly release indications.  The
+.BR t_rcvrel (3)
+XTI library call will fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
+.PP
+For connectionless SCCP transport service providers, these XTI library calls
+receive a unit data from the SCCP perr with the indicated options, described
+under
+.IR \(lqOPTIONS\(rq ,
+above.  For connection-oriented transport service providers, these XTI library
+calls will fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_rcvuderr\fR(3)
+.PP
+.B SCCP
+will only return errors for unit data messages for which the option
+.I T_SCCP_RET_ERROR
+was set on transmission.  For unit data messages for which the optoin
+.I T_SCCP_RET_ERROR
+was not set, no unit data error will be returned.
+.B SCCP
+will return the options specified under
+.IR \(lqOPTIONS\(rq ,
+above.
+.PP
+.B SCCP
+defines the following protocol dependent error codes:
+.TP
+.I T_SCCP_RETC_NO_ADDRESS_TYPE_TRANSLATION
+the network returned the unit data because there was no translation for the
+called party address in the message.
+.TP
+.I T_SCCP_RETC_NO_ADDRESS_TRANSLATION
+the network returned the unit data because the called part address required
+translation and no address translation was available.
+.TP
+.I T_SCCP_RETC_SUBSYSTEM_CONGESTION
+the network returned the unit data because of remote subsystem congestion.
+.TP
+.I T_SCCP_RETC_SUBSYSTEM_FAILURE
+the network returned the unit data because of remote subsystem failure.
+.TP
+.I T_SCCP_RETC_UNEQUIPPED_USER
+the network returned the unit data due to an unequipped remote user.
+.TP
+.I T_SCCP_RETC_MTP_FAILURE
+the network returned the unit data due to remote MTP failure.
+.TP
+.I T_SCCP_RETC_NETWORK_CONGESTION
+the network returned the unit data due to network congestion.
+.TP
+.I T_SCCP_RETC_UNQUALIFIED
+the network returned the unit data for an unqualified (unknown or unspecified)
+reason.
+.TP
+.I T_SCCP_RETC_MESSAGE_TRANSPORT_ERROR
+the network returned the unit data due to a transport error.
+.TP
+.I T_SCCP_RETC_LOCAL_PROCESSING_ERROR
+the network returned the unit data due to a local processing error.
+.TP
+.I T_SCCP_RETC_NO_REASSEMBLY_AT_DESTINATION
+the network returned the unit data because it required reassembly at the
+destination an no reassembly was available at the destination.
+.TP
+.I T_SCCP_RETC_SCCP_FAILURE
+the network returned the unit data due to remote SCCP failure.
+.TP
+.I T_SCCP_RETC_SCCP_HOP_COUNTER_VIOLATION
+the network returned the unit data due to a hop counter violation.
+.TP
+.I T_SCCP_RETC_SEGMENTATION_NOT_SUPPORTED
+the network returned the unit data because segmentation of the message was
+required and segmentation was not supported.
+.TP
+.I T_SCCP_RETC_SEGMENTATION_FAILURE
+the network returned the unit data because segmentation of the message was
+required and segmentation failed.
+.PP
+The following error codes will be returned by some protocol variants with some
+protocol additional options:
+.TP
+.I T_SCCP_RETC_MESSAGE_CHANGE_FAILURE
+the network returned the unit data because a change between [XL]UDT was
+necessary but failed.
+.TP
+.I T_SCCP_RETC_INVALID_INS_ROUTING_REQUEST
+the network returned the unit data because it contained an invalid
+intermediate network selector.
+.TP
+.I T_SCCP_RETC_INVALID_INSI_ROUTING_REQUEST
+the network returned the unit data because it contained an invalid
+intermediate network signalling identifier.
+.TP
+.I T_SCCP_RETC_UNAUTHORIZED_MESSAGE
+the network returned the unit data because the message failed authorization
+screening.
+.TP
+.I T_SCCP_RETC_MESSAGE_INCOMPATIBILITY
+the network returned the unit data because it was incompatible with a network
+across a relay node.
+.TP
+.I T_SCCP_RETC_CANNOT_PERFORM_ISNI_CONSTRAINED_ROUTING
+the network returned the unit data because it required ISNI constrained
+routing and the requested routing could not be performed.
+.TP
+.I T_SCCP_RETC_REDUNDANT_ISNI_CONSTRAINED_ROUTING_INFO
+the network returned the unit data because it required ISNI constrained
+routing but contained redundant (invalid) routing information.
+.TP
+.I T_SCCP_RETC_UNABLE_TO_PERFORM_ISNI_IDENTIFICATION
+the network returned the unit data because it required ISNI identification and
+no identification was available.
+.\"
+.\"
+.SS t_snddis\fR(3)
+.PP
+For connection-oriented SCCP transport service providers, this XTI library
+call releases an existing transport connection, or refuses a transport
+connection indication, associated with the requesting stream.  For
+connectionless service providers, this XTI library call fails, returns -1 and
+sets
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.PP
+For connection-oriented SCCP transport service providers, if the caller does
+not specify the responding address,
+.IR call->addr ,
+the SCCP provider can supply the responding address from the bound address or
+the destination address of the connection request.
+.B SCCP
+does not support disconnection data when the disconnection is a refusal of a
+connection request; i.e. the 
+.I call->udata
+parameter must be empty, otherwise the XTI library call will fail, return -1
+and set
+.IR t_errno (3)
+to
+.RB [ TBADDATA ].
+Otherwise, the call functions as described in
+.BR t_snddis (3).
+.\"
+.\"
+.SS t_snd\fR(3), \fBt_sndv\fR(3)
+.PP
+For connection-oriented SCCP transport service providers, these XTI library
+calls are used to send data, with or without gather, to the SCCP peer user.
+These functions operate as described in
+.BR t_snd "(3) and " t_sndv (3).
+.\"
+.\"
+.SS t_sndreldata\fR(3)
+.PP
+.B SCCP
+does not support sending orderly release with user data.  The
+.BR t_sndreldata (3)
+XTI library call will fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_sndrel\fR(3)
+.PP
+.B SCCP
+does not support sending orderly release.  The
+.BR t_sndrel (3)
+XTI library call will fail, return -1 and set
+.IR t_errno (3)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_sndudata\fR(3), \fBt_sndvudata\fR(3)
+.PP
+For connectionless SCCP transport service providers, this XTI call sends a
+unit data to the SCCP peer with the specified options, described under
+.IR \(lqOPTIONS\(rq ,
+above.  For connection-oriented SCCP transport service providers, these XTI
+library calls will fail, return -1 and set
+.IR t_errno 93)
+to
+.RB [ TNOTSUPPORT ].
+.\"
+.\"
+.SS t_unbind\fR(3)
+.PP
+This function operates as described in
+.BR t_unbind (3).
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+.B SCCP
+connectionless transport service providers only support protocol classes 0 and
+1.
+.B SCCP
+connection-oriented transport service providers only support protocol classes
+2 nd 3.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.BR xti (3),
+.BR xnet (3).
+.\"
+.\"
+.SH "DEVICES"
+.PP
+There are a number of SCCP devices providing the Transport Provider Interface
+that provide SCCP conforming TPI devices as follows:
+.\"
+.\"
+.TP
+.IR /dev/sccp-tpi-cl ", " /dev/sccp-tpi-co
+For more information on the SS7 SCCP device, see
+.BR sccp (4).
+.\"
+.\"
+.TP
+.IR /dev/tali-sccp-tpi-cl ", " /dev/tali-sccp-tpi-co
+For more information on the TALI SCCP device, see
+.BR tali (4).
+.\"
+.\"
+.TP
+.IR /dev/sua-tpi-cl ", " /dev/sua-tpi-co
+For more information on the SIGTRAN SUA device, see
+.BR sua (4).
+.\"
+.\"
+.SH "VERSIONS"
+.PP
+The
+.B SCCP-TPI
+driver is specific to the
+.B OpenSS7
+stack.
+This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.[
+xns
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

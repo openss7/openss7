@@ -1,0 +1,727 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: sdti.7,v 0.9 2004/01/17 08:01:29 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997, 1998, 1999, 2000 Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified $Date: 2004/01/17 08:01:29 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.\"
+.\" $Log: sdti.7,v $
+.\" Revision 0.9  2004/01/17 08:01:29  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.6  2003/07/30 05:04:49  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.5  2003/07/20 21:45:18  brian
+.\" Minor formatting.
+.\"
+.\" Revision 0.8.2.4  2003/07/20 17:29:53  brian
+.\" Reworking man files.
+.\"
+.\" Revision 0.8.2.3  2003/07/18 20:38:44  brian
+.\" A lot of minor embellishments.
+.\"
+.\" Revision 0.8.2.2  2003/06/26 02:04:30  brian
+.\" Some formatting revisions.
+.\"
+.\" Revision 0.8.2.1  2003/04/19 09:53:49  brian
+.\" Mods for MTP.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:37  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7.8.1  2001/12/11 13:16:08  brian
+.\" Branched for new development.
+.\"
+.\" Revision 0.7.6.1  2001/02/18 12:11:14  brian
+.\" New working branch for next release.
+.\"
+.\" Revision 0.7.4.1  2001/02/18 09:44:48  brian
+.\" Added new working branch.
+.\"
+.\" Revision 0.7.2.6  2001/01/16 03:19:47  brian
+.\" Updated man pages.
+.\"
+.\" Revision 0.7.2.5  2001/01/15 10:14:30  brian
+.\" Worked up LMI and SDTI man pages.
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SDTI 7 "$Date: 2004/01/17 08:01:29 $" "$Name:  $" "Signalling Data Terminal Interface"
+.SH "NAME"
+.B sdti
+\- Signalling System No. 7 Signalling Data Terminal (SDT) Interface
+.SH "SYNOPSIS"
+.PP
+.B #include <ss7/sdti.h>
+.br
+.B #include <ss7/sdti_ioctl.h>
+.HP
+.BI "int " fd " = open (" \fR\*(lq/dev/sdt\*(rq\fI ", " flags );
+.HP
+.BI "int " ret " = ioctl(" fd ", " cmd ", ... /* " arg " */ );"
+.SH "DESCRIPTION"
+.PP
+This man page describes the STREAMS interface which is used to configure and
+exchange data with an SS7 Signalling Data Terminal Interface (SDTI) for all
+SS7 devices conforming to the \fIOpenSS7\fR Signalling Data Terminal Interface
+(SDTI) specification.
+.SS "LOCAL MANAGEMENT INTERFACE"
+.PP
+.PP
+SDTI drivers are normally linked using \fBstreamio\fR(2) \fBI_PUSH\fR ioctl
+commands under a Signalling Link (SL) STREAMS module conforming to the
+Signalling Link Interface (SLI) specification \fBsli\fR(7) such as
+\fBsl\fR(8), by the SS7 Configuration Daemon \fBss7d\fR(8).  Yet, this
+interface is available for the purpose of ferry-clip conformance and
+diagnostic testing of the SS7 Signalling Data Terminal.
+.PP
+SDTI \fRStype 1\fR and \fIStyle 2\fR drviers may be configured to autopush the
+\fBsl\fR(8) module and appear as \fBsli\fR(7) drivers.  Not all SS7 drivers
+need be written to the SDT interface: drivers may be written to the
+\fBsli\fR(7), \fBslsi\fR(7) and even \fBmtpi\fR(7) interfaces.
+.PP
+SDTI provides a local management interface which utilizes \fBM_PROTO\fR and
+\fBM_PCPROTO\fR messages which can be exchanged with the interface using
+\fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls on the stream head once the
+interface is opened.  The local management interfae controls local management
+(STREAMS configuration functions) which are normally used by the SS7
+Configuration Daemon \fBss7d\fR(8) on the driver interface before pushing an
+\fBsl\fR(8) module onto the stream head.
+.PP
+The Local Management Interface (LMI) is common to all \fIOpenSS7\fR drivers
+and modules and is described in detail in \fBlmi\fR(7).
+.SS "DEVICE CONTROL INTERFACE"
+.PP
+.PP
+SDTI provides a device control interface which utilizes \fBioctl\fR(2)
+transparent calls or an \fBI_STR\fR ioctl under \fBstreamio\fR(2) from a
+stream head to the driver.  The device control interface controls aspects of
+the SDT driver device which are outside the scope of the SS7 protocol.  These
+controls are normally issued by the SS7 Configuration Daemon \fBss7d\fR(8) on
+the driver interface or multiplexor control channel before or after the
+protocol stack has been assembled.
+.PP
+The device control interface (DEVI) is common to all \fIOpenSS7\fR drivers and
+modules and is described in detail in \fBdevi\fR(7).
+.SS "PROTOCOL SERVICE INTERFACE"
+.PP
+.PP
+SDTI provides a protocol service interface which uses \fBM_DATA\fR,
+\fBM_PROTO\fR and \fBM_PCPROTO\fR STREAMS messages which can be exchanged with
+\fBwrite\fR(2), \fBread\fR(2), \fBputmsg\fR(2) or \fBgetmsg\fR(2) system calls
+on the stream head, or which can be exchanged with the driver by upstream
+pushed or linked modules.  The protocol service interface exchanges SS7
+protocol service primitives between the Signalling Link (SL) and the
+Signalling Data Terminal (SDT), but may also be used for ferry-clip
+conformance testing or diagnostics.
+.PP
+The protocol service interface for SDTI is described in detail in section
+\fIPROTOCOL SERVICE INTERFACE\fR, below.
+.SS "PROTOCOL MANAGEMENT INTERFACE"
+.PP
+.PP
+SDTI provides a protocol mangement interface which uses \fBM_CTL\fR messages
+between modules or \fBM_IOCTL\fR messages from a stream head.  This interface
+uses the controls defined in the Local Management Interface (LMI) as detailed
+under \fIINPUT OUTPUT CONTROL INTERFACE\fR in \fBlmi\fR(7).  The protocol
+management interface provides protocol configuration, state inquiry,
+statistics and event management (SNMP functions).  This interface is normally
+used by the SS7 Configuration Daemon \fBss7d\fR(8) on the stream after opening
+or during operation.
+.PP
+The protocol service interface for SDTI is described in detail in section
+\fIPROTOCOL MANAGEMENT INTERFACE\fR below.
+
+.SH "PROTOCOL SERVICE INTERFACE"
+.PP
+.PP
+Protocol service interface commands are from the stream head to the SDT driver
+using \fBputmsg\fR(2) and \fBgetmsg\fR(2) commands as follows:
+
+.RS 4
+.nf
+\fIfd\fB = open("\fI/dev/sdt\fB");
+\fIret\fB = putmsg(\fIfd\fB, \fIctlptr\fB, \fIdataptr\fB, \fIflags\fB);
+\fIret\fB = getmsg(\fIfd\fB, \fIctlptr\fB, \fIdataptr\fB, \fIflags\fB);
+.fi
+.RE
+.PP
+Downstream messages are sent from the stream head using \fBputmsg\fR(2);
+upstream messages are received at the stream head using \fBgetmsg\fR(2).
+.PP
+\fIflags\fR is either \fBRS_HIPRI\fR or not indicating a \fBM_PCPROTO\fR
+or an \fBM_PROTO\fR message respectively.  \fIctlptr\fR and \fIdataptr\fR are
+pointers to a \fBstrbuf\fR structure which contains the following members:
+
+.RS 4
+.nf
+struct strbuf {
+    int     maxlen;     /* not used       */
+    int     len;        /* length of data */
+    void    *buf;       /* ptr to buffer  */
+};
+.fi
+.RE
+.PP
+\fIbuf\fR contains a pointer to a \fBSDT_primitive\fR union which
+contains one of the following primitives and structures:
+.SS Downstream Primitives
+.PP
+.PP
+Downstream primitives are sent from the stream head to the protocol state
+machines using \fBputmsg\fR(2) system calls as described above.
+Except where otherwise noted, \fIbuf\fR contains only the \fBsdt_primitive\fR
+field which is set to the value of the primitive.
+.TP
+.B SDT_DAEDT_TRANSMISSION_REQ
+Transmit data.  This primitive must be sent with an accompanying \fBM_DATA\fR
+block which is pointed to by the \fIdataptr\fR in a \fBputmsg\fR(2) or is the
+buffer which is the argument of a \fBwrite\fR(2) on the stream file descriptor.
+.TP
+.B SDT_DAEDT_START_REQ
+Start the DAEDT state machine.
+.TP
+.B SDT_DAEDR_START_REQ
+Start the DAEDR state machine.
+.TP
+.B SDT_AERM_START_REQ
+Start the AERM state machine.
+.TP
+.B SDT_AERM_STOP_REQ
+Stop the AERM state machine.
+.TP
+.B SDT_AERM_SET_TI_TO_TIN_REQ
+Set the AERM proving period to normal proving.
+.TP
+.B SDT_AERM_SET_TI_TO_TIE_REQ
+Set the AERM proving period to emergency proving.
+.TP
+.B SDT_SUERM_START_REQ
+Start the SUERM state machine.
+.TP
+.B SDT_SUERM_STOP_REQ
+Stop the SUERM state machine.
+.SS Upstream Primitives
+.PP
+.PP
+Upstream primitives are collected at the stream head from the protocol state
+machines using \fBgetmsg\fR(2) system calls as described above.  Except where
+otherwise noted, \fIbuf\fR contains only the \fBsdt_primitive\fR field which
+is set to the value of the primitive.
+.TP
+.B SDT_RC_SIGNAL_UNIT_IND
+Receive data.  This primitive is received with an accompanying \fBM_DATA\fR
+block which is pointed to by the \fIdataptr\fR in a \fBgetmsg\fR(2) or is the
+buffer which is returned from a \fBread\fR(2) on the stream file descriptor.
+.TP
+.B SDT_RC_CONGESTION_ACCEPT_IND
+Congestion accept indication.
+.TP
+.B SDT_RC_CONGESTION_DISCARD_IND
+Congestion discard indication.
+.TP
+.B SDT_RC_NO_CONGESTION_IND
+Congestion ceases indication.
+.TP
+.B SDT_IAC_CORRECT_SU_IND
+Correct Signal Unit received indication.
+.TP
+.B SDT_IAC_ABORT_PROVING_IND
+Proving aborted indication.
+.TP
+.B SDT_LSC_LINK_FAILURE_IND
+Link failure indication.
+
+.SH "PROTOCOL MANAGEMENT INTERFACE"
+.PP
+.PP
+Protocol management interface comands are from the stream head to the SDT
+driver using \fBstreamio\fR(2) \fBI_STR\fR commands as follows:
+
+.RS 4
+.nf
+\fIfd\fB = open("\fI/dev/sdt\fB");
+\fIret\fB = ioctl(\fIfd\fB, \fRI_STR\fB, \fIarg\fB);
+.fi
+.RE
+.PP
+Where \fIarg\fR is a pointer to a \fBstrioctl\fR structure which contains the
+following members:
+.sp
+.RS 4
+.nf
+struct strioctl {
+    int     ic_cmd;
+    int     ic_timout;
+    int     ic_len;
+    char    *ic_dp;
+};
+.fi
+.RE
+.PP
+\fIic_cmd\fR can be one of the protocol management interface
+commands described in the following subsections:
+
+.SS "Protocol Options"
+.PP
+.PP
+Protocol management controls which affect protocol options are used by local
+management to set protocol variants and protocol options inherent to the SDT
+provider.
+.PP
+The \fIic_cmd\fR contains one of the following options commands:
+.TP
+.B SDT_IOCGOPTIONS
+Gets the protocol variant \fIpvar\fR and protocol options \fIpopt\fR
+assigned to the Signalling Data Terminal into the provided \fBlmi_option\fR
+structure.
+.TP
+.B SDT_IOCSOPTIONS
+Sets the protocol variant \fIpvar\fR and protocol options \fIpopt\fR to the
+Signalling Data Terminal as provided in the \fBlmi_option\fR structure.
+.PP
+\fIic_dp\fR points to a \fBlmi_option\fR structure which
+represents the protocol variant and options parameters as follows:
+.PP
+.RS 4
+.nf
+typedef struct lmi_option {
+    lmi_ulong   pvar;
+    lmi_ulong   popt;
+} lmi_option_t;
+.fi
+.TP
+.I pvar
+Specifies the protocol variant to be used for the Signalling Data Terminal and
+may be one of the following values:
+.RE
+.RS 4
+.IP
+.TS
+tab(:);
+lbw(16) 2 l.
+SS7_PVAR_ITUT_88:ITU-T Q.703 1988 (Blue Book)
+SS7_PVAR_ITUT_93:ITU-T Q.703 1993 (Grey Book)
+SS7_PVAR_ITUT_96:ITU-T Q.703 1996 (White Book)
+SS7_PVAR_ITUT_00:ITU-T Q.703 2000 (? Book)
+SS7_PVAR_ANSI_88:ANSI T1.113-1988
+SS7_PVAR_ANSI_92:ANSI T1.113-1992
+SS7_PVAR_ANSI_96:ANSI T1.113-1996
+SS7_PVAR_ANSI_00:ANSI T1.113-2000
+SS7_PVAR_ETSI_88:ETSI 300 008-1 1988
+SS7_PVAR_ETSI_93:ETSI 300 008-1 1993
+SS7_PVAR_ETSI_96:ETSI 300 008-1 1996
+SS7_PVAR_ETSI_00:ETSI 300 008-1 2000
+SS7_PVAR_JTTC_94:JTTC JQ.703 1994
+.TE
+.RE
+.RS 4
+.TP
+.I popt
+Specifies the protocol options to be used for the Signalling Data Terminal and
+may be a bitwise OR of any of the following values:
+.RE
+.RS 4
+.IP
+.TS
+tab(:);
+lbw(16) 2 l.
+SS7_POPT_MPLEV:Multi Priority/Cong Levels
+SS7_POPT_PCR:Preventative Cyclic Retrans
+SS7_POPT_HSL:High Speed Links
+SS7_POPT_XSN:Extended Sequence Numbers
+SS7_POPT_ALL:All options
+.TE
+.RE
+
+.SS "Protocol Configuration"
+.PP
+.PP
+Protocol management controls which affect protocol configuration are invoked
+by local management to configure or request configuration information from the
+SDT provider.
+.PP
+The \fIic_cmd\fR contains one of the following configuration commands:
+.TP
+.B SDT_IOCGCONFIG
+Gets the protocol configuration of the Signalling Data Terminal into the
+provided \fBsdt_config\fR structure.
+.TP
+.B SDT_IOCSCONFIG
+Sets the protocol configuration of the Signalling Data Terminal from the
+provided \fBsdt_config\fR structure.
+.TP
+.B SDT_IOCTCONFIG
+Tests the protocol configuration as provided in the \fBsdt_config\fR structure
+against the Signalling Data Terminal for consistency and validity.  Also locks
+the configuration of the SDT provider awaiting a commit.
+.TP
+.B SDT_IOCCCONFIG
+Commits the protocol configuration as provided in the \fBsdt_config\fR
+structure to the Signalling Data Terminal.  Also unlocks the configuration of
+the SDT provider.
+.PP
+\fIic_dp\fR points to a \fBsdt_config\fR structure which represents the
+Signalling Data Terminal protocol configuration as follows:
+.PP
+.RS 4
+.nf
+typedef struct sdt_config {
+    sdt_ulong   t8;  /* T8 timeout                       */
+    sdt_ulong   Tin; /* AERM normal proving threshold    */
+    sdt_ulong   Tie; /* AERM emergency proving threshold */
+    sdt_ulong   T;   /* SUERM error threshold            */
+    sdt_ulong   D;   /* SUERM error rate parameter       */
+    sdt_ulong   Te;  /* EIM error threshold              */
+    sdt_ulong   De;  /* EIM correct decrement            */
+    sdt_ulong   Ue;  /* EIM error increment              */
+} sdt_config_t;
+.fi
+.TP
+.I t8
+Contains the T8 timeout value (in jiffies) for the T8 timer used with the
+optional Errored Interval Monitor (EIM) procedure of ITU-T Q.703 Annex A.
+.TP
+.I Tin
+Contains the T4 timeout value (in jiffies) for the normal proving period.
+.TP
+.I Tie
+Contains the T4 timeout value (in jiffies) for the emergency proving period.
+.TP
+.I T
+Contains the Signal Unit Error Rate Monitor (SUERM) threshold value.
+.TP
+.I D
+Contains the Signal Unit Error Rate Monitor (SUERM) downcount value.
+.TP
+.I Te
+Contains the threshold value for use with the Errored Interval Monitor (EIM)
+procedure of ITU-T Q.703 Annex A.
+.TP
+.I De
+Contains the downcount value for use with the Errored Interval Monitor (EIM)
+procedure of ITU-T Q.703 Annex A.
+.TP
+.I Ue
+Contains the upcount value for use with the Errored Interval Monitor (EIM)
+procedure of ITU-T Q.703 Annex A.
+.RE
+
+.SS "Protocol State"
+.PP
+.PP
+Protocol management controls which affect protocol state are invoked by local
+management to request information about the state of the protocol state
+machines in the SDT provider.
+.PP
+The \fIic_cmd\fR contains one of the following state commands:
+.TP
+.B SDT_IOCGSTATEM
+Gets the protocol state machine variables of the Signalling Data Terminal into
+the provided \fBsdt_statem\fR structure.
+.TP
+.B SDT_IOCCMRESET
+Performs a master reset on the protocol state machines and returns the
+power-on settings of the state machine variables of the Signalling Data
+Terminal into the provided \fBsdt_statem\fR structure.
+.PP
+\fIic_dp\fR points to a \fBsdt_statem\fR structure which represents the
+Signalling Data Terminal protocol state as follows:
+.PP
+.RS 4
+.nf
+typedef struct sdt_statem {
+    sdt_ulong aerm_state;           /* AERM  state variable      */
+    sdt_ulong   aborted_proving;    /* AERM  aborted proving     */
+    sdt_long    Ca;                 /* AERM  error counter       */
+    sdt_ulong   Ti;                 /* AERM  threshold           */
+    sdt_ulong suerm_state;          /* SUERM state variable      */
+    sdt_long    Cs;                 /* SUERM error counter       */
+    sdt_ulong   Ns;                 /* SUERM su counter          */
+    sdt_ulong eim_state;            /* EIM   state variable      */
+    sdt_long    Ce;                 /* EIM   counter             */
+    sdt_ulong   su_received;        /* EIM   su received flag    */
+    sdt_ulong   interval_error;     /* EIM   interval error flag */
+    sdt_ulong daedt_state;          /* DAEDT state variable      */
+    sdt_ulong daedr_state;          /* DAEDR state variable      */
+    sdt_ulong   octet_counting_mode;/* receivers freewheeling    */
+} sdt_statem_t;
+.fi
+.TP
+\fIaerm_state\fR, \fIaborted_proving\fR, \fICa\fR, \fITi\fR
+Contains the Alignment Error Rate Monitor (AERM) current state
+\fIaerm_state\fR; a flag indicating whether proving has been aborted
+\fIaborted_proving\fR; the current AERM count \fICa\fR, and current AERM
+threshold \fITi\fR.
+.TP
+\fIsuerm_state\fR, \fICs\fR, \fINs\fR
+Contains the Signal Unit Error Rate Monitor (SUERM) current state
+\fIsuerm_state\fR; the current SUERM count \fICs\fR, and the number of errored
+periods \fINs\fR.
+.TP
+\fIeim_state\fR, \fICe\fR, \fIsu_received\fR, \fIinterval_error\fR
+Contains the Errored Interval Monitor (EIM) current state \fIeim_state\fR; the
+current EIM count \fICe\fR, a flag indicating whether a Signal Unit was
+received in the current interval \fIsu_received\fR; and a flag indicating
+whether an error occured in the current interval \fIinterval_error\fR.
+.TP
+\fIdaedt_state\fR
+Contains the Delimitation Alignment and Error Detection Transmit (DAEDT)
+current state.
+.TP
+\fIdeadr_state\fR, \fIoctet_counting_mode\fR
+Contains the Delimitation Alignment and Error Detection Receiving (DAEDR)
+current state; and a flag indicating whether the DAEDR is in octet counting
+mode \fIoctet_counting_mode\fR.
+.RE
+
+.SS "Protocol Data Collection"
+.PP
+.PP
+Protocol management controls which affect protocol measurement data collection
+are invoked by local management to request and alter collection periods for
+data collection within the SDT provider.
+.PP
+\fIic_cmd\fR contains one of the following collection commands:
+.TP
+.B SDT_IOCGSTATSP
+Get the protocol measurement collection period information of the identified
+\fIobject_id\fR into the provided \fBlmi_sta\fR structure.
+.TP
+.B SDT_IOCSSTATSP
+Set the protocol measurement collection period information of the identified
+\fIobject_id\fR using the provided \fBlmi_sta\fR structure.
+.PP
+\fIic_dp\fR points to a \fBlmi_sta\fR structure which represnts the Signalling
+Data Terminal collection periods as follows:
+.PP
+.RS 4
+.nf
+typedef struct lmi_sta {
+    lmi_ulong   object_id;  /* object id for stats      */
+    lmi_ulong   colperiod;  /* collection period        */
+    lmi_ulong   timestamp;  /* timestamp end of period  */
+} lmi_sta_t;
+.fi
+.TP
+.I object_id
+Contains the object idenitfier for the managed object to which the collection
+information applies.
+.TP
+.I colperiod
+Contains the collection period (in jiffies).  The managed object measurement
+data must be collected and notified once for each collection period interval.
+.TP
+.I timestamp
+Contains a timestamp (in seconds since epoch) which identifies the system time
+at which a collection period ends.  This value is used in conjunction with the
+collection period to calculate the time of the next collection interval.
+.RE
+
+.SS "Protocol Statistics"
+.PP
+.PP
+Protocol management controls which affect protocol statistics are invoked by
+local management to request information about statistics pertaining to the SDT
+provider.
+.PP
+\fIic_cmd\fR contains one of the following statistics commands:
+.TP
+.B SDT_IOCGSTATS
+Get the protocol statistics of the Signalling Data Terminal for the current
+collection period into the provided \fBsdt_stats\fR structure.
+.TP
+.B SDT_IOCCSTATS
+Clear the protocol statisics of the Signalling Data Terminal for the current
+collection period and return the statistics which were accumulated to the
+point of clearing during the current interval \fBsdt_stats\fR structure.
+.PP
+\fIic_dp\fR points to a \fBsdt_stats\fR structure which represents the
+Signalling Data Terminal protocol statistics as follows:
+.PP
+.RS 4
+.nf
+typedef struct sdt_stats {
+    lmi_sta_t   header;
+    sdt_ulong   tx_bytes;
+    sdt_ulong   tx_sus;
+    sdt_ulong   tx_underruns;
+    sdt_ulong   tx_aborts;
+    sdt_ulong   tx_buffer_overflows;
+    sdt_ulong   tx_sus_in_error;
+    sdt_ulong   rx_bytes;
+    sdt_ulong   rx_sus;
+    sdt_ulong   rx_overruns;
+    sdt_ulong   rx_aborts;
+    sdt_ulong   rx_buffer_overflows;
+    sdt_ulong   rx_sus_in_error;
+    sdt_ulong   rx_sync_transitions;
+    sdt_ulong   rx_bits_octet_counted;
+    sdt_ulong   rx_crc_errors;
+    sdt_ulong   rx_frame_errors;
+    sdt_ulong   rx_frame_overflows;
+    sdt_ulong   rx_frame_too_long;
+    sdt_ulong   rx_frame_too_short;
+    sdt_ulong   rx_residue_errors;
+    sdt_ulong   carrier_cts_lost;
+    sdt_ulong   carrier_dcd_lost;
+    sdt_ulong   carrier_lost;
+} sdt_stats_t;
+.fi
+.TP
+.I header
+Contains the timestamp for the current collection interval for which
+statistics are being reported.
+.TP
+.IR tx_bytes ", " tx_sus ", " tx_underruns ", " tx_aborts ", " tx_buffer_overflows ", " tx_sus_in_error
+Contains transmitter statistics for the current collection interval.
+.TP
+.IR rx_bytes ", " rx_sus ", " rx_overruns ", " rx_aborts ", " rx_buffer_overflows ", " rx_sus_in_error ", " rx_sync_transitions ", " rx_bits_octet_counted ", " rx_crc_errors ", " rx_frame_errors ", " rx_frame_overflow ", " rx_frame_too_long ", " rx_frame_too_short ", " rx_residue_errors
+Contains receiver statistics for the current collection interval.
+.TP
+.IR carrier_cts_lost ", " carrier_dcd_lost ", " carrier_lost
+Contains interface statistics for the current collection interval.
+.RE
+
+.SS "Protocol Events"
+.PP
+.PP
+Protocol management controls which affect notification of events to local
+management are invoked by local management to request information about
+notifications which have been requested as well as to set notification by
+event.
+.PP
+The \fIic_cmd\fR contians one of the following notify commands:
+.TP
+.B SDT_IOCGNOTIFY
+Gets the protocol notification bitmask of the Signalling Data Terminal into
+the provided \fBsdt_notify\fR structure.
+.TP
+.B SDT_IOCSNOTIFY
+Sets protocol notification for the Signalling Data Terminal events identified
+by set bits in the provided \fBsdt_notify\fR structure.
+.TP
+.B SDT_IOCCNOTIFY
+Clears protocol notification for the Signalling Data Terminal events identified
+by set bits in the provided \fBsdt_notify\fR structure.
+.PP
+\fIic_dp\fR points to a \fBsdt_notify\fR structure which represents the
+Signalling Data Terminal protocol event notifications as follows:
+.PP
+.RS 4
+.nf
+typedef struct sdt_notify {
+    sdt_ulong   sdt_mask;
+} sdt_notify_t;
+.fi
+.TP
+.I sdt_mask
+Contains a bit mask with bits set for each Signalling Data Terminal event for
+which notification has been requested.  May also contain set bits for events
+for which notification should be set (\fBSDT_IOCSNOTIFY\fR) or cleared
+(\fBSDT_IOCCNOTIFY\fR).  The mask is the bitwise OR of any of the following
+values:
+.RE
+.RS 4
+.IP
+.TS
+tab(:);
+lb 2 l.
+SDT_EVT_TX_FAIL:Transmitter failure.
+SDT_EVT_RX_FAIL:Receiver failure.
+SDT_EVT_CARRIER:Carrier failure.
+.TE
+.RE
+
+.\" .SH "ERROR HANDLING"
+.PP
+
+.\" .SS "ERRORS"
+.PP
+
+.SH "SEE ALSO"
+.PP
+.PP
+.BR devi (7),
+.BR getmsg (2),
+.BR ioctl (2),
+.BR lmi (7),
+.BR mtpi (7),
+.BR putmsg (2),
+.BR read (2),
+.BR sdli (7),
+.BR sl (8),
+.BR sl (8),
+.BR sli (7),
+.BR slsi (7),
+.BR ss7d (8),
+.BR streamio (2),
+.BR write (2)
+
+.SH "BUGS"
+.PP
+.PP
+Too many to mention.
+
+.SH "HISTORY"
+.PP
+.PP
+This STREAMS interface for SS7 is an original part of the \fIOpenSS7\fR package.
+
+.XX
+.[
+q702
+.]
+.[
+q703
+.]
+.[
+q704
+.]
+.[
+$LIST$
+.]
+.TA

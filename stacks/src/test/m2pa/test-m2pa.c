@@ -1,0 +1,9980 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:47 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
+
+ All Rights Reserved.
+
+ Unauthorized distribution or duplication is prohibited.
+
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written
+ authorization of the copyright holder, and licensors, if any.
+
+ The recipient of this document, by its retention and use, warrants that
+ the recipient will protect this information and keep it confidential, and
+ will not disclose the information contained in this document without the
+ written permission of its owner.
+
+ The author reserves the right to revise this software and documentation
+ for any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of
+ the technical arts, or the reflection of changes in the design of any
+ techniques, or procedures embodied, described, or referred to herein.
+ The author is under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"),
+ it is classified as "Commercial Computer Software" under paragraph
+ 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+ ("DFARS") (or any successor regulations) and the Government is acquiring
+ only the license rights granted herein (the license rights customarily
+ provided to non-Government users).  If the Software is supplied to any unit
+ or agency of the Government other than DoD, it is classified as "Restricted
+ Computer Software" and the Government's rights in the Software are defined
+ in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+ any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+ of the NASA Supplement to the FAR (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/01/17 08:25:47 $ by <bidulock@openss7.org>
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:47 $"
+
+static char const ident[] =
+    "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:25:47 $";
+
+#include <stropts.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <sys/poll.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <signal.h>
+#include <features.h>
+#include <limits.h>
+#include <stdint.h>
+#include <sys/types.h>
+#include <asm/byteorder.h>
+
+#include <ss7/lmi.h>
+#include <ss7/lmi_ioctl.h>
+#include <ss7/sdli.h>
+#include <ss7/sdli_ioctl.h>
+#include <ss7/devi.h>
+#include <ss7/devi_ioctl.h>
+#include <ss7/sdti.h>
+#include <ss7/sdti_ioctl.h>
+#include <ss7/sli.h>
+#include <ss7/sli_ioctl.h>
+
+#include <sys/npi.h>
+#include <sys/npi_sctp.h>
+
+#define SUCCESS		 0
+#define FAILURE		 1
+#define INCONCLUSIVE	-1
+#define NOTAPPLICABLE	-2
+#define SCRIPTERROR	-3
+
+#define BUFSIZE 300
+#define FFLUSH(_stream)
+//#define FFLUSH(_stream)  fflush((_stream))
+
+#define SHORT_WAIT   10
+#define NORMAL_WAIT  100
+#define LONG_WAIT    500
+#define MAXIMUM_WAIT 1000
+
+#ifndef HZ
+#define HZ 100
+#endif
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Configuration
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+//#define M2PA_VERSION_DRAFT3
+//#define M2PA_VERSION_DRAFT3_1
+//#define M2PA_VERSION_DRAFT4
+//#define M2PA_VERSION_DRAFT4_1
+//#define M2PA_VERSION_DRAFT4_9
+//#define M2PA_VERSION_DRAFT5
+//#define M2PA_VERSION_DRAFT5_1
+//#define M2PA_VERSION_DRAFT6
+//#define M2PA_VERSION_DRAFT6_1
+#define M2PA_VERSION_DRAFT6_9
+//#define M2PA_VERSION_DRAFT7
+
+typedef struct addr {
+	uint16_t port __attribute__ ((packed));
+	uint32_t addr[3] __attribute__ ((packed));
+} addr_t;
+
+static struct {
+	addr_t loc;
+	addr_t rem;
+	N_qos_sel_info_sctp_t qos;
+	N_qos_sel_data_sctp_t qos_data;
+} ptconf = {
+	{
+		__constant_htons(10001), {
+			__constant_htonl(0x7f000001), __constant_htonl(0x7f000002), __constant_htonl(0x7f000003)
+		}
+	},			/* loc */
+	{
+		__constant_htons(10000), {
+			__constant_htonl(0x7f000001), __constant_htonl(0x7f000002), __constant_htonl(0x7f000003)
+		}
+	},			/* rem */
+	{
+		N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
+		    2,		/* i_streams */
+		    2,		/* o_streams */
+		    5,		/* ppi */
+		    0,		/* sid */
+		    -1L,	/* max_in */
+		    -1L,	/* max_retran */
+		    -1L,	/* ck_life */
+		    -1L,	/* ck_inc */
+		    -1L,	/* hmac */
+		    -1L,	/* thrott */
+		    -1L,	/* max_sack */
+		    -1L,	/* rto_ini */
+		    -1L,	/* rto_min */
+		    -1L,	/* rto_max */
+		    -1L,	/* rtx_path */
+		    -1L,	/* hb_itvl */
+		    0		/* options */
+	}, {
+		N_QOS_SEL_DATA_SCTP,	/* n_qos_type */
+		    5,		/* ppi */
+		    1,		/* sid */
+		    0,		/* ssn */
+		    0,		/* tsn */
+		    0		/* more */
+	}
+};
+
+static struct {
+	addr_t loc;
+	addr_t rem;
+	N_qos_sel_info_sctp_t qos;
+	lmi_option_t opt;
+	sdl_config_t sdl;
+	sdt_config_t sdt;
+	sl_config_t sl;
+} iutconf = {
+	{
+		__constant_htons(10000), {
+		__constant_htonl(0x7f000001), __constant_htonl(0x7f000002), __constant_htonl(0x7f000003),}
+	},			/* loc */
+	{
+		__constant_htons(10001), {
+		__constant_htonl(0x7f000001), __constant_htonl(0x7f000002), __constant_htonl(0x7f000003),}
+	},			/* rem */
+	{
+		N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
+		    2,		/* i_streams */
+		    2,		/* o_streams */
+		    5,		/* ppi */
+		    0,		/* sid */
+		    -1L,	/* max_in */
+		    -1L,	/* max_retran */
+		    -1L,	/* ck_life */
+		    -1L,	/* ck_inc */
+		    -1L,	/* hmac */
+		    -1L,	/* thrott */
+		    -1L,	/* max_sack */
+		    -1L,	/* rto_ini */
+		    -1L,	/* rto_min */
+		    -1L,	/* rto_max */
+		    -1L,	/* rtx_path */
+		    -1L,	/* hb_itvl */
+		    0,		/* options */
+	},			/* qos */
+	{
+		SS7_PVAR_ITUT_96,	/* pvar */
+		    0,		/* popt */
+	},			/* opt */
+	{
+      ifname: NULL, ifflags: 0, iftype: SDL_TYPE_PACKET, ifrate: 10000000, ifgtype: SDL_GTYPE_SCTP, ifgrate: 10000000, ifmode: SDL_MODE_PEER, ifgmode: SDL_GMODE_NONE, ifgcrc: SDL_GCRC_NONE, ifclock: SDL_CLOCK_NONE, ifcoding: SDL_CODING_NONE, ifframing: SDL_FRAMING_NONE, ifblksize: 0, ifleads: 0, ifbpv: 0, ifalarms: 0, ifrxlevel: 0, iftxlevel: 0, ifsync:0,},
+				/* sdl */
+	{
+	      t8:100 * HZ / 1000,	/* t8 - T8 timeout */
+	      Tin: 4,		/* Tin - AERM normal proving threshold */
+	      Tie: 1,		/* Tie - AERM emergency proving threshold */
+	      T:   64,		/* T - SUERM error threshold */
+	      D:   256,	/* D - SUERM error rate parameter */
+	      Te:  577169,	/* Te - EIM error threshold */
+	      De:  9308000,	/* De - EIM correct decrement */
+	      Ue:  144292000,	/* Ue - EIM error increment */
+	      N:   16,		/* N */
+	      m:   272,	/* m */
+	      b:   64,		/* b */
+	      f:   1,		/* f */
+	},			/* sdt */
+	{
+	      t1:45 * HZ,	/* t1 - timer t1 duration (ticks) */
+	      t2:  5 * HZ,	/* t2 - timer t2 duration (ticks) */
+	      t2l: 20 * HZ,	/* t2l - timer t2l duration (ticks) */
+	      t2h: 100 * HZ,	/* t2h - timer t2h duration (ticks) */
+	      t3:  1 * HZ,	/* t3 - timer t3 duration (ticks) */
+	      t4n: 8 * HZ,	/* t4n - timer t4n duration (ticks) */
+	      t4e: 500 * HZ / 1000,	/* t4e - timer t4e duration (ticks) */
+	      t5:  100 * HZ / 1000,	/* t5 - timer t5 duration (ticks) */
+	      t6:  4 * HZ,	/* t6 - timer t6 duration (ticks) */
+	      t7:  2 * HZ,	/* t7 - timer t7 duration (ticks) */
+	      rb_abate:3,	/* rb_abate - RB cong abatement (#msgs) */
+	      rb_accept:6,	/* rb_accept - RB cong onset accept (#msgs) */
+	      rb_discard:9,	/* rb_discard - RB cong discard (#msgs) */
+	      tb_abate_1:128 * 272,
+		    /* tb_abate_1 - lev 1 cong abate (#bytes) */
+	      tb_onset_1:256 * 272,
+		    /* tb_onset_1 - lev 1 cong onset (#bytes) */
+	      tb_discd_1:384 * 272,
+		    /* tb_discd_1 - lev 1 cong discard (#bytes) */
+	      tb_abate_2:512 * 272,
+		    /* tb_abate_2 - lev 1 cong abate (#bytes) */
+	      tb_onset_2:640 * 272,
+		    /* tb_onset_2 - lev 1 cong onset (#bytes) */
+	      tb_discd_2:768 * 272,
+		    /* tb_discd_2 - lev 1 cong discard (#bytes) */
+	      tb_abate_3:896 * 272,
+		    /* tb_abate_3 - lev 1 cong abate (#bytes) */
+	      tb_onset_3:1024 * 272,
+		    /* tb_onset_3 - lev 1 cong onset (#bytes) */
+	      tb_discd_3:1152 * 272,
+		    /* tb_discd_3 - lev 1 cong discard (#bytes) */
+	      N1:  31,	/* N1 - PCR/RTBmax messages (#msg) */
+	      N2:  8192,	/* N2 - PCR/RTBmax octets (#bytes) */
+	      M:   5		/* M - IAC normal proving periods */
+} /* sl */ };
+
+static struct {
+	addr_t loc;
+	addr_t rem;
+	N_qos_sel_info_sctp_t qos;
+} mgmconf = {
+	{
+		__constant_htons(10001), {
+			__constant_htonl(0x7f000001), __constant_htonl(0x7f000002), __constant_htonl(0x7f000003)
+		}
+	},			/* loc */
+	{
+		__constant_htons(10000), {
+			__constant_htonl(0x7f000001), __constant_htonl(0x7f000002), __constant_htonl(0x7f000003)
+		}
+	},			/* rem */
+	{
+		N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
+		    2,		/* i_streams */
+		    2,		/* o_streams */
+		    5,		/* ppi */
+		    0,		/* sid */
+		    -1L,	/* max_in */
+		    -1L,	/* max_retran */
+		    -1L,	/* ck_life */
+		    -1L,	/* ck_inc */
+		    -1L,	/* hmac */
+		    -1L,	/* thrott */
+		    -1L,	/* max_sack */
+		    -1L,	/* rto_ini */
+		    -1L,	/* rto_min */
+		    -1L,	/* rto_max */
+		    -1L,	/* rtx_path */
+		    -1L,	/* hb_itvl */
+		    0		/* options */
+	}			/* qos */
+};
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Timer Functions
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  Timer values for tests: each timer has a low range (minus error margin) and
+ *  a high range (plus error margin).
+ */
+
+typedef struct timer_range {
+	long lo;
+	long hi;
+	char *name;
+} timer_range_t;
+
+enum { t1 = 0, t2, t3, t4n, t4e, t5, t6, t7, tmax };
+
+static timer_range_t timer[tmax] = {
+	{40000, 50000, "T1"},	/* Timer T1 30000 */
+	{5000, 150000, "T2"},	/* Timer T2 5000 */
+	{1000, 1500, "T3"},	/* Timer T3 100 */
+	{7500, 9500, "T4(Pn)"},	/* Timer T4n 3000 */
+	{400, 600, "T4(Pe)"},	/* Timer T4e 50 */
+	{125, 125, "T5"},	/* Timer T5 10 */
+	{3000, 6000, "T6"},	/* Timer T6 300 */
+	{500, 2000, "T7"}	/* Timer T7 50 */
+};
+
+long test_start = 0;
+
+/*
+ *  Return the current time in milliseconds.
+ */
+static long dual_milliseconds(int t1, int t2)
+{
+	long ret;
+	struct timeval now;
+	printf("                               !                                    \n");
+	printf("                               !  %-6.6s     %ld.%03ld <= %-2.2s <= %ld.%03ld   \n",
+	       timer[t1].name, timer[t1].lo / 1000, timer[t1].lo - ((timer[t1].lo / 1000) * 1000),
+	       timer[t1].name, timer[t1].hi / 1000, timer[t1].hi - ((timer[t1].hi / 1000) * 1000));
+	printf("                               !   +                                \n");
+	printf("                               !  %-6.6s     %ld.%03ld <= %-2.2s <= %ld.%03ld   \n",
+	       timer[t2].name, timer[t2].lo / 1000, timer[t2].lo - ((timer[t2].lo / 1000) * 1000),
+	       timer[t2].name, timer[t2].hi / 1000, timer[t2].hi - ((timer[t2].hi / 1000) * 1000));
+	printf("                               !                                    \n");
+	FFLUSH(stdout);
+	gettimeofday(&now, NULL);
+	if (!test_start)	/* avoid blowing over precision */
+		test_start = now.tv_sec;
+	ret = (now.tv_sec - test_start) * 1000;
+	ret += (now.tv_usec + 500L) / 1000;
+	return ret;
+}
+
+/*
+ *  Return the current time in milliseconds.
+ */
+static long milliseconds(int t)
+{
+	long ret;
+	struct timeval now;
+	printf("                               !                                    \n");
+	printf("                               !  %-6.6s     %ld.%03ld <= %-2.2s <= %ld.%03ld   \n",
+	       timer[t].name, timer[t].lo / 1000, timer[t].lo - ((timer[t].lo / 1000) * 1000),
+	       timer[t].name, timer[t].hi / 1000, timer[t].hi - ((timer[t].hi / 1000) * 1000));
+	printf("                               !                                    \n");
+	FFLUSH(stdout);
+	gettimeofday(&now, NULL);
+	if (!test_start)	/* avoid blowing over precision */
+		test_start = now.tv_sec;
+	ret = (now.tv_sec - test_start) * 1000;
+	ret += (now.tv_usec + 500L) / 1000;
+	return ret;
+}
+
+/*
+ *  Check the current time against the beginning time provided as an argnument
+ *  and see if the time inverval falls between the low and high values for the
+ *  timer as specified by arguments.  Return SUCCESS if the interval is within
+ *  the allowable range and FAILURE otherwise.
+ */
+static int check_time(const char *t, long beg, long lo, long hi)
+{
+	long i;
+	struct timeval now;
+	if (gettimeofday(&now, NULL)) {
+		printf("****ERROR: gettimeofday\n");
+		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	i = (now.tv_sec - test_start) * 1000;
+	i += (now.tv_usec + 500L) / 1000;
+	i -= beg;
+	printf
+	    ("                           check timeout     %s [%ld.%03ld <= %ld.%03ld <= %ld.%03ld]\n",
+	     t, (lo - 100) / 1000, (lo - 100) - (((lo - 100) / 1000) * 1000), i / 1000,
+	     i - ((i / 1000) * 1000), (hi + 100) / 1000, (hi + 100) - (((hi + 100) / 1000) * 1000)
+	    );
+	FFLUSH(stdout);
+	if (lo - 100 <= i && i <= hi + 100)
+		return SUCCESS;
+	else
+		return FAILURE;
+}
+
+static int timer_timeout = 0;
+
+static void timer_handler(int signum)
+{
+	if (signum == SIGALRM)
+		timer_timeout = 1;
+	return;
+}
+
+static int timer_sethandler(void)
+{
+	sigset_t mask;
+	struct sigaction act;
+	act.sa_handler = timer_handler;
+	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_restorer = NULL;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		return FAILURE;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	return SUCCESS;
+}
+
+/*
+ *  Start an interval timer as the overall test timer.
+ */
+static int start_tt(long duration)
+{
+	struct itimerval setting = {
+		{0, 0},
+		{duration / 1000, (duration % 1000) * 1000}
+	};
+	if (timer_sethandler())
+		return FAILURE;
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return FAILURE;
+	timer_timeout = 0;
+	return SUCCESS;
+}
+
+/*
+ *  Stop overall test timer.
+ */
+static int stop_tt(void)
+{
+	sigset_t mask;
+	struct sigaction act;
+	act.sa_handler = SIG_DFL;
+	act.sa_flags = 0;
+	act.sa_restorer = NULL;
+	sigemptyset(&act.sa_mask);
+	if (sigaction(SIGALRM, &act, NULL))
+		return FAILURE;
+	timer_timeout = 0;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
+	return SUCCESS;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  M2PA Message Definitions
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#define M2PA_PPI		5
+
+#define M2PA_MESSAGE_CLASS	11
+
+#define M2PA_VERSION		1
+
+#define M2PA_MTYPE_DATA		1
+#define M2PA_MTYPE_STATUS	2
+#define M2PA_MTYPE_PROVING	3
+#define M2PA_MTYPE_ACK		4
+
+#define M2PA_DATA_MESSAGE	\
+	__constant_htonl((M2PA_VERSION<<24)|(M2PA_MESSAGE_CLASS<<8)|M2PA_MTYPE_DATA)
+#define M2PA_STATUS_MESSAGE	\
+	__constant_htonl((M2PA_VERSION<<24)|(M2PA_MESSAGE_CLASS<<8)|M2PA_MTYPE_STATUS)
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+#define M2PA_PROVING_MESSAGE	\
+	__constant_htonl((M2PA_VERSION<<24)|(M2PA_MESSAGE_CLASS<<8)|M2PA_MTYPE_PROVING)
+#endif
+#if defined(M2PA_VERSION_DRAFT3_1)
+#define M2PA_ACK_MESSAGE	\
+	__constant_htonl((M2PA_VERSION<<24)|(M2PA_MESSAGE_CLASS<<8)|M2PA_MTYPE_ACK)
+#endif
+
+#define M2PA_STATUS_STREAM	0
+#define M2PA_DATA_STREAM	1
+
+#define M2PA_STATUS_ALIGNMENT			(__constant_htonl(1))
+#define M2PA_STATUS_PROVING_NORMAL		(__constant_htonl(2))
+#define M2PA_STATUS_PROVING_EMERGENCY		(__constant_htonl(3))
+#define M2PA_STATUS_IN_SERVICE			(__constant_htonl(4))
+#define M2PA_STATUS_PROCESSOR_OUTAGE		(__constant_htonl(5))
+#define M2PA_STATUS_PROCESSOR_OUTAGE_ENDED	(__constant_htonl(6))
+#define M2PA_STATUS_BUSY			(__constant_htonl(7))
+#define M2PA_STATUS_BUSY_ENDED			(__constant_htonl(8))
+#define M2PA_STATUS_OUT_OF_SERVICE		(__constant_htonl(9))
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+#define M2PA_STATUS_NONE			(__constant_htonl(10))
+#endif
+#define M2PA_STATUS_INVALID			(__constant_htonl(11))
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Definitions of signals and events.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#define OUT_OF_SERVICE		1	/* M2PA Status signals */
+#define ALIGNMENT		2
+#define PROVING_NORMAL		3
+#define PROVING_EMERG		4
+#define IN_SERVICE		5
+#define PROCESSOR_OUTAGE	6
+#define PROCESSOR_ENDED		7
+#define BUSY			8
+#define BUSY_ENDED		9
+#define INVALID_STATUS		10
+
+#define DATA			20	/* Protocol Tester (PT) signals and events */
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+#define PROVING			21
+#endif
+#define ACK			22
+
+#define TX_BREAK		30
+#define TX_MAKE			31
+#define BAD_ACK			32
+#define MSU_TOO_SHORT		29
+
+#if 0
+#define FISU			20
+#define FISU_S			21
+#define FISU_CORRUPT		23
+#define FISU_CORRUPT_S		24
+#define MSU_SEVEN_ONES		27
+#define MSU_TOO_LONG		28
+#define FISU_FISU_1FLAG		60
+#define FISU_FISU_2FLAG		61
+#define MSU_MSU_1FLAG		62
+#define MSU_MSU_2FLAG		63
+#endif
+
+#define TIMEOUT			40	/* TIMER events */
+#define COUNT			41
+#define TRIES			39
+#define ETC			49
+
+#if 0
+#define SIB_S			42
+#endif
+
+#define IUT_IN_SERVICE		43	/* Implementation Under Test (IUT) events */
+#define IUT_OUT_OF_SERVICE	44
+#define IUT_RPO			45
+#define IUT_RPR			46
+#define IUT_DATA		47
+
+#define POWER_ON		200	/* Implementation Under Test (IUT) signals */
+#define START			201
+#define STOP			202
+#define LPO			203
+#define LPR			204
+#define EMERG			205
+#define CEASE			206
+#define SEND_MSU		207
+#define SEND_MSU_S		208
+#define CONG_A			209
+#define CONG_D			210
+#define NO_CONG			211
+#define CLEARB			212
+
+#define CONN_REQ		300	/* MGMT controls */
+#define CONN_IND		301
+#define CONN_RES		302
+#define CONN_CON		303
+#define DISCON_REQ		304
+#define DISCON_IND		305
+#define INFO_REQ		306
+#define INFO_ACK		307
+#define BIND_REQ		308
+#define BIND_ACK		309
+#define OK_ACK			310
+#define ERROR_ACK		311
+#define OPTMGMT_REQ		312
+
+#define ENABLE_REQ		400
+#define ENABLE_CON		401
+#define DISABLE_REQ		402
+#define DISABLE_CON		403
+#define ERROR_IND		404
+
+#define UNKNOWN			48
+
+#define NO_MSG			-1
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Globals
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int state = 0;
+static int event = 0;
+static int count = 0;
+static int tries = 0;
+static int expand = 0;
+static int debug = 1;
+static int verbose = 0;
+static long beg_time = 0;
+
+static size_t nacks = 1;
+
+static unsigned long iut_options = 0;
+
+/* listening file descriptor */
+static int mgm_fd = 0;
+static ulong mgm_tok = 0;
+static ulong mgm_seq = 0;
+static unsigned char mgm_buf[BUFSIZE];
+
+/* protocol tester file descriptor */
+static int pt_fd = 0;
+static ulong pt_tok = 0;
+static ulong pt_seq = 0;
+static unsigned char pt_buf[BUFSIZE];
+static unsigned char pt_fib = 0x0;
+static unsigned int pt_fsn = 0x0;
+static unsigned char pt_bib = 0x0;
+static unsigned int pt_bsn = 0x0;
+//static unsigned char   pt_li  = 0;
+//static unsigned char   pt_sio = 0;
+
+/* implementation under test file descriptor */
+static int iut_fd = 0;
+static ulong iut_tok = 0;
+static ulong iut_seq = 0;
+static unsigned char iut_buf[BUFSIZE];
+static unsigned char iut_fib = 0x0;
+static unsigned int iut_fsn = 0x0;
+static unsigned char iut_bib = 0x0;
+static unsigned int iut_bsn = 0x0;
+
+#define MSU_LEN 35
+static int msu_len = MSU_LEN;
+
+/* some globals for compressing events */
+static int oldpsb = 0;				/* last pt sequence number and indicator bits */
+static int oldmsg = 0;				/* last pt message */
+static int cntmsg = 0;				/* repeats of pt message */
+static int oldact = 0;				/* last iut action */
+static int cntact = 0;				/* repeats of iut action */
+static int oldisb = 0;				/* last iut sequence number and indicator bits */
+static int oldret = 0;
+static int cntret = 0;
+static int oldprm = 0;
+static int cntprm = 0;
+static int oldmgm = 0;				/* last management control */
+static int cntmgm = 0;				/* repeats of management control */
+
+union primitives {
+	ulong prim;
+	union LMI_primitives lmi;
+	union SDL_primitives sdl;
+	union SDT_primitives sdt;
+	union SL_primitives sl;
+	union N_primitives npi;
+};
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Send messages from the Protocol Tester
+ *
+ *  -------------------------------------------------------------------------
+ */
+static void pt_printf(char *l, char *r)
+{
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+	if (pt_fsn || pt_bsn)
+		printf("%23.23s  ---[%04x, %04x]-->  %-23.23s\n", l, pt_fsn, pt_bsn, r);
+	else
+#endif
+		printf("%23.23s  ----------------->  %-23.23s\n", l, r);
+	FFLUSH(stdout);
+}
+
+#define send pt_send
+static int send(int msg)
+{
+	uint32_t status = 0;
+	char cbuf[BUFSIZE];
+	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
+	struct strbuf data = { sizeof(*pt_buf), 0, pt_buf };
+	union primitives *p = (union primitives *) cbuf;
+	if (msg != oldmsg) {
+		oldmsg = msg;
+		if (verbose) {
+			if (cntmsg) {
+				printf
+				    ("             Ct=%5d                                               \n",
+				     cntmsg + 1);
+				FFLUSH(stdout);
+			}
+		}
+		cntmsg = 0;
+	} else if (!expand)
+		cntmsg++;
+	switch (msg) {
+	case ALIGNMENT:
+		if (!cntmsg)
+			pt_printf("ALIGNMENT", "");
+		status = M2PA_STATUS_ALIGNMENT;
+		goto pt_status_putmsg;
+	case PROVING_NORMAL:
+		if (!cntmsg)
+			pt_printf("PROVING-NORMAL", "");
+		status = M2PA_STATUS_PROVING_NORMAL;
+		goto pt_status_putmsg;
+	case PROVING_EMERG:
+		if (!cntmsg)
+			pt_printf("PROVING-EMERGENCY", "");
+		status = M2PA_STATUS_PROVING_EMERGENCY;
+		goto pt_status_putmsg;
+	case OUT_OF_SERVICE:
+		if (!cntmsg)
+			pt_printf("OUT-OF-SERVICE", "");
+		status = M2PA_STATUS_OUT_OF_SERVICE;
+		goto pt_status_putmsg;
+	case IN_SERVICE:
+		if (!cntmsg)
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			pt_printf("IN-SERVICE", "");
+#else
+			pt_printf("READY", "");
+#endif
+		status = M2PA_STATUS_IN_SERVICE;
+		goto pt_status_putmsg;
+	case PROCESSOR_OUTAGE:
+		if (!cntmsg)
+			pt_printf("PROCESSOR-OUTAGE", "");
+		status = M2PA_STATUS_PROCESSOR_OUTAGE;
+		goto pt_status_putmsg;
+	case PROCESSOR_ENDED:
+		if (!cntmsg)
+			pt_printf("PROCESSOR-OUTAGE-ENDED", "");
+		status = M2PA_STATUS_PROCESSOR_OUTAGE_ENDED;
+		goto pt_status_putmsg;
+	case BUSY_ENDED:
+		if (!cntmsg)
+			pt_printf("BUSY-ENDED", "");
+		status = M2PA_STATUS_BUSY_ENDED;
+		goto pt_status_putmsg;
+	case BUSY:
+		if (!cntmsg)
+			pt_printf("BUSY", "");
+		status = M2PA_STATUS_BUSY;
+		goto pt_status_putmsg;
+	case COUNT:
+		printf("           Ct = %5d    ----------------->                         \n", count);
+		return SUCCESS;
+	case TRIES:
+		printf("       %5d iterations  ----------------->                         \n", tries);
+		FFLUSH(stdout);
+		return SUCCESS;
+	case ETC:
+		printf("                    .    ----------------->                         \n");
+		printf("                    .    ----------------->                         \n");
+		printf("                    .    ----------------->                         \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case INVALID_STATUS:
+		if (!cntmsg)
+			pt_printf("[INVALID-STATUS]", "");
+		status = M2PA_STATUS_INVALID;
+		goto pt_status_putmsg;
+	      pt_status_putmsg:
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+		data.len = 3 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = status;
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+		data.len = 4 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint16_t *) pt_buf)[4] = htons(pt_bsn);
+		((uint16_t *) pt_buf)[5] = htons(pt_fsn);
+		((uint32_t *) pt_buf)[3] = status;
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)
+		data.len = 5 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = htonl(pt_bsn & 0xffffff);
+		((uint32_t *) pt_buf)[3] = htonl(pt_fsn & 0xffffff);
+		((uint32_t *) pt_buf)[4] = status;
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+		data.len = 3 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = status;
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#else
+		return FAILURE;
+#endif
+	case MSU_TOO_SHORT:
+		msu_len = 1;
+		goto send_data;
+	case DATA:
+		if (msu_len > BUFSIZE - 10)
+			msu_len = BUFSIZE - 10;
+	      send_data:
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+		if (!cntmsg) {
+			printf("   [%3d bytes]     DATA  ----------------->                         \n", msu_len);
+			FFLUSH(stdout);
+		}
+		data.len = 2 * sizeof(uint32_t) + msu_len + 1;
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		memset(&(((uint32_t *) pt_buf)[2]), 'B', msu_len + 1);
+		memset(&(((uint32_t *) pt_buf)[2]), 0, 1);
+		p->npi.type = N_DATA_REQ;
+#if defined(M2PA_VERSION_DRAFT3)
+		p->npi.data_req.DATA_xfer_flags = N_RC_FLAG;
+#else
+		p->npi.data_req.DATA_xfer_flags = 0;
+#endif
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+		pt_fsn++;
+		if (!cntmsg) {
+			printf
+			    ("   [%3d bytes]     DATA  ---[%04x, %04x]-->                         \n",
+			     msu_len, pt_fsn, pt_bsn);
+			FFLUSH(stdout);
+		}
+		data.len = 3 * sizeof(uint32_t) + msu_len + 1;
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint16_t *) pt_buf)[4] = htons(pt_bsn);
+		((uint16_t *) pt_buf)[5] = htons(pt_fsn);
+		memset(&(((uint32_t *) pt_buf)[3]), 'B', msu_len + 1);
+		memset(&(((uint32_t *) pt_buf)[3]), 0, 1);
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+		pt_fsn++;
+		if (!cntmsg) {
+			printf
+			    ("   [%3d bytes]     DATA  ---[%04x, %04x]-->                         \n",
+			     msu_len, pt_fsn, pt_bsn);
+			FFLUSH(stdout);
+		}
+		data.len = 4 * sizeof(uint32_t) + msu_len + 1;
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = htonl(pt_bsn & 0xffffff);
+		((uint32_t *) pt_buf)[3] = htonl(pt_fsn & 0xffffff);
+		memset(&(((uint32_t *) pt_buf)[4]), 'B', msu_len + 1);
+		memset(&(((uint32_t *) pt_buf)[4]), 0, 1);
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#else
+		return FAILURE;
+#endif
+	case BAD_ACK:
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+		return INCONCLUSIVE;
+#else
+		pt_fsn = 0xffff;
+		goto pt_ack_putmsg;
+#endif
+	case ACK:
+#if defined(M2PA_VERSION_DRAFT3_1)
+		pt_printf("ACK", "");
+		data.len = 3 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_ACK_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = htonl(nacks);
+		p->npi.type = N_EXDATA_REQ;
+		bcopy(&ptconf.qos_data, (&p->npi.exdata_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT4_1)
+	      pt_ack_putmsg:
+		pt_printf("IN-SERVICE", "");
+		data.len = 4 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint16_t *) pt_buf)[4] = htons(pt_bsn);
+		((uint16_t *) pt_buf)[5] = htons(pt_fsn);
+		((uint32_t *) pt_buf)[3] = M2PA_STATUS_NONE;
+		p->npi.type = N_EXDATA_REQ;
+		bcopy(&ptconf.qos_data, (&p->npi.exdata_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT4_9)
+	      pt_ack_putmsg:
+		pt_printf("IN-SERVICE", "");
+		data.len = 5 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = htons(pt_bsn & 0xffffff);
+		((uint32_t *) pt_buf)[3] = htons(pt_fsn & 0xffffff);
+		((uint32_t *) pt_buf)[4] = M2PA_STATUS_NONE;
+		p->npi.type = N_EXDATA_REQ;
+		bcopy(&ptconf.qos_data, (&p->npi.exdata_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
+	      pt_ack_putmsg:
+		pt_printf("IN-SERVICE", "");
+		data.len = 5 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = htons(pt_bsn & 0xffffff);
+		((uint32_t *) pt_buf)[3] = htons(pt_fsn & 0xffffff);
+		((uint32_t *) pt_buf)[4] = M2PA_STATUS_IN_SERVICE;
+		p->npi.type = N_EXDATA_REQ;
+		bcopy(&ptconf.qos_data, (&p->npi.exdata_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+	      pt_ack_putmsg:
+		printf("               DATA-ACK  ---[%04x, %04x]-->                         \n", pt_fsn, pt_bsn);
+		FFLUSH(stdout);
+		data.len = 4 * sizeof(uint32_t);
+		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
+		((uint32_t *) pt_buf)[0] = M2PA_DATA_MESSAGE;
+		((uint32_t *) pt_buf)[1] = htonl(data.len);
+		((uint32_t *) pt_buf)[2] = htonl(pt_bsn & 0xffffff);
+		((uint32_t *) pt_buf)[3] = htonl(pt_fsn & 0xffffff);
+		p->npi.type = N_DATA_REQ;
+		p->npi.data_req.DATA_xfer_flags = 0;
+		bcopy(&ptconf.qos_data, (&p->npi.data_req) + 1, sizeof(ptconf.qos_data));
+		if (putmsg(pt_fd, &ctrl, &data, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+#else
+		return INCONCLUSIVE;
+#endif
+	case STOP:
+		printf("                  :stop                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case POWER_ON:
+		printf("              :power on                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case LPO:
+		printf("               :set lpo                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case LPR:
+		printf("             :clear lpo                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case EMERG:
+		printf("             :set emerg                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case CEASE:
+		printf("           :clear emerg                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case CONG_A:
+		printf("        :make congested                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case CONG_D:
+		printf("        :make congested                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case NO_CONG:
+		printf("       :clear congested                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case START:
+		printf("                 :start                                             \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case TX_BREAK:
+		printf("              :tx break                                             \n");
+		FFLUSH(stdout);
+		p->npi.type = N_DISCON_REQ;
+		p->npi.discon_req.DISCON_reason = 0;
+		p->npi.discon_req.RES_length = 0;
+		p->npi.discon_req.RES_offset = 0;
+		p->npi.discon_req.SEQ_number = 0;
+		ctrl.len = sizeof(N_discon_req_t);
+		goto pt_control_putmsg;
+	case TX_MAKE:
+		return SUCCESS;
+
+	case ENABLE_REQ:
+		if (verbose) {
+			printf("                :enable                                             \n");
+			FFLUSH(stdout);
+		}
+		return SUCCESS;
+	case DISABLE_REQ:
+		if (verbose) {
+			printf("               :disable                                             \n");
+			FFLUSH(stdout);
+		}
+		return SUCCESS;
+	case DISCON_REQ:
+		printf("            :disconnect                                             \n");
+		FFLUSH(stdout);
+		p->npi.type = N_DISCON_REQ;
+		p->npi.discon_req.DISCON_reason = 0;
+		p->npi.discon_req.RES_length = 0;
+		p->npi.discon_req.RES_offset = 0;
+		p->npi.discon_req.SEQ_number = 0;
+		ctrl.len = sizeof(N_discon_req_t);
+		goto pt_control_putmsg;
+	case BIND_REQ:
+		if (verbose) {
+			printf("                  :bind                                             \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_BIND_REQ;
+		p->npi.bind_req.ADDR_length = sizeof(ptconf.loc);
+		p->npi.bind_req.ADDR_offset = sizeof(p->npi.bind_req);
+		p->npi.bind_req.CONIND_number = 0;
+		p->npi.bind_req.BIND_flags = TOKEN_REQUEST;
+		p->npi.bind_req.PROTOID_length = 0;
+		p->npi.bind_req.PROTOID_offset = 0;
+		bcopy(&ptconf.loc, (&p->npi.bind_req + 1), sizeof(ptconf.loc));
+		ctrl.len = sizeof(N_bind_req_t) + sizeof(ptconf.loc);
+		goto pt_control_putmsg;
+	case OPTMGMT_REQ:
+		if (verbose) {
+			printf("           :optmgmt req                                             \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_OPTMGMT_REQ;
+		p->npi.optmgmt_req.QOS_length = sizeof(ptconf.qos);
+		p->npi.optmgmt_req.QOS_offset = sizeof(p->npi.optmgmt_req);
+		p->npi.optmgmt_req.OPTMGMT_flags = 0;
+		bcopy(&ptconf.qos, (&p->npi.optmgmt_req + 1), sizeof(ptconf.qos));
+		ctrl.len = sizeof(N_optmgmt_req_t) + sizeof(ptconf.qos);
+		goto pt_control_putmsg;
+	      pt_control_putmsg:
+		if (putmsg(pt_fd, &ctrl, NULL, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+	default:
+		if (verbose || !cntmsg) {
+			printf("              :????????                                             \n");
+			FFLUSH(stdout);
+		}
+		return FAILURE;
+	}
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Signal commands to the Implementation Under Test
+ *
+ *  -------------------------------------------------------------------------
+ */
+#define signal iut_signal
+static int signal(int action)
+{
+	char cbuf[BUFSIZE];
+	char dbuf[BUFSIZE];
+	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
+	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
+	union primitives *p = (union primitives *) cbuf;
+	if (action != oldact) {
+		oldact = action;
+		if (verbose) {
+			if (cntact) {
+				printf
+				    ("                                                     Ct=%5d       \n",
+				     cntact + 1);
+				FFLUSH(stdout);
+			}
+		}
+		cntact = 0;
+	} else if (!expand)
+		cntact++;
+	switch (action) {
+	case POWER_ON:
+		printf("                                             :power on              \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_POWER_ON_REQ;
+		ctrl.len = SL_POWER_ON_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case START:
+		printf("                                             :start                 \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_START_REQ;
+		ctrl.len = SL_START_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case STOP:
+		printf("                                             :stop                  \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_STOP_REQ;
+		ctrl.len = SL_STOP_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case LPO:
+		printf("                                             :set lpo               \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
+		ctrl.len = SL_LOCAL_PROC_OUTAGE_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case LPR:
+		printf("                                             :clear lpo             \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_RESUME_REQ;
+		ctrl.len = SL_RESUME_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case CONG_A:
+		printf("                                             :make cong accept      \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_CONGESTION_ACCEPT_REQ;
+		ctrl.len = SL_CONG_ACCEPT_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case CONG_D:
+		printf("                                             :make cong discard     \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_CONGESTION_DISCARD_REQ;
+		ctrl.len = SL_CONG_DISCARD_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case NO_CONG:
+		printf("                                             :clear congestion      \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_NO_CONGESTION_REQ;
+		ctrl.len = SL_NO_CONG_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case CLEARB:
+		printf("                                             :clear buffers         \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_CLEAR_BUFFERS_REQ;
+		ctrl.len = SL_CLEAR_BUFFERS_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case EMERG:
+		printf("                                             :set emergency         \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_EMERGENCY_REQ;
+		ctrl.len = SL_EMERGENCY_REQ_SIZE;
+		goto signal_iut_putmsg;
+	case CEASE:
+		printf("                                             :clear emergency       \n");
+		FFLUSH(stdout);
+		p->sl.sl_primitive = SL_EMERGENCY_CEASES_REQ;
+		ctrl.len = SL_EMERGENCY_CEASES_REQ_SIZE;
+	      signal_iut_putmsg:
+		if (putmsg(iut_fd, &ctrl, NULL, RS_HIPRI) < 0) {
+			printf("                                  ****ERROR: putmsg failed!\n");
+			printf("                                             %s: %s\n",
+			       __FUNCTION__, strerror(errno));
+			return FAILURE;
+		}
+		return SUCCESS;
+	case COUNT:
+		printf("                                                     Ct=%5d       \n", count);
+		FFLUSH(stdout);
+		return SUCCESS;
+	case TRIES:
+		printf("                                                     %4d iterations\n", tries);
+		FFLUSH(stdout);
+		return SUCCESS;
+	case ETC:
+		printf("                                                     .              \n");
+		printf("                                                     .              \n");
+		printf("                                                     .              \n");
+		FFLUSH(stdout);
+		return SUCCESS;
+	case SEND_MSU:
+		if (!cntact) {
+			printf("                                             :msu                   \n");
+			FFLUSH(stdout);
+		}
+	case SEND_MSU_S:
+		if (msu_len > BUFSIZE - 10)
+			msu_len = BUFSIZE - 10;
+		p->sl.sl_primitive = SL_PDU_REQ;
+		ctrl.len = SL_PDU_REQ_SIZE;
+		memset(dbuf, 'B', msu_len);
+		data.len = msu_len;
+		if (putmsg(iut_fd, NULL, &data, 0) < 0) {
+			printf("                                  ****ERROR: putmsg failed!\n");
+			printf("                                             %s: %s\n",
+			       __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+	case ENABLE_REQ:
+		if (verbose) {
+			printf("                                             :enable                \n");
+			FFLUSH(stdout);
+		}
+		p->lmi.enable_req.lmi_primitive = LMI_ENABLE_REQ;
+		ctrl.len = sizeof(p->lmi.enable_req);
+		goto iut_lmi_putmsg;
+	case DISABLE_REQ:
+		if (verbose) {
+			printf("                                             :disable               \n");
+			FFLUSH(stdout);
+		}
+		p->lmi.disable_req.lmi_primitive = LMI_DISABLE_REQ;
+		ctrl.len = sizeof(p->lmi.disable_req);
+		goto iut_lmi_putmsg;
+	      iut_lmi_putmsg:
+		if (putmsg(iut_fd, &ctrl, NULL, RS_HIPRI) < 0) {
+			printf("                                  ****ERROR: putmsg failed!\n");
+			printf("                                             %s: %s\n",
+			       __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+	case CONN_REQ:
+		printf("                                             :connect               \n");
+		FFLUSH(stdout);
+		p->npi.type = N_CONN_REQ;
+		p->npi.conn_req.DEST_length = sizeof(iutconf.rem);
+		p->npi.conn_req.DEST_offset = sizeof(p->npi.conn_req);
+		p->npi.conn_req.CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+		p->npi.conn_req.QOS_length = 0;
+		p->npi.conn_req.QOS_offset = 0;
+		bcopy(&iutconf.rem, (&p->npi.conn_req + 1), sizeof(iutconf.rem));
+		ctrl.len = sizeof(N_conn_req_t) + sizeof(iutconf.rem);
+		goto iut_control_putmsg;
+	case BIND_REQ:
+		if (verbose) {
+			printf("                                             <bind req              \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_BIND_REQ;
+		p->npi.bind_req.ADDR_length = sizeof(iutconf.loc);
+		p->npi.bind_req.ADDR_offset = sizeof(p->npi.bind_req);
+		p->npi.bind_req.CONIND_number = 0;
+		p->npi.bind_req.BIND_flags = TOKEN_REQUEST;
+		p->npi.bind_req.PROTOID_length = 0;
+		p->npi.bind_req.PROTOID_offset = 0;
+		bcopy(&iutconf.loc, (&p->npi.bind_req + 1), sizeof(iutconf.loc));
+		ctrl.len = sizeof(N_bind_req_t) + sizeof(iutconf.loc);
+		goto iut_control_putmsg;
+	case DISCON_REQ:
+		if (verbose) {
+			printf("                                             :disconnect            \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_DISCON_REQ;
+		p->npi.discon_req.DISCON_reason = 0;
+		p->npi.discon_req.RES_length = 0;
+		p->npi.discon_req.RES_offset = 0;
+		p->npi.discon_req.SEQ_number = 0;
+		ctrl.len = sizeof(N_discon_req_t);
+		goto iut_control_putmsg;
+	case OPTMGMT_REQ:
+		if (verbose) {
+			printf("                                             <optmgmt req           \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_OPTMGMT_REQ;
+		p->npi.optmgmt_req.QOS_length = sizeof(iutconf.qos);
+		p->npi.optmgmt_req.QOS_offset = sizeof(p->npi.optmgmt_req);
+		p->npi.optmgmt_req.OPTMGMT_flags = 0;
+		bcopy(&iutconf.qos, (&p->npi.optmgmt_req + 1), sizeof(iutconf.qos));
+		ctrl.len = sizeof(N_optmgmt_req_t) + sizeof(iutconf.qos);
+		goto iut_control_putmsg;
+	      iut_control_putmsg:
+		if (putmsg(iut_fd, &ctrl, NULL, 0) < 0) {
+			printf("                                  ****ERROR: putmsg failed!\n");
+			printf("                                             %s: %s\n",
+			       __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+	default:
+		if (!cntact) {
+			printf("                                             <????????              \n");
+			FFLUSH(stdout);
+		}
+		return FAILURE;
+	}
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Control commands given to management stream.
+ *
+ *  -------------------------------------------------------------------------
+ */
+#define control mgm_control
+static int control(int prim)
+{
+	char cbuf[BUFSIZE];
+	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
+	union primitives *p = (union primitives *) cbuf;
+	if (prim != oldmgm) {
+		oldmgm = prim;
+		if (cntmgm) {
+			printf
+			    ("             Ct=%5d                                               \n", cntmgm + 1);
+			FFLUSH(stdout);
+		}
+		cntmgm = 0;
+	} else if (!expand)
+		cntmgm++;
+	switch (prim) {
+	case CONN_RES:
+		if (verbose) {
+			printf("              >conn res                                             \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_CONN_RES;
+		p->npi.conn_res.TOKEN_value = pt_tok;
+		p->npi.conn_res.RES_length = 0;
+		p->npi.conn_res.RES_offset = 0;
+		p->npi.conn_res.SEQ_number = mgm_seq;
+		p->npi.conn_res.CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+		p->npi.conn_res.QOS_length = 0;
+		p->npi.conn_res.QOS_offset = 0;
+		ctrl.len = sizeof(N_conn_res_t);
+		goto mgm_control_putmsg;
+	case BIND_REQ:
+		if (verbose) {
+			printf("              >bind req |                        \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_BIND_REQ;
+		p->npi.bind_req.ADDR_length = sizeof(mgmconf.loc);
+		p->npi.bind_req.ADDR_offset = sizeof(p->npi.bind_req);
+		p->npi.bind_req.CONIND_number = 2;
+		p->npi.bind_req.BIND_flags = TOKEN_REQUEST;
+		p->npi.bind_req.PROTOID_length = 0;
+		p->npi.bind_req.PROTOID_offset = 0;
+		bcopy(&mgmconf.loc, (&p->npi.bind_req + 1), sizeof(mgmconf.loc));
+		ctrl.len = sizeof(N_bind_req_t) + sizeof(mgmconf.loc);
+		goto mgm_control_putmsg;
+	case OPTMGMT_REQ:
+		if (verbose) {
+			printf("           >optmgmt req |                        \n");
+			FFLUSH(stdout);
+		}
+		p->npi.type = N_OPTMGMT_REQ;
+		p->npi.optmgmt_req.QOS_length = sizeof(mgmconf.qos);
+		p->npi.optmgmt_req.QOS_offset = sizeof(p->npi.optmgmt_req);
+		p->npi.optmgmt_req.OPTMGMT_flags = 0;
+		bcopy(&mgmconf.qos, (&p->npi.optmgmt_req + 1), sizeof(mgmconf.qos));
+		ctrl.len = sizeof(N_optmgmt_req_t) + sizeof(mgmconf.qos);
+		goto mgm_control_putmsg;
+	      mgm_control_putmsg:
+		if (putmsg(mgm_fd, &ctrl, NULL, 0) < 0) {
+			printf("****ERROR: putmsg failed!\n");
+			printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+			FFLUSH(stdout);
+			return FAILURE;
+		}
+		return SUCCESS;
+	default:
+		if (!cntmgm) {
+			printf("              >???????? |                        \n");
+			FFLUSH(stdout);
+		}
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+
+/*
+ *  =========================================================================
+ *
+ *  DECODE DATA and CTRL
+ *
+ *  =========================================================================
+ */
+static int show_msus = 1;
+static int show_fisus = 1;
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Decode data at Protocol Tester
+ *
+ *  -------------------------------------------------------------------------
+ */
+static void iut_printf(char *l, char *r)
+{
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+	if (iut_fsn || iut_bsn)
+		printf("%23.23s  <--[%04x, %04x]---  %-23.23s\n", l, iut_bsn, iut_fsn, r);
+	else
+#endif
+		printf("%23.23s  <-----------------  %-23.23s\n", l, r);
+	FFLUSH(stdout);
+}
+
+static int pt_decode_data(void)
+{
+	int ret;
+	if (debug && verbose) {
+		printf("pt decode data...       .    .        .    .                        \n");
+		FFLUSH(stdout);
+	}
+	switch (((uint32_t *) pt_buf)[0]) {
+	case M2PA_STATUS_MESSAGE:
+	{
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+		uint mystatus = ((uint32_t *) pt_buf)[2];
+#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+		uint mystatus = ((uint32_t *) pt_buf)[3];
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)
+		uint mystatus = ((uint32_t *) pt_buf)[4];
+#else
+#error "Draft poorly defined."
+#endif
+		switch (mystatus) {
+		case M2PA_STATUS_OUT_OF_SERVICE:
+			ret = OUT_OF_SERVICE;
+			break;
+		case M2PA_STATUS_IN_SERVICE:
+			ret = IN_SERVICE;
+			break;
+		case M2PA_STATUS_PROVING_NORMAL:
+			ret = PROVING_NORMAL;
+			break;
+		case M2PA_STATUS_PROVING_EMERGENCY:
+			ret = PROVING_EMERG;
+			break;
+		case M2PA_STATUS_ALIGNMENT:
+			ret = ALIGNMENT;
+			break;
+		case M2PA_STATUS_PROCESSOR_OUTAGE:
+			ret = PROCESSOR_OUTAGE;
+			break;
+		case M2PA_STATUS_BUSY:
+			ret = BUSY;
+			break;
+		case M2PA_STATUS_PROCESSOR_OUTAGE_ENDED:
+			ret = PROCESSOR_ENDED;
+			break;
+		case M2PA_STATUS_BUSY_ENDED:
+			ret = BUSY_ENDED;
+			break;
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+		case M2PA_STATUS_NONE:
+			ret = ACK;
+			break;
+#endif
+		default:
+		{
+			int i;
+			printf("ERROR: invalid status = %d\n", mystatus);
+			printf("pt_buf =");
+			for (i = 0; i < 20; i++) {
+				printf(" %02x", pt_buf[i]);
+			}
+			printf("\n");
+			ret = INVALID_STATUS;
+			break;
+		}
+		}
+		break;
+	}
+#if defined(M2PA_VERSION_DRAFT3_1)
+	case M2PA_ACK_MESSAGE:
+		ret = ACK;
+		break;
+#endif
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+	case M2PA_PROVING_MESSAGE:
+		ret = PROVING;
+		break;
+#endif
+	case M2PA_DATA_MESSAGE:
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+		if (ntohl(((uint32_t *) pt_buf)[1]) == 4 * sizeof(uint32_t)) {
+			ret = ACK;
+			break;
+		}
+#endif
+		ret = DATA;
+		break;
+	default:
+		ret = FAILURE;
+		break;
+	}
+
+	if (ret != oldret) {
+		if ((ret == DATA || ret == ACK) && !expand)
+			cntmsg++;
+		else
+			cntret = 0;
+		oldret = ret;
+		if (verbose) {
+			if (cntret) {
+				printf
+				    ("    Ct=%5d                                                        \n",
+				     cntret + 1);
+				FFLUSH(stdout);
+			}
+		}
+		cntret = 0;
+	} else if (!expand)
+		cntret++;
+#if 0
+	if (show_fisus || ret != FISU || verbose) {
+		if (ret != oldret || oldisb != (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn))) {
+//                      if ( oldisb == (((iut_bib|iut_bsn)<<8)|(iut_fib|iut_fsn)) &&
+//                                      ( ( ret == FISU && oldret == DATA ) || ( ret == DATA && oldret == FISU ) ) )
+//                      {
+//                              if ( ret == DATA && !expand )
+//                                      cntmsg++;
+//                      }
+//                      else
+			cntret = 0;
+			oldret = ret;
+			oldisb = ((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn);
+			if (verbose) {
+				if (cntret) {
+					printf
+					    ("    Ct=%5d                                                        \n",
+					     cntret + 1);
+					FFLUSH(stdout);
+				}
+			}
+			cntret = 0;
+		} else if (!expand)
+			cntret++;
+	}
+#endif
+	if (!cntret) {
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+		iut_bsn = ntohl(((uint32_t *) pt_buf)[2]) >> 16;
+		iut_fsn = ntohl(((uint32_t *) pt_buf)[2]) & 0xffff;
+#else
+		iut_bsn = ntohl(((uint32_t *) pt_buf)[2]);
+		iut_fsn = ntohl(((uint32_t *) pt_buf)[3]);
+#endif
+		switch (ret) {
+		case IN_SERVICE:
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			iut_printf("", "IN-SERVICE");
+#else
+			iut_printf("", "READY");
+#endif
+			return ret;
+		case ALIGNMENT:
+			iut_printf("", "ALIGNMENT");
+			return ret;
+		case PROVING_NORMAL:
+			iut_printf("", "PROVING-NORMAL");
+			return ret;
+		case PROVING_EMERG:
+			iut_printf("", "PROVING-EMERGENCY");
+			return ret;
+		case OUT_OF_SERVICE:
+			iut_printf("", "OUT-OF-SERVICE");
+			return ret;
+		case PROCESSOR_OUTAGE:
+			iut_printf("", "PROCESSOR-OUTAGE");
+			return ret;
+		case BUSY:
+			iut_printf("", "BUSY");
+			return ret;
+		case INVALID_STATUS:
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+			printf
+			    ("                         <-----------------  [INVALID STATUS %5u] \n",
+			     ntohl(((uint32_t *) pt_buf)[2]));
+#elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
+			printf
+			    ("                         <--[%04x, %04x]---  [INVALID STATUS %5u] \n",
+			     iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[3]));
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)
+			printf
+			    ("                         <--[%04x, %04x]---  [INVALID STATUS %5u] \n",
+			     iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[4]));
+#else
+#error "Poorly defined version."
+#endif
+			FFLUSH(stdout);
+			return ret;
+		case PROCESSOR_ENDED:
+			iut_printf("", "PROCESSOR-OUTAGE-ENDED");
+			return ret;
+		case BUSY_ENDED:
+			iut_printf("", "BUSY-ENDED");
+			return ret;
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
+		case ACK:
+			iut_printf("", "IN-SERVICE");
+			return ret;
+#elif defined(M2PA_VERSION_DRAFT3_1)
+		case ACK:
+			printf
+			    ("                         <-----------------  ACK [%5u msgs]       \n",
+			     ntohl(((uint32_t *) pt_buf)[2]));
+			FFLUSH(stdout);
+			return ret;
+#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+		case ACK:
+			printf
+			    ("                         <--[%04x, %04x]---  DATA-ACK               \n",
+			     iut_bsn, iut_fsn);
+			FFLUSH(stdout);
+			return ret;
+#endif
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+		case PROVING:
+			printf
+			    ("                         <-----------------  PROVING [%5u bytes]  \n",
+			     ntohl(((uint32_t *) pt_buf)[1]) - 2 * sizeof(uint32_t));
+			FFLUSH(stdout);
+			return ret;
+#endif
+		case DATA:
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+			pt_bsn = iut_fsn;
+#endif
+			if (show_msus || verbose) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+				printf
+				    ("                         <-----------------  DATA [%5u bytes]     \n",
+				     iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[1]) - 2 * sizeof(uint32_t));
+#else
+				printf
+				    ("                         <--[%04x, %04x]---  DATA [%5u bytes]     \n",
+				     iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[1]) - 4 * sizeof(uint32_t));
+#endif
+				FFLUSH(stdout);
+				return ret;
+			}
+			return ret;
+		default:
+			printf("                         <-----------------  ????????               \n");
+			FFLUSH(stdout);
+			return ret;
+		}
+	}
+	return ret;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Decode ctrl at Protocol Tester
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int pt_decode_msg(unsigned char *buf)
+{
+	union primitives *p = (union primitives *) buf;
+	if (debug && verbose)
+		printf("pt decode msg...         <-----------------                         \n");
+	switch (p->npi.type) {
+	case N_DATA_IND:
+		if (verbose) {
+			printf("              !data ind                                             \n");
+			FFLUSH(stdout);
+		}
+		return pt_decode_data();
+	case N_EXDATA_IND:
+		if (verbose) {
+			printf("            !exdata ind                                             \n");
+			FFLUSH(stdout);
+		}
+		return pt_decode_data();
+	case N_CONN_IND:
+		if (verbose) {
+			printf("              !conn ind                                             \n");
+			FFLUSH(stdout);
+		}
+		pt_seq = p->npi.conn_ind.SEQ_number;
+		return UNKNOWN;
+	case N_CONN_CON:
+		if (verbose) {
+			printf("              !conn con                                             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_DISCON_IND:
+		if (verbose) {
+			printf("            !discon ind                                             \n");
+			FFLUSH(stdout);
+		}
+		return DISCON_IND;
+	case N_INFO_ACK:
+		if (verbose) {
+			printf("              !info ack                                             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_BIND_ACK:
+		if (verbose) {
+			printf("              !bind ack                                             \n");
+			printf("    cons = %lu\n", p->npi.bind_ack.CONIND_number);
+			printf("    tok  = %lx\n", p->npi.bind_ack.TOKEN_value);
+			printf("    alen = %lu\n", p->npi.bind_ack.ADDR_length);
+			if (p->npi.bind_ack.ADDR_length == 14) {
+				addr_t *a = (addr_t *) (buf + p->npi.bind_ack.ADDR_offset);
+				printf("    port = %u\n", ntohs(a->port));
+				printf("    add1 = %d.%d.%d.%d\n", (a->addr[0] >> 0) & 0xff,
+				       (a->addr[0] >> 8) & 0xff, (a->addr[0] >> 16) & 0xff,
+				       (a->addr[0] >> 24) & 0xff);
+				printf("    add2 = %d.%d.%d.%d\n", (a->addr[1] >> 0) & 0xff,
+				       (a->addr[1] >> 8) & 0xff, (a->addr[1] >> 16) & 0xff,
+				       (a->addr[1] >> 24) & 0xff);
+				printf("    add3 = %d.%d.%d.%d\n", (a->addr[2] >> 0) & 0xff,
+				       (a->addr[2] >> 8) & 0xff, (a->addr[2] >> 16) & 0xff,
+				       (a->addr[2] >> 24) & 0xff);
+			}
+			FFLUSH(stdout);
+		}
+		pt_tok = p->npi.bind_ack.TOKEN_value;
+		return BIND_ACK;
+	case N_ERROR_ACK:
+		if (verbose) {
+			printf("             !error ack                                             \n");
+			FFLUSH(stdout);
+		}
+		return ERROR_ACK;
+	case N_OK_ACK:
+		if (verbose) {
+			printf("                !ok ack                                             \n");
+			FFLUSH(stdout);
+		}
+		return OK_ACK;
+	case N_UNITDATA_IND:
+		if (verbose) {
+			printf("          !unitdata ind                                             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_UDERROR_IND:
+		if (verbose) {
+			printf("           !uderror ind                                             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_DATACK_IND:
+		if (verbose) {
+			printf("            !datack ind                                             \n");
+			FFLUSH(stdout);
+		}
+#if defined(M2PA_VERSION_DRAFT3_1)
+		return ACK;
+#else
+		return UNKNOWN;
+#endif
+	case N_RESET_IND:
+		if (verbose) {
+			printf("             !reset ind                                             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_RESET_CON:
+		if (verbose) {
+			printf("             !reset con                                             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	default:
+		printf("         !(unknown %3ld)                                             \n", p->npi.type);
+		FFLUSH(stdout);
+		return UNKNOWN;
+	}
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Decode data at Implementation Under Test
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int iut_decode_data(void)
+{
+	printf("                                             !msu                   \n");
+	FFLUSH(stdout);
+	return IUT_DATA;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Decode ctrl at Implementation Under Test
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int iut_decode_msg(unsigned char *buf)
+{
+	char *reason;
+	union primitives *p = (union primitives *) buf;
+	if (p->sl.sl_primitive != oldprm) {
+		oldprm = p->sl.sl_primitive;
+		cntprm = 0;
+	} else if (!expand)
+		cntprm++;
+	switch (p->prim) {
+	case SL_REMOTE_PROCESSOR_OUTAGE_IND:
+		if (!cntprm) {
+			printf("                                             !rpo                   \n");
+			FFLUSH(stdout);
+		}
+		return IUT_RPO;
+	case SL_REMOTE_PROCESSOR_RECOVERED_IND:
+		if (!cntprm) {
+			printf("                                             !rpr                   \n");
+			FFLUSH(stdout);
+		}
+		return IUT_RPR;
+	case SL_IN_SERVICE_IND:
+		printf("                                             !in service            \n");
+		FFLUSH(stdout);
+		return IUT_IN_SERVICE;
+	case SL_OUT_OF_SERVICE_IND:
+		switch (p->sl.out_of_service_ind.sl_reason) {
+		case SL_FAIL_UNSPECIFIED:
+			reason = "unspec";
+			break;
+		case SL_FAIL_CONG_TIMEOUT:
+			reason = "T6";
+			break;
+		case SL_FAIL_ACK_TIMEOUT:
+			reason = "T7";
+			break;
+		case SL_FAIL_ABNORMAL_BSNR:
+			reason = "BSNR";
+			break;
+		case SL_FAIL_ABNORMAL_FIBR:
+			reason = "FIBR";
+			break;
+		case SL_FAIL_SUERM_EIM:
+			reason = "SUERM";
+			break;
+		case SL_FAIL_ALIGNMENT_NOT_POSSIBLE:
+			reason = "AERM";
+			break;
+		case SL_FAIL_RECEIVED_SIO:
+			reason = "SIO";
+			break;
+		case SL_FAIL_RECEIVED_SIN:
+			reason = "SIN";
+			break;
+		case SL_FAIL_RECEIVED_SIE:
+			reason = "SIE";
+			break;
+		case SL_FAIL_RECEIVED_SIOS:
+			reason = "SIOS";
+			break;
+		case SL_FAIL_T1_TIMEOUT:
+			reason = "T1";
+			break;
+		default:
+			reason = "???";
+			break;
+		}
+		printf("                                             !out of service(%s)\n", reason);
+		FFLUSH(stdout);
+		return IUT_OUT_OF_SERVICE;
+	case SL_PDU_IND:
+		printf("                                             !msu                   \n");
+		FFLUSH(stdout);
+		return IUT_DATA;
+	case SL_LINK_CONGESTED_IND:
+		printf("                                             !congested             \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case SL_LINK_CONGESTION_CEASED_IND:
+		printf("                                             !congestion ceased     \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case SL_RETRIEVED_MESSAGE_IND:
+		printf("                                             !retrieved message     \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case SL_RETRIEVAL_COMPLETE_IND:
+		printf("                                             !retrieval compelte    \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case SL_RB_CLEARED_IND:
+		printf("                                             !rb cleared            \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case SL_BSNT_IND:
+		printf("                                             !bsnt                  \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case SL_RTB_CLEARED_IND:
+		printf("                                             !rtb cleared           \n");
+		FFLUSH(stdout);
+		return UNKNOWN;
+	case LMI_INFO_ACK:
+		if (verbose) {
+			printf("                                             !info ack              \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case LMI_OK_ACK:
+		if (verbose) {
+			printf("                                             !ok ack                \n");
+			FFLUSH(stdout);
+		}
+		return OK_ACK;
+	case LMI_ERROR_ACK:
+		if (verbose) {
+			printf("                                             !error ack             \n");
+			FFLUSH(stdout);
+		}
+		return ERROR_ACK;
+	case LMI_ENABLE_CON:
+		if (verbose) {
+			printf("                                             !enable con            \n");
+			FFLUSH(stdout);
+		}
+		return ENABLE_CON;
+	case LMI_DISABLE_CON:
+		if (verbose) {
+			printf("                                             !disable con           \n");
+			FFLUSH(stdout);
+		}
+		return DISABLE_CON;
+	case LMI_ERROR_IND:
+		if (verbose) {
+			printf("                                             !error ind             \n");
+			FFLUSH(stdout);
+		}
+		return ERROR_IND;
+	case LMI_STATS_IND:
+		if (verbose) {
+			printf("                                             !stats ind             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case LMI_EVENT_IND:
+		if (verbose) {
+			printf("                                             !event ind             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_CONN_IND:
+		if (verbose) {
+			printf("                                             !conn ind              \n");
+			FFLUSH(stdout);
+		}
+		iut_seq = p->npi.conn_ind.SEQ_number;
+		return UNKNOWN;
+	case N_CONN_CON:
+		if (verbose) {
+			printf("                                             !conn con              \n");
+			FFLUSH(stdout);
+		}
+		return CONN_CON;
+	case N_DISCON_IND:
+		if (verbose) {
+			printf("                                             !discon ind            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_INFO_ACK:
+		if (verbose) {
+			printf("                                             !info ack              \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_BIND_ACK:
+		if (verbose) {
+			printf("                                             !bind ack              \n");
+			printf("                                                   cons = %lu\n",
+			       p->npi.bind_ack.CONIND_number);
+			printf("                                                   tok  = %lx\n",
+			       p->npi.bind_ack.TOKEN_value);
+			printf("                                                   alen = %lu\n",
+			       p->npi.bind_ack.ADDR_length);
+			if (p->npi.bind_ack.ADDR_length == 14) {
+				addr_t *a = (addr_t *) (buf + p->npi.bind_ack.ADDR_offset);
+				printf
+				    ("                                                   port = %u\n",
+				     ntohs(a->port));
+				printf
+				    ("                                                   add1 = %d.%d.%d.%d\n",
+				     (a->addr[0] >> 0) & 0xff, (a->addr[0] >> 8) & 0xff,
+				     (a->addr[0] >> 16) & 0xff, (a->addr[0] >> 24) & 0xff);
+				printf
+				    ("                                                   add2 = %d.%d.%d.%d\n",
+				     (a->addr[1] >> 0) & 0xff, (a->addr[1] >> 8) & 0xff,
+				     (a->addr[1] >> 16) & 0xff, (a->addr[1] >> 24) & 0xff);
+				printf
+				    ("                                                   add3 = %d.%d.%d.%d\n",
+				     (a->addr[2] >> 0) & 0xff, (a->addr[2] >> 8) & 0xff,
+				     (a->addr[2] >> 16) & 0xff, (a->addr[2] >> 24) & 0xff);
+			}
+			FFLUSH(stdout);
+		}
+		iut_tok = p->npi.bind_ack.TOKEN_value;
+		return BIND_ACK;
+	case N_ERROR_ACK:
+		if (verbose) {
+			printf("                                             !error ack             \n");
+			FFLUSH(stdout);
+		}
+		return ERROR_ACK;
+	case N_OK_ACK:
+		if (verbose) {
+			printf("                                             !ok ack                \n");
+			FFLUSH(stdout);
+		}
+		return OK_ACK;
+	case N_UNITDATA_IND:
+		if (verbose) {
+			printf("                                             !unitdata ind          \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_UDERROR_IND:
+		if (verbose) {
+			printf("                                             !uderror ind           \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_DATACK_IND:
+		if (verbose) {
+			printf("                                             !datack ind            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_RESET_IND:
+		if (verbose) {
+			printf("                                             !reset ind             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_RESET_CON:
+		if (verbose) {
+			printf("                                             !reset con             \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	default:
+		printf("                                             !(unknown %5ld)       \n",
+		       p->sl.sl_primitive);
+		FFLUSH(stdout);
+		return UNKNOWN;
+	}
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Decode data at Management Stream
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int mgm_decode_data(void)
+{
+	printf("                 !data |                                            \n");
+	FFLUSH(stdout);
+	return UNKNOWN;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Decode ctrl at Management Stream
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int mgm_decode_msg(unsigned char *buf)
+{
+	union primitives *p = (union primitives *) buf;
+	if (p->npi.type != oldmgm) {
+		oldmgm = p->npi.type;
+		cntmgm = 0;
+	} else if (!expand)
+		cntmgm++;
+	switch (p->prim) {
+	case N_CONN_IND:
+		if (verbose) {
+			printf("             !conn ind |                                            \n");
+			FFLUSH(stdout);
+		}
+		mgm_seq = p->npi.conn_ind.SEQ_number;
+		return CONN_IND;
+	case N_CONN_CON:
+		if (verbose) {
+			printf("             !conn con |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_DISCON_IND:
+		if (verbose) {
+			printf("           !discon ind |                                            \n");
+			FFLUSH(stdout);
+		}
+		return DISCON_IND;
+	case N_INFO_ACK:
+		if (verbose) {
+			printf("             !info ack |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_BIND_ACK:
+		if (verbose) {
+			printf("             !bind ack |                                            \n");
+			printf("    cons = %lu\n", p->npi.bind_ack.CONIND_number);
+			printf("    tok  = %lx\n", p->npi.bind_ack.TOKEN_value);
+			printf("    alen = %lu\n", p->npi.bind_ack.ADDR_length);
+			if (p->npi.bind_ack.ADDR_length == 14) {
+				addr_t *a = (addr_t *) (buf + p->npi.bind_ack.ADDR_offset);
+				printf("    port = %u\n", ntohs(a->port));
+				printf("    add1 = %d.%d.%d.%d\n", (a->addr[0] >> 0) & 0xff,
+				       (a->addr[0] >> 8) & 0xff, (a->addr[0] >> 16) & 0xff,
+				       (a->addr[0] >> 24) & 0xff);
+				printf("    add2 = %d.%d.%d.%d\n", (a->addr[1] >> 0) & 0xff,
+				       (a->addr[1] >> 8) & 0xff, (a->addr[1] >> 16) & 0xff,
+				       (a->addr[1] >> 24) & 0xff);
+				printf("    add3 = %d.%d.%d.%d\n", (a->addr[2] >> 0) & 0xff,
+				       (a->addr[2] >> 8) & 0xff, (a->addr[2] >> 16) & 0xff,
+				       (a->addr[2] >> 24) & 0xff);
+			}
+			FFLUSH(stdout);
+		}
+		mgm_tok = p->npi.bind_ack.TOKEN_value;
+		return BIND_ACK;
+	case N_ERROR_ACK:
+		if (verbose) {
+			printf("            !error ack |                                            \n");
+			FFLUSH(stdout);
+		}
+		return ERROR_ACK;
+	case N_OK_ACK:
+		if (verbose) {
+			printf("               !ok ack |                                            \n");
+			FFLUSH(stdout);
+		}
+		return OK_ACK;
+	case N_UNITDATA_IND:
+		if (verbose) {
+			printf("         !unitdata ind |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_UDERROR_IND:
+		if (verbose) {
+			printf("          !uderror ind |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_DATACK_IND:
+		if (verbose) {
+			printf("           !datack ind |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_RESET_IND:
+		if (verbose) {
+			printf("            !reset ind |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	case N_RESET_CON:
+		if (verbose) {
+			printf("            !reset con |                                            \n");
+			FFLUSH(stdout);
+		}
+		return UNKNOWN;
+	default:
+		printf("      !(uninown %5ld) |                                            \n", p->npi.type);
+		FFLUSH(stdout);
+		return UNKNOWN;
+	}
+}
+
+/*
+ *  =========================================================================
+ *
+ *  EVENT HANDLING
+ *
+ *  =========================================================================
+ */
+static int show_timeout = 0;
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Wait for message or timeout.
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int wait_event(int wait)
+{
+	while (1) {
+		struct pollfd pfd[] = {
+			{pt_fd, POLLIN | POLLPRI, 0},
+			{iut_fd, POLLIN | POLLPRI, 0},
+			{mgm_fd, POLLIN | POLLPRI, 0}
+		};
+		if (debug && verbose) {
+			float t, m;
+			struct timeval now;
+			static long reference = 0;
+			gettimeofday(&now, NULL);
+			if (!reference)
+				reference = now.tv_sec;
+			t = (now.tv_sec - reference);
+			m = now.tv_usec;
+			m = m / 1000000;
+			t += m;
+			printf("%11.6g\n", t);
+			FFLUSH(stdout);
+		}
+		if (timer_timeout) {
+			timer_timeout = 0;
+			if (show_timeout || verbose) {
+				printf("                         -----timeout------                         \n");
+				FFLUSH(stdout);
+				if (show_timeout)
+					show_timeout--;
+			}
+			return TIMEOUT;
+		}
+		if (debug && verbose) {
+			printf("                         ......polling.....                         \n");
+			FFLUSH(stdout);
+		}
+		switch (poll(pfd, 3, wait)) {
+		case -1:
+			if (debug && verbose) {
+				printf("                         = = = ERROR = = =                          \n");
+				FFLUSH(stdout);
+			}
+			break;
+		case 0:
+			if (debug && verbose) {
+				printf("                         + + +nothing + + +                         \n");
+				FFLUSH(stdout);
+			}
+			return NO_MSG;
+		case 1:
+		case 2:
+		case 3:
+			if (debug && verbose) {
+				printf("                         ^^^^^^polled^^^^^^                         \n");
+				FFLUSH(stdout);
+			}
+			if (pfd[0].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP)) {
+				int ret = UNKNOWN;
+				int flags = 0;
+				unsigned char cbuf[BUFSIZE];
+				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
+				BUFSIZE, 0, pt_buf};
+				if (debug && verbose) {
+					printf
+					    ("pt getmsg...                                                        \n");
+					FFLUSH(stdout);
+				}
+				if (getmsg(pt_fd, &ctrl, &data, &flags) < 0) {
+					printf("****ERROR: pt getmsg failed\n");
+					printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+					FFLUSH(stdout);
+					return NO_MSG;
+				} else {
+					if (debug && verbose) {
+						printf
+						    ("pt gotmsg... [%2d,%2d]                                                \n",
+						     ctrl.len, data.len);
+						FFLUSH(stdout);
+					}
+					if (ctrl.len > 0 && (ret = pt_decode_msg(ctrl.buf)) != UNKNOWN)
+						return ret;
+					if (data.len > 0 && (ret = pt_decode_data()) != UNKNOWN)
+						return ret;
+				}
+			}
+			if (pfd[1].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP)) {
+				int ret = UNKNOWN;
+				int flags = 0;
+				unsigned char cbuf[BUFSIZE];
+				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
+				BUFSIZE, 0, iut_buf};
+				if (debug && verbose) {
+					printf
+					    ("                                             iut getmsg             \n");
+					FFLUSH(stdout);
+				}
+				if (getmsg(iut_fd, &ctrl, &data, &flags) < 0) {
+					printf
+					    ("                                   ****ERROR: iut getmsg failed\n");
+					printf
+					    ("                                              %s: %s\n",
+					     __FUNCTION__, strerror(errno));
+					FFLUSH(stdout);
+					return NO_MSG;
+				} else {
+					if (debug && verbose) {
+						printf
+						    ("                                             iut gotmsg [%2d,%2d]     \n",
+						     ctrl.len, data.len);
+						FFLUSH(stdout);
+					}
+					if (ctrl.len > 0 && (ret = iut_decode_msg(ctrl.buf)) != UNKNOWN)
+						return ret;
+					if (data.len > 0 && (ret = iut_decode_data()) != UNKNOWN)
+						return ret;
+				}
+			}
+			if (pfd[2].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP)) {
+				int ret = UNKNOWN;
+				int flags = 0;
+				unsigned char cbuf[BUFSIZE];
+				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
+				BUFSIZE, 0, mgm_buf};
+				if (debug && verbose) {
+					printf
+					    ("  mgm getmsg...                                                     \n");
+					FFLUSH(stdout);
+				}
+				if (getmsg(mgm_fd, &ctrl, &data, &flags) < 0) {
+					printf("  ****ERROR: mgm getmsg failed\n");
+					printf("             %s: %s\n", __FUNCTION__, strerror(errno));
+					FFLUSH(stdout);
+					return NO_MSG;
+				} else {
+					if (debug && verbose) {
+						printf
+						    ("  mgm gotmsg... [%2d,%2d]                                             \n",
+						     ctrl.len, data.len);
+						FFLUSH(stdout);
+					}
+					if (ctrl.len > 0 && (ret = mgm_decode_msg(ctrl.buf)) != UNKNOWN)
+						return ret;
+					if (data.len > 0 && (ret = mgm_decode_data()) != UNKNOWN)
+						return ret;
+				}
+			}
+		default:
+			break;
+		}
+	}
+}
+static int get_event(void)
+{
+	return wait_event(-1);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  The test cases...
+ *
+ *  =========================================================================
+ */
+#if 0
+static int check_snibs(unsigned char bsnib, unsigned char fsnib)
+{
+	printf("                 check b/f sn/ib:  ---> (%02x/%02x)\n", bsnib, fsnib);
+	FFLUSH(stdout);
+	if ((iut_bib | iut_bsn) == bsnib && (iut_fib | iut_fsn) == fsnib)
+		return SUCCESS;
+	return FAILURE;
+}
+#endif
+
+static int test_1_1a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(POWER_ON);
+			send(OUT_OF_SERVICE);
+			signal(POWER_ON);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_1b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+			case NO_MSG:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_2(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case ALIGNMENT:
+				start_tt(iutconf.sl.t2 * 20);
+				beg_time = milliseconds(t2);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T2  ", beg_time, timer[t2].lo, timer[t2].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_3(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 2;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				state = 3;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				start_tt(iutconf.sl.t3 * 20);
+				beg_time = milliseconds(t3);
+				state = 4;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T3  ", beg_time, timer[t3].lo, timer[t3].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_4(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 2;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				beg_time = milliseconds(t4n);
+				state = 3;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 4;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				if (check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi))
+					return FAILURE;
+				start_tt(iutconf.sl.t1 * 20);
+				beg_time = milliseconds(t1);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_5a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				start_tt(1000);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_5b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				start_tt(1000);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_6(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(DATA);
+				start_tt(1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case ACK:
+			case IUT_IN_SERVICE:
+			case IUT_DATA:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_7(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				show_timeout = 1;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case TIMEOUT:
+				start_tt(iutconf.sl.t4n * 20);
+				send(ALIGNMENT);
+				beg_time = milliseconds(t4n);
+				send(PROVING_NORMAL);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_8a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+			case IUT_RPR:
+				break;
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				send(IN_SERVICE);
+				start_tt(1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+			case IUT_RPR:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_8b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				send(LPO);
+				send(START);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(PROCESSOR_OUTAGE);
+				start_tt(1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_9a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				start_tt(1000);
+				send(DATA);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+			case IUT_RPR:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_9b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				send(LPO);
+				send(START);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 10);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				signal(SEND_MSU);
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case TIMEOUT:
+			case IN_SERVICE:
+			case DATA:
+				start_tt(1000);
+				send(PROCESSOR_OUTAGE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case DATA:
+				send(PROCESSOR_OUTAGE);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_10(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(LPR);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				start_tt(1000);
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_11(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				send(LPO);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROCESSOR_OUTAGE:
+				send(PROCESSOR_OUTAGE);
+				start_tt(1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_12a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				send(STOP);
+				start_tt(1000);
+				send(OUT_OF_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_12b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				send(LPO);
+				send(START);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				signal(STOP);
+				send(IN_SERVICE);
+				start_tt(1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_13(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				start_tt(1000);
+				send(ALIGNMENT);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case PROCESSOR_OUTAGE:
+				send(ALIGNMENT);
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_14(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				signal(LPO);
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case TIMEOUT:
+				signal(LPR);
+				start_tt(iutconf.sl.t4n * 10 / 2 + 1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_15(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				signal(LPO);
+				start_tt(1000);
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+			case IUT_RPR:
+				break;
+			case PROCESSOR_OUTAGE:
+				start_tt(5000);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case TIMEOUT:
+				signal(LPR);
+				start_tt(5000);
+				state = 6;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 6:
+			switch ((event = get_event())) {
+			case PROCESSOR_ENDED:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_16(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				start_tt(iutconf.sl.t1 * 20);
+				beg_time = milliseconds(t1);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_17(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(PROVING_NORMAL);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				beg_time = dual_milliseconds(t3, t4n);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T3,4", beg_time, timer[t4n].lo, timer[t3].hi + timer[t4n].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_18(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(EMERG);
+				signal(CEASE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				beg_time = milliseconds(t4n);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_19(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				signal(EMERG);
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4e * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_EMERG:
+				send(PROVING_EMERG);
+				beg_time = milliseconds(t4e);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_20(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				signal(EMERG);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROVING_EMERG:
+				beg_time = milliseconds(t4n);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_21(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(EMERG);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4e * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_EMERG:
+				send(PROVING_EMERG);
+				beg_time = milliseconds(t4e);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_22(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				send(EMERG);
+				send(START);
+				send(ALIGNMENT);
+				signal(START);
+				start_tt(iutconf.sl.t4e * 20);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(PROVING_EMERG);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				beg_time = milliseconds(t4e);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_23(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				signal(EMERG);
+				start_tt(iutconf.sl.t4e * 20);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROVING_EMERG:
+				beg_time = milliseconds(t4e);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_EMERG:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_24(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(EMERG);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(PROVING_EMERG);
+				start_tt(iutconf.sl.t4e * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_EMERG:
+				beg_time = milliseconds(t4e);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_EMERG:
+				send(PROVING_EMERG);
+				break;
+#endif
+			case IN_SERVICE:
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_25(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				show_timeout = 1;
+				start_tt(iutconf.sl.t2 * 10 - 200);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				break;
+			case TIMEOUT:
+				signal(STOP);
+				start_tt(1000);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_26(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t3 * 8);	/* 80% of T3 */
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				break;
+			case TIMEOUT:
+				signal(STOP);
+				start_tt(iutconf.sl.t4n * 10);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_27(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				signal(STOP);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_28(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(ALIGNMENT);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_29a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(STOP);
+			send(OUT_OF_SERVICE);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_29b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(STOP);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_30a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case PROCESSOR_OUTAGE:
+				signal(STOP);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_30b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case NO_MSG:
+				send(PROCESSOR_OUTAGE);
+				send(STOP);
+				send(OUT_OF_SERVICE);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(SHORT_WAIT))) {
+			case IUT_RPO:
+				break;	/* stupid ITU-T SDLs */
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_31a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(PROCESSOR_OUTAGE);
+			signal(STOP);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_31b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case PROCESSOR_OUTAGE:
+				send(STOP);
+				send(OUT_OF_SERVICE);
+				return SUCCESS;
+			case IUT_RPR:
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_32a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case TIMEOUT:
+				send(STOP);
+				send(OUT_OF_SERVICE);
+				start_tt(iutconf.sl.t4n * 10 / 2 + 1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_32b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(OUT_OF_SERVICE);
+			send(START);
+			signal(START);
+			send(ALIGNMENT);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case ALIGNMENT:
+				send(PROVING_NORMAL);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case TIMEOUT:
+				signal(STOP);
+				start_tt(iutconf.sl.t4n * 10 / 2 + 1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_33(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(ALIGNMENT);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_34(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(STOP);
+				send(OUT_OF_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_1_35(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(LPO);
+				send(PROCESSOR_OUTAGE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_1(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				send(ALIGNMENT);
+				send(PROVING_NORMAL);
+				send(PROVING_EMERG);
+				send(PROCESSOR_OUTAGE);
+				send(BUSY);
+				send(INVALID_STATUS);
+				send(PROCESSOR_ENDED);
+				send(IN_SERVICE);
+				send(BUSY_ENDED);
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				send(ACK);
+#endif
+				send(DATA);
+				signal(STOP);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_2(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				oldmsg = 0;
+				cntmsg = 0;	/* force display OUT_OF_SERVICE */
+				send(OUT_OF_SERVICE);
+				send(PROCESSOR_OUTAGE);
+				send(BUSY);
+				send(INVALID_STATUS);
+				send(IN_SERVICE);
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				send(ACK);
+#endif
+				send(DATA);
+				signal(CEASE);
+				signal(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_3(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				oldmsg = 0;
+				cntmsg = 0;	/* force display ALIGNMENT */
+				send(ALIGNMENT);
+				send(PROCESSOR_OUTAGE);
+				send(BUSY);
+				send(INVALID_STATUS);
+				send(IN_SERVICE);
+				send(PROCESSOR_ENDED);
+				send(BUSY_ENDED);
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				send(ACK);
+#endif
+				send(DATA);
+				signal(CEASE);
+				signal(START);
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_4(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				send(PROCESSOR_ENDED);
+				send(PROCESSOR_OUTAGE);
+				send(BUSY_ENDED);
+				send(BUSY);
+				send(INVALID_STATUS);
+				send(IN_SERVICE);
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				send(ACK);
+#endif
+				send(DATA);
+				signal(CEASE);
+				signal(START);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_5(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				send(BUSY);
+				send(INVALID_STATUS);
+				signal(EMERG);
+				signal(CEASE);
+				signal(LPR);
+				signal(START);
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_6(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				send(BUSY);
+				send(INVALID_STATUS);
+				signal(EMERG);
+				signal(CEASE);
+				// signal(LPR); // spec says LPR, but it doesn't make sense...
+				signal(LPO);
+				signal(START);
+				send(IN_SERVICE);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+			case IUT_RPR:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_7(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(INVALID_STATUS);
+			signal(EMERG);
+			signal(CEASE);
+			signal(LPR);
+			signal(START);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_2_8(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case PROCESSOR_OUTAGE:
+				send(BUSY);
+				send(INVALID_STATUS);
+				signal(EMERG);
+				signal(CEASE);
+				signal(START);
+				send(IN_SERVICE);
+				send(PROCESSOR_ENDED);
+				send(BUSY_ENDED);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_1(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case IN_SERVICE:
+				if (send(TX_BREAK))
+					return INCONCLUSIVE;
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OK_ACK:
+				break;
+			case IUT_OUT_OF_SERVICE:	/* FIXME */
+				send(TX_MAKE);
+				return SUCCESS;
+			default:
+				send(TX_MAKE);
+				return FAILURE;
+			}
+			break;
+		default:
+			send(TX_MAKE);
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_2(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(BAD_ACK);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case NO_MSG:
+				oldmsg = 0;
+				cntmsg = 0;	/* force display */
+				send(BAD_ACK);
+				start_tt(1000);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_3(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				if (send(TX_BREAK))
+					return INCONCLUSIVE;
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case OK_ACK:
+				break;
+			case IUT_OUT_OF_SERVICE:	/* FIXME */
+				send(TX_MAKE);
+				return SUCCESS;
+			default:
+				send(TX_MAKE);
+				return FAILURE;
+			}
+			break;
+		default:
+			send(TX_MAKE);
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_4(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(LPO);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 20);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+#endif
+			case PROCESSOR_OUTAGE:
+				send(BAD_ACK);
+				start_tt(1000);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = wait_event(0))) {
+			case NO_MSG:
+				oldmsg = 0;
+				cntmsg = 0;	/* force display */
+				send(BAD_ACK);
+				start_tt(1000);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_5(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			if (send(TX_BREAK))
+				return INCONCLUSIVE;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OK_ACK:
+				break;
+			case IUT_OUT_OF_SERVICE:	/* FIXME */
+				send(TX_MAKE);
+				return SUCCESS;
+			default:
+				send(TX_MAKE);
+				return FAILURE;
+			}
+			break;
+		default:
+			send(TX_MAKE);
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_6(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(BAD_ACK);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case NO_MSG:
+				oldmsg = 0;
+				cntmsg = 0;	/* force display */
+				send(BAD_ACK);
+				start_tt(1000);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_7(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case PROCESSOR_OUTAGE:
+				if (send(TX_BREAK))
+					return INCONCLUSIVE;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OK_ACK:
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case IUT_OUT_OF_SERVICE:	/* FIXME */
+				send(TX_MAKE);
+				return SUCCESS;
+			default:
+				send(TX_MAKE);
+				return FAILURE;
+			}
+			break;
+		default:
+			send(TX_MAKE);
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_3_8(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case PROCESSOR_OUTAGE:
+				send(BAD_ACK);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(0))) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case NO_MSG:
+				oldmsg = 0;
+				cntmsg = 0;	/* force display */
+				send(BAD_ACK);
+				start_tt(1000);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_4_1(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case DATA:
+				if (++count == 2) {
+					signal(LPO);
+					send(DATA);
+					start_tt(iutconf.sl.t7 * 10 / 2);
+					state = 2;
+					break;
+				}
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				break;
+			case ACK:
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case ACK:
+				break;
+			case PROCESSOR_OUTAGE:
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;
+			case TIMEOUT:
+				signal(CLEARB);
+				signal(SEND_MSU);
+				start_tt(1000);
+				signal(LPR);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;
+			case DATA:
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case PROCESSOR_ENDED:
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_4_2(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case PROCESSOR_OUTAGE:
+				send(PROCESSOR_OUTAGE);
+				send(PROCESSOR_ENDED);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(0))) {
+			case IUT_RPR:
+			case IUT_RPO:
+				break;
+			case NO_MSG:
+				send(LPR);
+				send(PROCESSOR_ENDED);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case IUT_RPR:
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_4_3(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(LPO);
+			send(LPO);
+			send(PROCESSOR_OUTAGE);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case PROCESSOR_OUTAGE:
+				signal(LPR);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				send(LPR);
+				send(PROCESSOR_ENDED);
+				state = 3;
+				break;
+			case PROCESSOR_ENDED:
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_5_1(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	unsigned char old_bsn = 0x7f;
+	for (;;) {
+		switch (state) {
+		case 0:
+			old_bsn = iut_bsn;
+			if (send(MSU_SEVEN_ONES))
+				return INCONCLUSIVE;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case FISU:
+				if (iut_bsn != old_bsn)
+					return FAILURE;
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			case IUT_DATA:
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_5_2(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(MSU_TOO_LONG);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case FISU:
+				if (iut_bsn != 0x7f)
+					return check_snibs(0x7f, 0xff);
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return check_snibs(0x7f, 0xff);
+			case IUT_DATA:
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_5_3(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(MSU_TOO_SHORT);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				return SUCCESS;
+			case ACK:
+			case IUT_DATA:
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_5_4a(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			if (send(FISU_FISU_1FLAG))
+				return INCONCLUSIVE;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_5_4b(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			if (send(FISU_FISU_2FLAG))
+				return INCONCLUSIVE;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_5_5a(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			if (send(MSU_MSU_1FLAG))
+				return INCONCLUSIVE;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_5_5b(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			if (send(MSU_MSU_2FLAG))
+				return INCONCLUSIVE;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_6_1(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(FISU_CORRUPT);
+			stop_tt();
+			count = 255;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				if (tries < 8192) {
+					int i;
+					if (tries) {
+						send(FISU_CORRUPT_S);
+						for (i = 0; i < count; i++)
+							send(FISU_S);
+					} else {
+						send(FISU_CORRUPT);
+						send(FISU);
+						for (i = 1; i < count; i++)
+							send(FISU_S);
+						send(COUNT);
+						send(ETC);
+					}
+					tries++;
+					break;
+				}
+				send(TRIES);
+				return SUCCESS;
+			default:
+				send(TRIES);
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_6_2(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			stop_tt();
+			count = 253;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				if (tries < 8192) {
+					int i;
+					if (tries) {
+						send(FISU_CORRUPT_S);
+						for (i = 0; i < count; i++)
+							send(FISU_S);
+					} else {
+						send(FISU_CORRUPT);
+						send(FISU);
+						for (i = 1; i < count; i++)
+							send(FISU_S);
+						send(COUNT);
+						send(ETC);
+					}
+					tries++;
+					break;
+				}
+				send(TRIES);
+				return FAILURE;
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				send(TRIES);
+				return SUCCESS;
+			default:
+				send(TRIES);
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_6_3(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			count++;
+			send(FISU_CORRUPT);
+			stop_tt();
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				count++;
+				send(FISU_CORRUPT_S);
+				if (count > 128) {
+					send(COUNT);
+					return FAILURE;
+				}
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				if (count > 1)
+					send(COUNT);
+				if (count > 70)
+					return FAILURE;
+				else
+					return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_6_4(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			if (send(TX_BREAK))
+				return INCONCLUSIVE;
+			start_tt(100);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				send(TX_MAKE);
+				start_tt(1000);
+				state = 2;
+				break;
+			default:
+				break;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				send(TX_MAKE);
+				return SUCCESS;
+			default:
+				send(TX_MAKE);
+				return FAILURE;
+			}
+			break;
+		default:
+			send(TX_MAKE);
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_7_1(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				break;
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				break;
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				beg_time = milliseconds(t4);
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case TIMEOUT:
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = wait_event(0))) {
+			case NO_MSG:
+			case PROVING_NORMAL:
+				if (count < iutconf.sdt.Tin - 1) {
+					send(INVALID_STATUS);
+					count++;
+				} else {
+					send(COUNT);
+					send(PROVING_NORMAL);
+					start_tt(iutconf.sl.t4n * 10 / 2 + 200);
+					state = 5;
+				}
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case FISU:
+				send(FISU);
+				return SUCCESS;
+			case TIMEOUT:
+				return FAILURE;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_7_2(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				break;
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 10 + 200);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				break;
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case TIMEOUT:
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((even = wait_event(0))) {
+			case NO_MSG:
+			case PROVING_NORMAL:
+				if (count < iutconf.sdt.Tin) {
+					send(INVALID_STATUS);
+					count++;
+				} else {
+					send(COUNT);
+					send(PROVING_NORMAL);
+					beg_time = milliseconds(t4);
+					start_tt(iutconf.sl.t4n * 10 + 200);
+					state = 5;
+				}
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case IUT_IN_SERVICE:
+				break;
+			case FISU:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_7_3(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				break;
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				start_tt(iutconf.sl.t4n * 10 + 200);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				break;
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				start_tt(iutconf.sl.t4n * 10 / 2);
+				tries = 1;
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case TIMEOUT:
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((even = wait_event(0))) {
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				send(COUNT);
+				if (tries == iutconf.sl.M)
+					return SUCCESS;
+				return FAILURE;
+			case NO_MSG:
+			case PROVING_NORMAL:
+				if (count <= iutconf.sdt.Tin) {
+					send(INVALID_STATUS);
+					count++;
+				} else {
+					send(COUNT);
+					count = 0;
+					send(PROVING_NORMAL);
+					if (tries < iutconf.sl.M) {
+						start_tt(iutconf.sl.t4n * 10 / 2);
+						state = 3;
+						tries++;
+					} else {
+						start_tt(iutconf.sl.t4n * 10 + 200);
+						state = 5;
+					}
+				}
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_NORMAL);
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_7_4(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(OUT_OF_SERVICE);
+				break;
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(ALIGNMENT);
+				break;
+			case PROVING_NORMAL:
+				send(PROVING_EMERG);
+				start_tt(iutconf.sl.t4e * 10 / 2);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_EMERG);
+				break;
+			case TIMEOUT:
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = wait_event(0))) {
+			case NO_MSG:
+			case PROVING_NORMAL:
+				if (count < iutconf.sdt.Tie) {
+					send(INVALID_STATUS);
+					count++;
+				} else {
+					send(COUNT);
+					send(PROVING_EMERG);
+					beg_time = milliseconds(t4e);
+					start_tt(iutconf.sl.t4e * 10 + 200);
+					state = 5;
+				}
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_EMERG);
+				break;
+			case IUT_IN_SERVICE:
+				break;
+			case FISU:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_1(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(DATA);
+			start_tt(5000);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ACK:
+				break;
+			case IUT_DATA:
+				signal(SEND_MSU);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ACK:
+				break;
+			case DATA:
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_8_2(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				if (check_snibs(0xff, 0x80))
+					return FAILURE;
+				state = 2;
+			case FISU:
+				pt_fsn = pt_bsn = 0x7f;
+				pt_fib = pt_bib = 0x80;
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (check_snibs(0xff, 0x81))
+					return FAILURE;
+				pt_fsn = pt_bsn = 0x7f;
+				pt_fib = 0x80;
+				pt_bib = 0x00;
+				send(FISU);
+				state = 3;
+				break;
+			case FISU:
+				pt_fsn = pt_bsn = 0x7f;
+				pt_fib = pt_bib = 0x80;
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case DATA:
+				if (check_snibs(0xff, 0x00))
+					return FAILURE;
+				state = 4;
+			case FISU:
+				pt_fsn = pt_bsn = 0x7f;
+				pt_fib = 0x80;
+				pt_bib = 0x00;
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case DATA:
+				if (check_snibs(0xff, 0x01))
+					return FAILURE;
+				return SUCCESS;
+			case FISU:
+				pt_fsn = pt_bsn = 0x7f;
+				pt_fib = 0x80;
+				pt_bib = 0x00;
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_3(void)
+{
+	int i;
+	int n = iutconf.sl.N1;
+	for (;;) {
+		switch (state) {
+		case 0:
+			stop_tt();
+			for (i = 0; i < n; i++)
+				signal(SEND_MSU);
+			for (i = 0; i < n; i++)
+				signal(SEND_MSU);
+			count = 0;
+			show_fisus = 0;
+			show_timeout = 1;
+			start_tt(iutconf.sl.t7 * 10 / 2 - 100);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(SHORT_WAIT))) {
+			case DATA:
+				if (++count == n) {
+					nacks = n;
+					signal(ETC);
+					signal(COUNT);
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+					pt_bsn += nacks;
+#endif
+					send(ACK);
+					nacks = 1;
+					count = 0;
+					oldret = 0;
+					cntret = 0;
+					start_tt(iutconf.sl.t7 * 10 / 2 + 200);
+					state = 2;
+				}
+				break;
+			case TIMEOUT:
+				signal(ETC);
+				signal(COUNT);
+				nacks = count;
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				pt_bsn += nacks;
+#endif
+				send(ACK);
+				nacks = 1;
+				count = 0;
+				oldret = 0;
+				cntret = 0;
+				start_tt(iutconf.sl.t7 * 10 / 2 + 200);
+				show_timeout = 1;
+				show_fisus = 1;
+				state = 2;
+				break;
+			default:
+				signal(ETC);
+				signal(COUNT);
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (++count == n) {
+					nacks = n;
+					signal(ETC);
+					signal(COUNT);
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+					pt_bsn += nacks;
+#endif
+					send(ACK);
+					nacks = 1;
+					return SUCCESS;
+				}
+				break;
+			default:
+				signal(ETC);
+				signal(COUNT);
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_8_4(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(ACK);
+			signal(SEND_MSU);
+			start_tt(iutconf.sl.t7 * 10 + 200);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				send(DATA);
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				state = 3;
+				break;
+			case ACK:
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_8_5(void)
+{
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+	return NOT_APPLICABLE;	/* can't do this */
+#else
+	int inds = 0;
+	for (;;) {
+		switch (state) {
+		case 0:
+			wait_event(0);
+			send(DATA);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				inds++;
+				break;
+			case ACK:
+				if (iut_fsn != 0)
+					return FAILURE;
+				if (iut_bsn != 0) {
+					if (iut_bsn != 1)
+						return FAILURE;
+					pt_fsn--;
+					send(DATA);
+					state = 2;
+					break;
+				}
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(SHORT_WAIT))) {
+			case IUT_DATA:
+				if (inds++)
+					return FAILURE;
+				break;
+			default:
+				if (iut_fsn != 0)
+					return FAILURE;
+				if (iut_bsn != 1)
+					return FAILURE;
+				if (inds) {
+					send(DATA);
+					state = 3;
+					break;
+				}
+				break;
+			}
+			break;
+		case 3:
+			switch ((event = wait_event(NORMAL_WAIT))) {
+			case IUT_DATA:
+				if (++inds > 2)
+					return FAILURE;
+				break;
+			default:
+				if (iut_fsn != 0)
+					return FAILURE;
+				if (iut_bsn != 1) {
+					if (iut_bsn != 2)
+						return FAILURE;
+					if (inds == 2)
+						return SUCCESS;
+				}
+				break;
+			case TIMEOUT:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_6(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			wait_event(0);
+			pt_fib = 0x00;
+			send(DATA);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case IUT_DATA:
+				break;
+			case FISU:
+			case NO_MSG:
+				pt_fib = 0x80;
+				send(FISU);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				send(FISU);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case FISU:
+				if ((iut_bib | iut_bsn) != 0xff || (iut_fib | iut_fsn) != 0xff) {
+					if (check_snibs(0x7f, 0xff))
+						return FAILURE;
+					pt_fib = 0x00;
+					pt_fsn = 0x7f;
+					oldmsg = 0;
+					cntmsg = 0;
+					send(DATA);
+					state = 4;
+					break;
+				}
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				break;
+			case FISU:
+				if ((iut_bib | iut_bsn) != 0x7f || (iut_fib | iut_fsn) != 0xff) {
+					if (check_snibs(0x00, 0xff))
+						return FAILURE;
+					return SUCCESS;
+				}
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_7(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(FISU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				pt_fib = 0x00;
+				send(FISU);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				pt_fib = 0x80;
+				send(FISU);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				pt_fib = 0x00;
+				send(FISU);
+				state = 4;
+				start_tt(100);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case FISU:
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_8(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			send(FISU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				pt_fib = 0x00;
+				send(FISU);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(0))) {
+			case FISU:
+			case NO_MSG:
+				pt_fib = 0x80;
+				send(FISU);
+				start_tt(1000);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_9(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			state = 1;
+			break;
+		case 1:
+			send(LPO);
+			send(PROCESSOR_OUTAGE);
+			state = 6;
+			break;
+		case 6:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			send(DATA);
+			state = 3;
+			break;
+		case 3:
+			start_tt(1000);
+			state = 4;
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+			case ACK:
+				break;
+			case IUT_DATA:
+				send(DATA);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;
+			case ACK:
+				break;
+			case IUT_DATA:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_8_10(void)
+{
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+	return NOTAPPLICABLE;	/* can't do this */
+#else
+	uint inds = 0;
+	for (;;) {
+		switch (state) {
+		case 0:
+			pt_bsn = 0x3fff;
+			send(DATA);
+			state = 3;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				inds++;
+				break;
+			case ACK:
+				if (iut_fsn != 0)
+					return FAILURE;
+				if (iut_bsn != 0)
+					if (iut_bsn != 1)
+						return FAILURE;
+				pt_bsn = 0;
+				send(DATA);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				if (inds++ > 1)
+					return FAILURE;
+				if (inds == 2)
+					return SUCCESS;
+				break;
+			case ACK:
+				if (iut_fsn != 0)
+					return FAILURE;
+				if (iut_bsn != 1)
+					if (iut_bsn != 2)
+						return FAILURE;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_11(void)
+{
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+	return NOTAPPLICABLE;	/* can't do this */
+#else
+	for (;;) {
+		switch (state) {
+		case 0:
+			state = 1;
+		case 1:
+			switch ((event = wait_event(0))) {
+			case ACK:
+			case NO_MSG:
+				pt_bsn = 0x3fff;
+				send(ACK);
+				oldmsg = 0;
+				cntmsg = 0;
+				send(ACK);
+				pt_bsn = 0;
+				send(ACK);
+				state = 2;
+				start_tt(1000);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case ACK:
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_8_12(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				beg_time = milliseconds(t7);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_8_13(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = wait_event(SHORT_WAIT))) {
+			case NO_MSG:
+				signal(STOP);
+				start_tt(1000);
+				state = 1;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_9_1(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				pt_bsn = 0x7f;
+				send(FISU);
+				break;
+			case DATA:
+				if (count < 4) {
+					cntret = -1;
+					pt_bsn = 0x7f;
+					send(FISU);
+					count++;
+					break;
+				}
+				send(FISU);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				send(FISU);
+				break;
+			case FISU:
+				if (check_snibs(0xff, 0x80))
+					return FAILURE;
+				send(DATA);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				break;
+			case FISU:
+				if ((iut_bsn | iut_bib) != 0xff || (iut_fsn | iut_fib) != 0x80)
+					return check_snibs(0x80, 0x80);
+				send(FISU);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_2(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	int fsn_lo = 0, fsn_hi = 0, fsn_ex = 0;
+	for (;;) {
+		switch (state) {
+		case 0:
+			fsn_lo = 0;
+			signal(SEND_MSU);
+			signal(SEND_MSU);
+			fsn_hi = 1;
+			fsn_ex = fsn_lo;
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				pt_bsn = 0x7f;
+				send(FISU);
+				break;
+			case DATA:
+				if (iut_fsn < fsn_hi) {
+					if (iut_fsn != fsn_ex)
+						return FAILURE;
+					if (++fsn_ex == fsn_hi) {
+						fsn_ex = fsn_lo;
+						tries++;
+					}
+					oldisb = (oldisb & 0xff80) + fsn_ex;
+					pt_bsn = 0x7f;
+					send(FISU);
+					break;
+				}
+				if (iut_fsn != fsn_hi)
+					return FAILURE;
+				signal(ETC);
+				signal(TRIES);
+				tries = 0;
+				oldisb = (oldisb & 0xff80) + fsn_ex;
+				pt_bsn = 0x7f;
+				send(FISU);
+				signal(SEND_MSU);
+				fsn_hi++;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn < fsn_hi) {
+					if (iut_fsn != fsn_ex)
+						return FAILURE;
+					if (++fsn_ex == fsn_hi) {
+						fsn_ex = fsn_lo;
+						tries++;
+					}
+					oldisb = (oldisb & 0xff80) + fsn_ex;
+					pt_bsn = 0x7f;
+					send(FISU);
+					break;
+				}
+				if (iut_fsn != fsn_hi)
+					return FAILURE;
+				signal(ETC);
+				signal(TRIES);
+				tries = 0;
+				oldisb = (oldisb & 0xff80) + fsn_ex;
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case FISU:
+				if (iut_fsn == 2)
+					return SUCCESS;
+				return FAILURE;
+			case DATA:
+				pt_bsn = fsn_lo;
+				send(FISU);
+				if (iut_fsn != fsn_ex) {
+					if (iut_fsn == fsn_ex + 1) {
+						if (fsn_lo < fsn_hi) {
+							fsn_lo++;
+							fsn_ex++;
+							signal(ETC);
+							signal(TRIES);
+							tries = 0;
+						}
+					} else
+						fsn_ex--;
+				} else if (++tries > 100)
+					return FAILURE;
+				if (++fsn_ex > fsn_hi)
+					fsn_ex = fsn_lo;
+				oldisb = (oldisb & 0xff80) + fsn_ex;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_3(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	int i;
+	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = iutconf.sl.N1;
+	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	if (msu_len < 3)
+		return INCONCLUSIVE;
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	fflush(stdout);
+	for (;;) {
+		switch (state) {
+		case 0:
+			start_tt(iutconf.sl.t7 * 10 + 1000);
+			for (i = 0; i < n + 1; i++)
+				signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(FISU);
+				count = 0;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n)
+					return FAILURE;
+				if (iut_fsn == n - 1)
+					count++;
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				if (iut_fsn == 0 && count) {
+					pt_bsn = 0x0;
+					send(FISU);
+					count = 1;
+					state = 3;
+					break;
+				}
+				pt_bsn = 0x7f;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n) {
+					send(FISU);
+					return SUCCESS;
+				}
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				pt_bsn = 0;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_4(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	int i;
+	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = iutconf.sl.N1 - 1;
+	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
+	n = iutconf.sl.N2 / (msu_len + h) + 1;
+	if (msu_len > iutconf.sdl.m)
+		return INCONCLUSIVE;
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	fflush(stdout);
+	for (;;) {
+		switch (state) {
+		case 0:
+			start_tt(iutconf.sl.t7 * 10 + 1000);
+			for (i = 0; i < n + 1; i++)
+				signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(FISU);
+				count = 0;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n)
+					return FAILURE;
+				if (iut_fsn == n - 1)
+					count++;
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				if (iut_fsn == 0 && count) {
+					pt_bsn = 0x0;
+					send(FISU);
+					count = 1;
+					state = 3;
+					break;
+				}
+				pt_bsn = 0x7f;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n) {
+					send(FISU);
+					return SUCCESS;
+				}
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				pt_bsn = 0;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_5(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	int i;
+	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = iutconf.sl.N1;
+	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	if (msu_len < 3) {
+		n = iutconf.sl.N1 - 1;
+		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
+		n = iutconf.sl.N2 / (msu_len + h) + 1;
+		if (msu_len > iutconf.sdl.m)
+			return INCONCLUSIVE;
+	}
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	fflush(stdout);
+	for (;;) {
+		switch (state) {
+		case 0:
+			start_tt(iutconf.sl.t7 * 10 + 1000);
+			for (i = 0; i < n + 1; i++)
+				signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(FISU);
+				count = 0;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n)
+					return FAILURE;
+				if (iut_fsn == n - 1)
+					count++;
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				if (iut_fsn == 3 && count) {
+					pt_bsn = n - 1;
+					send(FISU);
+					count = 1;
+					state = 3;
+					break;
+				}
+				pt_bsn = 0x7f;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n - 3)
+					return FAILURE;
+				if (iut_fsn == n) {
+					send(FISU);
+					return SUCCESS;
+				}
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				pt_bsn = n - 1;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_6(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	int i;
+	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
+	int n = iutconf.sl.N1;
+	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
+	if (msu_len < 3) {
+		n = iutconf.sl.N1 - 1;
+		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
+		n = iutconf.sl.N2 / (msu_len + h) + 1;
+		if (msu_len > iutconf.sdl.m)
+			return INCONCLUSIVE;
+	}
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	fflush(stdout);
+	for (;;) {
+		switch (state) {
+		case 0:
+			start_tt(iutconf.sl.t7 * 10 + 1000);
+			for (i = 0; i < n + 1; i++)
+				signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(FISU);
+				count = 0;
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				if (iut_fsn == n)
+					return FAILURE;
+				if (iut_fsn == n - 1)
+					count++;
+				if (iut_fsn > 1 && iut_fsn < n - 3)
+					oldisb++;
+				if (iut_fsn == 3 && count == 2) {
+					pt_bsn = n - 1;
+					send(FISU);
+					return SUCCESS;
+				}
+				pt_bsn = 0x7f;
+				send(FISU);
+				if (iut_fsn == 2)
+					signal(ETC);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_7(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			start_tt(5000);
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(LPO);
+				send(PROCESSOR_OUTAGE);
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_RPO:
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(PROCESSOR_OUTAGE);
+				break;
+			case FISU:
+				if (!count++)
+					if (check_snibs(0xff, 0x80))
+						return FAILURE;
+				pt_bsn = 0x7f;
+				send(PROCESSOR_OUTAGE);
+				break;
+			case TIMEOUT:
+				signal(CLEARB);
+				send(LPR);
+				pt_bsn = 0x7f;
+				send(DATA);
+				start_tt(500);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+			case IUT_RPR:
+				break;
+			case FISU:
+				if (iut_bsn != 0) {
+					pt_bsn = 0x7f;
+					pt_fsn = 0x7f;
+					send(DATA);
+					break;
+				}
+				send(FISU);
+				return SUCCESS;
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_8(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			pt_bsn = 0x00;
+			pt_fsn = 0x7f;
+			send(DATA);
+			pt_bsn = 0x7f;
+			pt_fsn = 0x7f;
+			send(DATA);
+			start_tt(1000);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				break;
+			case FISU:
+				if (iut_bsn == 0)
+					return SUCCESS;
+				pt_bsn = 0x7f;
+				pt_fsn = 0x7f;
+				send(DATA);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_9(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			pt_bsn = 0x7e;
+			pt_fsn = 0x7f;
+			send(DATA);
+			pt_bsn = 0x7f;
+			pt_fsn = 0x7f;
+			send(DATA);
+			pt_bsn = 0x7e;
+			pt_fsn = 0x7f;
+			send(DATA);
+			start_tt(1000);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_DATA:
+				return FAILURE;
+			case FISU:
+				pt_bsn = 0x7f;
+				pt_fsn = 0x7f;
+				send(DATA);
+				break;
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_10(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			pt_fsn = 0x7f;
+			send(DATA);
+			pt_fsn = 0x01;
+			send(DATA);
+			start_tt(1000);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				if (++count == 2)
+					return FAILURE;
+				break;
+			case FISU:
+				if (iut_bsn != 0x7f) {
+					if (check_snibs(0x80, 0xff))
+						return FAILURE;
+					return SUCCESS;
+				}
+				pt_fsn = 0x7f;
+				send(DATA);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_11(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case DATA:
+				pt_bsn = 0x7f;
+				send(FISU);
+				beg_time = milliseconds(t7);
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case DATA:
+				pt_bsn = 0x7f;
+				send(FISU);
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_12(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			pt_fsn = 0x00;
+			send(FISU);
+			pt_fsn = 0x7f;
+			start_tt(1000);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case TIMEOUT:
+				return check_snibs(0xff, 0xff);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_9_13(void)
+{
+	return NOTAPPLICABLE;	/* can't do this */
+#if 0
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(STOP);
+			start_tt(1000);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case FISU:
+				send(FISU);
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
+}
+static int test_10_1(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(CONG_D);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case BUSY:
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = wait_event(NORMAL_WAIT))) {
+			case NO_MSG:
+				signal(NO_CONG);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case BUSY_ENDED:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_10_2(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				send(BUSY);
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				beg_time = milliseconds(t7);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				start_tt((iutconf.sl.t6 - iutconf.sl.t7) * 10 - 300);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				state = 4;
+				start_tt(1000);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+static int test_10_3(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				send(BUSY);
+				start_tt(timer[t6].hi * 10 + 200);
+				beg_time = milliseconds(t6);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T6  ", beg_time, timer[t6].lo, timer[t6].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+
+/*
+ *  =========================================================================
+ *
+ *  OPENING, CONFIGURING and CLOSING Devices
+ *
+ *  =========================================================================
+ */
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Opening, configuring and closing the Management Stream (MGM)
+ *
+ *  -------------------------------------------------------------------------
+ */
+/*
+ *  Open and configure for SCTP operation the Protocol Tester (PT).
+ */
+static int mgm_open(void)
+{
+	int ret;
+	if (verbose) {
+		printf("                 :open |                                            \n");
+		FFLUSH(stdout);
+	}
+	if ((mgm_fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("  ****ERROR: open failed\n");
+		printf("             %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                :ioctl |                                            \n");
+		FFLUSH(stdout);
+	}
+	if (ioctl(mgm_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("  ****ERROR: ioctl failed\n");
+		printf("             %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if ((ret = control(OPTMGMT_REQ)) != SUCCESS)
+		return ret;
+	if ((event = wait_event(SHORT_WAIT)) != OK_ACK)
+		return FAILURE;
+	if ((ret = control(BIND_REQ)) != SUCCESS)
+		return ret;
+	if ((event = wait_event(SHORT_WAIT)) != BIND_ACK)
+		return FAILURE;
+	return SUCCESS;
+}
+
+/*
+ *  Close the Protocol Tester (PT).
+ */
+static int mgm_close(void)
+{
+	if (verbose) {
+		printf("                :close |                                            \n");
+		FFLUSH(stdout);
+	}
+	if (close(mgm_fd) < 0) {
+		printf("  ****ERROR: close failed\n");
+		printf("             %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Opening, configuring and closing the Protocol Tester (PT)
+ *
+ *  -------------------------------------------------------------------------
+ */
+/*
+ *  Open and configure for SCTP operation the Protocol Tester (PT).
+ */
+static int pt_open(void)
+{
+	int ret;
+	if (verbose) {
+		printf("                  :open                                             \n");
+		FFLUSH(stdout);
+	}
+	if ((pt_fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("****ERROR: open failed\n");
+		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                 :ioctl                                             \n");
+		FFLUSH(stdout);
+	}
+	if (ioctl(pt_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("****ERROR: ioctl failed\n");
+		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if ((ret = send(OPTMGMT_REQ)) != SUCCESS)
+		return ret;
+	if ((event = wait_event(SHORT_WAIT)) != OK_ACK)
+		return FAILURE;
+	if ((ret = send(BIND_REQ)) != SUCCESS)
+		return ret;
+	if ((event = wait_event(SHORT_WAIT)) != BIND_ACK)
+		return FAILURE;
+	return SUCCESS;
+}
+
+/*
+ *  Close the Protocol Tester (PT).
+ */
+static int pt_close(void)
+{
+	if (verbose) {
+		printf("                 :close                                             \n");
+		FFLUSH(stdout);
+	}
+	if (close(pt_fd) < 0) {
+		printf("****ERROR: close failed\n");
+		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Opening, configuring and closing the Implementation Under Test (IUT)
+ *
+ *  -------------------------------------------------------------------------
+ */
+/*
+ *  Open and configure for SCTP operation the Implementation Under Test (IUT).
+ */
+static int iut_open(void)
+{
+	int ret;
+	if (verbose) {
+		printf("                                             :open                  \n");
+		FFLUSH(stdout);
+	}
+	if ((iut_fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+		printf("                                   ****ERROR: open failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :ioctl                 \n");
+		FFLUSH(stdout);
+	}
+	if (ioctl(iut_fd, I_SRDOPT, RMSGD) < 0) {
+		printf("                                   ****ERROR: ioctl failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if ((ret = signal(OPTMGMT_REQ)) != SUCCESS)
+		return FAILURE;
+	if ((event = wait_event(SHORT_WAIT)) != OK_ACK)
+		return FAILURE;
+	if ((ret = signal(BIND_REQ)) != SUCCESS)
+		return FAILURE;
+	if ((event = wait_event(SHORT_WAIT)) != BIND_ACK)
+		return FAILURE;
+	return SUCCESS;
+}
+
+/*
+ *  Connect the Implementation Under Test (IUT) to the Protocol Tester (PT).
+ */
+static int iut_connect(void)
+{
+	int ret;
+	if (verbose) {
+		printf("                                             :connect               \n");
+		FFLUSH(stdout);
+	}
+	if ((ret = signal(CONN_REQ)) != SUCCESS)
+		return ret;
+	if ((event = wait_event(LONG_WAIT)) != CONN_IND)
+		return FAILURE;
+	if ((ret = control(CONN_RES)) != SUCCESS)
+		return ret;
+	ret = wait_event(LONG_WAIT);
+	if (ret != OK_ACK && ret != CONN_CON)
+		return FAILURE;
+	ret = wait_event(LONG_WAIT);
+	if (ret != OK_ACK && ret != CONN_CON)
+		return FAILURE;
+	return SUCCESS;
+}
+
+/*
+ *  Push and configure Implementation Under Test (IUT) for SL operation.
+ */
+static int iut_m2pa_push(void)
+{
+	struct strioctl ctl;
+	if (verbose) {
+		printf("                                             :push m2pa-sl          \n");
+		FFLUSH(stdout);
+	}
+	if (ioctl(iut_fd, I_PUSH, "m2pa-sl") < 0) {
+		printf("                                   ****ERROR: push m2pa-sl failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :options sdl           \n");
+		FFLUSH(stdout);
+	}
+	iutconf.opt.popt = iut_options;
+	ctl.ic_cmd = SDL_IOCSOPTIONS;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(iutconf.opt);
+	ctl.ic_dp = (char *) &iutconf.opt;
+	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
+		printf("                                   ****ERROR: options sdl failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :config sdl            \n");
+		FFLUSH(stdout);
+	}
+	ctl.ic_cmd = SDL_IOCSCONFIG;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(iutconf.sdl);
+	ctl.ic_dp = (char *) &iutconf.sdl;
+	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
+		printf("                                   ****ERROR: config sdl failed\n");
+		FFLUSH(stdout);
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :options sdt           \n");
+		FFLUSH(stdout);
+	}
+	iutconf.opt.popt = iut_options;
+	ctl.ic_cmd = SDT_IOCSOPTIONS;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(iutconf.opt);
+	ctl.ic_dp = (char *) &iutconf.opt;
+	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
+		printf("                                   ****ERROR: options sdt failed\n");
+		FFLUSH(stdout);
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :config sdt            \n");
+		FFLUSH(stdout);
+	}
+	ctl.ic_cmd = SDT_IOCSCONFIG;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(iutconf.sdt);
+	ctl.ic_dp = (char *) &iutconf.sdt;
+	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
+		printf("                                   ****ERROR: config sdt failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :options sl            \n");
+		FFLUSH(stdout);
+	}
+	iutconf.opt.popt = iut_options;
+	ctl.ic_cmd = SL_IOCSOPTIONS;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(iutconf.opt);
+	ctl.ic_dp = (char *) &iutconf.opt;
+	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
+		printf("                                   ****ERROR: options sl failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	if (verbose) {
+		printf("                                             :config sl             \n");
+		FFLUSH(stdout);
+	}
+	ctl.ic_cmd = SL_IOCSCONFIG;
+	ctl.ic_timout = 0;
+	ctl.ic_len = sizeof(iutconf.sl);
+	ctl.ic_dp = (char *) &iutconf.sl;
+	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
+		printf("                                   ****ERROR: config sl failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+static int iut_enable(void)
+{
+	int ret;
+	if ((ret = signal(ENABLE_REQ)) != SUCCESS)
+		return FAILURE;
+	if ((event = wait_event(SHORT_WAIT)) != ENABLE_CON)
+		return FAILURE;
+	return SUCCESS;
+}
+static int iut_disable(void)
+{
+	int ret;
+	if ((ret = signal(DISABLE_REQ)) != SUCCESS)
+		return FAILURE;
+	if (wait_event(SHORT_WAIT) != DISABLE_CON)
+		return FAILURE;
+	return SUCCESS;
+}
+static int iut_pop(void)
+{
+	if (verbose) {
+		printf("                                             :pop                   \n");
+		FFLUSH(stdout);
+	}
+	if (ioctl(iut_fd, I_POP, 0) < 0) {
+		printf("                                   ****ERROR: pop failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+static int iut_disconnect(void)
+{
+	int ret;
+	if ((ret = signal(DISCON_REQ)) != SUCCESS)
+		return ret;
+	if (wait_event(SHORT_WAIT) != OK_ACK)
+		return FAILURE;
+	if (wait_event(LONG_WAIT) != DISCON_IND)
+		return FAILURE;
+	return SUCCESS;
+}
+
+/*
+ *  Close Implementation Under Test (IUT).
+ */
+static int iut_close(void)
+{
+	if (verbose) {
+		printf("                                             :close                 \n");
+		FFLUSH(stdout);
+	}
+	if (close(iut_fd) < 0) {
+		printf("                                   ****ERROR: close failed\n");
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		FFLUSH(stdout);
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+
+/*
+ *  =========================================================================
+ *
+ *  PRECONDITIONS and POSTCONDITIONS
+ *
+ *  =========================================================================
+ */
+/*
+ *  Common Postcondition.
+ */
+static int iut_power_off(void)
+{
+	signal(STOP);
+	stop_tt();
+	show_msus = 0;
+	show_fisus = 1;
+//      while ( wait_event(0) != NO_MSG );
+	iut_disable();
+	ioctl(iut_fd, I_FLUSH, FLUSHRW);
+	iut_pop();
+	iut_disconnect();
+	iut_close();
+	ioctl(pt_fd, I_FLUSH, FLUSHRW);
+	pt_close();
+	ioctl(mgm_fd, I_FLUSH, FLUSHRW);
+	mgm_close();
+	return SUCCESS;
+}
+
+/*
+ *  Common Preconditions:
+ */
+static int link_power_off(void)
+{
+	show_msus = 1;
+	show_fisus = 1;
+	show_timeout = 0;
+	pt_bib = pt_fib = iut_bib = iut_fib = 0x0;
+	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
+	iut_options = 0;
+	if (mgm_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (pt_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_connect() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_m2pa_push() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_enable() != SUCCESS)
+		return INCONCLUSIVE;
+	start_tt(MAXIMUM_WAIT);
+	return SUCCESS;
+}
+static int link_out_of_service(void)
+{
+	show_msus = 1;
+	show_fisus = 1;
+	show_timeout = 0;
+	pt_bib = pt_fib = iut_bib = iut_fib = 0x0;
+	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
+	if (mgm_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (pt_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_connect() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_m2pa_push() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_enable() != SUCCESS)
+		return INCONCLUSIVE;
+	if (signal(POWER_ON) != SUCCESS)
+		return INCONCLUSIVE;
+	start_tt(MAXIMUM_WAIT);
+	return SUCCESS;
+}
+static int link_in_service(void)
+{
+	if (link_out_of_service() != SUCCESS)
+		return INCONCLUSIVE;
+	for (;;) {
+		switch (state) {
+		case 0:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				send(POWER_ON);
+				send(OUT_OF_SERVICE);
+				signal(START);
+				state = 1;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case ALIGNMENT:
+				send(START);
+				send(ALIGNMENT);
+				state = 2;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROVING_NORMAL:
+				send(PROVING_EMERG);
+				start_tt(iutconf.sl.t4e * 10 + 200);
+				state = 3;
+				break;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+			case PROVING:
+				send(PROVING);
+				break;
+#else
+			case PROVING_NORMAL:
+				send(PROVING_EMERG);
+				break;
+#endif
+			case IN_SERVICE:
+				send(IN_SERVICE);
+				break;
+			case IUT_IN_SERVICE:
+				start_tt(MAXIMUM_WAIT);
+				return SUCCESS;
+			default:
+				return INCONCLUSIVE;
+			}
+			break;
+		default:
+			return INCONCLUSIVE;
+		}
+	}
+	return INCONCLUSIVE;
+}
+static int link_in_service_basic(void)
+{
+	iut_options = 0;
+	return link_in_service();
+}
+static int link_in_service_pcr(void)
+{
+//      iut_options = SS7_POPT_PCR;
+	return link_in_service();
+}
+
+/*
+ *  =========================================================================
+ *
+ *  TEST CASE Lists
+ *
+ *  =========================================================================
+ */
+typedef struct test_case {
+	int (*test) (void);			/* test case function */
+	int (*precond) (void);			/* test preconditions */
+	char *title;				/* title of the test case */
+} test_case_t;
+
+static test_case_t test_suite[] = {
+	{test_1_1a, link_power_off,
+	 "Q.781/Test 1.1(a)\n" "Link State Control - Expected signal units/orders\n" "Initialization (Power-up)\n"}
+	,
+	{test_1_1b, link_out_of_service,
+	 "Q.781/Test 1.1(b)\n" "Link State Control - Expected signal units/orders\n" "Initialization (Power-up)\n"}
+	,
+	{test_1_2, link_out_of_service,
+	 "Q.781/Test 1.2\n" "Link State Control - Expected signal units/orders\n" "Timer T2\n"}
+	,
+	{test_1_3, link_out_of_service,
+	 "Q.781/Test 1.3\n" "Link State Control - Expected signal units/orders\n" "Timer T3\n"}
+	,
+	{test_1_4, link_out_of_service,
+	 "Q.781/Test 1.4\n" "Link State Control - Expected signal units/orders\n" "Timer T1 & Timer T4 (Normal)\n"}
+	,
+	{test_1_5a, link_out_of_service,
+	 "Q.781/Test 1.5(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment procedure\n"}
+	,
+	{test_1_5b, link_out_of_service,
+	 "Q.781/Test 1.5(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment procedure\n"}
+	,
+	{test_1_6, link_out_of_service,
+	 "Q.781/Test 1.6\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment procedure - correct procedure (MSU)\n"}
+	,
+	{test_1_7, link_out_of_service,
+	 "Q.781/Test 1.7\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during normal proving period\n"}
+	,
+	{test_1_8a, link_out_of_service,
+	 "Q.781/Test 1.8(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (FISU)\n"}
+	,
+	{test_1_8b, link_out_of_service,
+	 "Q.781/Test 1.8(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (FISU)\n"}
+	,
+	{test_1_9a, link_out_of_service,
+	 "Q.781/Test 1.9(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (MSU)\n"}
+	,
+	{test_1_9b, link_out_of_service,
+	 "Q.781/Test 1.9(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (MSU)\n"}
+	,
+	{test_1_10, link_out_of_service,
+	 "Q.781/Test 1.10\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set and cleared\n"}
+	,
+	{test_1_11, link_out_of_service,
+	 "Q.781/Test 1.11\n" "Link State Control - Expected signal units/orders\n"
+	 "Set RPO when \"Aligned not ready\"\n"}
+	,
+	{test_1_12a, link_out_of_service,
+	 "Q.781/Test 1.12(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIOS received when \"Aligned not ready\"\n"}
+	,
+	{test_1_12b, link_out_of_service,
+	 "Q.781/Test 1.12(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIOS received when \"Aligned not ready\"\n"}
+	,
+	{test_1_13, link_out_of_service,
+	 "Q.781/Test 1.13\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received when \"Aligned not ready\"\n"}
+	,
+	{test_1_14, link_out_of_service,
+	 "Q.781/Test 1.14\n" "Link State Control - Expected signal units/orders\n"
+	 "Set and clear LPO when \"Initial alignment\"\n"}
+	,
+	{test_1_15, link_out_of_service,
+	 "Q.781/Test 1.15\n" "Link State Control - Expected signal units/orders\n"
+	 "Set and clear LPO when \"Aligned ready\"\n"}
+	,
+	{test_1_16, link_out_of_service,
+	 "Q.781/Test 1.16\n" "Link State Control - Expected signal units/orders\n"
+	 "Timer T1 in \"Aligned not ready\" state\n"}
+	,
+	{test_1_17, link_out_of_service,
+	 "Q.781/Test 1.17\n" "Link State Control - Expected signal units/orders\n"
+	 "No SIO sent during normal proving period\n"}
+	,
+	{test_1_18, link_out_of_service,
+	 "Q.781/Test 1.18\n" "Link State Control - Expected signal units/orders\n"
+	 "Set and cease emergency prior to \"start alignment\"\n"}
+	,
+	{test_1_19, link_out_of_service,
+	 "Q.781/Test 1.19\n" "Link State Control - Expected signal units/orders\n"
+	 "Set emergency while in \"not aligned state\"\n"}
+	,
+	{test_1_20, link_out_of_service,
+	 "Q.781/Test 1.20\n" "Link State Control - Expected signal units/orders\n"
+	 "Set emergency when \"aligned\"\n"}
+	,
+	{test_1_21, link_out_of_service,
+	 "Q.781/Test 1.21\n" "Link State Control - Expected signal units/orders\n" "Both ends set emergency.\n"}
+	,
+	{test_1_22, link_out_of_service,
+	 "Q.781/Test 1.22\n" "Link State Control - Expected signal units/orders\n"
+	 "Individual end sets emergency\n"}
+	,
+	{test_1_23, link_out_of_service,
+	 "Q.781/Test 1.23\n" "Link State Control - Expected signal units/orders\n"
+	 "Set emergency during normal proving\n"}
+	,
+	{test_1_24, link_out_of_service,
+	 "Q.781/Test 1.24\n" "Link State Control - Expected signal units/orders\n"
+	 "No SIO send during emergency alignment\n"}
+	,
+	{test_1_25, link_out_of_service,
+	 "Q.781/Test 1.25\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation duing intial alignment\n"}
+	,
+	{test_1_26, link_out_of_service,
+	 "Q.781/Test 1.26\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during aligned state\n"}
+	,
+	{test_1_27, link_out_of_service,
+	 "Q.781/Test 1.27\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during aligned not ready\n"}
+	,
+	{test_1_28, link_in_service_basic,
+	 "Q.781/Test 1.28\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during link in service\n"}
+	,
+	{test_1_29a, link_in_service_basic,
+	 "Q.781/Test 1.29(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during link in service\n"}
+	,
+	{test_1_29b, link_in_service_basic,
+	 "Q.781/Test 1.29(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during link in service\n"}
+	,
+	{test_1_30a, link_in_service_basic,
+	 "Q.781/Test 1.30(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during LPO\n"}
+	,
+	{test_1_30b, link_in_service_basic,
+	 "Q.781/Test 1.30(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during LPO\n"}
+	,
+	{test_1_31a, link_in_service_basic,
+	 "Q.781/Test 1.31(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during RPO\n"}
+	,
+	{test_1_31b, link_in_service_basic,
+	 "Q.781/Test 1.31(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during RPO\n"}
+	,
+	{test_1_32a, link_out_of_service,
+	 "Q.781/Test 1.32(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during the proving period\n"}
+	,
+	{test_1_32b, link_out_of_service,
+	 "Q.781/Test 1.32(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during the proving period\n"}
+	,
+	{test_1_33, link_out_of_service,
+	 "Q.781/Test 1.33\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received instead of FISUs\n"}
+	,
+	{test_1_34, link_out_of_service,
+	 "Q.781/Test 1.34\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received instead of FISUs\n"}
+	,
+	{test_1_35, link_out_of_service,
+	 "Q.781/Test 1.35\n" "Link State Control - Expected signal units/orders\n"
+	 "SIPO received instead of FISUs\n"}
+	,
+	{test_2_1, link_out_of_service,
+	 "Q.781/Test 2.1\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Out of service\" state\n"}
+	,
+	{test_2_2, link_out_of_service,
+	 "Q.781/Test 2.2\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Not Aligned\" state\n"}
+	,
+	{test_2_3, link_out_of_service,
+	 "Q.781/Test 2.3\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Aligned\" state\n"}
+	,
+	{test_2_4, link_out_of_service,
+	 "Q.781/Test 2.4\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Proving\" state\n"}
+	,
+	{test_2_5, link_out_of_service,
+	 "Q.781/Test 2.5\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Aligned Ready\" state\n"}
+	,
+	{test_2_6, link_out_of_service,
+	 "Q.781/Test 2.6\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Aligned Not Ready\" state\n"}
+	,
+	{test_2_7, link_in_service_basic,
+	 "Q.781/Test 2.7\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"In Service\" state\n"}
+	,
+	{test_2_8, link_in_service_basic,
+	 "Q.781/Test 2.8\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Processor Outage\" state\n"}
+	,
+	{test_3_1, link_out_of_service,
+	 "Q.781/Test 3.1\n" "Transmission Failure\n" "Link aligned ready (Break Tx path)\n"}
+	,
+	{test_3_2, link_in_service_basic,
+	 "Q.781/Test 3.2\n" "Transmission Failure\n" "Link aligned ready (Corrupt FIBs - Basic)\n"}
+	,
+	{test_3_3, link_out_of_service,
+	 "Q.781/Test 3.3\n" "Transmission Failure\n" "Link aligned not ready (Break Tx path)\n"}
+	,
+	{test_3_4, link_out_of_service,
+	 "Q.781/Test 3.4\n" "Transmission Failure\n" "Link aligned not ready (Corrupt FIBs - Basic)\n"}
+	,
+	{test_3_5, link_in_service_basic,
+	 "Q.781/Test 3.5\n" "Transmission Failure\n" "Link in service (Break Tx path)\n"}
+	,
+	{test_3_6, link_in_service_basic,
+	 "Q.781/Test 3.6\n" "Transmission Failure\n" "Link in service (Corrupt FIBs - Basic)\n"}
+	,
+	{test_3_7, link_in_service_basic,
+	 "Q.781/Test 3.7\n" "Transmission Failure\n" "Link in processor outage (Break Tx path)\n"}
+	,
+	{test_3_8, link_in_service_basic,
+	 "Q.781/Test 3.8\n" "Transmission Failure\n" "Link in processor outage (Corrupt FIBs - Basic)\n"}
+	,
+	{test_4_1, link_in_service_basic,
+	 "Q.781/Test 4.1\n" "Processor Outage Control\n" "Set and clear LPO while link in service\n"}
+	,
+	{test_4_2, link_in_service_basic,
+	 "Q.781/Test 4.2\n" "Processor Outage Control\n" "RPO during LPO\n"}
+	,
+	{test_4_3, link_in_service_basic,
+	 "Q.781/Test 4.3\n" "Processor Outage Control\n" "Clear LPO when \"Both processor outage\"\n"}
+	,
+	{test_5_1, link_in_service_basic,
+	 "Q.781/Test 5.1\n" "SU delimitation, alignment, error detection and correction\n"
+	 "More than 7 ones between MSU opening and closing flags\n"}
+	,
+	{test_5_2, link_in_service_basic,
+	 "Q.781/Test 5.2\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Greater than maximum signal unit length\n"}
+	,
+	{test_5_3, link_in_service_basic,
+	 "Q.781/Test 5.3\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Below minimum signal unit length\n"}
+	,
+	{test_5_4a, link_in_service_basic,
+	 "Q.781/Test 5.4(a)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between FISUs\n"}
+	,
+	{test_5_4b, link_in_service_basic,
+	 "Q.781/Test 5.4(b)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between FISUs\n"}
+	,
+	{test_5_5a, link_in_service_basic,
+	 "Q.781/Test 5.5(a)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between MSUs\n"}
+	,
+	{test_5_5b, link_in_service_basic,
+	 "Q.781/Test 5.5(b)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between MSUs\n"}
+	,
+	{test_6_1, link_in_service_basic,
+	 "Q.781/Test 6.1\n" "SUERM check\n" "Error rate of 1 in 256 - Link remains in service\n"}
+	,
+	{test_6_2, link_in_service_basic,
+	 "Q.781/Test 6.2\n" "SUERM check\n" "Error rate of 1 in 254 - Link out of service\n"}
+	,
+	{test_6_3, link_in_service_basic,
+	 "Q.781/Test 6.3\n" "SUERM check\n" "Consequtive corrupt SUs\n"}
+	,
+	{test_6_4, link_in_service_basic,
+	 "Q.781/Test 6.4\n" "SUERM check\n" "Time controlled break of the link\n"}
+	,
+	{test_7_1, link_out_of_service,
+	 "Q.781/Test 7.1\n" "AERM check\n" "Error rate below the normal threshold\n"}
+	,
+	{test_7_2, link_out_of_service,
+	 "Q.781/Test 7.2\n" "AERM check\n" "Error rate at the normal threshold\n"}
+	,
+	{test_7_3, link_out_of_service,
+	 "Q.781/Test 7.3\n" "AERM check\n" "Error rate above the normal threshold\n"}
+	,
+	{test_7_4, link_out_of_service,
+	 "Q.781/Test 7.4\n" "AERM check\n" "Error rate at the emergency threshold\n"}
+	,
+	{test_8_1, link_in_service_basic,
+	 "Q.781/Test 8.1\n" "Transmission and reception control (Basic)\n" "MSU transmission and reception\n"}
+	,
+	{test_8_2, link_in_service_basic,
+	 "Q.781/Test 8.2\n" "Transmission and reception control (Basic)\n" "Negative acknowledgement of an MSU\n"}
+	,
+	{test_8_3, link_in_service_basic,
+	 "Q.781/Test 8.3\n" "Transmission and reception control (Basic)\n" "Check RTB full\n"}
+	,
+	{test_8_4, link_in_service_basic,
+	 "Q.781/Test 8.4\n" "Transmission and reception control (Basic)\n" "Single MSU with erroneous FIB\n"}
+	,
+	{test_8_5, link_in_service_basic,
+	 "Q.781/Test 8.5\n" "Transmission and reception control (Basic)\n" "Duplicated FSN\n"}
+	,
+	{test_8_6, link_in_service_basic,
+	 "Q.781/Test 8.6\n" "Transmission and reception control (Basic)\n"
+	 "Erroneous retransmission - Single MSU\n"}
+	,
+	{test_8_7, link_in_service_basic,
+	 "Q.781/Test 8.7\n" "Transmission and reception control (Basic)\n"
+	 "Erroneous retransmission - Multiple FISUs\n"}
+	,
+	{test_8_8, link_in_service_basic,
+	 "Q.781/Test 8.8\n" "Transmission and reception control (Basic)\n" "Single FISU with corrupt FIB\n"}
+	,
+	{test_8_9, link_in_service_basic,
+	 "Q.781/Test 8.9\n" "Transmission and reception control (Basic)\n" "Single FISU prior to RPO being set\n"}
+	,
+	{test_8_10, link_in_service_basic,
+	 "Q.781/Test 8.10\n" "Transmission and reception control (Basic)\n" "Abnormal BSN - single MSU\n"}
+	,
+	{test_8_11, link_in_service_basic,
+	 "Q.781/Test 8.11\n" "Transmission and reception control (Basic)\n"
+	 "Abnormal BSN - two consecutive FISUs\n"}
+	,
+	{test_8_12, link_in_service_basic,
+	 "Q.781/Test 8.12\n" "Transmission and reception control (Basic)\n" "Excessive delay of acknowledgement\n"}
+	,
+	{test_8_13, link_in_service_basic,
+	 "Q.781/Test 8.13\n" "Transmission and reception control (Basic)\n" "Level 3 Stop command\n"}
+	,
+	{test_9_1, link_in_service_pcr,
+	 "Q.781/Test 9.1\n" "Transmission and reception control (PCR)\n" "MSU transmission and reception\n"}
+	,
+	{test_9_2, link_in_service_pcr,
+	 "Q.781/Test 9.2\n" "Transmission and reception control (PCR)\n" "Priority control\n"}
+	,
+	{test_9_3, link_in_service_pcr,
+	 "Q.781/Test 9.3\n" "Transmission and reception control (PCR)\n"
+	 "Forced retransmission with the value N1\n"}
+	,
+	{test_9_4, link_in_service_pcr,
+	 "Q.781/Test 9.4\n" "Transmission and reception control (PCR)\n"
+	 "Forced retransmission with the value N2\n"}
+	,
+	{test_9_5, link_in_service_pcr,
+	 "Q.781/Test 9.5\n" "Transmission and reception control (PCR)\n" "Forced retransmission cancel\n"}
+	,
+	{test_9_6, link_in_service_pcr,
+	 "Q.781/Test 9.6\n" "Transmission and reception control (PCR)\n" "Reception of forced retransmission\n"}
+	,
+	{test_9_7, link_in_service_pcr,
+	 "Q.781/Test 9.7\n" "Transmission and reception control (PCR)\n" "MSU transmission while RPO set\n"}
+	,
+	{test_9_8, link_in_service_pcr,
+	 "Q.781/Test 9.8\n" "Transmission and reception control (PCR)\n" "Abnormal BSN - Single MSU\n"}
+	,
+	{test_9_9, link_in_service_pcr,
+	 "Q.781/Test 9.9\n" "Transmission and reception control (PCR)\n" "Abnormal BSN - Two MSUs\n"}
+	,
+	{test_9_10, link_in_service_pcr,
+	 "Q.781/Test 9.10\n" "Transmission and reception control (PCR)\n" "Unexpected FSN\n"}
+	,
+	{test_9_11, link_in_service_pcr,
+	 "Q.781/Test 9.11\n" "Transmission and reception control (PCR)\n" "Excessive delay of acknowledgement\n"}
+	,
+	{test_9_12, link_in_service_pcr,
+	 "Q.781/Test 9.12\n" "Transmission and reception control (PCR)\n" "FISU with FSN expected for MSU\n"}
+	,
+	{test_9_13, link_in_service_pcr,
+	 "Q.781/Test 9.13\n" "Transmission and reception control (PCR)\n" "Level 3 Stop command\n"}
+	,
+	{test_10_1, link_in_service_basic,
+	 "Q.781/Test 10.1\n" "Congestion Control\n" "Congestion abatement\n"}
+	,
+	{test_10_2, link_in_service_basic,
+	 "Q.781/Test 10.2\n" "Congestion Control\n" "Timer T7\n"}
+	,
+	{test_10_3, link_in_service_basic,
+	 "Q.781/Test 10.3\n" "Congestion Control\n" "Timer T6\n"}
+};
+
+static int run_test(test_case_t * tcase)
+{
+	int ret = 0;
+	printf(tcase->title);
+	fflush(stdout);
+//      ioctl( pt_fd, I_FLUSH, FLUSHRW);    /* flush Protocol Tester (PT) */
+	state = 0;
+	event = 0;
+	count = 0;
+	tries = 0;
+	beg_time = 0;
+	expand = 0;
+	oldmsg = 0;
+	cntmsg = 0;
+	oldpsb = 0;
+	oldact = 0;
+	cntact = 0;
+	oldret = 0;
+	cntret = 0;
+	oldisb = 0;
+	oldprm = 0;
+	cntprm = 0;
+	oldmgm = 0;
+	cntmgm = 0;
+	msu_len = MSU_LEN;
+	printf("Precondition                                                        \n");
+	printf("                                                                    \n");
+	FFLUSH(stdout);
+	if ((ret = (*tcase->precond) ()) == SUCCESS) {
+		state = 0;
+		event = 0;
+		count = 0;
+		tries = 0;
+		beg_time = 0;
+		expand = 1;
+		printf("                                                                    \n");
+		printf("Test Case                                                           \n");
+		printf("                                                                    \n");
+		FFLUSH(stdout);
+		ret = (*tcase->test) ();
+	}
+	switch (ret) {
+	case SUCCESS:
+		printf("                                                                    \n");
+		printf("                         =====SUCCESS======                         \n");
+		break;
+	case FAILURE:
+		printf("                                                                    \n");
+		printf("                         +++++FAILURE++++++                         \n");
+		break;
+	case INCONCLUSIVE:
+		printf("                                                                    \n");
+		printf("                         ???INCONCLUSIVE???                         \n");
+		break;
+	case NOTAPPLICABLE:
+		printf("                                                                    \n");
+		printf("                         xxNOT-APPLICABLExx                         \n");
+		break;
+	default:
+		printf("                                                                    \n");
+		printf("                         ******ERROR*******                         \n");
+		break;
+	}
+	printf("                                                                    \n");
+	printf("Postcondition                                                       \n");
+	printf("                                                                    \n");
+	FFLUSH(stdout);
+	iut_power_off();
+	printf("                                                                    \n");
+	printf("Done                                                                \n");
+	return ret;
+}
+
+int main(void)
+{
+	int i;
+	int retry = 0;
+	int failed = 0, passed = 0, inconc = 0, notappl = 0, errored = 0;
+	verbose = 0;
+	expand = 1;
+	show_msus = 1;
+	show_fisus = 1;
+	show_timeout = 1;
+	for (i = 0; i < sizeof(test_suite) / sizeof(test_case_t); i++) {
+		printf("\n");
+		FFLUSH(stdout);
+		switch (run_test(&test_suite[i])) {
+		case FAILURE:
+			if (!retry)
+				failed++;
+			printf("\n");
+			printf("********\n");
+			printf
+			    ("******** FAILURE(%d) - test case failed in state %d with event %d.\n",
+			     state, state, event);
+			printf("********\n\n");
+			fflush(stdout);
+			if (!retry) {
+				retry = 1;
+				verbose = 1;
+				i--;
+				continue;
+			} else {
+				retry = 0;
+				verbose = 0;
+				break;
+			}
+			break;
+		case SUCCESS:
+			passed++;
+			printf("\n");
+			printf("********\n");
+			printf("******** SUCCESS - test case successful.\n");
+			printf("********\n\n");
+			break;
+		case INCONCLUSIVE:
+			if (!retry)
+				inconc++;
+			printf("\n");
+			printf("********\n");
+			printf
+			    ("******** INCONCLUSIVE(%d) - test case inconclusive in state %d with event %d.\n",
+			     state, state, event);
+			printf("********\n\n");
+			fflush(stdout);
+			if (!retry) {
+				retry = 1;
+				verbose = 1;
+				i--;
+				continue;
+			} else {
+				retry = 0;
+				verbose = 0;
+				break;
+			}
+			break;
+		case NOTAPPLICABLE:
+			notappl++;
+			printf("\n");
+			printf("********\n");
+			printf("******** NOT APPLICABLE - test case does not apply.\n");
+			printf("********\n\n");
+			break;
+		case SCRIPTERROR:
+		default:
+			if (!retry)
+				errored++;
+			printf("\n");
+			printf("********\n");
+			printf
+			    ("******** ERROR(%d) - test case completed in error in state %d with event %d.\n",
+			     state, state, event);
+			printf("********\n\n");
+			fflush(stdout);
+			if (!retry) {
+				retry = 1;
+				verbose = 1;
+				i--;
+				continue;
+			} else {
+				retry = 0;
+				verbose = 0;
+				break;
+			}
+			break;
+		}
+		// if ( failed || inconc || errored ) break;
+	}
+	printf("Test Suite Summary:\n");
+	printf("    Failed         %3d\n", failed);
+	printf("    Passed         %3d\n", passed);
+	printf("    Inconclusive   %3d\n", inconc);
+	printf("    Not Applicable %3d\n", notappl);
+	printf("    Errors         %3d\n", errored);
+	printf("\n");
+	FFLUSH(stdout);
+	return (0);
+}

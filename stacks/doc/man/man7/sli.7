@@ -1,0 +1,1081 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: sli.7,v 0.9 2004/01/17 08:01:29 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997, 1998, 1999, 2000 Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified $Date: 2004/01/17 08:01:29 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.\"
+.\" $Log: sli.7,v $
+.\" Revision 0.9  2004/01/17 08:01:29  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.6  2003/07/31 11:09:14  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.5  2003/07/30 05:04:49  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.4  2003/07/20 21:45:19  brian
+.\" Minor formatting.
+.\"
+.\" Revision 0.8.2.3  2003/07/20 17:29:53  brian
+.\" Reworking man files.
+.\"
+.\" Revision 0.8.2.2  2003/07/18 20:38:45  brian
+.\" A lot of minor embellishments.
+.\"
+.\" Revision 0.8.2.1  2003/06/26 02:04:30  brian
+.\" Some formatting revisions.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:37  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7.8.1  2001/12/11 13:16:08  brian
+.\" Branched for new development.
+.\"
+.\" Revision 0.7.6.1  2001/02/18 12:11:14  brian
+.\" New working branch for next release.
+.\"
+.\" Revision 0.7.4.1  2001/02/18 09:44:48  brian
+.\" Added new working branch.
+.\"
+.\" Revision 0.7.2.5  2001/01/16 03:19:48  brian
+.\" Updated man pages.
+.\"
+.\" Revision 0.7.2.4  2001/01/16 00:35:20  brian
+.\" Reworked SLI man page.
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SLI 7 "$Date: 2004/01/17 08:01:29 $" "$Name:  $" "Signalling Link Interface"
+.SH "NAME"
+.B sli
+\- Signalling System No. 7 Signalling Link (SL) Interface
+.SH "SYNOPSIS"
+.PP
+.B #include <ss7/sli.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.HP
+.BI "int " fd " = open(" \fR\*(lq/dev/sl\*(rq\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" fd ", " cmd ", ... /* " arg " */ );"
+.SH "DESCRIPTION"
+.PP
+This man page describes the STREAMS interface which is used to configure and
+exchange data with an SS7 Signalling Link Interface (SLI) for all SS7 devices
+conforming to the \fIOpenSS7\fR Signalling Link Interface (SLI) specification.
+.SS "LOCAL MANAGEMENT INTERFACE"
+.PP
+.PP
+SLI drivers are normally linked using \fBstreamio\fR(2) \fBI_LINK\fR ioctl
+commands under a Signalling Link Set (SLS) STREAMS multiplexor conforming to
+the Signalling Link Set Interface (SLSI) specification \fBslsi\fR(7) such as
+\fBsls\fR(4), by the SS7 Configuration Daemon \fBss7d\fR(8).  Yet, this
+interface is available for the purpose of ferry-clip conformance and
+diagnostic testing of the SS7 Signalling Link.
+.PP
+SLI \fRStype 1\fR and \fIStyle 2\fR drivers may be configured to automatically
+link under the \fBsls\fR(4) multiplexor and appear as \fBslsi\fR(7) drivers.
+Not all SS7 drivers need be written to the SL or lower interfaces: drivers may
+be written to the \fBslsi\fR(7) and even \fBmtpi\fR(7) interfaces.
+.PP
+SLI provides a local management interface which utilizes \fBM_PROTO\fR and
+\fBM_PCPROTO\fR messages which can be exchanged with the interface using
+\fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls on the stream head once the
+interface is opened.  The local management interfae controls local management
+(STREAMS configuration functions) which are normally used by the SS7
+Configuration Daemon \fBss7d\fR(8) on the driver interface before linking
+under an \fBsls\fR(4) multiplexor.
+.PP
+The Local Management Interface (LMI) is common to all \fIOpenSS7\fR drivers
+and modules and is described in detail in \fBlmi\fR(7).
+.SS "DEVICE CONTROL INTERFACE"
+.PP
+.PP
+SLI provides a device control interface which utilizes \fBioctl\fR(2)
+transparent calls or an \fBI_STR\fR ioctl under \fBstreamio\fR(2) from a
+stream head or multiplexor control channel to the driver.  The device control
+interface controls aspects of the SL driver device which are outside the scope
+of the SS7 protocol.  These controls are normally issued by the SS7
+Configuration Daemon \fBss7d\fR(8) on the driver interface or multiplexor
+control channel before or after the protocol stack has been assembled.
+.PP
+The device control interface (DEVI) is common to all \fIOpenSS7\fR drivers and
+modules and is described in detail in \fBdevi\fR(7).
+.SS "PROTOCOL SERVICE INTERFACE"
+.PP
+.PP
+SLI provides a protocol service interface which uses \fBM_DATA\fR,
+\fBM_PROTO\fR and \fBM_PCPROTO\fR STREAMS messages which can be exchanged with
+\fBwrite\fR(2), \fBread\fR(2), \fBputmsg\fR(2) or \fBgetmsg\fR(2) system calls
+on the stream head, or which can be exchanged with the driver by upstream
+pushed or linked modules.  The protocol service interface exchanges SS7
+protocol service primitives between the Signalling Link (SL) and the
+Signalling Link Set (SLS), but may also be used for ferry-clip conformance
+testing or diagnostics.
+.PP
+The protocol service interface for SLI is described in detail in section
+\fIPROTOCOL SERVICE INTERFACE\fR, below.
+.SS "PROTOCOL MANAGEMENT INTERFACE"
+.PP
+.PP
+SLI provides a protocol mangement interface which uses \fBM_CTL\fR messages
+between modules or \fBM_IOCTL\fR messages from a stream head or multiplexor
+control channel.  This interface uses the controls defined in the Local
+Management Interface (LMI) as detailed under
+\fIINPUT OUTPUT CONTROL INTERFACE\fR in \fBlmi\fR(7).  The protocol management
+interface provides protocol configuration, state inquiry, statistics and event
+management (SNMP functions).  This interface is normally used by the SS7
+Configuration Daemon \fBss7d\fR(8) on the stream after opening or during
+operation.
+.PP
+The protocol service interface for SLI is described in detail in section
+\fIPROTOCOL MANAGEMENT INTERFACE\fR below.
+
+.SH "PROTOCOL SERVICE INTERFACE"
+.PP
+.PP
+Protocol service interface commands are from the stream head to the SL driver
+using \fBputmsg\fR(2) and \fBgetmsg\fR(2) commands as follows:
+
+.RS 4
+.nf
+\fIfd\fB = open("\fI/dev/sl\fB");
+\fIret\fB = putmsg(\fIfd\fB, \fIctlptr\fB, \fIdataptr\fB, \fIflags\fB);
+\fIret\fB = getmsg(\fIfd\fB, \fIctlptr\fB, \fIdataptr\fB, \fIflags\fB);
+.fi
+.RE
+.PP
+Downstream messages are sent from the stream head using \fBputmsg\fR(2);
+upstream messages are received at the stream head using \fBgetmsg\fR(2).
+.PP
+\fIflags\fR is either \fBRS_HIPRI\fR or not indicating a \fBM_PCPROTO\fR
+or an \fBM_PROTO\fR message respectively.  \fIctlptr\fR and \fIdataptr\fR are
+pointers to a \fBstrbuf\fR structure which contains the following members:
+
+.RS 4
+.nf
+struct strbuf {
+    int     maxlen;
+    int     len;
+    void    *buf;
+};
+.fi
+.RE
+.PP
+\fIbuf\fR contains a pointer to a \fBSL_primitive\fR union which contains one
+of the following primitives and structures:
+.SS Downstream Primitives
+.PP
+.PP
+Downstream primitives are sent from the stream head to the protocol state
+machines using \fBputmsg\fR(2) system calls as described above.
+Except where otherwise noted, \fIbuf\fR contains only the \fBsl_primitive\fR
+field which is set to the value of the primitive.
+
+.TP
+.B SL_PDU_REQ
+Transmit a Protocol Data Unit (PDU).  This primitive must be sent with an
+accompanying \fBM_DATA\fR block which is pointed to by the \fIdataptr\fR in a
+\fBputmsg\fR(2) or is the buffer which is the argument of a \fBwrite\fR(2) on
+the stream file descriptor.
+.TP
+.B SL_EMERGENCY_REQ
+Set emergency alignment procedures on the signalling link.
+.TP
+.B SL_EMERGENCY_CEASES_REQ
+Set normal alignment procedures on the signalling link.
+.TP
+.B SL_START_REQ
+Start the signalling link.
+.TP
+.B SL_STOP_REQ
+Stop the signalling link.
+.TP
+.B SL_RETRIEVE_BSNT_REQ
+Retreive the BSNT value for buffer updating.
+.TP
+.B SL_RETREIVAL_REQUEST_AND_FSNC_REQ
+Retreive the buffers from the TB/RTB up to and including FSNC.  This
+primitive uses a \fBsl_retrieval_request_and_fsnc_t\fB structure which
+includes the \fIsl_fsnc\fR value in addition to the \fIsl_primitive\fR as
+follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_fsnc;
+} sl_retreival_req_and_fsnc_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_RETRIEVAL_REQ_AND_FSNC_REQ\fR.
+.TP
+.I sl_fsnc
+Contains the last Forward Sequence Number (FSNC) which was successfully
+received by the far end.  Buffers in the RTB with FSN up to and including this
+value should be cleared as part of the retrieval.
+.RE
+.TP
+.B SL_RESUME_REQ
+Recover from local processor outage.
+.TP
+.B SL_CLEAR_BUFFERS_REQ
+Clear signalling link buffers.
+.TP
+.B SL_LOCAL_PROCESSOR_OUTAGE_REQ
+Institute local processor outage procedures.
+.TP
+.B SL_CONGESTION_DISCARD_REQ
+Set congestion discard on the signalling link.
+.TP
+.B SL_CONGESTION_ACCEPT_REQ
+Set congestion accept on the signalling link.
+.TP
+.B SL_NO_CONGESTION_REQ
+Indicate cessation of congestion to the signalling link.
+.TP
+.B SL_POWER_ON_REQ
+Power on the signalling link.
+
+.PP
+.SS Upstream Primitives
+.PP
+Upstream primitives are collected at the stream head from the protocol state
+machines using \fBgetmsg\fR(2) system calls as described above.  Except where
+otherwise noted, \fIbuf\fR contains only the \fBsl_primitive\fR field which
+is set to the value of the primitive.
+
+.TP
+.B SL_PDU_IND
+Receive a Protocol Data Unit (PDU).  This primitive is received with an
+accompanying \fBM_DATA\fR block which is pointed to by the \fBdataptr\fR in a
+\fBgetmsg\fR(2) or is the buffer which is returned from a \fBread\fR(2) on the
+stream file descriptor.
+.TP
+.B SL_LINK_CONGESTED_IND
+Indicates that the signalling link is congested.  This primitive indicates
+addtional information in the \fBsl_link_cong_ind_t\fR structure as follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_timestamp;
+    sl_ulong    sl_cong_level;
+    sl_ulong    sl_disc_level;
+} sl_link_cong_ind_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_LINK_CONGESTED_IND\fR.
+.TP
+.I sl_timestamp
+Contains the timestamp (system time) that this event occured for the purpose
+of event reporting.
+.TP
+.I sl_cong_level
+Contains the current congestion status for this link.
+.TP
+.I sl_disc_level
+Contains the current discard status for this link.
+.RE
+.TP
+.B SL_LINK_CONGESTION_CEASED_IND
+Indicates that signalling link congestion has ceased.  This primitive
+indicates additional information in the \fBsl_cong_ceased_ind_t\fR structure
+as follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_timestamp;
+    sl_ulong    sl_cong_level;
+    sl_ulong    sl_disc_level;
+} sl_link_cong_ceased_ind_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_LINK_CONGESTION_CEASED_IND\fR.
+.TP
+.I sl_timestamp
+Contains the timestamp (system time) that this event occured for the purpose
+of event reporting.
+.TP
+.I sl_cong_level
+Contains the current congestion status for this link.
+.TP
+.I sl_disc_level
+Contains the current discard status for this link.
+.RE
+.TP
+.B SL_RETREIVED_MESSAGE_IND
+Indicates one retreived message during buffer retreival.
+.TP
+.B SL_RETREIVAL_COMPLETE_IND
+Indicates that buffer retrieval is complete and not to expect further
+retrieved messages.
+.TP
+.B SL_RB_CLEARED_IND
+Indicates that the Receive Buffer (RB) has been cleared.
+.TP
+.B SL_BSNT_IND
+Indicates the value of BSNT which was requested by a \fBSL_RETRIEV_BSNT_REQ\fR.
+This primitive indicates additional information in the \fBsl_bsnt_ind_t\fR
+structure as follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_bsnt;
+} sl_bsnt_ind_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_BSNT_IND\fR.
+.TP
+.I sl_bsnt
+Contains the Backward Sequence Number (BSN) for transmission (BSNT) which
+is the Backwards Sequence Number which will be next sent acknowledging a
+received MSU.  This is the SN of the last successfully received MSU for use in
+changeover procedures and buffer updating.
+.RE
+.TP
+.B SL_IN_SERVICE_IND
+Indicates that the signalling link is in service and ready to accept traffic.
+.TP
+.B SL_OUT_OF_SERVICE_IND
+Indicates that the signalling link is out of service and can no longer accept
+traffic.  This primitive indicates additional information in the
+\fBsl_out_of_service_t\fR structure as follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_timestamp;
+    sl_ulong    sl_reason;
+} sl_out_of_service_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_IN_SERVICE_IND\fR.
+.TP
+.I sl_timestamp
+Contains the timestamp (system time) that this event occured for the purpose
+of event reporting.
+.TP
+.I sl_reason
+Contains the failure reason for management reporting.  The reason may be one
+of the following:
+.RE
+.sp
+.RS
+.TS
+tab(:);
+lb 2 l.
+SL_FAIL_UNSPECIFIED:Unknown.
+SL_FAIL_CONG_TIMEOUT:Timeout (T6).
+SL_FAIL_ACK_TIMEOUT:Timeout (T7).
+SL_FAIL_ABNORMAL_BSNR:Abnormal BSN.
+SL_FAIL_ABNORMAL_FIBR:Abnormal FIB.
+SL_FAIL_SUERM_EIM:SUERM/EIM failure.
+SL_FAIL_ALIGNMENT_NOT_POSSIBLE:Alignment failure.
+SL_FAIL_RECEIVED_SIO:Received SIO.
+SL_FAIL_RECEIVED_SIN:Received SIN.
+SL_FAIL_RECEIVED_SIE:Received SIE.
+SL_FAIL_RECEIVED_SIOS:Received SIOS.
+SL_FAIL_T1_TIMEOUT:Timeout (T1).
+.TE
+.RE
+.TP
+.B SL_REMOTE_PROCESSOR_OUTAGE_IND
+Indicates that the remote side of the link has lost communication with its L3
+processor.
+This primitive indicates additional information for event
+reporting in the \fBsl_rem_proc_out_ind_t\fR structure as follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_timestamp;
+} sl_rem_proc_out_ind_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_REMOTE_PROCESSOR_OUTAGE_IND\fR.
+.TP
+.I sl_timestamp
+Contains the timestamp (system time) that this event occured for the purpose
+of event reporting.
+.RE
+.TP
+.B SL_REMOTE_PROCESSOR_RECOVERED_IND
+Indicates that the remote side of the link has re-established communications
+with its L3 processor.
+This primitive indicates additional information for event
+reporting in the \fBsl_rem_proc_recovered_ind_t\fR structure as follows:
+.sp
+.RS
+.nf
+typedef struct {
+    sl_ulong    sl_primitive;
+    sl_ulong    sl_timestamp;
+} sl_rem_proc_recovered_ind_t;
+.fi
+.TP 14
+.I sl_primitive
+Contains the primitive \fBSL_REMOTE_PROCESSOR_RECOVERED_IND\fR.
+.TP
+.I sl_timestamp
+Contains the timestamp (system time) that this event occured for the purpose
+of event reporting.
+.RE
+.TP
+.B SL_RTB_CLEARED_IND
+Indicates that the Re-Transmission Buffer (RTB) has been cleared.
+
+.SH "PROTOCOL MANAGEMENT INTERFACE"
+.PP
+.PP
+Protocol management interface comands are from the stream head to the SL
+driver using \fBstreamio\fR(2) \fBI_STR\fR commands as follows:
+
+.RS 4
+.nf
+\fIfd\fB = open("\fI/dev/sl\fB");
+\fIret\fB = ioctl(\fIfd\fB, \fRI_STR\fB, \fIarg\fB);
+.fi
+.RE
+.PP
+Where \fIarg\fR is a pointer to a \fBstrioctl\fR structure which contains the
+following members:
+.sp
+.RS 4
+.nf
+struct strioctl {
+    int     ic_cmd;
+    int     ic_timout;
+    int     ic_len;
+    char    *ic_dp;
+};
+.fi
+.RE
+.PP
+\fIic_cmd\fR can be one of the protocol management interface
+commands described in the following subsections:
+
+.SS "Protocol Options"
+.PP
+.PP
+Protocol management controls which affect protocol options are used by local
+management to set protocol variants and protocol options inherent to the SL
+provider.
+.PP
+The \fIic_cmd\fR contains one of the following options commands:
+.TP
+.B SL_IOCGOPTIONS
+Gets the protocol variant \fIpvar\fR and protocol options \fIpopt\fR
+assigned to the Signalling Link into the provided \fBlmi_option\fR
+structure.
+.TP
+.B SL_IOCSOPTIONS
+Sets the protocol variant \fIpvar\fR and protocol options \fIpopt\fR to the
+Signalling Link as provided in the \fBlmi_option\fR structure.
+.PP
+\fIic_dp\fR points to a \fBlmi_option\fR structure which
+represents the protocol variant and options parameters as follows:
+.PP
+.RS 4
+.nf
+typedef struct lmi_option {
+    lmi_ulong   pvar;
+    lmi_ulong   popt;
+} lmi_option_t;
+.fi
+.TP
+.I pvar
+Specifies the protocol variant to be used for the Signalling Link and
+may be one of the following values:
+.RE
+.RS 4
+.IP
+.TS
+tab(:);
+lbw(16) 2 l.
+SS7_PVAR_ITUT_88:ITU-T Q.703 1988 (Blue Book)
+SS7_PVAR_ITUT_93:ITU-T Q.703 1993 (Grey Book)
+SS7_PVAR_ITUT_96:ITU-T Q.703 1996 (White Book)
+SS7_PVAR_ITUT_00:ITU-T Q.703 2000 (? Book)
+SS7_PVAR_ANSI_88:ANSI T1.113-1988
+SS7_PVAR_ANSI_92:ANSI T1.113-1992
+SS7_PVAR_ANSI_96:ANSI T1.113-1996
+SS7_PVAR_ANSI_00:ANSI T1.113-2000
+SS7_PVAR_ETSI_88:ETSI 300 008-1 1988
+SS7_PVAR_ETSI_93:ETSI 300 008-1 1993
+SS7_PVAR_ETSI_96:ETSI 300 008-1 1996
+SS7_PVAR_ETSI_00:ETSI 300 008-1 2000
+SS7_PVAR_JTTC_94:JTTC JQ.703 1994
+.TE
+.RE
+.RS 4
+.TP
+.I popt
+Specifies the protocol options to be used for the Signalling Link and
+may be a bitwise OR of any of the following values:
+.RE
+.RS 4
+.IP
+.TS
+tab(:);
+lbw(16) 2 l.
+SS7_POPT_MPLEV:Multi Priority/Cong Levels
+SS7_POPT_PCR:Preventative Cyclic Retrans
+SS7_POPT_HSL:High Speed Links
+SS7_POPT_XSN:Extended Sequence Numbers
+SS7_POPT_ALL:All options
+.TE
+.RE
+
+.SS "Protocol Configuration"
+.PP
+.PP
+Protocol management controls which affect protocol configuration are invoked
+by local management to configure or request configuration information from the
+SL provider.
+.PP
+The \fIic_cmd\fR contains one of the following configuration commands:
+.TP
+.B SL_IOCGCONFIG
+Gets the protocol configuration of the Signalling Link into the
+provided \fBsl_config\fR structure.
+.TP
+.B SL_IOCSCONFIG
+Sets the protocol configuration of the Signalling Link from the
+provided \fBsl_config\fR structure.
+.TP
+.B SL_IOCTCONFIG
+Tests the protocol configuration as provided in the \fBsl_config\fR structure
+against the Signalling Link for consistency and validity.  Also locks
+the configuration of the SL provider awaiting a commit.
+.TP
+.B SL_IOCCCONFIG
+Commits the protocol configuration as provided in the \fBsl_config\fR
+structure to the Signalling Link.  Also unlocks the configuration of
+the SL provider.
+.PP
+\fIic_dp\fR points to a \fBsl_config\fR structure which represents the
+Signalling Link protocol configuration as follows:
+.PP
+.RS 4
+.nf
+typedef struct sl_config {
+    sl_ulong    t1;
+    sl_ulong    t2;
+    sl_ulong    t2l;
+    sl_ulong    t2h;
+    sl_ulong    t3;
+    sl_ulong    t4n;
+    sl_ulong    t4e;
+    sl_ulong    t5;
+    sl_ulong    t6;
+    sl_ulong    t7;
+    sl_ulong    rb_abate;
+    sl_ulong    rb_accept;
+    sl_ulong    rb_discard;
+    sl_ulong    tb_abate_1;
+    sl_ulong    tb_onset_1;
+    sl_ulong    tb_discd_1;
+    sl_ulong    tb_abate_2;
+    sl_ulong    tb_onset_2;
+    sl_ulong    tb_discd_2;
+    sl_ulong    tb_abate_3;
+    sl_ulong    tb_onset_3;
+    sl_ulong    tb_discd_3;
+    sl_ulong    N1;
+    sl_ulong    N2;
+    sl_ulong    M;
+} sl_config_t;
+.fi
+.TP
+.IR t1 ", " t2 ", " t2l ", " t2h ", " t3 ", " t4n ", " t4e ", " t5 ", " t6 ", " t7
+Contains the timeout values for Level 2 timers (in jiffies or ticks).
+.TP
+.IR rb_abate ", " rb_accept ", " rb_discard
+Contains the accept, discard and abate levels of the Receive Buffer (RB) in
+integer numbers of messages.
+.TP
+.IR tb_abate_1 ", " tb_onset_1 ", " tb_discd_1
+Contains the onset, discard and abate levels for congestion level 1 of the
+Transmission/Re-Transmission Buffers (TB/RTB) in number of message bytes.
+.TP
+.IR tb_abate_2 ", " tb_onset_2 ", " tb_discd_2
+Contains the onset, discard and abate levels for congestion level 2 of the
+Transmission/Re-Transmission Buffers (TB/RTB) in number of message bytes.
+.TP
+.IR tb_abate_3 ", " tb_onset_3 ", " tb_discd_3
+Contains the onset, discard and abate levels for congestion level 3 of the
+Transmission/Re-Transmission Buffers (TB/RTB) in number of message bytes.
+.TP
+.IR N1 ", " N2
+Contains the Re-Transmission Buffer (RTB) occupancy which triggers forced
+retransmission  in numbers of messages (\fIN1\fR) and number of message bytes
+(\fIN2\fR).
+.TP
+.IR M
+Contains the number of normal proving periods which must be successfully
+passed during normal alignment procedures (usually 5).
+
+.SS "Protocol State"
+.PP
+.PP
+Protocol management controls which affect protocol state are invoked by local
+management to request information about the state of the protocol state
+machines in the SL provider.
+.PP
+The \fIic_cmd\fR contains one of the following state commands:
+.TP
+.B SL_IOCGSTATEM
+Gets the protocol state machine variables of the Signalling Link into
+the provided \fBsl_statem\fR structure.
+.TP
+.B SL_IOCCMRESET
+Performs a master reset on the protocol state machines and returns the
+power-on settings of the state machine variables of the Signalling Link
+into the provided \fBsl_statem\fR structure.
+.PP
+\fIic_dp\fR points to a \fBsl_statem\fR structure which represents the
+Signalling Link protocol state as follows:
+.PP
+.RS 4
+.nf
+typedef struct sl_statem {
+    sl_ulong    lsc_state;
+    sl_ulong      local_processor_outage;
+    sl_ulong      remote_processor_outage;
+    sl_ulong      processor_outage;
+    sl_ulong      emergency;
+    sl_ulong      l3_indication_received;
+    sl_ulong      failure_reason;
+    sl_ulong    iac_state;
+    sl_ulong      further_proving;
+    sl_ulong      t4v;
+    sl_ulong      Cp;
+    sl_ushort   ib_mask;
+    sl_ushort   sn_mask;
+    sl_ulong    txc_state;
+    tx_sni_t      tx;
+    sl_ulong      msu_inhibited;
+    sl_ulong      lssu_available;
+    sl_ulong      rtb_full;
+    sl_ulong      clear_rtb;
+    sl_ulong      sib_received;
+    sl_ulong      retrans_cycle;
+    sl_ulong      forced_retransmission;
+    sl_ulong      Cm;
+    sl_ulong      Ct;
+    sl_ulong      cong_level;
+    sl_ulong      disc_level;
+    sl_ulong      Z;
+    void          *z_ptr;
+    sl_ulong    rc_state;
+    rx_sni_t      rx;
+    sl_ulong      rtr;
+    sl_ulong      unb;
+    sl_ulong      unf;
+    sl_ulong      msu_fisu_accepted;
+    sl_ulong      abnormal_bsnr;
+    sl_ulong      abnormal_fibr;
+    sl_ulong      congestion_discard;
+    sl_ulong      congestion_accept;
+    sl_ulong      l2_congestion_detect;
+    sl_ulong      l3_congestion_detect;
+    sl_ulong      Cr;
+    sl_ulong    cc_state;
+    sl_ulong    poc_state;
+} sl_statem_t;
+.fi
+.TP
+\fIlsc_state\fR,
+\fIlocal_processor_outage\fR, \fIremote_processor_outage\fR, \fIprocessor_outage\fR, \fIemergency\fR, \fIl3_indication_received\fR, \fIfailure_reason\fR
+.br
+State variable, flags and counters for the Link State Control (LSC) state
+machine.
+.TP
+\fIiac_state\fR,
+\fIfurther_proving\fR, \fIt4v\fR, \fICp\fR
+.br
+State variable, flags and counters for the Initial Alignment Control (IAC)
+state machine.
+.TP
+\fIib_mask\fR, \fIsn_mask\fR
+Indicator bit and sequence number masks.
+.TP
+\fItxc_state\fR,
+\fItx\fR, \fImsu_inhibited\fR, \fIlssu_available\fR, \fIrtb_full\fR, \fIclear_rtb\fR, \fIsib_received\fR, \fIretrans_cycle\fR, \fIforced_retransmission\fR, \fICm\fR, \fICt\fR, \fIcong_level\fR, \fIdisc_level\fR, \fIZ\fR, \fIz_ptr\fR
+.br
+State variable, flags and counters for the Transmission Control (TXC) state
+machine.
+.TP
+\fIrc_state\fR,
+\fIrx\fR, \fIrtr\fR, \fIunb\fR, \fIunf\fR, \fImsu_fisu_accepted\fR, \fIabnormal_bsnr\fR, \fIabnormal_fibr\fR, \fIcongestion_discard\fR, \fIcongestion_accept\fR, \fIl2_congestion_detect\fR, \fIl3_congestion_detect\fR, \fICr\fR
+.br
+State variable, flags and counters for the Reception Control (RC) state
+machine.
+.TP
+\fIcc_state\fR
+State variable for the Congestion Control (CC) state machine.
+.TP
+\fIpoc_state\fR
+State variable for the Processor Outage Control (POC) state machine.
+.PP
+State variables can assume one of the following values (not all values are
+valid for all state variables):
+.sp
+.RS
+.TS
+tab(:);
+lb.
+SL_STATE_IDLE
+SL_STATE_NORMAL
+SL_STATE_POWER_OFF
+SL_STATE_BUSY
+SL_STATE_IN_SERVICE
+SL_STATE_LOCAL_PROCESSOR_OUTAGE
+SL_STATE_PROVING
+SL_STATE_INITIAL_ALIGNMENT
+SL_STATE_NOT_ALIGNED
+SL_STATE_REMOTE_PROCESSOR_OUTAGE
+SL_STATE_SLEEPING
+SL_STATE_ALIGNED
+SL_STATE_ALIGNED_NOT_READY
+SL_STATE_BOTH_PROCESSORS_OUT
+SL_STATE_ALIGNED_READY
+SL_STATE_OUT_OF_SERVICE
+SL_STATE_PROCESSOR_OUTAGE
+.TE
+.RE
+
+.SS "Protocol Data Collection"
+.PP
+.PP
+Protocol management controls which affect protocol measurement data collection
+are invoked by local management to request and alter collection periods for
+data collection within the SL provider.
+.PP
+\fIic_cmd\fR contains one of the following collection commands:
+.TP
+.B SL_IOCGSTATSP
+Get the protocol measurement collection period information of the identified
+\fIobject_id\fR into the provided \fBlmi_sta\fR structure.
+.TP
+.B SL_IOCSSTATSP
+Set the protocol measurement collection period information of the identified
+\fIobject_id\fR using the provided \fBlmi_sta\fR structure.
+.PP
+\fIic_dp\fR points to a \fBlmi_sta\fR structure which represnts the Signalling
+Link collection periods as follows:
+.PP
+.RS 4
+.nf
+typedef struct lmi_sta {
+    lmi_ulong   object_id;
+    lmi_ulong   colperiod;
+    lmi_ulong   timestamp;
+} lmi_sta_t;
+.fi
+.TP
+.I object_id
+Contains the object idenitfier for the managed object to which the collection
+information applies.
+.TP
+.I colperiod
+Contains the collection period (in jiffies).  The managed object measurement
+data must be collected and notified once for each collection period interval.
+.TP
+.I timestamp
+Contains a timestamp (in seconds since epoch) which identifies the system time
+at which a collection period ends.  This value is used in conjunction with the
+collection period to calculate the time of the next collection interval.
+.RE
+
+.SS "Protocol Statistics"
+.PP
+.PP
+Protocol management controls which affect protocol statistics are invoked by
+local management to request information about statistics pertaining to the SL
+provider.
+.PP
+\fIic_cmd\fR contains one of the following statistics commands:
+.TP
+.B SL_IOCGSTATS
+Get the protocol statistics of the Signalling Link for the current
+collection period into the provided \fBsl_stats\fR structure.
+.TP
+.B SL_IOCCSTATS
+Clear the protocol statisics of the Signalling Link for the current
+collection period and return the statistics which were accumulated to the
+point of clearing during the current interval \fBsl_stats\fR structure.
+.PP
+\fIic_dp\fR points to a \fBsl_stats\fR structure which represents the
+Signalling Link protocol statistics as follows:
+.PP
+.RS 4
+.nf
+
+typedef struct sl_stats {
+    lmi_sta_t   header;
+    sl_ulong    sl_dur_in_service;
+    sl_ulong    sl_fail_align_or_proving;
+    sl_ulong    sl_nacks_received;
+    sl_ulong    sl_dur_unavail;
+    sl_ulong    sl_dur_unavail_failed;
+    sl_ulong    sl_dur_unavail_rpo;
+    sl_ulong    sl_sibs_sent;
+    sl_ulong    sl_tran_sio_sif_octets;
+    sl_ulong    sl_retrans_octets;
+    sl_ulong    sl_tran_msus;
+    sl_ulong    sl_recv_sio_sif_octets;
+    sl_ulong    sl_recv_msus;
+    sl_ulong    sl_cong_onset_ind[4];
+    sl_ulong    sl_dur_cong_level[4];
+    sl_ulong    sl_msus_cong_discard;
+    sl_ulong    sl_cong_discd_ind[4];
+} sl_stats_t;
+.fi
+
+.TP
+.I header
+Contains the timestamp for the current collection interval for which
+statistics are being reported.
+.TP
+.I sl_dur_in_service
+(Q.752 Table 1.1)
+Contains the duration of time that the signalling link has been in
+service.
+.TP
+.I sl_fail_align_or_proving
+(Q.752 Table 1.7)
+Contains the number of times that the signalling link has failed
+during alignement or proving.
+.TP
+.I sl_nacks_received
+(Q.752 Table 1.9)
+Contains the number of negative acknowledgements of MSUs received.
+.TP
+.I sl_dur_unavail
+(Q.752 Table 2.1)
+Contains the duration of time that the signalling link has been
+uavailable for all reasons.
+.TP
+.I sl_dur_unavail_failed
+(Q.752 Table 2.7)
+Contains the duration of time that the signalling link has been
+unavailable due to failure.
+.TP
+.I sl_dur_unavail_rpo
+(Q.752 Table 2.9)
+Contains the duration of time that the signalling link has been
+unavailable due to remote processor outage.
+.TP
+.I sl_sibs_sent
+(Q.752 Table 2.15)
+Contains the number of SIBs sent.
+.TP
+.I sl_tran_sio_sif_octets
+(Q.752 Table 3.1)
+Contains the number of SIO/SIF octets transmitted.
+.TP
+.I sl_retrans_octets
+(Q.752 Table 3.2)
+Contains the number of octets retransmitted.
+.TP
+.I sl_tran_msus
+(Q.752 Table 3.3)
+Contains the number of MSUs transmitted.
+.TP
+.I sl_recv_sio_sif_octets
+(Q.752 Table 3.4)
+Contains the number of SIO/SIF octets received.
+.TP
+.I sl_recv_msus
+(Q.752 Table 3.5)
+Contains the number of MSUs received.
+.TP
+.I sl_cong_onset_ind[4]
+(Q.752 Table 3.6)
+Contains the number of times that a congestion onset threshold was
+passed.
+.TP
+.I sl_dur_cong_level[4]
+(Q.752 Table 3.7)
+Contains the duration of time spent in each congestion level.
+.TP
+.I sl_msus_cong_discard
+(Q.752 Table 3.10)
+Contains the number of MSUs discarded due to congestion.
+.TP
+.I sl_cong_discd_ind[4]
+(Q.752 Table 3.11)
+Contains the number of times that a congestion discard threshold
+was passed.
+.RE
+
+.SS "Protocol Events"
+.PP
+.PP
+Protocol management controls which affect notification of events to local
+management are invoked by local management to request information about
+notifications which have been requested as well as to set notification by
+event.
+.PP
+The \fIic_cmd\fR contians one of the following notify commands:
+.TP
+.B SL_IOCGNOTIFY
+Gets the protocol notification bitmask of the Signalling Link into
+the provided \fBsl_notify\fR structure.
+.TP
+.B SL_IOCSNOTIFY
+Sets protocol notification for the Signalling Link events identified
+by set bits in the provided \fBsl_notify\fR structure.
+.TP
+.B SL_IOCCNOTIFY
+Clears protocol notification for the Signalling Link events identified
+by set bits in the provided \fBsl_notify\fR structure.
+.PP
+\fIic_dp\fR points to a \fBsl_notify\fR structure which represents the
+Signalling Link protocol event notifications as follows:
+.PP
+.RS 4
+.nf
+typedef struct sl_notify {
+    sl_ulong   events;
+} sl_notify_t;
+.fi
+.TP
+.I events
+Contains a bit mask with bits set for each Signalling Link event for
+which notification has been requested.  May also contain set bits for events
+for which notification should be set (\fBSL_IOCSNOTIFY\fR) or cleared
+(\fBSL_IOCCNOTIFY\fR).  The mask is the bitwise OR of any of the following
+values:
+.RE
+.RS 4
+.IP
+.TS
+tab(:);
+lb 2 l.
+SL_EVT_FAIL_UNSPECIFIED:
+SL_EVT_FAIL_CONG_TIMEOUT:Q.752 Table 1.6
+SL_EVT_FAIL_ACK_TIMEOUT:Q.752 Table 1.4
+SL_EVT_FAIL_ABNORMAL_BSNR:
+SL_EVT_FAIL_ABNORMAL_FIBR:
+SL_EVT_FAIL_ABORMAL:Q.752 Table 1.3
+SL_EVT_FAIL_SUERM_EIM:Q.752 Table 1.5
+SL_EVT_FAIL_ALIGNMENT:
+SL_EVT_FAIL_RECEIVED_SIO:
+SL_EVT_FAIL_RECEIVED_SIN:
+SL_EVT_FAIL_RECEIVED_SIE:
+SL_EVT_FAIL_RECEIVED_SIOS:
+SL_EVT_FAIL_T1_TIMEOUT:
+SL_EVT_RPO_BEGIN:Q.752 Table 2.10
+SL_EVT_RPO_END:Q.752 Table 2.11
+SL_EVT_CONGEST_ONSET_IND:Q.752 Table 3.6  1st&D
+SL_EVT_CONGEST_DISCD_IND:Q.752 Table 3.11 1st&D
+.TE
+.RE
+
+.\" .SH "ERROR HANDLING"
+.PP
+
+.\" .SS "ERRORS"
+.PP
+
+.SH "SEE ALSO"
+.PP
+.PP
+.BR devi (7),
+.BR getmsg (2),
+.BR ioctl (2),
+.BR lmi (7),
+.BR mtpi (7),
+.BR putmsg (2),
+.BR read (2),
+.BR sls (4),
+.BR slsi (7),
+.BR ss7d (8),
+.BR streamio (2),
+.BR write (2)
+
+
+.SH "BUGS"
+.PP
+.PP
+Too many to mention.
+
+.SH "HISTORY"
+.PP
+.PP
+This STREAMS interface for SS7 is an original part of the \fIOpenSS7\fR package.
+
+.XX
+.[
+q702
+.]
+.[
+q703
+.]
+.[
+q704
+.]
+.[
+$LIST$
+.]
+.TA

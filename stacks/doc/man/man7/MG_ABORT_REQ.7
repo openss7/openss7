@@ -1,0 +1,128 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: MG_ABORT_REQ.7,v 0.9 2004/01/17 08:01:21 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:21 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MG_ABORT_REQ 7 "$Date: 2004/01/17 08:01:21 $" "$Name:  $" "Media Gateway Interface"
+.SH NAME
+.B MG_ABORT_REQ, MG_abort_req, MG_abort_req_t
+\- abort action request.
+.SH SYNOPSIS
+This primitive is one
+.B M_PROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MG_abort_req {
+    ulong mg_primitive;         /* always MG_ABORT_REQ */
+    ulong mg_se_id;             /* session id */
+    ulong mg_tp_id;             /* termination id for action to abort */
+    ulong mg_action_id;         /* identifier of action to abort */
+} MG_abort_req_t;
+
+#define MG_ACTION_PREVIOUS      (-1UL)
+\fR\s+1
+.fi
+.SH DESCRIPTION
+Requests that the specified action be aborted.  This primitive is confirmed
+with the
+.B MG_OK_ACK
+primiitve.  If the action identifier is
+.BR MG_ACTION_PREVIOUS ,
+this primitive requests that the previously initiated (unconfirmed) action be
+aborted.  If the action identifier is zero, this primitive requests that all
+actions on the specified termination point be aborted.
+.SH PARAMETERS
+.TP
+.I mg_primitive
+specifies the primitive type.  Always
+.BR MG_ABORT_REQ .
+.TP
+.I mg_se_id
+specifies the session id of the communications session in which to abort the
+action.
+.TP
+.I mg_tp_id
+specifies the termination id of the terminaton point for which to abort the
+action.
+.TP
+.I mg_action_id
+specifies the action id of the action, returned by the
+.BR MG_ACTION_CON (7)
+primitive when the action starts.  This action id may also be the value
+.BR MG_ACTION_PREVIOUS .
+This value is used when the
+.B MG_ABORT_REQ
+is being requested before the
+.BR MG_ACTION_CON (7)
+indicating the action id is received.  This will abort the last invoked
+action.
+.SH ORIGINATOR
+Media gateway controller.
+.SH "SEE ALSO"
+.BR MG_ACTION_REQ (7),
+.BR MG_ACTION_CON (7),
+.BR MG_ACTION_IND (7).
+.SH VERSIONS
+This manpage was written for MGI Version 1.
+.XX
+.[
+mgi
+.]
+.[
+rfc3435
+.]
+.[
+h248.1
+.]
+.[
+$LIST$
+.]
+.TA

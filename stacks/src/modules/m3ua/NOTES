@@ -1,0 +1,270 @@
+# *****************************************************************************
+# 
+# $Id: NOTES,v 0.9 2004/01/17 08:20:20 brian Exp $
+# 
+# *****************************************************************************
+# 
+# Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+# 
+# All Rights Reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+# 
+# Last Modified $Date: 2004/01/17 08:20:20 $ by $Author: brian $
+# 
+# *****************************************************************************
+# 
+# $Log: NOTES,v $
+# Revision 0.9  2004/01/17 08:20:20  brian
+# - Added files for 0.9 baseline autoconf release.
+#
+# Revision 0.8  2002/04/02 08:20:41  brian
+# Started Linux 2.4 development branch.
+#
+# Revision 0.7.8.1  2001/12/11 13:15:20  brian
+# Branched for new development.
+#
+# Revision 0.7.6.1  2001/07/25 04:51:35  brian
+# Working up M3UA.
+#
+# Revision 0.7  2001/06/04 03:48:36  brian
+# Added files for M3UA.
+#
+# *****************************************************************************
+
+The STREAMS model for the M3UA ASP side is as follows:
+
+Each ASP may be responsible for establishing its own SCTP associations to
+SGP and SG as follows:
+
+	o   The ASP opens an SCTP transport stream and binds it to the
+	    appropriate transport addresses with the number of streams which
+	    are required for operation.  The ASP does not connect these
+	    associations but leaves that for the SG or SGP proxy to perform.
+
+	o   When there are multiple SGP's, the ASP opens an SG-proxy
+	    multiplexor for each of the SGs that the ASP is bound to.
+
+	    The ASP configures the SG-proxy for the appropriate distribution
+	    algorithms for distributing outgoing messages over the available
+	    SGP.
+
+	    The ASP I_LINK's each of the SCTP transport streams under an
+	    SG-proxy multiplexor and gets returned an SG-proxy Mux Id which
+	    is later used as the SGP identifier.  (If the ASP addresses the
+	    SG-proxy multiplexor by minor device number, it is also possible
+	    to I_PLINK the SCTP streams.  In this case, the streams will not
+	    close if the ASP process dies and a subsequent open of the
+	    SG-proxy Mux will bring the Mux up preconfigured.)
+
+	o   When there is only a single SGP for particular SG, the ASP may
+	    I_PUSH the SG-proxy module over the SCTP stream (SGP) instead of
+	    linking.  The SG-proxy module used in this fashion knows that
+	    the trivial case of 1 SGP is what is desired and that the
+	    distribution mechanism is implied.
+
+	o   When there are multiple SG's, the ASP opens an M3UA-asp
+	    multiplexor and I_LINKs the SG-proxy modules under the M3UA-asp
+	    multiplexor and gets returned an M3UA-asp Mux Id which is later
+	    used as an SG identifier.
+
+	o   When there is only one SG which the ASP connects to, the ASP may
+	    I_PUSH the M3UA-asp module over the SG-proxy stream (SG) instead
+	    of linking.  The M3UA-asp module used in this fashion knows that
+	    the trivial case of 1 SG is what is desired and routing is
+	    implied.
+
+An alternative arrangement for configuring operation for ASPs is the M3UA
+ASP configuration daemon (m3ua_aspd).  This daemon establishes SCTP
+associations and links them under SG-proxy multiplexors and links SG-proxy
+multiplexors under M3UA-asp multiplexors using an SG-proxy multiplexor
+control stream and an M3UA-asp multiplexor control stream.  Then it is
+possible for the ASP to merely open M3UA-asp multiplexors (preconfigured,
+and ready to use) by minor device number.
+
+The resulting configuration is as follows:
+
+
+
+		+------+                        +------+
+		|stream|                        |stream|
+		| head |                        | head |
+		+------+                        +------+
+                   |                               |
+		+------+                        +------+
+		| M3UA |                        | M3UA |
+		| Mux  |                        | Mux  |
+		+------+                        +------+
+                   ||                              ||
+            +------++-------+              +-------++-------+
+            |               |              |                |
+	+------+        +------+        +------+        +------+
+	|  SG  |        |  SG  |        |  SG  |        |  SG  |
+	| Mux  |        | Mux  |        | Mux  |        | Mux  |
+	+------+        +------+        +------+        +------+
+           ||              ||              ||              ||
+       +---++---+      +---++---+      +---++---+      +---++---+
+       |        |      |        |      |        |      |        |
+    +-----+ +-----+ +-----+ +-----+ +-----+ +-----+ +-----+ +-----+
+    |SCTP | |SCTP | |SCTP | |SCTP | |SCTP | |SCTP | |SCTP | |SCTP |
+    +-----+ +-----+ +-----+ +-----+ +-----+ +-----+ +-----+ +-----+
+           
+The model also makes it possible to communicate to more than one SGP over
+the same SCTP association, or to communicate to multiple ASPs over the
+same over the same SCTP association by use of routing control within the
+multiplexor.
+
+Actually, I think that it may be better to use a single multiplexor
+as follows:
+
+
+		+------+                        +------+
+		|stream|                        |stream|
+		| head |                        | head |
+		+--+---+                        +---+--+
+                   |                                |
+      +------------+--------------------------------+-------------+
+      |                                                           |
+      |                          M3UA-ASP                         |
+      |                                                           |
+      |                         Muxtiplexor                       |
+      |                                                           |
+      +-----+-------+-------+-------+-------+-------+-------+-----+
+            |       |       |       |       |       |       |
+         +--+--+ +--+--+ +--+--+ +--+--+ +--+--+ +--+--+ +--+--+ 
+         |SCTP | |SCTP | |SCTP | |SCTP | |SCTP | |SCTP | |SCTP |
+         +-----+ +-----+ +-----+ +-----+ +-----+ +-----+ +-----+
+
+Routing functions would then be used to define which SCTP associations
+are used for which M3UA-ASP stream heads, for which SG and for which
+SGP.  SCTP associations could be formed and I_PLINKed under the M3UA
+multiplexor, and routing tables configured by an M3UA control stream,
+and then the M3UA configuration daemon could exit if necessary.  The
+M3UA daemon then could then also perform Layer Management functions.
+
+This is a better arrangement.  This would require two routing table
+mechanisms:
+	
+For messages arriving from the SG, the mapping would be:
+
+	SCTP Id/Stream Id/Context Id ==> ASP Id/AS Id
+	ASP Id/AS Id ==> SCTP Id/Stream Id/Context Id
+
+	Routing Id <==> SCTP Id/Stream Id/ASP Id/Routing Context
+
+That is, when ASPs send messages within an AS context, the M3UA must
+keep a list of all of the SGPs for which the ASP has registered in
+the AS context and which SCTP association and streams upon which to
+communicate with the SGPs in question.  For example:
+
+	ASP1:    AS1:    SG1:    SGP1 --> SCTP1/Stream1
+	                         SGP2 --> SCTP1/Stream2
+			
+			 SG2:    SGP1 --> SCTP2/Stream1 thru 16
+			         SGP2 --> SCTP3/Stream1 thru 16
+
+
+The other way would be:
+
+	SCTP3/Stream 2/RC 1 --> SG2/AS1/ASP1
+
+
+============================================
+
+Here is the basic design for M3UA.  There are two components to M3UA: the SG
+component and the ASP component.  The SG component works within the OpenSS7
+STREAMS framework as follows:
+
+
+	M3UA Layer Manager
+	        |
+	        |
+	        |
+	+-------+-----------------------------+
+	|                                     |
+	|                                     |
+	|              M3UA SG                |
+	|                                     |
+	|        Streams Multiplexor          |
+	|                                     |
+	|                                     |
+	|                                     |
+	|                                     |
+	|                                     |
+	+---+-+-+-+-+-+---------+-+-+-+-+-+---+
+	    | | | | | |         | | | | | |
+	    | | | | | |         | | | | | |
+	    | | | | | |         | | | | | |
+	    | | | | | |         | | | | | |
+	    | | | | | |         | | | | | |
+
+	    MTP Streams        SCTP Streams
+
+Intialization and Configuration
+-------------------------------
+
+When the system is initialized, the M3UA SG configuration daemon is started.
+The actions of the M3UA SG daemon are as follows:
+
+o   The m3ua_sgd starts.
+
+o   The m3ua_sgd reads whatever configuration files are necessary to determine
+    the necessary configuration for the SG.
+
+o   The m3ua_sgd opens the M3UA_SG multiplexor control stream and performs
+    initial configurations and optioning on the M3UA subsystem.
+
+o   The m3ua_sgd opens MTP user (MTP) streasm and configures them as would the
+    ss7d in OpenSS7, some of these streams may be bound to fixed routing
+    contexts, and others could be unbound in anticipation of registration of
+    routing keys.
+
+o   The m3ua_sgd LINKs or PLINKs the MTP streams under the M3UA_SG multiplexor
+    and provides the M3UA SG with any additional information which is required
+    pertaining to the configuration of each of the signalling links.
+
+o   Each MTP stream which is linked is provided with a Routing Context which
+    is statically allocated, or is left unbound and is placed in a pool for
+    dynamic registration of Routing Keys.
+
+o   The m3ua_sgd opens SCTP streams and configures them.
+
+o   The m3ua_sgd LINKs or PLINKs the SCTP streams under the M3UA_SG
+    multiplexor and provides the M3UA SG with any additional information which
+    is required pertaining to the configuration of each of the SCTP streams.
+
+o   At least one of the SCTP streams is bound as a listener stream and the
+    remainder are left unbound.  (When a connection is made from the ASP to
+    the SG, the connection indication will appear on the listener stream and
+    the M3UA will use one of the available SCTP non-listener streams to accept
+    the incoming connection.
+
+o   The M3UA control stream is kept open and is used to exchange management
+    information between the M3UA SG and user level programs.  The M3UA_SGD
+    should be prepared to respond to signals or user commands on a socket to
+    permit the user to reconfigure and manage the system during operation.
+
+NOTE:
+	As an altenative to LINKing or PLINKing SCTP associations under the
+	multiplexor, it is possible that the M3UA Layer Manager on the control
+	stream could respond to incoming connections by opening an SCTP stream
+	to accept incoming connections on demand rather than linking any of
+	them under the multiplexor in advance.  That way, the m3ua_sgd can
+	be responsible for managing incoming connections or can form outgoing
+	connections if necessary.  The same is possible for MTP streams using
+	registration of routing keys: the appropriate MTP stream could be
+	opened at registration time and linked under the multiplexor only when
+	it is needed.
+

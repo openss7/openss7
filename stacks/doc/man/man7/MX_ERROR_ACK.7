@@ -1,0 +1,206 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: MX_ERROR_ACK.7,v 0.9 2004/01/17 08:01:24 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:24 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MX_ERROR_ACK 7 "$Name:  $" "$Date: 2004/01/17 08:01:24 $" "Multiplex Interface"
+.SH NAME
+.B MX_ERROR_ACK, MX_error_ack, MX_error_ack_t
+\- error acknowledgment
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MX_error_ack {
+    ulong mx_primitive;         /* always MX_ERROR_ACK */
+    ulong mx_error_primitive;   /* primitive in error */
+    ulong mx_error_type;        /* MXI error */
+    ulong mx_unix_error;        /* UNIX error */
+    ulong mx_state;             /* resulting state */
+} MX_error_ack_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+For primitives that required local acknowledgment, this primitive provides
+negative acknowledgment on the receipt of the primitive.
+.SH PARAMETERS
+This primitive contains the following parameters:
+.TP
+.I mx_primitive
+indicates the primitive type.  Always
+.BR MX_ERROR_ACK .
+.TP
+.I mx_error_primitive
+indicates the primitive that was received in error.  This field can be one of
+the following values:
+.sp
+.TS
+tab(:);
+ll.
+\fBMX_INFO_REQ\fR(7):information request
+\fBMX_OPTMGMT_REQ\fR(7):options management request
+\fBMX_ATTACH_REQ\fR(7):attach request
+\fBMX_DETACH_REQ\fR(7):detach request
+\fBMX_ENABLE_REQ\fR(7):enable request
+\fBMX_DISABLE_REQ\fR(7):disable request
+\fBMX_CONNECT_REQ\fR(7):connection request
+\fBMX_DISCONNECT_REQ\fR(7):disconnection request
+.TE
+.TP
+.I mx_error_type
+indicates the error type.  See
+.I \*(lqERRORS\*(rq ,
+below.
+.TP
+.I mx_unix_error
+indicates the
+.BR UNIX \(rg
+error number,
+.IR errno (3).
+When
+.I mx_error_type
+is
+.BR MXSYSERR ,
+this field contains the
+.BR Linux \(rq
+.IR errno (3).
+Otherwise, this field is ignored by the multiplex service user and set to zero
+(0) by the multiplex service provider.
+.TP
+.I mx_state
+indicates the resulting state of the multiplex service provider.  This is the
+state from which the errored primitive was issued.
+.SH ORIGINATOR
+Multiplex Service Provider.
+.SH STATES
+This primitive is valid in any state when a local acknowledgment is
+outstanding.  The resulting state is the state in which the errored primitive
+was issued.
+.SH ERRORS
+The error type,
+.IR mx_error_type ,
+can be one of the following values:
+.TP 16
+.RB [ MXSYSERR ]
+.I UNIX system error.
+A
+.BR UNIX \(rg
+system error occured during the execution of the primitive, and the
+.BR UNIX \(rg
+error number,
+.IR errno (3),
+is indicated in the
+.I mx_unix_error
+field of the
+.B MX_ERROR_ACK
+primitive.
+.TP
+.RB [ MXBADADDR ]
+.I Bad address format or content.
+A specified address was poorly formatted or contained invalid information.
+.TP
+.RB [ MXOUTSTATE ]
+.I Interface out of state.
+The primitive would place the interface out of state.  The errored primitive
+must be issued from a specific set of valid states, yet the errored primitive
+was not issued in on e of the state for which it is valid.
+.TP
+.RB [ MXBADOPT ]
+.I Bad options format or content.
+Specified options were poory formatted or contained illegal information.
+.TP
+.RB [ MXBADPARM ]
+.I Bad parameter format or content.
+Specified options contained a parameter that was poorly formatted or contained
+invalid information.
+.TP
+.RB [ MXBADPARMTYPE ]
+.I Bad paramater structure type.
+Specified parameter type was not recognized or was poorly formatted for the
+specified type.
+.TP
+.RB [ MXBADFLAG ]
+.I Bad flag.
+Specified flags were invalid.
+.TP
+.RB [ MXBADPRIM ]
+.I Bad primitive.
+The primitive type was unrecognized or the primitive message block was poorly
+formatted for the primitive type.
+.TP
+.RB [ MXNOTSUPP ]
+.I Primitive not supported.
+The primitive type was recognized, but is not supported for the stream or
+multiplex service provider on which the errored primitive was issued.
+.TP
+.RB [ MXBADSLOT ]
+.I Bad multplex slot.
+The specified multiplex slot was invalid or out of range.
+.SH "SEE ALSO"
+.SH VERSIONS
+.BR MX_INFO_REQ (7),
+.BR MX_OPTMGMT_REQ (7),
+.BR MX_ATTACH_REQ (7),
+.BR MX_DETACH_REQ (7),
+.BR MX_ENABLE_REQ (7),
+.BR MX_DISABLE_REQ (7),
+.BR MX_CONNECT_REQ (7),
+.BR MX_DISCONNECT_REQ (7).
+This manpage was written for MXI Version 1.
+.XX
+.[
+mxi
+.]
+.[
+$LIST$
+.]
+.TA

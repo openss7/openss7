@@ -1,0 +1,103 @@
+# vim: ft=automake
+# =============================================================================
+# 
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 07:50:03 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/01/17 07:50:03 $ by $Author: brian $
+#
+# =============================================================================
+
+#
+#   These are some rules that I use for generating source and binary RPMs
+#   using automake.  I need to package releases using RPM.  The following
+#   rules accomplish that for most packages.
+#
+
+distdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
+
+RPMOPTS = -vv \
+	--define "__source_payload w9.bzdio" \
+	--define "__binary_payload w9.bzdio" \
+	--define "_topdir `(cd $(top_builddir); pwd)`" \
+	--define "_prefix $(prefix)" \
+	--define "_icon openss7-logo-small.gif" \
+	--define "_kversion $(PACKAGE_KVERSION)" \
+	@PACKAGE_OPTIONS@
+
+RPMTARGET = $(target)
+
+#
+#   This builds a source RPM for the current target.
+#   Note: rpm demands icon in current directory
+#
+dist dist-all: distdir $(top_builddir)/openss7-logo-small.gif
+	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
+	$(am__remove_distdir)
+	$(mkinstalldirs) $(top_builddir)/BUILD $(top_builddir)/SRPMS $(top_builddir)/SPECS $(top_builddir)/SOURCES $(top_builddir)/RPMS
+	@if [ ! -e openss7-logo-small.gif ] ; then \
+		echo "cp -f $(top_srcdir)/openss7-logo-small.gif ."; \
+		cp -f $(top_srcdir)/openss7-logo-small.gif .; \
+	fi
+	rpmbuild -ts $(RPMOPTS) $(SRPMFLAGS) $(AM_SRPMFLAGS) --target $(target) -- $(distdir).tar.bz2
+
+#   This is the type of thing that needs to be included in the master makefile
+#   to build rpms for the current target, we also build any defined
+#   AM_RPMTARGETS
+#
+rpms: dist
+	@for t in $(RPMTARGET) $(AM_RPMTARGETS) ; do \
+		echo "rpmbuild --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t --" SRPMS/*.src.rpm; \
+		rpmbuild --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t -- SRPMS/*.src.rpm; \
+	done
+
+srpm: dist
+
+.PHONY: srpm rpms # dist-srpm dist-rpms
+
+# vim: ft=automake
+

@@ -1,0 +1,220 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: CH_ATTACH_REQ.7,v 0.9 2004/01/17 08:01:20 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+'\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:20 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CH_ATTACH_REQ 7 "$Date: 2004/01/17 08:01:20 $" "$Name:  $" "Channel Interface"
+.SH NAME
+.B CH_ATTACH_REQ, CH_attach_req, CH_attach_req_t
+\- attach channel request
+.SH SYNOPSIS
+This primitive is one
+.B M_PROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CH_attach_req {
+    ch_ulong ch_primitive;      /* always CH_ATTACH_REQ */
+    ch_ulong ch_addr_length;    /* length of channel address */
+    ch_ulong ch_addr_offset;    /* offset of channel address */
+    ch_ulong ch_flags;          /* options flags */
+} CH_attach_req_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Requests that the channel specified by the provided address be attached to the
+requesting stream.
+.SH PARAMETERS
+This primitive has the following parameters:
+.TP
+.I ch_primitive
+specifies the primitive type.  Always
+.BR CH_ATTACH_REQ .
+.TP
+.I ch_addr_length
+specifies the length of the circuit address.
+.TP
+.I ch_addr_offset
+specifies the offset, from the beginning of the
+.B M_PROTO
+message block, of the circuit address.
+.TP
+.I ch_flags
+specifies the attach options flags.  No options flags are currently specified.
+.SH ORIGINATOR
+Channel Service User.
+.SH STATES
+This primitive is valid in state
+.BR CHS_DETACHED .
+The resulting state is
+.BR CHS_WACK_AREQ .
+.SH RULES
+The following rules apply to the attaching of the specified channel address to
+the stream:
+.IP \(em 4
+If the
+.I ch_addr_length
+field in the
+.B CH_ATTACH_REQ
+primitive is zero (0), then the channel service provider is to assign a
+channel address to the user.
+.IP \(em 4
+If the channel service provider is unable to assign a channel address to the
+user, the channel service provider will return
+.RB [ CHNOADDR ].
+.IP \(em 4
+When the
+.I ch_addr_length
+field in the
+.B CH_ATTACH_REQ
+primitive is non-zero, the channel service provider is to attach the channel
+address as specified in the
+.B CH_ATTACH_REQ
+primitive.
+.IP \(em 4
+If the channel service provider cannot attach the specified address, the
+channel service provider will return
+.RB [ CHADDRBUSY ].
+.PP
+These primitives require the Channel Service Provider to generate one of the
+following acknowledgments on receipt of the primitive, and the Channel Service
+User must wait for the acknowledgment before issuing any other primitives:
+.TP
+.B Successful
+Correct acknowledgment of the primitive is indicated with the
+.BR CH_OK_ACK (7)
+primitive.
+In this case, the resulting state is
+.BR CHS_ATTACHED .
+.TP
+.B Non-fatal errors
+These errors will be indicates with the
+.BR CH_ERROR_ACK (7)
+primitive.
+In this case, the resulting state is unchanged and remains the same as the
+state in which the primitive was issued.
+.SH ERRORS
+The allowable errors are as follows:
+.TP
+.RB [ CHSYSERR ]
+UNIX system error.
+A system error occured and the UNIX
+.IR errno (3)
+is specified in the
+.I ch_unix_error
+field of the
+.BR CH_ERROR_ACK (7)
+primitive.
+.TP
+.RB [ CHBADADDR ]
+Bad address format or content.
+The address specified by
+.I ch_addr_length
+and
+.I ch_addr_offset
+is invalid or of an incorrect format.
+.TP
+.RB [ CHOUTSTATE ]
+Interface out of state.
+The primitive would place the interface out of state.  The
+.B CH_ATTACH_REQ
+primitive is only valid in state
+.BR CHS_DETACHED .
+'\".TP
+'\".RB [ CHBADOPT ]
+'\"Bad options format or content.
+'\".TP
+'\".RB [ CHBADPARM ]
+'\"Bad parameter format or content.
+'\".TP
+'\".RB [ CHBADPARMTYPE ]
+'\"Bad paramater structure type.
+.TP
+.RB [ CHBADFLAG ]
+Bad flag.
+The flags specified in
+.I ch_flags
+are invalid.
+.TP
+.RB [ CHBADPRIM ]
+Bad primitive.
+The primitive is not recognized or incorrectly formatted.
+.TP
+.RB [ CHNOTSUPP ]
+Primitive not supported.
+The requesting stream is a
+.B CH_STYLE1
+stream that does not support the
+.BR CH_ATTACH_REQ .
+.TP
+.RB [ CHBOADDR ]
+Address could not be assigned.
+No address was specified
+.RI ( ch_addr_length
+is zero) and a channel address could not be assigned.
+.TP
+.RB [ CHADDRBUSY ]
+Address is busy.
+An address was specified
+.RI ( ch_addr_length
+is non-zero), but the channel address is already attached to another stream.
+.SH "SEE ALSO"
+.BR CH_OK_ACK (7),
+.BR CH_ERROR_ACK (7).
+.SH VERSIONS
+This manpage was written for CHI Version 1.
+.XX
+.[
+chi
+.]
+.[
+$LIST$
+.]
+.TA

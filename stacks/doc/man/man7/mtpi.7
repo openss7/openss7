@@ -1,0 +1,1220 @@
+'\" rt
+.\" Don't change the line above, it tells man that tbl is needed.
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: mtpi.7,v 0.9 2004/01/17 08:01:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corp. <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:28 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MTPI 7 "17 April 2003" "OpenSS7 Man Page" "OpenSS7 STREAMS Programmer's Manual"
+.SH "NAME"
+mtpi \- Message Transfer Part (MTP) Interface (MTPI).
+.SH "SYNOPSIS"
+.PP
+.B #include <ss7/mtpi.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.HP
+.BI "int " mtp_stream " = open(" /dev/mtp ", " flags );
+.HP
+.BI "int " mtp_stream " = open(" /dev/mtp-npi ", " flags );
+.HP
+.BI "int " mtp_stream " = open(" /dev/mtp-tpi ", " flags );
+.fi
+.SH "DESCRIPTION"
+.PP
+.PP
+This man page describes the STREAMS interface which is used to configure and
+exchange data with an SS7 Message Transfer Part (MTP) for all SS7 devices
+conforming to the \fIOpenSS7\fR Message Transfer Part Interface (MTPI)
+specification.
+.SS "STREAMS Configuration"
+.PP
+.SS "Local Management Interface"
+.PP
+.PP
+\fBMTPI\fR drivers are normally linked using \fBstreamio\fR(2) \fBI_PUSH\fR
+ioctl commands under a Signalling Connection Control Part (SCCP) (\fBsccp\fR(4)),
+Integrated Services Digital Network (ISDN) User Part (ISUP) (\fBisup\fR(4)) or
+Bearer Independent Call Control (BICC) (\fBbicc\fR(4)) such as \fBsccp\fR(8),
+\fBisup\fR(8) or \fBbicc\fR(8), by the SS7 Configuration Daemon \fBss7d\fR(8).
+.PP
+The \fBMTPI\fR interface is also available for ferry-clip testing of the
+Message Transfer Part (MTP) \fBmtp\fR(8) as well as for use by user-level
+programs wishing direct access to the Message Transfer Part (MTP)
+\fBmtp\fR(8).
+.PP
+.B MTPI
+provides a local management interface which utilizes
+.B M_PROTO
+and
+.B M_PCPROTO
+mesages which can be exchanged with the interface using
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system calls on the stream head once the interface is opened.  The local
+management interface control local management (STREAMS configuration
+functions) which are normally used by the SS7 Configuration Daemon
+.BR ss7d (8)
+on the driver interface before linking the
+.BR mtp (8)
+driver under an MTP-User driver such as
+.BR sccp (8),
+.BR isup (8)
+or
+.BR bicc (8).
+.PP
+The local management interface for
+.B MTPI
+is described in detail in section
+.I "LOCAL MANAGEMENT INTERFACE"
+below.
+.SS "Protocol Service Interface"
+.PP
+.PP
+.B MTPI
+provides a protocol service interface which uses
+.BR M_DATA ,
+.B M_PROTO
+and
+.B M_PCPROTO
+STREAMS messages which can be exchanged with
+.BR write (2),
+.BR read (2),
+.BR putmsg (2)
+or
+.BR getmsg (2)
+system calls on the stream head, or which can be exchanged with the driver by
+upstream pushed modules or linked drivers.  The  protocol service interface
+exchanges SS7 protocol service primitives between the Message Transfer Part
+(MTP) User and the Message Transfer Part (MTP) Provider, but may also be used
+for ferry-clip conformance testing or diagnostics.
+.PP
+The protocol service interface for
+.B MTPI
+is described in detail in section
+.I "PROTOCOL SERVICE INTERFACE"
+below.
+.SS "Protocol Management Interface"
+.PP
+.PP
+.B MTPI
+provides a protocol management interface which uses
+.B M_CTL
+message between mdoules or
+.B M_IOCTL
+messages from the stream head.  This interface uses the controls defined in
+the
+.I "Local Management Interface (LMI)"
+as detailed under
+.I "INPUT OUTPUT CONTROL INTERFACE"
+in
+.BR lmi (7).
+The protocol management interface provides protocol configuration, state
+inquiry, statistics and event management (SNMP functions).  This interface is
+normally used by the SS7 Configuration Daemon
+.BR ss7d (8)
+on the stream after opening or during operation.
+.PP
+The protocol management interface for
+.B MTPI
+is described in detail in section
+.I "PROTOCOL MANAGEMENT INTERFACE"
+below.
+.SS "Managed Object Model"
+.PP
+.TP
+.B MTP_OBJ_TYPE_DF
+The Default managed object represents the default options, configuration,
+state, statistics, events and management associated with the Message Transfer
+Part (MTP) provider
+.BR mtp (8).
+
+.TP
+.B MTP_OBJ_TYPE_MT
+The MTP User managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_NA
+The Network Appearance managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_SP
+The Signalling Point managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_RS
+The Route Set managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_RL
+The Route List managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_RT
+The Route managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_LS
+The (Combined) Link Set managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_LK
+The Link (Set) managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_SL
+The Signalling Link managed object \-
+
+.TP
+.B MTP_OBJ_TYPE_CB
+The Changeover/Changeback buffer \-
+
+.TP
+.B MTP_OBJ_TYPE_CR
+The Controlled Rerouting buffer \-
+
+.SH "LOCAL MANAGEMENT INTERFACE"
+.PP
+
+.SS MTP_INFO_REQ
+.PP
+This primitive requests that the MTP return the values of all supported
+protocol parameters (see MTP_INFO_ACK) and also the current state of the MTP.
+This primitive does not affect the statue of the MTP and does not appear in
+the state tables.
+.PP
+.B Format
+.PP
+The format of the message is one M_PROTO message block and its structure is as
+follows:
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_info_req {
+        mtp_ulong mtp_primitive;        /* always MTP_INFO_REQ */
+} MTP_info_req_t;
+\s+2\fR
+.fi
+.RE
+.PP
+.B Parameters
+.TP
+.I mtp_primitive
+Indicates the primitive type.
+.PP
+.B Valid States
+.PP
+This primitive is valid in any state where there is no local acknowledgement
+pending.
+.PP
+.B New State
+.PP
+The new state remains unchanged.
+.PP
+.B Acknowledgements
+.PP
+This primitive requires the MTP to generate one of the following
+acknowledgements upon receipt of the primitive:
+.HP
+.I Successful:
+Acknowledgement of the primitive with the MTP_INFO_ACK primitive.
+.HP
+.I Non-fatal errors:
+There are no errors associated with the issuance of this primitive.
+
+.SS MTP_INFO_ACK
+.PP
+This primitive indicates to the MTP User any relevant protocol-dependent
+paramteres.  It should be initiated in response to the N_INFO_REQ primitive
+described above.
+.PP
+.B Format
+.PP
+The format of this message is one M_PCPROTO message block and its structure is
+as follows:
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_info_ack {
+        mtp_ulong mtp_primitive;        /* always MTP_INFO_ACK */
+        mtp_ulong mtp_msu_size;         /* maximum MSU size for guaranteed delivery */
+        mtp_ulong mtp_addr_size;        /* maximum address size */
+        mtp_ulong mtp_addr_length;      /* address length */
+        mtp_ulong mtp_addr_offset;      /* address offset */
+        mtp_ulong mtp_current_state;    /* current interface state */
+        mtp_ulong mtp_serv_type;        /* service type */
+        mtp_ulong mtp_version;          /* version of interface */
+} MTP_info_ack_t;
+
+#define M_COMS	1		/* Connection-mode MTP service supported */
+#define M_CLMS	2		/* Connection-less MTP service supported */
+\s+2\fR
+.fi
+.RE
+.PP
+.B Parameters
+.TP
+.I mtp_primitive
+Indicates the primitive type.
+.TP
+.I mtp_msu_size
+Indicates the maximum MSU size accepted by the MTP provider on the bound or connected
+stream.
+.TP
+.I mtp_addr_size
+Indicates the size of the MTP address in bytes.
+.TP
+.I mtp_addr_length
+Indicates the length of the bound MTP address (if any).  If the stream is not
+bound to an address, this field is coded zero (0).
+.TP
+.I mtp_addr_offset
+Indicates the offset of the bound MTP address (if any) from the start of the
+message block.
+.TP
+.I mtp_current_state
+Indicates the current state of the MTP for the requesting stream.
+.TP
+.I mtp_serv_type
+Indicates the service type of the MTP for the requesting stream.  See
+\*(lqService Types\*(rq below.
+.TP
+.I mtp_version
+The version of the MTP interface.
+.PP
+.B Service Types
+.PP
+The service type can be one of the following:
+.TP
+M_COMS
+Connection-mode MTP service provided.
+.TP
+M_CLMS
+Connectionless MTP service provided.
+.PP
+.B Rules
+.IP \(bu 4
+.IP \(bu 4
+
+.SS MTP_ADDR_REQ
+.PP
+Requests that the MTP return the bound and connected MTP addresses.
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_addr_req {
+        mtp_ulong mtp_primitive;        /* always MTP_ADDR_REQ */
+} MTP_addr_req_t;
+\s+2\fR
+.fi
+.RE
+.PP
+.B Parameters
+.TP
+.I mtp_primitive
+Specifies the primitive type.
+.PP
+.B
+Valid States
+.PP
+This primitive is valid in any state where there is no local acknowledgement
+pending.
+.PP
+.B
+New State
+.PP
+The new state remains unchanged.
+.PP
+.B
+Acknowledgements
+.PP
+This primitive requires the MTP to generate one of the following
+acknowledgements upon receipt of the primitive:
+.HP
+.I Successful:
+Acknowledgement of the primitive with an MTP_ADDR_ACK primitive.
+.HP
+.I Non-fatal errors:
+There are no errors associated with the issuance of this primitive.
+
+.SS MTP_ADDR_ACK
+.PP
+This primitive indicates to the MTP User any bound or connected MTP addresses.
+It should be initiated in response to the MTP_ADDR_REQ primitive described
+above.
+.PP
+.B Format
+.PP
+The format of this message is one M_PCPROTO message block and its structure is
+as follows:
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_addr_ack {
+        mtp_ulong mtp_primitive;        /* always MTP_ADDR_ACK */
+        mtp_ulong mtp_loc_length;       /* length of local MTP address */
+        mtp_ulong mtp_loc_offset;       /* offset of local MTP address */
+        mtp_ulong mtp_rem_length;       /* length of remote MTP address */
+        mtp_ulong mtp_rem_offset;       /* offset of remote MTP address */
+} MTP_addr_ack_t;
+\s+2\fR
+.fi
+.RE
+.PP
+.B Parameters
+.TP
+.I mtp_primitive
+Indicates the primitive type.
+.TP
+.I mtp_loc_length
+Indicates the length of the local (bound) address.
+.TP
+.I mtp_loc_offset
+Indicates the offset of the local (bound) address from the beginning of the
+message block.
+.TP
+.I mtp_rem_length
+Indicates the length of the remote (connected) address.
+.TP
+.I mtp_rem_offset
+Indicates the offset of the remote (connected) address from the beginning of
+the message block.
+.PP
+.B Rules
+.IP \(bu 3
+If no local address is bound, the \fImtp_loc_length\fR and \fImtp_rem_length\fR fields will be coded zero (0).
+.IP \(bu 3
+If no remote address is connected, the \fImtp_rem_length\fR field will be coded zero (0).
+
+.SS MTP_OPTMGMT_REQ
+.PP
+Requests management of options associated with the requesting stream.
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_optmgmt_req {
+        mtp_ulong mtp_primitive;        /* always MTP_OPTMGMT_REQ */
+        mtp_ulong mtp_opt_length;       /* length of options */
+        mtp_ulong mtp_opt_offset;       /* offset of options */
+        mtp_ulong mtp_mgmt_flags;       /* management flags */
+} MTP_optmgmt_req_t;
+
+#define MTP_DEFAULT     0UL
+#define MTP_CHECK       1UL
+#define MTP_NEGOTIATE   2UL
+#define MTP_CURRENT     3UL
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_OPTMGMT_REQ\fR.
+.TP
+.I mtp_opt_length
+The length of the management options.
+.TP
+.I mtp_opt_offset
+The offset of the management options from the start of the M_PROTO message
+blcok.
+.TP
+.I mtp_mgmt_flags
+The management flags. See "Flags" below.
+.PP
+.B Flags
+.PP
+The management flags can take on one of the following values:
+.TP
+MTP_DEFAULT
+Return the default values of the specified (or all) options.
+.TP
+MTP_CHECK
+Check the specified options and values.
+.TP
+MTP_NEGOTIATE
+Negotiate the specified options and values.
+.TP
+MTP_CURRENT
+Return the current values of the specified (or all) options.
+
+.SS MTP_OPTMGMT_ACK
+.PP
+Returns the results of a previous management option request.
+.PP
+.B Format
+THe format of this primitive is one M_PROTO message block and its structure is
+as follows:
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_optmgmt_ack {
+        mtp_ulong mtp_primitive;        /* always MTP_OPTMGMT_ACK */
+        mtp_ulong mtp_opt_length;       /* length of options */
+        mtp_ulong mtp_opt_offset;       /* offset of options */
+        mtp_ulong mtp_mgmt_flags;       /* management flags */
+} MTP_optmgmt_ack_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_OPTMGMT_ACK\fR.
+.TP
+.I mtp_opt_length
+The length of the management options.
+.TP
+.I mtp_opt_offset
+The offset of the management options from the start of the M_PROTO message
+block.
+.TP
+.I mtp_mgmt_flags
+The management flags.  See "Flags" below.
+.PP
+.B Flags
+.PP
+The management flags can take on one of the following values:
+.TP
+MTP_DEFAULT
+The default values of selected options as indicated.
+.TP
+MTP_CHECK
+The success or failure of the selected options as indicated.
+.TP
+MTP_NEGOTIATE
+The success or failure and value of negotiated options as indicated.
+.TP
+MTP_CURRENT
+The current values of selected options as indicated.
+
+.SS MTP_BIND_REQ
+.PP
+Binds the requesting stream to an MTP address.
+.PP
+.B Format
+.PP
+The format of the MTP bind request is one M_PROTO message block, formatted as
+follows:
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_bind_req {
+        mtp_ulong mtp_primitive;        /* always MTP_BIND_REQ */
+        mtp_ulong mtp_addr_length;      /* length of MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of MTP address */
+        mtp_ulong mtp_bind_flags;       /* bind flags */
+} MTP_bind_req_t;
+\s+2\fR
+.fi
+.RE
+.PP
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_BIND_REQ\fR.
+.TP
+.I mtp_addr_length
+The length of the address to bind to the requesting stream.
+.TP
+.I mtp_addr_offset
+The offset of the address to bind to the requesting stream from the start of
+the M_PROTO message block.
+.TP
+.I mtp_bind_flags
+Bind flags.  See "Flags" below.
+.PP
+.B Acknowledgements
+.HP
+.I Successful Acknowledgement:
+Successful acknowledgement is performed with the MTP_BIND_ACK primitive.
+.HP
+.I Non-fatal Errors:
+Non-fatal errors are indicate with the MTP_ERROR_ACK primitive.
+.SS MTP_BIND_ACK
+.PP
+Acknowledges a previous bind request.
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_bind_ack {
+        mtp_ulong mtp_primitive;        /* always MTP_BIND_ACK */
+        mtp_ulong mtp_addr_length;      /* length of bound MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of bound MTP address */
+} MTP_bind_ack_t;
+\s+2\fR
+.fi
+.RE
+.PP
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_BIND_ACK\fR.
+.TP
+.I mtp_addr_length
+The length of the bound address.
+.TP
+.I mtp_addr_offset
+The offset of the bound address from the beginning of the M_PROTO message
+block.
+
+.SS MTP_CONN_REQ
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_conn_req {
+        mtp_ulong mtp_primitive;        /* always MTP_CONN_REQ */
+        mtp_ulong mtp_addr_length;      /* length of MTP address to connect */
+        mtp_ulong mtp_addr_offset;      /* offset of MTP address to connect */
+        mtp_ulong mtp_conn_flags;       /* connect flags */
+} MTP_conn_req_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_CONN_REQ\fR.
+.TP
+.I mtp_addr_length
+.TP
+.I mtp_addr_offset
+.TP
+.I mtp_conn_flags
+
+.SS MTP_DISCON_REQ
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_discon_req {
+        mtp_ulong mtp_primitive;        /* always MTP_DISCON_REQ */
+} MTP_discon_req_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_DISCON_REQ\fR.
+
+.SS MTP_UNBIND_REQ
+.PP
+Unbinds the requested stream from the bound signalling point.
+
+.B Format
+.RS
+.PP
+The format of the MTP unbind request is one M_PROTO message block, formatted
+as follows:
+.nf
+\fC\s-2\
+typedef struct MTP_unbind_req {
+        mtp_ulong mtp_primitive;        /* always MTP_UNBIND_REQ */
+} MTP_unbind_req_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_UNBIND_REQ\fR.
+
+.SS MTP_OK_ACK
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_ok_ack {
+        mtp_ulong mtp_primitive;        /* always MTP_OK_ACK */
+        mtp_ulong mtp_correct_prim;     /* correct primitive */
+} MTP_ok_ack_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_OK_ACK\fR.
+.TP
+.I mtp_correct_prim
+
+.SS MTP_ERROR_ACK
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_error_ack {
+        mtp_ulong mtp_primitive;        /* always MTP_ERROR_ACK */
+        mtp_ulong mtp_error_primitive;  /* primitive in error */
+        mtp_ulong mtp_mtpi_error;       /* MTP interface error */
+        mtp_ulong mtp_unix_error;       /* UNIX error */
+} MTP_error_ack_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_ERROR_ACK\fR.
+.TP
+.I mtp_error_primitive
+.TP
+.I mtp_mtpi_error
+.TP
+.I mtp_unix_error
+
+.SH "PROTOCOL SERVICE INTERFACE"
+.PP
+.SS MTP_TRANSFER_REQ
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_transfer_req {
+        mtp_ulong mtp_primitive;        /* always MTP_TRANSFER_REQ */
+        mtp_ulong mtp_dest_length;      /* length of destination address */
+        mtp_ulong mtp_dest_offset;      /* offset of destination address */
+        mtp_ulong mtp_mp;               /* message priority */
+        mtp_ulong mtp_sls;              /* signalling link selection */
+} MTP_transfer_req_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_TRANSFER_REQ\fR.
+.TP
+.I mtp_dest_length
+.TP
+.I mtp_dest_offset
+.TP
+.I mtp_mp
+.TP
+.I mtp_sls
+
+.SS MTP_TRANSFER_IND
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_transfer_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_TRANSFER_IND */
+        mtp_ulong mtp_srce_length;      /* length of source address */
+        mtp_ulong mtp_srce_offset;      /* offset of source address */
+        mtp_ulong mtp_mp;               /* message priority */
+        mtp_ulong mtp_sls;              /* signalling link selection */
+} MTP_transfer_ind_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_TRANSFER_IND\fR.
+.TP
+.I mtp_srce_length
+.TP
+.I mtp_srce_offset
+.TP
+.I mtp_mp
+.TP
+.I mtp_sls
+
+.SS MTP_STATUS_IND
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_status_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_STATUS_IND */
+        mtp_ulong mtp_addr_length;      /* length of affected MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
+        mtp_ulong mtp_type;             /* type */
+        mtp_ulong mtp_status;           /* status */
+} MTP_status_ind_t;
+
+/* Type for MTP_STATUS_IND */
+#define MTP_STATUS_TYPE_CONG            0x00    /* MTP-STATUS refers to congestion */
+#define MTP_STATUS_TYPE_UPU             0x01    /* MTP-STATUS referes to user part unavailability */
+
+/* Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_UPU */
+#define MTP_STATUS_UPU_UNKNOWN          0x01    /* User part unavailable: unknown */
+#define MTP_STATUS_UPU_UNEQUIPPED       0x02    /* User part unavailable: unequipped remote user. */
+#define MTP_STATUS_UPU_INACCESSIBLE     0x03    /* User part unavailable: inaccessible remote user. 
+                                                 */
+
+/* Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_CONG */
+#define MTP_STATUS_CONGESTION_LEVEL0    0x00    /* Signalling network congestion level 0 */
+#define MTP_STATUS_CONGESTION_LEVEL1    0x01    /* Signalling network congestion level 1 */
+#define MTP_STATUS_CONGESTION_LEVEL2    0x02    /* Signalling network congestion level 2 */
+#define MTP_STATUS_CONGESTION_LEVEL3    0x03    /* Signalling network congestion level 3 */
+#define MTP_STATUS_CONGESTION           0x04    /* Signalling network congestion */
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_STATUS_IND\fR.
+.TP
+.I mtp_addr_length
+.TP
+.I mtp_addr_offset
+.TP
+.I mtp_mp
+.TP
+.I mtp_sls
+.B Flags
+.PP
+Status type:
+
+.TP
+MTP_STATUS_TYPE_CONG
+.TP
+MTP_STATUS_TYPE_UPU
+
+.PP
+User Part status:
+
+.TP
+MTP_STATUS_UPU_UNKNOWN
+.TP
+MTP_STATUS_UPU_UNEQUIPPED
+.TP
+MTP_STATUS_UPU_INACCESSIBLE
+
+.PP
+Congestion status:
+
+.TP
+MTP_STATUS_CONGESTION_LEVEL0
+.TP
+MTP_STATUS_CONGESTION_LEVEL1
+.TP
+MTP_STATUS_CONGESTION_LEVEL2
+.TP
+MTP_STATUS_CONGESTION_LEVEL3
+.TP
+MTP_STATUS_CONGESTION
+
+.SS MTP_PAUSE_IND
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_pause_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_PAUSE_IND */
+        mtp_ulong mtp_addr_length;      /* length of affected MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
+} MTP_pause_ind_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_PAUSE_IND\fR.
+.TP
+.I mtp_addr_length
+.TP
+.I mtp_addr_offset
+
+.SS MTP_RESUME_IND
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_resume_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_RESUME_IND */
+        mtp_ulong mtp_addr_length;      /* length of affected MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
+} MTP_resume_ind_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_RESUME_IND\fR.
+.TP
+.I mtp_addr_length
+.TP
+.I mtp_addr_offset
+
+.SS MTP_RESTART_BEGINS_IND
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_restart_begins_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_RESTART_BEGINS_IND */
+} MTP_restart_begins_ind_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_RESTART_BEGINS_IND\fR.
+
+.SS MTP_RESTART_COMPLETE_IND
+.PP
+.B Format
+.RS
+.nf
+\fC\s-2\
+typedef struct MTP_restart_complete_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_RESTART_COMPLETE_IND */
+} MTP_restart_complete_ind_t;
+\s+2\fR
+.fi
+.RE
+.B Parameters
+.TP
+.I mtp_primitive
+Always \fCMTP_RESTART_COMPLETE_IND\fR.
+
+.SH "PROTOCOL MANAGEMENT INTERFACE"
+.PP
+.SS "Protocol Options"
+.PP
+.RS
+.nf
+\fC\s-2\
+typedef struct mtp_option {
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        /* followed by object-specific protocol options structure */
+} mtp_option_t;
+.fi
+\s+2\fR
+.fi
+.RE
+.TP
+.B MTP_IOCGOPTIONS
+
+.TP
+.B MTP_IOCSOPTIONS
+
+.SS "Protocol Configuration"
+.PP
+.RS
+.nf
+\fC\s-2\
+typedef struct mtp_config {
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong cmd;                              /* configuration command */
+        /* followed by object-specific configuration structure */
+} mtp_config_t;
+
+#define MTP_GET         0       /* get configuration */
+#define MTP_ADD         1       /* add configuration */
+#define MTP_CHA         2       /* cha configuration */
+#define MTP_DEL         3       /* del configuration */
+\s+2\fR
+.RE
+.TP
+.B MTP_IOCGCONFIG
+
+.RS
+.TP
+.B MTP_GET
+
+.RE
+.TP
+.B MTP_IOCSCONFIG
+
+.RS
+.TP
+.B MTP_ADD
+
+.TP
+.B MTP_CHA
+
+.TP
+.B MTP_DEL
+
+.RE
+.TP
+.B MTP_IOCTCONFIG
+
+.RS
+.TP
+.B MTP_ADD
+
+.TP
+.B MTP_CHA
+
+.TP
+.B MTP_DEL
+
+.RE
+.TP
+.B MTP_IOCCCONFIG
+
+.RS
+.TP
+.B MTP_ADD
+
+.TP
+.B MTP_CHA
+
+.TP
+.B MTP_DEL
+
+.RE
+.SS "Protocol State"
+.PP
+.RS
+.nf
+\fC\s-2\
+typedef struct mtp_statem {
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong flags;                            /* object flags */
+        ulong state;                            /* object state */
+        /* followed by object-specific state structure */
+} mtp_statem_t;
+\s+2\fR
+.fi
+.RE
+.TP
+.B MTP_IOCGSTATE
+
+.TP
+.B MTP_IOCCMRESET
+
+.SS "Protocol Statistics"
+.PP
+.RS
+.nf
+\fC\s-2\
+typedef struct mtp_stats {
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong header;                           /* object stats header */
+        /* followed by object-specific statistics structure */
+} mtp_stats_t;
+\s+2\fR
+.fi
+.RE
+.TP
+.B MTP_IOCGSTATSP
+
+.TP
+.B MTP_IOCSSTATSP
+
+.TP
+.B MTP_IOCGSTATS
+
+.TP
+.B MTP_IOCCSTATS
+
+.SS "Protocol Events"
+.PP
+.RS
+.nf
+\fC\s-2\
+typedef struct mtp_notify {
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        /* followed by object-specific notification structure */
+} mtp_notify_t;
+\s+2\fR
+.fi
+.RE
+.TP
+.B MTP_IOCGNOTIFY
+
+.TP
+.B MTP_IOCSNOTIFY
+
+.TP
+.B MTP_IOCCNOTIFY
+
+.SS "Protocol Management"
+.PP
+.RS
+.nf
+\fC\s-2\
+typedef struct mtp_mgmt {
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong cmd;                              /* mgmt command */
+} mtp_mgmt_t;
+
+#define MTP_MGMT_ALLOW                   0
+#define MTP_MGMT_RESTRICT                1
+#define MTP_MGMT_PROHIBIT                2
+#define MTP_MGMT_ACTIVATE                3
+#define MTP_MGMT_DEACTIVATE              4
+#define MTP_MGMT_BLOCK                   5
+#define MTP_MGMT_UNBLOCK                 6
+#define MTP_MGMT_INHIBIT                 7
+#define MTP_MGMT_UNINHIBIT               8
+#define MTP_MGMT_CONGEST                 9
+#define MTP_MGMT_UNCONGEST              10
+#define MTP_MGMT_DANGER                 11
+#define MTP_MGMT_NODANGER               12
+#define MTP_MGMT_RESTART                13
+#define MTP_MGMT_RESTARTED              14
+\s+2\fR
+.fi
+.RE
+.TP
+.B MTP_IOCCMGMT
+
+.RS
+.TP
+.B MTP_MGMT_ALLOW
+
+.TP
+.B MTP_MGMT_RESTRICT
+
+.TP
+.B MTP_MGMT_PROHIBIT
+
+.TP
+.B MTP_MGMT_ACTIVATE
+
+.TP
+.B MTP_MGMT_DEACTIVATE
+
+.TP
+.B MTP_MGMT_BLOCK
+
+.TP
+.B MTP_MGMT_UNBLOCK
+
+.TP
+.B MTP_MGMT_INHIBIT
+
+.TP
+.B MTP_MGMT_UNINHIBIT
+
+.TP
+.B MTP_MGMT_CONGEST
+
+.TP
+.B MTP_MGMT_UNCONGEST
+
+.TP
+.B MTP_MGMT_DANGER
+
+.TP
+.B MTP_MGMT_NODANGER
+
+.TP
+.B MTP_MGMT_RESTART
+
+.TP
+.B MTP_MGMT_RESTARTED
+
+.RE
+
+.SH "IOCTLS"
+.PP
+.SH "ERROR HANDLING"
+.PP
+.SH "NOTES"
+.PP
+.SH "ERRORS"
+.PP
+.SH "STATISTICS"
+.PP
+.SH "CAVEATS"
+.PP
+.SH "SEE ALSO"
+.PP
+.SH "VERSIONS"
+.PP
+.XX
+.[
+q700
+.]
+.[
+q701
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.[
+jtq704
+.]
+.[
+mtpi
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,305 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: CC_UNBLOCKING_REQ.7,v 0.9 2004/01/17 08:01:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_UNBLOCKING_REQ 7 "$Date: 2004/01/17 08:01:16 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_UNBLOCKING_REQ
+\- circuit unblocking request
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The format of this message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_unblocking_req {
+    ulong cc_primitive;         /* always CC_UNBLOCKING_REQ */
+    ulong cc_flags;             /* unblocking flags */
+    ulong cc_addr_length;       /* address length */
+    ulong cc_addr_offset;       /* address offset */
+} CC_unblocking_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive requests that the CCS provider locally unblock the specified
+call control address(es) (signalling interface and circuit or circuit group)
+with the peer CCS user.  For the NNI, this primitive supports both Circuit
+Unblocking Servce as well as the Circuit Group Unblocking Service.
+.\"
+.\"
+.SS Parameters
+.PP
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+specifies the primitive type.  Always
+.BR CC_UNBLOCKING_REQ .
+.TP
+.I cc_flags
+Specifies options flags for the operation.  (See
+.IR \*(lqFlags\*(rq ,
+below.)
+.TP
+.I cc_addr_length
+Specifies the length of the call control address (signalling interface and
+circuit or circuit group identifiers) upon which local unblocking is
+requested.  The semantics of the values in the call control address is
+described in Section 2.
+.TP
+.I cc_addr_offset
+Specifies the offset of the call control address(es) from the beginning of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.SS Flags
+.PP
+The options flags are protocol and provider-specific.  For additional
+information, see the specific Addendum.
+.\"
+.\"
+.SS Rules
+.PP
+The following rules apply to the unblocking of call control addresses
+(signalling interface and circuit or circuit group identifiers):
+.\"
+.\"
+.IP \(em 4
+If the stream upon which the unblocking request is issued is not bound (see
+.BR CC_BIND_REQ (7)),
+the call control address must contain a signalling interface identifier and a
+circuit or circuit group identifier.
+.\"
+.\"
+.IP \(em
+If the stream upon which the unblocking request is bound to a signalling
+interface and trunk group, and no call control address(es) are provided (i.e,
+.I cc_addr_length
+is set to zero), the CCS provider may interpret the primitive to be requesting
+unblocking on all circuits in the trunk group.
+.\"
+.\"
+.IP \(em
+At any time that the primitive is issued without specifying a call control
+address (i.e,
+.I cc_addr_length
+is zero to zero), the CCS provider may assign a call control address or
+addresses.
+.\"
+.\"
+.IP \(em
+If the CCS provider fails to assign a call control address or addresses, the
+primitive will fail with error
+.RB [ CCNOADDR ].
+.\"
+.\"
+.SS State
+.PP
+This primitive is valid in state
+.B CCS_IDLE
+for the requested address(es).  The new state is
+.B CCS_WCON_BLREQ
+for the specified address(es).
+.\"
+.\"
+.SS Modes
+.PP
+This primitive is only valid for call control address(es) (signalling
+interfaces) in the NNI mode.
+.\"
+.\"
+.SS Originator
+.PP
+This primitive is originated by the CC User.
+.\"
+.\"
+.SH ACKNOWLEDGMENTS
+.PP
+The CCS provider should generate one of the following acknowledgments upon
+receipt of this primitive.
+.HP
+.IR "Successful" :
+Successful completion is indicated via the
+.BR CC_BLOCKING_CON (7)
+primitive.
+.HP
+.IR "Unsuccessful" :
+Unsuccessful completion is indicated via the
+.BR CC_RELEASE_IND "(7) or " CC_RESET_IND (7)
+primitive.
+.HP
+.IR "Non-fatal errors" :
+Errors are indicated via the
+.BR CC_ERROR_ACK (7)
+primitive.
+.\"
+.\"
+.SH ERRORS
+.PP
+The applicable non-fatal errors are defined as follows:
+.\"
+.\"
+.TP 16
+.RB [ CCACCESS ]
+The user did not have sufficient permission to invoke the operation on the
+specified addresses.
+.TP
+.RB [ CCFLAGS ]
+The flags were invalid or unsupported.
+.TP
+.RB [ CCNOADDR ]
+An address or addresses was not provided by the CCS user (i.e.,
+.I cc_addr_length
+set to zero) and the CCS provider could not assign an address or addresses.
+.TP
+.RB [ CCBADADDR ]
+The call control address contained in the primitive were illegaly formatted or
+contained invalid information.
+.TP
+.RB [ CCNOTSUPP ]
+The primitive is not supported for the UNI interface and a UNI signalling
+interface identifier was provided in the call control address.
+.TP
+.RB [ CCOUTSTATE ]
+The primitive was issued from an invalid state for the requested address(es).
+.TP
+.RB [ CCSYSERR ]
+A system error occurred and the UNIX system error is indicated in the
+.BR CC_ERROR_ACK (7)
+primitive.
+.\"
+.\"
+.SH NOTES
+.PP
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+.PP
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+.PP
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+.PP
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+.PP
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,347 @@
+'\" rtp
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: OpenSS7.4,v 0.9 2004/01/17 07:59:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 07:59:22 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR [\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH OpenSS7 4 "$Date: 2004/01/17 07:59:22 $" "$Name:  $" "OpenSS7 Devices"
+.SH NAME
+.B OpenSS7
+\- OpenSS7 Devices, Drivers and Modules
+.SH DESCRIPTION
+.PP
+.SS Stacks
+.PP
+.TP
+.BR SS7 (4)
+The
+.B OpenSS7
+SS7
+.[
+q700
+.]
+stack consists of the following components (see
+.BR SS7 (4)
+for more information):
+.sp
+.TS
+tab(:);
+lbl.
+isup\fR(4):ISDN User Part (ISUP)
+.[
+q761
+.]
+.[
+t1.113
+.]
+.[
+isupv4
+.]
+bicc\fR(4):Bearer Independent Call Control (BICC)
+.[
+q1902
+.]
+.[
+t1.bicc
+.]
+tcap\fR(4):Transaction Capabilities Application Part (TCAP)
+.[
+q771
+.]
+.[
+t1.114
+.]
+sccp\fR(4):Signalling Connection Control Part (SCCP)
+.[
+q711
+.]
+.[
+t1.112
+.]
+.[
+sccpv2
+.]
+.[
+jtq711
+.]
+mtp\fR(4):Message Transfer Part Level 3 (MTP3)
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.[
+jtq704
+.]
+.[
+q2210
+.]
+sl\fR(4):Message Trasnfer Part Level 2 (MTP2), or Signalling Link (SL)
+.[
+q703
+.]
+.[
+q2140
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+sdt\fR(4):Signalling Terminal (SDT)
+.[
+q702
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+sdl\fR(4):Signalling Data Link (SDL)
+.[
+q702
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+acb56\fR(4):V.35 driver for the SeaLevel ACB56 card
+x100p\fR(4):Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
+x400p\fR(4):Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
+pca200e\fR(4):STS-3 driver for the PCA-200E card
+cpc388\fR(4):H.110 driver for the CPC-388 card
+.TE
+.TP
+.BR INET (4)
+The
+.B OpenSS7 (4)
+INET
+stack consists of the following components (see
+.BR INET (4)
+for more information):
+.sp
+.TS
+tab(:);
+lbl.
+socksys\fR(4):Socket System
+sctp\fR(4):Stream Control Transmission Protocol (SCTP)
+.[
+RFC 2960
+.]
+.[
+RFC 3309
+.]
+.[
+draft-ietf-tsvwg-prsctp-00.txt
+.]
+.[
+draft-stewart-tsvwg-addip-07.txt
+.]
+sscop\fR(4):Service Specific Connection Oriented Protocol (SSCOP)
+tcp\fR(4):Transmission Control Protocol (TCP)
+udp\fR(4):User Datagram Protocol (UDP)
+ip\fR(4):Internet Protocol (IP)
+timod\fR(4):Transport Interface Module (TIMOD)
+sockmod\fR(4):Socket Module (SOCKMOD)
+ldl\fR(4):Linux DL (LDL)
+.TE
+.sp
+Note that
+.B OpenSS7
+also provides a Linux NET4 native kernel socket implementation of Stream
+Control Transmission Protocol (SCTP).
+.[
+RFC 2960
+.]
+.[
+RFC 3309
+.]
+See
+.BR sctp (7)
+for more information on this
+.RI non- STREAMS
+implementation.
+The sockets implementation can also be used with TPI
+.[
+TPI Revision 2.0.0
+.]
+and XTI
+.[
+XTI
+.]
+.[
+XNS
+.]
+using the
+.B strinet
+package as is used for
+.BR tcp "(4), " udp "(4) and " ip (4).
+See
+.BR sctp (4)
+for more information.
+.TP
+.BR SIGTRAN (4)
+.sp
+.TS
+tab(:);
+lbl.
+bua\fR(4):BICC-User Adaptation Layer (BUA)
+isua\fR(4):ISUP-User Adaptation Layer (ISUA)
+tua\fR(4):TCAP-User Adaptation Layer (TUA)
+sua\fR(4):SCCP-User Adaptation Layer (SUA)
+m3ua\fR(4):MTP3-User Adaptation Layer (M3UA)
+m2ua\fR(4):MTP2-User Adaptation Layer (M2UA)
+m2pa\fR(4):MTP2-User Peer-to-Peer Adaptation Layer (M2PA)
+iua\fR(4):ISDN-Q.921 Adaptation Layer (IUA)
+dua\fR(4):DPNSS/DASS 2 Adaptation Layer (DUA)
+v5ua\fR(4):V5.2 Adaptation Layer (V5UA)
+gr303ua\fR(4):GR-303 Adaptation Layer (GR303UA)
+.TE
+.TP
+.BR ISDN (4)
+.sp
+.TS
+tab(:);
+lbl.
+isdn\fR(4):Integrated Service Digital Network (ISDN) Q.931
+capi\fR(4):Common-ISDN API (CAPI)
+v5\fR(4):V5.2
+gr303\fR(4):GR-303
+dl\fR(4):Data Link (DL)
+hdlc\fR(4):High-Level Data Link Control (HDLC)
+x100p\fR(4):Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
+x400p\fR(4):Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
+pca200e\fR(4):STS-3 driver for the PCA-200E card
+cpc388\fR(4):H.110 driver for the CPC-388 card
+.TE
+.TP
+.BR VOIP (4)
+.sp
+.TS
+tab(:);
+lbl.
+h225\fR(4):
+sipt\fR(4):Session Initiation Protocol (SIP) for Telephones (SIP-T)
+bicc\fR(4):Bearer Independent Call Control (BICC)
+.TE
+.TP
+.BR MG (4)
+.sp
+.TS
+tab(:);
+lbl.
+mgc\fR(4):Media Gateway Controller (MGC)
+mg\fR(4):Media Gateway (MG)
+mgcp\fR(4):Media Gateway Control Protocol (MGCP)
+h248\fR(4):Gateway Control Protocol (MEGACO)
+mx\fR(4):Multiplex (MX)
+rtp\fR(4):Real-Time Transport Protocol (RTP)
+x100p\fR(4):Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
+x400p\fR(4):Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
+pca200e\fR(4):STS-3 driver for the PCA-200E card
+cpc388\fR(4):H.110 driver for the CPC-388 card
+.TE
+.TP
+.BR STREAMS (4)
+.sp
+.TS
+tab(:);
+lbl.
+fifo\fR(4):
+clone\fR(4):
+sad\fR(4):
+ldl\fR(4):
+INET\fR(4):
+pipemod\fR(4):
+timod\fR(4):
+sockmod\fR(4):
+socksys\fR(4):
+.TE
+.SS Libraries
+.PP
+.TP
+.BR xti "(3), " xnet (3)
+.TP
+.BR sockets (3)
+.TP
+.BR cframe (3)
+.SH CAVEATS
+.PP
+.SH "SEE ALSO"
+.PP
+.SH VERSIONS
+.PP
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,193 @@
+'\" tr
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: mtp_tpi.4,v 0.9 2004/01/17 07:59:24 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 07:59:24 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MTP-TPI 4 "$Date: 2004/01/17 07:59:24 $" "$Name:  $" "OpenSS7 SS7 Devices"
+.SH NAME
+.B MTP-TPI
+\- Message Transfer Part (MTP) Transport Provider Interface (TPI)
+.SH SYNOPSIS
+.PP
+.B #include <sys/tpi.h>
+.br
+.B #include <sys/tpi_ss7.h>
+.br
+.B #include (sys/tpi_mtp.h>
+.HP
+.BI "int " mtp_stream " = open(" \fR/dev/mtp-tpi\fI ", " flags );
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_mtp.h>
+.HP
+.BI "int " mtp_xtistr " = t_open(" \fR/dev/mtp-tpi\fI ", " flags );
+.SH DESCRIPTION
+.PP
+.B MTP-TPI
+provides a stream supporting the Transport Provider Interface
+.RB ( tpi (7))
+to the Message Transfer Part
+.RB ( mtp (4)).
+This interface is intended solely for the use by user programs or protocol
+modules requiring the common
+.BR tpi (7)
+interface, such as the
+.BR xnet (3)
+or
+.BR xti (3),
+and
+.BR sockets (3)
+libaries.
+.PP
+A corrigendum for the use of the Transport Provider Interface (TPI) with the
+Message Transfer Part (MTP) is described in more detail in
+.BR tpi_mtp (7).
+.PP
+Information on the use of MTP TPI corrigendum with the
+.BR xnet (3)
+or
+.BR xti (3)
+libraries is detailed in the corrrigendum for use of XTI for the Message
+Transfer Part (MTP) in
+.BR xti_mtp (3).
+.I /dev/mtp-tpi
+supports this corrigendum.
+.SH NOTES
+.PP
+The
+.BR timod (4)
+module does not necessairly need to be used with this device for
+.BR libxnet (3).
+The
+.I /dev/mtp-tpi
+device supports the
+.BR timod (4)
+IO controls directly.  Pushing the
+.BR timod (4)
+module over a
+.I /dev/mtp-tpi
+stream will not alter its operation, but may be less efficient than using the
+device directly.
+.PP
+Although the
+.B mtp-tpi
+device can be registered under
+.BR socksys (4)
+for use by
+.BR sockets (3),
+it is recommended that the
+.BR mtp-npi (4)
+device be registered instead.
+.SH CAVEATS
+.PP
+.SH "SEE ALSO"
+.PP
+.BR open (2),
+.BR t_open (3),
+.BR tpi (7),
+.BR xnet (3),
+.BR xti (3),
+.BR sockets (3),
+.BR tpi_mtp (7),
+.BR xti_mtp (3).
+.SH FILES
+.PP
+.BR <sys/tpi_mtp.h> ,
+.BR <xti_mtp.h> .
+.SH DEVICES
+.PP
+/dev/mtp-tpi
+.SH VERSIONS
+.PP
+The
+.B MTP-TPI
+driver is specific to the
+.B OpenSS7
+stack.
+This is Version 2 of the interface.
+.\"
+.\"
+.XX
+.[
+q700
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+jtq704
+.]
+.[
+TLI
+.]
+.[
+TPI Revision 2.0.0
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TA
+
+
+
+
+
+
+
+
+
+
+
+

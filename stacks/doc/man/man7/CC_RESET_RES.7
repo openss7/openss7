@@ -1,0 +1,274 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: CC_RESET_RES.7,v 0.9 2004/01/17 08:01:15 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:15 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_RESET_RES 7 "$Date: 2004/01/17 08:01:15 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_RESET_RES
+\- circuit reset response
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The format of this message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_reset_res {
+    ulong cc_primitive;         /* always CC_RESET_RES */
+    ulong cc_flags;             /* reset flags */
+    ulong cc_addr_length;       /* address length */
+    ulong cc_addr_offset;       /* address offset */
+} CC_reset_res_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive request the CCS provider to complete the reset operation for
+the specified call control address(es) (signalling interface and circuit
+identifiers) which was previously indicated with a
+.BR CC_RESET_IND (7).
+.\"
+.\"
+.SS Parameters
+.PP
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+specifies the primitive type.  Always
+.BR CC_RESET_RES .
+.TP
+.I cc_flags
+Indicates options flags for the operation.  (See
+.IR \*(lqFlags\*(rq ,
+below.)
+.TP
+.I cc_addr_length
+Indicates the length of the call control address(es) (signalling interface and
+circuit identifiers) upon which the CCS user has accepted a reset.
+.TP
+.I cc_addr_offset
+Indicates the offset of the call control address(es) (signalling interface and
+circuit identifiers) from the beginning of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.SS Flags
+.PP
+The options flags are protocol and provider-specific.  For additional
+information, see the specific Addendum.
+.\"
+.\"
+.SS Rules
+.PP
+The following rules apply to the reset of call control addresses (signalling
+interface and circuit identifiers):
+.IP \(em 4
+The set of addresses specified must be a non-empty subset of the addresses
+which were specified in the indication primitive to which this primitive is
+responding.
+.IP \(em
+Only once the primitive is succesfully accepted by the CCS provider should the
+CCS provider take any actions whatsoever with regard to reset.
+.IP \(em
+Call control addresses included in the call control address list which are not
+equipped may be ignored by the CCS provider.
+.\"
+.\"
+.SS State
+.PP
+This primitive is valid in state
+.B CCS_WRES_RESIND
+for the specified
+address(es).  The new state is
+.B CCS_WACK_RESRES
+for the specified address(es).
+.\"
+.\"
+.SS Modes
+.PP
+.\"
+.\"
+.SS Originator
+.PP
+This primitive is issued by the CC Provider.
+.\"
+.\"
+.SH ACKNOWLEDGMENTS
+.PP
+The CCS provider should generate one of the following acknowledgments upon
+receipt of this primitive:
+.HP
+.IR "Successful" :
+Successful completion is indicated via the
+.BR CC_OK_ACK (7)
+primitive.
+.HP
+.IR "Unsuccessful (Non-fatal errors)" :
+Errors are indicated via the
+.BR CC_ERROR_ACK (7)
+primitive.
+.\"
+.\"
+.SH ERRORS
+.PP
+The applicable non-fatal errors are defined as follows:
+.\"
+.\"
+.TP 16
+.RB [ CCACCESS ]
+The user did not have sufficient permission to perform the operation on the
+specified call control addresses.
+.TP
+.RB [ CCNOADDR ]
+The call control address was not provided (cc_addr_length coded zero).
+.TP
+.RB [ CCBADADDR ]
+The call control address(es) contained in the primitive were poorly formatted
+or contained invalid information.
+.TP
+.RB [ CCNOTSUPP ]
+The primitive is not supported for the UNI interface and a UNI signalling
+interface identifier was provided in the call control address.
+.TP
+.RB [ CCOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ CCSYSERR ]
+A system error occurred and the UNIX system error is indicated in the
+.RB CC_ERROR_ACK (7)
+primitive.
+.\"
+.\"
+.SH NOTES
+.PP
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+.PP
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+.PP
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+.PP
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+.PP
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,172 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: CH_ENABLE_REQ.7,v 0.9 2004/01/17 08:01:21 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:21 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CH_ENABLE_REQ 7 "$Date: 2004/01/17 08:01:21 $" "$Name:  $" "Channel Interface"
+.SH NAME
+.B CH_ENABLE_REQ, CH_enable_req, CH_enable_req_t
+\- channel enable request
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CH_enable_req {
+    ch_ulong ch_primitive;      /* always CH_ENABLE_REQ */
+} CH_enable_req_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Requests that the channel service provider enable the channel associated with
+the stream.
+.PP
+Some channels provided by some channel service providers might require
+interactions with the peer to enable the channel.  An example of such channel
+types are
+.BR rtp (4)
+channels and compressed channels.
+.PP
+This primitive is used to inform the underlying transmission device that the
+requesting channel must be enabled
+.IR "post haste" .
+.SH PARAMETERS
+This primitive contains the following parameters:
+.TP
+.I ch_primitive
+specifies the primitive type.  Always
+.BR CH_ENABLE_REQ .
+.SH ORIGINATOR
+Channel Service User.
+.SH STATE
+This primitive is valid in state
+.BR CHS_ATTACHED .
+The resulting state is
+.BR CHS_WACK_EREQ .
+.SH RULES
+These primitives require the channel service provider to generate one of the
+following acknowledgments on receipt of the primitive, and the channel service
+user must wait for the acknowledgment before issuing any other primitive:
+.TP
+.B Successful
+Correct acknowledgment of the primitive is indicated with the
+.BR CH_OK_ACK (7)
+primitive.  In this case, the resulting state is
+.BR CHS_WCON_EREQ .
+.TP
+.B Non-fatal errors
+These errors will be indicated with the
+.BR CH_ERROR_ACK (7)
+primitive.  In this case, the resulting state is unchanged and remains the
+same as the state in which the primitive was issued.
+.SH ERRORS
+The allowable errors are as follows:
+.TP
+.RB [ CHSYSERR ]
+UNIX system error.
+A UNIX system error occured during the execution of the primitive, and the
+UNIX error number,
+.IR errno (3),
+is indicated in the
+.I ch_unix_error
+field of the
+.BR CH_ERROR_ACK (7)
+primitive.
+.\".TP
+.\".RB [ CHBADADDR ]
+.\"Bad address format or content.
+.TP
+.RB [ CHOUTSTATE ]
+Interface out of state.
+The primitive would place the interface out of state.  The
+.B CH_ENABLE_REQ
+primitive is only valid in state
+.BR CHS_ENABLED .
+.\".TP
+.\".RB [ CHBADOPT ]
+.\"Bad options format or content.
+.\".TP
+.\".RB [ CHBADPARM ]
+.\"Bad parameter format or content.
+.\".TP
+.\".RB [ CHBADPARMTYPE ]
+.\"Bad paramater structure type.
+.\".TP
+.\".RB [ CHBADFLAG ]
+.\"Bad flag.
+.TP
+.RB [ CHBADPRIM ]
+Bad primitive.
+The primitive type is not recognized or the primitive contained in the
+.B M_PROTO
+message block is poorly formatted.
+.TP
+.RB [ CHNOTSUPP ]
+Primitive not supported.
+The primitive type is recognized, but is not supported by the stream or the
+channel service provider.
+.\".TP
+.\".RB [ CHNOADDR ]
+.\"Address could not be assigned.
+.\".TP
+.\".RB [ CHADDRBUSY ]
+.\"Address is busy.
+.SH "SEE ALSO"
+.SH VERSIONS
+This manpage was written for CHI Version 1.
+.XX
+.[
+chi
+.]
+.[
+$LIST$
+.]
+.TA

@@ -1,0 +1,307 @@
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: acb56.8,v 0.9 2004/01/17 08:02:21 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997-2001  Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/01/17 08:02:21 $ by $Author: brian $
+.\"
+.\" $Log: acb56.8,v $
+.\" Revision 0.9  2004/01/17 08:02:21  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.2  2003/07/20 21:45:23  brian
+.\" Minor formatting.
+.\"
+.\" Revision 0.8.2.1  2003/07/18 20:38:49  brian
+.\" A lot of minor embellishments.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:37  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7.8.1  2001/12/11 13:16:10  brian
+.\" Branched for new development.
+.\"
+.\" Revision 0.7.6.1  2001/02/18 12:11:16  brian
+.\" New working branch for next release.
+.\"
+.\" Revision 0.7.4.1  2001/02/18 09:44:50  brian
+.\" Added new working branch.
+.\"
+.\" Revision 0.7.2.1  2001/01/14 11:07:55  brian
+.\" Changed headers back to GPL.
+.\"
+.\" Revision 0.7  2000/11/29 02:11:01  brian
+.\" Added man pages for drivers.
+.\"
+.\" =========================================================================
+.TH ACB56 8 "$Date: 2004/01/17 08:02:21 $" "OpenSS7 Man Page" "Linux STREAMS Programmer's Manual"
+.SH "NAME"
+acb56 \- Signalling System No. 7 SDTI Driver for ACB56
+.SH "SYNOPSIS"
+.PP
+.B #include <ss7/sli.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.HP
+.BI "int " fd " = open(" /dev/acb56-minor ", " flags );
+.HP
+.BI "int " ret " = putmsg(" fd ", " ctrl ", " data );
+.HP
+.BI "int " ret " = getmsg(" fd ", " ctrl ", " data );
+.HP
+.BI "int " ret " = ioctl(" fd ", " cmd ", ... /* " arg " */ );"
+
+.SH "DESCRIPTION"
+.PP
+The ACB56 driver provides a SS7 STREAMS driver which provides a Style 1
+SDTI interface (\fBsdti\fR(7)) for the SeaLevel ACB56 card using V.35 at
+56kbps.
+
+The driver can be opened using the \fBopen\fR(2) command on the character
+special device corresponding to an equipped ACB56 card, or can be opened using
+a clone device to obtain a filedescriptor for the next available ACB56 device
+in the system.  The device driver is not normally opened by user-level
+programs, but is opened by the SS7 Configuration Daemon \fBss7d\fR(8).
+Nevertheless, it is possible to open the device directly and interact with the
+device with \fBsdti\fR(7) primitives using \fBputmsg\fR(2) and \fBgetmsg\fR(2)
+and ioctls using \fBioctl\fR(2).
+
+.SS "Configuration"
+
+For all configuration IOCTLs and PRIMITIVEs, ACB56 supports the low-speed link
+members of the SDTI configuration \fBsdt_conf\fR structure as follows:
+
+.TP 6
+\fIpvar\fR
+(Default: SS7_PVAR_ITUT_96)
+ACB56 supports all of the protocol variants described in \fBss7\fR(7).  When
+\fIpvar\fR is altered alone, other members are adjusted to default values for
+the specified protocol variant.
+
+.TP
+\fIpopt\fR
+(Default: 0)
+ACB56 does not support any of the protocol options described in \fBsdti\fR(7).
+Because it is a low-speed link, \fBSDT_POPT_EIM\fR is not supported.  ACB56
+does not implement IAC in the SDT and, as such, \fBSDT_POPT_IAC\fR is not
+supported.
+
+.TP
+\fIM\fR
+(Default: 0)
+This is an IAC (Intial Alignment Control) parameter.  The ACB56 does not
+implement intial alignment control, so ignores any values placed in this
+configuration member.
+
+.TP
+\fITin\fR 
+Default: 4)
+ACB56 defaults this AERM normal proving threshold to the default values of
+ITU-T Recommendation Q.703 1996.
+
+.TP
+\fITie\fR
+(Default: 1)
+ACB56 defaults this AERM emergency proving threshold to the default values of
+ITU-T Recommendation Q.703 1996.
+
+.TP
+\fIT\fR
+(Default: 256)
+ACB56 defaults this SUERM threshold to the default values of ITU-T
+Recommendation Q.703 1996.
+
+.TP
+\fID\fR
+(Default: 256)
+ACB56 defaults this SUERM downcount to the default values of ITU-T
+Recommendation Q.703 1996.
+
+.TP
+\fIN\fR
+(Default: 16)
+ACB56 defaults this DAEDR octet count to the default values of ITU-T
+Recommendation Q.703 1996.
+
+.TP
+\fIt8\fR, \fITe\fR, \fIDe\fR, \fIUe\fR
+(Default: 0)
+These EIM (Errorred Interval Monitor) configuration members are only used by
+high-speed links.  As a low-speed link only implementation, ACB56 ignores any
+values placed in these configuration members.
+
+.SS "Local Management Primitives"
+
+The ACB56 driver will accept the following local management primitives
+exchanged with the \fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls:
+
+.TP
+.B SDT_INFO_REQ, SDT_INFO_ACK
+ACB67 implements the \fBSDT_INFO_REQ\fR and \fRSDT_INFO_ACK\fR local
+management primitives as described in \fBsdti\fR(7).  ACB56 will normally
+return the following values in the members of the \fBsdt_info_ack\fR
+structure:
+
+.RS
+.TP 14
+\fIsdt_version\fR
+ACB56 will always return 0x01000000 indicating that the driver has been
+written to the SDTI Version 1.0.0.0 specification.
+.TP
+\fIsdt_state\fR
+ACB56 will return the state of the SDT interface.  Because ACB56 is a Style 1
+device driver, it will never return \fBSDT_UNATTACHED\fR and opens in the
+\fBSDT_DISABLED\fR state.
+.TP
+\fIsdt_max_sdu\fR
+ACB56 is a low-speed SS7 link not supporting extended sequence numbers (Q.703
+Annex A) and will always return 277 (bytes) as the maximum sdu size.
+size.
+.TP
+\fIsdt_min_sdu\fR
+ACB56 is a low-speed SS7 link not supporting extended sequence numbers (Q.703
+Annex A) and will always return 3 (bytes) as the minimum sdu size.
+.TP
+\fIsdt_ppa_style\fR
+ACB56 is a Style 1 SDTI device driver and will always return \fBSDT_STYLE1\fR
+as the PPA style.
+.TP
+\fIsdt_ppa_addr\fR
+ACB56 is a Style 1 SDTI device driver and will always return all zeros in the
+PPA address.
+.TP
+\fIsdt_bitrate\fR
+ACB56 only supports 56kbps V.35 operation and will always return 56000 (bps)as
+the bitrate.
+.TP
+\fIsdt_config\fR
+See section on "CONFIGURATION".
+.RE
+
+.TP
+.B SDT_CONFIG_REQ, SDT_CONFIG_ACK, SDT_ERROR_ACK
+ACB56 will always return \fBSDT_ERROR_ACK\fR when a configuration request is
+made which contains a configuration parameter or option which is not supported
+by the driver.  Otherwise, a \fBSDT_CONFIG_ACK\fR is returned which contains
+that actual configuration of options and parameters.  For more information on
+configuration options and parameters, see section "CONFIGURATION".
+
+.TP
+.B SDT_ATTACH_REQ, SDT_OK_ACK, SDT_ERROR_ACK
+ACB56 is a Style 1 SDTI device driver and will always return
+\fBSDT_ERROR_ACK\fB with \fIsdt_errno\fR set to \fBSDT_OUTSTATE\fR in response
+to an attach request.
+
+.TP
+.B SDT_DETACH_REQ, SDT_OK_ACK, SDT_ERROR_ACK
+ACB56 is a Style 1 SDTI device driver and will always return
+\fBSDT_ERROR_ACK\fB with \fIsdt_errno\fR set to \fBSDT_NOTSUPP\fR in response
+to a detach request.
+
+.TP
+.B SDT_ENABLE_REQ, SDT_ENABLE_CON, SDT_ERROR_ACK
+ACB56 supports immediate enabling and will always return an
+\fBSDT_ENABLE_CON\fR immediately to a successful \fBSDT_ENABLE_REQ\fR.  The
+driver also supports all receiver and transmitter initialization options
+described in \fBsdti\fR(7).
+
+.TP
+.B SDT_DISABLE_REQ, SDT_DISABLE_CON, SDT_ERROR_ACK
+ACB56 suports immediate disabling and will always return an
+\fBSDT_DISABLE_CON\fR immediately to a successful \fBSDT_DISABLE_REQ\fR.  The
+driver also supports all receive and transmitter disposition options described
+in \fBsdti\fR(7).
+
+.SS "Primitive Interface"
+
+ACB56 will accept the following protocol primitives (as described in
+\fBsdti\fR(7)) exchanged with \fBputmsg\fR(2), \fBgetmsg\fR(2), and in some
+cases \fBwrite\fR(2) and \fBread\fR(2).  ACB56 treats the \fBM_PROTO\fR and
+\fBM_PCPROTO\fR forms of each request in a similar manner.  All request
+primitives are acted upon immediately when possible, regardless of whether
+they are an \fBM_PROTO\fR or \fBM_PCPROTO\fR.  If the device becomes
+overdriven and it becomes impossible to act on the primitive immediately,
+ACB56 will queue \fBM_PROTO\fR primitives for later execution, but will
+discard \fBM_PCPROTO\fR primitives which cannot be acted upon immediately.
+
+.TP
+.B "SDT_SIGNAL_UNIT_REQ, SDT_SIGNAL_UNIT_IND, M_DATA"
+Although ACB56 will accept the \fBM_PROTO\fR or \fRM_PCPROTO\fR forms of the
+request, it will only return the \fBM_DATA\fR form of the indication.  This
+means that signal units must be taken from the driver using \fBread\fR(2), and
+it is more efficient to write them to the driver using \fBwrite\fR(2).
+
+.TP
+.B "SDT_DAEDT_START_REQ"
+Starts the ACB56 DAEDT (transmitters).
+
+.TP
+.B "SDT_DAEDR_START_REQ"
+Starts the ACB56 DAEDR (receivers).
+
+.TP
+.B "SDT_DAEDR_CORRECT_SU_IND"
+ACB56 only delivers this indication on the first correct SU following a
+\fBSDT_AERM_ABORT_PROVING\fR indication to limit the number of such
+indications which are provided to the IAC in the upper level.  This primitive
+triggers another proving period if further proving is required from the SDT
+user.
+
+.TP
+.B "SDT_AERM_START_REQ, SDT_AERM_STOP_REQ"
+Starts and stops the ACB56 AERM (Alignment Error Rate Monitor).
+
+.TP
+.B "SDT_AERM_ABORT_PROVING_IND"
+ACB56 gives this indication when the internal AERM state machine detects that
+the number of SU errors during the interval that the AERM has been running has
+exceeded the configured threshold.
+
+.TP
+.B "SDT_SUERM_START_REQ, SDT_SUERM_STOP_REQ"
+Starts and stop the ACB56 SUERM (Signal Unit Error Rate Monitor).
+
+.TP
+.B "SDT_SUERM_LINK_FAILURE_IND"
+
+.TP
+.B "SDT_EIM_START_REQ, SDT_EIM_STOP_REQ"
+ACB56 does not support high-speed links and will return \fBSDT_ERROR_IND\fR
+with \fIsdt_errno\fR set to \fBSDT_NOTSUPP\fR if these requests are made.
+
+.TP
+.B "SDT_EIM_LINK_FAILURE_IND"
+ACB56 does not support high-speed links and will never make this indication.
+
+.TP
+.B "SDT_LINK_CONG_IND, SDT_NO_LINK_CONG_IND"
+ACB56 does not detect congestion in the SDTI driver and will not make these
+indications.
+

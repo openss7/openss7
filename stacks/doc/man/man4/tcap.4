@@ -1,0 +1,324 @@
+'\" tr
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: tcap.4,v 0.9 2004/01/17 07:59:24 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 07:59:24 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TCAP 4 "$Date: 2004/01/17 07:59:24 $" "$Name:  $" "OpenSS7 SS7 Devices"
+.\"
+.\"
+.SH NAME
+.B TCAP
+\- SS7 Transaction Capabilities Application Part (TCAP)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/tcapi.h>
+.br
+.B #include <ss7/tcapi_ioctl.h>
+.\"
+.\"
+.HP
+.BI "int " tcap_stream " = open(" device ", " flags );
+.\"
+.\"
+.PP
+.B #include <xti_tcap.h>
+.\"
+.\"
+.HP
+.BI "int " tcap_xtistr " = t_open(" device ", " flags );
+.\"
+.\"
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netss7/tcap.h>
+.\"
+.\"
+.HP
+.BI "int " tcap_socket " = socket(" \fRPF_SS7\fI ", " socket_type ", " \fRSS7PROTO_TCAP\fI );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TCAP
+is an implementation of the Signalling System No. 7 (SS7) Transaction
+Capabilities Application Part (TCAP) defined in ITU-T Recommendation Q.77X
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+and
+ANSI T1.114.
+.[
+t1.114
+.]
+.B TCAP
+provides reliable sequenced or unsequenced delivery of packets over a
+connectionless transport between two
+.B TCAP
+endpoints.
+.B TCAP
+provides stong assurances that the data arrives in order on a stream, if
+requested, and maintains sequencing of packets in the face of most network
+failures.
+.B TCAP
+uses the services of the
+Signalling Connection Control Part (see
+.BR sccp (4))
+or SCCP User Adaptation Layer (see
+.BR sua (4))
+to transfer packets.
+.\"
+.\"
+.PP
+.B TCAP
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver.
+.BR sccp "(4) or " sua (4)
+streams are linked under the
+.B TCAP
+multiplexing driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (2),
+to provide network services to
+.BR TCAP .
+Once linked, the streams must be configured using
+.BR tcap_ioctl (4).
+.\"
+.\"
+.PP
+.B TCAP
+provides the following stream types.  To select one of these stream types,
+.I device
+can be one of the following:
+.\"
+.\"
+.TP
+.I /dev/tcap
+This device provides the
+.B TCAP 
+protocol services interface using the TR- and TC-primitives of the Transaction
+Component Interface (TCI) described in
+.BR tcapi (7).
+This interface is suitable for use with other SS7 modules and drivers.
+.\"
+.\"
+.TP
+.IR /dev/tcap-tpi-cl ", " /dev/tcap-tpi-co
+This device provides the
+.B TCAP
+protocol service interface using the T-primitives of the Transport Provider
+Interface
+.BR tpi (7)
+interface provided on a stream opening this device is a suitable device for
+use with
+.BR xnet (3)
+or
+.BR xti (3)
+library
+.BR t_open (3)
+call and provides the
+.B TCAP
+interface using XTI as described in
+.BR xti_tcap (3).
+.\"
+.\"
+.sp
+.I /dev/tcap-tpi-co
+provides a connection-oriented
+.B T_COTS
+transport service provider supporting operations classes 1, 2 and 3;
+.I /dev/tcap-tpi-cl
+provides a connectionless
+.B T_CLTS
+transport service provider supporting operations class 4.
+.\"
+.\"
+.sp
+.I /dev/tcap-tpi-cl
+provides a connectionless
+.B T_CLTS
+transport service provider supporting operation class 1;
+.I /dev/tcap-tpi-co
+provides a connection-oriented
+.B T_COTS
+transport service provider supporting operation class 2, 3 and 4.
+.\"
+.\"
+.PP
+.B TCAP
+provides two socket types used by the
+.BR sockets (3)
+library
+.BR socket (3)
+call.
+.B TCAP
+provides sockets in the protocol family
+.B PF_SS7
+using the protocol number
+.BR SS7PROTO_TCAP .
+The
+.I socket_type
+argument can be one of the following:
+.\"
+.\"
+.TP
+.B SOCK_DGRAM
+Provides a connectionless datagram service without regard to order.  This is a
+.B TCAP
+operations class 4 service provider.
+This socket uses the underlying
+.I /dev/tcap-tpi-cl
+transport service providers supporting operations class 4.
+.\"
+.\"
+.TP
+.B SOCK_SEQPACKET
+Provides a connection oriented reliable packet service with or without
+receipt confirmation and flow control.  This is a
+.B TCAP
+operation class 1, 2 or 3 service provider.
+This socket uses the underlying
+.I /dev/tcap-tpi-co
+transport service provider supporting operations class 1, 2 or 3.
+.\"
+.\"
+.PP
+The following entries in /etc/protosw provides the information necesary for
+.BR socksys (4)
+to use these devices:
+.\"
+.\"
+.PP
+.TS
+tab(:);
+llllll.
+\fCPF_SS7:SOCK_RDM:SS7PROTO_TCAP:/dev/tcap-tpi-cl:tpi:clts
+\fCPF_SS7:SOCK_SEQPACKET:SS7PROTO_TCAP:/dev/tcap-tpi-co:tpi:cots
+.TE
+.\"
+.\"
+.PP
+For additional information, see
+.BR socksys (4)
+and
+.BR protosw (5).
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl(2)
+system calls on the
+.IR tcap_stream ", " tcap_xtistr " or " tcap_socket
+file descriptor or socket.  These management controls are documented in
+.BR tcap_ioctl (4).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR tcap (8),
+.BR ss7confd (8),
+.BR tcapi (7),
+.BR tpi_tcap (7),
+.BR tcap_socket (7),
+.BR sockets (3),
+.BR xnet (3).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/tcapi.h> ,
+.BR <ss7/tcapi_ioctl.h> ,
+.BR <sys/tpi_tcap.h> ,
+.BR <xti_tcap.h> ,
+.BR <netss7/tcap.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/tcap ,
+.IR /dev/tcap-tpi-cl ,
+.IR /dev/tcap-tpi-co .
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B TCAP
+interface is specific to the
+.B OpenSS7
+SS7 stack.  This is Version 2 of the interface.
+.\"
+.\"
+.PP
+XTI interfaces are consistent with XNS 5.2 Revision 2.
+.PP
+TPI interfaces are consistent with TPI Revision 1.5, Draft 2.
+.\"
+.[
+$LIST$
+.]
+.\"
+.TA

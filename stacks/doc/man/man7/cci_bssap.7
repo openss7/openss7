@@ -1,0 +1,576 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: cci_bssap.7,v 0.9 2004/01/17 08:01:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CCI-BSSAP 7 "$Date: 2004/01/17 08:01:25 $" "$Name:  $" "Call Control Interface \- Corrigendum"
+.SH NAME
+.B CCI-BSSAP
+\- Call Control Interface \- Corregendum for GSM 09.12 Conformance
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/bssapi.h>
+.br
+.B #include <ss7/bssapi_ioctl.h>
+.HP
+.BI "int " bssap_stream " = open(" \fR/dev/bssap\fI ", " flags );
+.SH DESCRIPTION
+.PP
+This Corrigendum describes the formats and rules that are specific to GSM
+09.12.  The Corrigendum must be used along with the generic CCI as defined in
+.BR cci (7)
+when implementing a CCS provider that will be configured with the GSM 09.12
+call processing layer.
+.SS "Call Control Addresses"
+.PP
+The format of the call control address for GSM 09.12 conforming CCS providers
+is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct gsma_addr {
+    ulong scope;   /* the scope of the identifier */
+    ulong id;      /* the identifier within the scope */
+    ulong cid;     /* channel id */
+} gsma_addr_t;
+\fR\s+1
+.fi
+.TP
+.I scope
+conveys the scope of the call control address.
+See
+.IR \*(lqScope\*(rq ,
+below.
+.TP
+.I id
+conveys the identifier within the
+.IR scope .
+.TP
+.I cid
+.PP
+.B Scope
+.PP
+The
+.I scope
+of the call control address is one of the following:
+.TP
+.B GSMA_SCOPE_CT
+Conveys that the
+.I scope
+of the call control address is a GSM-A circuit.  The
+.I id
+within this
+.I scope
+is an circuit identifier that uniquely identifies a circuit to the CCS
+provider.
+.TP
+.B GSMA_SCOPE_BSS
+Conveys that
+.I scope
+of the call control address is a GSM-A Base Station (BSS).  The
+.I id
+within this
+.I scope
+is an identifier that uniquely identifies a base station to the CCS provider.
+.TP
+.B GSMA_SCOPE_MSC
+Conveys that
+.I scope
+of the call control address is a Mobile Switching Center (MSC).  The
+.I id
+within this
+.I scope
+is an identifier that uniquely identifies a mobile switching center to the CCS
+provider.
+.TP
+.B GSMA_SCOPE_DF
+Conveys that the
+.I scope
+of the call control address is the default scope.
+The
+.I id
+within the
+.I scope
+is unused and should be ignored by the CCS user and will be coded zero (0) by
+the CCS provider.
+.PP
+.B Rules
+.PP
+Rules for
+.IR scope :
+.IP \(em 4
+In primitives in which the address parameter occurs, the
+.I scope
+field setting indicates the scope of the address parameter.
+.IP \(em
+Only one call control address can be specified within a single
+.IR scope .
+.IP \(em
+Not all scopes are necessarily supported by all primitives.  See the
+particular primitive, below.
+.PP
+Rules for call control addresses:
+.IP \(em 4
+The address contained in a primitive must contain a
+.I scope
+and an
+.I id
+within the
+.I scope
+(zero (0) is a valid
+.IR id ).
+.IP \(em
+If the
+.I scope of the address is
+.BR GSMA_SCOPE_DF ,
+then the
+.I id
+and
+.I port
+fields should be coded zero (0) and will be ignored by the CCS user or
+provider.
+.IP \(em
+In all scopes other than
+.BR GSMA_SCOPE_DF ,
+the
+.I cid
+field is optional and coded zero (0) if unused.
+.SS "Optional Parameters"
+.PP
+The format of the optional parameters for BSSAP conforming CCS providers are
+formatted as optional Information Elements as defined in GSM 09.12.
+.PP
+Rules for optional parameters:
+.IP \(em 4
+The optional parameters provider by the CCS user may be checked for format by
+the CCS provider.  If the CCS provider discovers formatting errors in the
+optional parameters, the CCS provider should respond with a
+.BR CC_ERROR_ACK (7)
+primitive with error
+.RB [ CCBADOPT ].
+.IP \(em
+For some primitive, specific optional parameters might be interpreted by the
+CCS provider and alter the function of some primitives.  See the specific
+primitive description for more details.
+.IP \(em
+Except for optional parameters interpreted by the CCS provider as specified
+along with the primitives, the optional parameters are treated as opaque and
+the optional parameter list is only check for format.  Opaque parameters will
+be passed to the BSSAP message without examination by the CCS provider.
+.IP \(em
+To perform specific functions, additional mandatory or optional parameters may
+be added to the BSSAP message by the CCS provider.
+.IP \(em
+To perform specific functions, optional parameters may be interpreted and
+modified by the CCS provider before being added to the BSSAP message.
+.SS "Service Primitives"
+.PP
+.PP
+.B "Local Management Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_INFO_REQ\fR(7):T{
+T}
+\fBCC_INFO_ACK\fR(7):T{
+T}
+\fBCC_BIND_REQ\fR(7):T{
+T}
+\fBCC_BIND_ACK\fR(7):T{
+T}
+\fBCC_OPTMGMT_REQ\fR(7):T{
+T}
+\fBCC_OPTMGMT_ACK\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Setup Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_SETUP_REQ\fR(7):T{
+T}
+\fBCC_SETUP_IND\fR(7):T{
+T}
+\fBCC_SETUP_RES\fR(7):T{
+T}
+\fBCC_SETUP_CON\fR(7):T{
+T}
+\fBCC_CALL_REATTEMPT_IND\fR(7):T{
+T}
+\fBCC_SETUP_COMPLETE_REQ\fR(7):T{
+T}
+\fBCC_SETUP_COMPLETE_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Continuity Check Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_CONT_CHECK_REQ\fR(7):T{
+T}
+\fBCC_CONT_CHECK_IND\fR(7):T{
+T}
+\fBCC_CONT_TEST_REQ\fR(7):T{
+T}
+\fBCC_CONT_TEST_IND\fR(7):T{
+T}
+\fBCC_CONT_REPORT_REQ\fR(7):T{
+T}
+\fBCC_CONT_REPORT_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Establishment Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_MORE_INFO_REQ\fR(7):T{
+T}
+\fBCC_MORE_INFO_IND\fR(7):T{
+T}
+\fBCC_INFORMATION_REQ\fR(7):T{
+T}
+\fBCC_INFORMATION_IND\fR(7):T{
+T}
+\fBCC_INFO_TIMEOUT_IND\fR(7):T{
+T}
+\fBCC_PROCEEDING_REQ\fR(7):T{
+T}
+\fBCC_PROCEEDING_IND\fR(7):T{
+T}
+\fBCC_ALERTING_REQ\fR(7):T{
+T}
+\fBCC_ALERTING_IND\fR(7):T{
+T}
+\fBCC_PROGRESS_REQ\fR(7):T{
+T}
+\fBCC_PROGRESS_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Established Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_SUSPEND_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_SUSPEND_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_SUSPEND_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_SUSPEND_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_SUSPEND_REJECT_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_SUSPEND_REJECT_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESUME_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESUME_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESUME_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESUME_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESUME_REJECT_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESUME_REJECT_IND\fR(7):T{
+.I (not used)
+T}
+.TE
+.PP
+.B "Supplementary Services Primitives
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_FACILITY_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_FACILITY_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_HOLD_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_HOLD_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_HOLD_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_HOLD_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_RETRIEVE_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_RETRIEVE_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_RETRIEVE_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_RETRIEVE_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_REGISTER_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_REGISTER_IND\fR(7):T{
+.I (not used)
+T}
+.TE
+.PP
+.B "Call Termination Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_REJECT_IND\fR(7):T{
+T}
+\fBCC_CALL_FAILURE_IND\fR(7):T{
+T}
+\fBCC_DISCONNECT_REQ\fR(7):T{
+T}
+\fBCC_DISCONNECT_IND\fR(7):T{
+T}
+\fBCC_RELEASE_REQ\fR(7):T{
+T}
+\fBCC_RELEASE_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Management Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_RESTART_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_CON\fR(7):T{
+.I (not used)
+T}
+.TE
+.PP
+.B "Maintenance Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_MAINT_IND\fR(7):T{
+T}
+.TE
+.\"
+.\"
+.SH NOTES
+.PP
+Following is a mapping of GSM 04.07 call control primitives onto CCI
+primitives:
+.PP
+.TS
+tab(:);
+lblblb.
+GSM 04.07 Primitive:Section:CCI Primitive
+.T&
+lllb.
+_
+MNCC_SETUP_REQ:6.2.2.1:\fBCC_SETUP_REQ\fR(7)
+MNCC_SETUP_IND:6.2.2.2:\fBCC_SETUP_IND\fR(7)
+MNCC_SETUP_RES:6.2.2.3:\fBCC_SETUP_RES\fR(7)
+MNCC_SETUP_CNF:6.2.2.4:\fBCC_SETUP_CON\fR(7)
+MNCC_SETUP_COMPL_REQ:6.2.2.5:\fBCC_SETUP_COMPLETE_REQ\fR(7)
+MNCC_SETUP_COMPL_IND:6.2.2.6:\fBCC_SETUP_COMPLETE_IND\fR(7)
+MNCC_REJ_REQ:6.2.2.7:\fBCC_REJECT_REQ\fR(7)
+MNCC_REJ_IND:6.2.2.8:\fBCC_REJECT_IND\fR(7)
+MNCC_CALL_CONF_REQ:6.2.2.9:\fBCC_SETUP_RES\fR(7)
+MNCC_CALL_PROC_IND:6.2.2.10:\fBCC_PROCEEDING_IND\fR(7)
+MNCC_PROGRESS_IND:6.2.2.11:\fBCC_PROGRESS_IND\fR(7)
+MNCC_ALERT_REQ:6.2.2.12:\fBCC_ALERTING_REQ\fR(7)
+MNCC_ALERT_IND:6.2.2.13:\fBCC_ALERTING_IND\fR(7)
+MNCC_NOTIFY_REQ:6.2.2.14:\fBCC_NOTIFY_REQ\fR(7)
+MNCC_NOTIFY_IND:6.2.2.15:\fBCC_NOTIFY_IND\fR(7)
+MNCC_DISC_REQ:6.2.2.16:\fBCC_DISCONNECT_REQ\fR(7)
+MNCC_DISC_IND:6.2.2.17:\fBCC_DISCONNECT_IND\fR(7)
+MNCC_REL_REQ:6.2.2.18:\fBCC_RELEASE_REQ\fR(7)
+MNCC_REL_IND:6.2.2.19:\fBCC_RELEASE_IND\fR(7)
+MNCC_REL_CNF:6.2.2.20:\fBCC_RELEASE_IND\fR(7)
+MNCC_FACILITY_REQ:6.2.2.21:\fBCC_FACILITY_REQ\fR(7)
+MNCC_FACILITY_IND:6.2.2.22:\fBCC_FACILITY_IND\fR(7)
+MNCC_START_DTMF_REQ:6.2.2.23:\(em
+MNCC_START_DTMF_CNF:6.2.2.24:\(em
+MNCC_STOP_DTMF_REQ:6.2.2.25:\(em
+MNCC_STOP_DTMF_CNF:6.2.2.26:\(em
+MNCC_MODIFY_REQ:6.2.2.27:\(em
+MNCC_MODIFY_IND:6.2.2.28:\(em
+MNCC_MODIFY_RES:6.2.2.29:\(em
+MNCC_MODIFY_CNF:6.2.2.30:\(em
+MNCC_SYNC_IND:6.2.2.31:\(em
+.TE
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7),
+.BR bssap (4),
+.BR gsma (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> ,
+.BR <ss7/bssapi.h> ,
+.BR <ss7/bssapi_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/bssap .
+.\"
+.\"
+.SH VERSIONS
+.PP
+.XX
+.[
+ETSI TS 100 939-V7.3.0 (1999-12)
+.]
+.[
+ETSI ETS 300 557-1999
+.]
+.[
+ETSI TS 100 940-V7.10.0 (2000-12)
+.]
+.[
+ETSI TS 100 940-V7.8.0 (2000-10)
+.]
+.[
+ETSI TS 101 642-V8.0.0 (2000-06)
+.]
+.[
+gsm0806
+.]
+.[
+3gppts0806
+.]
+.[
+ETSI ETS 300 590-1998
+.]
+.[
+ETSI TS 100 590-V8.5.0 (2000-08)
+.]
+.[
+$LIST$
+.]
+.TA

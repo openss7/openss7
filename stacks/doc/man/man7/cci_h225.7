@@ -1,0 +1,692 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: cci_h225.7,v 0.9 2004/01/17 08:01:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CCI-H225 7 "$Date: 2004/01/17 08:01:25 $" "$Name:  $" "Call Control Interface \- Corrigendum"
+.\"
+.\"
+.SH NAME
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/h225i.h>
+.br
+.B #include <ss7/h225i_ioctl.h>
+.\"
+.\"
+.HP
+.BI "int " h225_stream " = open (" \fR/dev/h225\fI ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This Corrigendum describes the formats and rules that are specific to ITU-T
+Recommndation H.225.0.  The Corrigendum must be used along with the generic
+Call Control Interface
+.RB ( cci (7))
+as defined in the main document when implementing a CCS provider that will be
+configured with the H.225.0 call processing layer.
+.\"
+.\"
+.PP
+.B Primitives and Rules for H.225.0 Conformance
+.\"
+.\"
+.PP
+The following are the rules that apply to the CCI primitives for H.225.0
+compatability.
+.SH "CALL CONTROL ADDRESSES"
+.PP
+The format of the call control address for H.225.0 conforming CCS providers is
+as follows:
+.\"
+.\"
+.sp
+.nf
+\fC\s-1\
+typedef struct h225_addr {
+    ulong scope;    /* the scope of the identifier */
+    ulong id;	    /* the identifier within the scope */
+    ulong port;     /* port number */
+} h225_addr_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.TP
+.I scope
+conveys the scope of the call control address.  See
+.IR \*(lqScope\*(rq ,
+below.
+.\"
+.\"
+.TP
+.I id
+conveys the indentifier within the
+.IR scope .
+.\"
+.\"
+.PP
+.B Scope
+.\"
+.\"
+.PP
+The
+.I scope
+of the address is one of the following:
+.\"
+.\"
+.TP
+.B H225_SCOPE_CT
+.\"
+.\"
+Conveys that the
+.I scope
+of the call control address is an H.245 transport address.  The
+.I id
+within this
+.I scope
+is an IPv4 address which uniquely identifies a reliable signalling channel
+for carrying the H.245 LCN 0 control for the call.
+.I port
+indicates the IP port number.
+.sp
+An H.245 transport address corresponds to a specific reliable control channel
+to a transport hosts.  Transport connections can be grouped by the host to
+which they connect.
+.sp
+H.245 transport addresses are identified using an IP address and port number
+within the CCS provider.  Addresses specifying all of the RTP streams
+controlled by a H.245 control stream are specified with
+.I scope
+.B H225_SCOPE_CT
+and the H.245 transport address (IP address in
+.I id
+and IP port number in
+.IR port ).
+.\"
+.\"
+.TP
+.B H225_SCOPE_TP
+Conveys that the
+.I scope
+of the call control address is a transport connection.  The
+.I id
+within this
+.I scope
+is an identifier which uniquely identifies a reliable signalling channel for a
+given call.
+.sp
+A transport connection corresponds to a specific reliable signalling channel
+to a transport host.  Transport connections can be grouped by the host to
+which they connect.
+.sp
+Transport connections are identified using a unique identifier within the CCS
+provider.  Addresses specifying all of the RTP streams controlled by a
+signalling transport connection are specified with
+.I scope
+.B H225_SCOPE_TP
+and the transport connection
+.IR id .
+.\"
+.\"
+.TP
+.B H225_SCOPE_EP
+Conveys that the
+.I scope
+of the call control address is an H.323 endpoints.  The
+.I id
+within this
+.I scope
+is an identifier which uniquely identifies a transport endpoint (host).
+.\"
+.\"
+.TP
+.B H225_SCOPE_ZN
+Conveys that the
+.I scope
+of the call control address is an H.323 Endpoint zone.  The
+.I id 
+within this
+.I scope
+is an identifier which uniquely identifies a group of H.323 endpoints all
+belonging to the same zone.
+.\"
+.\"
+.TP
+.B H225_SCOPE_EG
+Conveys that the
+.I scope
+of the call controll address is an H.225 equipment group.  The
+.I id
+within this
+.I scope
+is an identifier than uniquely identifies the equipment group to the CCS
+provider.
+.sp
+An equipment group is a group of all transport addresses terminating at the
+same location.  For Terminal mode, this corresponds to all the transport
+addresses terminating at the same network provider complex.  For
+Gateway/Gatekeeper mode this corresponds to all the transport addresses
+terminating on the same customer site.
+.sp
+Equipment groups are identified using a unique equipment group identifier
+within the CCS provider.  Addresses specifying all of the transport addresses
+making up an equipment group are specified within
+.I scope
+.B H224_SCOPE_EG
+and the equipment group
+.IR id .
+.\"
+.\"
+.TP
+.B H225_SCOPE_XG
+Conveys that the
+.I scope
+of the call control address is an exchange group.  The
+.I id
+within the
+scope is an identifier that uniquely identifies the exchange group to the CCS
+provider.
+.sp
+A exchange group has a different interpretation on the H.323 Terminal and
+Gateway/Gatekeeper side of the call control interface.  In Terminal mode, the
+provider group is a group of all zones which are serviced by the same network
+provider.  In Gateway/Gatekeeper mode, the customer group is a group of all
+equipment groups to which the same service is provided to the same customer by
+the network.
+.sp
+Exchange provider groups are identified using a unique exchange group
+identifier within the CCS provider.  Addresses specifying all of the equipment
+groups is an exchange group are specified with
+.I scope
+.B H225_SCOPE_XG
+and the exchange group
+.IR id .
+.\"
+.\"
+.TP
+.B H225_SCOPE_DF
+Conveys that the
+.I scope
+of the call control adress is the default scope.  The
+.I id
+within the
+.I scope
+is unused and should be ignored by the CCS user and will be coded zero (0) by
+the CCS provider.
+.\"
+.\"
+.PP
+.B Rules
+.\"
+.\"
+.PP
+Rules for scope:
+.\"
+.\"
+.IP \(em 4
+In primitives in which the address parameter occurs, the
+.I scope
+field setting indicates the scope of the address parameter.
+.\"
+.\"
+.IP \(em
+Only one call control address can be specified within a single
+.IR scope .
+.\"
+.\"
+.IP \(em
+Not all scopes are necessarily supported by all primitives.  See the
+particular primitive, below.
+.\"
+.\"
+.PP
+Rules for addresses:
+.\"
+.\"
+.IP \(em 4
+The address contained in the primitive contains the following:
+.\"
+.\"
+.RS
+.\"
+.IP \(bu 3
+A
+.IR scope .
+.\"
+.\"
+.IP \(bu
+An identifier within the
+.I scope
+or zero (0).
+.\"
+.RE
+.\"
+.\"
+.IP \(em
+If the
+.I scope
+of the address is
+.BR H225_SCOPE_DF ,
+then the
+.I id
+and
+.I port
+fields should be coded zero (0) and will be ignored by the CCS user or
+provider.
+.\"
+.\"
+.IP \(em
+If the
+.I scope
+of the address is
+.BR H225_SCOPE_EP ,
+then the
+.I port
+field should be coded all zeros (0) and will be ignored by the CCS user or
+provider.
+.\"
+.\"
+.IP \(em
+In all other scopes, the
+.I port
+number is optional and coded zero (0) if unused.
+.\"
+.\"
+.SH "OPTIONAL PARAMETERS"
+.PP
+.\"
+.\"
+.PP
+.B Format
+.\"
+.\"
+.PP
+The format of the optional parameters for H.225.0 conforming CCS providers is
+as follows:
+.\"
+.\"
+.PP
+.B Parameters
+.\"
+.\"
+.TP
+.I cc_opt_length
+Conveys the length of the optional parameters associated with the primitive.
+For H.225.0 conforming CCS providers, the format of the optional parameters is
+the format Information Elements of the H.225.0 message (including the tag and
+length octets) as specified in H.225.0.
+.\"
+.\"
+.TP
+.I cc_opt_offset
+Conveys the offset of the optional parameters from the beginning of the block.
+.\"
+.\"
+.PP
+.B Rules
+.\"
+.\"
+.PP
+Rules for optional parameters:
+.\"
+.\"
+.IP \(em 4
+The optional parameters provided by the CCS user may be checked for syntax by
+the CCS provider.  If the CCS provider discovers a syntax error in the format
+of the optional parameters, the CCS provider should respond with a
+.BR CC_ERROR_ACK (7)
+primitive with error
+.RB [ CCBADOPT ].
+.\"
+.\"
+.IP \(em
+For some primitives, specific optional parameters might be interpreted by the
+CCS provider and alter the function of some primitives.  See the specific
+primitive descriptions layer in this Corrigendum.
+.\"
+.\"
+.IP \(em
+Except for optional parameters interpreted by the CCS provider as specified
+later in this Corrigendum, the optional parameters are treated as opaque and
+the optional parameter lis is only checked for syntax.  Opaque parameters will
+be passed to the H.225 message without examination by the CCS provider.
+.\"
+.\"
+.IP \(em
+To perform specific functions, additional mandatory or optional parameters ma
+be added to the H.225 message by the CCS provider.
+.\"
+.\"
+.IP \(em
+To perform specfic functions, optional parameters may be modified by the CCS
+provider before being added to the H.225 message.
+.\"
+.\"
+.SS "Service Primitives"
+.PP
+.PP
+.B "Local Management Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_INFO_REQ\fR(7):T{
+T}
+\fBCC_INFO_ACK\fR(7):T{
+T}
+\fBCC_BIND_REQ\fR(7):T{
+T}
+\fBCC_BIND_ACK\fR(7):T{
+T}
+\fBCC_OPTMGMT_REQ\fR(7):T{
+T}
+\fBCC_OPTMGMT_ACK\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Setup Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_SETUP_REQ\fR(7):T{
+T}
+\fBCC_SETUP_IND\fR(7):T{
+T}
+\fBCC_SETUP_RES\fR(7):T{
+T}
+\fBCC_SETUP_CON\fR(7):T{
+T}
+\fBCC_CALL_REATTEMPT_IND\fR(7):T{
+T}
+\fBCC_SETUP_COMPLETE_REQ\fR(7):T{
+T}
+\fBCC_SETUP_COMPLETE_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Continuity Check Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_CONT_CHECK_REQ\fR(7):T{
+T}
+\fBCC_CONT_CHECK_IND\fR(7):T{
+T}
+\fBCC_CONT_TEST_REQ\fR(7):T{
+T}
+\fBCC_CONT_TEST_IND\fR(7):T{
+T}
+\fBCC_CONT_REPORT_REQ\fR(7):T{
+T}
+\fBCC_CONT_REPORT_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Establishment Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_MORE_INFO_REQ\fR(7):T{
+T}
+\fBCC_MORE_INFO_IND\fR(7):T{
+T}
+\fBCC_INFORMATION_REQ\fR(7):T{
+T}
+\fBCC_INFORMATION_IND\fR(7):T{
+T}
+\fBCC_INFO_TIMEOUT_IND\fR(7):T{
+T}
+\fBCC_PROCEEDING_REQ\fR(7):T{
+T}
+\fBCC_PROCEEDING_IND\fR(7):T{
+T}
+\fBCC_ALERTING_REQ\fR(7):T{
+T}
+\fBCC_ALERTING_IND\fR(7):T{
+T}
+\fBCC_PROGRESS_REQ\fR(7):T{
+T}
+\fBCC_PROGRESS_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Established Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_SUSPEND_REQ\fR(7):T{
+T}
+\fBCC_SUSPEND_IND\fR(7):T{
+T}
+\fBCC_SUSPEND_RES\fR(7):T{
+T}
+\fBCC_SUSPEND_CON\fR(7):T{
+T}
+\fBCC_SUSPEND_REJECT_REQ\fR(7):T{
+T}
+\fBCC_SUSPEND_REJECT_IND\fR(7):T{
+T}
+\fBCC_RESUME_REQ\fR(7):T{
+T}
+\fBCC_RESUME_IND\fR(7):T{
+T}
+\fBCC_RESUME_RES\fR(7):T{
+T}
+\fBCC_RESUME_CON\fR(7):T{
+T}
+\fBCC_RESUME_REJECT_REQ\fR(7):T{
+T}
+\fBCC_RESUME_REJECT_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Supplementary Services Primitives
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_FACILITY_REQ\fR(7):T{
+T}
+\fBCC_FACILITY_IND\fR(7):T{
+T}
+\fBCC_HOLD_REQ\fR(7):T{
+T}
+\fBCC_HOLD_IND\fR(7):T{
+T}
+\fBCC_HOLD_RES\fR(7):T{
+T}
+\fBCC_HOLD_CON\fR(7):T{
+T}
+\fBCC_RETRIEVE_REQ\fR(7):T{
+T}
+\fBCC_RETRIEVE_IND\fR(7):T{
+T}
+\fBCC_RETRIEVE_RES\fR(7):T{
+T}
+\fBCC_RETRIEVE_CON\fR(7):T{
+T}
+\fBCC_REGISTER_REQ\fR(7):T{
+T}
+\fBCC_REGISTER_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Call Termination Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_REJECT_IND\fR(7):T{
+T}
+\fBCC_CALL_FAILURE_IND\fR(7):T{
+T}
+\fBCC_DISCONNECT_REQ\fR(7):T{
+T}
+\fBCC_DISCONNECT_IND\fR(7):T{
+T}
+\fBCC_RELEASE_REQ\fR(7):T{
+T}
+\fBCC_RELEASE_IND\fR(7):T{
+T}
+.TE
+.PP
+.B "Management Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_RESTART_REQ\fR(7):T{
+T}
+\fBCC_RESET_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_RESET_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_BLOCKING_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_UNBLOCKING_CON\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_REQ\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_IND\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_RES\fR(7):T{
+.I (not used)
+T}
+\fBCC_QUERY_CON\fR(7):T{
+.I (not used)
+T}
+.TE
+.PP
+.B "Maintenance Primitives"
+.PP
+.TS
+tab(:);
+lw(2.5i)ls.
+\fBCC_MAINT_IND\fR(7):T{
+T}
+.TE
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7),
+.BR bssap (4),
+.BR gsma (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> ,
+.BR <ss7/bssapi.h> ,
+.BR <ss7/bssapi_ioctl.h> .
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/bssap .
+.\"
+.\"
+.SH VERSIONS
+.PP
+.\"
+.\"
+.XX
+.[
+h225
+.]
+.[
+h323
+.]
+.[
+h245
+.]
+.[
+$LIST$
+.]
+.TA

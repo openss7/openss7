@@ -1,0 +1,255 @@
+'\" rt
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: capi.7,v 0.9 2004/01/17 08:01:25 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/01/17 08:01:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CAPI 7 "$Date: 2004/01/17 08:01:25 $" "$Name:  $" "Linux CAPI 2.0 Interface"
+.SH NAME
+.B CAPI
+\- Linux CAPI 2.0 Interface
+.SH SYNOPSIS
+.B #include <linux/capi.h>
+.SH DESCRIPTION
+.SH CAVEATS
+.SH IOCTLS
+.SS CAPI_REGISTER		\" ('C'<<8|0x01)
+This ioctl is used to announce the presence of the application to CAPI
+.[
+capi20
+.]
+and set some parameters.
+.PP
+.I arg
+is a pointer to a
+.B capi_register_params
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct capi_register_params {
+    uint32_t level3cnt;
+    uint32_t datablkcnt;
+    uint32_t datablklen;
+};
+\fR\s+1
+.fi
+.TP
+.I level3cnt
+maximum number of simultaneous user data connections.
+.TP
+.I datablkcnt
+maximum number of buffered data messages.
+.TP
+.I datablklen
+maximum size of buffered data messages.
+.\".SS CAPI_RELEASE		\" ('C'<<8|0x02) but just close()
+.\".SS CAPI_PUT_MESSAGE		\" ('C'<<8|0x03) but just putmsg()
+.\".SS CAPI_GET_MESSAGE		\" ('C'<<8|0x04) but just getmsg()
+
+.SS CAPI_GET_MANUFACTURER	\" ('C'<<8|0x06)
+This IO control obtains the CAP manufacturer identification.
+.PP
+.I arg
+is a pointer to a buffer of at least 64 bytes.  On successful return, the
+.B capi
+driver copies the manufacturer name to the buffer as a zero terminated ASCII
+character string.
+.SS CAPI_GET_VERSION		\" ('C'<<8|0x07)
+.PP
+.I arg
+is a pointer to a
+.B capi_version
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct capi_version {
+    uint32_t majorversion;
+    uint32_t minorversion;
+    uint32_t majormanuversion;
+    uint32_t minormanuversion;
+};
+\fR\s+1
+.fi
+.TP
+.I majorversion
+The CAPI
+.[
+capi20
+.]
+major version:
+.BR 0x2 .
+.TP
+.I minorversion
+The CAPI
+.[
+capi20
+.]
+minor version:
+.BR 0x0 .
+.TP
+.I majormanuversion
+The manufacturer-specific major number:
+.BR 0x0 .
+.TP
+.I minormanuversion
+The manufacturer-specific minor number:
+.BR 0x8 .
+.SS CAPI_GET_SERIAL		\" ('C'<<8|0x08)
+Retrieves the serial number of the CAPI.
+.[
+capi20
+.]
+.PP
+.I arg
+is a pointer to a buffer of at least 8 bytes to hold the zero terminated ASCII
+character string representing the serial number of up to 7 characters.
+.SS CAPI_GET_PROFILE		\" ('C'<<8|0x09)
+.PP
+.I arg
+is a pointer to a
+.B capi_profile
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct capi_profile {
+    uint16_t ncontroller;       /* number of installed
+                                   controller */
+    uint16_t nbchannel;         /* number of B-Channels */
+    uint32_t goptions;          /* global options */
+    uint32_t support1;          /* B1 protocols support */
+    uint32_t support2;          /* B2 protocols support */
+    uint32_t support3;          /* B3 protocols support */
+    uint32_t reserved[6];       /* reserved */
+    uint32_t manu[5];           /* manufacturer specific
+                                   information */
+} capi_profile;
+\fR\s+1
+.fi
+.TP
+.I nocontroller
+The number of the controller.  If this field is set to zero (0) on call, the
+number of controllers will be returned and nothing else.
+.TP
+.I nbchannel
+The number of B-Channels supported by the controller.
+.TP
+.I goptions
+The global options.
+.RS
+.TP
+.B CAPI_GOPT_INT
+Internal controller supported.
+.TP
+.B CAPI_GOPT_EXT
+External equipment supported.
+.TP
+.B CAPI_GOPT_HANDSET
+Handset supported (external equipment must also be set)
+.TP
+.B CAPI_GOPT_DTMF
+DTMF supported.
+.TP
+.B CAPI_GOPT_CHANALLOC
+Channel allocationi supported (leased lines).
+.TP
+.B CAPI_GOPT_BCHANOPSUPP
+Parameter
+.I \*(lqB channel operation\*(rq
+supported.
+.TP
+.B CAPI_GOPT_LINTERC
+Line Interconnect supported.
+.RE
+.TP
+.I support1
+B1 protocols support.
+.TP
+.I support2
+B2 protocols support.
+.TP
+.I support3
+B3 protocols support.
+.TP
+.I reserved
+reserved.
+.TP
+.I manu
+Manufacturer specific information.
+
+.\".SS CAPI_SET_SIGNAL
+.\".SS CAPI_WAIT_FOR_SIGNAL
+
+.SS CAPI_MANUFACTURER_CMD	\" ('C'<<8|0x01)
+.SS CAPI_GET_ERRCODE		\" ('C'<<8|0x01)
+.SS CAPI_INSTALLED		\" ('C'<<8|0x01)
+
+.\".SS CAPI_GET_FLAGS		\" ('C'<<8|0x01)
+.\".SS CAPI_SET_FLAGS		\" ('C'<<8|0x01)
+.\".SS CAPI_CLR_FLAGS		\" ('C'<<8|0x01)
+.\".SS CAPI_NCCI_OPENCOUNT	\" ('C'<<8|0x01)
+.\".SS CAPI_NCCI_GETUNIT	\" ('C'<<8|0x01)
+
+.SH "SEE ALSO"
+.SH FILES
+.SH VERSIONS
+The
+.B CAPI
+.[
+capi20
+.]
+driver is specific to the
+.B OpenSS7
+stack.
+This is Version 2.0 of the interface.
+.[
+$LIST$
+.]
+.TA
