@@ -1,3 +1,57 @@
+/*****************************************************************************
+
+ @(#) $Id: netlib.h,v 1.1.1.2 2004/08/06 03:47:22 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ifndef __LOCAL_NETLIB_H__
+#define __LOCAL_NETLIB_H__
+
 /*
         Copyright (C) 1993-2003 Hewlett-Packard Company
 */
@@ -167,6 +221,62 @@
 #define         DO_DNS_RR                  400
 #define         DNS_RR_RESPONSE            401
 #define         DNS_RR_RESULTS             402
+
+#define         DO_SCTP_STREAM		510
+#define         SCTP_STREAM_RESPONSE	511
+#define         SCTP_STREAM_RESULTS	512
+
+#define         DO_SCTP_RR		513
+#define         SCTP_RR_RESPONSE	514
+#define         SCTP_RR_RESULTS		515
+
+#define         DO_SCTP_CRR		534
+#define         SCTP_CRR_RESPONSE	535
+#define         SCTP_CRR_RESULTS	536
+
+#define         DO_XTI_SCTP_STREAM	555
+#define         XTI_SCTP_STREAM_RESPONSE 556
+#define         XTI_SCTP_STREAM_RESULTS	557
+
+#define         DO_XTI_SCTP_RR		558
+#define         XTI_SCTP_RR_RESPONSE	559
+#define         XTI_SCTP_RR_RESULTS	560
+
+#define         DO_XTI_SCTP_CRR		567
+#define         XTI_SCTP_CRR_RESPONSE	568
+#define         XTI_SCTP_CRR_RESULTS	569
+
+#define         DO_SCTP_TRR		570
+#define         SCTP_TRR_RESPONSE	571
+#define         SCTP_TRR_RESULTS	572
+
+#define         DO_SCTP_NBRR		573
+#define         SCTP_NBRR_RESPONSE	574
+#define         SCTP_NBRR_RESULTS	575
+
+#define         DO_SCTPIPV6_STREAM	576
+#define         SCTPIPV6_STREAM_RESPONSE 577
+#define         SCTPIPV6_STREAM_RESULTS	578
+
+#define         DO_SCTPIPV6_RR		579
+#define         SCTPIPV6_RR_RESPONSE	580
+#define         SCTPIPV6_RR_RESULTS	581
+
+#define         DO_SCTPIPV6_CRR		588
+#define         SCTPIPV6_CRR_RESPONSE	589
+#define         SCTPIPV6_CRR_RESULTS	590
+
+#define         DO_SCTPIPV6_TRR		591
+#define         SCTPIPV6_TRR_RESPONSE	592
+#define         SCTPIPV6_TRR_RESULTS	593
+
+#define         DO_SCTP_MAERTS		594
+#define         SCTP_MAERTS_RESPONSE	595
+#define         SCTP_MAERTS_RESULTS	596
+
+#define         DO_SCTP_CC		600
+#define         SCTP_CC_RESPONSE	601
+#define         SCTP_CC_RESULTS		602
 
 enum sock_buffer{
   SEND_BUFFER,
@@ -468,3 +578,5 @@ extern double confidence;
 #ifndef HAVE_MIN
 #define min(a,b) ((a < b) ? a : b)
 #endif /* HAVE_MIN */
+
+#endif				/* __LOCAL_NETLIB_H__ */

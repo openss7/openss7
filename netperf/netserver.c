@@ -1,3 +1,59 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $"
+
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $";
+
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
 #endif /* NEED_MAKEFILE_EDIT */
@@ -215,6 +271,40 @@ process_requests()
       send_response();
       break;
       
+#ifdef DO_SCTP
+    case DO_SCTP_STREAM:
+      recv_sctp_stream();
+      break;
+      
+    case DO_SCTP_MAERTS:
+      recv_sctp_maerts();
+      break;
+      
+    case DO_SCTP_RR:
+      recv_sctp_rr();
+      break;
+      
+    case DO_SCTP_CRR:
+      recv_sctp_conn_rr();
+      break;
+      
+    case DO_SCTP_CC:
+      recv_sctp_cc();
+      break;
+      
+#ifdef DO_1644
+    case DO_SCTP_TRR:
+      recv_sctp_tran_rr();
+      break;
+#endif /* DO_1644 */
+      
+#ifdef DO_NBRR
+    case DO_SCTP_NBRR:
+      recv_sctp_nbrr();
+      break;
+#endif /* DO_NBRR */
+#endif				/* DO_SCTP */
+      
     case DO_TCP_STREAM:
       recv_tcp_stream();
       break;
@@ -320,6 +410,16 @@ process_requests()
 #endif /* DO_HIPPI */
 
 #ifdef DO_XTI
+#ifdef DO_XTI_SCTP
+    case DO_XTI_SCTP_STREAM:
+      recv_xti_sctp_stream();
+      break;
+      
+    case DO_XTI_SCTP_RR:
+      recv_xti_sctp_rr();
+      break;
+      
+#endif				/* DO_XTI_SCTP */
     case DO_XTI_TCP_STREAM:
       recv_xti_tcp_stream();
       break;
@@ -356,6 +456,20 @@ process_requests()
 
 #endif /* DO_LWP */
 #ifdef DO_IPV6
+#ifdef DO_IPV6_SCTP
+    case DO_SCTPIPV6_STREAM:
+      recv_sctpipv6_stream();
+      break;
+      
+    case DO_SCTPIPV6_RR:
+      recv_sctpipv6_rr();
+      break;
+      
+    case DO_SCTPIPV6_CRR:
+      recv_sctpipv6_conn_rr();
+      break;
+      
+#endif				/* DO_IPV6_SCTP */
     case DO_TCPIPV6_STREAM:
       recv_tcpipv6_stream();
       break;

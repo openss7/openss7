@@ -1,3 +1,59 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $"
+
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 03:47:22 $";
+
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
 #endif /* NEED_MAKEFILE_EDIT */
@@ -14,24 +70,34 @@ char	nettest_id[]="\
 /*								*/
 /*	nettest_bsd.c						*/
 /*								*/
-/*      the BSD sockets parsing routine...                      */
-/*       ...with the addition of Windows NT, this is now also   */
-/*          a Winsock test... sigh :)                           */
-/*                                                              */
-/*      scan_sockets_args()                                     */
-/*                                                              */
+/*	the BSD sockets parsing routine...			*/
+/*	 ...with the addition of Windows NT, this is now also	*/
+/*	    a Winsock test... sigh :)				*/
+/*								*/
+/*	scan_sockets_args()					*/
+/*								*/
 /*	the actual test routines...				*/
 /*								*/
+/*	send_sctp_stream()	perform a sctp stream test	*/
+/*	recv_sctp_stream()					*/
+/*	send_sctp_maerts()	perform a sctp stream test	*/
+/*	recv_sctp_maerts()	in the other direction		*/
+/*	send_sctp_rr()		perform a sctp request/response	*/
+/*	recv_sctp_rr()						*/
+/*	send_sctp_conn_rr()	an RR test including connect	*/
+/*	recv_sctp_conn_rr()					*/
+/*	send_sctp_cc()		a connect/disconnect test with	*/
+/*	recv_sctp_cc()		no RR				*/
 /*	send_tcp_stream()	perform a tcp stream test	*/
 /*	recv_tcp_stream()					*/
-/*      send_tcp_maerts()       perform a tcp stream test       */
-/*      recv_tcp_maerts()       in the other direction          */
+/*	send_tcp_maerts()	perform a tcp stream test	*/
+/*	recv_tcp_maerts()	in the other direction		*/
 /*	send_tcp_rr()		perform a tcp request/response	*/
 /*	recv_tcp_rr()						*/
-/*      send_tcp_conn_rr()      an RR test including connect    */
-/*      recv_tcp_conn_rr()                                      */
-/*      send_tcp_cc()           a connect/disconnect test with  */
-/*      recv_tcp_cc()           no RR                           */
+/*	send_tcp_conn_rr()	an RR test including connect	*/
+/*	recv_tcp_conn_rr()					*/
+/*	send_tcp_cc()		a connect/disconnect test with	*/
+/*	recv_tcp_cc()		no RR				*/
 /*	send_udp_stream()	perform a udp stream test	*/
 /*	recv_udp_stream()					*/
 /*	send_udp_rr()		perform a udp request/response	*/
@@ -73,6 +139,9 @@ char	nettest_id[]="\
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#ifdef DO_SCTP
+#include <netinet/sctp.h>
+#endif
 #include <arpa/inet.h>
 #include <netdb.h>
 #else /* WIN32 */
@@ -120,6 +189,7 @@ static  char  remote_cpu_method;
 
  /* these will control the width of port numbers we try to use in the */
  /* TCP_CRR and/or TCP_TRR tests. raj 3/95 */
+ /* or the SCTP_CRR and/or SCTP_TRR tests. */
 static int client_port_min = 5000;
 static int client_port_max = 65535;
 
@@ -139,6 +209,12 @@ int
   loc_tcpcork=0,        /* don't/do use TCP_CORK locally        */
   rem_tcpcork=0,        /* don't/do use TCP_CORK remotely       */
 #endif /* TCP_CORK */
+#ifdef DO_SCTP
+#ifdef SCTP_CORK
+  loc_sctpcork=0,       /* don't/do use SCTP_CORK locally       */
+  rem_sctpcork=0,       /* don't/do use SCTP_CORK remotely      */
+#endif				/* SCTP_CORK */
+#endif				/* DO_SCTP */
   loc_sndavoid,		/* avoid send copies locally		*/
   loc_rcvavoid,		/* avoid recv copies locally		*/
   rem_sndavoid,		/* avoid send copies remotely		*/
@@ -159,16 +235,16 @@ static HIST time_hist;
 char sockets_usage[] = "\n\
 Usage: netperf [global options] -- [test options] \n\
 \n\
-TCP/UDP BSD Sockets Test Options:\n\
-    -C                Set TCP_CORK when available\n\
-    -D [L][,R]        Set TCP_NODELAY locally and/or remotely (TCP_*)\n\
+SCTP/TCP/UDP BSD Sockets Test Options:\n\
+    -C                Set (SCTP|TCP)_CORK when available\n\
+    -D [L][,R]        Set (SCTP|TCP)_NODELAY locally and/or remotely (SCTP_*|TCP_*)\n\
     -h                Display this text\n\
     -I local[,remote] Set the local/remote IP addresses for the data socket\n\
-    -m bytes          Set the send size (TCP_STREAM, UDP_STREAM)\n\
-    -M bytes          Set the recv size (TCP_STREAM, UDP_STREAM)\n\
-    -p min[,max]      Set the min/max port numbers for TCP_CRR, TCP_TRR\n\
+    -m bytes          Set the send size (SCTP_STREAM, TCP_STREAM, UDP_STREAM)\n\
+    -M bytes          Set the recv size (SCTP_STREAM, TCP_STREAM, UDP_STREAM)\n\
+    -p min[,max]      Set the min/max port numbers for (SCTP|TCP)_CRR, (SCTP|TCP)_TRR\n\
     -P local[,remote] Set the local/remote port for the data socket\n\
-    -r req,[rsp]      Set request/response sizes (TCP_RR, UDP_RR)\n\
+    -r req,[rsp]      Set request/response sizes (SCTP_RR, TCP_RR, UDP_RR)\n\
     -s send[,recv]    Set local socket send/recv buffer sizes\n\
     -S send[,recv]    Set remote socket send/recv buffer sizes\n\
 \n\
@@ -179,6 +255,40 @@ parm, a value with a trailing comma will set just the first. To set\n\
 each parm to unique values, specify both and separate them with a\n\
 comma.\n"; 
      
+
+#ifdef DO_SCTP
+ /* This routine is intended to retrieve interesting aspects of sctp */
+ /* for the data connection. at first, it attempts to retrieve the */
+ /* maximum segment size. later, it might be modified to retrieve */
+ /* other information, but it must be information that can be */
+ /* retrieved quickly as it is called during the timing of the test. */
+ /* for that reason, a second routine may be created that can be */
+ /* called outside of the timing loop */
+static
+void
+get_sctp_info(SOCKET socket, int *mss)
+{
+
+#ifdef SCTP_MAXSEG
+  int sock_opt_len;
+
+  sock_opt_len = sizeof(int);
+  if (getsockopt(socket,
+		 getprotobyname("sctp")->p_proto,	
+		 SCTP_MAXSEG,
+		 (char *)mss,
+		 &sock_opt_len) == SOCKET_ERROR) {
+    fprintf(where,
+	    "netperf: get_sctp_info: getsockopt SCTP_MAXSEG: errno %d\n",
+	    errno);
+    fflush(where);
+    *mss = -1;
+  }
+#else
+  *mss = -1;
+#endif /* SCTP_MAXSEG */
+}
+#endif				/* DO_SCTP */
 
  /* This routine is intended to retrieve interesting aspects of tcp */
  /* for the data connection. at first, it attempts to retrieve the */
@@ -225,6 +335,9 @@ complete_sockaddr(struct sockaddr_in *server, char *remote_host, int ip_address)
   /* however, if the user provided a remote IP address with the -I
      option we will honour that above all else. raj 2004-06-15 */
 
+  /* NOTE:- this should be changed for SCTP to return all IP addresses
+   * belonging to the host in an array of IP addresses. */
+
   if (ip_address) {
     server->sin_addr.s_addr = ip_address;
     server->sin_family = AF_INET;
@@ -265,7 +378,7 @@ complete_sockaddr(struct sockaddr_in *server, char *remote_host, int ip_address)
  /* and type will be either SOCK_STREAM or SOCK_DGRAM */
 static
 SOCKET
-create_data_socket(int family, int type, int address, unsigned short port)
+create_data_socket(int family, int type, int protocol, int address, unsigned short port)
 {
 
   SOCKET temp_socket;
@@ -275,7 +388,7 @@ create_data_socket(int family, int type, int address, unsigned short port)
   /*set up the data socket                        */
   temp_socket = socket(family, 
 		       type,
-		       0);
+		       protocol);
   
   if (temp_socket == INVALID_SOCKET){
     fprintf(where,
@@ -355,31 +468,65 @@ create_data_socket(int family, int type, int address, unsigned short port)
   /* If the user tries to enable TCP_NODELAY on a UDP socket, this */
   /* will cause an error to be displayed */
   
+  switch ((type << 8) | protocol) {
+#ifdef DO_SCTP
+#ifdef SCTP_NODELAY
+    case ((SOCK_STREAM << 8) | IPPROTO_SCTP):
+    case ((SOCK_SEQPACKET << 8) | 0):
+    case ((SOCK_SEQPACKET << 8) | IPPROTO_SCTP):
+      /* Note:- for OpenSS7 SCTP, SCTP_NODELAY defaults to true instead of
+       * false. */
+      if (!loc_nodelay) {
+	one = 0;
+	if(setsockopt(temp_socket,
+		      SOL_SCTP,
+		      (char *)&one,
+		      sizeof(one)) == SOCKET_ERROR) {
+	  fprintf(where,
+		  "netperf: create_data_socket: nodelay: errno %d\n",
+		  errno);
+	  fflush(where);
+	}
+
+	if (debug > 1) {
+	  fprintf(where,
+		  "netperf: create_data_socket: SCTP_NODELAY not requested...\n");
+	  fflush(where);
+	}
+      }
+      break;
+#endif				/* SCTP_NODELAY */
+#endif				/* DO_SCTP */
 #ifdef TCP_NODELAY
-  if (loc_nodelay) {
-    one = 1;
-    if(setsockopt(temp_socket,
-		  getprotobyname("tcp")->p_proto,
-		  TCP_NODELAY,
-		  (char *)&one,
-		  sizeof(one)) == SOCKET_ERROR) {
-      fprintf(where,
-	      "netperf: create_data_socket: nodelay: errno %d\n",
-	      errno);
-      fflush(where);
-    }
+    case ((SOCK_STREAM << 8) | 0):
+    case ((SOCK_STREAM << 8) | IPPROTO_TCP):
+      if (loc_nodelay) {
+	one = 1;
+	if(setsockopt(temp_socket,
+		      SOL_TCP,
+		      TCP_NODELAY,
+		      (char *)&one,
+		      sizeof(one)) == SOCKET_ERROR) {
+	  fprintf(where,
+		  "netperf: create_data_socket: nodelay: errno %d\n",
+		  errno);
+	  fflush(where);
+	}
     
-    if (debug > 1) {
-      fprintf(where,
-	      "netperf: create_data_socket: TCP_NODELAY requested...\n");
-      fflush(where);
-    }
-  }
-#else /* TCP_NODELAY */
-  
-  loc_nodelay = 0;
-  
+	if (debug > 1) {
+	  fprintf(where,
+		  "netperf: create_data_socket: TCP_NODELAY requested...\n");
+	  fflush(where);
+	}
+      }
+      break;
 #endif /* TCP_NODELAY */
+    default:
+    case ((SOCK_DGRAM << 8) | 0):
+    case ((SOCK_DGRAM << 8) | IPPROTO_UDP):
+      loc_nodelay = 0;
+      break;
+  }
 
   if ((address) || (port)) {
     struct sockaddr_in temp;
@@ -423,7 +570,7 @@ create_data_socket(int family, int type, int address, unsigned short port)
  /* only be called for those broken systems. I *really* don't want to */
  /* have this, but even broken systems must be measured. raj 11/95 */
 void
-kludge_socket_options(int temp_socket)
+kludge_socket_options(int temp_socket, int level)
 {
 
   set_sock_buffer(temp_socket, SEND_BUFFER, lss_size_req, &lss_size);
@@ -442,34 +589,803 @@ kludge_socket_options(int temp_socket)
   /* If the user tries to enable TCP_NODELAY on a UDP socket, this */
   /* will cause an error to be displayed */
   
+  switch (level) {
+#ifdef DO_SCTP
+#ifdef SCTP_NODELAY
+    case SOL_SCTP:
+      if (!loc_nodelay) {
+	one = 0;
+	if(setsockopt(temp_socket,
+		      SOL_SCTP,
+		      SCTP_NODELAY,
+		      (char *)&one,
+		      sizeof(one)) == SOCKET_ERROR) {
+	  fprintf(where,"netperf: kludge_socket_options: nodelay: errno %d\n",
+		  errno);
+	  fflush(where);
+	}
+	
+	if (debug > 1) {
+	  fprintf(where,
+		  "netperf: kludge_socket_options: SCTP_NODELAY not requested...\n");
+	  fflush(where);
+	}
+      }
+      break;
+#endif				/* SCTP_NODELAY */
+#endif				/* DO_SCTP */
 #ifdef TCP_NODELAY
-  if (loc_nodelay) {
-    one = 1;
-    if(setsockopt(temp_socket,
-		  getprotobyname("tcp")->p_proto,
-		  TCP_NODELAY,
-		  (char *)&one,
-		  sizeof(one)) == SOCKET_ERROR) {
-      fprintf(where,"netperf: kludge_socket_options: nodelay: errno %d\n",
-	      errno);
-      fflush(where);
-    }
-    
-    if (debug > 1) {
-      fprintf(where,
-	      "netperf: kludge_socket_options: TCP_NODELAY requested...\n");
-      fflush(where);
-    }
-  }
-#else /* TCP_NODELAY */
-  
-  loc_nodelay = 0;
-  
+    case SOL_TCP:
+      if (loc_nodelay) {
+	one = 1;
+	if(setsockopt(temp_socket,
+		      SOL_TCP,
+		      TCP_NODELAY,
+		      (char *)&one,
+		      sizeof(one)) == SOCKET_ERROR) {
+	  fprintf(where,"netperf: kludge_socket_options: nodelay: errno %d\n",
+		  errno);
+	  fflush(where);
+	}
+	
+	if (debug > 1) {
+	  fprintf(where,
+		  "netperf: kludge_socket_options: TCP_NODELAY requested...\n");
+	  fflush(where);
+	}
+      }
+      break;
 #endif /* TCP_NODELAY */
-
+    default:
+    case SOL_UDP:
+      loc_nodelay = 0;
+      break;
   }
+}
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
+
+#ifdef DO_SCTP
+
+
+/* This routine implements the SCTP unidirectional data transfer test */
+/* (a.k.a. stream) for the sockets interface. It receives its */
+/* parameters via global variables from the shell and writes its */
+/* output to the standard output. */
+
+
+void 
+send_sctp_stream(char remote_host[])
+{
+  
+  char *tput_title = "\
+Recv   Send    Send                          \n\
+Socket Socket  Message  Elapsed              \n\
+Size   Size    Size     Time     Throughput  \n\
+bytes  bytes   bytes    secs.    %s/sec  \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1 =
+    "%6d %6d %6d    %-6.2f   %7.2f   \n";
+  
+  char *cpu_title = "\
+Recv   Send    Send                          Utilization       Service Demand\n\
+Socket Socket  Message  Elapsed              Send     Recv     Send    Recv\n\
+Size   Size    Size     Time     Throughput  local    remote   local   remote\n\
+bytes  bytes   bytes    secs.    %-8.8s/s  %% %c      %% %c      us/KB   us/KB\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f %c\n";
+
+  char *cpu_fmt_1 =
+    "%6d %6d %6d    %-6.2f     %7.2f   %-6.2f   %-6.2f   %-6.3f  %-6.3f\n";
+  
+  char *ksink_fmt = "\n\
+Alignment      Offset         %-8.8s %-8.8s    Sends   %-8.8s Recvs\n\
+Local  Remote  Local  Remote  Xfered   Per                 Per\n\
+Send   Recv    Send   Recv             Send (avg)          Recv (avg)\n\
+%5d   %5d  %5d   %5d %6.4g  %6.2f    %6d   %6.2f %6d\n";
+
+  char *ksink_fmt2 = "\n\
+Maximum\n\
+Segment\n\
+Size (bytes)\n\
+%6d\n";
+  
+  
+  float			elapsed_time;
+  
+#ifdef INTERVALS
+  int interval_count;
+  sigset_t signal_set;
+#endif
+  
+  /* what we want is to have a buffer space that is at least one */
+  /* send-size greater than our send window. this will insure that we */
+  /* are never trying to re-use a buffer that may still be in the hands */
+  /* of the transport. This buffer will be malloc'd after we have found */
+  /* the size of the local senc socket buffer. We will want to deal */
+  /* with alignment and offset concerns as well. */
+  
+#ifdef DIRTY
+  int	*message_int_ptr;
+#endif
+
+  struct ring_elt *send_ring;
+  
+  int len;
+  unsigned int nummessages = 0;
+  SOCKET send_socket;
+  int bytes_remaining;
+  int sctp_mss = -1;  // possibly uninitialized on printf far below
+
+  /* with links like fddi, one can send > 32 bits worth of bytes */
+  /* during a test... ;-) at some point, this should probably become a */
+  /* 64bit integral type, but those are not entirely common yet */
+  double	bytes_sent = 0.0;
+  
+#ifdef DIRTY
+  int	i;
+#endif /* DIRTY */
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  unsigned      int             addr;
+  
+  struct	sctp_stream_request_struct	*sctp_stream_request;
+  struct	sctp_stream_response_struct	*sctp_stream_response;
+  struct	sctp_stream_results_struct	*sctp_stream_result;
+  
+  sctp_stream_request  = 
+    (struct sctp_stream_request_struct *)netperf_request.content.test_specific_data;
+  sctp_stream_response =
+    (struct sctp_stream_response_struct *)netperf_response.content.test_specific_data;
+  sctp_stream_result   = 
+    (struct sctp_stream_results_struct *)netperf_response.content.test_specific_data;
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+  
+  bzero((char *)&server,
+	sizeof(server));
+  
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+  
+  if ( print_headers ) {
+    /* we want to have some additional, interesting information in */
+    /* the headers. we know some of it here, but not all, so we will */
+    /* only print the test title here and will print the results */
+    /* titles after the test is finished */
+    fprintf(where,"SCTP STREAM TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+
+  send_ring = NULL;
+  confidence_iteration = 1;
+  init_stat();
+
+  /* we have a great-big while loop which controls the number of times */
+  /* we run a particular test. this is for the calculation of a */
+  /* confidence interval (I really should have stayed awake during */
+  /* probstats :). If the user did not request confidence measurement */
+  /* (no confidence is the default) then we will only go though the */
+  /* loop once. the confidence stuff originates from the folks at IBM */
+
+  while (((confidence < 0) && (confidence_iteration < iteration_max)) ||
+	 (confidence_iteration <= iteration_min)) {
+
+    /* initialize a few counters. we have to remember that we might be */
+    /* going through the loop more than once. */
+    
+    nummessages    =	0;
+    bytes_sent     =	0.0;
+    times_up       = 	0;
+    
+    /*set up the data socket                        */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP,
+				     local_data_ip,
+				     local_data_port);
+    
+    if (send_socket == INVALID_SOCKET){
+      perror("netperf: send_sctp_stream: sctp stream data socket");
+      exit(1);
+    }
+    
+    if (debug) {
+      fprintf(where,"send_sctp_stream: send_socket obtained...\n");
+    }
+    
+    /* at this point, we have either retrieved the socket buffer sizes, */
+    /* or have tried to set them, so now, we may want to set the send */
+    /* size based on that (because the user either did not use a -m */
+    /* option, or used one with an argument of 0). If the socket buffer */
+    /* size is not available, we will set the send size to 4KB - no */
+    /* particular reason, just arbitrary... */
+    if (send_size == 0) {
+      if (lss_size > 0) {
+	send_size = lss_size;
+      }
+      else {
+	send_size = 4096;
+      }
+    }
+    
+    /* set-up the data buffer ring with the requested alignment and offset. */
+    /* note also that we have allocated a quantity */
+    /* of memory that is at least one send-size greater than our socket */
+    /* buffer size. We want to be sure that there are at least two */
+    /* buffers allocated - this can be a bit of a problem when the */
+    /* send_size is bigger than the socket size, so we must check... the */
+    /* user may have wanted to explicitly set the "width" of our send */
+    /* buffers, we should respect that wish... */
+    if (send_width == 0) {
+      send_width = (lss_size/send_size) + 1;
+      if (send_width == 1) send_width++;
+    }
+    
+    if (send_ring == NULL) {
+      /* only allocate the send ring once. this is a networking test, */
+      /* not a memory allocation test. this way, we do not need a */
+      /* deallocate_buffer_ring() routine, and I don't feel like */
+      /* writing one anyway :) raj 11/94 */
+      send_ring = allocate_buffer_ring(send_width,
+				       send_size,
+				       local_send_align,
+				       local_send_offset);
+    }
+
+    /* If the user has requested cpu utilization measurements, we must */
+    /* calibrate the cpu(s). We will perform this task within the tests */
+    /* themselves. If the user has specified the cpu rate, then */
+    /* calibrate_local_cpu will return rather quickly as it will have */
+    /* nothing to do. If local_cpu_rate is zero, then we will go through */
+    /* all the "normal" calibration stuff and return the rate back. */
+    
+    if (local_cpu_usage) {
+      local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+    }
+    
+    /* Tell the remote end to do a listen. The server alters the socket */
+    /* paramters on the other side at this point, hence the reason for */
+    /* all the values being passed in the setup message. If the user did */
+    /* not specify any of the parameters, they will be passed as 0, which */
+    /* will indicate to the remote that no changes beyond the system's */
+    /* default should be used. Alignment is the exception, it will */
+    /* default to 1, which will be no alignment alterations. */
+    
+    netperf_request.content.request_type	=	DO_SCTP_STREAM;
+    sctp_stream_request->send_buf_size	=	rss_size;
+    sctp_stream_request->recv_buf_size	=	rsr_size;
+    sctp_stream_request->receive_size	=	recv_size;
+    sctp_stream_request->no_delay	=	rem_nodelay;
+    sctp_stream_request->recv_alignment	=	remote_recv_align;
+    sctp_stream_request->recv_offset	=	remote_recv_offset;
+    sctp_stream_request->measure_cpu	=	remote_cpu_usage;
+    sctp_stream_request->cpu_rate	=	remote_cpu_rate;
+    if (test_time) {
+      sctp_stream_request->test_length	=	test_time;
+    }
+    else {
+      sctp_stream_request->test_length	=	test_bytes;
+    }
+    sctp_stream_request->so_rcvavoid	=	rem_rcvavoid;
+    sctp_stream_request->so_sndavoid	=	rem_sndavoid;
+#ifdef DIRTY
+    sctp_stream_request->dirty_count	=       rem_dirty_count;
+    sctp_stream_request->clean_count	=       rem_clean_count;
+#endif /* DIRTY */
+    sctp_stream_request->port		=    (int)remote_data_port;
+    sctp_stream_request->ipaddress	=    remote_data_ip;
+    if (debug > 1) {
+      fprintf(where,
+	      "netperf: send_sctp_stream: requesting SCTP stream test\n");
+    }
+    
+    send_request();
+    
+    /* The response from the remote will contain all of the relevant 	*/
+    /* socket parameters for this test type. We will put them back into */
+    /* the variables here so they can be displayed if desired.  The	*/
+    /* remote will have calibrated CPU if necessary, and will have done	*/
+    /* all the needed set-up we will have calibrated the cpu locally	*/
+    /* before sending the request, and will grab the counter value right*/
+    /* after the connect returns. The remote will grab the counter right*/
+    /* after the accept call. This saves the hassle of extra messages	*/
+    /* being sent for the SCTP tests.					*/
+    
+    recv_response();
+    
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote listen done.\n");
+      rsr_size	      =	sctp_stream_response->recv_buf_size;
+      rss_size	      =	sctp_stream_response->send_buf_size;
+      rem_nodelay     =	sctp_stream_response->no_delay;
+      remote_cpu_usage=	sctp_stream_response->measure_cpu;
+      remote_cpu_rate = sctp_stream_response->cpu_rate;
+
+      /* we have to make sure that the server port number is in */
+      /* network order */
+      server.sin_port   = (short)sctp_stream_response->data_port_number;
+      server.sin_port   = htons(server.sin_port); 
+      rem_rcvavoid	= sctp_stream_response->so_rcvavoid;
+      rem_sndavoid	= sctp_stream_response->so_sndavoid;
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+
+    /*Connect up to the remote port on the data socket  */
+    if (connect(send_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server)) == INVALID_SOCKET){
+      perror("netperf: send_sctp_stream: data socket connect failed");
+      fprintf(stderr," port: %d\n",ntohs(server.sin_port));
+      fflush(stderr);
+      exit(1);
+    }
+
+    /* Data Socket set-up is finished. If there were problems, either */
+    /* the connect would have failed, or the previous response would */
+    /* have indicated a problem. I failed to see the value of the */
+    /* extra  message after the accept on the remote. If it failed, */
+    /* we'll see it here. If it didn't, we might as well start pumping */
+    /* data. */ 
+    
+    /* Set-up the test end conditions. For a stream test, they can be */
+    /* either time or byte-count based. */
+    
+    if (test_time) {
+      /* The user wanted to end the test after a period of time. */
+      times_up = 0;
+      bytes_remaining = 0;
+      /* in previous revisions, we had the same code repeated throught */
+      /* all the test suites. this was unnecessary, and meant more */
+      /* work for me when I wanted to switch to POSIX signals, so I */
+      /* have abstracted this out into a routine in netlib.c. if you */
+      /* are experiencing signal problems, you might want to look */
+      /* there. raj 11/94 */
+      start_timer(test_time);
+    }
+    else {
+      /* The tester wanted to send a number of bytes. */
+      bytes_remaining = test_bytes;
+      times_up = 1;
+    }
+    
+    /* The cpu_start routine will grab the current time and possibly */
+    /* value of the idle counter for later use in measuring cpu */
+    /* utilization and/or service demand and thruput. */
+    
+    cpu_start(local_cpu_usage);
+    
+#ifdef INTERVALS
+    if ((interval_burst) || (demo_mode)) {
+      /* zero means that we never pause, so we never should need the */
+      /* interval timer, unless we are in demo_mode */
+      start_itimer(interval_wate);
+    }
+    interval_count = interval_burst;
+    /* get the signal set for the call to sigsuspend */
+    if (sigprocmask(SIG_BLOCK, (sigset_t *)NULL, &signal_set) != 0) {
+      fprintf(where,
+	      "send_sctp_stream: unable to get sigmask errno %d\n",
+	      errno);
+      fflush(where);
+      exit(1);
+    }
+#endif /* INTERVALS */
+
+#ifdef DIRTY
+    /* initialize the random number generator for putting dirty stuff */
+    /* into the send buffer. raj */
+    srand((int) getpid());
+#endif
+    
+    /* before we start, initialize a few variables */
+
+    /* We use an "OR" to control test execution. When the test is */
+    /* controlled by time, the byte count check will always return false. */
+    /* When the test is controlled by byte count, the time test will */
+    /* always return false. When the test is finished, the whole */
+    /* expression will go false and we will stop sending data. */
+    
+    while ((!times_up) || (bytes_remaining > 0)) {
+      
+#ifdef DIRTY
+      /* we want to dirty some number of consecutive integers in the buffer */
+      /* we are about to send. we may also want to bring some number of */
+      /* them cleanly into the cache. The clean ones will follow any dirty */
+      /* ones into the cache. at some point, we might want to replace */
+      /* the rand() call with something from a table to reduce our call */
+      /* overhead during the test, but it is not a high priority item. */
+      message_int_ptr = (int *)(send_ring->buffer_ptr);
+      for (i = 0; i < loc_dirty_count; i++) {
+	*message_int_ptr = rand();
+	message_int_ptr++;
+      }
+      for (i = 0; i < loc_clean_count; i++) {
+	loc_dirty_count = *message_int_ptr;
+	message_int_ptr++;
+      }
+#endif /* DIRTY */
+      
+#ifdef HISTOGRAM
+      /* timestamp just before we go into send and then again just after */
+      /* we come out raj 8/94 */
+      HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+      
+      if((len=send(send_socket,
+		   send_ring->buffer_ptr,
+		   send_size,
+		   0)) != send_size) {
+      if ((len >=0) || SOCKET_EINTR(len)) {
+	    /* the test was interrupted, must be the end of test */
+	    break;
+	  }
+	perror("netperf: data send error");
+	printf("len was %d\n",len);
+	exit(1);
+      }
+
+#ifdef HISTOGRAM
+      /* timestamp the exit from the send call and update the histogram */
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */      
+
+#ifdef INTERVALS      
+      if (demo_mode) {
+	units_this_tick += send_size;
+      }
+      /* in this case, the interval count is the count-down couter */
+      /* to decide to sleep for a little bit */
+      if ((interval_burst) && (--interval_count == 0)) {
+	/* call sigsuspend and wait for the interval timer to get us */
+	/* out */
+	if (debug) {
+	  fprintf(where,"about to suspend\n");
+	  fflush(where);
+	}
+	if (sigsuspend(&signal_set) == EFAULT) {
+	  fprintf(where,
+		  "send_sctp_stream: fault with sigsuspend.\n");
+	  fflush(where);
+	  exit(1);
+	}
+	interval_count = interval_burst;
+      }
+#endif /* INTERVALS */
+      
+      /* now we want to move our pointer to the next position in the */
+      /* data buffer...we may also want to wrap back to the "beginning" */
+      /* of the bufferspace, so we will mod the number of messages sent */
+      /* by the send width, and use that to calculate the offset to add */
+      /* to the base pointer. */
+      nummessages++;          
+      send_ring = send_ring->next;
+      if (bytes_remaining) {
+	bytes_remaining -= send_size;
+      }
+    }
+
+    /* The test is over. Flush the buffers to the remote end. We do a */
+    /* graceful release to insure that all data has been taken by the */
+    /* remote. */ 
+
+    /* but first, if the verbosity is greater than 1, find-out what */
+    /* the SCTP maximum segment_size was (if possible) */
+    if (verbosity > 1) {
+      sctp_mss = -1;
+      get_sctp_info(send_socket,&sctp_mss);
+    }
+    
+    if (shutdown(send_socket,1) == SOCKET_ERROR) {
+      perror("netperf: cannot shutdown sctp stream socket");
+      exit(1);
+    }
+    
+    /* hang a recv() off the socket to block until the remote has */
+    /* brought all the data up into the application. it will do a */
+    /* shutdown to cause a FIN to be sent our way. We will assume that */
+    /* any exit from the recv() call is good... raj 4/93 */
+    
+    recv(send_socket, send_ring->buffer_ptr, send_size, 0);
+    
+    /* this call will always give us the elapsed time for the test, and */
+    /* will also store-away the necessaries for cpu utilization */
+    
+    cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being */
+						/* measured and how */
+						/* long did we really */
+						/* run? */
+    
+    /* we are finished with the socket, so close it to prevent hitting */
+    /* the limit on maximum open files. */
+
+    close(send_socket);
+
+    /* Get the statistics from the remote end. The remote will have */
+    /* calculated service demand and all those interesting things. If it */
+    /* wasn't supposed to care, it will return obvious values. */
+    
+    recv_response();
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote results obtained\n");
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+    
+    /* We now calculate what our thruput was for the test. In the future, */
+    /* we may want to include a calculation of the thruput measured by */
+    /* the remote, but it should be the case that for a SCTP stream test, */
+    /* that the two numbers should be *very* close... We calculate */
+    /* bytes_sent regardless of the way the test length was controlled. */
+    /* If it was time, we needed to, and if it was by bytes, the user may */
+    /* have specified a number of bytes that wasn't a multiple of the */
+    /* send_size, so we really didn't send what he asked for ;-) */
+    
+    bytes_sent	= ntohd(sctp_stream_result->bytes_received);
+
+    thruput	= calc_thruput(bytes_sent);
+    
+    if (local_cpu_usage || remote_cpu_usage) {
+      /* We must now do a little math for service demand and cpu */
+      /* utilization for the system(s) */
+      /* Of course, some of the information might be bogus because */
+      /* there was no idle counter in the kernel(s). We need to make */
+      /* a note of this for the user's benefit...*/
+      if (local_cpu_usage) {
+	
+	local_cpu_utilization	= calc_cpu_util(0.0);
+	local_service_demand	= calc_service_demand(bytes_sent,
+						      0.0,
+						      0.0,
+						      0);
+      }
+      else {
+	local_cpu_utilization	= (float) -1.0;
+	local_service_demand	= (float) -1.0;
+      }
+      
+      if (remote_cpu_usage) {
+	
+	remote_cpu_utilization	= sctp_stream_result->cpu_util;
+	remote_service_demand	= calc_service_demand(bytes_sent,
+						      0.0,
+						      remote_cpu_utilization,
+						      sctp_stream_result->num_cpus);
+      }
+      else {
+	remote_cpu_utilization = (float) -1.0;
+	remote_service_demand  = (float) -1.0;
+      }
+    }    
+    else {
+      /* we were not measuring cpu, for the confidence stuff, we */
+      /* should make it -1.0 */
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+
+    /* at this point, we want to calculate the confidence information. */
+    /* if debugging is on, calculate_confidence will print-out the */
+    /* parameters we pass it */
+    
+    calculate_confidence(confidence_iteration,
+			 elapsed_time,
+			 thruput,
+			 local_cpu_utilization,
+			 remote_cpu_utilization,
+			 local_service_demand,
+			 remote_service_demand);
+    
+    
+    confidence_iteration++;
+  }
+
+  /* at this point, we have finished making all the runs that we */
+  /* will be making. so, we should extract what the calcuated values */
+  /* are for all the confidence stuff. we could make the values */
+  /* global, but that seemed a little messy, and it did not seem worth */
+  /* all the mucking with header files. so, we create a routine much */
+  /* like calcualte_confidence, which just returns the mean values. */
+  /* raj 11/94 */
+
+  retrieve_confident_values(&elapsed_time,
+			    &thruput,
+			    &local_cpu_utilization,
+			    &remote_cpu_utilization,
+			    &local_service_demand,
+			    &remote_service_demand);
+
+  /* We are now ready to print all the information. If the user */
+  /* has specified zero-level verbosity, we will just print the */
+  /* local service demand, or the remote service demand. If the */
+  /* user has requested verbosity level 1, he will get the basic */
+  /* "streamperf" numbers. If the user has specified a verbosity */
+  /* of greater than 1, we will display a veritable plethora of */
+  /* background information from outside of this block as it it */
+  /* not cpu_measurement specific...  */
+
+  if (confidence < 0) {
+    /* we did not hit confidence, but were we asked to look for it? */
+    if (iteration_max > 1) {
+      display_confidence();
+    }
+  }
+
+  if (local_cpu_usage || remote_cpu_usage) {
+    local_cpu_method = format_cpu_method(cpu_method);
+    remote_cpu_method = format_cpu_method(sctp_stream_result->cpu_method);
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+		fprintf(where,
+		cpu_fmt_0,
+		local_service_demand,
+		local_cpu_method);
+      }
+      else {
+		fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand,
+		remote_cpu_method);
+      }
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+		fprintf(where,
+		cpu_title,
+		format_units(),
+		local_cpu_method,
+		remote_cpu_method);
+      }
+    
+      fprintf(where,
+	      cpu_fmt_1,		/* the format string */
+	      rsr_size,		        /* remote recvbuf size */
+	      lss_size,		        /* local sendbuf size */
+	      send_size,		/* how large were the sends */
+	      elapsed_time,		/* how long was the test */
+	      thruput, 		        /* what was the xfer rate */
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      thruput);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+		fprintf(where,tput_title,format_units());
+      }
+      fprintf(where,
+	      tput_fmt_1,		/* the format string */
+	      rsr_size, 		/* remote recvbuf size */
+	      lss_size, 		/* local sendbuf size */
+	      send_size,		/* how large were the sends */
+	      elapsed_time, 		/* how long did it take */
+	      thruput);/* how fast did it go */
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+   
+    /* this stuff needs to be worked-out in the presence of confidence */
+    /* intervals and multiple iterations of the test... raj 11/94 */
+ 
+    fprintf(where,
+	    ksink_fmt,
+	    "Bytes",
+	    "Bytes",
+	    "Bytes",
+	    local_send_align,
+	    remote_recv_align,
+	    local_send_offset,
+	    remote_recv_offset,
+	    bytes_sent,
+	    bytes_sent / (double)nummessages,
+	    nummessages,
+	    bytes_sent / (double)sctp_stream_result->recv_calls,
+	    sctp_stream_result->recv_calls);
+    fprintf(where,
+	    ksink_fmt2,
+	    sctp_mss);
+    fflush(where);
+#ifdef HISTOGRAM
+    fprintf(where,"\n\nHistogram of time spent in send() call.\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+  }
+  
+}
+
+#endif				/* DO_SCTP */
 
 
 
@@ -648,6 +1564,7 @@ Size (bytes)\n\
     /*set up the data socket                        */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
+				     IPPROTO_TCP,
 				     local_data_ip,
 				     local_data_port);
     
@@ -1210,6 +2127,748 @@ Size (bytes)\n\
 }
 
 
+#ifdef DO_SCTP
+
+/* This routine implements the netperf-side SCTP unidirectional data
+   transfer test (a.k.a. stream) for the sockets interface where the
+   data flow is from the netserver to the netperf.  It receives its
+   parameters via global variables from the shell and writes its
+   output to the standard output. */
+
+
+void 
+send_sctp_maerts(char remote_host[])
+{
+  
+  char *tput_title = "\
+Recv   Send    Send                          \n\
+Socket Socket  Message  Elapsed              \n\
+Size   Size    Size     Time     Throughput  \n\
+bytes  bytes   bytes    secs.    %s/sec  \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1 =
+    "%6d %6d %6d    %-6.2f   %7.2f   \n";
+  
+  char *cpu_title = "\
+Recv   Send    Send                          Utilization       Service Demand\n\
+Socket Socket  Message  Elapsed              Send     Recv     Send    Recv\n\
+Size   Size    Size     Time     Throughput  local    remote   local   remote\n\
+bytes  bytes   bytes    secs.    %-8.8s/s  %% %c      %% %c      us/KB   us/KB\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f %c\n";
+
+  char *cpu_fmt_1 =
+    "%6d %6d %6d    %-6.2f     %7.2f   %-6.2f   %-6.2f   %-6.3f  %-6.3f\n";
+  
+  char *ksink_fmt = "\n\
+Alignment      Offset         %-8.8s %-8.8s    Recvs   %-8.8s Sends\n\
+Local  Remote  Local  Remote  Xfered   Per                 Per\n\
+Recv   Send    Recv   Send             Recv (avg)          Send (avg)\n\
+%5d   %5d  %5d   %5d %6.4g  %6.2f    %6d   %6.2f %6d\n";
+
+  char *ksink_fmt2 = "\n\
+Maximum\n\
+Segment\n\
+Size (bytes)\n\
+%6d\n";
+  
+  
+  float			elapsed_time;
+  
+#ifdef INTERVALS
+  int interval_count;
+  sigset_t signal_set;
+#endif
+  
+  /* what we want is to have a buffer space that is at least one */
+  /* recv-size greater than our recv window. this will insure that we */
+  /* are never trying to re-use a buffer that may still be in the hands */
+  /* of the transport. This buffer will be malloc'd after we have found */
+  /* the size of the local senc socket buffer. We will want to deal */
+  /* with alignment and offset concerns as well. */
+  
+#ifdef DIRTY
+  int	*message_int_ptr;
+#endif
+
+  struct ring_elt *recv_ring;
+  
+  int len;
+  unsigned int nummessages = 0;
+  SOCKET recv_socket;
+  int bytes_remaining;
+  int sctp_mss = -1;  // possibly uninitialized on printf far below
+
+  /* with links like fddi, one can recv > 32 bits worth of bytes */
+  /* during a test... ;-) at some point, this should probably become a */
+  /* 64bit integral type, but those are not entirely common yet */
+  double	bytes_sent = 0.0;
+  
+#ifdef DIRTY
+  int	i;
+#endif /* DIRTY */
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  unsigned      int             addr;
+  
+  struct	sctp_maerts_request_struct	*sctp_maerts_request;
+  struct	sctp_maerts_response_struct	*sctp_maerts_response;
+  struct	sctp_maerts_results_struct	*sctp_maerts_result;
+  
+  sctp_maerts_request  = 
+    (struct sctp_maerts_request_struct *)netperf_request.content.test_specific_data;
+  sctp_maerts_response =
+    (struct sctp_maerts_response_struct *)netperf_response.content.test_specific_data;
+  sctp_maerts_result   = 
+    (struct sctp_maerts_results_struct *)netperf_response.content.test_specific_data;
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+  
+  bzero((char *)&server,
+	sizeof(server));
+
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+  
+  if ( print_headers ) {
+    /* we want to have some additional, interesting information in */
+    /* the headers. we know some of it here, but not all, so we will */
+    /* only print the test title here and will print the results */
+    /* titles after the test is finished */
+    fprintf(where,"SCTP MAERTS TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+
+  recv_ring = NULL;
+  confidence_iteration = 1;
+  init_stat();
+
+  /* we have a great-big while loop which controls the number of times */
+  /* we run a particular test. this is for the calculation of a */
+  /* confidence interval (I really should have stayed awake during */
+  /* probstats :). If the user did not request confidence measurement */
+  /* (no confidence is the default) then we will only go though the */
+  /* loop once. the confidence stuff originates from the folks at IBM */
+
+  while (((confidence < 0) && (confidence_iteration < iteration_max)) ||
+	 (confidence_iteration <= iteration_min)) {
+
+    /* initialize a few counters. we have to remember that we might be */
+    /* going through the loop more than once. */
+    
+    nummessages    =	0;
+    bytes_sent     =	0.0;
+    times_up       = 	0;
+    
+    /*set up the data socket                        */
+    recv_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP,
+				     local_data_ip,
+				     local_data_port);
+    
+    if (recv_socket == INVALID_SOCKET){
+      perror("netperf: send_sctp_maerts: sctp stream data socket");
+      exit(1);
+    }
+    
+    if (debug) {
+      fprintf(where,"send_sctp_maerts: recv_socket obtained...\n");
+    }
+
+    /* at this point, we have either retrieved the socket buffer sizes, */
+    /* or have tried to set them, so now, we may want to set the recv */
+    /* size based on that (because the user either did not use a -m */
+    /* option, or used one with an argument of 0). If the socket buffer */
+    /* size is not available, we will set the recv size to 4KB - no */
+    /* particular reason, just arbitrary... */
+    if (recv_size == 0) {
+      if (lsr_size > 0) {
+	recv_size = lsr_size;
+      }
+      else {
+	recv_size = 4096;
+      }
+    }
+
+    /* set-up the data buffer ring with the requested alignment and offset. */
+    /* note also that we have allocated a quantity */
+    /* of memory that is at least one recv-size greater than our socket */
+    /* buffer size. We want to be sure that there are at least two */
+    /* buffers allocated - this can be a bit of a problem when the */
+    /* recv_size is bigger than the socket size, so we must check... the */
+    /* user may have wanted to explicitly set the "width" of our recv */
+    /* buffers, we should respect that wish... */
+    if (recv_width == 0) {
+      recv_width = (lsr_size/recv_size) + 1;
+      if (recv_width == 1) recv_width++;
+    }
+    
+    if (recv_ring == NULL) {
+      /* only allocate the recv ring once. this is a networking test, */
+      /* not a memory allocation test. this way, we do not need a */
+      /* deallocate_buffer_ring() routine, and I don't feel like */
+      /* writing one anyway :) raj 11/94 */
+      recv_ring = allocate_buffer_ring(recv_width,
+				       recv_size,
+				       local_recv_align,
+				       local_recv_offset);
+    }
+
+    /* If the user has requested cpu utilization measurements, we must */
+    /* calibrate the cpu(s). We will perform this task within the tests */
+    /* themselves. If the user has specified the cpu rate, then */
+    /* calibrate_local_cpu will return rather quickly as it will have */
+    /* nothing to do. If local_cpu_rate is zero, then we will go through */
+    /* all the "normal" calibration stuff and return the rate back. */
+    
+    if (local_cpu_usage) {
+      local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+    }
+    
+    /* Tell the remote end to do a listen. The server alters the socket */
+    /* paramters on the other side at this point, hence the reason for */
+    /* all the values being passed in the setup message. If the user did */
+    /* not specify any of the parameters, they will be passed as 0, which */
+    /* will indicate to the remote that no changes beyond the system's */
+    /* default should be used. Alignment is the exception, it will */
+    /* default to 1, which will be no alignment alterations. */
+    
+    netperf_request.content.request_type	=	DO_SCTP_MAERTS;
+    sctp_maerts_request->send_buf_size	=	rss_size;
+    sctp_maerts_request->recv_buf_size	=	rsr_size;
+    sctp_maerts_request->send_size	=	send_size;
+    sctp_maerts_request->no_delay	=	rem_nodelay;
+    sctp_maerts_request->send_alignment	=	remote_send_align;
+    sctp_maerts_request->send_offset	=	remote_send_offset;
+    sctp_maerts_request->measure_cpu	=	remote_cpu_usage;
+    sctp_maerts_request->cpu_rate	=	remote_cpu_rate;
+    if (test_time) {
+      sctp_maerts_request->test_length	=	test_time;
+    }
+    else {
+      sctp_maerts_request->test_length	=	test_bytes;
+    }
+    sctp_maerts_request->so_rcvavoid	=	rem_rcvavoid;
+    sctp_maerts_request->so_sndavoid	=	rem_sndavoid;
+#ifdef DIRTY
+    sctp_maerts_request->dirty_count	=	rem_dirty_count;
+    sctp_maerts_request->clean_count	=	rem_clean_count;
+#endif /* DIRTY */
+    sctp_maerts_request->port		=	(int) remote_data_port;
+    sctp_maerts_request->ipaddress	=	remote_data_ip;
+    
+    if (debug > 1) {
+      fprintf(where,
+	      "netperf: send_sctp_maerts: requesting SCTP maerts test\n");
+    }
+    
+    send_request();
+    
+    /* The response from the remote will contain all of the relevant 	*/
+    /* socket parameters for this test type. We will put them back into */
+    /* the variables here so they can be displayed if desired.  The	*/
+    /* remote will have calibrated CPU if necessary, and will have done	*/
+    /* all the needed set-up we will have calibrated the cpu locally	*/
+    /* before sending the request, and will grab the counter value right*/
+    /* after the connect returns. The remote will grab the counter right*/
+    /* after the accept call. This saves the hassle of extra messages	*/
+    /* being sent for the SCTP tests.					*/
+    
+    recv_response();
+    
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote listen done.\n");
+      rsr_size	      =	sctp_maerts_response->recv_buf_size;
+      rss_size	      =	sctp_maerts_response->send_buf_size;
+      rem_nodelay     =	sctp_maerts_response->no_delay;
+      remote_cpu_usage=	sctp_maerts_response->measure_cpu;
+      remote_cpu_rate = sctp_maerts_response->cpu_rate;
+      send_size       = sctp_maerts_response->send_size;
+
+      /* we have to make sure that the server port number is in */
+      /* network order */
+      server.sin_port   = (short)sctp_maerts_response->data_port_number;
+      server.sin_port   = htons(server.sin_port); 
+      rem_rcvavoid	= sctp_maerts_response->so_rcvavoid;
+      rem_sndavoid	= sctp_maerts_response->so_sndavoid;
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+
+    /*Connect up to the remote port on the data socket  */
+    if (connect(recv_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server)) == INVALID_SOCKET){
+      perror("netperf: send_sctp_maerts: data socket connect failed");
+      printf(" port: %d\n",ntohs(server.sin_port));
+      exit(1);
+    }
+
+    /* Data Socket set-up is finished. If there were problems, either */
+    /* the connect would have failed, or the previous response would */
+    /* have indicated a problem. I failed to see the value of the */
+    /* extra  message after the accept on the remote. If it failed, */
+    /* we'll see it here. If it didn't, we might as well start pumping */
+    /* data. */ 
+    
+    /* Set-up the test end conditions. For a maerts test, they can be */
+    /* either time or byte-count based. */
+    
+    if (test_time) {
+      /* The user wanted to end the test after a period of time. */
+      times_up = 0;
+      bytes_remaining = 0;
+      /* in previous revisions, we had the same code repeated throught */
+      /* all the test suites. this was unnecessary, and meant more */
+      /* work for me when I wanted to switch to POSIX signals, so I */
+      /* have abstracted this out into a routine in netlib.c. if you */
+      /* are experiencing signal problems, you might want to look */
+      /* there. raj 11/94 */
+      start_timer(test_time + PAD_TIME);
+    }
+    else {
+      /* The tester wanted to recv a number of bytes. we don't do that 
+	 in a SCTP_MAERTS test. sorry. raj 2002-06-21 */
+      printf("netperf: send_sctp_maerts: test must be timed\n");
+      exit(1);
+    }
+    
+    /* The cpu_start routine will grab the current time and possibly */
+    /* value of the idle counter for later use in measuring cpu */
+    /* utilization and/or service demand and thruput. */
+    
+    cpu_start(local_cpu_usage);
+    
+#ifdef INTERVALS
+    if ((interval_burst) || (demo_mode)) {
+      /* zero means that we never pause, so we never should need the */
+      /* interval timer, unless we are in demo_mode */
+      start_itimer(interval_wate);
+    }
+    interval_count = interval_burst;
+    /* get the signal set for the call to sigsuspend */
+    if (sigprocmask(SIG_BLOCK, (sigset_t *)NULL, &signal_set) != 0) {
+      fprintf(where,
+	      "send_sctp_maerts: unable to get sigmask errno %d\n",
+	      errno);
+      fflush(where);
+      exit(1);
+    }
+#endif /* INTERVALS */
+
+#ifdef DIRTY
+    /* initialize the random number generator for putting dirty stuff */
+    /* into the recv buffer. raj */
+    srand((int) getpid());
+#endif
+    
+    /* before we start, initialize a few variables */
+
+    /* the test will continue until we either get a zero-byte recv()
+       on the socket or our failsafe timer expires. most of the time
+       we trust that we get a zero-byte recieve from the socket. raj
+       2002-06-21 */
+
+#ifdef DIRTY
+      /* we want to dirty some number of consecutive integers in the buffer */
+      /* we are about to recv. we may also want to bring some number of */
+      /* them cleanly into the cache. The clean ones will follow any dirty */
+      /* ones into the cache. at some point, we might want to replace */
+      /* the rand() call with something from a table to reduce our call */
+      /* overhead during the test, but it is not a high priority item. */
+      message_int_ptr = (int *)(recv_ring->buffer_ptr);
+      for (i = 0; i < loc_dirty_count; i++) {
+	*message_int_ptr = rand();
+	message_int_ptr++;
+      }
+      for (i = 0; i < loc_clean_count; i++) {
+	loc_dirty_count = *message_int_ptr;
+	message_int_ptr++;
+      }
+#endif /* DIRTY */
+      
+#ifdef HISTOGRAM
+      /* timestamp just before we go into recv and then again just after */
+      /* we come out raj 8/94 */
+      HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+    
+    while ((len=recv(recv_socket,
+		   recv_ring->buffer_ptr,
+		   recv_size,
+		   0)) > 0 ) {
+#ifdef HISTOGRAM
+      /* timestamp the exit from the recv call and update the histogram */
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */      
+
+#ifdef INTERVALS      
+      if (demo_mode) {
+	units_this_tick += recv_size;
+      }
+      /* in this case, the interval count is the count-down couter */
+      /* to decide to sleep for a little bit */
+      if ((interval_burst) && (--interval_count == 0)) {
+	/* call sigsuspend and wait for the interval timer to get us */
+	/* out */
+	if (debug) {
+	  fprintf(where,"about to suspend\n");
+	  fflush(where);
+	}
+	if (sigsuspend(&signal_set) == EFAULT) {
+	  fprintf(where,
+		  "send_sctp_maerts: fault with sigsuspend.\n");
+	  fflush(where);
+	  exit(1);
+	}
+	interval_count = interval_burst;
+      }
+#endif /* INTERVALS */
+      
+      /* now we want to move our pointer to the next position in the */
+      /* data buffer...we may also want to wrap back to the "beginning" */
+      /* of the bufferspace, so we will mod the number of messages sent */
+      /* by the recv width, and use that to calculate the offset to add */
+      /* to the base pointer. */
+      nummessages++;          
+      recv_ring = recv_ring->next;
+      if (bytes_remaining) {
+	bytes_remaining -= recv_size;
+      }
+
+#ifdef HISTOGRAM
+      /* make sure we timestamp just before we go into recv  */
+      /* raj 2004-06-15 */
+      HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+    
+    }
+
+    if ((len < 0) || SOCKET_EINTR(len)) {
+      perror("netperf: data recv error");
+      printf("len was %d\n",len);
+      exit(1);
+    }
+    
+    /* if we get here, it must mean we had a recv return of 0 before
+       the watchdog timer expired */
+
+    /* The test is over. Flush the buffers to the remote end. We do a
+       graceful release to tell the  remote we have all the data. */  
+
+    /* but first, if the verbosity is greater than 1, find-out what */
+    /* the SCTP maximum segment_size was (if possible) */
+    if (verbosity > 1) {
+      sctp_mss = -1;
+      get_sctp_info(recv_socket,&sctp_mss);
+    }
+    
+    if (shutdown(recv_socket,1) == SOCKET_ERROR) {
+      perror("netperf: cannot shutdown sctp maerts socket");
+      exit(1);
+    }
+
+    stop_timer();
+    
+    /* this call will always give us the local elapsed time for the
+       test, and will also store-away the necessaries for cpu
+       utilization */ 
+    
+    cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being */
+						/* measured and how */
+						/* long did we really */
+						/* run? */
+    
+    /* we are finished with the socket, so close it to prevent hitting */
+    /* the limit on maximum open files. */
+
+    close(recv_socket);
+
+    /* Get the statistics from the remote end. The remote will have */
+    /* calculated service demand and all those interesting things. If it */
+    /* wasn't supposed to care, it will return obvious values. */
+    
+    recv_response();
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote results obtained\n");
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+    
+    /* We now calculate what our thruput was for the test. In the future, */
+    /* we may want to include a calculation of the thruput measured by */
+    /* the remote, but it should be the case that for a SCTP maerts test, */
+    /* that the two numbers should be *very* close... We calculate */
+    /* bytes_sent regardless of the way the test length was controlled. */
+    /* If it was time, we needed to, and if it was by bytes, the user may */
+    /* have specified a number of bytes that wasn't a multiple of the */
+    /* recv_size, so we really didn't recv what he asked for ;-) */
+    
+    bytes_sent	= ntohd(sctp_maerts_result->bytes_sent);
+
+    thruput	= calc_thruput(bytes_sent);
+    
+    if (local_cpu_usage || remote_cpu_usage) {
+      /* We must now do a little math for service demand and cpu */
+      /* utilization for the system(s) */
+      /* Of course, some of the information might be bogus because */
+      /* there was no idle counter in the kernel(s). We need to make */
+      /* a note of this for the user's benefit...*/
+      if (local_cpu_usage) {
+	
+	local_cpu_utilization	= calc_cpu_util(0.0);
+	local_service_demand	= calc_service_demand(bytes_sent,
+						      0.0,
+						      0.0,
+						      0);
+      }
+      else {
+	local_cpu_utilization	= (float) -1.0;
+	local_service_demand	= (float) -1.0;
+      }
+      
+      if (remote_cpu_usage) {
+	
+	remote_cpu_utilization	= sctp_maerts_result->cpu_util;
+	remote_service_demand	= calc_service_demand(bytes_sent,
+						      0.0,
+						      remote_cpu_utilization,
+						      sctp_maerts_result->num_cpus);
+      }
+      else {
+	remote_cpu_utilization = (float) -1.0;
+	remote_service_demand  = (float) -1.0;
+      }
+    }    
+    else {
+      /* we were not measuring cpu, for the confidence stuff, we */
+      /* should make it -1.0 */
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+
+    /* at this point, we want to calculate the confidence information. */
+    /* if debugging is on, calculate_confidence will print-out the */
+    /* parameters we pass it */
+    
+    calculate_confidence(confidence_iteration,
+			 elapsed_time,
+			 thruput,
+			 local_cpu_utilization,
+			 remote_cpu_utilization,
+			 local_service_demand,
+			 remote_service_demand);
+    
+    
+    confidence_iteration++;
+  }
+
+  /* at this point, we have finished making all the runs that we */
+  /* will be making. so, we should extract what the calcuated values */
+  /* are for all the confidence stuff. we could make the values */
+  /* global, but that seemed a little messy, and it did not seem worth */
+  /* all the mucking with header files. so, we create a routine much */
+  /* like calcualte_confidence, which just returns the mean values. */
+  /* raj 11/94 */
+
+  retrieve_confident_values(&elapsed_time,
+			    &thruput,
+			    &local_cpu_utilization,
+			    &remote_cpu_utilization,
+			    &local_service_demand,
+			    &remote_service_demand);
+
+  /* We are now ready to print all the information. If the user */
+  /* has specified zero-level verbosity, we will just print the */
+  /* local service demand, or the remote service demand. If the */
+  /* user has requested verbosity level 1, he will get the basic */
+  /* "streamperf" numbers. If the user has specified a verbosity */
+  /* of greater than 1, we will display a veritable plethora of */
+  /* background information from outside of this block as it it */
+  /* not cpu_measurement specific...  */
+
+  if (confidence < 0) {
+    /* we did not hit confidence, but were we asked to look for it? */
+    if (iteration_max > 1) {
+      display_confidence();
+    }
+  }
+
+  if (local_cpu_usage || remote_cpu_usage) {
+    local_cpu_method = format_cpu_method(cpu_method);
+    remote_cpu_method = format_cpu_method(sctp_maerts_result->cpu_method);
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand,
+		local_cpu_method);
+      }
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand,
+		remote_cpu_method);
+      }
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		format_units(),
+		local_cpu_method,
+		remote_cpu_method);
+      }
+    
+      fprintf(where,
+	      cpu_fmt_1,		/* the format string */
+	      rsr_size,		        /* remote recvbuf size */
+	      lss_size,		        /* local sendbuf size */
+	      recv_size,		/* how large were the recvs */
+	      elapsed_time,		/* how long was the test */
+	      thruput, 		        /* what was the xfer rate */
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      thruput);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+      fprintf(where,
+	      tput_fmt_1,		/* the format string */
+	      lsr_size, 		/* local recvbuf size */
+	      rss_size, 		/* remot sendbuf size */
+	      send_size,		/* how large were the recvs */
+	      elapsed_time, 		/* how long did it take */
+	      thruput);/* how fast did it go */
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+   
+    /* this stuff needs to be worked-out in the presence of confidence */
+    /* intervals and multiple iterations of the test... raj 11/94 */
+ 
+    fprintf(where,
+	    ksink_fmt,
+	    "Bytes",
+	    "Bytes",
+	    "Bytes",
+	    local_recv_align,
+	    remote_recv_align,
+	    local_recv_offset,
+	    remote_recv_offset,
+	    bytes_sent,
+	    bytes_sent / (double)nummessages,
+	    nummessages,
+	    bytes_sent / (double)sctp_maerts_result->send_calls,
+	    sctp_maerts_result->send_calls);
+    fprintf(where,
+	    ksink_fmt2,
+	    sctp_mss);
+    fflush(where);
+#ifdef HISTOGRAM
+    fprintf(where,"\n\nHistogram of time spent in recv() call.\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+  }
+  
+}
+#endif				/* DO_SCTP */
+
 
 
 /* This routine implements the netperf-side TCP unidirectional data
@@ -1388,6 +3047,7 @@ Size (bytes)\n\
     /*set up the data socket                        */
     recv_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
+				     IPPROTO_TCP,
 				     local_data_ip,
 				     local_data_port);
     
@@ -1972,6 +3632,869 @@ sendpath(int s, char *path, off_t offset, size_t nbytes,
   }
 #endif /* QUICK_SENDPATH */
 
+#endif				/* defined(HAVE_SENDFILE) */
+
+
+#ifdef DO_SCTP
+
+#if defined(HAVE_SENDFILE)
+
+/* This routine implements the SCTP unidirectional data transfer test
+   (a.k.a. stream) for the sockets interface using the sendfile()
+   system call - SCTP_SENDFILE.  It receives its  parameters via global
+   variables from the shell and writes its  output to the standard
+   output. Basically,  this is the same test as the send_sctp_stream()
+   logic and we even tell the remote to do a SCTP_STREAM test since for 
+   all it knows, nothig is different. */
+
+void 
+sendfile_sctp_stream(remote_host)
+char	remote_host[];
+{
+  
+  char *tput_title = "\
+Recv   Send    Send                          \n\
+Socket Socket  Message  Elapsed              \n\
+Size   Size    Size     Time     Throughput  \n\
+bytes  bytes   bytes    secs.    %s/sec  \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1 =
+    "%6d %6d %6d    %-6.2f   %7.2f   \n";
+
+  char *cpu_title = "\
+Recv   Send    Send                          Utilization       Service Demand\n\
+Socket Socket  Message  Elapsed              Send     Recv     Send    Recv\n\
+Size   Size    Size     Time     Throughput  local    remote   local   remote\n\
+bytes  bytes   bytes    secs.    %-8.8s/s  %% %c      %% %c      us/KB   us/KB\n\n";
+
+  char *cpu_fmt_0 =
+    "%6.3f %c\n";
+  char *cpu_fmt_1 =
+    "%6d %6d %6d    %-6.2f     %7.2f   %-6.2f   %-6.2f   %-6.3f  %-6.3f\n";
+
+  char *ksink_fmt = "\n\
+Alignment      Offset         %-8.8s %-8.8s    Sends   %-8.8s Recvs\n\
+Local  Remote  Local  Remote  Xfered   Per                 Per\n\
+Send   Recv    Send   Recv             Send (avg)          Recv (avg)\n\
+%5d   %5d  %5d   %5d %6.4g  %6.2f    %6d   %6.2f %6d\n";
+
+char *ksink_fmt2 = "\n\
+Maximum\n\
+Segment\n\
+Size (bytes)\n\
+%6d\n";
+
+  float			elapsed_time;
+  
+#ifdef INTERVALS
+  int interval_count;
+  sigset_t signal_set;
+#endif
+  
+  /* what we want is to have a buffer space that is at least one */
+  /* send-size greater than our send window. this will insure that we */
+  /* are never trying to re-use a buffer that may still be in the hands */
+  /* of the transport. This buffer will be malloc'd after we have found */
+  /* the size of the local senc socket buffer. We will want to deal */
+  /* with alignment and offset concerns as well. */
+  
+#ifdef DIRTY
+  int	*message_int_ptr;
+#endif
+
+  struct sendfile_ring_elt *send_ring;
+  
+  int len;
+  unsigned int nummessages = 0;
+  SOCKET send_socket;
+  int bytes_remaining;
+  int sctp_mss = -1;  // possibly uninitialized on printf far below
+
+  /* with links like fddi, one can send > 32 bits worth of bytes */
+  /* during a test... ;-) at some point, this should probably become a */
+  /* 64bit integral type, but those are not entirely common yet */
+  double	bytes_sent = 0.0;
+  
+#ifdef DIRTY
+  int	i;
+#endif /* DIRTY */
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  unsigned      int             addr;
+
+#if defined(__linux) || defined(__SunOS_5_9)
+  off_t     scratch_offset;   /* the linux sendfile() call will update
+				 the offset variable, which is
+				 something we do _not_ want to happen
+				 to the value in the send_ring! so, we
+				 have to use a scratch variable. */
+#endif /* __linux  || defined(__SunOS_5_9) */
+  
+  struct	sctp_stream_request_struct	*sctp_stream_request;
+  struct	sctp_stream_response_struct	*sctp_stream_response;
+  struct	sctp_stream_results_struct	*sctp_stream_result;
+
+  sctp_stream_request  = 
+    (struct sctp_stream_request_struct *)netperf_request.content.test_specific_data;
+  sctp_stream_response =
+    (struct sctp_stream_response_struct *)netperf_response.content.test_specific_data;
+  sctp_stream_result   = 
+    (struct sctp_stream_results_struct *)netperf_response.content.test_specific_data;
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+  
+  bzero((char *)&server,
+	sizeof(server));
+  
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+
+  if ( print_headers ) {
+    /* we want to have some additional, interesting information in */
+    /* the headers. we know some of it here, but not all, so we will */
+    /* only print the test title here and will print the results */
+    /* titles after the test is finished */
+#ifdef QUICK_SENDPATH
+    fprintf(where,"SCTP SENDPATH TEST");
+#else
+    fprintf(where,"SCTP SENDFILE TEST");
+#endif /* QUICK_SENDPATH */
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+
+  send_ring = NULL;
+  confidence_iteration = 1;
+  init_stat();
+
+  /* we have a great-big while loop which controls the number of times */
+  /* we run a particular test. this is for the calculation of a */
+  /* confidence interval (I really should have stayed awake during */
+  /* probstats :). If the user did not request confidence measurement */
+  /* (no confidence is the default) then we will only go though the */
+  /* loop once. the confidence stuff originates from the folks at IBM */
+
+  while (((confidence < 0) && (confidence_iteration < iteration_max)) ||
+	 (confidence_iteration <= iteration_min)) {
+
+    /* initialize a few counters. we have to remember that we might be */
+    /* going through the loop more than once. */
+    
+    nummessages    =	0;
+    bytes_sent     =	0.0;
+    times_up       = 	0;
+    
+    /* set up the data socket */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP,
+				     local_data_ip,
+				     local_data_port);
+    if (send_socket == INVALID_SOCKET){
+      perror("netperf: sendfile_sctp_stream: sctp stream data socket");
+      exit(1);
+    }
+
+    if (debug) {
+      fprintf(where,"sendfile_sctp_stream: send_socket obtained...\n");
+    }
+
+#if defined(SCTP_CORK)
+
+    if (loc_sctpcork != 0) {
+      /* the user wishes for us to set SCTP_CORK on the socket */
+      int one = 1;
+      if (setsockopt(send_socket,
+		     SOL_SCTP,
+		     SCTP_CORK,
+		     (char *)&one,
+		     sizeof(one)) == SOCKET_ERROR) {
+	perror("netperf: sendfile_sctp_stream: sctp_cork");
+	exit(1);
+      }
+      if (debug) {
+	fprintf(where,"sendfile_sctp_stream: sctp_cork...\n");
+      }
+    }
+
+#endif /* SCTP_CORK */    
+
+    /* at this point, we have either retrieved the socket buffer sizes, */
+    /* or have tried to set them, so now, we may want to set the send */
+    /* size based on that (because the user either did not use a -m */
+    /* option, or used one with an argument of 0). If the socket buffer */
+    /* size is not available, we will set the send size to 4KB - no */
+    /* particular reason, just arbitrary... */
+
+    /*check for file size/ min file size here?  create file here/ back out???*/
+
+    if (send_size == 0) {
+      if (lss_size > 0) {
+	send_size = lss_size;
+      }
+      else {
+	send_size = 4096;
+      }
+    }
+   
+    /* set-up the data buffer ring with the requested alignment and
+       offset. note also that we have allocated a quantity  of memory
+       that is at least one send-size greater than our socket  buffer
+       size. We want to be sure that there are at least two  buffers
+       allocated - this can be a bit of a problem when the  send_size
+       is bigger than the socket size, so we must check... the  user
+       may have wanted to explicitly set the "width" of our send
+       buffers, we should respect that wish... */ 
+
+/*sendring -> an offset index that will shift the starting point of the*/
+/*section of the file sent throughout the file*/
+
+if (send_width == 0) {
+      send_width = (lss_size/send_size) + 1;
+      if (send_width == 1) send_width++;
+    }
+    
+    if (send_ring == NULL) { 
+
+      /* only allocate the send ring once. this is a networking test,
+	 not a memory allocation test. this way, we do not need a
+	 deallocate_buffer_ring() routine, and I don't feel like
+	 writing one anyway :) raj 11/94 */ 
+
+      send_ring = alloc_sendfile_buf_ring(send_width,
+					  send_size,
+					  local_send_align,
+					  local_send_offset);
+    }
+	
+    /* If the user has requested cpu utilization measurements, we must
+       calibrate the cpu(s). We will perform this task within the
+       tests  themselves. If the user has specified the cpu rate, then
+       calibrate_local_cpu will return rather quickly as it will have
+       nothing to do. If local_cpu_rate is zero, then we will go
+       through  all the "normal" calibration stuff and return the rate
+       back. */ 
+    
+    if (local_cpu_usage) {
+      local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+    }
+
+    /* Tell the remote end to do a listen. The server alters the
+       socket  paramters on the other side at this point, hence the
+       reason for  all the values being passed in the setup
+       message. If the user did  not specify any of the parameters,
+       they will be passed as 0, which  will indicate to the remote
+       that no changes beyond the system's  default should be
+       used. Alignment is the exception, it will  default to 1, which
+       will be no alignment alterations. */ 
+
+    netperf_request.content.request_type =	DO_SCTP_STREAM;
+    sctp_stream_request->send_buf_size	=	rss_size;
+    sctp_stream_request->recv_buf_size	=	rsr_size;
+    sctp_stream_request->receive_size	=	recv_size;
+    sctp_stream_request->no_delay	=	rem_nodelay;
+    sctp_stream_request->recv_alignment	=	remote_recv_align;
+    sctp_stream_request->recv_offset	=	remote_recv_offset;
+    sctp_stream_request->measure_cpu	=	remote_cpu_usage;
+    sctp_stream_request->cpu_rate	=	remote_cpu_rate;
+
+    if (test_time) {
+      sctp_stream_request->test_length	=	test_time;
+    }
+    else {
+      sctp_stream_request->test_length	=	test_bytes;
+    }
+
+    sctp_stream_request->so_rcvavoid	=	rem_rcvavoid;
+    sctp_stream_request->so_sndavoid	=	rem_sndavoid;
+
+#ifdef DIRTY
+    sctp_stream_request->dirty_count	=	rem_dirty_count;
+    sctp_stream_request->clean_count	=	rem_clean_count;
+#endif /* DIRTY */
+    
+    if (debug > 1) {
+      fprintf(where,
+	      "netperf: send_sctp_stream: requesting SCTP stream test\n");
+    }
+    
+    send_request();
+
+    /* The response from the remote will contain all of the relevant
+       socket parameters for this test type. We will put them back
+       into the variables here so they can be displayed if desired.
+       The remote will have calibrated CPU if necessary, and will have
+       done all the needed set-up we will have calibrated the cpu
+       locally before sending the request, and will grab the counter
+       value right after the connect returns. The remote will grab the
+       counter right after the accept call. This saves the hassle of
+       extra messages being sent for the SCTP tests.  */
+    
+    recv_response();
+
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote listen done.\n");
+      rsr_size	      =	sctp_stream_response->recv_buf_size;
+      rss_size	      =	sctp_stream_response->send_buf_size;
+      rem_nodelay     =	sctp_stream_response->no_delay;
+      remote_cpu_usage=	sctp_stream_response->measure_cpu;
+      remote_cpu_rate = sctp_stream_response->cpu_rate;
+
+      /* we have to make sure that the server port number is in */
+      /* network order */
+      server.sin_port   = (short)sctp_stream_response->data_port_number;
+      server.sin_port   = htons(server.sin_port); 
+      rem_rcvavoid	= sctp_stream_response->so_rcvavoid;
+      rem_sndavoid	= sctp_stream_response->so_sndavoid;
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+
+    /*Connect up to the remote port on the data socket  */
+    if (connect(send_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server)) == INVALID_SOCKET){
+      perror("netperf: send_sctp_stream: data socket connect failed");
+      printf(" port: %d\n",ntohs(server.sin_port));
+      exit(1);
+    }
+
+    /* Data Socket set-up is finished. If there were problems, either
+       the connect would have failed, or the previous response would
+       have indicated a problem. I failed to see the value of the
+       extra message after the accept on the remote. If it failed,
+       we'll see it here. If it didn't, we might as well start pumping
+       data. */
+
+    /* Set-up the test end conditions. For a stream test, they can be */
+    /* either time or byte-count based. */
+    
+    if (test_time) {
+      /* The user wanted to end the test after a period of time. */
+      times_up = 0;
+      bytes_remaining = 0;
+
+      /* in previous revisions, we had the same code repeated throught
+         all the test suites. this was unnecessary, and meant more
+         work for me when I wanted to switch to POSIX signals, so I
+         have abstracted this out into a routine in netlib.c. if you
+         are experiencing signal problems, you might want to look
+         there. raj 11/94 */
+
+      start_timer(test_time);
+    }
+    else {
+      /* The tester wanted to send a number of bytes. */
+      bytes_remaining = test_bytes;
+      times_up = 1;
+    }
+
+    /* The cpu_start routine will grab the current time and possibly */
+    /* value of the idle counter for later use in measuring cpu */
+    /* utilization and/or service demand and thruput. */
+    
+    cpu_start(local_cpu_usage);
+    
+#ifdef INTERVALS
+    if ((interval_burst) || (demo_mode)) {
+      /* zero means that we never pause, so we never should need the */
+      /* interval timer, unless we are in demo_mode */
+      start_itimer(interval_wate);
+    }
+
+    interval_count = interval_burst;
+
+    /* get the signal set for the call to sigsuspend */
+    
+    if (sigprocmask(SIG_BLOCK, (sigset_t *)NULL, &signal_set) != 0) {
+      fprintf(where,
+	      "send_udp_stream: unable to get sigmask errno %d\n",
+	      errno);
+      fflush(where);
+      exit(1);
+    }
+#endif /* INTERVALS */
+
+#ifdef DIRTY
+    /* initialize the random number generator for putting dirty stuff */
+    /* into the send buffer. raj */
+    /*    srand((int) getpid()); */
+#endif
+   
+    /* before we start, initialize a few variables */
+
+    /* We use an "OR" to control test execution. When the test is
+       controlled by time, the byte count check will always return
+       false. When the test is controlled by byte count, the time test
+       will always return false. When the test is finished, the whole
+       expression will go false and we will stop sending data. */
+    
+    while ((!times_up) || (bytes_remaining > 0)) {
+      
+      /* the sendfile_sctp_stream test does not support making the buffers
+	 dirty. 08/2000 */
+      
+#ifdef HISTOGRAM
+      
+      /* timestamp just before we go into sendfile() and then again just
+         after we come out raj 08/2000 */
+      
+      HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+      
+      /* you can look at netlib.h for a description of the fields we
+	 are passing to sendfile(). 08/2000 */
+#ifdef QUICK_SENDPATH
+      if ((len=sendpath(send_socket, 
+			fill_file,
+			send_ring->offset,
+			send_ring->length,
+			send_ring->hdtrl,
+			send_ring->flags)) != send_size)
+#elif defined(__linux)  || defined(__SunOS_5_9)
+	scratch_offset = send_ring->offset;
+	if ((len=sendfile(send_socket, 
+			  send_ring->fildes, 
+			  &scratch_offset,   /* modified after the call! */
+			  send_ring->length)) != send_size)
+#elif defined(__FreeBSD__)
+      /* so close to HP-UX and yet so far away... :) */
+      if ((sendfile(send_ring->fildes, 
+		    send_socket, 
+		    send_ring->offset,
+		    send_ring->length,
+		    NULL,
+		    (off_t *)&len,
+		    send_ring->flags) != 0) ||
+	  (len != send_size))
+#else /* original sendile HP-UX */
+      if ((len=sendfile(send_socket, 
+			send_ring->fildes, 
+			send_ring->offset,
+			send_ring->length,
+			send_ring->hdtrl,
+			send_ring->flags)) != send_size)
+#endif /* QUICK_SENDPATH */
+	  {
+	    /* the test was interrupted, must be the end of test. the
+	    send_sctp_stream code has some WIN32 ifdefs that we do not
+	    need here. */
+ 		if ((len >=0) || SOCKET_EINTR(len)) {
+	      break;
+		}
+        perror("netperf: data send error: sendfile");
+        fprintf(stderr,
+	        "len was %d send_size was %d\n",
+	        len,
+	        send_size);
+        fflush(stderr);
+        exit(1);
+      }
+    
+/*	offset += len;*/
+
+#ifdef HISTOGRAM
+      /* timestamp the exit from the send call and update the histogram */
+      
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+
+#endif /* HISTOGRAM */      
+
+#ifdef INTERVALS      
+      if (demo_mode) {
+	units_this_tick += send_size;
+      }
+      
+      /* in this case, the interval count is the count-down couter */
+      /* to decide to sleep for a little bit */
+      
+      if ((interval_burst) && (--interval_count == 0)) {
+	
+	/* call sigsuspend and wait for the interval timer to get us */
+	/* out */
+	
+	if (debug) {
+	  fprintf(where,"about to suspend\n");
+	  fflush(where);
+	}
+	
+	if (sigsuspend(&signal_set) == EFAULT) {
+	  fprintf(where,
+		  "send_udp_stream: fault with sigsuspend.\n");
+	  fflush(where);
+	  exit(1);
+	}
+	
+	interval_count = interval_burst;
+      }
+
+#endif /* INTERVALS */
+      
+      /* now we want to move our pointer to the next position in the */
+      /* data buffer...we may also want to wrap back to the "beginning" */
+      /* of the bufferspace, so we will mod the number of messages sent */
+      /* by the send width, and use that to calculate the offset to add */
+      /* to the base pointer. */
+
+      nummessages++;          
+      send_ring = send_ring->next; 
+      if (bytes_remaining) {
+	bytes_remaining -= send_size;
+      }
+    }
+
+    /* The test is over. Flush the buffers to the remote end. We do a
+       graceful release to insure that all data has been taken by the
+       remote. */
+
+    /* but first, if the verbosity is greater than 1, find-out what */
+    /* the SCTP maximum segment_size was (if possible) */
+    if (verbosity > 1) {
+      sctp_mss = -1;
+      get_sctp_info(send_socket,&sctp_mss);
+    }
+    
+    if (shutdown(send_socket,1) == SOCKET_ERROR) {
+      perror("netperf: cannot shutdown sctp stream socket");
+      exit(1);
+    }
+    
+    /* hang a recv() off the socket to block until the remote has */
+    /* brought all the data up into the application. it will do a */
+    /* shutdown to cause a FIN to be sent our way. We will assume that */
+    /* any exit from the recv() call is good... raj 4/93 */
+
+    /* since we are using sendfile() instead of send, we have no
+       scratch buffer from the send_ring to use for the
+       receive. however, since we "know" that the recv should be
+       returning zero bytes (not that we are making the checks we
+       should) we can pass the address of the flags field. raj 08/2000 
+    */
+
+    recv(send_socket,
+	 &(send_ring->flags), 
+	 sizeof(send_ring->flags),
+	 0);
+    
+    /* this call will always give us the elapsed time for the test, and */
+    /* will also store-away the necessaries for cpu utilization */
+    
+    cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being */
+						/* measured and how */
+						/* long did we really */
+						/* run? */
+    
+    /* we are finished with the socket, so close it to prevent hitting */
+    /* the limit on maximum open files. */
+
+    close(send_socket);
+
+    /* Get the statistics from the remote end. The remote will have */
+    /* calculated service demand and all those interesting things. If it */
+    /* wasn't supposed to care, it will return obvious values. */
+    
+    recv_response();
+
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote results obtained\n");
+    }
+
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+    
+    /* We now calculate what our thruput was for the test. In the future, */
+    /* we may want to include a calculation of the thruput measured by */
+    /* the remote, but it should be the case that for a SCTP stream test, */
+    /* that the two numbers should be *very* close... We calculate */
+    /* bytes_sent regardless of the way the test length was controlled. */
+    /* If it was time, we needed to, and if it was by bytes, the user may */
+    /* have specified a number of bytes that wasn't a multiple of the */
+    /* send_size, so we really didn't send what he asked for ;-) */
+    
+    bytes_sent	= ntohd(sctp_stream_result->bytes_received);
+
+    thruput	= calc_thruput(bytes_sent);
+    
+    if (local_cpu_usage || remote_cpu_usage) {
+
+      /* We must now do a little math for service demand and cpu */
+      /* utilization for the system(s) */
+      /* Of course, some of the information might be bogus because */
+      /* there was no idle counter in the kernel(s). We need to make */
+      /* a note of this for the user's benefit...*/
+      if (local_cpu_usage) {
+	
+	local_cpu_utilization	= calc_cpu_util(0.0);
+	local_service_demand	= calc_service_demand(bytes_sent,
+						      0.0,
+						      0.0,
+						      0);
+      }
+      else {
+	local_cpu_utilization	= (float) -1.0;
+	local_service_demand	= (float) -1.0;
+      }
+      
+      if (remote_cpu_usage) {
+	
+	remote_cpu_utilization	= sctp_stream_result->cpu_util;
+	remote_service_demand	= calc_service_demand(bytes_sent,
+						      0.0,
+						      remote_cpu_utilization,
+						      sctp_stream_result->num_cpus);
+      }
+      else {
+	remote_cpu_utilization = (float) -1.0;
+	remote_service_demand  = (float) -1.0;
+      }
+    }    
+    else {
+      /* we were not measuring cpu, for the confidence stuff, we */
+      /* should make it -1.0 */
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+
+    /* at this point, we want to calculate the confidence information. */
+    /* if debugging is on, calculate_confidence will print-out the */
+    /* parameters we pass it */
+    
+    calculate_confidence(confidence_iteration,
+			 elapsed_time,
+			 thruput,
+			 local_cpu_utilization,
+			 remote_cpu_utilization,
+			 local_service_demand,
+			 remote_service_demand);
+    
+    confidence_iteration++;
+  }
+
+  /* at this point, we have finished making all the runs that we */
+  /* will be making. so, we should extract what the calcuated values */
+  /* are for all the confidence stuff. we could make the values */
+  /* global, but that seemed a little messy, and it did not seem worth */
+  /* all the mucking with header files. so, we create a routine much */
+  /* like calcualte_confidence, which just returns the mean values. */
+  /* raj 11/94 */
+
+  retrieve_confident_values(&elapsed_time,
+			    &thruput,
+			    &local_cpu_utilization,
+			    &remote_cpu_utilization,
+			    &local_service_demand,
+			    &remote_service_demand);
+
+  /* We are now ready to print all the information. If the user */
+  /* has specified zero-level verbosity, we will just print the */
+  /* local service demand, or the remote service demand. If the */
+  /* user has requested verbosity level 1, he will get the basic */
+  /* "streamperf" numbers. If the user has specified a verbosity */
+  /* of greater than 1, we will display a veritable plethora of */
+  /* background information from outside of this block as it it */
+  /* not cpu_measurement specific...  */
+
+  if (confidence < 0) {
+    /* we did not hit confidence, but were we asked to look for it? */
+    if (iteration_max > 1) {
+      display_confidence();
+    }
+  }
+
+  if (local_cpu_usage || remote_cpu_usage) {
+    local_cpu_method = format_cpu_method(cpu_method);
+    remote_cpu_method = format_cpu_method(sctp_stream_result->cpu_method);
+    
+    switch (verbosity) {
+    case 0:
+
+    if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand,
+		local_cpu_method);
+      }
+
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand,
+		remote_cpu_method);
+      }
+
+      break;
+
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		format_units(),
+		local_cpu_method,
+		remote_cpu_method);
+      }
+    
+      fprintf(where,
+	      cpu_fmt_1,		/* the format string */
+	      rsr_size,		        /* remote recvbuf size */
+	      lss_size,		        /* local sendbuf size */
+	      send_size,		/* how large were the sends */
+	      elapsed_time,		/* how long was the test */
+	      thruput, 		        /* what was the xfer rate */
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      break;
+    }
+
+  }
+
+  else {
+    /* The tester did not wish to measure service demand. */
+    
+    switch (verbosity) {
+ 
+    case 0:
+
+      fprintf(where,
+	      tput_fmt_0,
+	      thruput);
+      break;
+
+    case 1:
+    case 2:
+
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+
+      fprintf(where,
+	      tput_fmt_1,		/* the format string */
+	      rsr_size, 		/* remote recvbuf size */
+	      lss_size, 		/* local sendbuf size */
+	      send_size,		/* how large were the sends */
+	      elapsed_time, 		/* how long did it take */
+	      thruput);/* how fast did it go */
+      break;
+    }
+  }
+
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+    if (verbosity > 1) {
+
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+   
+    /* this stuff needs to be worked-out in the presence of confidence */
+    /* intervals and multiple iterations of the test... raj 11/94 */
+ 
+    fprintf(where,
+	    ksink_fmt,
+	    "Bytes",
+	    "Bytes",
+	    "Bytes",
+	    local_send_align,
+	    remote_recv_align,
+	    local_send_offset,
+	    remote_recv_offset,
+	    bytes_sent,
+	    bytes_sent / (double)nummessages,
+	    nummessages,
+	    bytes_sent / (double)sctp_stream_result->recv_calls,
+	    sctp_stream_result->recv_calls);
+
+    fprintf(where,
+	    ksink_fmt2,
+	    sctp_mss);
+
+    fflush(where);
+
+#ifdef HISTOGRAM
+
+    fprintf(where,"\n\nHistogram of time spent in send() call.\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+  }
+}
+
+#endif				/* defined(HAVE_SENDFILE) */
+
+#endif				/* DO_SCTP */
+
+
+#if defined(HAVE_SENDFILE)
+
 /* This routine implements the TCP unidirectional data transfer test
    (a.k.a. stream) for the sockets interface using the sendfile()
    system call - TCP_SENDFILE.  It receives its  parameters via global
@@ -2161,6 +4684,7 @@ Size (bytes)\n\
     /* set up the data socket */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
+				     IPPROTO_TCP,
 				     local_data_ip,
 				     local_data_port);
     if (send_socket == INVALID_SOCKET){
@@ -2178,7 +4702,7 @@ Size (bytes)\n\
       /* the user wishes for us to set TCP_CORK on the socket */
       int one = 1;
       if (setsockopt(send_socket,
-		     getprotobyname("tcp")->p_proto,
+		     SOL_TCP,
 		     TCP_CORK,
 		     (char *)&one,
 		     sizeof(one)) == SOCKET_ERROR) {
@@ -2821,6 +5345,349 @@ if (send_width == 0) {
 }
 
 #endif /* HAVE_SENDFILE */
+
+#ifdef DO_SCTP
+
+/* This is the server-side routine for the sctp stream test. It is */
+/* implemented as one routine. I could break things-out somewhat, but */
+/* didn't feel it was necessary. */
+
+void
+recv_sctp_stream()
+{
+  
+  struct sockaddr_in myaddr_in, peeraddr_in;
+  SOCKET s_listen,s_data;
+  int 	addrlen;
+  int	len;
+  unsigned int	receive_calls;
+  float	elapsed_time;
+  double   bytes_received;
+  
+  struct ring_elt *recv_ring;
+
+#ifdef DIRTY
+  int   *message_int_ptr;
+  int   dirty_count;
+  int   clean_count;
+  int   i;
+#endif
+  
+#ifdef DO_SELECT
+  fd_set readfds;
+  struct timeval timeout;
+#endif /* DO_SELECT */
+
+  struct	sctp_stream_request_struct	*sctp_stream_request;
+  struct	sctp_stream_response_struct	*sctp_stream_response;
+  struct	sctp_stream_results_struct	*sctp_stream_results;
+  
+#ifdef DO_SELECT
+  FD_ZERO(&readfds);
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+#endif /* DO_SELECT */
+
+  sctp_stream_request	= 
+    (struct sctp_stream_request_struct *)netperf_request.content.test_specific_data;
+  sctp_stream_response	= 
+    (struct sctp_stream_response_struct *)netperf_response.content.test_specific_data;
+  sctp_stream_results	= 
+    (struct sctp_stream_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_stream: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired */
+  /* parameters and then let the initiator know that all is ready. If */
+  /* socket size defaults are to be used, then the initiator will have */
+  /* sent us 0's. If the socket sizes cannot be changed, then we will */
+  /* send-back what they are. If that information cannot be determined, */
+  /* then we send-back -1's for the sizes. If things go wrong for any */
+  /* reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It */
+  /* would be best if the error that the remote reports to the user is */
+  /* the actual error we encountered, rather than some bogus unexpected */
+  /* response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_stream: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_STREAM_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_stream: the response type is set...\n");
+    fflush(where);
+  }
+  
+  /* We now alter the message_ptr variable to be at the desired */
+  /* alignment with the desired offset. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_stream: requested alignment of %d\n",
+	    sctp_stream_request->recv_alignment);
+    fflush(where);
+  }
+
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_stream_request->send_buf_size;
+  lsr_size_req = sctp_stream_request->recv_buf_size;
+  loc_nodelay = sctp_stream_request->no_delay;
+  loc_rcvavoid = sctp_stream_request->so_rcvavoid;
+  loc_sndavoid = sctp_stream_request->so_sndavoid;
+
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP,
+				sctp_stream_request->ipaddress,
+				sctp_stream_request->port);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    exit(1);
+  }
+  
+  /* what sort of sizes did we end-up with? */
+  if (sctp_stream_request->receive_size == 0) {
+    if (lsr_size > 0) {
+      recv_size = lsr_size;
+    }
+    else {
+      recv_size = 4096;
+    }
+  }
+  else {
+    recv_size = sctp_stream_request->receive_size;
+  }
+  
+  /* we want to set-up our recv_ring in a manner analagous to what we */
+  /* do on the sending side. this is more for the sake of symmetry */
+  /* than for the needs of say copy avoidance, but it might also be */
+  /* more realistic - this way one could conceivably go with a */
+  /* double-buffering scheme when taking the data an putting it into */
+  /* the filesystem or something like that. raj 7/94 */
+
+  if (recv_width == 0) {
+    recv_width = (lsr_size/recv_size) + 1;
+    if (recv_width == 1) recv_width++;
+  }
+
+  recv_ring = allocate_buffer_ring(recv_width,
+				   recv_size,
+				   sctp_stream_request->recv_alignment,
+				   sctp_stream_request->recv_offset);
+
+  if (debug) {
+    fprintf(where,"recv_sctp_stream: receive alignment and offset set...\n");
+    fflush(where);
+  }
+  
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen, 
+		  (struct sockaddr *)&myaddr_in,
+		  &addrlen) == SOCKET_ERROR){
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_stream_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a -1 to */
+  /* the initiator. */
+  
+  sctp_stream_response->cpu_rate = (float)0.0; 	/* assume no cpu */
+  if (sctp_stream_request->measure_cpu) {
+    sctp_stream_response->measure_cpu = 1;
+    sctp_stream_response->cpu_rate = 
+      calibrate_local_cpu(sctp_stream_request->cpu_rate);
+  }
+  else {
+    sctp_stream_response->measure_cpu = 0;
+  }
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_stream_response->send_buf_size = lss_size;
+  sctp_stream_response->recv_buf_size = lsr_size;
+  sctp_stream_response->no_delay = loc_nodelay;
+  sctp_stream_response->so_rcvavoid = loc_rcvavoid;
+  sctp_stream_response->so_sndavoid = loc_sndavoid;
+  sctp_stream_response->receive_size = recv_size;
+
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+  
+  if ((s_data=accept(s_listen,
+		     (struct sockaddr *)&peeraddr_in,
+		     &addrlen)) == INVALID_SOCKET) {
+    /* Let's just punt. The remote will be given some information */
+    close(s_listen);
+    exit(1);
+  }
+
+#ifdef KLUDGE_SOCKET_OPTIONS
+  /* this is for those systems which *INCORRECTLY* fail to pass */
+  /* attributes across an accept() call. Including this goes against */
+  /* my better judgement :( raj 11/95 */
+
+  kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+  
+  /* Now it's time to start receiving data on the connection. We will */
+  /* first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_stream_request->measure_cpu);
+  
+  /* The loop will exit when the sender does a shutdown, which will */
+  /* return a length of zero   */
+  
+#ifdef DIRTY
+    /* we want to dirty some number of consecutive integers in the buffer */
+    /* we are about to recv. we may also want to bring some number of */
+    /* them cleanly into the cache. The clean ones will follow any dirty */
+    /* ones into the cache. */
+
+  dirty_count = sctp_stream_request->dirty_count;
+  clean_count = sctp_stream_request->clean_count;
+  message_int_ptr = (int *)recv_ring->buffer_ptr;
+  for (i = 0; i < dirty_count; i++) {
+    *message_int_ptr = rand();
+    message_int_ptr++;
+  }
+  for (i = 0; i < clean_count; i++) {
+    dirty_count = *message_int_ptr;
+    message_int_ptr++;
+  }
+#endif /* DIRTY */
+
+  bytes_received = 0;
+  receive_calls  = 0;
+
+  while ((len = recv(s_data, recv_ring->buffer_ptr, recv_size, 0)) != 0) {
+    if (len == SOCKET_ERROR )
+	{
+      netperf_response.content.serv_errno = errno;
+      send_response();
+      exit(1);
+    }
+    bytes_received += len;
+    receive_calls++;
+
+    /* more to the next buffer in the recv_ring */
+    recv_ring = recv_ring->next;
+
+#ifdef PAUSE
+    sleep(1);
+#endif /* PAUSE */
+
+#ifdef DIRTY
+    message_int_ptr = (int *)(recv_ring->buffer_ptr);
+    for (i = 0; i < dirty_count; i++) {
+      *message_int_ptr = rand();
+      message_int_ptr++;
+    }
+    for (i = 0; i < clean_count; i++) {
+      dirty_count = *message_int_ptr;
+      message_int_ptr++;
+    }
+#endif /* DIRTY */
+
+#ifdef DO_SELECT
+	FD_SET(s_data,&readfds);
+	select(s_data+1,&readfds,NULL,NULL,&timeout);
+#endif /* DO_SELECT */
+
+  }
+  
+  /* perform a shutdown to signal the sender that */
+  /* we have received all the data sent. raj 4/93 */
+
+  if (shutdown(s_data,1) == SOCKET_ERROR) {
+      netperf_response.content.serv_errno = errno;
+      send_response();
+      exit(1);
+    }
+  
+  cpu_stop(sctp_stream_request->measure_cpu,&elapsed_time);
+  
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_stream: got %g bytes\n",
+	    bytes_received);
+    fprintf(where,
+	    "recv_sctp_stream: got %d recvs\n",
+	    receive_calls);
+    fflush(where);
+  }
+  
+  sctp_stream_results->bytes_received	= htond(bytes_received);
+  sctp_stream_results->elapsed_time	= elapsed_time;
+  sctp_stream_results->recv_calls	= receive_calls;
+  
+  sctp_stream_results->cpu_method = cpu_method;
+  sctp_stream_results->num_cpus   = lib_num_loc_cpus;
+  
+  if (sctp_stream_request->measure_cpu) {
+    sctp_stream_results->cpu_util	= calc_cpu_util(0.0);
+  };
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_stream: test complete, sending results.\n");
+    fprintf(where,
+	    "                 bytes_received %g receive_calls %d\n",
+	    bytes_received,
+	    receive_calls);
+    fprintf(where,
+	    "                 len %d\n",
+	    len);
+    fflush(where);
+  }
+
+  send_response();
+
+  /* we are now done with the sockets */
+  close(s_data);
+  close(s_listen);
+
+  }
+#endif				/* DO_SCTP */
+
 
 /* This is the server-side routine for the tcp stream test. It is */
 /* implemented as one routine. I could break things-out somewhat, but */
@@ -2920,6 +5787,7 @@ recv_tcp_stream()
 
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
+				IPPROTO_TCP,
 				tcp_stream_request->ipaddress,
 				tcp_stream_request->port);
   
@@ -3035,7 +5903,7 @@ recv_tcp_stream()
   /* attributes across an accept() call. Including this goes against */
   /* my better judgement :( raj 11/95 */
 
-  kludge_socket_options(s_data);
+  kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
   
@@ -3160,6 +6028,359 @@ recv_tcp_stream()
 
   }
 
+#ifdef DO_SCTP
+
+/* This is the server-side routine for the sctp maerts test. It is
+   implemented as one routine. I could break things-out somewhat, but
+   didn't feel it was necessary. */ 
+
+void
+recv_sctp_maerts()
+{
+  
+  struct sockaddr_in myaddr_in, peeraddr_in;
+  SOCKET	s_listen,s_data;
+  int 	addrlen;
+  int	len;
+  unsigned int	send_calls;
+  float	elapsed_time;
+  double   bytes_sent = 0.0 ;
+  
+  struct ring_elt *send_ring;
+
+#ifdef DIRTY
+  int   *message_int_ptr;
+  int   dirty_count;
+  int   clean_count;
+  int   i;
+#endif
+  
+  struct	sctp_maerts_request_struct	*sctp_maerts_request;
+  struct	sctp_maerts_response_struct	*sctp_maerts_response;
+  struct	sctp_maerts_results_struct	*sctp_maerts_results;
+  
+  sctp_maerts_request	= 
+    (struct sctp_maerts_request_struct *)netperf_request.content.test_specific_data;
+  sctp_maerts_response	= 
+    (struct sctp_maerts_response_struct *)netperf_response.content.test_specific_data;
+  sctp_maerts_results	= 
+    (struct sctp_maerts_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_maerts: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired
+     parameters and then let the initiator know that all is ready. If
+     socket size defaults are to be used, then the initiator will have
+     sent us 0's. If the socket sizes cannot be changed, then we will
+     send-back what they are. If that information cannot be
+     determined, then we send-back -1's for the sizes. If things go
+     wrong for any reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It
+     would be best if the error that the remote reports to the user is
+     the actual error we encountered, rather than some bogus
+     unexpected response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_maerts: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_MAERTS_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_maerts: the response type is set...\n");
+    fflush(where);
+  }
+  
+  /* We now alter the message_ptr variable to be at the desired */
+  /* alignment with the desired offset. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_maerts: requested alignment of %d\n",
+	    sctp_maerts_request->send_alignment);
+    fflush(where);
+  }
+
+  /* Grab a socket to listen on, and then listen on it. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_maerts: grabbing a socket...\n");
+    fflush(where);
+  }
+  
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_maerts_request->send_buf_size;
+  lsr_size_req = sctp_maerts_request->recv_buf_size;
+  loc_nodelay = sctp_maerts_request->no_delay;
+  loc_rcvavoid = sctp_maerts_request->so_rcvavoid;
+  loc_sndavoid = sctp_maerts_request->so_sndavoid;
+
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP,
+				sctp_maerts_request->ipaddress,
+				sctp_maerts_request->port);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    exit(1);
+  }
+  
+  /* what sort of sizes did we end-up with? */
+  if (sctp_maerts_request->send_size == 0) {
+    if (lss_size > 0) {
+      send_size = lss_size;
+    }
+    else {
+      send_size = 4096;
+    }
+  }
+  else {
+    send_size = sctp_maerts_request->send_size;
+  }
+  
+  /* we want to set-up our recv_ring in a manner analagous to what we */
+  /* do on the recving side. this is more for the sake of symmetry */
+  /* than for the needs of say copy avoidance, but it might also be */
+  /* more realistic - this way one could conceivably go with a */
+  /* double-buffering scheme when taking the data an putting it into */
+  /* the filesystem or something like that. raj 7/94 */
+
+  if (send_width == 0) {
+    send_width = (lsr_size/send_size) + 1;
+    if (send_width == 1) send_width++;
+  }
+
+  send_ring = allocate_buffer_ring(send_width,
+				   send_size,
+				   sctp_maerts_request->send_alignment,
+				   sctp_maerts_request->send_offset);
+
+  if (debug) {
+    fprintf(where,"recv_sctp_maerts: receive alignment and offset set...\n");
+    fflush(where);
+  }
+  
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen, 
+		  (struct sockaddr *)&myaddr_in,
+		  &addrlen) == SOCKET_ERROR){
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_maerts_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a -1 to */
+  /* the initiator. */
+  
+  sctp_maerts_response->cpu_rate = (float)0.0; 	/* assume no cpu */
+  if (sctp_maerts_request->measure_cpu) {
+    sctp_maerts_response->measure_cpu = 1;
+    sctp_maerts_response->cpu_rate = 
+      calibrate_local_cpu(sctp_maerts_request->cpu_rate);
+  }
+  else {
+    sctp_maerts_response->measure_cpu = 0;
+  }
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_maerts_response->send_buf_size = lss_size;
+  sctp_maerts_response->recv_buf_size = lsr_size;
+  sctp_maerts_response->no_delay = loc_nodelay;
+  sctp_maerts_response->so_rcvavoid = loc_rcvavoid;
+  sctp_maerts_response->so_sndavoid = loc_sndavoid;
+  sctp_maerts_response->send_size = send_size;
+
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+
+  /* we will start the timer before the accept() to be somewhat
+     analagous to the starting of the timer before the connect() call
+     in the SCTP_STREAM test. raj 2002-06-21 */
+
+  start_timer(sctp_maerts_request->test_length);
+
+  /* Now it's time to start receiving data on the connection. We will
+     first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_maerts_request->measure_cpu);
+  
+
+  if ((s_data=accept(s_listen,
+		     (struct sockaddr *)&peeraddr_in,
+		     &addrlen)) == INVALID_SOCKET) {
+    /* Let's just punt. The remote will be given some information */
+    close(s_listen);
+    exit(1);
+  }
+
+#ifdef KLUDGE_SOCKET_OPTIONS
+  
+  /* this is for those systems which *INCORRECTLY* fail to pass
+     attributes across an accept() call. Including this goes against
+     my better judgement :( raj 11/95 */
+
+  kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+  
+  /* The loop will exit when the sender does a shutdown, which will */
+  /* return a length of zero   */
+  
+#ifdef DIRTY
+    /* we want to dirty some number of consecutive integers in the buffer */
+    /* we are about to send. we may also want to bring some number of */
+    /* them cleanly into the cache. The clean ones will follow any dirty */
+    /* ones into the cache. */
+
+  dirty_count = sctp_maerts_request->dirty_count;
+  clean_count = sctp_maerts_request->clean_count;
+  message_int_ptr = (int *)send_ring->buffer_ptr;
+  for (i = 0; i < dirty_count; i++) {
+    *message_int_ptr = rand();
+    message_int_ptr++;
+  }
+  for (i = 0; i < clean_count; i++) {
+    dirty_count = *message_int_ptr;
+    message_int_ptr++;
+  }
+#endif /* DIRTY */
+
+  bytes_sent = 0.0;
+  send_calls  = 0;
+
+  len = 0;   // nt-lint; len is not initialized (printf far below) if times_up initially true.
+  while (!times_up) {
+
+#ifdef DIRTY
+    message_int_ptr = (int *)(send_ring->buffer_ptr);
+    for (i = 0; i < dirty_count; i++) {
+      *message_int_ptr = rand();
+      message_int_ptr++;
+    }
+    for (i = 0; i < clean_count; i++) {
+      dirty_count = *message_int_ptr;
+      message_int_ptr++;
+    }
+#endif /* DIRTY */
+
+    if((len=send(s_data,
+		 send_ring->buffer_ptr,
+		 send_size,
+		 0)) != send_size) {
+		if ((len >=0) || SOCKET_EINTR(len)) {
+	      /* the test was interrupted, must be the end of test */
+	      break;
+		}
+      netperf_response.content.serv_errno = errno;
+      send_response();
+      exit(1);
+    }
+
+    bytes_sent += len;
+    send_calls++;
+
+    /* more to the next buffer in the send_ring */
+    send_ring = send_ring->next;
+
+  }
+  
+  /* perform a shutdown to signal the sender that */
+  /* we have received all the data sent. raj 4/93 */
+
+  if (shutdown(s_data,1) == SOCKET_ERROR) {
+      netperf_response.content.serv_errno = errno;
+      send_response();
+      exit(1);
+    }
+
+  /* hang a recv() off the socket to block until the remote has
+     brought all the data up into the application. it will do a
+     shutdown to cause a FIN to be sent our way. We will assume that
+     any exit from the recv() call is good... raj 4/93 */
+    
+  recv(s_data, send_ring->buffer_ptr, send_size, 0);
+    
+  
+  cpu_stop(sctp_maerts_request->measure_cpu,&elapsed_time);
+  
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_maerts: got %g bytes\n",
+	    bytes_sent);
+    fprintf(where,
+	    "recv_sctp_maerts: got %d sends\n",
+	    send_calls);
+    fflush(where);
+  }
+  
+  sctp_maerts_results->bytes_sent	= htond(bytes_sent);
+  sctp_maerts_results->elapsed_time	= elapsed_time;
+  sctp_maerts_results->send_calls	= send_calls;
+  
+  if (sctp_maerts_request->measure_cpu) {
+    sctp_maerts_results->cpu_util	= calc_cpu_util(0.0);
+  };
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_maerts: test complete, sending results.\n");
+    fprintf(where,
+	    "                 bytes_sent %g send_calls %d\n",
+	    bytes_sent,
+	    send_calls);
+    fprintf(where,
+	    "                 len %d\n",
+	    len);
+    fflush(where);
+  }
+  
+  sctp_maerts_results->cpu_method = cpu_method;
+  sctp_maerts_results->num_cpus   = lib_num_loc_cpus;
+  send_response();
+
+  /* we are now done with the sockets */
+  close(s_data);
+  close(s_listen);
+
+  }
+#endif				/* DO_SCTP */
+
 
 /* This is the server-side routine for the tcp maerts test. It is
    implemented as one routine. I could break things-out somewhat, but
@@ -3255,6 +6476,7 @@ recv_tcp_maerts()
 
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
+				IPPROTO_TCP,
 				tcp_maerts_request->ipaddress,
 				tcp_maerts_request->port);
   
@@ -3383,7 +6605,7 @@ recv_tcp_maerts()
      attributes across an accept() call. Including this goes against
      my better judgement :( raj 11/95 */
 
-  kludge_socket_options(s_data);
+  kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
   
@@ -3509,6 +6731,692 @@ recv_tcp_maerts()
   close(s_listen);
 
   }
+
+#ifdef DO_SCTP
+
+ /* this routine implements the sending (netperf) side of the SCTP_RR */
+ /* test. */
+
+void
+send_sctp_rr(char remote_host[])
+{
+  
+  char *tput_title = "\
+Local /Remote\n\
+Socket Size   Request  Resp.   Elapsed  Trans.\n\
+Send   Recv   Size     Size    Time     Rate         \n\
+bytes  Bytes  bytes    bytes   secs.    per sec   \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1_line_1 = "\
+%-6d %-6d %-6d   %-6d  %-6.2f   %7.2f   \n";
+  char *tput_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *cpu_title = "\
+Local /Remote\n\
+Socket Size   Request Resp.  Elapsed Trans.   CPU    CPU    S.dem   S.dem\n\
+Send   Recv   Size    Size   Time    Rate     local  remote local   remote\n\
+bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f %c\n";
+  
+  char *cpu_fmt_1_line_1 = "\
+%-6d %-6d %-6d  %-6d %-6.2f  %-6.2f  %-6.2f %-6.2f %-6.3f  %-6.3f\n";
+  
+  char *cpu_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *ksink_fmt = "\
+Alignment      Offset\n\
+Local  Remote  Local  Remote\n\
+Send   Recv    Send   Recv\n\
+%5d  %5d   %5d  %5d";
+  
+  
+  int			timed_out = 0;
+  float			elapsed_time;
+  
+  int	len;
+  char	*temp_message_ptr;
+  int	nummessages;
+  SOCKET	send_socket;
+  int	trans_remaining;
+  double	bytes_xferd;
+
+  struct ring_elt *send_ring;
+  struct ring_elt *recv_ring;
+  
+  int	rsp_bytes_left;
+  int	rsp_bytes_recvd;
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  unsigned      int             addr;
+
+  struct	sctp_rr_request_struct	*sctp_rr_request;
+  struct	sctp_rr_response_struct	*sctp_rr_response;
+  struct	sctp_rr_results_struct	*sctp_rr_result;
+  
+#ifdef INTERVALS
+  int	interval_count;
+  sigset_t signal_set;
+#endif /* INTERVALS */
+
+  sctp_rr_request = 
+    (struct sctp_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_rr_response=
+    (struct sctp_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_rr_result	=
+    (struct sctp_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+
+  bzero((char *)&server,
+	sizeof(server));
+  
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+
+  if ( print_headers ) {
+    fprintf(where,"SCTP REQUEST/RESPONSE TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+  
+  /* initialize a few counters */
+  
+  send_ring = NULL;
+  recv_ring = NULL;
+  confidence_iteration = 1;
+  init_stat();
+
+  /* we have a great-big while loop which controls the number of times */
+  /* we run a particular test. this is for the calculation of a */
+  /* confidence interval (I really should have stayed awake during */
+  /* probstats :). If the user did not request confidence measurement */
+  /* (no confidence is the default) then we will only go though the */
+  /* loop once. the confidence stuff originates from the folks at IBM */
+
+  while (((confidence < 0) && (confidence_iteration < iteration_max)) ||
+	 (confidence_iteration <= iteration_min)) {
+
+    /* initialize a few counters. we have to remember that we might be */
+    /* going through the loop more than once. */
+
+    nummessages     = 0;
+    bytes_xferd     = 0.0;
+    times_up        = 0;
+    timed_out       = 0;
+    trans_remaining = 0;
+
+    /* set-up the data buffers with the requested alignment and offset. */
+    /* since this is a request/response test, default the send_width and */
+    /* recv_width to 1 and not two raj 7/94 */
+
+    if (send_width == 0) send_width = 1;
+    if (recv_width == 0) recv_width = 1;
+  
+    if (send_ring == NULL) {
+      send_ring = allocate_buffer_ring(send_width,
+				       req_size,
+				       local_send_align,
+				       local_send_offset);
+    }
+
+    if (recv_ring == NULL) {
+      recv_ring = allocate_buffer_ring(recv_width,
+				       rsp_size,
+				       local_recv_align,
+				       local_recv_offset);
+    }
+    
+    /*set up the data socket                        */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP,
+				     local_data_ip,
+				     local_data_port);
+  
+    if (send_socket == INVALID_SOCKET){
+      perror("netperf: send_sctp_rr: sctp stream data socket");
+      exit(1);
+    }
+    
+    if (debug) {
+      fprintf(where,"send_sctp_rr: send_socket obtained...\n");
+    }
+  
+    /* If the user has requested cpu utilization measurements, we must */
+    /* calibrate the cpu(s). We will perform this task within the tests */
+    /* themselves. If the user has specified the cpu rate, then */
+    /* calibrate_local_cpu will return rather quickly as it will have */
+    /* nothing to do. If local_cpu_rate is zero, then we will go through */
+    /* all the "normal" calibration stuff and return the rate back.*/
+    
+    if (local_cpu_usage) {
+      local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+    }
+    
+    /* Tell the remote end to do a listen. The server alters the socket */
+    /* paramters on the other side at this point, hence the reason for */
+    /* all the values being passed in the setup message. If the user did */
+    /* not specify any of the parameters, they will be passed as 0, which */
+    /* will indicate to the remote that no changes beyond the system's */
+    /* default should be used. Alignment is the exception, it will */
+    /* default to 8, which will be no alignment alterations. */
+    
+    netperf_request.content.request_type=	DO_SCTP_RR;
+    sctp_rr_request->recv_buf_size	=	rsr_size;
+    sctp_rr_request->send_buf_size	=	rss_size;
+    sctp_rr_request->recv_alignment	=	remote_recv_align;
+    sctp_rr_request->recv_offset	=	remote_recv_offset;
+    sctp_rr_request->send_alignment	=	remote_send_align;
+    sctp_rr_request->send_offset	=	remote_send_offset;
+    sctp_rr_request->request_size	=	req_size;
+    sctp_rr_request->response_size	=	rsp_size;
+    sctp_rr_request->no_delay		=	rem_nodelay;
+    sctp_rr_request->measure_cpu	=	remote_cpu_usage;
+    sctp_rr_request->cpu_rate		=	remote_cpu_rate;
+    sctp_rr_request->so_rcvavoid	=	rem_rcvavoid;
+    sctp_rr_request->so_sndavoid	=	rem_sndavoid;
+    if (test_time) {
+      sctp_rr_request->test_length	=	test_time;
+    }
+    else {
+      sctp_rr_request->test_length	=	test_trans * -1;
+    }
+    sctp_rr_request->port		=	(int)remote_data_port;
+    sctp_rr_request->ipaddress		=	remote_data_ip;
+
+    if (debug > 1) {
+      fprintf(where,"netperf: send_sctp_rr: requesting SCTP rr test\n");
+    }
+    
+    send_request();
+    
+    /* The response from the remote will contain all of the relevant 	*/
+    /* socket parameters for this test type. We will put them back into */
+    /* the variables here so they can be displayed if desired.  The	*/
+    /* remote will have calibrated CPU if necessary, and will have done	*/
+    /* all the needed set-up we will have calibrated the cpu locally	*/
+    /* before sending the request, and will grab the counter value right*/
+    /* after the connect returns. The remote will grab the counter right*/
+    /* after the accept call. This saves the hassle of extra messages	*/
+    /* being sent for the SCTP tests.					*/
+  
+    recv_response();
+  
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote listen done.\n");
+      rsr_size          = sctp_rr_response->recv_buf_size;
+      rss_size          = sctp_rr_response->send_buf_size;
+      rem_nodelay       = sctp_rr_response->no_delay;
+      remote_cpu_usage  = sctp_rr_response->measure_cpu;
+      remote_cpu_rate   = sctp_rr_response->cpu_rate;
+      /* make sure that port numbers are in network order */
+      server.sin_port   = (short)sctp_rr_response->data_port_number;
+      server.sin_port   = htons(server.sin_port);
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+
+    /*Connect up to the remote port on the data socket  */
+    if (connect(send_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server)) == INVALID_SOCKET){
+      perror("netperf: data socket connect failed");
+      
+      exit(1);
+    }
+    
+    /* Data Socket set-up is finished. If there were problems, either the */
+    /* connect would have failed, or the previous response would have */
+    /* indicated a problem. I failed to see the value of the extra */
+    /* message after the accept on the remote. If it failed, we'll see it */
+    /* here. If it didn't, we might as well start pumping data. */
+    
+    /* Set-up the test end conditions. For a request/response test, they */
+    /* can be either time or transaction based. */
+    
+    if (test_time) {
+      /* The user wanted to end the test after a period of time. */
+      times_up = 0;
+      trans_remaining = 0;
+      start_timer(test_time);
+    }
+    else {
+      /* The tester wanted to send a number of bytes. */
+      trans_remaining = test_bytes;
+      times_up = 1;
+    }
+    
+    /* The cpu_start routine will grab the current time and possibly */
+    /* value of the idle counter for later use in measuring cpu */
+    /* utilization and/or service demand and thruput. */
+    
+    cpu_start(local_cpu_usage);
+
+#ifdef INTERVALS
+    if ((interval_burst) || (demo_mode)) {
+      /* zero means that we never pause, so we never should need the */
+      /* interval timer, unless we are in demo_mode */
+      start_itimer(interval_wate);
+    }
+    interval_count = interval_burst;
+    /* get the signal set for the call to sigsuspend */
+    if (sigprocmask(SIG_BLOCK, (sigset_t *)NULL, &signal_set) != 0) {
+      fprintf(where,
+	      "send_sctp_rr: unable to get sigmask errno %d\n",
+	      errno);
+      fflush(where);
+      exit(1);
+    }
+#endif /* INTERVALS */
+    
+    /* We use an "OR" to control test execution. When the test is */
+    /* controlled by time, the byte count check will always return false. */
+    /* When the test is controlled by byte count, the time test will */
+    /* always return false. When the test is finished, the whole */
+    /* expression will go false and we will stop sending data. I think I */
+    /* just arbitrarily decrement trans_remaining for the timed test, but */
+    /* will not do that just yet... One other question is whether or not */
+    /* the send buffer and the receive buffer should be the same buffer. */
+
+#ifdef DO_FIRST_BURST
+    {
+      int i;
+      for (i = 0; i < first_burst_size; i++) {
+	if((len=send(send_socket,
+		     send_ring->buffer_ptr,
+		     req_size,
+		     0)) != req_size) {
+	  /* we should never hit the end of the test in the first burst */
+	  perror("send_sctp_rr: initial burst data send error");
+	  exit(1);
+	}
+      }
+    }
+#endif /* DO_FIRST_BURST */
+
+    while ((!times_up) || (trans_remaining > 0)) {
+      /* send the request. we assume that if we use a blocking socket, */
+      /* the request will be sent at one shot. */
+      
+#ifdef HISTOGRAM
+      /* timestamp just before our call to send, and then again just */
+      /* after the receive raj 8/94 */
+      HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+      
+      if((len=send(send_socket,
+		   send_ring->buffer_ptr,
+		   req_size,
+		   0)) != req_size) {
+	if (SOCKET_EINTR(len) || (errno == 0)) {
+	  /* we hit the end of a */
+	  /* timed test. */
+	  timed_out = 1;
+	  break;
+	}
+	perror("send_sctp_rr: data send error");
+	exit(1);
+      }
+      send_ring = send_ring->next;
+      
+      /* receive the response */
+      rsp_bytes_left = rsp_size;
+      temp_message_ptr  = recv_ring->buffer_ptr;
+      while(rsp_bytes_left > 0) {
+	if((rsp_bytes_recvd=recv(send_socket,
+				 temp_message_ptr,
+				 rsp_bytes_left,
+				 0)) == SOCKET_ERROR) {
+		if ( SOCKET_EINTR(rsp_bytes_recvd) ) {
+		    /* We hit the end of a timed test. */
+			timed_out = 1;
+			break;
+		}
+	  perror("send_sctp_rr: data recv error");
+	  exit(1);
+	}
+	rsp_bytes_left -= rsp_bytes_recvd;
+	temp_message_ptr  += rsp_bytes_recvd;
+      }	
+      recv_ring = recv_ring->next;
+      
+      if (timed_out) {
+	/* we may have been in a nested while loop - we need */
+	/* another call to break. */
+	break;
+      }
+      
+#ifdef HISTOGRAM
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */
+#ifdef INTERVALS      
+      if (demo_mode) {
+	units_this_tick += 1;
+      }
+      /* in this case, the interval count is the count-down couter */
+      /* to decide to sleep for a little bit */
+      if ((interval_burst) && (--interval_count == 0)) {
+	/* call sigsuspend and wait for the interval timer to get us */
+	/* out */
+	if (debug) {
+	  fprintf(where,"about to suspend\n");
+	  fflush(where);
+	}
+	if (sigsuspend(&signal_set) == EFAULT) {
+	  fprintf(where,
+		  "send_sctp_rr: fault with signal set!\n");
+	  fflush(where);
+	  exit(1);
+	}
+	interval_count = interval_burst;
+      }
+#endif /* INTERVALS */
+      
+      nummessages++;          
+      if (trans_remaining) {
+	trans_remaining--;
+      }
+      
+      if (debug > 3) {
+	if ((nummessages % 100) == 0) {
+	  fprintf(where,
+		  "Transaction %d completed\n",
+		  nummessages);
+	  fflush(where);
+	}
+      }
+    }
+
+    /* At this point we used to call shutdown on the data socket to be */
+    /* sure all the data was delivered, but this was not germane in a */
+    /* request/response test, and it was causing the tests to "hang" when */
+    /* they were being controlled by time. So, I have replaced this */
+    /* shutdown call with a call to close that can be found later in the */
+    /* procedure. */
+    
+    /* this call will always give us the elapsed time for the test, and */
+    /* will also store-away the necessaries for cpu utilization */
+    
+    cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being */
+						/* measured? how long */
+						/* did we really run? */
+    
+    /* Get the statistics from the remote end. The remote will have */
+    /* calculated CPU utilization. If it wasn't supposed to care, it */
+    /* will return obvious values. */ 
+    
+    recv_response();
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote results obtained\n");
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,"netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      exit(1);
+    }
+    
+    /* We now calculate what our throughput was for the test. */
+  
+    bytes_xferd	= (req_size * nummessages) + (rsp_size * nummessages);
+    thruput	= nummessages/elapsed_time;
+  
+    if (local_cpu_usage || remote_cpu_usage) {
+      /* We must now do a little math for service demand and cpu */
+      /* utilization for the system(s) */
+      /* Of course, some of the information might be bogus because */
+      /* there was no idle counter in the kernel(s). We need to make */
+      /* a note of this for the user's benefit...*/
+      if (local_cpu_usage) {
+	local_cpu_utilization = calc_cpu_util(0.0);
+	/* since calc_service demand is doing ms/Kunit we will */
+	/* multiply the number of transaction by 1024 to get */
+	/* "good" numbers */
+	local_service_demand  = calc_service_demand((double) nummessages*1024,
+						    0.0,
+						    0.0,
+						    0);
+      }
+      else {
+	local_cpu_utilization	= (float) -1.0;
+	local_service_demand	= (float) -1.0;
+      }
+      
+      if (remote_cpu_usage) {
+	remote_cpu_utilization = sctp_rr_result->cpu_util;
+	/* since calc_service demand is doing ms/Kunit we will */
+	/* multiply the number of transaction by 1024 to get */
+	/* "good" numbers */
+	remote_service_demand = calc_service_demand((double) nummessages*1024,
+						    0.0,
+						    remote_cpu_utilization,
+						    sctp_rr_result->num_cpus);
+      }
+      else {
+	remote_cpu_utilization = (float) -1.0;
+	remote_service_demand  = (float) -1.0;
+      }
+      
+    }
+    else {
+      /* we were not measuring cpu, for the confidence stuff, we */
+      /* should make it -1.0 */
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+
+    /* at this point, we want to calculate the confidence information. */
+    /* if debugging is on, calculate_confidence will print-out the */
+    /* parameters we pass it */
+    
+    calculate_confidence(confidence_iteration,
+			 elapsed_time,
+			 thruput,
+			 local_cpu_utilization,
+			 remote_cpu_utilization,
+			 local_service_demand,
+			 remote_service_demand);
+    
+    
+    confidence_iteration++;
+
+    /* we are now done with the socket, so close it */
+    close(send_socket);
+
+  }
+
+  retrieve_confident_values(&elapsed_time,
+			    &thruput,
+			    &local_cpu_utilization,
+			    &remote_cpu_utilization,
+			    &local_service_demand,
+			    &remote_service_demand);
+
+  /* We are now ready to print all the information. If the user */
+  /* has specified zero-level verbosity, we will just print the */
+  /* local service demand, or the remote service demand. If the */
+  /* user has requested verbosity level 1, he will get the basic */
+  /* "streamperf" numbers. If the user has specified a verbosity */
+  /* of greater than 1, we will display a veritable plethora of */
+  /* background information from outside of this block as it it */
+  /* not cpu_measurement specific...  */
+
+  if (confidence < 0) {
+    /* we did not hit confidence, but were we asked to look for it? */
+    if (iteration_max > 1) {
+      display_confidence();
+    }
+  }
+
+  if (local_cpu_usage || remote_cpu_usage) {
+    local_cpu_method = format_cpu_method(cpu_method);
+    remote_cpu_method = format_cpu_method(sctp_rr_result->cpu_method);
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand,
+		local_cpu_method);
+      }
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand,
+		remote_cpu_method);
+      }
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		local_cpu_method,
+		remote_cpu_method);
+      }
+
+      fprintf(where,
+	      cpu_fmt_1_line_1,		/* the format string */
+	      lss_size,		/* local sendbuf size */
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* guess */
+	      elapsed_time,		/* how long was the test */
+	      thruput,
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      fprintf(where,
+	      cpu_fmt_1_line_2,
+	      rss_size,
+	      rsr_size);
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      thruput);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+
+      fprintf(where,
+	      tput_fmt_1_line_1,	/* the format string */
+	      lss_size,
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* how large were the responses */
+	      elapsed_time, 		/* how long did it take */
+	      thruput);
+      fprintf(where,
+	      tput_fmt_1_line_2,
+	      rss_size, 		/* remote recvbuf size */
+	      rsr_size);
+      
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  /* how to handle the verbose information in the presence of */
+  /* confidence intervals is yet to be determined... raj 11/94 */
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+    
+    fprintf(where,
+	    ksink_fmt,
+	    local_send_align,
+	    remote_recv_offset,
+	    local_send_offset,
+	    remote_recv_offset);
+
+#ifdef HISTOGRAM
+    fprintf(where,"\nHistogram of request/response times\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+
+  }
+  
+}
+#endif				/* DO_SCTP */
 
 
  /* this routine implements the sending (netperf) side of the TCP_RR */
@@ -3690,6 +7598,7 @@ Send   Recv    Send   Recv\n\
     /*set up the data socket                        */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
+				     IPPROTO_TCP,
 				     local_data_ip,
 				     local_data_port);
   
@@ -4342,6 +8251,7 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
     /*set up the data socket			*/
     data_socket = create_data_socket(AF_INET,
 				     SOCK_DGRAM,
+				     IPPROTO_UDP,
 				     local_data_ip,
 				     local_data_port);
     
@@ -4882,6 +8792,7 @@ recv_udp_stream()
     
   s_data = create_data_socket(AF_INET,
 			      SOCK_DGRAM,
+			      IPPROTO_UDP,
 			      udp_stream_request->ipaddress,
 			      udp_stream_request->port);
   
@@ -5220,6 +9131,7 @@ bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\
     /*set up the data socket                        */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_DGRAM,
+				     IPPROTO_UDP,
 				     local_data_ip,
 				     local_data_port);
     
@@ -5819,6 +9731,7 @@ recv_udp_rr()
 
   s_data = create_data_socket(AF_INET,
 			      SOCK_DGRAM,
+			      IPPROTO_UDP,
 			      INADDR_ANY,
 			      udp_rr_request->port);
   
@@ -6005,6 +9918,347 @@ recv_udp_rr()
       }
 
 
+#ifdef DO_SCTP
+ /* this routine implements the receive (netserver) side of a SCTP_RR */
+ /* test */
+void
+recv_sctp_rr()
+{
+  
+  struct ring_elt *send_ring;
+  struct ring_elt *recv_ring;
+
+  struct	sockaddr_in        myaddr_in,
+  peeraddr_in;
+  SOCKET	s_listen,s_data;
+  int 	addrlen;
+  char	*temp_message_ptr;
+  int	trans_received;
+  int	trans_remaining;
+  int	bytes_sent;
+  int	request_bytes_recvd;
+  int	request_bytes_remaining;
+  int	timed_out = 0;
+  float	elapsed_time;
+  
+  struct	sctp_rr_request_struct	*sctp_rr_request;
+  struct	sctp_rr_response_struct	*sctp_rr_response;
+  struct	sctp_rr_results_struct	*sctp_rr_results;
+  
+  sctp_rr_request = 
+    (struct sctp_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_rr_response =
+    (struct sctp_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_rr_results =
+    (struct sctp_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_rr: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired */
+  /* parameters and then let the initiator know that all is ready. If */
+  /* socket size defaults are to be used, then the initiator will have */
+  /* sent us 0's. If the socket sizes cannot be changed, then we will */
+  /* send-back what they are. If that information cannot be determined, */
+  /* then we send-back -1's for the sizes. If things go wrong for any */
+  /* reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It */
+  /* would be best if the error that the remote reports to the user is */
+  /* the actual error we encountered, rather than some bogus unexpected */
+  /* response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_rr: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_RR_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_rr: the response type is set...\n");
+    fflush(where);
+  }
+  
+  /* allocate the recv and send rings with the requested alignments */
+  /* and offsets. raj 7/94 */
+  if (debug) {
+    fprintf(where,"recv_sctp_rr: requested recv alignment of %d offset %d\n",
+	    sctp_rr_request->recv_alignment,
+	    sctp_rr_request->recv_offset);
+    fprintf(where,"recv_sctp_rr: requested send alignment of %d offset %d\n",
+	    sctp_rr_request->send_alignment,
+	    sctp_rr_request->send_offset);
+    fflush(where);
+  }
+
+  /* at some point, these need to come to us from the remote system */
+  if (send_width == 0) send_width = 1;
+  if (recv_width == 0) recv_width = 1;
+
+  send_ring = allocate_buffer_ring(send_width,
+				   sctp_rr_request->response_size,
+				   sctp_rr_request->send_alignment,
+				   sctp_rr_request->send_offset);
+
+  recv_ring = allocate_buffer_ring(recv_width,
+				   sctp_rr_request->request_size,
+				   sctp_rr_request->recv_alignment,
+				   sctp_rr_request->recv_offset);
+
+  
+  /* Grab a socket to listen on, and then listen on it. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_rr: grabbing a socket...\n");
+    fflush(where);
+  }
+
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_rr_request->send_buf_size;
+  lsr_size_req = sctp_rr_request->recv_buf_size;
+  loc_nodelay = sctp_rr_request->no_delay;
+  loc_rcvavoid = sctp_rr_request->so_rcvavoid;
+  loc_sndavoid = sctp_rr_request->so_sndavoid;
+  
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP,
+				sctp_rr_request->ipaddress,
+				sctp_rr_request->port);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen,
+		  (struct sockaddr *)&myaddr_in, 
+		  &addrlen) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_rr_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a 0.0 to */
+  /* the initiator. */
+  
+  sctp_rr_response->cpu_rate = (float)0.0; 	/* assume no cpu */
+  sctp_rr_response->measure_cpu = 0;
+
+  if (sctp_rr_request->measure_cpu) {
+    sctp_rr_response->measure_cpu = 1;
+    sctp_rr_response->cpu_rate = calibrate_local_cpu(sctp_rr_request->cpu_rate);
+  }
+  
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_rr_response->send_buf_size = lss_size;
+  sctp_rr_response->recv_buf_size = lsr_size;
+  sctp_rr_response->no_delay = loc_nodelay;
+  sctp_rr_response->so_rcvavoid = loc_rcvavoid;
+  sctp_rr_response->so_sndavoid = loc_sndavoid;
+  sctp_rr_response->test_length = sctp_rr_request->test_length;
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+  
+  if ((s_data = accept(s_listen,
+		       (struct sockaddr *)&peeraddr_in,
+		       &addrlen)) == INVALID_SOCKET) {
+    /* Let's just punt. The remote will be given some information */
+    close(s_listen);
+    
+    exit(1);
+  }
+  
+#ifdef KLUDGE_SOCKET_OPTIONS
+  /* this is for those systems which *INCORRECTLY* fail to pass */
+  /* attributes across an accept() call. Including this goes against */
+  /* my better judgement :( raj 11/95 */
+
+  kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+
+#ifdef WIN32
+  /* this is used so the timer thread can close the socket out from */
+  /* under us, which to date is the easiest/cleanest/least */
+  /* Windows-specific way I can find to force the winsock calls to */
+  /* return WSAEINTR with the test is over. anything that will run on */
+  /* 95 and NT and is closer to what netperf expects from Unix signals */
+  /* and such would be appreciated raj 1/96 */
+  win_kludge_socket = s_data;
+#endif /* WIN32 */
+
+  if (debug) {
+    fprintf(where,"recv_sctp_rr: accept completes on the data connection.\n");
+    fflush(where);
+  }
+  
+  /* Now it's time to start receiving data on the connection. We will */
+  /* first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_rr_request->measure_cpu);
+  
+  /* The loop will exit when we hit the end of the test time, or when */
+  /* we have exchanged the requested number of transactions. */
+  
+  if (sctp_rr_request->test_length > 0) {
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(sctp_rr_request->test_length + PAD_TIME);
+  }
+  else {
+    times_up = 1;
+    trans_remaining = sctp_rr_request->test_length * -1;
+  }
+
+  trans_received = 0;
+  
+  while ((!times_up) || (trans_remaining > 0)) {
+    temp_message_ptr = recv_ring->buffer_ptr;
+    request_bytes_remaining	= sctp_rr_request->request_size;
+    while(request_bytes_remaining > 0) {
+      if((request_bytes_recvd=recv(s_data,
+				   temp_message_ptr,
+				   request_bytes_remaining,
+				   0)) == SOCKET_ERROR) {
+	if (SOCKET_EINTR(request_bytes_recvd))
+	{
+	  timed_out = 1;
+	  break;
+	}
+	netperf_response.content.serv_errno = errno;
+	send_response();
+	exit(1);
+      }
+      else {
+	request_bytes_remaining -= request_bytes_recvd;
+	temp_message_ptr  += request_bytes_recvd;
+      }
+    }
+
+    recv_ring = recv_ring->next;
+
+    if (timed_out) {
+      /* we hit the end of the test based on time - lets */
+      /* bail out of here now... */
+      if (debug) {
+	fprintf(where,"yo5\n");
+	fflush(where);
+      }						
+      break;
+    }
+    
+    /* Now, send the response to the remote */
+    if((bytes_sent=send(s_data,
+			send_ring->buffer_ptr,
+			sctp_rr_request->response_size,
+			0)) == SOCKET_ERROR) {
+      if (SOCKET_EINTR(bytes_sent)) {
+	/* the test timer has popped */
+	timed_out = 1;
+	fprintf(where,"yo6\n");
+	fflush(where);						
+	break;
+      }
+      netperf_response.content.serv_errno = 992;
+      send_response();
+      exit(1);
+    }
+    
+    send_ring = send_ring->next;
+
+    trans_received++;
+    if (trans_remaining) {
+      trans_remaining--;
+    }
+  }
+  
+  
+  /* The loop now exits due to timeout or transaction count being */
+  /* reached */
+  
+  cpu_stop(sctp_rr_request->measure_cpu,&elapsed_time);
+  
+  stop_timer();
+
+  if (timed_out) {
+    /* we ended the test by time, which was at least 2 seconds */
+    /* longer than we wanted to run. so, we want to subtract */
+    /* PAD_TIME from the elapsed_time. */
+    elapsed_time -= PAD_TIME;
+  }
+
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_rr: got %d transactions\n",
+	    trans_received);
+    fflush(where);
+  }
+  
+  sctp_rr_results->bytes_received = (trans_received * 
+				    (sctp_rr_request->request_size + 
+				     sctp_rr_request->response_size));
+  sctp_rr_results->trans_received = trans_received;
+  sctp_rr_results->elapsed_time   = elapsed_time;
+  sctp_rr_results->cpu_method     = cpu_method;
+  sctp_rr_results->num_cpus       = lib_num_loc_cpus;
+  if (sctp_rr_request->measure_cpu) {
+    sctp_rr_results->cpu_util	= calc_cpu_util(elapsed_time);
+  }
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_rr: test complete, sending results.\n");
+    fflush(where);
+  }
+  
+  /* we are now done with the sockets */
+  close(s_data);
+  close(s_listen);
+
+  send_response();
+  
+}
+
+#endif				/* DO_SCTP */
+
  /* this routine implements the receive (netserver) side of a TCP_RR */
  /* test */
 void
@@ -6114,6 +10368,7 @@ recv_tcp_rr()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
+				IPPROTO_TCP,
 				tcp_rr_request->ipaddress,
 				tcp_rr_request->port);
   
@@ -6194,7 +10449,7 @@ recv_tcp_rr()
   /* attributes across an accept() call. Including this goes against */
   /* my better judgement :( raj 11/95 */
 
-  kludge_socket_options(s_data);
+  kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
 
@@ -6383,6 +10638,695 @@ rem_cpu_rate()
 	  calibrate_remote_cpu());
   
 }
+
+#ifdef DO_SCTP
+
+ /* this test is intended to test the performance of establishing a */
+ /* connection, exchanging a request/response pair, and repeating. it */
+ /* is expected that this would be a good starting-point for */
+ /* comparision of T/TCP with SCTP for transactional workloads. */
+ /* it will also look (can look) much like the communication pattern */
+ /* of http for www access. */
+
+void
+send_sctp_conn_rr(char remote_host[])
+{
+  
+  char *tput_title = "\
+Local /Remote\n\
+Socket Size   Request  Resp.   Elapsed  Trans.\n\
+Send   Recv   Size     Size    Time     Rate         \n\
+bytes  Bytes  bytes    bytes   secs.    per sec   \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1_line_1 = "\
+%-6d %-6d %-6d   %-6d  %-6.2f   %7.2f   \n";
+  char *tput_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *cpu_title = "\
+Local /Remote\n\
+Socket Size   Request Resp.  Elapsed Trans.   CPU    CPU    S.dem   S.dem\n\
+Send   Recv   Size    Size   Time    Rate     local  remote local   remote\n\
+bytes  bytes  bytes   bytes  secs.   per sec  %%      %%      us/Tr   us/Tr\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f\n";
+  
+  char *cpu_fmt_1_line_1 = "\
+%-6d %-6d %-6d  %-6d %-6.2f  %-6.2f   %-6.2f %-6.2f %-6.3f  %-6.3f\n";
+  
+  char *cpu_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *ksink_fmt = "\n\
+Alignment      Offset\n\
+Local  Remote  Local  Remote\n\
+Send   Recv    Send   Recv\n\
+%5d  %5d   %5d  %5d\n";
+  
+  
+  int 			one = 1;
+  int			timed_out = 0;
+  float			elapsed_time;
+  
+  int	len;
+  struct ring_elt *send_ring;
+  struct ring_elt *recv_ring;
+  char	*temp_message_ptr;
+  int	nummessages;
+  SOCKET	send_socket;
+  int	trans_remaining;
+  double	bytes_xferd;
+  int	sock_opt_len = sizeof(int);
+  int	rsp_bytes_left;
+  int	rsp_bytes_recvd;
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  struct        sockaddr_in     *myaddr;
+  unsigned      int             addr;
+  int                           myport;
+  int                           ret;
+
+  struct	sctp_conn_rr_request_struct	*sctp_conn_rr_request;
+  struct	sctp_conn_rr_response_struct	*sctp_conn_rr_response;
+  struct	sctp_conn_rr_results_struct	*sctp_conn_rr_result;
+  
+  sctp_conn_rr_request = 
+    (struct sctp_conn_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_conn_rr_response = 
+    (struct sctp_conn_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_conn_rr_result =
+    (struct sctp_conn_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+  
+  myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+  if (myaddr == NULL) {
+    printf("malloc(%ld) failed!\n", sizeof(struct sockaddr_in));
+    exit(1);
+  }
+
+  bzero((char *)&server,
+	sizeof(server));
+  bzero((char *)myaddr,
+	sizeof(struct sockaddr_in));
+  myaddr->sin_family = AF_INET;
+
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+
+  if ( print_headers ) {
+    fprintf(where,"SCTP Connect/Request/Response TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+  
+  /* initialize a few counters */
+  
+  nummessages	=	0;
+  bytes_xferd	=	0.0;
+  times_up 	= 	0;
+  
+  /* set-up the data buffers with the requested alignment and offset */
+  if (send_width == 0) send_width = 1;
+  if (recv_width == 0) recv_width = 1;
+
+  send_ring = allocate_buffer_ring(send_width,
+				   req_size,
+				   local_send_align,
+				   local_send_offset);
+
+  recv_ring = allocate_buffer_ring(recv_width,
+				   rsp_size,
+				   local_recv_align,
+				   local_recv_offset);
+
+
+  if (debug) {
+    fprintf(where,"send_sctp_conn_rr: send_socket obtained...\n");
+  }
+  
+  /* If the user has requested cpu utilization measurements, we must */
+  /* calibrate the cpu(s). We will perform this task within the tests */
+  /* themselves. If the user has specified the cpu rate, then */
+  /* calibrate_local_cpu will return rather quickly as it will have */
+  /* nothing to do. If local_cpu_rate is zero, then we will go through */
+  /* all the "normal" calibration stuff and return the rate back.*/
+  
+  if (local_cpu_usage) {
+    local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+  }
+  
+  /* Tell the remote end to do a listen. The server alters the socket */
+  /* paramters on the other side at this point, hence the reason for */
+  /* all the values being passed in the setup message. If the user did */
+  /* not specify any of the parameters, they will be passed as 0, which */
+  /* will indicate to the remote that no changes beyond the system's */
+  /* default should be used. Alignment is the exception, it will */
+  /* default to 8, which will be no alignment alterations. */
+  
+  netperf_request.content.request_type	=	DO_SCTP_CRR;
+  sctp_conn_rr_request->recv_buf_size	=	rsr_size;
+  sctp_conn_rr_request->send_buf_size	=	rss_size;
+  sctp_conn_rr_request->recv_alignment	=	remote_recv_align;
+  sctp_conn_rr_request->recv_offset	=	remote_recv_offset;
+  sctp_conn_rr_request->send_alignment	=	remote_send_align;
+  sctp_conn_rr_request->send_offset	=	remote_send_offset;
+  sctp_conn_rr_request->request_size	=	req_size;
+  sctp_conn_rr_request->response_size	=	rsp_size;
+  sctp_conn_rr_request->no_delay	=	rem_nodelay;
+  sctp_conn_rr_request->measure_cpu	=	remote_cpu_usage;
+  sctp_conn_rr_request->cpu_rate	=	remote_cpu_rate;
+  sctp_conn_rr_request->so_rcvavoid	=	rem_rcvavoid;
+  sctp_conn_rr_request->so_sndavoid	=	rem_sndavoid;
+  if (test_time) {
+    sctp_conn_rr_request->test_length	=	test_time;
+  }
+  else {
+    sctp_conn_rr_request->test_length	=	test_trans * -1;
+  }
+  sctp_conn_rr_request->port		=	(int)remote_data_port;
+
+  if (debug > 1) {
+    fprintf(where,"netperf: send_sctp_conn_rr: requesting SCTP crr test\n");
+  }
+  
+  send_request();
+  
+  /* The response from the remote will contain all of the relevant 	*/
+  /* socket parameters for this test type. We will put them back into 	*/
+  /* the variables here so they can be displayed if desired.  The	*/
+  /* remote will have calibrated CPU if necessary, and will have done	*/
+  /* all the needed set-up we will have calibrated the cpu locally	*/
+  /* before sending the request, and will grab the counter value right	*/
+  /* after the connect returns. The remote will grab the counter right	*/
+  /* after the accept call. This saves the hassle of extra messages	*/
+  /* being sent for the SCTP tests.					*/
+  
+  recv_response();
+  
+  if (!netperf_response.content.serv_errno) {
+    rsr_size	=	sctp_conn_rr_response->recv_buf_size;
+    rss_size	=	sctp_conn_rr_response->send_buf_size;
+    rem_nodelay	=	sctp_conn_rr_response->no_delay;
+    remote_cpu_usage=	sctp_conn_rr_response->measure_cpu;
+    remote_cpu_rate = 	sctp_conn_rr_response->cpu_rate;
+    /* make sure that port numbers are in network order */
+    server.sin_port	=	(short)sctp_conn_rr_response->data_port_number;
+    server.sin_port =	htons(server.sin_port);
+    if (debug) {
+      fprintf(where,"remote listen done.\n");
+      fprintf(where,"remote port is %d\n",ntohs(server.sin_port));
+      fflush(where);
+    }
+  }
+  else {
+    Set_errno(netperf_response.content.serv_errno);
+    fprintf(where,
+	    "netperf: remote error %d",
+	    netperf_response.content.serv_errno);
+    perror("");
+    fflush(where);
+    exit(1);
+  }
+  
+  /* pick a nice random spot between client_port_min and */
+  /* client_port_max for our initial port number */
+  srand(getpid());
+  if (client_port_max - client_port_min) {
+    myport = client_port_min + 
+      (rand() % (client_port_max - client_port_min));
+  }
+  else {
+    myport = client_port_min;
+  }
+  /* there will be a ++ before the first call to bind, so subtract one */
+  myport--;
+  myaddr->sin_port = htons((unsigned short)myport);
+  
+  /* Set-up the test end conditions. For a request/response test, they */
+  /* can be either time or transaction based. */
+  
+  if (test_time) {
+    /* The user wanted to end the test after a period of time. */
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(test_time);
+  }
+  else {
+    /* The tester wanted to send a number of bytes. */
+    trans_remaining = test_bytes;
+    times_up = 1;
+  }
+  
+  /* The cpu_start routine will grab the current time and possibly */
+  /* value of the idle counter for later use in measuring cpu */
+  /* utilization and/or service demand and thruput. */
+  
+  cpu_start(local_cpu_usage);
+  
+  /* We use an "OR" to control test execution. When the test is */
+  /* controlled by time, the byte count check will always return false. */
+  /* When the test is controlled by byte count, the time test will */
+  /* always return false. When the test is finished, the whole */
+  /* expression will go false and we will stop sending data. I think I */
+  /* just arbitrarily decrement trans_remaining for the timed test, but */
+  /* will not do that just yet... One other question is whether or not */
+  /* the send buffer and the receive buffer should be the same buffer. */
+
+  while ((!times_up) || (trans_remaining > 0)) {
+
+#ifdef HISTOGRAM
+    /* timestamp just before our call to create the socket, and then */
+    /* again just after the receive raj 3/95 */
+    HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+
+    /* set up the data socket */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP,
+				     local_data_ip,
+				     local_data_port);
+  
+    if (send_socket == INVALID_SOCKET) {
+      perror("netperf: send_sctp_conn_rr: sctp stream data socket");
+      exit(1);
+    }
+
+    /* we set SO_REUSEADDR on the premis that no unreserved port */
+    /* number on the local system is going to be already connected to */
+    /* the remote netserver's port number. One thing that I might */
+    /* try later is to have the remote actually allocate a couple of */
+    /* port numbers and cycle through those as well. depends on if we */
+    /* can get through all the unreserved port numbers in less than */
+    /* the length of the TIME_WAIT state raj 8/94 */
+    one = 1;
+    if(setsockopt(send_socket, SOL_SOCKET, SO_REUSEADDR,
+		  (char *)&one, sock_opt_len) == SOCKET_ERROR) {
+      perror("netperf: send_sctp_conn_rr: so_reuseaddr");
+      exit(1);
+    }
+
+newport:
+    /* pick a new port number */
+    myport = ntohs(myaddr->sin_port);
+    myport++;
+
+    /* wrap the port number when we get to client_port_max. NOTE, some */
+    /* broken SCTP's might treat the port number as a signed 16 bit */
+    /* quantity.  we aren't interested in testing such broken */
+    /* implementations :) so we won't make sure that it is below 32767 */
+    /* raj 8/94  */
+    if (myport >= client_port_max) {
+      myport = client_port_min;
+    }
+
+    /* we do not want to use the port number that the server is */
+    /* sitting at - this would cause us to fail in a loopback test. we */
+    /* could just rely on the failure of the bind to get us past this, */
+    /* but I'm guessing that in this one case at least, it is much */
+    /* faster, given that we *know* that port number is already in use */
+    /* (or rather would be in a loopback test) */
+
+    if (myport == ntohs(server.sin_port)) myport++;
+
+    myaddr->sin_port = htons((unsigned short)myport);
+
+    if (debug) {
+      if ((nummessages % 100) == 0) {
+	printf("port %d\n",myport);
+      }
+    }
+
+    /* we want to bind our socket to a particular port number. */
+    if ((ret = bind(send_socket,
+		   (struct sockaddr *)myaddr,
+		   sizeof(struct sockaddr_in))) == SOCKET_ERROR) {
+      /* if the bind failed, someone else must have that port number */
+      /* - perhaps in the listen state. since we can't use it, skip to */
+      /* the next port number. we may have to do this again later, but */
+      /* that's just too bad :) */
+      if (SOCKET_EINTR(ret))
+	  {
+	    /* we hit the end of a */
+	    /* timed test. */
+	    timed_out = 1;
+	    break;
+      }
+      if (debug > 1) {
+	fprintf(where,
+		"send_sctp_conn_rr: tried to bind to port %d errno %d\n",
+		ntohs(myaddr->sin_port),
+		errno);
+	fflush(where);
+      }
+	/* yes, goto's are supposed to be evil, but they do have their */
+	/* uses from time to time. the real world doesn't always have */
+	/* to code to ge tthe A in CS 101 :) raj 3/95 */
+	goto newport;
+    }
+
+    /* Connect up to the remote port on the data socket  */
+    if ((ret = connect(send_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server))) == INVALID_SOCKET){
+      if (SOCKET_EINTR(ret))
+	  {
+	    /* we hit the end of a */
+	    /* timed test. */
+	    timed_out = 1;
+	    break;
+      }
+      perror("netperf: data socket connect failed");
+      printf("\tattempted to connect on socket %d to port %d",
+	     send_socket,
+	     ntohs(server.sin_port));
+      printf(" from port %d \n",ntohs(myaddr->sin_port));
+      exit(1);
+    }
+
+    /* send the request */
+    if((len=send(send_socket,
+		 send_ring->buffer_ptr,
+		 req_size,
+		 0)) != req_size) {
+      if (SOCKET_EINTR(len))
+	  {
+	    /* we hit the end of a */
+	    /* timed test. */
+	    timed_out = 1;
+	    break;
+      }
+      perror("send_sctp_conn_rr: data send error");
+      exit(1);
+    }
+    send_ring = send_ring->next;
+
+    /* receive the response */
+    rsp_bytes_left = rsp_size;
+    temp_message_ptr  = recv_ring->buffer_ptr;
+
+    while((rsp_bytes_recvd=recv(send_socket,
+			       temp_message_ptr,
+			       rsp_bytes_left,
+			       0)) > 0) {
+      rsp_bytes_left -= rsp_bytes_recvd;
+      /* if we allow rsp_bytes_left to go to zero, we may mistankenly */
+      /* detect connection close - ask for zero bytes, get zero */
+      /* bytes... so, make sure that we always ask for at least one */
+      /* byte. raj 10/96 */
+      if (rsp_bytes_left == 0) rsp_bytes_left = 1;
+      temp_message_ptr += rsp_bytes_recvd;
+    }
+
+    /* our exit from the while loop should generally be when */
+    /* tmp_bytes_recvd is equal to zero, which implies the connection */
+    /* has been closed by the server side. By waiting until we get the */
+    /* zero return we can avoid race conditions that stick us with the */
+    /* TIME_WAIT connection and not the server. raj 8/96 */
+
+    if (rsp_bytes_recvd == 0) {
+      /* connection close, call close. we assume that the requisite */
+      /* number of bytes have been received */
+      recv_ring = recv_ring->next;
+
+#ifdef HISTOGRAM
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */
+
+      nummessages++;          
+      if (trans_remaining) {
+	trans_remaining--;
+      }
+    
+      if (debug > 3) {
+	fprintf(where,
+		"Transaction %d completed on local port %d\n",
+		nummessages,
+		ntohs(myaddr->sin_port));
+	fflush(where);
+      }
+
+      close(send_socket);
+
+    }
+    else {
+      /* it was less than zero - an error occured */
+      if (SOCKET_EINTR(rsp_bytes_recvd))
+	  {
+	    /* We hit the end of a timed test. */
+	    timed_out = 1;
+	    break;
+	  }
+	  perror("send_sctp_conn_rr: data recv error");
+	  exit(1);
+    }
+      
+  }
+
+  
+  /* this call will always give us the elapsed time for the test, and */
+  /* will also store-away the necessaries for cpu utilization */
+
+  cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being measured? */
+  /* how long did we really run? */
+  
+  /* Get the statistics from the remote end. The remote will have */
+  /* calculated service demand and all those interesting things. If it */
+  /* wasn't supposed to care, it will return obvious values. */
+  
+  recv_response();
+  if (!netperf_response.content.serv_errno) {
+    if (debug)
+      fprintf(where,"remote results obtained\n");
+  }
+  else {
+    Set_errno(netperf_response.content.serv_errno);
+    fprintf(where,
+	    "netperf: remote error %d",
+	     netperf_response.content.serv_errno);
+    perror("");
+    fflush(where);
+      
+    exit(1);
+  }
+  
+  /* We now calculate what our thruput was for the test. In the future, */
+  /* we may want to include a calculation of the thruput measured by */
+  /* the remote, but it should be the case that for a SCTP stream test, */
+  /* that the two numbers should be *very* close... We calculate */
+  /* bytes_sent regardless of the way the test length was controlled. */
+  /* If it was time, we needed to, and if it was by bytes, the user may */
+  /* have specified a number of bytes that wasn't a multiple of the */
+  /* send_size, so we really didn't send what he asked for ;-) We use */
+  /* Kbytes/s as the units of thruput for a SCTP stream test, where K = */
+  /* 1024. A future enhancement *might* be to choose from a couple of */
+  /* unit selections. */ 
+  
+  bytes_xferd	= (req_size * nummessages) + (rsp_size * nummessages);
+  thruput	= calc_thruput(bytes_xferd);
+  
+  if (local_cpu_usage || remote_cpu_usage) {
+    /* We must now do a little math for service demand and cpu */
+    /* utilization for the system(s) */
+    /* Of course, some of the information might be bogus because */
+    /* there was no idle counter in the kernel(s). We need to make */
+    /* a note of this for the user's benefit...*/
+    if (local_cpu_usage) {
+      if (local_cpu_rate == 0.0) {
+	fprintf(where,"WARNING WARNING WARNING  WARNING WARNING WARNING  WARNING!\n");
+	fprintf(where,"Local CPU usage numbers based on process information only!\n");
+	fflush(where);
+      }
+      local_cpu_utilization = calc_cpu_util(0.0);
+      /* since calc_service demand is doing ms/Kunit we will */
+      /* multiply the number of transaction by 1024 to get */
+      /* "good" numbers */
+      local_service_demand  = calc_service_demand((double) nummessages*1024,
+						  0.0,
+						  0.0,
+						  0);
+    }
+    else {
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+    }
+    
+    if (remote_cpu_usage) {
+      if (remote_cpu_rate == 0.0) {
+	fprintf(where,"DANGER  DANGER  DANGER    DANGER  DANGER  DANGER    DANGER!\n");
+	fprintf(where,"Remote CPU usage numbers based on process information only!\n");
+	fflush(where);
+      }
+      remote_cpu_utilization = sctp_conn_rr_result->cpu_util;
+      /* since calc_service demand is doing ms/Kunit we will */
+      /* multiply the number of transaction by 1024 to get */
+      /* "good" numbers */
+      remote_service_demand = calc_service_demand((double) nummessages*1024,
+						  0.0,
+						  remote_cpu_utilization,
+						  sctp_conn_rr_result->num_cpus);
+    }
+    else {
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+    
+    /* We are now ready to print all the information. If the user */
+    /* has specified zero-level verbosity, we will just print the */
+    /* local service demand, or the remote service demand. If the */
+    /* user has requested verbosity level 1, he will get the basic */
+    /* "streamperf" numbers. If the user has specified a verbosity */
+    /* of greater than 1, we will display a veritable plethora of */
+    /* background information from outside of this block as it it */
+    /* not cpu_measurement specific...  */
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand);
+      }
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand);
+      }
+      break;
+    case 1:
+    case 2:
+
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		local_cpu_method,
+		remote_cpu_method);
+      }
+      
+      fprintf(where,
+	      cpu_fmt_1_line_1,		/* the format string */
+	      lss_size,		/* local sendbuf size */
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* guess */
+	      elapsed_time,		/* how long was the test */
+	      nummessages/elapsed_time,
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      fprintf(where,
+	      cpu_fmt_1_line_2,
+	      rss_size,
+	      rsr_size);
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      nummessages/elapsed_time);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+
+      fprintf(where,
+	      tput_fmt_1_line_1,	/* the format string */
+	      lss_size,
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* how large were the responses */
+	      elapsed_time, 		/* how long did it take */
+	      nummessages/elapsed_time);
+      fprintf(where,
+	      tput_fmt_1_line_2,
+	      rss_size, 		/* remote recvbuf size */
+	      rsr_size);
+      
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+    
+    fprintf(where,
+	    ksink_fmt,
+	    local_send_align,
+	    remote_recv_offset,
+	    local_send_offset,
+	    remote_recv_offset);
+
+#ifdef HISTOGRAM
+    fprintf(where,"\nHistogram of request/response times\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+
+  }
+  
+}
+
+#endif				/* DO_SCTP */
 
 
  /* this test is intended to test the performance of establishing a */
@@ -6690,6 +11634,7 @@ Send   Recv    Send   Recv\n\
     /* set up the data socket */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
+				     IPPROTO_TCP,
 				     local_data_ip,
 				     local_data_port);
   
@@ -7070,6 +12015,382 @@ newport:
 }
 
 
+#ifdef DO_SCTP
+void
+recv_sctp_conn_rr()
+{
+  
+  char  *message;
+  struct	sockaddr_in        myaddr_in,
+  peeraddr_in;
+  SOCKET	s_listen,s_data;
+  int 	addrlen;
+  char	*recv_message_ptr;
+  char	*send_message_ptr;
+  char	*temp_message_ptr;
+  int	trans_received;
+  int	trans_remaining;
+  int	bytes_sent;
+  int	request_bytes_recvd;
+  int	request_bytes_remaining;
+  int	timed_out = 0;
+  float	elapsed_time;
+  
+  struct	sctp_conn_rr_request_struct	*sctp_conn_rr_request;
+  struct	sctp_conn_rr_response_struct	*sctp_conn_rr_response;
+  struct	sctp_conn_rr_results_struct	*sctp_conn_rr_results;
+  
+  sctp_conn_rr_request = 
+    (struct sctp_conn_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_conn_rr_response = 
+    (struct sctp_conn_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_conn_rr_results = 
+    (struct sctp_conn_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_conn_rr: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired */
+  /* parameters and then let the initiator know that all is ready. If */
+  /* socket size defaults are to be used, then the initiator will have */
+  /* sent us 0's. If the socket sizes cannot be changed, then we will */
+  /* send-back what they are. If that information cannot be determined, */
+  /* then we send-back -1's for the sizes. If things go wrong for any */
+  /* reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It */
+  /* would be best if the error that the remote reports to the user is */
+  /* the actual error we encountered, rather than some bogus unexpected */
+  /* response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_conn_rr: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_CRR_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_conn_rr: the response type is set...\n");
+    fflush(where);
+  }
+
+  /* set-up the data buffer with the requested alignment and offset */
+  message = (char *)malloc(DATABUFFERLEN);
+  if (message == NULL) {
+    printf("malloc(%d) failed!\n", DATABUFFERLEN);
+    exit(1);
+  }
+  
+  /* We now alter the message_ptr variables to be at the desired */
+  /* alignments with the desired offsets. */
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_conn_rr: requested recv alignment of %d offset %d\n",
+	    sctp_conn_rr_request->recv_alignment,
+	    sctp_conn_rr_request->recv_offset);
+    fprintf(where,
+	    "recv_sctp_conn_rr: requested send alignment of %d offset %d\n",
+	    sctp_conn_rr_request->send_alignment,
+	    sctp_conn_rr_request->send_offset);
+    fflush(where);
+  }
+
+  recv_message_ptr = ALIGN_BUFFER(message, sctp_conn_rr_request->recv_alignment, sctp_conn_rr_request->recv_offset);
+  
+  send_message_ptr = ALIGN_BUFFER(message, sctp_conn_rr_request->send_alignment, sctp_conn_rr_request->send_offset);
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_conn_rr: receive alignment and offset set...\n");
+    fflush(where);
+  }
+  
+  /* Grab a socket to listen on, and then listen on it. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_conn_rr: grabbing a socket...\n");
+    fflush(where);
+  }
+
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_conn_rr_request->send_buf_size;
+  lsr_size_req = sctp_conn_rr_request->recv_buf_size;
+  loc_nodelay = sctp_conn_rr_request->no_delay;
+  loc_rcvavoid = sctp_conn_rr_request->so_rcvavoid;
+  loc_sndavoid = sctp_conn_rr_request->so_sndavoid;
+  
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP,
+				sctp_conn_rr_request->ipaddress,
+				sctp_conn_rr_request->port);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    if (debug) {
+      fprintf(where,"could not create data socket\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not listen\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen,
+		  (struct sockaddr *)&myaddr_in,
+		  &addrlen) == SOCKET_ERROR){
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not geetsockname\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_conn_rr_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  if (debug) {
+    fprintf(where,"telling the remote to call me at %d\n",
+	    sctp_conn_rr_response->data_port_number);
+    fflush(where);
+  }
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a 0.0 to */
+  /* the initiator. */
+  
+  sctp_conn_rr_response->cpu_rate = (float)0.0; 	/* assume no cpu */
+  if (sctp_conn_rr_request->measure_cpu) {
+    sctp_conn_rr_response->measure_cpu = 1;
+    sctp_conn_rr_response->cpu_rate = 
+      calibrate_local_cpu(sctp_conn_rr_request->cpu_rate);
+  }
+  
+
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_conn_rr_response->send_buf_size = lss_size;
+  sctp_conn_rr_response->recv_buf_size = lsr_size;
+  sctp_conn_rr_response->no_delay = loc_nodelay;
+  sctp_conn_rr_response->so_rcvavoid = loc_rcvavoid;
+  sctp_conn_rr_response->so_sndavoid = loc_sndavoid;
+
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+  
+  /* Now it's time to start receiving data on the connection. We will */
+  /* first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_conn_rr_request->measure_cpu);
+  
+  /* The loop will exit when the sender does a shutdown, which will */
+  /* return a length of zero   */
+  
+  if (sctp_conn_rr_request->test_length > 0) {
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(sctp_conn_rr_request->test_length + PAD_TIME);
+  }
+  else {
+    times_up = 1;
+    trans_remaining = sctp_conn_rr_request->test_length * -1;
+  }
+  
+  trans_received = 0;
+
+  while ((!times_up) || (trans_remaining > 0)) {
+
+    /* accept a connection from the remote */
+    if ((s_data=accept(s_listen,
+		       (struct sockaddr *)&peeraddr_in,
+		       &addrlen)) == INVALID_SOCKET) {
+      if (errno == EINTR) {
+	/* the timer popped */
+	timed_out = 1;
+	break;
+      }
+      fprintf(where,"recv_sctp_conn_rr: accept: errno = %d\n",errno);
+      fflush(where);
+      close(s_listen);
+      
+      exit(1);
+    }
+
+    if (debug) {
+      fprintf(where,"recv_sctp_conn_rr: accepted data connection.\n");
+      fflush(where);
+    }
+  
+#ifdef WIN32
+  /* this is used so the timer thread can close the socket out from */
+  /* under us, which to date is the easiest/cleanest/least */
+  /* Windows-specific way I can find to force the winsock calls to */
+  /* return WSAEINTR with the test is over. anything that will run on */
+  /* 95 and NT and is closer to what netperf expects from Unix signals */
+  /* and such would be appreciated raj 1/96 */
+  win_kludge_socket = s_data;
+#endif /* WIN32 */
+
+#ifdef KLUDGE_SOCKET_OPTIONS
+    /* this is for those systems which *INCORRECTLY* fail to pass */
+    /* attributes across an accept() call. Including this goes against */
+    /* my better judgement :( raj 11/95 */
+    
+    kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+  
+    temp_message_ptr	= recv_message_ptr;
+    request_bytes_remaining	= sctp_conn_rr_request->request_size;
+    
+    /* receive the request from the other side */
+    while (!times_up && (request_bytes_remaining > 0)) {
+      if((request_bytes_recvd=recv(s_data,
+				   temp_message_ptr,
+				   request_bytes_remaining,
+				   0)) == SOCKET_ERROR) {
+	if (SOCKET_EINTR(request_bytes_recvd))
+	{
+	  /* the timer popped */
+	  timed_out = 1;
+	  break;
+	}
+	netperf_response.content.serv_errno = errno;
+	send_response();
+	exit(1);
+      }
+      else {
+	request_bytes_remaining -= request_bytes_recvd;
+	temp_message_ptr  += request_bytes_recvd;
+      }
+    }
+    
+    if (timed_out) {
+      /* we hit the end of the test based on time - lets */
+      /* bail out of here now... */
+      fprintf(where,"yo5\n");
+      fflush(where);						
+      break;
+    }
+    
+    /* Now, send the response to the remote */
+    if((bytes_sent=send(s_data,
+			send_message_ptr,
+			sctp_conn_rr_request->response_size,
+			0)) == SOCKET_ERROR) {
+      if (errno == EINTR) {
+	/* the test timer has popped */
+	timed_out = 1;
+	fprintf(where,"yo6\n");
+	fflush(where);						
+	break;
+      }
+      netperf_response.content.serv_errno = 99;
+      send_response();
+      exit(1);
+    }
+    
+    trans_received++;
+    if (trans_remaining) {
+      trans_remaining--;
+    }
+    
+    if (debug) {
+      fprintf(where,
+	      "recv_sctp_conn_rr: Transaction %d complete\n",
+	      trans_received);
+      fflush(where);
+    }
+
+    /* close the connection. the server will likely do a graceful */
+    /* close of the connection, insuring that all data has arrived at */
+    /* the client. for this it will call shutdown(), and then recv() and */
+    /* then close(). I'm reasonably confident that this is the */
+    /* appropriate sequence of calls - I would like to hear of */
+    /* examples in web servers to the contrary. raj 10/95*/
+#ifdef SCTP_CRR_SHUTDOWN
+    shutdown(s_data,SHUT_WR);
+    recv(s_data,
+	 recv_message_ptr,
+	 1,
+	 0);
+    close(s_data);
+#else
+    close(s_data);
+#endif /* SCTP_CRR_SHUTDOWN */
+
+  }
+  
+  
+  /* The loop now exits due to timeout or transaction count being */
+  /* reached */
+  
+  cpu_stop(sctp_conn_rr_request->measure_cpu,&elapsed_time);
+  
+  if (timed_out) {
+    /* we ended the test by time, which was at least 2 seconds */
+    /* longer than we wanted to run. so, we want to subtract */
+    /* PAD_TIME from the elapsed_time. */
+    elapsed_time -= PAD_TIME;
+  }
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_conn_rr: got %d transactions\n",
+	    trans_received);
+    fflush(where);
+  }
+  
+  sctp_conn_rr_results->bytes_received	= (trans_received * 
+					   (sctp_conn_rr_request->request_size + 
+					    sctp_conn_rr_request->response_size));
+  sctp_conn_rr_results->trans_received	= trans_received;
+  sctp_conn_rr_results->elapsed_time	= elapsed_time;
+  if (sctp_conn_rr_request->measure_cpu) {
+    sctp_conn_rr_results->cpu_util	= calc_cpu_util(elapsed_time);
+  }
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_conn_rr: test complete, sending results.\n");
+    fflush(where);
+  }
+  
+  send_response();
+  
+}
+#endif				/* DO_SCTP */
+
 void
 recv_tcp_conn_rr()
 {
@@ -7181,6 +12502,7 @@ recv_tcp_conn_rr()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
+				IPPROTO_TCP,
 				tcp_conn_rr_request->ipaddress,
 				tcp_conn_rr_request->port);
   
@@ -7318,7 +12640,7 @@ recv_tcp_conn_rr()
     /* attributes across an accept() call. Including this goes against */
     /* my better judgement :( raj 11/95 */
     
-    kludge_socket_options(s_data);
+    kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
   
@@ -7442,6 +12764,1079 @@ recv_tcp_conn_rr()
   send_response();
   
 }
+
+#ifdef DO_SCTP
+#ifdef DO_1644
+
+ /* this test is intended to test the performance of establishing a */
+ /* connection, exchanging a request/response pair, and repeating. it */
+ /* is expected that this would be a good starting-point for */
+ /* comparision of T/TCP with classic TCP for transactional workloads. */
+ /* it will also look (can look) much like the communication pattern */
+ /* of http for www access. */
+
+int 
+send_sctp_tran_rr(char remote_host[])
+{
+  
+  char *tput_title = "\
+Local /Remote\n\
+Socket Size   Request  Resp.   Elapsed  Trans.\n\
+Send   Recv   Size     Size    Time     Rate         \n\
+bytes  Bytes  bytes    bytes   secs.    per sec   \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1_line_1 = "\
+%-6d %-6d %-6d   %-6d  %-6.2f   %7.2f   \n";
+  char *tput_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *cpu_title = "\
+Local /Remote\n\
+Socket Size   Request Resp.  Elapsed Trans.   CPU    CPU    S.dem   S.dem\n\
+Send   Recv   Size    Size   Time    Rate     local  remote local   remote\n\
+bytes  bytes  bytes   bytes  secs.   per sec  %%      %%      us/Tr   us/Tr\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f\n";
+  
+  char *cpu_fmt_1_line_1 = "\
+%-6d %-6d %-6d  %-6d %-6.2f  %-6.2f   %-6.2f %-6.2f %-6.3f  %-6.3f\n";
+  
+  char *cpu_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *ksink_fmt = "\n\
+Alignment      Offset\n\
+Local  Remote  Local  Remote\n\
+Send   Recv    Send   Recv\n\
+%5d  %5d   %5d  %5d\n";
+  
+  
+  int 			one = 1;
+  int			timed_out = 0;
+  float			elapsed_time;
+  
+  int	len;
+  struct ring_elt *send_ring;
+  struct ring_elt *recv_ring;
+  char	*temp_message_ptr;
+  int	nummessages;
+  SOCKET	send_socket;
+  int	trans_remaining;
+  double	bytes_xferd;
+  int	sock_opt_len = sizeof(int);
+  int	rsp_bytes_left;
+  int	rsp_bytes_recvd;
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  struct        sockaddr_in     *myaddr;
+  unsigned      int             addr;
+  int                           myport;
+
+  struct	sctp_tran_rr_request_struct	*sctp_tran_rr_request;
+  struct	sctp_tran_rr_response_struct	*sctp_tran_rr_response;
+  struct	sctp_tran_rr_results_struct	*sctp_tran_rr_result;
+  
+  sctp_tran_rr_request = 
+    (struct sctp_tran_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_tran_rr_response = 
+    (struct sctp_tran_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_tran_rr_result =
+    (struct sctp_tran_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+  
+  myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+  if (myaddr == NULL) {
+    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
+    exit(1);
+  }
+
+  bzero((char *)&server,
+	sizeof(server));
+  bzero((char *)myaddr,
+	sizeof(struct sockaddr_in));
+  myaddr->sin_family = AF_INET;
+
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+
+  if ( print_headers ) {
+    fprintf(where,"TCP Transactional/Request/Response TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+  
+  /* initialize a few counters */
+  
+  nummessages	=	0;
+  bytes_xferd	=	0.0;
+  times_up 	= 	0;
+  
+  /* set-up the data buffers with the requested alignment and offset */
+  if (send_width == 0) send_width = 1;
+  if (recv_width == 0) recv_width = 1;
+
+  send_ring = allocate_buffer_ring(send_width,
+				   req_size,
+				   local_send_align,
+				   local_send_offset);
+
+  recv_ring = allocate_buffer_ring(recv_width,
+				   rsp_size,
+				   local_recv_align,
+				   local_recv_offset);
+
+
+  if (debug) {
+    fprintf(where,"send_sctp_tran_rr: send_socket obtained...\n");
+  }
+  
+  /* If the user has requested cpu utilization measurements, we must */
+  /* calibrate the cpu(s). We will perform this task within the tests */
+  /* themselves. If the user has specified the cpu rate, then */
+  /* calibrate_local_cpu will return rather quickly as it will have */
+  /* nothing to do. If local_cpu_rate is zero, then we will go through */
+  /* all the "normal" calibration stuff and return the rate back.*/
+  
+  if (local_cpu_usage) {
+    local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+  }
+  
+  /* Tell the remote end to do a listen. The server alters the socket */
+  /* paramters on the other side at this point, hence the reason for */
+  /* all the values being passed in the setup message. If the user did */
+  /* not specify any of the parameters, they will be passed as 0, which */
+  /* will indicate to the remote that no changes beyond the system's */
+  /* default should be used. Alignment is the exception, it will */
+  /* default to 8, which will be no alignment alterations. */
+  
+  netperf_request.content.request_type	=	DO_TCP_TRR;
+  sctp_tran_rr_request->recv_buf_size	=	rsr_size;
+  sctp_tran_rr_request->send_buf_size	=	rss_size;
+  sctp_tran_rr_request->recv_alignment	=	remote_recv_align;
+  sctp_tran_rr_request->recv_offset	=	remote_recv_offset;
+  sctp_tran_rr_request->send_alignment	=	remote_send_align;
+  sctp_tran_rr_request->send_offset	=	remote_send_offset;
+  sctp_tran_rr_request->request_size	=	req_size;
+  sctp_tran_rr_request->response_size	=	rsp_size;
+  sctp_tran_rr_request->no_delay	=	rem_nodelay;
+  sctp_tran_rr_request->measure_cpu	=	remote_cpu_usage;
+  sctp_tran_rr_request->cpu_rate	=	remote_cpu_rate;
+  sctp_tran_rr_request->so_rcvavoid	=	rem_rcvavoid;
+  sctp_tran_rr_request->so_sndavoid	=	rem_sndavoid;
+  if (test_time) {
+    sctp_tran_rr_request->test_length	=	test_time;
+  }
+  else {
+    sctp_tran_rr_request->test_length	=	test_trans * -1;
+  }
+  
+  if (debug > 1) {
+    fprintf(where,"netperf: send_sctp_tran_rr: requesting TCP_TRR test\n");
+  }
+  
+  send_request();
+  
+  /* The response from the remote will contain all of the relevant 	*/
+  /* socket parameters for this test type. We will put them back into 	*/
+  /* the variables here so they can be displayed if desired.  The	*/
+  /* remote will have calibrated CPU if necessary, and will have done	*/
+  /* all the needed set-up we will have calibrated the cpu locally	*/
+  /* before sending the request, and will grab the counter value right	*/
+  /* after the connect returns. The remote will grab the counter right	*/
+  /* after the accept call. This saves the hassle of extra messages	*/
+  /* being sent for the TCP tests.					*/
+  
+  recv_response();
+  
+  if (!netperf_response.content.serv_errno) {
+    rsr_size	=	sctp_tran_rr_response->recv_buf_size;
+    rss_size	=	sctp_tran_rr_response->send_buf_size;
+    rem_nodelay	=	sctp_tran_rr_response->no_delay;
+    remote_cpu_usage=	sctp_tran_rr_response->measure_cpu;
+    remote_cpu_rate = 	sctp_tran_rr_response->cpu_rate;
+    /* make sure that port numbers are in network order */
+    server.sin_port	=	sctp_tran_rr_response->data_port_number;
+    server.sin_port =	htons(server.sin_port);
+    if (debug) {
+      fprintf(where,"remote listen done.\n");
+      fprintf(where,"remote port is %d\n",ntohs(server.sin_port));
+      fflush(where);
+    }
+  }
+  else {
+    Set_errno(netperf_response.content.serv_errno);
+    fprintf(where,
+	    "netperf: remote error %d",
+	    netperf_response.content.serv_errno);
+    perror("");
+    fflush(where);
+    exit(1);
+  }
+
+  /* pick a nice random spot between client_port_min and */
+  /* client_port_max for our initial port number. if they are the */
+  /* same, then just set to _min */
+  if (client_port_max - client_port_min) {
+    srand(getpid());
+    myport = client_port_min + 
+      (rand() % (client_port_max - client_port_min));
+  }
+  else {
+    myport = client_port_min;
+  }
+
+  /* there will be a ++ before the first call to bind, so subtract one */
+  myport--;
+  myaddr->sin_port = htons((unsigned short)myport);
+  
+  /* Set-up the test end conditions. For a request/response test, they */
+  /* can be either time or transaction based. */
+  
+  if (test_time) {
+    /* The user wanted to end the test after a period of time. */
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(test_time);
+  }
+  else {
+    /* The tester wanted to send a number of bytes. */
+    trans_remaining = test_bytes;
+    times_up = 1;
+  }
+  
+  /* The cpu_start routine will grab the current time and possibly */
+  /* value of the idle counter for later use in measuring cpu */
+  /* utilization and/or service demand and thruput. */
+  
+  cpu_start(local_cpu_usage);
+  
+  /* We use an "OR" to control test execution. When the test is */
+  /* controlled by time, the byte count check will always return false. */
+  /* When the test is controlled by byte count, the time test will */
+  /* always return false. When the test is finished, the whole */
+  /* expression will go false and we will stop sending data. I think I */
+  /* just arbitrarily decrement trans_remaining for the timed test, but */
+  /* will not do that just yet... One other question is whether or not */
+  /* the send buffer and the receive buffer should be the same buffer. */
+
+  while ((!times_up) || (trans_remaining > 0)) {
+
+#ifdef HISTOGRAM
+    /* timestamp just before our call to create the socket, and then */
+    /* again just after the receive raj 3/95 */
+    HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+
+    /* set up the data socket - is this really necessary or can I just */
+    /* re-use the same socket and move this cal out of the while loop. */
+    /* it does introcudea *boatload* of system calls. I guess that it */
+    /* all depends on "reality of programming." keeping it this way is */
+    /* a bit more conservative I imagine - raj 3/95 */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_TCP);
+  
+    if (send_socket == INAVLID_SOCKET) {
+      perror("netperf: send_sctp_tran_rr: sctp stream data socket");
+      exit(1);
+    }
+
+    /* we set SO_REUSEADDR on the premis that no unreserved port */
+    /* number on the local system is going to be already connected to */
+    /* the remote netserver's port number. One thing that I might */
+    /* try later is to have the remote actually allocate a couple of */
+    /* port numbers and cycle through those as well. depends on if we */
+    /* can get through all the unreserved port numbers in less than */
+    /* the length of the TIME_WAIT state raj 8/94 */
+    one = 1;
+    if(setsockopt(send_socket, SOL_SOCKET, SO_REUSEADDR,
+		  (char *)&one, sock_opt_len) == SOCKET_ERROR) {
+      perror("netperf: send_sctp_tran_rr: so_reuseaddr");
+      exit(1);
+    }
+
+newport:
+    /* pick a new port number */
+    myport = ntohs(myaddr->sin_port);
+    myport++;
+
+    /* we do not want to use the port number that the server is */
+    /* sitting at - this would cause us to fail in a loopback test. we */
+    /* could just rely on the failure of the bind to get us past this, */
+    /* but I'm guessing that in this one case at least, it is much */
+    /* faster, given that we *know* that port number is already in use */
+    /* (or rather would be in a loopback test) */
+
+    if (myport == ntohs(server.sin_port)) myport++;
+
+    /* wrap the port number when we get to 65535. NOTE, some broken */
+    /* TCP's might treat the port number as a signed 16 bit quantity. */
+    /* we aren't interested in testing such broken implementations :) */
+    /* raj 8/94  */
+    if (myport >= client_port_max) {
+      myport = client_port_min;
+    }
+    myaddr->sin_port = htons((unsigned short)myport);
+
+    if (debug) {
+      if ((nummessages % 100) == 0) {
+	printf("port %d\n",myport);
+      }
+    }
+
+    /* we want to bind our socket to a particular port number. */
+    if (bind(send_socket,
+	     (struct sockaddr *)myaddr,
+	     sizeof(struct sockaddr_in)) == SOCKET_ERROR) {
+      /* if the bind failed, someone else must have that port number */
+      /* - perhaps in the listen state. since we can't use it, skip to */
+      /* the next port number. we may have to do this again later, but */
+      /* that's just too bad :) */
+      if (debug > 1) {
+	fprintf(where,
+		"send_sctp_tran_rr: tried to bind to port %d errno %d\n",
+		ntohs(myaddr->sin_port),
+		errno);
+	fflush(where);
+      }
+	/* yes, goto's are supposed to be evil, but they do have their */
+	/* uses from time to time. the real world doesn't always have */
+	/* to code to ge tthe A in CS 101 :) raj 3/95 */
+	goto newport;
+    }
+
+    /* Connect up to the remote port on the data socket. Since this is */
+    /* a test for RFC_1644-style transactional TCP, we can use the */
+    /* sendto() call instead of calling connect and then send() */
+
+    /* send the request */
+    if((len=sendto(send_socket,
+		   send_ring->buffer_ptr,
+		   req_size,
+		   MSG_EOF, 
+		   (struct sockaddr *)&server,
+		   sizeof(server))) != req_size) {
+      if (SOCKET_EINTR(len))
+	  {
+	    /* we hit the end of a */
+	    /* timed test. */
+	    timed_out = 1;
+	    break;
+      }
+      perror("send_sctp_tran_rr: data send error");
+      exit(1);
+    }
+    send_ring = send_ring->next;
+
+    /* receive the response */
+    rsp_bytes_left = rsp_size;
+    temp_message_ptr  = recv_ring->buffer_ptr;
+    while(rsp_bytes_left > 0) {
+      if((rsp_bytes_recvd=recv(send_socket,
+			       temp_message_ptr,
+			       rsp_bytes_left,
+			       0)) == SOCKET_ERROR) {
+	    if (SOCKET_EINTR(rsp_bytes_recvd))
+		{
+	      /* We hit the end of a timed test. */
+	      timed_out = 1;
+	      break;
+		}
+	    perror("send_sctp_tran_rr: data recv error");
+	    exit(1);
+      }
+      rsp_bytes_left -= rsp_bytes_recvd;
+      temp_message_ptr  += rsp_bytes_recvd;
+    }	
+    recv_ring = recv_ring->next;
+
+    if (timed_out) {
+      /* we may have been in a nested while loop - we need */
+      /* another call to break. */
+      break;
+    }
+
+    close(send_socket);
+
+#ifdef HISTOGRAM
+    HIST_timestamp(&time_two);
+    HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */
+
+    nummessages++;          
+    if (trans_remaining) {
+      trans_remaining--;
+    }
+    
+    if (debug > 3) {
+      fprintf(where,
+	      "Transaction %d completed on local port %d\n",
+	      nummessages,
+	      ntohs(myaddr->sin_port));
+      fflush(where);
+    }
+
+
+  }
+  
+  /* this call will always give us the elapsed time for the test, and */
+  /* will also store-away the necessaries for cpu utilization */
+
+  cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being measured? */
+  /* how long did we really run? */
+  
+  /* Get the statistics from the remote end. The remote will have */
+  /* calculated service demand and all those interesting things. If it */
+  /* wasn't supposed to care, it will return obvious values. */
+  
+  recv_response();
+  if (!netperf_response.content.serv_errno) {
+    if (debug)
+      fprintf(where,"remote results obtained\n");
+  }
+  else {
+    Set_errno(netperf_response.content.serv_errno);
+    fprintf(where,
+	    "netperf: remote error %d",
+	    netperf_response.content.serv_errno);
+    perror("");
+    fflush(where);
+    exit(1);
+  }
+  
+  /* We now calculate what our thruput was for the test. In the future, */
+  /* we may want to include a calculation of the thruput measured by */
+  /* the remote, but it should be the case that for a TCP stream test, */
+  /* that the two numbers should be *very* close... We calculate */
+  /* bytes_sent regardless of the way the test length was controlled. */
+  /* If it was time, we needed to, and if it was by bytes, the user may */
+  /* have specified a number of bytes that wasn't a multiple of the */
+  /* send_size, so we really didn't send what he asked for ;-) We use */
+  /* Kbytes/s as the units of thruput for a TCP stream test, where K = */
+  /* 1024. A future enhancement *might* be to choose from a couple of */
+  /* unit selections. */ 
+  
+  bytes_xferd	= (req_size * nummessages) + (rsp_size * nummessages);
+  thruput	= calc_thruput(bytes_xferd);
+  
+  if (local_cpu_usage || remote_cpu_usage) {
+    /* We must now do a little math for service demand and cpu */
+    /* utilization for the system(s) */
+    /* Of course, some of the information might be bogus because */
+    /* there was no idle counter in the kernel(s). We need to make */
+    /* a note of this for the user's benefit...*/
+    if (local_cpu_usage) {
+      if (local_cpu_rate == 0.0) {
+	fprintf(where,"WARNING WARNING WARNING  WARNING WARNING WARNING  WARNING!\n");
+	fprintf(where,"Local CPU usage numbers based on process information only!\n");
+	fflush(where);
+      }
+      local_cpu_utilization = calc_cpu_util(0.0);
+      /* since calc_service demand is doing ms/Kunit we will */
+      /* multiply the number of transaction by 1024 to get */
+      /* "good" numbers */
+      local_service_demand  = calc_service_demand((double) nummessages*1024,
+						  0.0,
+						  0.0,
+						  0);
+    }
+    else {
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+    }
+    
+    if (remote_cpu_usage) {
+      if (remote_cpu_rate == 0.0) {
+	fprintf(where,"DANGER  DANGER  DANGER    DANGER  DANGER  DANGER    DANGER!\n");
+	fprintf(where,"Remote CPU usage numbers based on process information only!\n");
+	fflush(where);
+      }
+      remote_cpu_utilization = sctp_tran_rr_result->cpu_util;
+      /* since calc_service demand is doing ms/Kunit we will */
+      /* multiply the number of transaction by 1024 to get */
+      /* "good" numbers */
+      remote_service_demand = calc_service_demand((double) nummessages*1024,
+						  0.0,
+						  remote_cpu_utilization,
+						  sctp_tran_rr_result->num_cpus);
+    }
+    else {
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+    
+    /* We are now ready to print all the information. If the user */
+    /* has specified zero-level verbosity, we will just print the */
+    /* local service demand, or the remote service demand. If the */
+    /* user has requested verbosity level 1, he will get the basic */
+    /* "streamperf" numbers. If the user has specified a verbosity */
+    /* of greater than 1, we will display a veritable plethora of */
+    /* background information from outside of this block as it it */
+    /* not cpu_measurement specific...  */
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand);
+      }
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand);
+      }
+      break;
+    case 1:
+    case 2:
+
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		local_cpu_method,
+		remote_cpu_method);
+      }
+      
+      fprintf(where,
+	      cpu_fmt_1_line_1,		/* the format string */
+	      lss_size,		/* local sendbuf size */
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* guess */
+	      elapsed_time,		/* how long was the test */
+	      nummessages/elapsed_time,
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      fprintf(where,
+	      cpu_fmt_1_line_2,
+	      rss_size,
+	      rsr_size);
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      nummessages/elapsed_time);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+
+      fprintf(where,
+	      tput_fmt_1_line_1,	/* the format string */
+	      lss_size,
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* how large were the responses */
+	      elapsed_time, 		/* how long did it take */
+	      nummessages/elapsed_time);
+      fprintf(where,
+	      tput_fmt_1_line_2,
+	      rss_size, 		/* remote recvbuf size */
+	      rsr_size);
+      
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* TCP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+    
+    fprintf(where,
+	    ksink_fmt,
+	    local_send_align,
+	    remote_recv_offset,
+	    local_send_offset,
+	    remote_recv_offset);
+
+#ifdef HISTOGRAM
+    fprintf(where,"\nHistogram of request/response times\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+
+  }
+  
+}
+
+
+int 
+recv_sctp_tran_rr()
+{
+  
+  char  *message;
+  struct	sockaddr_in        myaddr_in,
+  peeraddr_in;
+  SOCKET	s_listen,s_data;
+  int 	addrlen;
+  int   NoPush = 1;
+
+  char	*recv_message_ptr;
+  char	*send_message_ptr;
+  char	*temp_message_ptr;
+  int	trans_received;
+  int	trans_remaining;
+  int	bytes_sent;
+  int	request_bytes_recvd;
+  int	request_bytes_remaining;
+  int	timed_out = 0;
+  float	elapsed_time;
+  
+  struct	sctp_tran_rr_request_struct	*sctp_tran_rr_request;
+  struct	sctp_tran_rr_response_struct	*sctp_tran_rr_response;
+  struct	sctp_tran_rr_results_struct	*sctp_tran_rr_results;
+  
+  sctp_tran_rr_request = 
+    (struct sctp_tran_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_tran_rr_response = 
+    (struct sctp_tran_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_tran_rr_results = 
+    (struct sctp_tran_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_tran_rr: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired */
+  /* parameters and then let the initiator know that all is ready. If */
+  /* socket size defaults are to be used, then the initiator will have */
+  /* sent us 0's. If the socket sizes cannot be changed, then we will */
+  /* send-back what they are. If that information cannot be determined, */
+  /* then we send-back -1's for the sizes. If things go wrong for any */
+  /* reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It */
+  /* would be best if the error that the remote reports to the user is */
+  /* the actual error we encountered, rather than some bogus unexpected */
+  /* response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_tran_rr: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_TRR_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_tran_rr: the response type is set...\n");
+    fflush(where);
+  }
+
+  /* set-up the data buffer with the requested alignment and offset */
+  message = (char *)malloc(DATABUFFERLEN);
+  if (message == NULL) {
+    printf("malloc(%d) failed!\n", DATABUFFERLEN);
+    exit(1);
+  }
+  
+  /* We now alter the message_ptr variables to be at the desired */
+  /* alignments with the desired offsets. */
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_tran_rr: requested recv alignment of %d offset %d\n",
+	    sctp_tran_rr_request->recv_alignment,
+	    sctp_tran_rr_request->recv_offset);
+    fprintf(where,
+	    "recv_sctp_tran_rr: requested send alignment of %d offset %d\n",
+	    sctp_tran_rr_request->send_alignment,
+	    sctp_tran_rr_request->send_offset);
+    fflush(where);
+  }
+
+  recv_message_ptr = ALIGN_BUFFER(message, sctp_tran_rr_request->recv_alignment, sctp_tran_rr_request->recv_offset);
+  
+  send_message_ptr = ALIGN_BUFFER(message, sctp_tran_rr_request->send_alignment, sctp_tran_rr_request->send_offset);
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_tran_rr: receive alignment and offset set...\n");
+    fflush(where);
+  }
+  
+  /* Let's clear-out our sockaddr for the sake of cleanlines. Then we */
+  /* can put in OUR values !-) At some point, we may want to nail this */
+  /* socket to a particular network-level address, but for now, */
+  /* INADDR_ANY should be just fine. */
+  
+  bzero((char *)&myaddr_in,
+	sizeof(myaddr_in));
+  myaddr_in.sin_family      = AF_INET;
+  myaddr_in.sin_addr.s_addr = INADDR_ANY;
+  myaddr_in.sin_port        = htons((unsigned short)sctp_tran_rr_request->port);
+  
+  /* Grab a socket to listen on, and then listen on it. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_tran_rr: grabbing a socket...\n");
+    fflush(where);
+  }
+
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_tran_rr_request->send_buf_size;
+  lsr_size_req = sctp_tran_rr_request->recv_buf_size;
+  loc_nodelay = sctp_tran_rr_request->no_delay;
+  loc_rcvavoid = sctp_tran_rr_request->so_rcvavoid;
+  loc_sndavoid = sctp_tran_rr_request->so_sndavoid;
+  
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    if (debug) {
+      fprintf(where,"could not create data socket\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+
+  /* Let's get an address assigned to this socket so we can tell the */
+  /* initiator how to reach the data socket. There may be a desire to */
+  /* nail this socket to a specific IP address in a multi-homed, */
+  /* multi-connection situation, but for now, we'll ignore the issue */
+  /* and concentrate on single connection testing. */
+  
+  if (bind(s_listen,
+	   (struct sockaddr *)&myaddr_in,
+	   sizeof(myaddr_in)) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not bind\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+
+  /* we want to disable the implicit PUSH on all sends. at some point, */
+  /* this might want to be a parm to the test raj 3/95 */
+  if (setsockopt(s_listen,
+		 SOL_SCTP,
+		 SCTP_NOPUSH, 
+		 &NoPush,
+		 sizeof(int)) == SOCKET_ERROR) {
+    fprintf(where,
+	    "recv_sctp_tran_rr: could not set SCTP_NOPUSH errno %d\n",
+	    errno);
+    fflush(where);
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+  }
+
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not listen\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen,
+		  (struct sockaddr *)&myaddr_in,
+		  &addrlen) == SOCKET_ERROR){
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not geetsockname\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_tran_rr_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  if (debug) {
+    fprintf(where,"telling the remote to call me at %d\n",
+	    sctp_tran_rr_response->data_port_number);
+    fflush(where);
+  }
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a 0.0 to */
+  /* the initiator. */
+  
+  sctp_tran_rr_response->cpu_rate = 0.0; 	/* assume no cpu */
+  if (sctp_tran_rr_request->measure_cpu) {
+    sctp_tran_rr_response->measure_cpu = 1;
+    sctp_tran_rr_response->cpu_rate = 
+      calibrate_local_cpu(sctp_tran_rr_request->cpu_rate);
+  }
+  
+
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_tran_rr_response->send_buf_size = lss_size;
+  sctp_tran_rr_response->recv_buf_size = lsr_size;
+  sctp_tran_rr_response->no_delay = loc_nodelay;
+  sctp_tran_rr_response->so_rcvavoid = loc_rcvavoid;
+  sctp_tran_rr_response->so_sndavoid = loc_sndavoid;
+
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+  
+  /* Now it's time to start receiving data on the connection. We will */
+  /* first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_tran_rr_request->measure_cpu);
+  
+  /* The loop will exit when the sender does a shutdown, which will */
+  /* return a length of zero   */
+  
+  if (sctp_tran_rr_request->test_length > 0) {
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(sctp_tran_rr_request->test_length + PAD_TIME);
+  }
+  else {
+    times_up = 1;
+    trans_remaining = sctp_tran_rr_request->test_length * -1;
+  }
+  
+  trans_received = 0;
+
+  while ((!times_up) || (trans_remaining > 0)) {
+
+    /* accept a connection from the remote */
+    if ((s_data=accept(s_listen,
+		       (struct sockaddr *)&peeraddr_in,
+		       &addrlen)) == INVALID_SOCKET) {
+      if (errno == EINTR) {
+	/* the timer popped */
+	timed_out = 1;
+	break;
+      }
+      fprintf(where,"recv_sctp_tran_rr: accept: errno = %d\n",errno);
+      fflush(where);
+      close(s_listen);
+      
+      exit(1);
+    }
+  
+    if (debug) {
+      fprintf(where,"recv_sctp_tran_rr: accepted data connection.\n");
+      fflush(where);
+    }
+  
+#ifdef WIN32
+  /* this is used so the timer thread can close the socket out from */
+  /* under us, which to date is the easiest/cleanest/least */
+  /* Windows-specific way I can find to force the winsock calls to */
+  /* return WSAEINTR with the test is over. anything that will run on */
+  /* 95 and NT and is closer to what netperf expects from Unix signals */
+  /* and such would be appreciated raj 1/96 */
+  win_kludge_socket = s_data;
+#endif /* WIN32 */
+
+#ifdef KLUDGE_SOCKET_OPTIONS
+  /* this is for those systems which *INCORRECTLY* fail to pass */
+  /* attributes across an accept() call. Including this goes against */
+  /* my better judgement :( raj 11/95 */
+
+  kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+  
+    temp_message_ptr	= recv_message_ptr;
+    request_bytes_remaining	= sctp_tran_rr_request->request_size;
+    
+    /* receive the request from the other side. we can just receive */
+    /* until we get zero bytes, but that would be a slight structure */
+    /* change in the code, with minimal perfomance effects. If */
+    /* however, I has variable-length messages, I would want to do */
+    /* this to avoid needing "double reads" - one for the message */
+    /* length, and one for the rest of the message raj 3/95 */
+    while(request_bytes_remaining > 0) {
+      if((request_bytes_recvd=recv(s_data,
+				   temp_message_ptr,
+				   request_bytes_remaining,
+				   0)) == SOCKET_ERROR) {
+	    if ( SOCKET_EINTR(request_bytes_recvd) )
+		{
+	      /* the timer popped */
+	      timed_out = 1;
+	      break;
+		}
+	    netperf_response.content.serv_errno = errno;
+	    send_response();
+	    exit(1);
+      }
+      else {
+	request_bytes_remaining -= request_bytes_recvd;
+	temp_message_ptr  += request_bytes_recvd;
+      }
+    }
+    
+    if (timed_out) {
+      /* we hit the end of the test based on time - lets */
+      /* bail out of here now... */
+      fprintf(where,"yo5\n");
+      fflush(where);						
+      break;
+    }
+    
+    /* Now, send the response to the remote we can use sendto here to */
+    /* help remind people that this is an rfc 1644 style of test */
+    if((bytes_sent=sendto(s_data,
+			  send_message_ptr,
+			  sctp_tran_rr_request->response_size,
+			  MSG_EOF,
+			  &peeraddr_in,
+			  sizeof(struct sockaddr_in))) == SOCKET_ERROR) {
+      if (SOCKET_EINTR(bytes_sent)) {
+	/* the test timer has popped */
+	timed_out = 1;
+	fprintf(where,"yo6\n");
+	fflush(where);						
+	break;
+      }
+      netperf_response.content.serv_errno = 99;
+      send_response();
+      exit(1);
+    }
+    
+    trans_received++;
+    if (trans_remaining) {
+      trans_remaining--;
+    }
+    
+    if (debug) {
+      fprintf(where,
+	      "recv_sctp_tran_rr: Transaction %d complete\n",
+	      trans_received);
+      fflush(where);
+    }
+
+    /* close the connection. since we have disable PUSH on sends, the */
+    /* FIN should be tacked-onto our last send instead of being */
+    /* standalone */
+    close(s_data);
+
+  }
+  
+  
+  /* The loop now exits due to timeout or transaction count being */
+  /* reached */
+  
+  cpu_stop(sctp_tran_rr_request->measure_cpu,&elapsed_time);
+  
+  if (timed_out) {
+    /* we ended the test by time, which was at least 2 seconds */
+    /* longer than we wanted to run. so, we want to subtract */
+    /* PAD_TIME from the elapsed_time. */
+    elapsed_time -= PAD_TIME;
+  }
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_tran_rr: got %d transactions\n",
+	    trans_received);
+    fflush(where);
+  }
+  
+  sctp_tran_rr_results->bytes_received	= (trans_received * 
+					   (sctp_tran_rr_request->request_size + 
+					    sctp_tran_rr_request->response_size));
+  sctp_tran_rr_results->trans_received	= trans_received;
+  sctp_tran_rr_results->elapsed_time	= elapsed_time;
+  if (sctp_tran_rr_request->measure_cpu) {
+    sctp_tran_rr_results->cpu_util	= calc_cpu_util(elapsed_time);
+  }
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_tran_rr: test complete, sending results.\n");
+    fflush(where);
+  }
+  
+  send_response();
+  
+}
+#endif				/* DO_1644 */
+#endif				/* DO_SCTP */
 
 
 #ifdef DO_1644
@@ -7754,7 +14149,8 @@ Send   Recv    Send   Recv\n\
     /* all depends on "reality of programming." keeping it this way is */
     /* a bit more conservative I imagine - raj 3/95 */
     send_socket = create_data_socket(AF_INET, 
-				     SOCK_STREAM);
+				     SOCK_STREAM,
+				     IPPROTO_TCP);
   
     if (send_socket == INAVLID_SOCKET) {
       perror("netperf: send_tcp_tran_rr: tcp stream data socket");
@@ -8220,7 +14616,8 @@ recv_tcp_tran_rr()
   loc_sndavoid = tcp_tran_rr_request->so_sndavoid;
   
   s_listen = create_data_socket(AF_INET,
-				SOCK_STREAM);
+				SOCK_STREAM,
+				IPPROTO_TCP);
   
   if (s_listen == INVALID_SOCKET) {
     netperf_response.content.serv_errno = errno;
@@ -8254,7 +14651,7 @@ recv_tcp_tran_rr()
   /* we want to disable the implicit PUSH on all sends. at some point, */
   /* this might want to be a parm to the test raj 3/95 */
   if (setsockopt(s_listen,
-		 IPPROTO_TCP,
+		 SOL_TCP,
 		 TCP_NOPUSH, 
 		 &NoPush,
 		 sizeof(int)) == SOCKET_ERROR) {
@@ -8391,7 +14788,7 @@ recv_tcp_tran_rr()
   /* attributes across an accept() call. Including this goes against */
   /* my better judgement :( raj 11/95 */
 
-  kludge_socket_options(s_data);
+  kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
   
@@ -8512,6 +14909,1068 @@ recv_tcp_tran_rr()
   
 }
 #endif /* DO_1644 */
+
+#ifdef DO_SCTP
+#ifdef DO_NBRR
+ /* this routine implements the sending (netperf) side of the SCTP_RR */
+ /* test using POSIX-style non-blocking sockets. */
+
+int 
+send_sctp_nbrr(char remote_host[])
+{
+  
+  char *tput_title = "\
+Local /Remote\n\
+Socket Size   Request  Resp.   Elapsed  Trans.\n\
+Send   Recv   Size     Size    Time     Rate         \n\
+bytes  Bytes  bytes    bytes   secs.    per sec   \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1_line_1 = "\
+%-6d %-6d %-6d   %-6d  %-6.2f   %7.2f   \n";
+  char *tput_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *cpu_title = "\
+Local /Remote\n\
+Socket Size   Request Resp.  Elapsed Trans.   CPU    CPU    S.dem   S.dem\n\
+Send   Recv   Size    Size   Time    Rate     local  remote local   remote\n\
+bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f %c\n";
+  
+  char *cpu_fmt_1_line_1 = "\
+%-6d %-6d %-6d  %-6d %-6.2f  %-6.2f  %-6.2f %-6.2f %-6.3f  %-6.3f\n";
+  
+  char *cpu_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *ksink_fmt = "\
+Alignment      Offset\n\
+Local  Remote  Local  Remote\n\
+Send   Recv    Send   Recv\n\
+%5d  %5d   %5d  %5d";
+  
+  
+  int			timed_out = 0;
+  float			elapsed_time;
+  
+  int	len;
+  char	*temp_message_ptr;
+  int	nummessages;
+  SOCKET	send_socket;
+  int	trans_remaining;
+  double	bytes_xferd;
+
+  struct ring_elt *send_ring;
+  struct ring_elt *recv_ring;
+  
+  int	rsp_bytes_left;
+  int	rsp_bytes_recvd;
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  unsigned      int             addr;
+  
+  struct	sctp_rr_request_struct	*sctp_rr_request;
+  struct	sctp_rr_response_struct	*sctp_rr_response;
+  struct	sctp_rr_results_struct	*sctp_rr_result;
+  
+#ifdef INTERVALS
+  int	interval_count;
+  sigset_t signal_set;
+#endif /* INTERVALS */
+
+  sctp_rr_request = 
+    (struct sctp_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_rr_response=
+    (struct sctp_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_rr_result	=
+    (struct sctp_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+
+  bzero((char *)&server,
+	sizeof(server));
+  
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+
+  if ( print_headers ) {
+    fprintf(where,"SCTP Non-Blocking REQUEST/RESPONSE TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+  
+  /* initialize a few counters */
+  
+  send_ring = NULL;
+  recv_ring = NULL;
+  confidence_iteration = 1;
+  init_stat();
+
+  /* we have a great-big while loop which controls the number of times */
+  /* we run a particular test. this is for the calculation of a */
+  /* confidence interval (I really should have stayed awake during */
+  /* probstats :). If the user did not request confidence measurement */
+  /* (no confidence is the default) then we will only go though the */
+  /* loop once. the confidence stuff originates from the folks at IBM */
+
+  while (((confidence < 0) && (confidence_iteration < iteration_max)) ||
+	 (confidence_iteration <= iteration_min)) {
+
+    /* initialize a few counters. we have to remember that we might be */
+    /* going through the loop more than once. */
+
+    nummessages     = 0;
+    bytes_xferd     = 0.0;
+    times_up        = 0;
+    timed_out       = 0;
+    trans_remaining = 0;
+
+    /* set-up the data buffers with the requested alignment and offset. */
+    /* since this is a request/response test, default the send_width and */
+    /* recv_width to 1 and not two raj 7/94 */
+
+    if (send_width == 0) send_width = 1;
+    if (recv_width == 0) recv_width = 1;
+  
+    if (send_ring == NULL) {
+      send_ring = allocate_buffer_ring(send_width,
+				       req_size,
+				       local_send_align,
+				       local_send_offset);
+    }
+
+    if (recv_ring == NULL) {
+      recv_ring = allocate_buffer_ring(recv_width,
+				       rsp_size,
+				       local_recv_align,
+				       local_recv_offset);
+    }
+    
+    /*set up the data socket                        */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP);
+  
+    if (send_socket == INVALID_SOCKET){
+      perror("netperf: send_sctp_nbrr: sctp stream data socket");
+      exit(1);
+    }
+    
+    if (debug) {
+      fprintf(where,"send_sctp_nbrr: send_socket obtained...\n");
+    }
+  
+    /* If the user has requested cpu utilization measurements, we must */
+    /* calibrate the cpu(s). We will perform this task within the tests */
+    /* themselves. If the user has specified the cpu rate, then */
+    /* calibrate_local_cpu will return rather quickly as it will have */
+    /* nothing to do. If local_cpu_rate is zero, then we will go through */
+    /* all the "normal" calibration stuff and return the rate back.*/
+    
+    if (local_cpu_usage) {
+      local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+    }
+    
+    /* Tell the remote end to do a listen. The server alters the socket */
+    /* paramters on the other side at this point, hence the reason for */
+    /* all the values being passed in the setup message. If the user did */
+    /* not specify any of the parameters, they will be passed as 0, which */
+    /* will indicate to the remote that no changes beyond the system's */
+    /* default should be used. Alignment is the exception, it will */
+    /* default to 8, which will be no alignment alterations. */
+    
+    netperf_request.content.request_type=	DO_SCTP_NBRR;
+    sctp_rr_request->recv_buf_size	=	rsr_size;
+    sctp_rr_request->send_buf_size	=	rss_size;
+    sctp_rr_request->recv_alignment	=	remote_recv_align;
+    sctp_rr_request->recv_offset	=	remote_recv_offset;
+    sctp_rr_request->send_alignment	=	remote_send_align;
+    sctp_rr_request->send_offset	=	remote_send_offset;
+    sctp_rr_request->request_size	=	req_size;
+    sctp_rr_request->response_size	=	rsp_size;
+    sctp_rr_request->no_delay		=	rem_nodelay;
+    sctp_rr_request->measure_cpu	=	remote_cpu_usage;
+    sctp_rr_request->cpu_rate		=	remote_cpu_rate;
+    sctp_rr_request->so_rcvavoid	=	rem_rcvavoid;
+    sctp_rr_request->so_sndavoid	=	rem_sndavoid;
+    if (test_time) {
+      sctp_rr_request->test_length	=	test_time;
+    }
+    else {
+      sctp_rr_request->test_length	=	test_trans * -1;
+    }
+    
+    if (debug > 1) {
+      fprintf(where,"netperf: send_sctp_nbrr: requesting SCTP rr test\n");
+    }
+    
+    send_request();
+    
+    /* The response from the remote will contain all of the relevant 	*/
+    /* socket parameters for this test type. We will put them back into */
+    /* the variables here so they can be displayed if desired.  The	*/
+    /* remote will have calibrated CPU if necessary, and will have done	*/
+    /* all the needed set-up we will have calibrated the cpu locally	*/
+    /* before sending the request, and will grab the counter value right*/
+    /* after the connect returns. The remote will grab the counter right*/
+    /* after the accept call. This saves the hassle of extra messages	*/
+    /* being sent for the SCTP tests.					*/
+  
+    recv_response();
+  
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote listen done.\n");
+      rsr_size          = sctp_rr_response->recv_buf_size;
+      rss_size          = sctp_rr_response->send_buf_size;
+      rem_nodelay       = sctp_rr_response->no_delay;
+      remote_cpu_usage  = sctp_rr_response->measure_cpu;
+      remote_cpu_rate   = sctp_rr_response->cpu_rate;
+      /* make sure that port numbers are in network order */
+      server.sin_port   = sctp_rr_response->data_port_number;
+      server.sin_port   = htons(server.sin_port);
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      exit(1);
+    }
+    
+    /*Connect up to the remote port on the data socket  */
+    if (connect(send_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server)) == INVALID_SOCKET){
+      perror("netperf: data socket connect failed");
+      
+      exit(1);
+    }
+    
+    /* now that we are connected, mark the socket as non-blocking */
+    if (fcntl(send_socket, F_SETFL, O_NONBLOCK) == -1) {
+      perror("netperf: fcntl");
+      exit(1);
+    }
+
+    /* Data Socket set-up is finished. If there were problems, either the */
+    /* connect would have failed, or the previous response would have */
+    /* indicated a problem. I failed to see the value of the extra */
+    /* message after the accept on the remote. If it failed, we'll see it */
+    /* here. If it didn't, we might as well start pumping data. */
+    
+    /* Set-up the test end conditions. For a request/response test, they */
+    /* can be either time or transaction based. */
+    
+    if (test_time) {
+      /* The user wanted to end the test after a period of time. */
+      times_up = 0;
+      trans_remaining = 0;
+      start_timer(test_time);
+    }
+    else {
+      /* The tester wanted to send a number of bytes. */
+      trans_remaining = test_bytes;
+      times_up = 1;
+    }
+    
+    /* The cpu_start routine will grab the current time and possibly */
+    /* value of the idle counter for later use in measuring cpu */
+    /* utilization and/or service demand and thruput. */
+    
+    cpu_start(local_cpu_usage);
+
+#ifdef INTERVALS
+    if ((interval_burst) || (demo_mode)) {
+      /* zero means that we never pause, so we never should need the */
+      /* interval timer, unless we are in demo_mode */
+      start_itimer(interval_wate);
+    }
+    interval_count = interval_burst;
+    /* get the signal set for the call to sigsuspend */
+    if (sigprocmask(SIG_BLOCK, (sigset_t *)NULL, &signal_set) != 0) {
+      fprintf(where,
+	      "send_sctp_nbrr: unable to get sigmask errno %d\n",
+	      errno);
+      fflush(where);
+      exit(1);
+    }
+#endif /* INTERVALS */
+    
+    /* We use an "OR" to control test execution. When the test is */
+    /* controlled by time, the byte count check will always return false. */
+    /* When the test is controlled by byte count, the time test will */
+    /* always return false. When the test is finished, the whole */
+    /* expression will go false and we will stop sending data. I think I */
+    /* just arbitrarily decrement trans_remaining for the timed test, but */
+    /* will not do that just yet... One other question is whether or not */
+    /* the send buffer and the receive buffer should be the same buffer. */
+
+    while ((!times_up) || (trans_remaining > 0)) {
+      /* send the request. we assume that if we use a blocking socket, */
+      /* the request will be sent at one shot. */
+      
+#ifdef HISTOGRAM
+      /* timestamp just before our call to send, and then again just */
+      /* after the receive raj 8/94 */
+      HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+
+      /* even though this is a non-blocking socket, we will assume for */
+      /* the time being that we will be able to send an entire request */
+      /* without getting an EAGAIN */
+      if((len=send(send_socket,
+		   send_ring->buffer_ptr,
+		   req_size,
+		   0)) != req_size) {
+	if (SOCKET_EINTR(len)) {
+	  /* we hit the end of a */
+	  /* timed test. */
+	  timed_out = 1;
+	  break;
+	}
+	perror("send_sctp_nbrr: data send error");
+	exit(1);
+      }
+      send_ring = send_ring->next;
+      
+      /* receive the response. since we are using non-blocking I/O, we */
+      /* will "spin" on the recvs */
+      rsp_bytes_left = rsp_size;
+      temp_message_ptr  = recv_ring->buffer_ptr;
+      while(rsp_bytes_left > 0) {
+	if((rsp_bytes_recvd=recv(send_socket,
+				 temp_message_ptr,
+				 rsp_bytes_left,
+				 0)) == SOCKET_ERROR) {
+	  if (SOCKET_EINTR(rsp_bytes_recvd))
+	  {
+	    /* We hit the end of a timed test. */
+	    timed_out = 1;
+	    break;
+	  }
+	  else if (errno == EAGAIN) {
+	    Set_errno(0);
+	    continue;
+	  }
+	  else {
+	    perror("send_sctp_nbrr: data recv error");
+	    exit(1);
+	  }
+	}
+	rsp_bytes_left -= rsp_bytes_recvd;
+	temp_message_ptr  += rsp_bytes_recvd;
+      }	
+      recv_ring = recv_ring->next;
+      
+      if (timed_out) {
+	/* we may have been in a nested while loop - we need */
+	/* another call to break. */
+	break;
+      }
+      
+#ifdef HISTOGRAM
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */
+#ifdef INTERVALS      
+      if (demo_mode) {
+	units_this_tick += 1;
+      }
+      /* in this case, the interval count is the count-down couter */
+      /* to decide to sleep for a little bit */
+      if ((interval_burst) && (--interval_count == 0)) {
+	/* call sigsuspend and wait for the interval timer to get us */
+	/* out */
+	if (debug) {
+	  fprintf(where,"about to suspend\n");
+	  fflush(where);
+	}
+	if (sigsuspend(&signal_set) == EFAULT) {
+	  fprintf(where,
+		  "send_udp_rr: fault with signal set!\n");
+	  fflush(where);
+	  exit(1);
+	}
+	interval_count = interval_burst;
+      }
+#endif /* INTERVALS */
+      
+      nummessages++;          
+      if (trans_remaining) {
+	trans_remaining--;
+      }
+      
+      if (debug > 3) {
+	if ((nummessages % 100) == 0) {
+	  fprintf(where,
+		  "Transaction %d completed\n",
+		  nummessages);
+	  fflush(where);
+	}
+      }
+    }
+
+    /* At this point we used to call shutdown on the data socket to be */
+    /* sure all the data was delivered, but this was not germane in a */
+    /* request/response test, and it was causing the tests to "hang" when */
+    /* they were being controlled by time. So, I have replaced this */
+    /* shutdown call with a call to close that can be found later in the */
+    /* procedure. */
+    
+    /* this call will always give us the elapsed time for the test, and */
+    /* will also store-away the necessaries for cpu utilization */
+    
+    cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being */
+						/* measured? how long */
+						/* did we really run? */
+    
+    /* Get the statistics from the remote end. The remote will have */
+    /* calculated service demand and all those interesting things. If it */
+    /* wasn't supposed to care, it will return obvious values. */
+    
+    recv_response();
+    if (!netperf_response.content.serv_errno) {
+      if (debug)
+	fprintf(where,"remote results obtained\n");
+    }
+    else {
+      Set_errno(netperf_response.content.serv_errno);
+      fprintf(where,
+	      "netperf: remote error %d",
+	      netperf_response.content.serv_errno);
+      perror("");
+      fflush(where);
+      
+      exit(1);
+    }
+    
+    /* We now calculate what our thruput was for the test. */
+  
+    bytes_xferd	= (req_size * nummessages) + (rsp_size * nummessages);
+    thruput	= nummessages/elapsed_time;
+  
+    if (local_cpu_usage || remote_cpu_usage) {
+      /* We must now do a little math for service demand and cpu */
+      /* utilization for the system(s) */
+      /* Of course, some of the information might be bogus because */
+      /* there was no idle counter in the kernel(s). We need to make */
+      /* a note of this for the user's benefit...*/
+      if (local_cpu_usage) {
+	local_cpu_utilization = calc_cpu_util(0.0);
+	/* since calc_service demand is doing ms/Kunit we will */
+	/* multiply the number of transaction by 1024 to get */
+	/* "good" numbers */
+	local_service_demand  = calc_service_demand((double) nummessages*1024,
+						    0.0,
+						    0.0,
+						    0);
+      }
+      else {
+	local_cpu_utilization	= (float) -1.0;
+	local_service_demand	= (float) -1.0;
+      }
+      
+      if (remote_cpu_usage) {
+	remote_cpu_utilization = sctp_rr_result->cpu_util;
+	/* since calc_service demand is doing ms/Kunit we will */
+	/* multiply the number of transaction by 1024 to get */
+	/* "good" numbers */
+	remote_service_demand = calc_service_demand((double) nummessages*1024,
+						    0.0,
+						    remote_cpu_utilization,
+						    sctp_rr_result->num_cpus);
+      }
+      else {
+	remote_cpu_utilization = (float) -1.0;
+	remote_service_demand  = (float) -1.0;
+      }
+      
+    }
+    else {
+      /* we were not measuring cpu, for the confidence stuff, we */
+      /* should make it -1.0 */
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+
+    /* at this point, we want to calculate the confidence information. */
+    /* if debugging is on, calculate_confidence will print-out the */
+    /* parameters we pass it */
+    
+    calculate_confidence(confidence_iteration,
+			 elapsed_time,
+			 thruput,
+			 local_cpu_utilization,
+			 remote_cpu_utilization,
+			 local_service_demand,
+			 remote_service_demand);
+    
+    
+    confidence_iteration++;
+
+    /* we are now done with the socket, so close it */
+    close(send_socket);
+
+  }
+
+  retrieve_confident_values(&elapsed_time,
+			    &thruput,
+			    &local_cpu_utilization,
+			    &remote_cpu_utilization,
+			    &local_service_demand,
+			    &remote_service_demand);
+
+  /* We are now ready to print all the information. If the user */
+  /* has specified zero-level verbosity, we will just print the */
+  /* local service demand, or the remote service demand. If the */
+  /* user has requested verbosity level 1, he will get the basic */
+  /* "streamperf" numbers. If the user has specified a verbosity */
+  /* of greater than 1, we will display a veritable plethora of */
+  /* background information from outside of this block as it it */
+  /* not cpu_measurement specific...  */
+
+  if (confidence < 0) {
+    /* we did not hit confidence, but were we asked to look for it? */
+    if (iteration_max > 1) {
+      display_confidence();
+    }
+  }
+
+  if (local_cpu_usage || remote_cpu_usage) {
+    local_cpu_method = format_cpu_method(cpu_method);
+    remote_cpu_method = format_cpu_method(sctp_rr_result->cpu_method);
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand,
+		local_cpu_method);
+      }
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand,
+		remote_cpu_method);
+      }
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		local_cpu_method,
+		remote_cpu_method);
+      }
+
+      fprintf(where,
+	      cpu_fmt_1_line_1,		/* the format string */
+	      lss_size,		/* local sendbuf size */
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* guess */
+	      elapsed_time,		/* how long was the test */
+	      thruput,
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      fprintf(where,
+	      cpu_fmt_1_line_2,
+	      rss_size,
+	      rsr_size);
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      thruput);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+
+      fprintf(where,
+	      tput_fmt_1_line_1,	/* the format string */
+	      lss_size,
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* how large were the responses */
+	      elapsed_time, 		/* how long did it take */
+	      thruput);
+      fprintf(where,
+	      tput_fmt_1_line_2,
+	      rss_size, 		/* remote recvbuf size */
+	      rsr_size);
+      
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  /* how to handle the verbose information in the presence of */
+  /* confidence intervals is yet to be determined... raj 11/94 */
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+    
+    fprintf(where,
+	    ksink_fmt,
+	    local_send_align,
+	    remote_recv_offset,
+	    local_send_offset,
+	    remote_recv_offset);
+
+#ifdef HISTOGRAM
+    fprintf(where,"\nHistogram of request/response times\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+
+  }
+  
+}
+
+ /* this routine implements the receive (netserver) side of a SCTP_RR */
+ /* test */
+int 
+recv_sctp_nbrr()
+{
+  
+  struct ring_elt *send_ring;
+  struct ring_elt *recv_ring;
+
+  struct	sockaddr_in        myaddr_in,
+  peeraddr_in;
+  SOCKET	s_listen,s_data;
+  int 	addrlen;
+  char	*temp_message_ptr;
+  int	trans_received;
+  int	trans_remaining;
+  int	bytes_sent;
+  int	request_bytes_recvd;
+  int	request_bytes_remaining;
+  int	timed_out = 0;
+  float	elapsed_time;
+  
+  struct	sctp_rr_request_struct	*sctp_rr_request;
+  struct	sctp_rr_response_struct	*sctp_rr_response;
+  struct	sctp_rr_results_struct	*sctp_rr_results;
+  
+  sctp_rr_request = 
+    (struct sctp_rr_request_struct *)netperf_request.content.test_specific_data;
+  sctp_rr_response =
+    (struct sctp_rr_response_struct *)netperf_response.content.test_specific_data;
+  sctp_rr_results =
+    (struct sctp_rr_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_nbrr: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired */
+  /* parameters and then let the initiator know that all is ready. If */
+  /* socket size defaults are to be used, then the initiator will have */
+  /* sent us 0's. If the socket sizes cannot be changed, then we will */
+  /* send-back what they are. If that information cannot be determined, */
+  /* then we send-back -1's for the sizes. If things go wrong for any */
+  /* reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It */
+  /* would be best if the error that the remote reports to the user is */
+  /* the actual error we encountered, rather than some bogus unexpected */
+  /* response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_nbrr: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_RR_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_nbrr: the response type is set...\n");
+    fflush(where);
+  }
+  
+  /* allocate the recv and send rings with the requested alignments */
+  /* and offsets. raj 7/94 */
+  if (debug) {
+    fprintf(where,"recv_sctp_nbrr: requested recv alignment of %d offset %d\n",
+	    sctp_rr_request->recv_alignment,
+	    sctp_rr_request->recv_offset);
+    fprintf(where,"recv_sctp_nbrr: requested send alignment of %d offset %d\n",
+	    sctp_rr_request->send_alignment,
+	    sctp_rr_request->send_offset);
+    fflush(where);
+  }
+
+  /* at some point, these need to come to us from the remote system */
+  if (send_width == 0) send_width = 1;
+  if (recv_width == 0) recv_width = 1;
+
+  send_ring = allocate_buffer_ring(send_width,
+				   sctp_rr_request->response_size,
+				   sctp_rr_request->send_alignment,
+				   sctp_rr_request->send_offset);
+
+  recv_ring = allocate_buffer_ring(recv_width,
+				   sctp_rr_request->request_size,
+				   sctp_rr_request->recv_alignment,
+				   sctp_rr_request->recv_offset);
+
+  
+  /* Let's clear-out our sockaddr for the sake of cleanlines. Then we */
+  /* can put in OUR values !-) At some point, we may want to nail this */
+  /* socket to a particular network-level address, but for now, */
+  /* INADDR_ANY should be just fine. */
+  
+  bzero((char *)&myaddr_in,
+	sizeof(myaddr_in));
+  myaddr_in.sin_family      = AF_INET;
+  myaddr_in.sin_addr.s_addr = INADDR_ANY;
+  myaddr_in.sin_port        = htons((unsigned_short)sctp_rr_request->port);
+  
+  /* Grab a socket to listen on, and then listen on it. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_nbrr: grabbing a socket...\n");
+    fflush(where);
+  }
+
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_rr_request->send_buf_size;
+  lsr_size_req = sctp_rr_request->recv_buf_size;
+  loc_nodelay = sctp_rr_request->no_delay;
+  loc_rcvavoid = sctp_rr_request->so_rcvavoid;
+  loc_sndavoid = sctp_rr_request->so_sndavoid;
+  
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Let's get an address assigned to this socket so we can tell the */
+  /* initiator how to reach the data socket. There may be a desire to */
+  /* nail this socket to a specific IP address in a multi-homed, */
+  /* multi-connection situation, but for now, we'll ignore the issue */
+  /* and concentrate on single connection testing. */
+  
+  if (bind(s_listen,
+	   (struct sockaddr *)&myaddr_in,
+	   sizeof(myaddr_in)) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen,
+		  (struct sockaddr *)&myaddr_in, &addrlen) == SOCKET_ERROR){
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_rr_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a 0.0 to */
+  /* the initiator. */
+  
+  sctp_rr_response->cpu_rate = 0.0; 	/* assume no cpu */
+  sctp_rr_response->measure_cpu = 0;
+
+  if (sctp_rr_request->measure_cpu) {
+    sctp_rr_response->measure_cpu = 1;
+    sctp_rr_response->cpu_rate = calibrate_local_cpu(sctp_rr_request->cpu_rate);
+  }
+  
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_rr_response->send_buf_size = lss_size;
+  sctp_rr_response->recv_buf_size = lsr_size;
+  sctp_rr_response->no_delay = loc_nodelay;
+  sctp_rr_response->so_rcvavoid = loc_rcvavoid;
+  sctp_rr_response->so_sndavoid = loc_sndavoid;
+  sctp_rr_response->test_length = sctp_rr_request->test_length;
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+  
+  if ((s_data = accept(s_listen,
+		       (struct sockaddr *)&peeraddr_in,
+		       &addrlen)) == INVALID_SOCKET) {
+    /* Let's just punt. The remote will be given some information */
+    close(s_listen);
+    exit(1);
+  }
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_nbrr: accept completes on the data connection.\n");
+    fflush(where);
+  }
+
+#ifdef KLUDGE_SOCKET_OPTIONS
+  /* this is for those systems which *INCORRECTLY* fail to pass */
+  /* attributes across an accept() call. Including this goes against */
+  /* my better judgement :( raj 11/95 */
+
+  kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+    
+  /* now that we are connected, mark the socket as non-blocking */
+  if (fcntl(s_data, F_SETFL, O_NONBLOCK) == -1) {
+    close(s_data);
+    exit(1);
+  }
+
+  
+  /* Now it's time to start receiving data on the connection. We will */
+  /* first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_rr_request->measure_cpu);
+
+#ifdef WIN32
+  /* this is used so the timer thread can close the socket out from */
+  /* under us, which to date is the easiest/cleanest/least */
+  /* Windows-specific way I can find to force the winsock calls to */
+  /* return WSAEINTR with the test is over. anything that will run on */
+  /* 95 and NT and is closer to what netperf expects from Unix signals */
+  /* and such would be appreciated raj 1/96 */
+  win_kludge_socket = s_data;
+#endif /* WIN32 */
+  
+  /* The loop will exit when the sender does a shutdown, which will */
+  /* return a length of zero   */
+  
+  if (sctp_rr_request->test_length > 0) {
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(sctp_rr_request->test_length + PAD_TIME);
+  }
+  else {
+    times_up = 1;
+    trans_remaining = sctp_rr_request->test_length * -1;
+  }
+
+  trans_received = 0;
+  
+  while ((!times_up) || (trans_remaining > 0)) {
+    temp_message_ptr = recv_ring->buffer_ptr;
+    request_bytes_remaining	= sctp_rr_request->request_size;
+    while(request_bytes_remaining > 0) {
+      if((request_bytes_recvd=recv(s_data,
+				   temp_message_ptr,
+				   request_bytes_remaining,
+				   0)) == SOCKET_ERROR) {
+	    if ( SOCKET_EINTR(request_bytes_recvd))
+		{
+	      /* the timer popped */
+	      timed_out = 1;
+	      break;
+		}
+	    else if (errno == EAGAIN) {
+	      Set_errno(0);
+	      if (times_up) {
+	        timed_out = 1;
+	        break;
+		  }
+	      continue;
+		}
+	    else {
+	      netperf_response.content.serv_errno = errno;
+	      send_response();
+	      exit(1);
+		}
+      }
+      else {
+	request_bytes_remaining -= request_bytes_recvd;
+	temp_message_ptr  += request_bytes_recvd;
+      }
+    }
+
+    recv_ring = recv_ring->next;
+
+    if (timed_out) {
+      /* we hit the end of the test based on time - lets */
+      /* bail out of here now... */
+      fprintf(where,"yo5\n");
+      fflush(where);						
+      break;
+    }
+    
+    /* Now, send the response to the remote */
+    if((bytes_sent=send(s_data,
+			send_ring->buffer_ptr,
+			sctp_rr_request->response_size,
+			0)) == SOCKET_ERROR) {
+      if (SOCKET_EINTR(bytes_sent)) {
+	/* the test timer has popped */
+	timed_out = 1;
+	fprintf(where,"yo6\n");
+	fflush(where);						
+	break;
+      }
+      netperf_response.content.serv_errno = 992;
+      send_response();
+      exit(1);
+    }
+    
+    send_ring = send_ring->next;
+
+    trans_received++;
+    if (trans_remaining) {
+      trans_remaining--;
+    }
+  }
+  
+  
+  /* The loop now exits due to timeout or transaction count being */
+  /* reached */
+  
+  cpu_stop(sctp_rr_request->measure_cpu,&elapsed_time);
+  
+  stop_timer();
+
+  if (timed_out) {
+    /* we ended the test by time, which was at least 2 seconds */
+    /* longer than we wanted to run. so, we want to subtract */
+    /* PAD_TIME from the elapsed_time. */
+    elapsed_time -= PAD_TIME;
+  }
+
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_nbrr: got %d transactions\n",
+	    trans_received);
+    fflush(where);
+  }
+  
+  sctp_rr_results->bytes_received = (trans_received * 
+				    (sctp_rr_request->request_size + 
+				     sctp_rr_request->response_size));
+  sctp_rr_results->trans_received = trans_received;
+  sctp_rr_results->elapsed_time   = elapsed_time;
+  sctp_rr_results->cpu_method     = cpu_method;
+  sctp_rr_results->num_cpus       = lib_num_loc_cpus;
+  if (sctp_rr_request->measure_cpu) {
+    sctp_rr_results->cpu_util	= calc_cpu_util(elapsed_time);
+  }
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_nbrr: test complete, sending results.\n");
+    fflush(where);
+  }
+  
+  /* we are done with the socket, free it */
+  close(s_data);
+
+  send_response();
+  
+}
+
+#endif				/* DO_NBRR */
+#endif				/* DO_SCTP */
 
 #ifdef DO_NBRR
  /* this routine implements the sending (netperf) side of the TCP_RR */
@@ -8692,7 +16151,8 @@ Send   Recv    Send   Recv\n\
     
     /*set up the data socket                        */
     send_socket = create_data_socket(AF_INET, 
-				     SOCK_STREAM);
+				     SOCK_STREAM,
+				     IPPROTO_TCP);
   
     if (send_socket == INVALID_SOCKET){
       perror("netperf: send_tcp_nbrr: tcp stream data socket");
@@ -9313,7 +16773,8 @@ recv_tcp_nbrr()
   loc_sndavoid = tcp_rr_request->so_sndavoid;
   
   s_listen = create_data_socket(AF_INET,
-				SOCK_STREAM);
+				SOCK_STREAM,
+				IPPROTO_TCP);
   
   if (s_listen == INVALID_SOCKET) {
     netperf_response.content.serv_errno = errno;
@@ -9411,7 +16872,7 @@ recv_tcp_nbrr()
   /* attributes across an accept() call. Including this goes against */
   /* my better judgement :( raj 11/95 */
 
-  kludge_socket_options(s_data);
+  kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
     
@@ -9570,6 +17031,990 @@ recv_tcp_nbrr()
 }
 
 #endif /* DO_NBRR */
+
+#ifdef DO_SCTP
+
+ /* this test is intended to test the performance of establishing a */
+ /* connection, and then closing it again. this test is of somewhat */
+ /* arcane interest since no packets are exchanged between the */
+ /* user-space processes, but it will show the raw overhead of */
+ /* establishing a SCTP connection. that service demand could then be */
+ /* compared with the sum of the service demands of a SCTP_CRR and */
+ /* SCTP_RR test - presumeably, they would all relate */
+
+void
+send_sctp_cc(char remote_host[])
+{
+  
+  char *tput_title = "\
+Local /Remote\n\
+Socket Size   Request  Resp.   Elapsed  Trans.\n\
+Send   Recv   Size     Size    Time     Rate         \n\
+bytes  Bytes  bytes    bytes   secs.    per sec   \n\n";
+  
+  char *tput_fmt_0 =
+    "%7.2f\n";
+  
+  char *tput_fmt_1_line_1 = "\
+%-6d %-6d %-6d   %-6d  %-6.2f   %7.2f   \n";
+  char *tput_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *cpu_title = "\
+Local /Remote\n\
+Socket Size   Request Resp.  Elapsed Trans.   CPU    CPU    S.dem   S.dem\n\
+Send   Recv   Size    Size   Time    Rate     local  remote local   remote\n\
+bytes  bytes  bytes   bytes  secs.   per sec  %%      %%      us/Tr   us/Tr\n\n";
+  
+  char *cpu_fmt_0 =
+    "%6.3f\n";
+  
+  char *cpu_fmt_1_line_1 = "\
+%-6d %-6d %-6d  %-6d %-6.2f  %-6.2f   %-6.2f %-6.2f %-6.3f  %-6.3f\n";
+  
+  char *cpu_fmt_1_line_2 = "\
+%-6d %-6d\n";
+  
+  char *ksink_fmt = "\n\
+Alignment      Offset\n\
+Local  Remote  Local  Remote\n\
+Send   Recv    Send   Recv\n\
+%5d  %5d   %5d  %5d\n";
+  
+  
+  int 			one = 1;
+  int			timed_out = 0;
+  float			elapsed_time;
+  
+  char	temp_message_ptr[1];
+  int	nummessages;
+  SOCKET	send_socket;
+  int	trans_remaining;
+  double	bytes_xferd;
+  int	sock_opt_len = sizeof(int);
+  int	rsp_bytes_left = 1;
+  int	rsp_bytes_recvd;
+  
+  float	local_cpu_utilization;
+  float	local_service_demand;
+  float	remote_cpu_utilization;
+  float	remote_service_demand;
+  double	thruput;
+  
+  struct	hostent	        *hp;
+  struct	sockaddr_in	server;
+  struct        sockaddr_in     *myaddr;
+  unsigned      int             addr;
+  int                           myport;
+  int                           ret;
+
+  struct	sctp_cc_request_struct	*sctp_cc_request;
+  struct	sctp_cc_response_struct	*sctp_cc_response;
+  struct	sctp_cc_results_struct	*sctp_cc_result;
+  
+  sctp_cc_request = 
+    (struct sctp_cc_request_struct *)netperf_request.content.test_specific_data;
+  sctp_cc_response = 
+    (struct sctp_cc_response_struct *)netperf_response.content.test_specific_data;
+  sctp_cc_result =
+    (struct sctp_cc_results_struct *)netperf_response.content.test_specific_data;
+  
+  
+#ifdef HISTOGRAM
+  time_hist = HIST_new();
+#endif /* HISTOGRAM */
+
+  /* since we are now disconnected from the code that established the */
+  /* control socket, and since we want to be able to use different */
+  /* protocols and such, we are passed the name of the remote host and */
+  /* must turn that into the test specific addressing information. */
+  
+  myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+  if (myaddr == NULL) {
+    printf("malloc(%ld) failed!\n", sizeof(struct sockaddr_in));
+    exit(1);
+  }
+
+  bzero((char *)&server,
+	sizeof(server));
+  bzero((char *)myaddr,
+	sizeof(struct sockaddr_in));
+  myaddr->sin_family = AF_INET;
+
+  complete_sockaddr(&server, remote_host, remote_data_ip);
+
+  if ( print_headers ) {
+    fprintf(where,"SCTP Connect/Close TEST");
+    fprintf(where," to %s", remote_host);
+    if (iteration_max > 1) {
+      fprintf(where,
+	      " : +/-%3.1f%% @ %2d%% conf.",
+	      interval/0.02,
+	      confidence_level);
+      }
+    if (loc_nodelay || rem_nodelay) {
+      fprintf(where," : nodelay");
+    }
+    if (loc_sndavoid || 
+	loc_rcvavoid ||
+	rem_sndavoid ||
+	rem_rcvavoid) {
+      fprintf(where," : copy avoidance");
+    }
+#ifdef HISTOGRAM
+    fprintf(where," : histogram");
+#endif /* HISTOGRAM */
+#ifdef INTERVALS
+    fprintf(where," : interval");
+#endif /* INTERVALS */
+#ifdef DIRTY 
+    fprintf(where," : dirty data");
+#endif /* DIRTY */
+    fprintf(where,"\n");
+  }
+  
+  /* initialize a few counters */
+  
+  nummessages	=	0;
+  bytes_xferd	=	0.0;
+  times_up 	= 	0;
+  
+  /* since there are no data buffers in this test, we need no send or */
+  /* recv rings */
+
+  if (debug) {
+    fprintf(where,"send_sctp_cc: send_socket obtained...\n");
+  }
+  
+  /* If the user has requested cpu utilization measurements, we must */
+  /* calibrate the cpu(s). We will perform this task within the tests */
+  /* themselves. If the user has specified the cpu rate, then */
+  /* calibrate_local_cpu will return rather quickly as it will have */
+  /* nothing to do. If local_cpu_rate is zero, then we will go through */
+  /* all the "normal" calibration stuff and return the rate back.*/
+  
+  if (local_cpu_usage) {
+    local_cpu_rate = calibrate_local_cpu(local_cpu_rate);
+  }
+  
+  /* Tell the remote end to do a listen. The server alters the socket */
+  /* paramters on the other side at this point, hence the reason for */
+  /* all the values being passed in the setup message. If the user did */
+  /* not specify any of the parameters, they will be passed as 0, which */
+  /* will indicate to the remote that no changes beyond the system's */
+  /* default should be used. Alignment is the exception, it will */
+  /* default to 8, which will be no alignment alterations. */
+  
+  netperf_request.content.request_type	=	DO_SCTP_CC;
+  sctp_cc_request->recv_buf_size	=	rsr_size;
+  sctp_cc_request->send_buf_size	=	rss_size;
+  sctp_cc_request->recv_alignment	=	remote_recv_align;
+  sctp_cc_request->recv_offset		=	remote_recv_offset;
+  sctp_cc_request->send_alignment	=	remote_send_align;
+  sctp_cc_request->send_offset		=	remote_send_offset;
+  sctp_cc_request->request_size		=	req_size;
+  sctp_cc_request->response_size	=	rsp_size;
+  sctp_cc_request->no_delay		=	rem_nodelay;
+  sctp_cc_request->measure_cpu		=	remote_cpu_usage;
+  sctp_cc_request->cpu_rate		=	remote_cpu_rate;
+  sctp_cc_request->so_rcvavoid		=	rem_rcvavoid;
+  sctp_cc_request->so_sndavoid		=	rem_sndavoid;
+  if (test_time) {
+    sctp_cc_request->test_length	=	test_time;
+  }
+  else {
+    sctp_cc_request->test_length	=	test_trans * -1;
+  }
+  sctp_cc_request->port			=	(int)remote_data_port;
+
+  if (debug > 1) {
+    fprintf(where,"netperf: send_sctp_cc: requesting SCTP crr test\n");
+  }
+  
+  send_request();
+  
+  /* The response from the remote will contain all of the relevant 	*/
+  /* socket parameters for this test type. We will put them back into 	*/
+  /* the variables here so they can be displayed if desired.  The	*/
+  /* remote will have calibrated CPU if necessary, and will have done	*/
+  /* all the needed set-up we will have calibrated the cpu locally	*/
+  /* before sending the request, and will grab the counter value right	*/
+  /* after the connect returns. The remote will grab the counter right	*/
+  /* after the accept call. This saves the hassle of extra messages	*/
+  /* being sent for the SCTP tests.					*/
+  
+  recv_response();
+  
+  if (!netperf_response.content.serv_errno) {
+    rsr_size	=	sctp_cc_response->recv_buf_size;
+    rss_size	=	sctp_cc_response->send_buf_size;
+    rem_nodelay	=	sctp_cc_response->no_delay;
+    remote_cpu_usage=	sctp_cc_response->measure_cpu;
+    remote_cpu_rate = 	sctp_cc_response->cpu_rate;
+    /* make sure that port numbers are in network order */
+    server.sin_port	=	(unsigned short)sctp_cc_response->data_port_number;
+    server.sin_port =	htons(server.sin_port);
+    if (debug) {
+      fprintf(where,"remote listen done.\n");
+      fprintf(where,"remote port is %d\n",ntohs(server.sin_port));
+      fflush(where);
+    }
+  }
+  else {
+    Set_errno(netperf_response.content.serv_errno);
+    fprintf(where,
+	    "netperf: remote error %d",
+	    netperf_response.content.serv_errno);
+    perror("");
+    fflush(where);
+    exit(1);
+  }
+  
+  /* pick a nice random spot between client_port_min and */
+  /* client_port_max for our initial port number */
+  srand(getpid());
+  if (client_port_max - client_port_min) {
+    myport = client_port_min + 
+      (rand() % (client_port_max - client_port_min));
+  }
+  else {
+    myport = client_port_min;
+  }
+  /* there will be a ++ before the first call to bind, so subtract one */
+  myport--;
+  myaddr->sin_port = htons((unsigned short)myport);
+  
+  /* Set-up the test end conditions. For a request/response test, they */
+  /* can be either time or transaction based. */
+  
+  if (test_time) {
+    /* The user wanted to end the test after a period of time. */
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(test_time);
+  }
+  else {
+    /* The tester wanted to send a number of bytes. */
+    trans_remaining = test_bytes;
+    times_up = 1;
+  }
+  
+  /* The cpu_start routine will grab the current time and possibly */
+  /* value of the idle counter for later use in measuring cpu */
+  /* utilization and/or service demand and thruput. */
+  
+  cpu_start(local_cpu_usage);
+  
+  /* We use an "OR" to control test execution. When the test is */
+  /* controlled by time, the byte count check will always return false. */
+  /* When the test is controlled by byte count, the time test will */
+  /* always return false. When the test is finished, the whole */
+  /* expression will go false and we will stop sending data. I think I */
+  /* just arbitrarily decrement trans_remaining for the timed test, but */
+  /* will not do that just yet... One other question is whether or not */
+  /* the send buffer and the receive buffer should be the same buffer. */
+
+  while ((!times_up) || (trans_remaining > 0)) {
+
+#ifdef HISTOGRAM
+    /* timestamp just before our call to create the socket, and then */
+    /* again just after the receive raj 3/95 */
+    HIST_timestamp(&time_one);
+#endif /* HISTOGRAM */
+
+    /* set up the data socket */
+    send_socket = create_data_socket(AF_INET, 
+				     SOCK_STREAM,
+				     IPPROTO_SCTP,
+				     local_data_ip,
+				     local_data_port);
+
+    if (send_socket == INVALID_SOCKET) {
+      perror("netperf: send_sctp_cc: sctp stream data socket");
+      exit(1);
+    }
+
+    /* we set SO_REUSEADDR on the premis that no unreserved port */
+    /* number on the local system is going to be already connected to */
+    /* the remote netserver's port number. One thing that I might */
+    /* try later is to have the remote actually allocate a couple of */
+    /* port numbers and cycle through those as well. depends on if we */
+    /* can get through all the unreserved port numbers in less than */
+    /* the length of the TIME_WAIT state raj 8/94 */
+    one = 1;
+    if(setsockopt(send_socket, SOL_SOCKET, SO_REUSEADDR,
+		  (char *)&one, sock_opt_len) == SOCKET_ERROR) {
+      perror("netperf: send_sctp_cc: so_reuseaddr");
+      exit(1);
+    }
+
+newport:
+    /* pick a new port number */
+    myport = ntohs(myaddr->sin_port);
+    myport++;
+
+    /* wrap the port number when we get to client_port_max. NOTE, some */
+    /* broken SCTP's might treat the port number as a signed 16 bit */
+    /* quantity.  we aren't interested in testing such broken */
+    /* implementations :) so we won't make sure that it is below 32767 */
+    /* raj 8/94  */
+    if (myport >= client_port_max) {
+      myport = client_port_min;
+    }
+
+    /* we do not want to use the port number that the server is */
+    /* sitting at - this would cause us to fail in a loopback test. we */
+    /* could just rely on the failure of the bind to get us past this, */
+    /* but I'm guessing that in this one case at least, it is much */
+    /* faster, given that we *know* that port number is already in use */
+    /* (or rather would be in a loopback test) */
+
+    if (myport == ntohs(server.sin_port)) myport++;
+
+    myaddr->sin_port = htons((unsigned short)myport);
+
+    if (debug) {
+      if ((nummessages % 100) == 0) {
+	printf("port %d\n",myport);
+      }
+    }
+
+    /* we want to bind our socket to a particular port number. */
+    if ((ret = bind(send_socket,
+		   (struct sockaddr *)myaddr,
+		   sizeof(struct sockaddr_in))) == SOCKET_ERROR) {
+      /* if the bind failed, someone else must have that port number */
+      /* - perhaps in the listen state. since we can't use it, skip to */
+      /* the next port number. we may have to do this again later, but */
+      /* that's just too bad :) */
+      if (SOCKET_EINTR(ret))
+	  {
+	    /* we hit the end of a */
+	    /* timed test. */
+	    timed_out = 1;
+	    break;
+      }
+      if (debug > 1) {
+	fprintf(where,
+		"send_sctp_cc: tried to bind to port %d errno %d\n",
+		ntohs(myaddr->sin_port),
+		errno);
+	fflush(where);
+      }
+	/* yes, goto's are supposed to be evil, but they do have their */
+	/* uses from time to time. the real world doesn't always have */
+	/* to code to ge tthe A in CS 101 :) raj 3/95 */
+	goto newport;
+    }
+
+    /* Connect up to the remote port on the data socket  */
+    if ((ret = connect(send_socket, 
+		(struct sockaddr *)&server,
+		sizeof(server))) == INVALID_SOCKET){
+      if (SOCKET_EINTR(ret))
+	  {
+	    /* we hit the end of a */
+	    /* timed test. */
+	    timed_out = 1;
+	    break;
+      }
+      perror("netperf: data socket connect failed");
+      printf("\tattempted to connect on socket %d to port %d",
+	     send_socket,
+	     ntohs(server.sin_port));
+      printf(" from port %d \n",ntohs(myaddr->sin_port));
+      exit(1);
+    }
+
+
+    rsp_bytes_recvd=recv(send_socket,
+			 temp_message_ptr,
+			 rsp_bytes_left,
+			 0);
+
+
+    if (rsp_bytes_recvd == 0) {
+      /* connection close, call close. we assume that the requisite */
+      /* number of bytes have been received */
+
+#ifdef HISTOGRAM
+      HIST_timestamp(&time_two);
+      HIST_add(time_hist,delta_micro(&time_one,&time_two));
+#endif /* HISTOGRAM */
+
+      nummessages++;          
+      if (trans_remaining) {
+	trans_remaining--;
+      }
+    
+      if (debug > 3) {
+	fprintf(where,
+		"Transaction %d completed on local port %d\n",
+		nummessages,
+		ntohs(myaddr->sin_port));
+	fflush(where);
+      }
+
+      close(send_socket);
+
+    }
+    else {
+      /* it was less than zero - an error occured */
+      if (SOCKET_EINTR(rsp_bytes_recvd))
+	  {
+	    /* We hit the end of a timed test. */
+	    timed_out = 1;
+	    break;
+	  }
+	  perror("send_sctp_cc: data recv error");
+	  exit(1);
+    }
+      
+  }
+
+  
+  /* this call will always give us the elapsed time for the test, and */
+  /* will also store-away the necessaries for cpu utilization */
+
+  cpu_stop(local_cpu_usage,&elapsed_time);	/* was cpu being measured? */
+  /* how long did we really run? */
+  
+  /* Get the statistics from the remote end. The remote will have */
+  /* calculated service demand and all those interesting things. If it */
+  /* wasn't supposed to care, it will return obvious values. */
+  
+  recv_response();
+  if (!netperf_response.content.serv_errno) {
+    if (debug)
+      fprintf(where,"remote results obtained\n");
+  }
+  else {
+    Set_errno(netperf_response.content.serv_errno);
+    fprintf(where,
+	    "netperf: remote error %d",
+	     netperf_response.content.serv_errno);
+    perror("");
+    fflush(where);
+      
+    exit(1);
+  }
+  
+  /* We now calculate what our thruput was for the test. In the future, */
+  /* we may want to include a calculation of the thruput measured by */
+  /* the remote, but it should be the case that for a SCTP stream test, */
+  /* that the two numbers should be *very* close... We calculate */
+  /* bytes_sent regardless of the way the test length was controlled. */
+  /* If it was time, we needed to, and if it was by bytes, the user may */
+  /* have specified a number of bytes that wasn't a multiple of the */
+  /* send_size, so we really didn't send what he asked for ;-) We use */
+  /* Kbytes/s as the units of thruput for a SCTP stream test, where K = */
+  /* 1024. A future enhancement *might* be to choose from a couple of */
+  /* unit selections. */ 
+  
+  bytes_xferd	= (req_size * nummessages) + (rsp_size * nummessages);
+  thruput	= calc_thruput(bytes_xferd);
+  
+  if (local_cpu_usage || remote_cpu_usage) {
+    /* We must now do a little math for service demand and cpu */
+    /* utilization for the system(s) */
+    /* Of course, some of the information might be bogus because */
+    /* there was no idle counter in the kernel(s). We need to make */
+    /* a note of this for the user's benefit...*/
+    if (local_cpu_usage) {
+      if (local_cpu_rate == 0.0) {
+	fprintf(where,"WARNING WARNING WARNING  WARNING WARNING WARNING  WARNING!\n");
+	fprintf(where,"Local CPU usage numbers based on process information only!\n");
+	fflush(where);
+      }
+      local_cpu_utilization = calc_cpu_util(0.0);
+      /* since calc_service demand is doing ms/Kunit we will */
+      /* multiply the number of transaction by 1024 to get */
+      /* "good" numbers */
+      local_service_demand  = calc_service_demand((double) nummessages*1024,
+						  0.0,
+						  0.0,
+						  0);
+    }
+    else {
+      local_cpu_utilization	= (float) -1.0;
+      local_service_demand	= (float) -1.0;
+    }
+    
+    if (remote_cpu_usage) {
+      if (remote_cpu_rate == 0.0) {
+	fprintf(where,"DANGER  DANGER  DANGER    DANGER  DANGER  DANGER    DANGER!\n");
+	fprintf(where,"Remote CPU usage numbers based on process information only!\n");
+	fflush(where);
+      }
+      remote_cpu_utilization = sctp_cc_result->cpu_util;
+      /* since calc_service demand is doing ms/Kunit we will */
+      /* multiply the number of transaction by 1024 to get */
+      /* "good" numbers */
+      remote_service_demand = calc_service_demand((double) nummessages*1024,
+						  0.0,
+						  remote_cpu_utilization,
+						  sctp_cc_result->num_cpus);
+    }
+    else {
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
+    }
+    
+    /* We are now ready to print all the information. If the user */
+    /* has specified zero-level verbosity, we will just print the */
+    /* local service demand, or the remote service demand. If the */
+    /* user has requested verbosity level 1, he will get the basic */
+    /* "streamperf" numbers. If the user has specified a verbosity */
+    /* of greater than 1, we will display a veritable plethora of */
+    /* background information from outside of this block as it it */
+    /* not cpu_measurement specific...  */
+    
+    switch (verbosity) {
+    case 0:
+      if (local_cpu_usage) {
+	fprintf(where,
+		cpu_fmt_0,
+		local_service_demand);
+      }
+      else {
+	fprintf(where,
+		cpu_fmt_0,
+		remote_service_demand);
+      }
+      break;
+    case 1:
+    case 2:
+
+      if (print_headers) {
+	fprintf(where,
+		cpu_title,
+		local_cpu_method,
+		remote_cpu_method);
+      }
+      
+      fprintf(where,
+	      cpu_fmt_1_line_1,		/* the format string */
+	      lss_size,		/* local sendbuf size */
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* guess */
+	      elapsed_time,		/* how long was the test */
+	      nummessages/elapsed_time,
+	      local_cpu_utilization,	/* local cpu */
+	      remote_cpu_utilization,	/* remote cpu */
+	      local_service_demand,	/* local service demand */
+	      remote_service_demand);	/* remote service demand */
+      fprintf(where,
+	      cpu_fmt_1_line_2,
+	      rss_size,
+	      rsr_size);
+      break;
+    }
+  }
+  else {
+    /* The tester did not wish to measure service demand. */
+    switch (verbosity) {
+    case 0:
+      fprintf(where,
+	      tput_fmt_0,
+	      nummessages/elapsed_time);
+      break;
+    case 1:
+    case 2:
+      if (print_headers) {
+	fprintf(where,tput_title,format_units());
+      }
+
+      fprintf(where,
+	      tput_fmt_1_line_1,	/* the format string */
+	      lss_size,
+	      lsr_size,
+	      req_size,		/* how large were the requests */
+	      rsp_size,		/* how large were the responses */
+	      elapsed_time, 		/* how long did it take */
+	      nummessages/elapsed_time);
+      fprintf(where,
+	      tput_fmt_1_line_2,
+	      rss_size, 		/* remote recvbuf size */
+	      rsr_size);
+      
+      break;
+    }
+  }
+  
+  /* it would be a good thing to include information about some of the */
+  /* other parameters that may have been set for this test, but at the */
+  /* moment, I do not wish to figure-out all the  formatting, so I will */
+  /* just put this comment here to help remind me that it is something */
+  /* that should be done at a later time. */
+  
+  if (verbosity > 1) {
+    /* The user wanted to know it all, so we will give it to him. */
+    /* This information will include as much as we can find about */
+    /* SCTP statistics, the alignments of the sends and receives */
+    /* and all that sort of rot... */
+    
+    fprintf(where,
+	    ksink_fmt,
+	    local_send_align,
+	    remote_recv_offset,
+	    local_send_offset,
+	    remote_recv_offset);
+
+#ifdef HISTOGRAM
+    fprintf(where,"\nHistogram of request/response times\n");
+    fflush(where);
+    HIST_report(time_hist);
+#endif /* HISTOGRAM */
+
+  }
+  
+}
+
+
+void
+recv_sctp_cc()
+{
+  
+  char  *message;
+  struct	sockaddr_in        myaddr_in,
+  peeraddr_in;
+  SOCKET	s_listen,s_data;
+  int 	addrlen;
+  char	*recv_message_ptr;
+  char	*send_message_ptr;
+  int	trans_received;
+  int	trans_remaining;
+  int	timed_out = 0;
+  float	elapsed_time;
+  
+  struct	sctp_cc_request_struct	*sctp_cc_request;
+  struct	sctp_cc_response_struct	*sctp_cc_response;
+  struct	sctp_cc_results_struct	*sctp_cc_results;
+  
+  sctp_cc_request = 
+    (struct sctp_cc_request_struct *)netperf_request.content.test_specific_data;
+  sctp_cc_response = 
+    (struct sctp_cc_response_struct *)netperf_response.content.test_specific_data;
+  sctp_cc_results = 
+    (struct sctp_cc_results_struct *)netperf_response.content.test_specific_data;
+  
+  if (debug) {
+    fprintf(where,"netserver: recv_sctp_cc: entered...\n");
+    fflush(where);
+  }
+  
+  /* We want to set-up the listen socket with all the desired */
+  /* parameters and then let the initiator know that all is ready. If */
+  /* socket size defaults are to be used, then the initiator will have */
+  /* sent us 0's. If the socket sizes cannot be changed, then we will */
+  /* send-back what they are. If that information cannot be determined, */
+  /* then we send-back -1's for the sizes. If things go wrong for any */
+  /* reason, we will drop back ten yards and punt. */
+  
+  /* If anything goes wrong, we want the remote to know about it. It */
+  /* would be best if the error that the remote reports to the user is */
+  /* the actual error we encountered, rather than some bogus unexpected */
+  /* response type message. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_cc: setting the response type...\n");
+    fflush(where);
+  }
+  
+  netperf_response.content.response_type = SCTP_CC_RESPONSE;
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_cc: the response type is set...\n");
+    fflush(where);
+  }
+
+  /* set-up the data buffer with the requested alignment and offset */
+  message = (char *)malloc(DATABUFFERLEN);
+  if (message == NULL) {
+    printf("malloc(%d) failed!\n", DATABUFFERLEN);
+    exit(1);
+  }
+  
+  /* We now alter the message_ptr variables to be at the desired */
+  /* alignments with the desired offsets. */
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_cc: requested recv alignment of %d offset %d\n",
+	    sctp_cc_request->recv_alignment,
+	    sctp_cc_request->recv_offset);
+    fprintf(where,
+	    "recv_sctp_cc: requested send alignment of %d offset %d\n",
+	    sctp_cc_request->send_alignment,
+	    sctp_cc_request->send_offset);
+    fflush(where);
+  }
+
+  recv_message_ptr = ALIGN_BUFFER(message, sctp_cc_request->recv_alignment, sctp_cc_request->recv_offset);
+  
+  send_message_ptr = ALIGN_BUFFER(message, sctp_cc_request->send_alignment, sctp_cc_request->send_offset);
+
+  if (debug) {
+    fprintf(where,"recv_sctp_cc: receive alignment and offset set...\n");
+    fflush(where);
+  }
+  
+  /* Let's clear-out our sockaddr for the sake of cleanlines. Then we */
+  /* can put in OUR values !-) At some point, we may want to nail this */
+  /* socket to a particular network-level address, but for now, */
+  /* INADDR_ANY should be just fine. */
+  
+  bzero((char *)&myaddr_in,
+	sizeof(myaddr_in));
+  myaddr_in.sin_family      = AF_INET;
+  myaddr_in.sin_addr.s_addr = INADDR_ANY;
+  myaddr_in.sin_port        = htons((unsigned short)sctp_cc_request->port);
+  
+  /* Grab a socket to listen on, and then listen on it. */
+  
+  if (debug) {
+    fprintf(where,"recv_sctp_cc: grabbing a socket...\n");
+    fflush(where);
+  }
+
+  /* create_data_socket expects to find some things in the global */
+  /* variables, so set the globals based on the values in the request. */
+  /* once the socket has been created, we will set the response values */
+  /* based on the updated value of those globals. raj 7/94 */
+  lss_size_req = sctp_cc_request->send_buf_size;
+  lsr_size_req = sctp_cc_request->recv_buf_size;
+  loc_nodelay = sctp_cc_request->no_delay;
+  loc_rcvavoid = sctp_cc_request->so_rcvavoid;
+  loc_sndavoid = sctp_cc_request->so_sndavoid;
+  
+  s_listen = create_data_socket(AF_INET,
+				SOCK_STREAM,
+				IPPROTO_SCTP,
+				INADDR_ANY,
+				sctp_cc_request->port);
+  
+  if (s_listen == INVALID_SOCKET) {
+    netperf_response.content.serv_errno = errno;
+    send_response();
+    if (debug) {
+      fprintf(where,"could not create data socket\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+
+  /* Let's get an address assigned to this socket so we can tell the */
+  /* initiator how to reach the data socket. There may be a desire to */
+  /* nail this socket to a specific IP address in a multi-homed, */
+  /* multi-connection situation, but for now, we'll ignore the issue */
+  /* and concentrate on single connection testing. */
+  
+  if (bind(s_listen,
+	   (struct sockaddr *)&myaddr_in,
+	   sizeof(myaddr_in)) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not bind\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+
+  /* Now, let's set-up the socket to listen for connections */
+  if (listen(s_listen, 5) == SOCKET_ERROR) {
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not listen\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+  
+  /* now get the port number assigned by the system  */
+  addrlen = sizeof(myaddr_in);
+  if (getsockname(s_listen,
+		  (struct sockaddr *)&myaddr_in,
+		  &addrlen) == SOCKET_ERROR){
+    netperf_response.content.serv_errno = errno;
+    close(s_listen);
+    send_response();
+    if (debug) {
+      fprintf(where,"could not geetsockname\n");
+      fflush(where);
+    }
+    exit(1);
+  }
+  
+  /* Now myaddr_in contains the port and the internet address this is */
+  /* returned to the sender also implicitly telling the sender that the */
+  /* socket buffer sizing has been done. */
+  
+  sctp_cc_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  if (debug) {
+    fprintf(where,"telling the remote to call me at %d\n",
+	    sctp_cc_response->data_port_number);
+    fflush(where);
+  }
+  netperf_response.content.serv_errno   = 0;
+  
+  /* But wait, there's more. If the initiator wanted cpu measurements, */
+  /* then we must call the calibrate routine, which will return the max */
+  /* rate back to the initiator. If the CPU was not to be measured, or */
+  /* something went wrong with the calibration, we will return a 0.0 to */
+  /* the initiator. */
+  
+  sctp_cc_response->cpu_rate = (float)0.0; 	/* assume no cpu */
+  if (sctp_cc_request->measure_cpu) {
+    sctp_cc_response->measure_cpu = 1;
+    sctp_cc_response->cpu_rate = 
+      calibrate_local_cpu(sctp_cc_request->cpu_rate);
+  }
+  
+
+  
+  /* before we send the response back to the initiator, pull some of */
+  /* the socket parms from the globals */
+  sctp_cc_response->send_buf_size = lss_size;
+  sctp_cc_response->recv_buf_size = lsr_size;
+  sctp_cc_response->no_delay = loc_nodelay;
+  sctp_cc_response->so_rcvavoid = loc_rcvavoid;
+  sctp_cc_response->so_sndavoid = loc_sndavoid;
+
+  send_response();
+  
+  addrlen = sizeof(peeraddr_in);
+  
+  /* Now it's time to start receiving data on the connection. We will */
+  /* first grab the apropriate counters and then start grabbing. */
+  
+  cpu_start(sctp_cc_request->measure_cpu);
+  
+  /* The loop will exit when the sender does a shutdown, which will */
+  /* return a length of zero   */
+  
+  if (sctp_cc_request->test_length > 0) {
+    times_up = 0;
+    trans_remaining = 0;
+    start_timer(sctp_cc_request->test_length + PAD_TIME);
+  }
+  else {
+    times_up = 1;
+    trans_remaining = sctp_cc_request->test_length * -1;
+  }
+  
+  trans_received = 0;
+
+  while ((!times_up) || (trans_remaining > 0)) {
+
+    /* accept a connection from the remote */
+    if ((s_data=accept(s_listen,
+		       (struct sockaddr *)&peeraddr_in,
+		       &addrlen)) == INVALID_SOCKET) {
+      if (errno == EINTR) {
+	/* the timer popped */
+	timed_out = 1;
+	break;
+      }
+      fprintf(where,"recv_sctp_cc: accept: errno = %d\n",errno);
+      fflush(where);
+      close(s_listen);
+      
+      exit(1);
+    }
+
+#ifdef KLUDGE_SOCKET_OPTIONS
+    /* this is for those systems which *INCORRECTLY* fail to pass */
+    /* attributes across an accept() call. Including this goes against */
+    /* my better judgement :( raj 11/95 */
+    
+    kludge_socket_options(s_data, SOL_SCTP);
+
+#endif /* KLUDGE_SOCKET_OPTIONS */
+  
+#ifdef WIN32
+  /* this is used so the timer thread can close the socket out from */
+  /* under us, which to date is the easiest/cleanest/least */
+  /* Windows-specific way I can find to force the winsock calls to */
+  /* return WSAEINTR with the test is over. anything that will run on */
+  /* 95 and NT and is closer to what netperf expects from Unix signals */
+  /* and such would be appreciated raj 1/96 */
+  win_kludge_socket = s_data;
+#endif /* WIN32 */
+
+    if (debug) {
+      fprintf(where,"recv_sctp_cc: accepted data connection.\n");
+      fflush(where);
+    }
+  
+
+    /* close the connection. the server will likely do a graceful */
+    /* close of the connection, insuring that all data has arrived at */
+    /* the client. for this it will call shutdown(), and then recv() and */
+    /* then close(). I'm reasonably confident that this is the */
+    /* appropriate sequence of calls - I would like to hear of */
+    /* examples in web servers to the contrary. raj 10/95*/
+    close(s_data);
+
+    trans_received++;
+    if (trans_remaining) {
+      trans_remaining--;
+    }
+    
+    if (debug) {
+      fprintf(where,
+	      "recv_sctp_cc: Transaction %d complete\n",
+	      trans_received);
+      fflush(where);
+    }
+
+  }
+  
+  
+  /* The loop now exits due to timeout or transaction count being */
+  /* reached */
+  
+  cpu_stop(sctp_cc_request->measure_cpu,&elapsed_time);
+  
+  if (timed_out) {
+    /* we ended the test by time, which was at least 2 seconds */
+    /* longer than we wanted to run. so, we want to subtract */
+    /* PAD_TIME from the elapsed_time. */
+    elapsed_time -= PAD_TIME;
+  }
+  /* send the results to the sender			*/
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_cc: got %d transactions\n",
+	    trans_received);
+    fflush(where);
+  }
+  
+  sctp_cc_results->bytes_received	= (trans_received * 
+					   (sctp_cc_request->request_size + 
+					    sctp_cc_request->response_size));
+  sctp_cc_results->trans_received	= trans_received;
+  sctp_cc_results->elapsed_time	= elapsed_time;
+  if (sctp_cc_request->measure_cpu) {
+    sctp_cc_results->cpu_util	= calc_cpu_util(elapsed_time);
+  }
+  
+  if (debug) {
+    fprintf(where,
+	    "recv_sctp_cc: test complete, sending results.\n");
+    fflush(where);
+  }
+  
+  send_response();
+  
+}
+
+#endif				/* DO_SCTP */
 
 
  /* this test is intended to test the performance of establishing a */
@@ -9863,6 +18308,7 @@ Send   Recv    Send   Recv\n\
     /* set up the data socket */
     send_socket = create_data_socket(AF_INET, 
 				     SOCK_STREAM,
+				     IPPROTO_TCP,
 				     local_data_ip,
 				     local_data_port);
 
@@ -10327,6 +18773,7 @@ recv_tcp_cc()
   
   s_listen = create_data_socket(AF_INET,
 				SOCK_STREAM,
+				IPPROTO_TCP,
 				INADDR_ANY,
 				tcp_cc_request->port);
   
@@ -10468,7 +18915,7 @@ recv_tcp_cc()
     /* attributes across an accept() call. Including this goes against */
     /* my better judgement :( raj 11/95 */
     
-    kludge_socket_options(s_data);
+    kludge_socket_options(s_data, SOL_TCP);
 
 #endif /* KLUDGE_SOCKET_OPTIONS */
   
@@ -10601,6 +19048,15 @@ scan_sockets_args(int argc, char *argv[])
 #else 
       printf("WARNING: TCP_CORK not available on this platform!\n");
 #endif /* TCP_CORK */
+#ifdef DO_SCTP
+#ifdef SCTP_CORK
+      /* set SCTP_CORK */
+      loc_sctpcork = 1;
+      rem_sctpcork = 1; /* however, at first, we only have cork affect loc */
+#else
+      printf("WARNING: SCTP_CORK not available on this platform!\n");
+#endif /* SCTP_CORK */
+#endif				/* DO_SCTP */
       break;
     case 'D':
       /* set the TCP nodelay flag */

@@ -1,3 +1,59 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.2 $) $Date: 2004/08/06 03:47:22 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.2 $) $Date: 2004/08/06 03:47:22 $"
+
+static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.2 $) $Date: 2004/08/06 03:47:22 $";
+
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
 #endif /* NEED_MAKEFILE_EDIT */
@@ -116,7 +172,37 @@ if (debug) {
 
 establish_control(host_name,test_port);
 
-if (strcasecmp(test_name,"TCP_STREAM") == 0) {
+if (strcasecmp(test_name,"SCTP_STREAM") == 0) {
+	send_sctp_stream(host_name);
+}
+else if (strcasecmp(test_name,"SCTP_MAERTS") == 0) {
+	send_sctp_maerts(host_name);
+}
+#ifdef HAVE_SENDFILE
+else if (strcasecmp(test_name,"SCTP_SENDFILE") == 0) {
+	sendfile_sctp_stream(host_name);
+}
+#endif /* HAVE_SENDFILE */
+else if (strcasecmp(test_name,"SCTP_RR") == 0) {
+	send_sctp_rr(host_name);
+}
+else if (strcasecmp(test_name,"SCTP_CRR") == 0) {
+	send_sctp_conn_rr(host_name);
+}
+else if (strcasecmp(test_name,"SCTP_CC") == 0) {
+	send_sctp_cc(host_name);
+}
+#ifdef DO_1644
+else if (strcasecmp(test_name,"SCTP_TRR") == 0) {
+	send_sctp_tran_rr(host_name);
+}
+#endif /* DO_1644 */
+#ifdef DO_NBRR
+else if (strcasecmp(test_name,"SCTP_NBRR") == 0) {
+	send_sctp_nbrr(host_name);
+}
+#endif /* DO_NBRR */
+else if (strcasecmp(test_name,"TCP_STREAM") == 0) {
 	send_tcp_stream(host_name);
 }
 else if (strcasecmp(test_name,"TCP_MAERTS") == 0) {
@@ -203,6 +289,14 @@ else if (strcasecmp(test_name,"HIPPI_RR") == 0) {
 }
 #endif /* DO_HIPPI */
 #ifdef DO_XTI
+#ifdef DO_XTI_SCTP
+else if (strcasecmp(test_name,"XTI_SCTP_STREAM") == 0) {
+	send_xti_sctp_stream(host_name);
+}
+else if (strcasecmp(test_name,"XTI_SCTP_RR") == 0) {
+	send_xti_sctp_rr(host_name);
+}
+#endif	/* DO_XTI_SCTP */
 else if (strcasecmp(test_name,"XTI_TCP_STREAM") == 0) {
 	send_xti_tcp_stream(host_name);
 }
@@ -231,6 +325,17 @@ else if (strcasecmp(test_name,"LWPDG_RR") == 0) {
 }
 #endif /* DO_LWP */
 #ifdef DO_IPV6
+#ifdef DO_IPV6_SCTP
+else if (strcasecmp(test_name,"SCTPIPV6_STREAM") == 0) {
+	send_sctpipv6_stream(host_name);
+}
+else if (strcasecmp(test_name,"SCTPIPV6_RR") == 0) {
+	send_sctpipv6_rr(host_name);
+}
+else if (strcasecmp(test_name,"SCTPIPV6_CRR") == 0) {
+	send_sctpipv6_rr(host_name);
+}
+#endif	/* DO_IPV6_SCTP */
 else if (strcasecmp(test_name,"TCPIPV6_STREAM") == 0) {
 	send_tcpipv6_stream(host_name);
 }
