@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/12/20 18:47:49 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/12/21 10:11:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/20 18:47:49 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 10:11:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -679,13 +679,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FLAVOR], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
     AC_MSG_ERROR([
-**** 
-**** Build is for $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernel but the machine architecture is $linux_cv_march.
-**** $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march machine architecture.
-**** If you are automatically building with the rebuild make target this error
-**** is to be expected on a couple of kernel permutations.
-**** 
-    ])
+*** 
+*** Build is for $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernel but the
+*** machine architecture is $linux_cv_march.  $linux_cv_k_flavor
+*** $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march
+*** machine architecture.  If you are automatically building with the rebuild
+*** make target this error is to be expected on a couple of kernel
+*** permutations.
+*** ])
 ])# _LINUX_BAD_KERNEL_RHBOOT
 # =========================================================================
 
