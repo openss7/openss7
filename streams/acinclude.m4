@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/03/16 11:54:50 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/03/17 14:28:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 11:54:50 $ by $Author: brian $
+# Last Modified $Date: 2005/03/17 14:28:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -790,7 +790,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
 			pcibios_write_config_dword pcibios_write_config_word \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti], [:], [:], [
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

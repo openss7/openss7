@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/09 08:03:31 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:28:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
+ Last Modified $Date: 2005/03/17 14:28:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/09 08:03:31 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:28:07 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/09 08:03:31 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:28:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -103,6 +103,17 @@ static int (*graft_tree) (struct vfsmount * mnt, struct nameidata * nd)
 #if defined HAVE_DO_UMOUNT_ADDR
 static int (*do_umount) (struct vfsmount * mnt, int flags)
 = (typeof(do_umount)) HAVE_DO_UMOUNT_ADDR;
+#endif
+
+#if HAVE_KFUNC_PATH_LOOKUP
+#else
+static int path_lookup(const char *path, unsigned flags, struct nameidata *nd)
+{
+	int error = 0;
+	if (path_init(path, flags, nd))
+		error = path_walk(path, nd);
+	return error;
+}
 #endif
 
 long do_fattach(const struct file *file, const char *file_name)

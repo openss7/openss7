@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.1 $) $Date: 2005/03/09 23:13:47 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.2 $) $Date: 2005/03/17 14:32:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,53 +47,182 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:47 $ by $Author: brian $
+# Last Modified $Date: 2005/03/17 14:32:08 $ by $Author: brian $
 #
 # =============================================================================
 
 PACKAGE = @PACKAGE@
+PACKAGE_LCNAME = @PACKAGE_LCNAME@
 VERSION = @VERSION@
+PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
+mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
 
-export DH_VERBOSE=1
-export DH_OPTIONS
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+rootdir = @rootdir@
+kversion = @kversion@
 
-build: OS7_ARCH_OPTION = --enable-indep --enable-arch
+bindir = @bindir@
+configdir = @configdir@
+datadir = @datadir@
+includedir = @includedir@
+infodir = @infodir@
+initrddir = @initrddir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localstatedir = @localstatedir@
+mandir = @mandir@
+oldincludedir = @oldincludedir@
+sbindir = @sbindir@
+sharedstatedir = @sharedstatedir@
+sysconfdir = @sysconfdir@
+kmoduledir = @kmoduledir@
+
+pkgdatadir = $(datadir)/$(PACKAGE)
+pkglibdir = $(libdir)/$(PACKAGE)
+pkgincludedir = $(includedir)/$(PACKAGE)
+
+export DH_VERBOSE = 1
+export DH_OPTIONS =
+
+pkg_control_files =
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-core-$(kversion)-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-core-$(kversion)-$(VERSION).install:
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+@WITH_KO_MODULES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-info-$(kversion)-$(VERSION).install
+@WITH_KO_MODULES_FALSE@
+@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-info-$(kversion)-$(VERSION).install:
+@WITH_KO_MODULES_FALSE@	( echo '$(mytmpdir)$(pkgincludedir)/$(kversion)/*' ) \
+@WITH_KO_MODULES_FALSE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install:
+	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs:
+	( echo "AUTHORS" ; \
+	  echo "ChangeLog" ; \
+	  echo "COPYING" ; \
+	  echo "INSTALL" ; \
+	  echo "NEWS" ; \
+	  echo "README" ; \
+	  echo "THANKS" ; \
+	  echo "manual" ; \
+	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages:
+	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
+
+@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install
+@COOKED_MANPAGES_FALSE@
+@COOKED_MANPAGES_FALSE@debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install:
+@COOKED_MANPAGES_FALSE@	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
+@COOKED_MANPAGES_FALSE@	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
+@COOKED_MANPAGES_FALSE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info:
+	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install:
+	( echo '$(mytmpdir)$(pkgincludedir)/*.h' ; \
+	  echo '$(mytmpdir)$(pkgincludedir)/sys/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+#pkg_control_files += debian/$(PACKAGE_LCNAME)-source-$(VERSION).install
+
+#debian/$(PACKAGE_LCNAME)-source-$(VERSION).install:
+#	( echo '$(mytmpdir)/usr/src/*' ) \
+#	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-util-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-util-$(VERSION).install:
+	( echo '$(mytmpdir)$(bindir)/*' ; \
+	  echo '$(mytmpdir)$(sbindir)/*' ; \
+	  echo '$(mytmpdir)$(libexecdir)/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+@INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
+@INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
+
 build: build-stamp
 build-stamp:
 	dh_testdir
-	./configure $(OS7_ARCH_OPTION) $(PACKAGE_DEBOPTIONS)
-	$(MAKE)
+	./configure $(PACKAGE_DEBOPTIONS) --disable-initscripts
+	chmod +x debian/rules
+	$(MAKE) -f Makefile
+	chmod +x debian/rules
 	touch build-stamp
 
-build-arch: OS7_ARCH_OPTION = --disable-indep --enable-arch
-build-arch: build-stamp
-
-build-indep: OS7_ARCH_OPTION = --enable-indep --disable-arch
-build-indep: build-stamp
-
 clean:
-	dh_testdir
-	dh_testroot
+	dh_testdir -v
+	dh_testroot -v
 	rm -f build-stamp
-	$(MAKE) clean
-	$(MAKE) distclean
-	dh_clean
+	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
+	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
+	rm -fr $(mytmpdir)
+	rm -f $(pkg_control_files)
+	dh_clean -v
 
-install: DH_OPTIONS=
+install: DH_OPTIONS =
 install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-	$(MAKE) DESTDIR=`pwd`/debian/tmp install
-	dh_install
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_control_files)
+	dh_install -v
 
-binary: build
+binary-common:
+	dh_testdir -v
+	dh_testroot -v
+	dh_installchangelogs -v
+	dh_installdocs -v
+	dh_installdebconf -v
+	dh_installinit -v
+	dh_installinfo -v
+	dh_installman -v
+	dh_strip -v
+	dh_link -v
+	dh_compress -v
+	dh_fixperms -v
+	dh_makeshlibs -v
+	dh_installdeb -v
+	dh_shlibdeps -v
+	dh_gencontrol -v
+	dh_md5sums -v
+	dh_builddeb -v
 
-binary-arch: build-arch
+# Build architecture-independent files here.
+binary-indep: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
-binary-indep: build-indep
+# Build architecture-dependent files here.
+binary-arch: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+binary: binary-indep binary-arch
+
+binary-%: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
 
 get-orig-source:
 	wget http://www.openss7.org/$(PACKAGE)-$(VERSION).tar.bz
+
+.PHONY: build clean binary-indep binary-arch binary install
 

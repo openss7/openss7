@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/16 11:51:38 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/03/17 14:28:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 11:51:38 $ by $Author: brian $
+# Last Modified $Date: 2005/03/17 14:28:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -336,7 +336,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 # properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     arg=
-    for arg_part in $ac_configure_args ; do
+    args=`echo " $ac_configure_args " | sed -r -e 's| (.)?--enable-maintainer-mode(.)? | |g;s| (.)?--enable-dependency-tracking(.)? | |g'`
+    for arg_part in $args ; do
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
 	    if test -n "$arg" ; then
 		eval "arg=$arg"

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/16 13:28:06 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/17 14:28:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 13:28:06 $ by $Author: brian $
+# Last Modified $Date: 2005/03/17 14:28:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,17 +66,65 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     AC_ARG_ENABLE([devfs],
 	AS_HELP_STRING([--enable-devfs],
 	    [build for the devfs. @<:@default=auto@:>@]))
-    AC_CACHE_CHECK([for kernel devfs build], [linux_cv_devfs_build], [dnl
+    AC_CACHE_CHECK([for devfs kernel support], [devfs_cv_kernel_support], [dnl
 	case ":$enable_devfs" in
-	    :yes)   linux_cv_devfs_build=yes ;;
-	    :no)    linux_cv_devfs_build=no ;;
+	    :yes)   devfs_cv_kernel_support=yes ;;
+	    :no)    devfs_cv_kernel_support=no ;;
 	    :)  if test :"${linux_cv_CONFIG_DEVFS_FS:-no}" = :yes -o :"${linux_cv_CONFIG_DEVFS_MOUNT:-no}" = :yes
-		then linux_cv_devfs_build=yes
-		else linux_cv_devfs_build=no
+		then devfs_cv_kernel_support=yes
+		else devfs_cv_kernel_support=no
 		fi ;;
 	esac
     ])
-    if test :"${linux_cv_devfs_build:-no}" = :no
+    AC_CACHE_CHECK([for devfs modprobe entries], [devfs_cv_modprobe], [dnl
+	devfs_cv_modprobe=no
+	if test ":$linux_cv_k_ko_modules" = :yes
+	then
+	    eval "devfs_where=\"${DESTDIR}${sysconfdir}/modprobe.devfs\""
+	else
+	    eval "devfs_where=\"${DESTDIR}${sysconfdir}/modules.devfs\""
+	fi
+	if test -f "$devfs_where"
+	then
+	    devfs_cv_modprobe="yes (${devfs_where})"
+	fi
+    ])
+    AC_CACHE_CHECK([for devfs daemon config], [devfs_cv_daemon_config], [dnl
+	devfs_cv_daemon_config=no
+	eval "devfs_where=\"${DESTDIR}${sysconfdir}/devfsd.conf\""
+	if test -f "$devfs_where"
+	then
+	    devfs_cv_daemon_config="yes (${devfs_where})"
+	fi
+    ])
+    AC_CACHE_CHECK([for devfs daemon], [devfs_cv_daemon], [dnl
+	devfs_cv_daemon=no
+	eval "devfs_where=\"${DESTDIR}${rootdir}/sbin/devfsd\""
+	if test -x "$devfs_where"
+	then
+	    devfs_cv_daemon="yes (${devfs_where})"
+	fi
+    ])
+    AC_CACHE_CHECK([for devfs build], [devfs_cv_build], [dnl
+	devfs_cv_build=yes
+	if test ":$devfs_cv_kernel_support" = :no
+	then
+	    devfs_cv_build=no
+	fi
+	if test ":$devfs_cv_modprobe" = :no
+	then
+	    devfs_cv_build=no
+	fi
+	if test ":$devfs_cv_daemon_config" = :no
+	then
+	    devfs_cv_build=no
+	fi
+	if test ":$devfs_cv_daemon" = :no
+	then
+	    devfs_cv_build=no
+	fi
+    ])
+    if test :"${devfs_cv_build:-no}" = :no
     then
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_devfs --disable-devfs\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--disable-devfs'"
@@ -86,7 +134,7 @@ dnl	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--disable-devf
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--enable-devfs'"
 dnl	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--enable-devfs"
     fi
-    AM_CONDITIONAL([WITH_DEVFS], [test :"${linux_cv_devfs_build:-no}" != :no])dnl
+    AM_CONDITIONAL([WITH_DEVFS], [test :"${devfs_cv_build:-no}" != :no])dnl
 ])# _LINUX_DEVFS
 # =============================================================================
 
