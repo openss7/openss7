@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9 2004/01/17 08:08:42 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.1 2004/08/21 10:14:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1

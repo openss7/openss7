@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sl.h,v 0.9 2004/01/17 08:08:43 brian Exp $
+ @(#) $Id: xti_sl.h,v 0.9.2.1 2004/08/21 10:14:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_SL_H
 #define _SYS_XTI_SL_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define T_SS7_SL		1	/* MTP level (same as SI value) */
 

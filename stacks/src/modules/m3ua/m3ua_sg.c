@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9 2004/01/17 08:20:21 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.1 2004/08/21 10:14:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2004/01/17 08:20:21 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.1  2004/08/21 10:14:45  brian
+ - Force checkin on branch.
+
  Revision 0.9  2004/01/17 08:20:21  brian
  - Added files for 0.9 baseline autoconf release.
 
@@ -47,7 +50,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:21 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:45 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

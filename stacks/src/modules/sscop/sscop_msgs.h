@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_msgs.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:59 $
+ @(#) $RCSfile: sscop_msgs.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SSCOP_MSGS_H__
 #define __SSCOP_MSGS_H__
 
-#ident "@(#) $RCSfile: sscop_msgs.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:59 $"
+#ident "@(#) $RCSfile: sscop_msgs.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $"
 
 #define	SSCOP_BGN	0x01	/* Request initialization */
 #define SSCOP_BGAK	0x02	/* Request acknowledgement */

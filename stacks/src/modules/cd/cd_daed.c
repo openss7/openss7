@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:12:36 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:12:36 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:12:36 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:12:36 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -84,7 +84,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define DAED_DESCRIP	"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
-#define DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:12:36 $"
+#define DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:41 $"
 #define DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define DAED_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define DAED_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

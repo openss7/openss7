@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:49 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:14:49 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:49 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
 
-static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:49 $";
+static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include "allocb.h"
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:49 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:21 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:21 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:21 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $"
 
-static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:21 $";
+static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9 $) 
 #include "allocb.h"
 
 #define MX_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:21 $"
+#define MX_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:56 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

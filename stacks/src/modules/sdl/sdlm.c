@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:13 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:13 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:13 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:13 $";
+static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include "timer.h"
 
 #define DL_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:13 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define DL_DEVICE	"Supportes OpenSS7 SDL Drivers."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

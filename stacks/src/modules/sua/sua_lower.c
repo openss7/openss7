@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lower.c,v 0.9 2004/01/17 08:23:12 brian Exp $
+ @(#) $Id: sua_lower.c,v 0.9.2.1 2004/08/21 10:14:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,9 +24,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:23:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
 
  $Log: sua_lower.c,v $
+ Revision 0.9.2.1  2004/08/21 10:14:59  brian
+ - Force checkin on branch.
+
  Revision 0.9  2004/01/17 08:23:12  brian
  - Added files for 0.9 baseline autoconf release.
 
@@ -44,9 +47,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $Id: sua_lower.c,v 0.9 2004/01/17 08:23:12 brian Exp $"
+#ident "@(#) $Id: sua_lower.c,v 0.9.2.1 2004/08/21 10:14:59 brian Exp $"
 
-static char const ident[] = "$Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:12 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tpi_inet.h,v 0.9 2004/01/17 08:08:42 brian Exp $
+ @(#) $Id: tpi_inet.h,v 0.9.2.1 2004/08/21 10:14:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_INET_H
 #define _SYS_TPI_INET_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #include <sys/tpi_ip.h>
 #include <sys/tpi_udp.h>

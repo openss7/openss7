@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_send.h,v 0.9 2004/01/17 08:23:12 brian Exp $
+ @(#) $Id: sua_send.h,v 0.9.2.1 2004/08/21 10:14:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2004/01/17 08:23:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_send.h,v $
+ Revision 0.9.2.1  2004/08/21 10:14:59  brian
+ - Force checkin on branch.
+
  Revision 0.9  2004/01/17 08:23:12  brian
  - Added files for 0.9 baseline autoconf release.
 

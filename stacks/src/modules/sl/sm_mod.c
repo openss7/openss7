@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:31 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:31 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:31 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:31 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 #include "debug.h"
 
 #define SM_DESCRIP	"SIMPLE SINGLE LINK MTP."
-#define SM_REVISION	"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:31 $"
+#define SM_REVISION	"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:58 $"
 #define SM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi.h,v 0.9 2004/01/17 08:08:12 brian Exp $
+ @(#) $Id: mtpi.h,v 0.9.2.1 2004/08/21 10:14:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_MTPI_H__
 #define __SS7_MTPI_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define MTP_VERSION_1	    0x10
 #define MTP_CURRENT_VERSION MTP_VERSION_1

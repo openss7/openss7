@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:04 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:24:04 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:15:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:04 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:24:04 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

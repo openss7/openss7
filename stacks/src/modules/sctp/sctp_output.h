@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9 2004/01/17 08:21:59 brian Exp $
+ @(#) $Id: sctp_output.h,v 0.9.2.1 2004/08/21 10:14:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_OUTPUT_H__
 #define __SCTP_OUTPUT_H__
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $"
+#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
 
 extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
 extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);

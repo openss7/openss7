@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdti_ioctl.h,v 0.9 2004/01/17 08:08:12 brian Exp $
+ @(#) $Id: sdti_ioctl.h,v 0.9.2.1 2004/08/21 10:14:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SDTI_IOCTL_H__
 #define __SDTI_IOCTL_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #include <linux/ioctl.h>
 

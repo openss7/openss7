@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:14:17 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
 
-static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $";
+static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -69,8 +69,8 @@ static char const ident[] = "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9 $) $Dat
 
 #include "debug.h"
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.1 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

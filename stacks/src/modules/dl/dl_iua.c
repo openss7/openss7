@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_iua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $
+ @(#) $RCSfile: dl_iua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:14:17 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_iua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $"
+#ident "@(#) $RCSfile: dl_iua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $"
 
-static char const ident[] = "$RCSfile: dl_iua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $";
+static char const ident[] = "$RCSfile: dl_iua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:42 $";
 

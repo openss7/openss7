@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:30 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:23:30 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:15:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:30 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:00 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:30 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:00 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

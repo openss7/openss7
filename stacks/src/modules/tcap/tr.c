@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:42 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:23:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:15:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:42 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:42 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:15:01 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.

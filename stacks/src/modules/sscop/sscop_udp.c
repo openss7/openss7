@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_udp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:59 $
+ @(#) $RCSfile: sscop_udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,10 +46,10 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:59 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_udp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:59 $"
+#ident "@(#) $RCSfile: sscop_udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $"
 
-static char const ident[] = "$RCSfile: sscop_udp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:59 $";
+static char const ident[] = "$RCSfile: sscop_udp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:59 $";

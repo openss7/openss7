@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:22 $
+ @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:22:22 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:22 $"
+#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
 
-static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:22:22 $";
+static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $";
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
