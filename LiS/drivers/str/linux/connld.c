@@ -33,7 +33,7 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS connld.c 1.9 12/15/02"
+#ident "@(#) LiS connld.c 1.10 9/24/03"
 
 #ifdef MODULE
 #  if defined(LINUX) && defined(__KERNEL__)
@@ -288,7 +288,7 @@ cred_t *credp;
 	/*
 	 *  set q_ptr as an open count flag
 	 */
-	((int)q->q_ptr)++;
+	((char *)q->q_ptr)++;
 
 	MOD_INC_USE_COUNT;
     

@@ -25,7 +25,7 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS pipemod.c 1.6 12/15/02"
+#ident "@(#) LiS pipemod.c 1.7 9/24/03"
 
 #ifdef MODULE
 #  if defined(LINUX) && defined(__KERNEL__)
@@ -132,7 +132,7 @@ cred_t *credp;
 	     MOD_NAME, q, *devp, flag, sflag );
 #endif
 
-    if (!(((int)RD(q)->q_ptr)++))  MOD_INC_USE_COUNT;
+    if (!(((char *)RD(q)->q_ptr)++))  MOD_INC_USE_COUNT;
     WR(q)->q_ptr = RD(q)->q_ptr;
 
     qprocson(q);
