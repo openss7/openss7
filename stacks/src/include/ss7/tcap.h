@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tcap.h,v 0.9.2.1 2004/08/21 10:14:39 brian Exp $
+ @(#) $Id: tcap.h,v 0.9.2.2 2004/08/30 06:19:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:39 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 06:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TCAP_H__
 #define __SS7_TCAP_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
-#include "tr.h"
-#include "tc.h"
+#include <ss7/tr.h>
+#include <ss7/tc.h>
 
 #endif				/* __SS7_TCAP_H__ */

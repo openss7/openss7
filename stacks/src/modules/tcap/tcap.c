@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:14 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 06:19:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $"
 
-static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+static char const ident[] =
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -70,24 +71,29 @@ static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <ss7/mtpi_ioctl.h>
 #include <ss7/sccpi.h>
 #include <ss7/sccpi_ioctl.h>
+#include <ss7/tcap.h>
+#include <ss7/tcap_ioctl.h>
 
 #include <sys/npi.h>
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
 #include <sys/npi_sccp.h>
-#include <sys/tpi.h>
-#include <sys/tpi_ss7.h>
-#include <sys/tpi_mtp.h>
-#include <sys/tpi_sccp.h>
-#include <sys/tpi_tr.h>
-#include <sys/tpi_tc.h>
+//#include <sys/tpi.h>
+//#include <sys/tpi_ss7.h>
+//#include <sys/tpi_mtp.h>
+//#include <sys/tpi_sccp.h>
+//#include <sys/tpi_tr.h>
+//#include <sys/tpi_tc.h>
+#include <sys/tihdr.h>
+#include <sys/xti.h>
 #include <sys/xti_mtp.h>
 #include <sys/xti_sccp.h>
-#include <sys/xti_tr.h>
-#include <sys/xti_tc.h>
+#include <sys/xti_tcap.h>
+//#include <sys/xti_tr.h>
+//#include <sys/xti_tc.h>
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
-#define TCAP_REVISION	"LfS $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:14 $"
+#define TCAP_REVISION	"LfS $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/30 06:19:39 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -109,22 +115,16 @@ MODULE_LICENSE(TCAP_LICENSE);
 #endif
 #endif				/* LINUX */
 
+#ifndef FIXME
+#define FIXME -1UL
+#endif
+
 #ifdef LFS
 #define TCAP_DRV_ID		CONFIG_STREAMS_TCAP_MODID
 #define TCAP_DRV_NAME		CONFIG_STREAMS_TCAP_NAME
 #define TCAP_CMAJORS		CONFIG_STREAMS_TCAP_NMAJORS
 #define TCAP_CMAJOR_0		CONFIG_STREAMS_TCAP_MAJOR
-#define TCAP_NMINORS		CONFIG_STREAMS_TCAP_NMINORS
-#endif
-
-#ifndef TCAP_DRV_ID
-#define TCAP_DRV_ID	TCAP_IOC_MAGIC
-#endif
-#ifndef TCAP_DRV_NAME
-#define TCAP_DRV_NAME	"tcap"
-#endif
-#ifndef TCAP_NMINORS
-#define TCAP_NMINORS 255
+#define TCAP_UNITS		CONFIG_STREAMS_TCAP_NMINORS
 #endif
 
 #ifndef TCAP_CMINOR_TRI
@@ -147,70 +147,77 @@ MODULE_LICENSE(TCAP_LICENSE);
  *  =========================================================================
  */
 
-STATIC struct module_info tcap_winfo = {
-	mi_idnum:TCAP_DRV_ID,			/* Module ID number */
-	mi_idname:TCAP_DRV_NAME "-wr",		/* Module ID name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:272 + 1,			/* Max packet size accepted */
-	mi_hiwat:1 << 15,			/* Hi water mark */
-	mi_lowat:1 << 10,			/* Lo water mark */
+#define DRV_ID		TCAP_DRV_ID
+#define DRV_NAME	TCAP_DRV_NAME
+#define CMAJORS		TCAP_CMAJORS
+#define CMAJOR_0	TCAP_CMAJOR_0
+#define UNITS		TCAP_UNITS
+#ifdef MODULE
+#define DRV_BANNER	TCAP_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	TCAP_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info tcap_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module ID name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
-STATIC struct module_info tcap_rinfo = {
-	mi_idnum:TCAP_DRV_ID,			/* Module ID number */
-	mi_idname:TCAP_DRV_NAME "-rd",		/* Module ID name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:272 + 1,			/* Max packet size accepted */
-	mi_hiwat:1 << 15,			/* Hi water mark */
-	mi_lowat:1 << 10,			/* Lo water mark */
-};
-STATIC struct module_info sccp_winfo = {
-	mi_idnum:TCAP_DRV_ID,			/* Module ID number */
-	mi_idname:TCAP_DRV_NAME "-muxw",	/* Module ID name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:272 + 1,			/* Max packet size accepted */
-	mi_hiwat:1 << 15,			/* Hi water mark */
-	mi_lowat:1 << 10,			/* Lo water mark */
-};
-STATIC struct module_info sccp_rinfo = {
-	mi_idnum:TCAP_DRV_ID,			/* Module ID number */
-	mi_idname:TCAP_DRV_NAME "-muxr",	/* Module ID name */
-	mi_minpsz:1,				/* Min packet size accepted */
-	mi_maxpsz:272 + 1,			/* Max packet size accepted */
-	mi_hiwat:1 << 15,			/* Hi water mark */
-	mi_lowat:1 << 10,			/* Lo water mark */
-};
+
+STATIC struct module_stat tcap_mstat = { 0, };
 
 STATIC int tcap_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int tcap_close(queue_t *, int, cred_t *);
 
 STATIC struct qinit tcap_rinit = {
-	qi_putp:ss7_oput,			/* Read put (message from below) */
-	qi_srvp:ss7_osrv,			/* Read queue service */
-	qi_qopen:tcap_open,			/* Each open */
-	qi_qclose:tcap_close,			/* Last close */
-	qi_minfo:&tcap_rinfo,			/* Information */
-};
-STATIC struct qinit tcap_winit = {
-	qi_putp:ss7_iput,			/* Write put (message from above) */
-	qi_srvp:ss7_isrv,			/* Write queue service */
-	qi_minfo:&tcap_winfo,			/* Information */
-};
-STATIC struct qinit sccp_rinit = {
-	qi_putp:ss7_iput,			/* Read put (message from below) */
-	qi_srvp:ss7_isrv,			/* Read queue service */
-	qi_minfo:&sccp_rinfo,			/* Information */
-};
-STATIC struct qinit sccp_winit = {
-	qi_putp:ss7_oput,			/* Write put (message from above) */
-	qi_srvp:ss7_osrv,			/* Write queue service */
-	qi_minfo:&sccp_winfo,			/* Information */
+	.qi_putp = ss7_oput,		/* Read put (message from below) */
+	.qi_srvp = ss7_osrv,		/* Read queue service */
+	.qi_qopen = tcap_open,		/* Each open */
+	.qi_qclose = tcap_close,	/* Last close */
+	.qi_minfo = &tcap_minfo,	/* Information */
+	.qi_mstat = &tcap_mstat,	/* Statistics */
 };
 
-STATIC struct streamtab tcap_info = {
-	st_rdinit:&tcap_rinit,			/* Upper read queue */
-	st_wrinit:&tcap_winit,			/* Upper write queue */
-	st_muxrinit:&sccp_rinit,		/* Lower read queue */
-	st_muxwinit:&sccp_winit,		/* Lower write queue */
+STATIC struct qinit tcap_winit = {
+	.qi_putp = ss7_iput,		/* Write put (message from above) */
+	.qi_srvp = ss7_isrv,		/* Write queue service */
+	.qi_minfo = &tcap_minfo,	/* Information */
+	.qi_mstat = &tcap_mstat,	/* Statistics */
+};
+
+STATIC struct module_info sccp_minfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module ID name */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
+};
+
+STATIC struct module_stat sccp_mstat = { 0, };
+
+STATIC struct qinit sccp_rinit = {
+	.qi_putp = ss7_iput,		/* Read put (message from below) */
+	.qi_srvp = ss7_isrv,		/* Read queue service */
+	.qi_minfo = &sccp_minfo,	/* Information */
+	.qi_mstat = &sccp_mstat,	/* Statistics */
+};
+
+STATIC struct qinit sccp_winit = {
+	.qi_putp = ss7_oput,		/* Write put (message from above) */
+	.qi_srvp = ss7_osrv,		/* Write queue service */
+	.qi_minfo = &sccp_minfo,	/* Information */
+	.qi_mstat = &sccp_mstat,	/* Statistics */
+};
+
+MODULE_STATIC struct streamtab tcapinfo = {
+	.st_rdinit = &tcap_rinit,	/* Upper read queue */
+	.st_wrinit = &tcap_winit,	/* Upper write queue */
+	.st_muxrinit = &sccp_rinit,	/* Lower read queue */
+	.st_muxwinit = &sccp_winit,	/* Lower write queue */
 };
 
 /* 
@@ -228,53 +235,55 @@ typedef struct tcap_buf {
 } tcap_buf_t;
 
 typedef struct tcap_options {
-	tcap_buf_t ctx;				/* application context */
-	tcap_buf_t inf;				/* user information */
-	t_uscalar_t pcl;			/* protocol class */
-	t_uscalar_t ret;			/* return option */
-	t_uscalar_t imp;			/* importance */
-	t_uscalar_t seq;			/* sequence control */
-	t_uscalar_t pri;			/* priority */
-	t_uscalar_t sls;			/* signalling link selection */
-	t_uscalar_t mp;				/* message priority */
+	tcap_buf_t ctx;			/* application context */
+	tcap_buf_t inf;			/* user information */
+	t_uscalar_t pcl;		/* protocol class */
+	t_uscalar_t ret;		/* return option */
+	t_uscalar_t imp;		/* importance */
+	t_uscalar_t seq;		/* sequence control */
+	t_uscalar_t pri;		/* priority */
+	t_uscalar_t sls;		/* signalling link selection */
+	t_uscalar_t mp;			/* message priority */
+	t_uscalar_t mtu;		/* maximum transfer unit */
 } tcap_options_t;
 
 struct tcap_options opt_defaults;
 
-struct tcap;					/* TCAP user */
-struct iv;					/* invoke */
-struct dg;					/* dialog */
-struct tr;					/* transaction */
-struct sp;					/* SCCP-SAP */
-struct sccp;					/* SCCP provider */
+struct tcap;				/* TCAP user */
+struct iv;				/* invoke */
+struct dg;				/* dialog */
+struct tr;				/* transaction */
+struct sp;				/* SCCP-SAP */
+struct sccp;				/* SCCP provider */
 
 /*
  *  Trasnaction Capabilities Application Part
  *  -----------------------------------------------------------
  */
 typedef struct tcap {
-	STR_DECLARATION (struct tcap);		/* stream declaration */
-	SLIST_HEAD (tr, tr);			/* transaction list */
-	SLIST_HEAD (dg, dg);			/* dialogue list */
-	ulong token;				/* token for this stream */
-	ulong conind;				/* max connection inds */
-	ulong outcnt;				/* out connection inds */
-	ulong pclass;				/* protocol class */
-	ulong reterr;				/* return on error */
-	struct sccp_addr src;			/* bound src address */
+	STR_DECLARATION (struct tcap);	/* stream declaration */
+	SLIST_HEAD (tr, tr);		/* transaction list */
+	SLIST_HEAD (dg, dg);		/* dialogue list */
+	ulong token;			/* token for this stream */
+	ulong conind;			/* max connection inds */
+	ulong outcnt;			/* out connection inds */
+	ulong pclass;			/* protocol class */
+	ulong reterr;			/* return on error */
+	struct sccp_addr src;		/* bound src address */
 	uint8_t saddr[SCCP_MAX_ADDR_LENGTH];
-	struct sccp_addr dst;			/* bound dst address */
+	struct sccp_addr dst;		/* bound dst address */
 	uint8_t daddr[SCCP_MAX_ADDR_LENGTH];
-	bufq_t conq;				/* connection indication queue */
-	struct tcap_options options;		/* settable options */
-	struct lmi_option option;		/* tcap protocol variant and options */
-	struct tcap_notify_tc notify;		/* tcap notifications */
-	struct tcap_timers_tc timers;		/* tcap timers */
-	struct tcap_opt_conf_tc config;		/* tcap configuration */
-	struct tcap_stats_tc statsp;		/* tcap statistics periods */
-	struct tcap_stats_tc stamp;		/* tcap statistics timestamps */
-	struct tcap_stats_tc stats;		/* tcap statistics */
+	bufq_t conq;			/* connection indication queue */
+	struct tcap_options options;	/* settable options */
+	struct lmi_option option;	/* tcap protocol variant and options */
+	struct tcap_notify_tc notify;	/* tcap notifications */
+	struct tcap_timers_tc timers;	/* tcap timers */
+	struct tcap_opt_conf_tc config;	/* tcap configuration */
+	struct tcap_stats_tc statsp;	/* tcap statistics periods */
+	struct tcap_stats_tc stamp;	/* tcap statistics timestamps */
+	struct tcap_stats_tc stats;	/* tcap statistics */
 } tcap_t;
+#define TCAP_PRIV(__q) ((struct tcap *)(__q)->q_ptr)
 
 STATIC struct tcap *tcap_alloc_priv(queue_t *, struct tcap **, dev_t *, cred_t *, ushort);
 STATIC struct tcap *tcap_get(struct tcap *);
@@ -288,17 +297,17 @@ STATIC void tcap_put(struct tcap *);
  *  -----------------------------------------------------------
  */
 typedef struct iv {
-	HEAD_DECLARATION (struct iv);		/* head declaration */
-	SLIST_LINKAGE (dg, iv, dg);		/* associated dialogue */
-	ulong oper;				/* operation */
-	ulong iid;				/* invoke id */
-	ulong lid;				/* linked id */
-	struct tcap_notify_iv notify;		/* invoke notifications */
-	struct tcap_timers_iv timers;		/* invoke protocol timers */
-	struct tcap_opt_conf_iv config;		/* invoke configuration */
-	struct tcap_stats_iv statsp;		/* invoke statistics periods */
-	struct tcap_stats_iv stamp;		/* invoke statsistics timestamps */
-	struct tcap_stats_iv stats;		/* invoke statistics */
+	HEAD_DECLARATION (struct iv);	/* head declaration */
+	SLIST_LINKAGE (dg, iv, dg);	/* associated dialogue */
+	ulong oper;			/* operation */
+	ulong iid;			/* invoke id */
+	ulong lid;			/* linked id */
+	struct tcap_notify_iv notify;	/* invoke notifications */
+	struct tcap_timers_iv timers;	/* invoke protocol timers */
+	struct tcap_opt_conf_iv config;	/* invoke configuration */
+	struct tcap_stats_iv statsp;	/* invoke statistics periods */
+	struct tcap_stats_iv stamp;	/* invoke statsistics timestamps */
+	struct tcap_stats_iv stats;	/* invoke statistics */
 } iv_t;
 
 STATIC struct iv *tcap_alloc_iv(ulong);
@@ -313,16 +322,16 @@ STATIC void iv_put(struct iv *);
  *  -----------------------------------------------------------
  */
 typedef struct dg {
-	HEAD_DECLARATION (struct dg);		/* head declaration */
-	SLIST_LINKAGE (tr, dg, tr);		/* associated transaction */
-	SLIST_HEAD (iv, dg, iv);		/* list of invocations */
-	ulong did;				/* dialogue id */
-	struct tcap_notify_dg notify;		/* dialog notifications */
-	struct tcap_timers_dg timers;		/* dialog protocol timers */
-	struct tcap_opt_conf_dg config;		/* dialog configuration */
-	struct tcap_stats_dg statsp;		/* dialog statistics periods */
-	struct tcap_stats_dg stamp;		/* dialog statsistics timestamps */
-	struct tcap_stats_dg stats;		/* dialog statistics */
+	HEAD_DECLARATION (struct dg);	/* head declaration */
+	SLIST_LINKAGE (tr, dg, tr);	/* associated transaction */
+	SLIST_LINKAGE (iv, dg, iv);	/* list of invocations */
+	ulong did;			/* dialogue id */
+	struct tcap_notify_dg notify;	/* dialog notifications */
+	struct tcap_timers_dg timers;	/* dialog protocol timers */
+	struct tcap_opt_conf_dg config;	/* dialog configuration */
+	struct tcap_stats_dg statsp;	/* dialog statistics periods */
+	struct tcap_stats_dg stamp;	/* dialog statsistics timestamps */
+	struct tcap_stats_dg stats;	/* dialog statistics */
 } dg_t;
 
 STATIC struct dg *tcap_alloc_dg(ulong);
@@ -337,19 +346,19 @@ STATIC void dg_put(struct dg *);
  *  -----------------------------------------------------------
  */
 typedef struct tr {
-	HEAD_DECLARATION (struct tr);		/* head declaration */
-	SLIST_LINKAGE (tcap, tr, tcap);		/* associated TCAP user */
-	SLIST_LINKAGE (sp, tr, sp);		/* associated SCCP-SAP */
-	SLIST_HEAD (iv, iv);			/* invokes for this transaction */
-	ulong cid;				/* correlation id */
-	ulong tid;				/* transaction id */
-	ulong ocls;				/* operation class */
-	struct tcap_notify_tr notify;		/* transaction notifications */
-	struct tcap_timers_tr timers;		/* transaction protocol timers */
-	struct tcap_opt_conf_tr config;		/* transaction configuration */
-	struct tcap_stats_tr statsp;		/* transaction statistics periods */
-	struct tcap_stats_tr stamp;		/* transaction statsistics timestamps */
-	struct tcap_stats_tr stats;		/* transaction statistics */
+	HEAD_DECLARATION (struct tr);	/* head declaration */
+	SLIST_LINKAGE (tcap, tr, tcap);	/* associated TCAP user */
+	SLIST_LINKAGE (sp, tr, sp);	/* associated SCCP-SAP */
+	SLIST_HEAD (iv, iv);		/* invokes for this transaction */
+	ulong cid;			/* correlation id */
+	ulong tid;			/* transaction id */
+	ulong ocls;			/* operation class */
+	struct tcap_notify_tr notify;	/* transaction notifications */
+	struct tcap_timers_tr timers;	/* transaction protocol timers */
+	struct tcap_opt_conf_tr config;	/* transaction configuration */
+	struct tcap_stats_tr statsp;	/* transaction statistics periods */
+	struct tcap_stats_tr stamp;	/* transaction statsistics timestamps */
+	struct tcap_stats_tr stats;	/* transaction statistics */
 } tr_t;
 
 STATIC struct tr *tcap_alloc_tr(struct tcap *, ulong, ulong);
@@ -365,15 +374,15 @@ STATIC void tr_put(struct tr *);
  *  -----------------------------------------------------------
  */
 typedef struct sp {
-	HEAD_DECLARATION (struct sp);		/* head declaration */
-	struct sccp *sccp;			/* sccp for this sp */
-	SLIST_HEAD (tr, tr);			/* transaction list for this sp */
-	struct tcap_notify_sp notify;		/* SCCP-SAP notifications */
-	struct tcap_timers_sp timers;		/* SCCP-SAP protocol timers */
-	struct tcap_opt_conf_sp config;		/* SCCP-SAP configuration */
-	struct tcap_stats_sp statsp;		/* SCCP-SAP statistics periods */
-	struct tcap_stats_sp stamp;		/* SCCP-SAP statistics timestamps */
-	struct tcap_stats_sp stats;		/* SCCP-SAP statistics */
+	HEAD_DECLARATION (struct sp);	/* head declaration */
+	struct sccp *sccp;		/* sccp for this sp */
+	SLIST_HEAD (tr, tr);		/* transaction list for this sp */
+	struct tcap_notify_sp notify;	/* SCCP-SAP notifications */
+	struct tcap_timers_sp timers;	/* SCCP-SAP protocol timers */
+	struct tcap_opt_conf_sp config;	/* SCCP-SAP configuration */
+	struct tcap_stats_sp statsp;	/* SCCP-SAP statistics periods */
+	struct tcap_stats_sp stamp;	/* SCCP-SAP statistics timestamps */
+	struct tcap_stats_sp stats;	/* SCCP-SAP statistics */
 } sp_t;
 
 STATIC struct sp *tcap_alloc_sp(ulong);
@@ -388,20 +397,21 @@ STATIC void sp_put(struct sp *);
  *  -----------------------------------------------------------
  */
 typedef struct sccp {
-	STR_DECLARATION (struct sccp);		/* stream declaration */
-	struct sp *sp;				/* SCCP-SAP instance for this stream */
-	ulong psdu;				/* pSDU size */
-	ulong pidu;				/* pIDU size */
-	ulong podu;				/* pODU size */
-	struct sccp_addr add;			/* local address */
+	STR_DECLARATION (struct sccp);	/* stream declaration */
+	struct sp *sp;			/* SCCP-SAP instance for this stream */
+	size_t outcnt;			/* outstanding connection indications */
+	ulong psdu;			/* pSDU size */
+	ulong pidu;			/* pIDU size */
+	ulong podu;			/* pODU size */
+	struct sccp_addr add;		/* local address */
 	uint8_t addr[SCCP_MAX_ADDR_LENGTH];
-	struct lmi_option option;		/* protocol variant and options */
-	struct tcap_notify_sc notify;		/* tcap notifications */
-	struct tcap_timers_sc timers;		/* tcap protocol timers */
-	struct tcap_opt_conf_sc config;		/* tcap configuration */
-	struct tcap_stats_sc statsp;		/* tcap statistics periods */
-	struct tcap_stats_sc stamp;		/* tcap statistics timestamp */
-	struct tcap_stats_sc stats;		/* tcap statistics */
+	struct lmi_option option;	/* protocol variant and options */
+	struct tcap_notify_sc notify;	/* tcap notifications */
+	struct tcap_timers_sc timers;	/* tcap protocol timers */
+	struct tcap_opt_conf_sc config;	/* tcap configuration */
+	struct tcap_stats_sc statsp;	/* tcap statistics periods */
+	struct tcap_stats_sc stamp;	/* tcap statistics timestamp */
+	struct tcap_stats_sc stats;	/* tcap statistics */
 } sccp_t;
 #define SCCP_PRIV(__q) ((struct sccp *)(__q)->q_ptr)
 
@@ -418,17 +428,17 @@ STATIC void sccp_put(struct sccp *);
  */
 typedef struct df {
 	spinlock_t lock;
-	SLIST_HEAD (tcap, tcap);		/* master list of TCAP users */
-	SLIST_HEAD (tr, tr);			/* master list of transactions */
-	SLIST_HEAD (sp, sp);			/* master list of SCCP-SAPs */
-	SLIST_HEAD (sccp, sccp);		/* master list of SCCP providers */
-	struct lmi_option proto;		/* default protocol variant and options */
-	struct tcap_notify_df notify;		/* default notifications */
-	struct tcap_timers_df timers;		/* default protocol timers */
-	struct tcap_opt_conf_df config;		/* default configuration */
-	struct tcap_stats_df statsp;		/* default statistics periods */
-	struct tcap_stats_df stamp;		/* default statistics timestamps */
-	struct tcap_stats_df stats;		/* default statistics */
+	SLIST_HEAD (tcap, tcap);	/* master list of TCAP users */
+	SLIST_HEAD (tr, tr);		/* master list of transactions */
+	SLIST_HEAD (sp, sp);		/* master list of SCCP-SAPs */
+	SLIST_HEAD (sccp, sccp);	/* master list of SCCP providers */
+	struct lmi_option proto;	/* default protocol variant and options */
+	struct tcap_notify_df notify;	/* default notifications */
+	struct tcap_timers_df timers;	/* default protocol timers */
+	struct tcap_opt_conf_df config;	/* default configuration */
+	struct tcap_stats_df statsp;	/* default statistics periods */
+	struct tcap_stats_df stamp;	/* default statistics timestamps */
+	struct tcap_stats_df stats;	/* default statistics */
 } df_t;
 STATIC struct df master;
 
@@ -513,7 +523,7 @@ STATIC struct df master;
 #define	TCAP_TAG_PRIV_ABORT	22	/* ANSI Abort */
 #define	TCAP_TAG_PRIV_PCAUSE	23	/* ANSI P-Abort Cause */
 #define	TCAP_TAG_PRIV_U_ABORT	24	/* ANSI User Abort Information */
-#define	TCAP_TAG_PRIV_DIALOG	25	/* ANSI Dialog Portion */
+#define	TCAP_TAG_PRIV_DLGP	25	/* ANSI Dialog Portion */
 #define	TCAP_TAG_PRIV_VERSION	26	/* ANSI Protocol Version */
 #define	TCAP_TAG_PRIV_CONTEXT	27	/* ANSI Integer Application Context */
 #define	TCAP_TAG_PRIV_CTX_OID	28	/* ANSI OID Application Context */
@@ -527,7 +537,7 @@ STATIC struct df master;
 #define TCAP_TAG_APPL_ORIGID	8	/* ITUT Origination Transaction Id */
 #define TCAP_TAG_APPL_DESTID	9	/* ITUT Destination Transaction Id */
 #define TCAP_TAG_APPL_PCAUSE	10	/* ITUT P-Abort Cause */
-#define TCAP_TAG_APPL_DIALOG	11	/* ITUT Dialog Portion */
+#define TCAP_TAG_APPL_DLGP	11	/* ITUT Dialog Portion */
 #define TCAP_TAG_APPL_CSEQ	12	/* ITUT Component Portion */
 
 #define TCAP_TAG_APPL_AUDT_PDU	0	/* ITUT AUDT APDU */
@@ -545,32 +555,32 @@ STATIC struct df master;
 #define TCAP_TAG_CNTX_RR	7	/* Return Result (Not Last) */
 
 typedef struct sc_msg {
-	struct sccp_addr orig;			/* Originating address */
+	struct sccp_addr orig;		/* Originating address */
 	uchar oaddr[SCCP_MAX_ADDR_LENGTH];	/* Originating address signals */
-	struct sccp_addr dest;			/* Destination address */
+	struct sccp_addr dest;		/* Destination address */
 	uchar daddr[SCCP_MAX_ADDR_LENGTH];	/* Destination address signals */
-	ulong pcl;				/* protocol class */
-	ulong imp;				/* importance */
-	ulong seq;				/* sequence control */
-	ulong ret;				/* return option */
-	ulong sls;				/* signalling link selection */
-	ulong mp;				/* message priority */
+	ulong pcl;			/* protocol class */
+	ulong imp;			/* importance */
+	ulong seq;			/* sequence control */
+	ulong ret;			/* return option */
+	ulong sls;			/* signalling link selection */
+	ulong mp;			/* message priority */
 } sc_msg_t;
 
 typedef struct tr_msg {
-	struct sc_msg sccp;			/* SCCP message */
-	ulong type;				/* Message type */
-	ulong parms;				/* Bit mask of parms included */
-	ulong origid;				/* Originating Transaction Id */
-	ulong destid;				/* Destination Transaction Id */
-	ulong cause;				/* Abort Cause */
-	ulong version;				/* TCAP version flags */
-	uchar *dlg_beg;				/* beg of dialog portion */
-	uchar *dlg_end;				/* end of dialog portion */
-	uchar *cmp_beg;				/* beg of components or u-abort info */
-	uchar *cmp_end;				/* end of components or u-abort info */
-	uchar *abt_beg;				/* beg of u-abort info */
-	uchar *abt_end;				/* end of u-abort info */
+	struct sc_msg sccp;		/* SCCP message */
+	ulong type;			/* Message type */
+	ulong parms;			/* Bit mask of parms included */
+	ulong origid;			/* Originating Transaction Id */
+	ulong destid;			/* Destination Transaction Id */
+	ulong cause;			/* Abort Cause */
+	ulong version;			/* TCAP version flags */
+	uchar *dlg_beg;			/* beg of dialog portion */
+	uchar *dlg_end;			/* end of dialog portion */
+	uchar *cmp_beg;			/* beg of components or u-abort info */
+	uchar *cmp_end;			/* end of components or u-abort info */
+	uchar *abt_beg;			/* beg of u-abort info */
+	uchar *abt_end;			/* end of u-abort info */
 } tr_msg_t;
 
 #define TCAP_PTF_ORIGID	(1<<0)	/* Originating Transaction id */
@@ -579,15 +589,15 @@ typedef struct tr_msg {
 #define TCAP_PTF_CSEQ	(1<<3)	/* Component Portion */
 
 typedef struct tc_msg {
-	ulong type;				/* Component type */
-	ulong parms;				/* Bit mask of parms included */
-	ulong iid;				/* Invoke Id */
-	ulong lid;				/* Linked Id */
-	ulong opcode;				/* Operation Code */
-	ulong ecode;				/* Error Code */
-	ulong pcode;				/* Problem Code */
-	uchar *prm_beg;				/* beg of parameters */
-	uchar *prm_end;				/* end of parameters */
+	ulong type;			/* Component type */
+	ulong parms;			/* Bit mask of parms included */
+	ulong iid;			/* Invoke Id */
+	ulong lid;			/* Linked Id */
+	ulong opcode;			/* Operation Code */
+	ulong ecode;			/* Error Code */
+	ulong pcode;			/* Problem Code */
+	uchar *prm_beg;			/* beg of parameters */
+	uchar *prm_end;			/* end of parameters */
 } tc_msg_t;
 
 #define TCAP_PTF_IID	(1<<0)	/* Invoke Id */
@@ -612,7 +622,8 @@ typedef struct tc_msg {
  *  General purpose decoding functions.
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_taglen(uchar **p, uchar **e, ulong * tag, ulong * cls)
+STATIC INLINE int
+unpack_taglen(uchar **p, uchar **e, ulong *tag, ulong *cls)
 {
 	ulong len;
 	if (*p >= *e)
@@ -674,7 +685,8 @@ STATIC INLINE int unpack_taglen(uchar **p, uchar **e, ulong * tag, ulong * cls)
 }
 
 /* unpack universal primitive class 0 form 0 */
-STATIC INLINE int unpack_univ_prim(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_univ_prim(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -686,7 +698,8 @@ STATIC INLINE int unpack_univ_prim(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack universal constructor class 0 form 1 */
-STATIC INLINE int unpack_univ_cons(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_univ_cons(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -698,7 +711,8 @@ STATIC INLINE int unpack_univ_cons(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack application-wide primitive class 1 form 0 */
-STATIC INLINE int unpack_appl_prim(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_appl_prim(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -710,7 +724,8 @@ STATIC INLINE int unpack_appl_prim(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack application-wide constructor class 1 form 1 */
-STATIC INLINE int unpack_appl_cons(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_appl_cons(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -722,7 +737,8 @@ STATIC INLINE int unpack_appl_cons(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack context-specific primitive class 2 form 0 */
-STATIC INLINE int unpack_ctxt_prim(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_ctxt_prim(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -734,7 +750,8 @@ STATIC INLINE int unpack_ctxt_prim(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack context-specific constructor class 2 form 1 */
-STATIC INLINE int unpack_ctxt_cons(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_ctxt_cons(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -746,7 +763,8 @@ STATIC INLINE int unpack_ctxt_cons(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack private primitive class 3 form 0 */
-STATIC INLINE int unpack_priv_prim(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_priv_prim(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -758,7 +776,8 @@ STATIC INLINE int unpack_priv_prim(uchar **p, uchar **e, ulong * tag)
 }
 
 /* unpack private constructor class 3 form 1 */
-STATIC INLINE int unpack_priv_cons(uchar **p, uchar **e, ulong * tag)
+STATIC INLINE int
+unpack_priv_cons(uchar **p, uchar **e, ulong *tag)
 {
 	int err;
 	ulong cls;
@@ -768,12 +787,14 @@ STATIC INLINE int unpack_priv_cons(uchar **p, uchar **e, ulong * tag)
 		return (0);
 	return (-EINVAL);
 }
-STATIC INLINE int unpack_implicit_int(uchar **p, uchar *e, ulong * val)
+STATIC INLINE int
+unpack_implicit_int(uchar **p, uchar *e, ulong *val)
 {
 	/* FIXME */
 	return (-EFAULT);
 }
-STATIC INLINE int unpack_explicit_int(uchar **p, uchar *e, ulong * val)
+STATIC INLINE int
+unpack_explicit_int(uchar **p, uchar *e, ulong *val)
 {
 	/* FIXME */
 	return (-EFAULT);
@@ -793,7 +814,8 @@ STATIC INLINE int unpack_explicit_int(uchar **p, uchar *e, ulong * val)
  *  UNPACK ANSI Correlation Ids.
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_priv_corids(uchar **p, uchar *e, struct tc_msg *m, const ulong ctype)
+STATIC INLINE int
+unpack_priv_corids(uchar **p, uchar *e, struct tc_msg *m, const ulong ctype)
 {
 	int err;
 	ulong tag;
@@ -849,7 +871,8 @@ STATIC INLINE int unpack_priv_corids(uchar **p, uchar *e, struct tc_msg *m, cons
  *  UNPACK ANSI Opcodes
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_priv_opcode(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_priv_opcode(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -876,7 +899,8 @@ STATIC INLINE int unpack_priv_opcode(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ANSI Error Codes
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_priv_ecode(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_priv_ecode(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -901,7 +925,8 @@ STATIC INLINE int unpack_priv_ecode(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ANSI Problem Codes
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_priv_pcode(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_priv_pcode(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -917,7 +942,8 @@ STATIC INLINE int unpack_priv_pcode(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ANSI Component Parameter Sets
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_priv_pset(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_priv_pset(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -936,7 +962,8 @@ STATIC INLINE int unpack_priv_pset(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI INVOKE (LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_inkl(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_inkl(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_INVOKE_L;
@@ -955,7 +982,8 @@ STATIC int tcap_priv_dec_inkl(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI INVOKE (NOT LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_ink(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_ink(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_INVOKE_NL;
@@ -974,7 +1002,8 @@ STATIC int tcap_priv_dec_ink(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI RETURN RESULT (LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_rrl(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_rrl(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_RESULT_L;
@@ -991,7 +1020,8 @@ STATIC int tcap_priv_dec_rrl(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI RETURN RESULT (NOT LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_rr(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_rr(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_RESULT_NL;
@@ -1008,7 +1038,8 @@ STATIC int tcap_priv_dec_rr(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI RETURN ERROR
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_rer(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_rer(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_ERROR;
@@ -1027,7 +1058,8 @@ STATIC int tcap_priv_dec_rer(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI REJECT
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_rej(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_rej(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_REJECT;
@@ -1046,7 +1078,8 @@ STATIC int tcap_priv_dec_rej(uchar **p, uchar *e, struct tc_msg *m)
  *  ANSI Component Decoder
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_priv_dec_comp(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_priv_dec_comp(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1093,7 +1126,8 @@ STATIC int tcap_priv_dec_comp(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ITUT Correlation Ids.
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_univ_iid(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_univ_iid(uchar **p, uchar *e, struct tc_msg *m)
 {
 	(void) p;
 	(void) e;
@@ -1101,7 +1135,8 @@ STATIC INLINE int unpack_univ_iid(uchar **p, uchar *e, struct tc_msg *m)
 	/* FIXME */
 	return (-EFAULT);
 }
-STATIC INLINE int unpack_univ_lid(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_univ_lid(uchar **p, uchar *e, struct tc_msg *m)
 {
 	(void) p;
 	(void) e;
@@ -1109,7 +1144,8 @@ STATIC INLINE int unpack_univ_lid(uchar **p, uchar *e, struct tc_msg *m)
 	/* FIXME */
 	return (-EFAULT);
 }
-STATIC INLINE int unpack_univ_corids(uchar **p, uchar *e, struct tc_msg *m, const ulong ctype)
+STATIC INLINE int
+unpack_univ_corids(uchar **p, uchar *e, struct tc_msg *m, const ulong ctype)
 {
 	int err;
 	switch (ctype) {
@@ -1142,7 +1178,8 @@ STATIC INLINE int unpack_univ_corids(uchar **p, uchar *e, struct tc_msg *m, cons
  *  UNPACK ITUT Opcodes
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_univ_opcode(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_univ_opcode(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1162,7 +1199,8 @@ STATIC INLINE int unpack_univ_opcode(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ITUT Parameter Sequences
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_univ_pseq(uchar **p, uchar *e, struct tc_msg *m, const ulong opt)
+STATIC INLINE int
+unpack_univ_pseq(uchar **p, uchar *e, struct tc_msg *m, const ulong opt)
 {
 	int err;
 	ulong tag;
@@ -1187,7 +1225,8 @@ STATIC INLINE int unpack_univ_pseq(uchar **p, uchar *e, struct tc_msg *m, const 
  *  UNPACK ITUT Result Opcode and Parameter Sequences
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_univ_rseq(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_univ_rseq(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1210,7 +1249,8 @@ STATIC INLINE int unpack_univ_rseq(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ITUT Error Codes
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_univ_ecode(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_univ_ecode(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1232,7 +1272,8 @@ STATIC INLINE int unpack_univ_ecode(uchar **p, uchar *e, struct tc_msg *m)
  *  UNPACK ITUT Problem Codes
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_ctxt_pcode(uchar **p, uchar *e, struct tc_msg *m)
+STATIC INLINE int
+unpack_ctxt_pcode(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1251,7 +1292,8 @@ STATIC INLINE int unpack_ctxt_pcode(uchar **p, uchar *e, struct tc_msg *m)
  *  ITUT INVOKE (LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_ctxt_dec_inkl(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_ctxt_dec_inkl(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_INVOKE_L;
@@ -1270,7 +1312,8 @@ STATIC int tcap_ctxt_dec_inkl(uchar **p, uchar *e, struct tc_msg *m)
  *  ITUT RETURN RESULT (LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_ctxt_dec_rrl(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_ctxt_dec_rrl(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_RESULT_L;
@@ -1287,7 +1330,8 @@ STATIC int tcap_ctxt_dec_rrl(uchar **p, uchar *e, struct tc_msg *m)
  *  ITUT RETURN RESULT (NOT LAST)
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_ctxt_dec_rr(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_ctxt_dec_rr(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_RESULT_NL;
@@ -1304,7 +1348,8 @@ STATIC int tcap_ctxt_dec_rr(uchar **p, uchar *e, struct tc_msg *m)
  *  ITUT RETURN ERROR
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_ctxt_dec_rer(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_ctxt_dec_rer(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_ERROR;
@@ -1323,7 +1368,8 @@ STATIC int tcap_ctxt_dec_rer(uchar **p, uchar *e, struct tc_msg *m)
  *  ITUT REJECT
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_ctxt_dec_rej(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_ctxt_dec_rej(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	m->type = TCAP_CT_REJECT;
@@ -1340,7 +1386,8 @@ STATIC int tcap_ctxt_dec_rej(uchar **p, uchar *e, struct tc_msg *m)
  *  ITUT Component Decoder
  *  ------------------------------------------------------------------------
  */
-STATIC int tcap_appl_dec_comp(uchar **p, uchar *e, struct tc_msg *m)
+STATIC int
+tcap_appl_dec_comp(uchar **p, uchar *e, struct tc_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1384,7 +1431,8 @@ STATIC int tcap_appl_dec_comp(uchar **p, uchar *e, struct tc_msg *m)
  *  PRIVATE-TCAP version of Packages.  (Used by the TR sub-layer.)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_priv_trsid(uchar **p, uchar *e, struct tr_msg *m, const ulong mtype)
+STATIC INLINE int
+unpack_priv_trsid(uchar **p, uchar *e, struct tr_msg *m, const ulong mtype)
 {
 	int err;
 	ulong tag;
@@ -1426,17 +1474,18 @@ STATIC INLINE int unpack_priv_trsid(uchar **p, uchar *e, struct tr_msg *m, const
 }
 
 /* ANSI dialog portion */
-STATIC int unpack_priv_dialog_portion(uchar **p, uchar *e, struct tr_msg *m)
+STATIC int
+unpack_priv_dialog_portion(uchar **p, uchar *e, struct tr_msg *m)
 {
 	ulong err;
 	ulong tag;
 	if (*p >= e)
 		return (0);
-	if (**p != (0xc0 | TCAP_TAG_PRIV_DIALOG))
+	if (**p != (0xc0 | TCAP_TAG_PRIV_DLGP))
 		return (0);
 	if ((err = unpack_priv_cons(p, &e, &tag)))
 		return (err);
-	if (tag != TCAP_TAG_PRIV_DIALOG)
+	if (tag != TCAP_TAG_PRIV_DLGP)
 		return (-EINVAL);
 	m->dlg_beg = *p;
 	m->dlg_end = e;
@@ -1446,7 +1495,8 @@ STATIC int unpack_priv_dialog_portion(uchar **p, uchar *e, struct tr_msg *m)
 }
 
 /* ANSI component portion */
-STATIC int unpack_priv_component_portion(uchar **p, uchar *e, struct tr_msg *m, ulong opt)
+STATIC int
+unpack_priv_component_portion(uchar **p, uchar *e, struct tr_msg *m, ulong opt)
 {
 	ulong err;
 	ulong tag;
@@ -1468,7 +1518,8 @@ STATIC int unpack_priv_component_portion(uchar **p, uchar *e, struct tr_msg *m, 
 }
 
 /* ANSI abort cause information */
-STATIC int unpack_priv_cause_info(uchar **p, uchar *e, struct tr_msg *m)
+STATIC int
+unpack_priv_cause_info(uchar **p, uchar *e, struct tr_msg *m)
 {
 	(void) p;
 	(void) e;
@@ -1476,7 +1527,8 @@ STATIC int unpack_priv_cause_info(uchar **p, uchar *e, struct tr_msg *m)
 	/* FIXME */
 	return (-EFAULT);
 }
-STATIC int tcap_priv_dec_uni(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_uni(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_UNI;
@@ -1488,7 +1540,8 @@ STATIC int tcap_priv_dec_uni(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_priv_dec_qwp(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_qwp(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_QWP;
@@ -1500,7 +1553,8 @@ STATIC int tcap_priv_dec_qwp(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_priv_dec_qwop(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_qwop(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_QWOP;
@@ -1512,7 +1566,8 @@ STATIC int tcap_priv_dec_qwop(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_priv_dec_cwp(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_cwp(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_CWP;
@@ -1524,7 +1579,8 @@ STATIC int tcap_priv_dec_cwp(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_priv_dec_cwop(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_cwop(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_CWOP;
@@ -1536,7 +1592,8 @@ STATIC int tcap_priv_dec_cwop(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_priv_dec_resp(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_resp(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_RESP;
@@ -1548,7 +1605,8 @@ STATIC int tcap_priv_dec_resp(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_priv_dec_abt(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_priv_dec_abt(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_ABORT;
@@ -1565,7 +1623,8 @@ STATIC int tcap_priv_dec_abt(uchar *p, uchar *e, struct tr_msg *m)
  *  APPLICATION-TCAP version of Packages.  (Used by the TR sub-layer.)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE int unpack_appl_origid(uchar **p, uchar *e, struct tr_msg *m)
+STATIC INLINE int
+unpack_appl_origid(uchar **p, uchar *e, struct tr_msg *m)
 {
 	ulong err;
 	ulong tag;
@@ -1579,7 +1638,8 @@ STATIC INLINE int unpack_appl_origid(uchar **p, uchar *e, struct tr_msg *m)
 	m->parms |= TCAP_PTF_ORIGID;
 	return (0);
 }
-STATIC INLINE int unpack_appl_destid(uchar **p, uchar *e, struct tr_msg *m)
+STATIC INLINE int
+unpack_appl_destid(uchar **p, uchar *e, struct tr_msg *m)
 {
 	ulong err;
 	ulong tag;
@@ -1593,7 +1653,8 @@ STATIC INLINE int unpack_appl_destid(uchar **p, uchar *e, struct tr_msg *m)
 	m->parms |= TCAP_PTF_DESTID;
 	return (0);
 }
-STATIC INLINE int unpack_appl_trsid(uchar **p, uchar *e, struct tr_msg *m, const ulong mtype)
+STATIC INLINE int
+unpack_appl_trsid(uchar **p, uchar *e, struct tr_msg *m, const ulong mtype)
 {
 	ulong err;
 	switch (mtype) {
@@ -1619,17 +1680,18 @@ STATIC INLINE int unpack_appl_trsid(uchar **p, uchar *e, struct tr_msg *m, const
 }
 
 /* ITU-T dialog portion */
-STATIC int unpack_appl_dialog_portion(uchar **p, uchar *e, struct tr_msg *m)
+STATIC int
+unpack_appl_dialog_portion(uchar **p, uchar *e, struct tr_msg *m)
 {
 	ulong err;
 	ulong tag;
 	if (*p >= e)
 		return (0);
-	if (**p != (0x60 | TCAP_TAG_APPL_DIALOG))
+	if (**p != (0x60 | TCAP_TAG_APPL_DLGP))
 		return (0);
 	if ((err = unpack_appl_cons(p, &e, &tag)))
 		return (err);
-	if (tag != TCAP_TAG_APPL_DIALOG)
+	if (tag != TCAP_TAG_APPL_DLGP)
 		return (-EINVAL);
 	m->dlg_beg = *p;
 	m->dlg_end = e;
@@ -1639,7 +1701,8 @@ STATIC int unpack_appl_dialog_portion(uchar **p, uchar *e, struct tr_msg *m)
 }
 
 /* ITU-T component portion */
-STATIC int unpack_appl_component_portion(uchar **p, uchar *e, struct tr_msg *m, ulong opt)
+STATIC int
+unpack_appl_component_portion(uchar **p, uchar *e, struct tr_msg *m, ulong opt)
 {
 	ulong err;
 	ulong tag;
@@ -1661,7 +1724,8 @@ STATIC int unpack_appl_component_portion(uchar **p, uchar *e, struct tr_msg *m, 
 }
 
 /* ITU-T abort cause information */
-STATIC int unpack_appl_cause_info(uchar **p, uchar *e, struct tr_msg *m)
+STATIC int
+unpack_appl_cause_info(uchar **p, uchar *e, struct tr_msg *m)
 {
 	(void) p;
 	(void) e;
@@ -1669,7 +1733,8 @@ STATIC int unpack_appl_cause_info(uchar **p, uchar *e, struct tr_msg *m)
 	/* FIXME */
 	return (-EFAULT);
 }
-STATIC int tcap_appl_dec_uni(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_appl_dec_uni(uchar *p, uchar *e, struct tr_msg *m)
 {
 	/* Application Context, Component Sequence */
 	int err;
@@ -1682,7 +1747,8 @@ STATIC int tcap_appl_dec_uni(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_appl_dec_beg(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_appl_dec_beg(uchar *p, uchar *e, struct tr_msg *m)
 {
 	/* Originating Transaction Id, Application Context, Component Sequence */
 	int err;
@@ -1695,7 +1761,8 @@ STATIC int tcap_appl_dec_beg(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_appl_dec_cnt(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_appl_dec_cnt(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	m->type = TCAP_MT_CWP;	/* Conversation with permission to release */
@@ -1707,7 +1774,8 @@ STATIC int tcap_appl_dec_cnt(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_appl_dec_end(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_appl_dec_end(uchar *p, uchar *e, struct tr_msg *m)
 {
 	/* Dest Transaction Id, Application Context, Component Sequence */
 	int err;
@@ -1720,7 +1788,8 @@ STATIC int tcap_appl_dec_end(uchar *p, uchar *e, struct tr_msg *m)
 		return (err);
 	return (0);
 }
-STATIC int tcap_appl_dec_abt(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_appl_dec_abt(uchar *p, uchar *e, struct tr_msg *m)
 {
 	/* Dest Transaction Id, P-Abort-Cause prim or U-Abort-Info const */
 	int err;
@@ -1737,7 +1806,8 @@ STATIC int tcap_appl_dec_abt(uchar *p, uchar *e, struct tr_msg *m)
  *  TCAP Package decoder.  (Only decodes TR Sub-Layer.)
  *  -------------------------------------------------------------------------
  */
-STATIC int tcap_dec_msg(uchar *p, uchar *e, struct tr_msg *m)
+STATIC int
+tcap_dec_msg(uchar *p, uchar *e, struct tr_msg *m)
 {
 	int err;
 	ulong tag;
@@ -1790,7 +1860,8 @@ STATIC int tcap_dec_msg(uchar *p, uchar *e, struct tr_msg *m)
  *  General purpose encoding functions.
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE int len_size(ulong len)
+STATIC INLINE int
+len_size(ulong len)
 {
 	if (!(len & 0xffffff80))
 		return (1);
@@ -1804,7 +1875,8 @@ STATIC INLINE int len_size(ulong len)
 		return (2);
 	return (1);
 }
-STATIC INLINE int tag_size(ulong tag)
+STATIC INLINE int
+tag_size(ulong tag)
 {
 	if (!(tag & 0xffffffc0))
 		return (1);
@@ -1820,7 +1892,8 @@ STATIC INLINE int tag_size(ulong tag)
 		return (2);
 	return (1);
 }
-STATIC INLINE void pack_tag_class(uchar **p, ulong tag, ulong fcls)
+STATIC INLINE void
+pack_tag_class(uchar **p, ulong tag, ulong fcls)
 {
 	int n;
 	if (tag < 32) {
@@ -1843,39 +1916,48 @@ STATIC INLINE void pack_tag_class(uchar **p, ulong tag, ulong fcls)
 	}
 	return;
 }
-STATIC INLINE void pack_tag_univ_prim(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_univ_prim(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0x00);
 }
-STATIC INLINE void pack_tag_univ_cons(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_univ_cons(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0x20);
 }
-STATIC INLINE void pack_tag_appl_prim(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_appl_prim(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0x40);
 }
-STATIC INLINE void pack_tag_appl_cons(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_appl_cons(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0x60);
 }
-STATIC INLINE void pack_tag_cntx_prim(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_cntx_prim(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0x80);
 }
-STATIC INLINE void pack_tag_cntx_cons(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_cntx_cons(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0xa0);
 }
-STATIC INLINE void pack_tag_priv_prim(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_priv_prim(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0xc0);
 }
-STATIC INLINE void pack_tag_priv_cons(uchar **p, ulong tag)
+STATIC INLINE void
+pack_tag_priv_cons(uchar **p, ulong tag)
 {
 	return pack_tag_class(p, tag, 0xe0);
 }
-STATIC INLINE void pack_len(uchar **p, ulong len)
+STATIC INLINE void
+pack_len(uchar **p, ulong len)
 {
 	ulong n;
 	if (len < 128) {
@@ -1896,6 +1978,12 @@ STATIC INLINE void pack_len(uchar **p, ulong len)
 	}
 	return;
 }
+STATIC INLINE void
+pack_int(uchar **p, ulong val, size_t len)
+{
+	fixme(("Write this function.\n"));
+	return;
+}
 
 /*
  *  =========================================================================
@@ -1911,10 +1999,11 @@ STATIC INLINE void pack_len(uchar **p, ulong len)
  *  ANSI UNI (Unidirectional)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_uni(mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_priv_enc_uni(mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -1924,8 +2013,8 @@ STATIC INLINE mblk_t *tcap_priv_enc_uni(mblk_t *dp, mblk_t *cp)
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_UNI) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_UNI) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_UNI);
@@ -1963,10 +2052,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_uni(mblk_t *dp, mblk_t *cp)
  *  ANSI QWP (Query with permission)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_qwp(ulong origid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_priv_enc_qwp(ulong origid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -1976,15 +2066,15 @@ STATIC INLINE mblk_t *tcap_priv_enc_qwp(ulong origid, mblk_t *dp, mblk_t *cp)
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(origid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_QWP) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_QWP) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_QWP);
 		pack_len(&mp->b_wptr, pkg_len);
 		pack_tag_priv_prim(&mp->b_wptr, TCAP_TAG_PRIV_TRSID);
 		pack_len(&mp->b_wptr, sizeof(origid));
-		pack_int(*mp->b_wptr, origid, sizeof(origid));
+		pack_int(&mp->b_wptr, origid, sizeof(origid));
 		if (clen && !dlen) {	/* common case */
 			pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CSEQ);
 			pack_len(&mp->b_wptr, cmp_len);
@@ -2016,10 +2106,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_qwp(ulong origid, mblk_t *dp, mblk_t *cp)
  *  ANSI QWOP (Query without permission)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_qwop(ulong origid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_priv_enc_qwop(ulong origid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2029,15 +2120,15 @@ STATIC INLINE mblk_t *tcap_priv_enc_qwop(ulong origid, mblk_t *dp, mblk_t *cp)
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(origid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_QWOP) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_QWOP) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_QWOP);
 		pack_len(&mp->b_wptr, pkg_len);
 		pack_tag_priv_prim(&mp->b_wptr, TCAP_TAG_PRIV_TRSID);
 		pack_len(&mp->b_wptr, sizeof(origid));
-		pack_int(*mp->b_wptr, origid, sizeof(origid));
+		pack_int(&mp->b_wptr, origid, sizeof(origid));
 		if (clen && !dlen) {	/* common case */
 			pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CSEQ);
 			pack_len(&mp->b_wptr, cmp_len);
@@ -2069,10 +2160,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_qwop(ulong origid, mblk_t *dp, mblk_t *cp)
  *  ANSI RESP (Response)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_resp(ulong destid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_priv_enc_resp(ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2082,15 +2174,15 @@ STATIC INLINE mblk_t *tcap_priv_enc_resp(ulong destid, mblk_t *dp, mblk_t *cp)
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_RESP) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_RESP) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_RESP);
 		pack_len(&mp->b_wptr, pkg_len);
 		pack_tag_priv_prim(&mp->b_wptr, TCAP_TAG_PRIV_TRSID);
 		pack_len(&mp->b_wptr, sizeof(destid));
-		pack_int(*mp->b_wptr, destid, sizeof(destid));
+		pack_int(&mp->b_wptr, destid, sizeof(destid));
 		if (clen && !dlen) {	/* common case */
 			pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CSEQ);
 			pack_len(&mp->b_wptr, cmp_len);
@@ -2122,10 +2214,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_resp(ulong destid, mblk_t *dp, mblk_t *cp)
  *  ANSI CWP (Conversation with permission)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_cwp(ulong origid, ulong destid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_priv_enc_cwp(ulong origid, ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2135,16 +2228,16 @@ STATIC INLINE mblk_t *tcap_priv_enc_cwp(ulong origid, ulong destid, mblk_t *dp, 
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(origid) + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_CWP) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_CWP) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CWP);
 		pack_len(&mp->b_wptr, pkg_len);
 		pack_tag_priv_prim(&mp->b_wptr, TCAP_TAG_PRIV_TRSID);
 		pack_len(&mp->b_wptr, sizeof(origid) + sizeof(destid));
-		pack_int(*mp->b_wptr, origid, sizeof(origid));
-		pack_int(*mp->b_wptr, destid, sizeof(destid));
+		pack_int(&mp->b_wptr, origid, sizeof(origid));
+		pack_int(&mp->b_wptr, destid, sizeof(destid));
 		if (clen && !dlen) {	/* common case */
 			pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CSEQ);
 			pack_len(&mp->b_wptr, cmp_len);
@@ -2176,10 +2269,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_cwp(ulong origid, ulong destid, mblk_t *dp, 
  *  ANSI CWOP (Conversation without permission)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_cwop(ulong origid, ulong destid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_priv_enc_cwop(ulong origid, ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2189,16 +2283,16 @@ STATIC INLINE mblk_t *tcap_priv_enc_cwop(ulong origid, ulong destid, mblk_t *dp,
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(origid) + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_CWOP) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_CWOP) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CWOP);
 		pack_len(&mp->b_wptr, pkg_len);
 		pack_tag_priv_prim(&mp->b_wptr, TCAP_TAG_PRIV_TRSID);
 		pack_len(&mp->b_wptr, sizeof(origid) + sizeof(destid));
-		pack_int(*mp->b_wptr, origid, sizeof(origid));
-		pack_int(*mp->b_wptr, destid, sizeof(destid));
+		pack_int(&mp->b_wptr, origid, sizeof(origid));
+		pack_int(&mp->b_wptr, destid, sizeof(destid));
 		if (clen && !dlen) {	/* common case */
 			pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CSEQ);
 			pack_len(&mp->b_wptr, cmp_len);
@@ -2230,10 +2324,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_cwop(ulong origid, ulong destid, mblk_t *dp,
  *  ANSI ABORT (Abort)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_abt(ulong destid, mblk_t *dp, mblk_t *ep)
+STATIC INLINE mblk_t *
+tcap_priv_enc_abt(ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2243,8 +2338,8 @@ STATIC INLINE mblk_t *tcap_priv_enc_abt(ulong destid, mblk_t *dp, mblk_t *ep)
 	dlen = dlg_len ? (tag_size(TCAP_TAG_PRIV_DLGP) + len_size(dlg_len)) : 0;
 	clen = cmp_len ? (tag_size(TCAP_TAG_PRIV_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_PRIV_ABORT) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_PRIV_ABORT) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		/* 
 		 *  FIXME for cause information rather than components
@@ -2254,7 +2349,7 @@ STATIC INLINE mblk_t *tcap_priv_enc_abt(ulong destid, mblk_t *dp, mblk_t *ep)
 		pack_len(&mp->b_wptr, pkg_len);
 		pack_tag_priv_prim(&mp->b_wptr, TCAP_TAG_PRIV_TRSID);
 		pack_len(&mp->b_wptr, sizeof(destid));
-		pack_int(*mp->b_wptr, destid, sizeof(destid));
+		pack_int(&mp->b_wptr, destid, sizeof(destid));
 		if (clen && !dlen) {	/* common case */
 			pack_tag_priv_cons(&mp->b_wptr, TCAP_TAG_PRIV_CSEQ);
 			pack_len(&mp->b_wptr, cmp_len);
@@ -2292,10 +2387,11 @@ STATIC INLINE mblk_t *tcap_priv_enc_abt(ulong destid, mblk_t *dp, mblk_t *ep)
  *  ITUT UNI (Unidirectional)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_appl_enc_uni(mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_appl_enc_uni(mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2303,10 +2399,10 @@ STATIC INLINE mblk_t *tcap_appl_enc_uni(mblk_t *dp, mblk_t *cp)
 	cmp_len = cp ? msgdsize(cp) : 0;
 	ilen = 0;
 	dlen = dlg_len ? (tag_size(TCAP_TAG_APPL_DLGP) + len_size(dlg_len)) : 0;
-	clen = cmp_len ? (tag_size(TCAP_TAG_PAPPLCSEQ) + len_size(cmp_len)) : 0;
-	pkg_len = ilen + sizeof(origid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_APPL_UNI) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	clen = cmp_len ? (tag_size(TCAP_TAG_APPL_CSEQ) + len_size(cmp_len)) : 0;
+	pkg_len = ilen + dlen + dlg_len + clen + cmp_len;
+	hlen = tag_size(TCAP_TAG_APPL_UNI) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_appl_cons(&mp->b_wptr, TCAP_TAG_APPL_UNI);
@@ -2342,10 +2438,11 @@ STATIC INLINE mblk_t *tcap_appl_enc_uni(mblk_t *dp, mblk_t *cp)
  *  ITUT BEG (Begin)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_appl_enc_beg(ulong origid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_appl_enc_beg(ulong origid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2353,10 +2450,10 @@ STATIC INLINE mblk_t *tcap_appl_enc_beg(ulong origid, mblk_t *dp, mblk_t *cp)
 	cmp_len = cp ? msgdsize(cp) : 0;
 	ilen = tag_size(TCAP_TAG_APPL_ORIGID) + len_size(sizeof(origid));
 	dlen = dlg_len ? (tag_size(TCAP_TAG_APPL_DLGP) + len_size(dlg_len)) : 0;
-	clen = cmp_len ? (tag_size(TCAP_TAG_PAPPLCSEQ) + len_size(cmp_len)) : 0;
+	clen = cmp_len ? (tag_size(TCAP_TAG_APPL_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(origid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_APPL_BEGIN) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_APPL_BEGIN) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_appl_cons(&mp->b_wptr, TCAP_TAG_APPL_BEGIN);
@@ -2395,10 +2492,11 @@ STATIC INLINE mblk_t *tcap_appl_enc_beg(ulong origid, mblk_t *dp, mblk_t *cp)
  *  ITUT END (End)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_appl_enc_end(ulong destid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_appl_enc_end(ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2406,10 +2504,10 @@ STATIC INLINE mblk_t *tcap_appl_enc_end(ulong destid, mblk_t *dp, mblk_t *cp)
 	cmp_len = cp ? msgdsize(cp) : 0;
 	ilen = tag_size(TCAP_TAG_APPL_DESTID) + len_size(sizeof(destid));
 	dlen = dlg_len ? (tag_size(TCAP_TAG_APPL_DLGP) + len_size(dlg_len)) : 0;
-	clen = cmp_len ? (tag_size(TCAP_TAG_PAPPLCSEQ) + len_size(cmp_len)) : 0;
+	clen = cmp_len ? (tag_size(TCAP_TAG_APPL_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_APPL_END) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_APPL_END) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_appl_cons(&mp->b_wptr, TCAP_TAG_APPL_END);
@@ -2448,23 +2546,24 @@ STATIC INLINE mblk_t *tcap_appl_enc_end(ulong destid, mblk_t *dp, mblk_t *cp)
  *  ITUT CONT (Continue)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_appl_enc_cont(ulong origid, ulong destid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_appl_enc_cont(ulong origid, ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
 	dlg_len = dp ? msgdsize(dp) : 0;
 	cmp_len = cp ? msgdsize(cp) : 0;
 	ilen =
-	    tag_size(TCAP_TAG_APPL_ORIGID) + len_size(sizeof(origid)) + tag_size(TCAP_TAG_APPL_DESTID) +
-	    len_size(sizeof(destid));
+	    tag_size(TCAP_TAG_APPL_ORIGID) + len_size(sizeof(origid)) +
+	    tag_size(TCAP_TAG_APPL_DESTID) + len_size(sizeof(destid));
 	dlen = dlg_len ? (tag_size(TCAP_TAG_APPL_DLGP) + len_size(dlg_len)) : 0;
-	clen = cmp_len ? (tag_size(TCAP_TAG_PAPPLCSEQ) + len_size(cmp_len)) : 0;
+	clen = cmp_len ? (tag_size(TCAP_TAG_APPL_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_APPL_CONT) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_APPL_CONT) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_appl_cons(&mp->b_wptr, TCAP_TAG_APPL_CONT);
@@ -2506,10 +2605,11 @@ STATIC INLINE mblk_t *tcap_appl_enc_cont(ulong origid, ulong destid, mblk_t *dp,
  *  ITUT ABORT (Abort)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_appl_enc_abt(ulong destid, mblk_t *dp, mblk_t *cp)
+STATIC INLINE mblk_t *
+tcap_appl_enc_abt(ulong destid, mblk_t *dp, mblk_t *cp)
 {
 	mblk_t *mp, *mc;
-	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, plen, dlen, clen;
+	size_t pkg_len, dlg_len, cmp_len, mlen, hlen, ilen, dlen, clen;
 	/* 
 	 *  TODO: reduce these to constants where possible
 	 */
@@ -2517,10 +2617,10 @@ STATIC INLINE mblk_t *tcap_appl_enc_abt(ulong destid, mblk_t *dp, mblk_t *cp)
 	cmp_len = cp ? msgdsize(cp) : 0;
 	ilen = tag_size(TCAP_TAG_APPL_DESTID) + len_size(sizeof(destid));
 	dlen = dlg_len ? (tag_size(TCAP_TAG_APPL_DLGP) + len_size(dlg_len)) : 0;
-	clen = cmp_len ? (tag_size(TCAP_TAG_PAPPLCSEQ) + len_size(cmp_len)) : 0;
+	clen = cmp_len ? (tag_size(TCAP_TAG_APPL_CSEQ) + len_size(cmp_len)) : 0;
 	pkg_len = ilen + sizeof(destid) + dlen + dlg_len + clen + cmp_len;
-	hlen = tag_size(TCAP_TAG_APPL_ABORT) + len_size(pkg_len)
-	    mlen = hlen + ilen + dlen ? dlen : clen;
+	hlen = tag_size(TCAP_TAG_APPL_ABORT) + len_size(pkg_len);
+	mlen = hlen + ilen + dlen ? dlen : clen;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		pack_tag_appl_cons(&mp->b_wptr, TCAP_TAG_APPL_ABORT);
@@ -2568,48 +2668,66 @@ STATIC INLINE mblk_t *tcap_appl_enc_abt(ulong destid, mblk_t *dp, mblk_t *cp)
  *  ANSI INKL (Invoke Last)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_inkl(ulong * iid, ulong * lid, ulong opclass, ulong opcode, mblk_t *pseq)
+STATIC INLINE mblk_t *
+tcap_priv_enc_inkl(ulong *iid, ulong *lid, ulong opclass, ulong opcode, mblk_t *pseq)
 {
+	mblk_t *mp = NULL;
+	return (mp);
 }
 
 /*
  *  ANSI INK  (Invoke Not Last)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_ink(ulong * iid, ulong * lid, ulong opclass, ulong opcode, mblk_t *pseq)
+STATIC INLINE mblk_t *
+tcap_priv_enc_ink(ulong *iid, ulong *lid, ulong opclass, ulong opcode, mblk_t *pseq)
 {
+	mblk_t *mp = NULL;
+	return (mp);
 }
 
 /*
  *  ANSI RRL  (Return Result Last)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_rrl(ulong * iid, mblk_t *pseq)
+STATIC INLINE mblk_t *
+tcap_priv_enc_rrl(ulong *iid, mblk_t *pseq)
 {
+	mblk_t *mp = NULL;
+	return (mp);
 }
 
 /*
  *  ANSI RR   (Return Result Not Last)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_rr(ulong * iid, mblk_t *pseq)
+STATIC INLINE mblk_t *
+tcap_priv_enc_rr(ulong *iid, mblk_t *pseq)
 {
+	mblk_t *mp = NULL;
+	return (mp);
 }
 
 /*
  *  ANSI RER  (Return Error)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_rer(ulong * iid, ulong ecode, mblk_t *pseq)
+STATIC INLINE mblk_t *
+tcap_priv_enc_rer(ulong *iid, ulong ecode, mblk_t *pseq)
 {
+	mblk_t *mp = NULL;
+	return (mp);
 }
 
 /*
  *  ANSI REJ  (Reject)
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *tcap_priv_enc_rej(ulong * iid, ulong pcode, mblk_t *pseq)
+STATIC INLINE mblk_t *
+tcap_priv_enc_rej(ulong *iid, ulong pcode, mblk_t *pseq)
 {
+	mblk_t *mp = NULL;
+	return (mp);
 }
 
 /*
@@ -2653,16 +2771,16 @@ typedef struct tcap_var {
 } tcap_var_t;
 
 typedef struct tcap_opts {
-	ulong flags;				/* success flags */
-	tcap_var_t ctx;				/* application context */
-	tcap_var_t inf;				/* user information */
-	t_uscalar_t *pcl;			/* protocol class */
-	t_uscalar_t *ret;			/* return option */
-	t_uscalar_t *imp;			/* importance */
-	t_uscalar_t *seq;			/* sequence control */
-	t_uscalar_t *pri;			/* priority */
-	t_uscalar_t *sls;			/* signalling link selection */
-	t_uscalar_t *mp;			/* message priority */
+	ulong flags;			/* success flags */
+	tcap_var_t ctx;			/* application context */
+	tcap_var_t inf;			/* user information */
+	t_uscalar_t *pcl;		/* protocol class */
+	t_uscalar_t *ret;		/* return option */
+	t_uscalar_t *imp;		/* importance */
+	t_uscalar_t *seq;		/* sequence control */
+	t_uscalar_t *pri;		/* priority */
+	t_uscalar_t *sls;		/* signalling link selection */
+	t_uscalar_t *mp;		/* message priority */
 } tcap_opts_t;
 
 #define TF_OPT_APP	(1<<0)	/* application context */
@@ -2677,7 +2795,8 @@ typedef struct tcap_opts {
 
 #define _T_ALIGN_SIZEOF(s) \
 	((sizeof((s)) + _T_ALIGN_SIZE - 1) & ~(_T_ALIGN_SIZE - 1))
-STATIC size_t tcap_opts_size(struct tcap *tcap, struct tcap_opts *ops)
+STATIC size_t
+tcap_opts_size(struct tcap *tcap, struct tcap_opts *ops)
 {
 	size_t len = 0;
 	if (ops) {
@@ -2703,7 +2822,8 @@ STATIC size_t tcap_opts_size(struct tcap *tcap, struct tcap_opts *ops)
 	}
 	return (len);
 }
-STATIC void tcap_build_opts(struct tcap *tcap, struct tcap_opts *ops, uchar *p)
+STATIC void
+tcap_build_opts(struct tcap *tcap, struct tcap_opts *ops, uchar *p)
 {
 	if (ops) {
 		struct t_opthdr *oh;
@@ -2791,7 +2911,8 @@ STATIC void tcap_build_opts(struct tcap *tcap, struct tcap_opts *ops, uchar *p)
 		}
 	}
 }
-STATIC int tcap_parse_opts(struct tcap *tcap, struct tcap_opts *ops, uchar *op, size_t len)
+STATIC int
+tcap_parse_opts(struct tcap *tcap, struct tcap_opts *ops, uchar *op, size_t len)
 {
 	struct t_opthdr *oh;
 	for (oh = _T_OPT_FIRSTHDR_OFS(op, len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(op, len, oh, 0)) {
@@ -2861,7 +2982,8 @@ STATIC int tcap_parse_opts(struct tcap *tcap, struct tcap_opts *ops, uchar *op, 
  *
  *  =========================================================================
  */
-STATIC int tcap_opt_check(struct tcap *tcap, struct tcap_opts *ops)
+STATIC int
+tcap_opt_check(struct tcap *tcap, struct tcap_opts *ops)
 {
 	if (ops && ops->flags) {
 		ops->flags = 0;
@@ -2886,7 +3008,8 @@ STATIC int tcap_opt_check(struct tcap *tcap, struct tcap_opts *ops)
 	}
 	return (0);
 }
-STATIC int tcap_opt_default(struct tcap *tcap, struct tcap_opts *ops)
+STATIC int
+tcap_opt_default(struct tcap *tcap, struct tcap_opts *ops)
 {
 	if (ops) {
 		int flags = ops->flags;
@@ -2934,7 +3057,8 @@ STATIC int tcap_opt_default(struct tcap *tcap, struct tcap_opts *ops)
 	swerr();
 	return (-EFAULT);
 }
-STATIC int tcap_opt_current(struct tcap *tcap, struct tcap_opts *ops)
+STATIC int
+tcap_opt_current(struct tcap *tcap, struct tcap_opts *ops)
 {
 	int flags = ops->flags;
 	ops->flags = 0;
@@ -2978,7 +3102,8 @@ STATIC int tcap_opt_current(struct tcap *tcap, struct tcap_opts *ops)
 	}
 	return (0);
 }
-STATIC int tcap_opt_negotiate(struct tcap *tcap, struct tcap_opts *ops)
+STATIC int
+tcap_opt_negotiate(struct tcap *tcap, struct tcap_opts *ops)
 {
 	if (ops->flags) {
 		ops->flags = 0;
@@ -3042,21 +3167,92 @@ STATIC int tcap_opt_negotiate(struct tcap *tcap, struct tcap_opts *ops)
  */
 
 #ifdef _DEBUG
-STATIC INLINE const char *tcap_r_state(ulong state)
+STATIC INLINE const char *
+tcap_r_state(ulong state)
 {
 	switch (state) {
+	case TRS_UNBND:
+		return ("TRS_UNBND");
+	case TRS_WACK_BREQ:
+		return ("TRS_WACK_BREQ");
+	case TRS_WACK_UREQ:
+		return ("TRS_WACK_UREQ");
+	case TRS_IDLE:
+		return ("TRS_IDLE");
+	case TRS_WACK_OPTREQ:
+		return ("TRS_WACK_OPTREQ");
+	case TRS_WACK_RRES:
+		return ("TRS_WACK_RRES");
+	case TRS_WCON_CREQ:
+		return ("TRS_WCON_CREQ");
+	case TRS_WRES_CIND:
+		return ("TRS_WRES_CIND");
+	case TRS_WACK_CRES:
+		return ("TRS_WACK_CRES");
+	case TRS_DATA_XFER:
+		return ("TRS_DATA_XFER");
+	case TRS_WCON_RREQ:
+		return ("TRS_WCON_RREQ");
+	case TRS_WRES_RIND:
+		return ("TRS_WRES_RIND");
+	case TRS_WACK_DREQ6:
+		return ("TRS_WACK_DREQ6");
+	case TRS_WACK_DREQ7:
+		return ("TRS_WACK_DREQ7");
+	case TRS_WACK_DREQ9:
+		return ("TRS_WACK_DREQ9");
+	case TRS_WACK_DREQ10:
+		return ("TRS_WACK_DREQ10");
+	case TRS_WACK_DREQ11:
+		return ("TRS_WACK_DREQ11");
 	default:
 		return ("(unknown)");
 	}
 }
-STATIC INLINE const char *tcap_c_state(ulong state)
+STATIC INLINE const char *
+tcap_c_state(ulong state)
 {
 	switch (state) {
+	case TCS_UNBND:
+		return ("TCS_UNBND");
+	case TCS_WACK_BREQ:
+		return ("TCS_WACK_BREQ");
+	case TCS_WACK_UREQ:
+		return ("TCS_WACK_UREQ");
+	case TCS_IDLE:
+		return ("TCS_IDLE");
+	case TCS_WACK_OPTREQ:
+		return ("TCS_WACK_OPTREQ");
+	case TCS_WACK_RRES:
+		return ("TCS_WACK_RRES");
+	case TCS_WCON_CREQ:
+		return ("TCS_WCON_CREQ");
+	case TCS_WRES_CIND:
+		return ("TCS_WRES_CIND");
+	case TCS_WACK_CRES:
+		return ("TCS_WACK_CRES");
+	case TCS_DATA_XFER:
+		return ("TCS_DATA_XFER");
+	case TCS_WCON_RREQ:
+		return ("TCS_WCON_RREQ");
+	case TCS_WRES_RIND:
+		return ("TCS_WRES_RIND");
+	case TCS_WACK_DREQ6:
+		return ("TCS_WACK_DREQ6");
+	case TCS_WACK_DREQ7:
+		return ("TCS_WACK_DREQ7");
+	case TCS_WACK_DREQ9:
+		return ("TCS_WACK_DREQ9");
+	case TCS_WACK_DREQ10:
+		return ("TCS_WACK_DREQ10");
+	case TCS_WACK_DREQ11:
+		return ("TCS_WACK_DREQ11");
 	default:
 		return ("(unknown)");
 	}
 }
-STATIC INLINE const char *tcap_t_state(ulong state)
+STATIC INLINE const char *
+tcap_t_state(ulong state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -3097,69 +3293,141 @@ STATIC INLINE const char *tcap_t_state(ulong state)
 		return ("(unknown)");
 	}
 }
-STATIC INLINE const char *tcap_m_state(ulong state)
+STATIC INLINE const char *
+tcap_m_state(ulong state)
 {
 	switch (state) {
 	default:
 		return ("(unknown)");
 	}
 }
+STATIC INLINE const char *
+sccp_i_state(ulong state)
+{
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
+	default:
+		return ("(unknown)");
+	}
+}
 #endif
 
-STATIC INLINE void tcap_set_state(struct tcap *tcap, ulong newstate)
+STATIC INLINE void
+tcap_set_state(struct tcap *tcap, ulong newstate)
 {
 	ulong oldstate = tcap->state;
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", TCAP_DRV_NAME, tcap, tcap_state(newstate), tcap_state(oldstate)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, tcap, tcap_state(newstate), tcap_state(oldstate)));
 	tcap->state = newstate;
 }
-STATIC INLINE ulong tcap_get_state(struct tcap *tcap)
+STATIC INLINE ulong
+tcap_get_state(struct tcap *tcap)
 {
 	return tcap->state;
 }
-STATIC INLINE void tcap_set_r_state(struct tcap *tcap, ulong newstate)
+STATIC INLINE void
+tcap_set_r_state(struct tcap *tcap, ulong newstate)
 {
 	ulong oldstate = tcap->i_state;
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", TCAP_DRV_NAME, tcap, tcap_r_state(newstate), tcap_r_state(oldstate)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, tcap, tcap_r_state(newstate),
+		tcap_r_state(oldstate)));
 	tcap->i_state = newstate;
 }
-STATIC INLINE ulong tcap_get_r_state(struct tcap *tcap)
+STATIC INLINE ulong
+tcap_get_r_state(struct tcap *tcap)
 {
 	return tcap->i_state;
 }
-STATIC INLINE void tcap_set_c_state(struct tcap *tcap, ulong newstate)
+STATIC INLINE void
+tcap_set_c_state(struct tcap *tcap, ulong newstate)
 {
 	ulong oldstate = tcap->i_state;
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", TCAP_DRV_NAME, tcap, tcap_c_state(newstate), tcap_c_state(oldstate)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, tcap, tcap_c_state(newstate),
+		tcap_c_state(oldstate)));
 	tcap->i_state = newstate;
 }
-STATIC INLINE ulong tcap_get_c_state(struct tcap *tcap)
+STATIC INLINE ulong
+tcap_get_c_state(struct tcap *tcap)
 {
 	return tcap->i_state;
 }
-STATIC INLINE void tcap_set_t_state(struct tcap *tcap, ulong newstate)
+STATIC INLINE void
+tcap_set_t_state(struct tcap *tcap, ulong newstate)
 {
 	ulong oldstate = tcap->i_state;
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", TCAP_DRV_NAME, tcap, tcap_t_state(newstate), tcap_t_state(oldstate)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, tcap, tcap_t_state(newstate),
+		tcap_t_state(oldstate)));
 	tcap->i_state = newstate;
 }
-STATIC INLINE ulong tcap_get_m_state(struct tcap *tcap)
+STATIC INLINE ulong
+tcap_get_t_state(struct tcap *tcap)
 {
 	return tcap->i_state;
 }
-STATIC INLINE void tcap_set_m_state(struct tcap *tcap, ulong newstate)
+STATIC INLINE void
+tcap_set_m_state(struct tcap *tcap, ulong newstate)
 {
 	ulong oldstate = tcap->i_state;
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", TCAP_DRV_NAME, tcap, tcap_m_state(newstate), tcap_m_state(oldstate)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, tcap, tcap_m_state(newstate),
+		tcap_m_state(oldstate)));
 	tcap->i_state = newstate;
 }
-STATIC INLINE ulong tcap_get_m_state(struct tcap *tcap)
+STATIC INLINE ulong
+tcap_get_m_state(struct tcap *tcap)
 {
 	return tcap->i_state;
+}
+
+STATIC INLINE void
+sccp_set_i_state(struct sccp *sccp, ulong newstate)
+{
+	ulong oldstate = sccp->i_state;
+	(void) oldstate;
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, sccp, sccp_i_state(newstate),
+		sccp_i_state(oldstate)));
+	sccp->i_state = newstate;
+}
+STATIC INLINE ulong
+sccp_get_i_state(struct sccp *sccp)
+{
+	return sccp->i_state;
 }
 
 /*
@@ -3209,7 +3477,8 @@ STATIC INLINE ulong tcap_get_m_state(struct tcap *tcap)
  *  M_FLUSH
  *  -----------------------------------
  */
-STATIC int m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
+STATIC int
+m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 {
 	mblk_t *mp;
 	if (!(mp = ss7_allocb(q, 2, BPRI_MED)))
@@ -3217,7 +3486,7 @@ STATIC int m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 	mp->b_datap->db_type = M_FLUSH;
 	*(mp->b_wptr)++ = flags | (band ? FLUSHBAND : 0);
 	*(mp->b_wptr)++ = band;
-	printd(("%s: %p: <- M_FLUSH\n", TCAP_DRV_NAME, pq));
+	printd(("%s: %p: <- M_FLUSH\n", DRV_NAME, pq));
 	putq(pq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3229,7 +3498,8 @@ STATIC int m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
  *  M_ERROR
  *  -----------------------------------
  */
-STATIC int m_error(queue_t *q, struct tcap *tcap, int error)
+STATIC int
+m_error(queue_t *q, struct tcap *tcap, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
@@ -3251,7 +3521,7 @@ STATIC int m_error(queue_t *q, struct tcap *tcap, int error)
 	if (hangup) {
 		mp->b_datap->db_type = M_HANGUP;
 		tcap_set_state(tcap, NS_NOSTATES);
-		printd(("%s: %p: <- M_HANGUP\n", TCAP_DRV_NAME, tcap));
+		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, tcap));
 		ss7_oput(tcap->oq, mp);
 		return (-error);
 	} else {
@@ -3259,7 +3529,7 @@ STATIC int m_error(queue_t *q, struct tcap *tcap, int error)
 		*(mp->b_wptr)++ = error < 0 ? -error : error;
 		*(mp->b_rptr)++ = error < 0 ? -error : error;
 		tcap_set_state(tcap, NS_NOSTATES);
-		printd(("%s: %p: <- M_ERROR\n", TCAP_DRV_NAME, tcap));
+		printd(("%s: %p: <- M_ERROR\n", DRV_NAME, tcap));
 		ss7_oput(tcap->oq, mp);
 		return (QR_DONE);
 	}
@@ -3276,7 +3546,8 @@ STATIC int m_error(queue_t *q, struct tcap *tcap, int error)
  *  TC_INFO_ACK
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_info_ack(queue_t *q, struct tcap *tcap)
+STATIC INLINE int
+tc_info_ack(queue_t *q, struct tcap *tcap)
 {
 	int err;
 	mblk_t *mp;
@@ -3291,14 +3562,14 @@ STATIC INLINE int tc_info_ack(queue_t *q, struct tcap *tcap)
 	p->ETSDU_size = FIXME;
 	p->CDATA_size = FIXME;
 	p->DDATA_size = FIXME;
-	p->ADDR_size = sizeof(struct sccp_addr) + SCCP_MAX_ADDR_LEN;
+	p->ADDR_size = sizeof(struct sccp_addr) + SCCP_MAX_ADDR_LENGTH;
 	p->OPT_size = FIXME;
 	p->TIDU_size = FIXME;
 	p->SERV_type = FIXME;
 	p->CURRENT_state = tcap_get_c_state(tcap);
-	p->PROVIDER_flags = FIXME;
+	p->PROVIDER_flag = FIXME;
 	p->TRPI_version = FIXME;
-	printd(("%s: %p: <- TC_INFO_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_INFO_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3313,7 +3584,8 @@ STATIC INLINE int tc_info_ack(queue_t *q, struct tcap *tcap)
  *  TC_BIND_ACK
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulong xact, ulong tok)
+STATIC INLINE int
+tc_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulong xact, ulong tok)
 {
 	int err;
 	mblk_t *mp;
@@ -3333,7 +3605,7 @@ STATIC INLINE int tc_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *a
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- TC_BIND_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_BIND_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3348,7 +3620,8 @@ STATIC INLINE int tc_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *a
  *  TC_SUBS_BIND_ACK
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_subs_bind_ack(queue_t *q, struct tcap *tcap)
+STATIC INLINE int
+tc_subs_bind_ack(queue_t *q, struct tcap *tcap)
 {
 	int err;
 	mblk_t *mp;
@@ -3359,7 +3632,7 @@ STATIC INLINE int tc_subs_bind_ack(queue_t *q, struct tcap *tcap)
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = TC_SUBS_BIND_ACK;
-	printd(("%s: %p: <- TC_SUBS_BIND_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_SUBS_BIND_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3374,7 +3647,8 @@ STATIC INLINE int tc_subs_bind_ack(queue_t *q, struct tcap *tcap)
  *  TC_OK_ACK
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
+STATIC INLINE int
+tc_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
 {
 	int err;
 	mblk_t *mp;
@@ -3386,7 +3660,7 @@ STATIC INLINE int tc_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = TC_OK_ACK;
 	p->CORRECT_prim = prim;
-	printd(("%s: %p: <- TC_OK_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_OK_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3401,7 +3675,8 @@ STATIC INLINE int tc_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
  *  TC_ERROR_ACK
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, ulong did, ulong iid)
+STATIC INLINE int
+tc_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, ulong did, ulong iid)
 {
 	int err;
 	mblk_t *mp;
@@ -3413,11 +3688,11 @@ STATIC INLINE int tc_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long e
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = TC_ERROR_ACK;
 	p->ERROR_prim = prim;
-	p->TRPI_error = etype < 0 ? TRSYSERR : etype;
+	p->TRPI_error = etype < 0 ? TCSYSERR : etype;
 	p->UNIX_error = etype < 0 ? -etype : 0;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
-	printd(("%s: %p: <- TC_ERROR_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_ERROR_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3432,12 +3707,13 @@ STATIC INLINE int tc_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long e
  *  TC_OPTMGMT_ACK
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong flags)
+STATIC INLINE int
+tc_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong flags)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_optmgmt_ack *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
@@ -3448,10 +3724,10 @@ STATIC INLINE int tc_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
 	p->MGMT_flags = flags;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
-	printd(("%s: %p: <- TC_OPTMGMT_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_OPTMGMT_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3466,15 +3742,16 @@ STATIC INLINE int tc_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts
  *  TC_UNI_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct sccp_addr *dst,
-			     struct tcap_opts *opt, ulong did, ulong flags, mblk_t *dp)
+STATIC INLINE int
+tc_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct sccp_addr *dst,
+	   struct tcap_opts *opt, ulong did, ulong flags, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_uni_ind *p;
 	size_t src_len = src ? sizeof(*src) + src->alen : 0;
 	size_t dst_len = dst ? sizeof(*dst) + dst->alen : 0;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + src_len + dst_len + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -3500,11 +3777,11 @@ STATIC INLINE int tc_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *sr
 		mp->b_wptr += dst_len;
 	}
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TC_UNI_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_UNI_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -3523,15 +3800,16 @@ STATIC INLINE int tc_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *sr
  *  TC_BEGIN_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_begin_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct sccp_addr *dst,
-			       struct tcap_opts *opt, ulong did, ulong flags, mblk_t *dp)
+STATIC INLINE int
+tc_begin_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct sccp_addr *dst,
+	     struct tcap_opts *opt, ulong did, ulong flags, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_begin_ind *p;
 	size_t src_len = src ? sizeof(*src) + src->alen : 0;
 	size_t dst_len = dst ? sizeof(*dst) + dst->alen : 0;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + src_len + dst_len + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -3557,11 +3835,11 @@ STATIC INLINE int tc_begin_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *
 		mp->b_wptr += dst_len;
 	}
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TC_BEGIN_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_BEGIN_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -3580,13 +3858,14 @@ STATIC INLINE int tc_begin_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *
  *  TC_BEGIN_CON
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_begin_con(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong flags,
-			       mblk_t *dp)
+STATIC INLINE int
+tc_begin_con(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong flags,
+	     mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_begin_con *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -3600,11 +3879,11 @@ STATIC INLINE int tc_begin_con(queue_t *q, struct tcap *tcap, struct tcap_opts *
 	p->DIALOG_id = did;
 	p->COMP_flags = flags;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TC_BEGIN_CON\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_BEGIN_CON\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -3623,13 +3902,14 @@ STATIC INLINE int tc_begin_con(queue_t *q, struct tcap *tcap, struct tcap_opts *
  *  TC_CONT_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_cont_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong flags,
-			      mblk_t *dp)
+STATIC INLINE int
+tc_cont_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong flags,
+	    mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_cont_ind *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -3643,11 +3923,11 @@ STATIC INLINE int tc_cont_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *o
 	p->DIALOG_id = did;
 	p->COMP_flags = flags;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TC_CONT_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_CONT_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -3666,13 +3946,13 @@ STATIC INLINE int tc_cont_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *o
  *  TC_END_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_end_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong flags,
-			     mblk_t *dp)
+STATIC INLINE int
+tc_end_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong flags, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_end_ind *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -3686,11 +3966,11 @@ STATIC INLINE int tc_end_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *op
 	p->DIALOG_id = did;
 	p->COMP_flags = flags;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TC_END_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_END_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -3709,13 +3989,14 @@ STATIC INLINE int tc_end_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *op
  *  TC_ABORT_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_abort_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong reason,
-			       ulong orig)
+STATIC INLINE int
+tc_abort_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulong reason,
+	     ulong orig)
 {
 	int err;
 	mblk_t *mp;
 	struct TC_abort_ind *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -3730,10 +4011,10 @@ STATIC INLINE int tc_abort_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *
 	p->ABORT_reason = reason;
 	p->ORIGINATOR = orig;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
-	printd(("%s: %p: <- TC_ABORT_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_ABORT_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3752,7 +4033,8 @@ STATIC INLINE int tc_abort_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *
  *  TC_NOTICE_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_notice_ind(queue_t *q, struct tcap *tcap, ulong did, ulong cause)
+STATIC INLINE int
+tc_notice_ind(queue_t *q, struct tcap *tcap, ulong did, ulong cause)
 {
 	int err;
 	mblk_t *mp;
@@ -3767,7 +4049,7 @@ STATIC INLINE int tc_notice_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
 	p->PRIM_type = TC_NOTICE_IND;
 	p->DIALOG_id = did;
 	p->REPORT_cause = cause;
-	printd(("%s: %p: <- TC_NOTICE_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_NOTICE_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3786,8 +4068,9 @@ STATIC INLINE int tc_notice_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
  *  TC_INVOKE_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_invoke_ind(queue_t *q, struct tcap *tcap, ulong did, ulong ocls, ulong iid, ulong lid,
-				ulong oper, ulong more)
+STATIC INLINE int
+tc_invoke_ind(queue_t *q, struct tcap *tcap, ulong did, ulong ocls, ulong iid, ulong lid,
+	      ulong oper, ulong more)
 {
 	int err;
 	mblk_t *mp;
@@ -3805,8 +4088,8 @@ STATIC INLINE int tc_invoke_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
 	p->INVOKE_id = iid;
 	p->LINKED_id = lid;
 	p->OPERATION = oper;
-	p->MORE_flags = more;
-	printd(("%s: %p: <- TC_INVOKE_IND\n", TCAP_DRV_NAME, tcap));
+	p->MORE_flag = more;
+	printd(("%s: %p: <- TC_INVOKE_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3825,7 +4108,8 @@ STATIC INLINE int tc_invoke_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
  *  TC_RESULT_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_result_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong oper, ulong more)
+STATIC INLINE int
+tc_result_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong oper, ulong more)
 {
 	int err;
 	mblk_t *mp;
@@ -3842,7 +4126,7 @@ STATIC INLINE int tc_result_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
 	p->INVOKE_id = iid;
 	p->OPERATION = oper;
 	p->MORE_flag = more;
-	printd(("%s: %p: <- TC_RESULT_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_RESULT_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3861,7 +4145,8 @@ STATIC INLINE int tc_result_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
  *  TC_ERROR_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_error_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong ecode)
+STATIC INLINE int
+tc_error_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong ecode)
 {
 	int err;
 	mblk_t *mp;
@@ -3877,7 +4162,7 @@ STATIC INLINE int tc_error_ind(queue_t *q, struct tcap *tcap, ulong did, ulong i
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
 	p->ERROR_code = ecode;
-	printd(("%s: %p: <- TC_ERROR_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_ERROR_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3896,7 +4181,8 @@ STATIC INLINE int tc_error_ind(queue_t *q, struct tcap *tcap, ulong did, ulong i
  *  TC_CANCEL_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_cancel_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid)
+STATIC INLINE int
+tc_cancel_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid)
 {
 	int err;
 	mblk_t *mp;
@@ -3911,7 +4197,7 @@ STATIC INLINE int tc_cancel_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
 	p->PRIM_type = TC_CANCEL_IND;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
-	printd(("%s: %p: <- TC_CANCEL_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TC_CANCEL_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3930,7 +4216,8 @@ STATIC INLINE int tc_cancel_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
  *  TC_REJECT_IND
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int tc_reject_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong ecode)
+STATIC INLINE int
+tc_reject_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong ecode)
 {
 	int err;
 	mblk_t *mp;
@@ -3945,8 +4232,8 @@ STATIC INLINE int tc_reject_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
 	p->PRIM_type = TC_REJECT_IND;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
-	p->ERROR_code = ecode;
-	printd(("%s: %p: <- TC_REJECT_IND\n", TCAP_DRV_NAME, tcap));
+	p->PROBLEM_code = ecode;
+	printd(("%s: %p: <- TC_REJECT_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -3969,7 +4256,8 @@ STATIC INLINE int tc_reject_ind(queue_t *q, struct tcap *tcap, ulong did, ulong 
  *  TR_INFO_ACK
  *  -----------------------------------------------------------------
  */
-STATIC int tr_info_ack(queue_t *q, struct tcap *tcap)
+STATIC int
+tr_info_ack(queue_t *q, struct tcap *tcap)
 {
 	int err;
 	mblk_t *mp;
@@ -3984,14 +4272,14 @@ STATIC int tr_info_ack(queue_t *q, struct tcap *tcap)
 	p->ETSDU_size = FIXME;
 	p->CDATA_size = FIXME;
 	p->DDATA_size = FIXME;
-	p->ADDR_size = sizeof(struct sccp_addr) + SCCP_MAX_ADDR_LEN;
+	p->ADDR_size = sizeof(struct sccp_addr) + SCCP_MAX_ADDR_LENGTH;
 	p->OPT_size = FIXME;
 	p->TIDU_size = FIXME;
 	p->SERV_type = FIXME;
 	p->CURRENT_state = tcap_get_c_state(tcap);
 	p->PROVIDER_flag = FIXME;
 	p->TRPI_version = FIXME;
-	printd(("%s: %p: <- TR_INFO_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_INFO_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4006,7 +4294,8 @@ STATIC int tr_info_ack(queue_t *q, struct tcap *tcap)
  *  TR_BIND_ACK
  *  -----------------------------------------------------------------
  */
-STATIC int tr_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulong xact, ulong tok)
+STATIC int
+tr_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulong xact, ulong tok)
 {
 	int err;
 	mblk_t *mp;
@@ -4021,13 +4310,13 @@ STATIC int tr_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulo
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
 	p->XACT_number = xact;
-//      p->TOKEN_value = tok;
-	p->BIND_flags = flags;
+	p->TOKEN_value = tok;
+//      p->BIND_flags = flags;
 	if (add_len) {
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: <- TR_BIND_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_BIND_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4042,7 +4331,8 @@ STATIC int tr_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulo
  *  TR_OK_ACK
  *  -----------------------------------------------------------------
  */
-STATIC int tr_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
+STATIC int
+tr_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
 {
 	int err;
 	mblk_t *mp;
@@ -4054,7 +4344,7 @@ STATIC int tr_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = TR_OK_ACK;
 	p->CORRECT_prim = prim;
-	printd(("%s: %p: <- TR_OK_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_OK_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4069,7 +4359,8 @@ STATIC int tr_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
  *  TR_ERROR_ACK
  *  -----------------------------------------------------------------
  */
-STATIC int tr_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, ulong tid)
+STATIC int
+tr_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, ulong tid)
 {
 	int err;
 	mblk_t *mp;
@@ -4084,7 +4375,7 @@ STATIC int tr_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, u
 	p->TRPI_error = etype < 0 ? TRSYSERR : etype;
 	p->UNIX_error = etype < 0 ? -etype : 0;
 	p->TRANS_id = tid;
-	printd(("%s: %p: <- TR_ERROR_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_ERROR_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4099,12 +4390,13 @@ STATIC int tr_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, u
  *  TR_OPTMGMT_ACK
  *  -----------------------------------------------------------------
  */
-STATIC int tr_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong flags)
+STATIC int
+tr_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong flags)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_optmgmt_ack *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
@@ -4115,10 +4407,10 @@ STATIC int tr_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, 
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
 	p->MGMT_flags = flags;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
-	printd(("%s: %p: <- TR_OPTMGMT_ACK\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_OPTMGMT_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4133,15 +4425,16 @@ STATIC int tr_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, 
  *  TR_UNI_IND
  *  -----------------------------------------------------------------
  */
-STATIC int tr_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *org, struct sccp_addr *dst,
-		      struct tcap_opts *opt, mblk_t *dp)
+STATIC int
+tr_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *org, struct sccp_addr *dst,
+	   struct tcap_opts *opt, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_uni_ind *p;
 	size_t dst_len = dst ? sizeof(*dst) + dst->alen : 0;
 	size_t org_len = org ? sizeof(*org) + org->alen : 0;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + dst_len + org_len + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -4165,11 +4458,11 @@ STATIC int tr_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *org, stru
 		mp->b_wptr += org_len;
 	}
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TR_UNI_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_UNI_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -4188,15 +4481,16 @@ STATIC int tr_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *org, stru
  *  TR_BEGIN_IND
  *  -----------------------------------------------------------------
  */
-STATIC int tr_begin_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct sccp_addr *org,
-			struct sccp_addr *dst, struct tcap_opts *opt, mblk_t *dp)
+STATIC int
+tr_begin_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct sccp_addr *org,
+	     struct sccp_addr *dst, struct tcap_opts *opt, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_begin_ind *p;
 	size_t dst_len = dst ? sizeof(*dst) + dst->alen : 0;
 	size_t org_len = org ? sizeof(*org) + org->alen : 0;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + dst_len + org_len + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -4221,11 +4515,11 @@ STATIC int tr_begin_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct scc
 		mp->b_wptr += org_len;
 	}
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TR_BEGIN_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_BEGIN_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -4244,14 +4538,15 @@ STATIC int tr_begin_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct scc
  *  TR_BEGIN_CON
  *  -----------------------------------------------------------------
  */
-STATIC int tr_begin_con(queue_t *q, struct tcap *tcap, struct tr *tr, struct sccp_addr *org,
-			struct tcap_opts *opt, mblk_t *dp)
+STATIC int
+tr_begin_con(queue_t *q, struct tcap *tcap, struct tr *tr, struct sccp_addr *org,
+	     struct tcap_opts *opt, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_begin_con *p;
 	size_t org_len = org ? sizeof(*org) + org->alen : 0;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + org_len + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -4265,16 +4560,17 @@ STATIC int tr_begin_con(queue_t *q, struct tcap *tcap, struct tr *tr, struct scc
 	p->ORIG_length = org_len;
 	p->ORIG_offset = org_len ? sizeof(*p) : 0;
 	p->OPT_length = opt_len;
-	p->OPT_offset = opt_len ? sizeof(*p) + org_len : 0 if (org_len) {
+	p->OPT_offset = opt_len ? sizeof(*p) + org_len : 0;
+	if (org_len) {
 		bcopy(org, mp->b_wptr, org_len);
 		mp->b_wptr += org_len;
 	}
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TR_BEGIN_CON\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_BEGIN_CON\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -4293,12 +4589,13 @@ STATIC int tr_begin_con(queue_t *q, struct tcap *tcap, struct tr *tr, struct scc
  *  TR_CONT_IND
  *  -----------------------------------------------------------------
  */
-STATIC int tr_cont_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_opts *opt, mblk_t *dp)
+STATIC int
+tr_cont_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_opts *opt, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_cont_ind *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -4311,11 +4608,11 @@ STATIC int tr_cont_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TR_CONT_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_CONT_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -4334,12 +4631,13 @@ STATIC int tr_cont_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap
  *  TR_END_IND
  *  -----------------------------------------------------------------
  */
-STATIC int tr_end_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_opts *opt, mblk_t *dp)
+STATIC int
+tr_end_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_opts *opt, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_end_ind *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -4353,11 +4651,11 @@ STATIC int tr_end_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- TR_END_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_END_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -4376,13 +4674,14 @@ STATIC int tr_end_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_
  *  TR_ABORT_IND
  *  -----------------------------------------------------------------
  */
-STATIC int tr_abort_ind(queue_t *q, struct tcap *tcap, struct tr *tr, ulong cause, ulong orig,
-			struct tcap_opts *opt)
+STATIC int
+tr_abort_ind(queue_t *q, struct tcap *tcap, struct tr *tr, ulong cause, ulong orig,
+	     struct tcap_opts *opt)
 {
 	int err;
 	mblk_t *mp;
 	struct TR_abort_ind *p;
-	size_t opt_len = tcap_opt_size(tcap, opt);
+	size_t opt_len = tcap_opts_size(tcap, opt);
 	size_t msg_len = sizeof(*p) + opt_len;
 	if (!canput(tcap->oq))
 		goto ebusy;
@@ -4398,10 +4697,10 @@ STATIC int tr_abort_ind(queue_t *q, struct tcap *tcap, struct tr *tr, ulong caus
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
 	if (opt_len) {
-		tcap_opt_build(tcap, opt, mp->b_wptr);
+		tcap_build_opts(tcap, opt, mp->b_wptr);
 		mp->b_wptr += opt_len;
 	}
-	printd(("%s: %p: <- TR_ABORT_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_ABORT_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4420,7 +4719,8 @@ STATIC int tr_abort_ind(queue_t *q, struct tcap *tcap, struct tr *tr, ulong caus
  *  TR_NOTICE_IND
  *  -----------------------------------------------------------------
  */
-STATIC int tr_notice_ind(queue_t *q, struct tcap *tcap, ulong cause, struct tr *tr)
+STATIC int
+tr_notice_ind(queue_t *q, struct tcap *tcap, ulong cause, struct tr *tr)
 {
 	int err;
 	mblk_t *mp;
@@ -4436,7 +4736,7 @@ STATIC int tr_notice_ind(queue_t *q, struct tcap *tcap, ulong cause, struct tr *
 	p->REPORT_cause = cause;
 	p->CORR_id = tr->cid;
 	p->TRANS_id = tr->tid;
-	printd(("%s: %p: <- TR_NOTICE_IND\n", TCAP_DRV_NAME, tcap));
+	printd(("%s: %p: <- TR_NOTICE_IND\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -4455,6 +4755,9 @@ STATIC int tr_notice_ind(queue_t *q, struct tcap *tcap, ulong cause, struct tr *
  *  TPI Primitives
  *  -------------------------------------------------------------------------
  */
+#ifndef PAD4
+#define PAD4(__x) (((__x)+3)&~(3))
+#endif
 /* 
  *  T_CONN_IND          11 - connection indication
  *  -----------------------------------------------------------------
@@ -4462,13 +4765,14 @@ STATIC int tr_notice_ind(queue_t *q, struct tcap *tcap, ulong cause, struct tr *
  *  decode parameter block) itself as the connection indication.  The sequence number is really just a pointer to
  *  the first mblk_t in the received CR message.
  */
-STATIC INLINE int t_conn_ind(queue_t *q, struct tcap *tcap, mblk_t *cp)
+STATIC INLINE int
+t_conn_ind(queue_t *q, struct tcap *tcap, mblk_t *cp)
 {
 	mblk_t *mp;
 	struct tr_msg *m = (typeof(m)) cp->b_rptr;
 	struct T_conn_ind *p;
 	struct t_opthdr *oh;
-	struct tcap_addr *src = &m->cgpa;
+	struct sccp_addr *src = &m->sccp.orig;
 	size_t src_len = sizeof(*src) + src->alen;
 	size_t opt_len = sizeof(*oh) + sizeof(t_scalar_t);
 	size_t msg_len = sizeof(*p) + PAD4(src_len) + opt_len;
@@ -4497,7 +4801,7 @@ STATIC INLINE int t_conn_ind(queue_t *q, struct tcap *tcap, mblk_t *cp)
 	oh->level = T_SS7_SCCP;
 	oh->name = T_SCCP_PCLASS;
 	oh->status = T_SUCCESS;
-	*((t_uscalar_t *) mp->b_wptr)++ = m->pclass;
+	*((t_uscalar_t *) mp->b_wptr)++ = m->sccp.pcl;
 	bufq_queue(&tcap->conq, cp);
 	tcap_set_t_state(tcap, TS_WRES_CIND);
 	putnext(tcap->oq, mp);
@@ -4509,10 +4813,10 @@ STATIC INLINE int t_conn_ind(queue_t *q, struct tcap *tcap, mblk_t *cp)
 	rare();
 	return (-EBUSY);
       erestart:
-	ptrace(("%s: %p: PROTO: too many connection indications\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: PROTO: too many connection indications\n", DRV_NAME, tcap));
 	return (-ERESTART);
       efault:
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	return (-EFAULT);
 }
@@ -4522,8 +4826,9 @@ STATIC INLINE int t_conn_ind(queue_t *q, struct tcap *tcap, mblk_t *cp)
  *  -----------------------------------------------------------------
  *  The only options with end-to-end significance that are negotiated is the protocol class.
  */
-STATIC INLINE int t_conn_con(queue_t *q, struct tcap *tcap, struct sccp_addr *res, ulong pcls, ulong flags,
-			     mblk_t *dp)
+STATIC INLINE int
+t_conn_con(queue_t *q, struct tcap *tcap, struct sccp_addr *res, ulong pcls, ulong flags,
+	   mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -4561,15 +4866,15 @@ STATIC INLINE int t_conn_con(queue_t *q, struct tcap *tcap, struct sccp_addr *re
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, tcap));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	goto error;
       error:
@@ -4583,14 +4888,16 @@ STATIC INLINE int t_conn_con(queue_t *q, struct tcap *tcap, struct sccp_addr *re
  *  are rejected with a disconnect indication as well.  We can use this to directly address the mblk in the
  *  connection indication bufq.
  */
-STATIC INLINE int t_discon_ind(queue_t *q, struct tcap *tcap, long reason, mblk_t *seq, mblk_t *dp)
+STATIC INLINE int
+t_discon_ind(queue_t *q, struct tcap *tcap, long reason, mblk_t *seq, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
 	struct T_discon_ind *p;
 	size_t msg_len = sizeof(*p);
 	if ((1 << tcap->
-	     state) & ~(TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))
+	     state) & ~(TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL |
+			TSF_WREQ_ORDREL))
 		goto efault;
 	if (!canputnext(tcap->oq))
 		goto ebusy;
@@ -4614,15 +4921,15 @@ STATIC INLINE int t_discon_ind(queue_t *q, struct tcap *tcap, long reason, mblk_
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, tcap));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	goto error;
       error:
@@ -4633,7 +4940,8 @@ STATIC INLINE int t_discon_ind(queue_t *q, struct tcap *tcap, long reason, mblk_
  *  T_DATA_IND          14 - data indication
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int t_data_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t *dp)
+STATIC INLINE int
+t_data_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -4654,15 +4962,15 @@ STATIC INLINE int t_data_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t *
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, tcap));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	goto error;
       error:
@@ -4673,7 +4981,8 @@ STATIC INLINE int t_data_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t *
  *  T_EXDATA_IND        15 - expedited data indication
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int t_exdata_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t *dp)
+STATIC INLINE int
+t_exdata_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -4695,15 +5004,15 @@ STATIC INLINE int t_exdata_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: no buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, tcap));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	goto error;
       error:
@@ -4714,7 +5023,8 @@ STATIC INLINE int t_exdata_ind(queue_t *q, struct tcap *tcap, ulong more, mblk_t
  *  T_INFO_ACK          16 - information acknowledgement
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int t_info_ack(queue_t *q, struct tcap *tcap)
+STATIC INLINE int
+t_info_ack(queue_t *q, struct tcap *tcap)
 {
 	int err;
 	mblk_t *mp;
@@ -4724,16 +5034,16 @@ STATIC INLINE int t_info_ack(queue_t *q, struct tcap *tcap)
 		goto enobufs;
 	{
 		ulong serv = tcap->pclass < 2 ? T_CLTS : T_COTS_ORD;
-		ulong etsdu = tcap->pclass < 2 ? T_INVALID : tcap->mtu;
+		ulong etsdu = tcap->pclass < 2 ? T_INVALID : tcap->options.mtu;
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		fixme(("Still some things to double-check here\n"));
 		p->PRIM_type = T_INFO_ACK;
 		p->TSDU_size = T_INFINITE;	/* no limit on TSDU size */
 		p->ETSDU_size = etsdu;	/* no concept of ETSDU size */
-		p->CDATA_size = tcap->mtu;	/* no concept of CDATA size */
-		p->DDATA_size = tcap->mtu;	/* no concept of DDATA size */
-		p->ADDR_size = sizeof(struct tcap_addr);	/* no limit on ADDR size */
+		p->CDATA_size = tcap->options.mtu;	/* no concept of CDATA size */
+		p->DDATA_size = tcap->options.mtu;	/* no concept of DDATA size */
+		p->ADDR_size = sizeof(struct sccp_addr);	/* no limit on ADDR size */
 		p->OPT_size = T_INFINITE;	/* no limit on OPTIONS size */
 		p->TIDU_size = T_INFINITE;	/* no limit on TIDU size */
 		p->SERV_type = serv;	/* COTS or CLTS */
@@ -4744,7 +5054,7 @@ STATIC INLINE int t_info_ack(queue_t *q, struct tcap *tcap)
 	}
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -4754,7 +5064,8 @@ STATIC INLINE int t_info_ack(queue_t *q, struct tcap *tcap)
  *  T_BIND_ACK          17 - bind acknowledgement
  *  -----------------------------------------------------------------
  */
-STATIC int t_bind_ack(queue_t *q, struct tcap *tcap, struct tcap_addr *add)
+STATIC int
+t_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add)
 {
 	int err;
 	mblk_t *mp;
@@ -4780,12 +5091,12 @@ STATIC int t_bind_ack(queue_t *q, struct tcap *tcap, struct tcap_addr *add)
 	return (0);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -4795,7 +5106,8 @@ STATIC int t_bind_ack(queue_t *q, struct tcap *tcap, struct tcap_addr *add)
  *  T_ERROR_ACK         18 - error acknowledgement
  *  -----------------------------------------------------------------
  */
-STATIC int t_error_ack(queue_t *q, struct tcap *tcap, const ulong prim, long error)
+STATIC int
+t_error_ack(queue_t *q, struct tcap *tcap, const ulong prim, long error)
 {
 	int err = error;
 	mblk_t *mp;
@@ -4849,15 +5161,15 @@ STATIC int t_error_ack(queue_t *q, struct tcap *tcap, const ulong prim, long err
 	case TS_WACK_DREQ11:
 		tcap_set_t_state(tcap, TS_WREQ_ORDREL);
 		break;
-		/* Note: if we are not in a WACK state we simply do not change state.  This occurs normally when
-		   we send TOUTSTATE or TNOTSUPPORT or are responding to a T_OPTMGMT_REQ in other then TS_IDLE
-		   state. */
+		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
+		   normally when we send TOUTSTATE or TNOTSUPPORT or are responding to a
+		   T_OPTMGMT_REQ in other then TS_IDLE state. */
 	}
 	putnext(tcap->oq, mp);
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -4867,7 +5179,8 @@ STATIC int t_error_ack(queue_t *q, struct tcap *tcap, const ulong prim, long err
  *  T_OK_ACK            19 - success acknowledgement
  *  -----------------------------------------------------------------
  */
-STATIC int t_ok_ack(queue_t *q, struct tcap *tcap, ulong prim, ulong seq, ulong tok)
+STATIC int
+t_ok_ack(queue_t *q, struct tcap *tcap, ulong prim, ulong seq, ulong tok)
 {
 	int err;
 	mblk_t *mp;
@@ -4889,11 +5202,11 @@ STATIC int t_ok_ack(queue_t *q, struct tcap *tcap, ulong prim, ulong seq, ulong 
 	case TS_WACK_CRES:
 	{
 		queue_t *aq = (queue_t *) tok;
-		struct tcap *ap = SCCP_PRIV(aq);
+		struct tcap *ap = TCAP_PRIV(aq);
 		if (ap) {
 			ap->i_state = TS_DATA_XFER;
-			tcap_cleanup_read(q);
-			tcap_transmit_wakeup(q);
+//                      tcap_cleanup_read(q);
+//                      tcap_transmit_wakeup(q);
 		}
 		if (seq) {
 			bufq_unlink(&tcap->conq, (mblk_t *) seq);
@@ -4919,14 +5232,15 @@ STATIC int t_ok_ack(queue_t *q, struct tcap *tcap, ulong prim, ulong seq, ulong 
 		else
 			tcap_set_t_state(tcap, TS_IDLE);
 		break;
-		/* Note: if we are not in a WACK state we simply do not change state.  This occurs normally when
-		   we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE state. */
+		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
+		   normally when we are responding to a T_OPTMGMT_REQ in other than the TS_IDLE
+		   state. */
 	}
 	putnext(tcap->oq, mp);
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -4936,7 +5250,8 @@ STATIC int t_ok_ack(queue_t *q, struct tcap *tcap, ulong prim, ulong seq, ulong 
  *  T_OPTMGMT_ACK       22 - options management acknowledgement
  *  -----------------------------------------------------------------
  */
-STATIC int t_optmgmt_ack(queue_t *q, struct tcap *tcap, ulong flags, struct tcap_opts *ops)
+STATIC int
+t_optmgmt_ack(queue_t *q, struct tcap *tcap, ulong flags, struct tcap_opts *ops)
 {
 	int err;
 	mblk_t *mp;
@@ -4961,7 +5276,7 @@ STATIC int t_optmgmt_ack(queue_t *q, struct tcap *tcap, ulong flags, struct tcap
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -4971,7 +5286,8 @@ STATIC int t_optmgmt_ack(queue_t *q, struct tcap *tcap, ulong flags, struct tcap
  *  T_ORDREL_IND        23 - orderly release indication
  *  -----------------------------------------------------------------
  */
-STATIC INLINE int t_ordrel_ind(queue_t *q, struct tcap *tcap)
+STATIC INLINE int
+t_ordrel_ind(queue_t *q, struct tcap *tcap)
 {
 	int err;
 	mblk_t *mp;
@@ -4998,16 +5314,16 @@ STATIC INLINE int t_ordrel_ind(queue_t *q, struct tcap *tcap)
 	return (0);
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", TCAP_DRV_NAME, tcap,
+	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", DRV_NAME, tcap,
 		tcap_get_t_state(tcap)));
 	goto error;
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: flow controlled\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -5017,7 +5333,8 @@ STATIC INLINE int t_ordrel_ind(queue_t *q, struct tcap *tcap)
  *  T_ADDR_ACK          27 - address acknowledgement
  *  -----------------------------------------------------------------
  */
-STATIC int t_addr_ack(queue_t *q, struct tcap *tcap, struct tcap_addr *loc, struct tcap_addr *rem)
+STATIC int
+t_addr_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *loc, struct sccp_addr *rem)
 {
 	int err;
 	mblk_t *mp;
@@ -5046,7 +5363,7 @@ STATIC int t_addr_ack(queue_t *q, struct tcap *tcap, struct tcap_addr *loc, stru
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -5057,7 +5374,8 @@ STATIC int t_addr_ack(queue_t *q, struct tcap *tcap, struct tcap_addr *loc, stru
  *  T_CAPABILITY_ACK    ?? - protocol capability ack
  *  -----------------------------------------------------------------
  */
-STATIC int t_capability_ack(queue_t *q, struct tcap *tcap, ulong caps)
+STATIC int
+t_capability_ack(queue_t *q, struct tcap *tcap, ulong caps)
 {
 	int err;
 	mblk_t *mp;
@@ -5088,7 +5406,7 @@ STATIC int t_capability_ack(queue_t *q, struct tcap *tcap, ulong caps)
 		return (0);
 	} else {
 		err = -ENOBUFS;
-		ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+		ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	}
 	return (err);
 }
@@ -5101,8 +5419,9 @@ STATIC int t_capability_ack(queue_t *q, struct tcap *tcap, ulong caps)
  *  bind to multiple alias addresses, but will only permit us to bind to a single alias address.  This might or
  *  might not be a problem to the user.
  */
-STATIC INLINE int t_unitdata_ind(queue_t *q, struct tcap *tcap, struct tcap_addr *src, ulong * seq, ulong * prior,
-				 ulong * pcls, ulong * imp, ulong * rerr, mblk_t *dp)
+STATIC INLINE int
+t_unitdata_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct tcap_opts *opt,
+	       mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5111,7 +5430,8 @@ STATIC INLINE int t_unitdata_ind(queue_t *q, struct tcap *tcap, struct tcap_addr
 	struct T_unitdata_ind *p;
 	size_t src_len = src ? sizeof(*src) : 0;
 	size_t opt_len =
-	    (seq ? olen : 0) + (prior ? olen : 0) + (pcls ? olen : 0) + (imp ? olen : 0) + (rerr ? olen : 0);
+	    (opt->seq ? olen : 0) + (opt->pri ? olen : 0) + (opt->pcl ? olen : 0) +
+	    (opt->imp ? olen : 0) + (opt->ret ? olen : 0);
 	size_t msg_len = sizeof(*p) + src_len + opt_len;
 	if (!canputnext(tcap->oq))
 		goto ebusy;
@@ -5129,56 +5449,56 @@ STATIC INLINE int t_unitdata_ind(queue_t *q, struct tcap *tcap, struct tcap_addr
 		mp->b_wptr += src_len;
 	}
 	if (opt_len) {
-		if (seq) {
+		if (opt->seq) {
 			oh = ((typeof(oh)) mp->b_wptr)++;
 			oh->len = olen;
 			oh->level = T_SS7_SCCP;
 			oh->name = T_SCCP_SEQ_CTRL;
 			oh->status = T_SUCCESS;
-			*((t_uscalar_t *) mp->b_wptr)++ = *seq;
+			*((t_uscalar_t *) mp->b_wptr)++ = *opt->seq;
 		}
-		if (prior) {
+		if (opt->pri) {
 			oh = ((typeof(oh)) mp->b_wptr)++;
 			oh->len = olen;
 			oh->level = T_SS7_SCCP;
 			oh->name = T_SCCP_PRIORITY;
 			oh->status = T_SUCCESS;
-			*((t_uscalar_t *) mp->b_wptr)++ = *prior;
+			*((t_uscalar_t *) mp->b_wptr)++ = *opt->pri;
 		}
-		if (pcls) {
+		if (opt->pcl) {
 			oh = ((typeof(oh)) mp->b_wptr)++;
 			oh->len = olen;
 			oh->level = T_SS7_SCCP;
 			oh->name = T_SCCP_PCLASS;
 			oh->status = T_SUCCESS;
-			*((t_uscalar_t *) mp->b_wptr)++ = *pcls;
+			*((t_uscalar_t *) mp->b_wptr)++ = *opt->pcl;
 		}
-		if (imp) {
+		if (opt->imp) {
 			oh = ((typeof(oh)) mp->b_wptr)++;
 			oh->len = olen;
 			oh->level = T_SS7_SCCP;
 			oh->name = T_SCCP_IMPORTANCE;
 			oh->status = T_SUCCESS;
-			*((t_uscalar_t *) mp->b_wptr)++ = *imp;
+			*((t_uscalar_t *) mp->b_wptr)++ = *opt->imp;
 		}
-		if (rerr) {
+		if (opt->ret) {
 			oh = ((typeof(oh)) mp->b_wptr)++;
 			oh->len = olen;
 			oh->level = T_SS7_SCCP;
 			oh->name = T_SCCP_RET_ERROR;
 			oh->status = T_SUCCESS;
-			*((t_uscalar_t *) mp->b_wptr)++ = *rerr;
+			*((t_uscalar_t *) mp->b_wptr)++ = *opt->ret;
 		}
 	}
 	putnext(tcap->oq, mp);
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -5190,8 +5510,9 @@ STATIC INLINE int t_unitdata_ind(queue_t *q, struct tcap *tcap, struct tcap_addr
  *  This primitive indicates to the transport user that a datagram with the specified destination address and
  *  options produced an error.
  */
-STATIC INLINE int t_uderror_ind(queue_t *q, struct tcap *tcap, ulong etype, struct tcap_addr *dst, ulong * seq,
-				ulong * pri, ulong * pcl, ulong * imp, ulong * ret, mblk_t *dp)
+STATIC INLINE int
+t_uderror_ind(queue_t *q, struct tcap *tcap, ulong etype, struct sccp_addr *dst, ulong *seq,
+	      ulong *pri, ulong *pcl, ulong *imp, ulong *ret, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5200,7 +5521,8 @@ STATIC INLINE int t_uderror_ind(queue_t *q, struct tcap *tcap, ulong etype, stru
 	struct T_uderror_ind *p;
 	size_t dst_len = dst ? sizeof(*dst) : 0;
 	size_t opt_len =
-	    (seq ? olen : 0) + (pri ? olen : 0) + (pcl ? olen : 0) + (imp ? olen : 0) + (ret ? olen : 0);
+	    (seq ? olen : 0) + (pri ? olen : 0) + (pcl ? olen : 0) + (imp ? olen : 0) +
+	    (ret ? olen : 0);
 	size_t msg_len = sizeof(*p) + dst_len;
 	if (!canputnext(tcap->oq))
 		goto ebusy;
@@ -5265,11 +5587,11 @@ STATIC INLINE int t_uderror_ind(queue_t *q, struct tcap *tcap, ulong etype, stru
 	return (0);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, tcap));
 	goto error;
       ebusy:
 	err = -EBUSY;
-	ptrace(("%s: %p: ERROR: Flow controlled\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: Flow controlled\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return (err);
@@ -5286,8 +5608,9 @@ STATIC INLINE int t_uderror_ind(queue_t *q, struct tcap *tcap, ulong etype, stru
  *  N_CONN_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_conn_req(queue_t *q, struct sccp *sccp, struct sccp_addr *dst, ulong flags,
-			     N_qos_sel_conn_sccp_t * qos, mblk_t *dp)
+STATIC INLINE int
+n_conn_req(queue_t *q, struct sccp *sccp, struct sccp_addr *dst, ulong flags,
+	   N_qos_sel_conn_sccp_t * qos, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5307,8 +5630,8 @@ STATIC INLINE int n_conn_req(queue_t *q, struct sccp *sccp, struct sccp_addr *ds
 	p->DEST_length = dst_len;
 	p->DEST_offset = dst_len ? sizeof(*p) : 0;
 	p->CONN_flags = flags;
-	p->OPT_length = qos_len;
-	p->OPT_offset = qos_len ? sizeof(*p) + dst_len : 0;
+	p->QOS_length = qos_len;
+	p->QOS_offset = qos_len ? sizeof(*p) + dst_len : 0;
 	if (dst_len) {
 		bcopy(dst, mp->b_wptr, dst_len);
 		mp->b_wptr += dst_len;
@@ -5319,7 +5642,7 @@ STATIC INLINE int n_conn_req(queue_t *q, struct sccp *sccp, struct sccp_addr *ds
 	}
 	mp->b_cont = dp;
 	sccp_set_i_state(sccp, NS_WCON_CREQ);
-	printd(("%s: %p: N_CONN_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_CONN_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       efault:
@@ -5342,8 +5665,9 @@ STATIC INLINE int n_conn_req(queue_t *q, struct sccp *sccp, struct sccp_addr *ds
  *  N_CONN_RES
  *  -----------------------------------
  */
-STATIC INLINE int n_conn_res(queue_t *q, struct sccp *sccp, ulong tok, struct sccp_addr *res, ulong seq,
-			     ulong flags, N_qos_sel_conn_sccp_t * qos, mblk_t *dp)
+STATIC INLINE int
+n_conn_res(queue_t *q, struct sccp *sccp, ulong tok, struct sccp_addr *res, ulong seq,
+	   ulong flags, N_qos_sel_conn_sccp_t * qos, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5365,8 +5689,8 @@ STATIC INLINE int n_conn_res(queue_t *q, struct sccp *sccp, ulong tok, struct sc
 	p->RES_offset = res_len ? sizeof(*p) : 0;
 	p->SEQ_number = seq;
 	p->CONN_flags = flags;
-	p->OPT_length = qos_len;
-	p->OPT_offset = qos_len ? sizeof(*p) + res_len : 0;
+	p->QOS_length = qos_len;
+	p->QOS_offset = qos_len ? sizeof(*p) + res_len : 0;
 	if (res_len) {
 		bcopy(res, mp->b_wptr, res_len);
 		mp->b_wptr += res_len;
@@ -5380,7 +5704,7 @@ STATIC INLINE int n_conn_res(queue_t *q, struct sccp *sccp, ulong tok, struct sc
 		sccp_set_i_state(sccp, NS_IDLE);
 	else
 		sccp_set_i_state(sccp, NS_WRES_CIND);
-	printd(("%s: %p: N_CONN_RES ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_CONN_RES ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       efault:
@@ -5403,8 +5727,9 @@ STATIC INLINE int n_conn_res(queue_t *q, struct sccp *sccp, ulong tok, struct sc
  *  N_DISCON_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_discon_req(queue_t *q, struct sccp *sccp, ulong reason, struct sccp_addr *res, ulong seq,
-			       mblk_t *dp)
+STATIC INLINE int
+n_discon_req(queue_t *q, struct sccp *sccp, ulong reason, struct sccp_addr *res, ulong seq,
+	     mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5450,7 +5775,7 @@ STATIC INLINE int n_discon_req(queue_t *q, struct sccp *sccp, ulong reason, stru
 		swerr();
 		break;
 	}
-	p->printd(("%s: %p: N_DISCON_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_DISCON_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       efault:
@@ -5473,7 +5798,8 @@ STATIC INLINE int n_discon_req(queue_t *q, struct sccp *sccp, ulong reason, stru
  *  N_DATA_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_data_req(queue_t *q, struct sccp *sccp, ulong flags, mblk_t *dp)
+STATIC INLINE int
+n_data_req(queue_t *q, struct sccp *sccp, ulong flags, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5490,7 +5816,7 @@ STATIC INLINE int n_data_req(queue_t *q, struct sccp *sccp, ulong flags, mblk_t 
 	p->PRIM_type = N_DATA_REQ;
 	p->DATA_xfer_flags = flags;
 	mp->b_cont = dp;
-	printd(("%s: %p: N_DATA_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_DATA_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       efault:
@@ -5519,7 +5845,8 @@ STATIC INLINE int n_data_req(queue_t *q, struct sccp *sccp, ulong flags, mblk_t 
  *  N_EXDATA_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_exdata_req(queue_t *q, struct sccp *sccp, mblk_t *dp)
+STATIC INLINE int
+n_exdata_req(queue_t *q, struct sccp *sccp, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5536,7 +5863,7 @@ STATIC INLINE int n_exdata_req(queue_t *q, struct sccp *sccp, mblk_t *dp)
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_EXDATA_REQ;
 	mp->b_cont = dp;
-	printd(("%s: %p: N_EXDATA_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_EXDATA_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       efault:
@@ -5565,7 +5892,8 @@ STATIC INLINE int n_exdata_req(queue_t *q, struct sccp *sccp, mblk_t *dp)
  *  N_INFO_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_info_req(queue_t *q, struct sccp *sccp)
+STATIC INLINE int
+n_info_req(queue_t *q, struct sccp *sccp)
 {
 	int err;
 	mblk_t *mp;
@@ -5576,7 +5904,7 @@ STATIC INLINE int n_info_req(queue_t *q, struct sccp *sccp)
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_INFO_REQ;
-	printd(("%s: %p: N_INFO_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_INFO_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -5591,8 +5919,9 @@ STATIC INLINE int n_info_req(queue_t *q, struct sccp *sccp)
  *  N_BIND_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_bind_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add, ulong cons, ulong flags,
-			     uchar *pro, size_t pro_len)
+STATIC INLINE int
+n_bind_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add, ulong cons, ulong flags,
+	   uchar *pro, size_t pro_len)
 {
 	int err;
 	mblk_t *mp;
@@ -5621,7 +5950,7 @@ STATIC INLINE int n_bind_req(queue_t *q, struct sccp *sccp, struct sccp_addr *ad
 		mp->b_wptr += pro_len;
 	}
 	sccp_set_i_state(sccp, NS_WACK_BREQ);
-	printd(("%s: %p: N_BIND_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_BIND_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       efault:
@@ -5640,7 +5969,8 @@ STATIC INLINE int n_bind_req(queue_t *q, struct sccp *sccp, struct sccp_addr *ad
  *  N_UNBIND_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_unbind_req(queue_t *q, struct sccp *sccp)
+STATIC INLINE int
+n_unbind_req(queue_t *q, struct sccp *sccp)
 {
 	int err;
 	mblk_t *mp;
@@ -5654,7 +5984,7 @@ STATIC INLINE int n_unbind_req(queue_t *q, struct sccp *sccp)
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_UNBIND_REQ;
 	sccp_set_i_state(sccp, NS_WACK_UREQ);
-	printd(("%s: %p: N_UNBIND_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       efault:
@@ -5673,7 +6003,8 @@ STATIC INLINE int n_unbind_req(queue_t *q, struct sccp *sccp)
  *  N_UNITDATA_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_unitdata_req(queue_t *q, struct sccp *sccp, struct sccp_addr *dst, mblk_t *dp)
+STATIC INLINE int
+n_unitdata_req(queue_t *q, struct sccp *sccp, struct sccp_addr *dst, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -5698,7 +6029,7 @@ STATIC INLINE int n_unitdata_req(queue_t *q, struct sccp *sccp, struct sccp_addr
 		mp->b_wptr += dst_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: N_UNITDATA_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_UNITDATA_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       efault:
@@ -5721,7 +6052,8 @@ STATIC INLINE int n_unitdata_req(queue_t *q, struct sccp *sccp, struct sccp_addr
  *  N_OPTMGMT_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_optmgmt_req(queue_t *q, struct sccp *sccp, N_qos_sel_info_sccp_t * qos, ulong flags)
+STATIC INLINE int
+n_optmgmt_req(queue_t *q, struct sccp *sccp, N_qos_sel_info_sccp_t * qos, ulong flags)
 {
 	int err;
 	mblk_t *mp;
@@ -5735,12 +6067,12 @@ STATIC INLINE int n_optmgmt_req(queue_t *q, struct sccp *sccp, N_qos_sel_info_sc
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_OPTMGMT_REQ;
-	p->OPT_length = qos_len;
-	p->OPT_offset = qos_len ? sizeof(*p) : 0;
+	p->QOS_length = qos_len;
+	p->QOS_offset = qos_len ? sizeof(*p) : 0;
 	p->OPTMGMT_flags = flags;
 	if (sccp_get_i_state(sccp) == NS_IDLE)
 		sccp_set_i_state(sccp, NS_WACK_OPTREQ);
-	printd(("%s: %p: N_OPTMGMT_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_OPTMGMT_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -5759,7 +6091,8 @@ STATIC INLINE int n_optmgmt_req(queue_t *q, struct sccp *sccp, N_qos_sel_info_sc
  *  N_DATACK_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_datack_req(queue_t *q, struct sccp *sccp)
+STATIC INLINE int
+n_datack_req(queue_t *q, struct sccp *sccp)
 {
 	int err;
 	mblk_t *mp;
@@ -5774,7 +6107,7 @@ STATIC INLINE int n_datack_req(queue_t *q, struct sccp *sccp)
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_DATACK_REQ;
-	printd(("%s: %p: N_DATACK_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_DATACK_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       efault:
@@ -5803,7 +6136,8 @@ STATIC INLINE int n_datack_req(queue_t *q, struct sccp *sccp)
  *  N_RESET_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_reset_req(queue_t *q, struct sccp *sccp, ulong reason)
+STATIC INLINE int
+n_reset_req(queue_t *q, struct sccp *sccp, ulong reason)
 {
 	int err;
 	mblk_t *mp;
@@ -5820,7 +6154,7 @@ STATIC INLINE int n_reset_req(queue_t *q, struct sccp *sccp, ulong reason)
 	p->PRIM_type = N_RESET_REQ;
 	p->RESET_reason = reason;
 	sccp_set_i_state(sccp, NS_WCON_RREQ);
-	printd(("%s: %p: N_RESET_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_RESET_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       efault:
@@ -5843,7 +6177,8 @@ STATIC INLINE int n_reset_req(queue_t *q, struct sccp *sccp, ulong reason)
  *  N_RESET_RES
  *  -----------------------------------
  */
-STATIC INLINE int n_reset_res(queue_t *q, struct sccp *sccp)
+STATIC INLINE int
+n_reset_res(queue_t *q, struct sccp *sccp)
 {
 	int err;
 	mblk_t *mp;
@@ -5859,7 +6194,7 @@ STATIC INLINE int n_reset_res(queue_t *q, struct sccp *sccp)
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_RESET_RES;
 	sccp_set_i_state(sccp, NS_DATA_XFER);
-	printd(("%s: %p: N_RESET_RES ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_RESET_RES ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       efault:
@@ -5882,7 +6217,8 @@ STATIC INLINE int n_reset_res(queue_t *q, struct sccp *sccp)
  *  N_INFORM_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_inform_req(queue_t *q, struct sccp *sccp)
+STATIC INLINE int
+n_inform_req(queue_t *q, struct sccp *sccp)
 {
 	int err;
 	mblk_t *mp;
@@ -5895,7 +6231,7 @@ STATIC INLINE int n_inform_req(queue_t *q, struct sccp *sccp)
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr++;
 	p->PRIM_type = N_INFORM_REQ;
-	printd(("%s: %p: N_INFORM_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_INFORM_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
@@ -5914,7 +6250,8 @@ STATIC INLINE int n_inform_req(queue_t *q, struct sccp *sccp)
  *  N_COORD_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_coord_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add)
+STATIC INLINE int
+n_coord_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add)
 {
 	int err;
 	mblk_t *mp;
@@ -5934,7 +6271,7 @@ STATIC INLINE int n_coord_req(queue_t *q, struct sccp *sccp, struct sccp_addr *a
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: N_COORD_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_COORD_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -5953,7 +6290,8 @@ STATIC INLINE int n_coord_req(queue_t *q, struct sccp *sccp, struct sccp_addr *a
  *  N_COORD_RES
  *  -----------------------------------
  */
-STATIC INLINE int n_coord_res(queue_t *q, struct sccp *sccp, struct sccp_addr *add)
+STATIC INLINE int
+n_coord_res(queue_t *q, struct sccp *sccp, struct sccp_addr *add)
 {
 	int err;
 	mblk_t *mp;
@@ -5973,7 +6311,7 @@ STATIC INLINE int n_coord_res(queue_t *q, struct sccp *sccp, struct sccp_addr *a
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: N_COORD_RES ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_COORD_RES ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -5992,7 +6330,8 @@ STATIC INLINE int n_coord_res(queue_t *q, struct sccp *sccp, struct sccp_addr *a
  *  N_STATE_REQ
  *  -----------------------------------
  */
-STATIC INLINE int n_state_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add, ulong status)
+STATIC INLINE int
+n_state_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add, ulong status)
 {
 	int err;
 	mblk_t *mp;
@@ -6013,7 +6352,7 @@ STATIC INLINE int n_state_req(queue_t *q, struct sccp *sccp, struct sccp_addr *a
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
 	}
-	printd(("%s: %p: N_STATE_REQ ->\n", TCAP_DRV_NAME, sccp));
+	printd(("%s: %p: N_STATE_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -6040,59 +6379,81 @@ STATIC INLINE int n_state_req(queue_t *q, struct sccp *sccp, struct sccp_addr *a
  *  TCAP_MT_UNI
  *  -----------------------------------
  */
-STATIC int tcap_send_uni(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_uni(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
 /*
  *  TCAP_MT_QWP
  *  -----------------------------------
  */
-STATIC int tcap_send_qwp(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_qwp(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
 /*
  *  TCAP_MT_QWOP
  *  -----------------------------------
  */
-STATIC int tcap_send_qwop(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_qwop(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
 /*
  *  TCAP_MT_CWP
  *  -----------------------------------
  */
-STATIC int tcap_send_cwp(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_cwp(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
 /*
  *  TCAP_MT_CWOP
  *  -----------------------------------
  */
-STATIC int tcap_send_cwop(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_cwop(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
 /*
  *  TCAP_MT_RESP
  *  -----------------------------------
  */
-STATIC int tcap_send_resp(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_resp(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
 /*
  *  TCAP_MT_ABORT
  *  -----------------------------------
  */
-STATIC int tcap_send_abort(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_abort(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
+	fixme(("Write this function\n"));
+	return (-EFAULT);
 }
 
-STATIC int tcap_send_msg(queue_t *q, struct sccp *sccp, struct tr_msg *m)
+STATIC int
+tcap_send_msg(queue_t *q, struct sccp *sccp, struct tr_msg *m)
 {
 	int ret;
 	switch (m->type) {
@@ -6135,7 +6496,8 @@ STATIC int tcap_send_msg(queue_t *q, struct sccp *sccp, struct tr_msg *m)
  *  TCAP_MT_UNI
  *  -----------------------------------
  */
-STATIC int tcap_recv_uni(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_uni(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
 	int err;
 	ulong did = 0;
@@ -6147,7 +6509,8 @@ STATIC int tcap_recv_uni(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, s
 			goto error;
 		break;
 	case TCAP_STYLE_TCI:
-		if ((err = tc_uni_ind(q, tcap, &m->sccp.orig, &m->sccp.dest, opt, did, flags, dp)) < 0)
+		if ((err =
+		     tc_uni_ind(q, tcap, &m->sccp.orig, &m->sccp.dest, opt, did, flags, dp)) < 0)
 			goto error;
 		/* Provide a TC_UNI_IND and follow with any TC_XXX_IND component indications. */
 		fixme(("Send components.\n"));
@@ -6170,15 +6533,18 @@ STATIC int tcap_recv_uni(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, s
  *  TCAP_MT_QWP
  *  -----------------------------------
  */
-STATIC int tcap_recv_qwp(queue_t *q, struct tcap *tcap, struct tcap_opt *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_qwp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
+	int err;
 	switch (tcap->i_style) {
 	case TCAP_STYLE_TRI:
 		if ((err = tr_begin_ind(q, tcap, tr, &m->sccp.orig, &m->sccp.dest, opt, dp)) < 0)
 			goto error;
 		break;
 	case TCAP_STYLE_TCI:
-		if ((err = tc_begin_ind(q, tcap, &m->sccp.orig, &m->sccp.dest, opt, did, flags, dp)) < 0)
+		if ((err =
+		     tc_begin_ind(q, tcap, &m->sccp.orig, &m->sccp.dest, opt, did, flags, dp)) < 0)
 			goto error;
 		/* Provide a TC_BEG_IND and follow with any TC_XXX_IND component indications. */
 		fixme(("Send components\n"));
@@ -6201,15 +6567,18 @@ STATIC int tcap_recv_qwp(queue_t *q, struct tcap *tcap, struct tcap_opt *opt, st
  *  TCAP_MT_QWOP
  *  -----------------------------------
  */
-STATIC int tcap_recv_qwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_qwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
+	int err;
 	switch (tcap->i_style) {
 	case TCAP_STYLE_TRI:
 		if ((err = tr_begin_ind(q, tcap, tr, &m->sccp.orig, &m->sccp.dest, opt, dp)) < 0)
 			goto error;
 		break;
 	case TCAP_STYLE_TCI:
-		if ((err = tc_begin_ind(q, tcap, &m->sccp.orig, &m->sccp.dest, opt, did, flags, dp)) < 0)
+		if ((err =
+		     tc_begin_ind(q, tcap, &m->sccp.orig, &m->sccp.dest, opt, did, flags, dp)) < 0)
 			goto error;
 		/* Provide a TC_BEG_IND and follow with any TC_XXX_IND component indications. */
 		fixme(("Send components\n"));
@@ -6232,8 +6601,10 @@ STATIC int tcap_recv_qwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, 
  *  TCAP_MT_CWP
  *  -----------------------------------
  */
-STATIC int tcap_recv_cwp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_cwp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
+	int err;
 	switch (tcap->i_style) {
 	case TCAP_STYLE_TRI:
 		if ((err = tr_begin_con(q, tcap, tr, &m->sccp.orig, opt, dp)))
@@ -6242,7 +6613,8 @@ STATIC int tcap_recv_cwp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, s
 	case TCAP_STYLE_TCI:
 		if ((err = tc_begin_con(q, tcap, opt, did, flags, dp)))
 			goto error;
-		/* Provide a TC_BEG_CON or TC_CONT_IND and follow with any TC_XXX_IND component indications. */
+		/* Provide a TC_BEG_CON or TC_CONT_IND and follow with any TC_XXX_IND component
+		   indications. */
 		fixme(("Send components.\n"));
 		break;
 	case TCAP_STYLE_TPI:
@@ -6259,8 +6631,10 @@ STATIC int tcap_recv_cwp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, s
  *  TCAP_MT_CWOP
  *  -----------------------------------
  */
-STATIC int tcap_recv_cwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_cwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
+	int err;
 	switch (tcap->i_style) {
 	case TCAP_STYLE_TRI:
 		if ((err = tr_begin_con(q, tcap, tr, &m->sccp.orig, opt, dp)))
@@ -6269,7 +6643,8 @@ STATIC int tcap_recv_cwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, 
 	case TCAP_STYLE_TCI:
 		if ((err = tc_begin_con(q, tcap, opt, did, flags, dp)))
 			goto error;
-		/* Provide a TC_BEG_CON or TC_CONT_IND and follow with any TC_XXX_IND component indications. */
+		/* Provide a TC_BEG_CON or TC_CONT_IND and follow with any TC_XXX_IND component
+		   indications. */
 		fixme(("Send components.\n"));
 		break;
 	case TCAP_STYLE_TPI:
@@ -6286,8 +6661,10 @@ STATIC int tcap_recv_cwop(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, 
  *  TCAP_MT_RESP
  *  -----------------------------------
  */
-STATIC int tcap_recv_resp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_resp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
+	int err;
 	switch (tcap->i_style) {
 	case TCAP_STYLE_TRI:
 		if ((err = tr_end_ind(q, tcap, tr, opt, dp)))
@@ -6313,8 +6690,10 @@ STATIC int tcap_recv_resp(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, 
  *  TCAP_MT_ABORT
  *  -----------------------------------
  */
-STATIC int tcap_recv_abort(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_abort(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
+	int err;
 	switch (tcap->i_style) {
 	case TCAP_STYLE_TRI:
 		if ((err = tr_abort_ind(q, tcap, tr, cause, orig, opt)))
@@ -6336,30 +6715,31 @@ STATIC int tcap_recv_abort(queue_t *q, struct tcap *tcap, struct tcap_opts *opt,
 	return (err);
 }
 
-STATIC int tcap_recv_msg(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m)
+STATIC int
+tcap_recv_msg(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, struct tr_msg *m, mblk_t *dp)
 {
 	int ret;
 	switch (m->type) {
 	case TCAP_MT_UNI:
-		ret = tcap_recv_uni(q, tcap, opt, m);
+		ret = tcap_recv_uni(q, tcap, opt, m, dp);
 		break;
 	case TCAP_MT_QWP:
-		ret = tcap_recv_qwp(q, tcap, opt, m);
+		ret = tcap_recv_qwp(q, tcap, opt, m, dp);
 		break;
 	case TCAP_MT_QWOP:
-		ret = tcap_recv_qwop(q, tcap, opt, m);
+		ret = tcap_recv_qwop(q, tcap, opt, m, dp);
 		break;
 	case TCAP_MT_CWP:
-		ret = tcap_recv_cwp(q, tcap, opt, m);
+		ret = tcap_recv_cwp(q, tcap, opt, m, dp);
 		break;
 	case TCAP_MT_CWOP:
-		ret = tcap_recv_cwop(q, tcap, opt, m);
+		ret = tcap_recv_cwop(q, tcap, opt, m, dp);
 		break;
 	case TCAP_MT_RESP:
-		ret = tcap_recv_resp(q, tcap, opt, m);
+		ret = tcap_recv_resp(q, tcap, opt, m, dp);
 		break;
 	case TCAP_MT_ABORT:
-		ret = tcap_recv_abort(q, tcap, opt, m);
+		ret = tcap_recv_abort(q, tcap, opt, m, dp);
 		break;
 	default:
 		ret = -EOPNOTSUPP;
@@ -6390,7 +6770,8 @@ STATIC int tcap_recv_msg(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, s
  *  TC_INFO_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_info_req *p = (typeof(p)) mp->b_rptr;
@@ -6400,7 +6781,7 @@ STATIC int tc_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, 0, 0);
@@ -6410,7 +6791,8 @@ STATIC int tc_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_BIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_bind_req *p = (typeof(p)) mp->b_rptr;
@@ -6433,11 +6815,11 @@ STATIC int tc_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badaddr:
 	err = TCBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, 0, 0);
@@ -6447,7 +6829,8 @@ STATIC int tc_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_UNBIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_unbind_req *p = (typeof(p)) mp->b_rptr;
@@ -6459,11 +6842,11 @@ STATIC int tc_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       outstate:
 	err = TCOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, 0, 0);
@@ -6473,7 +6856,8 @@ STATIC int tc_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_SUBS_BIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_subs_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_subs_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_subs_bind_req *p = (typeof(p)) mp->b_rptr;
@@ -6483,7 +6867,7 @@ STATIC int tc_subs_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, 0, 0);
@@ -6493,7 +6877,8 @@ STATIC int tc_subs_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_SUBS_UNBIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_subs_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_subs_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_subs_unbind_req *p = (typeof(p)) mp->b_rptr;
@@ -6503,7 +6888,7 @@ STATIC int tc_subs_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, 0, 0);
@@ -6513,7 +6898,8 @@ STATIC int tc_subs_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_OPTMGMT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_optmgmt_req *p = (typeof(p)) mp->b_rptr;
@@ -6532,11 +6918,11 @@ STATIC int tc_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, 0, 0);
@@ -6546,7 +6932,8 @@ STATIC int tc_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_UNI_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_uni_req *p = (typeof(p)) mp->b_rptr;
@@ -6586,15 +6973,15 @@ STATIC int tc_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TCBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, 0);
@@ -6604,7 +6991,8 @@ STATIC int tc_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_BEGIN_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_begin_req *p = (typeof(p)) mp->b_rptr;
@@ -6646,15 +7034,15 @@ STATIC int tc_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TCBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, 0);
@@ -6664,7 +7052,8 @@ STATIC int tc_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_BEGIN_RES
  *  -----------------------------------------------------------
  */
-STATIC int tc_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_begin_res *p = (typeof(p)) mp->b_rptr;
@@ -6696,15 +7085,15 @@ STATIC int tc_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TCBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, 0);
@@ -6714,7 +7103,8 @@ STATIC int tc_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_CONT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_cont_req *p = (typeof(p)) mp->b_rptr;
@@ -6736,11 +7126,11 @@ STATIC int tc_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, 0);
@@ -6750,7 +7140,8 @@ STATIC int tc_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_END_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_end_req *p = (typeof(p)) mp->b_rptr;
@@ -6772,11 +7163,11 @@ STATIC int tc_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, 0);
@@ -6786,7 +7177,8 @@ STATIC int tc_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_ABORT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_abort_req *p = (typeof(p)) mp->b_rptr;
@@ -6808,11 +7200,11 @@ STATIC int tc_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, 0);
@@ -6822,7 +7214,8 @@ STATIC int tc_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_INVOKE_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_invoke_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_invoke_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_invoke_req *p = (typeof(p)) mp->b_rptr;
@@ -6845,7 +7238,7 @@ STATIC int tc_invoke_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, p->INVOKE_id);
@@ -6855,7 +7248,8 @@ STATIC int tc_invoke_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_RESULT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_result_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_result_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_result_req *p = (typeof(p)) mp->b_rptr;
@@ -6874,7 +7268,7 @@ STATIC int tc_result_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, p->INVOKE_id);
@@ -6884,7 +7278,8 @@ STATIC int tc_result_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_ERROR_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_error_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_error_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_error_req *p = (typeof(p)) mp->b_rptr;
@@ -6903,7 +7298,7 @@ STATIC int tc_error_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, p->INVOKE_id);
@@ -6913,7 +7308,8 @@ STATIC int tc_error_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_CANCEL_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_cancel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_cancel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_cancel_req *p = (typeof(p)) mp->b_rptr;
@@ -6929,7 +7325,7 @@ STATIC int tc_cancel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, p->INVOKE_id);
@@ -6939,7 +7335,8 @@ STATIC int tc_cancel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TC_REJECT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tc_reject_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tc_reject_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TC_reject_req *p = (typeof(p)) mp->b_rptr;
@@ -6957,7 +7354,7 @@ STATIC int tc_reject_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TCBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tc_error_ack(q, tcap, p->PRIM_type, err, p->DIALOG_id, p->INVOKE_id);
@@ -6971,7 +7368,8 @@ STATIC int tc_reject_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_INFO_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_info_req *p = (typeof(p)) mp->b_rptr;
@@ -6981,7 +7379,7 @@ STATIC int tr_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, 0);
@@ -6991,7 +7389,8 @@ STATIC int tr_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_BIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_bind_req *p = (typeof(p)) mp->b_rptr;
@@ -7014,11 +7413,11 @@ STATIC int tr_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badaddr:
 	err = TRBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, 0);
@@ -7028,7 +7427,8 @@ STATIC int tr_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_UNBIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_unbind_req *p = (typeof(p)) mp->b_rptr;
@@ -7038,7 +7438,7 @@ STATIC int tr_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, 0);
@@ -7048,7 +7448,8 @@ STATIC int tr_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_OPTMGMT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_optmgmt_req *p = (typeof(p)) mp->b_rptr;
@@ -7067,11 +7468,11 @@ STATIC int tr_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, 0);
@@ -7081,7 +7482,8 @@ STATIC int tr_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_UNI_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_uni_req *p = (typeof(p)) mp->b_rptr;
@@ -7118,15 +7520,15 @@ STATIC int tr_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TRBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, 0);
@@ -7136,7 +7538,8 @@ STATIC int tr_uni_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_BEGIN_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_begin_req *p = (typeof(p)) mp->b_rptr;
@@ -7178,15 +7581,15 @@ STATIC int tr_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TRBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, p->CORR_id);
@@ -7196,7 +7599,8 @@ STATIC int tr_begin_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_BEGIN_RES
  *  -----------------------------------------------------------
  */
-STATIC int tr_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_begin_res *p = (typeof(p)) mp->b_rptr;
@@ -7226,19 +7630,19 @@ STATIC int tr_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badtid:
 	err = TRBADTID;
-	ptrace(("%s: %p: ERROR: bad transaction id\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad transaction id\n", DRV_NAME, tcap));
 	goto error;
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TRBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, p->TRANS_id);
@@ -7248,7 +7652,8 @@ STATIC int tr_begin_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_CONT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_cont_req *p = (typeof(p)) mp->b_rptr;
@@ -7268,15 +7673,15 @@ STATIC int tr_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badtid:
 	err = TRBADTID;
-	ptrace(("%s: %p: ERROR: bad transaction id\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad transaction id\n", DRV_NAME, tcap));
 	goto error;
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, p->TRANS_id);
@@ -7286,7 +7691,8 @@ STATIC int tr_cont_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_END_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_end_req *p = (typeof(p)) mp->b_rptr;
@@ -7308,15 +7714,15 @@ STATIC int tr_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badtid:
 	err = TRBADTID;
-	ptrace(("%s: %p: ERROR: bad transaction id\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad transaction id\n", DRV_NAME, tcap));
 	goto error;
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, p->TRANS_id);
@@ -7326,7 +7732,8 @@ STATIC int tr_end_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TR_ABORT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int tr_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tr_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct TR_abort_req *p = (typeof(p)) mp->b_rptr;
@@ -7348,15 +7755,15 @@ STATIC int tr_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badtid:
 	err = TRBADTID;
-	ptrace(("%s: %p: ERROR: bad transaction id\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad transaction id\n", DRV_NAME, tcap));
 	goto error;
       badopt:
 	err = TRBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = TRBADPRIM;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return tr_error_ack(q, tcap, p->PRIM_type, err, p->TRANS_id);
@@ -7370,7 +7777,8 @@ STATIC int tr_abort_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_CONN_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_conn_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_conn_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_conn_req *p = (typeof(p)) mp->b_rptr;
@@ -7397,19 +7805,19 @@ STATIC int t_conn_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: could not assign address\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: could not assign address\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7419,7 +7827,8 @@ STATIC int t_conn_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_CONN_RES
  *  -----------------------------------------------------------
  */
-STATIC int t_conn_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_conn_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_conn_res *p = (typeof(p)) mp->b_rptr;
@@ -7439,11 +7848,11 @@ STATIC int t_conn_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7453,7 +7862,8 @@ STATIC int t_conn_res(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_DISCON_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_discon_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_discon_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_discon_req *p = (typeof(p)) mp->b_rptr;
@@ -7465,7 +7875,7 @@ STATIC int t_discon_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7475,7 +7885,8 @@ STATIC int t_discon_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_DATA_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_data_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_data_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_data_req *p = (typeof(p)) mp->b_rptr;
@@ -7487,7 +7898,7 @@ STATIC int t_data_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7497,7 +7908,8 @@ STATIC int t_data_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_EXDATA_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_exdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_exdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_exdata_req *p = (typeof(p)) mp->b_rptr;
@@ -7509,7 +7921,7 @@ STATIC int t_exdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7519,7 +7931,8 @@ STATIC int t_exdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_INFO_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_info_req *p = (typeof(p)) mp->b_rptr;
@@ -7529,7 +7942,7 @@ STATIC int t_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7539,7 +7952,8 @@ STATIC int t_info_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_BIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_bind_req *p = (typeof(p)) mp->b_rptr;
@@ -7561,15 +7975,15 @@ STATIC int t_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: could not assign address\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: could not assign address\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7579,7 +7993,8 @@ STATIC int t_bind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_UNBIND_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_unbind_req *p = (typeof(p)) mp->b_rptr;
@@ -7589,7 +8004,7 @@ STATIC int t_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7599,7 +8014,8 @@ STATIC int t_unbind_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_UNITDATA_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_unitdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_unitdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
@@ -7632,23 +8048,23 @@ STATIC int t_unitdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: bad address format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad address format\n", DRV_NAME, tcap));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: could not assign address\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: could not assign address\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for operations class\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: primitive not supported for operations class\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7658,7 +8074,8 @@ STATIC int t_unitdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_OPTMGMT_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
@@ -7685,15 +8102,15 @@ STATIC int t_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badflag:
 	err = TBADFLAG;
-	ptrace(("%s: %p: ERROR: bad flags\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad flags\n", DRV_NAME, tcap));
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7703,7 +8120,8 @@ STATIC int t_optmgmt_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_ORDREL_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_ordrel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_ordrel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
@@ -7713,7 +8131,7 @@ STATIC int t_ordrel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7724,7 +8142,8 @@ STATIC int t_ordrel_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_OPTDATA_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_optdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_optdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
@@ -7743,11 +8162,11 @@ STATIC int t_optdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad options format\n", DRV_NAME, tcap));
 	goto error;
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7759,7 +8178,8 @@ STATIC int t_optdata_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_ADDR_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_addr_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_addr_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_addr_req *p = (typeof(p)) mp->b_rptr;
@@ -7769,7 +8189,7 @@ STATIC int t_addr_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: bad primitive format\n", TCAP_DRV_NAME, tcap));
+	ptrace(("%s: %p: ERROR: bad primitive format\n", DRV_NAME, tcap));
 	goto error;
       error:
 	return t_error_ack(q, tcap, p->PRIM_type, err);
@@ -7781,7 +8201,8 @@ STATIC int t_addr_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  T_CAPABILITY_REQ
  *  -----------------------------------------------------------
  */
-STATIC int t_capability_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+t_capability_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	int err;
 	struct T_capability_req *p = (typeof(p)) mp->b_rptr;
@@ -7808,7 +8229,8 @@ STATIC int t_capability_req(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  N_CONN_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_conn_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_conn_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_conn_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *dst;
@@ -7839,22 +8261,22 @@ STATIC int n_conn_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	}
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badqosparam:
-	pswerr(("%s: %p: SWERR: bad QOS parameter value\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad QOS parameter value\n", DRV_NAME, sccp));
 	goto error;
       badqostype:
-	pswerr(("%s: %p: SWERR: bad QOS structure type\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad QOS structure type\n", DRV_NAME, sccp));
 	goto error;
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -7864,7 +8286,8 @@ STATIC int n_conn_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_CONN_CON
  *  -----------------------------------------------------------
  */
-STATIC int n_conn_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_conn_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_conn_con_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *res = &sccp->rem;
@@ -7895,19 +8318,19 @@ STATIC int n_conn_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	}
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badqosparam:
-	pswerr(("%s: %p: SWERR: bad QOS parameter value\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad QOS parameter value\n", DRV_NAME, sccp));
 	goto error;
       badqostype:
-	pswerr(("%s: %p: SWERR: bad QOS structure type\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad QOS structure type\n", DRV_NAME, sccp));
 	goto error;
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -7917,7 +8340,8 @@ STATIC int n_conn_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_DISCON_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_discon_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_discon_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_discon_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *res = &sccp->rem;
@@ -7938,13 +8362,13 @@ STATIC int n_discon_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	seq = p->SEQ_number;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -7954,7 +8378,8 @@ STATIC int n_discon_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_DATA_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_data_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_data_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_data_ind_t *p = (typeof(p)) mp->b_rptr;
 	ulong flags;
@@ -7963,10 +8388,10 @@ STATIC int n_data_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	flags = p->DATA_xfer_flags;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -7976,17 +8401,18 @@ STATIC int n_data_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_EXDATA_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_exdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_exdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_exdata_ind_t *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -7996,7 +8422,8 @@ STATIC int n_exdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_INFO_ACK
  *  -----------------------------------------------------------
  */
-STATIC int n_info_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_info_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_info_ack_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *add = NULL;
@@ -8042,16 +8469,16 @@ STATIC int n_info_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badqosparam:
-	pswerr(("%s: %p: SWERR: bad QOS parameter value\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad QOS parameter value\n", DRV_NAME, sccp));
 	goto error;
       badqostype:
-	pswerr(("%s: %p: SWERR: bad QOS structure type\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad QOS structure type\n", DRV_NAME, sccp));
 	goto error;
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8061,7 +8488,8 @@ STATIC int n_info_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_BIND_ACK
  *  -----------------------------------------------------------
  */
-STATIC int n_bind_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_bind_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_bind_ack_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *add;
@@ -8087,16 +8515,16 @@ STATIC int n_bind_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	}
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8106,7 +8534,8 @@ STATIC int n_bind_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_ERROR_ACK
  *  -----------------------------------------------------------
  */
-STATIC int n_error_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_error_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_error_ack_t *p = (typeof(p)) mp->b_rptr;
 	ulong prim, etype;
@@ -8116,10 +8545,10 @@ STATIC int n_error_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	etype = (p->NPI_error == NSYSERR) ? -p->UNIX_error : p->NPI_error;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8129,7 +8558,8 @@ STATIC int n_error_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_OK_ACK
  *  -----------------------------------------------------------
  */
-STATIC int n_ok_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_ok_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_ok_ack_t *p = (typeof(p)) mp->b_rptr;
 	ulong prim;
@@ -8138,10 +8568,10 @@ STATIC int n_ok_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	prim = p->CORRECT_prim;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8151,7 +8581,8 @@ STATIC int n_ok_ack(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_UNITDATA_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_unitdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_unitdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_unitdata_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct tr_msg msg;
@@ -8220,20 +8651,20 @@ STATIC int n_unitdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 		goto error;
 	if ((err = tcap_dec_msg(dp->b_rtpr, dp->b_wptr, &msg)) < 0)
 		goto error;
-	if ((err = tcap_recv_msg(q, tcap, &opts, &msg)) < 0)
+	if ((err = tcap_recv_msg(q, tcap, &opts, &msg, dp)) < 0)
 		goto error;
 	return (err);
       baddata:
-	pswerr(("%s: %p: SWERR: bad data\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad data\n", DRV_NAME, sccp));
 	goto error;
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8243,7 +8674,8 @@ STATIC int n_unitdata_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_UDERROR_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_uderror_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_uderror_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_uderror_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *dst;
@@ -8263,13 +8695,13 @@ STATIC int n_uderror_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8279,17 +8711,18 @@ STATIC int n_uderror_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_DATACK_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_datack_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_datack_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_datack_ind_t *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8299,7 +8732,8 @@ STATIC int n_datack_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_RESET_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_reset_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_reset_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_reset_ind_t *p = (typeof(p)) mp->b_rptr;
 	ulong orig, reason;
@@ -8309,10 +8743,10 @@ STATIC int n_reset_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	reason = p->RESET_reason;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8322,17 +8756,18 @@ STATIC int n_reset_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_RESET_CON
  *  -----------------------------------------------------------
  */
-STATIC int n_reset_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_reset_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_reset_con_t *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupport;
       notsupport:
-	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8342,7 +8777,8 @@ STATIC int n_reset_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_COORD_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_coord_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_coord_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_coord_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *add;
@@ -8362,13 +8798,13 @@ STATIC int n_coord_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8378,7 +8814,8 @@ STATIC int n_coord_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_COORD_CON
  *  -----------------------------------------------------------
  */
-STATIC int n_coord_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_coord_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_coord_con_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *add;
@@ -8398,13 +8835,13 @@ STATIC int n_coord_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8414,7 +8851,8 @@ STATIC int n_coord_con(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_STATE_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_state_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_state_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_state_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *add;
@@ -8435,13 +8873,13 @@ STATIC int n_state_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8451,7 +8889,8 @@ STATIC int n_state_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  N_PCSTATE_IND
  *  -----------------------------------------------------------
  */
-STATIC int n_pcstate_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
+STATIC int
+n_pcstate_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 {
 	N_pcstate_ind_t *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *add;
@@ -8471,13 +8910,13 @@ STATIC int n_pcstate_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
-	pswerr(("%s: %p: SWERR: bad address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sccp));
 	goto error;
       noaddr:
-	pswerr(("%s: %p: SWERR: could not assign address\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: could not assign address\n", DRV_NAME, sccp));
 	goto error;
       badprim:
-	pswerr(("%s: %p: SWERR: invalid primitive format\n", TCAP_DRV_NAME, sccp));
+	pswerr(("%s: %p: SWERR: invalid primitive format\n", DRV_NAME, sccp));
 	goto error;
       error:
 	return sccp_hangup(q, sccp, -EPROTO);
@@ -8495,7 +8934,8 @@ STATIC int n_pcstate_ind(queue_t *q, struct sccp *sccp, mblk_t *mp)
  *  TCAP_IOCGOPTIONS
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocgoptions(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocgoptions(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8505,7 +8945,8 @@ STATIC int tcap_iocgoptions(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCSOPTIONS
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocsoptions(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocsoptions(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8515,7 +8956,8 @@ STATIC int tcap_iocsoptions(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCGCONFIG
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocgconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocgconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8525,7 +8967,8 @@ STATIC int tcap_iocgconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCSCONFIG
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocsconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocsconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8535,7 +8978,8 @@ STATIC int tcap_iocsconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCTCONFIG
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioctconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioctconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8545,7 +8989,8 @@ STATIC int tcap_ioctconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCCCONFIG
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioccconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioccconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8555,7 +9000,8 @@ STATIC int tcap_ioccconfig(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCGSTATEM
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocgstatem(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocgstatem(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8565,7 +9011,8 @@ STATIC int tcap_iocgstatem(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCCMRESET
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioccmreset(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioccmreset(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8575,7 +9022,8 @@ STATIC int tcap_ioccmreset(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCGSTATSP
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocgstatsp(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocgstatsp(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8585,7 +9033,8 @@ STATIC int tcap_iocgstatsp(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCSSTATSP
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocsstatsp(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocsstatsp(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8595,7 +9044,8 @@ STATIC int tcap_iocsstatsp(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCGSTATS
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocgstats(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocgstats(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8605,7 +9055,8 @@ STATIC int tcap_iocgstats(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCCSTATS
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioccstats(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioccstats(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8615,7 +9066,8 @@ STATIC int tcap_ioccstats(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCGNOTIFY
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocgnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocgnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8625,7 +9077,8 @@ STATIC int tcap_iocgnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCSNOTIFY
  *  -----------------------------------------------------------
  */
-STATIC int tcap_iocsnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_iocsnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8635,7 +9088,8 @@ STATIC int tcap_iocsnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCCNOTIFY
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioccnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioccnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8645,7 +9099,8 @@ STATIC int tcap_ioccnotify(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCCMGMT
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioccmgmt(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioccmgmt(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8655,7 +9110,8 @@ STATIC int tcap_ioccmgmt(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *  TCAP_IOCCPASS
  *  -----------------------------------------------------------
  */
-STATIC int tcap_ioccpass(queue_t *q, struct tcap *tcap, mblk_t *mp)
+STATIC int
+tcap_ioccpass(queue_t *q, struct tcap *tcap, mblk_t *mp)
 {
 	swerr();
 	return (-EFAULT);
@@ -8675,7 +9131,8 @@ STATIC int tcap_ioccpass(queue_t *q, struct tcap *tcap, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
+STATIC int
+tcap_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct tcap *tcap = TCAP_PRIV(q);
 	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
@@ -8686,7 +9143,7 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 	switch (type) {
 	case _IOC_TYPE(__SID):
 	{
-		int flags;
+		psw_t flags;
 		struct sccp *sccp, **sccpp;
 		struct linkblk *lb;
 		if (!(lb = arg)) {
@@ -8696,21 +9153,25 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
-			ptrace(("%s: %p: I_PLINK\n", TCAP_DRV_NAME, tcap));
+			ptrace(("%s: %p: I_PLINK\n", DRV_NAME, tcap));
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", TCAP_DRV_NAME, tcap));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", DRV_NAME,
+					tcap));
 				ret = -EPERM;
 				break;
 			}
 		case _IOC_NR(I_LINK):
-			ptrace(("%s: %p: I_LINK\n", TCAP_DRV_NAME, tcap));
+			ptrace(("%s: %p: I_LINK\n", DRV_NAME, tcap));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
 			spin_lock_irqsave(&master.lock, flags);
 			{
 				/* place in list in ascending index order */
-				for (sccpp = &master.sccp.list; *sccpp && (*sccpp)->u.mux.index < lb->l_index;
+				for (sccpp = &master.sccp.list;
+				     *sccpp && (*sccpp)->u.mux.index < lb->l_index;
 				     sccpp = &(*sccpp)->next) ;
-				if ((sccp = tcap_alloc_sccp(lb->l_qbot, sccpp, lb->l_index, iocp->ioc_cr))) {
+				if ((sccp =
+				     tcap_alloc_sccp(lb->l_qbot, sccpp, lb->l_index,
+						     iocp->ioc_cr))) {
 					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
@@ -8720,14 +9181,15 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&master.lock, flags);
 			break;
 		case _IOC_NR(I_PUNLINK):
-			ptrace(("%s: %p: I_PUNLINK\n", TCAP_DRV_NAME, tcap));
+			ptrace(("%s: %p: I_PUNLINK\n", DRV_NAME, tcap));
 			if (iocp->ioc_cr->cr_uid != 0) {
-				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", TCAP_DRV_NAME, tcap));
+				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n", DRV_NAME,
+					tcap));
 				ret = -EPERM;
 				break;
 			}
 		case _IOC_NR(I_UNLINK):
-			ptrace(("%s: %p: I_UNLINK\n", TCAP_DRV_NAME, tcap));
+			ptrace(("%s: %p: I_UNLINK\n", DRV_NAME, tcap));
 			spin_lock_irqsave(&master.lock, flags);
 			{
 				for (sccp = master.sccp.list; sccp; sccp = sccp->next)
@@ -8735,8 +9197,8 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 						break;
 				if (!sccp) {
 					ret = -EINVAL;
-					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n", TCAP_DRV_NAME,
-						tcap));
+					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
+						DRV_NAME, tcap));
 					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
@@ -8747,7 +9209,7 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", TCAP_DRV_NAME, tcap,
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %c, %d\n", DRV_NAME, tcap,
 				(char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
@@ -8762,75 +9224,75 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(TCAP_IOCGOPTIONS):
-			printd(("%s; %p: -> TCAP_IOCGOPTIONS\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCGOPTIONS\n", DRV_NAME, tcap));
 			ret = tcap_iocgoptions(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCSOPTIONS):
-			printd(("%s; %p: -> TCAP_IOCSOPTIONS\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCSOPTIONS\n", DRV_NAME, tcap));
 			ret = tcap_iocsoptions(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCGCONFIG):
-			printd(("%s; %p: -> TCAP_IOCGCONFIG\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCGCONFIG\n", DRV_NAME, tcap));
 			ret = tcap_iocgconfig(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCSCONFIG):
-			printd(("%s; %p: -> TCAP_IOCSCONFIG\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCSCONFIG\n", DRV_NAME, tcap));
 			ret = tcap_iocsconfig(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCTCONFIG):
-			printd(("%s; %p: -> TCAP_IOCTCONFIG\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCTCONFIG\n", DRV_NAME, tcap));
 			ret = tcap_ioctconfig(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCCCONFIG):
-			printd(("%s; %p: -> TCAP_IOCCCONFIG\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCCCONFIG\n", DRV_NAME, tcap));
 			ret = tcap_ioccconfig(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCGSTATEM):
-			printd(("%s; %p: -> TCAP_IOCGSTATEM\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCGSTATEM\n", DRV_NAME, tcap));
 			ret = tcap_iocgstatem(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCCMRESET):
-			printd(("%s; %p: -> TCAP_IOCCMRESET\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCCMRESET\n", DRV_NAME, tcap));
 			ret = tcap_ioccmreset(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCGSTATSP):
-			printd(("%s; %p: -> TCAP_IOCGSTATSP\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCGSTATSP\n", DRV_NAME, tcap));
 			ret = tcap_iocgstatsp(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCSSTATSP):
-			printd(("%s; %p: -> TCAP_IOCSSTATSP\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCSSTATSP\n", DRV_NAME, tcap));
 			ret = tcap_iocsstatsp(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCGSTATS):
-			printd(("%s; %p: -> TCAP_IOCGSTATS\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCGSTATS\n", DRV_NAME, tcap));
 			ret = tcap_iocgstats(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCCSTATS):
-			printd(("%s; %p: -> TCAP_IOCCSTATS\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCCSTATS\n", DRV_NAME, tcap));
 			ret = tcap_ioccstats(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCGNOTIFY):
-			printd(("%s; %p: -> TCAP_IOCGNOTIFY\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCGNOTIFY\n", DRV_NAME, tcap));
 			ret = tcap_iocgnotify(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCSNOTIFY):
-			printd(("%s; %p: -> TCAP_IOCSNOTIFY\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCSNOTIFY\n", DRV_NAME, tcap));
 			ret = tcap_iocsnotify(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCCNOTIFY):
-			printd(("%s; %p: -> TCAP_IOCCNOTIFY\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCCNOTIFY\n", DRV_NAME, tcap));
 			ret = tcap_ioccnotify(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCCMGMT):
-			printd(("%s; %p: -> TCAP_IOCCMGMT\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCCMGMT\n", DRV_NAME, tcap));
 			ret = tcap_ioccmgmt(q, tcap, mp);
 			break;
 		case _IOC_NR(TCAP_IOCCPASS):
-			printd(("%s; %p: -> TCAP_IOCCPASS\n", TCAP_DRV_NAME, tcap));
+			printd(("%s; %p: -> TCAP_IOCCPASS\n", DRV_NAME, tcap));
 			ret = tcap_ioccpass(q, tcap, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported TCAP ioctl %c, %d\n", TCAP_DRV_NAME, tcap,
+			ptrace(("%s: %p: ERROR: Unsupported TCAP ioctl %c, %d\n", DRV_NAME, tcap,
 				(char) type, nr));
 			ret = -EOPNOTSUPP;
 			break;
@@ -8838,7 +9300,8 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
 		break;
 	}
 	default:
-		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", TCAP_DRV_NAME, tcap, (char) type, nr));
+		ptrace(("%s: %p: ERROR: Unsupported ioctl %c, %d\n", DRV_NAME, tcap, (char) type,
+			nr));
 		ret = -EOPNOTSUPP;
 		break;
 	}
@@ -8864,86 +9327,87 @@ STATIC int tcap_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int sccp_r_proto(queue_t *q, mblk_t *mp)
+STATIC int
+sccp_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct sccp *sccp = SCCP_PRIV(q);
 	ulong oldstate = sccp_get_i_state(sccp);
 	switch (*(ulong *) mp->b_rptr) {
 	case N_CONN_IND:
-		printd(("%s: %p: N_CONN_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_CONN_IND <-\n", DRV_NAME, sccp));
 		rtn = n_conn_ind(q, sccp, mp);
 		break;
 	case N_CONN_CON:
-		printd(("%s: %p: N_CONN_CON <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_CONN_CON <-\n", DRV_NAME, sccp));
 		rtn = n_conn_con(q, sccp, mp);
 		break;
 	case N_DISCON_IND:
-		printd(("%s: %p: N_DISCON_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_DISCON_IND <-\n", DRV_NAME, sccp));
 		rtn = n_discon_ind(q, sccp, mp);
 		break;
 	case N_DATA_IND:
-		printd(("%s: %p: N_DATA_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_DATA_IND <-\n", DRV_NAME, sccp));
 		rtn = n_data_ind(q, sccp, mp);
 		break;
 	case N_EXDATA_IND:
-		printd(("%s: %p: N_EXDATA_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_EXDATA_IND <-\n", DRV_NAME, sccp));
 		rtn = n_exdata_ind(q, sccp, mp);
 		break;
 	case N_INFO_ACK:
-		printd(("%s: %p: N_INFO_ACK <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_INFO_ACK <-\n", DRV_NAME, sccp));
 		rtn = n_info_ack(q, sccp, mp);
 		break;
 	case N_BIND_ACK:
-		printd(("%s: %p: N_BIND_ACK <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_BIND_ACK <-\n", DRV_NAME, sccp));
 		rtn = n_bind_ack(q, sccp, mp);
 		break;
 	case N_ERROR_ACK:
-		printd(("%s: %p: N_ERROR_ACK <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_ERROR_ACK <-\n", DRV_NAME, sccp));
 		rtn = n_error_ack(q, sccp, mp);
 		break;
 	case N_OK_ACK:
-		printd(("%s: %p: N_OK_ACK <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_OK_ACK <-\n", DRV_NAME, sccp));
 		rtn = n_ok_ack(q, sccp, mp);
 		break;
 	case N_UNITDATA_IND:
-		printd(("%s: %p: N_UNITDATA_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_UNITDATA_IND <-\n", DRV_NAME, sccp));
 		rtn = n_unitdata_ind(q, sccp, mp);
 		break;
 	case N_UDERROR_IND:
-		printd(("%s: %p: N_UDERROR_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_UDERROR_IND <-\n", DRV_NAME, sccp));
 		rtn = n_uderror_ind(q, sccp, mp);
 		break;
 	case N_DATACK_IND:
-		printd(("%s: %p: N_DATACK_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_DATACK_IND <-\n", DRV_NAME, sccp));
 		rtn = n_datack_ind(q, sccp, mp);
 		break;
 	case N_RESET_IND:
-		printd(("%s: %p: N_RESET_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_RESET_IND <-\n", DRV_NAME, sccp));
 		rtn = n_reset_ind(q, sccp, mp);
 		break;
 	case N_RESET_CON:
-		printd(("%s: %p: N_RESET_CON <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_RESET_CON <-\n", DRV_NAME, sccp));
 		rtn = n_reset_con(q, sccp, mp);
 		break;
 	case N_COORD_IND:
-		printd(("%s: %p: N_COORD_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_COORD_IND <-\n", DRV_NAME, sccp));
 		rtn = n_coord_ind(q, sccp, mp);
 		break;
 	case N_COORD_CON:
-		printd(("%s: %p: N_COORD_CON <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_COORD_CON <-\n", DRV_NAME, sccp));
 		rtn = n_coord_con(q, sccp, mp);
 		break;
 	case N_STATE_IND:
-		printd(("%s: %p: N_STATE_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_STATE_IND <-\n", DRV_NAME, sccp));
 		rtn = n_state_ind(q, sccp, mp);
 		break;
 	case N_PCSTATE_IND:
-		printd(("%s: %p: N_PCSTATE_IND <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: N_PCSTATE_IND <-\n", DRV_NAME, sccp));
 		rtn = n_pcstate_ind(q, sccp, mp);
 		break;
 	default:
-		printd(("%s: %p: ???? <-\n", TCAP_DRV_NAME, sccp));
+		printd(("%s: %p: ???? <-\n", DRV_NAME, sccp));
 		rtn = -EFAULT;
 		break;
 	}
@@ -8951,7 +9415,8 @@ STATIC int sccp_r_proto(queue_t *q, mblk_t *mp)
 		sccp_set_i_state(sccp, oldstate);
 	return (rtn);
 }
-STATIC int tcap_w_proto(queue_t *q, mblk_t *mp)
+STATIC int
+tcap_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct tcap *tcap = TCAP_PRIV(q);
@@ -8961,75 +9426,75 @@ STATIC int tcap_w_proto(queue_t *q, mblk_t *mp)
 		ulong oldstate = tcap_get_c_state(tcap);
 		switch (*(ulong *) mp->b_rptr) {
 		case TC_INFO_REQ:
-			printd(("%s: %p: -> TC_INFO_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_INFO_REQ\n", DRV_NAME, tcap));
 			rtn = tc_info_req(q, tcap, mp);
 			break;
 		case TC_BIND_REQ:
-			printd(("%s: %p: -> TC_BIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_BIND_REQ\n", DRV_NAME, tcap));
 			rtn = tc_bind_req(q, tcap, mp);
 			break;
 		case TC_UNBIND_REQ:
-			printd(("%s: %p: -> TC_UNBIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_UNBIND_REQ\n", DRV_NAME, tcap));
 			rtn = tc_unbind_req(q, tcap, mp);
 			break;
 		case TC_SUBS_BIND_REQ:
-			printd(("%s: %p: -> TC_SUBS_BIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_SUBS_BIND_REQ\n", DRV_NAME, tcap));
 			rtn = tc_subs_bind_req(q, tcap, mp);
 			break;
 		case TC_SUBS_UNBIND_REQ:
-			printd(("%s: %p: -> TC_SUBS_UNBIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_SUBS_UNBIND_REQ\n", DRV_NAME, tcap));
 			rtn = tc_subs_unbind_req(q, tcap, mp);
 			break;
 		case TC_OPTMGMT_REQ:
-			printd(("%s: %p: -> TC_OPTMGMT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_OPTMGMT_REQ\n", DRV_NAME, tcap));
 			rtn = tc_optmgmt_req(q, tcap, mp);
 			break;
 		case TC_UNI_REQ:
-			printd(("%s: %p: -> TC_UNI_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_UNI_REQ\n", DRV_NAME, tcap));
 			rtn = tc_uni_req(q, tcap, mp);
 			break;
 		case TC_BEGIN_REQ:
-			printd(("%s: %p: -> TC_BEGIN_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_BEGIN_REQ\n", DRV_NAME, tcap));
 			rtn = tc_begin_req(q, tcap, mp);
 			break;
 		case TC_BEGIN_RES:
-			printd(("%s: %p: -> TC_BEGIN_RES\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_BEGIN_RES\n", DRV_NAME, tcap));
 			rtn = tc_begin_res(q, tcap, mp);
 			break;
 		case TC_CONT_REQ:
-			printd(("%s: %p: -> TC_CONT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_CONT_REQ\n", DRV_NAME, tcap));
 			rtn = tc_cont_req(q, tcap, mp);
 			break;
 		case TC_END_REQ:
-			printd(("%s: %p: -> TC_END_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_END_REQ\n", DRV_NAME, tcap));
 			rtn = tc_end_req(q, tcap, mp);
 			break;
 		case TC_ABORT_REQ:
-			printd(("%s: %p: -> TC_ABORT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_ABORT_REQ\n", DRV_NAME, tcap));
 			rtn = tc_abort_req(q, tcap, mp);
 			break;
 		case TC_INVOKE_REQ:
-			printd(("%s: %p: -> TC_INVOKE_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_INVOKE_REQ\n", DRV_NAME, tcap));
 			rtn = tc_invoke_req(q, tcap, mp);
 			break;
 		case TC_RESULT_REQ:
-			printd(("%s: %p: -> TC_RESULT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_RESULT_REQ\n", DRV_NAME, tcap));
 			rtn = tc_result_req(q, tcap, mp);
 			break;
 		case TC_ERROR_REQ:
-			printd(("%s: %p: -> TC_ERROR_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_ERROR_REQ\n", DRV_NAME, tcap));
 			rtn = tc_error_req(q, tcap, mp);
 			break;
 		case TC_CANCEL_REQ:
-			printd(("%s: %p: -> TC_CANCEL_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_CANCEL_REQ\n", DRV_NAME, tcap));
 			rtn = tc_cancel_req(q, tcap, mp);
 			break;
 		case TC_REJECT_REQ:
-			printd(("%s: %p: -> TC_REJECT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TC_REJECT_REQ\n", DRV_NAME, tcap));
 			rtn = tc_reject_req(q, tcap, mp);
 			break;
 		default:
-			printd(("%s: %p: -> ????\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> ????\n", DRV_NAME, tcap));
 			rtn = -EPROTO;
 			break;
 		}
@@ -9042,47 +9507,47 @@ STATIC int tcap_w_proto(queue_t *q, mblk_t *mp)
 		ulong oldstate = tcap_get_r_state(tcap);
 		switch (*(ulong *) mp->b_rptr) {
 		case TR_INFO_REQ:
-			printd(("%s: %p: -> TR_INFO_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_INFO_REQ\n", DRV_NAME, tcap));
 			rtn = tr_info_req(q, tcap, mp);
 			break;
 		case TR_BIND_REQ:
-			printd(("%s: %p: -> TR_BIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_BIND_REQ\n", DRV_NAME, tcap));
 			rtn = tr_bind_req(q, tcap, mp);
 			break;
 		case TR_UNBIND_REQ:
-			printd(("%s: %p: -> TR_UNBIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_UNBIND_REQ\n", DRV_NAME, tcap));
 			rtn = tr_unbind_req(q, tcap, mp);
 			break;
 		case TR_OPTMGMT_REQ:
-			printd(("%s: %p: -> TR_OPTMGMT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_OPTMGMT_REQ\n", DRV_NAME, tcap));
 			rtn = tr_optmgmt_req(q, tcap, mp);
 			break;
 		case TR_UNI_REQ:
-			printd(("%s: %p: -> TR_UNI_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_UNI_REQ\n", DRV_NAME, tcap));
 			rtn = tr_uni_req(q, tcap, mp);
 			break;
 		case TR_BEGIN_REQ:
-			printd(("%s: %p: -> TR_BEGIN_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_BEGIN_REQ\n", DRV_NAME, tcap));
 			rtn = tr_begin_req(q, tcap, mp);
 			break;
 		case TR_BEGIN_RES:
-			printd(("%s: %p: -> TR_BEGIN_RES\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_BEGIN_RES\n", DRV_NAME, tcap));
 			rtn = tr_begin_res(q, tcap, mp);
 			break;
 		case TR_CONT_REQ:
-			printd(("%s: %p: -> TR_CONT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_CONT_REQ\n", DRV_NAME, tcap));
 			rtn = tr_cont_req(q, tcap, mp);
 			break;
 		case TR_END_REQ:
-			printd(("%s: %p: -> TR_END_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_END_REQ\n", DRV_NAME, tcap));
 			rtn = tr_end_req(q, tcap, mp);
 			break;
 		case TR_ABORT_REQ:
-			printd(("%s: %p: -> TR_ABORT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> TR_ABORT_REQ\n", DRV_NAME, tcap));
 			rtn = tr_abort_req(q, tcap, mp);
 			break;
 		default:
-			printd(("%s: %p: -> ????\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> ????\n", DRV_NAME, tcap));
 			rtn = -EPROTO;
 			break;
 		}
@@ -9095,63 +9560,63 @@ STATIC int tcap_w_proto(queue_t *q, mblk_t *mp)
 		ulong oldstate = tcap_get_t_state(tcap);
 		switch (*(ulong *) mp->b_rptr) {
 		case T_CONN_REQ:
-			printd(("%s: %p: -> T_CONN_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, tcap));
 			rtn = t_conn_req(q, tcap, mp);
 			break;
 		case T_CONN_RES:
-			printd(("%s: %p: -> T_CONN_RES\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_CONN_RES\n", DRV_NAME, tcap));
 			rtn = t_conn_res(q, tcap, mp);
 			break;
 		case T_DISCON_REQ:
-			printd(("%s: %p: -> T_DISCON_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_DISCON_REQ\n", DRV_NAME, tcap));
 			rtn = t_discon_req(q, tcap, mp);
 			break;
 		case T_DATA_REQ:
-			printd(("%s: %p: -> T_DATA_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_DATA_REQ\n", DRV_NAME, tcap));
 			rtn = t_data_req(q, tcap, mp);
 			break;
 		case T_EXDATA_REQ:
-			printd(("%s: %p: -> T_EXDATA_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_EXDATA_REQ\n", DRV_NAME, tcap));
 			rtn = t_exdata_req(q, tcap, mp);
 			break;
 		case T_INFO_REQ:
-			printd(("%s: %p: -> T_INFO_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_INFO_REQ\n", DRV_NAME, tcap));
 			rtn = t_info_req(q, tcap, mp);
 			break;
 		case T_BIND_REQ:
-			printd(("%s: %p: -> T_BIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_BIND_REQ\n", DRV_NAME, tcap));
 			rtn = t_bind_req(q, tcap, mp);
 			break;
 		case T_UNBIND_REQ:
-			printd(("%s: %p: -> T_UNBIND_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_UNBIND_REQ\n", DRV_NAME, tcap));
 			rtn = t_unbind_req(q, tcap, mp);
 			break;
 		case T_UNITDATA_REQ:
-			printd(("%s: %p: -> T_UNITDATA_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_UNITDATA_REQ\n", DRV_NAME, tcap));
 			rtn = t_unitdata_req(q, tcap, mp);
 			break;
 		case T_OPTMGMT_REQ:
-			printd(("%s: %p: -> T_OPTMGMT_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_OPTMGMT_REQ\n", DRV_NAME, tcap));
 			rtn = t_optmgmt_req(q, tcap, mp);
 			break;
 		case T_ORDREL_REQ:
-			printd(("%s: %p: -> T_ORDREL_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_ORDREL_REQ\n", DRV_NAME, tcap));
 			rtn = t_ordrel_req(q, tcap, mp);
 			break;
 		case T_OPTDATA_REQ:
-			printd(("%s: %p: -> T_OPTDATA_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_OPTDATA_REQ\n", DRV_NAME, tcap));
 			rtn = t_optdata_req(q, tcap, mp);
 			break;
 		case T_ADDR_REQ:
-			printd(("%s: %p: -> T_ADDR_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_ADDR_REQ\n", DRV_NAME, tcap));
 			rtn = t_addr_req(q, tcap, mp);
 			break;
 		case T_CAPABILITY_REQ:
-			printd(("%s: %p: -> T_CAPABILITY_REQ\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> T_CAPABILITY_REQ\n", DRV_NAME, tcap));
 			rtn = t_capability_req(q, tcap, mp);
 			break;
 		default:
-			printd(("%s: %p: -> ???\n", TCAP_DRV_NAME, tcap));
+			printd(("%s: %p: -> ???\n", DRV_NAME, tcap));
 			rtn = -EPROTO;
 			break;
 		}
@@ -9183,12 +9648,14 @@ STATIC int tcap_w_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int sccp_r_data(queue_t *q, mblk_t *mp)
+STATIC int
+sccp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct sccp *sccp = SCCP_PRIV(q);
 	return n_data(q, sccp, mp);
 }
-STATIC int tcap_w_data(queue_t *q, mblk_t *mp)
+STATIC int
+tcap_w_data(queue_t *q, mblk_t *mp)
 {
 	struct tcap *tcap = TCAP_PRIV(q);
 	switch (tcap->i_style) {
@@ -9213,12 +9680,14 @@ STATIC int tcap_w_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE int sccp_r_error(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+sccp_r_error(queue_t *q, mblk_t *mp)
 {
 	struct sccp *sccp = SCCP_PRIV(q);
 	return sccp_hangup(q, sccp);
 }
-STATIC INLINE int sccp_r_hangup(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+sccp_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct sccp *sccp = SCCP_PRIV(q);
 	return sccp_hangup(q, sccp);
@@ -9231,7 +9700,8 @@ STATIC INLINE int sccp_r_hangup(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int tcap_r_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+tcap_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -9239,7 +9709,8 @@ STATIC INLINE int tcap_r_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int tcap_w_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+tcap_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -9258,7 +9729,8 @@ STATIC INLINE int tcap_w_prim(queue_t *q, mblk_t *mp)
 	seldom();
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int sccp_r_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+sccp_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
@@ -9279,7 +9751,8 @@ STATIC INLINE int sccp_r_prim(queue_t *q, mblk_t *mp)
 	seldom();
 	return (QR_PASSFLOW);
 }
-STATIC INLINE int sccp_w_prim(queue_t *q, mblk_t *mp)
+STATIC INLINE int
+sccp_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -9298,10 +9771,12 @@ STATIC INLINE int sccp_w_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC int tcap_majors[TCAP_CMAJORS] = { TCAP_CMAJOR_0, };
-STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int tcap_majors[CMAJORS] = { CMAJOR_0, };
+STATIC int
+tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int flags, mindex = 0;
+	psw_t flags;
+	int mindex = 0;
 	ushort cmajor = getmajor(*devp);
 	ushort cminor = getminor(*devp);
 	ushort bminor = cminor;
@@ -9312,11 +9787,11 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		ptrace(("%s: ERROR: cannot push as module\n", TCAP_DRV_NAME));
+		ptrace(("%s: ERROR: cannot push as module\n", DRV_NAME));
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
-	if (cmajor != TCAP_CMAJOR_0 || cminor >= TCAP_CMINOR_FREE) {
+	if (cmajor != CMAJOR_0 || cminor >= TCAP_CMINOR_FREE) {
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -9334,8 +9809,8 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor > dminor)
 				continue;
 			if (cminor == dminor) {
-				if (++cminor >= TCAP_NMINORS) {
-					if (++mindex >= TCAP_CMAJORS || !(cmajor = tcap_majors[mindex]))
+				if (++cminor >= NMINORS) {
+					if (++mindex >= CMAJORS || !(cmajor = tcap_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -9343,16 +9818,16 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (mindex >= TCAP_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", TCAP_DRV_NAME));
+	if (mindex >= CMAJORS || !cmajor) {
+		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %d:%d\n", TCAP_DRV_NAME, cmajor, cminor));
+	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(tcap = tcap_alloc_priv(q, tcapp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: no memory\n", TCAP_DRV_NAME));
+		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
 		spin_unlock_irqrestore(&master.lock, flags);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
@@ -9365,14 +9840,16 @@ STATIC int tcap_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int tcap_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+tcap_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct tcap *tcap = TCAP_PRIV(q);
-	int flags;
+	psw_t flags;
 	(void) flag;
 	(void) crp;
 	(void) tcap;
-	printd(("%s: closing character device %d:%d\n", TCAP_DRV_NAME, tcap->u.dev.cmajor, tcap->u.dev.cminor));
+	printd(("%s: closing character device %d:%d\n", DRV_NAME, tcap->u.dev.cmajor,
+		tcap->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	tcap_free_priv(tcap);
 	spin_unlock_irqrestore(&master.lock, flags);
@@ -9383,70 +9860,328 @@ STATIC int tcap_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Allocation and deallocation
  *
  *  =========================================================================
  */
-STATIC int tcap_initialized = 0;
-STATIC void tcap_init(void)
+
+/*
+ *  TCAP Structure
+ *  -----------------------------------
+ */
+STATIC struct tcap *
+tcap_alloc_priv(queue_t *, struct tcap **, dev_t *, cred_t *, ushort)
 {
-	int rtn, major;
-	unless(tcap_initialized, return);
-	cmn_err(CE_NOTE, TCAP_BANNER);	/* console splash */
-	if ((rtn = tcap_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Counld not allocated caches", TCAP_DRV_NAME);
-		tcap_initialized = rtn;
-		return;
-	}
-	for (major = 0; major < TCAP_CMAJORS; major++) {
-		if ((rtn = lis_register_strdev(tcap_majors[major], &tcap_info, TCAP_NMINORS, TCAP_DRV_NAME)) <= 0) {
-			if (!major) {
-				cmn_err(CE_PANIC, "%s: Can't register 1'st major %d", TCAP_DRV_NAME,
-					tcap_majors[0]);
-				tcap_term_caches();
-				tcap_initialized = rtn;
-				return;
-			}
-			cmn_err(CE_WARN, "%s: Can't register %d'th major", TCAP_DRV_NAME, major + 1);
-			tcap_majors[major] = 0;
-		} else if (major)
-			tcap_majors[major] = rtn;
-	}
-	spin_lock_init(&master.lock); /* "tcap-open-list-lock" */
-	tcap_initialized = 1;
-	return;
 }
-STATIC void tcap_terminate(void)
+STATIC struct tcap *
+tcap_get(struct tcap *)
 {
-	int rtn, major;
-	for (major = 0; major < TCAP_CMAJORS; major++) {
-		if (tcap_majors[major]) {
-			if ((rtn = lis_unregister_strdev(tcap_majors[major])))
-				cmn_err(CE_PANIC, "%s: Can't unregister major %d\n", TCAP_DRV_NAME,
-					tcap_majors[major]);
-			if (major)
-				tcap_majors[major] = 0;
-		}
-	}
-	tcap_term_caches();
-	return;
+}
+STATIC struct tcap *
+tcap_lookup(ulong)
+{
+}
+STATIC ulong
+tcap_get_id(ulong)
+{
+}
+STATIC void
+tcap_free_priv(struct tcap *)
+{
+}
+STATIC void
+tcap_put(struct tcap *)
+{
+}
+
+/*
+ *  Invoke Structure
+ *  -----------------------------------
+ */
+STATIC struct iv *
+tcap_alloc_iv(ulong)
+{
+}
+STATIC struct iv *
+iv_get(struct iv *)
+{
+}
+STATIC struct iv *
+iv_lookup(struct dg *, ulong)
+{
+}
+STATIC ulong
+iv_get_id(ulong)
+{
+}
+STATIC void
+tcap_free_iv(struct iv *)
+{
+}
+STATIC void
+iv_put(struct iv *)
+{
+}
+
+/*
+ *  Dialogue Structure
+ *  -----------------------------------
+ */
+STATIC struct dg *
+tcap_alloc_dg(ulong)
+{
+}
+STATIC struct dg *
+dg_get(struct dg *)
+{
+}
+STATIC struct dg *
+dg_lookup(struct tr *, ulong)
+{
+}
+STATIC ulong
+dg_get_id(ulong)
+{
+}
+STATIC void
+tcap_free_dg(struct dg *)
+{
+}
+STATIC void
+dg_put(struct dg *)
+{
+}
+
+/*
+ *  Transaction Structure
+ *  -----------------------------------
+ */
+STATIC struct tr *
+tcap_alloc_tr(struct tcap *, ulong, ulong)
+{
+}
+STATIC struct tr *
+tr_get(struct tr *)
+{
+}
+STATIC struct tr *
+tr_lookup_cid(struct tcap *, ulong)
+{
+}
+STATIC struct tr *
+tr_lookup_tid(struct tcap *, ulong)
+{
+}
+STATIC ulong
+tr_get_id(ulong)
+{
+}
+STATIC void
+tcap_free_tr(struct tr *)
+{
+}
+STATIC void
+tr_put(struct tr *)
+{
+}
+
+/*
+ *  SCCP SAP Structure
+ *  -----------------------------------
+ */
+STATIC struct sp *
+tcap_alloc_sp(ulong)
+{
+}
+STATIC struct sp *
+sp_get(struct sp *)
+{
+}
+STATIC struct sp *
+sp_lookup(ulong)
+{
+}
+STATIC ulong
+sp_get_id(ulong)
+{
+}
+STATIC void
+tcap_free_sp(struct sp *)
+{
+}
+STATIC void
+sp_put(struct sp *)
+{
+}
+
+/*
+ *  SCCP Structure
+ *  -----------------------------------
+ */
+STATIC struct sccp *
+tcap_alloc_link(ulong)
+{
+}
+STATIC struct sccp *
+sccp_get(struct sccp *)
+{
+}
+STATIC struct sccp *
+sccp_lookup(ulong)
+{
+}
+STATIC ulong
+sccp_get_id(ulong)
+{
+}
+STATIC void
+sccp_free_link(struct sccp *)
+{
+}
+STATIC void
+sccp_put(struct sccp *)
+{
 }
 
 /*
  *  =========================================================================
  *
- *  LINUX MODULE INITIALIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-int init_module(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the TCAP driver. (0 for allocation.)");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Device number for the TCAP driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct cdevsw tcap_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &tcapinfo,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
+};
+
+STATIC int
+tcap_register_strdev(major_t major)
 {
-	tcap_init();
-	if (tcap_initialized < 0)
-		return tcap_initialized;
+	int err;
+	if ((err = register_strdev(&tcap_cdev, major)) < 0)
+		return (err);
 	return (0);
 }
-void cleanup_module(void)
+
+STATIC int
+tcap_unregister_strdev(major_t major)
 {
-	tcap_terminate();
+	int err;
+	if ((err = unregister_strdev(&tcap_cdev, major)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+tcap_register_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, &tcapinfo, UNITS, DRV_NAME)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+tcap_unregister_strdev(major_t major)
+{
+	int err;
+	if ((err = lis_unregister_strdev(major)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC void __exit
+tcapterminate(void)
+{
+	int err, mindex;
+	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
+		if (tcap_majors[mindex]) {
+			if ((err = tcap_unregister_strdev(tcap_majors[mindex])))
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
+					tcap_majors[mindex]);
+			if (mindex)
+				tcap_majors[mindex] = 0;
+		}
+	}
+	if ((err = tcap_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", DRV_NAME);
+	return;
+}
+
+MODULE_STATIC int __init
+tcapinit(void)
+{
+	int err, mindex = 0;
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = tcap_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
+		tcapterminate();
+		return (err);
+	}
+	for (mindex = 0; mindex < CMAJORS; mindex++) {
+		if ((err = tcap_register_strdev(tcap_majors[mindex])) < 0) {
+			if (mindex) {
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
+					tcap_majors[mindex]);
+				continue;
+			} else {
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
+					DRV_NAME, err);
+				tcapterminate();
+				return (err);
+			}
+		}
+		if (tcap_majors[mindex] == 0)
+			tcap_majors[mindex] = err;
+#ifdef LIS
+		LIS_DEVFLAGS(tcap_majors[mindex]) |= LIS_MODFLG_CLONE;
+#endif
+		if (major == 0)
+			major = tcap_majors[0];
+	}
+	return (0);
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(tcapinit);
+module_exit(tcapterminate);
+
+#endif				/* LINUX */

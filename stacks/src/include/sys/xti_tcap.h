@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_tcap.h,v 0.9.2.1 2004/08/21 10:14:40 brian Exp $
+ @(#) $Id: xti_tcap.h,v 0.9.2.2 2004/08/30 06:19:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:40 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 06:19:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_TCAP_H
 #define _SYS_XTI_TCAP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define T_SS7_TCAP		0x13	/* TCAP level (same as SI value) */
 
@@ -84,5 +84,8 @@
 #define T_TCAP_USER_PART_UNKNOWN	(0x1005)
 #define T_TCAP_USER_PART_UNEQUIPPED	(0x1006)
 #define T_TCAP_USER_PART_UNAVAILABLE	(0x1007)
+
+#define T_TCAP_APP_CTX		20	/* application context */
+#define T_TCAP_USER_INFO	21	/* user information */
 
 #endif				/* _SYS_XTI_TCAP_H */

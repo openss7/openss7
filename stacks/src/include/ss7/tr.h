@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tr.h,v 0.9.2.1 2004/08/21 10:14:39 brian Exp $
+ @(#) $Id: tr.h,v 0.9.2.2 2004/08/30 06:19:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:39 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 06:19:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TR_H__
 #define __SS7_TR_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define TR_INFO_REQ		 0	/* Information request */
 #define TR_BIND_REQ		 1	/* Bind to network address */
@@ -89,6 +89,50 @@ typedef struct {
 
 #define TR_PROVIDER		0x0001
 #define TR_USER			0x0002
+
+/*
+ * TRPI interface states
+ */
+#define TRS_UNBND	0	/* TR user not bound to network address */
+#define TRS_WACK_BREQ	1	/* Awaiting acknowledgement of N_BIND_REQ */
+#define TRS_WACK_UREQ	2	/* Pending acknowledgement for N_UNBIND_REQ */
+#define TRS_IDLE	3	/* Idle, no connection */
+#define TRS_WACK_OPTREQ	4	/* Pending acknowledgement of N_OPTMGMT_REQ */
+#define TRS_WACK_RRES	5	/* Pending acknowledgement of N_RESET_RES */
+#define TRS_WCON_CREQ	6	/* Pending confirmation of N_CONN_REQ */
+#define TRS_WRES_CIND	7	/* Pending response of N_CONN_REQ */
+#define TRS_WACK_CRES	8	/* Pending acknowledgement of N_CONN_RES */
+#define TRS_DATA_XFER	9	/* Connection-mode data transfer */
+#define TRS_WCON_RREQ	10	/* Pending confirmation of N_RESET_REQ */
+#define TRS_WRES_RIND	11	/* Pending response of N_RESET_IND */
+#define TRS_WACK_DREQ6	12	/* Waiting ack of N_DISCON_REQ */
+#define TRS_WACK_DREQ7	13	/* Waiting ack of N_DISCON_REQ */
+#define TRS_WACK_DREQ9	14	/* Waiting ack of N_DISCON_REQ */
+#define TRS_WACK_DREQ10	15	/* Waiting ack of N_DISCON_REQ */
+#define TRS_WACK_DREQ11	16	/* Waiting ack of N_DISCON_REQ */
+
+#define TRS_NOSTATES	17
+
+/*
+ * TR_ERROR_ACK error return code values
+ */
+#define TRBADADDR	1	/* Incorrect address format/illegal address information */
+#define TRBADOPT	2	/* Options in incorrect format or contain illegal information */
+#define TRACCESS	3	/* User did not have proper permissions */
+#define TRNOADDR	5	/* TR Provider could not allocate address */
+#define TROUTSTATE	6	/* Primitive was issues in wrong sequence */
+#define TRBADSEQ	7	/* Sequence number in primitive was incorrect/illegal */
+#define TRSYSERR	8	/* UNIX system error occurred */
+#define TRBADDATA	10	/* User data spec. outside range supported by TR provider */
+#define TRBADFLAG	16	/* Flags specified in primitive were illegal/incorrect */
+#define TRNOTSUPPORT	18	/* Primitive type not supported by the TR provider */
+#define TRBOUND		19	/* Illegal second attempt to bind listener or default listener */
+#define TRBADQOSPARAM	20	/* QOS values specified are outside the range supported by the TR
+				   provider */
+#define TRBADQOSTYPE	21	/* QOS structure type specified is not supported by the TR provider 
+				 */
+#define TRBADTOKEN	22	/* Token used is not associated with an open stream */
+#define TRNOPROTOID	23	/* Protocol id could not be allocated */
 
 /*
  *  TR_INFO_REQ.  This primitive consists of one M_PCPROTO message block.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isupi_ioctl.h,v 0.9.2.1 2004/08/21 10:14:39 brian Exp $
+ @(#) $Id: isupi_ioctl.h,v 0.9.2.2 2004/08/30 06:19:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:39 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 06:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __ISUPI_IOCTL_H__
 #define __ISUPI_IOCTL_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define ISUP_IOC_MAGIC 'i'
 
@@ -760,116 +760,42 @@ typedef struct isup_notify {
 
 /*
    10.1 (Event:On occur) Start of local ISDN-UP unavailable - failure 
- */
-/*
    10.2 (Event:On occur) Start of local ISDN-UP unavailable - maint made busy 
- */
-/*
    10.3 (Event:On occur) ISDN-UP available 
- */
-/*
    10.4 (s:30min) Total duration ISDN-UP unavailable 
- */
-/*
    10.5 (Event:On occur) Start of local ISDN-UP congestion 
- */
-/*
    10.6 (Event:On occur) Stop of local ISDN-UP congestion 
- */
-/*
    10.7 (s:30min) Duration of local ISDN-UP congestion 
- */
-/*
    10.8 (Event/dest:On occur) Start of remote ISDN-UP unavailable 
- */
-/*
    10.9 (Event/dest:On occur) Stop of remote ISDN-UP unavailable 
- */
-/*
    10.10 (s/dest:30min) Duration of remote ISDN-UP unavailable 
- */
-/*
    10.11 (Event/dest:On occur) Start of remote ISDN-UP congestion 
- */
-/*
    10.12 (Event/dest:On occur) Stop of remote ISDN-UP congestion 
- */
-/*
    10.13 (s/dest:30min) Duration of remote ISDN-UP congestion 
- */
-/*
    11.1 (Msgs/type:5/30min) Total ISDN-UP messages sent (by type) 
- */
-/*
    11.2 (Msgs/type:5/30min) Total ISDN-UP messages received (by type) 
- */
-/*
    12.1 (Event/CIC/dest:1+d) No acknowledgement for circuit reset with T17 
- */
-/*
    12.2 (Event/CIC/dest:1+d) No GRA reeived for GRS within T23 
- */
-/*
    12.3 - 
- */
-/*
    12.4 - 
- */
-/*
    12.5 (Event/CIC/dest:On occur) RLC not received within T5 
- */
-/*
    12.6 (Event/CIC/dest:1+d) Release initiated due to abnormal conditions 
- */
-/*
    12.7 (Event/CIC/dest:On occur) Circuit BLO (excessive errors detected by CRC) 
- */
-/*
    12.8 (Event/CIC/dest:1+d) Missing blocking acknowledgement in CGBA for previous CGB 
- */
-/*
    12.9 (Event/CIC/dest:1+d) Missing unblocking acknowledgement in CGUA for previous CGU 
- */
-/*
    12.10 (Event/CIC/dest:1+d) Abnormal blocking acknowledgement in CGBA for prevous CGB 
- */
-/*
    12.11 (Event/CIC/dest:1+d) Abnormal unblocking acknowledgement in CGUA for previous CGU 
- */
-/*
    12.12 (Event/CIC/dest:1+d) Unexpected CGBA with abnormal blocking acknowledgement 
- */
-/*
    12.13 (Event/CIC/dest:1+d) Unexpected CGUA with abnormal unblocking acknowledgement 
- */
-/*
    12.14 (Event/CIC/dest:1+d) Unexpected BLA with abnormal blocking acknowledgement 
- */
-/*
    12.15 (Event/CIC/dest:1+d) Unexpected UBA with abnormal unblocking acknowledgement 
- */
-/*
    12.16 (Event/CIC/dest:1+d) No BLA received for BLO within T13 
- */
-/*
    12.17 (Event/CIC/dest:1+d) No UBA received for UBL within T15 
- */
-/*
    12.18 (Event/CIC/dest:1+d) No CGBA received for CGB within T19 
- */
-/*
    12.19 (Event/CIC/dest:1+d) No CGUA received for CGU within T21 
- */
-/*
    12.20 (Event/CIC/dest:1+d) Message format error 
- */
-/*
    12.21 (Event/CIC/dest:1+d) Unexpected message received 
- */
-/*
    12.22 (Event/CIC/dest:1+d) Release due to unrecognized info. 
- */
-/*
    12.23 (Event/CIC:1+d) Inability to release a circuit 
  */
 

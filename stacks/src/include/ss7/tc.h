@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.1 2004/08/21 10:14:39 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.2 2004/08/30 06:19:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:39 $ by $Author: brian $
+ Last Modified $Date: 2004/08/30 06:19:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  Primitive definitions for TC-Users and TC-Providers.
@@ -110,27 +110,27 @@ typedef struct {
 } TC_qos_sel1_t;
 
 /*
- * TRPI interface states
+ * TCPI interface states
  */
-#define TRS_UNBND	0	/* TR user not bound to network address */
-#define TRS_WACK_BREQ	1	/* Awaiting acknowledgement of N_BIND_REQ */
-#define TRS_WACK_UREQ	2	/* Pending acknowledgement for N_UNBIND_REQ */
-#define TRS_IDLE	3	/* Idle, no connection */
-#define TRS_WACK_OPTREQ	4	/* Pending acknowledgement of N_OPTMGMT_REQ */
-#define TRS_WACK_RRES	5	/* Pending acknowledgement of N_RESET_RES */
-#define TRS_WCON_CREQ	6	/* Pending confirmation of N_CONN_REQ */
-#define TRS_WRES_CIND	7	/* Pending response of N_CONN_REQ */
-#define TRS_WACK_CRES	8	/* Pending acknowledgement of N_CONN_RES */
-#define TRS_DATA_XFER	9	/* Connection-mode data transfer */
-#define TRS_WCON_RREQ	10	/* Pending confirmation of N_RESET_REQ */
-#define TRS_WRES_RIND	11	/* Pending response of N_RESET_IND */
-#define TRS_WACK_DREQ6	12	/* Waiting ack of N_DISCON_REQ */
-#define TRS_WACK_DREQ7	13	/* Waiting ack of N_DISCON_REQ */
-#define TRS_WACK_DREQ9	14	/* Waiting ack of N_DISCON_REQ */
-#define TRS_WACK_DREQ10	15	/* Waiting ack of N_DISCON_REQ */
-#define TRS_WACK_DREQ11	16	/* Waiting ack of N_DISCON_REQ */
+#define TCS_UNBND	0	/* TC user not bound to network address */
+#define TCS_WACK_BREQ	1	/* Awaiting acknowledgement of N_BIND_REQ */
+#define TCS_WACK_UREQ	2	/* Pending acknowledgement for N_UNBIND_REQ */
+#define TCS_IDLE	3	/* Idle, no connection */
+#define TCS_WACK_OPTREQ	4	/* Pending acknowledgement of N_OPTMGMT_REQ */
+#define TCS_WACK_RRES	5	/* Pending acknowledgement of N_RESET_RES */
+#define TCS_WCON_CREQ	6	/* Pending confirmation of N_CONN_REQ */
+#define TCS_WRES_CIND	7	/* Pending response of N_CONN_REQ */
+#define TCS_WACK_CRES	8	/* Pending acknowledgement of N_CONN_RES */
+#define TCS_DATA_XFER	9	/* Connection-mode data transfer */
+#define TCS_WCON_RREQ	10	/* Pending confirmation of N_RESET_REQ */
+#define TCS_WRES_RIND	11	/* Pending response of N_RESET_IND */
+#define TCS_WACK_DREQ6	12	/* Waiting ack of N_DISCON_REQ */
+#define TCS_WACK_DREQ7	13	/* Waiting ack of N_DISCON_REQ */
+#define TCS_WACK_DREQ9	14	/* Waiting ack of N_DISCON_REQ */
+#define TCS_WACK_DREQ10	15	/* Waiting ack of N_DISCON_REQ */
+#define TCS_WACK_DREQ11	16	/* Waiting ack of N_DISCON_REQ */
 
-#define TRS_NOSTATES	17
+#define TCS_NOSTATES	17
 
 /*
  * TC_ERROR_ACK error return code values
