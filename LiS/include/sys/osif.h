@@ -16,7 +16,9 @@
 #if defined(LINUX) && !defined(OSIF_H)
 #define OSIF_H		/* file included */
 
-#ident "@(#) LiS osif.h 1.35 11/23/03"
+#ident "@(#) LiS osif.h 1.43 09/16/04"
+
+#include <sys/LiS/genconf.h>
 
 #ifndef LINUX_VERSION_CODE
 #include <linux/version.h>
@@ -396,6 +398,22 @@
 #undef interruptible_sleep_on
 #endif
 #define	interruptible_sleep_on		lis_interruptible_sleep_on
+#ifdef sleep_on_timeout
+#undef sleep_on_timeout
+#endif
+#define	sleep_on_timeout		lis_sleep_on_timeout
+#ifdef interruptible_sleep_on_timeout
+#undef interruptible_sleep_on_timeout
+#endif
+#define	interruptible_sleep_on_timeout	lis_interruptible_sleep_on_timeout
+#ifdef wait_event
+#undef wait_event
+#endif
+#define	wait_event			lis_wait_event
+#ifdef wait_event_interruptible
+#undef wait_event_interruptible
+#endif
+#define	wait_event_interruptible	lis_wait_event_interruptible
 #ifdef wake_up
 #undef wake_up
 #endif
@@ -413,47 +431,47 @@
  * PCI BIOS routines
  */
 
-int lis_pcibios_present(void) ;
+int lis_pcibios_present(void) _RP;
 #if LINUX_VERSION_CODE < 0x020100		/* 2.0 kernel */
 unsigned long lis_pcibios_init(unsigned long memory_start,
-			        unsigned long memory_end) ;
+			        unsigned long memory_end) _RP;
 #else						/* 2.1 or 2.2 kernel */
-void lis_pcibios_init(void) ;
+void lis_pcibios_init(void) _RP;
 #endif
 int lis_pcibios_find_class(unsigned int   class_code,
 			    unsigned short index,
                             unsigned char *bus,
-			    unsigned char *dev_fn) ;
+			    unsigned char *dev_fn) _RP;
 int lis_pcibios_find_device(unsigned short vendor,
 			     unsigned short dev_id,
 			     unsigned short index,
 			     unsigned char *bus,
-			     unsigned char *dev_fn) ;
+			     unsigned char *dev_fn) _RP;
 int lis_pcibios_read_config_byte(unsigned char  bus,
 				  unsigned char  dev_fn,
 				  unsigned char  where,
-				  unsigned char *val) ;
+				  unsigned char *val) _RP;
 int lis_pcibios_read_config_word(unsigned char   bus,
 				  unsigned char   dev_fn,
 				  unsigned char   where,
-				  unsigned short *val) ;
+				  unsigned short *val) _RP;
 int lis_pcibios_read_config_dword(unsigned char  bus,
 				   unsigned char  dev_fn,
 				   unsigned char  where,
-				   unsigned int  *val) ;
+				   unsigned int  *val) _RP;
 int lis_pcibios_write_config_byte(unsigned char  bus,
 				   unsigned char  dev_fn,
 				   unsigned char  where,
-				   unsigned char  val) ;
+				   unsigned char  val) _RP;
 int lis_pcibios_write_config_word(unsigned char   bus,
 				   unsigned char   dev_fn,
 				   unsigned char   where,
-				   unsigned short  val) ;
+				   unsigned short  val) _RP;
 int lis_pcibios_write_config_dword(unsigned char  bus,
 				    unsigned char  dev_fn,
 				    unsigned char  where,
-				    unsigned int   val) ;
-const char *lis_pcibios_strerror(int error) ;
+				    unsigned int   val) _RP;
+const char *lis_pcibios_strerror(int error) _RP;
 
 
 /*
@@ -461,71 +479,71 @@ const char *lis_pcibios_strerror(int error) ;
  */
 struct pci_dev	*lis_osif_pci_find_device(unsigned int vendor,
 				 unsigned int device,
-				 struct pci_dev *from);
+				 struct pci_dev *from)_RP;
 struct pci_dev	*lis_osif_pci_find_class(unsigned int class,
-					 struct pci_dev *from);
-struct pci_dev	*lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn);
+					 struct pci_dev *from)_RP;
+struct pci_dev	*lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)_RP;
 
-int	lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 *val);
-int	lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 *val);
-int	lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 *val);
-int	lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val);
-int	lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val);
-int	lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val);
-void	lis_osif_pci_set_master(struct pci_dev *dev);
-int     lis_osif_pci_enable_device (struct pci_dev *dev);
-void    lis_osif_pci_disable_device (struct pci_dev *dev);
+int	lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 *val)_RP;
+int	lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 *val)_RP;
+int	lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 *val)_RP;
+int	lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val)_RP;
+int	lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val)_RP;
+int	lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val)_RP;
+void	lis_osif_pci_set_master(struct pci_dev *dev)_RP;
+int     lis_osif_pci_enable_device (struct pci_dev *dev)_RP;
+void    lis_osif_pci_disable_device (struct pci_dev *dev)_RP;
 
 #if LINUX_VERSION_CODE >= 0x020400		/* 2.4 kernel */
-int	lis_osif_pci_module_init( struct pci_driver *p );
-void	lis_osif_pci_unregister_driver( struct pci_driver *p );
+int	lis_osif_pci_module_init( struct pci_driver *p )_RP;
+void	lis_osif_pci_unregister_driver( struct pci_driver *p )_RP;
 #else						/* older kernel */
-int	lis_osif_pci_module_init( void *p );
-void	lis_osif_pci_unregister_driver( void *p );
+int	lis_osif_pci_module_init( void *p )_RP;
+void	lis_osif_pci_unregister_driver( void *p )_RP;
 #endif
 
 #if LINUX_VERSION_CODE >= 0x020400		/* 2.4 kernel */
 
 extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
-	                                  dma_addr_t *dma_handle);
+	                                  dma_addr_t *dma_handle)_RP;
 extern void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size,
-	                                void *vaddr, dma_addr_t dma_handle);
+	                                void *vaddr, dma_addr_t dma_handle)_RP;
 extern dma_addr_t lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr,
-	                                        size_t size, int direction);
+	                                        size_t size, int direction)_RP;
 extern void lis_osif_pci_unmap_single(struct pci_dev *hwdev,
-			    dma_addr_t dma_addr, size_t size, int direction);
+			    dma_addr_t dma_addr, size_t size, int direction)_RP;
 extern int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
-	                             int nents, int direction);
+	                             int nents, int direction)_RP;
 extern void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
-	                                int nents, int direction);
+	                                int nents, int direction)_RP;
 extern void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev,
-			   dma_addr_t dma_handle, size_t size, int direction);
+			   dma_addr_t dma_handle, size_t size, int direction)_RP;
 extern void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
-			   struct scatterlist *sg, int nelems, int direction);
-extern int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask);
-extern int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask);
-extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg);
-extern size_t lis_osif_sg_dma_len(struct scatterlist *sg);
+			   struct scatterlist *sg, int nelems, int direction)_RP;
+extern int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)_RP;
+extern int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)_RP;
+extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg)_RP;
+extern size_t lis_osif_sg_dma_len(struct scatterlist *sg)_RP;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
 #if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 extern void lis_osif_pci_unmap_page(struct pci_dev *hwdev,
 				dma_addr_t dma_address, size_t size,
-				int direction);
-extern int lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask);
+				int direction)_RP;
+extern int lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)_RP;
 extern dma_addr_t lis_osif_pci_map_page(struct pci_dev *hwdev,
 				struct page *page, unsigned long offset,
-				size_t size, int direction);
-extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
+				size_t size, int direction)_RP;
+extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)_RP;
 extern dma64_addr_t lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev,
 			struct page *page, unsigned long offset,
-			int direction);
+			int direction)_RP;
 extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev,
-					dma64_addr_t dma_addr);
+					dma64_addr_t dma_addr)_RP;
 extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
-					dma64_addr_t dma_addr);
+					dma64_addr_t dma_addr)_RP;
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
-			    dma64_addr_t dma_addr, size_t len, int direction);
+			    dma64_addr_t dma_addr, size_t len, int direction)_RP;
 #endif					/* S390 or S390X */
 #endif					/* 2.4.13 */
 
@@ -541,16 +559,40 @@ extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 #else
 #define	OSIF_REGS_T	void
 #endif
+
+/*
+ * Pre 2.6 kernels use a void routine for interrupt handling.  In 2.6
+ * it is an int routine.  For portability in LiS we will always use
+ * an int handler.  It will be called as a void in earlier kernels.
+ * This should allow you do move your driver back and forth between
+ * 2.4 and 2.6 without recompilation.
+ *
+ * If you need to, use one of the typedefs here to cast your routine
+ * pointer to the proper type to keep the compiler from squawking.
+ */
+typedef int  _RP (*lis_int_handler) (int, void *, OSIF_REGS_T *) ;
+typedef void _RP (*lis_void_handler)(int, void *, OSIF_REGS_T *) ;
+
+/*
+ * In 2.6 the kernel wants the irq handler to return 1 if it handled the
+ * interrupt and 0 if not.  LiS will provide a pair of variables that
+ * hold these values for portability.  The externs are here and the
+ * variables are in osif.c.  The variables will exist even on a 2.4
+ * kernel so your handler can be portable.
+ */
+extern int	lis_irqreturn_handled ;
+extern int	lis_irqreturn_not_handled ;
+
 int  lis_request_irq(unsigned int  irq,
-	              void        (*handler)(int, void *, OSIF_REGS_T *),
+		      lis_int_handler handler,
 	              unsigned long flags,
 		      const char   *device,
-		      void         *dev_id) ;
-void lis_free_irq(unsigned int irq, void *dev_id) ;
-void lis_disable_irq(unsigned int irq) ;
-void lis_enable_irq(unsigned int irq) ;
-void lis_osif_cli( void );
-void lis_osif_sti( void );
+		      void         *dev_id) _RP;
+void lis_free_irq(unsigned int irq, void *dev_id) _RP;
+void lis_disable_irq(unsigned int irq) _RP;
+void lis_enable_irq(unsigned int irq) _RP;
+void lis_osif_cli( void )_RP;
+void lis_osif_sti( void )_RP;
 
 
 #if defined(_SPARC_LIS_) || defined(_SPARC64_LIS_)
@@ -577,62 +619,63 @@ extern __inline__ void *sparc_ioremap(unsigned long offset, unsigned long size)
 /*
  * Memory mapping routines
  */
-void *lis_ioremap(unsigned long offset, unsigned long size) ;
-void *lis_ioremap_nocache(unsigned long offset, unsigned long size) ;
-void  lis_iounmap(void *addr) ;
-void *lis_vremap(unsigned long offset, unsigned long size) ;
-unsigned long lis_virt_to_phys(volatile void *addr) ;
-void         *lis_phys_to_virt(unsigned long addr) ;
+void *lis_ioremap(unsigned long offset, unsigned long size) _RP;
+void *lis_ioremap_nocache(unsigned long offset, unsigned long size) _RP;
+void  lis_iounmap(void *addr) _RP;
+void *lis_vremap(unsigned long offset, unsigned long size) _RP;
+unsigned long lis_virt_to_phys(volatile void *addr) _RP;
+void         *lis_phys_to_virt(unsigned long addr) _RP;
 
 /*
  * I/O port routines <linux/ioport.h>
  */
-int  lis_check_region(unsigned int from, unsigned int extent) ;
+int  lis_check_region(unsigned int from, unsigned int extent) _RP;
 void lis_request_region(unsigned int from,
 			 unsigned int extent,
-			 const char  *name) ;
-void lis_release_region(unsigned int from, unsigned int extent) ;
+			 const char  *name) _RP;
+void lis_release_region(unsigned int from, unsigned int extent) _RP;
 
 
 /*
  * Memory allocator <linux/malloc.h>
  */
-void *lis_kmalloc(size_t nbytes, int type) ;
-void  lis_kfree(const void *ptr) ;
-void *lis_vmalloc(unsigned long size);
-void  lis_vfree(void *ptr) ;
+void *lis_kmalloc(size_t nbytes, int type) _RP;
+void  lis_kfree(const void *ptr) _RP;
+void *lis_vmalloc(unsigned long size)_RP;
+void  lis_vfree(void *ptr) _RP;
 
 
 /*
  * DMA routines <asm/dma.h>
  */
-int  lis_request_dma(unsigned int dma_nr, const char *device_id) ;
-void lis_free_dma(unsigned int dma_nr) ;
+int  lis_request_dma(unsigned int dma_nr, const char *device_id) _RP;
+void lis_free_dma(unsigned int dma_nr) _RP;
 
 /*
  * Delay routine in <linux/delay.h> and <asm/delay.h>
  */
-void lis_udelay(long micro_secs) ;
-unsigned long lis_jiffies(void) ;
+void lis_udelay(long micro_secs) _RP;
+unsigned long lis_jiffies(void) _RP;
 
 /*
  * Printing routines.
  */
-int lis_printk(const char *fmt, ...) ;
-int lis_sprintf(char *bfr, const char *fmt, ...) ;
-int lis_vsprintf(char *bfr, const char *fmt, va_list args) ;
+#define PRINTF_LIKE(a,b)	__attribute__ ((format (printf, a, b)))
+int lis_printk(const char *fmt, ...) PRINTF_LIKE(1,2) _RP;
+int lis_sprintf(char *bfr, const char *fmt, ...) PRINTF_LIKE(2,3) _RP;
+int lis_vsprintf(char *bfr, const char *fmt, va_list args) PRINTF_LIKE(2,0) _RP;
 
 /*
  * Timer routines.
  */
-void lis_add_timer(struct timer_list * timer);
-int  lis_del_timer(struct timer_list * timer);
+void lis_add_timer(struct timer_list * timer)_RP;
+int  lis_del_timer(struct timer_list * timer)_RP;
 
 /*
  * Time routines in <linux/time.h>
  */
-void lis_osif_do_gettimeofday( struct timeval *tp ) ;
-void lis_osif_do_settimeofday( struct timeval *tp ) ;
+void lis_osif_do_gettimeofday( struct timeval *tp ) _RP;
+void lis_osif_do_settimeofday( struct timeval *tp ) _RP;
 
 /*
  * Sleep/wakeup routines
@@ -640,16 +683,42 @@ void lis_osif_do_settimeofday( struct timeval *tp ) ;
  * Note: It it only legitimate to use these in open and close
  * routines in STREAMS.  DO NOT sleep in put or service routines.
  */
-#if LINUX_VERSION_CODE >= 0x020300		/* 2.3, 2.4 kernel */
-#define	OSIF_WAIT_Q_ARG		wait_queue_head_t  *wq
-#else
-#define	OSIF_WAIT_Q_ARG		struct wait_queue **wq
-#endif
-void lis_sleep_on(OSIF_WAIT_Q_ARG) ;
-void lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG) ;
-void lis_wake_up(OSIF_WAIT_Q_ARG) ;
-void lis_wake_up_interruptible(OSIF_WAIT_Q_ARG) ;
+#define	OSIF_WAIT_Q_ARG		wait_queue_head_t *wq
+#define	OSIF_WAIT_E_ARG		wait_queue_head_t  wq
+void lis_sleep_on(OSIF_WAIT_Q_ARG) _RP;
+void lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG) _RP;
+void lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout) _RP;
+void lis_interruptible_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout) _RP;
+void lis_wait_event(OSIF_WAIT_E_ARG, int condition) _RP;
+void lis_wait_event_interruptible(OSIF_WAIT_E_ARG, int condition) _RP;
+void lis_wake_up(OSIF_WAIT_Q_ARG) _RP;
+void lis_wake_up_interruptible(OSIF_WAIT_Q_ARG) _RP;
 
 
+/*
+ * Wrapped functions.
+ *
+ * These are some common functions that drivers might use and want to wrap
+ * so that LiS can change the parameter passing convention prior to calling
+ * the kernel's version of the function.
+ */
+extern char * _RP __wrap_strcpy(char *,const char *);
+extern char * _RP __wrap_strncpy(char *,const char *, __kernel_size_t);
+extern char * _RP __wrap_strcat(char *, const char *);
+extern char * _RP __wrap_strncat(char *, const char *, __kernel_size_t);
+extern int _RP __wrap_strcmp(const char *,const char *);
+extern int _RP __wrap_strncmp(const char *,const char *,__kernel_size_t);
+extern int _RP __wrap_strnicmp(const char *, const char *, __kernel_size_t);
+extern char * _RP __wrap_strchr(const char *,int);
+extern char * _RP __wrap_strrchr(const char *,int);
+extern char * _RP __wrap_strstr(const char *,const char *);
+extern __kernel_size_t _RP __wrap_strlen(const char *);
+extern void * _RP __wrap_memset(void *,int,__kernel_size_t);
+extern void * _RP __wrap_memcpy(void *,const void *,__kernel_size_t);
+extern int _RP __wrap_memcmp(const void *,const void *,__kernel_size_t);
+extern int _RP __wrap_sprintf(char *, const char *, ...);
+extern int _RP __wrap_snprintf(char *, size_t, const char *, ...);
+extern int _RP __wrap_vsprintf(char *, const char *, va_list);
+extern int _RP __wrap_vsnprintf(char *, size_t, const char *, va_list);
 
 #endif			/* from top of file */
