@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:59 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:17 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:17 $";
 
 #define __NO_VERSION__
 
@@ -967,7 +967,7 @@ sctp_transmit_wakeup(sp)
 					ptrace(("sp->nrtxs = %u\n", sp->nrtxs));
 				rare();
 				freechunks(mp);
-#if _DEBUG
+#ifdef _DEBUG
 				for (mp = bufq_head(&sp->sndq); mp; mp = mp->b_next) {
 					sctp_tcb_t *cb = SCTP_TCB(mp);
 					printk("sndq: mp = %08x, dlen = %u\n", (uint) mp, cb->dlen);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:49:20 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:19 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 08:49:20 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/04/14 10:33:19 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.2  2004/04/14 10:33:19  brian
+ - Some configuration rearrangement and a few changes for full compile.
+
  Revision 0.9.2.1  2004/02/22 08:49:20  brian
  - Added --help and --version options to all executables.
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:49:20 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:19 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:49:20 $";
+    "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:19 $";
 
 /*
  *  Simple test program for INET streams.
@@ -107,6 +110,7 @@ static char const ident[] =
 #include <xti.h>
 #include <tihdr.h>
 #include <xti_inet.h>
+#include <sys/xti_sctp.h>
 
 int verbose = 1;
 
@@ -372,7 +376,7 @@ struct {
 	, 50, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE,
 		    T_SUCCESS}
-	, SCTP_HMAC_NONE, {
+	, T_SCTP_HMAC_NONE, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
 , 0};
 
@@ -760,13 +764,13 @@ print_opt(char *opt_ptr, size_t opt_len)
 					printf("T_SCTP_MAC_TYPE = ");
 					switch (val) {
 					default:
-					case SCTP_HMAC_NONE:
+					case T_SCTP_HMAC_NONE:
 						sprintf(result, "NONE");
 						break;
-					case SCTP_HMAC_SHA_1:
+					case T_SCTP_HMAC_SHA1:
 						sprintf(result, "SHA_1");
 						break;
-					case SCTP_HMAC_MD5:
+					case T_SCTP_HMAC_MD5:
 						sprintf(result, "MD5");
 						break;
 					}
@@ -2434,14 +2438,14 @@ preamble_6(void)
 int
 preamble_7(void)
 {
-	opt_optm.mac_val = SCTP_HMAC_SHA_1;
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
 	return preamble_1();
 }
 
 int
 preamble_8(void)
 {
-	opt_optm.mac_val = SCTP_HMAC_MD5;
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1();
 }
 
@@ -2488,7 +2492,7 @@ postamble_1(void)
 				failed = state;
 		}
 		opt_data.sid_val = 0;
-		opt_optm.mac_val = SCTP_HMAC_NONE;
+		opt_optm.mac_val = T_SCTP_HMAC_NONE;
 		opt_optm.dbg_val = 0;
 		opt_optm.rcv_val = T_NO;
 		opt_optm.ist_val = 1;
@@ -2570,7 +2574,7 @@ postamble_2(void)
 				failed = state;
 		}
 		opt_data.sid_val = 0;
-		opt_optm.mac_val = SCTP_HMAC_NONE;
+		opt_optm.mac_val = T_SCTP_HMAC_NONE;
 		opt_optm.dbg_val = 0;
 		opt_optm.rcv_val = T_NO;
 		opt_optm.ist_val = 1;
@@ -2652,7 +2656,7 @@ postamble_3(void)
 				failed = state;
 		}
 		opt_data.sid_val = 0;
-		opt_optm.mac_val = SCTP_HMAC_NONE;
+		opt_optm.mac_val = T_SCTP_HMAC_NONE;
 		opt_optm.dbg_val = 0;
 		opt_optm.rcv_val = T_NO;
 		opt_optm.ist_val = 1;

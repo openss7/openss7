@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -88,7 +88,7 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9 $)
 #include "bufq.h"
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $"
+#define MTP_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1533,7 +1533,7 @@ t_capability_ack(queue_t *q, ulong caps)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = TC1_INFO;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) m->rq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) m->rq : 0;
 		if (caps & TC1_INFO) {
 			p->INFO_ack->PRIM_type = T_INFO_ACK;
 			p->INFO_ack->TSDU_size = 272;

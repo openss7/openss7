@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:54 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/19 22:59:54 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:54 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:17 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:54 $";
+static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:17 $";
 
 #define __NO_VERSION__
 
@@ -67,10 +67,22 @@ static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <sys/cmn_err.h>
 #include <sys/dki.h>
 
+#if 0
 #include <sys/tpi.h>
 #include <sys/tpi_sctp.h>
+#else
+#include <sys/tihdr.h>
+#endif
 #include <sys/xti_ip.h>
 #include <sys/xti_sctp.h>
+
+#ifndef sctp_addr_t
+typedef struct sctp_addr {
+	uint16_t port __attribute__ ((packed));
+	uint32_t addr[0] __attribute__ ((packed));
+} sctp_addr_t;
+#define sctp_addr_t sctp_addr_t
+#endif				/* sctp_addr_t */
 
 #include "debug.h"
 #include "bufq.h"
@@ -2418,13 +2430,13 @@ t_capability_ack(sctp_t * sp, ulong caps)
 {
 	mblk_t *mp;
 	struct T_capability_ack *p;
-	uint caps = (acceptor ? TC1_ACCEPTOR : 0) | (info ? TC1_INFO : 0);
+	uint caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_capability_ack *) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) sp->rq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) sp->rq : 0;
 		if (caps & TC1_INFO) {
 			p->INFO_ack.PRIM_type = T_INFO_ACK;
 			p->INFO_ack.TSDU_size = sp->tsdu;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:15:26 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:15:26 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:15:26 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:15:26 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $";
 
 /*
  *  This driver provides the functionality of IP (Internet Protocol) over a
@@ -76,9 +76,16 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include <sys/stream.h>
 #include <sys/stropts.h>
 #include <sys/cmn_err.h>
+#if 0
 #include <sys/tpi.h>
 #include <sys/tpi_inet.h>
 #include <sys/xti_inet.h>
+#else
+#include <sys/tihdr.h>
+#include <sys/xti.h>
+#include <sys/xti_inet.h>
+#include <sys/xti_sctp.h>
+#endif
 
 #if defined(CONFIG_SCTP)||defined(CONFIG_SCTP_MODULE)
 #include <netinet/sctp.h>
@@ -89,7 +96,7 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $D
 
 #define	SS_DESCRIP	"SOCKSYS STREAMS (TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:15:26 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SS_DEVICE	"Supports OpenSS7 INET Drivers."
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2666,7 +2673,7 @@ t_capability_ack(queue_t *q, ulong caps)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = TC1_INFO;
-		p->ACCPETOR_id = (caps & TC1_ACCEPTOR) ? (ulong) ss->rq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) ss->rq : 0;
 		if (caps & TC1_INFO)
 			p->INFO_ack = ss->p.info;
 		else
@@ -3856,7 +3863,7 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 }
 
 #ifdef T_ADDR_REQ
-/*
+/* 
  *  T_ADDR_REQ          25 - Address Request
  *  -------------------------------------------------------------------
  */
@@ -3882,12 +3889,24 @@ t_addr_req(queue_t *q, mblk_t *mp)
 }
 #endif
 #ifdef T_CAPABILITY_REQ
-/*
+/* 
  *  T_CAPABILITY_REQ    ?? - Capability Request
  *  -------------------------------------------------------------------
  */
+STATIC int
+t_capability_req(queue_t *q, mblk_t *mp)
+{
+	const size_t mlen = mp->b_wptr - mp->b_rptr;
+	const struct T_capability_req *p = (typeof(p)) mp->b_rptr;
+	if (mlen < sizeof(*p))
+		goto einval;
+	return t_capability_ack(q, p->CAP_bits1);
+      einval:
+	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
+	return m_error(q, EPROTO);
+}
 #endif
-/*
+/* 
  *  Other primitives    XX - other invalid primitives
  *  -------------------------------------------------------------------------
  */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
 
-static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $";
+static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -76,10 +76,10 @@ static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9 $)
 #include <ss7/lmi_ioctl.h>
 #include <ss7/mtpi.h>
 #include <ss7/mtpi_ioctl.h>
-#include <sys/tpi.h>
-#include <sys/tpi_ss7.h>
-#include <sys/tpi_mtp.h>
-// #include <sys/xti.h>
+#include <sys/tihdr.h>
+// #include <sys/tpi_ss7.h>
+// #include <sys/tpi_mtp.h>
+#include <sys/xti.h>
 #include <sys/xti_mtp.h>
 
 #include "debug.h"
@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9 $)
 #define INLINE			/* let compiler do its job */
 
 #define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:01 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:13 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1155,7 +1155,7 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 	p = ((typeof(p)) mp->b_wptr)++;
 	p->PRIM_type = T_CAPABILITY_ACK;
 	p->CAP_bits1 = TC1_INFO;
-	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) mtp->oq : 0;
+	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) mtp->oq : 0;
 	if (caps & TC1_INFO)
 		p->INFO_ack = mtp->prot;
 	else

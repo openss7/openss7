@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:40 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:20:40 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:40 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $"
 
-static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:40 $";
+static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9 $) $Dat
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:40 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1131,7 +1131,7 @@ m_flush(queue_t *q, struct mg *mg, int band, int flags, int what)
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | band ? FLUSHBAND : 0;
 		*(mp->b_wptr)++ = band;
-		printd(("%s: %p: <- M_FLUSH\n", MG_DRV_NAME, pq));
+		printd(("%s: %p: <- M_FLUSH\n", MG_DRV_NAME, mg));
 		ss7_oput(mg->oq, mp);
 		return (QR_DONE);
 	}
@@ -5664,7 +5664,7 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n", MG_DRV_NAME,
-					s));
+					mg));
 				ret = -EPERM;
 				break;
 			}
@@ -5677,7 +5677,7 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					MG_DRV_NAME, s));
+					MG_DRV_NAME, mg));
 				ret = -EPERM;
 				break;
 			}
@@ -5687,7 +5687,8 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 					break;
 			if (!mx) {
 				ret = -EINVAL;
-				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n"));
+				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
+					MG_DRV_NAME, mg));
 				break;
 			}
 			mx_free_link(mx);

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/02/22 19:53:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/14 10:33:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/22 19:53:40 $ by $Author: brian $
+# Last Modified $Date: 2004/04/14 10:33:02 $ by $Author: brian $
 #
 # =============================================================================
 
-if SS7_PUBLIC_RELEASE
+if PUBLIC_RELEASE
 
 libexec_PROGRAMS		= \
 				  test-inet_raw \
@@ -545,7 +545,7 @@ test_x400p_CFLAGS		= @USER_CFLAGS@
 
 test_x400p_cap2_SOURCES		= src/test/x400p-ss7/test-x400p-cap2.c
 test_x400p_cap2_LDFLAGS		= -lLiS
-test_x400p_cap2_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_x400p_cap2_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
 test_x400p_cap2_CFLAGS		= @USER_CFLAGS@
 
 test_x400p_cap_SOURCES		= src/test/x400p-ss7/test-x400p-cap.c
@@ -560,7 +560,7 @@ test_x400p_hsl_CFLAGS		= @USER_CFLAGS@
 
 test_x400p_perf_SOURCES		= src/test/x400p-ss7/test-x400p-perf.c
 test_x400p_perf_LDFLAGS		= -lLiS
-test_x400p_perf_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_x400p_perf_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
 test_x400p_perf_CFLAGS		= @USER_CFLAGS@
 
 test_x400p_sdl_SOURCES		= src/test/x400p-ss7/test-x400p-sdl.c
@@ -570,7 +570,7 @@ test_x400p_sdl_CFLAGS		= @USER_CFLAGS@
 
 test_x400p_sdt2_SOURCES		= src/test/x400p-ss7/test-x400p-sdt2.c
 test_x400p_sdt2_LDFLAGS		= -lLiS
-test_x400p_sdt2_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+test_x400p_sdt2_CPPFLAGS	= @SS7_INCLUDES@ @USER_CPPFLAGS@
 test_x400p_sdt2_CFLAGS		= @USER_CFLAGS@
 
 test_x400p_sdt_SOURCES		= src/test/x400p-ss7/test-x400p-sdt.c
@@ -861,10 +861,10 @@ KERNEL_MODCONF			= conf.modules
 KERNEL_SUBDIR			= ss7
 KMODCONF_EXT			= ss7
 
+include am/kernel.am
+
 MANMACRO_PFX			= openss7
 mansrcdir			= $(srcdir)/doc/man
-
-include kernel.am
 
 man_MANS = \
 	doc/man/man3/cframe.3 doc/man/man3/soon.3 doc/man/man3/xti_mtp.3 doc/man/man3/xti_sccp.3 \
@@ -1104,6 +1104,8 @@ man_MANS = \
 	doc/man/man8/ss7dev.8 doc/man/man8/strconf.8 doc/man/man8/sua.8 doc/man/man8/tcap.8 doc/man/man8/tua.8 \
 	doc/man/man8/uaconfd.8 doc/man/man8/voipconfd.8
 
+include am/man.am
+
 nobase_include_HEADERS = \
 	src/include/ss7/capi.h src/include/ss7/capi_ioctl.h src/include/ss7/cci.h src/include/ss7/cdi.h \
 	src/include/ss7/chi.h src/include/ss7/chi_ioctl.h src/include/ss7/devi.h src/include/ss7/devi_ioctl.h \
@@ -1316,12 +1318,12 @@ SUBDIRS = doc
 AM_RPMFLAGS = --define "_kversion @kversion@"
 AM_SRPMFLAGS =
 
-include rpm.am
+include am/rpm.am
 
 #
 #   General rules
 #
 
-include openss7.am
+include am/openss7.am
 
 # vim: ft=automake

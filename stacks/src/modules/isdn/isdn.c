@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:16:09 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:16:09 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:16:09 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
 
-static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:16:09 $";
+static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:16:09 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2033,6 +2033,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, unsigned char *opt_ptr, size_t opt_len
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
+		p = ((typeof(p))mp->b_wptr)++;
 		p->cc_call_ref = cref;
 		p->cc_opt_length = opt_len;
 		p->cc_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -10780,11 +10781,15 @@ cc_suspend_reject_req(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
+	if (!(cr = cc_find_cpc_cref(cc, p->cc_call_ref)))
+		goto badclr;
 	switch (cr_get_c_state(cr)) {
 	default:
 		goto outstate;
 	}
 	return (QR_DONE);
+      badclr:
+	return cc_error_ack(q, cc, p->cc_primitive, CCBADCLR);
       outstate:
 	return cc_error_ack(q, cc, p->cc_primitive, CCOUTSTATE);
       badprim:
@@ -10840,11 +10845,15 @@ cc_resume_res(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
+	if (!(cr = cc_find_cpc_cref(cc, p->cc_call_ref)))
+		goto badclr;
 	switch (cr_get_c_state(cr)) {
 	default:
 		goto outstate;
 	}
 	return (QR_DONE);
+      badclr:
+	return cc_error_ack(q, cc, p->cc_primitive, CCBADCLR);
       outstate:
 	return cc_error_ack(q, cc, p->cc_primitive, CCOUTSTATE);
       badprim:
@@ -10864,11 +10873,15 @@ cc_resume_reject_req(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
+	if (!(cr = cc_find_cpc_cref(cc, p->cc_call_ref)))
+		goto badclr;
 	switch (cr_get_c_state(cr)) {
 	default:
 		goto outstate;
 	}
 	return (QR_DONE);
+      badclr:
+	return cc_error_ack(q, cc, p->cc_primitive, CCBADCLR);
       outstate:
 	return cc_error_ack(q, cc, p->cc_primitive, CCOUTSTATE);
       badprim:

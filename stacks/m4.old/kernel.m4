@@ -167,6 +167,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [
     _LINUX_CHECK_KERNEL_ARCHDIR
     _LINUX_CHECK_KERNEL_MACHDIR
     _LINUX_SETUP_KERNEL_CFLAGS
+    _LINUX_SETUP_KERNEL_DEBUG
     _LINUX_CHECK_KERNEL_VERSIONS
     PACKAGE_KNUMBER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
     AC_SUBST(PACKAGE_KNUMBER)
@@ -794,6 +795,44 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [
     linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
     CPPFLAGS="${linux_k_defs}${linux_tmp:+ -nostdinc} -I${linux_cv_k_includes}${linux_tmp:+ -I}${linux_tmp}${CPPFLAGS:+ }${CPPFLAGS}"
 ])# _LINUX_SETUP_KERNEL_CFLAGS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_SETUP_KERNEL_DEBUG
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [
+    linux_tmp=
+    if test :"${enable_k_safe:-yes}" != :no ; then
+        linux_tmp='_SAFE'
+    fi
+    if test "${enable_k_test:-no}" != :no ; then
+        linux_tmp='_TEST'
+    fi
+    if test "${enable_k_debug:-no}" != :no ; then
+        linux_tmp='_DEBUG'
+    fi
+    case "$linux_tmp" in
+        _DEBUG)
+            AC_DEFINE_UNQUOTED([_DEBUG], [], [Define for kernel symbol
+            debugging.  This has the effect of defeating inlines, making
+            static declarations global, and activating all debugging macros.])
+            ;;
+        _TEST)
+            AC_DEFINE_UNQUOTED([_TEST], [], [Define for kernel testing.  This
+            has the same effect as _DEBUG for now.])
+            ;;
+        _SAFE)
+            AC_DEFINE_UNQUOTED([_SAFE], [], [Define for kernel safety.  This
+            has the effect of enabling safety debugging macros.  This is the
+            default.])
+            ;;
+        *)
+            AC_DEFINE_UNQUOTED([_NONE], [], [Define for maximum performance
+            and minimum size.  This has the effect of disabling all safety
+            debugging macros.])
+            ;;
+    esac
+])# _LINUX_SETUP_KERNEL_DEBUG
 # =========================================================================
 
 # =========================================================================

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:10 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:20:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:10 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $"
 
-static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:10 $";
+static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,8 +70,8 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 #include <ss7/m2ua_ioctl.h>
-#include <sys/tpi.h>
-#include <sys/tpi_sctp.h>
+#include <sys/tihdr.h>
+#include <sys/xti.h>
 #include <sys/xti_sctp.h>
 
 #include "debug.h"
@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include "allocb.h"
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:20:10 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:08 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

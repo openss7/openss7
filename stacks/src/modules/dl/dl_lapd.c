@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:14:17 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $"
 
-static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $";
+static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -83,8 +83,8 @@ static char const ident[] = "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9 $)
 #include "allocb.h"
 #include "timer.h"
 
-#define LAPD_DESCRIP	"LAPD Data Link (DL-LAPD) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9 $)"
-#define LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:14:17 $"
+#define LAPD_DESCRIP	"LAPD Data Link (DL-LAPD) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.1 $)"
+#define LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:05 $"
 #define LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
 #define LAPD_DEVICE	"OpenSS7 CDI Devices."
 #define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1901,7 +1901,7 @@ cd_info_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_INFO_REQ;
-		printd(("%s: %p: <- CD_INFO_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_INFO_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1924,7 +1924,7 @@ cd_attach_req(queue_t *q, struct cd *cd, struct dl *dl)
 		p->cd_primitive = CD_ATTACH_REQ;
 		p->cd_ppa = cd->ppa;
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_ATTACH_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_ATTACH_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1946,7 +1946,7 @@ cd_detach_req(queue_t *q, struct cd *cd, struct dl *dl)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_DETACH_REQ;
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_DETACH_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_DETACH_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1972,7 +1972,7 @@ cd_enable_req(queue_t *q, struct cd *cd, struct dl *dl)
 		p->cd_dial_offset = 0;
 		cd_set_state(cd, CD_ENABLE_PENDING);
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_ENABLE_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_ENABLE_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -1996,7 +1996,7 @@ cd_disable_req(queue_t *q, struct cd *cd, struct dl *dl, ulong disposal)
 		p->cd_disposal = disposal;
 		cd_set_state(cd, CD_DISABLE_PENDING);
 		dl_wait_link(dl, cd);	/* put the dl into the wait list */
-		printd(("%s: %p: <- CD_DISABLE_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_DISABLE_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2018,7 +2018,7 @@ cd_allow_input_req(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_ALLOW_INPUT_REQ;
 		cd_set_state(cd, CD_INPUT_ALLOWED);
-		printd(("%s: %p: <- CD_ALLOW_INPUT_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_ALLOW_INPUT_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2041,7 +2041,7 @@ cd_read_req(queue_t *q, struct cd *cd, ulong msec)
 		p->cd_primitive = CD_READ_REQ;
 		p->cd_msec = msec;
 		cd_set_state(cd, CD_READ_ACTIVE);
-		printd(("%s: %p: <- CD_READ_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_READ_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2072,7 +2072,7 @@ cd_unitdata_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst_l
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_UNITDATA_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_UNITDATA_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2106,7 +2106,7 @@ cd_write_read_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst
 			mp->b_wptr += dst_len;
 		}
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_WRITE_READ_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_WRITE_READ_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2129,7 +2129,7 @@ cd_halt_input_req(queue_t *q, struct cd *cd, ulong disposal)
 		p->cd_primitive = CD_HALT_INPUT_REQ;
 		p->cd_disposal = disposal;
 		cd_set_state(cd, CD_ENABLED);
-		printd(("%s: %p: <- CD_HALT_INPUT_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_HALT_INPUT_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2150,7 +2150,7 @@ cd_abort_output_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_ABORT_OUTPUT_REQ;
-		printd(("%s: %p: <- CD_ABORT_OUTPUT_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_ABORT_OUTPUT_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2172,7 +2172,7 @@ cd_mux_name_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MUX_NAME_REQ;
-		printd(("%s: %p: <- CD_MUX_NAME_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_MUX_NAME_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2195,7 +2195,7 @@ cd_modem_sig_req(queue_t *q, struct cd *cd, ulong sigs)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MODEM_SIG_REQ;
 		p->cd_sigs = sigs;
-		printd(("%s: %p: <- CD_MODEM_SIG_REQ\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_MODEM_SIG_REQ\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -2216,7 +2216,7 @@ cd_modem_sig_poll(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MODEM_SIG_POLL;
-		printd(("%s: %p: <- CD_MODEM_SIG_POLL\n", DL_LAPD_DRV_NAME, dl));
+		printd(("%s: %p: <- CD_MODEM_SIG_POLL\n", DL_LAPD_DRV_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -3746,7 +3746,7 @@ dl_free_link(struct cd *cd)
 {
 	psw_t flags;
 	ensure(cd, return);
-	printd(("%s: %p: free cd mux = %lu\N", DL_LAPD_DRV_NAME, cd, cd->u.mux.index));
+	printd(("%s: %p: free cd mux = %lu\n", DL_LAPD_DRV_NAME, cd, cd->u.mux.index));
 	lis_spin_lock_irqsave(&cd->lock, &flags);
 	{
 		int i;
@@ -6047,71 +6047,71 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(LAPD_IOCGOPTIONS):
-			printd(("%d: %p: -> LAPD_IOCGOPTIONS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGOPTIONS\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocgoptions(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSOPTIONS):
-			printd(("%d: %p: -> LAPD_IOCSOPTIONS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSOPTIONS\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocsoptions(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGCONFIG):
-			printd(("%d: %p: -> LAPD_IOCGCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGCONFIG\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocgconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSCONFIG):
-			printd(("%d: %p: -> LAPD_IOCSCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSCONFIG\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocsconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCTCONFIG):
-			printd(("%d: %p: -> LAPD_IOCTCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCTCONFIG\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioctconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCCONFIG):
-			printd(("%d: %p: -> LAPD_IOCCCONFIG\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCCONFIG\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioccconfig(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGSTATEM):
-			printd(("%d: %p: -> LAPD_IOCGSTATEM\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGSTATEM\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocgstatem(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCMRESET):
-			printd(("%d: %p: -> LAPD_IOCCMRESET\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCMRESET\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioccmreset(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGSTATSP):
-			printd(("%d: %p: -> LAPD_IOCGSTATSP\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGSTATSP\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocgstatsp(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSSTATSP):
-			printd(("%d: %p: -> LAPD_IOCSSTATSP\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSSTATSP\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocsstatsp(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGSTATS):
-			printd(("%d: %p: -> LAPD_IOCGSTATS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGSTATS\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocgstats(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCSTATS):
-			printd(("%d: %p: -> LAPD_IOCCSTATS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCSTATS\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioccstats(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCGNOTIFY):
-			printd(("%d: %p: -> LAPD_IOCGNOTIFY\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCGNOTIFY\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocgnotify(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCSNOTIFY):
-			printd(("%d: %p: -> LAPD_IOCSNOTIFY\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCSNOTIFY\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_iocsnotify(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCNOTIFY):
-			printd(("%d: %p: -> LAPD_IOCCNOTIFY\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCNOTIFY\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioccnotify(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCMGMT):
-			printd(("%d: %p: -> LAPD_IOCCMGMT\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCMGMT\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioccmgmt(q, dl, hdr, count);
 			break;
 		case _IOC_NR(LAPD_IOCCPASS):
-			printd(("%d: %p: -> LAPD_IOCCPASS\n", DL_LAPD_DRV_NAME, dl));
+			printd(("%s: %p: -> LAPD_IOCCPASS\n", DL_LAPD_DRV_NAME, dl));
 			ret = lapd_ioccpass(q, dl, hdr, count);
 			break;
 		default:

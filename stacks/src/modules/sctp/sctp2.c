@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 07:24:51 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -119,7 +119,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/14 10:33:16 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15330,13 +15330,13 @@ t_capability_ack(sctp_t * sp, ulong caps)
 {
 	mblk_t *mp;
 	struct T_capability_ack *p;
-	uint caps = (acceptor ? TC1_ACCEPTOR : 0) | (info ? TC1_INFO : 0);
+	uint caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_capability_ack *) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) sp->rq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) sp->rq : 0;
 		if (caps & TC1_INFO) {
 			p->INFO_ack.PRIM_type = T_INFO_ACK;
 			p->INFO_ack.TSDU_size = sp->tsdu;

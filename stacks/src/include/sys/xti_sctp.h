@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9 2004/01/17 08:08:43 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.1 2004/04/14 10:33:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:43 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifndef t_uscalar_t
 #define t_uscalar_t ulong
@@ -59,6 +59,7 @@ typedef struct sctp_addr {
 	uint16_t port __attribute__ ((packed));
 	uint32_t addr[0] __attribute__ ((packed));
 } sctp_addr_t;
+#define sctp_addr_t sctp_addr_t
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 

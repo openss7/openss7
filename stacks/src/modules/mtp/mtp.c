@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:00 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:00 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:00 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $"
 
-static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:00 $";
+static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -81,10 +81,10 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9 $) $Da
 #include <sys/npi.h>
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
-#include <sys/tpi.h>
-#include <sys/tpi_ss7.h>
-#include <sys/tpi_mtp.h>
-// #include <sys/xti.h>
+#include <sys/tihdr.h>
+// #include <sys/tpi_ss7.h>
+// #include <sys/tpi_mtp.h>
+#include <sys/xti.h>
 #include <sys/xti_mtp.h>
 
 #include "debug.h"
@@ -96,7 +96,7 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9 $) $Da
 #include "timer.h"
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:00 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:11 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2838,9 +2838,9 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = TC1_INFO;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) mtp->oq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) mtp->oq : 0;
 		if (caps & TC1_INFO)
-			p->INFO_ack = mtp->prot;
+			p->INFO_ack = *(mtp->prot);
 		else
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
 		printd(("%s: %p: <- T_CAPABILITY_ACK\n", MTP_DRV_NAME, mtp));
@@ -13784,7 +13784,6 @@ STATIC int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
-	int err;
 	const struct T_capability_req *p = (typeof(p)) mp->b_rptr;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;

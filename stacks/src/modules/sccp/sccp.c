@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:48 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:48 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:14 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:48 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:14 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -83,10 +83,12 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
 #include <sys/npi_sccp.h>
-#include <sys/tpi.h>
-#include <sys/tpi_ss7.h>
-#include <sys/tpi_mtp.h>
-#include <sys/tpi_sccp.h>
+#include <sys/tihdr.h>
+// #include <sys/tpi.h>
+// #include <sys/tpi_ss7.h>
+// #include <sys/tpi_mtp.h>
+// #include <sys/tpi_sccp.h>
+#include <sys/xti.h>
 #include <sys/xti_mtp.h>
 #include <sys/xti_sccp.h>
 
@@ -102,7 +104,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9 $) $D
 #define INLINE
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:48 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:14 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3600,13 +3602,13 @@ t_capability_ack(queue_t *q, struct sc *sc, ulong caps)
 	mblk_t *mp;
 	struct T_capability_ack *p;
 	size_t msg_len = sizeof(*p);
-	ulong caps = (acceptor ? TC1_ACCEPTOR : 0) | (info ? TC1_INFO : 0);
+	ulong caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
 	if ((mp = ss7_allocb(q, msg_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_capability_ack *) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) sc->oq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) sc->oq : 0;
 		if (caps & TC1_INFO) {
 			p->INFO_ack.PRIM_type = T_INFO_ACK;
 			p->INFO_ack.TSDU_size = sc->tsdu;
@@ -12593,8 +12595,8 @@ sccp_conn_req(queue_t *q, struct sc *sc, struct sccp_addr *dst, ulong *sls, ulon
 {
 	int err = 0;
 	int tries;
-	unsigned short slr;
-	struct sc **scp;
+	unsigned short slr = 0; /* just to shut up compiler */
+	struct sc **scp = NULL; /* just to shut up compiler */
 	struct sp *sp;
 	if (sccp_get_state(sc) != SS_IDLE)
 		goto efault;
@@ -12741,7 +12743,7 @@ sccp_conn_res(queue_t *q, struct sc *sc, mblk_t *cp, struct sc *ap, mblk_t *dp)
 	int err;
 	int tries;
 	unsigned short slr;
-	struct sc **scp;
+	struct sc **scp = NULL; /* just to shut up compiler */
 	struct sccp_msg *m = (struct sccp_msg *) cp->b_rptr;
 	struct sp *sp;
 	struct sr *sr;

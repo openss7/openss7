@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:42 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:23:42 $ by $Author: brian $
+ Last Modified $Date: 2004/04/14 10:33:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:42 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:18 $"
 
-static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:23:42 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:18 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -5059,13 +5059,13 @@ STATIC int t_capability_ack(queue_t *q, struct tcap *tcap, ulong caps)
 	mblk_t *mp;
 	struct T_capability_ack *p;
 	size_t msg_len = sizeof(*p);
-	ulong caps = (acceptor ? TC1_ACCEPTOR : 0) | (info ? TC1_INFO : 0);
+	ulong caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
 	if ((mp = ss7_allocb(q, msg_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((struct T_capability_ack *) mp->b_wptr)++;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR) ? (ulong) tcap->oq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) tcap->oq : 0;
 		if (caps & TC1_INFO) {
 			p->INFO_ack.PRIM_type = T_INFO_ACK;
 			p->INFO_ack.TSDU_size = tcap->tsdu;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:48:45 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 08:48:45 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/04/14 10:33:21 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:48:45 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:48:45 $";
+    "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/14 10:33:21 $";
 
 /* 
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -91,11 +91,19 @@ static char const ident[] =
 #include "../include/sys/xti_ip.h"
 #include "../include/sys/xti_sctp.h"
 #else
-#include <sys/tpi.h>
-#include <sys/tpi_sctp.h>
+#include <sys/tihdr.h>
+#include <sys/xti.h>
 #include <sys/xti_ip.h>
 #include <sys/xti_sctp.h>
 #endif
+
+#ifndef sctp_addr_t
+typedef struct sctp_addr {
+	uint16_t port __attribute__ ((packed));
+	uint32_t addr[0] __attribute__ ((packed));
+} sctp_addr_t;
+#define sctp_addr_t sctp_addr_t
+#endif				/* sctp_addr_t */
 
 #define BUFSIZE 5*4096
 #define FFLUSH(stream)
@@ -279,7 +287,7 @@ struct {
 	, 50, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE,
 		    T_SUCCESS}
-	, SCTP_HMAC_NONE, {
+	, T_SCTP_HMAC_NONE, {
 	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
 , 0};
 
@@ -645,13 +653,13 @@ print_opt(char *opt_ptr, size_t opt_len)
 					printf("T_SCTP_MAC_TYPE = ");
 					switch (val) {
 					default:
-					case SCTP_HMAC_NONE:
+					case T_SCTP_HMAC_NONE:
 						sprintf(result, "NONE");
 						break;
-					case SCTP_HMAC_SHA_1:
-						sprintf(result, "SHA_1");
+					case T_SCTP_HMAC_SHA1:
+						sprintf(result, "SHA1");
 						break;
-					case SCTP_HMAC_MD5:
+					case T_SCTP_HMAC_MD5:
 						sprintf(result, "MD5");
 						break;
 					}
@@ -2182,14 +2190,14 @@ preamble_6(void)
 int
 preamble_7(void)
 {
-	opt_optm.mac_val = SCTP_HMAC_SHA_1;
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
 	return preamble_1();
 }
 
 int
 preamble_8(void)
 {
-	opt_optm.mac_val = SCTP_HMAC_MD5;
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1();
 }
 
@@ -2236,7 +2244,7 @@ postamble_1(void)
 				failed = state;
 		}
 		opt_data.sid_val = 0;
-		opt_optm.mac_val = SCTP_HMAC_NONE;
+		opt_optm.mac_val = T_SCTP_HMAC_NONE;
 		opt_optm.dbg_val = 0;
 		opt_optm.rcv_val = T_NO;
 		opt_optm.ist_val = 1;
@@ -2318,7 +2326,7 @@ postamble_2(void)
 				failed = state;
 		}
 		opt_data.sid_val = 0;
-		opt_optm.mac_val = SCTP_HMAC_NONE;
+		opt_optm.mac_val = T_SCTP_HMAC_NONE;
 		opt_optm.dbg_val = 0;
 		opt_optm.rcv_val = T_NO;
 		opt_optm.ist_val = 1;
@@ -2400,7 +2408,7 @@ postamble_3(void)
 				failed = state;
 		}
 		opt_data.sid_val = 0;
-		opt_optm.mac_val = SCTP_HMAC_NONE;
+		opt_optm.mac_val = T_SCTP_HMAC_NONE;
 		opt_optm.dbg_val = 0;
 		opt_optm.rcv_val = T_NO;
 		opt_optm.ist_val = 1;
@@ -2838,7 +2846,7 @@ test_case_4b(void)
 #define desc_case_5 "\
 Test Case 5:\n\
 Attempt and accept a connection.  This should be successful.  The\n\
-accepting stream uses the SCTP_HMAC_NONE signature on its cookie."
+accepting stream uses the T_SCTP_HMAC_NONE signature on its cookie."
 int
 test_case_5(void)
 {
@@ -2892,7 +2900,7 @@ test_case_5(void)
 #define desc_case_5b "\
 Test Case 5(b):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
-accepting stream uses the SCTP_HMAC_MD5 signature on its cookie."
+accepting stream uses the T_SCTP_HMAC_MD5 signature on its cookie."
 int
 test_case_5b(void)
 {
@@ -2946,7 +2954,7 @@ test_case_5b(void)
 #define desc_case_5c "\
 Test Case 5(c):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
-accepting stream uses the SCTP_HMAC_SHA_1 signature on its cookie."
+accepting stream uses the T_SCTP_HMAC_SHA1 signature on its cookie."
 int
 test_case_5c(void)
 {
