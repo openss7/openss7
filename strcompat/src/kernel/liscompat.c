@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) liscompat.c,v (0.9.2.17) 2003/10/28 08:00:04
+ @(#) liscompat.c,v (1.1.2.17) 2003/10/28 08:00:04
 
  -----------------------------------------------------------------------------
 
@@ -50,16 +50,12 @@
 
  *****************************************************************************/
 
-#ident "@(#) liscompat.c,v (0.9.2.17) 2003/10/28 08:00:04"
+#ident "@(#) liscompat.c,v (1.1.2.17) 2003/10/28 08:00:04"
 
 static char const ident[] =
-    "liscompat.c,v (0.9.2.17) 2003/10/28 08:00:04";
+    "liscompat.c,v (1.1.2.17) 2003/10/28 08:00:04";
 
 #include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 
 /* 
@@ -116,7 +112,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS liscompat.c,v (0.9.2.17) 2003/10/28 08:00:04"
+#define LISCOMP_REVISION	"LfS liscompat.c,v (1.1.2.17) 2003/10/28 08:00:04"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -134,8 +130,7 @@ MODULE_SUPPORTED_DEVICE(LISCOMP_DEVICE);
 MODULE_LICENSE(LISCOMP_LICENSE);
 
 #ifndef CONFIG_STREAMS_CLONE_MAJOR
-#define CONFIG_STREAMS_CLONE_MAJOR 54
-//#error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
+#error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
 #endif
 
 /* 
@@ -260,7 +255,7 @@ char *lis_poll_file = "<linux/poll.h>";
 char *lis_stropts_file = "<linux/stropts.h>";
 char lis_date[] = "2003/10/28 08:00:04";
 char lis_kernel_version[] = UTS_RELEASE;
-char lis_version[] = "0.9.2.17";
+char lis_version[] = "1.1.2.17";
 char *lis_poll_events(short events)
 {
 	return dont_use_this_function();

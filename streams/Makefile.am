@@ -1,0 +1,564 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/01 00:08:40 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/03/01 00:08:40 $ by $Author: brian $
+#
+# =============================================================================
+
+#bin_PROGRAMS			= 
+#sbin_PROGRAMS			= 
+
+#LFS_EXTRA_TESTS			= 
+#LFS_EXTRA_TOOLS			= 
+
+LDADD				= 
+
+lib_LTLIBRARIES			= 
+
+noinst_LIBRARIES		= \
+				libLfSkernel.a \
+				libLfSdrivers.a \
+				libLfSmodules.a \
+				libLfScompat.a
+
+libLfSkernel_a_SOURCES		= \
+				src/kernel/strattach.c \
+				src/kernel/strattach.h \
+				src/kernel/strhead.c \
+				src/kernel/strhead.h \
+				src/kernel/strmain.c \
+				src/kernel/strprocfs.c \
+				src/kernel/strprocfs.h \
+				src/kernel/strsad.c \
+				src/kernel/strsad.h \
+				src/kernel/strsched.c \
+				src/kernel/strsched.h \
+				src/kernel/strspecfs.c \
+				src/kernel/strspecfs.h \
+				src/kernel/strsyms.c \
+				src/kernel/strsysctl.c \
+				src/kernel/strsysctl.h \
+				src/kernel/strutil.c \
+				src/kernel/strutil.h \
+				src/kernel/strreg.c \
+				src/kernel/strreg.h
+
+libLfSkernel_a_DEPENDENCIES	=
+libLfSkernel_a_CPPFLAGS		= \
+				-I./src/kernel -I@srcdir@/src/kernel \
+				-I./src/drivers -I@srcdir@/src/drivers \
+				-I./src/modules -I@srcdir@/src/modules \
+				@LFS_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libLfSkernel_a_CFLAGS		= @KERNEL_CFLAGS@
+
+libLfSdrivers_a_SOURCES		= \
+				src/drivers/echo.c \
+				src/drivers/nuls.c \
+				src/drivers/sad.c \
+				src/drivers/strclone.c \
+				src/drivers/strfifo.c \
+				src/drivers/strfifo.h \
+				src/drivers/strnsdev.c \
+				src/drivers/strpipe.c \
+				src/drivers/strpipe.h \
+				src/drivers/strsock.c \
+				src/drivers/strsock.h
+#				src/drivers/strinet.c
+#				src/drivers/strsfx.c
+#				src/drivers/strsocksys.c
+#				src/drivers/strspx.c
+#				src/drivers/strunix.c
+#				src/drivers/strxnet.c
+
+
+libLfSdrivers_a_DEPENDENCIES	=
+libLfSdrivers_a_CPPFLAGS	= \
+				-I./src/kernel -I@srcdir@/src/kernel \
+				-I./src/drivers -I@srcdir@/src/drivers \
+				-I./src/modules -I@srcdir@/src/modules \
+				@LFS_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libLfSdrivers_a_CFLAGS		= @KERNEL_CFLAGS@
+
+libLfSmodules_a_SOURCES		= \
+				src/modules/connld.c \
+				src/modules/pipemod.c \
+				src/modules/sockmod.c \
+				src/modules/timod.c \
+				src/modules/tirdwr.c
+
+
+libLfSmodules_a_DEPENDENCIES	=
+libLfSmodules_a_CPPFLAGS	= \
+				-I./src/kernel -I@srcdir@/src/kernel \
+				-I./src/drivers -I@srcdir@/src/drivers \
+				-I./src/modules -I@srcdir@/src/modules \
+				@LFS_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libLfSmodules_a_CFLAGS		= @KERNEL_CFLAGS@
+
+libLfScompat_a_SOURCES		= \
+				src/compat/aix/aixcompat.c \
+				src/compat/aix/aixksyms.c \
+				src/compat/hpux/hpuxcompat.c \
+				src/compat/hpux/hpuxksyms.c \
+				src/compat/lis/liscompat.c \
+				src/compat/lis/lisksyms.c \
+				src/compat/osf/osfcompat.c \
+				src/compat/osf/osfksyms.c \
+				src/compat/sun/suncompat.c \
+				src/compat/sun/sunksyms.c \
+				src/compat/svr4/svr4compat.c \
+				src/compat/svr4/svr4ksyms.c \
+				src/compat/uw7/uw7compat.c \
+				src/compat/uw7/uw7ksyms.c
+
+libLfScompat_a_DEPENDENCIES	=
+libLfScompat_a_CPPFLAGS		= \
+				-I./src/compat -I@srcdir@/src/compat \
+				-I./src/kernel -I@srcdir@/src/kernel \
+				-I./src/drivers -I@srcdir@/src/drivers \
+				-I./src/modules -I@srcdir@/src/modules \
+				@LFS_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@ -DEXPORT_SYMTAB
+libLfScompat_a_CFLAGS		= @KERNEL_CFLAGS@
+
+streams.o: $(libLfSkernel_a_OBJECTS)
+	$(LD) -r -o $@ $^
+
+KERNEL_MODULES			= streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
+KERNEL_MODCONF			= $(LFS_SC_CONFMOD)
+KERNEL_SUBDIR			= streams
+KMODCONF_EXT			= streams
+
+MANMACRO_PFX			= streams
+mansrcdir			= $(srcdir)/doc/man
+
+include kernel.am
+
+#EXTRA_PROGRAMS			= 
+#bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
+#sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
+
+dist_man_MANS = \
+	doc/man/man2/fattach.2 doc/man/man2/fcntl.2 doc/man/man2/fcntl.2s doc/man/man2/getmsg.2 doc/man/man2/getpmsg.2 \
+	doc/man/man2/pipe.2 doc/man/man2/pipe.2s doc/man/man2/poll.2 doc/man/man2/poll.2s doc/man/man2/putmsg.2 \
+	doc/man/man2/putpmsg.2 doc/man/man2/read.2 doc/man/man2/readv.2 doc/man/man2/soon.2 doc/man/man2/write.2 \
+	doc/man/man2/writev.2 \
+	doc/man/man3/accept.3 doc/man/man3/bind.3 doc/man/man3/connect.3 doc/man/man3/fattach.3 doc/man/man3/fdetach.3 \
+	doc/man/man3/getpeername.3 doc/man/man3/getsockname.3 doc/man/man3/getsockopt.3 doc/man/man3/isastream.3 \
+	doc/man/man3/libsocket.3 doc/man/man3/listen.3 doc/man/man3/netbuf.3 doc/man/man3/pipe.3 doc/man/man3/recv.3 \
+	doc/man/man3/recvfrom.3 doc/man/man3/recvmsg.3 doc/man/man3/send.3 doc/man/man3/sendmsg.3 \
+	doc/man/man3/sendto.3 doc/man/man3/setsockopt.3 doc/man/man3/shutdown.3 doc/man/man3/socket.3 \
+	doc/man/man3/socketpair.3 doc/man/man3/sockets.3 doc/man/man3/s_pipe.3 doc/man/man3/t_accept.3 \
+	doc/man/man3/t_addleaf.3 doc/man/man3/t_alloc.3 doc/man/man3/t_bind.3 doc/man/man3/t_close.3 \
+	doc/man/man3/t_connect.3 doc/man/man3/t_errno.3 doc/man/man3/t_error.3 doc/man/man3/t_free.3 \
+	doc/man/man3/t_getinfo.3 doc/man/man3/t_getprotaddr.3 doc/man/man3/t_getstate.3 doc/man/man3/t_listen.3 \
+	doc/man/man3/t_look.3 doc/man/man3/t_open.3 doc/man/man3/t_optmgmt.3 doc/man/man3/t_rcv.3 \
+	doc/man/man3/t_rcvconnect.3 doc/man/man3/t_rcvdis.3 doc/man/man3/t_rcvleafchange.3 doc/man/man3/t_rcvrel.3 \
+	doc/man/man3/t_rcvreldata.3 doc/man/man3/t_rcvudata.3 doc/man/man3/t_rcvuderr.3 doc/man/man3/t_rcvv.3 \
+	doc/man/man3/t_rcvvudata.3 doc/man/man3/t_removeleaf.3 doc/man/man3/t_snd.3 doc/man/man3/t_snddis.3 \
+	doc/man/man3/t_sndrel.3 doc/man/man3/t_sndreldata.3 doc/man/man3/t_sndudata.3 doc/man/man3/t_sndv.3 \
+	doc/man/man3/t_sndvudata.3 doc/man/man3/t_strerror.3 doc/man/man3/t_sync.3 doc/man/man3/t_sysconf.3 \
+	doc/man/man3/t_unbind.3 doc/man/man3/xnet.3 doc/man/man3/xti.3 doc/man/man3/xti_ip.3 doc/man/man3/xti_mtp.3 \
+	doc/man/man3/xti_sccp.3 doc/man/man3/xti_sctp.3 doc/man/man3/xti_ss7.3 doc/man/man3/xti_sscop.3 \
+	doc/man/man3/xti_tcap.3 doc/man/man3/xti_tcp.3 doc/man/man3/xti_udp.3 \
+	doc/man/man4/acb56.4 doc/man/man4/bicc.4 doc/man/man4/bicc_ioctl.4 doc/man/man4/bssap.4 \
+	doc/man/man4/bssap_ioctl.4 doc/man/man4/bua.4 doc/man/man4/bua_ioctl.4 doc/man/man4/capi.4 \
+	doc/man/man4/capi_ioctl.4 doc/man/man4/clone.4 doc/man/man4/connld.4 doc/man/man4/connld.old.4 \
+	doc/man/man4/dl.4 doc/man/man4/dl_ioctl.4 doc/man/man4/dua.4 doc/man/man4/echo.4 doc/man/man4/egp.4 \
+	doc/man/man4/eth.4 doc/man/man4/fifo.4 doc/man/man4/fifo.old.4 doc/man/man4/ggp.4 doc/man/man4/gr303.4 \
+	doc/man/man4/gr303_ioctl.4 doc/man/man4/gr303ua.4 doc/man/man4/gr303ua_ioctl.4 doc/man/man4/gsma.4 \
+	doc/man/man4/h225.4 doc/man/man4/h225_ioctl.4 doc/man/man4/h245.4 doc/man/man4/h248.4 \
+	doc/man/man4/h248_ioctl.4 doc/man/man4/hdlc.4 doc/man/man4/hdlc_ioctl.4 doc/man/man4/icmp.4 doc/man/man4/idp.4 \
+	doc/man/man4/INET.4 doc/man/man4/ip.4 doc/man/man4/ipip.4 doc/man/man4/ISDN.4 doc/man/man4/isdn.4 \
+	doc/man/man4/isdn_ioctl.4 doc/man/man4/isua.4 doc/man/man4/isua_ioctl.4 doc/man/man4/isup.4 \
+	doc/man/man4/isup_ioctl.4 doc/man/man4/iua.4 doc/man/man4/iua_ioctl.4 doc/man/man4/lapb.4 doc/man/man4/lapd.4 \
+	doc/man/man4/lapf.4 doc/man/man4/lmi_ioctl.4 doc/man/man4/m2pa.4 doc/man/man4/m2ua.4 doc/man/man4/m2ua_ioctl.4 \
+	doc/man/man4/m3ua.4 doc/man/man4/m3ua_ioctl.4 doc/man/man4/MG.4 doc/man/man4/mg.4 doc/man/man4/mgc.4 \
+	doc/man/man4/mgcp.4 doc/man/man4/mgcp_ioctl.4 doc/man/man4/mtp.4 doc/man/man4/mtp_ioctl.4 \
+	doc/man/man4/mtp_tpi.4 doc/man/man4/mx.4 doc/man/man4/mx_ioctl.4 doc/man/man4/nsdev.4 doc/man/man4/nuls.4 \
+	doc/man/man4/OpenSS7.4 doc/man/man4/pipe.4 doc/man/man4/pipemod.4 doc/man/man4/pipemod.old.4 \
+	doc/man/man4/pup.4 doc/man/man4/q921.4 doc/man/man4/q922.4 doc/man/man4/q931.4 doc/man/man4/rawip.4 \
+	doc/man/man4/rtp.4 doc/man/man4/sad.4 doc/man/man4/sc.4 doc/man/man4/sccp.4 doc/man/man4/sccp_ioctl.4 \
+	doc/man/man4/sctp.4 doc/man/man4/sdl.4 doc/man/man4/sdl_ioctl.4 doc/man/man4/sdt.4 doc/man/man4/sdt_ioctl.4 \
+	doc/man/man4/s_fifo.4 doc/man/man4/sfx.4 doc/man/man4/SIGTRAN.4 doc/man/man4/sl.4 doc/man/man4/sl_ioctl.4 \
+	doc/man/man4/sockmod.4 doc/man/man4/socksys.4 doc/man/man4/soon.4 doc/man/man4/spx.4 doc/man/man4/SS7.4 \
+	doc/man/man4/sscop.4 doc/man/man4/sscop_mce.4 doc/man/man4/STREAMS.4 doc/man/man4/sua.4 \
+	doc/man/man4/sua_ioctl.4 doc/man/man4/tali.4 doc/man/man4/tali_ioctl.4 doc/man/man4/tcap.4 \
+	doc/man/man4/tcap_ioctl.4 doc/man/man4/tcp.4 doc/man/man4/ticlts.4 doc/man/man4/ticots.4 \
+	doc/man/man4/ticotsord.4 doc/man/man4/timod.4 doc/man/man4/tirdwr.4 doc/man/man4/tlclts.4 \
+	doc/man/man4/tlcots.4 doc/man/man4/tlcotsod.4 doc/man/man4/tua.4 doc/man/man4/tua_ioctl.4 \
+	doc/man/man4/ua_ioctl.4 doc/man/man4/udp.4 doc/man/man4/v52.4 doc/man/man4/v5.4 doc/man/man4/v5_ioctl.4 \
+	doc/man/man4/v5ua.4 doc/man/man4/v5ua_ioctl.4 doc/man/man4/VOIP.4 doc/man/man4/x100p.4 doc/man/man4/x100p-ch.4 \
+	doc/man/man4/x100p-ss7.4 doc/man/man4/x400p.4 doc/man/man4/x400p-ch.4 doc/man/man4/x400p-ss7.4 \
+	doc/man/man5/autopush.5 \
+	doc/man/man7/CD_ABORT_OUTPUT_REQ.7 doc/man/man7/cd_abort_output_req_t.7 doc/man/man7/CD_ALLOW_INPUT_REQ.7 \
+	doc/man/man7/cd_allow_input_req_t.7 doc/man/man7/CD_ATTACH_REQ.7 doc/man/man7/cd_attach_req_t.7 \
+	doc/man/man7/CD_BAD_FRAME_IND.7 doc/man/man7/cd_bad_frame_ind_t.7 doc/man/man7/CD_DETACH_REQ.7 \
+	doc/man/man7/cd_detach_req_t.7 doc/man/man7/CD_DISABLE_CON.7 doc/man/man7/cd_disable_con_t.7 \
+	doc/man/man7/CD_DISABLE_REQ.7 doc/man/man7/cd_disable_req_t.7 doc/man/man7/CD_ENABLE_CON.7 \
+	doc/man/man7/cd_enable_con_t.7 doc/man/man7/CD_ENABLE_REQ.7 doc/man/man7/cd_enable_req_t.7 \
+	doc/man/man7/CD_ERROR_ACK.7 doc/man/man7/cd_error_ack_t.7 doc/man/man7/CD_ERROR_IND.7 \
+	doc/man/man7/cd_error_ind_t.7 doc/man/man7/CD_HALT_INPUT_REQ.7 doc/man/man7/cd_halt_input_req_t.7 \
+	doc/man/man7/CD_INFO_ACK.7 doc/man/man7/cd_info_ack_t.7 doc/man/man7/CD_INFO_REQ.7 \
+	doc/man/man7/CD_MODEM_SIG_IND.7 doc/man/man7/cd_modem_sig_ind_t.7 doc/man/man7/CD_MODEM_SIG_POLL.7 \
+	doc/man/man7/cd_modem_sig_poll_t.7 doc/man/man7/CD_MODEM_SIG_REQ.7 doc/man/man7/cd_modem_sig_req_t.7 \
+	doc/man/man7/CD_MUX_NAME_REQ.7 doc/man/man7/cd_mux_name_req_t.7 doc/man/man7/CD_OK_ACK.7 \
+	doc/man/man7/cd_ok_ack_t.7 doc/man/man7/CD_READ_REQ.7 doc/man/man7/cd_read_req_t.7 \
+	doc/man/man7/CD_UNITDATA_ACK.7 doc/man/man7/cd_unitdata_ack_t.7 doc/man/man7/CD_UNITDATA_IND.7 \
+	doc/man/man7/cd_unitdata_ind_t.7 doc/man/man7/CD_UNITDATA_REQ.7 doc/man/man7/cd_unitdata_req_t.7 \
+	doc/man/man7/CD_WRITE_READ_REQ.7 doc/man/man7/cd_write_read_req_t.7 doc/man/man7/DL_ATTACH_REQ.7 \
+	doc/man/man7/dl_attach_req_t.7 doc/man/man7/DL_BIND_ACK.7 doc/man/man7/dl_bind_ack_t.7 \
+	doc/man/man7/DL_BIND_REQ.7 doc/man/man7/dl_bind_req_t.7 doc/man/man7/DL_CONNECT_CON.7 \
+	doc/man/man7/dl_connect_con_t.7 doc/man/man7/DL_CONNECT_IND.7 doc/man/man7/dl_connect_ind_t.7 \
+	doc/man/man7/DL_CONNECT_REQ.7 doc/man/man7/dl_connect_req_t.7 doc/man/man7/DL_CONNECT_RES.7 \
+	doc/man/man7/dl_connect_res_t.7 doc/man/man7/DL_DATA_ACK_IND.7 doc/man/man7/dl_data_ack_ind_t.7 \
+	doc/man/man7/DL_DATA_ACK_REQ.7 doc/man/man7/dl_data_ack_req_t.7 doc/man/man7/DL_DATA_ACK_STATUS_IND.7 \
+	doc/man/man7/dl_data_ack_status_ind_t.7 doc/man/man7/DL_DATA_IND.7 doc/man/man7/DL_DATA_REQ.7 \
+	doc/man/man7/DL_DETACH_REQ.7 doc/man/man7/dl_detach_req_t.7 doc/man/man7/DL_DISABMULTI_REQ.7 \
+	doc/man/man7/dl_disabmulti_req_t.7 doc/man/man7/DL_DISCONNECT_IND.7 doc/man/man7/dl_disconnect_ind_t.7 \
+	doc/man/man7/DL_DISCONNECT_REQ.7 doc/man/man7/dl_disconnect_req_t.7 doc/man/man7/DL_ENABMULTI_REQ.7 \
+	doc/man/man7/dl_enabmulti_req_t.7 doc/man/man7/DL_ERROR_ACK.7 doc/man/man7/dl_error_ack_t.7 \
+	doc/man/man7/DL_GET_STATISTICS_ACK.7 doc/man/man7/dl_get_statistics_ack_t.7 \
+	doc/man/man7/DL_GET_STATISTICS_REQ.7 doc/man/man7/dl_get_statistics_req_t.7 doc/man/man7/DL_INFO_ACK.7 \
+	doc/man/man7/dl_info_ack_t.7 doc/man/man7/DL_INFO_REQ.7 doc/man/man7/dl_info_req_t.7 doc/man/man7/DL_OK_ACK.7 \
+	doc/man/man7/dl_ok_ack_t.7 doc/man/man7/DL_PHYS_ADDR_ACK.7 doc/man/man7/dl_phys_addr_ack_t.7 \
+	doc/man/man7/DL_PHYS_ADDR_REQ.7 doc/man/man7/dl_phys_addr_req_t.7 doc/man/man7/dlpi.7 doc/man/man7/dlpi_eth.7 \
+	doc/man/man7/DL_PROMISCOFF_REQ.7 doc/man/man7/dl_promiscoff_req_t.7 doc/man/man7/DL_PROMISCON_REQ.7 \
+	doc/man/man7/dl_promiscon_req_t.7 doc/man/man7/DL_REPLY_IND.7 doc/man/man7/dl_reply_ind_t.7 \
+	doc/man/man7/DL_REPLY_REQ.7 doc/man/man7/dl_reply_req_t.7 doc/man/man7/DL_REPLY_STATUS_IND.7 \
+	doc/man/man7/dl_reply_status_ind_t.7 doc/man/man7/DL_REPLY_UPDATE_REQ.7 doc/man/man7/dl_reply_update_req_t.7 \
+	doc/man/man7/DL_REPLY_UPDATE_STATUS_IND.7 doc/man/man7/dl_reply_update_status_ind_t.7 \
+	doc/man/man7/DL_RESET_CON.7 doc/man/man7/dl_reset_con_t.7 doc/man/man7/DL_RESET_IND.7 \
+	doc/man/man7/dl_reset_ind_t.7 doc/man/man7/DL_RESET_REQ.7 doc/man/man7/dl_reset_req_t.7 \
+	doc/man/man7/DL_RESET_RES.7 doc/man/man7/dl_reset_res_t.7 doc/man/man7/DL_SET_PHYS_ADDR_REQ.7 \
+	doc/man/man7/dl_set_phys_addr_req_t.7 doc/man/man7/DL_SUBS_BIND_ACK.7 doc/man/man7/dl_subs_bind_ack_t.7 \
+	doc/man/man7/DL_SUBS_BIND_REQ.7 doc/man/man7/dl_subs_bind_req_t.7 doc/man/man7/DL_SUBS_UNBIND_REQ.7 \
+	doc/man/man7/dl_subs_unbind_req_t.7 doc/man/man7/DL_TEST_CON.7 doc/man/man7/dl_test_con_t.7 \
+	doc/man/man7/DL_TEST_IND.7 doc/man/man7/dl_test_ind_t.7 doc/man/man7/DL_TEST_REQ.7 \
+	doc/man/man7/dl_test_req_t.7 doc/man/man7/DL_TEST_RES.7 doc/man/man7/dl_test_res_t.7 \
+	doc/man/man7/DL_TOKEN_ACK.7 doc/man/man7/dl_token_ack_t.7 doc/man/man7/DL_TOKEN_REQ.7 \
+	doc/man/man7/dl_token_req_t.7 doc/man/man7/DL_UDERROR_IND.7 doc/man/man7/dl_uderror_ind_t.7 \
+	doc/man/man7/DL_UDQOS_REQ.7 doc/man/man7/dl_udqos_req_t.7 doc/man/man7/DL_UNBIND_REQ.7 \
+	doc/man/man7/dl_unbind_req_t.7 doc/man/man7/DL_UNITDATA_IND.7 doc/man/man7/dl_unitdata_ind_t.7 \
+	doc/man/man7/DL_UNITDATA_REQ.7 doc/man/man7/dl_unitdata_req_t.7 doc/man/man7/DL_XID_CON.7 \
+	doc/man/man7/dl_xid_con_t.7 doc/man/man7/DL_XID_IND.7 doc/man/man7/dl_xid_ind_t.7 doc/man/man7/DL_XID_REQ.7 \
+	doc/man/man7/dl_xid_req_t.7 doc/man/man7/DL_XID_RES.7 doc/man/man7/dl_xid_res_t.7 doc/man/man7/N_BIND_ACK.7 \
+	doc/man/man7/N_bind_ack_t.7 doc/man/man7/N_BIND_REQ.7 doc/man/man7/N_bind_req_t.7 doc/man/man7/N_CONN_CON.7 \
+	doc/man/man7/N_conn_con_t.7 doc/man/man7/N_CONN_IND.7 doc/man/man7/N_conn_ind_t.7 doc/man/man7/N_CONN_REQ.7 \
+	doc/man/man7/N_conn_req_t.7 doc/man/man7/N_CONN_RES.7 doc/man/man7/N_conn_res_t.7 doc/man/man7/N_DATACK_IND.7 \
+	doc/man/man7/N_datack_ind_t.7 doc/man/man7/N_DATACK_REQ.7 doc/man/man7/N_datack_req_t.7 \
+	doc/man/man7/N_DATA_IND.7 doc/man/man7/N_data_ind_t.7 doc/man/man7/N_DATA_REQ.7 doc/man/man7/N_data_req_t.7 \
+	doc/man/man7/N_DISCON_IND.7 doc/man/man7/N_discon_ind_t.7 doc/man/man7/N_DISCON_REQ.7 \
+	doc/man/man7/N_discon_req_t.7 doc/man/man7/N_ERROR_ACK.7 doc/man/man7/N_error_ack_t.7 \
+	doc/man/man7/N_EXDATA_IND.7 doc/man/man7/N_exdata_ind_t.7 doc/man/man7/N_EXDATA_REQ.7 \
+	doc/man/man7/N_exdata_req_t.7 doc/man/man7/N_INFO_ACK.7 doc/man/man7/N_info_ack_t.7 doc/man/man7/N_INFO_REQ.7 \
+	doc/man/man7/N_info_req_t.7 doc/man/man7/N_OK_ACK.7 doc/man/man7/N_ok_ack_t.7 doc/man/man7/N_OPTMGMT_REQ.7 \
+	doc/man/man7/N_optmgmt_req_t.7 doc/man/man7/npi.7 doc/man/man7/npi_mtp.7 doc/man/man7/npi_sccp.7 \
+	doc/man/man7/npi_sctp.7 doc/man/man7/npi_sscop.7 doc/man/man7/N_RESET_CON.7 doc/man/man7/N_reset_con_t.7 \
+	doc/man/man7/N_RESET_IND.7 doc/man/man7/N_reset_ind_t.7 doc/man/man7/N_RESET_REQ.7 \
+	doc/man/man7/N_reset_req_t.7 doc/man/man7/N_RESET_RES.7 doc/man/man7/N_reset_res_t.7 \
+	doc/man/man7/N_UDERROR_IND.7 doc/man/man7/N_uderror_ind_t.7 doc/man/man7/N_UNBIND_REQ.7 \
+	doc/man/man7/N_unbind_req_t.7 doc/man/man7/N_UNITDATA_IND.7 doc/man/man7/N_unitdata_ind_t.7 \
+	doc/man/man7/N_UNITDATA_REQ.7 doc/man/man7/N_unitdata_req_t.7 doc/man/man7/saal_sscop.7 doc/man/man7/soon.7 \
+	doc/man/man7/streamio.7 doc/man/man7/T_ADDR_ACK.7 doc/man/man7/T_addr_ack.7 doc/man/man7/T_ADDR_REQ.7 \
+	doc/man/man7/T_addr_req.7 doc/man/man7/T_BIND_ACK.7 doc/man/man7/T_bind_ack.7 doc/man/man7/T_BIND_REQ.7 \
+	doc/man/man7/T_bind_req.7 doc/man/man7/T_CAPABILITY_ACK.7 doc/man/man7/T_capability_ack.7 \
+	doc/man/man7/T_CAPABILITY_REQ.7 doc/man/man7/T_capability_req.7 doc/man/man7/T_CONN_CON.7 \
+	doc/man/man7/T_conn_con.7 doc/man/man7/T_CONN_IND.7 doc/man/man7/T_conn_ind.7 doc/man/man7/T_CONN_REQ.7 \
+	doc/man/man7/T_conn_req.7 doc/man/man7/T_CONN_RES.7 doc/man/man7/T_conn_res.7 doc/man/man7/T_DATA_IND.7 \
+	doc/man/man7/T_data_ind.7 doc/man/man7/T_DATA_REQ.7 doc/man/man7/T_data_req.7 doc/man/man7/T_DISCON_IND.7 \
+	doc/man/man7/T_discon_ind.7 doc/man/man7/T_DISCON_REQ.7 doc/man/man7/T_discon_req.7 doc/man/man7/T_ERROR_ACK.7 \
+	doc/man/man7/T_error_ack.7 doc/man/man7/T_EXDATA_IND.7 doc/man/man7/T_exdata_ind.7 doc/man/man7/T_EXDATA_REQ.7 \
+	doc/man/man7/T_exdata_req.7 doc/man/man7/T_INFO_ACK.7 doc/man/man7/T_info_ack.7 doc/man/man7/T_INFO_REQ.7 \
+	doc/man/man7/T_info_req.7 doc/man/man7/T_OK_ACK.7 doc/man/man7/T_ok_ack.7 doc/man/man7/T_OPTDATA_IND.7 \
+	doc/man/man7/T_optdata_ind.7 doc/man/man7/T_OPTDATA_REQ.7 doc/man/man7/T_optdata_req.7 \
+	doc/man/man7/T_OPTMGMT_ACK.7 doc/man/man7/T_optmgmt_ack.7 doc/man/man7/T_OPTMGMT_REQ.7 \
+	doc/man/man7/T_optmgmt_req.7 doc/man/man7/T_ORDREL_IND.7 doc/man/man7/T_ordrel_ind.7 \
+	doc/man/man7/T_ORDREL_REQ.7 doc/man/man7/T_ordrel_req.7 doc/man/man7/tpi.7 doc/man/man7/tpi_ip.7 \
+	doc/man/man7/tpi_mtp.7 doc/man/man7/tpi_sccp.7 doc/man/man7/tpi_sctp.7 doc/man/man7/tpi_sscop.7 \
+	doc/man/man7/tpi_tcap.7 doc/man/man7/tpi_tcp.7 doc/man/man7/tpi_udp.7 doc/man/man7/T_UDERROR_IND.7 \
+	doc/man/man7/T_uderror_ind.7 doc/man/man7/T_UNBIND_REQ.7 doc/man/man7/T_unbind_req.7 \
+	doc/man/man7/T_UNITDATA_IND.7 doc/man/man7/T_unitdata_ind.7 doc/man/man7/T_UNITDATA_REQ.7 \
+	doc/man/man7/T_unitdata_req.7 \
+	doc/man/man8/autopush.8 doc/man/man8/fattach.8 doc/man/man8/fattach.old.8 doc/man/man8/fdetach.8 \
+	doc/man/man8/fdetach.old.8 doc/man/man8/insf.8 doc/man/man8/lisbcm.8 doc/man/man8/soon.8 \
+	doc/man/man8/strconf.8 doc/man/man8/strinfo.8 doc/man/man8/strload.8 doc/man/man8/strsetup.8 \
+	doc/man/man8/xxx.8 \
+	doc/man/man9/adjmsg.9 doc/man/man9/allocb.9 doc/man/man9/allocb_physreq.9 doc/man/man9/alloc_proto.9 \
+	doc/man/man9/allocq.9 doc/man/man9/appq.9 doc/man/man9/apush_get.9 doc/man/man9/apush_set.9 \
+	doc/man/man9/autopush_add.9 doc/man/man9/autopush_del.9 doc/man/man9/autopush_find.9 \
+	doc/man/man9/autopush_vml.9 doc/man/man9/backq.9 doc/man/man9/bcanput.9 doc/man/man9/bcanputnext.9 \
+	doc/man/man9/bcopy.9 doc/man/man9/bufcall.9 doc/man/man9/bzero.9 doc/man/man9/canenable.9 \
+	doc/man/man9/canput.9 doc/man/man9/canputnext.9 doc/man/man9/cdevsw.9 doc/man/man9/cmn_err.9 \
+	doc/man/man9/copyb.9 doc/man/man9/copyin.9 doc/man/man9/copymsg.9 doc/man/man9/copyout.9 doc/man/man9/cred_t.9 \
+	doc/man/man9/datab.9 doc/man/man9/datamsg.9 doc/man/man9/DDI.9 doc/man/man9/ddi_get_cred.9 \
+	doc/man/man9/ddi_getiminor.9 doc/man/man9/ddi_get_lbolt.9 doc/man/man9/ddi_get_pid.9 \
+	doc/man/man9/ddi_get_time.9 doc/man/man9/ddi_umem_alloc.9 doc/man/man9/ddi_umem_free.9 \
+	doc/man/man9/drv_getparm.9 doc/man/man9/drv_hztomsec.9 doc/man/man9/drv_hztousec.9 doc/man/man9/drv_msectohz.9 \
+	doc/man/man9/drv_priv.9 doc/man/man9/drv_usectohz.9 doc/man/man9/drv_usecwait.9 doc/man/man9/dtimeout.9 \
+	doc/man/man9/dupb.9 doc/man/man9/dupmsg.9 doc/man/man9/enableok.9 doc/man/man9/enableq.9 \
+	doc/man/man9/esballoc.9 doc/man/man9/esbbcall.9 doc/man/man9/flushband.9 doc/man/man9/flushq.9 \
+	doc/man/man9/fmodsw.9 doc/man/man9/freeb.9 doc/man/man9/freemsg.9 doc/man/man9/freeq.9 \
+	doc/man/man9/freezestr.9 doc/man/man9/getemajor.9 doc/man/man9/geteminor.9 doc/man/man9/getmajor.9 \
+	doc/man/man9/getminor.9 doc/man/man9/getq.9 doc/man/man9/insq.9 doc/man/man9/Intro.9 doc/man/man9/isdatablk.9 \
+	doc/man/man9/isdatamsg.9 doc/man/man9/itimeout.9 doc/man/man9/kmem_alloc.9 doc/man/man9/kmem_free.9 \
+	doc/man/man9/kmem_zalloc.9 doc/man/man9/LfS.9 doc/man/man9/lfs_register_strdev.9 doc/man/man9/linkb.9 \
+	doc/man/man9/linkmsg.9 doc/man/man9/LiS.9 doc/man/man9/lisbcm.9 \
+	doc/man/man9lis/lis_add_timer.9lis doc/man/man9lis/lis_adjmsg.9lis doc/man/man9lis/lis_alloc_atomic_fcn.9lis \
+	doc/man/man9lis/lis_allocb.9lis doc/man/man9lis/lis_allocb_physreq.9lis doc/man/man9lis/lis_alloc_dma_fcn.9lis \
+	doc/man/man9lis/lis_alloc_kernel_fcn.9lis doc/man/man9lis/lis_allocq.9lis doc/man/man9lis/lis_appq.9lis \
+	doc/man/man9lis/lis_apush_get.9lis doc/man/man9lis/lis_apushm.9lis doc/man/man9lis/lis_apush_set.9lis \
+	doc/man/man9lis/lis_assert_fail.9lis doc/man/man9lis/lis_atomic_add.9lis doc/man/man9lis/lis_atomic_dec.9lis \
+	doc/man/man9lis/lis_atomic_dec_and_test.9lis doc/man/man9lis/lis_atomic_inc.9lis \
+	doc/man/man9lis/lis_atomic_read.9lis doc/man/man9lis/lis_atomic_set.9lis doc/man/man9lis/lis_atomic_sub.9lis \
+	doc/man/man9lis/lis_backq.9lis doc/man/man9lis/lis_backq_fcn.9lis doc/man/man9lis/lis_bcanput.9lis \
+	doc/man/man9lis/lis_bcanputnext.9lis doc/man/man9lis/lis_bcanputnext_anyband.9lis \
+	doc/man/man9lis/lis_bcopy.9lis doc/man/man9lis/lis_bprintf.9lis doc/man/man9lis/lis_bufcall.9lis \
+	doc/man/man9lis/lis_bzero.9lis doc/man/man9lis/lis_canenable.9lis doc/man/man9lis/lis_canput.9lis \
+	doc/man/man9lis/lis_canputnext.9lis doc/man/man9lis/lis_can_unload.9lis doc/man/man9lis/lis_check_guard.9lis \
+	doc/man/man9lis/lis_check_mem.9lis doc/man/man9lis/lis_check_q_magic.9lis \
+	doc/man/man9lis/lis_check_region.9lis doc/man/man9lis/lis_check_umem.9lis doc/man/man9lis/lis_clone_major.9lis \
+	doc/man/man9lis/lis_cmn_err.9lis doc/man/man9lis/lis_copyb.9lis doc/man/man9lis/lis_copyin.9lis \
+	doc/man/man9lis/lis_copymsg.9lis doc/man/man9lis/lis_copyout.9lis doc/man/man9lis/lis_datamsg.9lis \
+	doc/man/man9lis/lis_date.9lis doc/man/man9lis/lis_debug_mask2.9lis doc/man/man9lis/lis_debug_mask.9lis \
+	doc/man/man9lis/lis_dec_mod_cnt_fcn.9lis doc/man/man9lis/lis_del_timer.9lis \
+	doc/man/man9lis/lis_disable_irq.9lis doc/man/man9lis/lis_dobufcall.9lis doc/man/man9lis/lis_doclose.9lis \
+	doc/man/man9lis/lis_down_fcn.9lis doc/man/man9lis/lis_dsecs.9lis doc/man/man9lis/lis_dupb.9lis \
+	doc/man/man9lis/lis_dupmsg.9lis doc/man/man9lis/lis_enable_intr.9lis doc/man/man9lis/lis_enable_irq.9lis \
+	doc/man/man9lis/lis_enableok.9lis doc/man/man9lis/lis_esballoc.9lis doc/man/man9lis/lis_esbbcall.9lis \
+	doc/man/man9lis/lis_fattach.9lis doc/man/man9lis/lis_fdetach.9lis doc/man/man9lis/lis_fdetach_all.9lis \
+	doc/man/man9lis/lis_fdetach_stream.9lis doc/man/man9lis/lis_fifo_close_sync.9lis \
+	doc/man/man9lis/lis_fifo_open_sync.9lis doc/man/man9lis/lis_fifo_write_sync.9lis \
+	doc/man/man9lis/lis_file_inode.9lis doc/man/man9lis/lis_file_str.9lis doc/man/man9lis/lis_find_strdev.9lis \
+	doc/man/man9lis/lis_flushband.9lis doc/man/man9lis/lis_flush_print_buffer.9lis doc/man/man9lis/lis_flushq.9lis \
+	doc/man/man9lis/lis_fmod_sw.9lis doc/man/man9lis/lis_free.9lis doc/man/man9lis/lis_freeb.9lis \
+	doc/man/man9lis/lis_freedb.9lis doc/man/man9lis/lis_free_dma.9lis doc/man/man9lis/lis_free_irq.9lis \
+	doc/man/man9lis/lis_free_mem_fcn.9lis doc/man/man9lis/lis_freemsg.9lis doc/man/man9lis/lis_free_pages_fcn.9lis \
+	doc/man/man9lis/lis_free_passfp.9lis doc/man/man9lis/lis_freeq.9lis doc/man/man9lis/lis_fstr_sw.9lis \
+	doc/man/man9lis/lis_get_fifo.9lis doc/man/man9lis/lis_get_free_pages_atomic_fcn.9lis \
+	doc/man/man9lis/lis_get_free_pages_fcn.9lis doc/man/man9lis/lis_get_free_pages_kernel_fcn.9lis \
+	doc/man/man9lis/lis_getint.9lis doc/man/man9lis/lis_get_passfp.9lis doc/man/man9lis/lis_get_pipe.9lis \
+	doc/man/man9lis/lis_getq.9lis doc/man/man9lis/lis_gettimeofday.9lis doc/man/man9lis/lis_hitime.9lis \
+	doc/man/man9lis/lis_inc_mod_cnt_fcn.9lis doc/man/man9lis/lis_init_bufcall.9lis doc/man/man9lis/lis_insq.9lis \
+	doc/man/man9lis/lis_in_syscall.9lis doc/man/man9lis/lis_interruptible_sleep_on.9lis \
+	doc/man/man9lis/lis_ioc_fattach.9lis doc/man/man9lis/lis_ioc_fdetach.9lis doc/man/man9lis/lis_ioc_pipe.9lis \
+	doc/man/man9lis/lis_ioremap.9lis doc/man/man9lis/lis_ioremap_nocache.9lis doc/man/man9lis/lis_iounmap.9lis \
+	doc/man/man9lis/lis_isdatablk.9lis doc/man/man9lis/lis_isdatamsg.9lis doc/man/man9lis/lis_jiffies.9lis \
+	doc/man/man9lis/lis_kernel_down.9lis doc/man/man9lis/lis_kernel_up.9lis \
+	doc/man/man9lis/lis_kernel_version.9lis doc/man/man9lis/lis__kfree.9lis doc/man/man9lis/lis_kfree.9lis \
+	doc/man/man9lis/lis_kill_pg.9lis doc/man/man9lis/lis_kill_proc.9lis doc/man/man9lis/lis__kmalloc.9lis \
+	doc/man/man9lis/lis_kmalloc.9lis doc/man/man9lis/lis_linkb.9lis doc/man/man9lis/lis_loadable_load.9lis \
+	doc/man/man9lis/lis_maj_min_name.9lis doc/man/man9lis/lis_major.9lis doc/man/man9lis/lis_malloc.9lis \
+	doc/man/man9lis/lis_mark_mem.9lis doc/man/man9lis/lis_max_mem.9lis doc/man/man9lis/lis_milli_to_ticks.9lis \
+	doc/man/man9lis/lis_mknod.9lis doc/man/man9lis/lis_mount.9lis doc/man/man9lis/lis_msecs.9lis \
+	doc/man/man9lis/lis_msgdsize.9lis doc/man/man9lis/lis_msgpullup.9lis doc/man/man9lis/lis_msgsize.9lis \
+	doc/man/man9lis/lis_msg_type_name.9lis doc/man/man9lis/lis_msgutil.9lis doc/man/man9lis/lis_noenable.9lis \
+	doc/man/man9lis/lis_num_cpus.9lis doc/man/man9lis/lis_old_inode.9lis doc/man/man9lis/lis_open_cnt.9lis \
+	doc/man/man9lis/lis_osif_cli.9lis doc/man/man9lis/lis_osif_do_gettimeofday.9lis \
+	doc/man/man9lis/lis_osif_do_settimeofday.9lis doc/man/man9lis/lis_osif_pci_alloc_consistent.9lis \
+	doc/man/man9lis/lis_osif_pci_dac_dma_supported.9lis doc/man/man9lis/lis_osif_pci_dac_dma_sync_single.9lis \
+	doc/man/man9lis/lis_osif_pci_dac_dma_to_offset.9lis doc/man/man9lis/lis_osif_pci_dac_dma_to_page.9lis \
+	doc/man/man9lis/lis_osif_pci_dac_page_to_dma.9lis doc/man/man9lis/lis_osif_pci_dac_set_dma_mask.9lis \
+	doc/man/man9lis/lis_osif_pci_disable_device.9lis doc/man/man9lis/lis_osif_pci_dma_supported.9lis \
+	doc/man/man9lis/lis_osif_pci_dma_sync_sg.9lis doc/man/man9lis/lis_osif_pci_dma_sync_single.9lis \
+	doc/man/man9lis/lis_osif_pci_enable_device.9lis doc/man/man9lis/lis_osif_pci_find_class.9lis \
+	doc/man/man9lis/lis_osif_pci_find_device.9lis doc/man/man9lis/lis_osif_pci_find_slot.9lis \
+	doc/man/man9lis/lis_osif_pci_free_consistent.9lis doc/man/man9lis/lis_osif_pci_map_page.9lis \
+	doc/man/man9lis/lis_osif_pci_map_sg.9lis doc/man/man9lis/lis_osif_pci_map_single.9lis \
+	doc/man/man9lis/lis_osif_pci_module_init.9lis doc/man/man9lis/lis_osif_pci_read_config_byte.9lis \
+	doc/man/man9lis/lis_osif_pci_read_config_dword.9lis doc/man/man9lis/lis_osif_pci_read_config_word.9lis \
+	doc/man/man9lis/lis_osif_pci_set_dma_mask.9lis doc/man/man9lis/lis_osif_pci_set_master.9lis \
+	doc/man/man9lis/lis_osif_pci_unmap_page.9lis doc/man/man9lis/lis_osif_pci_unmap_sg.9lis \
+	doc/man/man9lis/lis_osif_pci_unmap_single.9lis doc/man/man9lis/lis_osif_pci_unregister_driver.9lis \
+	doc/man/man9lis/lis_osif_pci_write_config_byte.9lis doc/man/man9lis/lis_osif_pci_write_config_dword.9lis \
+	doc/man/man9lis/lis_osif_pci_write_config_word.9lis doc/man/man9lis/lis_osif_sg_dma_address.9lis \
+	doc/man/man9lis/lis_osif_sg_dma_len.9lis doc/man/man9lis/lis_osif_sti.9lis doc/man/man9lis/lis_OTHER.9lis \
+	doc/man/man9lis/lis_OTHERQ.9lis doc/man/man9lis/lis_own_spl.9lis doc/man/man9lis/lis_pcibios_find_class.9lis \
+	doc/man/man9lis/lis_pcibios_find_device.9lis doc/man/man9lis/lis_pcibios_init.9lis \
+	doc/man/man9lis/lis_pcibios_present.9lis doc/man/man9lis/lis_pcibios_read_config_byte.9lis \
+	doc/man/man9lis/lis_pcibios_read_config_dword.9lis doc/man/man9lis/lis_pcibios_read_config_word.9lis \
+	doc/man/man9lis/lis_pcibios_strerror.9lis doc/man/man9lis/lis_pcibios_write_config_byte.9lis \
+	doc/man/man9lis/lis_pcibios_write_config_dword.9lis doc/man/man9lis/lis_pcibios_write_config_word.9lis \
+	doc/man/man9lis/lis_pci_cleanup.9lis doc/man/man9lis/lis_pci_disable_device.9lis \
+	doc/man/man9lis/lis_pci_enable_device.9lis doc/man/man9lis/lis_pci_find_class.9lis \
+	doc/man/man9lis/lis_pci_find_device.9lis doc/man/man9lis/lis_pci_find_slot.9lis \
+	doc/man/man9lis/lis_pci_read_config_byte.9lis doc/man/man9lis/lis_pci_read_config_dword.9lis \
+	doc/man/man9lis/lis_pci_read_config_word.9lis doc/man/man9lis/lis_pci_set_master.9lis \
+	doc/man/man9lis/lis_pci_write_config_byte.9lis doc/man/man9lis/lis_pci_write_config_dword.9lis \
+	doc/man/man9lis/lis_pci_write_config_word.9lis doc/man/man9lis/lis_phys_to_virt.9lis \
+	doc/man/man9lis/lis_pipe.9lis doc/man/man9lis/lis_poll_2_1.9lis doc/man/man9lis/lis_poll_bits.9lis \
+	doc/man/man9lis/lis_poll_events.9lis doc/man/man9lis/lis_poll_file.9lis doc/man/man9lis/lis_print_block.9lis \
+	doc/man/man9lis/lis_print_data.9lis doc/man/man9lis/lis_printk.9lis doc/man/man9lis/lis_print_mem.9lis \
+	doc/man/man9lis/lis_print_msg.9lis doc/man/man9lis/lis_print_queue.9lis doc/man/man9lis/lis_print_queues.9lis \
+	doc/man/man9lis/lis_print_spl_track.9lis doc/man/man9lis/lis_print_stream.9lis \
+	doc/man/man9lis/lis_pullupmsg.9lis doc/man/man9lis/lis_putbq.9lis doc/man/man9lis/lis_putbyte.9lis \
+	doc/man/man9lis/lis_putctl1.9lis doc/man/man9lis/lis_putctl.9lis doc/man/man9lis/lis_putnext.9lis \
+	doc/man/man9lis/lis_putnextctl1.9lis doc/man/man9lis/lis_putnextctl.9lis doc/man/man9lis/lis_putq.9lis \
+	doc/man/man9lis/lis_qattach.9lis doc/man/man9lis/lis_qclose.9lis doc/man/man9lis/lis_qcountstrm.9lis \
+	doc/man/man9lis/lis_qdetach.9lis doc/man/man9lis/lis_qenable.9lis doc/man/man9lis/lis_qprocsoff.9lis \
+	doc/man/man9lis/lis_qprocson.9lis doc/man/man9lis/lis_qreply.9lis doc/man/man9lis/lis_qsize.9lis \
+	doc/man/man9lis/lis_queue_name.9lis doc/man/man9lis/lis_queuerun_cnts.9lis \
+	doc/man/man9lis/lis_queues_running.9lis doc/man/man9lis/lis_RD.9lis doc/man/man9lis/lis_recvfd.9lis \
+	doc/man/man9lis/lis_register_strdev.9lis doc/man/man9lis/lis_register_strmod.9lis \
+	doc/man/man9lis/lis_release_region.9lis doc/man/man9lis/lis_request_dma.9lis \
+	doc/man/man9lis/lis_request_irq.9lis doc/man/man9lis/lis_request_region.9lis doc/man/man9lis/lis_rmvb.9lis \
+	doc/man/man9lis/lis_rmvq.9lis doc/man/man9lis/lis_runq_cnts.9lis doc/man/man9lis/lis_runq_req_cnt.9lis \
+	doc/man/man9lis/lis_rw_lock_alloc_fcn.9lis doc/man/man9lis/lis_rw_lock_free_fcn.9lis \
+	doc/man/man9lis/lis_rw_lock_init_fcn.9lis doc/man/man9lis/lis_rw_read_lock_fcn.9lis \
+	doc/man/man9lis/lis_rw_read_lock_irq_fcn.9lis doc/man/man9lis/lis_rw_read_lock_irqsave_fcn.9lis \
+	doc/man/man9lis/lis_rw_read_unlock_fcn.9lis doc/man/man9lis/lis_rw_read_unlock_irq_fcn.9lis \
+	doc/man/man9lis/lis_rw_read_unlock_irqrestore_fcn.9lis doc/man/man9lis/lis_rw_write_lock_fcn.9lis \
+	doc/man/man9lis/lis_rw_write_lock_irq_fcn.9lis doc/man/man9lis/lis_rw_write_lock_irqsave_fcn.9lis \
+	doc/man/man9lis/lis_rw_write_unlock_fcn.9lis doc/man/man9lis/lis_rw_write_unlock_irq_fcn.9lis \
+	doc/man/man9lis/lis_rw_write_unlock_irqrestore_fcn.9lis doc/man/man9lis/lis_safe_canenable.9lis \
+	doc/man/man9lis/lis_safe_enableok.9lis doc/man/man9lis/lis_safe_noenable.9lis \
+	doc/man/man9lis/lis_safe_OTHERQ.9lis doc/man/man9lis/lis_safe_putmsg.9lis \
+	doc/man/man9lis/lis_safe_putnext.9lis doc/man/man9lis/lis_safe_qreply.9lis doc/man/man9lis/lis_safe_RD.9lis \
+	doc/man/man9lis/lis_safe_SAMESTR.9lis doc/man/man9lis/lis_safe_WR.9lis doc/man/man9lis/lis_SAMESTR.9lis \
+	doc/man/man9lis/lis_secs.9lis doc/man/man9lis/lis_sem_alloc.9lis doc/man/man9lis/lis_sem_destroy.9lis \
+	doc/man/man9lis/lis_sem_init.9lis doc/man/man9lis/lis_sendfd.9lis doc/man/man9lis/lis_set_file_str.9lis \
+	doc/man/man9lis/lis_setq.9lis doc/man/man9lis/lis_setqsched.9lis doc/man/man9lis/lis_setqsched_cnts.9lis \
+	doc/man/man9lis/lis_setqsched_isr_cnts.9lis doc/man/man9lis/lis_sleep_on.9lis \
+	doc/man/man9lis/lis_spin_is_locked_fcn.9lis doc/man/man9lis/lis_spin_lock_alloc_fcn.9lis \
+	doc/man/man9lis/lis_spin_lock_fcn.9lis doc/man/man9lis/lis_spin_lock_free_fcn.9lis \
+	doc/man/man9lis/lis_spin_lock_init_fcn.9lis doc/man/man9lis/lis_spin_lock_irq_fcn.9lis \
+	doc/man/man9lis/lis_spin_lock_irqsave_fcn.9lis doc/man/man9lis/lis_spin_trylock_fcn.9lis \
+	doc/man/man9lis/lis_spin_unlock_fcn.9lis doc/man/man9lis/lis_spin_unlock_irq_fcn.9lis \
+	doc/man/man9lis/lis_spin_unlock_irqrestore_fcn.9lis doc/man/man9lis/lis_spl0_fcn.9lis \
+	doc/man/man9lis/lis_splstr_fcn.9lis doc/man/man9lis/lis_splx_fcn.9lis doc/man/man9lis/lis_sprintf.9lis \
+	doc/man/man9lis/lis_stdata_cnt.9lis doc/man/man9lis/lis_strclose.9lis doc/man/man9lis/lis_strcount.9lis \
+	doc/man/man9lis/lis_stream_utils.9lis doc/man/man9lis/lis_strgetpmsg.9lis doc/man/man9lis/lis_strioctl.9lis \
+	doc/man/man9lis/lis_strm_name.9lis doc/man/man9lis/lis_strm_name_from_queue.9lis \
+	doc/man/man9lis/lis_stropen.9lis doc/man/man9lis/lis_stropts_file.9lis doc/man/man9lis/lis_strputpmsg.9lis \
+	doc/man/man9lis/lis_strqget.9lis doc/man/man9lis/lis_strqset.9lis doc/man/man9lis/lis_strread.9lis \
+	doc/man/man9lis/lis_strstats.9lis doc/man/man9lis/lis_strwrite.9lis doc/man/man9lis/lis_testb.9lis \
+	doc/man/man9lis/lis_thread_start.9lis doc/man/man9lis/lis_thread_stop.9lis doc/man/man9lis/lis_timeout.9lis \
+	doc/man/man9lis/lis_timeout_fcn.9lis doc/man/man9lis/lis_udelay.9lis doc/man/man9lis/lis_umount2.9lis \
+	doc/man/man9lis/lis_umount.9lis doc/man/man9lis/lis_unbufcall.9lis doc/man/man9lis/lis_unlink.9lis \
+	doc/man/man9lis/lis_unlinkb.9lis doc/man/man9lis/lis_unregister_strdev.9lis \
+	doc/man/man9lis/lis_unregister_strmod.9lis doc/man/man9lis/lis_untimeout.9lis doc/man/man9lis/lis_up_fcn.9lis \
+	doc/man/man9lis/lis_usecs.9lis doc/man/man9lis/lis_usectohz.9lis doc/man/man9lis/lis_valid_mod_list.9lis \
+	doc/man/man9lis/lis_version.9lis doc/man/man9lis/lis_vfree.9lis doc/man/man9lis/lis_virt_to_phys.9lis \
+	doc/man/man9lis/lis_vmalloc.9lis doc/man/man9lis/lis_vremap.9lis doc/man/man9lis/lis_vsprintf.9lis \
+	doc/man/man9lis/lis_wake_up.9lis doc/man/man9lis/lis_wake_up_interruptible.9lis doc/man/man9lis/lis_WR.9lis \
+	doc/man/man9lis/lis_xmsgsize.9lis doc/man/man9lis/lis_zmalloc.9lis doc/man/man9/lis_register_strdev.9 \
+	doc/man/man9/major.9 doc/man/man9/makedevice.9 doc/man/man9/mblk_t.9 doc/man/man9/mi_bufcall.9 \
+	doc/man/man9/mi_close_comm.9 doc/man/man9/mi_next_ptr.9 doc/man/man9/minor.9 doc/man/man9/mi_open_comm.9 \
+	doc/man/man9/mknod.9 doc/man/man9/module_info.9 doc/man/man9/mount.9 doc/man/man9/mp-streams.9 \
+	doc/man/man9/msgb.9 doc/man/man9/msgdsize.9 doc/man/man9/msgpullup.9 doc/man/man9/msgsize.9 \
+	doc/man/man9/msgutil.9 doc/man/man9/noenable.9 doc/man/man9/OTHER.9 doc/man/man9/OTHERQ.9 \
+	doc/man/man9/physreq.9 doc/man/man9/physreq_t.9 doc/man/man9/pipe.9 doc/man/man9/pullupmsg.9 \
+	doc/man/man9/put.9 doc/man/man9/putbq.9 doc/man/man9/putctl1.9 doc/man/man9/putctl2.9 doc/man/man9/putctl.9 \
+	doc/man/man9/putnext.9 doc/man/man9/putnextctl1.9 doc/man/man9/putnextctl2.9 doc/man/man9/putnextctl.9 \
+	doc/man/man9/putq.9 doc/man/man9/qattach.9 doc/man/man9/qband.9 doc/man/man9/qbufcall.9 doc/man/man9/qclose.9 \
+	doc/man/man9/qcountstrm.9 doc/man/man9/qdetach.9 doc/man/man9/qenable.9 doc/man/man9/qinit.9 \
+	doc/man/man9/qinsert.9 doc/man/man9/qopen.9 doc/man/man9/qprocsoff.9 doc/man/man9/qprocson.9 \
+	doc/man/man9/qreply.9 doc/man/man9/qsize.9 doc/man/man9/qtimeout.9 doc/man/man9/queclass.9 \
+	doc/man/man9/queinfo.9 doc/man/man9/queue.9 doc/man/man9/queue_t.9 doc/man/man9/qunbufcall.9 \
+	doc/man/man9/quntimeout.9 doc/man/man9/qwait.9 doc/man/man9/qwait_sig.9 doc/man/man9/qwriter.9 \
+	doc/man/man9/RD.9 doc/man/man9/register_inode.9 doc/man/man9/register_inode_major.9 \
+	doc/man/man9/register_inode_minor.9 doc/man/man9/register_strdev.9 doc/man/man9/register_strdev_major.9 \
+	doc/man/man9/register_strdev_minor.9 doc/man/man9/register_strmod.9 doc/man/man9/rmvb.9 doc/man/man9/rmvq.9 \
+	doc/man/man9/SAMESTR.9 doc/man/man9/setq.9 doc/man/man9/soon.9 doc/man/man9/SPG.9 doc/man/man9/STREAMS.9 \
+	doc/man/man9/streamtab.9 doc/man/man9/stream_utils.9 doc/man/man9/str_install.9 doc/man/man9/strlog.9 \
+	doc/man/man9/strqget.9 doc/man/man9/strqset.9 doc/man/man9/testb.9 doc/man/man9/timeout.9 \
+	doc/man/man9/umount.9 doc/man/man9/unbufcall.9 doc/man/man9/unfreezestr.9 doc/man/man9/unlink.9 \
+	doc/man/man9/unlinkb.9 doc/man/man9/unregister_inode.9 doc/man/man9/unregister_inode_major.9 \
+	doc/man/man9/unregister_inode_minor.9 doc/man/man9/unregister_strdev.9 doc/man/man9/unregister_strdev_major.9 \
+	doc/man/man9/unregister_strdev_minor.9 doc/man/man9/unregister_strmod.9 doc/man/man9/untimeout.9 \
+	doc/man/man9/unweldq.9 doc/man/man9/wantio.9 doc/man/man9/wantmsg.9 doc/man/man9/weldq.9 doc/man/man9/WR.9 \
+	doc/man/man9/xmsgsize.9 doc/man/man9/xxx.9
+
+nobase_pkginclude_HEADERS = \
+	include/sys/aixddi.h include/sys/cmn_err.h include/sys/ddi.h include/sys/debug.h include/sys/dki.h \
+	include/sys/hpuxddi.h include/sys/kmem.h include/sys/lisddi.h include/sys/osfddi.h include/sys/sad.h \
+	include/sys/sockmod.h include/sys/spec_fs_i.h include/sys/strconf.h include/sys/stream.h include/sys/strlog.h \
+	include/sys/stropts.h include/sys/strsubr.h include/sys/sunddi.h include/sys/svr4ddi.h include/sys/timod.h \
+	include/sys/uw7ddi.h
+
+#
+#   Need to override the following two automake rules to strip the first path
+#   component from the header file path name.
+#
+install-nobase_pkgincludeHEADERS: $(nobase_pkginclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(pkgincludedir)
+	@list='$(nobase_pkginclude_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^[^/]*/||'`"; \
+	  echo "$(nobase_pkgincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(pkgincludedir)/$$f"; \
+	  $(nobase_pkgincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(pkgincludedir)/$$f; \
+	done
+
+uninstall-nobase_pkgincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(nobase_pkginclude_HEADERS)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^[^/]*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(pkgincludedir)/$$f"; \
+	  rm -f $(DESTDIR)$(pkgincludedir)/$$f; \
+	done
+
+EXTRA_DIST = streams.spec.in streams.spec doc/man/openss7.refs doc/man/openss7.macros \
+	openss7-logo-small.gif openss7-logo-small.xpm \
+	m4/kernel.m4 m4/rpm.m4
+
+#SUBDIRS = intl m4 po manual
+
+#
+# Rules for making rpms
+#
+AM_RPMFLAGS = --define "_kversion @PACKAGE_KVERSION@"
+AM_SRPMFLAGS =
+
+include rpm.am
+
+#
+# General rules
+#
+include openss7.am
+
+# vim: ft=automake
