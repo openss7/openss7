@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/03 10:28:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/03 10:28:05 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/03 10:28:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/02/28 13:46:46 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/03 10:28:05 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -103,9 +103,22 @@ modID_t modid = CONFIG_STREAMS_NULS_MODID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module id number for NULS driver. (0 for auto allocation)");
 
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULS_MODID));
+MODULE_ALIAS("streams-driver-nuls");
+#endif
+
 major_t major = CONFIG_STREAMS_NULS_MAJOR;
 MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto allocation)");
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NULS_MAJOR) "-*");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NULS_MAJOR));
+MODULE_ALIAS("/dev/nuls");
+MODULE_ALIAS("/dev/streams/nuls");
+MODULE_ALIAS("/dev/streams/nuls/*");
+#endif
 
 static struct module_info nuls_minfo = {
 	mi_idnum:CONFIG_STREAMS_NULS_MODID,

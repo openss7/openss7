@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -110,9 +110,22 @@ modID_t modid = CONFIG_STREAMS_PIPE_MODID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-based PIPEs (0 for allocation).");
 
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PIPE_MODID));
+MODULE_ALIAS("streams-driver-pipe");
+#endif
+
 major_t major = CONFIG_STREAMS_PIPE_MAJOR;
 MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allocation).");
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR) "-*");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
+MODULE_ALIAS("/dev/pipe");
+MODULE_ALIAS("/dev/streams/pipe");
+MODULE_ALIAS("/dev/streams/pipe/*");
+#endif
 
 static struct module_info pipe_minfo = {
 	mi_idnum:CONFIG_STREAMS_PIPE_MODID,

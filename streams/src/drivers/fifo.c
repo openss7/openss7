@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/03 10:28:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/03 10:28:05 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/03 10:28:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,10 +75,10 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/02/28 13:46:46 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/03 10:28:05 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define FIFO_LICENSE	"GPL and additional rights"
+#define FIFO_LICENSE	"GPL"
 #define FIFO_BANNER	FIFO_DESCRIP	"\n" \
 			FIFO_COPYRIGHT	"\n" \
 			FIFO_REVISION	"\n" \
@@ -111,9 +111,22 @@ modID_t modid = CONFIG_STREAMS_FIFO_MODID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module identification number for STREAMS-based FIFOs");
 
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_FIFO_MODID));
+MODULE_ALIAS("streams-driver-fifo");
+#endif
+
 major_t major = CONFIG_STREAMS_FIFO_MAJOR;
 MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
+MODULE_ALIAS("/dev/fifo");
+MODULE_ALIAS("/dev/streams/fifo");
+MODULE_ALIAS("/dev/streams/fifo/*");
+#endif
 
 static struct module_info fifo_minfo = {
 	mi_idnum:CONFIG_STREAMS_FIFO_MODID,

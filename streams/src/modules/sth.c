@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:29 $ by $Author: brian $
+ Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/02 17:41:29 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -133,6 +133,11 @@ MODULE_LICENSE(STH_LICENSE);
 modID_t modid = CONFIG_STREAMS_STH_MODID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module identification number for STH module.");
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_STH_MODID));
+MODULE_ALIAS("streams-module-sth");
+#endif
 
 struct module_info str_minfo = {
 	mi_idnum:CONFIG_STREAMS_STH_MODID,

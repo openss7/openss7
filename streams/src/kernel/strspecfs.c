@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/02 17:41:28 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/03 10:28:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/02 17:41:28 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/03 10:28:05 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/02 17:41:28 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/03 10:28:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/02 17:41:28 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/03 10:28:05 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -106,6 +106,13 @@ MODULE_AUTHOR(SPECFS_CONTACT);
 MODULE_DESCRIPTION(SPECFS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SPECFS_DEVICE);
 MODULE_LICENSE(SPECFS_LICENSE);
+#endif
+
+#ifdef CONFIG_STREAMS_MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("/dev/streams");
+MODULE_ALIAS("/dev/streams/*");
+#endif
 #endif
 
 #include <sys/stream.h>

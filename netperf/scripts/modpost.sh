@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/02 17:41:28 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/03 10:28:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
+# Last Modified $Date: 2005/03/03 10:28:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/02 17:41:28 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/03 10:28:04 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1002,32 +1002,25 @@ read_kobjects() {
 
 function process_command()
 {
+    # .modpost is just a (quick) way of caching system maps and module maps
     if test -f .modpost ; then
 	. .modpost
-	infile=
-	sysmap=
-	moddir=
-	sysfile=
+    else
+	test -n "$infile"  && command_info "infiles= \`$infile'"
+	read_infiles
+	test -n "$sysmap"  && command_info "sysmaps= \`$sysmap'"
+	read_sysmap
+	test -n "$moddir"  && command_info "moddir=  \`$moddir'"
+	read_kobjects
+	write_script >.modpost
     fi
     test -n "$modules" && command_info "modules= \`$modules'"
-    test -n "$infile"  && command_info "infiles= \`$infile'"
-    test -n "$sysmap"  && command_info "sysmaps= \`$sysmap'"
-    test -n "$moddir"  && command_info "moddir=  \`$moddir'"
-    test -n "$outfile" && command_info "outfile= \`$outfile'"
-    test -n "$sysfile" && command_info "sysfile= \`$sysfile'"
     read_modules
-    test -n "$infile"  && command_info "infiles= \`$infile'"
-    read_infiles
-    test -n "$sysmap"  && command_info "sysmaps= \`$sysmap'"
-    read_sysmap
-    test -n "$moddir"  && command_info "moddir=  \`$moddir'"
-    read_kobjects
     write_sources
     test -n "$outfile" && command_info "outfile= \`$outfile'"
     write_outfile
     test -n "$sysfile" && command_info "sysfile= \`$sysfile'"
     write_sysfile
-    write_script >.modpost
 }
 
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/03 10:28:05 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -104,9 +104,22 @@ modID_t modid = CONFIG_STREAMS_SPX_MODID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver.");
 
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SPX_MODID));
+MODULE_ALIAS("streams-driver-spx");
+#endif
+
 major_t major = CONFIG_STREAMS_SPX_MAJOR;
 MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
+
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR) "-*");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
+MODULE_ALIAS("/dev/spx");
+MODULE_ALIAS("/dev/streams/spx");
+MODULE_ALIAS("/dev/streams/spx/*");
+#endif
 
 typedef struct spx {
 	struct spx *next;
