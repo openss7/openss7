@@ -36,7 +36,7 @@
 #ifndef _MSG_H
 #define _MSG_H 1
 
-#ident "@(#) LiS msg.h 2.3 3/16/01 19:52:55 "
+#ident "@(#) LiS msg.h 2.4 4/15/03 19:01:51 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -174,6 +174,7 @@ struct datab {
   EXPORT
         unsigned char   *db_base;
         unsigned char   *db_lim;
+	volatile
         unsigned char   db_ref;
 	unsigned char	db_type; /* QNORM or QPCTL */
   PRIVATE
