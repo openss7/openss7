@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-#ident "@(#) LiS stream.h 2.8 7/23/03 15:53:08 "
+#ident "@(#) LiS stream.h 2.12 08/23/04 11:42:44 "
 
 /*
  * Always use the safe routines.  A driver writer can make
@@ -66,11 +66,11 @@ extern "C" {
 /*                               Dependencies                            */
 
 /* This are std defines to allow you to include only `stream.h' and run
- * miles w/o including nothing else from LiS. */
+ * miles w/o including anything else from LiS. */
 
 /* plain usr API */
 #ifndef _STRPORT_H
-#include <sys/strport.h>	/* poring structures */
+#include <sys/strport.h>	/* porting structures */
 #endif
 
 #ifndef _LIS_CONFIG_H
@@ -170,7 +170,7 @@ extern "C" {
 #define  SAMESTR     LIS_SAMESTR    
 #define	 strqset	lis_strqset
 #define	 strqget	lis_strqget
-extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l);
+extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)_RP;
 #define put(q,m)	lis_safe_putmsg((q),(m),__FILE__,__LINE__)
 #endif				/* __KERNEL__ */
 
@@ -242,9 +242,11 @@ extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l);
 
 /* Append message to queue */
 #define putq	lis_putq
+#define putqf	lis_putqf
 
 /* Put message back onto queue */
 #define putbq	lis_putbq
+#define putbqf	lis_putbqf
 
 /* Insert message(3) before message(2) or at end */
 #define insq	lis_insq
