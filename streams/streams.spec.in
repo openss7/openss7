@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2004/11/08 10:36:48 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2004/11/24 14:30:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 10:36:48 $ by $Author: brian $
+# Last Modified $Date: 2004/11/24 14:30:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,14 +109,16 @@ Name:           @PACKAGE_NAME@-bin
 %endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
-Release:        @PACKAGE_RELEASE@
+Release:        @PACKAGE_RELEASE@@PACKAGE_RPMEXTRA@
 License:        GPL
 Group:          System Environment/Kernel
-%if %{?_vendor: 1}%{!?_vendor: 0}
-Vendor:         %{_vendor}
+%if %{?_pkg_vendor: 1}%{!?_pkg_vendor: 0}
+Vendor:         %{_pkg_vendor}
 %endif
 %if %{?_distribution: 1}%{!?_distribution: 0}
 Distribution:   %{_distribution}
+%else
+Distribution:   @PACKAGE_RPMDIST@
 %endif
 %if %{?disturl: 1}%{!?disturl: 0}
 URL:            %disturl
@@ -126,7 +128,7 @@ Icon:           %{_icon}
 %endif
 ExclusiveArch:  i386 i686 i586 athlon x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
-Source:         %{name}-%{version}-%{release}.tar.bz2
+Source:         %{name}-%{version}-@PACKAGE_RELEASE@.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      %{_conflict} STREAMS
@@ -165,7 +167,7 @@ for other architectures as well.
 # ---------------------------------------------------------------------------
 # let rpm do its job (but tell it where to find things)
 
-%setup -q -n %{name}-%{version}-%{release}
+%setup -q -n %{name}-%{version}-@PACKAGE_RELEASE@
 
 %build
 # ---------------------------------------------------------------------------
@@ -226,7 +228,7 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
     --with-rpm-epoch=%{epoch} \
-    --with-rpm-release=%{release} \
+    --with-rpm-release=@PACKAGE_RELEASE@ \
     --with-base-major=%{majbase} \
     %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
     %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
@@ -857,8 +859,14 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.38  2004/11/08 10:36:48  brian
-# - Removed nested ifs.
+# Revision 0.9.2.40  2004/11/24 14:30:45  brian
+# - Changes for multiple rpm distro builds.
+#
+# Revision 0.9.2.8  2004/11/24 14:30:45  brian
+# - Changes for multiple rpm distro builds.
+#
+# Revision 0.9.2.7  2004/11/24 11:27:50  brian
+# - Changes to accomodate %_vendor macro for multiple distribution rpm builds.
 #
 # Revision 0.9.2.6  2004/11/08 10:36:48  brian
 # - Removed nested ifs.

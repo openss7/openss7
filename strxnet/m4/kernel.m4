@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/11/08 10:38:02 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/11/24 14:31:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 10:38:02 $ by $Author: brian $
+# Last Modified $Date: 2004/11/24 14:31:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -136,6 +136,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_KSYMS
     _LINUX_CHECK_KERNEL_HEADERS
     _LINUX_CHECK_KERNEL_MARCH
+    _LINUX_CHECK_KERNEL_FLAVOR
     _LINUX_CHECK_KERNEL_RHBOOT
     _LINUX_CHECK_KERNEL_ARCHDIR
     _LINUX_CHECK_KERNEL_MACHDIR
@@ -190,7 +191,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
 *** cross-compiling, you must specify the kernel release that you are
 *** targetting using the --with-k-release option.  This option should specify
 *** the entire UTS_RELEASE of the kernel, including the EXTRAVERSION such as
-*** that associated with RedHat kernel releases.
+*** that associated with RedHat or Mandrake kernel releases.
 *** ])
     fi
     # pull out versions from release number
@@ -596,13 +597,91 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [dnl
 # =========================================================================
 
 # =========================================================================
+# _LINUX_CHECK_KERNEL_FLAVOR
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_FLAVOR], [dnl
+    AC_CACHE_CHECK([for kernel flavor], [linux_cv_k_flavor], [dnl
+        case $target_vendor in
+            redhat)
+                linux_cv_k_flavor=RedHat
+                ;;
+            mandrake)
+                linux_cv_k_flavor=Mandrake
+                ;;
+            suse)
+                linux_cv_k_flavor=SuSE
+                ;;
+            debian)
+                linux_cv_k_flavor=Debian
+                ;;
+            pc|*)
+                linux_cv_k_flavor=kernel.org
+                if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
+                then
+                    case "$linux_cv_k_release" in
+                        *mdk*)
+                            linux_cv_k_flavor=Mandrake
+                            ;;
+                    esac
+                fi
+                if test $linux_cv_k_flavor = kernel.org
+                then
+                    # do some more guessing
+                    if ( cat /proc/version | grep 'Mandrake Linux') >/dev/null 2>&1
+                    then
+                        linux_cv_k_flavor=Mandrake
+                    fi
+                    if ( cat /proc/version | grep 'Red Hat Linux') >/dev/null 2>&1
+                    then
+                        linux_cv_k_flavor=RedHat
+                    fi
+                    if ( cat /proc/version | grep 'SuSE Linux') >/dev/null 2>&1
+                    then
+                        linux_cv_k_flavor=SuSE
+                    fi
+                    if ( cat /proc/version | grep 'Debian Linux') >/dev/null 2>&1
+                    then
+                        linux_cv_k_flavor=Debian
+                    fi
+                fi
+                ;;
+        esac
+    ])
+    case $linux_cv_k_flavor in
+        RedHat)
+            host_vendor=redhat
+            target_vendor=redhat
+            ;;
+        Mandrake)
+            host_vendor=mandrake
+            target_vendor=mandrake
+            ;;
+        SuSE)
+            host_vendor=suse
+            target_vendor=suse
+            ;;
+        Debian)
+            host_vendor=debian
+            target_vendor=debian
+            ;;
+        kernel.org|*)
+            host_vendor=pc
+            target_vendor=pc
+            ;;
+    esac
+    host="${host_cpu}-${host_vendor}-${host_os}"
+    target="${target_cpu}-${target_vendor}-${target_os}"
+])# _LINUX_CHECK_KERNEL_FLAVOR
+# =========================================================================
+
+# =========================================================================
 # _LINUX_BAD_KERNEL_RHBOOT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
     AC_MSG_ERROR([
 **** 
-**** Build is for RedHat $linux_cv_rh_boot_kernel kernel but the machine architecture is $linux_cv_march.
-**** RedHat $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march machine architecture.
+**** Build is for $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernel but the machine architecture is $linux_cv_march.
+**** $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march machine architecture.
 **** If you are automatically building with the rebuild make target this error
 **** is to be expected on a couple of kernel permutations.
 **** 
@@ -614,7 +693,7 @@ AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
 # _LINUX_CHECK_KERNEL_RHBOOT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
-    AC_CACHE_CHECK([for kernel Red Hat boot], [linux_cv_rh_boot_kernel], [dnl
+    AC_CACHE_CHECK([for kernel $linux_cv_k_flavor boot], [linux_cv_rh_boot_kernel], [dnl
         linux_cv_rh_boot_kernel=no
         if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
         then
@@ -634,6 +713,18 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
                 *debug)
                     linux_cv_rh_boot_kernel=debug
                     ;;
+                *enterprise)
+                    linux_cv_rh_boot_kernel=enterprise
+                    ;;
+                *secure)
+                    linux_cv_rh_boot_kernel=secure
+                    ;;
+                *i686-up-4GB)
+                    linux_cv_rh_boot_kernel=i686-up-4GB
+                    ;;
+                *p3-smp-64GB)
+                    linux_cv_rh_boot_kernel=p3-smp-64GB
+                    ;;
                 *)
                     linux_cv_rh_boot_kernel=UP
                     ;;
@@ -641,55 +732,75 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
         fi ])
     if test :"${linux_cv_rh_boot_kernel:-no}" != :no
     then
-        AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for Red Hat kernel.])
+        AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for RedHat/Mandrake kernel.])
         case "${linux_cv_rh_boot_kernel:-no}" in
             BOOT)
-                AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for Red Hat BOOT kernel.])
+                AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for RedHat/Mandrake BOOT kernel.])
                 case "$linux_cv_march" in
                     i586 | i686 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
             smp)
-                AC_DEFINE([__BOOT_KERNEL_SMP], [1], [Define for Red Hat SMP kernel.])
+                AC_DEFINE([__BOOT_KERNEL_SMP], [1], [Define for RedHat/Mandrake SMP kernel.])
                 case "$linux_cv_march" in
                     i386)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
             bigmem)
-                AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for Red Hat BIGMEM kernel.])
+                AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for RedHat/Mandrake BIGMEM kernel.])
                 case "$linux_cv_march" in
                     i386 | i586 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
             hugemem)
-                AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for Red Hat HUGEMEM kernel.])
+                AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for RedHat/Mandrake HUGEMEM kernel.])
                 case "$linux_cv_march" in
                     i386 | i586 | athlon)
                         _LINUX_BAD_KERNEL_RHBOOT ;;
                 esac
                 ;;
             debug)
-                AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for Red Hat DEBUG kernel.])
+                AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for RedHat/Mandrake DEBUG kernel.])
+                ;;
+            enterprise)
+                AC_DEFINE([__BOOT_KERNEL_ENTERPRISE], [1], [Define for RedHat/Mandrake ENTERPRISE kernel.])
+                ;;
+            secure)
+                AC_DEFINE([__BOOT_KERNEL_SECURE], [1], [Define for RedHat/Mandrake SECURE kernel.])
+                ;;
+            i686-up-4GB)
+                AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for RedHat/Mandrake BIGMEM kernel.])
+                case "$linux_cv_march" in
+                    i386 | i586 | athlon)
+                        _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac
+                ;;
+            p3-smp-64GB)
+                AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for RedHat/Mandrake HUGEMEM kernel.])
+                case "$linux_cv_march" in
+                    i386 | i586 | athlon)
+                        _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac
                 ;;
             UP)
-                AC_DEFINE([__BOOT_KERNEL_UP], [1], [Define for Red Hat UP kernel.])
+                AC_DEFINE([__BOOT_KERNEL_UP], [1], [Define for RedHat/Mandrake UP kernel.])
                 ;;
         esac
         case "$linux_cv_march" in
             i586)
-                AC_DEFINE([__MODULE_KERNEL_i586], [1], [Define for i586 Red Hat kernel.])
+                AC_DEFINE([__MODULE_KERNEL_i586], [1], [Define for i586 RedHat/Mandrake kernel.])
                 ;;
             i686)
-                AC_DEFINE([__MODULE_KERNEL_i686], [1], [Define for i686 Red Hat kernel.])
+                AC_DEFINE([__MODULE_KERNEL_i686], [1], [Define for i686 RedHat/Mandrake kernel.])
                 ;;
             i?86)
-                AC_DEFINE([__MODULE_KERNEL_i386], [1], [Define for i386 Red Hat kernel.])
+                AC_DEFINE([__MODULE_KERNEL_i386], [1], [Define for i386 RedHat/Mandrake kernel.])
                 ;;
             athlon)
-                AC_DEFINE([__MODULE_KERNEL_athlon], [1], [Define for athlon Red Hat kernel.])
+                AC_DEFINE([__MODULE_KERNEL_athlon], [1], [Define for athlon RedHat/Mandrake kernel.])
                 ;;
         esac
     fi
