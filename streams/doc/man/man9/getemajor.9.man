@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getemajor.9.man,v 0.9.2.3 2004/03/18 09:13:44 brian Exp $
+.\" @(#) $Id: getemajor.9.man,v 0.9.2.4 2004/03/19 01:28:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/19 01:28:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETEMAJOR 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS UWDDI"
+.TH GETEMAJOR 9 "$Date: 2004/03/19 01:28:37 $" "$Name:  $" "Linux Fast-STREAMS UWDDI"
 .\"
 .\"
 .SH NAME
@@ -116,12 +116,19 @@ gets the external (real) device major number associated with the external
 device number,
 .IR dev .
 .BR getemajor ()
-is a UWDDI specific function intended to replace
+is a UWDDI specific architecture dependent macro intended to replace the
+older
+.I SVR 4
+.[
+svr4
+.]
+behaviour of
 .BR getmajor (9).
-Both are a system independent way for a
+.BR getemajor ()
+is a system depdent way for a
 .I STREAMS
-driver or module to obtain the external major device number from the external
-device number; however,
+driver or module to obtain the external (real) major device number from the
+external device number.
 .BR getemajor (9)
 is often implemented as an architecture dependent macro, whereas
 .BR getmajor ()
@@ -140,7 +147,7 @@ major device number associated with the device
 .PP
 .BR getmajor (9)
 supports the concept of extended minor device numbers.  Under extended minor
-device number, a device has a single
+device numbering, a device has a single
 .I base
 major device number and an extended range of minor device numbers (exceeding
 255).  Real device numbers consist of a number of major devices numbers and a
@@ -150,7 +157,7 @@ to 255.
 Following is an example contrasting the mapping of external major and minor
 device numbers to a based major device number and an extended minor device
 number:
-.RS
+.PP
 .TS
 center tab(:);
 nn|nn.
@@ -165,7 +172,12 @@ _
 ":255:":766
 _
 .TE
-.RE
+.PP
+For additional information, see section
+.RI \(lq "Device Numbering" \(rq
+in the
+.BR "Linux Fast-STREAMS Programmer's Guide" ,
+.BR SPG (9).
 .\"
 .\"
 .SH USAGE
@@ -266,6 +278,7 @@ to obtain the external major device number.
 .BR ddi_getiminor (9),
 .BR ddi_create_minor_node (9),
 .BR ddi_remove_minor_node (9),
+.BR SPG (9),
 .BR STREAMS (9).
 .\"
 .\"

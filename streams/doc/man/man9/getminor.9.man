@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getminor.9.man,v 0.9.2.4 2004/03/18 09:13:44 brian Exp $
+.\" @(#) $Id: getminor.9.man,v 0.9.2.5 2004/03/19 01:28:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/19 01:28:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMINOR 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETMINOR 9 "$Date: 2004/03/19 01:28:37 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH "NAME"
 .B getminor, minor
-\- get the minor device number for a device.
+\- get the extended minor device number for a device.
 .\"
 .\"
 .SH "SYNOPSIS"
@@ -86,34 +86,109 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .HP
 .BI "minor_t getminor(dev_t " dev );
-.PP
-.B #define _SVR3_SOURCE
-.br
-.B #include <sys/streams.h>
-.br
-.B #include <sys/ddi.h>
-.HP
-.BI "minor_t minor(dev_t " dev );
 .\"
 .\"
 .SH ARGUMENTS
 .TP
 .I dev
-the device number from which to extract the minor device number.
+the device number from which to extract the internal minor device number.
 .\"
 .\"
 .SH "DESCRIPTION"
 .PP
+.BR getmajor (9),
+.BR getminor (9)
+and
+.BR makedevice (9)
+are the device handling functions defined in
+.I SVR 4
+.[
+svr4
+.]
+that are normally used by
+.I STREAMS
+device drivers in the
+.BR qopen (9)
+procedure.
+.PP
 .BR getminor ()
-returns the minor device number associated with the
-.B dev_t
+gets the internal (extended) device minor number associated with the external
+.BR dev_t
+device number,
 .IR dev .
-.BR minor ()
-was the SVR 3
+.BR getminor ()
+is the normal architecture independent function call providing newer internal
+and extended device numbering replacing older
+.I SVR 4
+.[
+svr4
+.]
+behaviour using a function of the same name.
+.PP
+.BR getminor ()
+is an architecture independent function that obtains the internal (extended)
+minor device number associated with device
+.IR dev .
+.BR geteminor (9),
+on the other hand, will return the external (real) minor device number
+associated with the device
+.IR dev .
+.BR minor (9)
+was the
+.I SVR 3
 .[
 svr3
 .]
 name for this function.
+.BR minor (3)
+also exists as a user subroutine in
+.BR <sys/sysmacros.h> .
+.PP
+.BR getminor ()
+supports the concept of extended device numbering.  Under extended device
+numbering, a device has a single internal (base) major device number and an
+internal (extended) range of minor device numbers (exceeding 0 to 255).  Real
+device number consist of a number of major device numbers visible to user
+applications, and a range of minor device numbers associated with each major
+device limited by the acrchitecture (0 to 255 on
+.BR "Linux 2.4" ).
+.PP
+Following is an example contrasting the mapping of external major and minor
+device numbers to internal base major and extended minor device numbers:
+.PP
+.TS
+center tab(;);
+nn|nn.
+_
+\fBgetmajor\fR(9);\fBgetminor(9)\fR;\fBgetemajor\fR(9);\fBgeteminor\fR(9)
+_
+32;0;32;0
+:;255;:;255
+:;256;35;0
+:;511;:;255
+:;512;37;0
+:;766;:;255
+_
+.TE
+.PP
+.BR getminor ()
+is compatible with all device numbering schemes provided by
+.BR "Linux Fast-STREAMS" .
+For additional information on device numbering, see section
+.RI \(lq "Device Numbering" \(rq,
+in the
+.BR "Linux Fast-STREAMS Programmer's Guide" ,
+.BR SPG (9).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR getminor ()
+is used by drivers and modules that do not required knowledge of external
+major device numbers and that wish to use a simplified approach to assignment
+of minor device numbers for
+.BR clone (4)
+operations.
 .\"
 .\"
 .SH RETURN
@@ -122,7 +197,7 @@ name for this function.
 always returns the minor device number.
 .\"
 .\"
-.SH "ERRORS"
+.SH ERRORS
 .PP
 .BR getminor ()
 always succeeds.
@@ -140,15 +215,62 @@ can be called from any context.
 is MP-safe.
 .\"
 .\"
-.SH "NOTICES"
+.SH NOTICES
 .PP
-.BR getminor ()
-simply invokes the kernel macro
-.BR MINOR (9).
-For Linux 2.4,
+Depending on the architecture, the internal extended minor device number may
+or may not be equal to one of the external (real) minor device numbers
+assigned ot the driver.
+.PP
+Portable
+.I STREAMS
+drivers should neither rely upon the specific value returned by
+.BR getminor (),
+nor should it hard code the range of minor device numbers available to the
+major device number returned by
+.BR getmajor (9).
+.PP
 .B minor_t
 is
-.BR "unsigned char" .
+.BR "unsigned short" .
+.PP
+The current maximum range of extended minor device numbers is the range
+of
+.B minor_t
+which is
+.B unsigned short
+or a range from 0 to 65535.
+.PP
+Although the extended minor device range is currently from 0 to 65535, only
+the first 1024 minor device numbers can be represented as external (real)
+device numbers.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR getminor ()
+extracts the internal (base) major device number from
+.I dev
+using
+.BR getmajor (9)
+and the external (real) major and minor device numbers from
+.I dev
+using
+.BR getemajor (9)
+and
+.BR geteminor (9).
+It then uses
+.BR itoeminor (9)
+using the internal (base) major device number
+return by
+.BR getmajor (9)
+to establish which ordinal belongs to the external major device number
+returned by
+.BR getemajor (9)
+and adds an offset of 256 for each ordinal that the external major device
+number is offset from the external base major device number.
+.BR
+extracts the external (real)
+
 .\"
 .\"
 .SH "SEE ALSO"
@@ -156,7 +278,9 @@ is
 .BR getminor (9),
 .BR makedevice (9),
 .BR geteminor (9),
-.BR ddi_getiminor (9).
+.BR ddi_getiminor (9),
+.BR SPG (9),
+.BR STREAMS (9),
 .\"
 .\"
 .SH BUGS
@@ -168,26 +292,82 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR getminor ()
-is source level compatible with
-.BR "SVR 4.2" ,
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr42
+usldk
 .]
+and implementations based on
+.IR "SVR 4"
+.[
+svr4
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF \(rg,
 .IR Solaris \(rg,
+.IR Super-UX \(rg,
 .IR UnixWare \(rg
 and
-.IR LiS .
-.[
-LiS
-.]
-.PP
-.BR getminor ()
-is binary compatible with LiS.  Binary compatibility with
-.BR "SVR 4.2" ,
+.IR UXP/V \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
 .IR Solaris \(rg
+provides a somewhat different mechanism.  See
+.BR ddi_driver_major (9),
+.BR ddi_getiminor (9),
+.BR ddi_create_minor_node (9)
 and
-.IR UnixWare \(rg
-is not guaranteed.
+.BR ddi_remove_minor_node (9).
+.IP \(em
+.IR UnixWare "\(rg DDI8"
+provides a different mechanism with registered driver resources and channel
+numbers.
+.IP \(em
+.I LiS
+.[
+lis
+.]
+does not support extended device numbering, and
+.BR getminor ()
+on
+.I LiS
+reduces to
+.BR geteminor (9).
+.I LiS
+version 2.17
+is supposed to have some enhancements in this regard.
+.IP \(em
+.BR getminor ()
+is provided for source level compatibility with
+.I SVR 4.2 MP
+and implementations based on
+.I SVR 4.2
+for the purpose of porting drivers to
+.BR Linux .
+Because the
+.B dev_t
+structure for
+.B Linux
+differs from that of other implementations,
+binaries are incompatible.
+.IP \(em
+.BR getminor ()
+only provide functionality comparable to
+.I SVR 4.2 MP DDI/DKI
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR getminor ()
+in support of
+.RI non- STREAMS
+devices is not supported.
+.PP
+See
+.BR STREAMS(9)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -196,9 +376,14 @@ is not guaranteed.
 .[
 usldk
 .]
-.IR Solaris \(rg
-and
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF \(rg,
+.IR Solaris \(rg,
+.IR Super-UX \(rg,
 .IR UnixWare \(rg
+and
+.IR UXP/V \(rg
 documentation.
 .\"
 .\"
@@ -209,7 +394,7 @@ first appeared in SVR 4.
 .[
 svr4
 .]
-.BR minor ()
+.BR minor (9)
 first appeared as
 in SVR 3.
 .[
