@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 20:46:41 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 20:46:41 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 20:46:41 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 20:46:41 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -84,6 +84,7 @@ static char const ident[] =
 #include <sys/strconf.h>	/* for syscontrols */
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */

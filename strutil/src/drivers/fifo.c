@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,17 +75,16 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strspecfs.h"		/* strm_open and struct str_args */
 #include "strsad.h"		/* for autopush */
 #include "sth.h"
 #include "fifo.h"		/* extern verification */
 
-#include "sys/config.h"
-
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -97,10 +96,12 @@ static char const ident[] =
 #define FIFO_SPLASH	FIFO_DEVICE	" - " \
 			FIFO_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 MODULE_AUTHOR(FIFO_CONTACT);
 MODULE_DESCRIPTION(FIFO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(FIFO_DEVICE);
 MODULE_LICENSE(FIFO_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_FIFO_NAME
 //#define CONFIG_STREAMS_FIFO_NAME "fifo"
@@ -297,7 +298,7 @@ static struct cdevsw fifo_cdev = {
 static int __init fifo_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 	printk(KERN_INFO FIFO_BANNER);
 #else
 	printk(KERN_INFO FIFO_SPLASH);
@@ -314,5 +315,7 @@ static void __exit fifo_exit(void)
 	unregister_strdev(&fifo_cdev, 0);
 };
 
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 module_init(fifo_init);
 module_exit(fifo_exit);
+#endif

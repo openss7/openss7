@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,11 +70,12 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+
 #include "sys/config.h"
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -86,10 +87,12 @@ static char const ident[] =
 #define ECHO_SPLASH	ECHO_DEVICE	" - " \
 			ECHO_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 MODULE_AUTHOR(ECHO_CONTACT);
 MODULE_DESCRIPTION(ECHO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
 MODULE_LICENSE(ECHO_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_ECHO_NAME
 #define CONFIG_STREAMS_ECHO_NAME "echo"
@@ -270,7 +273,7 @@ static struct cdevsw echo_cdev = {
 static int __init echo_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 	printk(KERN_INFO ECHO_BANNER);
 #else
 	printk(KERN_INFO ECHO_SPLASH);
@@ -286,5 +289,7 @@ static void __exit echo_exit(void)
 	unregister_strdev(&echo_cdev, major);
 };
 
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 module_init(echo_init);
 module_exit(echo_exit);
+#endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,13 +74,14 @@ static char const ident[] =
 
 #include <tihdr.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 //#include "strxnet.h"          /* extern verification */
 #include "strreg.h"
 
 #define XNET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XNET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 #define XNET_DEVICE	"SVR 4.2 Sockets Library NET4 Support"
 #define XNET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XNET_LICENSE	"GPL"
@@ -92,10 +93,12 @@ static char const ident[] =
 #define XNET_SPLASH	XNET_DEVICE	" - " \
 			XNET_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_XNET_MODULE
 MODULE_AUTHOR(XNET_CONTACT);
 MODULE_DESCRIPTION(XNET_DESCRIP);
 MODULE_SUPPORTED_DEVICE(XNET_DEVICE);
 MODULE_LICENSE(XNET_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_XNET_NAME
 #define CONFIG_STREAMS_XNET_NAME "xnet"
@@ -740,7 +743,7 @@ static struct cdevsw xnet_cdev = {
 static int __init xnet_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_XNET_MODULE
 	printk(KERN_INFO XNET_BANNER);
 #else
 	printk(KERN_INFO XNET_SPLASH);
@@ -756,5 +759,7 @@ static void __exit xnet_exit(void)
 	unregister_strdev(&xnet_cdev, major);
 }
 
+#ifdef CONFIG_STREAMS_XNET_MODULE
 module_init(xnet_init);
 module_exit(xnet_exit);
+#endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -117,6 +117,7 @@ static char const ident[] =
 
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */
@@ -874,7 +875,7 @@ struct linkblk *alloclk(void)
 	return (l);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(alloclk);
+EXPORT_SYMBOL_GPL(alloclk);
 #endif
 void freelk(struct linkblk *l)
 {
@@ -892,7 +893,7 @@ void freelk(struct linkblk *l)
 	kmem_cache_free(si->si_cache, li);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(freelk);
+EXPORT_SYMBOL_GPL(freelk);
 #endif
 
 /* 
@@ -2209,7 +2210,7 @@ struct stdata *allocsd(void)
 	return (sd);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(allocsd);
+EXPORT_SYMBOL_GPL(allocsd);
 #endif
 static void __freesd(struct stdata *sd)
 {
@@ -2244,7 +2245,7 @@ struct stdata *sd_get(struct stdata *sd)
 	return (sd);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(sd_get);
+EXPORT_SYMBOL_GPL(sd_get);
 #endif
 void sd_put(struct stdata *sd)
 {
@@ -2263,7 +2264,7 @@ void sd_put(struct stdata *sd)
 	return;
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(sd_put);
+EXPORT_SYMBOL_GPL(sd_put);
 #endif
 
 /* 

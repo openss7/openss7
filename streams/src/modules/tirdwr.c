@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $";
 
 /* 
  *  This is TIRDWR an TLI read/write module for TPI Version 2 transport
@@ -80,13 +80,12 @@ static char const ident[] =
 
 #include <tihdr.h>
 
-#include "strdebug.h"
-
 #include "sys/config.h"
+#include "strdebug.h"
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
+#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -98,10 +97,12 @@ static char const ident[] =
 #define TIRDWR_SPLASH		TIRDWR_DEVICE		" - " \
 				TIRDWR_REVISION		"\n"
 
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
 MODULE_AUTHOR(TIRDWR_CONTACT);
 MODULE_DESCRIPTION(TIRDWR_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TIRDWR_DEVICE);
 MODULE_LICENSE(TIRDWR_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_TIRDWR_NAME
 //#define CONFIG_STREAMS_TIRDWR_NAME "tirdwr"
@@ -340,7 +341,7 @@ static struct fmodsw tirdwr_fmod = {
 static int __init tirdwr_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
 	printk(KERN_INFO TIRDWR_BANNER);
 #else
 	printk(KERN_INFO TIRDWR_SPLASH);
@@ -360,5 +361,7 @@ static void __exit tirdwr_exit(void)
 	return (void) (0);
 };
 
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
 module_init(tirdwr_init);
 module_exit(tirdwr_exit);
+#endif

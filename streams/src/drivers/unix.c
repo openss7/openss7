@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $
+ @(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#ident "@(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $";
+    "$RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,13 +74,14 @@ static char const ident[] =
 
 #include <tihdr.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 //#include "strunix.h"          /* extern verification */
 #include "strreg.h"
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"
@@ -92,10 +93,12 @@ static char const ident[] =
 #define UNIX_SPLASH	UNIX_DEVICE	" - " \
 			UNIX_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_UNIX_MODULE
 MODULE_AUTHOR(UNIX_CONTACT);
 MODULE_DESCRIPTION(UNIX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(UNIX_DEVICE);
 MODULE_LICENSE(UNIX_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_UNIX_NAME
 #define CONFIG_STREAMS_UNIX_NAME "unix"
@@ -364,7 +367,7 @@ static struct cdevsw unix_cdev = {
 static int __init unix_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_UNIX_MODULE
 	printk(KERN_INFO UNIX_BANNER);
 #else
 	printk(KERN_INFO UNIX_SPLASH);
@@ -380,5 +383,7 @@ static void __exit unix_exit(void)
 	unregister_strdev(&unix_cdev, major);
 }
 
+#ifdef CONFIG_STREAMS_UNIX_MODULE
 module_init(unix_init);
 module_init(unix_exit);
+#endif

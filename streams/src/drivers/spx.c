@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,14 +71,13 @@ static char const ident[] =
 #include <sys/kmem.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strreg.h"
 
-#include "sys/config.h"
-
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -90,10 +89,12 @@ static char const ident[] =
 #define SPX_SPLASH	SPX_DEVICE	" - " \
 			SPX_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_SPX_MODULE
 MODULE_AUTHOR(SPX_CONTACT);
 MODULE_DESCRIPTION(SPX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SPX_DEVICE);
 MODULE_LICENSE(SPX_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_SPX_NAME
 #error CONFIG_STREAMS_SPX_NAME must be defined.
@@ -324,7 +325,7 @@ static struct cdevsw spx_cdev = {
 static int __init spx_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_SPX_MODULE
 	printk(KERN_INFO SPX_BANNER);
 #else
 	printk(KERN_INFO SPX_SPLASH);
@@ -341,5 +342,7 @@ static void __exit spx_exit(void)
 	unregister_strdev(&spx_cdev, major);
 };
 
+#ifdef CONFIG_STREAMS_SPX_MODULE
 module_init(spx_init);
 module_exit(spx_exit);
+#endif

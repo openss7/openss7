@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,13 +78,12 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
-#include "strdebug.h"
-
 #include "sys/config.h"
+#include "strdebug.h"
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
+#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -96,10 +95,12 @@ static char const ident[] =
 #define PIPEMOD_SPLASH		PIPEMOD_DEVICE		" - " \
 				PIPEMOD_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 MODULE_AUTHOR(PIPEMOD_CONTACT);
 MODULE_DESCRIPTION(PIPEMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPEMOD_DEVICE);
 MODULE_LICENSE(PIPEMOD_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_PIPEMOD_NAME
 //#define CONFIG_STREAMS_PIPEMOD_NAME "pipemod"
@@ -214,7 +215,7 @@ static struct fmodsw pipemod_fmod = {
 static int __init pipemod_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 	printk(KERN_INFO PIPEMOD_BANNER);
 #else
 	printk(KERN_INFO PIPEMOD_SPLASH);
@@ -234,5 +235,7 @@ static void __exit pipemod_exit(void)
 	return (void) (0);
 };
 
+#ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 module_init(pipemod_init);
 module_exit(pipemod_exit);
+#endif

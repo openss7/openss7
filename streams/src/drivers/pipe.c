@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,6 +73,7 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* fort sd_get/sd_put */
@@ -81,11 +82,9 @@ static char const ident[] =
 #include "strspecfs.h"		/* for strm_open() */
 #include "pipe.h"		/* extern verification */
 
-#include "sys/config.h"
-
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/05 23:10:10 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -97,10 +96,12 @@ static char const ident[] =
 #define PIPE_SPLASH	PIPE_DEVICE	" - " \
 			PIPE_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 MODULE_AUTHOR(PIPE_CONTACT);
 MODULE_DESCRIPTION(PIPE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPE_DEVICE);
 MODULE_LICENSE(PIPE_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_PIPE_NAME
 //#define CONFIG_STREAMS_PIPE_NAME "pipe"
@@ -230,7 +231,7 @@ static struct cdevsw pipe_cdev = {
 static int __init pipe_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 	printk(KERN_INFO PIPE_BANNER);
 #else
 	printk(KERN_INFO PIPE_SPLASH);
@@ -246,5 +247,7 @@ static void __exit pipe_exit(void)
 	unregister_strdev(&pipe_cdev, 0);
 };
 
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 module_init(pipe_init);
 module_exit(pipe_exit);
+#endif

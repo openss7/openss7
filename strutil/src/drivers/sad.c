@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,15 +74,14 @@ static char const ident[] =
 #include <sys/ddi.h>
 #include <sys/sad.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strreg.h"		/* for struct str_args */
 #include "strsad.h"		/* for autopush functions */
 
-#include "sys/config.h"
-
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/05 23:10:10 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/06 08:44:21 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -94,10 +93,12 @@ static char const ident[] =
 #define SAD_SPLASH	SAD_DEVICE	" - " \
 			SAD_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_SAD_MODULE
 MODULE_AUTHOR(SAD_CONTACT);
 MODULE_DESCRIPTION(SAD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SAD_DEVICE);
 MODULE_LICENSE(SAD_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_SAD_NAME
 #error CONFIG_STREAMS_SAD_NAME must be defined.
@@ -396,7 +397,7 @@ static struct cdevsw sad_cdev = {
 static int __init sad_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_SAD_MODULE
 	printk(KERN_INFO SAD_BANNER);
 #else
 	printk(KERN_INFO SAD_SPLASH);
@@ -413,5 +414,7 @@ static void __exit sad_exit(void)
 	unregister_strdev(&sad_cdev, major);
 };
 
+#ifdef CONFIG_STREAMS_SAD_MODULE
 module_init(sad_init);
 module_exit(sad_exit);
+#endif

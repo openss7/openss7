@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:54 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -74,6 +74,7 @@ static char const ident[] =
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* extern verification */

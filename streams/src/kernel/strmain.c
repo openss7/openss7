@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:54 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,11 +67,12 @@ static char const ident[] =
 #include <sys/modversions.h>
 #endif
 
+#include "sys/config.h"
 #include "strdebug.h"
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $"
+#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -83,10 +84,12 @@ static char const ident[] =
 #define STREAMS_SPLASH		STREAMS_DEVICE		" - " \
 				STREAMS_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_MODULE
 MODULE_AUTHOR(STREAMS_CONTACT);
 MODULE_DESCRIPTION(STREAMS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(STREAMS_DEVICE);
 MODULE_LICENSE(STREAMS_LICENSE);
+#endif
 
 #include <sys/stropts.h>
 #include <sys/stream.h>
@@ -105,11 +108,220 @@ MODULE_LICENSE(STREAMS_LICENSE);
  *  We put all our heavily used globals handy.  Hopefully by placing these all
  *  together we keep them in the same cache slot or two.
  */
+#ifdef CONFIG_STREAMS_CLONE
+extern int clone_init(void);
+extern void clone_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_FIFO
+extern int fifo_init(void);
+extern void fifo_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_LOOP
+extern int loop_init(void);
+extern void loop_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_SAD
+extern int sad_init(void);
+extern void sad_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_NSDEV
+extern int nsdev_init(void);
+extern void nsdev_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_ECHO
+extern int echo_init(void);
+extern void echo_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_NULS
+extern int nuls_init(void);
+extern void nuls_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_PIPE
+extern int pipe_init(void);
+extern void pipe_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_SOCKSYS
+extern int socksys_init(void);
+extern void socksys_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_UNIX
+extern int unix_init(void);
+extern void unix_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_XNET
+extern int xnet_init(void);
+extern void xnet_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_LOG
+extern int log_init(void);
+extern void log_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_INET
+extern int inet_init(void);
+extern void inet_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_STH
+extern int sth_init(void);
+extern void sth_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_PIPEMOD
+extern int pipemod_init(void);
+extern void pipemod_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_CONNLD
+extern int connld_init(void);
+extern void connld_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_TIMOD
+extern int timod_init(void);
+extern void timod_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_TIRDWR
+extern int tirdwr_init(void);
+extern void tirdwr_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_SOCKMOD
+extern int sockmod_init(void);
+extern void sockmod_exit(void);
+#endif
+#ifdef CONFIG_STREAMS_SC
+extern int sc_init(void);
+extern void sc_exit(void);
+#endif
+
+static int modules_init(void)
+{
+#ifdef CONFIG_STREAMS_CLONE
+	clone_init();
+#endif
+#ifdef CONFIG_STREAMS_FIFO
+	fifo_init();
+#endif
+#ifdef CONFIG_STREAMS_LOOP
+	loop_init();
+#endif
+#ifdef CONFIG_STREAMS_SAD
+	sad_init();
+#endif
+#ifdef CONFIG_STREAMS_NSDEV
+	nsdev_init();
+#endif
+#ifdef CONFIG_STREAMS_ECHO
+	echo_init();
+#endif
+#ifdef CONFIG_STREAMS_NULS
+	nuls_init();
+#endif
+#ifdef CONFIG_STREAMS_PIPE
+	pipe_init();
+#endif
+#ifdef CONFIG_STREAMS_SOCKSYS
+	socksys_init();
+#endif
+#ifdef CONFIG_STREAMS_UNIX
+	unix_init();
+#endif
+#ifdef CONFIG_STREAMS_XNET
+	xnet_init();
+#endif
+#ifdef CONFIG_STREAMS_LOG
+	log_init();
+#endif
+#ifdef CONFIG_STREAMS_INET
+	inet_init();
+#endif
+#ifdef CONFIG_STREAMS_STH
+	sth_init();
+#endif
+#ifdef CONFIG_STREAMS_PIPEMOD
+	pipemod_init();
+#endif
+#ifdef CONFIG_STREAMS_CONNLD
+	connld_init();
+#endif
+#ifdef CONFIG_STREAMS_TIMOD
+	timod_init();
+#endif
+#ifdef CONFIG_STREAMS_TIRDWR
+	tirdwr_init();
+#endif
+#ifdef CONFIG_STREAMS_SOCKMOD
+	sockmod_init();
+#endif
+#ifdef CONFIG_STREAMS_SC
+	sc_init();
+#endif
+	return (0);
+}
+
+static void modules_exit(void)
+{
+#ifdef CONFIG_STREAMS_SC
+	sc_exit();
+#endif
+#ifdef CONFIG_STREAMS_SOCKMOD
+	sockmod_exit();
+#endif
+#ifdef CONFIG_STREAMS_TIRDWR
+	tirdwr_exit();
+#endif
+#ifdef CONFIG_STREAMS_TIMOD
+	timod_exit();
+#endif
+#ifdef CONFIG_STREAMS_CONNLD
+	connld_exit();
+#endif
+#ifdef CONFIG_STREAMS_PIPEMOD
+	pipemod_exit();
+#endif
+#ifdef CONFIG_STREAMS_STH
+	sth_exit();
+#endif
+#ifdef CONFIG_STREAMS_INET
+	inet_exit();
+#endif
+#ifdef CONFIG_STREAMS_LOG
+	log_exit();
+#endif
+#ifdef CONFIG_STREAMS_XNET
+	xnet_exit();
+#endif
+#ifdef CONFIG_STREAMS_UNIX
+	unix_exit();
+#endif
+#ifdef CONFIG_STREAMS_SOCKSYS
+	socksys_exit();
+#endif
+#ifdef CONFIG_STREAMS_PIPE
+	pipe_exit();
+#endif
+#ifdef CONFIG_STREAMS_NULS
+	nuls_exit();
+#endif
+#ifdef CONFIG_STREAMS_ECHO
+	echo_exit();
+#endif
+#ifdef CONFIG_STREAMS_NSDEV
+	nsdev_exit();
+#endif
+#ifdef CONFIG_STREAMS_SAD
+	sad_exit();
+#endif
+#ifdef CONFIG_STREAMS_LOOP
+	loop_exit();
+#endif
+#ifdef CONFIG_STREAMS_FIFO
+	fifo_exit();
+#endif
+#ifdef CONFIG_STREAMS_CLONE
+	clone_exit();
+#endif
+}
 
 static int __init streams_init(void)
 {
 	int result;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_MODULE
 	printk(KERN_INFO STREAMS_BANNER);	/* log message */
 #else
 	printk(KERN_INFO STREAMS_SPLASH);	/* console splash */
@@ -124,6 +336,7 @@ static int __init streams_init(void)
 		goto no_strsched;
 	if ((result = strreg_init()))
 		goto no_strreg;
+	modules_init();
 	return (0);
       no_strreg:
 	strsched_exit();
@@ -139,6 +352,7 @@ static int __init streams_init(void)
 
 static void __exit streams_exit(void)
 {
+	modules_exit();
 	strreg_exit();
 	strsched_exit();
 	strsysctl_exit();
@@ -146,5 +360,7 @@ static void __exit streams_exit(void)
 	strprocfs_exit();
 }
 
+#ifdef CONFIG_STREAMS_MODULE
 module_init(streams_init);
 module_exit(streams_exit);
+#endif

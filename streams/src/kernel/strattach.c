@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -86,6 +86,8 @@ static char const ident[] =
 
 #include <sys/dki.h>
 
+#include "sys/config.h"
+#include "strdebug.h"
 #include "strattach.h"
 #include "strspecfs.h"		/* for specfs_mnt */
 
@@ -175,7 +177,7 @@ long do_fattach(const struct file *file, const char *file_name)
 	return err;
 }
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL(do_fattach);
+EXPORT_SYMBOL_GPL(do_fattach);
 #endif
 
 long do_fdetach(const char *file_name)
@@ -214,7 +216,7 @@ long do_fdetach(const char *file_name)
 	return err;
 }
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL(do_fdetach);
+EXPORT_SYMBOL_GPL(do_fdetach);
 #endif
 
 #endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */

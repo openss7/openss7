@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/05 23:10:09 $
+ @(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:09 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/05 23:10:09 $"
+#ident "@(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:19 $"
 
 static char const ident[] =
-    "$RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/05 23:10:09 $";
+    "$RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:19 $";
 
 #define __NO_VERSION__
 
@@ -85,6 +85,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 #include <sys/sad.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 
 EXPORT_SYMBOL_GPL(lis__kfree);

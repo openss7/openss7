@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:23 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:23 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,14 +80,13 @@ static char const ident[] =
 
 #include <sys/sc.h>
 
-#include "strreg.h"
-#include "strdebug.h"
-
 #include "sys/config.h"
+#include "strdebug.h"
+#include "strreg.h"
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:21 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/06 08:44:23 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -99,10 +98,12 @@ static char const ident[] =
 #define SC_SPLASH	SC_DEVICE	" - " \
 			SC_REVISION
 
+#ifdef CONFIG_STREAMS_SC_MODULE
 MODULE_AUTHOR(SC_CONTACT);
 MODULE_DESCRIPTION(SC_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SC_DEVICE);
 MODULE_LICENSE(SC_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_SC_NAME
 #error CONFIG_STREAMS_SC_NAME must be defined.
@@ -380,7 +381,7 @@ static struct fmodsw sc_fmod = {
 static int __init sc_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_SC_MODULE
 	cmn_err(CE_NOTE, SC_BANNER);
 #else
 	cmn_err(CE_NOTE, SC_SPLASH);
@@ -401,5 +402,7 @@ static void __exit sc_exit(void)
 	return (void) (0);
 };
 
+#ifdef CONFIG_STREAMS_SC_MODULE
 module_init(sc_init);
 module_exit(sc_exit);
+#endif

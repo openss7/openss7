@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:09 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:19 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -115,13 +115,14 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"
 #include "strsad.h"
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:19 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -133,10 +134,12 @@ static char const ident[] =
 #define LISCOMP_SPLASH		LISCOMP_DEVICE		" - " \
 				LISCOMP_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 MODULE_AUTHOR(LISCOMP_CONTACT);
 MODULE_DESCRIPTION(LISCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LISCOMP_DEVICE);
 MODULE_LICENSE(LISCOMP_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_CLONE_MAJOR
 #define CONFIG_STREAMS_CLONE_MAJOR 54
@@ -2210,7 +2213,7 @@ EXPORT_SYMBOL_GPL(lis_unregister_strmod);
 
 static int __init liscomp_init(void)
 {
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 	printk(KERN_INFO LISCOMP_BANNER);
 #else
 	printk(KERN_INFO LISCOMP_SPLASH);
@@ -2222,5 +2225,7 @@ static void __exit liscomp_exit(void)
 	return;
 }
 
+#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 module_init(liscomp_init);
 module_exit(liscomp_exit);
+#endif

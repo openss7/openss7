@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:21 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -87,10 +87,12 @@ static char const ident[] =
 #define NULS_SPLASH	NULS_DEVICE	" - " \
 			NULS_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_NULS_MODULE
 MODULE_AUTHOR(NULS_CONTACT);
 MODULE_DESCRIPTION(NULS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(NULS_DEVICE);
 MODULE_LICENSE(NULS_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_NULS_NAME
 #define CONFIG_STREAMS_NULS_NAME "nuls"
@@ -267,7 +269,7 @@ static struct cdevsw nuls_cdev = {
 static int __init nuls_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_NULS_MODULE
 	printk(KERN_INFO NULS_BANNER);
 #else
 	printk(KERN_INFO NULS_SPLASH);
@@ -283,5 +285,7 @@ static void __exit nuls_exit(void)
 	unregister_strdev(&nuls_cdev, major);
 };
 
+#ifdef CONFIG_STREAMS_NULS_MODULE
 module_init(nuls_init);
 module_exit(nuls_exit);
+#endif

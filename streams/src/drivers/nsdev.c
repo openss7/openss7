@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,16 +73,15 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strspecfs.h"
 #include "strreg.h"
 #include "sth.h"
 
-#include "sys/config.h"
-
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -94,10 +93,12 @@ static char const ident[] =
 #define NSDEV_SPLASH	NSDEV_DEVICE	" - " \
 			NSDEV_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
 MODULE_AUTHOR(NSDEV_CONTACT);
 MODULE_DESCRIPTION(NSDEV_DESCRIP);
 MODULE_SUPPORTED_DEVICE(NSDEV_DEVICE);
 MODULE_LICENSE(NSDEV_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_NSDEV_NAME
 //#define CONFIG_STREAMS_NSDEV_NAME "nsdev"
@@ -241,7 +242,7 @@ static struct cdevsw nsdev_cdev = {
 static int __init nsdev_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
 	printk(KERN_INFO NSDEV_BANNER);
 #else
 	printk(KERN_INFO NSDEV_SPLASH);
@@ -262,5 +263,7 @@ static void __exit nsdev_exit(void)
 	unregister_strdrv(&nsdev_cdev);
 };
 
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
 module_init(nsdev_init);
 module_exit(nsdev_exit);
+#endif

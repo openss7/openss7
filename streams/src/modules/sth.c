@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/05 23:10:11 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:11 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/05 23:10:11 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/05 23:10:11 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $";
 
 //#define __NO_VERSION__
 
@@ -83,6 +83,7 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strsched.h"		/* for allocsd */
 #include "strreg.h"		/* For str_args */
@@ -93,11 +94,9 @@ static char const ident[] =
 #include "strattach.h"		/* for do_fattach/do_fdetach/do_spipe */
 #include "strspecfs.h"		/* for strm_open() */
 
-#include "sys/config.h"
-
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/05 23:10:11 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -109,12 +108,12 @@ static char const ident[] =
 #define STH_SPLASH	STH_DEVICE	" - " \
 			STH_REVISION	"\n"
 
-#ifndef __NO_VERSION__
+#ifdef CONFIG_STREAMS_STH_MODULE
 MODULE_AUTHOR(STH_CONTACT);
 MODULE_DESCRIPTION(STH_DESCRIP);
 MODULE_SUPPORTED_DEVICE(STH_DEVICE);
 MODULE_LICENSE(STH_LICENSE);
-#endif				/* __NO_VERSION__ */
+#endif				/* CONFIG_STREAMS_STH_MODULE */
 
 #define QR_DONE		0
 #define QR_ABSORBED	1
@@ -2587,7 +2586,9 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
       exit:
 	return (err);
 }
-EXPORT_SYMBOL(strputpmsg);
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(strputpmsg);
+#endif
 
 /**
  *  strgetpmsg: - getpmsg file operation for a stream
@@ -2724,7 +2725,9 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
       einval:
 	return (-EINVAL);
 }
-EXPORT_SYMBOL(strgetpmsg);
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(strgetpmsg);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3005,7 +3008,9 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #endif
 };
 
+#if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL_GPL(strm_f_ops);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3029,7 +3034,9 @@ int strwsrv(queue_t *q)
 		wake_up_interruptible(&sd->sd_waitq);
 	return (0);
 }
-EXPORT_SYMBOL(strwsrv);
+#if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE
+EXPORT_SYMBOL_GPL(strwsrv);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3306,7 +3313,9 @@ int strrput(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 }
-EXPORT_SYMBOL(strrput);
+#if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE
+EXPORT_SYMBOL_GPL(strrput);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3609,7 +3618,7 @@ static struct fmodsw sth_fmod = {
 int __init sth_init(void)
 {
 	int err;
-#ifdef  MODULE
+#ifdef CONFIG_STREAMS_STH_MODULE
 	printk(KERN_INFO STH_BANNER);
 #else
 	printk(KERN_INFO STH_SPLASH);
@@ -3626,7 +3635,7 @@ void __exit sth_exit(void)
 	unregister_strmod(&sth_fmod);
 }
 
-#ifndef __NO_VERSION__
+#ifdef CONFIG_STREAMS_STH_MODULE
 module_init(sth_init);
 module_exit(sth_exit);
-#endif				/* __NO_VERSION__ */
+#endif				/* CONFIG_STREAMS_STH_MODULE */

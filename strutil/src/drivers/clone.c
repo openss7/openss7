@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,15 +70,14 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strspecfs.h"		/* for strm_open() and str_args */
 #include "sth.h"		/* for make_oflags */
 
-#include "sys/config.h"
-
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -90,10 +89,12 @@ static char const ident[] =
 #define CLONE_SPLASH	CLONE_DEVICE	" - " \
 			CLONE_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 MODULE_AUTHOR(CLONE_CONTACT);
 MODULE_DESCRIPTION(CLONE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CLONE_DEVICE);
 MODULE_LICENSE(CLONE_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_CLONE_NAME
 //#define CONFIG_STREAMS_CLONE_NAME "clone"
@@ -202,7 +203,7 @@ static struct cdevsw clone_cdev = {
 static int __init clone_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 	printk(KERN_INFO CLONE_BANNER);
 #else
 	printk(KERN_INFO CLONE_SPLASH);
@@ -218,5 +219,7 @@ static void __exit clone_exit(void)
 	unregister_strdev(&clone_cdev, 0);
 };
 
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 module_init(clone_init);
 module_exit(clone_exit);
+#endif

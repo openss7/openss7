@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -76,6 +76,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 #include <sys/sad.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "strsched.h"		/* for ap_get/ap_put */
 #include "strsad.h"		/* extern verification */
@@ -148,7 +149,7 @@ struct strapush *autopush_find(dev_t dev)
 	return ((struct strapush *) api);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL(autopush_find);
+EXPORT_SYMBOL_GPL(autopush_find);
 #endif
 
 int autopush_add(struct strapush *sap)
@@ -191,7 +192,7 @@ int autopush_add(struct strapush *sap)
 	return (err);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL(autopush_add);
+EXPORT_SYMBOL_GPL(autopush_add);
 #endif
 
 int autopush_del(struct strapush *sap)
@@ -213,7 +214,7 @@ int autopush_del(struct strapush *sap)
 	return (err);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL(autopush_del);
+EXPORT_SYMBOL_GPL(autopush_del);
 #endif
 
 int autopush_vml(struct str_mlist *smp, int nmods)
@@ -235,7 +236,7 @@ int autopush_vml(struct str_mlist *smp, int nmods)
 	return (-EINVAL);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL(autopush_vml);
+EXPORT_SYMBOL_GPL(autopush_vml);
 #endif
 
 int apush_set(struct strapush *sap)
@@ -332,5 +333,5 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
     defined CONFIG_STREAMS_FIFO_MODULE || \
     defined CONFIG_STREAMS_PIPE_MODULE || \
     defined CONFIG_STREAMS_SOCK_MODULE
-EXPORT_SYMBOL(autopush);
+EXPORT_SYMBOL_GPL(autopush);
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -93,6 +93,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 #include <sys/kmem.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"
 #include "fifo.h"
@@ -386,7 +387,7 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
 	return (err);
 }
 #if defined CONFIG_STREAMS_STH_MODULE || CONFIG_STREAMS_NSDEV_MODULE
-EXPORT_SYMBOL(strm_open);
+EXPORT_SYMBOL_GPL(strm_open);
 #endif
 
 /**
@@ -1476,7 +1477,7 @@ long do_spipe(int *fds)
 	return (err);
 }
 #if defined CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(do_spipe);
+EXPORT_SYMBOL_GPL(do_spipe);
 #endif
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/05 23:10:10 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/06 08:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/05 23:10:10 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/06 08:44:22 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/05 23:10:10 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/06 08:44:22 $";
 
 #define __NO_VERSION__
 
@@ -87,20 +87,12 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 #include "sth.h"		/* for stream operations */
 #include "strspecfs.h"		/* for str_args */
 #include "strsched.h"		/* for di_get and di_put */
 #include "strreg.h"		/* extern verification */
-
-#ifndef CONFIG_STREAMS_FIFO_MAJOR
-#define CONFIG_STREAMS_FIFO_MAJOR 211
-//#error "CONFIG_STREAMS_FIFO_MAJOR must be defined."
-#endif
-#ifndef CONFIG_STREAMS_SOCKSYS_MAJOR
-#define CONFIG_STREAMS_SOCKSYS_MAJOR 40
-//#error "CONFIG_STREAMS_SOCKSYS_MAJOR must be defined."
-#endif
 
 /* these don't need to be so big */
 
@@ -129,10 +121,10 @@ struct list_head minors_list = LIST_HEAD_INIT(minors_list);	/* Minors go here */
 
 #if	defined CONFIG_STREAMS_NSDEV_MODULE || \
 	defined CONFIG_STREAMS_SC_MODULE
-EXPORT_SYMBOL(cdevsw_list);
+EXPORT_SYMBOL_GPL(cdevsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE
-EXPORT_SYMBOL(fmodsw_list);
+EXPORT_SYMBOL_GPL(fmodsw_list);
 #endif
 
 struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
@@ -148,8 +140,8 @@ int cdev_count = 0;
 int fmod_count = 0;
 
 #if defined CONFIG_STREAMS_SC_MODULE
-EXPORT_SYMBOL(cdev_count);
-EXPORT_SYMBOL(fmod_count);
+EXPORT_SYMBOL_GPL(cdev_count);
+EXPORT_SYMBOL_GPL(fmod_count);
 #endif
 
 /*
@@ -718,8 +710,8 @@ void cdev_put(struct cdevsw *cdev)
     defined CONFIG_STREAMS_COMPAT_LIS_MODULE || \
     defined CONFIG_STREAMS_COMPAT_UW7_MODULE || \
     defined CONFIG_STREAMS_CLONE_MODULE
-EXPORT_SYMBOL(cdev_get);
-EXPORT_SYMBOL(cdev_put);
+EXPORT_SYMBOL_GPL(cdev_get);
+EXPORT_SYMBOL_GPL(cdev_put);
 #endif
 
 /**
@@ -732,7 +724,7 @@ struct cdevsw *cdrv_get(modID_t modid)
 }
 #if defined CONFIG_STREAMS_STH_MODULE || \
     defined CONFIG_STREAMS_COMPAT_UW7_MODULE
-EXPORT_SYMBOL(cdrv_get);
+EXPORT_SYMBOL_GPL(cdrv_get);
 #endif
 
 /**
@@ -744,7 +736,7 @@ void cdrv_put(struct cdevsw *cdev)
 	cdev_put(cdev);
 }
 #if defined CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(cdrv_put);
+EXPORT_SYMBOL_GPL(cdrv_put);
 #endif
 
 /**
@@ -797,7 +789,7 @@ struct cdevsw *cdev_find(const char *name)
 	return cdev_search(name, !in_interrupt());
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL(cdev_find);
+EXPORT_SYMBOL_GPL(cdev_find);
 #endif
 
 /**

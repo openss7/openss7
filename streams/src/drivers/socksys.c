@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
+ Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 
 static char const ident[] =
-    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $";
+    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,13 +74,14 @@ static char const ident[] =
 
 #include <tihdr.h>
 
+#include "sys/config.h"
 #include "strdebug.h"
 //#include "strsocksys.h"               /* extern verification */
 #include "strreg.h"
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/05 19:32:53 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -92,10 +93,12 @@ static char const ident[] =
 #define SOCKSYS_SPLASH		SOCKSYS_DEVICE		" - " \
 				SOCKSYS_REVISION	"\n"
 
+#ifdef CONFIG_STREAMS_SOCKSYS_MODULE
 MODULE_AUTHOR(SOCKSYS_CONTACT);
 MODULE_DESCRIPTION(SOCKSYS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SOCKSYS_DEVICE);
 MODULE_LICENSE(SOCKSYS_LICENSE);
+#endif
 
 #ifndef CONFIG_STREAMS_SOCKSYS_NAME
 #define CONFIG_STREAMS_SOCKSYS_NAME "socksys"
@@ -184,7 +187,7 @@ static struct cdevsw socksys_cdev = {
 static int __init socksys_init(void)
 {
 	int err;
-#ifdef MODULE
+#ifdef CONFIG_STREAMS_SOCKSYS_MODULE
 	printk(KERN_INFO SOCKSYS_BANNER);
 #else
 	printk(KERN_INFO SOCKSYS_SPLASH);
@@ -200,5 +203,7 @@ static void __exit socksys_exit(void)
 	unregister_strdev(&socksys_cdev, major);
 }
 
+#ifdef CONFIG_STREAMS_SOCKSYS_MODULE
 module_init(socksys_init);
 module_exit(socksys_exit);
+#endif

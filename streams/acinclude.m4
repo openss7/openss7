@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.18 2004/05/04 21:36:56 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.19 2004/05/06 08:44:18 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/06 08:44:18 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -289,9 +289,24 @@ AC_DEFUN([_LFS_SETUP], [
     _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
+    _LFS_SETUP_MODULE
     _LFS_CHECK_KERNEL
     _LFS_SETUP_DEBUG
 ])# _LFS_SETUP
+# =========================================================================
+
+# =========================================================================
+# _LFS_SETUP_MODULE
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_MODULE], [
+    if test :"${linux_cv_modules:-yes}" = :yes ; then
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MODULE], [], [When defined, STREAMS
+            is being compiled as a loadable kernel module.])
+    else
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS], [], [When defined, STREAMS is
+            being compiled as a kernel linkable object.])
+    fi
+])# _LFS_SETUP_MODULE
 # =========================================================================
 
 # =========================================================================
