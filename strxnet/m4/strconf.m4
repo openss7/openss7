@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.2 2004/08/17 02:45:23 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.5 2004/08/22 11:19:20 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/17 02:45:23 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/22 11:19:20 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -149,6 +149,9 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
     AC_MSG_CHECKING([for strconf strload configuration file name])
     STRCONF_STRLOAD="${strconf_cv_strload:-strload.conf}"
     AC_MSG_RESULT([${STRCONF_STRLOAD}])
+    AC_MSG_CHECKING([for strconf STREAMS package])
+    STRCONF_PACKAGE="${strconf_cv_package:-LiS}"
+    AC_MSG_RESULT([${STRCONF_PACKAGE}])
 ])# _STRCONF_SETUP
 # =========================================================================
 
@@ -162,8 +165,8 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
 AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     AC_MSG_NOTICE([searching for $STRCONF_INPUT input files in  $ac_srcdir and $ac_builddir])
     strconf_configs=
-    ac_abs_srcdir=`( cd $ac_srcdir ; /bin/pwd )`
-    ac_abs_builddir=`( cd $ac_builddir ; /bin/pwd )`
+#   ac_abs_srcdir=`( cd $ac_srcdir ; /bin/pwd )`
+#   ac_abs_builddir=`( cd $ac_builddir ; /bin/pwd )`
     strconf_list="`find $ac_abs_srcdir $ac_abs_builddir -follow -type f -name \"$STRCONF_STEM\" | sort | uniq`"
     for strconf_tmp in $strconf_list ; do
         if test -r "$strconf_tmp" ; then
@@ -175,35 +178,35 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
         cat $strconf_configs > $STRCONF_INPUT
         if test :"${STRCONF_CONFIG:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_CONFIG from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT"
         fi
         if test :"${STRCONF_MODCONF:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_MODCONF from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --modconf=$STRCONF_MODCONF $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --modconf=$STRCONF_MODCONF $STRCONF_INPUT"
         fi
         if test :"${STRCONF_MKNODES:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_MKNODES from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --makenodes=$STRCONF_MKNODES $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --makenodes=$STRCONF_MKNODES $STRCONF_INPUT"
         fi
         if test :"${STRCONF_DRVCONF:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_DRVCONF from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --driverconf=$STRCONF_DRVCONF $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --driverconf=$STRCONF_DRVCONF $STRCONF_INPUT"
         fi
         if test :"${STRCONF_CONFMOD:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_CONFMOD from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --confmodules=$STRCONF_CONFMOD $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --confmodules=$STRCONF_CONFMOD $STRCONF_INPUT"
         fi
         if test :"${STRCONF_MAKEDEV:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_MAKEDEV from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT"
         fi
         if test :"${STRCONF_STSETUP:+set}" = :set; then
             AC_MSG_NOTICE([creating $STRCONF_STSETUP from $STRCONF_INPUT])
-            eval "$STRCONF -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT"
+            eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT"
         fi
 dnl     if test :"${STRCONF_STRLOAD:+set}" = :set; then
 dnl         AC_MSG_NOTICE([creating $STRCONF_STRLOAD from $STRCONF_INPUT])
-dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT"
+dnl         eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT"
 dnl     fi
     fi
 ])# _STRCONF_OUTPUT_CONFIG_COMMANDS
@@ -228,7 +231,8 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [dnl
         STRCONF_CONFMOD="$STRCONF_CONFMOD" \
         STRCONF_MAKEDEV="$STRCONF_MAKEDEV" \
         STRCONF_STSETUP="$STRCONF_STSETUP" \
-        STRCONF_STRLOAD="$STRCONF_STRLOAD" ])
+        STRCONF_STRLOAD="$STRCONF_STRLOAD" \
+        STRCONF_PACKAGE="$STRCONF_PACKAGE" ])
 ])# _STRCONF_OUTPUT_CONFIG
 # =========================================================================
 
@@ -250,6 +254,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
         AC_SUBST([STRCONF_MAKEDEV])dnl
         AC_SUBST([STRCONF_STSETUP])dnl
         AC_SUBST([STRCONF_STRLOAD])dnl
+        AC_SUBST([STRCONF_PACKAGE])dnl
         _STRCONF_OUTPUT_CONFIG
 ])# _STRCONF_OUTPUT
 # =========================================================================

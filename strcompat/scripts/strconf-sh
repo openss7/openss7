@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/17 02:45:42 $
+# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 11:34:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/17 02:45:42 $ by $Author: brian $
+# Last Modified $Date: 2004/08/22 11:34:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,23 +78,6 @@ fi
 progname=`$echo "$0" | ${SED} -e 's%^.*/%%'`
 modename="$progname"
 reexec="$SHELL $0"
-
-PROGRAM=strconf.sh
-PACKAGE=LiS
-VERSION='0.9.2'
-TIMESTAMP='(Mon Aug 16 19:50:05 MDT 2004)'
-
-if test "$PACKAGE" = LfS ; then
-    ucstreams='LFS'
-    lcstreams='lfs'
-    mcstreams='LfS'
-fi
-
-if test "$PACKAGE" = LiS ; then
-    ucstreams='LIS'
-    lcstreams='lis'
-    mcstreams='LiS'
-fi
 
 help="Try \`$progname --help' for more information."
 mkdir="mkdir"
@@ -143,9 +126,17 @@ strconf_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
 
 # Defaults
 
+default_package=${PACKAGE:-LiS}
 default_basemajor=230
 default_permission=0666
 default_functionname='main'
+
+package=
+basemajor=
+permission=
+functionname=
+
+defaults='package basemajor permission functionname'
 
 default_hconfig='config.h'
 default_modconf='modconf.inc'
@@ -155,10 +146,6 @@ default_confmodules='conf.modules'
 default_strmknods='makedev.lst'
 default_strsetup='strsetup.conf'
 
-basemajor=$default_basemajor
-permission=$default_permission
-functionname=$default_functionname
-
 hconfig=
 modconf=
 makenodes=
@@ -167,62 +154,64 @@ confmodules=
 strmknods=
 strsetup=
 
-
 # Parse our command line options once, thoroughly.
-while test "$#" -gt 0
+while test "$#" -gt 0 -o ":$more" != ":"
 do
-    arg="$1"
-    shift
-
-    if test x"$more_options" = xno
-    then
-        nonopt="$arg"
-        break
-    fi
-
+    if test ":$more" != ":" ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
+    if test x"$more_options" = xno ; then nonopt="$arg" ; break; fi
     # check for attached option argument
     case $arg in
+        --basemajor=* | --basemajo=* | --basemaj=* | --basema=* | --basem=* | --base=* | --bas=* | --ba=* | --b=* | \
+        --hconfig=* | --hconfi=* | --hconf=* | --hcon=* | --hco=* | --hc=* | --h=* | \
+        --modconf=* | --modcon=* | --modco=* | --modc=* | --mod=* | --mo=* | --m=* | --o=* | \
+        --makenodes=* | --makenode=* | --makenod=* | --makeno=* | --maken=* | --make=* | --mak=* | --ma=* | --mknod=* | \
+        --strsetup=* | --strsetu=* | --strset=* | --strse=* | --strs=* | --setup=* | \
+        --strmknods=* | --strmknod=* | --strmkno=* | --strmkn=* | --strmk=* | --strm=* | --str=* | --st=* | --smknod=* | \
+        --permission=* | --permissio=* | --permissi=* | --permiss=* | --permis=* | --permi=* | --perm=* | --per=* | --pe=* | --umask=* | --p=* | \
+        --driverconf=* | --drvrconf=* | --drvconf=* | --drconf=* | --dconf=* | --l* | \
+        --confmodules=* | --confmodule=* | --confmodul=* | --confmodu=* | --confmod=* | --confmo=* | --conf=* | --con=* | --co=* | --c=* | --L=* | \
+        --functionname=* | --funcname=* | --funcnam=* | --function=* | --func=* | --fncname=* | --fncnam=* | --fnc=* | --f=* | --r=* | \
+        --package=* | --packag=* | --packa=* | --pack=* | --pac=* | --pa=* | --k=*)
+            optarg=`$echo "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
         --*=*)
-            optarg=`$echo "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'`
-            ;;
-        -b | -h | -o | -m | -H | -p | -r | -l | -L | -s | -S)
-            optarg=
-            ;;
-        -b* | -h* | -o* | -m* | -H* | -p* | -r* | -l* | -L* | -s* | -S*)
-            optarg=`$echo "X$arg" | $Xsed -e 's/-[bhomHprlLsS]//'`
-            ;;
+            opt=`$echo -n "X$1" | $Xsed -e 's|=.*||'`
+            $echo "$program: syntax error -- \`$opt' does not accept an argument" 1>&2
+            $echo "$help" 1>&2
+            exit 2 ;;
+        -[bhomHprlLsSk])
+            optarg= ;;
+        -[bhomHprlLsSk]*)
+            optarg=`$echo "X$arg" | $Xsed -e 's/-[bhomHprlLsSk]//'` ;;
         *)
-            optarg=
-            ;;
+            optarg= ;;
     esac
 
     # check for optional or required option argument
     if test -n "$prev"; then
         case $arg in
-            -*)
+            -*) # optional arguments not forthcoming
                 case $prev in
                     # these have optional arguments
-                    hconfig | modconf | makenodes | strmknods | strsetup | driverconf | confmodules)
+                    basemajor | permission | functionname | hconfig | modconf | makenodes | driverconf | confmodules | strmknods | strsetup | package)
                         eval "$prev=\"\$default_$prev\""
                         reexec="$reexec $prevopt"
+                        prev= ; prevopt=
                         ;;
                     # the rest have required arguments
                     *)
-                        $echo "$progname: option \`$prevopt' requires an argument" 1>&2
+                        $echo "$progname: syntax error -- \`$prevopt' requires an argument" 1>&2
                         $echo "$help" 1>&2
-                        exit 1
+                        exit 2
                         ;;
                 esac
                 ;;
-            *)
-                # If the previous option needs an argument, assign it.
+            *) # If the previous option needs an argument, assign it.
                 eval "$prev=\"\$arg\""
                 reexec="$reexec $prevopt=\"$arg\""
+                prev= ; prevopt=
+                continue
                 ;;
         esac
-        prev=
-        prevopt=
-        continue
     fi
 
     # Have we seen a non-optional argument yet?
@@ -249,129 +238,81 @@ do
             show=:
             ;;
         --basemajor | --basemajo | --basemaj | --basema | --basem | --base | --bas | --ba | --b | -b)
-            prevopt="$arg"
-            prev=basemajor
-            ;;
+            prevopt="$arg" ; prev=basemajor ;;
         --basemajor=* | --basemajo=* | --basemaj=* | --basema=* | --basem=* | --base=* | --bas=* | --ba=* | --b=* | -b*)
-            basemajor="$optarg"
-            reexec="$reexec --basemajor=\"$optarg\""
-            ;;
+            basemajor="$optarg" ; reexec="$reexec --basemajor=\"$optarg\"" ;;
         --hconfig | --hconfi | --hconf | --hcon | --hco | --hc | --h | -h)
-            prevopt="$arg"
-            prev=hconfig
-            ;;
+            prevopt="$arg" ; prev=hconfig ;;
         --hconfig=* | --hconfi=* | --hconf=* | --hcon=* | --hco=* | --hc=* | --h=* | -h*)
-            hconfig="$optarg"
-            reexec="$reexec --hconfig=\"$optarg\""
-            ;;
+            hconfig="$optarg" ; reexec="$reexec --hconfig=\"$optarg\"" ;;
         --modconf | --modcon | --modco | --modc | --mod | --mo | --m | --o | -o)
-            prevopt="$arg"
-            prev=modconf
-            ;;
+            prevopt="$arg" ; prev=modconf ;;
         --modconf=* | --modcon=* | --modco=* | --modc=* | --mod=* | --mo=* | --m=* | --o=* | -o*)
-            modconf="$optarg"
-            reexec="$reexec --modconf=\"$optarg\""
-            ;;
+            modconf="$optarg" ; reexec="$reexec --modconf=\"$optarg\"" ;;
         --makenodes | --makenode | --makenod | --makeno | --maken | --make | --mak | --ma | --mknod | -m)
-            prevopt="$arg"
-            prev=makenodes
-            ;;
+            prevopt="$arg" ; prev=makenodes ;;
         --makenodes=* | --makenode=* | --makenod=* | --makeno=* | --maken=* | --make=* | --mak=* | --ma=* | --mknod=* | -m*)
-            makenodes="$optarg"
-            reexec="$reexec --makenodes=\"$optarg\""
-            ;;
+            makenodes="$optarg" ; reexec="$reexec --makenodes=\"$optarg\"" ;;
         --strsetup | --strsetu | --strset | --strse | --strs | --setup | -S)
-            prevopt="$arg"
-            prev=strsetup
-            ;;
+            prevopt="$arg" ; prev=strsetup ;;
         --strsetup=* | --strsetu=* | --strset=* | --strse=* | --strs=* | --setup=* | -S*)
-            strsetup="$optarg"
-            reexec="$reexec --strsetup=\"$optarg\""
-            ;;
+            strsetup="$optarg" ; reexec="$reexec --strsetup=\"$optarg\"" ;;
         --strmknods | --strmknod | --strmkno | --strmkn | --strmk | --strm | --str | --st | --smknod | -s)
-            prevopt="$arg"
-            prev=strmknods
-            ;;
+            prevopt="$arg" ; prev=strmknods ;;
         --strmknods=* | --strmknod=* | --strmkno=* | --strmkn=* | --strmk=* | --strm=* | --str=* | --st=* | --smknod=* | -s*)
-            strmknods="$optarg"
-            reexec="$reexec --strmknods=\"$optarg\""
-            ;;
+            strmknods="$optarg" ; reexec="$reexec --strmknods=\"$optarg\"" ;;
         --permission | --permissio | --permissi | --permiss | --permis | --permi | --perm | --per | --pe | --umask | --p | -p)
-            prevopt="$arg"
-            prev=permission
-            ;;
+            prevopt="$arg" ; prev=permission ;;
         --permission=* | --permissio=* | --permissi=* | --permiss=* | --permis=* | --permi=* | --perm=* | --per=* | --pe=* | --umask=* | --p=* | -p*)
-            permission="$optarg"
-            reexec="$reexec --permission=\"$optarg\""
-            ;;
+            permission="$optarg" ; reexec="$reexec --permission=\"$optarg\"" ;;
         --driverconf | --drvrconf | --drvconf | --drconf | --dconf | --l | -l)
-            prevopt="$arg"
-            prev=driverconf
-            ;;
+            prevopt="$arg" ; prev=driverconf ;;
         --driverconf=* | --drvrconf=* | --drvconf=* | --drconf=* | --dconf=* | --l* | -l*)
-            driverconf="$optarg"
-            reexec="$reexec --driverconf=\"$optarg\""
-            ;;
+            driverconf="$optarg" ; reexec="$reexec --driverconf=\"$optarg\"" ;;
         --confmodules | --confmodule | --confmodul | --confmodu | --confmod | --confmo | --conf | --con | --co | --c | --L | -L)
-            prevopt="$arg"
-            prev=confmodules
-            ;;
+            prevopt="$arg" ; prev=confmodules ;;
         --confmodules=* | --confmodule=* | --confmodul=* | --confmodu=* | --confmod=* | --confmo=* | --conf=* | --con=* | --co=* | --c=* | --L=* | -L*)
-            confmodules="$optarg"
-            reexec="$reexec --confmodules=\"$optarg\""
-            ;;
+            confmodules="$optarg"; reexec="$reexec --confmodules=\"$optarg\"" ;;
         --functionname | --funcname | --funcnam | --function | --func | --fncname | --fncnam | --fnc | --f | --r | -r)
-            prevopt="$arg"
-            prev=functionname
-            ;;
+            prevopt="$arg" ; prev=functionname ;;
         --functionname=* | --funcname=* | --funcnam=* | --function=* | --func=* | --fncname=* | --fncnam=* | --fnc=* | --f=* | --r=* | -r*)
-            functionname="$optarg"
-            reexec="$reexec --functionname=\"$optarg\""
-            ;;
-        --)
-            # end of options
+            functionname="$optarg" ; reexec="$reexec --functionname=\"$optarg\"" ;;
+        --package | --packag | --packa | --pack | --pac | --pa | --k | -k)
+            prevopt="$arg" ; prev=package ;;
+        --package=* | --packag=* | --packa=* | --pack=* | --pac=* | --pa=* | --k=* | -k*)
+            package="$optarg" ; reexec="$reexec --package=\"$optarg\"" ;;
+        --) # end of options
             more_options=no
             ;;
         -*)
-            $echo "$progname: unrecognized option \`$arg'" 1>&2
+            $echo "$progname: syntax error -- unrecognized option \`$arg'" 1>&2
             $echo "$help" 1>&2
-            exit 1
+            exit 2
             ;;
-        *)
-            nonopt="$arg"
-            break
-            ;;
+        *) # permute all non-options to the end
+            nonopt="${nonopt}${nonopt:+ }$arg" ;;
     esac
 done
 
 # hit the end of the list wanting an argument
-if test -n "$prev"; then
-    case $arg in
-            -*)
-                case $prev in
-                    # these have optional arguments
-                    hconfig | modconf | makenodes | strmknods | strsetup | driverconf | confmodules)
-                        eval "$prev=\"\$default_$prev\""
-                        reexec="$reexec $prevopt"
-                        ;;
-                    # the rest have required arguments
-                    *)
-                        $echo "$progname: option \`$prevopt' requires an argument" 1>&2
-                        $echo "$help" 1>&2
-                        exit 1
-                        ;;
-                esac
-                ;;
-            *)
-                # If the previous option needs an argument, assign it.
-                eval "$prev=\"\$arg\""
-                reexec="$reexec $prevopt=\"$arg\""
-                ;;
-        esac
+if test -n "$prev" ; then
+    case $prev in
+        # these have optional arguments
+        basemajor | permission | functionname | hconfig | modconf | makenodes | driverconf | confmodules | strmknods | strsetup | package)
+            eval "$prev=\"\$default_$prev\""
+            reexec="$reexec $prevopt"
+            ;;
+        # the rest have required arguments
+        *)
+            $echo "$progname: stynax error -- option \`$prevopt' requires an argument" 1>&2
+            $echo "$help" 1>&2
+            exit 1
+            ;;
+    esac
 fi
 
 if test X"$show_version" = Xyes ; then
-    $echo "$progname: Version $VERSION $TIMESTAMP" 1>&2
+    $echo "$progname:"' Version $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 11:34:47 $' 1>&2
 fi
 
 if test X"$show_help" = Xyes ; then
@@ -382,36 +323,39 @@ Usage:
         where the configuration file will be read
 
 Options:
-    -b|--basmajor=MAJOR
+    -b, --basmajor=MAJOR
         major number to act as base for STREAMS drivers and devices
         [default: $default_basemajor]
-    -h|--hconfig=[HCONFIG]
+    -h, --hconfig=[HCONFIG]
         full path and filename of the STREAMS configuration header file
         [default: $default_hconfig]
-    -o|--modconf=[MODCONFINC]
+    -o, --modconf=[MODCONFINC]
         full path and filename of the module configuration include file
         [default: $default_modconf]
-    -m|--makenodes=[MAKENODES]
+    -m, --makenodes=[MAKENODES]
         full path and filename of the makenodes file
         [default: $default_makenodes]
-    -p|--permission=PERM
+    -p, --permission=PERM
         permissions to assign to created files
         [default: $default_permission]
-    -l|--driverconf=[DRIVERCONF]
+    -l, --driverconf=[DRIVERCONF]
         full path and filename of the driver configuration makefile
         [default: $default_driverconf]
-    -L|--confmodules=[CONFMODULES]
+    -L, --confmodules=[CONFMODULES]
         full path and filename of the modules configuration file
         [default: $default_confmodules]
-    -r|--functionanme=FUNCNAME
+    -r, --functionanme=FUNCNAME
         function name of the function in makenodes
         [default: $default_functionname]
-    -s|--strmknods=[MAKEDEVICES]
+    -s, --strmknods=[MAKEDEVICES]
         full path and filename of the makedevices script
         [default: $default_strmknods]
-    -S|--strsetup=[STRSETUP]
+    -S, --strsetup=[STRSETUP]
         full path and filename of the strsetup configuration file
         [default: $default_strsetup]
+    -k, --package=[PACKAGE]
+        name of STREAMS package: LiS or LfS
+        [default: $default_package]
 EOF
     exit 0
 fi
@@ -423,6 +367,29 @@ else
     # reading standard input
     infile=
 fi
+
+# assign defaults to all unassigned variables
+for def in $defaults ; do
+    val=`eval 'echo $'"$def"`
+    if test :${val:+set} != :set ; then
+        eval "$def=\$default_$def"
+    else
+        eval "$def=\"\$val\""
+    fi
+done
+
+case $package in
+LfS)
+    ucpackage='LFS'
+    lcpackage='lfs'
+    package='LfS'
+    ;;
+LiS | *)
+    ucpackage='LIS'
+    lcpackage='lis'
+    package='LiS'
+    ;;
+esac
 
 # create all our directories
 
@@ -768,8 +735,8 @@ cat >$hconfig <<EOF
 
  *****************************************************************************/
 
-#ifndef __SYS_${ucstreams}_CONFIG_H__
-#define __SYS_${ucstreams}_CONFIG_H__
+#ifndef __SYS_${ucpackage}_CONFIG_H__
+#define __SYS_${ucpackage}_CONFIG_H__
 
 /*
  * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
@@ -789,7 +756,14 @@ do
     eval "major=\"\$strconf_major_$name\""
     eval "nmajors=\"\$strconf_nmajors_$name\""
     eval "nminors=\"\$strconf_nminors_$name\""
-    if test "$PACKAGE" = "LiS" ; then
+    case $package in
+    LfS)
+        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_NMINORS  $nminors" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_NMAJORS  $nmajors" >>$hconfig
+        ;;
+    LiS | *)
         $echo "#define ${Prefix}            1" >>$hconfig
         $echo "#define ${Prefix}_ID         $Idnum" >>$hconfig
         $echo "#define ${Prefix}_DRV_NAME   \"$realname\"" >>$hconfig
@@ -798,22 +772,11 @@ do
         $echo "#define ${Prefix}_CNTLS      0" >>$hconfig
         $echo "#define ${Prefix}_UNITS      $nminors" >>$hconfig
         $echo "#define ${Prefix}_CMAJORS    $nmajors" >>$hconfig
-    fi
-    if test "$PACKAGE" = "LfS" ; then
-        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
-        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
-        $echo "#define CONFIG_STREAMS_${Prefix}_NMINORS  $nminors" >>$hconfig
-        $echo "#define CONFIG_STREAMS_${Prefix}_NMAJORS  $nmajors" >>$hconfig
-    fi
+        ;;
+    esac
     count=0
-    if test "$PACKAGE" = "LiS" ; then
-        while test $count -lt $nmajors
-        do
-            $echo "#define ${Prefix}_CMAJOR_${count}   $((major+count++))" >>$hconfig
-        done
-        $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
-    fi
-    if test "$PACKAGE" = "LfS" ; then
+    case $package in
+    LfS)
         while test $count -lt $nmajors
         do
             if test ${count} -eq 0 ; then
@@ -827,7 +790,15 @@ do
         if test x"$loadable" = xyes; then
             $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
         fi
-    fi
+        ;;
+    LiS | *)
+        while test $count -lt $nmajors
+        do
+            $echo "#define ${Prefix}_CMAJOR_${count}   $((major+count++))" >>$hconfig
+        done
+        $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
+        ;;
+    esac
     $echo "" >>$hconfig
 done
 for name in $strconf_module_names
@@ -837,7 +808,17 @@ do
     Prefix=`$echo $prefix | $strconf_uppercase`
     eval "realname=\"\$strconf_realname_$name\""
     eval "Idnum=\"\$strconf_id_$name\""
-    if test "$PACKAGE" = "LiS" ; then
+    case $package in
+    LfS)
+        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
+        eval "objname=\"\$strconf_objname_$name\""
+            eval "loadable=\"\$strconf_loadable_$objname\""
+        if test x"$loadable" = xyes; then
+            $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
+        fi
+        ;;
+    LiS | *)
         $echo "#define ${Prefix}            1" >>$hconfig
         $echo "#define ${Prefix}_ID         $Idnum" >>$hconfig
         $echo "#define ${Prefix}_MOD_NAME   \"$realname\"" >>$hconfig
@@ -845,22 +826,14 @@ do
         $echo "#define ${Prefix}_MOD_ID     $Idnum" >>$hconfig
         $echo "#define ${Prefix}_UNITS      0" >>$hconfig
         $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
-    fi
-    if test "$PACKAGE" = "LfS" ; then
-        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
-        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
-        eval "objname=\"\$strconf_objname_$name\""
-        eval "loadable=\"\$strconf_loadable_$objname\""
-        if test x"$loadable" = xyes; then
-            $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
-        fi
-    fi
+        ;;
+    esac
     $echo "" >>$hconfig
 done
 cat >>$hconfig <<EOF
 /* -------------------------------------------------- */
 
-#endif  /* __SYS_${ucstreams}_CONFIG_H__ */
+#endif  /* __SYS_${ucpackage}_CONFIG_H__ */
 
 /*
  * vim: ft=c
@@ -918,8 +891,8 @@ cat >$modconf <<EOF
 
  *****************************************************************************/
 
-#ifndef __SYS_${ucstreams}_MODCONF_INC__
-#define __SYS_${ucstreams}_MODCONF_INC__
+#ifndef __SYS_${ucpackage}_MODCONF_INC__
+#define __SYS_${ucpackage}_MODCONF_INC__
 
 /*
  * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
@@ -968,7 +941,7 @@ do
 #    fi
 done
 $echo "" >>$modconf
-$echo "driver_config_t ${lcstreams}_driver_config[] =" >>$modconf
+$echo "driver_config_t ${lcpackage}_driver_config[] =" >>$modconf
 $echo "{" >>$modconf
 for name in $strconf_driver_names
 do
@@ -996,7 +969,7 @@ do
 done
 $echo "};" >>$modconf
 $echo "" >>$modconf
-$echo "device_config_t ${lcstreams}_device_config[] =" >>$modconf
+$echo "device_config_t ${lcpackage}_device_config[] =" >>$modconf
 $echo "{" >>$modconf
 $echo "};" >>$modconf
 $echo "" >>$modconf
@@ -1010,7 +983,7 @@ do
     fi
 done
 $echo "" >>$modconf
-$echo "module_config_t ${lcstreams}_module_config[] =" >>$modconf
+$echo "module_config_t ${lcpackage}_module_config[] =" >>$modconf
 $echo "{" >>$modconf
 $echo "	{\"\", NULL, \"\"},	/* empty 0th entry */" >>$modconf
 for name in $strconf_module_names
@@ -1027,9 +1000,9 @@ do
 done
 $echo "};" >>$modconf
 $echo "" >>$modconf
-$echo "#ifdef ${ucstreams}_LOADABLE_SUPPORT" >>$modconf
+$echo "#ifdef ${ucpackage}_LOADABLE_SUPPORT" >>$modconf
 $echo "" >>$modconf
-$echo "driver_obj_name_t ${lcstreams}_drv_objnames[] =" >>$modconf
+$echo "driver_obj_name_t ${lcpackage}_drv_objnames[] =" >>$modconf
 $echo "{" >>$modconf
 for name in $strconf_driver_names
 do
@@ -1049,9 +1022,9 @@ do
 done
 $echo "};" >>$modconf
 $echo "" >>$modconf
-$echo "#endif			/* ${ucstreams}_LOADABLE_SUPPORT */" >>$modconf
+$echo "#endif			/* ${ucpackage}_LOADABLE_SUPPORT */" >>$modconf
 $echo "" >>$modconf
-$echo "autopush_init_t ${lcstreams}_apush_init[] =" >>$modconf
+$echo "autopush_init_t ${lcpackage}_apush_init[] =" >>$modconf
 $echo "{" >>$modconf
 for name in $strconf_driver_names
 do
@@ -1077,7 +1050,7 @@ cat >>$modconf <<EOF
 
 /* -------------------------------------------------- */
 
-#endif  /* __SYS_${ucstreams}_MODCONF_INC__ */
+#endif  /* __SYS_${ucpackage}_MODCONF_INC__ */
 
 /*
  * vim: ft=c
