@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/14 06:20:57 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/18 00:58:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/14 06:20:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/18 00:58:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,6 +102,9 @@ postun-libraries:
 # embedded targets that cannot build from packages.
 #
 UNINSTALL_HOOK += postun-libraries
+
+dist_check_SCRIPTS 	+= $(top_srcdir)/scripts/check_libs
+TESTS_ENVIRONMENT 	+= lib_LTLIBRARIES='$(lib_LTLIBRARIES)'
 
 endif
 

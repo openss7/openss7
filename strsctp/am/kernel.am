@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/01/14 06:20:57 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/01/18 00:58:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/14 06:20:57 $ by $Author: brian $
+# Last Modified $Date: 2005/01/18 00:58:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -263,6 +263,11 @@ postun-modules:
 # runs after uninstall has completed.
 #
 UNINSTALL_HOOK += postun-modules
+
+dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
+TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
+			   ksysmap='$(ksysmap)' \
+			   KERNEL_MODULES='$(KERNEL_MODULES)'
 
 else
 

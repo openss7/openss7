@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/01/17 14:20:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/01/18 01:01:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/17 14:20:13 $ by $Author: brian $
+# Last Modified $Date: 2005/01/18 01:01:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -539,17 +539,5 @@ AM_RPMFLAGS = --define "_kversion $(PACKAGE_KVERSION)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
-
-@MAINTAINER_MODE_TRUE@MAINTAINER_MODE = yes
-@MAINTAINER_MODE_FALSE@MAINTAINER_MODE =
-
-dist_check_SCRIPTS	= $(srcdir)/scripts/check_libs \
-			  $(srcdir)/scripts/check_commands \
-			  $(srcdir)/scripts/check_modules
-
-TESTS			= $(dist_check_SCRIPTS)
-TESTS_ENVIRONMENT	= $(SHELL)
-
-.EXPORT_ALL_VARIABLES:
 
 # vim: ft=automake
