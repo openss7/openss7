@@ -72,16 +72,13 @@
 #include "headers.h" 
 
 #include "PerfSocket.hpp" 
-#include "Settings.hpp" 
-#include "Locale.hpp" 
 #include "delay.hpp" 
-#include "Listener.hpp" 
+#include "Locale.hpp"
+#include "List.h"
 #include "util.h" 
 
 const double kSecs_to_usecs = 1e6; 
 const int    kBytes_to_Bits = 8; 
-
-using namespace std; 
 
 /* ------------------------------------------------------------------- 
  * Send data using the connected UDP socket, 
@@ -100,11 +97,12 @@ void PerfSocket::Send_UDP( void ) {
 
     // terminate loop nicely on user interupts 
     sInterupted = false; 
-    my_signal( SIGINT, Sig_Interupt ); 
+    SigfuncPtr oldINT = my_signal( SIGINT,  Sig_Interupt );
+    SigfuncPtr oldPIPE = my_signal( SIGPIPE, Sig_Interupt );
 
     // compute delay for UDP bandwidth restriction, constrained to [0,1] seconds 
-    delay_target = (int) (mBufLen * ((kSecs_to_usecs * kBytes_to_Bits) 
-                                     / gSettings->GetUDPRate())); 
+    delay_target = (int) ( mSettings->mBufLen * ((kSecs_to_usecs * kBytes_to_Bits) 
+                                                 / mSettings->mUDPRate) ); 
     if ( delay_target < 0  || 
          delay_target > (int) 1 * kSecs_to_usecs ) {
         printf( warn_delay_large, delay_target / kSecs_to_usecs ); 
@@ -115,22 +113,28 @@ void PerfSocket::Send_UDP( void ) {
     // TODO is this the right place to put this??? 
     SocketAddr remote = getRemoteAddress(); 
     if ( remote.isMulticast() ) {
-        McastSetTTL( gSettings->GetMcastTTL() ); 
+        McastSetTTL( mSettings->mTTL, remote ); 
     }
 
     Timestamp lastPacketTime; 
     InitTransfer(); 
-    // File Input option 
-    bool fileInput = gSettings->GetFileInput(); 
-
     // Indicates if the stream is readable 
     bool canRead; 
 
     // Due to the UDP timestamps etc, included 
     // reduce the read size by an amount 
-    // equal to the header size 
-    if ( fileInput )
-        extractor->reduceReadSize(sizeof(struct UDP_datagram));
+    // equal to the header size
+    char* readAt = mBuf;
+    if ( mSettings->mFileInput )
+        if ( mSettings->mCompat ) {
+            extractor->reduceReadSize(sizeof(struct UDP_datagram));
+            readAt += sizeof(struct UDP_datagram);
+        } else {
+            extractor->reduceReadSize(sizeof(struct UDP_datagram) +
+                                      sizeof(struct client_hdr));
+            readAt += sizeof(struct UDP_datagram) +
+                      sizeof(struct client_hdr);
+        }
 
     mStartTime.setnow(); 
 
@@ -153,18 +157,22 @@ void PerfSocket::Send_UDP( void ) {
 
         // Read the next data block from 
         // the file if it's file input 
-        if ( fileInput ) {
-            extractor->getNextDataBlock(mBuf + sizeof(struct UDP_datagram)); 
+        if ( mSettings->mFileInput ) {
+            extractor->getNextDataBlock(readAt); 
             canRead = extractor->canRead(); 
         } else
             canRead = true; 
 
         // perform write 
-        currLen = write( mSock, mBuf, mBufLen ); 
+        currLen = write( mSock, mBuf, mSettings->mBufLen ); 
         if ( currLen < 0 ) {
             WARN_errno( currLen < 0, "write" ); 
             break; 
         }
+
+        // periodically report bandwidths 
+        ReportPeriodicBW(); 
+
         mTotalLen += currLen; 
 
         // delay between writes 
@@ -180,15 +188,21 @@ void PerfSocket::Send_UDP( void ) {
             delay_loop( delay ); 
         }
 
-        // periodically report bandwidths 
-        ReportPeriodicBW(); 
     } while ( ! (sInterupted  || 
                  (mMode_time   &&  mPacketTime.after( mEndTime ))  || 
                  (!mMode_time  &&  mTotalLen >= mAmount)) && canRead ); 
 
+    if ( oldINT != Sig_Interupt ) {
+        // Return signal handlers to previous handlers
+        my_signal( SIGINT, oldINT );
+        my_signal( SIGPIPE, oldPIPE );
+    }
+
     // stop timing 
     mEndTime.setnow(); 
+    sReporting.Lock();
     ReportBW( mTotalLen, 0.0, mEndTime.subSec( mStartTime )); 
+    sReporting.Unlock();
 
     // send a final terminating datagram 
     // Don't count in the mTotalLen. The server counts this one, 
@@ -202,12 +216,13 @@ void PerfSocket::Send_UDP( void ) {
     mBuf_UDP->tv_usec = htonl( mPacketTime.getUsecs()); 
 
     if ( remote.isMulticast() ) {
-        write( mSock, mBuf, mBufLen ); 
+        write( mSock, mBuf, mSettings->mBufLen ); 
     } else {
-        write_UDP_FIN( mSock, mBuf, mBufLen ); 
+        write_UDP_FIN( ); 
     } 
 
     printf( report_datagrams, mSock, datagramID ); 
+    
 } 
 // end SendUDP 
 
@@ -226,7 +241,12 @@ void PerfSocket::Recv_UDP( void ) {
     int errorCnt   = 0; 
     int outofOrder = 0; 
 
-    extern Mutex clients_mutex; 
+    extern Mutex clients_mutex;
+    extern Iperf_ListEntry *clients;
+
+    // get the remote address and remove it later from the set of clients 
+    SocketAddr remote = getRemoteAddress(); 
+    iperf_sockaddr peer = *(iperf_sockaddr *) (remote.get_sockaddr()); 
 
     // for jitter 
     Timestamp sentTime; 
@@ -237,9 +257,13 @@ void PerfSocket::Recv_UDP( void ) {
     InitTransfer(); 
     do {
         // perform read 
-        currLen = read( mSock, mBuf, mBufLen ); 
+        currLen = read( mSock, mBuf, mSettings->mBufLen ); 
 
         mPacketTime.setnow(); 
+
+        // periodically report bandwidths 
+        ReportPeriodicBW_Jitter_Loss( errorCnt, outofOrder, datagramID ); 
+
         mTotalLen += currLen; 
 
         // read the datagram ID and sentTime out of the buffer 
@@ -279,27 +303,26 @@ void PerfSocket::Recv_UDP( void ) {
             lastDatagramID = datagramID; 
         }
 
-        // periodically report bandwidths 
-        ReportPeriodicBW_Jitter_Loss( errorCnt, outofOrder, datagramID ); 
     } while ( going ); 
 
     // stop timing 
     mEndTime.setnow(); 
+    sReporting.Lock();
     ReportBW_Jitter_Loss( mTotalLen, 0.0, mEndTime.subSec( mStartTime ), 
-                          errorCnt, outofOrder, datagramID ); 
+                          errorCnt, outofOrder, datagramID );
+    sReporting.Unlock(); 
 
     // send a acknowledgement back only if we're NOT receiving multicast 
     SocketAddr local = getLocalAddress(); 
     if ( ! local.isMulticast() ) {
         // send back an acknowledgement of the terminating datagram 
-        write_UDP_AckFIN( mSock, mBuf, mBufLen ); 
+        write_UDP_AckFIN( mTotalLen, mEndTime, mStartTime, errorCnt,
+                          outofOrder, datagramID ); 
     }
-    // get the remote address and remove it from the set of clients 
-    (clients_mutex).Lock();     
-    SocketAddr remote = getRemoteAddress(); 
-    iperf_sockaddr peer = *(iperf_sockaddr *) (remote.get_sockaddr()); 
-    Multicast_remove_client(peer); 
-    (clients_mutex).Unlock(); 
+
+    clients_mutex.Lock();     
+    Iperf_delete ( &peer, &clients ); 
+    clients_mutex.Unlock(); 
 } 
 // end RecvUDP 
 
@@ -307,7 +330,6 @@ void PerfSocket::Recv_UDP( void ) {
  * Do the equivalent of an accept() call for UDP sockets. This waits 
  * on a listening UDP socket until we get a datagram. Connect the 
  * UDP socket for efficiency. 
- * Verify that the datagram ID starts at zero. TODO is that needed still? 
  * ------------------------------------------------------------------- */ 
 
 iperf_sockaddr PerfSocket::Accept_UDP( void ) {
@@ -317,7 +339,7 @@ iperf_sockaddr PerfSocket::Accept_UDP( void ) {
     int rc; 
 
     peerlen = sizeof(peer); 
-    rc = recvfrom( mSock, mBuf, mBufLen, 0, 
+    rc = recvfrom( mSock, mBuf, mSettings->mBufLen, 0, 
                    (struct sockaddr*) &peer, &peerlen ); 
 
     FAIL_errno( rc == SOCKET_ERROR, "recvfrom" );       
@@ -330,7 +352,7 @@ iperf_sockaddr PerfSocket::Accept_UDP( void ) {
  * acknowledgement datagram is received. 
  * ------------------------------------------------------------------- */ 
 
-void PerfSocket::write_UDP_FIN( int sock, void* buf, int len ) {
+void PerfSocket::write_UDP_FIN( ) {
     int rc; 
     fd_set readSet; 
     struct timeval timeout; 
@@ -340,15 +362,15 @@ void PerfSocket::write_UDP_FIN( int sock, void* buf, int len ) {
         count++; 
 
         // write data 
-        write( sock, buf, len ); 
+        write( mSock, mBuf, mSettings->mBufLen ); 
 
         // wait until the socket is readable, or our timeout expires 
         FD_ZERO( &readSet ); 
-        FD_SET( sock, &readSet ); 
+        FD_SET( mSock, &readSet ); 
         timeout.tv_sec  = 0; 
         timeout.tv_usec = 250000; // quarter second, 250 ms 
 
-        rc = select( sock+1, &readSet, NULL, NULL, &timeout ); 
+        rc = select( mSock+1, &readSet, NULL, NULL, &timeout ); 
         FAIL_errno( rc == SOCKET_ERROR, "select" ); 
 
         if ( rc == 0 ) {
@@ -356,8 +378,33 @@ void PerfSocket::write_UDP_FIN( int sock, void* buf, int len ) {
             continue; 
         } else {
             // socket ready to read 
-            rc = read( sock, buf, len ); 
-            FAIL_errno( rc < 0, "read" ); 
+            rc = read( mSock, mBuf, mSettings->mBufLen ); 
+            FAIL_errno( rc < 0, "read" );
+            if ( rc >= (int) (sizeof(UDP_datagram) + sizeof(server_hdr)) ) {
+                UDP_datagram *UDP_Hdr;
+                server_hdr *hdr;
+
+                UDP_Hdr = (UDP_datagram*) mBuf;
+                hdr = (server_hdr*) (UDP_Hdr+1);
+
+                if ( (ntohl(hdr->flags) & HEADER_VERSION1) != 0 ) {
+                    mJitter = ntohl( hdr->jitter1 );
+                    mJitter += (double)ntohl( hdr->jitter2 ) / 1000000.0;
+                    sReporting.Lock();
+                    printf( server_reporting, mSock );
+                    ReportBW_Jitter_Loss( (((max_size_t) ntohl( hdr->total_len1 )) << 32) +
+                                          ntohl( hdr->total_len2 ), 
+                                          0.0,
+                                          ntohl( hdr->stop_sec ) + 
+                                          ntohl( hdr->stop_usec ) / 1000000.0,
+                                          ntohl( hdr->error_cnt ),
+                                          ntohl( hdr->outorder_cnt ),
+                                          ntohl( hdr->datagrams ));
+                    sReporting.Unlock();
+                }
+            }
+
+
             return; 
         } 
     } 
@@ -373,7 +420,9 @@ void PerfSocket::write_UDP_FIN( int sock, void* buf, int len ) {
  * termination datagrams, so re-transmit our AckFIN. 
  * ------------------------------------------------------------------- */ 
 
-void PerfSocket::write_UDP_AckFIN( int sock, void* buf, int len ) {
+void PerfSocket::write_UDP_AckFIN( max_size_t mTotalLen, Timestamp mEndTime,
+                                   Timestamp mStartTime, int errorCnt,
+                                   int outofOrder, int32_t datagramID ) {
 
     int rc; 
 
@@ -386,15 +435,39 @@ void PerfSocket::write_UDP_AckFIN( int sock, void* buf, int len ) {
     while ( count < 10 ) {
         count++; 
 
+        UDP_datagram *UDP_Hdr;
+        server_hdr *hdr;
+
+        UDP_Hdr = (UDP_datagram*) mBuf;
+
+        if ( mSettings->mBufLen > (int) ( sizeof( UDP_datagram )
+             + sizeof( server_hdr ) ) ) {
+            hdr = (server_hdr*) (UDP_Hdr+1);
+
+            hdr->flags        = htonl( HEADER_VERSION1 );
+            hdr->total_len1   = htonl( (long) (mTotalLen >> 32) );
+            hdr->total_len2   = htonl( (long) (mTotalLen & 0xFFFFFFFF) );
+            Timestamp temp( mEndTime.subSec( mStartTime ) );
+            hdr->stop_sec     = htonl( temp.getSecs() );
+            hdr->stop_usec    = htonl( temp.getUsecs() );
+            hdr->error_cnt    = htonl( errorCnt );
+            hdr->outorder_cnt = htonl( outofOrder );
+            hdr->datagrams    = htonl( datagramID );
+            int temp2 = (int)mJitter;
+            hdr->jitter1      = htonl( temp2 );
+            hdr->jitter2      = htonl( (long) ((mJitter - temp2) * 1000000) );
+
+        }
+
         // write data 
-        write( sock, buf, len ); 
+        write( mSock, mBuf, mSettings->mBufLen ); 
 
         // wait until the socket is readable, or our timeout expires 
-        FD_SET( sock, &readSet ); 
+        FD_SET( mSock, &readSet ); 
         timeout.tv_sec  = 1; 
         timeout.tv_usec = 0; 
 
-        rc = select( sock+1, &readSet, NULL, NULL, &timeout ); 
+        rc = select( mSock+1, &readSet, NULL, NULL, &timeout ); 
         FAIL_errno( rc == SOCKET_ERROR, "select" ); 
 
         if ( rc == 0 ) {
@@ -402,32 +475,13 @@ void PerfSocket::write_UDP_AckFIN( int sock, void* buf, int len ) {
             return; 
         } else {
             // socket ready to read 
-            rc = read( sock, buf, len ); 
-#ifndef WIN32
-            FAIL_errno( rc < 0, "read" ); 
+            rc = read( mSock, mBuf, mSettings->mBufLen ); 
+            WARN_errno( rc < 0, "read" ); 
             continue; 
-#else
-            return;
-#endif
         } 
     } 
 
     printf( warn_ack_failed, mSock, count ); 
 } 
 // end write_UDP_AckFIN 
-
-void PerfSocket::Multicast_remove_client( iperf_sockaddr peer ) {
-    extern vector<iperf_sockaddr> clients; 
-    std::vector<iperf_sockaddr>::iterator client_iter = clients.begin();
-
-    for ( int i=0; i < (int)(clients).size(); i++ ) {
-        struct sockaddr *sap = (struct sockaddr *)&peer, *sac = (struct sockaddr *) &(*client_iter);
-        if ( SocketAddr::are_Equal(sap,sac) ) {
-            (clients).erase(client_iter);                                                   
-            return;
-        }
-        client_iter++;
-    } 
-    return; 
-}
 

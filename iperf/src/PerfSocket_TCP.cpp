@@ -73,10 +73,9 @@
 #include "headers.h"
 
 #include "PerfSocket.hpp"
-#include "Settings.hpp"
 #include "Locale.hpp"
-
-#include "util.h"
+#include "List.h"
+#include "util.h" 
 
 /* -------------------------------------------------------------------
  * Send data using the connected TCP socket.
@@ -84,18 +83,17 @@
  * ------------------------------------------------------------------- */
 
 void PerfSocket::Send_TCP( void ) {
-    if ( gSettings->GetSuggestWin() ) {
+    if ( false ) {
         Client_Recv_TCP();
         return;
     }
 
     // terminate loop nicely on user interupts
     sInterupted = false;
-    my_signal( SIGINT,  Sig_Interupt );
-    my_signal( SIGPIPE, Sig_Interupt );
+    SigfuncPtr oldINT = my_signal( SIGINT,  Sig_Interupt );
+    SigfuncPtr oldPIPE = my_signal( SIGPIPE, Sig_Interupt );
 
     int currLen;
-    bool fileInput = gSettings->GetFileInput();
     bool canRead;
     InitTransfer();
 
@@ -104,7 +102,7 @@ void PerfSocket::Send_TCP( void ) {
         // If the input is from a 
         // file, fill the buffer with
         // data from the file 
-        if ( fileInput ) {
+        if ( mSettings->mFileInput ) {
             extractor->getNextDataBlock(mBuf);
 
             // If the first character is 'a'
@@ -118,37 +116,46 @@ void PerfSocket::Send_TCP( void ) {
             canRead = true;
 
         // perform write
-        currLen = write( mSock, mBuf, mBufLen );
+        currLen = write( mSock, mBuf, mSettings->mBufLen );
         mPacketTime.setnow();
         if ( currLen < 0 ) {
             WARN_errno( currLen < 0, "write" );
             break;
         }
 
-        mTotalLen += currLen;
-
         // periodically report bandwidths
         ReportPeriodicBW();
+
+        mTotalLen += currLen;
 
     } while ( ! (sInterupted  ||
                  (mMode_time   &&  mPacketTime.after( mEndTime ))  ||
                  (!mMode_time  &&  mTotalLen >= mAmount)) && canRead );
 
+    if ( oldINT != Sig_Interupt ) {
+        // Return signal handlers to previous handlers
+        my_signal( SIGINT, oldINT );
+        my_signal( SIGPIPE, oldPIPE );
+    }
+
     // shutdown sending connection and wait (read)
     // for the other side to shutdown
     shutdown( mSock, SHUT_WR );
-    currLen = read( mSock, mBuf, mBufLen );
+    currLen = read( mSock, mBuf, mSettings->mBufLen );
     WARN_errno( currLen == SOCKET_ERROR, "read on server close" );
     WARN( currLen > 0, "server sent unexpected data" );
 
     // stop timing
     mEndTime.setnow();
+    sReporting.Lock();
     ReportBW( mTotalLen, 0.0, mEndTime.subSec( mStartTime ));
+    sReporting.Unlock();
 
-    if ( gSettings->GetPrintMSS() ) {
+    if ( mSettings->mPrintMSS ) {
         // read the socket option for MSS (maximum segment size)
         ReportMSS( getsock_tcp_mss( mSock ));
     }
+
 }
 // end SendTCP
 
@@ -158,11 +165,18 @@ void PerfSocket::Send_TCP( void ) {
  * ------------------------------------------------------------------- */
 
 void PerfSocket::Recv_TCP( void ) {
+    extern Mutex clients_mutex;
+    extern Iperf_ListEntry *clients;
+
+    // get the remote address and remove it later from the set of clients 
+    SocketAddr remote = getRemoteAddress(); 
+    iperf_sockaddr peer = *(iperf_sockaddr *) (remote.get_sockaddr()); 
+
     // keep track of read sizes -> gives some indication of MTU size
     // on SGI this must be dynamically allocated to avoid seg faults
     int currLen;
-    int *readLenCnt = new int[ mBufLen+1 ];
-    for ( int i = 0; i <= mBufLen; i++ ) {
+    int *readLenCnt = new int[ mSettings->mBufLen+1 ];
+    for ( int i = 0; i <= mSettings->mBufLen; i++ ) {
         readLenCnt[ i ] = 0;
     }
 
@@ -173,45 +187,48 @@ void PerfSocket::Recv_TCP( void ) {
 
     do {
         // perform read
-        currLen = read( mSock, mBuf, mBufLen );
+        currLen = read( mSock, mBuf, mSettings->mBufLen );
 
         if ( false ) {
-            DELETE_PTR( readLenCnt );
+            DELETE_ARRAY( readLenCnt );
             Server_Send_TCP();
             return;
         }
         mPacketTime.setnow();
-        mTotalLen += currLen;
-
-        // count number of reads of each size
-        if ( currLen <= mBufLen ) {
-            readLenCnt[ currLen ]++;
-        }
 
         // periodically report bandwidths
         ReportPeriodicBW();
+
+        mTotalLen += currLen;
+
+        // count number of reads of each size
+        if ( currLen <= mSettings->mBufLen ) {
+            readLenCnt[ currLen ]++;
+        }
 
     } while ( currLen > 0  &&  sInterupted == false );
 
     // stop timing
     mEndTime.setnow();
+    sReporting.Lock();
     ReportBW( mTotalLen, 0.0, mEndTime.subSec( mStartTime ));
+    sReporting.Unlock();
 
-    if ( gSettings->GetPrintMSS() ) {
+    if ( mSettings->mPrintMSS ) {
         // read the socket option for MSS (maximum segment size)
         ReportMSS( getsock_tcp_mss( mSock ));
 
         // on WANs the most common read length is often the MSS
         // on fast LANs it is much harder to detect
         int totalReads  = 0;
-        for ( currLen = 0; currLen < mBufLen+1; currLen++ ) {
+        for ( currLen = 0; currLen < mSettings->mBufLen+1; currLen++ ) {
             totalReads += readLenCnt[ currLen ];
         }
 
         // print each read length that occured > 5% of reads
         int thresh = (int) (0.05 * totalReads);
         printf( report_read_lengths, mSock );
-        for ( currLen = 0; currLen < mBufLen+1; currLen++ ) {
+        for ( currLen = 0; currLen < mSettings->mBufLen+1; currLen++ ) {
             if ( readLenCnt[ currLen ] > thresh ) {
                 printf( report_read_length_times, mSock,
                         (int) currLen, readLenCnt[ currLen ],
@@ -219,7 +236,11 @@ void PerfSocket::Recv_TCP( void ) {
             }
         }
     }
-    DELETE_PTR( readLenCnt );
+    DELETE_ARRAY( readLenCnt );
+
+    clients_mutex.Lock();     
+    Iperf_delete ( &peer, &clients ); 
+    clients_mutex.Unlock(); 
 }
 // end RecvTCP
 
@@ -249,7 +270,7 @@ void PerfSocket::Client_Recv_TCP(void) {
 
     /* Send the first packet indicating that the server has to send data */
     mBuf[0] = 'a';
-    currLen = write( mSock, mBuf, mBufLen );
+    currLen = write( mSock, mBuf, mSettings->mBufLen );
     if ( currLen < 0 ) {
         WARN_errno( currLen < 0, "write" );
         return;
@@ -257,7 +278,7 @@ void PerfSocket::Client_Recv_TCP(void) {
 
     do {
         // perform read
-        currLen = read( mSock, mBuf, mBufLen );
+        currLen = read( mSock, mBuf, mSettings->mBufLen );
         mPacketTime.setnow();
         if ( currLen < 0 ) {
             WARN_errno( currLen < 0, "read" );
@@ -274,7 +295,9 @@ void PerfSocket::Client_Recv_TCP(void) {
         if ( nFract > (fract + 0.1) ) {
             printf(seperator_line);
             ReportWindowSize();
+            sReporting.Lock();
             ReportBW( loopLen, prevTime.subSec(mStartTime),  mPacketTime.subSec( mStartTime));
+            sReporting.Unlock();
             fract +=0.1;
             if ( startSize != endSize ) {
                 /* Change the window size only if the data transfer has changed at least by 5% */
@@ -307,7 +330,7 @@ void PerfSocket::Client_Recv_TCP(void) {
             //shutdown(mSock,SHUT_RDWR);
             close(mSock);
             mSock = -1;
-            Connect(gSettings->GetHost(),gSettings->GetLocalhost());
+            Connect( mSettings->mHost, mSettings->mLocalhost );
             mBuf[0] = 'a';
             if ( set_tcp_windowsize(mSock,endSize) == -1 ) {
                 printf(unable_to_change_win);
@@ -315,7 +338,7 @@ void PerfSocket::Client_Recv_TCP(void) {
             if ( get_tcp_windowsize(mSock) != endSize ) {
                 printf(unable_to_change_win);
             }
-            write( mSock, mBuf, mBufLen );
+            write( mSock, mBuf, mSettings->mBufLen );
         }
     } while ( ! (sInterupted  ||
                  (mMode_time   &&  mPacketTime.after( mEndTime ))  ||
@@ -325,7 +348,9 @@ void PerfSocket::Client_Recv_TCP(void) {
 
     printf( seperator_line );
     ReportWindowSize();
+    sReporting.Lock();
     ReportBW( loopLen, prevTime.subSec(mStartTime),  mPacketTime.subSec( mStartTime));
+    sReporting.Unlock();
 
     printf( seperator_line);
     printf( opt_estimate);
@@ -340,9 +365,11 @@ void PerfSocket::Client_Recv_TCP(void) {
     // stop timing
     mEndTime.setnow();
 
+    sReporting.Lock();
     ReportBW( mTotalLen, 0.0, mEndTime.subSec( mStartTime ));
+    sReporting.Unlock();
 
-    if ( gSettings->GetPrintMSS() ) {
+    if ( mSettings->mPrintMSS ) {
         // read the socket option for MSS (maximum segment size)
         ReportMSS( getsock_tcp_mss( mSock ));
     }
@@ -356,9 +383,9 @@ void PerfSocket::Server_Send_TCP(void) {
     int currLen;
     int writeLenCnt[8193];
 
-    if ( mBufLen > 8193 )
-        mBufLen = 8193;
-    for ( int i = 0; i <= mBufLen; i++ ) {
+    if ( mSettings->mBufLen > 8193 )
+        mSettings->mBufLen = 8193;
+    for ( int i = 0; i <= mSettings->mBufLen; i++ ) {
         writeLenCnt[ i ] = 0;
     }
 
@@ -368,12 +395,12 @@ void PerfSocket::Server_Send_TCP(void) {
 
     do {
         // perform write
-        currLen = write( mSock, mBuf, mBufLen );
+        currLen = write( mSock, mBuf, mSettings->mBufLen );
         mPacketTime.setnow();
         mTotalLen += currLen;
 
         // count number of reads of each size
-        if ( currLen <= mBufLen ) {
+        if ( currLen <= mSettings->mBufLen ) {
             writeLenCnt[ currLen ]++;
         }
 
@@ -387,23 +414,25 @@ void PerfSocket::Server_Send_TCP(void) {
 
     // stop timing
     mEndTime.setnow();
+    sReporting.Lock();
     ReportBW( mTotalLen, 0.0, mEndTime.subSec( mStartTime ));
+    sReporting.Unlock();
 
-    if ( gSettings->GetPrintMSS() ) {
+    if ( mSettings->mPrintMSS ) {
         // read the socket option for MSS (maximum segment size)
         ReportMSS( getsock_tcp_mss( mSock ));
 
         // on WANs the most common read length is often the MSS
         // on fast LANs it is much harder to detect
         int totalWrites  = 0;
-        for ( currLen = 0; currLen < mBufLen+1; currLen++ ) {
+        for ( currLen = 0; currLen < mSettings->mBufLen+1; currLen++ ) {
             totalWrites += writeLenCnt[ currLen ];
         }
 
         // print each read length that occured > 5% of reads
         int thresh = (int) (0.05 * totalWrites);
         printf( report_read_lengths, mSock );
-        for ( currLen = 0; currLen < mBufLen+1; currLen++ ) {
+        for ( currLen = 0; currLen < mSettings->mBufLen+1; currLen++ ) {
             if ( writeLenCnt[ currLen ] > thresh ) {
                 printf( report_read_length_times, mSock,
                         (int) currLen, writeLenCnt[ currLen ],
