@@ -40,7 +40,7 @@
 #ifndef	_STRMDBG_H
 #define	_STRMDBG_H		1
 
-#ident "@(#) LiS strmdbg.h 2.13 12/15/02 18:00:05 "
+#ident "@(#) LiS strmdbg.h 2.15 7/15/03 20:23:22 "
 
 #ifndef _HEAD_H
 #include <sys/LiS/head.h>
@@ -93,6 +93,8 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_DMP_DBLK_BIT		0x04000000L
 #define LIS_DEBUG_DMP_STRHD_BIT		0x08000000L
 
+#define LIS_DEBUG_VOPEN_BIT		0x10000000L	/* Verbose open */
+#define LIS_DEBUG_VCLOSE_BIT		0x20000000L	/* Verbose close */
 #define LIS_DEBUG_ADDRS_BIT		0x80000000L	/* print addrs */
 
 /*
@@ -140,6 +142,8 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_DMP_DBLK	(lis_debug_mask & LIS_DEBUG_DMP_DBLK_BIT)
 #define LIS_DEBUG_DMP_STRHD	(lis_debug_mask & LIS_DEBUG_DMP_STRHD_BIT)
 
+#define LIS_DEBUG_VOPEN		(lis_debug_mask & LIS_DEBUG_VOPEN_BIT)
+#define LIS_DEBUG_VCLOSE	(lis_debug_mask & LIS_DEBUG_VCLOSE_BIT)
 #define LIS_DEBUG_ADDRS		(lis_debug_mask & LIS_DEBUG_ADDRS_BIT)
 
 

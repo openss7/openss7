@@ -28,7 +28,7 @@
  * 
  */
 
-#ident "@(#) LiS dki.c 2.8 5/30/03 21:40:39 "
+#ident "@(#) LiS dki.c 2.9 7/15/03 19:58:21 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
@@ -54,12 +54,40 @@ typedef struct tlist
     struct tlist	*next ;		/* thread of these */
     struct timer_list	 tl ;		/* Linux timer structure */
     int			 handle ;	/* SVR4-style handle */
+    timo_fcn_t		*fcn ;		/* function to call */
+    caddr_t		 arg ;		/* function argument */
 
 } tlist_t ;
 
 lis_spin_lock_t	  lis_tlist_lock ;
 volatile tlist_t *lis_tlist_head ;	/* this list is no particular order */
 volatile int	  lis_tlist_handle ;	/* next handle to use */
+
+
+/*
+ * This is always the function passed to the kernel.  'arg' is a pointer to
+ * the tlist_t for the timeout.
+ */
+static void sys_timeout_fcn(caddr_t arg)
+{
+    tlist_t		*tp = (tlist_t *) arg ;
+    timo_fcn_t		*fcn ;
+    caddr_t		 arg ;
+    lis_flags_t  	 psw;
+
+    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+    if (tp->handle != 0 && tp->fcn != NULL)
+    {
+	fcn        = tp->fcn ;		/* save local copy */
+	arg        = tp->arg ;
+	tp->handle = 0 ;		/* entry now available */
+	tp->fcn    = NULL ;
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+	fcn(arg) ;			/* call fcn while not holding lock */
+    }
+    else
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+}
 
 /*
  * "timeout" is #defined to be this function in dki.h.
@@ -122,8 +150,11 @@ toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 	lis_mark_mem(tp, file_name, line_nr) ;
     }
 
-    tp->handle = handle ;
-    lis_tmout(&tp->tl, (tmout_fcn_t *) timo_fcn, (long) arg, ticks) ;
+    tp->handle	= handle ;
+    tp->fcn	= timo_fcn ;
+    tp->arg	= arg ;
+    
+    lis_tmout(&tp->tl, sys_timeout_fcn, (long) tp, ticks) ;
 						/* use Linux */
     lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
 

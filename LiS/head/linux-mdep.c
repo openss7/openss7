@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.106 6/6/03 16:28:15 "
+#ident "@(#) LiS linux-mdep.c 2.109 7/15/03 19:58:21 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -389,7 +389,7 @@ void lis_mnt_cnt_sync(const char *file, int line, const char *fn)
     if (lis_mnt)
 	lis_atomic_set(&lis_mnt_cnt,MNT_COUNT(lis_mnt));
 #if 1
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_CLOSE || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_VCLOSE || LIS_DEBUG_ADDRS)
 	printk("lis_mnt_cnt_sync() >> [%d] {%s@%d,%s()}\n",
 	       lis_atomic_read(&lis_mnt_cnt), file, line, fn);
 #endif
@@ -402,7 +402,7 @@ struct vfsmount *lis_mntget(struct vfsmount *m,
 
     lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__);
 
-    if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
     {
 	if (mm == NULL)
 	    printk("lis_mntget(NULL) {%s@%d%s,%s()}\n", file,line,fn) ;
@@ -421,12 +421,12 @@ void lis_mntput(struct vfsmount *m,
 {
     if (m == NULL)
     {
-	if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+	if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
 	    printk("lis_mntput(NULL) {%s@%d,%s()}\n", file,line,fn) ;
 	return ;
     }
 
-    if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
 	printk("lis_mntput(m@0x%p/%d%s) \"%s\"%s {%s@%d,%s()}\n",
 	       m,
 	       MNT_COUNT(m), (MNT_COUNT(m)>0?"--":""), m->mnt_devname,
@@ -566,7 +566,7 @@ static struct inode *lis_get_new_inode(struct super_block *sb)
     i->i_sb = sb;          /* ASSERT: sb is or will be lis_mnt->mnt_sb */
     lis_atomic_inc(&lis_inode_cnt);
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	printk("lis_get_new_inode(s@0x%p)%s%s >> i@0x%p/%d%s\n",
 	       sb,
 	       (S_IS_LIS(sb)?" <LiS>":""),
@@ -613,11 +613,7 @@ lis_tmout(struct timer_list *tl, void (*fn)(ulong), long arg, long ticks)
 void
 lis_untmout( struct timer_list *tl)
 {
-    /*
-     * del_timer returns 0 if the timer's callback function is
-     * executing.  We just spin until it finishes.
-     */
-    do {} while (!del_timer(tl));
+    del_timer(tl);		/* don't care if timeout fcn is running */
 }
 
 /************************************************************************
@@ -786,7 +782,7 @@ void lis_dput(struct dentry *d)
 {
     struct super_block	*sb = NULL ;
 
-    if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
 	printk("lis_dput(d@0x%p/%d%s)%s i@0x%p/%d \"%s\"\n", 
 	       d,
 	       D_COUNT(d), (D_COUNT(d)>0?"--":""),
@@ -816,7 +812,7 @@ struct dentry *lis_dget(struct dentry *d)
     
     d = dget(d);
 
-    if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
 	printk("lis_dget(d@0x%p/%s%d)%s i@0x%p/%d%s \"%s\"\n", 
 	       d, (D_IS_LIS(d)?"++":""), D_COUNT(d),
 	       (D_IS_LIS(d)?" <LiS>":""),
@@ -1196,7 +1192,7 @@ int lis_fs_kern_mount_sb( struct super_block *sb, void *ptr, int silent )
     if (sb->s_root == NULL)
         return(-ENOMEM) ;
 
-    if (LIS_DEBUG_OPEN)
+    if (LIS_DEBUG_VOPEN)
 	printk("lis_fs_kern_mount_sb(s@x%p,...)"
 	       " >> root d@0x%p/%d i@0x%p/%d rdev (%d,%d)\n",
 	       sb,
@@ -1270,7 +1266,7 @@ struct super_block *lis_fs_read_super(struct super_block *sb,
 #if defined(KERNEL_2_3)
 int lis_dentry_delete(struct dentry *d)
 {
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_VCLOSE)
 	printk("lis_dentry_delete(d@0x%p/%d) [%d]%s\n",
 	       d, D_COUNT(d),
 	       lis_atomic_read(&lis_mnt_cnt),
@@ -1281,7 +1277,7 @@ int lis_dentry_delete(struct dentry *d)
 
 void lis_dentry_iput( struct dentry *d, struct inode *i )
 {
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_VCLOSE)
 	printk("lis_dentry_iput(d@0x%p/%d,i@0x%p/%d%s) [%d]%s%s\n",
 	       d, D_COUNT(d),
 	       i, (i?I_COUNT(i):0),(i&&I_COUNT(i)>0?"--":""),
@@ -1310,7 +1306,7 @@ void lis_super_put_inode(struct inode *i)
 #if defined(KERNEL_2_3)			/* linux >= 2.3.0 */
     MNTSYNC();
 
-    if (LIS_DEBUG_OPEN)
+    if (LIS_DEBUG_VOPEN)
     {
 	printk("lis_super_put_inode(i@0x%p/%d)%s "
 	       "i_rdev=0x%x <[%d] %d LiS inode(s)>%s\n",
@@ -1545,7 +1541,7 @@ int	lis_new_file_name(struct file *f, const char *name)
      */
     if (D_IS_LIS(f->f_dentry) &&
 	strcmp(name, f->f_dentry->d_name.name) == 0) {
-	if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	    printk("lis_new_file_name(f@0x%p/%d,\"%s\")"
 		   " - same name, already <LiS> - ignoring call\n",
 		   f, F_COUNT(f), name);
@@ -1564,7 +1560,7 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
     struct inode   *oldi = NULL;
     struct vfsmount *oldmnt = F_VFSMNT(f);
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
 	struct dentry *d = (f ? f->f_dentry : NULL);
 	struct inode *i  = (d ? d->d_inode : NULL);
 
@@ -1608,7 +1604,7 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
 	return(PTR_ERR(new)) ;
     }
 
-    if (LIS_DEBUG_OPEN && 0)
+    if (LIS_DEBUG_VOPEN && 0)
     {
 	if (old != NULL)
 	    lis_print_dentry(old, "lis_new_file_name(b4)") ;
@@ -1644,7 +1640,7 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
 
     f->f_dentry = new ;			/* d_alloc set count */
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
 	struct dentry *d = (f ? f->f_dentry : NULL);
 	struct inode *i  = (d ? d->d_inode : NULL);
 
@@ -1662,7 +1658,7 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
 	       i, (i?I_COUNT(i):0), (i&&I_IS_LIS(i)?" <LiS>":""));
     }
 
-   if (LIS_DEBUG_OPEN && 0)
+   if (LIS_DEBUG_VOPEN && 0)
     {
 	lis_print_dentry(f->f_dentry, "lis_new_file_name") ;
 	lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint, "---mount point") ;
@@ -1682,7 +1678,7 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
  */
 void lis_new_stream_name(struct stdata *head, struct file *f)
 {
-    if (LIS_DEBUG_OPEN)
+    if (LIS_DEBUG_VOPEN)
 	printk("lis_new_stream_name(h@0x%p/%d/%d,f@0x%p/%d) << d@0x%p/%d\n",
 	       head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
 	       f, F_COUNT(f),
@@ -1694,7 +1690,7 @@ void lis_new_stream_name(struct stdata *head, struct file *f)
     lis_mark_mem(head, head->sd_name, MEM_STRMHD) ;
     lis_new_file_name(f, head->sd_name) ;
 
-    if (LIS_DEBUG_OPEN)
+    if (LIS_DEBUG_VOPEN)
 	printk("lis_new_stream_name(h@0x%p/%d/%d,f@0x%p/%d) >> d@0x%p/%d\n",
 	       head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
 	       f, F_COUNT(f),
@@ -1752,7 +1748,7 @@ lis_new_inode( struct file *f, dev_t dev )
 	return(NULL) ;				/* bad return */
     }
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
 	printk("lis_new_inode(f@0x%p/%d,d0x%x)%s%s",
 	       f, F_COUNT(f), DEV_TO_INT(dev),
 	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
@@ -1833,13 +1829,13 @@ lis_new_inode( struct file *f, dev_t dev )
 	PIPE_LOCK(*new) = 0;
 #endif
 #if defined(KERNEL_2_3)			/* linux >= 2.3.0 */
-	if (LIS_DEBUG_OPEN && 0)
+	if (LIS_DEBUG_VOPEN && 0)
 	{
 	    printk("lis_new_inode: inode_cnt=%d i_rdev=0x%x i_count=%d\n",
 		   lis_atomic_read(&lis_inode_cnt), new->i_rdev, I_COUNT(new));
 	}
 
-	if (LIS_DEBUG_OPEN && 0)
+	if (LIS_DEBUG_VOPEN && 0)
 	{
 	    lis_print_dentry(f->f_dentry, "lis_new_inode(b4)") ;
 	    lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint,
@@ -1889,7 +1885,7 @@ lis_new_inode( struct file *f, dev_t dev )
 	d_add(newd, new) ;			/* add inode to new dentry */
 	f->f_dentry = newd ;
 
-	if (LIS_DEBUG_OPEN && 0)
+	if (LIS_DEBUG_VOPEN && 0)
 	{
 	    lis_print_dentry(f->f_dentry, "lis_new_inode") ;
 	    lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint, "---mount point(b4)");
@@ -1909,7 +1905,7 @@ lis_new_inode( struct file *f, dev_t dev )
 #endif
     }
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
 	printk("lis_new_inode(f@0x%p/%d,d0x%x)%s%s",
 	       f, F_COUNT(f), DEV_TO_INT(dev),
 	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
@@ -1949,7 +1945,7 @@ void lis_cleanup_file_opening(struct file *f, stdata_t *head,
 			       struct dentry *oldd, int oldd_cnt,
 			       struct vfsmount *oldmnt, int oldmnt_cnt)
 {
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
     {
         printk("lis_cleanup_file_opening(f@0x%p/%d,h@0x%p/%d/%d,%d,...)\n"
 	       "    << [%d]%s d@0x%p/%d%s i@0x%p/%d%s",
@@ -1982,7 +1978,7 @@ void lis_cleanup_file_opening(struct file *f, stdata_t *head,
 	if (f->f_dentry != oldd)
 	    (void)lis_dput(f->f_dentry);
 #if 1
-	if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	    printk("    error %d >> oldmnt@0x%p/%d %c oldmnt_cnt %d\n",
 		   open_fail,
 		   oldmnt, MNT_COUNT(oldmnt),
@@ -2024,7 +2020,7 @@ void lis_cleanup_file_closing(struct file *f, stdata_t *head)
 	MNTPUT(lis_mnt);
 #endif
 
-    if (LIS_DEBUG_CLOSE || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VCLOSE || LIS_DEBUG_ADDRS)
     {
         printk("lis_cleanup_file_closing(f@0x%p/%d,h@0x%p/%d/%d)"
 	       " [%d]%s%s",
@@ -2126,7 +2122,7 @@ lis_get_inode( mode_t mode, dev_t dev )
 	i->i_rdev  = INT_TO_KDEV(dev);
 	i->i_dev   = MKDEV( lis_major, MAJOR(dev) );
 
-	if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	    printk("lis_get_inode(m0x%x,d0x%x) >> i@0x%p/%d"
 		   " <[%d] %d LiS inodes>\n",
 		   mode, dev,
@@ -2150,7 +2146,7 @@ lis_old_inode( struct file *f, struct inode *i )
     struct vfsmount *oldmnt = F_VFSMNT(f);
 #endif
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	printk("lis_old_inode(f@0x%p/%d,i@0x%p/%d)%s << "
 	       "i@0x%p/%d%s (dev 0x%x -> 0x%x)\n",
 	       f, F_COUNT(f),
@@ -2177,7 +2173,7 @@ lis_old_inode( struct file *f, struct inode *i )
 	MNTPUT(oldmnt);
 #endif
 
-    if (LIS_DEBUG_OPEN || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	printk("lis_old_inode(f@0x%p/%d,i@0x%p/%d)%s >> "
 	       "d@0x%p/%d%s i@0x%p/%d%s\n",
 	       f, F_COUNT(f),
@@ -2447,7 +2443,7 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
 	return(-EINVAL);
     }
 
-    if (LIS_DEBUG_OPEN && 0)
+    if (LIS_DEBUG_VOPEN && 0)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" << mode 0%o flags 0%o\n",
 	       i, I_COUNT(i), f, F_COUNT(f),
@@ -2534,7 +2530,7 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
 
     lis_kernel_up(PIPE_SEM(*i));
 
-    if (LIS_DEBUG_OPEN && 0)
+    if (LIS_DEBUG_VOPEN && 0)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" >> %d reader(s) %d writer(s)\n",
 	       i, I_COUNT(i), f, F_COUNT(f),
@@ -2565,7 +2561,7 @@ err_nocleanup:
     lis_kernel_up(PIPE_SEM(*i));
 
 err_nolock_nocleanup:
-    if (LIS_DEBUG_OPEN && 0)
+    if (LIS_DEBUG_VOPEN && 0)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld \"%s\""
 	       " >> error(%d)\n",
 	       i, (i?I_COUNT(i):0),
@@ -2653,7 +2649,7 @@ err_nolock_nocleanup:
 	ret = -EINVAL;
     }
 
-    if (LIS_DEBUG_OPEN && 0)
+    if (LIS_DEBUG_VOPEN && 0)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" >> %d reader(s) %d writer(s)\n",
 	       i, I_COUNT(i), f, F_COUNT(f),
@@ -2677,7 +2673,7 @@ lis_fifo_close_sync( struct inode *i, struct file *f )
     PIPE_READERS(*i) -= (f && f->f_mode & FMODE_READ ? 1 : 0);
     PIPE_WRITERS(*i) -= (f && f->f_mode & FMODE_WRITE ? 1 : 0);
 
-    if (LIS_DEBUG_CLOSE && 0)
+    if (LIS_DEBUG_VCLOSE && 0)
 	printk("lis_fifo_close_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" >> %d reader(s) %d writer(s)\n",
 	       i, I_COUNT(i), f, (f?F_COUNT(f):0),
@@ -3238,7 +3234,7 @@ void lis_tq_free_passfp( void *arg )
 	is_a_stream = (sent->f.fp->f_op == (&lis_streams_fops));
 
 
-	if (LIS_DEBUG_SNDFD | LIS_DEBUG_CLOSE) {
+	if (LIS_DEBUG_SNDFD | LIS_DEBUG_VCLOSE) {
 	    struct file *f = sent->f.fp;
 
 	    printk("lis_tq_free_passfp(m@0x%p)"
@@ -3540,6 +3536,9 @@ int lis_loadable_load(const char *name)
 #ifdef MODULE
 int lis_can_unload(void)
 {
+    if (THIS_MODULE == NULL)
+	return(0) ;			/* can unload */
+
     return(atomic_read(&(THIS_MODULE->uc.usecount)) <= lis_initial_use_cnt) ;
 }
 #endif
@@ -3753,7 +3752,7 @@ void	streams_init(void)
 ************************************************************************/
 void	lis_inc_mod_cnt_fcn(const char *file, int line)
 {
-    if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
 	printk("lis_inc_mod_cnt() <\"%s\"/%d>++ {%s@%d}\n",
 	    THIS_MODULE->name,
 	    atomic_read(&(THIS_MODULE->uc.usecount)), file, line) ;
@@ -3773,7 +3772,7 @@ void	lis_dec_mod_cnt_fcn(const char *file, int line)
 {
     MOD_DEC_USE_COUNT ;
 
-    if (LIS_DEBUG_OPEN | LIS_DEBUG_CLOSE)
+    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
 	printk("lis_dec_mod_cnt() --<\"%s\"/%d> {%s@%d}\n",
 	    THIS_MODULE->name,
 	    atomic_read(&(THIS_MODULE->uc.usecount)), file, line) ;
