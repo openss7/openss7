@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/03/30 02:24:35 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/01 09:52:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:35 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/03/30 02:24:35 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/01 09:52:19 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/03/30 02:24:35 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/01 09:52:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -102,6 +102,16 @@ struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
 #if defined CONFIG_STREAMS_DEBUG
 EXPORT_SYMBOL(strthreads);
+#endif
+
+#if HAVE_RAISE_SOFTIRQ_IRQOFF_EXPORT && ! HAVE_RAISE_SOFTIRQ_EXPORT
+void fastcall raise_softirq(unsigned int nr)
+{
+	unsigned long flags;
+	local_irq_save(flags);
+	raise_softirq_irqoff(nr);
+	local_irq_restore(flags);
+}
 #endif
 
 /* 

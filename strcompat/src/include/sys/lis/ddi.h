@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/03/30 02:24:29 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/04/01 09:52:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:29 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/30 02:24:29 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/01 09:52:13 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -208,8 +208,10 @@ extern int lis_down_fcn(lis_semaphore_t *lsem, char *file, int line);
 extern unsigned long lis_dsecs(void);
 extern void lis_enable_intr(struct streamtab *strtab, int major, const char *name);
 extern void lis_enable_irq(unsigned int irq);
+#if HAVE_KERNEL_FATTACH_SUPPORT
 extern int lis_fattach(struct file *f, const char *path);
 extern int lis_fdetach(const char *path);
+#endif
 extern void lis_fdetach_all(void);
 extern void lis_fdetach_stream(struct stdata *head);
 extern void lis_fifo_close_sync(struct inode *i, struct file *f);
@@ -280,7 +282,9 @@ extern void lis_osif_do_settimeofday(struct timeval *tp);
 extern void lis_osif_sti(void);
 extern int lis_own_spl(void);
 extern void *lis_phys_to_virt(unsigned long addr);
+#if HAVE_KERNEL_PIPE_SUPPORT
 extern int lis_pipe(unsigned int *fd);
+#endif
 extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
 extern unsigned lis_poll_bits(struct stdata *hd);
 extern char *lis_poll_events(short events);
@@ -401,8 +405,10 @@ extern int lis_unregister_strmod(struct streamtab *strtab);
 extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 					   dma_addr_t *dma_handle);
 extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
+#endif
 extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
 extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,

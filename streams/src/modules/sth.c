@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/04/01 09:52:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:25 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/04/01 09:52:23 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/04/01 09:52:23 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/31 06:53:25 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/04/01 09:52:23 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3005,7 +3005,11 @@ static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int strfattach(struct file *file, const char *path)
 {
+#if HAVE_KERNEL_FATTACH_SUPPORT
 	return do_fattach(file, path);	/* see strattach.c */
+#else
+	return (-ENOSYS);
+#endif
 }
 
 /**
@@ -3034,7 +3038,11 @@ static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int strfdetach(const char *path)
 {
+#if HAVE_KERNEL_FATTACH_SUPPORT
 	return do_fdetach(path);	/* see strattach.c */
+#else
+	return (-ENOSYS);
+#endif
 }
 
 /**
@@ -3061,7 +3069,11 @@ static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int strpipe(int fds[2])
 {
+#if HAVE_KERNEL_PIPE_SUPPORT
 	return do_spipe(fds);	/* see strpipe.c */
+#else
+	return (-ENOSYS);
+#endif
 }
 
 /**

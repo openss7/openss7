@@ -1,1 +1,1 @@
-
+.so man7/ss7_undoc.7.man

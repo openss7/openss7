@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/10 04:30:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/01 09:54:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/10 04:30:30 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 09:54:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -420,6 +420,8 @@ man_MANS = \
 	man9/lis_osif_pci_alloc_consistent.9 \
 	man9/lis_osif_pci_dac_dma_supported.9 \
 	man9/lis_osif_pci_dac_dma_sync_single.9 \
+	man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9 \
+	man9/lis_osif_pci_dac_dma_sync_single_for_device.9 \
 	man9/lis_osif_pci_dac_dma_to_offset.9 \
 	man9/lis_osif_pci_dac_dma_to_page.9 \
 	man9/lis_osif_pci_dac_page_to_dma.9 \
@@ -1184,6 +1186,8 @@ dist_noinst_MANS = \
 	man9/lis_osif_pci_alloc_consistent.9.man \
 	man9/lis_osif_pci_dac_dma_supported.9.man \
 	man9/lis_osif_pci_dac_dma_sync_single.9.man \
+	man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9.man \
+	man9/lis_osif_pci_dac_dma_sync_single_for_device.9.man \
 	man9/lis_osif_pci_dac_dma_to_offset.9.man \
 	man9/lis_osif_pci_dac_dma_to_page.9.man \
 	man9/lis_osif_pci_dac_page_to_dma.9.man \

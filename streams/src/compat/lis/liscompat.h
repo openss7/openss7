@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 02:24:31 $
+ @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/01 09:52:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:31 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:17 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -202,8 +202,10 @@ extern void lis_enable_irq(unsigned int irq);
 extern mblk_t *lis_esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo,
 			    char *file_name, int line_nr);
 extern int lis_esbbcall(int priority, void (*function) (long), long arg);
+#if HAVE_KERNEL_FATTACH_SUPPORT
 extern int lis_fattach(struct file *f, const char *path);
 extern int lis_fdetach(const char *path);
+#endif
 extern void lis_fdetach_all(void);
 extern void lis_fdetach_stream(stdata_t *head);
 extern void lis_fifo_close_sync(struct inode *i, struct file *f);
@@ -281,8 +283,10 @@ extern void lis_osif_do_settimeofday(struct timeval *tp);
 extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 					   dma_addr_t *dma_handle);
 extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
+#if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
+#endif
 extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
 extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
@@ -365,7 +369,9 @@ extern int lis_pcibios_write_config_dword(unsigned char bus, unsigned char dev_f
 extern int lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn,
 					 unsigned char where, unsigned short val);
 extern void *lis_phys_to_virt(unsigned long addr);
+#if HAVE_KERNEL_PIPE_SUPPORT
 extern int lis_pipe(unsigned int *fd);
+#endif
 extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
 extern unsigned lis_poll_bits(stdata_t *hd);
 extern char *lis_poll_events(short events);

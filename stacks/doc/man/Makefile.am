@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/26 22:12:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/01 09:54:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:10 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 09:54:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,6 +62,7 @@ ss7_man_MANS = \
 	man3/xti_ss7.3 \
 	man3/xti_sscop.3 \
 	man3/xti_tcap.3 \
+	man3/ss7_undoc.3 \
 	man4/acb56.4 \
 	man4/bicc.4 \
 	man4/bicc_ioctl.4 \
@@ -180,6 +181,7 @@ ss7_man_MANS = \
 	man4/x400p.4 \
 	man4/x400p-ch.4 \
 	man4/x400p-ss7.4 \
+	man4/ss7_undoc.4 \
 	man5/openss7_soon.5 \
 	man7/bicci.7 \
 	man7/capi.7 \
@@ -755,6 +757,7 @@ ss7_man_MANS = \
 	man7/smi.7 \
 	man7/soon.7 \
 	man7/ss7.7 \
+	man7/ss7_undoc.7 \
 	man7/sscop.7 \
 	man7/sscopi.7 \
 	man7/tcapi.7 \
@@ -1377,6 +1380,7 @@ ss7_dist_noinst_MANS = \
 	man3/xti_ss7.3.man \
 	man3/xti_sscop.3.man \
 	man3/xti_tcap.3.man \
+	man3/ss7_undoc.3.man \
 	man4/acb56.4.man \
 	man4/bicc.4.man \
 	man4/bicc_ioctl.4.man \
@@ -1495,6 +1499,7 @@ ss7_dist_noinst_MANS = \
 	man4/x400p.4.man \
 	man4/x400p-ch.4.man \
 	man4/x400p-ss7.4.man \
+	man4/ss7_undoc.4.man \
 	man5/openss7_soon.5.man \
 	man7/bicci.7.man \
 	man7/capi.7.man \
@@ -2070,6 +2075,7 @@ ss7_dist_noinst_MANS = \
 	man7/smi.7.man \
 	man7/soon.7.man \
 	man7/ss7.7.man \
+	man7/ss7_undoc.7.man \
 	man7/sscop.7.man \
 	man7/sscopi.7.man \
 	man7/tcapi.7.man \

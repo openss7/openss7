@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/24 02:11:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/01 09:52:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:06 $ by $Author: brian $
+# Last Modified $Date: 2005/04/01 09:52:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -206,7 +206,7 @@ endif
 if WITH_SCTP2
 nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
 endif
-libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/sctp_hooks.h
 libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:28:07 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/01 09:52:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/17 14:28:07 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:28:07 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/01 09:52:19 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:28:07 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/01 09:52:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -95,6 +95,11 @@ static struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * roo
 #if defined HAVE_CHECK_MNT_ADDR
 static int (*check_mnt) (struct vfsmount * mnt)
 = (typeof(check_mnt)) HAVE_CHECK_MNT_ADDR;
+#else
+static inline int check_mnt(struct vfsmount *mnt)
+{
+	return mt->mnt_namespace == current->namepsace;
+}
 #endif
 #if defined HAVE_GRAFT_TREE_ADDR
 static int (*graft_tree) (struct vfsmount * mnt, struct nameidata * nd)
