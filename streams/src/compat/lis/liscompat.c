@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:18 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -453,7 +453,7 @@ int lis_clone_major(void)
 EXPORT_SYMBOL_GPL(lis_clone_major);
 int lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds)
 {
-	return strclose(i, f);
+	return strm_f_ops.release(i, f);
 }
 
 EXPORT_SYMBOL_GPL(lis_doclose);
@@ -531,7 +531,7 @@ int lis_printk(const char *fmt, ...)
 EXPORT_SYMBOL_GPL(lis_printk);
 int lis_strclose(struct inode *i, struct file *f)
 {
-	return strclose(i, f);
+	return strm_f_ops.release(i, f);
 }
 
 EXPORT_SYMBOL_GPL(lis_strclose);
@@ -544,13 +544,13 @@ int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int
 EXPORT_SYMBOL_GPL(lis_strgetpmsg);
 int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg)
 {
-	return strioctl(i, f, cmd, arg);
+	return strm_f_ops.ioctl(i, f, cmd, arg);
 }
 
 EXPORT_SYMBOL_GPL(lis_strioctl);
 int lis_stropen(struct inode *i, struct file *f)
 {
-	return stropen(i, f);
+	return strm_f_ops.open(i, f);
 }
 
 EXPORT_SYMBOL_GPL(lis_stropen);
@@ -583,13 +583,13 @@ pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name)
 EXPORT_SYMBOL_GPL(lis_thread_start);
 ssize_t lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 {
-	return strread(fp, ubuff, ulen, op);
+	return strm_f_ops.read(fp, ubuff, ulen, op);
 }
 
 EXPORT_SYMBOL_GPL(lis_strread);
 ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
 {
-	return strwrite(fp, ubuff, ulen, op);
+	return strm_f_ops.write(fp, ubuff, ulen, op);
 }
 
 EXPORT_SYMBOL_GPL(lis_strwrite);
@@ -620,7 +620,7 @@ struct inode *lis_old_inode(struct file *f, struct inode *i)
 EXPORT_SYMBOL_GPL(lis_old_inode);
 unsigned lis_poll_2_1(struct file *fp, poll_table * wait)
 {
-	return strpoll(fp, wait);
+	return strm_f_ops.poll(fp, wait);
 }
 
 EXPORT_SYMBOL_GPL(lis_poll_2_1);

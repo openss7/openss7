@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +79,7 @@ static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $)
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:58 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -110,12 +111,12 @@ MODULE_PARM(major, "b");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-log driver.");
 
 static struct module_info log_minfo = {
-      mi_idnum:CONFIG_STREAMS_LOG_MODID,
-      mi_idname:CONFIG_STREAMS_LOG_NAME,
-      mi_minpsz:0,
-      mi_maxpsz:INFPSZ,
-      mi_hiwat:STRHIGH,
-      mi_lowat:STRLOW,
+	mi_idnum:CONFIG_STREAMS_LOG_MODID,
+	mi_idname:CONFIG_STREAMS_LOG_NAME,
+	mi_minpsz:0,
+	mi_maxpsz:INFPSZ,
+	mi_hiwat:STRHIGH,
+	mi_lowat:STRLOW,
 };
 
 queue_t *log_errq = NULL;
@@ -133,8 +134,7 @@ struct log {
 	mblk_t *traceblk;		/* a message block containing trace ids */
 };
 
-static int
-log_put(queue_t *q, mblk_t *mp)
+static int log_put(queue_t *q, mblk_t *mp)
 {
 	struct log *log = q->q_ptr;
 	union ioctypes *ioc;
@@ -196,7 +196,7 @@ log_put(queue_t *q, mblk_t *mp)
 			err = -ENOSR;
 			if ((log->traceblk = dupb(dp)) == NULL)
 				goto nak;
-			log->traceids = (dp->b_wptr - dp->b_rptr)/sizeof(struct trace_ids);
+			log->traceids = (dp->b_wptr - dp->b_rptr) / sizeof(struct trace_ids);
 			log_trcq = RD(q);
 			goto ack;
 		}
@@ -229,17 +229,15 @@ log_put(queue_t *q, mblk_t *mp)
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
 static struct log *log_list = NULL;
 
-static int
-log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct log *p, **pp = &log_list;
-	int cmajor, cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);	/* can't open as module */
-	cmajor = getmajor(*devp);
-	cminor = getminor(*devp);
 	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
 		return (ENOMEM);	/* no memory */
 	bzero(p, sizeof(*p));
@@ -249,13 +247,14 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			cminor = 1;
 	case DRVOPEN:
 	{
-		int dmajor = 0, dminor = 0;
+		major_t dmajor = 0;
+		minor_t dminor = 0;
 		if (cminor < 1)
 			return (ENXIO);
 		spin_lock(&log_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     cminor == getminor(makedevice(cmajor, cminor)); pp = &(*pp)->next, cminor++) {
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
 			dminor = getminor((*pp)->dev);
 			if (cminor < dminor)
 				break;
@@ -265,7 +264,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				return (EIO);	/* bad error */
 			}
 		}
-		if (cminor != getminor(makedevice(cmajor, cminor))) {
+		if (getminor(makedevice(cmajor, cminor)) == 0) {
 			spin_unlock(&log_lock);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */
@@ -283,8 +282,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int
-log_close(queue_t *q, int oflag, cred_t *crp)
+static int log_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct log *p;
 	if ((p = q->q_ptr) == NULL)
@@ -300,32 +298,31 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit log_rqinit = {
-      qi_qopen:log_open,
-      qi_qclose:log_close,
-      qi_minfo:&log_minfo,
+	qi_qopen:log_open,
+	qi_qclose:log_close,
+	qi_minfo:&log_minfo,
 };
 
 static struct qinit log_wqinit = {
-      qi_putp:log_put,
-      qi_minfo:&log_minfo,
+	qi_putp:log_put,
+	qi_minfo:&log_minfo,
 };
 
 static struct streamtab log_info = {
-      st_rdinit:&log_rqinit,
-      st_wrinit:&log_wqinit,
+	st_rdinit:&log_rqinit,
+	st_wrinit:&log_wqinit,
 };
 
 static struct cdevsw log_cdev = {
-      d_name:CONFIG_STREAMS_LOG_NAME,
-      d_str:&log_info,
-      d_flag:0,
-      d_fop:NULL,
-      d_mode:S_IFCHR,
-      d_kmod:THIS_MODULE,
+	d_name:CONFIG_STREAMS_LOG_NAME,
+	d_str:&log_info,
+	d_flag:0,
+	d_fop:NULL,
+	d_mode:S_IFCHR,
+	d_kmod:THIS_MODULE,
 };
 
-static int __init
-log_init(void)
+static int __init log_init(void)
 {
 	int err;
 #ifdef MODULE
@@ -339,8 +336,7 @@ log_init(void)
 		major = err;
 	return (0);
 }
-static void __exit
-log_exit(void)
+static void __exit log_exit(void)
 {
 	unregister_strdev(&log_cdev, major);
 }

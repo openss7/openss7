@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/04/30 10:41:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/05/04 21:36:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/30 10:41:58 $ by $Author: brian $
+# Last Modified $Date: 2004/05/04 21:36:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -97,8 +97,6 @@ noinst_LIBRARIES		= \
 libLfSkernel_a_SOURCES		= \
 				src/kernel/strattach.c \
 				src/kernel/strattach.h \
-				src/kernel/strhead.c \
-				src/kernel/strhead.h \
 				src/kernel/strmain.c \
 				src/kernel/strprocfs.c \
 				src/kernel/strprocfs.h \
@@ -122,7 +120,7 @@ libLfSkernel_a_CPPFLAGS		= \
 				-I./src/kernel -I$(srcdir)/src/kernel \
 				-I./src/drivers -I$(srcdir)/src/drivers \
 				-I./src/modules -I$(srcdir)/src/modules \
-				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfSkernel_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfSkernel_a_OBJECTS): $(libLfSkernel_a_DEPENDENCIES)
@@ -165,6 +163,8 @@ libLfSdrivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLfSdrivers_a_OBJECTS): $(libLfSdrivers_a_DEPENDENCIES)
 
 libLfSmodules_a_SOURCES		= \
+				src/kernel/strhead.c \
+				src/kernel/strhead.h \
 				src/modules/connld.c \
 				src/modules/pipemod.c \
 				src/modules/sockmod.c \
@@ -183,7 +183,7 @@ libLfSmodules_a_CPPFLAGS	= \
 				-I./src/kernel -I$(srcdir)/src/kernel \
 				-I./src/drivers -I$(srcdir)/src/drivers \
 				-I./src/modules -I$(srcdir)/src/modules \
-				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfSmodules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfSmodules_a_OBJECTS): $(libLfSmodules_a_DEPENDENCIES)
@@ -391,6 +391,7 @@ EXPORT_SRCFILES = \
 	src/compat/uw7/uw7compat.c \
 	src/drivers/strpipe.c \
 	src/drivers/strfifo.c \
+	src/kernel/strhead.c \
 	src/kernel/strsyms.c
 
 EXPORT_VERFILES = \
@@ -403,6 +404,7 @@ EXPORT_VERFILES = \
 	include/sys/versions/uw7compat.ver \
 	include/sys/versions/strpipe.ver \
 	include/sys/versions/strfifo.ver \
+	include/sys/versions/strhead.ver \
 	include/sys/versions/strsyms.ver
 
 PKGINCL = include/sys

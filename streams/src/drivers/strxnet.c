@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,12 +75,12 @@ static char const ident[] = "$RCSfile: strxnet.c,v $ $Name:  $($Revision: 0.9.2.
 #include <tihdr.h>
 
 #include "strdebug.h"
-//#include "strxnet.h"		/* extern verification */
+//#include "strxnet.h"          /* extern verification */
 #include "strreg.h"
 
 #define XNET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XNET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $"
+#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $"
 #define XNET_DEVICE	"SVR 4.2 Sockets Library NET4 Support"
 #define XNET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XNET_LICENSE	"GPL"
@@ -118,8 +119,8 @@ typedef struct xnet_protosw {
 	} prot;
 	struct T_info_ack info;
 	/* need functions for converting options */
-//	int (*getops) ();
-//	int (*setops) ();
+//      int (*getops) ();
+//      int (*setops) ();
 } xnet_protosw_t;
 
 struct xnet_protosw *xnet_protosw[MAX_CHRDEV + 1] = { NULL, };
@@ -663,8 +664,8 @@ static int xnet_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct xnet *xnet;
 	struct xnet_protosw *proto;
-	unsigned short cmajor = getmajor(*devp);
-	unsigned short cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)

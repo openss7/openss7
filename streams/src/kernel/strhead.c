@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/04 21:36:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/04 21:36:59 $"
 
 static char const ident[] =
-    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/03 06:30:20 $";
+    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/04 21:36:59 $";
 
-#define __NO_VERSION__
+//#define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #include <linux/kernel.h>	/* for FASTCALL() */
 #include <linux/sched.h>	/* for send_sig_info() */
 #include <linux/spinlock.h>
@@ -87,9 +91,30 @@ static char const ident[] =
 #include "strsad.h"		/* for autopush_find */
 #include "strutil.h"		/* for q locking and puts and gets */
 #include "strattach.h"		/* for do_fattach/do_fdetach/do_spipe */
-#include "strspecfs.h"		/* for spec_open() */
+#include "strspecfs.h"		/* for strm_open() */
 
 #include "sys/config.h"
+
+#define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/04 21:36:59 $"
+#define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
+#define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define STH_LICENSE	"GPL"
+#define STH_BANNER	STH_DESCRIP	"\n" \
+			STH_COPYRIGHT	"\n" \
+			STH_REVISION	"\n" \
+			STH_DEVICE	"\n" \
+			STH_CONTACT	"\n"
+#define STH_SPLASH	STH_DEVICE	" - " \
+			STH_REVISION	"\n"
+
+#ifndef __NO_VERSION__
+MODULE_AUTHOR(STH_CONTACT);
+MODULE_DESCRIPTION(STH_DESCRIP);
+MODULE_SUPPORTED_DEVICE(STH_DEVICE);
+MODULE_LICENSE(STH_LICENSE);
+#endif				/* __NO_VERSION__ */
 
 #define QR_DONE		0
 #define QR_ABSORBED	1
@@ -102,13 +127,17 @@ static char const ident[] =
 #define QR_RETRY	8
 
 #ifndef CONFIG_STREAMS_STH_NAME
-#define CONFIG_STREAMS_STH_NAME "sth"
-// #warning "CONFIG_STREAMS_STH_NAME not defined."
+//#define CONFIG_STREAMS_STH_NAME "sth"
+#error "CONFIG_STREAMS_STH_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_STH_MODID
-#define CONFIG_STREAMS_STH_MODID 0
-// #warning "CONFIG_STREAMS_STH_MODID not defined."
+//#define CONFIG_STREAMS_STH_MODID 0
+#error "CONFIG_STREAMS_STH_MODID must be defined."
 #endif
+
+static short modid = CONFIG_STREAMS_STH_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module identification number for STH module.");
 
 struct module_info str_minfo = {
 	mi_idnum:CONFIG_STREAMS_STH_MODID,
@@ -1561,7 +1590,7 @@ static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, un
 		goto error;
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
-	dev = kdev_t_to_nr(sd->sd_inode->i_rdev);
+	dev = sd->sd_file->f_dentry->d_inode->i_ino;	/* FIXME: must be a better way */
 	if ((err = qpush(sd, name, &dev, make_oflag(file), current_creds)) < 0)
 		goto error;
       error:
@@ -1581,7 +1610,7 @@ static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, uns
 	dev_t dev;
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
-	dev = kdev_t_to_nr(sd->sd_inode->i_rdev);
+	dev = sd->sd_file->f_dentry->d_inode->i_ino;	/* FIXME: must be a better way */
 	if ((err = qpop(sd, make_oflag(file), current_creds)) < 0)
 		goto error;
       error:
@@ -1933,30 +1962,35 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
  *  @inode: shadow special filesystem device inode
  *  @file: shadow special filesystem file pointer
  *
- *  Because stropen() is called by sdev_open() on the filesystem device, the inode represented here
- *  is the shadow inode and the file is the shadow file pointer. We don't have to do any swapping,
- *  just return the error code. Because it is a specfs inode, the dentry has our d_fsdata.
+ *  Because stropen() is called by cdev_open() on the filesystem device, the inode represented here
+ *  is the shadow inode and the file is the shadow file pointer.  We don't have to do any swapping,
+ *  just return the error code.  Because it is a specfs inode, the dentry has our d_fsdata.
+ *
+ *  There are two ways to arrive here, we were called by a dentry_open() from cdev_open() in which
+ *  case the streams arguments are attached to the d_fsdata member of the dentry.  The other way is
+ *  via a direct open of this device within the mounted shadow special filesystem.  In that case, we
+ *  do not have any fsdata attached.
  */
 int stropen(struct inode *inode, struct file *file)
 {
-	struct str_args *argp = file->f_dentry->d_fsdata;
 	int err = 0;
+	dev_t dev = inode->i_ino;
 	struct stdata *sd;
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (!(sd = sd_get((struct stdata *) inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
 		queue_t *q;
 		struct cdevsw *cdev;
-		if (sd)		/* put away old one */
-			sd_put(sd);
-		/* we don't have a stream yet (or want a new one), so allocate one */
-		if (!(cdev = cdev_get(getmajor(argp->dev))))
+		if (sd)
+			sd_put(sd);	/* put away old one */
+		if (!(cdev = cdrv_get(getmajor(dev))))
 			return (-ENXIO);
+		/* we don't have a stream yet (or want a new one), so allocate one */
 		if (!(q = allocq())) {
-			cdev_put(cdev);
+			cdrv_put(cdev);
 			return (-ENOSR);
 		}
 		if (!(sd = allocsd())) {
-			cdev_put(cdev);
+			cdrv_put(cdev);
 			freeq(q);
 			return (-ENOSR);
 		}
@@ -1988,18 +2022,16 @@ int stropen(struct inode *inode, struct file *file)
 		/* XXX */
 		sd->sd_strtab = &str_info;	/* no driver yet */
 		setq(q, str_info.st_rdinit, str_info.st_wrinit);
-		/* grafting onto inode */
-		/* TODO: need to chain here if necessary */
-		sd->sd_inode = inode;	/* shadow inode */
-		inode->i_pipe = (void *) sd;
+		/* don't graft onto inode just yet */
+		sd->sd_file = file;
 		stri_lookup(file) = (void *) sd;
 		/* done setup, do the open */
 	} else
 		err = strwaitopen(file, sd);
 	if (!err) {
 		/* here we hold the STWOPEN bit - stream head open must clear */
-		argp->sflag = (sd->sd_flag & STRCLONE) ? CLONEOPEN : argp->sflag;
-		if (!(err = qopen(sd->sd_rq, &argp->dev, argp->oflag, argp->sflag, argp->crp))) {
+		int sflag = (sd->sd_flag & STRCLONE) ? CLONEOPEN : DRVOPEN;
+		if (!(err = qopen(sd->sd_rq, &dev, make_oflag(file), sflag, current_creds))) {
 			sd->sd_opens++;
 			sd->sd_readers += (file->f_mode & FREAD) ? 1 : 0;
 			sd->sd_writers += (file->f_mode & FWRITE) ? 1 : 0;
@@ -3004,7 +3036,7 @@ int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned 
  *
  *  -------------------------------------------------------------------------
  */
-STATIC struct file_operations strm_f_ops ____cacheline_aligned = {
+struct file_operations strm_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
 	llseek:strllseek,
 	read:strread,
@@ -3024,6 +3056,8 @@ STATIC struct file_operations strm_f_ops ____cacheline_aligned = {
 	putpmsg:strputpmsg,
 #endif
 };
+
+EXPORT_SYMBOL_GPL(strm_f_ops);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3364,44 +3398,43 @@ static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		dev_t dev = *devp;
 		struct stdata *sd;
 		if ((sd = ((struct queinfo *) q)->qu_str)) {
-			struct char_device *cd;
-			struct cdevsw *sdev;
+			struct cdevsw *cdev;
 			struct streamtab *st;
-			cd = sd->sd_inode->i_cdev;
-			sdev = sd->sd_cdevsw;
+			cdev = sd->sd_cdevsw;
 			/* 1st step: attach the driver and call its open routine */
-			st = sd->sd_strtab = sdev->d_str;
-			if ((err = qattach(sd, (struct fmodsw *) sdev, &dev, oflag, sflag, crp))) {
+			st = sd->sd_strtab = cdev->d_str;
+			if ((err = qattach(sd, (struct fmodsw *) cdev, &dev, oflag, sflag, crp))) {
 				MOD_DEC_USE_COUNT;
 				return (err > 0 ? -err : err);
 			}
+			/* FIXME: move the redirected return check to upper level open call */
 			/* 2nd step: check for redirected return */
 			if (dev != *devp) {
-				// struct char_device *cd_old = cd;
-				struct cdevsw *sdev_old = sdev;
+				struct cdevsw *cdev_old = cdev;
 				struct streamtab *st_old = st;
-				if ((cd = cdget(dev)) == NULL)
-					goto done_check;
-				if ((sdev = cdev_get(getmajor(dev))) == NULL)
-					goto done_check;
-				if (sdev == sdev_old)
+				if ((cdev = cdrv_get(getmajor(dev))) == NULL)
+					goto done_check;	/* FIXME: bad */
+				if (cdev == cdev_old)
 					goto put_done_check;
-				if ((st = sd->sd_strtab = sdev->d_str) == st_old)
+				if ((st = sd->sd_strtab = cdev->d_str) == st_old)
 					goto put_done_check;
 				setq(sd->sd_rq, st->st_rdinit, st->st_wrinit);
 				/* need to handle situation where cdevsw entry is different and a
 				   new syncq structure is required as well. */
 			      put_done_check:
-				cdev_put(sdev);
+				cdrv_put(cdev);
 			      done_check:
+				/* always relink the inode */
+#if 0
 				/* always rehash the inode */
 				remove_inode_hash(sd->sd_inode);
 				sd->sd_inode->i_ino = to_kdev_t(dev);
 				sd->sd_inode->i_rdev = to_kdev_t(dev);
 				insert_inode_hash(sd->sd_inode);
+#endif
 			}
 			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sdev, devp, oflag, MODOPEN, crp))) {
+			if ((err = autopush(sd, cdev, devp, oflag, MODOPEN, crp))) {
 				MOD_DEC_USE_COUNT;
 				return (err > 0 ? -err : err);
 			}
@@ -3442,7 +3475,7 @@ static int open_strm(struct inode *inode, struct file *file)
 		name:{args.buf, 0, 0},
 	};
 	file->f_op = &strm_f_ops;	/* fops_get already done */
-	return spec_open(inode, file, &args);
+	return strm_open(inode, file, &args);
 }
 
 static struct file_operations strm_ops ____cacheline_aligned = {
@@ -3450,160 +3483,6 @@ static struct file_operations strm_ops ____cacheline_aligned = {
 	open:open_strm,
 };
 #endif
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  Special open for character based streams, fifos and pipes.
- *
- *  -------------------------------------------------------------------------
- */
-
-/**
- *  sdev_open: - open a character special device node
- *  @inode: the character device inode
- *  @file: the user file pointer
- *
- *  sdev_open() is only used to open a stream from a character device node in an external
- *  filesystem.  This is never called for direct opens of a specfs device node.  It is also not used
- *  for direct opens of fifos, pipes or sockets.  Those devices provide their own file operations to
- *  the main operating system.  The character device number from the inode is used to determine the
- *  shadow special file system (internal) inode and chain the open call.
- *
- *  This is the separation point where we can convert the external device number to an internal
- *  device number.  The external device number is contained in inode->i_rdev.
- */
-STATIC int sdev_open(struct inode *inode, struct file *file)
-{
-	struct char_device *cd;
-	struct cdevsw *cdev;
-	major_t major = MAJOR(kdev_t_to_nr(inode->i_rdev));
-	minor_t minor = MINOR(kdev_t_to_nr(inode->i_rdev));
-	struct str_args args = {
-		file:file,
-		dev:makedevice(major, minor),
-		oflag:make_oflag(file),
-		sflag:DRVOPEN,
-		crp:current_creds,
-		name:{args.buf, 0, 0},
-	};
-	int err;
-	if ((inode->i_mode & S_IFMT) != S_IFCHR)
-		return (-EIO);
-	if (!(cd = inode->i_cdev) && !(cd = inode->i_cdev = cdget(args.dev)))
-		return (-ENOMEM);	/* memory problem */
-	/* autoload and determine cloning right now */
-	if (!(cdev = cdev_get(getmajor(args.dev))))
-		return (-ENXIO);
-	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
-	err = spec_open(inode, file, &args);
-	cdev_put(cdev);
-	return (err);
-}
-
-STATIC struct file_operations sdev_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:sdev_open,
-};
-
-/* 
- *  -------------------------------------------------------------------------
- *
- *  REGISTRATION
- *
- *  -------------------------------------------------------------------------
- */
-
-/**
- *  register_strdev: - register a STREAMS device against a device major number
- *  @cdev: STREAMS character device structure to register
- *  @major: requested major device number or 0 for automatic major selection
- *
- *  register_strdev() registers the device specified by the @cdev to the device major number
- *  specified by @major.
- *
- *  register_strdev() will register the STREAMS character device specified by @cdev against the
- *  major device number @major.  If the major device number is zero, then it requests that
- *  register_strdev() allocate an available major device number and assign it to @cdev.
- *
- *  Context: register_strdev() is intended to be called from kernel __init() or module_init()
- *  routines only.  It cannot be called from in_irq() level.
- *
- *  Return Values: Upon success, register_strdev() will return the requested or assigned major
- *  device number as a positive integer value.  Upon failure, the registration is denied and a
- *  negative error number is returned.
- *
- *  Errors: Upon failure, register_strdev() returns on of the negative error numbers listed below.
- *
- *  -[%ENOMEM]	insufficient memory was available to complete the request.
- *
- *  -[%EINVAL]	@cdev was NULL
- *
- *  -[%EBUSY]	a device was already registered against the requested major device number, or no
- *	        device numbers were available for automatic major device number assignment.
- *
- *  Notes: Linux Fast-STREAMS provides improvements over LiS.
- *
- *  LfS uses a small hash instead of a cdevsw[] table and requires that the driver (statically)
- *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
- *  cb_ops.
- */
-int register_strdev(struct cdevsw *cdev, major_t major)
-{
-	int err;
-	if (!cdev)
-		return (-EINVAL);
-	if ((err = register_strdrv(cdev)) < 0)
-		return (err);
-	cdev->d_fop = &strm_f_ops;
-	cdev->d_mode = (cdev->d_mode & S_IFMT) | S_IFCHR;
-	if ((err = register_cmajor(cdev, major, &sdev_f_ops)) < 0) {
-		unregister_strdrv(cdev);
-		return (err);
-	}
-	return (err);
-}
-
-/**
- *  unregister_strdev: - unregister previously registered STREAMS device
- *  @cdev: STREAMS character device structure to unregister
- *  @major: major device number to unregister or 0 for all majors
- *
- *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
- *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
- *  getminor(@dev) component must be coded zero (0).
- *
- *  unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
- *  major device number in getmajor(@dev).  If the major device number is zero, then it requests
- *  that unregister_strdev() unregister @cdev from any device majors with which it is currently
- *  registered.
- *
- *  Context: unregister_strdev() is intended to be called from kernel __exit() or module_exit()
- *  routines only.  It cannot be called from in_irq() level.
- *
- *  Return Values: Upon success, unregister_strdev() will return zero (0).  Upon failure, the
- *  deregistration is denied and a negative error number is returned.
- *
- *  Errors: Upon failure, unregister_strdev() returns one of the negative error numbers listed
- *  below.
- *
- *  -[%ENXIO]	The specified device does not exist in the registration tables.
- *
- *  -[%EINVAL]	@cdev is NULL, or the @d_name component associated with @cdev has changed since
- *              registration.
- *
- *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
- *		and permission is therefore denied.
- */
-int unregister_strdev(struct cdevsw *cdev, major_t major)
-{
-	int err, ret = 0;
-	if ((err = unregister_cmajor(cdev, major)) < 0)
-		ret = err;
-	if ((err = unregister_strdrv(cdev)) < 0 && ret == 0)
-		ret = err;
-	return (ret);
-}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3618,3 +3497,36 @@ int unregister_strdev(struct cdevsw *cdev, major_t major)
 
 /* Perhaps we should...  The stream head should be entered into the fmodsw table at position 0,
    with module id 0 */
+
+static struct fmodsw sth_fmod = {
+	f_name:CONFIG_STREAMS_STH_NAME,
+	f_str:&str_info,
+	f_flag:D_MP,
+	f_modid:CONFIG_STREAMS_STH_MODID,
+	f_kmod:THIS_MODULE,
+};
+
+int __init sth_init(void)
+{
+	int err;
+#ifdef  MODULE
+	printk(KERN_INFO STH_BANNER);
+#else
+	printk(KERN_INFO STH_SPLASH);
+#endif
+	if ((err = register_strmod(&sth_fmod)) < 0)
+		return (err);
+	if (modid == -1 && err >= 0)
+		modid = err;
+	return (0);
+};
+
+void __exit sth_exit(void)
+{
+	unregister_strmod(&sth_fmod);
+}
+
+#ifndef __NO_VERSION__
+module_init(sth_init);
+module_exit(sth_exit);
+#endif				/* __NO_VERSION__ */

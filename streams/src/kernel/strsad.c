@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/04 21:36:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/04 21:36:59 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/04 21:36:59 $";
 
 #define __NO_VERSION__
 
@@ -134,13 +134,13 @@ struct strapush *autopush_find(dev_t dev)
 	unsigned long flags;
 	struct cdevsw *cdev;
 	struct apinfo *api = NULL;
-	if ((cdev = cdev_get(getmajor(dev))) == NULL)
+	if ((cdev = cdrv_get(getmajor(dev))) == NULL)
 		goto notfound;
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
 		ap_grab(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
-	cdev_put(cdev);
+	cdrv_put(cdev);
       notfound:
 	return ((struct strapush *) api);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: uw7ddi.h,v 0.9.2.5 2004/03/18 11:17:49 brian Exp $
+ @(#) $Id: uw7ddi.h,v 0.9.2.6 2004/05/04 21:36:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/18 11:17:49 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/18 11:17:49 $"
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:57 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -120,42 +120,35 @@ typedef struct {
 	unsigned char sg_format;
 } scgth_t;
 
-extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t *prp);
-extern mblk_t *msgphysreq(mblk_t *mp, physreq_t *prp);
-extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t *prp);
-extern mblk_t *msgscgth(mblk_t *mp, physreq_t *prp, scgth_t *sgp);
+extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
+extern mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
+extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
+extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
 
 typedef int processorid_t;
 toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
 
-int strioccall(int (*func)(void *), void *arg, uint iocid, queue_t *q);
+int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
 
 __UW7_EXTERN_INLINE major_t getemajor(dev_t dev)
 {
-	return (MAJOR(dev));
+	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
 __UW7_EXTERN_INLINE minor_t geteminor(dev_t dev)
 {
-	return (MINOR(dev));
+	return (MINOR(getminor(dev)));
 }
 __UW7_EXTERN_INLINE major_t emajor(dev_t dev)
 {
-	return (MAJOR(dev));
+	return (getmajor(dev) + MAJOR(getminor(dev)));
 }
 __UW7_EXTERN_INLINE minor_t eminor(dev_t dev)
 {
-	return (MINOR(dev));
+	return (MINOR(getminor(dev)));
 }
-__UW7_EXTERN_INLINE int etoimajor(major_t emajor)
-{
-	return major(to_kdev_t(makedevice(emajor, 0)));
-}
-__UW7_EXTERN_INLINE int itoemajor(major_t imajor, int prevemaj)
-{
-	if (prevemaj)
-		return (NODEV);
-	return MAJOR(kdev_t_to_nr(mk_kdev(imajor, 0)));
-}
+
+extern int etoimajor(major_t emajor);
+extern int itoemajor(major_t imajor, int prevemaj);
 
 __UW7_EXTERN_INLINE int printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 __UW7_EXTERN_INLINE int printf(char *fmt, ...)
@@ -247,7 +240,7 @@ __UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag)
 {
 	atomic_int_t *counter;
 	if ((counter = kmem_alloc(sizeof(*counter), flag)))
-		*counter = (atomic_int_t)ATOMIC_INIT(0);
+		*counter = (atomic_int_t) ATOMIC_INIT(0);
 	return (counter);
 }
 __UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter)
@@ -320,7 +313,6 @@ __UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp)
 {
 	up(lockp);
 }
-
 
 #elif defined(_UW7_SOURCE)
 #warning "_UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7"

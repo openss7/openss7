@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.5 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.6 2004/05/04 21:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SAD_H__
 #define __SYS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:56 $"
 
-#define SAD_IOC_MAGIC	'D' /* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
+#define SAD_IOC_MAGIC	'D'	/* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
 
 #define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/* set autopush */
 #define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/* get autopush */
@@ -79,13 +79,13 @@ struct strapush {
 	/* Solaris adds sap_anchor which is the integer anchor position */
 	int sap_anchor;
 	/* This one is Linux Fast-STREAMS specific */
-	char sap_module[FMNAMESZ + 1]; /* This is mine. */
+	char sap_module[FMNAMESZ + 1];	/* This is mine. */
 };
 
-#define SAP_CLEAR	0x00		/* clear entry */
-#define SAP_ONE		0x01		/* add entry for one minor */
-#define SAP_RANGE	0x02		/* add entry for range of minors */
-#define SAP_ALL		0x03		/* add etnry for all minors */
-#define SAP_CLONE	0x04		/* mark clonable minor device */
+#define SAP_CLEAR	0x00	/* clear entry */
+#define SAP_ONE		0x01	/* add entry for one minor */
+#define SAP_RANGE	0x02	/* add entry for range of minors */
+#define SAP_ALL		0x03	/* add etnry for all minors */
+#define SAP_CLONE	0x04	/* mark clonable minor device */
 
 #endif				/* __SYS_SAD_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,14 +74,14 @@ static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.1
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strspecfs.h"		/* for spec_open() */
+#include "strspecfs.h"		/* for strm_open() */
 #include "strfifo.h"		/* for fifo stuff */
 
 #include "sys/config.h"
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -225,7 +226,7 @@ static int sfxopen(struct inode *inode, struct file *file)
 	int err = 0;
 	struct stdata *sd;
 	/* first find out if we already have a stream head (or need a new one anyway) */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
+	if (!(sd = sd_get((struct stdata *) inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
 		/* We only do not have a stream head on initial open of the inode.  This only
 		   occurs in response to a pipe(2) or s_pipe(3) system call */
 		queue_t *q;
@@ -247,8 +248,8 @@ static int sfxopen(struct inode *inode, struct file *file)
 		((struct queinfo *) q)->qu_str = sd;
 		setq(q, sfx_info.st_rdinit, sfx_info.st_wrinit);
 		/* grafting onto inode */
-		sd->sd_inode = inode;	/* real inode */
-		inode->i_pipe = (void *)sd;
+		sd->sd_file = file;	/* real file */
+		inode->i_pipe = (void *) sd;
 		/* done setup, do the open */
 	} else if (test_and_set_bit(STWOPEN_BIT, &sd->sd_flag)) {
 		DECLARE_WAITQUEUE(wait, current);
@@ -514,7 +515,7 @@ static int open_sfx(struct inode *inode, struct file *file)
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
 	file->f_op = &sfx_f_ops;	/* fops_get already done */
-	return spec_open(inode, file, &args);
+	return strm_open(inode, file, &args);
 }
 
 static struct file_operations sfx_ops ____cacheline_aligned = {

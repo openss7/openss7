@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.17 2004/04/30 10:41:58 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.18 2004/05/04 21:36:56 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/30 10:41:58 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -76,6 +76,7 @@ AC_DEFUN([AC_LFS], [
     _RPM_SPEC
     _LDCONFIG
     _LFS_SETUP_COMPAT
+    _LFS_SETUP_FIFOS
     LFS_INCLUDES="-D_LFS_SOURCE=1 -I- -imacros ./config.h -I./include -I${srcdir}/include"
     AC_SUBST([LFS_INCLUDES])
     USER_CPPFLAGS="$CPPFLAGS"
@@ -146,6 +147,12 @@ AC_DEFUN([_LFS_OPTIONS], [
                                  variants.  @<:@default=no@:>@]),
                   [enable_compat_lis=$enableval],
                   [enable_compat_lis=''])
+    AC_ARG_ENABLE([streams-fifos],
+                  AS_HELP_STRING([--enable-streams-fifos],
+                                 [enable override of system fifos with
+                                 STREAMS-based fifos. @<:@default=no@:>@]),
+                  [enable_streams_fifos=$enableval],
+                  [enable_streams_fifos=''])
 ])# _LFS_OPTIONS
 # =========================================================================
 
@@ -262,6 +269,19 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [
 # =========================================================================
 
 # =========================================================================
+# _LFS_SETUP_FIFOS
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_FIFOS], [
+    if test :"${enable_streams_fifos-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OVERRIDE_FIFOS], [], [When defined,
+                Linux Fast STREAMS will override the Linux system defined
+                FIFOs at startup.  This should be used with care for a while,
+                until streams FIFOs are proven.])
+    fi
+])# _LFS_SETUP_FIFOS
+# =========================================================================
+
+# =========================================================================
 # _LFS_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP], [
@@ -353,6 +373,10 @@ AC_DEFUN([_LFS_CONFIG_INET], [
 # path_init             <--- exported
 # path_release          <--- exported
 # check_mnt             <=== static, can be ripped
+#
+# symbols to override system fifos
+# -------------------------------------------------------------------------
+# def_fifo_fops         <-- extern, declared in <linux/fs.h>
 # 
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_FATTACH], [
@@ -455,6 +479,19 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         AC_DEFINE_UNQUOTED([HAVE_KERNEL_PIPE_SUPPORT], [1],
         [If the addresses for the necessary symbols above are defined, then
         define this to include pipe support.])
+    fi
+    AC_CACHE_CHECK([for usable def_fifo_f_ops address], [lfs_cv_def_fifo_f_ops_addr], [
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_def_fifo_f_ops_addr=`($EGREP '\<def_fifo_f_ops' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_def_fifo_f_ops_addr="${lfs_cv_def_fifo_f_ops_addr:+0x}$lfs_cv_def_fifo_f_ops_addr"
+        lfs_cv_def_fifo_f_ops_addr="${lfs_cv_def_fifo_f_ops_addr:-no}"
+    ])
+    if test :${lfs_cv_def_fifo_f_ops_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_DEF_FIFO_F_OPS_ADDR], [$lfs_cv_def_fifo_f_ops_addr],
+        [The symbol def_fifo_f_ops is not exported by most kernels.  Define this to
+        the address of def_fifo_f_ops in the kernel system map so that
+        system fifos can be properly supported.])
     fi
 ])# _LFS_CONFIG_FATTACH
 # =========================================================================

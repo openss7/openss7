@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.6 2004/04/30 10:42:00 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.7 2004/05/04 21:36:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/30 10:42:00 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/04 21:36:57 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -152,8 +152,9 @@ struct stdata {
 	mblk_t *sd_iocblk;		/* message to return for ioctl */
 	struct stdata *sd_other;	/* other stream head for pipes */
 	struct streamtab *sd_strtab;	/* driver streamtab */
-	struct inode *sd_inode;		/* back pointer to inode */
-	struct dentry *sd_dentry;	/* back pointer to dentry */
+//      struct inode *sd_inode;         /* back pointer to inode */
+//      struct dentry *sd_dentry;       /* back pointer to dentry */
+	struct file *sd_file;		/* back pointer to file */
 	ulong sd_flag;			/* stream head state */
 	ulong sd_rdopt;			/* read options */
 	ulong sd_wropt;			/* write options */
@@ -471,8 +472,8 @@ struct devinfo {
 	struct module_info *di_info;	/* quick pointer to module info */
 	atomic_t di_refs;		/* structure references */
 	atomic_t di_count;		/* open count */
-	int major;	/* major device number */
-	int minor;	/* minor device number */
+	int major;			/* major device number */
+	int minor;			/* minor device number */
 	struct devinfo *di_next;	/* Strinfo list linkage */
 	struct devinfo *di_prev;	/* Strinfo list linkage */
 };
@@ -510,11 +511,14 @@ extern void freeqb(qband_t *qb);
 
 /* from strreg.c */
 extern struct cdevsw *cdev_get(major_t major);
-extern void cdev_put(struct cdevsw *sdev);
+extern void cdev_put(struct cdevsw *cdev);
+extern struct cdevsw *cdrv_get(modID_t modid);
+extern void cdrv_put(struct cdevsw *cdev);
 extern struct cdevsw *cdev_find(const char *name);
 extern struct fmodsw *fmod_get(modID_t modid);
 extern void fmod_put(struct fmodsw *smod);
 extern struct fmodsw *fmod_find(const char *name);
 extern struct devnode *node_find(const struct cdevsw *cdev, const char *name);
+extern struct devnode *node_get(const struct cdevsw *cdev, minor_t minor);
 
 #endif				/* __SYS_STRSUBR_H__ */

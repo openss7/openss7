@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,7 +76,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/ddi.h>
 
 #include "strdebug.h"
-#include "strspecfs.h"		/* spec_open and struct str_args */
+#include "strspecfs.h"		/* strm_open and struct str_args */
 #include "strsched.h"		/* allocsd(), freesd() */
 #include "strhead.h"		/* for autopush */
 #include "strfifo.h"		/* extern verification */
@@ -84,7 +85,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -170,7 +171,6 @@ static mblk_t *fifowaitread(struct stdata *sd, long *timeo)
 #define sdev_lookup(__i) ((struct cdevsw *)(__i)->i_cdev->data)
 
 static ssize_t fiforeadv(struct file *file, const struct iovec *, unsigned long len, loff_t *ppos);
-static int fifogetpmsg(struct file *, struct strbuf *, struct strbuf *, int *, int *);
 static ssize_t fiforead(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
@@ -186,7 +186,7 @@ static ssize_t fiforead(struct file *file, char *buf, size_t len, loff_t *ppos)
 		if (sg->databuf.maxlen > 0
 		    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
 			goto error;
-		return fifogetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
+		return strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
 	      error:
 		return (err);
 	}
@@ -196,9 +196,6 @@ static ssize_t fiforead(struct file *file, char *buf, size_t len, loff_t *ppos)
 	return fiforeadv(file, &iov, 1, ppos);
 }
 
-static ssize_t fifowritev(struct file *file, const struct iovec *iov, unsigned long count,
-			  loff_t *ppos);
-static int fifoputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
 static ssize_t fifowrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov;
@@ -214,31 +211,39 @@ static ssize_t fifowrite(struct file *file, const char *buf, size_t len, loff_t 
 		if (sp->databuf.len > 0
 		    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
 			goto error;
-		return fifoputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
+		return strputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
 	      error:
 		return (err);
 	}
 #endif
 	iov.iov_base = (void *) buf;
 	iov.iov_len = len;
-	return fifowritev(file, &iov, 1, ppos);
+	return strm_f_ops.writev(file, &iov, 1, ppos);
 }
 
 static struct streamtab fifo_info;
 static struct qinit fifo_rinit;
 static struct qinit fifo_winit;
- /* Because we are called directly from a fifo or character node in the filesystem, the indode and
-    file pointer are the real inode and file pointer in the filesystem.  We don't do any specfs
-    creation of any inodes, we do not remap the dentry and inode, we simply attach a stream head on
-    the first open and use it after that.  We don't care whether the filesystem node that was opened 
-    was an S_IFIFO or an S_IFCHR node, we use the STREAMS-fifo device number anyway.  */
+
+/*
+ *  fifopen:	- open a fifo device
+ *  @inode:	the real external or internal inode
+ *  @file:	the real external or internal file pointer
+ *
+ *  Because we are called directly from a fifo or character node in the filesystem, the indode and
+ *  file pointer are the real inode and file pointer in the filesystem.  We don't do any specfs
+ *  creation of any inodes, we do not remap the dentry and inode, we simply attach a stream head on
+ *  the first open and use it after that.  We don't care whether the filesystem node that was opened
+ *  was an S_IFIFO or an S_IFCHR node, we use the STREAMS-fifo device number anyway.
+ */
+
 static int fifoopen(struct inode *inode, struct file *file)
 {
 	struct stdata *sd;
 	int err = 0;
 	/* either the FIFO is already open or we need a stream head */
 	if (!(sd = stri_lookup(file)) &&
-	    (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sd->sd_flag & STRCLONE))) {
+	    (!(sd = sd_get((struct stdata *) inode->i_pipe)) || (sd->sd_flag & STRCLONE))) {
 		queue_t *q;
 		if (!(q = allocq()))
 			return (-ENOSR);
@@ -257,9 +262,9 @@ static int fifoopen(struct inode *inode, struct file *file)
 		sd->sd_other = sd;
 		((struct queinfo *) q)->qu_str = sd;
 		setq(q, fifo_info.st_rdinit, fifo_info.st_wrinit);
-		/* grafting onto inode */
-		sd->sd_inode = inode;	/* real inode */
-		inode->i_pipe = (void *)sd;
+		/* don't graft onto inode just yet */
+		sd->sd_file = file;	/* real file */
+		stri_lookup(file) = (void *) sd;
 		/* done setup, do the open */
 	} else if (test_and_set_bit(STWOPEN_BIT, &sd->sd_flag)) {
 		DECLARE_WAITQUEUE(wait, current);
@@ -592,47 +597,8 @@ static ssize_t fiforeadv(struct file *file, const struct iovec *iov, unsigned lo
 	return (total);
 }
 
-static ssize_t fifowritev(struct file *file, const struct iovec *iov, unsigned long count,
-			  loff_t *ppos)
-{
-	return strwritev(file, iov, count, ppos);
-}
-
-static ssize_t fifosendpage(struct file *file, struct page *page, int offset, size_t size,
-			    loff_t *ppos, int more)
-{
-	return strsendpage(file, page, offset, size, ppos, more);
-}
-static int fifogetpmsg(struct file *file, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
-{
-	return strgetpmsg(file, ctlptr, datptr, bandp, flagsp);
-}
-static int fifoputpmsg(struct file *file, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
-{
-	return strputpmsg(file, ctlptr, datptr, band, flags);
-}
-
-static struct file_operations fifo_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	llseek:strllseek,
-	read:fiforead,
-	write:fifowrite,
-	poll:strpoll,
-	ioctl:strioctl,
-	mmap:strmmap,
-	open:fifoopen,
-	release:fifoclose,
-	fasync:strfasync,
-	readv:fiforeadv,
-	writev:fifowritev,
-	sendpage:fifosendpage,
-#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
-	getpmsg:fifogetpmsg,
-	putpmsg:fifoputpmsg,
-#endif
-};
-
-EXPORT_SYMBOL(fifo_f_ops);
+struct file_operations fifo_f_ops ____cacheline_aligned;
+EXPORT_SYMBOL_GPL(fifo_f_ops);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -678,9 +644,9 @@ static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				err = 0;
 				if (sd->sd_readers > 0)
 					break;
-				up(&sd->sd_inode->i_sem);
+				up(&sd->sd_file->f_dentry->d_inode->i_sem);
 				schedule();
-				down(&sd->sd_inode->i_sem);
+				down(&sd->sd_file->f_dentry->d_inode->i_sem);
 			}
 			set_current_state(TASK_RUNNING);
 			remove_wait_queue(&sd->sd_waitq, &wait);
@@ -703,9 +669,9 @@ static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				err = 0;
 				if (sd->sd_writers > 0)
 					break;
-				up(&sd->sd_inode->i_sem);
+				up(&sd->sd_file->f_dentry->d_inode->i_sem);
 				schedule();
-				down(&sd->sd_inode->i_sem);
+				down(&sd->sd_file->f_dentry->d_inode->i_sem);
 			}
 		}
 		break;
@@ -818,6 +784,15 @@ static int __init fifo_init(void)
 #else
 	printk(KERN_INFO FIFO_SPLASH);
 #endif
+	fifo_f_ops = strm_f_ops;
+	fifo_f_ops.owner = THIS_MODULE;
+	fifo_f_ops.read = &fiforead;
+	fifo_f_ops.write = &fifowrite;
+	fifo_f_ops.open = &fifoopen;
+	fifo_f_ops.release = &fifoclose;
+	fifo_f_ops.readv = &fiforeadv;
+	// fifo_f_ops.writev = &fifowritev;
+
 	if ((err = register_strdrv(&fifo_cdev)) < 0)
 		return (err);
 	if ((err = register_cmajor(&fifo_cdev, major, &fifo_ops)) < 0) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tihdr.h,v 0.9.2.2 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: tihdr.h,v 0.9.2.3 2004/05/04 21:36:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIHDR_H
 #define _SYS_TIHDR_H
 
-#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/04 21:36:57 $"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -233,9 +233,8 @@ struct T_bind_req {
 	t_scalar_t ADDR_length;		/* length of address */
 	t_scalar_t ADDR_offset;		/* offset of address */
 	t_uscalar_t CONIND_number;
-	/*
-	   requested number of connect indications to be queued 
-	 */
+	/* 
+	   requested number of connect indications to be queued */
 };
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +79,7 @@ static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -110,16 +111,15 @@ MODULE_PARM(major, "b");
 MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto allocation)");
 
 static struct module_info nuls_minfo = {
-      mi_idnum:CONFIG_STREAMS_NULS_MODID,
-      mi_idname:CONFIG_STREAMS_NULS_NAME,
-      mi_minpsz:0,
-      mi_maxpsz:INFPSZ,
-      mi_hiwat:STRHIGH,
-      mi_lowat:STRLOW,
+	mi_idnum:CONFIG_STREAMS_NULS_MODID,
+	mi_idname:CONFIG_STREAMS_NULS_NAME,
+	mi_minpsz:0,
+	mi_maxpsz:INFPSZ,
+	mi_hiwat:STRHIGH,
+	mi_lowat:STRLOW,
 };
 
-static int
-nuls_put(queue_t *q, mblk_t *mp)
+static int nuls_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 	switch (mp->b_datap->db_type) {
@@ -176,17 +176,15 @@ typedef struct nuls {
 static spinlock_t nuls_lock = SPIN_LOCK_UNLOCKED;
 static struct nuls *nuls_list = NULL;
 
-static int
-nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct nuls *p, **pp = &nuls_list;
-	int cmajor, cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);	/* can't open as module */
-	cmajor = getmajor(*devp);
-	cminor = getminor(*devp);
 	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
 		return (ENOMEM);	/* no memory */
 	bzero(p, sizeof(*p));
@@ -196,14 +194,14 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			cminor = 1;
 	case DRVOPEN:
 	{
-		int dmajor = cmajor;
+		major_t dmajor = cmajor;
 		if (cminor < 1)
 			return (ENXIO);
 		spin_lock(&nuls_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
-		for (; *pp && dmajor == getmajor((*pp)->dev)
-		     && cminor == getminor(makedevice(cmajor, cminor)); pp = &(*pp)->next, cminor++) {
-			int dminor = getminor((*pp)->dev);
+		for (; *pp && dmajor == getmajor((*pp)->dev) &&
+		     getminor(makedevice(cmajor, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+			minor_t dminor = getminor((*pp)->dev);
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor && sflag != CLONEOPEN) {
@@ -212,7 +210,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				return (EIO);	/* bad error */
 			}
 		}
-		if (cminor != getminor(makedevice(cmajor, cminor))) {
+		if (getminor(makedevice(cmajor, cminor)) == 0) {
 			spin_unlock(&nuls_lock);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */
@@ -230,8 +228,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int
-nuls_close(queue_t *q, int oflag, cred_t *crp)
+static int nuls_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct nuls *p;
 	if ((p = q->q_ptr) == NULL)
@@ -247,32 +244,31 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 static struct qinit nuls_rqinit = {
-      qi_qopen:nuls_open,
-      qi_qclose:nuls_close,
-      qi_minfo:&nuls_minfo,
+	qi_qopen:nuls_open,
+	qi_qclose:nuls_close,
+	qi_minfo:&nuls_minfo,
 };
 
 static struct qinit nuls_wqinit = {
-      qi_putp:nuls_put,
-      qi_minfo:&nuls_minfo,
+	qi_putp:nuls_put,
+	qi_minfo:&nuls_minfo,
 };
 
 static struct streamtab nuls_info = {
-      st_rdinit:&nuls_rqinit,
-      st_wrinit:&nuls_wqinit,
+	st_rdinit:&nuls_rqinit,
+	st_wrinit:&nuls_wqinit,
 };
 
 static struct cdevsw nuls_cdev = {
-      d_name:CONFIG_STREAMS_NULS_NAME,
-      d_str:&nuls_info,
-      d_flag:0,
-      d_fop:NULL,
-      d_mode:S_IFCHR,
-      d_kmod:THIS_MODULE,
+	d_name:CONFIG_STREAMS_NULS_NAME,
+	d_str:&nuls_info,
+	d_flag:0,
+	d_fop:NULL,
+	d_mode:S_IFCHR,
+	d_kmod:THIS_MODULE,
 };
 
-static int __init
-nuls_init(void)
+static int __init nuls_init(void)
 {
 	int err;
 #ifdef MODULE
@@ -286,8 +282,7 @@ nuls_init(void)
 		major = err;
 	return (0);
 };
-static void __exit
-nuls_exit(void)
+static void __exit nuls_exit(void)
 {
 	unregister_strdev(&nuls_cdev, major);
 };

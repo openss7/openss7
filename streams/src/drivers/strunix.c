@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,12 +75,12 @@ static char const ident[] = "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.
 #include <tihdr.h>
 
 #include "strdebug.h"
-//#include "strunix.h"		/* extern verification */
+//#include "strunix.h"          /* extern verification */
 #include "strreg.h"
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $"
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"
@@ -289,8 +290,8 @@ static int unix_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *cred
 {
 	struct unix *unix;
 	struct unix_protosw *proto;
-	unsigned short cmajor = getmajor(*devp);
-	unsigned short cminor = getminor(*devp);
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)

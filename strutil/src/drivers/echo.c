@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,12 +73,12 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $
 #include "sys/config.h"
 
 //#include "strdebug.h"
-//#include "strreg.h"		/* for struct str_args */
-//#include "strsched.h"		/* for ap_get/ap_put */
+//#include "strreg.h"           /* for struct str_args */
+//#include "strsched.h"         /* for ap_get/ap_put */
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -182,13 +183,12 @@ static struct echo *echo_list = NULL;
 static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct echo *p, **pp = &echo_list;
-	int cmajor, cminor;
+	major_t cmajor = getmajor(*devp);
+	minor_t cminor = getminor(*devp);
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);	/* can't open as module */
-	cmajor = getmajor(*devp);
-	cminor = getminor(*devp);
 	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
 		return (ENOMEM);	/* no memory */
 	bzero(p, sizeof(*p));
@@ -198,14 +198,14 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			cminor = 1;
 	case DRVOPEN:
 	{
-		int dmajor = cmajor;
+		major_t dmajor = cmajor;
 		if (cminor < 1)
 			return (ENXIO);
 		spin_lock(&echo_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     cminor == getminor(makedevice(cmajor, cminor)); pp = &(*pp)->next, cminor++) {
-			int dminor = getminor((*pp)->dev);
+		     getminor(makedevice(0, cminor)) != 0; pp = &(*pp)->next, cminor++) {
+			minor_t dminor = getminor((*pp)->dev);
 			if (cminor < dminor)
 				break;
 			if (cminor == dminor && sflag != CLONEOPEN) {
@@ -214,7 +214,7 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				return (EIO);	/* bad error */
 			}
 		}
-		if (cminor != getminor(makedevice(cmajor, cminor))) {
+		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&echo_lock);
 			kmem_free(p, sizeof(*p));
 			return (EBUSY);	/* no minors left */

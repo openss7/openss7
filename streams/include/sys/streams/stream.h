@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.9 2004/05/03 06:30:17 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.10 2004/05/04 21:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:17 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:17 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:56 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -792,8 +792,8 @@ struct wantio {
 	ssize_t (*readv) (struct file *, const struct iovec *, unsigned long, loff_t *);
 	ssize_t (*writev) (struct file *, const struct iovec *, unsigned long, loff_t *);
 	ssize_t (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
-	int (*getpmsg)(struct file *, struct strbuf *, struct strbuf *, int *, int *);
-	int (*putpmsg)(struct file *, struct strbuf *, struct strbuf *, int, int);
+	int (*getpmsg) (struct file *, struct strbuf *, struct strbuf *, int *, int *);
+	int (*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
 };
 
 typedef int bcid_t;
@@ -859,7 +859,8 @@ extern int insq(queue_t *q, mblk_t *emp, mblk_t *mp);
 extern int pullupmsg(mblk_t *mp, ssize_t len);
 extern int putbq(queue_t *q, mblk_t *mp);
 extern int putq(queue_t *q, mblk_t *mp);
-extern int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag, cred_t *crp);
+extern int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sflag,
+		   cred_t *crp);
 extern int qdetach(queue_t *rq, int oflag, cred_t *crp);
 extern int qclose(queue_t *q, int oflag, cred_t *credp);
 extern int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp);

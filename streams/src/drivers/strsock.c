@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -83,7 +84,7 @@ static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Library (SOCKSYS) Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -106,7 +107,7 @@ MODULE_LICENSE(SOCKSYS_LICENSE);
  */
 static int t_bind(struct inode *inode, struct sockaddr *umyaddr, int sockaddr_len)
 {
-	struct stdata *sd = (struct stdata *)inode->i_pipe;
+	struct stdata *sd = (struct stdata *) inode->i_pipe;
 	struct T_bind_req *p;
 	mblk_t *mp;
 	if ((mp = allocb(sizeof(*p) + sockaddr_len, BPRI_MED))) {
@@ -143,7 +144,7 @@ static int t_bind(struct inode *inode, struct sockaddr *umyaddr, int sockaddr_le
 #if 0
 static int t_unbind(struct inode *inode)
 {
-	struct stdata *sd = (struct stdata *)inode->i_pipe;
+	struct stdata *sd = (struct stdata *) inode->i_pipe;
 	struct T_unbind_req *p;
 	mblk_t *mp;
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -588,8 +589,8 @@ static int socksys_close(struct inode *i, struct file *f)
 static typeof(&sock_readv_writev) _sock_readv_writev
     = (typeof(_sock_readv_writev)) HAVE_SOCK_READV_WRITEV_ADDR;
 
-static ssize_t socksys_readv(struct file *f, const struct iovec *iov, unsigned long len,
-			     loff_t *ppos)
+	static ssize_t socksys_readv(struct file *f, const struct iovec *iov, unsigned long len,
+				     loff_t *ppos)
 {
 	size_t tot_len = 0;
 	int i;
@@ -687,14 +688,14 @@ static int __init socksys_init(void)
 #endif
 	(void) socksys_f_ops;
 	(void) socksys_p_ops;
-//	xchg(&sock_f_ops, &socksys_f_ops);
-//	xchg(&sock_p_ops, &socksys_p_ops);
+//      xchg(&sock_f_ops, &socksys_f_ops);
+//      xchg(&sock_p_ops, &socksys_p_ops);
 	return (0);
 };
 static void __exit socksys_exit(void)
 {
-//	xchg(&sock_f_ops, NULL);
-//	xchg(&sock_p_ops, NULL);
+//      xchg(&sock_f_ops, NULL);
+//      xchg(&sock_p_ops, NULL);
 	return (void) (0);
 };
 

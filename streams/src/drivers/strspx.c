@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,14 +79,14 @@ static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.1
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strspecfs.h"		/* for spec_open() */
+#include "strspecfs.h"		/* for strm_open() */
 #include "strpipe.h"		/* for pipe stuff */
 
 #include "sys/config.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -262,7 +263,7 @@ static int spxopen(struct inode *inode, struct file *file)
 	int err = 0;
 	struct stdata *sd;
 	/* first find out if we already have a stream head (or need a new one anyway) */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || sd->sd_cdevsw->d_flag & D_CLONE) {
+	if (!(sd = sd_get((struct stdata *) inode->i_pipe)) || sd->sd_cdevsw->d_flag & D_CLONE) {
 		/* We only do not have a stream head on initial open of the inode.  This only
 		   occurs in response to a pipe(2) or s_pipe(3) system call */
 		queue_t *q;
@@ -284,8 +285,8 @@ static int spxopen(struct inode *inode, struct file *file)
 		((struct queinfo *) q)->qu_str = sd;
 		setq(q, spx_info.st_rdinit, spx_info.st_wrinit);
 		/* grafting onto inode */
-		sd->sd_inode = inode;	/* real inode */
-		inode->i_pipe = (void *)sd;
+		sd->sd_file = file;	/* real file */
+		inode->i_pipe = (void *) sd;
 		/* done setup, do the open */
 	} else if (test_and_set_bit(STWOPEN_BIT, &sd->sd_flag)) {
 		DECLARE_WAITQUEUE(wait, current);
@@ -551,7 +552,7 @@ static int open_spx(struct inode *inode, struct file *file)
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
 	file->f_op = &spx_f_ops;	/* fops_get already done */
-	return spec_open(inode, file, &args);
+	return strm_open(inode, file, &args);
 }
 
 static struct file_operations spx_ops ____cacheline_aligned = {

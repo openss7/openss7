@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:37:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:37:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:37:00 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:37:00 $";
 
 #define __NO_VERSION__
 
@@ -1627,12 +1627,12 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 		/* magic garden */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
-			if (!(sdev = cdev_get(getmajor(*devp))))
+			if (!(sdev = cdrv_get(getmajor(*devp))))
 				goto enoent;
 			if (!(st = sdev->d_str))
 				goto put_noent;
 			setsq(q, (struct fmodsw *) sdev, 0);
-			cdev_put(sdev);
+			cdrv_put(sdev);
 		}
 	} else if (odev != *devp)
 		swerr();

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2004/05/04 21:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:56 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,15 +74,24 @@
 
 __EXTERN_INLINE major_t getmajor(dev_t dev)
 {
-	return (major(to_kdev_t(dev)));
+	major_t major = ((dev >> 16) & 0x0000ffff);
+	if (major == 0)
+		major = MAJOR(dev);
+	return (major);
 }
 __EXTERN_INLINE minor_t getminor(dev_t dev)
 {
-	return (minor(to_kdev_t(dev)));
+	major_t major = ((dev >> 16) & 0x0000ffff);
+	minor_t minor = dev & 0x0000ffff;
+	if (major == 0)
+		minor = MINOR(dev);
+	return (minor);
 }
-__EXTERN_INLINE dev_t makedevice(unsigned char major, unsigned char minor)
+__EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor)
 {
-	return (MKDEV(major, minor));
+	ulong maj = major;
+	ulong min = minor;
+	return ((maj << 16) | min);
 }
 
 typedef void timo_fcn_t (caddr_t arg);

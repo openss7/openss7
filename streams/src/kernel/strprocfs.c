@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:59 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:59 $";
 
 #define __NO_VERSION__
 
@@ -328,7 +328,7 @@ static int get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }, d_flag");
 	len += snprintf(page + len, maxlen - len, ", d_kmod");
 	len += snprintf(page + len, maxlen - len, ", d_count");
-//	len += snprintf(page + len, maxlen - len, ", d_regs");
+//      len += snprintf(page + len, maxlen - len, ", d_regs");
 	len += snprintf(page + len, maxlen - len, ", d_fopp");
 	len += snprintf(page + len, maxlen - len, ", d_mode");
 	len += snprintf(page + len, maxlen - len, ", d_apush { ");
@@ -348,7 +348,7 @@ static int get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", d->d_flag);
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_kmod);
 	len += snprintf(page + len, maxlen - len, ", %hu", atomic_read(&d->d_count));
-//	len += snprintf(page + len, maxlen - len, ", %hu", d->d_regs);
+//      len += snprintf(page + len, maxlen - len, ", %hu", d->d_regs);
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_fop);
 	len += snprintf(page + len, maxlen - len, ", %hu", d->d_mode);
 	len += snprintf(page + len, maxlen - len, ", { ");
@@ -429,7 +429,7 @@ static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, " }, f_flag");
 	len += snprintf(page + len, maxlen - len, ", f_kmod");
 	len += snprintf(page + len, maxlen - len, ", f_count");
-//	len += snprintf(page + len, maxlen - len, ", f_regs");
+//      len += snprintf(page + len, maxlen - len, ", f_regs");
 	return (len);
 }
 static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
@@ -444,7 +444,7 @@ static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", f->f_flag);
 	len += snprintf(page + len, maxlen - len, ", %p", f->f_kmod);
 	len += snprintf(page + len, maxlen - len, ", %hu", atomic_read(&f->f_count));
-//	len += snprintf(page + len, maxlen - len, ", %hu", f->f_regs);
+//      len += snprintf(page + len, maxlen - len, ", %hu", f->f_regs);
       done:
 	return (len);
 }
@@ -537,7 +537,7 @@ static int get_streams_stdata_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_iocblk");
 	len += snprintf(page + len, maxlen - len, ", sd_other");
 	len += snprintf(page + len, maxlen - len, ", sd_strtab");
-	len += snprintf(page + len, maxlen - len, ", sd_inode");
+//      len += snprintf(page + len, maxlen - len, ", sd_inode");
 	len += snprintf(page + len, maxlen - len, ", sd_flag");
 	len += snprintf(page + len, maxlen - len, ", sd_rdopt");
 	len += snprintf(page + len, maxlen - len, ", sd_wropt");
@@ -582,7 +582,7 @@ static int get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_iocblk);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_other);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_strtab);
-	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_inode);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_inode);
 	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_flag);
 	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_rdopt);
 	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_wropt);

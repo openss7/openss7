@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 19:43:13 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 19:43:13 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:59 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/30 19:43:13 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:59 $";
 
 #define __NO_VERSION__
 
@@ -317,4 +317,3 @@ long do_spipe(int *fds)
 	return (err);
 }
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
-

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +80,7 @@ static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.9 $)
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:58 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -268,9 +269,10 @@ static int sad_put(queue_t *q, mblk_t *mp)
 				      sad_gap_state1:
 					sap = (typeof(sap)) dp->b_rptr;
 					err = -ENODEV;
-					if (!(sap = autopush_find(makedevice
-								  (sap->sap_major,
-								   sap->sap_minor))))
+					if (!
+					    (sap =
+					     autopush_find(makedevice
+							   (sap->sap_major, sap->sap_minor))))
 						goto nak;
 					bcopy(sap, dp->b_rptr, sizeof(*sap));
 					mp->b_datap->db_type = M_COPYOUT;
@@ -340,8 +342,8 @@ static int sad_put(queue_t *q, mblk_t *mp)
     character device and a check on open. */
 static int sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
-	unsigned short major = getmajor(*devp);
-	unsigned short minor = getminor(*devp);
+	major_t major = getmajor(*devp);
+	minor_t minor = getminor(*devp);
 	if (q->q_ptr)
 		return (0);	/* already open */
 	switch (sflag) {

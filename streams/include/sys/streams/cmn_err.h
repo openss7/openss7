@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.4 2004/05/04 21:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_CMN_ERR_H__
 #define __SYS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/04 21:36:56 $"
 
 #ifndef __KERNEL__
 #error "Do not include kernel header files in user space programs."
@@ -64,6 +64,6 @@
 #define CE_PANIC    3
 
 extern void vcmn_err(int err_lvl, const char *fmt, va_list args);
-extern void cmn_err(int err_lvl, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+extern void cmn_err(int err_lvl, const char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 
 #endif				/* __SYS_CMN_ERR_H__ */

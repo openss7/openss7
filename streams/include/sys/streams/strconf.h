@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.6 2004/05/03 06:30:17 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.7 2004/05/04 21:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:17 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/03 06:30:17 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/04 21:36:56 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -271,15 +271,15 @@ typedef struct dev_info dev_info_t;
 struct dev_ops {
 	int devo_rev;
 	int devo_refcnt;
-	int (*devo_getinfo)(dev_info_t *dip, ddi_info_cmn_t cmd, void *arg, void **result);
-	int (*devo_identify)(dev_info_t *dip);
-	int (*devo_probe)(dev_info_t *dip);
-	int (*devo_attach)(dev_info_t *dip, ddi_attach_cmn_t cmd);
-	int (*devo_detach)(dev_info_t *dip, ddi_detach_cmn_t cmd);
-	int (*devo_reset)(dev_info_t *dip, ddi_reset_cmn_t cmd);
+	int (*devo_getinfo) (dev_info_t * dip, ddi_info_cmn_t cmd, void *arg, void **result);
+	int (*devo_identify) (dev_info_t * dip);
+	int (*devo_probe) (dev_info_t * dip);
+	int (*devo_attach) (dev_info_t * dip, ddi_attach_cmn_t cmd);
+	int (*devo_detach) (dev_info_t * dip, ddi_detach_cmn_t cmd);
+	int (*devo_reset) (dev_info_t * dip, ddi_reset_cmn_t cmd);
 	struct cb_ops *devo_cb_ops;
 	struct bus_ops *devo_bus_ops;
-	int (*devo_power)(dev_info_t *dip, int component, int level);
+	int (*devo_power) (dev_info_t * dip, int component, int level);
 };
 
 __SUN_EXTERN_INLINE int nodev()
@@ -331,8 +331,8 @@ struct modlstrmod {
 #define MODREV_1 1
 
 struct modlinkage {
-	int ml_rev; /* revision, must be MODREV_1 */
-	void *ml_linkage[4]; /* null terminated array of linkage structures */
+	int ml_rev;			/* revision, must be MODREV_1 */
+	void *ml_linkage[4];		/* null terminated array of linkage structures */
 };
 
 struct modinfo;

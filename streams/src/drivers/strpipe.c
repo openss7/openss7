@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,14 +77,14 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* fort sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strspecfs.h"		/* for spec_open() */
+#include "strspecfs.h"		/* for strm_open() */
 #include "strpipe.h"		/* extern verification */
 
 #include "sys/config.h"
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:58 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -144,7 +145,7 @@ static int pipeopen(struct inode *inode, struct file *file)
 	int err = 0;
 	struct stdata *sd;
 	/* first find out of we already have a stream head, or we need a new one anyway */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
+	if (!(sd = sd_get((struct stdata *) inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
 		/* We only do not have a stream head on initial open of the inode.  This only
 		   occurs in response to a pipe(2) or s_pipe(3) system call */
 		queue_t *q;
@@ -166,8 +167,8 @@ static int pipeopen(struct inode *inode, struct file *file)
 		((struct queinfo *) q)->qu_str = sd;
 		setq(q, pipe_info.st_rdinit, pipe_info.st_wrinit);
 		/* grafting onto inode */
-		sd->sd_inode = inode;	/* real inode */
-		inode->i_pipe = (void *)sd;
+		sd->sd_file = file;	/* real file */
+		inode->i_pipe = (void *) sd;
 		/* done setup, do the open */
 	} else if (test_and_set_bit(STWOPEN_BIT, &sd->sd_flag)) {
 		DECLARE_WAITQUEUE(wait, current);
@@ -244,27 +245,8 @@ static int pipeclose(struct inode *inode, struct file *file)
 	return (-ENOSTR);
 }
 
-struct file_operations pipe_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	llseek:strllseek,
-	read:strread,
-	write:strwrite,
-	poll:strpoll,
-	ioctl:strioctl,
-	mmap:strmmap,
-	open:pipeopen,
-	flush:strflush,
-	release:pipeclose,
-	fasync:strfasync,
-	readv:strreadv,
-	writev:strwritev,
-	sendpage:strsendpage,
-#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
-	getpmsg:strgetpmsg,
-	putpmsg:strputpmsg,
-#endif
-};
-EXPORT_SYMBOL(pipe_f_ops);
+struct file_operations pipe_f_ops ____cacheline_aligned;
+EXPORT_SYMBOL_GPL(pipe_f_ops);
 
 static int pipe_rput(queue_t *q, mblk_t *mp)
 {
@@ -357,15 +339,15 @@ static struct streamtab pipe_info = {
 static int open_pipe(struct inode *inode, struct file *file)
 {
 	struct str_args args = {
-	      file:file,
-	      dev:makedevice(major, 0),
-	      oflag:make_oflag(file),
-	      sflag:CLONEOPEN,
-	      crp:current_creds,
-	      name:{args.buf, 0, 0},
+		file:file,
+		dev:makedevice(major, 0),
+		oflag:make_oflag(file),
+		sflag:CLONEOPEN,
+		crp:current_creds,
+		name:{args.buf, 0, 0},
 	};
 	file->f_op = &pipe_f_ops;	/* fops_get already done */
-	return spec_open(inode, file, &args);
+	return strm_open(inode, file, &args);
 }
 
 static struct file_operations pipe_ops ____cacheline_aligned = {
@@ -390,6 +372,11 @@ static int __init pipe_init(void)
 #else
 	printk(KERN_INFO PIPE_SPLASH);
 #endif
+	pipe_f_ops = strm_f_ops;
+	pipe_f_ops.owner = THIS_MODULE;
+	pipe_f_ops.open = pipeopen;
+	pipe_f_ops.release = pipeclose;
+
 	if ((err = register_strdrv(&pipe_cdev)) < 0)
 		return (err);
 	if ((err = register_cmajor(&pipe_cdev, major, &pipe_ops)) < 0) {

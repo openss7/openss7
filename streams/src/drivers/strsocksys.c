@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $
+ @(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $"
+#ident "@(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $"
 
-static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $";
+static char const ident[] =
+    "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,12 +75,12 @@ static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9
 #include <tihdr.h>
 
 #include "strdebug.h"
-//#include "strsocksys.h"		/* extern verification */
+//#include "strsocksys.h"               /* extern verification */
 #include "strreg.h"
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/03 06:30:20 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/04 21:36:58 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/04 21:36:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/04 21:36:59 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/04 21:36:59 $";
 
 #define __NO_VERSION__
 
@@ -426,6 +426,27 @@ STATIC struct devinfo *__devi_lookup_locked(struct cdevsw *cdev, major_t major)
 	return (devi);
 }
 
+/*
+ *  __node_lookup_locked: - look up devnode by device a minor device number
+ *  @cdev:	cdevsw structure for the driver
+ *  @minor:	minor device number to look up
+ */
+STATIC struct devnode *__node_lookup_locked(const struct cdevsw *cdev, minor_t minor)
+{
+	struct devnode *node = NULL;
+	if (cdev && cdev->d_nodes.next) {
+		struct list_head *pos;
+		list_for_each(pos, &cdev->d_nodes) {
+			struct devnode *n = list_entry(pos, struct devnode, n_list);
+			if (n->n_minor == minor) {
+				node = n;
+				break;
+			}
+		}
+	}
+	return (node);
+}
+
 /**
  *  cdev_lookup: - look up a cdev by major device number in cdev hashes
  *  @major: major device number to look up
@@ -480,6 +501,20 @@ STATIC struct devinfo *devi_lookup(struct cdevsw *cdev, major_t major)
 	devi = __devi_lookup_locked(cdev, major);
 	read_unlock(&cdevsw_lock);
 	return (devi);
+}
+
+/**
+ *  node_lookup: - look up a devnode by device and minor device number
+ *  @cdev:	cdevsw structure for the driver
+ *  @minor:	minor device number to look up
+ */
+STATIC struct devnode *node_lookup(const struct cdevsw *cdev, minor_t minor)
+{
+	struct devnode *node;
+	read_lock(&cdevsw_lock);
+	node = __node_lookup_locked(cdev, minor);
+	read_unlock(&cdevsw_lock);
+	return (node);
 }
 
 /**
@@ -623,13 +658,31 @@ struct cdevsw *cdev_get(major_t major)
 }
 
 /**
- *  cdev_put: - put a reference to a STREAMS device
- *  @sdev: STREAMS device structure pointer to put
+ *  cdev_put:	- put a reference to a STREAMS device
+ *  @cdev:	STREAMS device structure pointer to put
  */
-void cdev_put(struct cdevsw *sdev)
+void cdev_put(struct cdevsw *cdev)
 {
-	if (sdev)
-		__MOD_DEC_USE_COUNT(sdev->d_kmod);
+	if (cdev)
+		__MOD_DEC_USE_COUNT(cdev->d_kmod);
+}
+
+/**
+ *  cdrv_get:	- get a reference to a STREAMS driver
+ *  @modid:	module id number of the STREAMS driver
+ */
+struct cdevsw *cdrv_get(modID_t modid)
+{
+	return cdrv_lookup(modid, !in_interrupt());
+}
+
+/**
+ *  cdrv_put:	- put a reference to a STREAMS driver
+ *  @cdev:	STREAMS driver structure pointer to put
+ */
+void cdrv_put(struct cdevsw *cdev)
+{
+	cdev_put(cdev);
 }
 
 /**
@@ -653,6 +706,16 @@ void fmod_put(struct fmodsw *smod)
 {
 	if (smod)
 		__MOD_DEC_USE_COUNT(smod->f_kmod);
+}
+
+/**
+ *  node_get: - get a reference to a minor device node (devnode)
+ *  @cdev:	cdevsw structure for device
+ *  @minor:	minor device number
+ */
+struct devnode *node_get(const struct cdevsw *cdev, minor_t minor)
+{
+	return node_lookup(cdev, minor);
 }
 
 /**
@@ -693,6 +756,80 @@ struct devnode *node_find(const struct cdevsw *cdev, const char *name)
 {
 	return node_search(cdev, name);
 }
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for character based streams, fifos and pipes.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ *  cdev_open: - open a character special device node
+ *  @inode: the character device inode
+ *  @file: the user file pointer
+ *
+ *  cdev_open() is only used to open a stream from a character device node in an external
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
+ *  sdev_open() in strspecfs.c).  It is also not used for direct opens of fifos, pipes or sockets.
+ *  Those devices provide their own file operations to the main operating system.  The character
+ *  device number from the inode is used to determine the shadow special file system (internal)
+ *  inode and chain the open call.
+ *
+ *  This is the separation point where we convert the external device number to an internal device
+ *  number.  The external device number is contained in inode->i_rdev.
+ */
+STATIC int cdev_open(struct inode *inode, struct file *file)
+{
+	struct str_args args;
+	struct cdevsw *cdev;
+	major_t major;
+	minor_t minor;
+	switch (inode->i_mode & S_IFMT) {
+	case S_IFCHR:
+		major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+		if (!(cdev = cdev_get(major)))
+			return (-ENXIO);
+		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		break;
+	case S_IFIFO:
+		if (!(cdev = cdev_find("fifo")))
+			return (-ENXIO);
+		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		minor = 0;
+		break;
+	case S_IFSOCK:
+		if (!(cdev = cdev_find("sock")))
+			return (-ENXIO);
+		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		minor = 0;
+		break;
+	default:
+		return (-EIO);
+	}
+	if (!cdev->d_fop || !cdev->d_fop->open) {
+		cdev_put(cdev);
+		return (-EIO);
+	}
+	args.inode = inode;
+	args.file = file;
+	args.dev = makedevice(major, minor);
+	args.name.name = args.buf;
+	args.name.len = snprintf(args.buf, sizeof(args.buf), "%u", args.dev);
+	args.name.hash = args.dev;
+	args.oflag = make_oflag(file);
+	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+	args.crp = current_creds;
+	cdev_put(cdev);
+	return strm_open(inode, file, &args);
+}
+
+STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
+	owner:THIS_MODULE,
+	open:cdev_open,
+};
 
 /* 
  *  -------------------------------------------------------------------------
@@ -980,6 +1117,98 @@ int unregister_cmajor(struct cdevsw *cdev, major_t major)
 	write_lock(&cdevsw_lock);
 	ret = __unregister_major_locked(major, cdev);
 	write_unlock(&cdevsw_lock);
+	return (ret);
+}
+
+/**
+ *  register_strdev: - register a STREAMS device against a device major number
+ *  @cdev: STREAMS character device structure to register
+ *  @major: requested major device number or 0 for automatic major selection
+ *
+ *  register_strdev() registers the device specified by the @cdev to the device major number
+ *  specified by @major.
+ *
+ *  register_strdev() will register the STREAMS character device specified by @cdev against the
+ *  major device number @major.  If the major device number is zero, then it requests that
+ *  register_strdev() allocate an available major device number and assign it to @cdev.
+ *
+ *  Context: register_strdev() is intended to be called from kernel __init() or module_init()
+ *  routines only.  It cannot be called from in_irq() level.
+ *
+ *  Return Values: Upon success, register_strdev() will return the requested or assigned major
+ *  device number as a positive integer value.  Upon failure, the registration is denied and a
+ *  negative error number is returned.
+ *
+ *  Errors: Upon failure, register_strdev() returns on of the negative error numbers listed below.
+ *
+ *  -[%ENOMEM]	insufficient memory was available to complete the request.
+ *
+ *  -[%EINVAL]	@cdev was NULL
+ *
+ *  -[%EBUSY]	a device was already registered against the requested major device number, or no
+ *	        device numbers were available for automatic major device number assignment.
+ *
+ *  Notes: Linux Fast-STREAMS provides improvements over LiS.
+ *
+ *  LfS uses a small hash instead of a cdevsw[] table and requires that the driver (statically)
+ *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
+ *  cb_ops.
+ */
+int register_strdev(struct cdevsw *cdev, major_t major)
+{
+	int err;
+	if (!cdev)
+		return (-EINVAL);
+	if ((err = register_strdrv(cdev)) < 0)
+		return (err);
+	if (!cdev->d_fop)
+		cdev->d_fop = &strm_f_ops;
+	cdev->d_mode = (cdev->d_mode & S_IFMT) | S_IFCHR;
+	if ((err = register_cmajor(cdev, major, &cdev_f_ops)) < 0) {
+		unregister_strdrv(cdev);
+		return (err);
+	}
+	return (err);
+}
+
+/**
+ *  unregister_strdev: - unregister previously registered STREAMS device
+ *  @cdev: STREAMS character device structure to unregister
+ *  @major: major device number to unregister or 0 for all majors
+ *
+ *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
+ *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
+ *  getminor(@dev) component must be coded zero (0).
+ *
+ *  unregister_strdev() will unregister the STREAMS character device specified by @cdev from the
+ *  major device number in getmajor(@dev).  If the major device number is zero, then it requests
+ *  that unregister_strdev() unregister @cdev from any device majors with which it is currently
+ *  registered.
+ *
+ *  Context: unregister_strdev() is intended to be called from kernel __exit() or module_exit()
+ *  routines only.  It cannot be called from in_irq() level.
+ *
+ *  Return Values: Upon success, unregister_strdev() will return zero (0).  Upon failure, the
+ *  deregistration is denied and a negative error number is returned.
+ *
+ *  Errors: Upon failure, unregister_strdev() returns one of the negative error numbers listed
+ *  below.
+ *
+ *  -[%ENXIO]	The specified device does not exist in the registration tables.
+ *
+ *  -[%EINVAL]	@cdev is NULL, or the @d_name component associated with @cdev has changed since
+ *              registration.
+ *
+ *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
+ *		and permission is therefore denied.
+ */
+int unregister_strdev(struct cdevsw *cdev, major_t major)
+{
+	int err, ret = 0;
+	if ((err = unregister_cmajor(cdev, major)) < 0)
+		ret = err;
+	if ((err = unregister_strdrv(cdev)) < 0 && ret == 0)
+		ret = err;
 	return (ret);
 }
 

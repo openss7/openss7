@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/04 21:37:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/04 21:37:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/04 21:37:00 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/04 21:37:00 $";
 
 #define __NO_VERSION__
 
@@ -254,77 +254,226 @@ void file_swap_put(struct file *f1, struct file *f2)
 	fput(f2);
 }
 
-STATIC struct dentry *dentry_lookup(struct cdevsw *cdev)
+/*
+ *  dentry_open2: - simplified form of dentry_open()
+ *  @dentry:	    the dentry to open
+ *  @mnt:	    the vfsmount to open
+ *  @cdev:	    the STREAMS device entry
+ *  @argp:	    pointer to arguments
+ */
+STATIC struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, int flags,
+				 struct cdevsw *cdev, struct str_args *argp)
 {
-	struct dentry *dentry = NULL;
-	if (cdev && !(dentry = cdev->d_dentry)) {
-		char buf[FMNAMESZ + 1];
-		struct qstr name = { name:buf, len:sizeof(buf), };
-		if ((name.len = snprintf(buf, sizeof(buf), cdev->d_name)) > FMNAMESZ)
-			name.len = FMNAMESZ;
-		if ((dentry = lookup_hash(&name, specfs_mnt->mnt_root))) {
-			if (IS_ERR(dentry)) {
-				dentry = NULL;
-			} else if (!dentry->d_inode || is_bad_inode(dentry->d_inode)) {
-				dput(dentry);
-				dentry = NULL;
-			}
-		}
-	}
-	return (dget(dentry));
+	static LIST_HEAD(kill_list);
+	struct inode *inode = dentry->d_inode;
+	struct file *file;
+	int err;
+	err = -ENFILE;
+	if (!(file = get_empty_filp()))
+		goto dput_error;
+	file->f_flags = flags;
+	file->f_mode = (flags + 1) & O_ACCMODE;
+	file->f_dentry = dentry;
+	file->f_vfsmnt = mnt;
+	file->f_pos = 0;
+	file->f_reada = 0;
+	file->f_op = fops_get(cdev->d_fop);
+	file_move(file, &inode->i_sb->s_files);
+	file->f_iobuf = NULL;
+	file->f_iobuf_lock = 0;
+	if (file->f_op && file->f_op->open && (err = file->f_op->open(inode, file)))
+		goto error;
+	file->f_flags &= ~(O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC);
+	return (file);
+      error:
+	fops_put(file->f_op);
+	file_move(file, &kill_list);	/* out of the way.. */
+	file->f_dentry = NULL;
+	file->f_vfsmnt = NULL;
+	put_filp(file);
+      dput_error:
+	dput(dentry);
+	mntput(mnt);
+	return ERR_PTR(err);
 }
 
 /**
- *  spec_open: - open a stream from an external character special device, fifo, or socket.
+ *  strm_open: - open a stream from an external character special device, fifo, or socket.
  *  @ext_inode:	external filesystem inode
  *  @ext_file:	external filesystem file pointer (user file pointer)
  *  @args:	arguments to qopen
  */
-int spec_open(struct inode *ext_inode, struct file *ext_file, struct str_args *argp)
+int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *argp)
 {
-	struct dentry *dentry;
+	struct dentry *parent, *dentry = NULL;
 	struct file *file;		/* next file pointer to use */
-	struct inode *inode;		/* next inode to use */
+	struct inode *inode = ext_inode;		/* next inode to use */
 	int err;
 	struct cdevsw *cdev;
-	if ((err = down_interruptible(&ext_inode->i_sem)) < 0)
+	struct devnode *node;
+	if ((err = down_interruptible(&inode->i_sem)) < 0)
 		goto exit;
 	err = ENOENT;
-	if (!(cdev = cdev_get(getmajor(argp->dev))))
+	if (!(cdev = cdrv_get(getmajor(argp->dev))))
 		goto up_exit;
-	if (!(dentry = dentry_lookup(cdev)))
-		goto up_exit;
-	argp->name.len = snprintf(argp->buf, sizeof(argp->buf), "%u", getminor(argp->dev));
-	argp->name.hash = (cdev->d_str->st_rdinit->qi_minfo->mi_idnum << 16) | getminor(argp->dev);
-	dentry = lookup_hash(&argp->name, specfs_mnt->mnt_root);
-	cdev_put(cdev);
+	argp->name.name = cdev->d_name;
+	argp->name.len = strnlen(cdev->d_name, FMNAMESZ);
+	argp->name.hash = getmajor(argp->dev);
+	parent = lookup_hash(&argp->name, specfs_mnt->mnt_root);
+	if (!parent)
+		goto cput_exit;
+	if ((err = PTR_ERR(parent)) < 0)
+		goto cput_exit;
+	err = -ENOMEM;
+	if (!parent->d_inode)
+		goto pput_exit;
+	err = -ENODEV;
+	if (is_bad_inode(parent->d_inode))
+		goto pput_exit;
+	up(&inode->i_sem);
+	inode = parent->d_inode;
+	if ((err = down_interruptible(&inode->i_sem)) < 0) {
+		inode = NULL;
+		goto pput_exit;
+	}
+	if ((node = node_get(cdev, getminor(argp->dev)))) {
+		argp->name.name = node->n_name;
+		argp->name.len = strnlen(node->n_name, FMNAMESZ);
+		argp->name.hash = argp->dev;
+	} else {
+		argp->name.name = argp->buf;
+		argp->name.len = snprintf(argp->buf, sizeof(argp->buf), "%u", getminor(argp->dev));
+		argp->name.hash = argp->dev;
+	}
+	dentry = lookup_hash(&argp->name, parent);
+	if (!dentry)
+		goto pput_exit;
 	if ((err = PTR_ERR(dentry)) < 0)
-		goto up_exit;
+		goto pput_exit;
 	/* we only fail to get an inode when memory allocation fails */
 	err = -ENOMEM;
-	if (!(inode = dentry->d_inode))
+	if (!dentry->d_inode)
 		goto dput_exit;
 	/* we only get a bad inode when there is no device entry */
 	err = -ENODEV;
-	if (is_bad_inode(inode))
+	if (is_bad_inode(dentry->d_inode))
 		goto dput_exit;
-	dentry->d_fsdata = argp;	/* this is how we pass open arguments */
-	file = dentry_open(dentry, specfs_mnt, ext_file->f_flags);
+	up(&inode->i_sem);
+	inode = NULL;
+	file = dentry_open2(dentry, specfs_mnt, ext_file->f_flags, cdev, argp);
 	if ((err = PTR_ERR(file)) < 0)
-		goto up_exit;
+		goto dput_exit;
 	if (err == 0) {
 		file_swap_put(ext_file, file);
-		goto up_exit;
+		goto cput_exit;
 	}
 	/* fifo returns 1 on exit to cleanup shadow pointer and use existing file pointer */
 	err = 0;
       dput_exit:
 	dput(dentry);
+      pput_exit:
+	dput(parent);
+      cput_exit:
+	cdrv_put(cdev);
       up_exit:
-	up(&ext_inode->i_sem);
+	if (inode)
+		up(&inode->i_sem);
       exit:
 	return (err);
 }
+
+/**
+ *  spec_open: - open a stream from an external character special device, fifo, or socket.
+ *  @inode: external filesystem inode
+ *  @file:  external filesystem file pointer (user file pointer)
+ */
+int spec_open(struct inode *inode, struct file *file)
+{
+	struct cdevsw *cdev;
+	major_t major;
+	minor_t minor;
+	struct str_args args = {
+		.inode = inode,
+		.file = file,
+		.oflag = make_oflag(file),
+		.sflag = DRVOPEN,
+		.crp = current_creds,
+	};
+	int err;
+	switch (inode->i_mode & ~S_IFMT) {
+	case S_IFCHR:
+		if (!(cdev = cdev_get(MAJOR(kdev_t_to_nr(inode->i_rdev)))))
+			return (-ENXIO);
+		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+		break;
+	case S_IFIFO:
+		if (!(cdev = cdev_find("fifo")))
+			return (-ENXIO);
+		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		minor = 0;
+		break;
+	case S_IFSOCK:
+		if (!(cdev = cdev_find("sock")))
+			return (-ENXIO);
+		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		minor = 0;
+		break;
+	default:
+		return (-ENODEV);
+	}
+	args.dev = makedevice(major, minor);
+	args.name.name = args.buf;
+	args.name.len = snprintf(args.buf, sizeof(args.buf), "%u", args.dev);
+	args.name.hash = args.dev;
+	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+	err = strm_open(inode, file, &args);
+	cdev_put(cdev);
+	return (err);
+}
+
+struct file_operations spec_f_ops = {
+	owner:THIS_MODULE,
+	open:&spec_open,
+};
+
+/**
+ *  spec_dev_open: - open a stream from an internal character special device, fifo or socket
+ *  @inode:	internal shadown special filesystem inode
+ *  @file:	file pointer (user file pointer)
+ *
+ *  This open procedure is only called from spec_dev_f_ops directly attached to a shadow special
+ *  filesystem device inode.  Entering spec_dev_open() means that a direct open of the internal
+ *  shadow special filesystem has been performed on the mounted filesystem.  We need to establish
+ *  our streams arguments and nest into the devices open procedure.
+ */
+STATIC int spec_dev_open(struct inode *inode, struct file *file)
+{
+	struct str_args args;
+	struct cdevsw *cdev;
+	if (!(cdev = file->f_dentry->d_parent->d_inode->u.generic_ip))
+		return (-ENOENT);
+	args.inode = inode;
+	args.file = file;
+	args.dev = inode->i_ino;
+	args.name.name = file->f_dentry->d_name.name;
+	args.name.len = file->f_dentry->d_name.len;
+	args.name.hash = file->f_dentry->d_name.hash;
+	args.oflag = make_oflag(file);
+	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+	args.crp = current_creds;
+	fops_put(xchg(&file->f_op, fops_get(cdev->d_fop)));
+	cdev_put(cdev);
+	if (!file->f_op || !file->f_op->open)
+		return (-EIO);
+	file->private_data = &args;
+	return file->f_op->open(inode, file);
+}
+
+STATIC struct file_operations spec_dev_f_ops = {
+	owner:THIS_MODULE,
+	open:&spec_dev_open,
+};
 
 #if 0
 /**
@@ -346,7 +495,7 @@ int nest_open(struct inode *old_inode, struct file *old_file, struct str_args *a
 	argp->name.len = 0;
 	argp->name.hash = argp->dev;
 	dentry = lookup_hash(&argp->name, specfs_mnt->mnt_root);
-	cdev_put(cdev);
+	cdrv_put(cdev);
 	if ((err = PTR_ERR(dentry)) < 0)
 		goto exit;
 	err = -ENOMEM;		/* we only fail to get an inode when memory allocation fails */
@@ -402,7 +551,9 @@ static struct dentry *spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 	if ((cdev = dir->u.generic_ip)) {
 		struct devnode *node;
 		const char *name = new->d_name.name;
-		ulong modid = (new->d_name.hash & 0xffff0000) ? cdev->d_str->st_rdinit->qi_minfo->mi_idnum : 0;
+		ulong modid =
+		    (new->d_name.hash & 0xffff0000) ? cdev->d_str->st_rdinit->qi_minfo->
+		    mi_idnum : 0;
 		/* if the name length is zero, the hash *is* the inode number */
 		if (new->d_name.len == 0) {
 			struct inode *inode;
@@ -534,7 +685,9 @@ static int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 		/* walk the active stream head list */
 		list_for_each_safe(pos, tmp, &cdev->d_stlist) {
 			struct stdata *sd = list_entry(pos, struct stdata, sd_list);
-			if (!(dentry = sd->sd_dentry) || !(inode = dentry->d_inode))
+			struct file *file;
+			if (!(file = sd->sd_file) || !(dentry = file->f_dentry)
+			    || !(inode = dentry->d_inode))
 				continue;
 			err = filldir(dirent, dentry->d_name.name, dentry->d_name.len, file->f_pos,
 				      inode->i_ino, inode->i_mode >> 12);
@@ -551,6 +704,7 @@ static int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 }
 
 static struct file_operations spec_dir_f_ops = {
+	owner:THIS_MODULE,
 	read:generic_read_dir,
 	readdir:spec_dir_readdir,
 };
@@ -721,6 +875,7 @@ static int spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 }
 
 struct file_operations spec_root_f_ops = {
+	owner:THIS_MODULE,
 	read:generic_read_dir,
 	readdir:spec_root_readdir,
 };
@@ -960,22 +1115,23 @@ static int spec_parse_options(char *options, struct spec_sb_info *sbi)
 static void spec_read_inode(struct inode *inode)
 {
 	modID_t modid;
-	struct cdevsw *sdev;
+	struct cdevsw *cdev;
 	dev_t dev;
 	if ((modid = (inode->i_ino >> 16) & 0x0000ffff)) {
 		/* For device nodes, the upper 16 bits of the inode number is the module id; the
 		   lower 16 bits of the inode number is the device instance. */
-		if ((sdev = (struct cdevsw *) fmod_get(modid))) {
+		if ((cdev = (struct cdevsw *) fmod_get(modid))) {
 			struct spec_sb_info *sbi;
-			dev = makedevice(sdev->d_major, inode->i_ino & 0x0000ffff);
+			dev = MKDEV(getmajor(inode->i_ino) + MAJOR(getminor(inode->i_ino)),
+				    MINOR(getminor(inode->i_ino)));
 			/* initialize specfs specific fields */
 			sbi = inode->i_sb->u.generic_sbp;
 			inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
 			inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
 			inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
-			inode->u.generic_ip = sdev;
-			inode->i_mode = sdev->d_mode | sbi->sbi_mode;
-			inode->i_fop = fops_get(sdev->d_fop);
+			inode->u.generic_ip = cdev;
+			inode->i_mode = cdev->d_mode | sbi->sbi_mode;
+			inode->i_fop = fops_get(&spec_dev_f_ops);
 			inode->i_rdev = to_kdev_t(dev);
 			inode->i_cdev = cdget(dev);
 			insert_inode_hash(inode);
@@ -986,14 +1142,14 @@ static void spec_read_inode(struct inode *inode)
 		   this is a module node; the lower 16 bits is the module id. */
 		if ((modid = inode->i_ino & 0x0000ffff)) {
 			dev = NODEV;
-			if ((sdev = (struct cdevsw *) fmod_get(modid))) {
+			if ((cdev = (struct cdevsw *) fmod_get(modid))) {
 				/* initialize specfs specific fields */
 				struct spec_sb_info *sbi;
 				sbi = inode->i_sb->u.generic_sbp;
 				inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
 				inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
 				inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
-				inode->u.generic_ip = sdev;
+				inode->u.generic_ip = cdev;
 				inode->i_mode = S_IFDIR | sbi->sbi_mode;
 				inode->i_op = &spec_dir_i_ops;
 				inode->i_fop = fops_get(&spec_dir_f_ops);
@@ -1044,7 +1200,7 @@ static void spec_delete_inode(struct inode *inode)
 	switch (inode->i_mode & S_IFMT) {
 		struct fmodsw *fmod;
 		struct devnode *node;
-		struct stdata *sd;
+//              struct stdata *sd;
 	case S_IFDIR:
 		/* directory inodes potentially have a cdevsw or fmodsw structure hanging off of
 		   the u.generic_ip pointer, these are for sanity checks only. When we referemce
@@ -1083,6 +1239,7 @@ static void spec_delete_inode(struct inode *inode)
 		/* When we referemce the inode from the stdata structure, we hold a reference count 
 		   on the inode.  We should never get here with the the sd_inode reference still
 		   held.  Forced deletions might get us here anyway. */
+#if 0
 		if ((sd = (struct stdata *) inode->i_pipe)) {
 			swerr();
 			do {
@@ -1093,6 +1250,7 @@ static void spec_delete_inode(struct inode *inode)
 			}
 			while ((sd = (struct stdata *) inode->i_pipe));
 		}
+#endif
 		break;
 	}
 	clear_inode(inode);	/* we must call clear_inode when we take this hook */
