@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.15 2004/05/22 10:22:05 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.16 2004/05/23 04:18:07 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/22 10:22:05 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/23 04:18:07 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.15 2004/05/22 10:22:05 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.16 2004/05/23 04:18:07 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
@@ -78,12 +78,15 @@ auxdir="$ac_aux_dir"
 AC_SUBST(auxdir)
 
 AC_CANONICAL_TARGET
+
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 
 AC_GNU_SOURCE
 
+#
 # Checks for programs.
+#
 AM_PROG_AS
 AC_PROG_AWK
 AC_PROG_CXX
@@ -92,6 +95,8 @@ AC_PROG_CPP
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
+AC_ARG_VAR([LD], [Linker loader command])
+AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_YACC
@@ -99,19 +104,25 @@ AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION(0.14.1)
 
+#
 # Checks for libraries.
+#
 lfs_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
 LIBS="$lfs_save_LIBS"
 
+#
 # Checks for header files.
+#
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h termios.h unistd.h values.h wchar.h])
 
+#
 # Checks for typedefs, structures, and compiler characteristics.
+#
 AC_HEADER_STAT
 AC_HEADER_STDBOOL
 AC_C_CONST
@@ -129,19 +140,21 @@ AC_STRUCT_TM
 AC_C_VOLATILE
 AC_CHECK_TYPES([ptrdiff_t])
 
+#
 # Checks for library functions.
+#
 AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
-if test :"${cross_compiling-no}" != :yes ; then : AC_FUNC_FORK fi
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_LSTAT
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-if test :"${cross_compiling-no}" != :yes ; then : AC_FUNC_MALLOC fi
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_FUNC_SELECT_ARGTYPES
-if test :"${cross_compiling-no}" != :yes ; then : AC_FUNC_SETPGRP fi
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRNLEN
