@@ -31,7 +31,7 @@
 #define	 DLPI_H		1
 #define	 LIS_DLPI_H	1		/* unique to this version of dlpi.h */
 
-#ident "@(#) LiS dlpi.h 1.10 7/24/01"
+#ident "@(#) LiS dlpi.h 1.11 9/18/03"
 
 /************************************************************************
 *                           Reference                                   *
@@ -1130,7 +1130,7 @@ union DL_primitives
  * Service class values for acknowledged connectionless data transfer
  */
 #define DL_RQST_RSP	0x01	/* Use acknowldege capability in MAC sublayer */
-#define DL_RQST_NORSP	0x01	/* No acknowldegement services requested */
+#define DL_RQST_NORSP	0x02	/* No acknowldegement services requested */
 
 
 
