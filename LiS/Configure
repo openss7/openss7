@@ -1,0 +1,1633 @@
+#!/bin/bash
+
+Configure_version="2.56 3/10/03"
+
+if [ "$1" = "invoked from main makefile" ]; then
+    MAKE_INVOKED=1
+    shift
+else
+    MAKE_INVOKED=0
+fi
+
+CONFIG=${1:-config.in}
+
+#
+# agument parsing
+#
+arg1()
+{
+    printf "%s" $1
+}
+arg2()
+{
+    printf "%s" $2
+}
+arg3()
+{
+    printf "%s" $3
+}
+arg4()
+{
+    printf "%s" $4
+}
+arg5()
+{
+    printf "%s" $5
+}
+
+#
+# do_readstring  - Ask for a string
+#
+# Inputs:
+# 	PROMPT has the string to prompt the user with.
+#	DEFAULT is the default response to use for empty input
+# Outputs:
+#	RESULT has the response from the user
+#
+do_readstring()
+{
+    while true; do
+	echo -en "\n$PROMPT "
+	if [ "$DEFAULT..." != "..." ]; then
+	    echo -n "[default: $DEFAULT] "
+	fi
+
+	read RESULT
+
+	if [ "$RESULT..." != "..." ]; then
+	    return
+	else
+	    if [ "$DEFAULT..." != "..." ]; then
+		RESULT=$DEFAULT
+	        return
+	    fi
+	fi
+    done
+}
+
+#
+# Write a message to the user and get a CR to continue
+#
+do_confirm()
+{
+    PROMPT="$1"
+    if [ "$1..." != "..." ]; then
+	PROMPT="$PROMPT  "
+    fi
+    PROMPT="${PROMPT}Press Enter to continue... "
+    echo -en "\n$PROMPT"
+    read DISCARD
+}
+
+#
+# do_read_dir  - Ask for name of an existing directory
+#
+# Inputs:
+# 	PROMPT has the string to prompt the user with.
+#	DEFAULT is the default response to use for empty input
+# Outputs:
+#	RESULT has the response from the user
+#
+do_read_dir()
+{
+    n=4
+    while :; do
+	do_readstring
+	if [ -d $RESULT ]; then
+	    return 0
+	fi
+	n=`expr $n - 1`
+	if [ $n -eq 0 ]; then
+	    return 1
+	fi
+    done
+}
+
+#
+# do_read_choice  - Ask for a choice
+#
+# Inputs:
+# 	PROMPT has the string to prompt the user with.
+#	RESPONSE has the responses that are valid
+#	DEFAULT is the default response to use for empty input
+# Outputs:
+#	RESULT has the response from the user
+#
+do_read_choice()
+{
+    # Check that we have valid responses and default
+    if [ "$RESPONSE..." = "..." ]; then
+	echo "Internal error."
+	exit 1;
+    fi
+    local VALID_DEFAULT=0
+    for i in $RESPONSE; do
+        if [ "$ALTERNATE_DEFAULT..." = "..." ]; then
+	    local ALTERNATE_DEFAULT=$i
+	fi
+        if [ "$i" = "$DEFAULT" ]; then
+    	    local VALID_DEFAULT=1
+	    break
+        fi
+    done
+    if [ "$VALID_DEFAULT" = "0" ]; then
+	DEFAULT=
+    fi
+    if [ "$DEFAULT..." = "..." ]; then
+	DEFAULT=$ALTERNATE_DEFAULT
+    fi
+
+    while :; do
+	do_readstring
+	for i in $RESPONSE; do
+	    if [ "$i" = "$RESULT" ]; then
+		return
+	    fi
+	done
+	echo "Unexpected response"
+    done
+}
+
+#
+# default_ksrc
+#
+# Figure out a good default for kernel source directory
+# Do not retain any "../" isms in the path name.
+#
+default_ksrc()
+{
+    ksrc=/lib/modules/`uname -r`/build
+    if [ -L $ksrc ]; then
+	ksrc=`ls -l $ksrc | sed -e 's/^.*-> //' -e 's/\.\.\//\//g'`
+        if [ -d "$ksrc" -o -L "$ksrc" ]; then
+	    echo $ksrc
+	else
+	    echo "Unknown"
+	fi
+    elif [ -d /usr/src/linux -o -L /usr/src/linux ]; then
+        echo "/usr/src/linux"
+    else
+        echo "Unknown"
+    fi
+}
+
+#
+# check_ksrc
+#
+# Check to see if the directory $KSRC is present.  If it is set to
+# /usr/src/linux and that directory is not present then feel around
+# a bit for a substitute to which a symbolic link can be constructed.
+#
+check_ksrc()
+{
+    if [ -d $KSRC ]; then
+	return 0				# present
+    fi
+
+    if [ -L $KSRC ]; then
+	return 0			# symbolic link, presume present
+    fi
+
+    if [ "$KSRC" != "/usr/src/linux" ]; then
+	return 1				# not present
+    fi
+
+    #
+    # pick up version string.  It might be like "2.4.2" or it
+    # might be like "2.4.2-21smp".
+    #
+    vers=`cat /proc/version`
+    vers=`arg3 $vers`
+    trunc_vers=`echo $vers | sed -e 's/-.*//'`
+    num_vers=`echo $vers | sed -e 's/[a-zA-Z][a-zA-Z]*//'`
+    if [ -d /usr/src/$vers ]; then
+	KSRC=/usr/src/$vers
+    elif [ -d /usr/src/linux-$vers ]; then
+	KSRC=/usr/src/linux-$vers
+    elif [ -d /usr/src/linux$trunc_vers ]; then
+	KSRC=/usr/src/linux$trunc_vers
+    elif [ -d /usr/src/linux-$trunc_vers ]; then
+	KSRC=/usr/src/linux-$trunc_vers
+    elif [ -d /usr/src/linux$num_vers ]; then
+	KSRC=/usr/src/linux$num_vers
+    elif [ -d /usr/src/linux-$num_vers ]; then
+	KSRC=/usr/src/linux-$num_vers
+    else
+	return 1				# not present
+    fi
+
+    return 0					# present
+}
+
+#
+# Get config variable from config.h/autoconf.h.  If config.h is not present
+# or does not have the config variable, try the "include/config" 
+# subdirectory.
+#
+# $1 is the name of the variable to find.
+#
+# Return via stdout a "y" if defined or "" if not.
+#
+ac_get_config()
+{
+    if [ -f $KSRC/include/linux/config.h ]; then
+	cc -I$KSRC/include -E -dM \
+		-include $KSRC/include/linux/config.h dummy.c >kconfig
+	x=`grep $1 kconfig 2>&1`
+	if [ $? -eq 0 ]; then			# found it
+	    if expr "$x" : "#define" >/dev/null 2>/dev/null; then
+		echo -n "y"			# option selected
+		return 0			# found
+	    fi
+	    if expr "$x" : "#undef" >/dev/null 2>/dev/null; then
+		return 0			# found, but empty
+	    fi
+	fi
+	#
+	# If autoconf.h is present but our option is not mentioned
+	# in a #define, then it must be in a #undef.  So assume
+	# that the option is "found" but not set.
+	#
+	return 0				# found, but empty
+    fi
+						# no autoconf.h
+    return 1					# not found
+}
+
+#
+# Get config variable from .config
+#
+# $1 is the name of the variable to find, of the form "VAR=y".
+#
+# Return via stdout a "y" if defined or "" if not.
+#
+dc_get_config()
+{
+    x=`grep $1 $KSRC/.config 2>&1`
+    if [ $? -ne 0 ]; then
+	return 1
+    fi
+    echo -n "y"
+    return 0			# found
+}
+
+#
+# Get System.map file name on a Red Hat system
+# 5.2 has one of them in /boot, 6.0 has several with a symbolic
+# link from System.map to the one that is in use.
+#
+# This is only meaningful if the user intends to run LiS on the
+# machine on which he is installing it.  So ask first.
+#
+# Return 0 (true) if found
+#
+rh_get_system_map()
+{
+    if [ "$BEEN_HERE_DONE_THIS..." = "1..." ]; then
+	if [ "$SMAP..." = "..." ]; then
+	    return 1
+	fi
+	return 0
+    fi
+
+    SMAP=
+    PROMPT="\
+Is it your intent to run LiS on the same machine on which\n\
+you are installing it?  Or are you intending to cross compile\n\
+for another machine?\n\
+    y = I am going to run it on this machine\n\
+    n = I am not going to run it on this machine\n\
+Please enter y or n"
+    RESPONSE="y n"
+    DEFAULT=y
+    do_read_choice
+    BEEN_HERE_DONE_THIS=1
+    if [ "$RESULT..." = "n..." ]; then
+	echo
+	echo "You really should load your kernel source and build"
+	echo "your kernel before installing LiS."
+	echo
+	do_confirm
+	return 1
+    fi
+
+    if [ ! -d /boot ]; then
+	return 1
+    fi
+    if [ ! -L /boot/System.map ]; then
+	files=`ls /boot/System.map*`
+	if [ $? -ne 0 ]; then
+	    return 1
+	fi
+	nfiles=0
+	for i in $files; do
+	    nfiles=`expr $nfiles + 1`
+	done
+	if [ $nfiles -ne 1 ]; then	# need just one of them
+	    return 1
+	fi
+
+	SMAP=$i				# save file name
+    else				# it's a symbolic link
+	SMAP=/boot/System.map
+    fi
+    return 0
+}
+
+#
+# Check for places that version.h may be hiding.  Try to establish it
+# in the kernel source tree where it belongs.
+#
+check_kver()
+{
+    #
+    # SuSE 7.2 lacks a version.h in the kernel source tree but has one
+    # in /boot -- presumably paired with the running kernel version.
+    # We will attempt to copy it if it is there and not care whether or
+    # not the copy fails.  If we need a version.h in kernel source and
+    # it isn't there then we will just write a message and terminate the
+    # install.
+    #
+    if [    ! -f $KSRC/include/linux/version.h \
+    	 -a -f /boot/vmlinuz.version.h \
+	 -a -d $KSRC/include/linux \
+       ]
+    then
+	cp /boot/vmlinuz.version.h $KSRC/include/linux/version.h \
+		>/dev/null 2>/dev/null
+    fi
+}
+
+#
+# Figure out kernel version
+# Return the version string in KVER (e.g. 2.2.6)
+#
+get_kver()
+{
+    check_kver
+    if [ -f $KSRC/include/linux/version.h ]; then
+	cc -I$KSRC/include -E -dM \
+	    -include $KSRC/include/linux/version.h dummy.c >kver
+	KVER=`grep UTS_RELEASE kver | \
+	     sed -e 's/^.*UTS_RELEASE.//' -e's/"//g' -e's/  *$//'`
+    elif [ -f $KSRC/vmlinux ]; then
+	KVDEC=`nm -g $KSRC/vmlinux | grep Version_ | sed -e 's/^.*_//'`
+	KMAJ=`expr $KVDEC / 65536`
+	KMIN=`expr $KVDEC / 256`
+	KMIN=`expr $KMIN % 256`
+	KPCH=`expr $KVDEC % 256`
+	KVER="$KMAJ.$KMIN.$KPCH"
+    elif grep -q "Red Hat" /etc/issue && rh_get_system_map; then
+	KVDEC=`grep Version_ $SMAP | sed -e 's/^.*_//'`
+	KMAJ=`expr $KVDEC / 65536`
+	KMIN=`expr $KVDEC / 256`
+	KMIN=`expr $KMIN % 256`
+	KPCH=`expr $KVDEC % 256`
+	KVER="$KMAJ.$KMIN.$KPCH"
+    else
+        echo "The file $KSRC/include/linux/version.h is not present."
+        echo "LiS installation cannot proceed without it.  Please fix"
+        echo "this problem and then try the installation again."
+        exit 1
+    fi
+    # Remove the extra version glarf from the end of kernel version
+    NKVER=`echo $KVER | sed -e 's/-.*//'`
+}
+
+#
+# Red Hat helper for getting SMP info
+#
+# Return 0 (true) if found, 1 (false) if not
+#
+rh_get_smp()
+{
+    if ! grep -q "Red Hat" /etc/issue || ! rh_get_system_map; then
+	return 1
+    fi
+
+    if grep -w -q cpu_online_map $SMAP; then
+	NEED_KSMP=0
+	KSMP=y			# SMP kernel
+    else
+	KSMP=			# non-SMP kernel
+    fi
+    return 0			# got info
+}
+
+#
+# Get SMP or not
+# Return result in KSMP
+#
+get_smp()
+{
+    NEED_KSMP=0				# default is "found"
+    KSMP=`ac_get_config CONFIG_SMP`	# check autoconf.h
+    if [ $? -eq 0 ]; then		# found
+	: OK
+    elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
+	if nm -g $KSRC/vmlinux |grep -w -q cpu_online_map; then
+	    KSMP=y			# SMP kernel
+	else
+	    KSMP=			# non-SMP kernel
+	fi
+    elif [ -f $KSRC/.config ]; then	# kernel .config file?
+	KSMP=`dc_get_config "CONFIG_SMP=y"`
+    else
+	NEED_KSMP=1			# still need the option
+    fi
+
+    if [ "$KSMP..." = "y..." ]; then
+	echo "Kernel support for SMP detected."
+    else
+	echo "No kernel support for SMP detected."
+    fi
+}
+
+#
+# Helper routine for Red Hat systems.  This is invoked when there
+# is no vmlinux available.  If the system is Red Hat we look at the
+# System.map file in /boot for some of our information.
+#
+# Return 0 (true) if found, 1 (false) if not
+#
+rh_get_modules()
+{
+    if ! grep -q "Red Hat" /etc/issue || ! rh_get_system_map; then
+	return 1
+    fi
+
+    if grep -q init_modules $SMAP; then
+	NEED_KMODULES=0
+	KMODULES=y			# Module support
+	if grep -q unregister_chrdev_R /proc/ksyms; then
+	    KMODVERS=y
+	else
+	    KMODVERS=
+	fi
+    else
+	KMODULES=			# No module support
+    fi
+    return 0
+}
+
+#
+# Get Modules or not
+# Return result in KMODULES
+#
+get_modules()
+{
+    NEED_KMODULES=0				# default is "found"
+    KMODULES=`ac_get_config CONFIG_MODULES`	# check autoconf.h
+    if [ $? -eq 0 ]; then		# found
+	KMODVERS=`ac_get_config CONFIG_MODVERSIONS`
+    elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
+	if nm -g $KSRC/vmlinux |grep -w -q init_modules; then
+	    KMODULES=y			# module support
+	    if strings $KSRC/vmlinux |grep -q Using_Versions; then
+		KMODVERS=y
+	    else
+		KMODVERS=
+	    fi
+	else
+	    KMODULES=			# non-module support
+	fi
+    elif [ -f $KSRC/.config ]; then	# kernel .config file?
+	KMODULES=`dc_get_config "CONFIG_MODULES=y"`
+	if [ "$KMODULES..." = "y..." ]; then
+	    KMODVERS=`dc_get_config "CONFIG_MODVERSIONS=y"`
+	fi
+    else
+	NEED_KMODULES=1			# still need the option
+    fi
+
+    if [ "$KMODVERS..." = "y..." ]; then
+	echo "Kernel support for mod-versions detected."
+    else
+	echo "No kernel support for mod-versions detected."
+    fi
+}
+
+#
+# Having dug out the SMP setting from the kernel source info, now
+# verify that the currently running kernel has the same settings.
+#
+smp_error()
+{
+    echo
+    echo "Your kernel source indicates SMP=$XKSMP, but your running"
+    echo "kernel appears to have SMP=$NKSMP.  This is a good indication"
+    echo "that you are not running on the kernel represented"
+    echo "by the kernel source.  Please make the running kernel"
+    echo "the same as the one in kernel source and then install"
+    echo "LiS again."
+    echo
+    do_confirm
+    exit 1
+}
+
+verify_smp()
+{
+    if [ "$KSMP..." = "y..." ]; then		# compute "not" SMP
+	XKSMP=y
+	NKSMP=n
+    else
+	XKSMP=n
+	NKSMP=y
+    fi
+
+    export NKSMP XKSMP
+    if [ ! -f /proc/ksyms ]; then
+	echo
+	echo "The kernel SMP option cannot be verified because there"
+	echo "is no /proc/ksyms present on the system.  If you experience"
+	echo "problems on multi-CPU systems, or unresolved externals"
+	echo "when loading LiS it may be because LiS was compiled with"
+	echo "SMP=$XKSMP while your running kernel has SMP=$NKSMP."
+	echo
+	do_confirm
+	return
+    fi
+
+    if grep -q cpu_online_map /proc/ksyms; then
+	# running kernel has SMP set
+	if [ $XKSMP = "n" ]; then	# kernel source does not
+	    smp_error
+	fi
+    else
+					# running kernel does not have SMP set
+	if [ $XKSMP = "y" -a "$MACHINE..." != "s390..." ]
+	then				# kernel source does
+	    smp_error
+	fi
+    fi
+    echo "SMP option verified between kernel source and running kernel"
+}
+
+#
+# Having dug out the kernel version from the kernel source info, now
+# verify that the currently running kernel has the same settings.
+#
+verify_kver()
+{
+    if [ ! -f /proc/sys/kernel/osrelease ]; then
+	echo
+	echo "The kernel version cannot be verified because there"
+	echo "is no /proc/sys/kernel/osrelease present on the system."
+	echo "Chances are that you will experience some kind of problem in"
+	echo "loading or running LiS.  This problem really should"
+	echo "be rectified before continuing with the installation."
+	echo
+	do_confirm
+	return
+    fi
+
+    PKVER=`cat /proc/sys/kernel/osrelease`
+    NPKVER=`echo $PKVER | sed -e 's/-.*//'`
+    if [ "$NKVER" != "$NPKVER" ]; then
+	echo
+	echo "Your kernel source is for kernel version $NKVER, but"
+	echo "your running kernel is version $NPKVER.  This is a"
+	echo "good indication that you are not running on the kernel"
+	echo "represented by the kernel source.  Please make the"
+	echo "running kernel the same as the one in kernel source and"
+	echo "then install LiS again."
+	echo
+	do_confirm
+	exit 1
+    fi
+    echo "Kernel version verified between kernel source and running kernel"
+}
+
+#
+# Having dug out the mod-versions option from the kernel source info, now
+# verify that the currently running kernel has the same settings.
+#
+modver_error()
+{
+    echo
+    echo "Your kernel source indicates MODVERSIONS=$XKMODVERS, but your running"
+    echo "kernel appears to have MODVERSIONS=$NKMODVERS.  This is a good indication"
+    echo "that you are not running on the kernel represented"
+    echo "by the kernel source."
+    PROMPT="Do you want to continue with the installation anyway? (y/n) "
+    RESPONSE="y n"
+    do_read_choice
+    case $RESULT in
+	y)
+		if [ "$XKMODVERS" = "y" ]; then
+		    return			# modversions.h exists
+		fi
+		if [ ! -f $KSRC/include/linux/modversions.h ]; then
+		    PROMPT="Would you like to try to make modversions.h? (y/n) "
+		    RESPONSE="y n"
+		    do_read_choice
+		    if [ "$RESULT..." = "y..." ]; then
+			(cd $KSRC; make depend)
+			if [ -f $KSRC/include/linux/modversions.h ]; then
+			    echo
+			    echo "Succeeded in making modversions.h."
+			    echo "Installation will proceed."
+			    echo
+			    do_confirm
+			else
+			    echo
+			    echo "Could not make modversions.h."
+			    echo "LiS compilation will fail."
+			    echo "Please make the running kernel the"
+			    echo "same as the one in the kernel source"
+			    echo "and then install LiS again."
+			    echo
+			    do_confirm
+			    exit 1
+			fi
+		    fi
+		fi
+		;;
+	n)
+		echo "Please make the running kernel the same as the one"
+		echo "in the kernel source and then install LiS again."
+		echo
+		do_confirm
+		exit 1
+		;;
+    esac
+}
+
+verify_modver()
+{
+    if [ "$KMODVERS..." = "y..." ]; then		# compute "not" SMP
+	XKMODVERS=y
+	NKMODVERS=n
+    else
+	XKMODVERS=n
+	NKMODVERS=y
+    fi
+
+    export NKMODVERS XKMODVERS
+    if [ ! -f /proc/ksyms ]; then
+	echo
+	echo "The kernel module versions option cannot be verified because"
+	echo "there is no /proc/ksyms present on the system.  If you experience"
+	echo "problems with unresolved externals when loading LiS it may be "
+	echo "because LiS was compiled with mod-versions = \"$XKMODVERS\""
+	echo "while your running kernel has mod-versions = \"$NKMODVERS\""
+	echo
+	do_confirm
+	return
+    fi
+
+    if grep -q schedule_R /proc/ksyms; then
+	# running kernel has mod-versions set
+	NKMODVERS=y
+	if [ $XKMODVERS = "n" ]; then	# kernel source does not
+	    modver_error
+	fi
+    else
+	# running kernel does not have mod-versions set
+	NKMODVERS=n
+	if [ $XKMODVERS = "y" ]; then	# kernel source does
+	    modver_error
+	fi
+    fi
+
+    if [ $NOKSRC -eq 0 ]; then
+	if [ -f $KSRC/include/linux/modversions.h -a \
+	     -f $KSRC/include/linux/modules/ksyms.ver ]; then
+	    # kernel source is set up for mod versions in compiles
+	    XKMODVERS=y
+	    if [ $NKMODVERS = "n" ]; then
+		modver_error
+	    fi
+	elif [ -f $KSRC/include/linux/modversions.h -a \
+	       -f $KSRC/include/linux/modules/kernel/ksyms.ver ]; then
+	    # kernel source is set up for mod versions in compiles
+	    XKMODVERS=y
+	    if [ $NKMODVERS = "n" ]; then
+		modver_error
+	    fi
+	else
+	    # kernel source is not set up for mod versions in compiles
+	    XKMODVERS=n
+	    if [ $NKMODVERS = "y" ]; then
+		modver_error
+	    fi
+	fi
+    fi
+
+    echo "MODVERS option verified between kernel source and running kernel"
+}
+
+#
+# From /proc/ksyms, generate a C header file with defines for all
+# of the version-mangled symbol names.
+#
+generate_symbol_names()
+{
+    grep _R /proc/ksyms | sed -e 's/^.........//' -e 's/[ 	].*//' |
+    	sed 's/\(.*\)_R\(.*\)/#define \1 \1_R\2/'
+}
+
+#
+# From what LiS has gleaned from /proc, generate a little autoconf.h
+# file that has the correct settings for MODULES, MODVERSIONS and SMP.
+#
+generate_autoconf()
+{
+    acf="include/sys/autoconf.h"
+    echo '/* FILE AUTOMATICALLY GENERATED BY LIS CONFIGURE.' >$acf
+    echo ' * DO NOT EDIT BY HAND' >>$acf
+    echo ' */' >>$acf
+
+    if [ "$KSMP" = "y" ]; then
+	echo "#define CONFIG_SMP 1" >>$acf
+    else
+	echo "#undef CONFIG_SMP" >>$acf
+    fi
+    if [ "$KMODULES" = "y" ]; then
+	echo "#define CONFIG_MODULES 1" >>$acf
+    else
+	echo "#undef CONFIG_MODULES" >>$acf
+    fi
+    if [ "$KMODVERS" = "y" ]; then
+	echo "#define CONFIG_MODVERSIONS 1" >>$acf
+    else
+	echo "#undef CONFIG_MODVERSIONS" >>$acf
+    fi
+    LISAUTOCONF=y
+}
+
+#
+# get_empty_inode_option
+#
+# Try to find out whether or not the routine that gets an empty inode
+# is still called "get_empty_inode" or "new_inode".
+#
+# This must be done after it is known whether we are going to install
+# on the running kernel and whether there is kernel source available.
+#
+get_empty_inode_option()
+{
+    if [ "$TARGET" != "l" ]; then
+	return				# not relevant unless Linux kernel
+    fi
+
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	if grep -q new_inode /proc/ksyms; then
+	    GET_EMPTY_INODE="new_inode(LIS_SB)"
+	elif grep -q get_empty_inode /proc/ksyms; then
+	    GET_EMPTY_INODE="get_empty_inode()"
+	else
+	    GET_EMPTY_INODE="get_empty_inode()"
+	    echo "Your running kernel exports neither the symbol"
+	    echo "get_empty_inode nor new_inode.  The compilation of"
+	    echo "LiS will probably print warnings related to"
+	    echo "these symbols, and LiS will probably fail to"
+	    echo "load as a module."
+	    do_confirm
+	fi
+	return
+    elif [ -f $KSRC/kernel/ksyms.c ]; then
+	if grep -q new_inode $KSRC/kernel/ksyms.c; then
+	    GET_EMPTY_INODE="new_inode(LIS_SB)"
+	elif grep -q get_empty_inode $KSRC/kernel/ksyms.c; then
+	    GET_EMPTY_INODE="get_empty_inode()"
+	else
+	    GET_EMPTY_INODE="get_empty_inode()"
+	    echo "Your kernel source exports neither the symbol"
+	    echo "get_empty_inode nor new_inode.  The compilation of"
+	    echo "LiS will probably print warnings related to"
+	    echo "these symbols, and LiS will probably fail to"
+	    echo "load as a module."
+	    do_confirm
+	fi
+	return
+    else
+	GET_EMPTY_INODE="get_empty_inode()"
+	echo "You have told the LiS installation that you do not"
+	echo "intend to run LiS on the running kernel and we cannot"
+	echo "find the file $KSRC/kernel/ksyms.c"
+	echo "One or the other is necessary to determine whether"
+	echo "to use get_empty_inode or new_inode.  The compilation of"
+	echo "LiS will probably print warnings related to"
+	echo "these symbols, and LiS will probably fail to"
+	echo "load as a module."
+	do_confirm
+    fi
+}
+
+
+
+#
+# Make genconf.h
+#
+# This is a generated header file that captures information
+# gleaned from the kernel.  linux-mdep.h uses it to get this
+# info without having to clutter the command line with lots
+# of "-D" options.
+#
+mk_genconf_h()
+{
+    f=$LIS_HOME/include/sys/LiS/genconf.h
+    echo '/* GENERATED FILE -- DO NOT MODIFY */' >$f
+    echo "#define GET_EMPTY_INODE $GET_EMPTY_INODE" >>$f
+}
+
+#
+# Establish defaults
+#
+echo "LiS Configure script version $Configure_version"
+echo
+
+if [ -f $CONFIG ]; then
+. $CONFIG
+    if [ "$KERN_TARGET..." = "..." ]; then
+	KERN_TARGET=bzImage
+    fi
+else
+    USING_DEFAULTS=y
+    CROSS_COMPILING=n
+    TARGET=l
+    CONFIG_STREAMS=m
+    MOD_INSTALL=y
+    KSRC=`default_ksrc`
+    check_ksrc
+    CONFIG_MK_KERNEL=n
+    KERN_TARGET=bzImage
+    STRMS_QUEUES=t
+    DBG_OPT=D
+    LIS_SHLIB=y
+    MACHINE=`uname -m`
+fi
+
+case $KERN_TARGET in
+    zImage)	KTARG=1;;
+    zlilo)	KTARG=2;;
+    bzImage)	KTARG=3;;
+    bzlilo)	KTARG=4;;
+    *)		KTARG=3;;
+esac
+
+#
+# LIS_HOME
+#
+# Plant a symbolic link from /usr/src/LiS to whereever this directory is.
+# Remember our directory name as either its real name or as /usr/src/LiS
+# if /usr/src/LiS is symbolically linked to this directory.
+#
+LIS_HOME=`pwd`
+
+if [ -L /usr/src/LiS ]; then
+    usr_src_lis=`ls -l /usr/src/LiS | sed -e 's/^.* //' | sed -e 's/\/$//'`
+else
+    usr_src_lis=
+fi
+if [ "$LIS_HOME" = "$usr_src_lis" ]; then
+    LIS_HOME="/usr/src/LiS"
+elif [ `id -u` -eq 0 ]; then
+    if [ -L /usr/src/LiS ]; then
+	rm /usr/src/LiS
+	if [ $? -ne 0 ]; then
+	    echo "Error removing symbolic link /usr/src/LiS"
+	fi
+    fi
+    if [ "$LIS_HOME" = "/usr/src/LiS" ]; then
+	LIS_HOME=$usr_src_lis
+    fi
+    if [ $LIS_HOME != "/usr/src/LiS" ]; then
+	ln -s $LIS_HOME /usr/src/LiS
+	if [ $? -ne 0 ]; then
+	    echo "Error making symbolic link from /usr/src/LiS to $LIS_HOME."
+	    echo "Please fix this problem and try again."
+	    exit 1
+	fi
+    fi
+    LIS_HOME="/usr/src/LiS"
+fi
+
+#
+# TARGET
+#
+PROMPT="\
+How do you want to configure STREAMS?\n\
+    l = to run in the Linux kernel\n\
+    u = to run in user level\n\
+    q = to run under QNX (may not work)\n\
+Please enter your choice"
+RESPONSE="l u q"
+DEFAULT="$TARGET"
+do_read_choice
+TARGET=$RESULT
+
+if [ "$TARGET" = "l" ]; then
+    #
+    # The linux target needs some special handling
+    #
+    PROMPT="\
+Are you using the native Linux C compiler (y) or\n\
+are you cross-compiling using a different compiler (n)?\n\
+Native C (y) or cross-compile (n)?"
+        RESPONSE="y n"
+        do_read_choice
+        case $RESULT in
+	    y)
+		    CROSS_COMPILING=n
+		    ;;
+	    n)
+		    CROSS_COMPILING=y
+		    echo
+		    echo "You should create a file named \"cross-compile\""
+		    echo "which contains \"make\" assignments for the name"
+		    echo "of your cross compiler.  See the file config.mk"
+		    echo "for more information on this."
+		    echo
+		    do_confirm
+		    ;;
+        esac
+
+    #
+    # See if the GNU Libc stropts.h is an old version.  If so, substitute
+    # the new 2.2 version.
+    #
+    if grep -w -q RDNORM /usr/include/sys/bits/stropts.h 2>/dev/null; then
+	mv /usr/include/sys/bits/stropts.h /usr/include/sys/bits/stropts.h.orig
+	cp -f ./include/sys/gnu.stropts.h /usr/include/sys/bits/stropts.h
+	echo "Updated version of stropts.h installed in /usr/include/sys/bits"
+    fi
+
+    #
+    # Kernel source location
+    #
+    PROMPT="Enter directory location of your kernel source\n          "
+    DEFAULT=$KSRC
+    if [ "$KSRC..." = "..." ]; then
+        DEFAULT="/usr/src/linux"
+    fi
+    if [ ! -d $KSRC ]; then
+        DEFAULT="/usr/src/linux"
+	check_ksrc
+    fi
+    if do_read_dir; then
+	KSRC=$RESULT
+	NOKSRC=0
+    else
+	echo "Cannot locate kernel source."
+	echo "Will use /usr/include for header files."
+	KSRC=/usr
+	NOKSRC=1
+    fi
+
+    #
+    # Try to dig some info out of the kernel binary "vmlinux".  If we
+    # can find out this stuff from the binary then we don't need the
+    # .config file
+    #
+    get_kver
+    get_smp
+    get_modules
+    if [ $NEED_KSMP -eq 1 -o $NEED_KMODULES -eq 1 ]; then
+	NEED_KCONFIG=1		# couldn't access kernel binary
+    else
+	NEED_KCONFIG=0		# have info from kernel binary
+    fi
+
+    #
+    # See if the kernel's .config file is there.  If not then the user
+    # has not done a "make menuconfig" yet.
+    #
+    if [ $NOKSRC -eq 0 -a $NEED_KCONFIG -eq 1 -a ! -f $KSRC/.config ]; then
+        PROMPT="\
+It appears that you have not done a 'make menuconfig' on\n\
+your kernel in $KSRC yet.  You should do that now to avoid\n\
+problems with the installation.\n\
+Do you want to do that now?"
+        RESPONSE="y n"
+        do_read_choice
+        case $RESULT in
+	    y)
+		    if ! make -C $KSRC menuconfig; then
+		        echo "Menuconfig failed.  LiS installation aborted."
+		        exit 1
+		    fi
+		    echo "Make menuconfig was successful."
+		    echo "Continuing with LiS installation."
+		    ;;
+	    n)
+		    echo "OK, but this may cause problems with the installation."
+		    ;;
+        esac
+    fi
+
+    #
+    # If we have a kernel configuration now, source it.
+    #
+    if [ -f $KSRC/.config ]; then
+        . $KSRC/.config
+    fi
+
+    #
+    # See if version.h is there.  It may not be if the user just unpacked
+    # a fresh version of Linux and has not done a "make dep" yet.
+    #
+    if [ $NEED_KCONFIG -eq 1 ]; then
+	check_kver
+    fi
+    #
+    # Now see if there is one present.
+    #
+    if [ $NEED_KCONFIG -eq 1 -a ! -f $KSRC/include/linux/version.h ]; then
+        PROMPT="\
+It appears that you have not done a 'make dep' on your kernel yet.\n\
+You will have to do this to proceed.\n\
+Do you want to do that now?"
+        RESPONSE="y n"
+        do_read_choice
+        case $RESULT in
+	    y)
+	        if ! make -C $KSRC dep; then
+	            echo "Make dep failed.  LiS installation aborted."
+	            exit 1
+	        fi
+	        echo "Make dep was successful."
+		echo "Continuing with LiS installation."
+	        ;;
+	    n)
+		echo "LiS installation cannot proceed until this is done."
+		echo "Please fix the problem and then try again."
+		exit 1
+		;;
+        esac
+    fi
+
+    #
+    # Kernel version
+    #
+    DEFAULT=$KVER
+    PROMPT="Which version of the kernel are you building for?"
+    do_readstring
+    KVER=$RESULT
+    
+    KVER_PATCH=`echo ${KVER}|sed -e "s/[^\.]\.[^\.]\.//"`
+    KVER_PATCHNO=`echo $KVER_PATCH | sed -e 's/-.*//' -e 's/[^0-9].*//'`
+    KVER_MAJORMINOR=`echo ${KVER}|sed -e "s/\.${KVER_PATCH}//"`
+    if [ "${KVER_MAJORMINOR}" != "2.0" -a	\
+         "${KVER_MAJORMINOR}" != "2.1" -a	\
+         "${KVER_MAJORMINOR}" != "2.2" -a	\
+         "${KVER_MAJORMINOR}" != "2.3" -a	\
+         "${KVER_MAJORMINOR}" != "2.4" 		\
+       ]
+    then
+	:
+       # echo Sorry, LiS does not compile Linux version $KVER_MAJORMINOR.x
+       # exit 1
+    fi
+    KVER_MINOR=`echo ${KVER_MAJORMINOR}|sed -e "s/[^\.]\.//"`
+    KVER_MAJOR=`echo ${KVER}|sed -e "s/\.${KVER_MINOR}\.${KVER_PATCH}//"`
+    if [ "$KVER_MAJORMINOR" = "2.0" ]; then
+	echo
+	echo "This version of LiS has not been tested on 2.0 kernels."
+	echo "It will probably not install correctly.  It will probably"
+	echo "contain syntax errors at compile time and/or unresolved"
+	echo "externals at module load time.  You are probably better"
+	echo "off to install an older version of LiS, say LiS-2.8."
+	echo
+	echo "The installation will proceed, but be warned that there"
+	echo "is trouble ahead, and no support from the LiS authors."
+	echo
+	do_confirm
+    fi
+    if [ "$KVER_MAJORMINOR" = "2.0" -a $KVER_PATCHNO -lt 36 ]; then
+	echo
+	echo "The assigned system call numbers used by LiS in kernel"
+	echo "version prior to 2.0.36 are not official numbers assigned"
+	echo "by Linus.  From kernel version 2.0.36 onward these syscall"
+	echo "numbers have been assigned to LiS by Linus.  It would be"
+	echo "a good idea from an application compatibility standpoint"
+	echo "to install LiS on a more recent kernel.  This is just an"
+	echo "informational message and will not prevent LiS from installing."
+	echo
+	do_confirm
+    fi
+    
+    #
+    # Verify kernel version, SMP and mod versions against the running
+    # kernel if the user says that he/she intends to install on the
+    # running kernel.
+    #
+    PROMPT="\
+Do you intend to run LiS on this machine with\n\
+the currently running kernel?"
+    RESPONSE="y n"
+    do_read_choice
+    case $RESULT in
+	y)
+		USE_RUNNING_KERNEL=y
+		verify_kver
+		verify_smp
+		verify_modver
+		;;
+	n)
+		USE_RUNNING_KERNEL=
+		echo "Bypassing kernel parameter consistency checks"
+		;;
+    esac
+
+    #
+    # CONFIG_STREAMS
+    #
+    # If we have concluded that the kernel does not support modules
+    # then we need to inform the user of what is going on.  It is
+    # next to impossible for a kernel not to support modules these
+    # days.
+    #
+    if [ "$KMODULES" != "y" ]; then
+	if [ "$USING_DEFAULTS..." = "y..." ]; then
+	    CONFIG_STREAMS=k
+	fi
+        PROMPT="\n\
+Analysis of your kernel configuration suggests that your kernel\n\
+does not support loadable modules.  This is extremely rare and\n\
+is likely a result of mis-analysis of the kernel configuration\n\
+files.  You are being offered the choice to override this automatic\n\
+configuration parameter.  If you have answered this question already\n\
+in a previous configuration dialog then your previous answer will\n\
+appear as the default.\n\
+\n"
+    fi
+
+    PROMPT="\
+How do you want to build STREAMS for the Linux kernel?\n\
+    k = link with the linux kernel\n\
+    m = create a kernel loadable module\n\
+Please enter your choice"
+    RESPONSE="m k"
+    DEFAULT="$CONFIG_STREAMS"
+    do_read_choice
+    CONFIG_STREAMS=$RESULT
+
+    #
+    # CONFIG_MK_KERNEL
+    #
+    if [ $CONFIG_STREAMS = "k" ]; then
+	# no module versioning if linking directly into the kernel
+	KMODVERS=
+        PROMPT="\
+When you make STREAMS, do you want to also build the kernel automatically?\n\
+    y = make kernel\n\
+    n = just make LiS and leave streams.o in this directory\n\
+Please enter y or n"
+        RESPONSE="y n"
+        DEFAULT="$CONFIG_MK_KERNEL"
+        do_read_choice
+        CONFIG_MK_KERNEL=$RESULT
+    else
+        CONFIG_MK_KERNEL="n"
+    fi
+    
+    #
+    # KERN_TARGET
+    #
+    if [ $CONFIG_STREAMS = "k" -a $CONFIG_MK_KERNEL = "y" ]; then
+	PROMPT="The target to make when building a kernel."
+	PROMPT="$PROMPT  Possibilities are:\n"
+	PROMPT="${PROMPT}    1 = zImage\n"
+	PROMPT="${PROMPT}    2 = zlilo\n"
+	PROMPT="${PROMPT}    3 = bzImage\n"
+	PROMPT="${PROMPT}    4 = bzlilo\n"
+	PROMPT="${PROMPT}Please enter a number from 1-4 [default: $KTARG] \c"
+	RESPONSE="1 2 3 4"
+	DEFAULT="$KTARG"
+	do_read_choice
+
+	case $RESULT in
+	    1) RESULT=zImage;;
+	    2) RESULT=zlilo;;
+	    3) RESULT=bzImage;;
+	    4) RESULT=bzlilo;;
+	esac
+	KERN_TARGET=$RESULT
+	echo "KERN_TARGET=$RESULT" >>$CONFIG
+    else
+	echo "# KERN_TARGET not set" >>$CONFIG
+    fi
+
+    #
+    # See if the user wants STREAMS kernel loadable modules installed for
+    # easy running.
+    #
+    if [ "$CONFIG_STREAMS" = "m" -a "$KMODULES" = "y" ]; then
+        PROMPT="\
+After building STREAMS, do you want kernel loadable modules installed?\n\
+This allows you to load it by typing in \"insmod streams\".\n\
+    y = install it for module loading\n\
+    n = just leave modules for later \"make modules_install\"\n\
+Please enter y or n "
+        RESPONSE="y n"
+        DEFAULT="$MOD_INSTALL"
+        do_read_choice
+        MOD_INSTALL=$RESULT
+    else
+        MOD_INSTALL="n"
+    fi
+
+    #
+    # MOD_INST_DIR
+    #
+    if [ "$CONFIG_STREAMS" = "m" -a "$KMODULES" = "y" ]
+    then
+        PROMPT="Enter location of your kernel module directory\n"
+	PROMPT="$PROMPT              "
+	if [ "$MOD_INST_DIR..." = "..." ]; then
+	    DEFAULT=/lib/modules/$PKVER/misc
+	    if [ ! -d $DEFAULT ]; then
+		DEFAULT=/lib/modules/$KVER/misc
+		if [ ! -d $DEFAULT ]; then
+		    DEFAULT=/lib/modules/preferred/misc
+		    if [ ! -d $DEFAULT ]; then
+			if [ `id -u` -eq 0 ]; then
+			    DEFAULT=/lib/modules/$PKVER/misc
+			    if ! mkdir $DEFAULT 2>/dev/null; then
+				DEFAULT=/lib/modules/preferred/misc
+				if ! mkdir $DEFAULT 2>/dev/null; then
+				    DEFAULT=
+				fi
+			    fi
+			else
+			DEFAULT=
+			fi
+		    fi
+		fi
+	    fi
+	else
+	    DEFAULT=$MOD_INST_DIR
+        fi
+        do_read_dir
+        MOD_INST_DIR=$RESULT
+    fi
+
+    #
+    # STRMS_QUEUES
+    #
+    # Cannot run as kernel thread on 2.0.x kernels unless LiS
+    # is linked directly into the kernel or unless we can apply
+    # the ksyms patch.
+    #
+    choose_runqueues=0
+    if [ "$CONFIG_STREAMS" = "m" -a "$KVER_MAJORMINOR" = "2.0" ]; then
+        if [ $KVER_PATCHNO -ge 35 -a ! -f $KSRC/kernel/ksyms.c ]; then
+	    echo
+	    echo "In order to be able to run STREAMS queues as a kernel thread"
+	    echo "on a 2.0.x kernel we need to apply a patch to the file"
+	    echo "$KSRC/kernel/ksyms.c.  But that file is missing --"
+	    echo "perhaps your kernel source is not present.  This is"
+	    echo "nothing to be concerned about.  However, we will configure"
+	    echo "LiS to run the STREAMS queues as a \"bottom half\""
+	    echo "process with no ability to choose the \"kernel thread\""
+	    echo "method."
+	    echo
+	    do_confirm
+	    STRMS_QUEUES=b		# use bottom half by default
+        elif [ $KVER_PATCHNO -ge 35 -a -f $KSRC/kernel/ksyms.c ]; then
+	    echo
+	    echo "Because this is a 2.0.35/36 kernel we are going to set"
+	    echo "the default option for running STREAMS queues to"
+	    echo "use the \"bottom half\" method.  You can choose"
+	    echo "another method in the next menu, but the default"
+	    echo "choice will be best if you don't wish to rebuild"
+	    echo "your kernel."
+	    echo
+	    do_confirm
+	    STRMS_QUEUES=b		# use bottom half by default
+	    choose_runqueues=1		# allow user to choose
+	fi
+    else			# not installing as module, or later kernel
+	choose_runqueues=1
+    fi
+    if [ "$KVER_MAJORMINOR" = "2.0" -a $KVER_PATCHNO -lt 35 ]; then
+	echo
+	echo "You may experience some difficulty with kernel versions"
+	echo "earlier than 2.0.35.  If you see syntax errors when compiling"
+	echo "LiS or unresolved externals when loading it as a module"
+	echo "you may consider ugrading to at least 2.0.36 or configuring"
+	echo "LiS to link directly into the kernel.  If you elect to"
+	echo "link LiS directly into the kernel and you still get"
+	echo "syntax errors then you will need to upgrade your kernel"
+	echo "to at least 2.0.36."
+	echo
+	do_confirm
+    fi
+    if [ $choose_runqueues -eq 0 ]; then
+	echo
+	echo "We will configure LiS to use \"bottom half\" processing"
+	echo "for STREAMS queues.  If you want to use the kernel thread"
+	echo "technique, load your kernel source, come back to the"
+	echo "/usr/src/LiS directory and do 'make realclean; make'."
+	echo "If you don't care, just ignore this message and proceed."
+	echo
+	do_confirm
+	STRMS_QUEUES=b
+    else
+	if [ "$KVER_MAJORMINOR" = "2.0" ]; then
+	    PROMPT="\
+The STREAMS queues can be run either as a bottom half task (faster\n\
+but with restrictions on kernel constructs) or as a kernel thread\n\
+(slower but no restrictions on kernel routines used from STREAMS\n\
+service procedures).\n\
+    t = use kernel thread\n\
+    b = use bottom half processing\n\
+Please enter t or b"
+	    RESPONSE="t b"
+	    DEFAULT="$STRMS_QUEUES"
+	    do_read_choice
+	    STRMS_QUEUES=$RESULT
+	fi
+    fi
+
+    if [ "$STRMS_QUEUES" = "t" -a "$CONFIG_STREAMS" = "m" -a \
+	 "$KVER_MAJORMINOR" = "2.0" ]; then
+	echo
+	echo "               PLEASE NOTE"
+	echo "The LiS 'make' procedure will install a patch in"
+	echo "your kernel source that will allow you to run"
+	echo "the STREAMS queues as a kernel thread.  Be sure"
+	echo "to remake your kernel, run lilo, and reboot before"
+	echo "attempting to run streams.  If you get an unresolved"
+	echo "external on \"exit_files\" when you attempt to run"
+	echo "streams via \"insmod streams\" this is a sign that you"
+	echo "need to perform this procedure."
+	echo
+	echo "If you do not wish to rebuild your kernel, reconfigure"
+	echo "LiS and select 'b' for \"bottom half\" for STREAMS"
+	echo "queue processing."
+	echo
+	do_confirm
+    fi
+
+    if [ $NOKSRC -eq 1 -a "$KMODVERS..." = "y..." ]; then
+	echo "No kernel symbols. Generating $LIS_HOME/include/sys/modversions.h."
+	rm -f include/sys/modversions.h
+	generate_symbol_names >include/sys/modversions.h
+	LISMODVERS=y
+    fi
+
+
+else # Not a Linux kernel target
+    # These configuration items only make sense in the Linux kernel
+    KSRC=
+    KVER=
+    CONFIG_MK_KERNEL=
+    KERN_TARGET=
+    STRMS_QUEUES=
+    MOD_INST_DIR=
+    MOD_INSTALL=
+    KSMP=
+    KMODULES=
+    CONFIG_STREAMS=
+fi # Not a Linux kernel target
+
+#
+# LIS_OLD_CONSTS
+#
+if [ "$LIS_OLD_CONSTS..." = "..." ]; then
+    LIS_OLD_CONSTS=n
+fi
+PROMPT="\
+When you make STREAMS, do you want to use backward compatible constants\n\
+in the file stropts.h?  If you answer No (the default) you will get\n\
+constants that are compatible with UnixWare and Solaris, but which\n\
+differ somewhat from previous versions of LiS.  If you answer Yes\n\
+you will get constants that are compatible with previous versions of\n\
+LiS but somewhat incompatible with UnixWare and Solaris.  If you\n\
+intend to run application programs that were compiled with LiS-2.6\n\
+or earlier then they have the old constants compiled into them and\n\
+you should answer Yes to this question.\n\
+    y = LiS backward compatible constants in stropts.h\n\
+    n = UnixWare/Solaris compatible constants in stropts.h\n\
+Please enter y or n"
+RESPONSE="y n"
+DEFAULT=$LIS_OLD_CONSTS
+do_read_choice
+LIS_OLD_CONSTS=$RESULT
+if [ "$LIS_OLD_CONSTS..." = "y..." ]; then
+    echo
+    echo "When you compile your application programs you must include"
+    echo "-DUSE_OLD_CONSTS on the command line so that your program"
+    echo "uses the same values as LiS is being compiled with.  If you"
+    echo "have an application program that was compiled with LiS-2.6"
+    echo "or earlier then it has the old constants built into it."
+    echo "It is to be preferred to use the new UnixWare/Solaris"
+    echo "compatible constants as soon as it is practicable for you."
+    echo
+    do_confirm
+fi
+
+#
+# SOLARIS_STYLE_CMN_ERR
+#
+if [ "$SOLARIS_STYLE_CMN_ERR..." = "..." ]; then
+    SOLARIS_STYLE_CMN_ERR=n
+fi
+PROMPT="\
+When you make STREAMS, do you want to use Solaris style cmn_err?\n\
+In Solaris the newline goes on the end of the message.  For SVR4\n\
+style cmn_err the newline goes on the beginning.\n\
+    y = Solaris style cmn_err\n\
+    n = SVR4 style cmn_err\n\
+Please enter y or n"
+RESPONSE="n y"
+DEFAULT=$SOLARIS_STYLE_CMN_ERR
+do_read_choice
+SOLARIS_STYLE_CMN_ERR=$RESULT
+
+#
+# DBG_OPT
+#
+# Defaults to y for user build and to n for others
+#
+if [ "$DBG_OPT" = "D" ]; then
+    if [ "$TARGET" = "u" ]; then
+	DBG_OPT=y
+    else
+	DBG_OPT=n
+    fi
+fi
+PROMPT="\
+When you make STREAMS, do you want to compile for source level debugging?\n\
+This is most useful when STREAMS is linked into the kernel and the\n\
+gdbstub patch is installed in the kernel for kernel source level debugging.\n\
+    y = set up for source level debugging\n\
+    n = no source level debugging\n\
+Please enter y or n"
+RESPONSE="y n"
+DEFAULT=$DBG_OPT
+do_read_choice
+DBG_OPT=$RESULT
+
+
+#
+# LIS_SHLIB
+#
+if [ "$TARGET" = "l" ]; then
+    PROMPT="\
+Do you want to use shared libraries?
+If you select static linking, you will get larger binaries that run by
+themselves. If you select dynamic linking, the binaries will be smaller but
+you will have to install the shared libraries in a directory that is in your
+LD_LIBRARY_PATH environment variable.
+    y = use dynamic linking with shared libraries\n\
+    n = use static linking\n\
+Please enter y or n"
+    RESPONSE="y n"
+    DEFAULT=$LIS_SHLIB
+    do_read_choice
+    LIS_SHLIB=$RESULT
+else
+    LIS_SHLIB=n
+fi
+
+#
+# Some systems don't have a /usr/local/sbin directory.  Make one
+# if necessary.  We keep some LiS utilities in that directory.
+#
+if [ `id -u` -eq 0 ]; then			# must be root to do this
+    if [ ! -d /usr/local/sbin ]; then
+	mkdir -p /usr/local/sbin
+    fi
+fi
+
+#
+# Red Hat 7.1 needs a kludge related to including highmem.h from vmalloc.h.
+#
+if [ "$TARGET" = "l" ]; then
+    if grep -q 'highmem\.h' $KSRC/include/linux/vmalloc.h; then
+	RH_71_KLUDGE=y
+    fi
+fi
+
+#
+# 2.4.20 (or thereabouts) changed the location of the signal mask lock
+#
+if [ "$TARGET" = "l" ]; then
+    if grep -q 'sigmask_lock' $KSRC/include/linux/sched.h; then
+	SIGMASKLOCK=y
+    fi
+fi
+
+#
+# Red Hat changed the number of arguments in recalc_sigpending
+#
+if [ "$TARGET" = "l" ]; then
+    if grep -q 'recalc_sigpending(void)' $KSRC/include/linux/sched.h; then
+	RCVOID=y
+    fi
+fi
+
+
+#
+# Decide which C compiler to use.  gcc 2.96 is buggy, so try to use
+# something better if it is present.
+#
+# The default is plain old gcc with -O2.
+#
+if [ "$TARGET" = "l"  -a -x /usr/bin/kgcc ]; then
+    CC_NAME=kgcc
+    CC_OPTIMIZE=-O3
+elif [ -x /usr/bin/gcc3 ]; then
+    CC_NAME=gcc3
+    CC_OPTIMIZE=-O3
+elif [ -x /usr/bin/egcs ]; then
+    CC_NAME=egcs
+    CC_OPTIMIZE=-O3
+else
+    CC_NAME=gcc
+    CC_OPTIMIZE=-O2
+fi
+
+GCC_VERS=`$CC_NAME -v 2>&1 |tail -1`
+GCC_VERS=`arg3 $GCC_VERS`
+GCC_VERS=`echo $GCC_VERS | tr -d '[:alpha:]-'`
+if [ "$CC_VERS..." = "3.0.2..." ]; then
+    echo
+    echo "Compiler $CC_NAME $GCC_VERS is known to be buggy when"
+    echo "compiling kernel code such as LiS.  You will probably"
+    echo "experience problems, and perhaps crashes, when running LiS."
+    echo
+    do_confirm
+fi
+
+#
+# Figure out which routine name to use for "get_empty_inode".
+#
+get_empty_inode_option
+
+#
+# Some architectures need an additional include directory
+#
+case $MACHINE in
+i?86)	MACHINE_INCL="-I$KSRC/arch/i386/mach-generic" ;;
+esac
+
+#
+# Finally output configuration file
+#
+
+cfg_out()
+{
+    if [ $# = 2 ]; then
+        echo "$1=$2" >>$CONFIG
+    else
+        echo "# $1 is not set" >>$CONFIG
+    fi
+}
+
+echo "" >$CONFIG
+echo "# This file is generated from the Configure script" >>$CONFIG
+echo "# Do not edit manually." >>$CONFIG
+echo "" >>$CONFIG
+cfg_out LIS_HOME $LIS_HOME
+cfg_out CONFIG_STREAMS $CONFIG_STREAMS
+cfg_out TARGET $TARGET
+if [ "$TARGET" = "l" ]; then
+    cfg_out CROSS_COMPILING $CROSS_COMPILING
+    cfg_out KSRC $KSRC
+    cfg_out NOKSRC $NOKSRC
+    cfg_out USE_RUNNING_KERNEL $USE_RUNNING_KERNEL
+    cfg_out PKVER $PKVER
+    cfg_out NKVER $NKVER
+    cfg_out KVER $KVER
+    cfg_out KVER_MAJOR $KVER_MAJOR
+    cfg_out KVER_MINOR $KVER_MINOR
+    cfg_out KVER_PATCH $KVER_PATCH
+    cfg_out KVER_MAJORMINOR $KVER_MAJORMINOR
+    cfg_out KSMP $KSMP
+    cfg_out KMODULES $KMODULES
+    cfg_out KMODVERS $KMODVERS
+    cfg_out LISMODVERS $LISMODVERS
+    cfg_out LISAUTOCONF $LISAUTOCONF
+    cfg_out CONFIG_MK_KERNEL $CONFIG_MK_KERNEL 
+    cfg_out KERN_TARGET $KERN_TARGET
+    cfg_out STRMS_QUEUES $STRMS_QUEUES
+    cfg_out MOD_INST_DIR $MOD_INST_DIR
+    cfg_out MOD_INSTALL $MOD_INSTALL
+    cfg_out RH_71_KLUDGE $RH_71_KLUDGE
+    cfg_out SIGMASKLOCK $SIGMASKLOCK
+    cfg_out RCVOID $RCVOID
+    cfg_out MACHINE $MACHINE
+    cfg_out CC_NAME $CC_NAME
+    cfg_out GCC_VERS $GCC_VERS
+    cfg_out CC_OPTIMIZE $CC_OPTIMIZE
+    cfg_out MACHINE_INCL $MACHINE_INCL
+    #cfg_out GET_EMPTY_INODE $GET_EMPTY_INODE 
+    #cfg_out REGISTER_SYSCALLS $REGISTER_SYSCALLS
+    mk_genconf_h
+fi
+cfg_out LIS_OLD_CONSTS $LIS_OLD_CONSTS
+cfg_out SOLARIS_STYLE_CMN_ERR $SOLARIS_STYLE_CMN_ERR
+cfg_out DBG_OPT $DBG_OPT
+cfg_out LIS_SHLIB $LIS_SHLIB
+
+if [ "$MAKE_INVOKED" != "1" ]; then
+    echo
+    echo "Warning:"
+    echo "You did not use \"make configure\" to run this configuration."
+    echo "Please do \"make clean && make dep\" first to get a clean build."
+fi
