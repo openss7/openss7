@@ -1,8 +1,8 @@
 LIS_HOME = ../..
 include $(LIS_HOME)/config.mk
 
-PRELDOBJS = getpmsg.o getmsg.o putpmsg.o putmsg.o poll.o \
-	  fattach.o fdetach.o isastream.o # mknod.o
+PRELDOBJS = getpmsg.o getmsg.o putpmsg.o putmsg.o \
+	  fattach.o fdetach.o isastream.o # mknod.o poll.o
 
 LIBOBJS = $(PRELDOBJS) pipe.o
 

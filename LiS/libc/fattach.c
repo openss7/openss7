@@ -1,10 +1,10 @@
-#ident "@(#) LiS fattach.c 2.4 1/23/02"
+#ident "@(#) LiS fattach.c 2.5 9/9/03"
 
 #include <stropts.h>		/* includes unistd.h */
 #include <errno.h>
 #include <sys/ioctl.h>
 
-#ifdef __NR_fattach
+#if defined(__NR_fattach) && defined(USE_SYSCALLS)
 
 #define	__NR_sys_fattach	__NR_fattach
 

@@ -1,4 +1,4 @@
-#ident "@(#) LiS fdetach.c 2.4 10/23/00"
+#ident "@(#) LiS fdetach.c 2.5 9/9/03"
 
 #include <errno.h>
 #include <unistd.h>
@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 
-#ifdef __NR_fdetach
+#if defined(__NR_fdetach) && defined(USE_SYSCALLS)
 
 #define	__NR_sys_fdetach	__NR_fdetach
 
