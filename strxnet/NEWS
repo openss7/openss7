@@ -58,6 +58,19 @@ All Rights Reserved.
 
 =========================================================================
 
+* Major changes in strxnet-0.9.2-4
+
+  Changes to ompile, install and builds rpms for Fedora Core 1 (FC1), Whitebox
+  Enterprise Linux (WBEL) and RedHat Enterprise Linux 3 (EL3).  Included
+  explicit epoch in internal dependencies in spec file for RPM versions 4.2.1,
+  4.2.2 and higher.  Added hugemem kernel detection and moved getpmsg and
+  putpmsg manual pages.
+
+  Correction to symbolic linking and system map file location during non-rpm
+  autoconf installation.
+
+  Correction to zero maxlen behavior in t_rcvconnect().
+
 * Major changes in strxnet-0.9.2-3
 
   Added check for CONFIG_REGPARM, addition of -mregparm=3 CFLAGS, addition
