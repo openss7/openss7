@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.4.1 2005/03/15 12:05:37 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.4.2 2005/03/16 13:20:23 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/03/15 12:05:37 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/16 13:20:23 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -818,18 +818,26 @@ by package kernel modules.  The default is to version exported module symbols.
 This package does not export symbols so this option has no effect.
 @end ignore
 
-@item --with k-tools
-@itemx --without k-tools
-@opindex k-tools
+@item --with devfs
+@itemx --without devfs
+Specifies whether the build is for a device filesystem daemon enabled system
+with autoloading, or not.  The default is to build for devfsd autoloading when
+CONFIG_DEVFS_FS is defined in the target kernel.  The @command{reuild} target
+uses this option to signal to the RPM spec file that the @samp{dev} subpackage
+need not be built.  This option does not appear when the package has no devices.
+
+@item --with tools
+@itemx --without tools
+@opindex tools
 Specifies whether user space packages are to be built.  The default is to build
 user space packages.  This option can be useful when rebuilding for multiple
 architectures and target kernels.  The @command{rebuild} automake target uses
 this feature when rebuilding for all available architectures and kernels, to
 rebuild user packages once per architecture instead of once per kernel.
 
-@item --with k-modules
-@itemx --without k-modules
-@opindex k-modules
+@item --with modules
+@itemx --without modules
+@opindex modules
 Specifies whether kernel modules packages are to be built.  The default is to
 build kernel module packages.  This option can be useful when rebuilding for
 multiple architectures and target kernels.  The @command{rebuild} automake
@@ -935,6 +943,15 @@ No private components exist in @file{@value{PACKAGE_NAME}} releases.
 Disables the installation of init scripts.
 The default is to configure and install init scripts and their associated
 configuration files.
+
+@item --enable-devfs
+@itemx --disable-devfs
+@opindex devfs
+Specifies whether the build is for a device filesystem daemon enabled system
+with autoloading, or not.  The default is to build for devfsd autoloading when
+CONFIG_DEVFS_FS is defined in the target kernel.  The @command{reuild} target
+uses this option to signal to the RPM spec file that the @samp{dev} subpackage
+need not be built.  This option does not appear when the package has no devices.
 
 @item --enable-tools
 @opindex tools
