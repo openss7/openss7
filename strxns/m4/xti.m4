@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.10 2005/01/22 13:52:59 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.11 2005/01/23 00:24:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 13:52:59 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 00:24:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -106,23 +106,14 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
         xti_what="xti.h"
         if test ":${xti_cv_includes:-no}" = :no ; then
             # The next place to look now is for a peer package being built under
-            # the same top directory.
-            for xti_where in strxnet/src/include ; do
-                xti_dir=`echo "$srcdir/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+            # the same top directory, and then the higher level directory.
+            xti_here=`pwd`
+            xti_where="strxnet/src/include"
+            for xti_d in . .. ; do
+                xti_dir=`echo "$srcdir/$xti_d/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                xti_bld=`echo "$xti_here/$xti_d/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
-                    xti_cv_includes="$xti_dir ../$xti_where"
-                    XTI_LDADD="../strxnet/libxnet.la"
-                    break
-                fi
-            done
-        fi
-        if test ":${xti_cv_includes:-no}" = :no ; then
-            # The next place to look now is for a peer package being built at
-            # the same directory level as this package.
-            for xti_where in strxnet/src/include ; do
-                xti_dir=`echo "$srcdir/../$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
-                    xti_cv_includes="$xti_dir ../$xti_where"
+                    xti_cv_includes="$xti_dir $xti_bld"
                     XTI_LDADD="../strxnet/libxnet.la"
                     break
                 fi
@@ -187,16 +178,19 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
                 fi
             done
         fi
-        if test :"${xti_cv_includes:-no}" = :no ; then
-            AC_MSG_RESULT([ERROR])
-            AC_MSG_ERROR([
+    ])
+    if test :"${xti_cv_includes:-no}" = :no ; then
+        AC_MSG_WARN([
 *** 
 *** Could not find XTI include directories.  This package requires the
 *** presence of XTI include directories to compile.  Specify the location of
 *** XTI include directories with option --with-xti to configure and try again.
 *** ])
+    else
+        if test -z "$with_xti" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with xti"
         fi
-    ])
+    fi
 ])# _XTI_CHECK_HEADERS
 # =========================================================================
 

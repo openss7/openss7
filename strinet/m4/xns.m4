@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xns.m4,v 0.9.2.7 2005/01/22 13:26:23 brian Exp $
+dnl @(#) $Id: xns.m4,v 0.9.2.8 2005/01/23 00:24:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 13:26:23 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 00:24:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -109,22 +109,14 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
         xns_what="sys/npi.h"
         if test ":${xns_cv_includes:-no}" = :no ; then
             # The next place to look now is for a peer package being built under
-            # the same top directory.
-            for xns_where in strxns/src/include ; do
-                xns_dir=`echo "$srcdir/$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+            # the same top directory, and then the higher level directory.
+            xns_here=`pwd`
+            xns_where="strxns/src/include"
+            for xns_d in . .. ; do
+                xns_dir=`echo "$srcdir/$xns_d/$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                xns_bld=`echo "$xns_here/$xns_d/$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
-                    xns_cv_includes="$xns_dir ../$xns_where"
-                    break
-                fi
-            done
-        fi
-        if test ":${xns_cv_includes:-no}" = :no ; then
-            # The next place to look now is for a peer package being built at
-            # the same directory level as this package.
-            for xns_where in strxns/src/include ; do
-                xns_dir=`echo "$srcdir/../$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
-                    xns_cv_includes="$xns_dir ../$xns_where"
+                    xns_cv_includes="$xns_dir $xns_bld"
                     break
                 fi
             done
@@ -192,15 +184,19 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
                 fi
             done
         fi
-        if test :"${xns_cv_includes:-no}" = :no ; then
-            AC_MSG_ERROR([
+    ])
+    if test :"${xns_cv_includes:-no}" = :no ; then :
+        AC_MSG_WARN([
 ***
 *** Could not find XNS include directories.  This package requires the
 *** presence of XNS include directories to compile.  Specify the location of
 *** XNS include directories with option --with-xns to configure and try again.
 *** ])
+    else
+        if test -z "$with_xns" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with xns"
         fi
-    ])
+    fi
 ])# _XNS_CHECK_HEADERS
 # =========================================================================
 

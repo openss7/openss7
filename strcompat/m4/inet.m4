@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: inet.m4,v 0.9.2.4 2005/01/22 13:26:22 brian Exp $
+dnl @(#) $Id: inet.m4,v 0.9.2.5 2005/01/23 00:24:46 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 13:26:22 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 00:24:46 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -99,99 +99,81 @@ AC_DEFUN([_INET_SETUP], [dnl
 AC_DEFUN([_INET_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS INET header files.  The package
     # normally requires INET header files to compile.
-    if test ":${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ;  then
-        inet_cv_includes="$with_inet"
-    fi
-    inet_what="sys/xti_inet.h"
-    if test ":${inet_cv_includes:-no}" = :no ; then
+    AC_CACHE_CHECK([for inet include directory], [inet_cv_includes], [dnl
+        if test ":${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ;  then
+            inet_cv_includes="$with_inet"
+        fi
+        inet_what="sys/xti_inet.h"
+        if test ":${inet_cv_includes:-no}" = :no ; then
             # The next place to look now is for a peer package being built under
-            # the same top directory.
-            for inet_where in strinet/src/include ; do
-                inet_dir=`echo "$srcdir/$inet_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                AC_MSG_CHECKING([for inet include directory $inet_dir])
+            # the same top directory, and then the higher level directory.
+            inet_here=`pwd`
+            inet_where="strinet/src/include"
+            for inet_d in . .. ; do
+                inet_dir=`echo "$srcdir/$inet_d/$inet_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                inet_bld=`echo "$inet_here/$inet_d/$inet_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $inet_dir -a -r $inet_dir/$inet_what ; then
-                    inet_cv_includes="$inet_dir ../$inet_where"
-                    AC_MSG_RESULT([yes])
+                    inet_cv_includes="$inet_dir $inet_bld"
                     break
                 fi
-                AC_MSG_RESULT([no])
             done
-    fi
-    if test ":${inet_cv_includes:-no}" = :no ; then
-            # The next place to look now is for a peer package being built at
-            # the same directory level as this package.
-            for inet_where in strinet/src/include ; do
-                inet_dir=`echo "$srcdir/../$inet_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
-                AC_MSG_CHECKING([for inet include directory $inet_dir])
-                if test -d $inet_dir -a -r $inet_dir/$inet_what ; then
-                    inet_cv_includes="$inet_dir ../$inet_where"
-                    AC_MSG_RESULT([yes])
+        fi
+        if test ":${inet_cv_includes:-no}" = :no ; then
+            eval "inet_search_path=\"
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strinet/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strinet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strinet/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strxnet/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/streams/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/LiS/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
+            inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+            inet_cv_includes=
+            for inet_dir in $inet_search_path ; do
+                if test -d "$inet_dir" -a -r "$inet_dir/$inet_what" ; then
+                    inet_cv_includes="$inet_dir"
                     break
                 fi
-                AC_MSG_RESULT([no])
             done
-    fi
-    if test ":${inet_cv_includes:-no}" = :no ; then
-        eval "inet_search_path=\"
-            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strinet/src/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strinet
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strinet/src/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strxnet/src/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/streams/src/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/LiS/include
-            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
-            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
-        inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        inet_cv_includes=
-        for inet_dir in $inet_search_path ; do
-            AC_MSG_CHECKING([for inet include directory $inet_dir])
-            if test -d "$inet_dir" -a -r "$inet_dir/$inet_what" ; then
-                inet_cv_includes="$inet_dir"
-                AC_MSG_RESULT([yes])
-                break
-            fi
-            AC_MSG_RESULT([no])
-        done
-    fi
-    AC_MSG_CHECKING([for inet include directory])
-    AC_MSG_RESULT([${inet_cv_includes:-no}])
-    if test :"${inet_cv_includes:-no}" = :no ; then
-        :
-#        AC_MSG_ERROR([
-#***
-#*** Could not find INET include directories.  This package requires the
-#*** presence of INET include directories to compile.  Specify the location of
-#*** INET include directories with option --with-inet to configure and try again.
-#***
-#        ])
+        fi
+    ])
+    if test :"${inet_cv_includes:-no}" = :no ; then :
+        AC_MSG_WARN([
+***
+*** Could not find INET include directories.  This package requires the
+*** presence of INET include directories to compile.  Specify the location of
+*** INET include directories with option --with-inet to configure and try again.
+***
+        ])
     else
         if test -z "$with_inet" ; then
             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with inet"
