@@ -35,7 +35,7 @@
 #ifndef _STATS_H
 #define _STATS_H 1
 
-#ident "@(#) LiS stats.h 2.4 11/10/00 15:52:58 "
+#ident "@(#) LiS stats.h 2.5 4/17/03 15:55:12 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -70,8 +70,9 @@
 #define	GETMSGTIME	21			/* file getmsg time */
 #define	PUTMSGTIME	22			/* file putmsg time */
 #define	POLLTIME	23			/* poll time */
+#define	LOCKCNTS	24			/* locks and contention */
 
-#define	STRMAXSTAT	24			/* largest slot */
+#define	STRMAXSTAT	25			/* largest slot */
 #define HEADERSSTR      "In-Use Message Blocks"
 #define FREEHDRSSTR     "Free Message Blocks"
 #define DATABSSTR       "Data Blocks"
@@ -96,6 +97,7 @@
 #define	GETMSGTIMESTR	"Getmsg Processing Time"
 #define	PUTMSGTIMESTR	"Putmsg Processing Time"
 #define	POLLTIMESTR	"Poll Processing Time"
+#define LOCKCNTSSTR	"Spin Lock Counts"
 
 /* per item statistics & their names
  */

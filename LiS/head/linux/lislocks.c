@@ -21,7 +21,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lislocks.c 1.20 3/6/03"
+#ident "@(#) LiS lislocks.c 1.21 4/17/03"
 
 #include <sys/LiS/linux-mdep.h>
 #include <sys/LiS/strmdbg.h>
@@ -43,6 +43,18 @@
 #endif
 
 #define FL	char *file, int line
+
+
+/************************************************************************
+*                         Lock Contention                               *
+*************************************************************************
+*									*
+* Some global counters to keep track of spin lock contention.		*
+*									*
+************************************************************************/
+
+lis_atomic_t	lis_spin_lock_count ;
+lis_atomic_t	lis_spin_lock_contention_count ;
 
 
 /************************************************************************
@@ -372,6 +384,7 @@ void    lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
     DCL_l ;
 
     (void) l ;				/* suppress compiler warning */
+    lis_atomic_inc(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
     lock->spinner_file = file ;
     lock->spinner_line = line ;
@@ -379,6 +392,8 @@ void    lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
     if ((void *) current != lock->taskp)
     {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
+	if (spin_is_locked(l))
+	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
 	spin_lock(l) ;
 #endif
 	lock->taskp = (void *) current ;
@@ -422,6 +437,7 @@ int     lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
     DCL_l ;
 
     (void) l ;				/* avoid warning in non-SMP case */
+    lis_atomic_inc(&lis_spin_lock_count) ;
     lock->spinner_file = file ;
     lock->spinner_line = line ;
     lock->spinner_cntr = ++lis_seq_cntr ;
@@ -435,6 +451,8 @@ int     lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 	    lock->owner_line = line ;
 	    lock->owner_cntr = ++lis_seq_cntr ;
 	}
+	else
+	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
 	return(ret) ;
     }
     return(1) ;				/* already held */
@@ -450,6 +468,7 @@ void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
     DCL_l ;
 
     (void) l ;				/* compiler happiness in 2.2 */
+    lis_atomic_inc(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
 
     lock->spinner_file = file ;
@@ -458,6 +477,8 @@ void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
     if ((void *) current != THELOCK->taskp)
     {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
+	if (spin_is_locked(l))
+	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
 	spin_lock_irq(l) ;
 #else					/* 2.2 kernel */
 	cli() ;				/* global cli */
@@ -504,6 +525,7 @@ void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, FL)
     DCL_l ;
 
     (void) l ;				/* compiler happiness in 2.2 */
+    lis_atomic_inc(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
 
     lock->spinner_file = file ;
@@ -512,6 +534,8 @@ void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, FL)
     if ((void *) current != THELOCK->taskp)
     {
 #if defined(KERNEL_2_3)			/* 2.3 kernel or later */
+	if (spin_is_locked(l))
+	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
 	spin_lock_irqsave(l, (*flags)) ;
 #else					/* 2.2 kernel */
 	cli() ;				/* global cli */
