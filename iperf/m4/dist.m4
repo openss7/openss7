@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/23 01:57:02 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/28 13:48:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/23 01:57:02 $ by $Author: brian $
+# Last Modified $Date: 2005/02/28 13:48:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -509,15 +509,13 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 AC_DEFUN([_DISTRO_OUTPUT], [dnl
 # now we adjust the cannonical names
     AC_MSG_CHECKING([build system type])
-    if test -z "$build_alias" ; then
-	build_vendor="$dist_cv_build_vendor"
-	case "$build_vendor" in
-	    (whitebox|redhat|suse|debian)  
-		case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
-	    (mandrake)  
-		case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
-	esac
-    fi
+    build_vendor="$dist_cv_build_vendor"
+    case "$build_vendor" in
+	(whitebox|redhat|suse|debian)  
+	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
+	(mandrake)  
+	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
+    esac
     build="${build_cpu}-${build_vendor}-${build_os}"
     AC_MSG_RESULT([$build])
     AC_MSG_CHECKING([host system type])

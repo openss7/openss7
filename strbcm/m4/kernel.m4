@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/02/25 12:49:49 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/02/28 13:48:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 12:49:49 $ by $Author: brian $
+# Last Modified $Date: 2005/02/28 13:48:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -96,6 +96,7 @@ dnl but with module flags included
     CPPFLAGS=`echo " $KERNEL_MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
     LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
+    CFLAGS="$CFLAGS -Werror"
 }
 ])# _LINUX_KERNEL_ENV_FUNCTIONS
 
@@ -224,20 +225,20 @@ dnl pull out versions from release number
     fi
     AC_CACHE_CHECK([for kernel minor release number], [linux_cv_k_minor], [dnl
 	linux_cv_k_minor="`echo $linux_cv_k_release | sed -e 's|[[0-9]]*\.||;s|[[^0-9]].*||'`" ])
-    if test ${linux_cv_k_minor:-0} -ne 4
+    if test ${linux_cv_k_minor:-0} -ne 4 -a ${linux_cv_k_minor:-0} -ne 6
     then
 	AC_MSG_ERROR([
 *** 
 *** Kernel minor release number "$linux_cv_k_minor" is either too old or too new, or
 *** the UTS_RELEASE name "$linux_cv_k_release" is mangled.  Try specifiying a
-*** 2.4 kernel with the --with-k-release option to configure.  If you are
-*** trying to compile for a 2.2, 2.3, 2.5 or 2.6 kernel, give up.  Only 2.4
+*** 2.4 or 2.6 kernel with the --with-k-release option to configure.  If you are
+*** trying to compile for a 2.2, 2.3, 2.5 or 2.7 kernel, give up.  Only 2.4 and 2.6
 *** kernels are supported at the current time.
 *** ])
     fi
     AC_CACHE_CHECK([for kernel patch release number], [linux_cv_k_patch], [dnl
 	linux_cv_k_patch="`echo $linux_cv_k_release | sed -e 's|[[0-9]]*\.[[0-9]]*\.||;s|[[^0-9]].*||'`" ])
-    if test ${linux_cv_k_patch:-0} -le 10
+    if test ${linux_cv_k_minor:-0} -eq 4 -a ${linux_cv_k_patch:-0} -le 10
     then
 	AC_MSG_ERROR([
 *** 
@@ -251,6 +252,16 @@ dnl pull out versions from release number
     AC_SUBST([kversion])dnl
     knumber="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
     AC_SUBST([knumber])dnl
+    if test "$linux_cv_k_minor" -eq 4
+    then
+	AC_DEFINE_UNQUOTED([LINUX_2_4], [], [Define for the linux 2.4 kernel series.])
+    fi
+    if test "$linux_cv_k_minor" -eq 6
+    then
+	AC_DEFINE_UNQUOTED([LINUX_2_6], [], [Define for the linux 2.6 kernel series.])
+    fi
+    AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_minor -eq 4])
+    AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_minor -eq 6])
 ])# _LINUX_CHECK_KERNEL_RELEASE
 # =========================================================================
 
@@ -345,7 +356,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
 	if test -r $linux_cv_k_modules_eval/modules.dep
 	then
-	    if ( grep -q '\.o\.gz:' $linux_cv_k_modules_eval/modules.dep )
+	    if ( egrep -q '\.(k)?o\.gz:' $linux_cv_k_modules_eval/modules.dep )
 	    then
 		linux_cv_k_compress='yes'
 	    else
@@ -358,7 +369,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	(yes)		COMPRESS_KERNEL_MODULES='gzip -9' ;;
 	(no)		COMPRESS_KERNEL_MODULES= ;;
 	(unknown|*)	COMPRESS_KERNEL_MODULES=
-	    AC_MSG_WARN([
+		AC_MSG_WARN([
 **** 
 **** Strange, the modules directory is $linux_cv_k_modules_eval
 **** but the file $linux_cv_k_modules_eval/modules.dep does
@@ -622,13 +633,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [dnl
 	case "$target_cpu" in
 	    (i586)
 		case "${target_alias:-${host_alias:-$build_alias}}" in
-		    (k6*)	linux_cv_march=k6 ;;
+		    (k6-*)	linux_cv_march=k6 ;;
 		    (*)		linux_cv_march=i586 ;;
 		esac
 		;;
 	    (i686)
 		case "${target_alias:-${host_alias:-$build_alias}}" in
-		    (athlon*)	linux_cv_march=athlon ;;
+		    (athlon-*)	linux_cv_march=athlon ;;
 		    (*)		linux_cv_march=i686 ;;
 		esac
 		;;
@@ -687,24 +698,24 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
 	    linux_cv_k_machdir="$with_k_machdir"
 	else
 	    case "$karch" in
-		(alpha*)		linux_cv_k_machdir="alpha"	;;
-		(arm*|sa110)		linux_cv_k_machdir="arm"	;;
-		(cris*)			linux_cv_k_machdir="cris"	;;
-		(i?86*|k6*|athlon*)	linux_cv_k_machdir="i386"	;;
-		(ia64)			linux_cv_k_machdir="ia64"	;;
-		(m68*)			linux_cv_k_machdir="m68k"	;;
-		(mips64*)		linux_cv_k_machdir="mips64"	;;
-		(mips*)			linux_cv_k_machdir="mips"	;;
-		(hppa*)			linux_cv_k_machdir="parisc"	;;
-		(ppc*|powerpc*)		linux_cv_k_machdir="ppc"	;;
-		(s390x*)		linux_cv_k_machdir="s390x"	;;
-		(s390*)			linux_cv_k_machdir="s390"	;;
-		(sh*)			linux_cv_k_machdir="sh"		;;
-		(sparc64*|sun4u)	linux_cv_k_machdir="sparc64"	;;
-		(sparc*)		linux_cv_k_machdir="sparc"	;;
-		(*)			linux_cv_k_machdir="$karch"	;;
+		(alpha*)		linux_cv_k_mach="alpha"	 ;;
+		(arm*|sa110)		linux_cv_k_mach="arm"	  ;;
+		(cris*)			linux_cv_k_mach="cris"	  ;;
+		(i?86*|k6*|athlon*)	linux_cv_k_mach="i386"	  ;;
+		(ia64)			linux_cv_k_mach="ia64"	  ;;
+		(m68*)			linux_cv_k_mach="m68k"	  ;;
+		(mips64*)		linux_cv_k_mach="mips64"  ;;
+		(mips*)			linux_cv_k_mach="mips"	  ;;
+		(hppa*)			linux_cv_k_mach="parisc"  ;;
+		(ppc*|powerpc*)		linux_cv_k_mach="ppc"	  ;;
+		(s390x*)		linux_cv_k_mach="s390x"	  ;;
+		(s390*)			linux_cv_k_mach="s390"	  ;;
+		(sh*)			linux_cv_k_mach="sh"	  ;;
+		(sparc64*|sun4u)	linux_cv_k_mach="sparc64" ;;
+		(sparc*)		linux_cv_k_mach="sparc"	  ;;
+		(*)			linux_cv_k_mach="$karch"  ;;
 	    esac
-	    linux_cv_k_machdir="${kbuilddir}/arch/${linux_cv_k_machdir}"
+	    linux_cv_k_machdir="${kbuilddir}/arch/${linux_cv_k_mach}"
 	fi
 	if test :"${linux_cv_k_machdir:-no}" != :no -a \
 	    \( ! -d "$linux_cv_k_machdir" -o ! -f "$linux_cv_k_machdir/Makefile" \)
@@ -718,6 +729,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
 *** configure before attempting again.
 *** ])
 	fi ])
+    test -d include2 || mkdir include2
+    ln -snf "${kbuilddir}/include/asm-${linux_cv_k_mach}" include2/asm
+    mkdir include2
     kmachdir="$linux_cv_k_machdir"
     AC_SUBST([kmachdir])dnl
 ])# _LINUX_CHECK_KERNEL_MACHDIR
@@ -1038,7 +1052,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
     AC_CACHE_CHECK([for kernel CFLAGS], [linux_cv_k_cflags], [dnl
-	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} cflag-check`"
+	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} cflag-check`"
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
 	    AS_HELP_STRING([--with-k-optimize=HOW],
@@ -1087,15 +1101,21 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	then
 	    linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
 	fi
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude\>| -I${kbuilddir}/include|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9]]* | $linux_cflags |"` ])
     CFLAGS="$linux_cv_k_cflags"
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
-	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} cppflag-check`"
-	linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
-	linux_cv_k_cppflags="${linux_tmp:+-nostdinc -I${linux_tmp} }-DLINUX $linux_cv_k_cppflags" ])
+	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} cppflag-check`"
+dnl	linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
+dnl	linux_cv_k_cppflags="${linux_tmp:+-nostdinc -I${linux_tmp} }-DLINUX $linux_cv_k_cppflags"
+	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags" ])
+	# need to adjust 2.6.3 kernel stupid include includes to add the absolute location of the
+	# source directory
+	# include2 on the otherhand is properly set up for the asm directory
+	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude\>| -I${kbuilddir}/include|g"`
     CPPFLAGS="$linux_cv_k_cppflags"
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
-	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} modflag-check`" ])
+	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} modflag-check`" ])
     KERNEL_MODFLAGS="$linux_cv_k_modflags"][dnl
 ])# _LINUX_SETUP_KERNEL_CFLAGS
 # =========================================================================
@@ -1396,7 +1416,7 @@ AC_DEFUN([_LINUX_CHECK_MEMBER_internal],
 	     [m4_fatal([$0: Did not see any dot in '$1'])])dnl
     AS_VAR_PUSHDEF([linux_Member], [linux_cv_member_$1])dnl
     dnl Extract the aggregate name, and the member name
-    AC_CACHE_CHECK([for kernel $1], linux_Member,
+    AC_CACHE_CHECK([for kernel member $1], linux_Member,
     [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])],
     [dnl AGGREGATE linux_aggr;
     static m4_bpatsubst([$1], [\..*]) linux_aggr;
@@ -1426,8 +1446,7 @@ AC_DEFUN([_LINUX_CHECK_MEMBERS_internal],
     [m4_foreach([LK_Member], [$1],
 	[_LINUX_CHECK_MEMBER_internal(LK_Member,
 	    [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_[]LK_Member), 1,
-		[Define to 1 if `]m4_bpatsubst(LK_Member, [^[^.]*\.])[' is member of
-		 `]m4_bpatsubst(LK_Member, [\..*])['.])
+		[Define to 1 if `]m4_bpatsubst(LK_Member, [^[^.]*\.])[' is member of `]m4_bpatsubst(LK_Member, [\..*])['.])
 $2],
 		[$3],
 		[$4])])
@@ -1459,11 +1478,72 @@ AC_DEFUN([_LINUX_CHECK_MEMBERS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _LINUX_CHECK_FUNC_internal(FUNCTION, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_FUNC
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_FUNC_internal],
+    [AS_VAR_PUSHDEF([linux_Function], [linux_cv_func_$1])dnl
+    AC_CACHE_CHECK([for kernel function $1], linux_Function,
+	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])], [
+void (*my_autoconf_function_pointer)(void) = (typeof(my_autoconf_function_pointer))&$1;
+	 ])],
+	[AS_VAR_SET(linux_Function, yes)],
+	[AS_VAR_SET(linux_Function, no)])])
+    AS_IF([test :AS_VAR_GET(linux_Function) = :yes], [$2], [$3])dnl
+    AS_VAR_POPDEF([linux_Function])dnl
+])# _LINUX_CHECK_FUNC_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_FUNCS_internal(FUNCTIONS, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_FUNCS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_FUNCS_internal],
+[AC_FOREACH([LK_Function], [$1],
+  [AH_TEMPLATE(AS_TR_CPP(HAVE_KFUNC_[]LK_Function),
+	       [Define to 1 if kernel function ]LK_Function[() exists.])])dnl
+for lk_func in $1
+do
+    _LINUX_CHECK_FUNC_internal($lk_func,
+			       [AC_DEFINE_UNQUOTED([AS_TR_CPP([HAVE_KFUNC_$lk_func])])
+$2],
+			       [$3], [$4])dnl
+done
+])# _LINUX_CHECK_FUNCS_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_FUNC(FUNCTION, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent to AC_CHECK_FUNC
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_FUNC], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+	_LINUX_CHECK_FUNC_internal([$1], [$2], [$3], [$4])])
+])# _LINUX_CHECK_FUNC
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_FUNCS(FUNCTIONS, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_FUNCS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_FUNCS], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+	_LINUX_CHECK_FUNCS_internal([$1], [$2], [$3], [$4])])
+])# _LINUX_CHECK_FUNCS
+# =============================================================================
+
+# =============================================================================
 # _LINUX_CHECK_TYPE_internal
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_TYPE_internal], [dnl
     AS_VAR_PUSHDEF([linux_Type], [linux_cv_type_$1])dnl
-    AC_CACHE_CHECK([for kernel $1], linux_Type,
+    AC_CACHE_CHECK([for kernel type $1], linux_Type,
 	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])],
 [if (($1 *) 0)
     return 0;
@@ -1517,7 +1597,7 @@ AC_DEFUN([_LINUX_CHECK_TYPES], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_HEADER_internal], [dnl
     AS_VAR_PUSHDEF([linux_Header], [linux_cv_header_$1])dnl
-    AC_CACHE_CHECK([for kernel $1], linux_Header,
+    AC_CACHE_CHECK([for kernel header $1], linux_Header,
 	[AC_COMPILE_IFELSE([AC_LANG_SOURCE([AC_INCLUDES_DEFAULT([$4])
 @%:@include <$1>])],
 	[AS_VAR_SET(linux_Header, yes)],
@@ -1534,14 +1614,14 @@ AC_DEFUN([_LINUX_CHECK_HEADERS_internal], [dnl
     AC_FOREACH([LK_Header], [$1],
 	[AH_TEMPLATE(AS_TR_CPP(HAVE_[]LK_Header),
 	    [Define to 1 if you have the <]LK_Header[> header file.])])
-    for lk_header in $1
-    do
+for lk_header in $1
+do
     _LINUX_CHECK_HEADER_internal($lk_header,
 	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$lk_header))
 $2],
 	[$3],
 	[$4])dnl
-    done
+done
 ])# _LINUX_CHECK_HEADERS_internal
 # =============================================================================
 
@@ -1569,7 +1649,7 @@ AC_DEFUN([_LINUX_CHECK_HEADERS], [dnl
 # _LINUX_CHECK_KERNEL_CONFIG_internal([CHECKING-LABEL], CONFIG-NAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
-    if test -n "$1" ; then linux_tmp="$1" ; else linux_tmp="for kernel $2" ; fi
+    if test -n "$1" ; then linux_tmp="$1" ; else linux_tmp="for kernel config $2" ; fi
     AS_VAR_PUSHDEF([linux_config], [linux_cv_$2])dnl
     AC_CACHE_CHECK([$linux_tmp], [linux_cv_$2], [dnl
 	AC_EGREP_CPP([\<yes_we_have_$2_defined\>], [

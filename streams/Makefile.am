@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/02/25 08:14:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/02/28 13:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 08:14:20 $ by $Author: brian $
+# Last Modified $Date: 2005/02/28 13:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -610,7 +610,7 @@ GENKSYMS_CPPFLAGS		= \
 				-I./src/kernel -I$(srcdir)/src/kernel \
 				-I./src/drivers -I$(srcdir)/src/drivers \
 				-I./src/modules -I$(srcdir)/src/modules \
-				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS)
+				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 include am/genksyms.am
 

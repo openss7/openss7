@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:25 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 /* 
@@ -103,10 +99,6 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
-
 #define _HPUX_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
@@ -122,7 +114,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
+#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:55 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:55 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or

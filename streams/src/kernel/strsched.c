@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #include <linux/compiler.h>
 #include <linux/spinlock.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
+#ifdef HAVE_LINUX_LOCKS_H
 #include <linux/locks.h>
+#endif
 #include <linux/delay.h>
 #include <linux/sysctl.h>
 #include <linux/file.h>
@@ -84,10 +82,6 @@ static char const ident[] =
 #endif
 #include <linux/major.h>
 // #include <asm/atomic.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -1141,7 +1135,11 @@ static void timeout_function(unsigned long arg)
 	*xchg(&t->strtimout_tail, &se->se_next) = se;
 	/* bind timeout back to the CPU that called for it */
 	if (!test_and_set_bit(strtimout, &t->flags))
+#if defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 		cpu_raise_softirq(se->x.t.cpu, STREAMS_SOFTIRQ);
+#else
+		raise_softirq(STREAMS_SOFTIRQ);
+#endif
 }
 
 #if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \

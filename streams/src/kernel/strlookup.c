@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 10:37:14 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/28 14:13:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/11/08 10:37:14 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 10:37:14 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/28 14:13:57 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 10:37:14 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/28 14:13:57 $";
 
 #define __NO_VERSION__
 
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #ifdef CONFIG_KMOD
@@ -74,17 +70,21 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #include <linux/file.h>		/* for fput */
 #include <linux/poll.h>
 #include <linux/fs.h>
+#include <linux/mount.h>	/* for vfsmount stuff */
 #include <asm/hardirq.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 #include <sys/kmem.h>		/* for kmem_ */
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
 #include <sys/ddi.h>
+
+#ifndef HAVE_KFUNC_TRY_MODULE_GET
+#define try_module_get try_inc_mod_count
+#endif
+#ifndef HAVE_KFUNC_MODULE_PUT
+#define module_put(__m) __MOD_DEC_USE_COUNT((__m))
+#endif
 
 #include "sys/config.h"
 #include "sth.h"		/* for stream operations */
@@ -414,7 +414,7 @@ STATIC struct cdevsw *cdev_lookup(major_t major, int load)
 		} while (0);
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
-			if (try_inc_mod_count(cdev->d_kmod)) {
+			if (try_module_get(cdev->d_kmod)) {
 				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__, cdev->d_name));
 				break;
 			}
@@ -456,7 +456,7 @@ STATIC struct cdevsw *cdrv_lookup(modID_t modid, int load)
 		} while (0);
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
-			if (try_inc_mod_count(cdev->d_kmod)) {
+			if (try_module_get(cdev->d_kmod)) {
 				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
 				break;
@@ -499,7 +499,7 @@ STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
 		} while (0);
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
-			if (try_inc_mod_count(fmod->f_kmod)) {
+			if (try_module_get(fmod->f_kmod)) {
 				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
@@ -600,7 +600,7 @@ STATIC struct cdevsw *cdev_search(const char *name, int load)
 		} while (0);
 		/* try to acquire the module */
 		if (cdev && cdev->d_str)
-			if (try_inc_mod_count(cdev->d_kmod)) {
+			if (try_module_get(cdev->d_kmod)) {
 				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					cdev->d_name));
 				break;
@@ -645,7 +645,7 @@ STATIC struct fmodsw *fmod_search(const char *name, int load)
 		} while (0);
 		/* try to acquire the module */
 		if (fmod && fmod->f_str)
-			if (try_inc_mod_count(fmod->f_kmod)) {
+			if (try_module_get(fmod->f_kmod)) {
 				ptrace(("%s: %s: incremented mod count\n", __FUNCTION__,
 					fmod->f_name));
 				break;
@@ -760,7 +760,7 @@ void cdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
 		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
-		__MOD_DEC_USE_COUNT(cdev->d_kmod);
+		module_put(cdev->d_kmod);
 	}
 }
 
@@ -823,7 +823,7 @@ void fmod_put(struct fmodsw *fmod)
 {
 	if (fmod && fmod->f_kmod) {
 		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
-		__MOD_DEC_USE_COUNT(fmod->f_kmod);
+		module_put(fmod->f_kmod);
 	}
 }
 
@@ -952,66 +952,6 @@ minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
 
 EXPORT_SYMBOL_GPL(cdev_minor);
 
-/*
- *  spec_dir_alloc: - allocate a specfs directory entry
- *  @parent: parenty directory entry
- *  @name: directory name
- *  @opaque: opaque data for iget4
- */
-STATIC struct dentry *spec_dir_alloc(struct dentry *parent, const char *name, long ino, void *opaque)
-{
-	struct dentry *dentry;
-	struct inode *base = parent->d_inode;
-	struct qstr str;
-	ptrace(("strreg: allocating dentry %s for parent %s ino %ld opaque %p\n", name, parent->d_name.name, ino, opaque));
-	str.name = name;
-	str.len = strnlen(name, FMNAMESZ);
-	str.hash = full_name_hash(str.name, str.len);
-	// down(&base->i_sem); /* don't do this: we hold a cdevsw lock */
-	if ((dentry = d_alloc(parent, &str)))
-		d_add(dentry, iget4(base->i_sb, ino, NULL, opaque));
-	// up(&base->i_sem); /* don't do this: we hold a cdevsw lock */
-	if (dentry && !dentry->d_inode) {
-		dput(dentry);
-		dentry = NULL;
-	}
-	return (dentry);
-}
-
-/*
- *  spec_dir_delete: - delete a specfs directory entry
- *  @parent: parent directory entry
- *  @child: child directory entry to delete
- */
-STATIC void spec_dir_delete(struct dentry *child)
-{
-	struct inode *base, *inode;
-	struct dentry *parent;
-	if (!child || !(parent = child->d_parent))
-		return;
-	ptrace(("strreg: deallocating dentry %s from parent %s\n", child->d_name.name, parent->d_name.name));
-	base = parent->d_inode;
-	inode = child->d_inode;
-	triple_down(&base->i_sem, &base->i_zombie, &inode->i_zombie);
-	dget(child);
-	switch (atomic_read(&child->d_count)) {
-	default:
-		shrink_dcache_parent(child);
-		if (atomic_read(&child->d_count) != 2)
-			break;
-	case 2:
-		d_drop(child);
-	}
-	inode->u.generic_ip = NULL;
-	inode->i_nlink--;
-	inode->i_flags |= S_DEAD;
-	double_up(&base->i_zombie, &inode->i_zombie);
-	d_delete(child);
-	dput(child);
-	dput(child);
-	up(&base->i_sem);
-}
-
 void fmod_add(struct fmodsw *fmod, modID_t modid)
 {
 	fmod->f_modid = modid;
@@ -1033,16 +973,34 @@ EXPORT_SYMBOL_GPL(fmod_del);
 
 int cdev_add(struct cdevsw *cdev, modID_t modid)
 {
-	struct vfsmount *mnt;
-	if (!(mnt = specfs_get()))
-		return (-ENODEV);
-	/* get a dentry if required */
-	if (!cdev->d_dentry &&
-	    !(cdev->d_dentry = spec_dir_alloc(mnt->mnt_root, cdev->d_name, modid, cdev))) {
-		ptrace(("couldn't allocate dentry\n"));
+	struct inode *inode;
+	struct super_block *sb;
+	{
+		dev_t dev = makedevice(0, modid);
+		struct vfsmount *mnt;
+		if (!(mnt = specfs_get()))
+			return (-ENODEV);
+		sb = mnt->mnt_sb;
+#ifdef HAVE_KFUNC_IGET_LOCKED
+		inode = iget_locked(sb, dev);
+#else
+		inode = iget4(sb, dev, NULL, cdev);
+#endif
 		specfs_put();
+	}
+	if (!inode) {
+		ptrace(("couldn't allocate inode\n"));
 		return (-ENOMEM);
 	}
+#ifdef HAVE_KFUNC_IGET_LOCKED
+	if (inode->i_state & I_NEW) {
+		inode->u.generic_ip = cdev;
+		sb->s_op->read_inode(inode);
+		inode->i_nlink++;
+		unlock_new_inode(inode);
+	}
+#endif
+	cdev->d_inode = inode;
 	cdev->d_modid = modid;
 	list_add(&cdev->d_list, &cdevsw_list);
 	list_add(&cdev->d_hash, strmod_hash_slot(modid));
@@ -1063,7 +1021,7 @@ EXPORT_SYMBOL_GPL(cdev_add);
 void cdev_del(struct cdevsw *cdev)
 {
 	/* put away dentry if necessary */
-	spec_dir_delete(xchg(&cdev->d_dentry, NULL));
+	iput(xchg(&cdev->d_inode, NULL));
 	/* remove from list and hash */
 	list_del_init(&cdev->d_list);
 	list_del_init(&cdev->d_hash);
@@ -1100,17 +1058,38 @@ EXPORT_SYMBOL_GPL(cmaj_del);
 
 int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 {
+	struct inode *inode;
+	struct super_block *sb;
+	{
+		dev_t dev = makedevice(cdev->d_modid, minor);
+		struct vfsmount *mnt;
+		if (!(mnt = specfs_get()))
+			return (-ENODEV);
+		sb = mnt->mnt_sb;
+		/* get dentry if required */
+#ifdef HAVE_KFUNC_IGET_LOCKED
+		inode = iget_locked(sb, dev);
+#else
+		inode = iget4(sb, dev, NULL, cdev);
+#endif
+		specfs_put();
+	}
+	if (!inode) {
+		ptrace(("couldn't allocate inode\n"));
+		return (-ENOMEM);
+	}
+#ifdef HAVE_KFUNC_IGET_LOCKED
+	if (inode->i_state & I_NEW) {
+		inode->u.generic_ip = cdev;
+		sb->s_op->read_inode(inode);
+		inode->i_nlink++;
+		unlock_new_inode(inode);
+	}
+#endif
+	cmin->n_inode = inode;
 	cmin->n_dev = cdev;
 	cmin->n_modid = cdev->d_modid;
 	cmin->n_minor = minor;
-	/* get dentry if required */
-	if (!cmin->n_dentry
-	    && !(cmin->n_dentry =
-		 spec_dir_alloc(cdev->d_dentry, cmin->n_name,
-				makedevice(cmin->n_modid, cmin->n_minor), cmin))) {
-		ptrace(("couldn't allocate dentry\n"));
-		return (-ENOMEM);
-	}
 	if (!cmin->n_str)
 		cmin->n_str = cdev->d_str;
 	if (!cmin->n_mode & S_IFMT)
@@ -1130,7 +1109,7 @@ EXPORT_SYMBOL_GPL(cmin_add);
 void cmin_del(struct devnode *cmin, struct cdevsw *cdev)
 {
 	/* put away dentry if required */
-	spec_dir_delete(xchg(&cmin->n_dentry, NULL));
+	iput(xchg(&cmin->n_inode, NULL));
 	cmin->n_dev = NULL;
 	cmin->n_modid = -1;
 	cmin->n_minor = -1;

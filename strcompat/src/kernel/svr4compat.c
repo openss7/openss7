@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 /* 
@@ -101,13 +97,11 @@ static char const ident[] =
 #include <linux/spinlock.h>	/* for spinlock functions */
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/interrupt.h>	/* for local_irq functions */
+#ifdef HAVE_ASM_SOFTIRQ_H
 #include <asm/softirq.h>	/* for local_bh_ functions */
+#endif
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 #define _SVR4_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
@@ -124,7 +118,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"

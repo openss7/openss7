@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.2 2005/02/28 13:49:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/28 13:49:24 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,6 +69,7 @@
 #if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
 
 #include <linux/poll.h>
+#include <linux/interrupt.h>
 
 #define LIS_MAXAPUSH	8
 #define LIS_FMNAMESZ	8
@@ -268,7 +269,11 @@ extern struct inode *lis_old_inode(struct file *f, struct inode *i);
 extern lis_atomic_t lis_open_cnt;
 extern void lis_osif_cli(void);
 extern void lis_osif_do_gettimeofday(struct timeval *tp);
+#ifdef HAVE_TIMESPEC_DO_SETTIMEOFDAY
+extern int lis_osif_do_settimeofday(struct timespec *tp);
+#else
 extern void lis_osif_do_settimeofday(struct timeval *tp);
+#endif
 extern void lis_osif_sti(void);
 extern int lis_own_spl(void);
 extern void *lis_phys_to_virt(unsigned long addr);
@@ -293,8 +298,13 @@ extern lis_atomic_t lis_queues_running;
 extern int lis_recvfd(struct stdata *recvhd, strrecvfd_t * recv, struct file *fp);
 extern void lis_release_region(unsigned int from, unsigned int extent);
 extern int lis_request_dma(unsigned int dma_nr, const char *device_id);
+#ifdef HAVE_IRQRETURN_T
+extern int lis_request_irq(unsigned int irq, irqreturn_t (*handler) (int, void *, struct pt_regs *),
+			   unsigned long flags, const char *device, void *dev_id);
+#else
 extern int lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *),
 			   unsigned long flags, const char *device, void *dev_id);
+#endif
 extern void lis_request_region(unsigned int from, unsigned int extent, const char *name);
 extern volatile unsigned long lis_runq_cnts[NR_CPUS];
 extern lis_atomic_t lis_runq_req_cnt;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/28 13:46:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/28 13:46:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/28 13:46:47 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -170,7 +162,11 @@ int autopush_add(struct strapush *sap)
 	default:
 		goto error;
 	}
+#ifndef MAX_CHRDEV
+	if (sap->sap_major != MAJOR(MKDEV(sap->sap_major, 0)))
+#else
 	if (sap->sap_major >= MAX_CHRDEV)
+#endif
 		goto error;
 	if (sap->sap_minor > 255)
 		goto error;
@@ -203,7 +199,11 @@ int autopush_del(struct strapush *sap)
 	struct cdevsw *cdev;
 	int err;
 	err = -EINVAL;
+#ifndef MAX_CHRDEV
+	if (sap->sap_major != MAJOR(MKDEV(sap->sap_major, 0)))
+#else
 	if (sap->sap_major >= MAX_CHRDEV)
+#endif
 		goto error;
 	err = -ENODEV;
 	if ((cdev = cdev_get(sap->sap_major)) == NULL)
@@ -271,7 +271,11 @@ int apush_get(struct strapush *sap)
 	struct strapush *ap;
 	if (sap != NULL) {
 		dev_t dev;
+#ifndef MAX_CHRDEV
+		if (sap->sap_major != MAJOR(MKDEV(sap->sap_major, 0)))
+#else
 		if (sap->sap_major >= MAX_CHRDEV)
+#endif
 			goto einval;
 		if (sap->sap_minor > 255)
 			goto einval;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 /* 
@@ -103,10 +99,6 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
-
 #define _OSF_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
@@ -122,7 +114,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -217,7 +209,11 @@ int streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int
 	case MODOPEN:
 	{
 		/* just push modules on list with no device */
+#ifdef NODEV
 		sp->dev = NODEV;
+#else
+		sp->dev = 0;
+#endif
 		break;
 	}
 	}

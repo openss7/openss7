@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/22 06:42:27 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,36 +46,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/22 06:42:27 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/22 06:42:27 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #include <linux/compiler.h>
 #include <linux/kernel.h>
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
-
 #include "sys/config.h"
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/22 06:42:27 $"
+#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"

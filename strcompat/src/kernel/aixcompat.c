@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:25 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 /* 
@@ -103,10 +99,6 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
-
 #define _AIX_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
@@ -123,7 +115,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:45 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -223,7 +215,11 @@ int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *devp, int flag,
 	case MODOPEN:
 	{
 		/* just push modules on list with no device */
+#ifdef NODEV
 		mi->mi_dev = NODEV;
+#else
+		mi->mi_dev = 0;
+#endif
 		break;
 	}
 	}
@@ -336,7 +332,11 @@ int str_install_AIX(int cmd, strconf_t * sc)
 	{
 		struct cdevsw *cdev;
 		int err;
+#ifdef MAX_CHRDEV
 		if (0 >= sc->sc_major || sc->sc_major >= MAX_CHRDEV)
+#else
+		if (sc->sc_major != MAJOR(MKDEV(sc->sc_major, 0)))
+#endif
 			return (EINVAL);
 		/* We don't do old-style opens */
 		if (!(sc->sc_open_stylesc_flags & STR_NEW_OPEN))

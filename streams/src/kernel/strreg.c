@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/10 04:36:17 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/28 14:13:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/10 04:36:17 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/10 04:36:17 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/28 14:13:57 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/10 04:36:17 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/28 14:13:57 $";
 
 #define __NO_VERSION__
 
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #ifdef CONFIG_KMOD
@@ -75,11 +71,11 @@ static char const ident[] =
 #include <linux/file.h>		/* for fput */
 #include <linux/poll.h>
 #include <linux/fs.h>
-#include <asm/hardirq.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
+#include <linux/mount.h>	/* for vfsmount and friends */
+#ifdef HAVE_LINUX_NAMEI_H
+#include <linux/namei.h>	/* for lookup_hash on 2.6 */
 #endif
+#include <asm/hardirq.h>
 
 #include <sys/kmem.h>		/* for kmem_ */
 #include <sys/stream.h>
@@ -325,10 +321,12 @@ EXPORT_SYMBOL_GPL(unregister_strdrv);
  *  only one character major device number will be allocated.  If @major is zero on each call, a new
  *  available major device number will be allocated on each call.
  */
-STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major, struct file_operations *fops)
+STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
+			   struct file_operations *fops)
 {
 	int err = 0;
-	ptrace(("registering major %hu device node %s to driver %s\n", major, cmaj->n_name, cdev->d_name));
+	ptrace(("registering major %hu device node %s to driver %s\n", major, cmaj->n_name,
+		cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
 		err = -EINVAL;
@@ -337,7 +335,12 @@ STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t ma
 			break;
 		}
 		err = -EINVAL;
-		if (major >= MAX_CHRDEV) {
+#ifndef MAX_CHRDEV
+		if (major != MAJOR(MKDEV(major, 0)))
+#else
+		if (major >= MAX_CHRDEV)
+#endif
+		{
 			printd(("invalid major device number\n"));
 			break;
 		}
@@ -387,7 +390,8 @@ STATIC int register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t ma
 STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major)
 {
 	int err = 0;
-	ptrace(("unregistering major %hu device node %s from driver %s\n", major, cmaj->n_name, cdev->d_name));
+	ptrace(("unregistering major %hu device node %s from driver %s\n", major, cmaj->n_name,
+		cdev->d_name));
 	write_lock(&cdevsw_lock);
 	do {
 		struct devnode *d;
@@ -397,7 +401,12 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t 
 			break;
 		}
 		err = -EINVAL;
-		if (major >= MAX_CHRDEV) {
+#ifndef MAX_CHRDEV
+		if (major != MAJOR(MKDEV(major, 0)))
+#else
+		if (major >= MAX_CHRDEV)
+#endif
+		{
 			printd(("invalid major argument\n"));
 			break;
 		}
@@ -418,7 +427,8 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t 
 				break;
 			}
 			cmaj_del(cmaj, cdev);
-			printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name, cmaj->n_major));
+			printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name,
+				cmaj->n_major));
 		} else {
 			struct list_head *pos;
 			/* deregister all major device numbers */
@@ -426,7 +436,8 @@ STATIC int unregister_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t 
 				cmaj = list_entry(pos, struct devnode, n_list);
 				unregister_chrdev(cmaj->n_major, cdev->d_name);
 				cmaj_del(cmaj, cdev);
-				printd(("STREAMS: unregistered driver %s, major %hu\n", cdev->d_name, cmaj->n_major));
+				printd(("STREAMS: unregistered driver %s, major %hu\n",
+					cdev->d_name, cmaj->n_major));
 			}
 		}
 		err = 0;
@@ -461,7 +472,8 @@ int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *
 	cmaj->n_minor = 0;
 	cmaj->n_dev = cdev;
 	if ((err = register_xinode(cdev, cmaj, major, fops)) < 0) {
-		printd(("could not register major %hu to %s, err = %d\n", major, cdev->d_name, -err));
+		printd(("could not register major %hu to %s, err = %d\n", major, cdev->d_name,
+			-err));
 		goto no_xinode;
 	}
 	return (err);
@@ -486,7 +498,8 @@ int unregister_cmajor(struct cdevsw *cdev, major_t major)
 		goto error;
 	}
 	if ((err = unregister_xinode(cdev, cmaj, major)) < 0) {
-		printd(("could not unregister major device node %hu from %s, err = %d\n", major, cdev->d_name, -err));
+		printd(("could not unregister major device node %hu from %s, err = %d\n", major,
+			cdev->d_name, -err));
 		goto error;
 	}
 	kfree(cmaj);
@@ -681,91 +694,89 @@ STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
  */
 struct dentry *spec_dentry(dev_t dev, int *sflagp)
 {
-	int err;
-	struct dentry *parent, *dentry = NULL;
-	struct inode *inode;
+	struct dentry *dentry;
 	struct cdevsw *cdev;
-	struct devnode *cmin;
 	ptrace(("%s: finding dentry for major %hu minor %hu\n", __FUNCTION__, getmajor(dev),
 		getminor(dev)));
-	err = -ENXIO;
-	if (!(cdev = cdrv_get(getmajor(dev))))
-		goto no_cdev;
-	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-	err = -ENOENT;
-	if (!(parent = dget(cdev->d_dentry)))
-		goto no_parent;
-	printd(("%s: parent dentry %s\n", __FUNCTION__, parent->d_name.name));
-	err = -ENOMEM;
-	if (!(inode = parent->d_inode))
-		goto no_inode;
-	printd(("%s: parent inode %ld\n", __FUNCTION__, inode->i_ino));
-	err = -ENODEV;
-	if (is_bad_inode(inode))
-		goto no_inode;
-	/* lock the parent */
-	if ((err = down_interruptible(&inode->i_sem)) < 0)
-		goto no_lock;
-	if (sflagp && cdev->d_flag & D_CLONE)
-		*sflagp = CLONEOPEN;
-	printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(dev)));
-	if ((cmin = cmin_get(cdev, getminor(dev)))) {
-		printd(("%s: found minor device %hu\n", __FUNCTION__, getminor(dev)));
-		dentry = dget(cmin->n_dentry);
-		if (sflagp && cmin->n_flag & D_CLONE)
-			*sflagp = CLONEOPEN;
-	} else {
-		char buf[32];
+	{
 		struct qstr name;
+		char buf[32];
+		dentry = ERR_PTR(-ENXIO);
+		if (!(cdev = cdrv_get(getmajor(dev))))
+			goto done;
+		if (sflagp && cdev->d_flag & D_CLONE)
+			*sflagp = CLONEOPEN;
+		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+		snprintf(buf, 32, "%s", cdev->d_name);
+		cdrv_put(cdev);
 		name.name = buf;
-		name.len = snprintf(buf, 32, "%u", getminor(dev));
 		name.len = strnlen(buf, 32 - 1);
 		name.hash = full_name_hash(name.name, name.len);
-		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__,
-			getminor(dev), name.name, name.len));
-		dentry = lookup_hash(&name, parent);
+		{
+			struct vfsmount *mnt;
+			dentry = ERR_PTR(-EIO);
+			if (!(mnt = specfs_get()))
+				goto done;
+			printd(("%s: got mount point\n", __FUNCTION__));
+			down(&mnt->mnt_root->d_inode->i_sem);
+			dentry = lookup_hash(&name, mnt->mnt_root);
+			up(&mnt->mnt_root->d_inode->i_sem);
+			specfs_put();
+		}
 	}
-	err = -ENOENT;		/* XXX */
-	if (!dentry) {
-		ptrace(("%s: dentry lookup is NULL\n", __FUNCTION__));
-		goto no_dentry;
-	}
-	err = PTR_ERR(dentry);
 	if (IS_ERR(dentry)) {
-		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -err));
-		goto no_dentry;
+		ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__, -(int)PTR_ERR(dentry)));
+		goto done;
 	}
-	/* we only fail to get an inode when memory allocation fails */
-	err = -ENOMEM;
 	if (!dentry->d_inode) {
 		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
-		goto bad_dentry;
+		goto enoent;
 	}
-	/* we only get a bad inode when there is no device entry */
-	err = -ENODEV;
-	if (is_bad_inode(dentry->d_inode)) {
-		ptrace(("%s: bad inode on lookup\n", __FUNCTION__));
-		goto bad_dentry;
+	{
+		struct qstr name;
+		char buf[32];
+		struct dentry *parent = dentry;
+		printd(("%s: parent dentry %s, inode %ld\n", __FUNCTION__, parent->d_name.name,
+			parent->d_inode->i_ino));
+		{
+			struct devnode *cmin;
+			printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(dev)));
+			if ((cmin = cmin_get(cdev, getminor(dev)))) {
+				if (sflagp && cmin->n_flag & D_CLONE)
+					*sflagp = CLONEOPEN;
+				printd(("%s: found minor device %hu, use name %s\n", __FUNCTION__,
+					getminor(dev), cmin->n_name));
+				snprintf(buf, 32, "%s", cmin->n_name);
+			} else {
+				printd(("%s: no minor device %hu, use minor number\n", __FUNCTION__,
+					getminor(dev)));
+				snprintf(buf, 32, "%u", getminor(dev));
+			}
+			name.name = buf;
+			name.len = strnlen(buf, 32 - 1);
+			name.hash = full_name_hash(name.name, name.len);
+		}
+		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__,
+			getminor(dev), name.name, name.len));
+		down(&parent->d_inode->i_sem);
+		dentry = lookup_hash(&name, parent);
+		up(&parent->d_inode->i_sem);
+		dput(parent);
 	}
-	/* unlock the parent */
-	up(&inode->i_sem);
-	inode = NULL;
-	err = 0;
-	dget(dentry);
-      bad_dentry:
+	if (IS_ERR(dentry)) {
+		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -(int)PTR_ERR(dentry)));
+		goto done;
+	}
+	if (!dentry->d_inode) {
+		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
+		goto enoent;
+	}
+      done:
+	return (dentry);
+      enoent:
 	dput(dentry);
-      no_dentry:
-	if (inode)
-		up(&inode->i_sem);
-      no_lock:
-      no_inode:
-	dput(parent);
-      no_parent:
-	cdrv_put(cdev);
-      no_cdev:
-	if (err != 0)
-		dentry = ERR_PTR(err);
-	return dentry;
+	dentry = ERR_PTR(-ENOENT);
+	goto done;
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE

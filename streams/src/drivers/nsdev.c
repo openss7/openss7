@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
-#endif
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/stream.h>
@@ -83,7 +75,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:46 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -231,8 +223,13 @@ STATIC int nsdev_open(struct inode *inode, struct file *file)
 	modID_t modid, instance;
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
+#ifdef HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
 	minor = cdev_minor(&nsdev_cdev, major, minor);
 	major = nsdev_cdev.d_major;
 	modid = nsdev_cdev.d_modid;

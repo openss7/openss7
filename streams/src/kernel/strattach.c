@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:46 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #include <linux/slab.h>
@@ -72,6 +68,7 @@ static char const ident[] =
 #include <linux/quotaops.h>
 #include <linux/acct.h>
 #include <linux/devfs_fs_kernel.h>
+#include <linux/fs.h>
 
 #include <asm/uaccess.h>
 
@@ -80,9 +77,8 @@ static char const ident[] =
 #include <linux/namespace.h>
 #endif
 #include <linux/file.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
+#ifdef HAVE_LINUX_NAMEI_H
+#include <linux/namei.h>
 #endif
 
 #include "sys/config.h"
@@ -125,8 +121,11 @@ long do_fattach(const struct file *file, const char *file_name)
 	if (!file_name || !*file_name)
 		goto out;
 
-	if (path_init(file_name, LOOKUP_FOLLOW | LOOKUP_POSITIVE, &nd))
-		err = path_walk(file_name, &nd);
+#ifdef LOOKUP_POSITIVE
+	err = path_lookup(file_name, LOOKUP_FOLLOW | LOOKUP_POSITIVE, &nd);
+#else
+	err = path_lookup(file_name, LOOKUP_FOLLOW, &nd);
+#endif
 	if (err)
 		goto out;
 
@@ -187,8 +186,11 @@ long do_fdetach(const char *file_name)
 	if (!file_name || !*file_name)
 		goto out;
 
-	if (path_init(file_name, LOOKUP_FOLLOW | LOOKUP_POSITIVE, &nd))
-		err = path_walk(file_name, &nd);
+#ifdef LOOKUP_POSITIVE
+	err = path_lookup(file_name, LOOKUP_FOLLOW | LOOKUP_POSITIVE, &nd);
+#else
+	err = path_lookup(file_name, LOOKUP_FOLLOW, &nd);
+#endif
 	if (err)
 		goto out;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/02/10 04:37:24 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,24 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/10 04:37:24 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/02/10 04:37:24 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/02/10 04:37:24 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $";
 
 //#define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #include <linux/kernel.h>	/* for FASTCALL() */
@@ -73,10 +69,9 @@ static char const ident[] =
 #include <linux/file.h>		/* for fget() */
 #include <linux/poll.h>		/* for poll_wait */
 #include <linux/highmem.h>	/* for kmap, kunmap */
+#include <linux/uio.h>		/* for iovec */
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
+#include <asm/sockios.h>	/* for FIOCGETOWN, etc. */
 
 #include <sys/stream.h>
 #include <sys/strsubr.h>
@@ -97,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/02/10 04:37:24 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2084,8 +2079,8 @@ int stropen(struct inode *inode, struct file *file)
 		printd(("%s: using current inode\n", __FUNCTION__));
 		/* current inode is ok */
 	}
-	printd(("%s: got inode %p (%ld), generic %p, i_count %d, i_nlink %d\n", __FUNCTION__, inode,
-		inode->i_ino, inode->u.generic_ip, atomic_read(&inode->i_count), inode->i_nlink));
+	printd(("%s: got inode %p (%ld), i_count %d, i_nlink %d\n", __FUNCTION__, inode,
+		inode->i_ino, atomic_read(&inode->i_count), inode->i_nlink));
 	/* hold inode while stream head attached */
 	if (!sd->sd_inode && (sd->sd_inode = igrab(inode))) {
 		/* link into clone list */
@@ -2223,8 +2218,8 @@ int strclose(struct inode *inode, struct file *file)
 			assert(inode == sd->sd_inode);
 		}
 		/* we need to put the inode on each close because we grabbed it on each open */
-		printd(("%s: putting inode %p (%ld), generic %p, i_count %d, i_nlink %d\n",
-			__FUNCTION__, inode, inode->i_ino, inode->u.generic_ip,
+		printd(("%s: putting inode %p (%ld), i_count %d, i_nlink %d\n",
+			__FUNCTION__, inode, inode->i_ino,
 			atomic_read(&inode->i_count), inode->i_nlink));
 		iput(inode);
 	      put_exit:
@@ -3049,6 +3044,10 @@ int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned 
 	switch (cmd) {
 	case FIOGETOWN:
 	case FIOSETOWN:
+	case SIOCSPGRP:
+	case SIOCGPGRP:
+	case SIOCATMARK:
+	case SIOCGSTAMP:
 	default:
 		break;
 	}
@@ -3594,8 +3593,13 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	ptrace(("%s: opening character device\n", __FUNCTION__));
 	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
+#ifdef HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+#else
+	minor = MINOR(inode->i_rdev);
+	major = MAJOR(inode->i_rdev);
+#endif
 	printd(("%s: character device external major %hu, minor %hu\n", __FUNCTION__, major,
 		minor));
 	err = -ENXIO;
@@ -3749,8 +3753,12 @@ static struct fmodsw sth_fmod = {
 /* bleedin' mercy! */
 static inline void put_filesystem(struct file_system_type *fs)
 {
+#ifdef HAVE_KFUNC_MODULE_PUT
+	module_put(fs->owner);
+#else
 	if (fs->owner)
 		__MOD_DEC_USE_COUNT(fs->owner);
+#endif
 }
 
 #ifdef CONFIG_STREAMS_STH_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,27 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -82,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/28 13:46:46 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -169,7 +161,6 @@ static struct streamtab pipe_info = {
 static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int err;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		/* we walk down the queue chain calling open on each of the modules and the driver */
 		queue_t *wq = WR(q), *wq_next;
@@ -178,12 +169,9 @@ static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			int new_sflag;
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			new_sflag = wq_next ? MODOPEN : sflag;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp))) {
-				MOD_DEC_USE_COUNT;
+			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
 				return (err > 0 ? -err : err);
-			}
 		}
-		MOD_DEC_USE_COUNT;	/* already open */
 		return (0);
 	}
 	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
@@ -200,16 +188,13 @@ static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			/* we are the driver and this *is* the open routine and there is no
 			   redirection. */
 			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp))) {
-				MOD_DEC_USE_COUNT;
+			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp)))
 				return (err > 0 ? -err : err);
-			}
 			/* lastly, attach our privates and return */
 			q->q_ptr = WR(q)->q_ptr = sd;
 			return (0);
 		}
 	}
-	MOD_DEC_USE_COUNT;
 	return (-EIO);		/* can't be opened as module or clone */
 }
 static int pipe_close(queue_t *q, int oflag, cred_t *crp)
@@ -217,7 +202,6 @@ static int pipe_close(queue_t *q, int oflag, cred_t *crp)
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	MOD_DEC_USE_COUNT;
 	return (0);
 }
 

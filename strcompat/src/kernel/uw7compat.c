@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 /* 
@@ -103,10 +99,6 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
-
 #define _UW7_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
@@ -122,7 +114,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/28 13:46:46 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -245,7 +237,11 @@ EXPORT_SYMBOL(eminor);		/* uw7ddi.h */
 int etoimajor(major_t emajor)
 {
 	struct cdevsw *cdev;
+#ifdef NODEV
 	major_t major = NODEV;
+#else
+	major_t major = 0;
+#endif
 	if ((cdev = cdev_get(emajor))) {
 		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 		major = cdev->d_modid;
@@ -261,7 +257,11 @@ int itoemajor(major_t imajor, int prevemaj)
 	struct cdevsw *cdev;
 	if ((cdev = cdrv_get(imajor)) && cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
 		struct list_head *pos;
+#ifdef NODEV
 		int found_previous = (prevemaj == NODEV) ? 1 : 0;
+#else
+		int found_previous = (prevemaj == 0) ? 1 : 0;
+#endif
 		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 		list_for_each(pos, &cdev->d_majors) {
 			struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
@@ -271,7 +271,11 @@ int itoemajor(major_t imajor, int prevemaj)
 				found_previous = 1;
 		}
 	}
+#ifdef NODEV
 	return (NODEV);
+#else
+	return (0);
+#endif
 }
 
 EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */

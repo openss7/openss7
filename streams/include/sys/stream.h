@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.25 2004/11/08 04:02:31 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.26 2005/02/28 13:49:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/11/08 04:02:31 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/11/08 04:02:31 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:49:24 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,12 +63,7 @@
 #endif				/* HAVE_LINUX_FAST_STREAMS */
 
 #include <linux/config.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
-
 #include <linux/types.h>	/* for various types */
 
 /* FIXME: Need to put these in autoconf */
@@ -97,12 +92,9 @@ typedef unsigned long __streams_dev_t;
 #include <asm/bitops.h>		/* for set_bit */
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
+#include <linux/poll.h>		/* for poll_table_struct */
 
 #include "sys/streams/config.h"		/* build specific configuration file */
-
-#ifndef __GENKSYMS__
-#include "sys/streams/modversions.h"	/* build specific module versions file */
-#endif
 
 #include <sys/strdebug.h>	/* for debugging assertions */
 
@@ -326,7 +318,7 @@ typedef struct qband {
 	struct msgb *qb_last;		/* last queued message in this band */
 	size_t qb_hiwat;		/* hi water mark for flow control */
 	size_t qb_lowat;		/* lo water mark for flow control */
-	uint qb_flag;			/* flags */
+	unsigned long qb_flag;		/* flags */
 	long qb_pad1;			/* OSF: reserved */
 	/* Linux fast-STREAMS specific members */
 	ssize_t qb_msgs;		/* messages in band */
@@ -358,7 +350,7 @@ typedef struct queue {
 	struct queue *q_link;		/* next queue for scheduling */
 	void *q_ptr;			/* private data pointer */
 	size_t q_count;			/* number of bytes in queue */
-	uint q_flag;			/* queue state */
+	unsigned long q_flag;		/* queue state */
 	ssize_t q_minpsz;		/* min packet size accepted */
 	ssize_t q_maxpsz;		/* max packet size accepted */
 	size_t q_hiwat;			/* hi water mark for flow control */
@@ -604,7 +596,7 @@ struct devnode {
 	struct module *n_kmod;		/* kernel module */
 	/* above must match fmodsw */
 	int n_major;			/* node major device number */
-	struct dentry *n_dentry;	/* specfs directory entry */
+	struct inode *n_inode;		/* specfs inode */
 	mode_t n_mode;			/* inode mode */
 	/* above must match cdevsw */
 	int n_minor;			/* node minor device number */
@@ -627,7 +619,7 @@ struct cdevsw {
 	struct module *d_kmod;		/* kernel module */
 	/* above must match fmodsw */
 	int d_major;			/* base major device number */
-	struct dentry *d_dentry;	/* specfs directory entry */
+	struct inode *d_inode;		/* specfs inode */
 	mode_t d_mode;			/* inode mode */
 	/* above must match devnode */
 	struct file_operations *d_fop;	/* file operations */

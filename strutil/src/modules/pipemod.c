@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:47 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:47 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -65,16 +65,8 @@ static char const ident[] =
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
-#endif
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -86,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $"
+#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:46:47 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -162,9 +154,7 @@ static int pipemod_put(queue_t *q, mblk_t *mp)
 static int pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	queue_t *wq;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
-		MOD_DEC_USE_COUNT;
 		return (0);	/* already open */
 	}
 	wq = WR(q);
@@ -175,7 +165,6 @@ static int pipemod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *c
 		q->q_ptr = wq->q_ptr = q;	/* just set it to something */
 		return (0);
 	}
-	MOD_DEC_USE_COUNT;
 	return (EIO);		/* can't be opened as driver */
 }
 static int pipemod_close(queue_t *q, int oflag, cred_t *crp)
@@ -185,7 +174,6 @@ static int pipemod_close(queue_t *q, int oflag, cred_t *crp)
 	if (!q->q_ptr)
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	MOD_DEC_USE_COUNT;
 	return (0);
 }
 

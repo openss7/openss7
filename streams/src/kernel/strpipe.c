@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 04:34:09 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/28 14:13:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,23 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/10 04:34:09 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 14:13:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 04:34:09 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/28 14:13:57 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 04:34:09 $";
+static char const ident[] =
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/28 14:13:57 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
-#include <linux/modversions.h>
 #include <linux/init.h>
 
 #include <linux/slab.h>
@@ -79,14 +76,15 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
 #include <linux/namespace.h>
 #endif
 #include <linux/file.h>
-
-#ifndef __GENKSYMS__
-#include <sys/streams/modversions.h>
+#ifdef HAVE_LINUX_NAMEI_H
+#include <linux/namei.h>
 #endif
 
+#include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
+#include <sys/ddi.h>
 
 #include "sys/config.h"
 #include "strlookup.h"		/* cdevsw_list, etc. */
@@ -104,98 +102,66 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
  */
 STATIC struct file *pipe_file_open(void)
 {
-	int err;
 	struct file *file;
-	struct cdevsw *cdev;
-	struct dentry *parent, *dentry;
-	struct inode *inode;
+	struct dentry *dentry;
 	struct vfsmount *mnt;
 	ptrace(("%s: performing pipe open\n", __FUNCTION__));
-	file = ERR_PTR(-ENXIO);
-	if (!(cdev = cdev_find("pipe")))
-		goto exit;
-	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-	printd(("%s: open of driver %s\n", __FUNCTION__, cdev->d_name));
-	file = ERR_PTR(-ENOENT);
-	if (!(parent = dget(cdev->d_dentry)))
-		goto cput_exit;
-	printd(("%s: parent dentry %s\n", __FUNCTION__, parent->d_name.name));
-	file = ERR_PTR(-ENOMEM);
-	if (!(inode = parent->d_inode))
-		goto pput_exit;
-	printd(("%s: parent inode %ld\n", __FUNCTION__, inode->i_ino));
-	file = ERR_PTR(-ENODEV);
-	if (is_bad_inode(inode))
-		goto pput_exit;
-	/* lock the parent */
-	if ((err = down_interruptible(&inode->i_sem)) < 0) {
-		file = ERR_PTR(err);
-		goto pput_exit;
-	}
 	{
-		char buf[] = "0";
-		struct qstr name;
-		name.name = buf;
-		name.len = 1;
+		struct qstr name = {.name = "pipe",.len = 4, };
 		name.hash = full_name_hash(name.name, name.len);
-		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__,
-			0, name.name, name.len));
-		dentry = lookup_hash(&name, parent);
+		{
+			file = ERR_PTR(-ENXIO);
+			if (!(mnt = specfs_get()))
+				goto done;
+			printd(("%s: got mount point\n", __FUNCTION__));
+			down(&mnt->mnt_root->d_inode->i_sem);
+			dentry = lookup_hash(&name, mnt->mnt_root);
+			up(&mnt->mnt_root->d_inode->i_sem);
+			specfs_put();
+		}
 	}
-	file = ERR_PTR(-ENOENT);		/* XXX */
-	if (!dentry) {
-		ptrace(("%s: dentry lookup is NULL\n", __FUNCTION__));
-		goto up_exit;
+	if (IS_ERR((file = (void *) dentry))) {
+		ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__,
+			-(int) PTR_ERR(file)));
+		goto done;
 	}
-	file = (typeof(file))dentry;
-	if (IS_ERR(dentry)) {
-		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -err));
-		goto up_exit;
-	}
-	/* we only fail to get an inode when memory allocation fails */
-	file = ERR_PTR(-ENOMEM);
 	if (!dentry->d_inode) {
 		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
-		goto dput_exit;
+		goto enoent;
 	}
-	/* we only get a bad inode when there is no device entry */
-	file = ERR_PTR(-ENODEV);
-	if (is_bad_inode(dentry->d_inode)) {
-		ptrace(("%s: bad inode on lookup\n", __FUNCTION__));
-		goto dput_exit;
+	{
+		struct dentry *parent = dentry;
+		struct qstr name = {.name = "0",.len = 1, };
+		name.hash = full_name_hash(name.name, name.len);
+		printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__, 0,
+			name.name, name.len));
+		down(&parent->d_inode->i_sem);
+		dentry = lookup_hash(&name, parent);
+		up(&parent->d_inode->i_sem);
+		dput(parent);
 	}
-	/* unlock the parent */
-	up(&inode->i_sem);
-	inode = NULL;
-	file = ERR_PTR(-ENODEV);
-	if (!(mnt = specfs_get())) {
-		ptrace(("%s: could not find specfs mount point\n", __FUNCTION__));
-		goto dput_exit;
+	if (IS_ERR((file = (void *) dentry))) {
+		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -(int)PTR_ERR(file)));
+		goto done;
 	}
-	printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode, dentry->d_inode->i_ino));
+	if (!dentry->d_inode) {
+		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
+		goto enoent;
+	}
+	printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode,
+		dentry->d_inode->i_ino));
 	file = dentry_open(dentry, mntget(mnt), O_CLONE | 0x3);
-	specfs_put();
 	if (IS_ERR(file)) {
-		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__, -err));
-		goto pput_exit;
+		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__,
+			-(int)PTR_ERR(file)));
+		goto done;
 	}
-	goto cput_exit;
-      dput_exit:
-	printd(("%s: putting dentry\n", __FUNCTION__));
-	dput(dentry);
-      up_exit:
-	if (inode) {
-		printd(("%s: releasing inode semaphore\n", __FUNCTION__));
-		up(&inode->i_sem);
-	}
-      pput_exit:
-	printd(("%s: putting parent dentry\n", __FUNCTION__));
-	dput(parent);
-      cput_exit:
-	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
-      exit:
+      done:
 	return (file);
+      enoent:
+	dput(dentry);
+	file = ERR_PTR(-ENOENT);
+	goto done;
 }
 
 long do_spipe(int *fds)
@@ -237,4 +203,3 @@ long do_spipe(int *fds)
 EXPORT_SYMBOL_GPL(do_spipe);
 #endif
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
-

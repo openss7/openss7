@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.17 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.18 2005/02/28 13:49:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/28 13:49:24 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -173,7 +173,7 @@ struct stdata {
 //	int sd_wwaiters;		/* number of waiters on write */
 	int sd_pushcnt;			/* number of modules pushed */
 	int sd_nanchor;			/* number of modules anchored */
-	int sd_sigflags;		/* signal flags */
+	unsigned long sd_sigflags;		/* signal flags */
 	struct fasync_struct *sd_siglist;	/* list of procs for SIGPOLL */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
 	wait_queue_head_t sd_waitq;	/* waiters */
@@ -327,7 +327,7 @@ enum {
 };
 
 struct strthread {
-	volatile int flags;		/* flags */
+	volatile unsigned long flags;	/* flags */
 	queue_t *qhead;			/* first queue in scheduled queues */
 	queue_t **qtail;		/* last queue in scheduled queues */
 	queue_t *currentq;		/* current queue being processed */
