@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/01/26 21:17:58 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/27 08:01:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 21:17:58 $ by $Author: brian $
+# Last Modified $Date: 2005/01/27 08:01:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,9 +122,11 @@ EXTRA_DIST += $(PACKAGE_TARNAME).spec $(PACKAGE_TARNAME).gif $(PACKAGE_TARNAME).
 srpm-am:
 	$(MAKE) $(AM_MAKEFLAGS) distdir='$(tardir)' dist
 	$(mkinstalldirs) $(PACKAGE_RPMTOPDIR)/BUILD $(PACKAGE_RPMTOPDIR)/SRPMS $(PACKAGE_RPMTOPDIR)/SPECS $(PACKAGE_RPMTOPDIR)/SOURCES $(PACKAGE_RPMTOPDIR)/RPMS
-	cp -f $(top_srcdir)/$(PACKAGE_TARNAME).gif .
-	cp -f $(top_srcdir)/$(PACKAGE_TARNAME).xpm .
-	$(RPMBUILD) -ts $(SRPMFLAGS) $(AM_SRPMFLAGS) $(RPMOPTS) $(RPMICONS) --target $(target) -- $(tardir).tar.bz2
+	cp -pf ./$(tardir).tar.bz2 $(PACKAGE_RPMTOPDIR)/SOURCES
+	cp -pf $(top_srcdir)/$(PACKAGE_TARNAME).gif $(PACKAGE_RPMTOPDIR)/SOURCES
+	cp -pf $(top_srcdir)/$(PACKAGE_TARNAME).xpm $(PACKAGE_RPMTOPDIR)/SOURCES
+	cp -pf $(PACKAGE_TARNAME).spec $(PACKAGE_RPMTOPDIR)/SPECS
+	$(RPMBUILD) -bs $(SRPMFLAGS) $(AM_SRPMFLAGS) $(RPMOPTS) $(RPMICONS) --target $(target) -- $(PACKAGE_TARNAME).spec
 
 #
 #   This is the type of thing that needs to be included in the master makefile

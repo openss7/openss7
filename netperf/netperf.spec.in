@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/01/25 03:41:15 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/01/27 08:30:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/25 03:41:15 $ by $Author: brian $
+# Last Modified $Date: 2005/01/27 08:30:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -115,9 +115,9 @@
 
 Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
 %if %{?_without_public: 0}%{!?_without_public: 1}
-Name:           @PACKAGE_NAME@
+Name:           @PACKAGE_TARNAME@
 %else
-Name:           @PACKAGE_NAME@-bin
+Name:           @PACKAGE_TARNAME@-bin
 %endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
@@ -387,6 +387,9 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.2  2005/01/27 08:30:29  brian
+# - Get tarball and srpm names right.
+#
 # Revision 1.1.2.1  2005/01/25 03:41:15  brian
 # - Get manpages to pass check_mans.
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/01/22 06:41:13 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/01/27 08:32:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/22 06:41:13 $ by $Author: brian $
+# Last Modified $Date: 2005/01/27 08:32:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -110,9 +110,9 @@
 
 Summary:        %{title} (SVR 4.2 MP STREAMS)
 %if %{?_without_public: 0}%{!?_without_public: 1}
-Name:           @PACKAGE_NAME@
+Name:           @PACKAGE_TARNAME@
 %else
-Name:           @PACKAGE_NAME@-bin
+Name:           @PACKAGE_TARNAME@-bin
 %endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
@@ -173,7 +173,7 @@ Autoreq:        true
 # ---------------------------------------------------------------------------
 %description
 The %{name} package includes kernel modules, libraries, utilities and
-development environment for pthe development and execution of System V Release
+development environment for the development and execution of System V Release
 4.2 MP STREAMS modules and drivers developed for Linux.  In addition (source)
 compatibility modules are provided for AIX, HP-UX, LiS, OSF, Solaris, SVR 4
 and UnixWare 7.  This distribution is only currently applicable to 2.4 kernels
@@ -950,8 +950,14 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.61  2005/01/22 06:41:13  brian
-# - add more flags for configure
+# Revision 0.9.2.63  2005/01/27 08:32:38  brian
+# - Typo.
+#
+# Revision 0.9.2.31  2005/01/27 08:32:38  brian
+# - Typo.
+#
+# Revision 0.9.2.30  2005/01/27 08:30:29  brian
+# - Get tarball and srpm names right.
 #
 # Revision 0.9.2.29  2005/01/22 06:41:13  brian
 # - add more flags for configure
