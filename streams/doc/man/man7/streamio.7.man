@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.2 2004/03/02 10:58:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/02 10:58:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMIO 7 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH STREAMIO 7 "$Date: 2004/03/02 10:58:15 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
@@ -665,6 +665,15 @@ Similar to
 .B RMSGN
 mode, above, but data that remains in a message after the read count has been
 satisfied is discarded.
+.TP 12
+.B RFILL
+message fill mode.
+Similar to
+.B RNORM
+but requests that the stream head fill a buffer completely before returning to
+the application.  This is used in conjunction with a cooperating module and
+.BR M_READ (9)
+messages.
 .PP
 bitwise OR'ed with one flag from the protocol group as follows:
 .TP 12
@@ -737,6 +746,9 @@ message non-discard mode.
 .TP 12
 .B RMSGD
 message discard mode.
+.TP 12
+.B RFILL
+message fill mode.
 .PP
 bitwise OR'ed with one flag from the following protocol flags:
 .TP 12
@@ -2029,11 +2041,18 @@ and
 .[
 LiS
 .]
-with the following exceptions:
+with the following portability considerations:
 .IP \(em 4
-.IP \(em 4
-.IP \(em 4
-.IP \(em 4
+.B Linux Fast-STREAMS
+supports the
+.B RFILL
+read mode.  This read mode is
+.BR AIX \(rg
+.[
+aixcpc
+%O "Differences Between Portable Streams Environment and V.4 STREAMS"
+.]
+specific.
 .PP
 .B Linux Fast-STREAMS
 provides ioctls that are used to implement this system call.  In addition,

@@ -2917,6 +2917,16 @@ Part 1: Protocol Specification
 %C Boulder, Colorado
 %U http://publibn.boulder.ibm.com/
 
+%L AIXCPC
+%R AIX\(rg 5L Version 5.1
+%K aixcpc
+%T AIX Communications Programming Concepts
+%D 2001
+%Q Internatonal Busness Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
 %L HPUXSPG
 %R STREAMS/UX
 %K hpuxspg

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: mi_bufcall.9.man,v 0.9.2.2 2004/03/02 10:58:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/02 10:58:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_BUFCALL 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
+.TH MI_BUFCALL 9 "$Date: 2004/03/02 10:58:15 $" "$Name:  $" "Linux Fast-STREAMS AIX DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -96,14 +96,43 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
+Specifies the queue which is to be passed to
+.BR qenable (9).
 .TP
 .I size
+Specifies the required buffer size.
 .TP
 .I priority
+Specifies the priority as used by the standard STREAMS
+.BR bufcall (9)
+mechanism.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.BR mi_bufcall ()
+utility provides a reliable alternative to the bufcall utility.  The standard
+STREAMS
+.BR bufcall (9)
+utility is intended to be called when the allocb utility is unable to allocate
+a block for a message, and invokes a specified callback function (typically
+the qenable utility) with a given queue when a large enough block becomes
+available.  This can cause system problems if the stream closes so that that
+queue becomes invalid before the callback function is invoked.
+.PP
+The
+.BR mi_bufcall ()
+utility is a reliable alternative, as the queue is not deallocated until the
+call is complete.  This utility uses the standard
+.BR bufcall (9)
+mechanism with its own internal callback routine.  The callback routiner
+either invokes the
+.BR qenable (9)
+utility with the specified
+.I q
+parameter, or simply deallocates the instance data associated with the stream
+if the queue has already been closed.
 .\"
 .\"
 .SH RETURN
@@ -143,7 +172,7 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR mi_bufcall ()
-is an
+is anis
 .BR AIX \(rg
 specific function
 provided for source level compatibility with

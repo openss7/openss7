@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: strload.8.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: strload.8.man,v 0.9.2.2 2004/03/02 10:58:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/02 10:58:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRLOAD 8 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRLOAD 8 "$Date: 2004/03/02 10:58:15 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -87,6 +87,42 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+.B Linux Fast-STREAMS
+drivers and modules are dynamically loaded and unloaded.  To support this
+function, each driver and module must have a configuration routine that
+performs the necessary initialization and setup operations.
+.PP
+For compatibility with
+.BR AIX \(rg " PSE ,
+.[
+aixcpc
+.]
+.B Linux Fast-STREAMS
+provides the
+.B strload
+command to load
+.I STREAMS
+drivers and modules.  After loading the driver or module, the
+.B strload
+command calls the driver or module entry point using the
+.B SYS_CFGDD
+and
+.B SYS_CFGMOD
+operations in
+.BR sysconfig (9).
+.PP
+Each
+.I STREAMS
+driver or module must eventually call the
+.BR str_install (9)
+utility to link into
+.IR STREAMS .
+.PP
+Commonly used drivers or modules can be placed in a configuration file, which
+controls the normal setup and tear-down of
+.BR "Linux Fast-STREAMS" .
+The configuration file allows more flexibility when loading drivers or modules
+by providing user-specified nodes and arguments.
 .\"
 .\"
 .SH OPTIONS
@@ -98,12 +134,21 @@ Loads the referenced drivers and modules.  (This is the default if the
 and
 .B -u
 flags are not specified.)
+If no configuration file, drivers or modules are listed in the command options, only the
+.I STREAMS
+executive is loaded;
 .TP
 .BI -u ", " --unload
 Unloads the referenced drivers and modules.
+If no configuration file, drivers or modules are listed in the command options, the entire
+.I STREAMS
+executive is unloaded;
 .TP
 .BI -q ", " --query
 Queries the referenced drivers and modules.
+If no configuration file, drivers or modules are listed in the command options, only the
+.I STREAMS
+executive is queried;
 .TP
 .BI -f ", " --file " file"
 Specifies the file to use as the configuration file.
