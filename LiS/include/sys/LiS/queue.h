@@ -35,7 +35,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 1
 
-#ident "@(#) LiS queue.h 2.15 5/30/03 21:41:02 "
+#ident "@(#) LiS queue.h 2.16 8/14/03 14:26:09 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -79,6 +79,7 @@
 #define	QPROCSOFF	0x002000 /* don't call Q put/svc routines */
 #define QRUNNING	0x004000 /* svc proc is actually running */
 #define	QWAITING	0x008000 /* qdetach is waiting for wakeup */
+#define	QREADING	0x010000 /* read/getpmsg running on queue */
 
 /*  -------------------------------------------------------------------  */
 /* STREAMS queue's qband flags
