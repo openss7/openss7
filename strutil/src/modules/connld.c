@@ -66,10 +66,11 @@ static char const ident[] =
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
-#include <linux/kmem.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
+
+#include <sys/kmem.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
 
 #include "strdebug.h"
 

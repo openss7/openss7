@@ -81,8 +81,8 @@ static char const ident[] =
 #include <linux/major.h>
 #include <asm/atomic.h>
 
-#include <linux/strsubr.h>
-#include <linux/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
 
 #include "strdebug.h"
 #include "strhead.h"

@@ -73,12 +73,12 @@ static char const ident[] =
 #include <linux/poll.h>
 #include <linux/fs.h>
 
-#include <linux/kmem.h>		/* for kmem_ */
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strsubr.h>
-#include <linux/strconf.h>
-#include <linux/ddi.h>
+#include <sys/kmem.h>		/* for kmem_ */
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strhead.h"		/* for stream operations */

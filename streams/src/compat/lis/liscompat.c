@@ -103,12 +103,12 @@ static char const ident[] =
 #include <linux/string.h>
 
 #define _LIS_SOURCE
-#include <linux/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strhead.h"

@@ -70,11 +70,11 @@ static char const ident[] = "strhead.c,v (0.9.2.19) 2003/10/27 12:23:15";
 #include <linux/poll.h>		/* for poll_wait */
 #include <linux/highmem.h>	/* for kmap, kunmap */
 
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strsubr.h>
-#include <linux/strconf.h>
-#include <linux/ddi.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strsched.h"		/* for allocsd */

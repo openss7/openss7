@@ -64,7 +64,8 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/proc_fs.h>
-#include <linux/strsubr.h>
+
+#include <sys/strsubr.h>
 
 #include "strdebug.h"
 #include "strreg.h"

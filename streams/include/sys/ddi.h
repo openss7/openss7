@@ -68,7 +68,7 @@
 #endif
 #include <linux/version.h>	/* for UTS_RELEASE */
 #include <asm/delay.h>		/* for udelay */
-#include <linux/dki.h>
+#include <sys/dki.h>
 
 __EXTERN_INLINE major_t getmajor(dev_t dev)
 {
@@ -285,7 +285,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _SVR4_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
-#include <linux/svr4ddi.h>
+#include <sys/svr4ddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4
 #endif
@@ -293,7 +293,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _OSF_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
-#include <linux/osfddi.h>
+#include <sys/osfddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF
 #endif
@@ -301,7 +301,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _AIX_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-#include <linux/aixddi.h>
+#include <sys/aixddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX
 #endif
@@ -309,7 +309,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _HPUX_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
-#include <linux/hpuxddi.h>
+#include <sys/hpuxddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX
 #endif
@@ -317,7 +317,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _UW7_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-#include <linux/uw7ddi.h>
+#include <sys/uw7ddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7
 #endif
@@ -325,7 +325,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _SUN_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-#include <linux/sunddi.h>
+#include <sys/sunddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN
 #endif
@@ -333,7 +333,7 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 #ifdef _LIS_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
-#include <linux/lisddi.h>
+#include <sys/lisddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS
 #endif

@@ -71,15 +71,15 @@ static char const ident[] = "strutil.c,v (0.9.2.21) 2003/10/28 08:00:05";
 #include <linux/types.h>	/* for various types */
 #include <linux/interrupt.h>	/* for in_interrupt() */
 
-#include <linux/cmn_err.h>	/* for CE_ constants */
-#include <linux/strlog.h>	/* for SL_ constants */
-#include <linux/kmem.h>		/* for kmem_alloc */
+#include <sys/cmn_err.h>	/* for CE_ constants */
+#include <sys/strlog.h>		/* for SL_ constants */
+#include <sys/kmem.h>		/* for kmem_alloc */
 
-#include <linux/stropts.h>	/* streams definitions */
-#include <linux/stream.h>	/* streams definitions */
-#include <linux/strsubr.h>	/* for implementation definitions */
-#include <linux/strconf.h>	/* for syscontrols */
-#include <linux/ddi.h>
+#include <sys/stropts.h>	/* streams definitions */
+#include <sys/stream.h>	/* streams definitions */
+#include <sys/strsubr.h>	/* for implementation definitions */
+#include <sys/strconf.h>	/* for syscontrols */
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strhead.h"		/* for str_minfo */

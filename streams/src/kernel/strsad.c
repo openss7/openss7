@@ -64,12 +64,12 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
-#include <linux/sad.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
+#include <sys/sad.h>
 
 #include "strdebug.h"
 #include "strsched.h"		/* for ap_get/ap_put */

@@ -81,10 +81,10 @@ static char const ident[] = "strsched.c,v (0.9.2.27) 2003/10/28 08:00:05";
 #include <linux/major.h>
 // #include <asm/atomic.h>
 
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strsubr.h>
-#include <linux/strconf.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR4)||defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 #define _SVR4_SOURCE
@@ -108,7 +108,7 @@ static char const ident[] = "strsched.c,v (0.9.2.27) 2003/10/28 08:00:05";
 #define _LIS_SOURCE
 #endif
 
-#include <linux/ddi.h>
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strhead.h"		/* for str_minfo */

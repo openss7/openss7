@@ -64,11 +64,11 @@ static char const ident[] =
 #include <linux/smp_lock.h>
 #include <linux/slab.h>
 
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
 
 #include <tihdr.h>
 

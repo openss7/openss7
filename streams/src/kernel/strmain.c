@@ -86,11 +86,11 @@ MODULE_DESCRIPTION(STREAMS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(STREAMS_DEVICE);
 MODULE_LICENSE(STREAMS_LICENSE);
 
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strsubr.h>
-#include <linux/strconf.h>
-#include <linux/ddi.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strsubr.h>
+#include <sys/strconf.h>
+#include <sys/ddi.h>
 
 #include "strprocfs.h"
 #include "strspecfs.h"

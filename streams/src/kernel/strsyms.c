@@ -78,14 +78,14 @@ static char const ident[] =
 
 #define __EXTERN_INLINE inline
 
-#include <linux/kmem.h>
-#include <linux/cmn_err.h>
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
 
-#include <linux/strlog.h>
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
+#include <sys/strlog.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR4)||defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 #define _SVR4_SOURCE
@@ -110,7 +110,7 @@ static char const ident[] =
 #endif
 
 #undef STR
-#include <linux/ddi.h>
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strspecfs.h"

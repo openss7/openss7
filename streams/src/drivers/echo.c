@@ -61,12 +61,12 @@ static char const ident[] = "echo.c,v (0.9.2.2) 2003/10/21 21:50:08";
 #endif
 #include <linux/module.h>
 
-#include <linux/kmem.h>
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strconf.h>
-#include <linux/strsubr.h>
-#include <linux/ddi.h>
+#include <sys/kmem.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
 
 #include "strdebug.h"
 #include "strreg.h"		/* for struct str_args */

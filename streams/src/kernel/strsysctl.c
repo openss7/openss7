@@ -68,9 +68,9 @@ static char const ident[] =
 #endif
 #include <linux/sysctl.h>
 
-#include <linux/stropts.h>
-#include <linux/stream.h>
-#include <linux/strsubr.h>
+#include <sys/stropts.h>
+#include <sys/stream.h>
+#include <sys/strsubr.h>
 
 #include "strdebug.h"
 #include "strhead.h"		/* for str_minfo */
