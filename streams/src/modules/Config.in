@@ -12,10 +12,10 @@
 #	name		prefix
 module	pipemod		pipemod
 module	connld		connld
-@WITH_TLI_TRUE@module	timod		timod
-@WITH_TLI_TRUE@module	tirdwr		tirdwr
-module	sockmod		sockmod
 module	sc		sc
+#module	timod		timod
+#module	tirdwr		tirdwr
+#module	sockmod		sockmod
 
 #
 # Object name specifications
@@ -23,10 +23,10 @@ module	sc		sc
 #	type	name		object name
 objname module	pipemod		pipemod
 objname module	connld		connld
-@WITH_TLI_TRUE@objname module	timod		timod
-@WITH_TLI_TRUE@objname module	tirdwr		tirdwr
-objname	module	sockmod		sockmod
 objname	module	sc		sc
+#objname module	timod		timod
+#objname module	tirdwr		tirdwr
+#objname module	sockmod		sockmod
 
 #
 # Loadable specifications
@@ -40,10 +40,10 @@ objname	module	sc		sc
 #
 loadable pipemod
 loadable connld
-@WITH_TLI_TRUE@loadable timod
-@WITH_TLI_TRUE@loadable tirdwr
-loadable sockmod
 loadable sc
+#loadable timod
+#loadable tirdwr
+#loadable sockmod
 
 #
 # Initialization specifications

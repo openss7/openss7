@@ -1,3 +1,12 @@
+* Major changes for STREAMS-0.7a-2
+
+  Removed all XTI/TLI and Linux networking code, headers and documentation
+  from streams distribution and set epoch at 0.  Linux networking code has
+  been migrated to the strxnet, strinet and strsctp packages.  The purpose for
+  doing this was to allow the Linux networking to build against Linux
+  Fast-STREAMS as well as Linux STREAMS and is a preparation for phasing out
+  LiS and phasing in LfS.
+
 * Major changes for STREAMS-0.7a-1
 
   This is the initial release of the Linux Fast-STREAMS package for Linux.

@@ -1,1 +1,0 @@
-.so N_BIND_REQ.7.man

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/16 19:18:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/27 03:07:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 19:18:47 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 03:07:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,17 +56,6 @@ PSS		= STREAMS.ps SPG.ps porting.ps
 PDFS		= STREAMS.pdf SPG.pdf porting.pdf
 HTMLS		= STREAMS.html SPG.html porting.html
 INFO_DEPS	= $(srcdir)/STREAMS.info $(srcdir)/SPG.info $(srcdir)/porting.info
-
-if WITH_XNET
-
-info_TEXINFOS	+= libxnet.texi
-DVIS		+= libxnet.dvi
-PSS		+= libxnet.ps
-PDFS		+= libxnet.pdf
-HTMLS		+= libxnet.html
-INFO_DEPS	+= $(srcdir)/libxnet.info
-
-endif
 
 MAKEINFOHTML	= $(MAKEINFO) --html --no-split
 

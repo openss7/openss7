@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/20 23:56:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/27 03:07:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 23:56:13 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 03:07:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,7 +104,7 @@ installcheck-tirdwr:
 installcheck-inet:
 
 installcheck-test:
-	$(SHELL) $(TESTSUITE) -x -v -d
+#	$(SHELL) $(TESTSUITE) -x -v -d
 
 installcheck-hook: installcheck-specfs
 

@@ -24,16 +24,16 @@ driver	nsdev		nsdev	*
 driver	echo		echo	*
 driver	nuls		nuls	*
 driver	pipe		pipe	*
+driver	log		log	*
 #driver	sfx		sfx	*
 #driver	spx		spx	*
-driver	socksys		socksys	*
-@WITH_INET_TRUE@driver	unix		unix	*
-@WITH_INET_TRUE@driver	xnet		xnet	*
-driver	log		log	*
+#driver	socksys		socksys	*
+#driver	unix		unix	*
+#driver	xnet		xnet	*
 #
 # this must be 30 for iBCS compatibility
 #
-@WITH_INET_TRUE@driver	inet		inet	30
+#driver	inet		inet	30
 
 #
 # Object name specifications
@@ -47,13 +47,13 @@ objname	driver	nsdev		nsdev
 objname	driver	echo		echo
 objname	driver	nuls		nuls
 objname	driver	pipe		pipe
+objname driver	log		log
 #objname	driver	sfx		sfx
 #objname	driver	spx		spx
-objname	driver	socksys		socksys
-@WITH_INET_TRUE@objname	driver	unix		unix
-@WITH_INET_TRUE@objname	driver	xnet		xnet
-@WITH_INET_TRUE@objname driver	inet		inet
-objname driver	log		log
+#objname	driver	socksys		socksys
+#objname	driver	unix		unix
+#objname	driver	xnet		xnet
+#objname driver	inet		inet
 
 #
 # Autopush specifications
@@ -76,13 +76,13 @@ loadable nsdev
 loadable echo
 loadable nuls
 loadable pipe
+loadable log
 #loadable sfx
 #loadable spx
-loadable socksys
-@WITH_INET_TRUE@loadable unix
-@WITH_INET_TRUE@loadable xnet
-@WITH_INET_TRUE@loadable inet
-loadable log
+#loadable socksys
+#loadable unix
+#loadable xnet
+#loadable inet
 
 #
 # Initialization specifications
@@ -116,12 +116,12 @@ node	/dev/nsdev	     c	*	nsdev		0
 node	/dev/echo	     c	*	clone		echo
 node	/dev/nuls	     c	*	clone		nuls
 node	/dev/pipe	     c	*	pipe		0
+node	/dev/strlog	     c	*	clone		log
 #node	/dev/sfx	     c	*	sfx		0
 #node	/dev/spx	     c	*	spx		0
-node	/dev/socksys	     c	*	socksys		0
-@WITH_INET_TRUE@node	/dev/unix	     c	*	unix		0
-@WITH_INET_TRUE@node	/dev/xnet	     c	*	xnet		0
-node	/dev/strlog	     c	*	clone		log
+#node	/dev/socksys	     c	*	socksys		0
+#node	/dev/unix	     c	*	unix		0
+#node	/dev/xnet	     c	*	xnet		0
 #
 # These are iBCS devices that should already be installed on a
 # system that supports the iBCS.  The /dev entries are supposed
@@ -152,9 +152,9 @@ node	/dev/strlog	     c	*	clone		log
 #node	/dev/inet/rawip	     c	0666	inet		41
 #node	/dev/inet/arp	     c	0666	inet		39
 #node	/dev/inet/rip	     c	0666	inet		39
-@WITH_INET_TRUE@node	/dev/ticots_ord	     c	0666	inet		42
-@WITH_INET_TRUE@node	/dev/ticots	     c	0666	inet		43
-@WITH_INET_TRUE@node	/dev/ticlts	     c	0666	inet		44
+#node	/dev/ticots_ord	     c	0666	inet		42
+#node	/dev/ticots	     c	0666	inet		43
+#node	/dev/ticlts	     c	0666	inet		44
 
 #
 # Device specifications

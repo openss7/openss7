@@ -1,1 +1,0 @@
-.so N_EXDATA_REQ.7.man

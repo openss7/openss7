@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.29 2004/06/12 23:18:59 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.30 2004/06/27 03:06:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,13 +53,12 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/12 23:18:59 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/27 03:06:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/kernel.m4])
 m4_include([m4/genksyms.m4])
-m4_include([m4/xopen.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
@@ -299,7 +298,6 @@ AC_DEFUN([_LFS_SETUP_FIFOS], [dnl
 AC_DEFUN([_LFS_SETUP], [dnl
     _LINUX_KERNEL
     _GENKSYMS
-    _XOPEN
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _LFS_SETUP_MODULE

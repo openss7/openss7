@@ -1,1 +1,0 @@
-.so sockets.3.man

@@ -1,1 +1,0 @@
-.so N_OPTMGMT_REQ.7.man

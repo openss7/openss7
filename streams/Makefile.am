@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2004/06/20 23:55:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2004/06/27 03:06:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 23:55:30 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 03:06:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,43 +89,12 @@ libexec_PROGRAMS		= \
 				test-streams
 
 
-if WITH_TLI
-
-libexec_PROGRAMS		+= \
-				test-timod \
-				test-tirdwr
-
-endif
-
-if WITH_INET
-
-libexec_PROGRAMS		+= \
-				test-inet_raw \
-				test-inet_tcp \
-				test-inet_udp
-
-endif
-
-if WITH_XNET
-
-libexec_PROGRAMS		+= \
-				test-xnet \
-				test-xnet_thr
-
-endif
-
 #LFS_EXTRA_TESTS		= 
 #LFS_EXTRA_TOOLS		= @PACKAGE_TARNAME@_mknod
 
 LDADD				= libstreams.la
 
 lib_LTLIBRARIES			= libstreams.la
-
-if WITH_XNET
-
-lib_LTLIBRARIES			+= libxnet.la
-
-endif
 
 endif
 
@@ -208,25 +177,6 @@ libLfSdrivers_a_SOURCES		= \
 #				src/drivers/sfx.c
 #				src/drivers/spx.c
 
-if WITH_INET
-
-libLfSdrivers_a_SOURCES		+= \
-				src/drivers/inet.c \
-				src/drivers/bufq.h
-#				src/drivers/unix.c
-#				src/drivers/xnet.c
-
-endif
-
-if WITH_SOCK
-
-libLfSdrivers_a_SOURCES		+= \
-				src/drivers/sock.c \
-				src/drivers/sock.h
-#				src/drivers/socksys.c
-
-endif
-
 libLfSdrivers_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
 libLfSdrivers_a_CPPFLAGS	= \
 				-I./src/kernel -I$(srcdir)/src/kernel \
@@ -244,24 +194,6 @@ libLfSmodules_a_SOURCES		= \
 				src/modules/pipemod.c \
 				src/modules/sc.c \
 				include/sys/sc.h
-
-if WITH_TLI
-
-libLfSmodules_a_SOURCES		+= \
-				src/modules/timod.c \
-				include/timod.h \
-				include/sys/timod.h \
-				src/modules/tirdwr.c \
-				include/tihdr.h \
-				include/sys/tihdr.h
-
-endif
-
-if WITH_SOCK
-
-libLfSmodules_a_SOURCES		+= \
-				src/modules/sockmod.c
-endif
 
 libLfSmodules_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
 libLfSmodules_a_CPPFLAGS	= \
@@ -328,16 +260,6 @@ libstreams_la_SOURCES		= \
 libstreams_la_LDFLAGS		= -no-undefined -version-info 0:0:0
 libstreams_la_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
-
-if WITH_XNET
-
-libxnet_la_SOURCES		= lib/libxnet/xnet.c gettext.h
-libxnet_la_LDFLAGS		= -version-info 0:0:0
-libxnet_la_CPPFLAGS		= -I$(top_srcdir)/lib/libxnet -I$(top_builddir)/lib/libxnet $(LFS_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
-libxnet_la_CFLAGS		= $(USER_CFLAGS)
-libxnet_la_LIBADD		= libstreams.la
-
-endif
 
 EXTRA_PROGRAMS			= @PACKAGE_TARNAME@_mknod
 
@@ -518,53 +440,6 @@ test_streams_LDFLAGS		= libstreams.la
 test_streams_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
 
-if WITH_TLI
-
-test_timod_SOURCES		= src/test/test-timod.c
-test_timod_LDFLAGS		= libstreams.la
-test_timod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_timod_CFLAGS		= $(USER_CFLAGS)
-
-test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_LDFLAGS		= libstreams.la
-test_tirdwr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_tirdwr_CFLAGS		= $(USER_CFLAGS)
-
-endif
-
-if WITH_INET
-
-test_inet_raw_SOURCES		= src/test/test-inet_raw.c
-test_inet_raw_LDFLAGS		= libstreams.la
-test_inet_raw_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_inet_raw_CFLAGS		= $(USER_CFLAGS)
-
-test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDFLAGS		= libstreams.la
-test_inet_udp_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_inet_udp_CFLAGS		= $(USER_CFLAGS)
-
-test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
-test_inet_tcp_LDFLAGS		= libstreams.la
-test_inet_tcp_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
-
-endif
-
-if WITH_XNET
-
-test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDFLAGS		= libxnet.la libstreams.la
-test_xnet_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_xnet_CFLAGS		= $(USER_CFLAGS)
-
-test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDFLAGS		= libxnet.la libstreams.la -lpthread
-test_xnet_thr_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
-test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
-
-endif
-
 endif
 
 EXPORT_SRCFILES = \
@@ -626,21 +501,6 @@ include am/strconf.am
 
 if RPM_BUILD_KERNEL
 
-if WITH_INET
-
-INET_MKDEV			= scripts/inet_mkdev
-INET_RMDEV			= scripts/inet_rmdev
-
-install-devices: $(STRMAKENODES) $(INET_MKDEV)
-	./$(STRMAKENODES)
-	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)
-
-uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
-	./$(STRMAKENODES) --remove
-	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)
-
-else
-
 install-devices: $(STRMAKENODES)
 	./$(STRMAKENODES)
 
@@ -649,14 +509,9 @@ uninstall-devices: $(STRMAKENODES)
 
 endif
 
-dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-
-endif
-
 if RPM_BUILD_USER
 
-SUBDIRS = include intl m4 po doc tests
+SUBDIRS = include doc tests
 
 endif
 
