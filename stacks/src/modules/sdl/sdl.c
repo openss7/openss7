@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:07 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:07 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -86,17 +86,13 @@ MODULE_DESCRIPTION(SDL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDL_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
 #define SDL_MOD_ID	CONFIG_STREAMS_SDL_MODID
 #define SDL_MOD_NAME	CONFIG_STREAMS_SDL_NAME
 #endif
-
-unsigned short modid = SDL_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for SDL module. (0 for allocation)");
 
 /*
  *  =======================================================================
@@ -105,9 +101,18 @@ MODULE_PARM_DESC(modid, "Module ID for SDL module. (0 for allocation)");
  *
  *  =======================================================================
  */
+
+#define MOD_ID		SDL_MOD_ID
+#define MOD_NAME	SDL_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	SDL_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	SDL_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info sdl_rinfo = {
-	mi_idnum:SDL_MOD_ID,		/* Module ID number */
-	mi_idname:SDL_MOD_NAME "-rd",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:128,			/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
@@ -115,8 +120,8 @@ STATIC struct module_info sdl_rinfo = {
 };
 
 STATIC struct module_info sdl_winfo = {
-	mi_idnum:SDL_MOD_ID,		/* Module ID number */
-	mi_idname:SDL_MOD_NAME "-wr",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:280,			/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
@@ -138,7 +143,7 @@ STATIC struct qinit sdl_winit = {
 	qi_minfo:&sdl_winfo,		/* Information */
 };
 
-STATIC struct streamtab sdl_info = {
+STATIC struct streamtab sdlinfo = {
 	st_rdinit:&sdl_rinit,		/* Upper read queue */
 	st_wrinit:&sdl_winit,		/* Upper write queue */
 };
@@ -225,7 +230,7 @@ m_error(queue_t *q, struct sdl *s, int err)
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		s->i_state = LMI_UNUSABLE;
-		printd(("%s: %p: <- M_ERROR\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- M_ERROR\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -246,7 +251,7 @@ m_hangup(queue_t *q, struct sdl *s, int err)
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		s->i_state = LMI_UNUSABLE;
-		printd(("%s: %p: <- M_HANGUP\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- M_HANGUP\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -273,7 +278,7 @@ lmi_info_ack(queue_t *q, struct sdl *s)
 		p->lmi_min_sdu = 8;
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE1;	/* only STYLE1 for modules */
-		printd(("%s: %p: <- LMI_INFO_ACK\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_INFO_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -304,7 +309,7 @@ lmi_ok_ack(queue_t *q, struct sdl *s, long prim)
 			break;
 		}
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_OK_ACK\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_OK_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -345,7 +350,7 @@ lmi_error_ack(queue_t *q, struct sdl *s, long prim, ulong reason, ulong errno)
 			break;
 		}
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_ERROR_ACK\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -377,7 +382,7 @@ lmi_enable_con(queue_t *q, struct sdl *s)
 			break;
 		}
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_ENABLE_CON\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_ENABLE_CON\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -407,7 +412,7 @@ lmi_disable_con(queue_t *q, struct sdl *s)
 			break;
 		}
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_DISABLE_CON\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_DISABLE_CON\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -433,7 +438,7 @@ lmi_optmgmt_ack(queue_t *q, struct sdl *s, ulong flags, caddr_t opt_ptr, size_t 
 		p->lmi_mgmt_flags = flags;
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
-		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -457,7 +462,7 @@ lmi_error_ind(queue_t *q, struct sdl *s, long error, long reason)
 		p->lmi_errno = error;
 		p->lmi_reason = reason;
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_ERROR_IND\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_ERROR_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -480,7 +485,7 @@ lmi_stats_ind(queue_t *q, struct sdl *s)
 		p->lmi_primitive = LMI_STATS_IND;
 		p->lmi_interval = 0;
 		p->lmi_timestamp = jiffies;
-		printd(("%s: %p: <- LMI_STATS_IND\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_STATS_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -506,7 +511,7 @@ lmi_event_ind(queue_t *q, struct sdl *s, ulong oid, ulong level, caddr_t inf_ptr
 		p->lmi_severity = level;
 		bcopy(inf_ptr, mp->b_wptr, inf_len);
 		mp->b_wptr += inf_len;
-		printd(("%s: %p: <- LMI_EVENT_IND\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_EVENT_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -723,19 +728,19 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_ATTACH_PENDING;
 	return lmi_ok_ack(q, s, LMI_ATTACH_REQ);
       badppa:
-	ptrace(("%s: %p: PROTO: bad ppa (too short)\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: bad ppa (too short)\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_BADPPA, EMSGSIZE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_OUTSTATE, EPROTO);
       eopnotsupp:
-	ptrace(("%s: %p: PROTO: primitive not supported for style\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: primitive not supported for style\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -759,16 +764,16 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_DETACH_PENDING;
 	return lmi_ok_ack(q, s, LMI_DETACH_REQ);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DETACH_REQ, LMI_OUTSTATE, EPROTO);
       eopnotsupp:
-	ptrace(("%s: %p: PROTO: primitive not supported for style\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: primitive not supported for style\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DETACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DETACH_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -790,13 +795,13 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_ENABLE_PENDING;
 	return lmi_enable_con(q, s);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ENABLE_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -818,13 +823,13 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_DISABLE_PENDING;
 	return lmi_disable_con(q, s);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DISABLE_REQ, LMI_OUTSTATE, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DISABLE_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -841,11 +846,11 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 		goto emsgsize;
 	goto eopnotsupp;
       eopnotsupp:
-	ptrace(("%s: %p: PROTO: primitive not supported\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: primitive not supported\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_OPTMGMT_REQ, LMI_NOTSUPP, EOPNOTSUPP);
       emsgsize:
 	(void) s;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_OPTMGMT_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -868,7 +873,7 @@ sdl_send_data(queue_t *q, mblk_t *mp)
 	if (s->i_state != LMI_ENABLED)
 		goto outstate;
 	if (s->timestamp > jiffies) {
-		printd(("%s: %p: %s sleeping for %ld ms\n", SDL_MOD_NAME, s, __FUNCTION__,
+		printd(("%s: %p: %s sleeping for %ld ms\n", MOD_NAME, s, __FUNCTION__,
 			s->timestamp - jiffies));
 		sdl_timer_start(s, t9);
 		return (-EAGAIN);
@@ -928,16 +933,16 @@ sdl_bits_for_transmission_req(queue_t *q, mblk_t *mp)
 	trace();
 	return (QR_STRIP);
       eproto:
-	ptrace(("%s: %p: ERROR: bad message\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: ERROR: bad message\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
 }
 
@@ -960,13 +965,13 @@ sdl_connect_req(queue_t *q, mblk_t *mp)
 	s->statem.rx_state = SDL_STATE_IN_SERVICE;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
 }
 
@@ -989,13 +994,13 @@ sdl_disconnect_req(queue_t *q, mblk_t *mp)
 	s->statem.rx_state = SDL_STATE_IDLE;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDL_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
 }
 
@@ -1323,7 +1328,7 @@ sdl_test_config(struct sdl *s, sdl_config_t * arg)
 {
 	(void) s;
 	(void) arg;
-	// fixme(("%s: FIXME: write this function\n", SDL_MOD_NAME));
+	// fixme(("%s: FIXME: write this function\n", MOD_NAME));
 	return (0);
 }
 STATIC void
@@ -1348,7 +1353,7 @@ sdl_commit_config(struct sdl *s, sdl_config_t * arg)
 		s->timestamp++;
 	}
 	if (s->timestamp > jiffies) {
-		printd(("%s: %p: %s sleeping for %ld ms\n", SDL_MOD_NAME, s, __FUNCTION__,
+		printd(("%s: %p: %s sleeping for %ld ms\n", MOD_NAME, s, __FUNCTION__,
 			s->timestamp - jiffies));
 		sdl_timer_start(s, t9);
 	}
@@ -1481,7 +1486,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 	struct sdl *s = SDL_PRIV(q);
 	(void) s;
 	(void) mp;
-	// fixme(("%s: FIXME: Support master reset\n", SDL_MOD_NAME));
+	// fixme(("%s: FIXME: Support master reset\n", MOD_NAME));
 	return (-EOPNOTSUPP);
 }
 STATIC int
@@ -1656,13 +1661,11 @@ sdl_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_UNLINK):
 		case _IOC_NR(I_PUNLINK):
 			(void) lp;
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDL_MOD_NAME, s,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, s, nr));
 			ret = (-EINVAL);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDL_MOD_NAME, s,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, s, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -1721,7 +1724,7 @@ sdl_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = lmi_ioccnotify(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported LMI ioctl %d\n", SDL_MOD_NAME, s, nr));
+			ptrace(("%s: %p: ERROR: Unsupported LMI ioctl %d\n", MOD_NAME, s, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -1786,7 +1789,7 @@ sdl_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = sdl_ioccconntx(q, mp);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported SDL ioctl %d\n", SDL_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported SDL ioctl %d\n", MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -1830,7 +1833,7 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 	struct sdl *s = SDL_PRIV(q);
 	ulong oldstate = s->i_state;
 	if ((prim = *(ulong *) mp->b_rptr) == SDL_BITS_FOR_TRANSMISSION_REQ) {
-		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%d]\n", SDL_MOD_NAME, s,
+		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
 			msgdsize(mp->b_cont)));
 		if ((rtn = sdl_bits_for_transmission_req(q, mp)) < 0)
 			s->i_state = oldstate;
@@ -1838,40 +1841,40 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 	}
 	switch (prim) {
 	case SDL_BITS_FOR_TRANSMISSION_REQ:
-		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%d]\n", SDL_MOD_NAME, s,
+		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
 			msgdsize(mp->b_cont)));
 		rtn = sdl_bits_for_transmission_req(q, mp);
 		break;
 	case SDL_CONNECT_REQ:
-		printd(("%s: %p: -> SDL_CONNECT_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> SDL_CONNECT_REQ\n", MOD_NAME, s));
 		rtn = sdl_connect_req(q, mp);
 		break;
 	case SDL_DISCONNECT_REQ:
-		printd(("%s: %p: -> SDL_DISCONNECT_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> SDL_DISCONNECT_REQ\n", MOD_NAME, s));
 		rtn = sdl_disconnect_req(q, mp);
 		break;
 	case LMI_INFO_REQ:
-		printd(("%s: %p: -> LMI_INFO_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_INFO_REQ\n", MOD_NAME, s));
 		rtn = lmi_info_req(q, mp);
 		break;
 	case LMI_ATTACH_REQ:
-		printd(("%s: %p: -> LMI_ATTACH_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_ATTACH_REQ\n", MOD_NAME, s));
 		rtn = lmi_attach_req(q, mp);
 		break;
 	case LMI_DETACH_REQ:
-		printd(("%s: %p: -> LMI_DETACH_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_DETACH_REQ\n", MOD_NAME, s));
 		rtn = lmi_detach_req(q, mp);
 		break;
 	case LMI_ENABLE_REQ:
-		printd(("%s: %p: -> LMI_ENABLE_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_ENABLE_REQ\n", MOD_NAME, s));
 		rtn = lmi_enable_req(q, mp);
 		break;
 	case LMI_DISABLE_REQ:
-		printd(("%s: %p: -> LMI_DISABLE_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_DISABLE_REQ\n", MOD_NAME, s));
 		rtn = lmi_disable_req(q, mp);
 		break;
 	case LMI_OPTMGMT_REQ:
-		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", MOD_NAME, s));
 		rtn = lmi_optmgmt_req(q, mp);
 		break;
 	default:
@@ -1898,7 +1901,7 @@ sdl_w_data(queue_t *q, mblk_t *mp)
 {
 	struct sdl *s = SDL_PRIV(q);
 	(void) s;
-	printd(("%s: %p: -> M_DATA [%d]\n", SDL_MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, s, msgdsize(mp)));
 	return sdl_send_data(q, mp);
 }
 STATIC INLINE int
@@ -1906,7 +1909,7 @@ sdl_r_data(queue_t *q, mblk_t *mp)
 {
 	struct sdl *s = SDL_PRIV(q);
 	(void) s;
-	printd(("%s: %p: M_DATA [%d] <-\n", SDL_MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, s, msgdsize(mp)));
 	return sdl_recv_data(q, mp);
 }
 
@@ -2017,26 +2020,27 @@ sdl_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate sdl_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	}
-	printd(("%s: Allocated/selected private structure cache\n", SDL_MOD_NAME));
+	printd(("%s: Allocated/selected private structure cache\n", MOD_NAME));
 	return (0);
 }
-STATIC void
-sdl_free_caches(void)
+STATIC int
+sdl_term_caches(void)
 {
 	if (sdl_priv_cachep) {
-		if (kmem_cache_destroy(sdl_priv_cachep))
+		if (kmem_cache_destroy(sdl_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: id not destroy sdl_priv_cachep.", __FUNCTION__);
-		else
-			printd(("%s: destroyed sdl_priv_cachep\n", SDL_MOD_NAME));
+			return (-EBUSY);
+		} else
+			printd(("%s: destroyed sdl_priv_cachep\n", MOD_NAME));
 	}
-	return;
+	return (0);
 }
 STATIC struct sdl *
 sdl_alloc_priv(queue_t *q, struct sdl **sp, dev_t *devp, cred_t *crp)
 {
 	struct sdl *s;
 	if ((s = kmem_cache_alloc(sdl_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: %p: allocated module private structure\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: allocated module private structure\n", MOD_NAME, s));
 		bzero(s, sizeof(*s));
 		sdl_get(s);	/* first get */
 		s->u.dev.cmajor = getmajor(*devp);
@@ -2057,7 +2061,7 @@ sdl_alloc_priv(queue_t *q, struct sdl **sp, dev_t *devp, cred_t *crp)
 			s->next->prev = &s->next;
 		s->prev = sp;
 		*sp = sdl_get(s);
-		printd(("%s: %p: linked module private structure\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: linked module private structure\n", MOD_NAME, s));
 		s->timestamp = jiffies;
 		s->tickbytes = s->config.ifrate / HZ / 8;
 		s->bytecount = 0;
@@ -2065,9 +2069,9 @@ sdl_alloc_priv(queue_t *q, struct sdl **sp, dev_t *devp, cred_t *crp)
 		   configuration defaults */
 		s->option = lmi_default;
 		s->config = sdl_default;
-		printd(("%s: %p: setting module private structure defaults\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: setting module private structure defaults\n", MOD_NAME, s));
 	} else
-		ptrace(("%s: ERROR: Could not allocate module private structure\n", SDL_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", MOD_NAME));
 	return (s);
 }
 STATIC void
@@ -2108,129 +2112,121 @@ sdl_put(struct sdl *s)
 {
 	if (atomic_dec_and_test(&s->refcnt)) {
 		kmem_cache_free(sdl_priv_cachep, s);
-		printd(("%s: %p: freed sdl private structure\n", SDL_MOD_NAME, s));
+		printd(("%s: %p: freed sdl private structure\n", MOD_NAME, s));
 	}
 }
 
-STATIC int sdl_initialized = 0;
-
-#if defined LFS
 /*
- *  =======================================================================
+ *  =========================================================================
  *
- *  Linux Fast-STREAMS Kernel Module Initialization
+ *  Registration and initialization
  *
- *  =======================================================================
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
  */
 
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SDL module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
 STATIC struct fmodsw sdl_fmod = {
-	.f_name = SDL_MOD_NAME,
-	.f_str = &sdl_info,
+	.f_name = MOD_NAME,
+	.f_str = &sdlinfo,
 	.f_flag = 0,
 	.f_kmod = THIS_MODULE,
 };
 
 STATIC int
-sdl_register_module(void)
+sdl_register_strmod(void)
 {
 	int err;
 	if ((err = register_strmod(&sdl_fmod)) < 0)
 		return (err);
-	if (modid == 0 && err > 0)
+	return (0);
+}
+
+STATIC int
+sdl_unregister_strmod(void)
+{
+	int err;
+	if ((err = unregister_strmod(&sdl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sdl_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sdlinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sdl_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sdlinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sdlinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sdl_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sdl_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sdl_term_caches();
+		return (err);
+	}
+	if (modid == 0)
 		modid = err;
 	return (0);
 }
 
-STATIC void
-sdl_unregister_module(void)
-{
-	return (void) unregister_strmod(&sdl_fmod);
-}
-
-#elif defined LIS
-/*
- *  =======================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =======================================================================
- */
-STATIC int
-sdl_register_module(void)
-{
-	int ret;
-	if ((ret = lis_register_strmod(&sdl_info, SDL_MOD_NAME)) != LIS_NULL_MID) {
-		if (modid == 0)
-			modid = ret;
-		return (0);
-	}
-	/* LiS is not too good on giving informative errors here. */
-	return (EIO);
-}
-
-STATIC int
-sdl_unregister_module(void)
-{
-	/* LiS provides detailed errors here when they are discarded */
-	return (void) lis_unregister_strmod(&sdl_info);
-}
-#endif
-
-void
-sdl_init(void)
+MODULE_STATIC void __exit
+sdlterminate(void)
 {
 	int err;
-	unless(sdl_initialized > 0, return);
-	cmn_err(CE_NOTE, SDL_BANNER);	/* console splash */
-	if ((err = sdl_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", SDL_MOD_NAME);
-		sdl_initialized = err < 0 ? err : -err;
-		return;
-	}
-	if ((err = sdl_register_module())) {
-		sdl_free_caches();
-		cmn_err(CE_WARN, "%s: ERROR: couldn't register module", SDL_MOD_NAME);
-		sdl_initialized = err < 0 ? err : -err;
-		return;
-	}
-	sdl_initialized = 1;
-	return;
-}
-
-void
-sdl_terminate(void)
-{
-	ensure(sdl_initialized > 0, return);
-	sdl_unregister_module();
-	sdl_free_caches();
-	sdl_initialized = 0;
+	if ((err = sdl_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sdl_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
 /*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
-int __init
-_sdl_init(void)
-{
-	sdl_init();
-	if (sdl_initialized < 0)
-		return sdl_initialized;
-	return (0);
-}
+module_init(sdlinit);
+module_exit(sdlterminate);
 
-void __exit
-_sdl_exit(void)
-{
-	sdl_terminate();
-	(void) ss7_oput;
-	(void) ss7_iput;
-	(void) ss7_unbufcall;
-}
-
-module_init(_sdl_init);
-module_exit(_sdl_exit);
+#endif				/* LINUX */

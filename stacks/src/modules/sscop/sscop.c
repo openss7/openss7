@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -75,7 +75,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -94,7 +94,8 @@ MODULE_DESCRIPTION(SSCOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SSCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
 #ifdef SCCOP_DEBUG
 static int sscop_debug = SSCOP_DEBUG;
@@ -107,12 +108,20 @@ static int sscop_debug = 2;
 #define SSCOP_DRV_NAME		CONFIG_STREAMS_SSCOP_NAME
 #define SSCOP_CMAJORS		CONFIG_STREAMS_SSCOP_NMAJORS
 #define SSCOP_CMAJOR_0		CONFIG_STREAMS_SSCOP_MAJOR
+#define SSCOP_NMINOR		CONFIG_STREAMS_SSCOP_NMINORS
 #endif
 
+#ifndef SSCOP_DRV_NAME
+#define SSCOP_DRV_NAME		"sscop-mce"
+#endif				/* SSCOP_DRV_NAME */
+
 #ifndef SSCOP_CMAJOR_0
-#define SSCOP_CMAJOR_0 240
-#endif
-#define SSCOP_CMINORS 255
+#define SSCOP_CMAJOR_0		240
+#endif				/* SSCOP_CMAJOR_0 */
+
+#ifndef SSCOP_NMINOR
+#define SSCOP_NMINOR		255
+#endif				/* SSCOP_NMINOR */
 
 /*
  *  =========================================================================
@@ -122,21 +131,30 @@ static int sscop_debug = 2;
  *  =========================================================================
  */
 
-static struct module_info sscop_minfo = {
-	0,				/* Module ID number */
-	"sscop-mce",			/* Module name */
+#define DRV_ID		SSCOP_DRV_ID
+#define DRV_NAME	SSCOP_DRV_NAME
+#ifdef MODULE
+#define DRV_BANNER	SSCOP_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SSCOP_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info sscop_minfo = {
+	DRV_ID,				/* Module ID number */
+	DRV_NAME,			/* Module name */
 	1,				/* Min packet size accepted */
 	512,				/* Max packet size accepted */
 	8 * 512,			/* Hi water mark */
 	1 * 512				/* Lo water mark */
 };
 
-static int sscop_rput(queue_t *, mblk_t *);
-static int sscop_rsrv(queue_t *);
-static int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
-static int sscop_close(queue_t *, int, cred_t *);
+STATIC int sscop_rput(queue_t *, mblk_t *);
+STATIC int sscop_rsrv(queue_t *);
 
-static struct qinit sscop_rinit = {
+STATIC int sscop_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sscop_close(queue_t *, int, cred_t *);
+
+STATIC struct qinit sscop_rinit = {
 	sscop_rput,			/* Read put (msg from below) */
 	sscop_rsrv,			/* Read queue service */
 	sscop_open,			/* Each open */
@@ -146,10 +164,10 @@ static struct qinit sscop_rinit = {
 	NULL				/* Statistics */
 };
 
-static int sscop_wput(queue_t *, mblk_t *);
-static int sscop_wsrv(queue_t *);
+STATIC int sscop_wput(queue_t *, mblk_t *);
+STATIC int sscop_wsrv(queue_t *);
 
-static struct qinit sscop_winit = {
+STATIC struct qinit sscop_winit = {
 	sscop_wput,			/* Write put (msg from above) */
 	sscop_wsrv,			/* Write queue service */
 	NULL,				/* Each open */
@@ -159,7 +177,7 @@ static struct qinit sscop_winit = {
 	NULL				/* Statistics */
 };
 
-MODULE_STATIC struct streamtab sscop_info = {
+MODULE_STATIC struct streamtab sscopinfo = {
 	&sscop_rinit,			/* Upper read queue */
 	&sscop_winit,			/* Upper write queue */
 	NULL,				/* Lower read queue */
@@ -623,7 +641,8 @@ struct MAA_error_ind {
  *  AA_INFO_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_info_ack(queue_t * q)
+STATIC __inline__ mblk_t *
+aa_info_ack(queue_t *q)
 {
 	mblk_t *mp;
 	struct AA_info_ack *p;
@@ -669,7 +688,8 @@ static __inline__ mblk_t *aa_info_ack(queue_t * q)
  *  AA_BIND_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_bind_ack()
+STATIC __inline__ mblk_t *
+aa_bind_ack()
 {
 	mblk_t *mp;
 	struct AA_bind_req *p;
@@ -696,7 +716,8 @@ static __inline__ mblk_t *aa_bind_ack()
  *  AA_ERROR_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_error_ack(ulong prim, long err)
+STATIC __inline__ mblk_t *
+aa_error_ack(ulong prim, long err)
 {
 	mblk_t *mp;
 	struct AA_error_ack *p;
@@ -716,7 +737,8 @@ static __inline__ mblk_t *aa_error_ack(ulong prim, long err)
  *  AA_OK_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_ok_ack(ulong prim)
+STATIC __inline__ mblk_t *
+aa_ok_ack(ulong prim)
 {
 	mblk_t *mp;
 	struct AA_ok_ack *p;
@@ -734,8 +756,8 @@ static __inline__ mblk_t *aa_ok_ack(ulong prim)
  *  AA_ESTABLISH_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_establish_ind(dst_ptr, dst_len, src_ptr, src_len,
-					   seq, flags, qos_ptr, qos_len, db)
+STATIC __inline__ mblk_t *
+aa_establish_ind(dst_ptr, dst_len, src_ptr, src_len, seq, flags, qos_ptr, qos_len, db)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	caddr_t src_ptr;
@@ -776,7 +798,8 @@ static __inline__ mblk_t *aa_establish_ind(dst_ptr, dst_len, src_ptr, src_len,
  *  AA_ESTABLISH_CON
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_establish_con(res_ptr, res_len, flags, qos_ptr, qos_len, db)
+STATIC __inline__ mblk_t *
+aa_establish_con(res_ptr, res_len, flags, qos_ptr, qos_len, db)
 	caddr_t res_ptr;
 	size_t res_len;
 	uint flags;
@@ -809,7 +832,8 @@ static __inline__ mblk_t *aa_establish_con(res_ptr, res_len, flags, qos_ptr, qos
  *  AA_RELEASE_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_release_ind(orig, res_ptr, res_len, seq, db)
+STATIC __inline__ mblk_t *
+aa_release_ind(orig, res_ptr, res_len, seq, db)
 	uint orig;
 	caddr_t res_ptr;
 	size_t res_len;
@@ -838,7 +862,8 @@ static __inline__ mblk_t *aa_release_ind(orig, res_ptr, res_len, seq, db)
  *  AA_DATA_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_data_ind(flags, seqno, db)
+STATIC __inline__ mblk_t *
+aa_data_ind(flags, seqno, db)
 	ulong flags;
 	ulong seqno;
 	mblk_t *db;
@@ -860,7 +885,8 @@ static __inline__ mblk_t *aa_data_ind(flags, seqno, db)
  *  AA_DATACK_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_datack_ind(seqno, db)
+STATIC __inline__ mblk_t *
+aa_datack_ind(seqno, db)
 	ulong seqno;
 	mblk_t *db;
 {
@@ -880,7 +906,8 @@ static __inline__ mblk_t *aa_datack_ind(seqno, db)
  *  AA_RESYNC_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_resync_ind(orig, reason, db)
+STATIC __inline__ mblk_t *
+aa_resync_ind(orig, reason, db)
 	ulong orig;
 	ulong reason;
 	mblk_t *db;
@@ -901,7 +928,8 @@ static __inline__ mblk_t *aa_resync_ind(orig, reason, db)
  *  AA_RESYNC_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_resync_ind(orig, reason, db)
+STATIC __inline__ mblk_t *
+aa_resync_ind(orig, reason, db)
 	ulong orig;
 	ulong reason;
 	mblk_t *db;
@@ -922,7 +950,8 @@ static __inline__ mblk_t *aa_resync_ind(orig, reason, db)
  *  AA_RECOVER_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_recover_ind(void)
+STATIC __inline__ mblk_t *
+aa_recover_ind(void)
 {
 	mblk_t *mp;
 	struct AA_recover_ind *p;
@@ -939,7 +968,8 @@ static __inline__ mblk_t *aa_recover_ind(void)
  *  AA_UNITDATA_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db)
+STATIC __inline__ mblk_t *
+aa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	caddr_t src_ptr;
@@ -970,7 +1000,8 @@ static __inline__ mblk_t *aa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db
  *  AA_RETRIEVE_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_retrieve_ind(db)
+STATIC __inline__ mblk_t *
+aa_retrieve_ind(db)
 	mblk_t *db;
 {
 	mblk_t *mp;
@@ -989,7 +1020,8 @@ static __inline__ mblk_t *aa_retrieve_ind(db)
  *  AA_RETRIEVE_COMPLETE
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *aa_retrieve_complete_ind(void)
+STATIC __inline__ mblk_t *
+aa_retrieve_complete_ind(void)
 {
 	mblk_t *mp;
 	struct AA_retrieve_complete_ind *p;
@@ -1006,7 +1038,8 @@ static __inline__ mblk_t *aa_retrieve_complete_ind(void)
  *  MAA_ERROR_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *maa_error_ind(dst_ptr, dst_len, code, count)
+STATIC __inline__ mblk_t *
+maa_error_ind(dst_ptr, dst_len, code, count)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	uint code;
@@ -1032,7 +1065,8 @@ static __inline__ mblk_t *maa_error_ind(dst_ptr, dst_len, code, count)
  *  MAA_UNITDATA_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *maa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db)
+STATIC __inline__ mblk_t *
+maa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	caddr_t src_ptr;
@@ -1066,7 +1100,8 @@ static __inline__ mblk_t *maa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, d
  *
  *  =========================================================================
  */
-static __inline__ mblk_t *n_info_req(void)
+STATIC __inline__ mblk_t *
+n_info_req(void)
 {
 	mblk_t *mp;
 	N_info_req_t *p;
@@ -1078,7 +1113,8 @@ static __inline__ mblk_t *n_info_req(void)
 	}
 	return (mp);
 };
-static __inline__ mblk_t *n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len)
+STATIC __inline__ mblk_t *
+n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len)
 	caddr_t add_ptr;
 	size_t add_len;
 	uint cons;
@@ -1106,7 +1142,8 @@ static __inline__ mblk_t *n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro
 	}
 	return (mp);
 }
-static __inline__ mblk_t *n_unbind_req(void)
+STATIC __inline__ mblk_t *
+n_unbind_req(void)
 {
 	mblk_t *mp;
 	N_unbind_req_t *p;
@@ -1118,7 +1155,8 @@ static __inline__ mblk_t *n_unbind_req(void)
 	}
 	return (mp);
 }
-static __inline__ mblk_t *n_optmgmt_req(qos_ptr, qos_len, flags)
+STATIC __inline__ mblk_t *
+n_optmgmt_req(qos_ptr, qos_len, flags)
 	caddr_t qos_ptr;
 	size_t qos_len;
 	uint flags;
@@ -1137,7 +1175,8 @@ static __inline__ mblk_t *n_optmgmt_req(qos_ptr, qos_len, flags)
 	}
 	return (mp);
 }
-static __inline__ mblk_t *n_conn_req(dst_ptr, dst_len, flags, qos_ptr, qos_len)
+STATIC __inline__ mblk_t *
+n_conn_req(dst_ptr, dst_len, flags, qos_ptr, qos_len)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	uint flags;
@@ -1163,7 +1202,8 @@ static __inline__ mblk_t *n_conn_req(dst_ptr, dst_len, flags, qos_ptr, qos_len)
 	}
 	return (mp);
 }
-static __inline__ mblk_t *n_data_req(uint flags, mblk_t * db)
+STATIC __inline__ mblk_t *
+n_data_req(uint flags, mblk_t *db)
 {
 	mblk_t *mp;
 	N_data_req_t *p;
@@ -1177,7 +1217,8 @@ static __inline__ mblk_t *n_data_req(uint flags, mblk_t * db)
 	}
 	return (mp);
 }
-static __inline__ mblk_t *n_discon_req(reason, res_ptr, res_len, seq)
+STATIC __inline__ mblk_t *
+n_discon_req(reason, res_ptr, res_len, seq)
 	uint reason;
 	caddr_t res_ptr;
 	size_t res_len;
@@ -1198,7 +1239,8 @@ static __inline__ mblk_t *n_discon_req(reason, res_ptr, res_len, seq)
 	}
 	return (mp);
 }
-static __inline__ mblk_t *n_unitdata_req(dst_ptr, dst_len)
+STATIC __inline__ mblk_t *
+n_unitdata_req(dst_ptr, dst_len)
 	caddr_t dst_ptr;
 	size_t dst_len;
 {
@@ -1227,7 +1269,8 @@ static __inline__ mblk_t *n_unitdata_req(dst_ptr, dst_len)
  *  SEND
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_msg(queue_t * q, mblk_t * mp)
+STATIC __inline__ int
+s_send_msg(queue_t *q, mblk_t *mp)
 {
 	mblk_t *pp;
 	if ((pp = n_data_req(0))) {
@@ -1243,7 +1286,8 @@ static __inline__ int s_send_msg(queue_t * q, mblk_t * mp)
  *  SEND BGN.request N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_bgn(queue_t * q, uint n_sq, uint n_mr, mblk_t * db)
+STATIC __inline__ int
+s_send_bgn(queue_t *q, uint n_sq, uint n_mr, mblk_t *db)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1264,7 +1308,8 @@ static __inline__ int s_send_bgn(queue_t * q, uint n_sq, uint n_mr, mblk_t * db)
  *  SEND BGAK.request N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_bgak(queue_t * q, uint n_mr, mblk_t * db)
+STATIC __inline__ int
+s_send_bgak(queue_t *q, uint n_mr, mblk_t *db)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1285,7 +1330,8 @@ static __inline__ int s_send_bgak(queue_t * q, uint n_mr, mblk_t * db)
  *  SEND BGREJ.request SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_bgrej(queue_t * q, mblk_t * db)
+STATIC __inline__ int
+s_send_bgrej(queue_t *q, mblk_t *db)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1306,7 +1352,8 @@ static __inline__ int s_send_bgrej(queue_t * q, mblk_t * db)
  *  SEND END.request [src] SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_end(queue_t * q, uint s, mblk_t * db)
+STATIC __inline__ int
+s_send_end(queue_t *q, uint s, mblk_t *db)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1327,7 +1374,8 @@ static __inline__ int s_send_end(queue_t * q, uint s, mblk_t * db)
  *  SEND ENDAK.request ()
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_endak(queue_t * q)
+STATIC __inline__ int
+s_send_endak(queue_t *q)
 {
 	mblk_t *mp;
 	const uint32_t ptype = SSCOP_ENDAK << 24;
@@ -1344,7 +1392,8 @@ static __inline__ int s_send_endak(queue_t * q)
  *  SEND RS.request N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_rs(queue_t * q, uint n_w, uint n_sq, uint n_s, mblk_t * db)
+STATIC __inline__ int
+s_send_rs(queue_t *q, uint n_w, uint n_sq, uint n_s, mblk_t *db)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1365,7 +1414,8 @@ static __inline__ int s_send_rs(queue_t * q, uint n_w, uint n_sq, uint n_s, mblk
  *  SEND RSAK.request N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_rsak(queue_t * q, uint n_mr)
+STATIC __inline__ int
+s_send_rsak(queue_t *q, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_RSAK) << 24;
@@ -1382,7 +1432,8 @@ static __inline__ int s_send_rsak(queue_t * q, uint n_mr)
  *  SEND ER.request N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_er(queue_t * q, uint n_sq, uint n_mr)
+STATIC __inline__ int
+s_send_er(queue_t *q, uint n_sq, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_ER) << 24;
@@ -1399,7 +1450,8 @@ static __inline__ int s_send_er(queue_t * q, uint n_sq, uint n_mr)
  *  SEND ERAK.request N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_erak(queue_t * q, uint n_mr)
+STATIC __inline__ int
+s_send_erak(queue_t *q, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_ERAK) << 24;
@@ -1416,7 +1468,8 @@ static __inline__ int s_send_erak(queue_t * q, uint n_mr)
  *  SEND SD.request N(S), OOS, MU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_sd(queue_t * q, uint n_s, mblk_t * db)
+STATIC __inline__ int
+s_send_sd(queue_t *q, uint n_s, mblk_t *db)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1436,7 +1489,8 @@ static __inline__ int s_send_sd(queue_t * q, uint n_s, mblk_t * db)
  *  SEND POLL.request N(S), N(PS), N(SQ)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_poll(queue_t * q, uint n_ps, uint n_s)
+STATIC __inline__ int
+s_send_poll(queue_t *q, uint n_ps, uint n_s)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_POLL) << 24;
@@ -1453,7 +1507,8 @@ static __inline__ int s_send_poll(queue_t * q, uint n_ps, uint n_s)
  *  SEND STAT.indicaiton N(R), N(MR), N(PS), N(SQ), N(SS), [list]
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_stat(queue_t * q, uint n_r, uint n_mr, uint n_ps)
+STATIC __inline__ int
+s_send_stat(queue_t *q, uint n_r, uint n_mr, uint n_ps)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_STAT) << 24;
@@ -1474,7 +1529,8 @@ static __inline__ int s_send_stat(queue_t * q, uint n_r, uint n_mr, uint n_ps)
  *  SEND USTAT.request N(R), N(MR), N(PS), N(SQ), N(SS), [list]
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_ustat(queue_t * q, uint n_r, uint n_mr)
+STATIC __inline__ int
+s_send_ustat(queue_t *q, uint n_r, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_USTAT) << 24;
@@ -1493,7 +1549,8 @@ static __inline__ int s_send_ustat(queue_t * q, uint n_r, uint n_mr)
  *  SEND UD.request MU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_ud(queue_t * q, mblk_t * mp)
+STATIC __inline__ int
+s_send_ud(queue_t *q, mblk_t *mp)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1512,7 +1569,8 @@ static __inline__ int s_send_ud(queue_t * q, mblk_t * mp)
  *  SEND MD.request MU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int s_send_md(queue_t * q, mblk_t * mp)
+STATIC __inline__ int
+s_send_md(queue_t *q, mblk_t *mp)
 {
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
@@ -1535,7 +1593,8 @@ static __inline__ int s_send_md(queue_t * q, mblk_t * mp)
  *  ========================================================================
  */
 
-static int aa_idle_msg(queue_t * q, mblk_t * mp)
+STATIC int
+aa_idle_msg(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -1591,7 +1650,8 @@ static int aa_idle_msg(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-static int aa_idle_sig(queue_t * q, mblk_t * mp)
+STATIC int
+aa_idle_sig(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -1620,7 +1680,8 @@ static int aa_idle_sig(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-static int aa_outcon_msg(queue_t * q, mblk_t * mp)
+STATIC int
+aa_outcon_msg(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -1677,7 +1738,8 @@ static int aa_outcon_msg(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-static int aa_outcon_sig(queue_t * q, mblk_t * mp)
+STATIC int
+aa_outcon_sig(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint sig = ((union AA_signals *) mp->b_rptr)->signal;
@@ -1696,7 +1758,8 @@ static int aa_outcon_sig(queue_t * q, mblk_t * mp)
 	}
 }
 
-static int aa_incon_msg(queue_t * q, mblk_t * mp)
+STATIC int
+aa_incon_msg(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp, *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -1810,7 +1873,8 @@ static int aa_incon_msg(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-static int aa_incon_sig(queue_t * q, mblk_t * mp)
+STATIC int
+aa_incon_sig(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint sig = ((union AA_signals *) mp->b_rptr)->signal;
@@ -1854,7 +1918,8 @@ static int aa_incon_sig(queue_t * q, mblk_t * mp)
       return (0):
 }
 
-static int aa_outdis_msg(queue_t * q, mblk_t * mp)
+STATIC int
+aa_outdis_msg(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp, *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -1894,7 +1959,8 @@ static int aa_outdis_msg(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-static int aa_outdis_sig(queue_t * q, mblk_t * mp)
+STATIC int
+aa_outdis_sig(queue_t *q, mblk_t *mp)
 {
 	mblk_t *bp, *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -1925,7 +1991,8 @@ static int aa_outdis_sig(queue_t * q, mblk_t * mp)
  *
  *  =========================================================================
  */
-static int n_info_ack(q, mp)
+STATIC int
+n_info_ack(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -1944,7 +2011,8 @@ static int n_info_ack(q, mp)
 	freemsg(mp);
 	return (0);
 }
-static int n_bind_ack(q, mp)
+STATIC int
+n_bind_ack(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -1964,7 +2032,8 @@ static int n_bind_ack(q, mp)
 	freemsg(mp);
 	return (0);
 }
-static int n_error_ack(q, mp)
+STATIC int
+n_error_ack(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -1979,7 +2048,8 @@ static int n_error_ack(q, mp)
 	freemsg(mp);
 	return (0);
 }
-static int n_ok_ack(q, mp)
+STATIC int
+n_ok_ack(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -1994,7 +2064,8 @@ static int n_ok_ack(q, mp)
 	freemsg(mp);
 	return (0);
 }
-static int n_conn_con(q, mp)
+STATIC int
+n_conn_con(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -2007,7 +2078,8 @@ static int n_conn_con(q, mp)
 	}
 	return -EPROTO;
 }
-static int n_discon_ind(q, mp)
+STATIC int
+n_discon_ind(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -2028,7 +2100,8 @@ static int n_discon_ind(q, mp)
 	}
 	return -EPROTO;
 }
-static int n_unitdata_ind(q, mp)
+STATIC int
+n_unitdata_ind(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -2038,7 +2111,8 @@ static int n_unitdata_ind(q, mp)
 	}
 	return -EPROTO;
 }
-static int n_uderror_ind(q, mp)
+STATIC int
+n_uderror_ind(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {
@@ -2049,7 +2123,7 @@ static int n_uderror_ind(q, mp)
 	return -EPROTO;
 }
 
-static int (*n_prim[]) (queue_t *, mblk_t *) = {
+STATIC int (*n_prim[]) (queue_t *, mblk_t *) = {
 	NULL,			/* N_CONN_REQ 0 */
 	    NULL,		/* N_CONN_RES 1 */
 	    NULL,		/* N_DISCON_REQ 2 */
@@ -2088,7 +2162,8 @@ static int (*n_prim[]) (queue_t *, mblk_t *) = {
  *
  *  =========================================================================
  */
-static int aa_info_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_info_req(queue_t *q, mblk_t *mp)
 {
 	mblk_t *ap;
 	(void) mp;
@@ -2097,7 +2172,8 @@ static int aa_info_req(queue_t * q, mblk_t * mp)
 	qreply(q, ap);
 	return (0);
 }
-static int aa_bind_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_bind_req(queue_t *q, mblk_t *mp)
 {
 	mblk_t *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -2111,56 +2187,72 @@ static int aa_bind_req(queue_t * q, mblk_t * mp)
 	 *  FIXME: more...
 	 */
 }
-static int aa_unbind_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_unbind_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_unitdata_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_unitdata_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_optmgmt_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_establish_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_establish_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_establish_res(queue_t * q, mblk_t * mp)
+STATIC int
+aa_establish_res(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_release_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_release_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_data_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_data_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_exdata_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_exdata_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_datack_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_datack_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_resync_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_resync_req(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_resync_res(queue_t * q, mblk_t * mp)
+STATIC int
+aa_resync_res(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_recover_res(queue_t * q, mblk_t * mp)
+STATIC int
+aa_recover_res(queue_t *q, mblk_t *mp)
 {
 }
-static int aa_retrieve_req(queue_t * q, mblk_t * mp)
+STATIC int
+aa_retrieve_req(queue_t *q, mblk_t *mp)
 {
 }
-static int maa_set_timer_req(queue_t * q, mblk_t * mp)
+STATIC int
+maa_set_timer_req(queue_t *q, mblk_t *mp)
 {
 }
-static int maa_add_link_req(queue_t * q, mblk_t * mp)
+STATIC int
+maa_add_link_req(queue_t *q, mblk_t *mp)
 {
 }
-static int maa_remove_link_req(queue_t * q, mblk_t * mp)
+STATIC int
+maa_remove_link_req(queue_t *q, mblk_t *mp)
 {
 }
 
-static int (*n_prim[]) (queue_t *, mblk_t *) = {
+STATIC int (*n_prim[]) (queue_t *, mblk_t *) = {
 	&aa_establish_req,	/* AA_ESTABLISH_REQ 0 */
 	    &aa_establish_res,	/* AA_ESTABLISH_RES 1 */
 	    &aa_release_req,	/* AA_RELEASE_REQ 2 */
@@ -2208,7 +2300,7 @@ static int (*n_prim[]) (queue_t *, mblk_t *) = {
  *
  *  =========================================================================
  */
-static int (*aa_ioctl[]) (queue_t *, uint, void *) = {
+STATIC int (*aa_ioctl[]) (queue_t *, uint, void *) = {
 };
 
 /*
@@ -2222,11 +2314,13 @@ static int (*aa_ioctl[]) (queue_t *, uint, void *) = {
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_data(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_data(queue_t *q, mblk_t *mp)
 {
 	return sscop_write_data(q, mp);
 }
-static inline int sscop_r_data(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_data(queue_t *q, mblk_t *mp)
 {
 	return sscop_recv_data(q, mp);
 }
@@ -2238,7 +2332,8 @@ static inline int sscop_r_data(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_proto(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_proto(queue_t *q, mblk_t *mp)
 {
 	int sig = ((union AA_signals *) (mp->b_rptr))->type;
 	if (0 <= sig && sig < sizeof(aa_sigs) / sizeof(void *))
@@ -2246,7 +2341,8 @@ static inline int sscop_w_proto(queue_t * q, mblk_t * mp)
 			return (*aa_sigs[sig]) (q, mp);
 	return (-EOPNOTSUPP);
 }
-static inline int sscop_r_proto(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_proto(queue_t *q, mblk_t *mp)
 {
 	int prim = ((union N_primitives *) (mp->b_rptr))->type;
 	if (0 <= prim && prim <= sizeof(n_prim) / sizeof(void *))
@@ -2254,11 +2350,13 @@ static inline int sscop_r_proto(queue_t * q, mblk_t * mp)
 			return (*n_prim[prim]) (q, mp);
 	return (-EOPNOTSUPP);
 }
-static inline int sscop_w_pcproto(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_pcproto(queue_t *q, mblk_t *mp)
 {
 	return sscop_w_proto(q, mp);
 }
-static inline int sscop_r_pcproto(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_pcproto(queue_t *q, mblk_t *mp)
 {
 	return sscop_r_proto(q, mp);
 }
@@ -2270,13 +2368,15 @@ static inline int sscop_r_pcproto(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_ctl(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_ctl(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
 	return (-EOPNOTSUPP);
 }
-static inline int sscop_r_ctl(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_r_ctl(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -2290,7 +2390,8 @@ static inline int sscop_r_ctl(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_w_ioctl(queue_t * q, mblk_t * mp)
+STATIC inline int
+sscop_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	int ret;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -2344,7 +2445,8 @@ static inline int sscop_w_ioctl(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline void sscop_w_flush(queue_t * q, mblk_t * mp)
+STATIC inline void
+sscop_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & M_FLUSHW) {
 		flushq(q, FLUSHALL);
@@ -2372,7 +2474,8 @@ static inline void sscop_w_flush(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static inline void sscop_r_error(queue_t * q, mblk_t * mp)
+STATIC inline void
+sscop_r_error(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	sp->a_state = AA_UNUSABLE;
@@ -2401,7 +2504,8 @@ static inline void sscop_r_error(queue_t * q, mblk_t * mp)
  *  supported, we pass it down-queue if possible.  If the message cannot be
  *  processed immediately we place it on the queue.
  */
-static int sscop_rput(q, mp)
+STATIC int
+sscop_rput(q, mp)
 	queue_t *q;
 	mblk_t *mp;
 {
@@ -2457,7 +2561,8 @@ static int sscop_rput(q, mp)
  *  messages which cannot be processed immediately.  Unrecognized messages are
  *  passwed down-queue.
  */
-static int sscop_rsrv(q)
+STATIC int
+sscop_rsrv(q)
 	queue_t *q;
 {
 	mblk_t *mp;
@@ -2517,7 +2622,8 @@ static int sscop_rsrv(q)
  */
 kmem_cache_t *sscop_cachep = NULL;
 
-static sscop_t *sscop_alloc_priv(queue_t * q)
+STATIC sscop_t *
+sscop_alloc_priv(queue_t *q)
 {
 	sscop_t *sp;
 	if ((sscop = kmem_cache_alloc(sscop_cachep))) {
@@ -2529,7 +2635,8 @@ static sscop_t *sscop_alloc_priv(queue_t * q)
 	return (sp);
 }
 
-static void sscop_init_priv(void)
+STATIC void
+sscop_init_priv(void)
 {
 	if (!(sscop_cachep = kmem_find_general_cachep(sizeof(sscop_t)))) {
 		/* allocate a new cachep */
@@ -2544,7 +2651,8 @@ static void sscop_init_priv(void)
  *
  *  -------------------------------------------------------------------------
  */
-static int sscop_open(queue_t * q, drv_t * devp, int flag, int sflag, cred_t * crp)
+STATIC int
+sscop_open(queue_t *q, drv_t * devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;
 	if (q->q_ptr != NULL)
@@ -2569,7 +2677,8 @@ static int sscop_open(queue_t * q, drv_t * devp, int flag, int sflag, cred_t * c
  *
  *  -------------------------------------------------------------------------
  */
-static int sscop_close(queue_t * q, int flag, cred_t * crp)
+STATIC int
+sscop_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
 	(void) crp;
@@ -2580,62 +2689,114 @@ static int sscop_close(queue_t * q, int flag, cred_t * crp)
 /*
  *  =========================================================================
  *
- *  LiS MODULE INITIATLIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-static in sscop_initialized = 0;
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
-#ifndef LIS_REGISTERED
-static inline void sscop_init(void)
-#else
-__initfunc(void sscop_init(void))
-#endif
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw aa_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sscopinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+aa_register_strmod(void)
 {
-	if (sscop_initialized)
-		return;
-	printk(KERN_INFO SSCOP_BANNER);	/* console splash */
-#ifndef LIS_REGISTERED
-	if (!(sscop_minfo.mi_idnum = lis_register_strmod(&sscop_info, sscop_minfo.mi_idname))) {
-		cmn_err(CE_NOTE "sscop: couldn't register as module\n");
-		sscop_minfo.mi_idnum = 0;
-	}
-#endif
+	int err;
+	if ((err = register_strmod(&aa_fmod)) < 0)
+		return (err);
+	return (0);
 }
 
-#ifndef LIS_REGISTERED
-static inline void sscop_terminate(void)
-#else
-__initfunc(void sscop_terminate(void))
-#endif
+STATIC int
+aa_unregister_strmod(void)
 {
-	if (!sscop_initialized)
-		return;
-	sscop_initialized = 0;
-#ifndef LIS_REGISTERED
-	if (sscop_minfo.mi_idnum)
-		if ((sccop_minfo.mi_idnum = lis_unregister_strmod(&sscop_minfo)))
-			cmn_err(CE_WARN, "sscop: couldn't unregister as module!\n");
-#endif
+	int err;
+	if ((err = unregister_strmod(&aa_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+aa_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sscopinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+aa_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sscopinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sscopinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = aa_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = aa_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		aa_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sscopterminate(void)
+{
+	int err;
+	if ((err = aa_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = aa_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	return;
 }
 
 /*
- *  =========================================================================
- *
- *  LINUX KERNEL MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
+module_init(sscopinit);
+module_exit(sscopterminate);
 
-#ifdef MODULE
-int init_module(void)
-{
-	sscop_init();
-	return (0);
-}
-void cleanup_module(void)
-{
-	sscop_terminate();
-	return;
-}
-#endif
+#endif				/* LINUX */

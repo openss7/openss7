@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:43 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:43 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:43 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:43 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4697,7 +4697,7 @@ sdt_close(queue_t *q, int flag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-MODULE_STATIC unsigned short modid = MOD_ID;
+unsigned short modid = MOD_ID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for the SDT-ACB56 module. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,62 +46,80 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:09 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $";
 
 #include "compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/mtpi.h>
 
-#define SM_DESCRIP	"SIMPLE SINGLE LINK MTP."
-#define SM_REVISION	"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:09 $"
-#define SM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SM_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SM_LICENSE	"GPL"
-#define SM_BANNER	SM_DESCRIP	"\n" \
-			SM_REVISION	"\n" \
-			SM_COPYRIGHT	"\n" \
-			SM_DEVICE	"\n" \
-			SM_CONTACT
+#define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $"
+#define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define SM_MOD_LICENSE		"GPL"
+#define SM_MOD_BANNER		SM_MOD_DESCRIP		"\n" \
+				SM_MOD_REVISION		"\n" \
+				SM_MOD_COPYRIGHT	"\n" \
+				SM_MOD_DEVICE		"\n" \
+				SM_MOD_CONTACT		"\n"
+#define SM_MOD_SPLASH		SM_MOD_DESCRIP		"\n" \
+				SM_MOD_REVISION		"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(SM_CONTACT);
-MODULE_DESCRIPTION(SM_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SM_DEVICE);
+MODULE_AUTHOR(SM_MOD_CONTACT);
+MODULE_DESCRIPTION(SM_MOD_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SM_MOD_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(SM_LICENSE);
-#endif
+MODULE_LICENSE(SM_MOD_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define SM_MOD_MOD_ID CONFIG_STREAMS_SM_MOD_MODID
-#define SM_MOD_MOD_NAME CONFIG_STREAMS_SM_MOD_NAME
+#define SM_MOD_MOD_ID		CONFIG_STREAMS_SM_MOD_MODID
+#define SM_MOD_MOD_NAME		CONFIG_STREAMS_SM_MOD_NAME
 #endif
 
-static struct module_info sm_minfo = {
-	SM_MOD_MOD_ID,			/* id */
-	SM_MOD_MOD_NAME,			/* name */
+/*
+ *  =======================================================================
+ *
+ *  STREAMS Definitions
+ *
+ *  =======================================================================
+ */
+
+#define MOD_ID		SM_MOD_MOD_ID
+#define MOD_NAME	SM_MOD_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	SM_MOD_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	SM_MOD_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info sm_minfo = {
+	MOD_ID,				/* id */
+	MOD_NAME,			/* name */
 	0,				/* min packet size accepted */
 	INFPSZ,				/* max packet size accepted */
 	10240L,				/* high water mark */
 	512L				/* low water mark */
 };
 
-static int sm_open(queue_t *, dev_t *, int, int, cred_t *);
-static int sm_close(queue_t *, int, cred_t *);
+STATIC int sm_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sm_close(queue_t *, int, cred_t *);
 
-static int sm_wput(queue_t *, mblk_t *);
-static int sm_rput(queue_t *, mblk_t *);
+STATIC int sm_wput(queue_t *, mblk_t *);
+STATIC int sm_rput(queue_t *, mblk_t *);
 
-static struct qinit sm_rinit = {
+STATIC struct qinit sm_rinit = {
 	sm_rput,			/* put */
 	NULL,				/* service */
 	sm_open,			/* open */
@@ -111,7 +129,7 @@ static struct qinit sm_rinit = {
 	NULL				/* stat */
 };
 
-static struct qinit sm_winit = {
+STATIC struct qinit sm_winit = {
 	sm_wput,			/* put */
 	NULL,				/* service */
 	NULL,				/* open */
@@ -121,7 +139,7 @@ static struct qinit sm_winit = {
 	NULL				/* stat */
 };
 
-static struct streamtab sm_info = {
+MODULE_STATIC struct streamtab sm_modinfo = {
 	&sm_rinit,			/* read queue */
 	&sm_winit,			/* write queue */
 	NULL,				/* mux read queue */
@@ -134,12 +152,23 @@ struct priv {
 	uint32_t sio;
 };
 
-static int
+STATIC int
+sm_init_caches(void)
+{
+	return (0);
+}
+
+STATIC int
+sm_term_caches(void)
+{
+	return (0);
+}
+
+STATIC int
 sm_rput(queue_t *q, mblk_t *dp)
 {
-	/*
-	   message from below, strip MTP header and add MTP-TRANSFER primitive 
-	 */
+	/* 
+	   message from below, strip MTP header and add MTP-TRANSFER primitive */
 	switch (dp->b_datap->db_type) {
 	case M_DATA:
 	{
@@ -180,19 +209,17 @@ sm_rput(queue_t *q, mblk_t *dp)
 		return (0);
 	}
 	}
-	/*
-	   pass along unrecognized 
-	 */
+	/* 
+	   pass along unrecognized */
 	putnext(q, dp);
 	return (0);
 }
 
-static int
+STATIC int
 sm_wput(queue_t *q, mblk_t *mp)
 {
-	/*
-	   message from above, strip MTP-TRANSFER primitive and add header 
-	 */
+	/* 
+	   message from above, strip MTP-TRANSFER primitive and add header */
 	switch (mp->b_datap->db_type) {
 	case M_PROTO:
 	case M_PCPROTO:
@@ -217,14 +244,13 @@ sm_wput(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 	}
-	/*
-	   pass along unrecognized 
-	 */
+	/* 
+	   pass along unrecognized */
 	putnext(q, mp);
 	return (0);
 }
 
-static int
+STATIC int
 sm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	struct priv *p;
@@ -241,7 +267,7 @@ sm_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
 }
 
-static int
+STATIC int
 sm_close(queue_t *q, int sflag, cred_t *crp)
 {
 	struct priv *p = q->q_ptr;
@@ -254,21 +280,114 @@ sm_close(queue_t *q, int sflag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  Kernel Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-int
-init_module(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SM-MOD module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw sm_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sm_modinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sm_register_strmod(void)
 {
-	cmn_err(CE_NOTE, SM_BANNER);	/* console splash */
-	lis_register_strmod(&sm_info, SM_MOD_MOD_NAME);
+	int err;
+	if ((err = register_strmod(&sm_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+sm_unregister_strmod(void)
 {
-	lis_unregister_strmod(&sm_info);
+	int err;
+	if ((err = unregister_strmod(&sm_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sm_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sm_modinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sm_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sm_modinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sm_modinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sm_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sm_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sm_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sm_modterminate(void)
+{
+	int err;
+	if ((err = sm_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sm_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sm_modinit);
+module_exit(sm_modterminate);
+
+#endif				/* LINUX */

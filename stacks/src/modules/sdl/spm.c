@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:08 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -84,32 +84,27 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #define SPM_SPLASH	SPM_DEVICE	" - " \
 			SPM_REVISION
 
+#ifdef LINUX
 MODULE_AUTHOR(SPM_CONTACT);
 MODULE_DESCRIPTION(SPM_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SPM_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SPM_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
+
+#ifdef LFS
+#define SPM_MOD_ID	CONFIG_STREAMS_SPM_MODID
+#define SPM_MOD_NAME	CONFIG_STREAMS_SPM_NAME
+#endif				/* LFS */
 
 #ifndef SPM_MOD_NAME
-#   ifdef CONFIG_STREAMS_SPM_NAME
-#	define SPM_MOD_NAME CONFIG_STREAMS_SPM_NAME
-#   else
-#	define SPM_MOD_NAME "spm"
-#   endif
+#define SPM_MOD_NAME	"spm"
 #endif
 
 #ifndef SPM_MOD_ID
-#   ifdef CONFIG_STREAMS_SPM_MODID
-#	define SPM_MOD_ID CONFIG_STREAMS_SPM_MODID
-#   else
-#	define SPM_MOD_ID 0
-#   endif
+#define SPM_MOD_ID	0
 #endif
-
-unsigned short modid = SPM_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for SDL Pipe Module. (0 for allocation.)");
 
 /*
  *  =======================================================================
@@ -118,9 +113,18 @@ MODULE_PARM_DESC(modid, "Module ID for SDL Pipe Module. (0 for allocation.)");
  *
  *  =======================================================================
  */
+
+#define MOD_ID		SPM_MOD_ID
+#define MOD_NAME	SPM_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	SPM_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	SPM_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info spm_winfo = {
-	SPM_MOD_ID,				/* Module ID number */
-	SPM_MOD_NAME "-wr",			/* Module name */
+	MOD_ID,				/* Module ID number */
+	MOD_NAME "-wr",			/* Module name */
 	1,				/* Min packet size accepted */
 	280,				/* Max packet size accepted */
 	1,				/* Hi water mark */
@@ -128,8 +132,8 @@ STATIC struct module_info spm_winfo = {
 };
 
 STATIC struct module_info spm_rinfo = {
-	SPM_MOD_ID,				/* Module ID number */
-	SPM_MOD_NAME "-rd",			/* Module name */
+	MOD_ID,				/* Module ID number */
+	MOD_NAME "-rd",			/* Module name */
 	1,				/* Min packet size accepted */
 	128,				/* Max packet size accepted */
 	1,				/* Hi water mark */
@@ -165,7 +169,7 @@ STATIC struct qinit spm_rinit = {
 	NULL				/* Statistics */
 };
 
-STATIC struct streamtab spm_info = {
+STATIC struct streamtab spminfo = {
 	&spm_rinit,			/* Upper read queue */
 	&spm_winit,			/* Upper write queue */
 	NULL,				/* Lower read queue */
@@ -224,26 +228,29 @@ STATIC kmem_cache_t *spm_priv_cachep = NULL;
  *  Cache allocation
  *  ------------------------------------------------------------------------
  */
-STATIC void
+STATIC int
 spm_init_caches(void)
 {
 	if (!spm_priv_cachep &&
 	    !(spm_priv_cachep = kmem_cache_create
-	      ("spm_priv_cachep", sizeof(spm_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-		panic("%s: Cannot allocate spm_priv_cachep\n", __FUNCTION__);
-	printd(("spm: Allocated/selected private structure cache\n"));
-	return;
+	      ("spm_priv_cachep", sizeof(spm_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		cmn_err(CE_PANIC, "%s: did not allocate spm_priv_cachep", MOD_NAME);
+		return (-ENOMEM);
+	} else
+		printd(("%s: Allocated/selected private structure cache\n", MOD_NAME));
+	return (0);
 }
-STATIC void
-spm_free_caches(void)
+STATIC int
+spm_term_caches(void)
 {
 	if (spm_priv_cachep) {
-		if (kmem_cache_destroy(spm_priv_cachep))
+		if (kmem_cache_destroy(spm_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy spm_priv_cachep.", __FUNCTION__);
-		else
+			return (-EBUSY);
+		} else
 			printd(("spm: destroyed spm_priv_cachep\n"));
 	}
-	return;
+	return (0);
 }
 
 /*
@@ -1337,111 +1344,117 @@ spm_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
-STATIC int spm_initialized = 0;
-
-#ifdef LFS
 /*
- *  =======================================================================
+ *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
- *  =======================================================================
+ *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SPM module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
 STATIC struct fmodsw spm_fmod = {
-	.f_name = SPM_MOD_NAME,
-	.f_str = &spm_info,
+	.f_name = MOD_NAME,
+	.f_str = &spminfo,
 	.f_flag = 0,
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC void
-spm_init(void)
+STATIC int
+spm_register_strmod(void)
 {
-	unless(spm_initialized > 0, return);
-	spm_init_caches();
-	if ((spm_initialized = register_strmod(&spm_fmod)) < 0) {
-		cmn_err(CE_WARN, "spm: could not register module\n");
-		spm_free_caches();
-		return;
-	}
-	spm_initialized = 1;
-	return;
-}
-STATIC void
-spm_terminate(void)
-{
-	ensure(spm_initialized > 0, return);
-	if ((spm_initialized = unregister_strmod(&spm_fmod)) < 0) {
-		cmn_err(CE_WARN, "spm: could not unregister module\n");
-		return;
-	}
-	spm_free_caches();
-	spm_initialized = 0;
-	return;
-}
-
-#elif defined LIS
-/*
- *  =======================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =======================================================================
- */
-STATIC void
-spm_init(void)
-{
-	unless(spm_initialized > 0, return);
-	spm_init_caches();
-	if ((spm_initialized = lis_register_strmod(&spm_info, SPM_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "spm: couldn't register module\n");
-		spm_free_caches();
-		return;
-	}
-	spm_initialized = 1;
-	return;
-}
-STATIC void
-spm_terminate(void)
-{
-	ensure(spm_initialized > 0, return);
-	if ((spm_initialized = lis_unregister_strmod(&spm_info)) < 0) {
-		cmn_err(CE_WARN, "spm: couldn't unregister module\n");
-		return;
-	}
-	spm_free_caches();
-	spm_initialized = 0;
-	return;
-}
-#endif
-
-/*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
- */
-int __init
-_spm_init(void)
-{
-#ifdef MODULE
-	cmn_err(CE_NOTE, SPM_BANNER);	/* message banner */
-#else
-	cmn_err(CE_NOTE, SPM_SPLASH);	/* console splash */
-#endif
-	spm_init();
-	if (spm_initialized < 0)
-		return spm_initialized;
+	int err;
+	if ((err = register_strmod(&spm_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void __exit
-_spm_exit(void)
+STATIC int
+spm_unregister_strmod(void)
 {
-	(void) m_error;
-	spm_terminate();
+	int err;
+	if ((err = unregister_strmod(&spm_fmod)) < 0)
+		return (err);
+	return (0);
 }
 
-module_init(_spm_init);
-module_exit(_spm_exit);
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+spm_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&spminfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+spm_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&spminfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+spminit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = spm_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = spm_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		spm_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+spmterminate(void)
+{
+	int err;
+	if ((err = spm_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = spm_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	return;
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(spminit);
+module_exit(spmterminate);
+
+#endif				/* LINUX */

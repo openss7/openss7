@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:11 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:41 $"
 
-static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $";
+static char const ident[] =
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:41 $";
 
 #include "compat.h"
 
@@ -68,27 +69,27 @@ static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2
 #include <ss7/sdti.h>
 #include <ss7/sdti_ioctl.h>
 
-#define SDT_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:11 $"
-#define SDT_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_LICENSE	"GPL"
-#define SDT_BANNER	SDT_DESCRIP	"\n" \
-			SDT_REVISION	"\n" \
-			SDT_COPYRIGHT	"\n" \
-			SDT_DEVICE	"\n" \
-			SDT_CONTACT	"\n"
-#define SDT_SPLASH	SDT_DEVICE	" - " \
-			SDT_REVISION	"\n" \
+#define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:41 $"
+#define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SDT_SCTP_LICENSE	"GPL"
+#define SDT_SCTP_BANNER		SDT_SCTP_DESCRIP	"\n" \
+				SDT_SCTP_REVISION	"\n" \
+				SDT_SCTP_COPYRIGHT	"\n" \
+				SDT_SCTP_DEVICE		"\n" \
+				SDT_SCTP_CONTACT	"\n"
+#define SDT_SCTP_SPLASH		SDT_SCTP_DEVICE		" - " \
+				SDT_SCTP_REVISION	"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(SDT_CONTACT);
-MODULE_DESCRIPTION(SDT_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SDT_DEVICE);
+MODULE_AUTHOR(SDT_SCTP_CONTACT);
+MODULE_DESCRIPTION(SDT_SCTP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SDT_SCTP_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(SDT_LICENSE);
-#endif
+MODULE_LICENSE(SDT_SCTP_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -106,22 +107,31 @@ MODULE_LICENSE(SDT_LICENSE);
  *
  *  =========================================================================
  */
-static struct module_info sdt_minfo = {
-	mi_idnum:SDT_SCTP_MOD_ID,		/* Module ID number */
-	mi_idname:SDT_SCTP_MOD_NAME,	/* Module name */
+
+#define MOD_ID	    SDT_SCTP_MOD_ID
+#define MOD_NAME    SDT_SCTP_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER  SDT_SCTP_BANNER
+#else				/* MODULE */
+#define MOD_BANNER  SDT_SCTP_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info sdt_minfo = {
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted *//* FIXME */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted *//* FIXME */
 	mi_hiwat:1 << 15,		/* Hi water mark *//* FIXME */
 	mi_lowat:1 << 10,		/* Lo water mark *//* FIXME */
 };
 
-static int sdt_open(queue_t *, dev_t *, int, int, cred_t *);
-static int sdt_close(queue_t *, int, cred_t *);
+STATIC int sdt_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sdt_close(queue_t *, int, cred_t *);
 
-static int sdt_rput(queue_t *, mblk_t *);
-static int sdt_rsrv(queue_t *);
+STATIC int sdt_rput(queue_t *, mblk_t *);
+STATIC int sdt_rsrv(queue_t *);
 
-static struct qinit sdt_rinit = {
+STATIC struct qinit sdt_rinit = {
 	qi_putp:sdt_rput,		/* Read put (msg from below) */
 	qi_srvp:sdt_rsrv,		/* Read queue service */
 	qi_qopen:sdt_open,		/* Each open */
@@ -129,16 +139,16 @@ static struct qinit sdt_rinit = {
 	qi_minfo:&sdt_minfo,		/* Information */
 };
 
-static int sdt_wput(queue_t *, mblk_t *);
-static int sdt_wsrv(queue_t *);
+STATIC int sdt_wput(queue_t *, mblk_t *);
+STATIC int sdt_wsrv(queue_t *);
 
-static struct qinit sdt_winit = {
+STATIC struct qinit sdt_winit = {
 	qi_putp:sdt_wput,		/* Write put (msg from above) */
 	qi_srvp:sdt_wsrv,		/* Write queue service */
 	qi_minfo:&sdt_minfo,		/* Information */
 };
 
-static struct streamtab sdt_info = {
+MODULE_STATIC struct streamtab sdt_sctpinfo = {
 	st_rdinit:&sdt_rinit,		/* Upper read queue */
 	st_wrinit:&sdt_winit,		/* Upper write queue */
 };
@@ -196,7 +206,7 @@ typedef struct sdt {
  *  LMI_INFO_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_info_ack(sdt_t * sp)
 {
 	mblk_t *mp;
@@ -224,7 +234,7 @@ lmi_info_ack(sdt_t * sp)
  *  LMI_OK_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_ok_ack(sdt_t * sp, long prim)
 {
 	mblk_t *mp;
@@ -242,9 +252,8 @@ lmi_ok_ack(sdt_t * sp, long prim)
 		case LMI_DETACH_PENDING:
 			sp->state = LMI_UNATTACHED;
 			break;
-			/*
-			   default is don't change state 
-			 */
+			/* 
+			   default is don't change state */
 		}
 		p->lmi_state = sp->state;
 		putnext(sp->iq, mp);
@@ -258,7 +267,7 @@ lmi_ok_ack(sdt_t * sp, long prim)
  *  LMI_ERROR_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_error_ack(sdt_t * sp, long prim, long err)
 {
 	mblk_t *mp;
@@ -292,7 +301,7 @@ lmi_error_ack(sdt_t * sp, long prim, long err)
 		case LMI_DISABLE_PENDING:
 			sp->state = LMI_ENABLED;
 			break;
-			/*
+			/* 
 			 *  Default is not to change state.
 			 */
 		}
@@ -308,7 +317,7 @@ lmi_error_ack(sdt_t * sp, long prim, long err)
  *  LMI_ENABLE_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_enable_con(sdt_t * sp)
 {
 	mblk_t *mp;
@@ -335,7 +344,7 @@ lmi_enable_con(sdt_t * sp)
  *  LMI_DISABLE_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_disable_con(sdt_t * sp)
 {
 	mblk_t *mp;
@@ -363,7 +372,7 @@ lmi_disable_con(sdt_t * sp)
  *  LMI_OPTMGMT_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_optmgmt_ack(sdt_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -390,7 +399,7 @@ lmi_optmgmt_ack(sdt_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 lmi_error_ind(sdt_t * sp, long err)
 {
 	mblk_t *mp;
@@ -415,7 +424,7 @@ lmi_error_ind(sdt_t * sp, long err)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 lmi_stats_ind(sdt_t * sp, ulong interval, ulong timestamp)
 {
 	mblk_t *mp;
@@ -443,7 +452,7 @@ lmi_stats_ind(sdt_t * sp, ulong interval, ulong timestamp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 lmi_event_ind(sdt_t * sp, ulong oid, ulong severity, ulong timestamp)
 {
 	mblk_t *mp;
@@ -471,7 +480,7 @@ lmi_event_ind(sdt_t * sp, ulong oid, ulong severity, ulong timestamp)
  *  SDT_DAEDR_RECEIVED_BITS_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_read(sdt_t * sp, mblk_t *dp)
 {
 	ensure(sp, return (-EFAULT));
@@ -484,7 +493,7 @@ sdt_read(sdt_t * sp, mblk_t *dp)
 }
 
 #if 0
-static int
+STATIC int
 sdt_daedr_received_bits_ind(sdt_t * sp, ulong count, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -511,7 +520,7 @@ sdt_daedr_received_bits_ind(sdt_t * sp, ulong count, mblk_t *dp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdt_daedr_correct_su_ind(sdt_t * sp, ulong count)
 {
 	mblk_t *mp;
@@ -534,7 +543,7 @@ sdt_daedr_correct_su_ind(sdt_t * sp, ulong count)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdt_daedr_su_in_error_ind(sdt_t * sp)
 {
 	mblk_t *mp;
@@ -555,7 +564,7 @@ sdt_daedr_su_in_error_ind(sdt_t * sp)
  *  SDT_TXC_TRANSMISSION_REQUEST_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_daedt_transmission_request_ind(sdt_t * sp)
 {
 	mblk_t *mp;
@@ -583,7 +592,7 @@ sdt_daedt_transmission_request_ind(sdt_t * sp)
  *  N_DATA_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_data_req(sdt_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -614,7 +623,7 @@ n_data_req(sdt_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 n_exdata_req(sdt_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -650,7 +659,7 @@ n_exdata_req(sdt_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 
 #define SDT_PPI	    10
 
-static int
+STATIC int
 sdt_write(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -676,7 +685,7 @@ sdt_write(sdt_t * sp, mblk_t *mp)
  *  LMI_INFO_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_info_req(sdt_t * sp, mblk_t *mp)
 {
 	(void) mp;
@@ -689,7 +698,7 @@ lmi_info_req(sdt_t * sp, mblk_t *mp)
  *  LMI_ATTACH_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_attach_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -721,7 +730,7 @@ lmi_attach_req(sdt_t * sp, mblk_t *mp)
  *  LMI_DETACH_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_detach_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -753,7 +762,7 @@ lmi_detach_req(sdt_t * sp, mblk_t *mp)
  *  LMI_ENABLE_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_enable_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -785,7 +794,7 @@ lmi_enable_req(sdt_t * sp, mblk_t *mp)
  *  LMI_DISABLE_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_disable_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -823,7 +832,7 @@ lmi_disable_req(sdt_t * sp, mblk_t *mp)
  *  LMI_OPTMGMT_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_optmgmt_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -852,7 +861,7 @@ lmi_optmgmt_req(sdt_t * sp, mblk_t *mp)
 #ifndef abs
 #define abs(x) ((x)<0?-(x):(x))
 #endif
-static int
+STATIC int
 m_error_reply(sdt_t * sp, int err)
 {
 	mblk_t *mp;
@@ -880,7 +889,7 @@ m_error_reply(sdt_t * sp, int err)
 	rare();
 	return (-ENOBUFS);
 }
-static int
+STATIC int
 sdt_daedt_xmit_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -930,7 +939,7 @@ sdt_daedt_xmit_req(sdt_t * sp, mblk_t *mp)
  *  SDT_DAEDT_START_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_daedt_start_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -942,9 +951,8 @@ sdt_daedt_start_req(sdt_t * sp, mblk_t *mp)
 		if (mlen >= sizeof(*p)) {
 			if (sp->state == LMI_ENABLED) {
 
-				/*
-				   enable the transmitter section 
-				 */
+				/* 
+				   enable the transmitter section */
 				sp->flags |= SDT_FLAG_TX_ENABLED;
 				return (0);
 
@@ -965,7 +973,7 @@ sdt_daedt_start_req(sdt_t * sp, mblk_t *mp)
  *  SDT_DAEDR_START_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_daedr_start_req(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -977,9 +985,8 @@ sdt_daedr_start_req(sdt_t * sp, mblk_t *mp)
 		if (mlen >= sizeof(*p)) {
 			if (sp->state == LMI_ENABLED) {
 
-				/*
-				   enable the receiver section 
-				 */
+				/* 
+				   enable the receiver section */
 				sp->flags |= SDT_FLAG_RX_ENABLED;
 				return (0);
 
@@ -1007,7 +1014,7 @@ sdt_daedr_start_req(sdt_t * sp, mblk_t *mp)
  *  N_CONN_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_conn_ind(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1022,7 +1029,7 @@ n_conn_ind(sdt_t * sp, mblk_t *mp)
  *  N_CONN_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_conn_con(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1037,7 +1044,7 @@ n_conn_con(sdt_t * sp, mblk_t *mp)
  *  N_DISCON_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_discon_ind(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1052,7 +1059,7 @@ n_discon_ind(sdt_t * sp, mblk_t *mp)
  *  N_DATA_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_data_ind(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -1092,7 +1099,7 @@ n_data_ind(sdt_t * sp, mblk_t *mp)
  *  N_EXDATA_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_exdata_ind(sdt_t * sp, mblk_t *mp)
 {
 	int err;
@@ -1132,7 +1139,7 @@ n_exdata_ind(sdt_t * sp, mblk_t *mp)
  *  N_DATACK_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_datack_ind(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1147,7 +1154,7 @@ n_datack_ind(sdt_t * sp, mblk_t *mp)
  *  N_INFO_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_info_ack(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1162,7 +1169,7 @@ n_info_ack(sdt_t * sp, mblk_t *mp)
  *  N_BIND_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_bind_ack(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1177,7 +1184,7 @@ n_bind_ack(sdt_t * sp, mblk_t *mp)
  *  N_OK_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_ok_ack(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1192,7 +1199,7 @@ n_ok_ack(sdt_t * sp, mblk_t *mp)
  *  N_ERROR_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_error_ack(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1207,7 +1214,7 @@ n_error_ack(sdt_t * sp, mblk_t *mp)
  *  N_RESET_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_reset_ind(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1222,7 +1229,7 @@ n_reset_ind(sdt_t * sp, mblk_t *mp)
  *  N_RESET_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_reset_con(sdt_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1246,7 +1253,7 @@ n_reset_con(sdt_t * sp, mblk_t *mp)
  *  SDT_IOCGOPTIONS
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_iocgoptions(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
@@ -1263,7 +1270,7 @@ sdt_iocgoptions(queue_t *q, int cmd, void *arg)
  *  SDT_IOCSOPTIONS
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_iocsoptions(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
@@ -1303,7 +1310,7 @@ sdt_iocsoptions(queue_t *q, int cmd, void *arg)
  *  SDT_IOCGCONFIG
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_iocgconfig(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
@@ -1320,7 +1327,7 @@ sdt_iocgconfig(queue_t *q, int cmd, void *arg)
  *  SDT_IOCSCONFIG
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdt_iocsconfig(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
@@ -1337,7 +1344,7 @@ sdt_iocsconfig(queue_t *q, int cmd, void *arg)
  *  DEV_IOCSIFCLOCK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 dev_iocsifclock(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
@@ -1370,7 +1377,7 @@ dev_iocsifclock(queue_t *q, int cmd, void *arg)
  *  DEV_IOCGIFCLOCK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 dev_iocgifclock(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
@@ -1388,7 +1395,7 @@ dev_iocgifclock(queue_t *q, int cmd, void *arg)
  *  ---------------------------------------------
  *  Disconnect the transmit path.
  */
-static int
+STATIC int
 dev_ioccdisctx(queue_t *q, int cmd, void *arg)
 {
 	ensure(q, return (-EFAULT));
@@ -1401,7 +1408,7 @@ dev_ioccdisctx(queue_t *q, int cmd, void *arg)
  *  ---------------------------------------------
  *  Reconnect the transmit path.
  */
-static int
+STATIC int
 dev_ioccconntx(queue_t *q, int cmd, void *arg)
 {
 	ensure(q, return (-EFAULT));
@@ -1421,7 +1428,7 @@ dev_ioccconntx(queue_t *q, int cmd, void *arg)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdt_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1471,7 +1478,7 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	}
 	return (rtn);
 }
-static int
+STATIC int
 sdt_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1535,7 +1542,7 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdt_w_data(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -1548,7 +1555,7 @@ sdt_w_data(queue_t *q, mblk_t *mp)
 		return err;
 	return (1);		/* absorbed mblk */
 }
-static int
+STATIC int
 sdt_r_data(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -1570,7 +1577,7 @@ sdt_r_data(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdt_r_ctl(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sp;
@@ -1593,7 +1600,7 @@ sdt_r_ctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdt_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -1724,7 +1731,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdt_r_error(queue_t *q, mblk_t *mp)
 {
 	ensure(q, return (-EFAULT));
@@ -1740,7 +1747,7 @@ sdt_r_error(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdt_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 {
 	ensure(q, return (-EFAULT));
@@ -1754,14 +1761,14 @@ sdt_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 	putnext(q, mp);
 	return (1);
 }
-static int
+STATIC int
 sdt_w_flush(queue_t *q, mblk_t *mp)
 {
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	return sdt_m_flush(q, mp, FLUSHW);
 }
-static int
+STATIC int
 sdt_r_flush(queue_t *q, mblk_t *mp)
 {
 	ensure(q, return (-EFAULT));
@@ -1776,7 +1783,7 @@ sdt_r_flush(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdt_m_other(queue_t *q, mblk_t *mp)
 {
 	rare();
@@ -1800,7 +1807,7 @@ sdt_m_other(queue_t *q, mblk_t *mp)
 /*
  *  SDT Write Put and Service
  */
-static int
+STATIC int
 sdt_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1841,9 +1848,8 @@ sdt_wput(queue_t *q, mblk_t *mp)
 			freeb(mp);
 			break;
 		case -ENOBUFS:
-			/*
-			   should set up bufcall 
-			 */
+			/* 
+			   should set up bufcall */
 		case -EBUSY:
 		case -EAGAIN:
 		case -ENOMEM:
@@ -1866,7 +1872,7 @@ sdt_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+STATIC int
 sdt_wsrv(queue_t *q)
 {
 	int rtn;
@@ -1903,9 +1909,8 @@ sdt_wsrv(queue_t *q)
 				freeb(mp);
 				continue;
 			case -ENOBUFS:
-				/*
-				   should set up bufcall 
-				 */
+				/* 
+				   should set up bufcall */
 			case -EBUSY:
 			case -EAGAIN:
 			case -ENOMEM:
@@ -1940,7 +1945,7 @@ sdt_wsrv(queue_t *q)
 /*
  *  SCTP Read Put and Service
  */
-static int
+STATIC int
 sdt_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1982,9 +1987,8 @@ sdt_rput(queue_t *q, mblk_t *mp)
 			freeb(mp);
 			break;
 		case -ENOBUFS:
-			/*
-			   should set up bufcall 
-			 */
+			/* 
+			   should set up bufcall */
 		case -EBUSY:
 		case -EAGAIN:
 		case -ENOMEM:
@@ -2007,7 +2011,7 @@ sdt_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+STATIC int
 sdt_rsrv(queue_t *q)
 {
 	int rtn;
@@ -2045,9 +2049,8 @@ sdt_rsrv(queue_t *q)
 				freeb(mp);
 				continue;
 			case -ENOBUFS:
-				/*
-				   should set up bufcall 
-				 */
+				/* 
+				   should set up bufcall */
 			case -EBUSY:
 			case -EAGAIN:
 			case -ENOMEM:
@@ -2088,25 +2091,27 @@ sdt_rsrv(queue_t *q)
  */
 kmem_cache_t *sdt_cachep = NULL;
 
-static void
+STATIC int
 sdt_init_caches(void)
 {
 	if (!sdt_cachep
 	    && !(sdt_cachep =
 		 kmem_cache_create("sdt_cachep", sizeof(sdt_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-		panic("%s:Cannot alloc sdt_cachep.\n", __FUNCTION__);
-	return;
+		cmn_err(CE_PANIC, "%s: Cannot alloc sdt_cachep.", __FUNCTION__);
+	return (0);
 }
-static void
+STATIC int
 sdt_term_caches(void)
 {
 	if (sdt_cachep)
-		if (kmem_cache_destroy(sdt_cachep))
+		if (kmem_cache_destroy(sdt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdt_cachep", __FUNCTION__);
-	return;
+			return (-EBUSY);
+		}
+	return (0);
 }
 
-static sdt_t *
+STATIC sdt_t *
 sdt_alloc_priv(queue_t *q)
 {
 	sdt_t *sp;
@@ -2118,11 +2123,11 @@ sdt_alloc_priv(queue_t *q)
 		sp->iq = RD(q);
 		sp->oq = WR(q);
 		sp->state = LMI_DISABLED;
-		spin_lock_init(&sp->lock); /* "ss7sctp-private" */
+		spin_lock_init(&sp->lock);	/* "ss7sctp-private" */
 	}
 	return (sp);
 }
-static void
+STATIC void
 sdt_free_priv(queue_t *q)
 {
 	sdt_t *sp;
@@ -2143,7 +2148,7 @@ sdt_free_priv(queue_t *q)
  *
  *  =========================================================================
  */
-static int
+STATIC int
 sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;		/* for now */
@@ -2157,7 +2162,7 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	return EIO;
 }
-static int
+STATIC int
 sdt_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
@@ -2170,57 +2175,114 @@ sdt_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  Lis Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-void
-sdt_init(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw sdt_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sdt_sctpinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sdt_register_strmod(void)
 {
-	int modnum;
-	unless(sdt_minfo.mi_idnum, return);
-	cmn_err(CE_NOTE, SDT_BANNER);	/* console splash */
-	sdt_init_caches();
-	if (!(modnum = lis_register_strmod(&sdt_info, sdt_minfo.mi_idname))) {
-		sdt_minfo.mi_idnum = 0;
-		rare();
-		cmn_err(CE_NOTE, "sdt: couldn't register as module\n");
-		return;
-	}
-	sdt_minfo.mi_idnum = modnum;
-	return;
+	int err;
+	if ((err = register_strmod(&sdt_fmod)) < 0)
+		return (err);
+	return (0);
 }
 
-void
-sdt_terminate(void)
+STATIC int
+sdt_unregister_strmod(void)
 {
-	ensure(sdt_minfo.mi_idnum, return);
-	if ((sdt_minfo.mi_idnum = lis_unregister_strmod(&sdt_info)))
-		cmn_err(CE_WARN, "sdt: couldn't unregister as module!\n");
-	sdt_term_caches();
+	int err;
+	if ((err = unregister_strmod(&sdt_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sdt_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sdt_sctpinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sdt_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sdt_sctpinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sdt_sctpinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sdt_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sdt_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sdt_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sdt_sctpterminate(void)
+{
+	int err;
+	if ((err = sdt_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sdt_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
-int
-init_module(void)
-{
-	sdt_init();
-	return (0);
-}
+module_init(sdt_sctpinit);
+module_exit(sdt_sctpterminate);
 
-void
-cleanup_module(void)
-{
-	sdt_terminate();
-	(void) ss7_oput;
-	(void) ss7_iput;
-	(void) ss7_unbufcall;
-	return;
-}
+#endif				/* LINUX */

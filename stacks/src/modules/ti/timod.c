@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:15 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:42 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:42 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/26 23:38:15 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/27 07:31:42 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -95,25 +95,26 @@ static char const ident[] =
 #define TIMOD_SPLASH	TIMOD_DEVICE	" - " \
 			TIMOD_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(TIMOD_CONTACT);
 MODULE_DESCRIPTION(TIMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TIMOD_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(TIMOD_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
+
+#ifdef LFS
+#define TIMOD_MOD_ID		CONFIG_STREAMS_TIMOD_MODID
+#define TIMOD_MOD_NAME		CONFIG_STREAMS_TIMOD_NAME
+#endif				/* LFS */
 
 #ifndef TIMOD_MOD_NAME
-#   ifdef CONFIG_STREAMS_TIMOD_NAME
-#	define TIMOD_MOD_NAME CONFIG_STREAMS_TIMOD_NAME
-#   else
-#	define TIMOD_MOD_NAME "timod"
-#   endif
+#define TIMOD_MOD_NAME		"timod"
 #endif
 
 #ifndef TIMOD_MOD_ID
-#   ifdef CONFIG_STREAMS_TIMOD_MODID
-#	define TIMOD_MOD_ID CONFIG_STREAMS_TIMOD_MODID
-#   else
-#	define TIMOD_MOD_ID 0
-#   endif
+#define TIMOD_MOD_ID		0
 #endif
 
 modID_t modid = TIMOD_MOD_ID;
@@ -212,13 +213,12 @@ timod_alloc_priv(queue_t *q)
 		priv->flags = 0;
 		priv->qlen = 0;
 		priv->cons = 0;
-		/*
+		/* 
 		   we are a module with no service routine so our hiwat, lowat shouldn't matter;
 		   however, our minpsz, maxpsz do because we are the first queue under the stream
 		   head.  We do not want to alter the characteristics of the transport packet sizes
 		   so we copy them here. This will allow the stream head to exhibit the same
-		   behaviour as before we were pushed. 
-		 */
+		   behaviour as before we were pushed. */
 		priv->wq->q_minpsz = priv->wq->q_next->q_minpsz;
 		priv->wq->q_maxpsz = priv->wq->q_next->q_maxpsz;
 		q->q_ptr = WR(q)->q_ptr = priv;
@@ -297,10 +297,9 @@ timod_rput(queue_t *q, mblk_t *mp)
 		p = (typeof(p)) mp->b_rptr;
 		if (!(dp = xchg(&priv->iocblk, NULL)))
 			goto pass_along;
-		/*
+		/* 
 		   we are expecting a response, but only intercept the expected response, pass
-		   along others 
-		 */
+		   along others */
 		ioc = (typeof(ioc)) dp->b_rptr;
 		switch (p->type) {
 		case T_OK_ACK:
@@ -316,9 +315,8 @@ timod_rput(queue_t *q, mblk_t *mp)
 			case TI_SETMYNAME:
 				switch (priv->state) {
 				case TS_WACK_CRES:
-					/*
-					   but could be TS_DATA_XFER for same stream connect 
-					 */
+					/* 
+					   but could be TS_DATA_XFER for same stream connect */
 					priv->state = (priv->cons && --priv->cons > 0)
 					    ? TS_WRES_CIND : TS_IDLE;
 					break;
@@ -418,9 +416,8 @@ timod_rput(queue_t *q, mblk_t *mp)
 			putnext(q, dp);
 			return (0);
 		}
-		/*
-		   not expecting anything, but do state tracking 
-		 */
+		/* 
+		   not expecting anything, but do state tracking */
 	      pass_along:
 		switch (p->type) {
 		case T_CONN_IND:
@@ -468,9 +465,8 @@ timod_rput(queue_t *q, mblk_t *mp)
 				priv->state = TS_WCON_CREQ;
 				break;
 			case TS_WACK_CRES:
-				/*
-				   FIXME: depends 
-				 */
+				/* 
+				   FIXME: depends */
 				priv->state = TS_DATA_XFER;
 				break;
 			case TS_WACK_DREQ6:
@@ -547,14 +543,13 @@ timod_wput(queue_t *q, mblk_t *mp)
 		mblk_t *dp;
 		int err;
 	case M_IOCTL:
-		/*
+		/* 
 		   Most of the ioctls provided here are to acheive atomic and thread-safe
 		   operations on the stream for use by the XTI/TLI library.  Each ioctl takes a TPI 
 		   message in the buffer and results in sending the TPI message downstream.  We
 		   strip off and keep the io control block for latter response correlation.  We
 		   also track the state of the stream and the number of outstanding connection
-		   indications. 
-		 */
+		   indications. */
 		ioc = (typeof(ioc)) mp->b_rptr;
 		err = -EFAULT;
 		if (!(dp = unlinkb(mp)))
@@ -777,9 +772,8 @@ timod_wput(queue_t *q, mblk_t *mp)
 		return (0);
 	case M_PROTO:
 	case M_PCPROTO:
-		/*
-		   this is just to do state tracking 
-		 */
+		/* 
+		   this is just to do state tracking */
 		if (mp->b_wptr < mp->b_rptr + sizeof(p->type))
 			break;
 		p = (typeof(p)) mp->b_rptr;
@@ -906,9 +900,8 @@ timod_pop(queue_t *q)
 				qreply(q, mp);
 			}
 		}
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
@@ -974,9 +967,8 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 #if defined LIS
-	/*
-	   protect against LiS bugs 
-	 */
+	/* 
+	   protect against LiS bugs */
 	if (q->q_ptr == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", TIMOD_MOD_NAME,
 			__FUNCTION__);
@@ -1041,17 +1033,15 @@ timod_register_module(void)
 			modid = ret;
 		return (0);
 	}
-	/*
-	   LiS is not too good on giving informative errors here. 
-	 */
+	/* 
+	   LiS is not too good on giving informative errors here. */
 	return (EIO);
 }
 static void
 timod_unregister_module(void)
 {
-	/*
-	   LiS provides detailed errors here when they are discarded. 
-	 */
+	/* 
+	   LiS provides detailed errors here when they are discarded. */
 	return (void) lis_unregister_strmod(&timod_info);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:55 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:55 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:55 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:36 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:55 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:36 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -75,7 +75,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -94,7 +94,7 @@ MODULE_DESCRIPTION(M2TP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M2TP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2TP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 /*
@@ -104,6 +104,9 @@ MODULE_LICENSE(M2TP_LICENSE);
  *
  *  =========================================================================
  */
+
+#define MOD_ID	    M2TP_MOD_ID
+#define MOD_NAME    M2TP_MOD_NAME
 
 static struct module_info m2tp_minfo = {
 	M2TP_MOD_ID,			/* Module ID number *//* FIXME */
@@ -2064,70 +2067,118 @@ m2tp_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LiS MODULE INITIALIZATION
+ *  Registration and initialization
  *
  *  =========================================================================
  */
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
 
-static int m2tp_initialized = 0;
-
-#ifndef LIS_REGISTERED
-static inline void
-m2tp_init(void)
-#else
-__initfunc(void m2tp_init(void))
-#endif
-{
-	if (m2tp_initialized)
-		return;
-	m2tp_initialized = 1;
-	printk(KERN_INFO M2TP_BANNER);	/* console splash */
-#ifndef LIS_REGISTERED
-	if (!(m2tp_minfo.mi_idnum = lis_register_strmod(&m2tp_info, m2tp_minfo.mi_idname))) {
-		cmn_err(CE_NOTE, "m2tp: couldn't register as module\n");
-		m2tp_minfo.mi_idnum = 0;
-	}
-#endif
-}
-
-#ifndef LIS_REGISTERED
-static inline void
-m2tp_terminate(void)
-#else
-__initfunc(void m2tp_terminate(void))
-#endif
-{
-	if (!m2tp_initialized)
-		return;
-	m2tp_initialized = 0;
-#ifndef LIS_REGISTERED
-	if (m2tp_minfo.mi_idnum)
-		if ((sdt_minfo.mi_idnum = lis_unregister_strmod(&m2tp_info))) {
-			cmn_err(CE_WARN, "sdt: couldn't unregister as module!\n");
-		}
-#endif
-};
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the M2PA-SL module. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  LINUX KERNEL MODULE INITIALIZATION
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
+#ifdef LFS
 
-#ifdef MODULE
-int
-init_module(void)
+STATIC struct fmodsw sl_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &m2tpinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sl_register_strmod(void)
 {
-	m2tp_init();
+	int err;
+	if ((err = register_strmod(&sl_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+sl_unregister_strmod(void)
 {
-	sctp_terminate();
+	int err;
+	if ((err = unregister_strmod(&sl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sl_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&m2tpinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sl_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&m2tpinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+m2tpinit(void)
+{
+	int err;
+#ifdef MODULE
+	cmn_err(CE_NOTE, M2TP_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, M2TP_SPLASH);	/* console splash */
+#endif
+	if ((err = sl_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sl_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sl_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+m2tpterminate(void)
+{
+	int err;
+	if ((err = sl_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sl_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
-#endif
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(m2tpinit);
+module_exit(m2tpterminate);
+
+#endif				/* LINUX */

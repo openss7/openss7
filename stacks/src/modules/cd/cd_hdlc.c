@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -80,28 +80,32 @@ static char const ident[] =
 
 #include "cd/cd.h"
 
-#define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
-#define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
-#define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define HDLC_LICENSE	"GPL"
-#define HDLC_BANNER	HDLC_DESCRIP	"\n" \
-			HDLC_REVISION	"\n" \
-			HDLC_COPYRIGHT	"\n" \
-			HDLC_DEVICES	"\n" \
-			HDLC_CONTACT	"\n"
+#define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
+#define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
+#define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
+#define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define CD_HDLC_LICENSE		"GPL"
+#define CD_HDLC_BANNER		CD_HDLC_DESCRIP		"\n" \
+				CD_HDLC_COPYRIGHT	"\n" \
+				CD_HDLC_REVISION	"\n" \
+				CD_HDLC_DEVICES		"\n" \
+				CD_HDLC_CONTACT		"\n"
+#define CD_HDLC_SPLASH		CD_HDLC_DESCRIP		"\n" \
+				CD_HDLC_REVISION	"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(HDLC_CONTACT);
-MODULE_DESCRIPTION(HDLC_DESCRIP);
-MODULE_SUPPORTED_DEVICE(HDLC_DEVICES);
-MODULE_LICENSE(HDLC_LICENSE);
+MODULE_AUTHOR(CD_HDLC_CONTACT);
+MODULE_DESCRIPTION(CD_HDLC_DESCRIP);
+MODULE_SUPPORTED_DEVICE(CD_HDLC_DEVICES);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(CD_HDLC_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define HDLC_MOD_ID	CONFIG_STREAMS_HDLC_MODID
-#define HDLC_MOD_NAME	CONFIG_STREAMS_HDLC_NAME
+#define CD_HDLC_MOD_ID		CONFIG_STREAMS_CD_HDLC_MODID
+#define CD_HDLC_MOD_NAME	CONFIG_STREAMS_CD_HDLC_NAME
 #endif
 
 /*
@@ -112,9 +116,12 @@ MODULE_LICENSE(HDLC_LICENSE);
  *  =======================================================================
  */
 
+#define MOD_ID		CD_HDLC_MOD_ID
+#define MOD_NAME	CD_HDLC_MOD_NAME
+
 STATIC struct module_info hdlc_winfo = {
-	mi_idnum:HDLC_MOD_ID,		/* Module ID number */
-	mi_idname:HDLC_MOD_NAME "-wr",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME "-wr",	/* Module name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -122,8 +129,8 @@ STATIC struct module_info hdlc_winfo = {
 };
 
 STATIC struct module_info hdlc_rinfo = {
-	mi_idnum:HDLC_MOD_ID,		/* Module ID number */
-	mi_idname:HDLC_MOD_NAME "-rd",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME "-rd",	/* Module name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -147,10 +154,22 @@ STATIC struct qinit hdlc_winit = {
 	qi_minfo:&hdlc_winfo,		/* Information */
 };
 
-STATIC struct streamtab hdlc_info = {
+STATIC struct streamtab cd_hdlcinfo = {
 	st_rdinit:&hdlc_rinit,		/* Upper read queue */
 	st_wrinit:&hdlc_winit,		/* Upper write queue */
 };
+
+STATIC int
+hdlc_init_caches(void)
+{
+	return (0);
+}
+STATIC int
+
+hdlc_term_caches(void)
+{
+	return (0);
+}
 
 /*
  *  =========================================================================
@@ -176,9 +195,8 @@ hdlc_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct str *str;
-		/*
-		   test for multiple push 
-		 */
+		/* 
+		   test for multiple push */
 		for (str = hdlc_list; str; str = str->next) {
 			if (str->u.dev.cmajor == cmajor && str->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -209,57 +227,115 @@ hdlc_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
+#ifdef LINUX
 /*
- *  =======================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =======================================================================
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
  */
-STATIC int hdlc_initialized = 0;
-STATIC void
-hdlc_init(void)
-{
-	unless(hdlc_initialized > 0, return);
-	cmn_err(CE_NOTE, HDLC_BANNER);	/* console splash */
-	if ((hdlc_initialized = lis_register_strmod(&hdlc_info, HDLC_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: couldn't register module", HDLC_MOD_NAME);
-		return;
-	}
-	hdlc_initialized = 1;
-	return;
-}
-STATIC void
-hdlc_terminate(void)
-{
-	ensure(hdlc_initialized > 0, return);
-	if ((hdlc_initialized = lis_unregister_strmod(&hdlc_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", HDLC_MOD_NAME);
-		return;
-	}
-	hdlc_initialized = 0;
-	return;
-}
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the CD-HDLC module. (0 for allocation.)");
 
 /*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct fmodsw hdlc_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &cd_hdlcinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+hdlc_register_strmod(void)
 {
-	hdlc_init();
-	if (hdlc_initialized < 0)
-		return hdlc_initialized;
+	int err;
+	if ((err = register_strmod(&hdlc_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+hdlc_unregister_strmod(void)
 {
-	(void) ss7_unbufcall;
-	hdlc_terminate();
+	int err;
+	if ((err = unregister_strmod(&hdlc_fmod)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+hdlc_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&cd_hdlcinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+hdlc_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&cd_hdlcinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+cd_hdlcinit(void)
+{
+	int err;
+#ifdef MODULE
+	cmn_err(CE_NOTE, CD_HDLC_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, CD_HDLC_SPLASH);	/* console splash */
+#endif
+	if ((err = hdlc_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = hdlc_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		hdlc_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+cd_hdlcterminate(void)
+{
+	int err;
+	if ((err = hdlc_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = hdlc_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	return;
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(cd_hdlcinit);
+module_exit(cd_hdlcterminate);
+
+#endif				/* LINUX */
+

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:08 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
 
-static char const ident[] = "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:08 $";
+static char const ident[] =
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -74,43 +75,35 @@ static char const ident[] = "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_LICENSE	"GPL"
 #define SDT_BANNER	SDT_DESCRIP	"\n" \
+			SDT_REVISION	"\n" \
 			SDT_COPYRIGHT	"\n" \
 			SDT_DEVICE	"\n" \
 			SDT_CONTACT	"\n"
 #define SDT_SPLASH	SDT_DEVICE	" - " \
-			SDT_REVISION
+			SDT_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(SDT_CONTACT);
 MODULE_DESCRIPTION(SDT_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SDT_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDT_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
+
+#ifndef SDT_MOD_NAME
+#define SDT_MOD_NAME	"sdt"
 #endif
 
 #ifndef SDT_MOD_ID
-#   ifdef CONFIG_STREAMS_SDT_MODID
-#	define SDT_MOD_ID CONFIG_STREAMS_SDT_MODID
-#   else
-#	define SDT_MOD_ID 0
-#   endif
+#define SDT_MOD_ID	0
 #endif
-
-#ifndef SDT_MOD_NAME
-#   ifdef CONFIG_STREAMS_SDT_NAME
-#	define SDT_MOD_NAME CONFIG_STREAMS_SDT_NAME
-#   else
-#	define SDT_MOD_NAME "sdt"
-#   endif
-#endif
-
-unsigned short modid = SDT_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for the SDT module.  (0 for allocation.)");
 
 /*
  *  =======================================================================
@@ -119,9 +112,18 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT module.  (0 for allocation.)");
  *
  *  =======================================================================
  */
+
+#define MOD_ID		SDT_MOD_ID
+#define MOD_NAME	SDT_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	SDT_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	SDT_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info sdt_rinfo = {
-	mi_idnum:SDT_MOD_ID,		/* Module ID number */
-	mi_idname:SDT_MOD_NAME "-rd",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:128,			/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
@@ -129,8 +131,8 @@ STATIC struct module_info sdt_rinfo = {
 };
 
 STATIC struct module_info sdt_winfo = {
-	mi_idnum:SDT_MOD_ID,		/* Module ID number */
-	mi_idname:SDT_MOD_NAME "-wr",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:280,			/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
@@ -152,7 +154,7 @@ STATIC struct qinit sdt_winit = {
 	qi_minfo:&sdt_winfo,		/* Information */
 };
 
-STATIC struct streamtab sdt_info = {
+STATIC struct streamtab sdtinfo = {
 	st_rdinit:&sdt_rinit,		/* Upper read queue */
 	st_wrinit:&sdt_winit,		/* Upper write queue */
 };
@@ -248,7 +250,7 @@ m_error(queue_t *q, struct sdt *s, int err)
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		s->i_state = LMI_UNUSABLE;
-		printd(("%s: %p: <- M_ERROR\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- M_ERROR\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -270,7 +272,7 @@ m_hangup(queue_t *q, struct sdt *s, int err)
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		s->i_state = LMI_UNUSABLE;
-		printd(("%s: %p: <- M_HANGUP\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- M_HANGUP\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -299,7 +301,7 @@ lmi_info_ack(queue_t *q, struct sdt *s)
 		p->lmi_min_sdu = ((s->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE1;	/* only STYLE1 for modules */
-		printd(("%s: %p: <- LMI_INFO_ACK\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_INFO_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -330,7 +332,7 @@ lmi_ok_ack(queue_t *q, struct sdt *s, long prim)
 			break;
 		}
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_OK_ACK\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_OK_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -372,7 +374,7 @@ lmi_error_ack(queue_t *q, struct sdt *s, long prim, ulong reason, ulong errno)
 			break;
 		}
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_ERROR_ACK\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -395,7 +397,7 @@ lmi_enable_con(queue_t *q, struct sdt *s)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_ENABLE_CON\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_ENABLE_CON\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -417,7 +419,7 @@ lmi_disable_con(queue_t *q, struct sdt *s)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_DISABLE_CON\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_DISABLE_CON\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -443,7 +445,7 @@ lmi_optmgmt_ack(queue_t *q, struct sdt *s, ulong flags, caddr_t opt_ptr, size_t 
 		p->lmi_flags = flags;
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
-		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -467,7 +469,7 @@ lmi_error_ind(queue_t *q, struct sdt *s, long error, long reason)
 		p->lmi_errno = error;
 		p->lmi_reason = reason;
 		p->lmi_state = s->i_state;
-		printd(("%s: %p: <- LMI_ERROR_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_ERROR_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -490,7 +492,7 @@ lmi_stats_ind(queue_t *q, struct sdt *s)
 		p->lmi_primitive = LMI_STATS_IND;
 		p->lmi_interval = 0;
 		p->lmi_timestamp = jiffies;
-		printd(("%s: %p: <- LMI_STATS_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_STATS_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -517,7 +519,7 @@ lmi_event_ind(queue_t *q, struct sdt *s, ulong oid, ulong level, caddr_t inf_ptr
 		p->lmi_severity = level;
 		bcopy(inf_ptr, mp->b_wptr, inf_len);
 		mp->b_wptr += inf_len;
-		printd(("%s: %p: <- LMI_EVENT_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_EVENT_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -533,7 +535,7 @@ STATIC INLINE int
 sdt_rc_signal_unit_ind(queue_t *q, struct sdt *s, mblk_t *dp, ulong count)
 {
 	if (count == 1) {
-		printd(("%s: %p: <- M_DATA [%d]\n", SDT_MOD_NAME, s, msgdsize(dp)));
+		printd(("%s: %p: <- M_DATA [%d]\n", MOD_NAME, s, msgdsize(dp)));
 		putnext(s->oq, dp);
 		return (QR_DONE);
 	} else if (count > 1) {
@@ -545,7 +547,7 @@ sdt_rc_signal_unit_ind(queue_t *q, struct sdt *s, mblk_t *dp, ulong count)
 			p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 			p->sdt_count = count;
 			mp->b_cont = dp;
-			printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND [%lu x %d]\n", SDT_MOD_NAME, s,
+			printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND [%lu x %d]\n", MOD_NAME, s,
 				count, msgdsize(dp)));
 			putnext(s->oq, mp);
 			return (QR_DONE);
@@ -570,7 +572,7 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_RC_CONGESTION_ACCEPT_IND;
-		printd(("%s: %p: <- SDT_RC_CONGESTION_ACCEPT_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_RC_CONGESTION_ACCEPT_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -591,7 +593,7 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_RC_CONGESTION_DISCARD_IND;
-		printd(("%s: %p: <- SDT_RC_CONGESTION_DISCARD_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_RC_CONGESTION_DISCARD_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -612,7 +614,7 @@ sdt_rc_no_congestion_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_RC_NO_CONGESTION_IND;
-		printd(("%s: %p: <- SDT_RC_NO_CONGESTION_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_RC_NO_CONGESTION_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -633,7 +635,7 @@ sdt_iac_correct_su_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_IAC_CORRECT_SU_IND;
-		printd(("%s: %p: <- SDT_IAC_CORRECT_SU_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_IAC_CORRECT_SU_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -654,7 +656,7 @@ sdt_iac_abort_proving_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_IAC_ABORT_PROVING_IND;
-		printd(("%s: %p: <- SDT_IAC_ABORT_PROVING_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_IAC_ABORT_PROVING_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -675,7 +677,7 @@ sdt_lsc_link_failure_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_LSC_LINK_FAILURE_IND;
-		printd(("%s: %p: <- SDT_LSC_LINK_FAILURE_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_LSC_LINK_FAILURE_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -700,7 +702,7 @@ sdt_txc_transmission_request_ind(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdt_primitive = SDT_TXC_TRANSMISSION_REQUEST_IND;
-		printd(("%s: %p: <- SDT_TXC_TRANSMISSION_REQUEST_IND\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- SDT_TXC_TRANSMISSION_REQUEST_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
 	}
@@ -729,7 +731,7 @@ sdl_info_req(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_INFO_REQ;
-		printd(("%s: %p: LMI_INFO_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_INFO_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -756,7 +758,7 @@ sdl_attach_req(queue_t *q, struct sdt *s, caddr_t ppa_ptr, size_t ppa_len)
 		p->lmi_primitive = LMI_ATTACH_REQ;
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
-		printd(("%s: %p: LMI_ATTACH_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_ATTACH_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -777,7 +779,7 @@ sdl_detach_req(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DETACH_REQ;
-		printd(("%s: %p: LMI_DETACH_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_DETACH_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -798,7 +800,7 @@ sdl_enable_req(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_ENABLE_REQ;
-		printd(("%s: %p: LMI_ENABLE_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -819,7 +821,7 @@ sdl_disable_req(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->lmi_primitive = LMI_DISABLE_REQ;
-		printd(("%s: %p: LMI_DISABLE_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -845,7 +847,7 @@ sdl_optmgmt_req(queue_t *q, struct sdt *s, long flags, caddr_t opt_ptr, size_t o
 		p->lmi_mgmt_flags = flags;
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
-		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -871,7 +873,7 @@ sdl_bits_for_transmission_req(queue_t *q, struct sdt *s, mblk_t *dp)
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_BITS_FOR_TRANSMISSION_REQ;
 		mp->b_cont = dp;
-		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION [%d] ->\n", SDT_MOD_NAME, s, msgdsize(dp)));
+		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION [%d] ->\n", MOD_NAME, s, msgdsize(dp)));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -892,7 +894,7 @@ sdl_connect_req(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_CONNECT_REQ;
-		printd(("%s: %p: SDL_CONNECT_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -913,7 +915,7 @@ sdl_disconnect_req(queue_t *q, struct sdt *s)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->sdl_primitive = SDL_DISCONNECT_REQ;
-		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
 		return (QR_DONE);
 	}
@@ -938,7 +940,7 @@ sdl_disconnect_req(queue_t *q, struct sdt *s)
  */
 enum { tall, t8 };
 
-SS7_DECLARE_TIMER(SDT_MOD_NAME, sdt, t8, config);
+SS7_DECLARE_TIMER(MOD_NAME, sdt, t8, config);
 
 STATIC INLINE void
 __sdt_timer_stop(struct sdt *s, const uint t)
@@ -947,16 +949,14 @@ __sdt_timer_stop(struct sdt *s, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 	case t8:
 		sdt_stop_timer_t8(s);
 		if (single)
 			break;
-		/*
-		   fall through 
-		 */
+		/* 
+		   fall through */
 		break;
 	default:
 		swerr();
@@ -1308,21 +1308,19 @@ sdt_tx_repeat(queue_t *q, struct sdt *s, mblk_t *mp)
 	mblk_t *cp;
 	int len, hlen, clen;
 	if ((len = msgdsize(mp)) < (hlen = (s->option.popt & SS7_POPT_XSN) ? 6 : 3)) {
-		ptrace(("%s: %p: ERROR: user violated minimum size\n", SDT_MOD_NAME, s));
+		ptrace(("%s: %p: ERROR: user violated minimum size\n", MOD_NAME, s));
 		goto dont_repeat;
 	}
 	if (len > hlen + 2
 	    || ((len == hlen + 1 || len == hlen + 2) && (mp->b_rptr[hlen] & 0x7) == 5)) {
-		/*
-		   MSU or SIB 
-		 */
+		/* 
+		   MSU or SIB */
 		if (s->option.popt & SS7_POPT_PCR)
 			goto dont_repeat;
 		clen = hlen;
 	} else {
-		/*
-		   FISU or LSSU 
-		 */
+		/* 
+		   FISU or LSSU */
 		clen = len;
 	}
 	if (!(cp = s->tx.cmp) && !(cp = s->tx.cmp = ss7_allocb(q, clen, BPRI_MED)))
@@ -1350,9 +1348,8 @@ sdt_tx_buffer(queue_t *q, struct sdt *s)
 {
 	mblk_t *dp = NULL;
 	psw_t flags;
-	/*
-	   lock down while we traverse queue 
-	 */
+	/* 
+	   lock down while we traverse queue */
 	spin_lock_irqsave(&s->qlock, flags);
 	{
 		mblk_t *mp;
@@ -1435,18 +1432,15 @@ sdt_tx_block(queue_t *q, struct sdt *s)
 					tx->mode = TX_MODE_BOF;
 			}
 		}
-		/*
-		   check if transmission block complete 
-		 */
+		/* 
+		   check if transmission block complete */
 		while (bp->b_wptr < bp->b_rptr + s->config.b) {
-			/*
-			   drain residue bits, if necessary 
-			 */
+			/* 
+			   drain residue bits, if necessary */
 			if (tx->rbits >= bits) {
 			      drain_rbits:
-				/*
-				   drain residue bits 
-				 */
+				/* 
+				   drain residue bits */
 				if (bits == 8)
 					*bp->b_wptr++ = tx->residue;
 				else
@@ -1457,23 +1451,20 @@ sdt_tx_block(queue_t *q, struct sdt *s)
 			}
 			switch (tx->mode) {
 			case TX_MODE_IDLE:
-				/*
-				   mark idle 
-				 */
+				/* 
+				   mark idle */
 				tx->residue |= 0xff << tx->rbits;
 				tx->rbits += 8;
 				goto drain_rbits;
 			case TX_MODE_FLAG:
-				/*
-				   idle flags 
-				 */
+				/* 
+				   idle flags */
 				tx->residue |= 0x7e << tx->rbits;
 				tx->rbits += 8;
 				goto drain_rbits;
 			case TX_MODE_BOF:
-				/*
-				   add opening flag (also closing flag) 
-				 */
+				/* 
+				   add opening flag (also closing flag) */
 				switch (s->config.f) {
 				case SDT_FLAGS_ONE:
 					tx->residue |= 0x7e << tx->rbits;
@@ -1500,26 +1491,23 @@ sdt_tx_block(queue_t *q, struct sdt *s)
 			case TX_MODE_MOF:	/* transmit frame bytes */
 				if (tx->nxt->b_rptr < tx->nxt->b_wptr
 				    || (tx->nxt = tx->nxt->b_cont)) {
-					/*
-					   continuing in message 
-					 */
+					/* 
+					   continuing in message */
 					uint byte = *(tx->nxt->b_rptr)++;
 					tx->bcc =
 					    (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
 					sdt_tx_bitstuff(tx, byte);
 					stats->tx_bytes++;
 				} else {
-					/*
-					   finished message: add 1st bcc byte 
-					 */
+					/* 
+					   finished message: add 1st bcc byte */
 					sdt_tx_bitstuff(tx, tx->bcc & 0x00ff);
 					tx->mode = TX_MODE_BCC;
 				}
 				goto drain_rbits;
 			case TX_MODE_BCC:
-				/*
-				   add 2nd bcc byte 
-				 */
+				/* 
+				   add 2nd bcc byte */
 				sdt_tx_bitstuff(tx, tx->bcc >> 8);
 				stats->tx_sus++;
 				tx->mode = TX_MODE_FLAG;
@@ -2127,8 +2115,8 @@ sdt_init_tables(void)
       bc_failed:
 	return (-ENOMEM);
 }
-STATIC void
-sdt_free_tables(void)
+STATIC int
+sdt_term_tables(void)
 {
 	free_pages((unsigned long) bc_table, bc_order);
 	printd(("sdt: freed BC table kernel pages\n"));
@@ -2136,6 +2124,7 @@ sdt_free_tables(void)
 	printd(("sdt: freed Tx table kernel pages\n"));
 	free_pages((unsigned long) rx_table, rx_order);
 	printd(("sdt: freed Rx table kernel pages\n"));
+	return (0);
 }
 
 /*
@@ -2263,19 +2252,19 @@ sdt_attach_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_ATTACH_PENDING;
 	return (QR_PASSFLOW);
       badppa:
-	ptrace(("%s: %p: PROTO: bad ppa (too short)\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: bad ppa (too short)\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_BADPPA, EMSGSIZE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_OUTSTATE, EPROTO);
       eopnotsupp:
-	ptrace(("%s: %p: PROTO: primitive not supported for style\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: primitive not supported for style\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ATTACH_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -2302,16 +2291,16 @@ sdt_detach_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_DETACH_PENDING;
 	return (QR_PASSFLOW);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DETACH_REQ, LMI_OUTSTATE, EPROTO);
       eopnotsupp:
-	ptrace(("%s: %p: PROTO: primitive not supported for style\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: primitive not supported for style\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DETACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DETACH_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -2335,13 +2324,13 @@ sdt_enable_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_ENABLE_PENDING;
 	return (QR_PASSFLOW);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_ENABLE_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -2365,13 +2354,13 @@ sdt_disable_req(queue_t *q, mblk_t *mp)
 	s->i_state = LMI_DISABLE_PENDING;
 	return (QR_PASSFLOW);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DISABLE_REQ, LMI_OUTSTATE, EPROTO);
       eagain:
-	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: INFO: waiting for streams to become usable\n", MOD_NAME, s));
 	return (-EAGAIN);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_DISABLE_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -2389,7 +2378,7 @@ sdt_optmgmt_req(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
       emsgsize:
 	(void) s;
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return lmi_error_ack(q, s, LMI_OPTMGMT_REQ, LMI_PROTOSHORT, EMSGSIZE);
 }
 
@@ -2417,9 +2406,8 @@ sdt_send_data(queue_t *q, mblk_t *mp)
 	hlen = (s->option.popt & SS7_POPT_XSN) ? 6 : 3;
 	if (len < hlen || len > hlen + s->config.m + 1)
 		goto eproto;
-	/*
-	   let tx_wakeup pull from the queue 
-	 */
+	/* 
+	   let tx_wakeup pull from the queue */
 	return (-EAGAIN);
       eproto:
 	swerr();		/* length violation, error out stream */
@@ -2463,10 +2451,10 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 		s->statem.daedt_state = SDT_STATE_IN_SERVICE;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2487,10 +2475,10 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 		s->statem.daedr_state = SDT_STATE_IN_SERVICE;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2514,10 +2502,10 @@ sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2540,10 +2528,10 @@ sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2564,10 +2552,10 @@ sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 		s->statem.Ti = s->config.Tin;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2588,10 +2576,10 @@ sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 		s->statem.Ti = s->config.Tie;
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2616,10 +2604,10 @@ sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2642,10 +2630,10 @@ sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       outstate:
-	ptrace(("%s: %p: PROTO: out of state\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: out of state\n", MOD_NAME, s));
 	return m_error(q, s, EPROTO);
       emsgsize:
-	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", SDT_MOD_NAME, s));
+	ptrace(("%s: %p: PROTO: M_PROTO block too short\n", MOD_NAME, s));
 	return (-EMSGSIZE);
 }
 
@@ -2697,7 +2685,7 @@ sdl_info_ack(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 	}
-	printd(("%s: %p: <- LMI_INFO_ACK\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_INFO_ACK\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -2739,7 +2727,7 @@ sdl_ok_ack(queue_t *q, mblk_t *mp)
 	default:
 		goto discard;
 	}
-	printd(("%s: %p: <- LMI_ERROR_ACK\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -2785,7 +2773,7 @@ sdl_error_ack(queue_t *q, mblk_t *mp)
 	default:
 		goto discard;
 	}
-	printd(("%s: %p: <- LMI_ERROR_ACK\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_ERROR_ACK\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       discard:
 	swerr();
@@ -2825,7 +2813,7 @@ sdl_enable_con(queue_t *q, mblk_t *mp)
 	default:
 		goto discard;
 	}
-	printd(("%s: %p: <- LMI_ENABLE_CON\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_ENABLE_CON\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -2851,9 +2839,8 @@ sdl_disable_con(queue_t *q, mblk_t *mp)
 		goto emsgsize;
 	switch (s->i_state) {
 	case LMI_DISABLED:
-		/*
-		   already disabled 
-		 */
+		/* 
+		   already disabled */
 		goto discard;
 	case LMI_DISABLE_PENDING:
 		s->i_state = LMI_DISABLED;
@@ -2890,7 +2877,7 @@ sdl_disable_con(queue_t *q, mblk_t *mp)
 			s->statem.daedr_state = SDT_STATE_IDLE;
 		}
 		spin_unlock_irqrestore(&s->lock, flags);
-		printd(("%s: %p: <- LMI_DISABLE_CON\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: <- LMI_DISABLE_CON\n", MOD_NAME, s));
 		return (QR_PASSFLOW);
 	}
       outstate:
@@ -2919,7 +2906,7 @@ sdl_optmgmt_ack(queue_t *q, mblk_t *mp)
 		goto discard;
 	if (s->i_state != LMI_ENABLED)
 		goto outstate;
-	printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_OPTMGMT_ACK\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -2947,7 +2934,7 @@ sdl_error_ind(queue_t *q, mblk_t *mp)
 		goto discard;
 	if (s->i_state != LMI_ENABLED)
 		goto outstate;
-	printd(("%s: %p: <- LMI_ERROR_IND\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_ERROR_IND\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -2975,7 +2962,7 @@ sdl_stats_ind(queue_t *q, mblk_t *mp)
 		goto discard;
 	if (s->i_state != LMI_ENABLED)
 		goto outstate;
-	printd(("%s: %p: <- LMI_STATS_IND\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_STATS_IND\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -3003,7 +2990,7 @@ sdl_event_ind(queue_t *q, mblk_t *mp)
 		goto discard;
 	if (s->i_state != LMI_ENABLED)
 		goto outstate;
-	printd(("%s: %p: <- LMI_EVENT_IND\n", SDT_MOD_NAME, s));
+	printd(("%s: %p: <- LMI_EVENT_IND\n", MOD_NAME, s));
 	return (QR_PASSFLOW);
       outstate:
 	swerr();
@@ -3547,7 +3534,7 @@ sdt_ioccmreset(queue_t *q, mblk_t *mp)
 	struct sdt *s = SDT_PRIV(q);
 	(void) s;
 	(void) mp;
-	fixme(("%s: Master reset\n", SDT_MOD_NAME));
+	fixme(("%s: Master reset\n", MOD_NAME));
 	return (-EOPNOTSUPP);
 }
 STATIC int
@@ -3710,11 +3697,11 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_UNLINK):
 		case _IOC_NR(I_PUNLINK):
 			(void) lp;
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDT_MOD_NAME, s, nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, s, nr));
 			ret = (-EINVAL);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", SDT_MOD_NAME, s, nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, s, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -3773,7 +3760,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = lmi_ioccnotify(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported SDT ioctl %d\n", SDT_MOD_NAME, s, nr));
+			ptrace(("%s: %p: ERROR: Unsupported SDT ioctl %d\n", MOD_NAME, s, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -3835,7 +3822,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = sdt_ioccabort(q, mp);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported SDT ioctl %d\n", SDT_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported SDT ioctl %d\n", MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -3879,7 +3866,7 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	struct sdt *s = SDT_PRIV(q);
 	ulong oldstate = s->i_state;
 	if ((prim = *(ulong *) mp->b_rptr) == SDT_DAEDT_TRANSMISSION_REQ) {
-		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%d]\n", SDT_MOD_NAME, s,
+		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
 			msgdsize(mp->b_cont)));
 		if ((rtn = sdt_daedt_transmission_req(q, mp)) < 0)
 			s->i_state = oldstate;
@@ -3887,64 +3874,64 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	}
 	switch (prim) {
 	case SDT_DAEDT_TRANSMISSION_REQ:
-		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%d]\n", SDT_MOD_NAME, s,
+		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
 			msgdsize(mp->b_cont)));
 		rtn = sdt_daedt_transmission_req(q, mp);
 		break;
 	case SDT_DAEDT_START_REQ:
-		printd(("%s: %p: -> SDT_DAEDT_START_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_DAEDT_START_REQ\n", MOD_NAME, s));
 		rtn = sdt_daedt_start_req(q, mp);
 		break;
 	case SDT_DAEDR_START_REQ:
-		printd(("%s: %p: -> SDT_DAEDT_START_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_DAEDT_START_REQ\n", MOD_NAME, s));
 		rtn = sdt_daedr_start_req(q, mp);
 		break;
 	case SDT_AERM_START_REQ:
-		printd(("%s: %p: -> SDT_AERM_START_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_AERM_START_REQ\n", MOD_NAME, s));
 		rtn = sdt_aerm_start_req(q, mp);
 		break;
 	case SDT_AERM_STOP_REQ:
-		printd(("%s: %p: -> SDT_AERM_STOP_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_AERM_STOP_REQ\n", MOD_NAME, s));
 		rtn = sdt_aerm_stop_req(q, mp);
 		break;
 	case SDT_AERM_SET_TI_TO_TIN_REQ:
-		printd(("%s: %p: -> SDT_AERM_SET_TI_TO_TIN_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_AERM_SET_TI_TO_TIN_REQ\n", MOD_NAME, s));
 		rtn = sdt_aerm_set_ti_to_tin_req(q, mp);
 		break;
 	case SDT_AERM_SET_TI_TO_TIE_REQ:
-		printd(("%s: %p: -> SDT_AERM_SET_TI_TO_TIE_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_AERM_SET_TI_TO_TIE_REQ\n", MOD_NAME, s));
 		rtn = sdt_aerm_set_ti_to_tie_req(q, mp);
 		break;
 	case SDT_SUERM_START_REQ:
-		printd(("%s: %p: -> SDT_SUERM_START_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_SUERM_START_REQ\n", MOD_NAME, s));
 		rtn = sdt_suerm_start_req(q, mp);
 		break;
 	case SDT_SUERM_STOP_REQ:
-		printd(("%s: %p: -> SDT_SUERM_STOP_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> SDT_SUERM_STOP_REQ\n", MOD_NAME, s));
 		rtn = sdt_suerm_stop_req(q, mp);
 		break;
 	case LMI_INFO_REQ:
-		printd(("%s: %p: -> LMI_INFO_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_INFO_REQ\n", MOD_NAME, s));
 		rtn = sdt_info_req(q, mp);
 		break;
 	case LMI_ATTACH_REQ:
-		printd(("%s: %p: -> LMI_ATTACH_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_ATTACH_REQ\n", MOD_NAME, s));
 		rtn = sdt_attach_req(q, mp);
 		break;
 	case LMI_DETACH_REQ:
-		printd(("%s: %p: -> LMI_DETACH_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_DETACH_REQ\n", MOD_NAME, s));
 		rtn = sdt_detach_req(q, mp);
 		break;
 	case LMI_ENABLE_REQ:
-		printd(("%s: %p: -> LMI_ENABLE_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_ENABLE_REQ\n", MOD_NAME, s));
 		rtn = sdt_enable_req(q, mp);
 		break;
 	case LMI_DISABLE_REQ:
-		printd(("%s: %p: -> LMI_DISABLE_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_DISABLE_REQ\n", MOD_NAME, s));
 		rtn = sdt_disable_req(q, mp);
 		break;
 	case LMI_OPTMGMT_REQ:
-		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: -> LMI_OPTMGMT_REQ\n", MOD_NAME, s));
 		rtn = sdt_optmgmt_req(q, mp);
 		break;
 	default:
@@ -3968,11 +3955,10 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct sdt *s = SDT_PRIV(q);
 	ulong oldstate = s->i_state;
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SDL_RECEIVED_BITS_IND) {
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%d] <-\n", SDT_MOD_NAME, s,
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%d] <-\n", MOD_NAME, s,
 			msgdsize(mp->b_cont)));
 		if ((rtn = sdl_received_bits_ind(q, mp)) < 0)
 			s->i_state = oldstate;
@@ -3980,48 +3966,48 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
 	}
 	switch (prim) {
 	case SDL_RECEIVED_BITS_IND:
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%d] <-\n", SDT_MOD_NAME, s,
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%d] <-\n", MOD_NAME, s,
 			msgdsize(mp->b_cont)));
 		rtn = sdl_received_bits_ind(q, mp);
 		break;
 	case SDL_DISCONNECT_IND:
-		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: SDL_DISCONNECT_IND <-\n", MOD_NAME, s));
 		rtn = sdl_disconnect_ind(q, mp);
 		break;
 	case LMI_INFO_ACK:
-		printd(("%s: %p: LMI_INFO_ACK <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_INFO_ACK <-\n", MOD_NAME, s));
 		rtn = sdl_info_ack(q, mp);
 		break;
 	case LMI_OK_ACK:
-		printd(("%s: %p: LMI_OK_ACK <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_OK_ACK <-\n", MOD_NAME, s));
 		rtn = sdl_ok_ack(q, mp);
 		break;
 	case LMI_ERROR_ACK:
-		printd(("%s: %p: LMI_ERROR_ACK <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_ERROR_ACK <-\n", MOD_NAME, s));
 		rtn = sdl_error_ack(q, mp);
 		break;
 	case LMI_ENABLE_CON:
-		printd(("%s: %p: LMI_ENABLE_CON <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_ENABLE_CON <-\n", MOD_NAME, s));
 		rtn = sdl_enable_con(q, mp);
 		break;
 	case LMI_DISABLE_CON:
-		printd(("%s: %p: LMI_DISABLE_CON <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_DISABLE_CON <-\n", MOD_NAME, s));
 		rtn = sdl_disable_con(q, mp);
 		break;
 	case LMI_OPTMGMT_ACK:
-		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_OPTMGMT_ACK <-\n", MOD_NAME, s));
 		rtn = sdl_optmgmt_ack(q, mp);
 		break;
 	case LMI_ERROR_IND:
-		printd(("%s: %p: LMI_ERROR_IND <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_ERROR_IND <-\n", MOD_NAME, s));
 		rtn = sdl_error_ind(q, mp);
 		break;
 	case LMI_STATS_IND:
-		printd(("%s: %p: LMI_STATS_IND <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_STATS_IND <-\n", MOD_NAME, s));
 		rtn = sdl_stats_ind(q, mp);
 		break;
 	case LMI_EVENT_IND:
-		printd(("%s: %p: LMI_EVENT_IND <-\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: LMI_EVENT_IND <-\n", MOD_NAME, s));
 		rtn = sdl_event_ind(q, mp);
 		break;
 	default:
@@ -4046,7 +4032,7 @@ sdt_w_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *s = SDT_PRIV(q);
 	(void) s;
-	printd(("%s: %p: -> M_DATA [%d]\n", SDT_MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, s, msgdsize(mp)));
 	return sdt_send_data(q, mp);
 }
 STATIC INLINE int
@@ -4054,7 +4040,7 @@ sdt_r_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *s = SDT_PRIV(q);
 	(void) s;
-	printd(("%s: %p: M_DATA [%d] <-\n", SDT_MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, s, msgdsize(mp)));
 	return sdt_recv_data(q, mp);
 }
 
@@ -4068,9 +4054,8 @@ sdt_r_data(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sdt_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sdt_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -4089,9 +4074,8 @@ sdt_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sdt_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sdt_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -4130,9 +4114,8 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct sdt *s;
-		/*
-		   test for multiple push 
-		 */
+		/* 
+		   test for multiple push */
 		for (s = sdt_opens; s; s = s->next) {
 			if (s->u.dev.cmajor == cmajor && s->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -4143,9 +4126,8 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			MOD_DEC_USE_COUNT;
 			return (ENOMEM);
 		}
-		/*
-		   generate immediate information request 
-		 */
+		/* 
+		   generate immediate information request */
 		if ((err = sdl_info_req(q, s)) < 0) {
 			sdt_free_priv(q);
 			MOD_DEC_USE_COUNT;
@@ -4189,19 +4171,20 @@ sdt_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate sdt_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	}
-	printd(("%s: Allocated/selected private structure cache\n", SDT_MOD_NAME));
+	printd(("%s: Allocated/selected private structure cache\n", MOD_NAME));
 	return (0);
 }
-STATIC void
-sdt_free_caches(void)
+STATIC int
+sdt_term_caches(void)
 {
 	if (sdt_priv_cachep) {
-		if (kmem_cache_destroy(sdt_priv_cachep))
+		if (kmem_cache_destroy(sdt_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdt_priv_cachep.", __FUNCTION__);
-		else
+			return (-EBUSY);
+		} else
 			printd(("sdt: destroyed sdt_priv_cachep\n"));
 	}
-	return;
+	return (0);
 }
 STATIC struct sdt *
 sdt_alloc_priv(queue_t *q, struct sdt **sp, dev_t *devp, cred_t *crp)
@@ -4216,7 +4199,7 @@ sdt_alloc_priv(queue_t *q, struct sdt **sp, dev_t *devp, cred_t *crp)
 		s->cred = *crp;
 		(s->oq = RD(q))->q_ptr = sdt_get(s);
 		(s->iq = WR(q))->q_ptr = sdt_get(s);
-		spin_lock_init(&s->qlock); /* "sdt-queue-lock" */
+		spin_lock_init(&s->qlock);	/* "sdt-queue-lock" */
 		s->o_prim = &sdt_r_prim;
 		s->i_prim = &sdt_w_prim;
 		s->o_wakeup = &sdt_rx_wakeup;
@@ -4224,20 +4207,19 @@ sdt_alloc_priv(queue_t *q, struct sdt **sp, dev_t *devp, cred_t *crp)
 		s->i_state = LMI_UNUSABLE;
 		s->i_style = LMI_STYLE1;
 		s->i_version = 1;
-		spin_lock_init(&s->qlock); /* "sdt-priv_lock" */
+		spin_lock_init(&s->qlock);	/* "sdt-priv_lock" */
 		if ((s->next = *sp))
 			s->next->prev = &s->next;
 		s->prev = sp;
 		*sp = sdt_get(s);
-		printd(("%s: %p: linked module private structure\n", SDT_MOD_NAME, s));
-		/*
-		   configuration defaults 
-		 */
+		printd(("%s: %p: linked module private structure\n", MOD_NAME, s));
+		/* 
+		   configuration defaults */
 		s->option = lmi_default;
 		s->config = sdt_default;
-		printd(("%s: %p: setting module private structure defaults\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: setting module private structure defaults\n", MOD_NAME, s));
 	} else
-		ptrace(("%s: ERROR: Could not allocate module private structure\n", SDT_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", MOD_NAME));
 	return (s);
 }
 STATIC void
@@ -4288,66 +4270,129 @@ sdt_put(struct sdt *s)
 {
 	if (atomic_dec_and_test(&s->refcnt)) {
 		kmem_cache_free(sdt_priv_cachep, s);
-		printd(("%s: %p: freed sdt private structure\n", SDT_MOD_NAME, s));
+		printd(("%s: %p: freed sdt private structure\n", MOD_NAME, s));
 	}
 }
 
 /*
- *  =======================================================================
+ *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
- *  =======================================================================
+ *  =========================================================================
  */
-STATIC int sdt_initialized = 0;
-STATIC void
-sdt_init(void)
-{
-	unless(sdt_initialized > 0, return);
-	cmn_err(CE_NOTE, SDT_BANNER);	/* console splash */
-	if ((sdt_initialized = sdt_init_caches()) || (sdt_initialized = sdt_init_tables())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", SDT_MOD_NAME);
-	} else if ((sdt_initialized = lis_register_strmod(&sdt_info, SDT_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: couldn't register module", SDT_MOD_NAME);
-		sdt_free_tables();
-		sdt_free_caches();
-	}
-	return;
-}
-STATIC void
-sdt_terminate(void)
-{
-	ensure(sdt_initialized > 0, return);
-	if ((sdt_initialized = lis_unregister_strmod(&sdt_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", SDT_MOD_NAME);
-	} else {
-		sdt_free_tables();
-		sdt_free_caches();
-	}
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
 
 /*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int __init
-_sdt_init(void)
+#ifdef LFS
+
+STATIC struct fmodsw sdt_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sdtinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sdt_register_strmod(void)
 {
-	sdt_init();
-	if (sdt_initialized < 0)
-		return sdt_initialized;
+	int err;
+	if ((err = register_strmod(&sdt_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void __exit
-_sdt_exit(void)
+STATIC int
+sdt_unregister_strmod(void)
 {
-	sdt_terminate();
+	int err;
+	if ((err = unregister_strmod(&sdt_fmod)) < 0)
+		return (err);
+	return (0);
 }
 
-module_init(_sdt_init);
-module_exit(_sdt_exit);
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sdt_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sdtinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sdt_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sdtinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sdtinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sdt_init_tables())) {
+		cmn_err(CE_WARN, "%s: could not intialized tables, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sdt_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		sdt_term_tables();
+		return (err);
+	}
+	if ((err = sdt_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sdt_term_caches();
+		sdt_term_tables();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sdtterminate(void)
+{
+	int err;
+	if ((err = sdt_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sdt_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	if ((err = sdt_term_tables()))
+		cmn_err(CE_WARN, "%s: could not terminate tables", MOD_NAME);
+	return;
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(sdtinit);
+module_exit(sdtterminate);
+
+#endif				/* LINUX */

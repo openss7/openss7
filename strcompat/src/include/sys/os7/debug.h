@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.3 2004/08/27 07:31:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_DEBUG_H__
 #define __OS7_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:42 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $"
 
 #ifdef LFS
+
+#if	defined _DEBUG
+#define CONFIG_STREAMS_DEBUG
+#elif	defined _SAFE
+#define CONFIG_STREAMS_SAFE
+#else
+#define CONFIG_STREAMS_NONE
+#endif
+
 #include <sys/strdebug.h>
 #include <sys/debug.h>
+
 #else
 
 #if 1

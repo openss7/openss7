@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:37 $"
 
-static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $";
+static char const ident[] =
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:37 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -73,25 +74,27 @@ static char const ident[] = "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.
 #undef INLINE
 #define INLINE			/* let compiler do its job */
 
-#define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:01 $"
-#define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_LICENSE	"GPL"
-#define MTP_BANNER	MTP_DESCRIP	"\n" \
-			MTP_REVISION	"\n" \
-			MTP_COPYRIGHT	"\n" \
-			MTP_DEVICE	"\n" \
-			MTP_CONTACT
+#define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:37 $"
+#define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
+#define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define MTP_NPI_LICENSE		"GPL"
+#define MTP_NPI_BANNER		MTP_NPI_DESCRIP		"\n" \
+				MTP_NPI_REVISION	"\n" \
+				MTP_NPI_COPYRIGHT	"\n" \
+				MTP_NPI_DEVICE		"\n" \
+				MTP_NPI_CONTACT		"\n"
+#define MTP_NPI_SPLASH		MTP_NPI_DESCRIP		"\n" \
+				MTP_NPI_REVISION	"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(MTP_CONTACT);
-MODULE_DESCRIPTION(MTP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(MTP_DEVICE);
+MODULE_AUTHOR(MTP_NPI_CONTACT);
+MODULE_DESCRIPTION(MTP_NPI_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MTP_NPI_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(MTP_LICENSE);
-#endif
+MODULE_LICENSE(MTP_NPI_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -106,9 +109,18 @@ MODULE_LICENSE(MTP_LICENSE);
  *
  *  =========================================================================
  */
+
+#define MOD_ID		MTP_NPI_MOD_ID
+#define MOD_NAME	MTP_NPI_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	MTP_NPI_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	MTP_NPI_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info mtp_minfo = {
-	mi_idnum:MTP_NPI_MOD_ID,		/* Module ID number */
-	mi_idname:MTP_NPI_MOD_NAME,		/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:1,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -130,7 +142,7 @@ STATIC struct qinit mtp_winit = {
 	qi_minfo:&mtp_minfo,		/* Information */
 };
 
-STATIC struct streamtab mtp_info = {
+STATIC struct streamtab mtp_npiinfo = {
 	st_rdinit:&mtp_rinit,		/* Upper read queue */
 	st_wrinit:&mtp_winit,		/* Upper write queue */
 };
@@ -259,7 +271,7 @@ mtp_set_state(struct mtp *mtp, ulong newstate)
 {
 	ulong oldstate = mtp->i_state;
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", MTP_NPI_MOD_NAME, mtp, mtp_state(newstate), mtp_state(oldstate)));
+	printd(("%s: %p: %s <- %s\n", MOD_NAME, mtp, mtp_state(newstate), mtp_state(oldstate)));
 	mtp->i_state = mtp->prot.CURRENT_state = newstate;
 }
 
@@ -312,7 +324,7 @@ m_error(queue_t *q, struct mtp *mtp, int etype)
 	*(mp->b_wptr)++ = etype < 0 ? -etype : etype;
 	*(mp->b_wptr)++ = etype < 0 ? -etype : etype;
 	mtp_set_state(mtp, NS_NOSTATES);
-	printd(("%s: %p: <- M_ERROR\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- M_ERROR\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
@@ -364,12 +376,12 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
 		bcopy(mp->b_wptr, qos, qos_len);
 		mp->b_wptr += qos_len;
 	}
-	printd(("%s: %p: <- N_CONN_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_CONN_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -410,12 +422,12 @@ n_conn_con(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_addr *res,
 	if (mtp_get_state(mtp) != NS_WCON_CREQ)
 		swerr();
 	mtp_set_state(mtp, NS_DATA_XFER);
-	printd(("%s: %p: <- N_CONN_CON\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_CONN_CON\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -449,12 +461,12 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq,
 		mp->b_wptr += res_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- N_DISCON_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_DISCON_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -478,12 +490,12 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 	p->PRIM_type = N_DATA_IND;
 	p->DATA_xfer_flags = flags;
 	mp->b_cont = dp;
-	printd(("%s: %p: <- N_DATA_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_DATA_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -506,12 +518,12 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 	p = ((typeof(p)) mp->b_wptr)++;
 	p->PRIM_type = N_EXDATA_IND;
 	mp->b_cont = dp;
-	printd(("%s: %p: <- N_EXDATA_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_EXDATA_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -582,12 +594,12 @@ n_info_ack(queue_t *q, struct mtp *mtp)
 		qor->sls_range = mtp->options.sls_mask;
 		qor->mp_range = (mtp->options.popt & SS7_POPT_MPLEV) ? 3 : 0;
 	}
-	printd(("%s: %p: <- N_INFO_ACK\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_INFO_ACK\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -622,12 +634,12 @@ n_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 	if ((err = mtp_bind(mtp, add)))
 		goto free_error;
 	mtp_set_state(mtp, NS_IDLE);
-	printd(("%s: %p: <- N_BIND_ACK\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_BIND_ACK\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -668,18 +680,17 @@ n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long etype)
 	p->ERROR_prim = prim;
 	p->NPI_error = etype < 0 ? NSYSERR : etype;
 	p->UNIX_error = etype < 0 ? -etype : 0;
-	printd(("%s: %p: <- N_ERROR_ACK\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_ERROR_ACK\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
-	/*
+	/* 
 	   Retruning -EPROTO here will make sure that the old state is restored correctly. If we
-	   return QR_DONE, then the state will never be restored. 
-	 */
+	   return QR_DONE, then the state will never be restored. */
 	if (etype >= 0)
 		return (-EPROTO);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -727,19 +738,18 @@ n_ok_ack(queue_t *q, struct mtp *mtp, ulong prim)
 		mtp_set_state(mtp, NS_IDLE);
 		break;
 	default:
-		/*
+		/* 
 		   Note: if we are not in a WACK state we simply do not change state.  This occurs
-		   normally when we are responding to a N_OPTMGMT_REQ in other than TS_IDLE state. 
-		 */
+		   normally when we are responding to a N_OPTMGMT_REQ in other than TS_IDLE state. */
 		seldom();
 		break;
 	}
-	printd(("%s: %p: <- N_OK_ACK\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_OK_ACK\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -776,12 +786,12 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 		mp->b_wptr += dst_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- N_UNITDATA_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_UNITDATA_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -812,12 +822,12 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, mblk_t *dp, ulo
 		mp->b_wptr += dst_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- N_UDERROR_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_UDERROR_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -839,12 +849,12 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
 	mp->b_datap->db_type = M_PROTO;
 	p = ((typeof(p)) mp->b_wptr)++;
 	p->PRIM_type = N_DATACK_IND;
-	printd(("%s: %p: <- N_DATACK_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_DATACK_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -868,12 +878,12 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 	p->PRIM_type = N_RESET_IND;
 	p->RESET_orig = orig;
 	p->RESET_reason = reason;
-	printd(("%s: %p: <- N_RESET_IND\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_RESET_IND\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -895,12 +905,12 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 	mp->b_datap->db_type = M_PROTO;
 	p = ((typeof(p)) mp->b_wptr)++;
 	p->PRIM_type = N_RESET_CON;
-	printd(("%s: %p: <- N_RESET_CON\n", MTP_NPI_MOD_NAME, mtp));
+	printd(("%s: %p: <- N_RESET_CON\n", MOD_NAME, mtp));
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -941,7 +951,7 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -967,7 +977,7 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1002,7 +1012,7 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mbl
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1028,7 +1038,7 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1054,7 +1064,7 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1080,7 +1090,7 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1115,7 +1125,7 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1153,7 +1163,7 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, ulong pri, u
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1189,22 +1199,21 @@ n_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto outstate;
 	}
       ignore:
-	/*
-	   If we are in the idle state this is just spurious data, ignore it 
-	 */
+	/* 
+	   If we are in the idle state this is just spurious data, ignore it */
 	rare();
 	return (QR_DONE);
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       notsupport:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", MOD_NAME, mtp));
 	goto error;
       baddata:
 	err = -EPROTO;
-	ptrace(("%s: %p: ERROR: bad data\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad data\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -1245,41 +1254,40 @@ n_conn_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto badaddr;
 	if (mtp_parse_qos(mtp, &opts, mp->b_rptr + p->QOS_offset, p->QOS_length))
 		goto badqostype;
-	/*
-	   TODO: set options first 
-	 */
+	/* 
+	   TODO: set options first */
 	mtp->dst = *dst;
 	mtp_set_state(mtp, NS_WCON_CREQ);
 	return n_conn_con(q, mtp, 0, &mtp->dst, NULL);
       badqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: bad qos type\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad qos type\n", MOD_NAME, mtp));
 	goto error;
 #if 0
       badqosparam:
 	err = NBADQOSPARAM;
-	ptrace(("%s: %p: ERROR: bad qos parameter\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad qos parameter\n", MOD_NAME, mtp));
 	goto error;
 #endif
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: bad destination address\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad destination address\n", MOD_NAME, mtp));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate destination address\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: couldn't allocate destination address\n", MOD_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       notsupport:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for N_CLNS\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported for N_CLNS\n", MOD_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_CONN_REQ, err);
@@ -1300,28 +1308,27 @@ n_conn_res(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	/*
+	/* 
 	   We never give an N_CONN_IND, so there is no reason for a N_CONN_RES.  We probably could
 	   do this * (issue an N_CONN_IND on a listening stream when there is no other MTP user for 
 	   the SI value and * send a UPU on an N_DISCON_REQ or just redirect all traffic for that
-	   user on a N_CONN_RES) but * that is for later. 
-	 */
+	   user on a N_CONN_RES) but * that is for later. */
 	goto eopnotsupp;
       eopnotsupp:
 	err = -EOPNOTSUPP;
-	ptrace(("%s: %p: ERROR: operation not supported\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: operation not supported\n", MOD_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       notsupport:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_CONN_RES, err);
@@ -1340,11 +1347,10 @@ n_discon_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto notsupport;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	/*
+	/* 
 	   Currently there are only three states we can disconnect from.  The first does not
 	   happen. Only the second one is normal.  The third should occur during simulteneous
-	   diconnect only. 
-	 */
+	   diconnect only. */
 	switch (mtp_get_state(mtp)) {
 	case NS_WCON_CREQ:
 		mtp_set_state(mtp, NS_WACK_DREQ6);
@@ -1361,15 +1367,15 @@ n_discon_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return n_ok_ack(q, mtp, N_DISCON_REQ);
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       notsupport:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_DISCON_REQ, err);
@@ -1393,31 +1399,30 @@ n_data_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	if ((1 << mtp_get_state(mtp)) & ~(NSF_DATA_XFER | NSF_WRES_RIND | NSF_WCON_RREQ))
 		goto outstate;
 	if (p->DATA_xfer_flags)
-		/*
+		/* 
 		   N_MORE_DATA_FLAG and N_RC_FLAG not supported yet.  We could do N_MORE_DATA_FLAG
 		   pretty easily by accumulating the packet until the last data request is
 		   received, but this would be rather pointless for small MTP packet sizes.
 		   N_RC_FLAG cannot be supported until the DLPI link driver is done and zero-loss
-		   operation is completed. 
-		 */
+		   operation is completed. */
 		goto notsupport;
 	if (dlen == 0 || dlen > mtp->prot.NSDU_size || dlen > mtp->prot.NIDU_size)
 		goto baddata;
 	return mtp_transfer_req(q, mtp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: bad data\n", MOD_NAME, mtp));
 	goto error;
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       discard:
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: ignore in idle state\n", MOD_NAME, mtp));
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: %p: ERROR: primitive not supported\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive not supported\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -1480,23 +1485,23 @@ n_bind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_bind_req(q, mtp, &src, 0);
       access:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", MOD_NAME, mtp));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", MOD_NAME, mtp));
 	goto error;
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: requested address invalid\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: requested address invalid\n", MOD_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_BIND_REQ, err);
@@ -1519,11 +1524,11 @@ n_unbind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_unbind_req(q, mtp);
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_UNBIND_REQ, err);
@@ -1569,31 +1574,31 @@ n_unitdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_transfer_req(q, mtp, &dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       access:
 	err = NACCESS;
-	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: no priviledge for requested address\n", MOD_NAME, mtp));
 	goto error;
       badaddr:
 	err = NBADADDR;
-	ptrace(("%s: %p: ERROR: requested address invalid\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: requested address invalid\n", MOD_NAME, mtp));
 	goto error;
       noaddr:
 	err = NNOADDR;
-	ptrace(("%s: %p: ERROR: could not allocate address\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: could not allocate address\n", MOD_NAME, mtp));
 	goto error;
       baddata:
 	err = NBADDATA;
-	ptrace(("%s: %p: ERROR: invalid amount of data\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid amount of data\n", MOD_NAME, mtp));
 	goto error;
       outstate:
 	err = NOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MOD_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       notsupport:
 	err = NNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive type not supported\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: primitive type not supported\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_UNITDATA_REQ, err);
@@ -1618,9 +1623,8 @@ n_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		mtp_set_state(mtp, NS_WACK_OPTREQ);
 #endif
 	if (p->OPTMGMT_flags)
-		/*
-		   Can't support DEFAULT_RC_SEL yet 
-		 */
+		/* 
+		   Can't support DEFAULT_RC_SEL yet */
 		goto badflags;
 	qos = (typeof(qos)) (mp->b_rptr + p->QOS_offset);
 	if (p->QOS_length < sizeof(qos->n_qos_data))
@@ -1636,19 +1640,19 @@ n_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return n_ok_ack(q, mtp, N_OPTMGMT_REQ);
       badqostype:
 	err = NBADQOSTYPE;
-	ptrace(("%s: %p: ERROR: invalid qos type\nn", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid qos type\nn", MOD_NAME, mtp));
 	goto error;
       badqosparam:
 	err = NBADQOSPARAM;
-	ptrace(("%s: %p: ERROR: invalid qos parameter\nn", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid qos parameter\nn", MOD_NAME, mtp));
 	goto error;
       badflags:
 	err = NBADFLAG;
-	ptrace(("%s: %p: ERROR: invalid flag\nn", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid flag\nn", MOD_NAME, mtp));
 	goto error;
       badprim:
 	err = -EMSGSIZE;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_NPI_MOD_NAME, mtp));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return n_error_ack(q, mtp, N_OPTMGMT_REQ, err);
@@ -1663,9 +1667,8 @@ n_datack_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   We don't support DATACK yet.  With zero loss operation we will. 
-	 */
+	/* 
+	   We don't support DATACK yet.  With zero loss operation we will. */
 	rare();
 	return (QR_DONE);
 }
@@ -1693,9 +1696,8 @@ n_reset_res(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   ignore.  if the user wishes to respond to our reset indications that's fine. 
-	 */
+	/* 
+	   ignore.  if the user wishes to respond to our reset indications that's fine. */
 	rare();
 	return (QR_DONE);
 }
@@ -1772,7 +1774,7 @@ mtp_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return n_ok_ack(q, mtp, prim);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -1856,7 +1858,7 @@ mtp_error_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return n_error_ack(q, mtp, prim, err);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -1878,7 +1880,7 @@ mtp_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		add = (typeof(add)) (mp->b_rptr + p->mtp_addr_offset);
 	return n_bind_ack(q, mtp, add);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -1904,7 +1906,7 @@ mtp_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		rem = (typeof(rem)) (mp->b_rptr + p->mtp_rem_offset);
 	return (QR_DONE);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -1941,7 +1943,7 @@ mtp_info_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return n_info_ack(q, mtp);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -1976,16 +1978,14 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	src = (typeof(src)) (mp->b_rptr + p->mtp_srce_offset);
 	switch (mtp->prot.SERV_type) {
 	case N_CONS:
-		/*
-		   N_DATA_IND 
-		 */
+		/* 
+		   N_DATA_IND */
 		if ((err = n_data_ind(q, mtp, 0, mp->b_cont)) < 0)
 			goto error;
 		return (QR_TRIMMED);
 	case N_CLNS:
-		/*
-		   N_UNITDATA_IND 
-		 */
+		/* 
+		   N_UNITDATA_IND */
 		if ((err = n_unitdata_ind(q, mtp, src, &mtp->src, mp->b_cont)) < 0)
 			goto error;
 		return (QR_TRIMMED);
@@ -1993,7 +1993,7 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
       error:
 	return (err);
@@ -2018,24 +2018,22 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_offset);
 	switch (mtp->prot.SERV_type) {
 	case N_CONS:
-		/*
-		   N_DISCON_IND 
-		 */
+		/* 
+		   N_DISCON_IND */
 		return n_discon_ind(q, mtp, N_PROVIDER, N_MTP_DEST_PROHIBITED, 0, NULL, mp->b_cont);
 	case N_CLNS:
 	{
 		struct mtp_addr *dst;
 		dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_length);
-		/*
-		   N_UDERROR_IND 
-		 */
+		/* 
+		   N_UDERROR_IND */
 		return n_uderror_ind(q, mtp, dst, mp->b_cont, N_MTP_DEST_PROHIBITED);
 	}
 	}
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2047,9 +2045,8 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 STATIC INLINE int
 mtp_resume_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (QR_DONE);
 }
 
@@ -2117,22 +2114,19 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	case N_CONS:
 		switch (type) {
 		case MTP_STATUS_TYPE_UPU:
-			/*
-			   N_DISCON_IND 
-			 */
+			/* 
+			   N_DISCON_IND */
 			return n_discon_ind(q, mtp, N_USER, error, 0, NULL, mp->b_cont);
 		case MTP_STATUS_TYPE_CONG:
-			/*
-			   N_RESET_IND 
-			 */
+			/* 
+			   N_RESET_IND */
 			return n_reset_ind(q, mtp, N_PROVIDER, error);
 		}
 		break;
 	case N_CLNS:
 	{
-		/*
-		   N_UDERROR_IND 
-		 */
+		/* 
+		   N_UDERROR_IND */
 		struct mtp_addr *dst;
 		dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_length);
 		return n_uderror_ind(q, mtp, dst, mp->b_cont, error);
@@ -2141,7 +2135,7 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2159,15 +2153,13 @@ mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto efault;
 	switch (mtp->prot.SERV_type) {
 	case N_CONS:
-		/*
-		   N_DISCON_IND 
-		 */
+		/* 
+		   N_DISCON_IND */
 		return n_discon_ind(q, mtp, N_PROVIDER, error, 0, NULL, mp->b_cont);
 	case N_CLNS:
 	{
-		/*
-		   N_UDERROR_IND 
-		 */
+		/* 
+		   N_UDERROR_IND */
 		struct mtp_addr *dst = NULL;
 		return n_uderror_ind(q, mtp, dst, mp->b_cont, error);
 	}
@@ -2175,7 +2167,7 @@ mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MTP_NPI_MOD_NAME, mtp));
+	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
 	return (-EFAULT);
 }
 
@@ -2187,9 +2179,8 @@ mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 STATIC INLINE int
 mtp_restart_complete_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
-	/*
-	   discard 
-	 */
+	/* 
+	   discard */
 	return (QR_DONE);
 }
 
@@ -2227,11 +2218,11 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_UNLINK):
 		case _IOC_NR(I_PUNLINK):
 			(void) lp;
-			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MTP_NPI_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, nr));
 			ret = -EINVAL;
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MTP_NPI_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -2277,66 +2268,65 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct mtp *mtp = MTP_PRIV(q);
 	ulong oldstate = mtp_get_state(mtp);
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == N_DATA_REQ) {
-		printd(("%s: %p: -> N_DATA_REQ [%d]\n", MTP_NPI_MOD_NAME, mtp, msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> N_DATA_REQ [%d]\n", MOD_NAME, mtp, msgdsize(mp->b_cont)));
 		if ((rtn = n_data_req(q, mtp, mp)))
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case N_CONN_REQ:
-		printd(("%s: %p: -> N_CONN_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_CONN_REQ\n", MOD_NAME, mtp));
 		rtn = n_conn_req(q, mtp, mp);
 		break;
 	case N_CONN_RES:
-		printd(("%s: %p: -> N_CONN_RES\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_CONN_RES\n", MOD_NAME, mtp));
 		rtn = n_conn_res(q, mtp, mp);
 		break;
 	case N_DISCON_REQ:
-		printd(("%s: %p: -> N_DISCON_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_DISCON_REQ\n", MOD_NAME, mtp));
 		rtn = n_discon_req(q, mtp, mp);
 		break;
 	case N_DATA_REQ:
-		printd(("%s: %p: -> N_DATA_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_DATA_REQ\n", MOD_NAME, mtp));
 		rtn = n_data_req(q, mtp, mp);
 		break;
 	case N_EXDATA_REQ:
-		printd(("%s: %p: -> N_EXDATA_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_EXDATA_REQ\n", MOD_NAME, mtp));
 		rtn = n_exdata_req(q, mtp, mp);
 		break;
 	case N_INFO_REQ:
-		printd(("%s: %p: -> N_INFO_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_INFO_REQ\n", MOD_NAME, mtp));
 		rtn = n_info_req(q, mtp, mp);
 		break;
 	case N_BIND_REQ:
-		printd(("%s: %p: -> N_BIND_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_BIND_REQ\n", MOD_NAME, mtp));
 		rtn = n_bind_req(q, mtp, mp);
 		break;
 	case N_UNBIND_REQ:
-		printd(("%s: %p: -> N_UNBIND_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_UNBIND_REQ\n", MOD_NAME, mtp));
 		rtn = n_unbind_req(q, mtp, mp);
 		break;
 	case N_UNITDATA_REQ:
-		printd(("%s: %p: -> N_UNITDATA_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_UNITDATA_REQ\n", MOD_NAME, mtp));
 		rtn = n_unitdata_req(q, mtp, mp);
 		break;
 	case N_OPTMGMT_REQ:
-		printd(("%s: %p: -> N_OPTMGMT_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_OPTMGMT_REQ\n", MOD_NAME, mtp));
 		rtn = n_optmgmt_req(q, mtp, mp);
 		break;
 	case N_DATACK_REQ:
-		printd(("%s: %p: -> N_DATACK_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_DATACK_REQ\n", MOD_NAME, mtp));
 		rtn = n_datack_req(q, mtp, mp);
 		break;
 	case N_RESET_REQ:
-		printd(("%s: %p: -> N_RESET_REQ\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_RESET_REQ\n", MOD_NAME, mtp));
 		rtn = n_reset_req(q, mtp, mp);
 		break;
 	case N_RESET_RES:
-		printd(("%s: %p: -> N_RESET_RES\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: -> N_RESET_RES\n", MOD_NAME, mtp));
 		rtn = n_reset_res(q, mtp, mp);
 		break;
 	default:
@@ -2360,63 +2350,61 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct mtp *mtp = MTP_PRIV(q);
 	ulong oldstate = mtp_get_state(mtp);
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == MTP_TRANSFER_IND) {
-		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", MTP_NPI_MOD_NAME, mtp,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", MOD_NAME, mtp, msgdsize(mp->b_cont)));
 		if ((rtn = mtp_transfer_ind(q, mtp, mp)) < 0)
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case MTP_OK_ACK:
-		printd(("%s: %p: MTP_OK_ACK <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_OK_ACK <-\n", MOD_NAME, mtp));
 		rtn = mtp_ok_ack(q, mtp, mp);
 		break;
 	case MTP_ERROR_ACK:
-		printd(("%s: %p: MTP_ERROR_ACK <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_ERROR_ACK <-\n", MOD_NAME, mtp));
 		rtn = mtp_error_ack(q, mtp, mp);
 		break;
 	case MTP_BIND_ACK:
-		printd(("%s: %p: MTP_BIND_ACK <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_BIND_ACK <-\n", MOD_NAME, mtp));
 		rtn = mtp_bind_ack(q, mtp, mp);
 		break;
 	case MTP_ADDR_ACK:
-		printd(("%s: %p: MTP_ADDR_ACK <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_ADDR_ACK <-\n", MOD_NAME, mtp));
 		rtn = mtp_addr_ack(q, mtp, mp);
 		break;
 	case MTP_INFO_ACK:
-		printd(("%s: %p: MTP_INFO_ACK <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_INFO_ACK <-\n", MOD_NAME, mtp));
 		rtn = mtp_info_ack(q, mtp, mp);
 		break;
 	case MTP_OPTMGMT_ACK:
-		printd(("%s: %p: MTP_OPTMGMT_ACK <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_OPTMGMT_ACK <-\n", MOD_NAME, mtp));
 		rtn = mtp_optmgmt_ack(q, mtp, mp);
 		break;
 	case MTP_TRANSFER_IND:
-		printd(("%s: %p: MTP_TRANSFER_IND <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_TRANSFER_IND <-\n", MOD_NAME, mtp));
 		rtn = mtp_transfer_ind(q, mtp, mp);
 		break;
 	case MTP_PAUSE_IND:
-		printd(("%s: %p: MTP_PAUSE_IND <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_PAUSE_IND <-\n", MOD_NAME, mtp));
 		rtn = mtp_pause_ind(q, mtp, mp);
 		break;
 	case MTP_RESUME_IND:
-		printd(("%s: %p: MTP_RESUME_IND <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_RESUME_IND <-\n", MOD_NAME, mtp));
 		rtn = mtp_resume_ind(q, mtp, mp);
 		break;
 	case MTP_STATUS_IND:
-		printd(("%s: %p: MTP_STATUS_IND <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_STATUS_IND <-\n", MOD_NAME, mtp));
 		rtn = mtp_status_ind(q, mtp, mp);
 		break;
 	case MTP_RESTART_BEGINS_IND:
-		printd(("%s: %p: MTP_RESTART_BEGINS_IND <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_RESTART_BEGINS_IND <-\n", MOD_NAME, mtp));
 		rtn = mtp_restart_begins_ind(q, mtp, mp);
 		break;
 	case MTP_RESTART_COMPLETE_IND:
-		printd(("%s: %p: MTP_RESTART_COMPLETE_IND <-\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: MTP_RESTART_COMPLETE_IND <-\n", MOD_NAME, mtp));
 		rtn = mtp_restart_complete_ind(q, mtp, mp);
 		break;
 	default:
@@ -2440,20 +2428,18 @@ STATIC int
 mtp_w_data(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
-	/*
-	   data from above 
-	 */
-	printd(("%s: %p: -> M_DATA [%d]\n", MTP_NPI_MOD_NAME, mtp, msgdsize(mp)));
+	/* 
+	   data from above */
+	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, mtp, msgdsize(mp)));
 	return n_data(q, mtp, mp);
 }
 STATIC int
 mtp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
-	/*
-	   data from below 
-	 */
-	printd(("%s: %p: M_DATA [%d] <-\n", MTP_NPI_MOD_NAME, mtp, msgdsize(mp)));
+	/* 
+	   data from below */
+	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, mtp, msgdsize(mp)));
 	return mtp_data(q, mtp, mp);
 }
 
@@ -2467,9 +2453,8 @@ mtp_r_data(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 mtp_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -2490,9 +2475,8 @@ mtp_w_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 mtp_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return mtp_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -2536,9 +2520,8 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct mtp *mtp;
-		/*
-		   test for multiple push 
-		 */
+		/* 
+		   test for multiple push */
 		for (mtp = mtp_opens; mtp; mtp = mtp->next) {
 			if (mtp->u.dev.cmajor == cmajor && mtp->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -2550,9 +2533,8 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			return (ENOMEM);
 		}
 #if 0
-		/*
-		   generate immediate information request 
-		 */
+		/* 
+		   generate immediate information request */
 		if ((err = sdt_info_req(q, mtp)) < 0) {
 			mtp_free_priv(q);
 			MOD_DEC_USE_COUNT;
@@ -2596,26 +2578,27 @@ mtp_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate mtp_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
-		printd(("%s: initialized module private structure cace\n", MTP_NPI_MOD_NAME));
+		printd(("%s: initialized module private structure cace\n", MOD_NAME));
 	return (0);
 }
-STATIC void
+STATIC int
 mtp_term_caches(void)
 {
 	if (mtp_priv_cachep) {
-		if (kmem_cache_destroy(mtp_priv_cachep))
+		if (kmem_cache_destroy(mtp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_priv_cachep", __FUNCTION__);
-		else
-			printd(("%s: destroyed mtp_priv_cachep\n", MTP_NPI_MOD_NAME));
+			return (-EBUSY);
+		} else
+			printd(("%s: destroyed mtp_priv_cachep\n", MOD_NAME));
 	}
-	return;
+	return (0);
 }
 STATIC struct mtp *
 mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 {
 	struct mtp *mtp;
 	if ((mtp = kmem_cache_alloc(mtp_priv_cachep, SLAB_ATOMIC))) {
-		printd(("%s: allocated module private structure\n", MTP_NPI_MOD_NAME));
+		printd(("%s: allocated module private structure\n", MOD_NAME));
 		bzero(mtp, sizeof(*mtp));
 		mtp_get(mtp);	/* first get */
 		mtp->u.dev.cmajor = getmajor(*devp);
@@ -2623,7 +2606,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		mtp->cred = *crp;
 		(mtp->oq = RD(q))->q_ptr = mtp_get(mtp);
 		(mtp->iq = WR(q))->q_ptr = mtp_get(mtp);
-		spin_lock_init(&mtp->qlock); /* "mtp-queue-lock" */
+		spin_lock_init(&mtp->qlock);	/* "mtp-queue-lock" */
 		mtp->o_prim = &mtp_r_prim;
 		mtp->i_prim = &mtp_w_prim;
 		mtp->o_wakeup = NULL;
@@ -2631,12 +2614,12 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		mtp->i_state = NS_UNBND;
 		mtp->i_style = LMI_STYLE1;
 		mtp->i_version = 1;
-		spin_lock_init(&mtp->lock); /* "mtp-priv-lock" */
+		spin_lock_init(&mtp->lock);	/* "mtp-priv-lock" */
 		if ((mtp->next = *mtpp))
 			mtp->next->prev = &mtp->next;
 		mtp->prev = mtpp;
 		*mtpp = mtp_get(mtp);
-		printd(("%s: linked module private structure\n", MTP_NPI_MOD_NAME));
+		printd(("%s: linked module private structure\n", MOD_NAME));
 		mtp->prot.PRIM_type = N_INFO_ACK;
 		mtp->prot.NSDU_size = -1UL;
 		mtp->prot.ENSDU_size = -2UL;
@@ -2650,9 +2633,9 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		mtp->prot.PROVIDER_type = N_SNICFP;
 		mtp->prot.NODU_size = 279;
 		mtp->prot.NPI_version = N_VERSION_2;
-		printd(("%s: setting module private structure defaults\n", MTP_NPI_MOD_NAME));
+		printd(("%s: setting module private structure defaults\n", MOD_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate module private structure\n", MTP_NPI_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", MOD_NAME));
 	return (mtp);
 }
 STATIC void
@@ -2692,71 +2675,121 @@ mtp_put(struct mtp *mtp)
 {
 	if (atomic_dec_and_test(&mtp->refcnt)) {
 		kmem_cache_free(mtp_priv_cachep, mtp);
-		printd(("%s: %p: freed mtp private structure\n", MTP_NPI_MOD_NAME, mtp));
+		printd(("%s: %p: freed mtp private structure\n", MOD_NAME, mtp));
 	}
 }
 
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int mtp_initialized = 0;
-STATIC void
-mtp_init(void)
-{
-	unless(mtp_initialized > 0, return);
-	cmn_err(CE_NOTE, MTP_BANNER);	/* console splash */
-	if ((mtp_initialized = mtp_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", MTP_NPI_MOD_NAME);
-	} else if (!(mtp_initialized = lis_register_strmod(&mtp_info, MTP_NPI_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: couldn't register module", MTP_NPI_MOD_NAME);
-		mtp_term_caches();
-	}
-	return;
-}
-STATIC void
-mtp_terminate(void)
-{
-	ensure(mtp_initialized > 0, return);
-	if ((mtp_initialized = lis_unregister_strmod(&mtp_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", MTP_NPI_MOD_NAME);
-	} else {
-		mtp_term_caches();
-	}
-	return;
-}
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the MTP-NPI module. (0 for allocation.)");
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct fmodsw mtp_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &mtp_npiinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+mtp_register_strmod(void)
 {
-	mtp_init();
-	if (mtp_initialized < 0)
-		return mtp_initialized;
+	int err;
+	if ((err = register_strmod(&mtp_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+mtp_unregister_strmod(void)
 {
-	mtp_terminate();
-	(void) mtp_connect;
-	(void) n_conn_ind;
-	(void) n_exdata_ind;
-	(void) n_datack_ind;
-	(void) n_reset_con;
-	(void) mtp_conn_req;
-	(void) mtp_discon_req;
-	(void) mtp_addr_req;
-	(void) mtp_info_req;
+	int err;
+	if ((err = unregister_strmod(&mtp_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+mtp_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&mtp_npiinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+mtp_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&mtp_npiinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+mtp_npiinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = mtp_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = mtp_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		mtp_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+mtp_npiterminate(void)
+{
+	int err;
+	if ((err = mtp_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = mtp_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(mtp_npiinit);
+module_exit(mtp_npiterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:46 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:46 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:46 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $"
 
-static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:46 $";
+static char const ident[] =
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -78,22 +79,26 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:46 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:32 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
+#define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"
 #define HDLC_BANNER	HDLC_DESCRIP	"\n" \
 			HDLC_REVISION	"\n" \
 			HDLC_COPYRIGHT	"\n" \
-			HDLC_DEVICES	"\n" \
+			HDLC_DEVICE	"\n" \
 			HDLC_CONTACT	"\n"
+#define HDLC_SPLASH	HDLC_DESCRIP	"\n" \
+			HDLC_REVISION	"\n"
 
 #ifdef LINUX
 MODULE_AUTHOR(HDLC_CONTACT);
 MODULE_DESCRIPTION(HDLC_DESCRIP);
-MODULE_SUPPORTED_DEVICE(HDLC_DEVICES);
+MODULE_SUPPORTED_DEVICE(HDLC_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(HDLC_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -109,9 +114,12 @@ MODULE_LICENSE(HDLC_LICENSE);
  *  =======================================================================
  */
 
+#define MOD_ID		HDLC_MOD_ID
+#define MOD_NAME	HDLC_MOD_NAME
+
 STATIC struct module_info cd_winfo = {
-	mi_idnum:HDLC_MOD_ID,		/* Module ID number */
-	mi_idname:HDLC_MOD_NAME "-wr",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -119,8 +127,8 @@ STATIC struct module_info cd_winfo = {
 };
 
 STATIC struct module_info cd_rinfo = {
-	mi_idnum:HDLC_MOD_ID,		/* Module ID number */
-	mi_idname:HDLC_MOD_NAME "-rd",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -144,7 +152,7 @@ STATIC struct qinit cd_winit = {
 	qi_minfo:&cd_winfo,		/* Information */
 };
 
-STATIC struct streamtab hdlc_info = {
+STATIC struct streamtab hdlcinfo = {
 	st_rdinit:&cd_rinit,		/* Upper read queue */
 	st_wrinit:&cd_winit,		/* Upper write queue */
 };
@@ -238,19 +246,20 @@ hdlc_init_caches(void)
 		cmn_err(CE_PANIC, "%s: Cannot allocate hdlc_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	}
-	printd(("%s: Allocated/selected private structure cache\n", HDLC_MOD_NAME));
+	printd(("%s: Allocated/selected private structure cache\n", MOD_NAME));
 	return (0);
 }
-STATIC void
-hdlc_free_caches(void)
+STATIC int
+hdlc_term_caches(void)
 {
 	if (hdlc_priv_cachep) {
-		if (kmem_cache_destroy(hdlc_priv_cachep))
+		if (kmem_cache_destroy(hdlc_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy hdlc_priv_cachep.", __FUNCTION__);
-		else
+			return (-EBUSY);
+		} else
 			printd(("cd: destroyed hdlc_priv_cachep\n"));
 	}
-	return;
+	return (0);
 }
 STATIC struct cd *
 cd_get(struct cd *cd)
@@ -263,7 +272,7 @@ cd_put(struct cd *cd)
 {
 	if (atomic_dec_and_test(&cd->refcnt)) {
 		kmem_cache_free(hdlc_priv_cachep, cd);
-		printd(("%s: %p: freed cd private structure\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: freed cd private structure\n", MOD_NAME, cd));
 	}
 	return;
 }
@@ -314,7 +323,7 @@ hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 		cd->cred = *crp;
 		(cd->oq = RD(q))->q_ptr = cd_get(cd);
 		(cd->iq = WR(q))->q_ptr = cd_get(cd);
-		spin_lock_init(&cd->qlock); /* "cd-queue-lock" */
+		spin_lock_init(&cd->qlock);	/* "cd-queue-lock" */
 		cd->o_prim = &cd_r_prim;
 		cd->i_prim = &cd_w_prim;
 		cd->o_wakeup = &cd_wakeup;
@@ -322,13 +331,13 @@ hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 		cd->i_version = 1;
 		cd->i_state = CD_UNINIT;
 		cd->i_style = CD_STYLE2;
-		spin_lock_init(&cd->qlock); /* "cd-priv_lock" */
+		spin_lock_init(&cd->qlock);	/* "cd-priv_lock" */
 		if ((cd->next = *hpp))
 			cd->next->prev = &cd->next;
 		cd->prev = hpp;
 		*hpp = cd_get(cd);
-		printd(("%s: %p: linked module private structure\n", HDLC_MOD_NAME, cd));
-		printd(("%s: %p: setting module private structure defaults\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: linked module private structure\n", MOD_NAME, cd));
+		printd(("%s: %p: setting module private structure defaults\n", MOD_NAME, cd));
 		cd->info.cd.cd_primitive = CD_INFO_ACK;
 		cd->info.cd.cd_state = CD_UNINIT;
 		cd->info.cd.cd_max_sdu = 260;
@@ -338,9 +347,8 @@ hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 		cd->info.cd.cd_features = CD_CANREAD | CD_AUTOALLOW;
 		cd->info.cd.cd_addr_length = 0;
 		cd->info.cd.cd_ppa_style = CD_STYLE2;	/* for now */
-		/*
-		   assume default circuit info 
-		 */
+		/* 
+		   assume default circuit info */
 		cd->info.ch.ch_primitive = CH_INFO_ACK;
 		cd->info.ch.ch_addr_length = 0;
 		cd->info.ch.ch_addr_offset = 0;
@@ -350,9 +358,8 @@ hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 		cd->info.ch.ch_style = CH_STYLE2;
 		cd->info.ch.ch_version = 1;
 		cd->info.ch.ch_state = CHS_UNINIT;
-		/*
-		   assume default circuit parameters 
-		 */
+		/* 
+		   assume default circuit parameters */
 		cd->parm.cp_type = CH_PARMS_CIRCUIT;
 		cd->parm.cp_block_size = 64;	/* bits */
 		cd->parm.cp_encoding = CH_ENCODING_NONE;
@@ -363,7 +370,7 @@ hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 		cd->parm.cp_opt_flags = CH_PARM_OPT_CLRCH;
 		todo(("set module defaults\n"));
 	} else
-		ptrace(("%s: ERROR: Could not allocate module private structure\n", HDLC_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate module private structure\n", MOD_NAME));
 	return (cd);
 }
 
@@ -427,7 +434,7 @@ cd_set_state(struct cd *cd, ulong newstate)
 	ulong oldstate = cd->i_state;
 	(void) oldstate;
 	cd->info.cd.cd_state = cd->i_state = newstate;
-	printd(("%s: %p: %s <- %s\n", HDLC_MOD_NAME, cd, cd_state_name(newstate),
+	printd(("%s: %p: %s <- %s\n", MOD_NAME, cd, cd_state_name(newstate),
 		cd_state_name(oldstate)));
 	return (newstate);
 }
@@ -487,7 +494,7 @@ ch_set_state(struct cd *cd, ulong newstate)
 	ulong oldstate = cd->state;
 	(void) oldstate;
 	cd->info.ch.ch_state = cd->state = newstate;
-	printd(("%s: %p: %s <- %s\n", HDLC_MOD_NAME, cd, ch_state_name(newstate),
+	printd(("%s: %p: %s <- %s\n", MOD_NAME, cd, ch_state_name(newstate),
 		ch_state_name(oldstate)));
 	return (newstate);
 }
@@ -521,7 +528,7 @@ m_error(queue_t *q, int err)
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		cd_set_state(cd, CD_UNUSABLE);
 		ch_set_state(cd, CHS_UNUSABLE);
-		printd(("%s: %p: <- M_ERROR\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- M_ERROR\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -544,7 +551,7 @@ m_hangup(queue_t *q, int err)
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
 		cd_set_state(cd, CD_UNUSABLE);
 		ch_set_state(cd, CHS_UNUSABLE);
-		printd(("%s: %p: <- M_HANGUP\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- M_HANGUP\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -565,7 +572,7 @@ cd_info_ack(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		*p = cd->info.cd;
-		printd(("%s: %p: <- CD_INFO_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_INFO_ACK\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -617,7 +624,7 @@ cd_ok_ack(queue_t *q, struct cd *cd, ulong prim)
 			swerr();
 			break;
 		}
-		printd(("%s: %p: <- CD_OK_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_OK_ACK\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -646,7 +653,7 @@ cd_error_ack(queue_t *q, struct cd *cd, ulong prim, ulong error, ulong reason)
 		else
 			cd_set_state(cd, cd->i_oldstate);
 		p->cd_state = cd_get_state(cd);
-		printd(("%s: %p: <- CD_ERROR_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_ERROR_ACK\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -668,7 +675,7 @@ cd_enable_con(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_ENABLE_CON;
 		p->cd_state = cd_set_state(cd, CD_ENABLED);
-		printd(("%s: %p: <- CD_ENABLE_CON\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_ENABLE_CON\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -690,7 +697,7 @@ cd_disable_con(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_DISABLE_CON;
 		p->cd_state = cd_set_state(cd, CD_DISABLED);
-		printd(("%s: %p: <- CD_DISABLE_CON\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_DISABLE_CON\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -715,7 +722,7 @@ cd_error_ind(queue_t *q, struct cd *cd, ulong error, ulong reason, ulong state, 
 		p->cd_errno = error;
 		p->cd_explanation = reason;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_ERROR_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_ERROR_IND\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -738,7 +745,7 @@ cd_uintdata_ack(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_UNITDATA_ACK;
 		p->cd_state = cd_get_state(cd);
-		printd(("%s: %p: <- CD_UNITDATA_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_UNITDATA_ACK\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -767,7 +774,7 @@ cd_unitdata_ind(queue_t *q, struct cd *cd, mblk_t *dp)
 		p->cd_dest_addr_length = 0;
 		p->cd_dest_addr_offset = 0;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_UNITDATA_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_UNITDATA_IND\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -791,7 +798,7 @@ cd_bad_frame_ind(queue_t *q, struct cd *cd, ulong error, mblk_t *dp)
 		p->cd_state = cd_get_state(cd);
 		p->cd_error = error;
 		mp->b_cont = dp;
-		printd(("%s: %p: <- CD_BAD_FRAME_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_BAD_FRAME_IND\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_ABSORBED);
 	}
@@ -814,7 +821,7 @@ cd_modem_sig_ind(queue_t *q, struct cd *cd, ulong sigs)
 		p = (typeof(p)) mp->b_wptr++;
 		p->cd_primitive = CD_MODEM_SIG_IND;
 		p->cd_sigs = sigs;
-		printd(("%s: %p: <- CD_MODEM_SIG_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: <- CD_MODEM_SIG_IND\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
 		return (QR_DONE);
 	}
@@ -843,7 +850,7 @@ ch_info_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->ch_primitive = CH_INFO_REQ;
-		printd(("%s: %p: CH_INFO_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_INFO_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -864,7 +871,7 @@ ch_optmgmt_req(queue_t *q, struct cd *cd)
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr++;
 		p->ch_primitive = CH_OPTMGMT_REQ;
-		printd(("%s: %p: CH_OPTMGMT_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_OPTMGMT_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -893,7 +900,7 @@ ch_attach_req(queue_t *q, struct cd *cd, size_t add_len, caddr_t add_ptr, ulong 
 			mp->b_wptr += add_len;
 		}
 		ch_set_state(cd, CHS_WACK_AREQ);
-		printd(("%s: %p: CH_ATTACH_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_ATTACH_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -915,7 +922,7 @@ ch_enable_req(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->ch_primitive = CH_ENABLE_REQ;
 		ch_set_state(cd, CHS_WACK_EREQ);
-		printd(("%s: %p: CH_ENABLE_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_ENABLE_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -939,7 +946,7 @@ ch_connect_req(queue_t *q, struct cd *cd, ulong flags)
 		p->ch_conn_flags = flags;
 		p->ch_slot = 0;
 		ch_set_state(cd, CHS_WACK_CREQ);
-		printd(("%s: %p: CH_CONNECT_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_CONNECT_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -962,7 +969,7 @@ ch_data_req(queue_t *q, struct cd *cd, mblk_t *dp)
 		p->ch_primitive = CH_DATA_REQ;
 		p->ch_slot = 0;
 		mp->b_cont = dp;
-		printd(("%s: %p: CH_DATA_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DATA_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_ABSORBED);
 	}
@@ -986,7 +993,7 @@ ch_disconnect_req(queue_t *q, struct cd *cd, ulong flags)
 		p->ch_conn_flags = flags;
 		p->ch_slot = 0;
 		ch_set_state(cd, CHS_WACK_DREQ);
-		printd(("%s: %p: CH_DISCONNECT_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DISCONNECT_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -1008,7 +1015,7 @@ ch_disable_req(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->ch_primitive = CH_DISABLE_REQ;
 		ch_set_state(cd, CHS_WACK_RREQ);
-		printd(("%s: %p: CH_DISABLE_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DISABLE_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -1030,7 +1037,7 @@ ch_detach_req(queue_t *q, struct cd *cd)
 		p = (typeof(p)) mp->b_wptr++;
 		p->ch_primitive = CH_DETACH_REQ;
 		ch_set_state(cd, CHS_WACK_UREQ);
-		printd(("%s: %p: CH_DETACH_REQ ->\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DETACH_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
 		return (QR_DONE);
 	}
@@ -1201,18 +1208,15 @@ cd_tx_block(queue_t *q, struct cd *cd)
 				tx->mode = TX_MODE_BOF;
 		}
 	}
-	/*
-	   check if transmission block complete 
-	 */
+	/* 
+	   check if transmission block complete */
 	while (bp->b_wptr < bp->b_rptr + blks) {
-		/*
-		   drain residue bits, if necessary 
-		 */
+		/* 
+		   drain residue bits, if necessary */
 		if (tx->rbits >= bits) {
 		      drain_rbits:
-			/*
-			   drain residue bits 
-			 */
+			/* 
+			   drain residue bits */
 			*bp->b_wptr++ = cd_rev(tx->residue & mask);
 			tx->residue >>= bits;
 			tx->rbits -= bits;
@@ -1220,23 +1224,20 @@ cd_tx_block(queue_t *q, struct cd *cd)
 		}
 		switch (tx->mode) {
 		case TX_MODE_IDLE:
-			/*
-			   mark idle 
-			 */
+			/* 
+			   mark idle */
 			tx->residue |= 0xff << tx->rbits;
 			tx->rbits += 8;
 			goto drain_rbits;
 		case TX_MODE_FLAG:
-			/*
-			   idle flags 
-			 */
+			/* 
+			   idle flags */
 			tx->residue |= 0x7e << tx->rbits;
 			tx->rbits += 8;
 			goto drain_rbits;
 		case TX_MODE_BOF:
-			/*
-			   add opening flag (also closing flag) 
-			 */
+			/* 
+			   add opening flag (also closing flag) */
 			switch (cd->config.f) {
 			case HDLC_FLAGS_ONE:
 				tx->residue |= 0x7e << tx->rbits;
@@ -1262,25 +1263,22 @@ cd_tx_block(queue_t *q, struct cd *cd)
 			goto drain_rbits;
 		case TX_MODE_MOF:	/* transmit frame bytes */
 			if (tx->nxt->b_rptr < tx->nxt->b_wptr || (tx->nxt = tx->nxt->b_cont)) {
-				/*
-				   continuing in message 
-				 */
+				/* 
+				   continuing in message */
 				uint byte = *(tx->nxt->b_rptr)++;
 				tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
 				cd_tx_bitstuff(tx, byte);
 				stats->tx_bytes++;
 			} else {
-				/*
-				   finished message: add 1st bcc byte 
-				 */
+				/* 
+				   finished message: add 1st bcc byte */
 				cd_tx_bitstuff(tx, tx->bcc & 0x00ff);
 				tx->mode = TX_MODE_BCC;
 			}
 			goto drain_rbits;
 		case TX_MODE_BCC:
-			/*
-			   add 2nd bcc byte 
-			 */
+			/* 
+			   add 2nd bcc byte */
 			cd_tx_bitstuff(tx, tx->bcc >> 8);
 			stats->tx_frames++;
 			tx->mode = TX_MODE_FLAG;
@@ -1938,9 +1936,8 @@ cd_write(queue_t *q, mblk_t *mp)
 		goto discard;
 	if (ch_get_state(cd) != CHS_CONNECTED)
 		goto discard;
-	/*
-	   let cd_wakeup pull from the queue 
-	 */
+	/* 
+	   let cd_wakeup pull from the queue */
 	return (-EAGAIN);
       discard:
 	return (QR_DONE);	/* silent discard */
@@ -1978,9 +1975,8 @@ cd_attach_req(queue_t *q, mblk_t *mp)
 	if (cd->info.cd.cd_ppa_style != CD_STYLE2)
 		goto notsupp;
 	cd->ppa = p->cd_ppa;
-	/*
-	   issue attach request to channel and wait for response 
-	 */
+	/* 
+	   issue attach request to channel and wait for response */
 	return ch_attach_req(q, cd, sizeof(cd->ppa), (caddr_t) &cd->ppa, 0);
       notsupp:
 	return cd_error_ack(q, cd, p->cd_primitive, CD_NOTSUPP, EOPNOTSUPP);
@@ -2003,9 +1999,8 @@ cd_detach_req(queue_t *q, mblk_t *mp)
 		goto badprim;
 	if (cd_get_state(cd) != CD_DISABLED)
 		goto outstate;
-	/*
-	   issue detach request to channel and wait for response 
-	 */
+	/* 
+	   issue detach request to channel and wait for response */
 	return ch_detach_req(q, cd);
       outstate:
 	return cd_error_ack(q, cd, p->cd_primitive, CD_OUTSTATE, 0);
@@ -2026,9 +2021,8 @@ cd_enable_req(queue_t *q, mblk_t *mp)
 		goto badprim;
 	if (cd_get_state(cd) != CD_DISABLED)
 		goto outstate;
-	/*
-	   issue enable request to channel and wait for response 
-	 */
+	/* 
+	   issue enable request to channel and wait for response */
 	return ch_enable_req(q, cd);
       outstate:
 	return cd_error_ack(q, cd, p->cd_primitive, CD_OUTSTATE, 0);
@@ -2049,9 +2043,8 @@ cd_disable_req(queue_t *q, mblk_t *mp)
 		goto badprim;
 	if (cd_get_state(cd) != CD_ENABLED)
 		goto outstate;
-	/*
-	   issue disconnect request to channel and wait for response 
-	 */
+	/* 
+	   issue disconnect request to channel and wait for response */
 	return ch_disconnect_req(q, cd, CHF_BOTH_DIR);
       outstate:
 	return cd_error_ack(q, cd, p->cd_primitive, CD_OUTSTATE, 0);
@@ -2303,9 +2296,8 @@ ch_info_ack(queue_t *q, mblk_t *mp)
 			cd->info.cd.cd_ppa_style = cd->i_style = CD_STYLE2;
 			break;
 		case CHS_ATTACHED:
-			/*
-			   treat already attached channels as CD_STYLE1 
-			 */
+			/* 
+			   treat already attached channels as CD_STYLE1 */
 			cd->info.cd.cd_ppa_style = cd->i_style = CD_STYLE1;
 			break;
 		default:
@@ -2326,9 +2318,8 @@ ch_info_ack(queue_t *q, mblk_t *mp)
 		if (p->ch_parm_length < sizeof(cd->parm))
 			goto eio;
 		bcopy(mp->b_rptr + p->ch_parm_offset, &cd->parm, sizeof(cd->parm));
-		/*
-		   check circuit parameters 
-		 */
+		/* 
+		   check circuit parameters */
 		if (cd->parm.cp_block_size == 0 || cd->parm.cp_block_size > 2048)
 			goto eio;
 		if (cd->parm.cp_encoding != CH_ENCODING_NONE)
@@ -2384,9 +2375,8 @@ ch_ok_ack(queue_t *q, mblk_t *mp)
 	switch (ch_get_state(cd)) {
 	case CHS_WACK_AREQ:
 		ch_set_state(cd, CHS_ATTACHED);
-		/*
-		   request information concerning attached circuit 
-		 */
+		/* 
+		   request information concerning attached circuit */
 		return ch_info_req(q, cd);
 	case CHS_WACK_UREQ:
 		ch_set_state(cd, CHS_DETACHED);
@@ -2485,9 +2475,8 @@ ch_enable_con(queue_t *q, mblk_t *mp)
 		goto eio;
 	if (ch_get_state(cd) != CHS_WCON_EREQ)
 		goto eio;
-	/*
-	   issue connect request to channel and wait for response 
-	 */
+	/* 
+	   issue connect request to channel and wait for response */
 	return ch_connect_req(q, cd, CHF_BOTH_DIR);
       eio:
 	swerr();
@@ -2566,9 +2555,8 @@ ch_disconnect_con(queue_t *q, mblk_t *mp)
 		goto eio;
 	if (ch_get_state(cd) != CHS_WCON_DREQ)
 		goto eio;
-	/*
-	   issue disable request to channel and wait for response 
-	 */
+	/* 
+	   issue disable request to channel and wait for response */
 	return ch_disable_req(q, cd);
       eio:
 	swerr();
@@ -3145,7 +3133,7 @@ cd_ioccmreset(queue_t *q, mblk_t *mp)
 	struct cd *cd = PRIV(q);
 	(void) cd;
 	(void) mp;
-	fixme(("%s: Master reset\n", HDLC_MOD_NAME));
+	fixme(("%s: Master reset\n", MOD_NAME));
 	return (-EOPNOTSUPP);
 }
 STATIC int
@@ -3308,13 +3296,11 @@ cd_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_UNLINK):
 		case _IOC_NR(I_PUNLINK):
 			(void) lp;
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", HDLC_MOD_NAME, cd,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, cd, nr));
 			ret = (-EINVAL);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", HDLC_MOD_NAME, cd,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, cd, nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -3373,8 +3359,7 @@ cd_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = lmi_ioccnotify(q, mp);
 			break;
 		default:
-			ptrace(("%s: %p: ERROR: Unsupported HDLC ioctl %d\n", HDLC_MOD_NAME, cd,
-				nr));
+			ptrace(("%s: %p: ERROR: Unsupported HDLC ioctl %d\n", MOD_NAME, cd, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -3436,7 +3421,7 @@ cd_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = cd_ioccmgmt(q, mp);
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported HDLC ioctl %d\n", HDLC_MOD_NAME, nr));
+			ptrace(("%s: ERROR: Unsupported HDLC ioctl %d\n", MOD_NAME, nr));
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -3480,72 +3465,70 @@ cd_w_proto(queue_t *q, mblk_t *mp)
 	struct cd *cd = PRIV(q);
 	cd->i_oldstate = cd_get_state(cd);
 	if ((prim = *(ulong *) mp->b_rptr) == CD_UNITDATA_REQ) {
-		printd(("%s: %p: -> CD_UNITDATA_REQ [%d]\n", HDLC_MOD_NAME, cd,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> CD_UNITDATA_REQ [%d]\n", MOD_NAME, cd, msgdsize(mp->b_cont)));
 		if ((rtn = cd_unitdata_req(q, mp)) < 0)
 			cd_set_state(cd, cd->i_oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case CD_INFO_REQ:
-		printd(("%s: %p: -> CD_INFO_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_INFO_REQ\n", MOD_NAME, cd));
 		rtn = cd_info_req(q, mp);
 		break;
 	case CD_ATTACH_REQ:
-		printd(("%s: %p: -> CD_ATTACH_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_ATTACH_REQ\n", MOD_NAME, cd));
 		rtn = cd_attach_req(q, mp);
 		break;
 	case CD_DETACH_REQ:
-		printd(("%s: %p: -> CD_DETACH_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_DETACH_REQ\n", MOD_NAME, cd));
 		rtn = cd_detach_req(q, mp);
 		break;
 	case CD_ENABLE_REQ:
-		printd(("%s: %p: -> CD_ENABLE_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_ENABLE_REQ\n", MOD_NAME, cd));
 		rtn = cd_enable_req(q, mp);
 		break;
 	case CD_DISABLE_REQ:
-		printd(("%s: %p: -> CD_DISABLE_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_DISABLE_REQ\n", MOD_NAME, cd));
 		rtn = cd_disable_req(q, mp);
 		break;
 	case CD_ALLOW_INPUT_REQ:
-		printd(("%s: %p: -> CD_ALLOW_INPUT_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_ALLOW_INPUT_REQ\n", MOD_NAME, cd));
 		rtn = cd_allow_input_req(q, mp);
 		break;
 	case CD_READ_REQ:
-		printd(("%s: %p: -> CD_READ_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_READ_REQ\n", MOD_NAME, cd));
 		rtn = cd_read_req(q, mp);
 		break;
 	case CD_UNITDATA_REQ:
-		printd(("%s: %p: -> CD_UNITDATA_REQ [%d]\n", HDLC_MOD_NAME, cd,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> CD_UNITDATA_REQ [%d]\n", MOD_NAME, cd, msgdsize(mp->b_cont)));
 		rtn = cd_unitdata_req(q, mp);
 		break;
 	case CD_WRITE_READ_REQ:
-		printd(("%s: %p: -> CD_WRITE_READ_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_WRITE_READ_REQ\n", MOD_NAME, cd));
 		rtn = cd_write_read_req(q, mp);
 		break;
 	case CD_HALT_INPUT_REQ:
-		printd(("%s: %p: -> CD_HALT_INPUT_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_HALT_INPUT_REQ\n", MOD_NAME, cd));
 		rtn = cd_halt_input_req(q, mp);
 		break;
 	case CD_ABORT_OUTPUT_REQ:
-		printd(("%s: %p: -> CD_ABORT_OUTPUT_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_ABORT_OUTPUT_REQ\n", MOD_NAME, cd));
 		rtn = cd_abort_output_req(q, mp);
 		break;
 	case CD_MUX_NAME_REQ:
-		printd(("%s: %p: -> CD_MUX_NAME_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_MUX_NAME_REQ\n", MOD_NAME, cd));
 		rtn = cd_mux_name_req(q, mp);
 		break;
 	case CD_MODEM_SIG_REQ:
-		printd(("%s: %p: -> CD_MODEM_SIG_REQ\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_MODEM_SIG_REQ\n", MOD_NAME, cd));
 		rtn = cd_modem_sig_req(q, mp);
 		break;
 	case CD_MODEM_SIG_POLL:
-		printd(("%s: %p: -> CD_MODEM_SIG_POLL\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: -> CD_MODEM_SIG_POLL\n", MOD_NAME, cd));
 		rtn = cd_modem_sig_poll(q, mp);
 		break;
 	default:
-		printd(("%s: %p -> CD_????\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p -> CD_????\n", MOD_NAME, cd));
 		rtn = cd_error_ack(q, cd, prim, CD_BADPRIM, 0);
 		break;
 	}
@@ -3565,68 +3548,66 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct cd *cd = PRIV(q);
 	ulong oldstate = ch_get_state(cd);
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == CH_DATA_IND) {
-		printd(("%s: %p: CH_DATA_IND [%d] <-\n", HDLC_MOD_NAME, cd, msgdsize(mp->b_cont)));
+		printd(("%s: %p: CH_DATA_IND [%d] <-\n", MOD_NAME, cd, msgdsize(mp->b_cont)));
 		if ((rtn = ch_data_ind(q, mp)) < 0)
 			ch_set_state(cd, oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case CH_INFO_ACK:
-		printd(("%s: %p: CH_INFO_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_INFO_ACK\n", MOD_NAME, cd));
 		rtn = ch_info_ack(q, mp);
 		break;
 	case CH_OPTMGMT_ACK:
-		printd(("%s: %p: CH_OPTMGMT_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_OPTMGMT_ACK\n", MOD_NAME, cd));
 		rtn = ch_optmgmt_ack(q, mp);
 		break;
 	case CH_OK_ACK:
-		printd(("%s: %p: CH_OK_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_OK_ACK\n", MOD_NAME, cd));
 		rtn = ch_ok_ack(q, mp);
 		break;
 	case CH_ERROR_ACK:
-		printd(("%s: %p: CH_ERROR_ACK\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_ERROR_ACK\n", MOD_NAME, cd));
 		rtn = ch_error_ack(q, mp);
 		break;
 	case CH_ENABLE_CON:
-		printd(("%s: %p: CH_ENABLE_CON\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_ENABLE_CON\n", MOD_NAME, cd));
 		rtn = ch_enable_con(q, mp);
 		break;
 	case CH_CONNECT_CON:
-		printd(("%s: %p: CH_CONNECT_CON\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_CONNECT_CON\n", MOD_NAME, cd));
 		rtn = ch_connect_con(q, mp);
 		break;
 	case CH_DATA_IND:
-		printd(("%s: %p: CH_DATA_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DATA_IND\n", MOD_NAME, cd));
 		rtn = ch_data_ind(q, mp);
 		break;
 	case CH_DISCONNECT_IND:
-		printd(("%s: %p: CH_DISCONNECT_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DISCONNECT_IND\n", MOD_NAME, cd));
 		rtn = ch_disconnect_ind(q, mp);
 		break;
 	case CH_DISCONNECT_CON:
-		printd(("%s: %p: CH_DISCONNECT_CON\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DISCONNECT_CON\n", MOD_NAME, cd));
 		rtn = ch_disconnect_con(q, mp);
 		break;
 	case CH_DISABLE_IND:
-		printd(("%s: %p: CH_DISABLE_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DISABLE_IND\n", MOD_NAME, cd));
 		rtn = ch_disable_ind(q, mp);
 		break;
 	case CH_DISABLE_CON:
-		printd(("%s: %p: CH_DISABLE_CON\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_DISABLE_CON\n", MOD_NAME, cd));
 		rtn = ch_disable_con(q, mp);
 		break;
 	case CH_EVENT_IND:
-		printd(("%s: %p: CH_EVENT_IND\n", HDLC_MOD_NAME, cd));
+		printd(("%s: %p: CH_EVENT_IND\n", MOD_NAME, cd));
 		rtn = ch_event_ind(q, mp);
 		break;
 	default:
-		/*
-		   dump anthing we don't recognize 
-		 */
+		/* 
+		   dump anthing we don't recognize */
 		swerr();
 		rtn = (-EFAULT);
 		break;
@@ -3648,7 +3629,7 @@ cd_w_data(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	(void) cd;
-	printd(("%s: %p: -> M_DATA [%d]\n", HDLC_MOD_NAME, cd, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, cd, msgdsize(mp)));
 	return cd_write(q, mp);
 }
 STATIC INLINE int
@@ -3656,7 +3637,7 @@ cd_r_data(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	(void) cd;
-	printd(("%s: %p: M_DATA [%d] <-\n", HDLC_MOD_NAME, cd, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, cd, msgdsize(mp)));
 	return ch_read(q, mp);
 }
 
@@ -3670,9 +3651,8 @@ cd_r_data(queue_t *q, mblk_t *mp)
 STATIC int
 cd_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return cd_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -3689,9 +3669,8 @@ cd_r_prim(queue_t *q, mblk_t *mp)
 STATIC int
 cd_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return cd_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -3732,9 +3711,8 @@ cd_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct cd *cd;
-		/*
-		   test for multiple push 
-		 */
+		/* 
+		   test for multiple push */
 		for (cd = cd_list; cd; cd = cd->next) {
 			if (cd->u.dev.cmajor == cmajor && cd->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -3745,9 +3723,8 @@ cd_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			MOD_DEC_USE_COUNT;
 			return (ENOMEM);
 		}
-		/*
-		   generate immediate information request 
-		 */
+		/* 
+		   generate immediate information request */
 		ch_info_req(q, cd);
 		return (0);
 	}
@@ -3770,61 +3747,120 @@ cd_close(queue_t *q, int flag, cred_t *crp)
 }
 
 /*
- *  =======================================================================
+ *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
- *  =======================================================================
+ *  =========================================================================
  */
-STATIC int hdlc_initialized = 0;
-STATIC void
-hdlc_init(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the HDLC module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw hdlc_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &hdlcinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+hdlc_register_strmod(void)
 {
-	unless(hdlc_initialized > 0, return);
-	cmn_err(CE_NOTE, HDLC_BANNER);	/* console splash */
-	if ((hdlc_initialized = hdlc_init_caches()) || (hdlc_initialized = hdlc_init_tables())) {
-		cmn_err(CE_PANIC, "%s: ERROR: could not allocate caches", HDLC_MOD_NAME);
-	} else if ((hdlc_initialized = lis_register_strmod(&hdlc_info, HDLC_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: couldn't register module", HDLC_MOD_NAME);
-		hdlc_free_tables();
-		hdlc_free_caches();
-		return;
-	}
-	hdlc_initialized = 1;
-	return;
+	int err;
+	if ((err = register_strmod(&hdlc_fmod)) < 0)
+		return (err);
+	return (0);
 }
-STATIC void
-hdlc_terminate(void)
+
+STATIC int
+hdlc_unregister_strmod(void)
 {
-	ensure(hdlc_initialized > 0, return);
-	if ((hdlc_initialized = lis_unregister_strmod(&hdlc_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", HDLC_MOD_NAME);
-	} else {
-		hdlc_free_tables();
-		hdlc_free_caches();
-		hdlc_initialized = 0;
+	int err;
+	if ((err = unregister_strmod(&hdlc_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+hdlc_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&hdlcinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+hdlc_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&hdlcinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+hdlcinit(void)
+{
+	int err;
+#ifdef MODULE
+	cmn_err(CE_NOTE, HDLC_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, HDLC_SPLASH);	/* console splash */
+#endif
+	if ((err = hdlc_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
 	}
+	if ((err = hdlc_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		hdlc_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+hdlcterminate(void)
+{
+	int err;
+	if ((err = hdlc_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = hdlc_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
 /*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
-int
-init_module(void)
-{
-	hdlc_init();
-	if (hdlc_initialized < 0)
-		return hdlc_initialized;
-	return (0);
-}
+module_init(hdlcinit);
+module_exit(hdlcterminate);
 
-void
-cleanup_module(void)
-{
-	hdlc_terminate();
-}
+#endif				/* LINUX */

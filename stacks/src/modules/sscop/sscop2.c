@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:12 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:12 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:42 $";
 
 #include "compat.h"
 
@@ -78,7 +78,7 @@ MODULE_DESCRIPTION(SSCOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SSCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
-#endif
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -86,7 +86,11 @@ MODULE_LICENSE(SSCOP_LICENSE);
 #define SSCOP_DRV_NAME		CONFIG_STREAMS_SSCOP_NAME
 #define SSCOP_CMAJORS		CONFIG_STREAMS_SSCOP_NMAJORS
 #define SSCOP_CMAJOR_0		CONFIG_STREAMS_SSCOP_MAJOR
-#endif
+#endif				/* LFS */
+
+#ifndef SSCOP_DRV_NAME
+#define SSCOP_DRV_NAME		"sscop"
+#endif				/* SSCOP_DRV_NAME */
 
 /*
  *  =========================================================================
@@ -95,9 +99,18 @@ MODULE_LICENSE(SSCOP_LICENSE);
  *
  *  =========================================================================
  */
+
+#define DRV_ID		SSCOP_DRV_ID
+#define DRV_NAME	SSCOP_DRV_NAME
+#ifdef MODULE
+#define DRV_BANNER	SSCOP_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	SSCOP_SPLASH
+#endif				/* MODULE */
+
 static struct module_info s_minfo = {
-	0,				/* Module ID number */
-	"sscop",			/* Module name */
+	DRV_ID,				/* Module ID number */
+	DRV_NAME,			/* Module name */
 	0,				/* Min packet size accepted */
 	INFPSZ,				/* Max packet size accepted */
 	1 << 15,			/* Hi water mark */
@@ -194,7 +207,8 @@ typedef struct sscop {
  *
  *  -------------------------------------------------------------------------
  */
-static int s_w_iocdata(queue_t * q, mblk_t * mp)
+static int
+s_w_iocdata(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -208,7 +222,8 @@ static int s_w_iocdata(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_w_iocdata(queue_t * q, mblk_t * mp)
+static int
+s_w_iocdata(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -222,7 +237,8 @@ static int s_w_iocdata(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_w_proto(queue_t * q, mblk_t * mp)
+static int
+s_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -277,7 +293,8 @@ static int s_w_proto(queue_t * q, mblk_t * mp)
 	}
 	return (rtn);
 }
-static int s_r_proto(queue_t q, mblk_t * mp)
+static int
+s_r_proto(queue_t q, mblk_t *mp)
 {
 	int rtn;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -317,7 +334,8 @@ static int s_r_proto(queue_t q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_w_data(queue_t * q, mblk_t * mp)
+static int
+s_w_data(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -327,7 +345,8 @@ static int s_w_data(queue_t * q, mblk_t * mp)
 	 */
 	return (4);
 }
-static int s_r_data(queue_t * q, mblk_t * mp)
+static int
+s_r_data(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -345,13 +364,15 @@ static int s_r_data(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_w_flush(queue_t * q, mblk_t * mp)
+static int
+s_w_flush(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
 	return (3);
 }
-static int s_r_flush(queue_t * q, mblk_t * mp)
+static int
+s_r_flush(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -365,7 +386,8 @@ static int s_r_flush(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_r_error(queue_t * q, mblk_t * mp)
+static int
+s_r_error(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -379,7 +401,8 @@ static int s_r_error(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_r_hangup(queue_t * q, mblk_t * mp)
+static int
+s_r_hangup(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -393,13 +416,15 @@ static int s_r_hangup(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int s_w_other(queue_t * q, mblk_t * mp)
+static int
+s_w_other(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
 	return (4);
 }
-static int s_r_other(queue_t * q, mblk_t * mp)
+static int
+s_r_other(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -413,7 +438,8 @@ static int s_r_other(queue_t * q, mblk_t * mp)
  *
  *  =========================================================================
  */
-static INT s_wput(queue_t * q, mblk_t * mp)
+static INT
+s_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn = 0;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -463,7 +489,8 @@ static INT s_wput(queue_t * q, mblk_t * mp)
 	return (INT) (0);
 }
 
-static INT s_rput(queue_t * q, mblk_t * mp)
+static INT
+s_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn = 0;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
@@ -527,7 +554,8 @@ static INT s_rput(queue_t * q, mblk_t * mp)
  */
 kmem_cache_t *s_cachep = NULL;
 
-static void s_init_caches(void)
+static void
+s_init_caches(void)
 {
 	if (!(s_cachep) &&
 	    !(s_cachep = kmem_cache_create
@@ -535,14 +563,16 @@ static void s_init_caches(void)
 		panic("%s:Cannot alloc s_cachep.\n", __FUNCTION__);
 	return;
 }
-static void s_term_caches(void)
+static void
+s_term_caches(void)
 {
 	if (s_cachep)
 		if (kmem_cache_destroy(s_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy s_cache", __FUNCTION__);
 	return;
 }
-static sscop_t *s_alloc_priv(queue_t * q)
+static sscop_t *
+s_alloc_priv(queue_t *q)
 {
 	sscop_t *sp;
 	if ((sp = kmem_cache_alloc(s_cachep, SLAB_ATOMIC))) {
@@ -556,7 +586,8 @@ static sscop_t *s_alloc_priv(queue_t * q)
 	}
 	return (sp);
 }
-static void s_free_priv(queue_t * q)
+static void
+s_free_priv(queue_t *q)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	bufq_purge(&sl->rb);
@@ -573,7 +604,8 @@ static void s_free_priv(queue_t * q)
  *
  *  =========================================================================
  */
-static int s_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
+static int
+s_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;
 	if (q->q_ptr != NULL)	/* already open */
@@ -586,7 +618,8 @@ static int s_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
 	}
 	return EIO;
 }
-static int s_close(queue_t * q, int flag, cred_t * crp)
+static int
+s_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
 	(void) crp;
@@ -597,48 +630,114 @@ static int s_close(queue_t * q, int flag, cred_t * crp)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-void s_init(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw aa_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sscopinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+aa_register_strmod(void)
 {
-	int modnum;
-	unless(s_minfo.mi_idnum, return);
-	cmn_err(CE_NOTE, SSCOP_BANNER);	/* console splash */
-	s_init_caches();
-	if (!(modnum = lis_register_strmod(&s_info, s_minfo.mi_idname))) {
-		s_minfo.mi_idnum = 0;
-		rare();
-		cmn_err(CE_NOTE, "sscop: couldn't register as module\n");
-		return;
-	}
-	s_minfo.mi_idnum = modnum;
-	return;
+	int err;
+	if ((err = register_strmod(&aa_fmod)) < 0)
+		return (err);
+	return (0);
 }
-void s_terminate(void)
+
+STATIC int
+aa_unregister_strmod(void)
 {
-	ensure(s_minfo.mi_idnum, return);
-	if ((s_minfo.mi_idnum = lis_unregister_strmod(&s_minfo)))
-		cmn_err(CE_WARN, "sscop: couldn't unregister module!\n");
-	s_term_caches();
+	int err;
+	if ((err = unregister_strmod(&aa_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+aa_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sscopinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+aa_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sscopinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sscopinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = aa_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = aa_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		aa_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sscopterminate(void)
+{
+	int err;
+	if ((err = aa_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = aa_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
-int init_module(void)
-{
-	s_init();
-	return (0);
-}
-void cleanup_module(void)
-{
-	s_terminate();
-	return;
-}
+module_init(sscopinit);
+module_exit(sscopterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:11 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:11 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:11 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $"
 
-static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:11 $";
+static char const ident[] =
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $";
 
 #include "compat.h"
 
@@ -66,26 +67,26 @@ static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#define SDL_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/26 23:38:11 $"
-#define SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDL_LICENSE	"GPL"
-#define SDL_BANNER	SDL_DESCRIP	"\n" \
-			SDL_REVISION	"\n" \
-			SDL_COPYRIGHT	"\n" \
-			SDL_DEVICE	"\n" \
-			SDL_CONTACT	"\n"
-#define SDL_SPLASH	SDL_DEVICE	" - " \
-			SDL_REVISION	"\n" \
+#define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $"
+#define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
+#define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define SDL_SCTP_LICENSE	"GPL"
+#define SDL_SCTP_BANNER		SDL_SCTP_DESCRIP	"\n" \
+				SDL_SCTP_REVISION	"\n" \
+				SDL_SCTP_COPYRIGHT	"\n" \
+				SDL_SCTP_DEVICE		"\n" \
+				SDL_SCTP_CONTACT	"\n"
+#define SDL_SCTP_SPLASH		SDL_SCTP_DEVICE		" - " \
+				SDL_SCTP_REVISION	"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(SDL_CONTACT);
-MODULE_DESCRIPTION(SDL_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SDL_DEVICE);
+MODULE_AUTHOR(SDL_SCTP_CONTACT);
+MODULE_DESCRIPTION(SDL_SCTP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SDL_SCTP_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(SDL_LICENSE);
+MODULE_LICENSE(SDL_SCTP_LICENSE);
 #endif
 #endif				/* LINUX */
 
@@ -93,9 +94,17 @@ MODULE_LICENSE(SDL_LICENSE);
 // #define SDL_TX_COMPRESSION
 
 #ifdef LFS
-#define SDL_SCTP_MOD_ID CONFIG_STREAMS_SDL_SCTP_MODID
-#define SDL_SCTP_MOD_NAME CONFIG_STREAMS_SDL_SCTP_NAME
-#endif
+#define SDL_SCTP_MOD_ID		CONFIG_STREAMS_SDL_SCTP_MODID
+#define SDL_SCTP_MOD_NAME	CONFIG_STREAMS_SDL_SCTP_NAME
+#endif				/* LFS */
+
+#ifndef SDL_SCTP_MOD_NAME
+#define SDL_SCTP_MOD_NAME	"sdl-sctp"
+#endif				/* SDL_SCTP_MOD_NAME */
+
+#ifndef SDL_SCTP_MOD_ID
+#define SDL_SCTP_MOD_ID		0
+#endif				/* SDL_SCTP_MOD_ID */
 
 /*
  *  =========================================================================
@@ -104,8 +113,17 @@ MODULE_LICENSE(SDL_LICENSE);
  *
  *  =========================================================================
  */
-static struct module_info sdl_minfo = {
-	mi_idnum:0,			/* Module ID number */
+
+#define MOD_ID		SDL_SCTP_MOD_ID
+#define MOD_NAME	SDL_SCTP_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	SDL_SCTP_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	SDL_SCTP_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info sdl_minfo = {
+	mi_idnum:MOD_ID,		/* Module ID number */
 	mi_idname:"sdl-sctp",		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted *//* FIXME */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted *//* FIXME */
@@ -113,13 +131,13 @@ static struct module_info sdl_minfo = {
 	mi_lowat:1 << 10,		/* Lo water mark *//* FIXME */
 };
 
-static int sdl_open(queue_t *, dev_t *, int, int, cred_t *);
-static int sdl_close(queue_t *, int, cred_t *);
+STATIC int sdl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int sdl_close(queue_t *, int, cred_t *);
 
-static int sdl_rput(queue_t *, mblk_t *);
-static int sdl_rsrv(queue_t *);
+STATIC int sdl_rput(queue_t *, mblk_t *);
+STATIC int sdl_rsrv(queue_t *);
 
-static struct qinit sdl_rinit = {
+STATIC struct qinit sdl_rinit = {
 	qi_putp:sdl_rput,		/* Read put (msg from below) */
 	qi_srvp:sdl_rsrv,		/* Read queue service */
 	qi_qopen:sdl_open,		/* Each open */
@@ -127,16 +145,16 @@ static struct qinit sdl_rinit = {
 	qi_minfo:&sdl_minfo,		/* Information */
 };
 
-static int sdl_wput(queue_t *, mblk_t *);
-static int sdl_wsrv(queue_t *);
+STATIC int sdl_wput(queue_t *, mblk_t *);
+STATIC int sdl_wsrv(queue_t *);
 
-static struct qinit sdl_winit = {
+STATIC struct qinit sdl_winit = {
 	qi_putp:sdl_wput,		/* Write put (msg from above) */
 	qi_srvp:sdl_wsrv,		/* Write queue service */
 	qi_minfo:&sdl_minfo,		/* Information */
 };
 
-static struct streamtab sdl_info = {
+MODULE_STATIC struct streamtab sdl_sctpinfo = {
 	st_rdinit:&sdl_rinit,		/* Upper read queue */
 	st_wrinit:&sdl_winit,		/* Upper write queue */
 };
@@ -194,7 +212,7 @@ typedef struct sdl {
  *  LMI_INFO_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_info_ack(sdl_t * sp)
 {
 	mblk_t *mp;
@@ -222,7 +240,7 @@ lmi_info_ack(sdl_t * sp)
  *  LMI_OK_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_ok_ack(sdl_t * sp, long prim)
 {
 	mblk_t *mp;
@@ -240,9 +258,8 @@ lmi_ok_ack(sdl_t * sp, long prim)
 		case LMI_DETACH_PENDING:
 			sp->state = LMI_UNATTACHED;
 			break;
-			/*
-			   default is don't change state 
-			 */
+			/* 
+			   default is don't change state */
 		}
 		p->lmi_state = sp->state;
 		putnext(sp->iq, mp);
@@ -256,7 +273,7 @@ lmi_ok_ack(sdl_t * sp, long prim)
  *  LMI_ERROR_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_error_ack(sdl_t * sp, long prim, long err)
 {
 	mblk_t *mp;
@@ -290,7 +307,7 @@ lmi_error_ack(sdl_t * sp, long prim, long err)
 		case LMI_DISABLE_PENDING:
 			sp->state = LMI_ENABLED;
 			break;
-			/*
+			/* 
 			 *  Default is not to change state.
 			 */
 		}
@@ -306,7 +323,7 @@ lmi_error_ack(sdl_t * sp, long prim, long err)
  *  LMI_ENABLE_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_enable_con(sdl_t * sp)
 {
 	mblk_t *mp;
@@ -333,7 +350,7 @@ lmi_enable_con(sdl_t * sp)
  *  LMI_DISABLE_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_disable_con(sdl_t * sp)
 {
 	mblk_t *mp;
@@ -361,7 +378,7 @@ lmi_disable_con(sdl_t * sp)
  *  LMI_OPTMGMT_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_optmgmt_ack(sdl_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -388,7 +405,7 @@ lmi_optmgmt_ack(sdl_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 lmi_error_ind(sdl_t * sp, long err)
 {
 	mblk_t *mp;
@@ -413,7 +430,7 @@ lmi_error_ind(sdl_t * sp, long err)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 lmi_stats_ind(sdl_t * sp, ulong interval, ulong timestamp)
 {
 	mblk_t *mp;
@@ -441,7 +458,7 @@ lmi_stats_ind(sdl_t * sp, ulong interval, ulong timestamp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 lmi_event_ind(sdl_t * sp, ulong oid, ulong severity, ulong timestamp)
 {
 	mblk_t *mp;
@@ -469,7 +486,7 @@ lmi_event_ind(sdl_t * sp, ulong oid, ulong severity, ulong timestamp)
  *  SDL_DAEDR_RECEIVED_BITS_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_read(sdl_t * sp, mblk_t *dp)
 {
 	ensure(sp, return (-EFAULT));
@@ -482,7 +499,7 @@ sdl_read(sdl_t * sp, mblk_t *dp)
 }
 
 #if 0
-static int
+STATIC int
 sdl_daedr_received_bits_ind(sdl_t * sp, ulong count, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -509,7 +526,7 @@ sdl_daedr_received_bits_ind(sdl_t * sp, ulong count, mblk_t *dp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdl_daedr_correct_su_ind(sdl_t * sp, ulong count)
 {
 	mblk_t *mp;
@@ -532,7 +549,7 @@ sdl_daedr_correct_su_ind(sdl_t * sp, ulong count)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdl_daedr_su_in_error_ind(sdl_t * sp)
 {
 	mblk_t *mp;
@@ -554,7 +571,7 @@ sdl_daedr_su_in_error_ind(sdl_t * sp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdl_daedt_transmission_request_ind(sdl_t * sp)
 {
 	mblk_t *mp;
@@ -583,7 +600,7 @@ sdl_daedt_transmission_request_ind(sdl_t * sp)
  *  N_DATA_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_data_req(sdl_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -614,7 +631,7 @@ n_data_req(sdl_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
  *  ---------------------------------------------
  */
 #if 0
-static int
+STATIC int
 n_exdata_req(sdl_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -650,7 +667,7 @@ n_exdata_req(sdl_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 
 #define SDL_PPI	    10
 
-static int
+STATIC int
 sdl_write(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -680,7 +697,7 @@ sdl_write(sdl_t * sp, mblk_t *mp)
  *  LMI_INFO_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_info_req(sdl_t * sp, mblk_t *mp)
 {
 	(void) mp;
@@ -693,7 +710,7 @@ lmi_info_req(sdl_t * sp, mblk_t *mp)
  *  LMI_ATTACH_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_attach_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -725,7 +742,7 @@ lmi_attach_req(sdl_t * sp, mblk_t *mp)
  *  LMI_DETACH_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_detach_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -757,7 +774,7 @@ lmi_detach_req(sdl_t * sp, mblk_t *mp)
  *  LMI_ENABLE_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_enable_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -789,7 +806,7 @@ lmi_enable_req(sdl_t * sp, mblk_t *mp)
  *  LMI_DISABLE_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_disable_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -827,7 +844,7 @@ lmi_disable_req(sdl_t * sp, mblk_t *mp)
  *  LMI_OPTMGMT_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 lmi_optmgmt_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -856,7 +873,7 @@ lmi_optmgmt_req(sdl_t * sp, mblk_t *mp)
 #ifndef abs
 #define abs(x) ((x)<0?-(x):(x))
 #endif
-static int
+STATIC int
 m_error_reply(sdl_t * sp, int err)
 {
 	mblk_t *mp;
@@ -884,7 +901,7 @@ m_error_reply(sdl_t * sp, int err)
 	rare();
 	return (-ENOBUFS);
 }
-static int
+STATIC int
 sdl_bits_for_transmission_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -934,7 +951,7 @@ sdl_bits_for_transmission_req(sdl_t * sp, mblk_t *mp)
  *  SDL_DAEDT_START_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_connect_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -946,13 +963,11 @@ sdl_connect_req(sdl_t * sp, mblk_t *mp)
 		if (mlen >= sizeof(*p)) {
 			if (sp->state == LMI_ENABLED) {
 
-				/*
-				   enable the transmitter section 
-				 */
+				/* 
+				   enable the transmitter section */
 				sp->flags |= SDL_FLAG_TX_ENABLED;
-				/*
-				   enable the receiver section 
-				 */
+				/* 
+				   enable the receiver section */
 				sp->flags |= SDL_FLAG_RX_ENABLED;
 				return (0);
 
@@ -973,7 +988,7 @@ sdl_connect_req(sdl_t * sp, mblk_t *mp)
  *  SDL_DAEDR_START_REQ
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_disconnect_req(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -985,13 +1000,11 @@ sdl_disconnect_req(sdl_t * sp, mblk_t *mp)
 		if (mlen >= sizeof(*p)) {
 			if (sp->state == LMI_ENABLED) {
 
-				/*
-				   disable the transmitter section 
-				 */
+				/* 
+				   disable the transmitter section */
 				sp->flags &= ~SDL_FLAG_TX_ENABLED;
-				/*
-				   disable the receiver section 
-				 */
+				/* 
+				   disable the receiver section */
 				sp->flags &= ~SDL_FLAG_RX_ENABLED;
 				return (0);
 
@@ -1019,7 +1032,7 @@ sdl_disconnect_req(sdl_t * sp, mblk_t *mp)
  *  N_CONN_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_conn_ind(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1034,7 +1047,7 @@ n_conn_ind(sdl_t * sp, mblk_t *mp)
  *  N_CONN_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_conn_con(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1049,7 +1062,7 @@ n_conn_con(sdl_t * sp, mblk_t *mp)
  *  N_DISCON_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_discon_ind(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1064,7 +1077,7 @@ n_discon_ind(sdl_t * sp, mblk_t *mp)
  *  N_DATA_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_data_ind(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -1101,7 +1114,7 @@ n_data_ind(sdl_t * sp, mblk_t *mp)
  *  N_EXDATA_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_exdata_ind(sdl_t * sp, mblk_t *mp)
 {
 	int err;
@@ -1138,7 +1151,7 @@ n_exdata_ind(sdl_t * sp, mblk_t *mp)
  *  N_DATACK_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_datack_ind(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1153,7 +1166,7 @@ n_datack_ind(sdl_t * sp, mblk_t *mp)
  *  N_INFO_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_info_ack(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1168,7 +1181,7 @@ n_info_ack(sdl_t * sp, mblk_t *mp)
  *  N_BIND_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_bind_ack(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1183,7 +1196,7 @@ n_bind_ack(sdl_t * sp, mblk_t *mp)
  *  N_OK_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_ok_ack(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1198,7 +1211,7 @@ n_ok_ack(sdl_t * sp, mblk_t *mp)
  *  N_ERROR_ACK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_error_ack(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1213,7 +1226,7 @@ n_error_ack(sdl_t * sp, mblk_t *mp)
  *  N_RESET_IND
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_reset_ind(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1228,7 +1241,7 @@ n_reset_ind(sdl_t * sp, mblk_t *mp)
  *  N_RESET_CON
  *  ---------------------------------------------
  */
-static int
+STATIC int
 n_reset_con(sdl_t * sp, mblk_t *mp)
 {
 	ensure(sp, return (-EFAULT));
@@ -1252,7 +1265,7 @@ n_reset_con(sdl_t * sp, mblk_t *mp)
  *  SDL_IOCGOPTIONS
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_iocgoptions(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
@@ -1269,7 +1282,7 @@ sdl_iocgoptions(queue_t *q, int cmd, void *arg)
  *  SDL_IOCSOPTIONS
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_iocsoptions(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
@@ -1309,7 +1322,7 @@ sdl_iocsoptions(queue_t *q, int cmd, void *arg)
  *  SDL_IOCGCONFIG
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_iocgconfig(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
@@ -1326,7 +1339,7 @@ sdl_iocgconfig(queue_t *q, int cmd, void *arg)
  *  SDL_IOCSCONFIG
  *  ---------------------------------------------
  */
-static int
+STATIC int
 sdl_iocsconfig(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
@@ -1343,7 +1356,7 @@ sdl_iocsconfig(queue_t *q, int cmd, void *arg)
  *  DEV_IOCSIFCLOCK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 dev_iocsifclock(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
@@ -1376,7 +1389,7 @@ dev_iocsifclock(queue_t *q, int cmd, void *arg)
  *  DEV_IOCGIFCLOCK
  *  ---------------------------------------------
  */
-static int
+STATIC int
 dev_iocgifclock(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
@@ -1394,7 +1407,7 @@ dev_iocgifclock(queue_t *q, int cmd, void *arg)
  *  ---------------------------------------------
  *  Disconnect the transmit path.
  */
-static int
+STATIC int
 dev_ioccdisctx(queue_t *q, int cmd, void *arg)
 {
 	ensure(q, return (-EFAULT));
@@ -1407,7 +1420,7 @@ dev_ioccdisctx(queue_t *q, int cmd, void *arg)
  *  ---------------------------------------------
  *  Reconnect the transmit path.
  */
-static int
+STATIC int
 dev_ioccconntx(queue_t *q, int cmd, void *arg)
 {
 	ensure(q, return (-EFAULT));
@@ -1427,7 +1440,7 @@ dev_ioccconntx(queue_t *q, int cmd, void *arg)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdl_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1477,7 +1490,7 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 	}
 	return (rtn);
 }
-static int
+STATIC int
 sdl_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1541,7 +1554,7 @@ sdl_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdl_w_data(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -1554,7 +1567,7 @@ sdl_w_data(queue_t *q, mblk_t *mp)
 		return err;
 	return (1);		/* absorbed mblk */
 }
-static int
+STATIC int
 sdl_r_data(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -1576,7 +1589,7 @@ sdl_r_data(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 #if 0
-static int
+STATIC int
 sdl_r_ctl(queue_t *q, mblk_t *mp)
 {
 	sdl_t *sp;
@@ -1599,7 +1612,7 @@ sdl_r_ctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdl_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -1730,7 +1743,7 @@ sdl_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdl_r_error(queue_t *q, mblk_t *mp)
 {
 	ensure(q, return (-EFAULT));
@@ -1746,7 +1759,7 @@ sdl_r_error(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdl_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 {
 	ensure(q, return (-EFAULT));
@@ -1760,14 +1773,14 @@ sdl_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 	putnext(q, mp);
 	return (1);
 }
-static int
+STATIC int
 sdl_w_flush(queue_t *q, mblk_t *mp)
 {
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	return sdl_m_flush(q, mp, FLUSHW);
 }
-static int
+STATIC int
 sdl_r_flush(queue_t *q, mblk_t *mp)
 {
 	ensure(q, return (-EFAULT));
@@ -1782,7 +1795,7 @@ sdl_r_flush(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+STATIC int
 sdl_m_other(queue_t *q, mblk_t *mp)
 {
 	rare();
@@ -1806,7 +1819,7 @@ sdl_m_other(queue_t *q, mblk_t *mp)
 /*
  *  SDL Write Put and Service
  */
-static int
+STATIC int
 sdl_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1847,9 +1860,8 @@ sdl_wput(queue_t *q, mblk_t *mp)
 			freeb(mp);
 			break;
 		case -ENOBUFS:
-			/*
-			   should set up bufcall 
-			 */
+			/* 
+			   should set up bufcall */
 		case -EBUSY:
 		case -EAGAIN:
 		case -ENOMEM:
@@ -1872,7 +1884,7 @@ sdl_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+STATIC int
 sdl_wsrv(queue_t *q)
 {
 	int rtn;
@@ -1909,9 +1921,8 @@ sdl_wsrv(queue_t *q)
 				freeb(mp);
 				continue;
 			case -ENOBUFS:
-				/*
-				   should set up bufcall 
-				 */
+				/* 
+				   should set up bufcall */
 			case -EBUSY:
 			case -EAGAIN:
 			case -ENOMEM:
@@ -1946,7 +1957,7 @@ sdl_wsrv(queue_t *q)
 /*
  *  SCTP Read Put and Service
  */
-static int
+STATIC int
 sdl_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -1988,9 +1999,8 @@ sdl_rput(queue_t *q, mblk_t *mp)
 			freeb(mp);
 			break;
 		case -ENOBUFS:
-			/*
-			   should set up bufcall 
-			 */
+			/* 
+			   should set up bufcall */
 		case -EBUSY:
 		case -EAGAIN:
 		case -ENOMEM:
@@ -2013,7 +2023,7 @@ sdl_rput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-static int
+STATIC int
 sdl_rsrv(queue_t *q)
 {
 	int rtn;
@@ -2051,9 +2061,8 @@ sdl_rsrv(queue_t *q)
 				freeb(mp);
 				continue;
 			case -ENOBUFS:
-				/*
-				   should set up bufcall 
-				 */
+				/* 
+				   should set up bufcall */
 			case -EBUSY:
 			case -EAGAIN:
 			case -ENOMEM:
@@ -2094,25 +2103,27 @@ sdl_rsrv(queue_t *q)
  */
 kmem_cache_t *sdl_cachep = NULL;
 
-static void
+STATIC int
 sdl_init_caches(void)
 {
 	if (!sdl_cachep &&
 	    !(sdl_cachep = kmem_cache_create
 	      ("sdl_cachep", sizeof(sdl_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
-		panic("%s:Cannot alloc sdl_cachep.\n", __FUNCTION__);
-	return;
+		cmn_err(CE_PANIC, "%s: Cannot alloc sdl_cachep.", __FUNCTION__);
+	return (0);
 }
-static void
+STATIC int
 sdl_term_caches(void)
 {
 	if (sdl_cachep)
-		if (kmem_cache_destroy(sdl_cachep))
+		if (kmem_cache_destroy(sdl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdl_cachep", __FUNCTION__);
-	return;
+			return (-EBUSY);
+		}
+	return (0);
 }
 
-static sdl_t *
+STATIC sdl_t *
 sdl_alloc_priv(queue_t *q)
 {
 	sdl_t *sp;
@@ -2124,11 +2135,11 @@ sdl_alloc_priv(queue_t *q)
 		sp->iq = RD(q);
 		sp->oq = WR(q);
 		sp->state = LMI_DISABLED;
-		spin_lock_init(&sp->lock); /* "ss7sctp-private" */
+		spin_lock_init(&sp->lock);	/* "ss7sctp-private" */
 	}
 	return (sp);
 }
-static void
+STATIC void
 sdl_free_priv(queue_t *q)
 {
 	sdl_t *sp;
@@ -2149,7 +2160,7 @@ sdl_free_priv(queue_t *q)
  *
  *  =========================================================================
  */
-static int
+STATIC int
 sdl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	(void) crp;		/* for now */
@@ -2163,7 +2174,7 @@ sdl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	return EIO;
 }
-static int
+STATIC int
 sdl_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
@@ -2176,54 +2187,114 @@ sdl_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  Lis Module Initialization
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-void
-sdl_init(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SDL module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw sdl_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sdl_sctpinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sdl_register_strmod(void)
 {
-	int modnum;
-	unless(sdl_minfo.mi_idnum, return);
-	cmn_err(CE_NOTE, SDL_BANNER);	/* console splash */
-	sdl_init_caches();
-	if (!(modnum = lis_register_strmod(&sdl_info, sdl_minfo.mi_idname))) {
-		sdl_minfo.mi_idnum = 0;
-		rare();
-		cmn_err(CE_NOTE, "sdl: couldn't register as module\n");
-		return;
-	}
-	sdl_minfo.mi_idnum = modnum;
-	return;
+	int err;
+	if ((err = register_strmod(&sdl_fmod)) < 0)
+		return (err);
+	return (0);
 }
 
-void
-sdl_terminate(void)
+STATIC int
+sdl_unregister_strmod(void)
 {
-	ensure(sdl_minfo.mi_idnum, return);
-	if ((sdl_minfo.mi_idnum = lis_unregister_strmod(&sdl_info)))
-		cmn_err(CE_WARN, "sdl: couldn't unregister as module!\n");
-	sdl_term_caches();
+	int err;
+	if ((err = unregister_strmod(&sdl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sdl_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sdl_sctpinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sdl_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sdl_sctpinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sdl_sctpinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sdl_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sdl_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sdl_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sdl_sctpterminate(void)
+{
+	int err;
+	if ((err = sdl_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sdl_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
-int
-init_module(void)
-{
-	sdl_init();
-	return (0);
-}
+module_init(sdl_sctpinit);
+module_exit(sdl_sctpterminate);
 
-void
-cleanup_module(void)
-{
-	sdl_terminate();
-	return;
-}
+#endif				/* LINUX */

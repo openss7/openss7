@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:44 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $";
 
 #include "compat.h"
 
@@ -67,29 +67,33 @@ static char const ident[] =
 
 #include "cd/cd.h"
 
-#define DAED_DESCRIP	"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
-#define DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:44 $"
-#define DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define DAED_DEVICES	"Supports OpenSS7 Channel Drivers."
-#define DAED_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DAED_LICENSE	"GPL"
-#define DAED_BANNER	DAED_DESCRIP	"\n" \
-			DAED_REVISION	"\n" \
-			DAED_COPYRIGHT	"\n" \
-			DAED_DEVICES	"\n" \
-			DAED_CONTACT	"\n"
+#define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
+#define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:31 $"
+#define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
+#define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define CD_DAED_LICENSE		"GPL"
+#define CD_DAED_BANNER		CD_DAED_DESCRIP		"\n" \
+				CD_DAED_COPYRIGHT	"\n" \
+				CD_DAED_REVISION	"\n" \
+				CD_DAED_DEVICE		"\n" \
+				CD_DAED_CONTACT		"\n"
+#define CD_DAED_SPLASH		CD_DAED_DEVICE		" - " \
+				CD_DAED_REVISION	"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(DAED_CONTACT);
-MODULE_DESCRIPTION(DAED_DESCRIP);
-MODULE_SUPPORTED_DEVICE(DAED_DEVICES);
-MODULE_LICENSE(DAED_LICENSE);
+MODULE_AUTHOR(CD_DAED_CONTACT);
+MODULE_DESCRIPTION(CD_DAED_DESCRIP);
+MODULE_SUPPORTED_DEVICE(CD_DAED_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(CD_DAED_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define DAED_MOD_ID	CONFIG_STREAMS_DAED_MODID
-#define DAED_MOD_NAME	CONFIG_STREAMS_DAED_NAME
-#endif
+#define CD_DAED_MOD_ID		CONFIG_STREAMS_CD_DAED_MODID
+#define CD_DAED_MOD_NAME	CONFIG_STREAMS_CD_DAED_NAME
+#endif				/* LFS */
 
 /*
  *  =======================================================================
@@ -99,9 +103,12 @@ MODULE_LICENSE(DAED_LICENSE);
  *  =======================================================================
  */
 
+#define MOD_ID		CD_DAED_MOD_ID
+#define MOD_NAME	CD_DAED_MOD_NAME
+
 STATIC struct module_info daed_winfo = {
-	mi_idnum:DAED_MOD_ID,		/* Module ID number */
-	mi_idname:DAED_MOD_NAME "-wr",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME "-wr",	/* Module name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -109,8 +116,8 @@ STATIC struct module_info daed_winfo = {
 };
 
 STATIC struct module_info daed_rinfo = {
-	mi_idnum:DAED_MOD_ID,		/* Module ID number */
-	mi_idname:DAED_MOD_NAME "-rd",	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME "-rd",	/* Module name */
 	mi_minpsz:(1),			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:(1),			/* Hi water mark */
@@ -134,10 +141,22 @@ STATIC struct qinit daed_winit = {
 	qi_minfo:&daed_winfo,		/* Information */
 };
 
-STATIC struct streamtab daed_info = {
+STATIC struct streamtab cd_daedinfo = {
 	st_rdinit:&daed_rinit,		/* Upper read queue */
 	st_wrinit:&daed_winit,		/* Upper write queue */
 };
+
+STATIC int
+daed_init_caches(void)
+{
+	return (0);
+}
+
+STATIC int
+daed_term_caches(void)
+{
+	return (0);
+}
 
 /*
  *  =========================================================================
@@ -163,9 +182,8 @@ daed_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct str *str;
-		/*
-		   test for multiple push 
-		 */
+		/* 
+		   test for multiple push */
 		for (str = daed_list; str; str = str->next) {
 			if (str->u.dev.cmajor == cmajor && str->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -196,57 +214,114 @@ daed_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
+#ifdef LINUX
 /*
- *  =======================================================================
- *
- *  LiS Module Initialization (For unregistered driver.)
- *
- *  =======================================================================
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
  */
-STATIC int daed_initialized = 0;
-STATIC void
-daed_init(void)
-{
-	unless(daed_initialized > 0, return);
-	cmn_err(CE_NOTE, DAED_BANNER);	/* console splash */
-	if ((daed_initialized = lis_register_strmod(&daed_info, DAED_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: couldn't register module", DAED_MOD_NAME);
-		return;
-	}
-	daed_initialized = 1;
-	return;
-}
-STATIC void
-daed_terminate(void)
-{
-	ensure(daed_initialized > 0, return);
-	if ((daed_initialized = lis_unregister_strmod(&daed_info)) < 0) {
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", DAED_MOD_NAME);
-		return;
-	}
-	daed_initialized = 0;
-	return;
-}
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the CD-DAED module. (0 for allocation.)");
 
 /*
- *  =======================================================================
- *
- *  Kernel Module Initialization
- *
- *  =======================================================================
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-int
-init_module(void)
+#ifdef LFS
+
+STATIC struct fmodsw daed_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &cd_daedinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+daed_register_strmod(void)
 {
-	daed_init();
-	if (daed_initialized < 0)
-		return daed_initialized;
+	int err;
+	if ((err = register_strmod(&daed_fmod)) < 0)
+		return (err);
 	return (0);
 }
 
-void
-cleanup_module(void)
+STATIC int
+daed_unregister_strmod(void)
 {
-	(void) ss7_unbufcall;
-	daed_terminate();
+	int err;
+	if ((err = unregister_strmod(&daed_fmod)) < 0)
+		return (err);
+	return (0);
 }
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+daed_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&cd_daedinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+daed_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&cd_daedinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+cd_daedinit(void)
+{
+	int err;
+#ifdef MODULE
+	cmn_err(CE_NOTE, CD_DAED_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, CD_DAED_SPLASH);	/* console splash */
+#endif
+	if ((err = daed_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = daed_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		daed_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+cd_daedterminate(void)
+{
+	int err;
+	if ((err = daed_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = daed_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	return;
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(cd_daedinit);
+module_exit(cd_daedterminate);
+
+#endif				/* LINUX */

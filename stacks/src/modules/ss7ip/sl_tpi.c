@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:10 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:10 $ by $Author: brian $
+ Last Modified $Date: 2004/08/27 07:31:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:10 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $"
 
-static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:10 $";
+static char const ident[] =
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -74,31 +75,31 @@ static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.2
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#define SS7IP_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SS7IP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SS7IP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SS7IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SS7IP_LICENSE	"GPL"
-#define SS7IP_BANNER	SS7IP_DESCRIP	"\n" \
-			SS7IP_COPYRIGHT	"\n" \
-			SS7IP_DEVICE	"\n" \
-			SS7IP_CONTACT
-#define SS7IP_SPLASH	SS7IP_DEVICE	" - " \
-			SS7IP_REVISION	"\n" \
+#define SL_TPI_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
+#define SL_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
+#define SL_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define SL_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define SL_TPI_LICENSE		"GPL"
+#define SL_TPI_BANNER		SL_TPI_DESCRIP		"\n" \
+				SL_TPI_COPYRIGHT	"\n" \
+				SL_TPI_DEVICE		"\n" \
+				SL_TPI_CONTACT		"\n"
+#define SL_TPI_SPLASH		SL_TPI_DEVICE		" - " \
+				SL_TPI_REVISION		"\n"
 
 #ifdef LINUX
-MODULE_AUTHOR(SS7IP_CONTACT);
-MODULE_DESCRIPTION(SS7IP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(SS7IP_DEVICE);
+MODULE_AUTHOR(SL_TPI_CONTACT);
+MODULE_DESCRIPTION(SL_TPI_DESCRIP);
+MODULE_SUPPORTED_DEVICE(SL_TPI_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(SS7IP_LICENSE);
-#endif
+MODULE_LICENSE(SL_TPI_LICENSE);
+#endif				/* MODULE_LICENSE */
 #endif				/* LINUX */
 
 #ifdef LFS
-#define SL_TPI_MOD_ID CONFIG_STREAMS_SL_TPI_MODID
-#define SL_TPI_MOD_NAME CONFIG_STREAMS_SL_TPI_NAME
-#endif
+#define SL_TPI_MOD_ID		CONFIG_STREAMS_SL_TPI_MODID
+#define SL_TPI_MOD_NAME		CONFIG_STREAMS_SL_TPI_NAME
+#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -107,9 +108,18 @@ MODULE_LICENSE(SS7IP_LICENSE);
  *
  *  =========================================================================
  */
+
+#define MOD_ID		SL_TPI_MOD_ID
+#define MOD_NAME	SL_TPI_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	SL_TPI_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	SL_TPI_SPLASH
+#endif				/* MODULE */
+
 STATIC struct module_info sl_minfo = {
 	mi_idnum:SL_TPI_MOD_ID,		/* Module ID number */
-	mi_idname:SL_TPI_MOD_NAME,		/* Module name */
+	mi_idname:SL_TPI_MOD_NAME,	/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1 << 15,		/* Hi water mark */
@@ -138,7 +148,7 @@ STATIC struct qinit sl_winit = {
 	qi_minfo:&sl_minfo,		/* Information */
 };
 
-STATIC struct streamtab sl_info = {
+STATIC struct streamtab sl_tpiinfo = {
 	st_rdinit:&sl_rinit,		/* Upper read queue */
 	st_wrinit:&sl_winit,		/* Upper write queue */
 };
@@ -440,9 +450,8 @@ sl_fast_freemsg(mblk_t *mp)
 			}
 			spin_unlock(&sl_bufpool_lock);
 		} else if (bp->b_datap->db_ref > 1)
-			/*
-			   other references, use normal free mechanism 
-			 */
+			/* 
+			   other references, use normal free mechanism */
 			ctrace(freeb(bp));
 	}
 }
@@ -467,10 +476,11 @@ sl_fast_dupb(mblk_t *mp)
  *  FAST INIT and TERM
  *  -------------------------------------------------------------------------
  */
-STATIC void
+STATIC int
 sl_bufpool_init(void)
 {
 	spin_lock_init(&sl_bufpool_lock);
+	return (0);
 }
 STATIC void
 sl_bufpool_alloc(int n)
@@ -498,7 +508,7 @@ sl_bufpool_dealloc(int n)
 	}
 	spin_unlock_irqrestore(&sl_bufpool_lock, flags);
 }
-STATIC void
+STATIC int
 sl_bufpool_term(void)
 {
 	psw_t flags;
@@ -512,6 +522,7 @@ sl_bufpool_term(void)
 		sl_bufpool = bp_next;
 	}
 	spin_unlock_irqrestore(&sl_bufpool_lock, flags);
+	return (0);
 }
 
 /*
@@ -1621,9 +1632,8 @@ t_bind_req(queue_t *q)
 	ulong conind = ((sl->t.serv_type == T_COTS || sl->t.serv_type == T_COTS_ORD)
 			&& (sl->sdl.ifmode == SDL_MODE_SERVER)) ? 1 : 0;
 #else
-	/*
-	   always listen on COTS 
-	 */
+	/* 
+	   always listen on COTS */
 	ulong conind = (sl->t.serv_type == T_COTS || sl->t.serv_type == T_COTS_ORD) ? 1 : 0;
 #endif
 	mblk_t *mp;
@@ -2147,7 +2157,8 @@ sl_timer_start(queue_t *q, const uint t)
 			sl->refcnt++;
 			break;
 		case t9:
-			// printd(("%s: %p: starting t9 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl, (ulong)
+			// printd(("%s: %p: starting t9 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			// (ulong)
 			// (10), jiffies));
 			sl->sdl.timer.t9 = timeout(&sl_t9_timeout, (caddr_t) sl, 1);
 			sl->refcnt++;
@@ -2457,9 +2468,8 @@ sl_txc_bsnr_and_bibr(queue_t *q)
 		sl->sl.statem.tx.N.fib = sl->sl.statem.tx.R.bib;
 		sl->sl.statem.Z = (sl->sl.statem.tx.R.bsn + 1) & sl->sl.statem.sn_mask;
 		sl->sl.statem.z_ptr = NULL;
-		/*
-		   FIXME: handle error return 
-		 */
+		/* 
+		   FIXME: handle error return */
 		sl_lsc_rtb_cleared(q);
 		sl->sl.statem.clear_rtb = 0;
 		sl->sl.statem.rtb_full = 0;
@@ -2512,9 +2522,8 @@ STATIC INLINE void
 sl_txc_sib_received(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
-	/*
-	   FIXME: consider these variations for all 
-	 */
+	/* 
+	   FIXME: consider these variations for all */
 	if (sl->option.pvar == SS7_PVAR_ANSI_92 && sl->sl.statem.lssu_available)
 		if (sl->sl.statem.tx.sio != LSSU_SIB)
 			return;
@@ -2535,10 +2544,9 @@ sl_txc_clear_rtb(queue_t *q)
 	sl->sl.statem.Ct = 0;
 	sl->sl.statem.clear_rtb = 1;
 	sl->sl.statem.rtb_full = 0;	/* added */
-	/*
+	/* 
 	   FIXME: should probably follow more of the ITUT flush_buffers stuff like reseting Z and
-	   FSNF, FSNL, FSNT. 
-	 */
+	   FSNF, FSNL, FSNT. */
 	sl_check_congestion(q);
 }
 
@@ -2564,9 +2572,8 @@ sl_txc_flush_buffers(queue_t *q)
 	sl->sl.statem.Cm = 0;
 	sl->sl.statem.Z = 0;
 	sl->sl.statem.z_ptr = NULL;
-	/*
-	   Z =0 error in ITUT 93 and ANSI 
-	 */
+	/* 
+	   Z =0 error in ITUT 93 and ANSI */
 	sl->sl.statem.Z = sl->sl.statem.tx.F.fsn =
 	    (sl->sl.statem.tx.R.bsn + 1) & sl->sl.statem.sn_mask;
 	sl->sl.statem.tx.L.fsn = sl->sl.statem.rx.R.bsn;
@@ -2589,7 +2596,7 @@ sl_txc_retrieval_request_and_fsnc(queue_t *q, sl_ulong fsnc)
 	mblk_t *mp;
 	int err;
 	sl->sl.statem.tx.C.fsn = fsnc & (sl->sl.statem.sn_mask);
-	/*
+	/* 
 	 *  FIXME: Q.704/5.7.2 states:
 	 *
 	 *  5.7.2   If a changeover order or acknowledgement containing an
@@ -2863,7 +2870,7 @@ sl_rc_start(queue_t *q)
 		sl_daedr_start(q);
 		sl->sl.statem.rc_state = SL_STATE_IN_SERVICE;
 		return;
-		/*
+		/* 
 		 *   Note 1 - Although rtr and abnormal_fibr are only applicable to the Basic procedure (and
 		 *   not PCR), these state machine variables are never examined by PCR routines, so PCR and
 		 *   basic can share the same start procedures.
@@ -3014,9 +3021,8 @@ sl_lsc_sio(queue_t *q)
 		sl_poc_stop(q);	/* ok if ANSI */
 		sl_txc_send_sios(q);
 		sl->sl.statem.emergency = 0;
-		/*
-		   FIXME: reinspect 
-		 */
+		/* 
+		   FIXME: reinspect */
 		sl->sl.statem.local_processor_outage = 0;
 		sl->sl.statem.remote_processor_outage = 0;	/* ok if ITUT */
 		sl->sl.statem.lsc_state = SL_STATE_OUT_OF_SERVICE;
@@ -3170,7 +3176,7 @@ sl_lsc_fisu_msu_received(queue_t *q)
 			sl->sl.statem.remote_processor_outage = 0;
 			return sl_remote_processor_recovered_ind(q);
 		default:
-			/*
+			/* 
 			 *  A deviation from the SDLs has been placed here to limit the number of remote
 			 *  processor recovered indications which are delivered to L3.  One indication is
 			 *  sufficient.
@@ -3290,7 +3296,7 @@ sl_lsc_sipo(queue_t *q)
 			sl->sl.statem.remote_processor_outage = 1;
 			return sl_remote_processor_outage_ind(q);
 		default:
-			/*
+			/* 
 			 *  A deviation from the SDLs has been placed here to limit the number of remote
 			 *  processor outage indications which are delivered to L3.  One indication is
 			 *  sufficient.
@@ -3565,7 +3571,7 @@ sl_rc_signal_unit(queue_t *q, mblk_t *mp)
 		ctrace(freemsg(mp));
 		return;
 	}
-	/*
+	/* 
 	 *  Note: the driver must check that the length of the frame is within appropriate bounds as specified by
 	 *  the DAEDR in Q.703.  If the length of the frame is incorrect, it should indicate daedr_error- _frame
 	 *  rather than daedr_received_frame.
@@ -4480,9 +4486,8 @@ sl_daedr_su_in_error(queue_t *q)
 		sl_suerm_su_in_error(q);
 		sl_aerm_su_in_error(q);
 	} else if (sl->sdt.statem.daedr_state != SDT_STATE_IDLE) {
-		/*
-		   cancel compression 
-		 */
+		/* 
+		   cancel compression */
 		if (sl->sdt.rx_cmp) {
 			printd(("SU in error\n"));
 			sl_fast_freemsg(xchg(&sl->sdt.rx_cmp, NULL));
@@ -4596,9 +4601,8 @@ sl_daedt_transmission_request(queue_t *q)
 				cp->b_rptr = cp->b_datap->db_base;
 				bcopy(mp->b_rptr, cp->b_rptr, len);
 				cp->b_wptr = cp->b_rptr + len;
-				/*
-				   always correct length indicator 
-				 */
+				/* 
+				   always correct length indicator */
 				if (sl->option.popt && SS7_POPT_XSN) {
 					cp->b_rptr[4] &= 0x00;
 					cp->b_rptr[5] &= 0xfe;
@@ -4647,31 +4651,26 @@ sl_rx_wakeup(queue_t *q)
 		case SL_STATE_INITIAL_ALIGNMENT:
 		case SL_STATE_ALIGNED_READY:
 		case SL_STATE_ALIGNED_NOT_READY:
-			/*
-			   we shouldn't have receive buffers around in these states 
-			 */
+			/* 
+			   we shouldn't have receive buffers around in these states */
 			swerr();
 			bufq_purge(&sl->sl.rb);
 			return (-EFAULT);
 		case SL_STATE_OUT_OF_SERVICE:
-			/*
-			   we keep receive buffers hanging around in these states 
-			 */
+			/* 
+			   we keep receive buffers hanging around in these states */
 			return (0);
 		case SL_STATE_PROCESSOR_OUTAGE:
 			if (sl->sl.statem.local_processor_outage) {
-				/*
-				   we can't deliver 
-				 */
+				/* 
+				   we can't deliver */
 				return (0);
 			}
-			/*
-			   fall thru 
-			 */
+			/* 
+			   fall thru */
 		case SL_STATE_IN_SERVICE:
-			/*
-			   when in service we deliver as many buffers as we can 
-			 */
+			/* 
+			   when in service we deliver as many buffers as we can */
 			do {
 				mblk_t *mp;
 				mp = bufq_dequeue(&sl->sl.rb);
@@ -4701,10 +4700,10 @@ sl_tx_wakeup(queue_t *q)
 		int size;
 		for (;;) {
 			if ((tdiff = jiffies - sl->sdl.timestamp) < 0) {
-				/*
-				   throttle back for a t9 
-				 */
-				// printd(("%s: %p: %s throttling back a tick\n", SL_TPI_MOD_NAME, sl,
+				/* 
+				   throttle back for a t9 */
+				// printd(("%s: %p: %s throttling back a tick\n", SL_TPI_MOD_NAME,
+				// sl,
 				// __FUNCTION__));
 				if (!sl->sdl.timer.t9)
 					sl_timer_start(q, t9);
@@ -4972,9 +4971,8 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 					sl->state = LMI_ATTACH_PENDING;
 					if (mlen - sizeof(*p) >= sl->t.add_size) {
 						bcopy(p->lmi_ppa, &sl->t.loc, sl->t.add_size);
-						/*
-						   start bind in motion 
-						 */
+						/* 
+						   start bind in motion */
 						return t_bind_req(q);
 					} else {
 						ptrace(("%s: PROTO: bad ppa (too short)\n",
@@ -4993,9 +4991,8 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 				return lmi_error_ack(q, LMI_ATTACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
 			}
 		} else {
-			/*
-			   wait for stream to become usable 
-			 */
+			/* 
+			   wait for stream to become usable */
 			return (-EAGAIN);
 		}
 	}
@@ -5022,9 +5019,8 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 				if (sl->state == LMI_DISABLED) {
 					sl->state = LMI_DETACH_PENDING;
 					bzero(&sl->t.loc, sl->t.add_size);
-					/*
-					   start unbind in motion 
-					 */
+					/* 
+					   start unbind in motion */
 					return t_unbind_req(q);
 				} else {
 					ptrace(("%s: PROTO: out of state\n", SL_TPI_MOD_NAME));
@@ -5037,9 +5033,8 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 				return lmi_error_ack(q, LMI_ATTACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
 			}
 		} else {
-			/*
-			   wait for stream to become usable 
-			 */
+			/* 
+			   wait for stream to become usable */
 			return (-EAGAIN);
 		}
 	}
@@ -5081,16 +5076,14 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 					} else {
 						assure(sl->t.state == TS_IDLE);
 						if (mlen == sizeof(*p))
-							/*
-							   wait for T_CONN_IND 
-							 */
+							/* 
+							   wait for T_CONN_IND */
 							return (QR_DONE);
 						if (mlen - sizeof(*p) < sl->t.add_size)
 							goto emsgsize;
 						bcopy(p->lmi_rem, &sl->t.rem, sl->t.add_size);
-						/*
-						   start connection in motion 
-						 */
+						/* 
+						   start connection in motion */
 						return t_conn_req(q);
 					}
 				}
@@ -5099,9 +5092,8 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				return lmi_error_ack(q, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
 			}
 		} else {
-			/*
-			   wait for stream to become usable 
-			 */
+			/* 
+			   wait for stream to become usable */
 			return (-EAGAIN);
 		}
 	}
@@ -5129,9 +5121,8 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 				sl->state = LMI_DISABLE_PENDING;
 				if (sl->style == LMI_STYLE1 || sl->t.serv_type == T_CLTS)
 					return lmi_disable_con(q);
-				/*
-				   start disconnect in motion 
-				 */
+				/* 
+				   start disconnect in motion */
 				if (sl->t.serv_type == T_COTS_ORD)
 					return t_ordrel_req(q);
 				return t_discon_req(q, 0);
@@ -5140,9 +5131,8 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 				return lmi_error_ack(q, LMI_DISABLE_REQ, LMI_OUTSTATE, EPROTO);
 			}
 		} else {
-			/*
-			   wait for stream to become available 
-			 */
+			/* 
+			   wait for stream to become available */
 			return (-EAGAIN);
 		}
 	}
@@ -5828,9 +5818,8 @@ t_conn_ind(queue_t *q, mblk_t *mp)
 			bcopy((char *) p + p->SRC_offset, &sl->t.rem, p->SRC_length);
 		return t_conn_res(q, p->SEQ_number);
 	}
-	/*
-	   refuse connection 
-	 */
+	/* 
+	   refuse connection */
 	return t_discon_req(q, p->SEQ_number);
 }
 
@@ -5898,7 +5887,7 @@ t_discon_ind(queue_t *q, mblk_t *mp)
 STATIC int
 t_data_ind_slow(queue_t *q, mblk_t *mp, int more)
 {
-	/*
+	/* 
 	 *  Normally we receive data unfragmented and in a single M_DATA
 	 *  block.  This slower routine handles the circumstances where we
 	 *  receive fragmented data or data that is chained together in
@@ -5909,17 +5898,15 @@ t_data_ind_slow(queue_t *q, mblk_t *mp, int more)
 	struct T_data_ind *p = (typeof(p)) mp->b_rptr;
 	seldom();
 	if (dp->b_cont) {
-		/*
+		/* 
 		 *  We have a chaned M_DATA blocks: pull them up.
 		 */
 		if (!pullupmsg(dp, -1)) {
-			/*
-			   normally only fail because of no buffer 
-			 */
+			/* 
+			   normally only fail because of no buffer */
 			if (!(newp = msgpullup(dp, -1))) {
-				/*
-				   normally only fail because of no buffer 
-				 */
+				/* 
+				   normally only fail because of no buffer */
 				if (!sl->rbid) {
 					sl->rbid =
 					    bufcall(xmsgsize(dp), BPRI_MED, &sl_bufsrv, (long) q);
@@ -5931,7 +5918,7 @@ t_data_ind_slow(queue_t *q, mblk_t *mp, int more)
 		}
 	}
 	if (more) {
-		/*
+		/* 
 		 *  We have a partial delivery.  Chain normal message
 		 *  together.  We might have a problem with messages split
 		 *  over multiple streams?  Treat normal and expedited
@@ -5969,9 +5956,8 @@ t_data_ind(queue_t *q, mblk_t *mp)
 			return t_data_ind_slow(q, mp, p->MORE_flag);
 		}
 	}
-	/*
-	   ignore data in other states 
-	 */
+	/* 
+	   ignore data in other states */
 	return (QR_DONE);
 }
 
@@ -5982,7 +5968,7 @@ t_data_ind(queue_t *q, mblk_t *mp)
 STATIC int
 t_exdata_ind_slow(queue_t *q, mblk_t *mp, int more)
 {
-	/*
+	/* 
 	 *  Normally we receive data unfragmented and in a single M_DATA
 	 *  block.  This slower routine handles the circumstances where we
 	 *  receive fragmented data or data that is chained together in
@@ -5993,17 +5979,15 @@ t_exdata_ind_slow(queue_t *q, mblk_t *mp, int more)
 	struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
 	seldom();
 	if (dp->b_cont) {
-		/*
+		/* 
 		 *  We have a chaned M_DATA blocks: pull them up.
 		 */
 		if (!pullupmsg(dp, -1)) {
-			/*
-			   normally only fail because of no buffer 
-			 */
+			/* 
+			   normally only fail because of no buffer */
 			if (!(newp = msgpullup(dp, -1))) {
-				/*
-				   normally only fail because of no buffer 
-				 */
+				/* 
+				   normally only fail because of no buffer */
 				if (!sl->rbid) {
 					sl->rbid =
 					    bufcall(xmsgsize(dp), BPRI_MED, &sl_bufsrv, (long) q);
@@ -6015,7 +5999,7 @@ t_exdata_ind_slow(queue_t *q, mblk_t *mp, int more)
 		}
 	}
 	if (more) {
-		/*
+		/* 
 		 *  We have a partial delivery.  Chain normal message
 		 *  together.  We might have a problem with messages split
 		 *  over multiple streams?  Treat normal and expedited
@@ -6052,9 +6036,8 @@ t_exdata_ind(queue_t *q, mblk_t *mp)
 		} else
 			return t_exdata_ind_slow(q, mp, p->MORE_flag);
 	}
-	/*
-	   ignore data in other states 
-	 */
+	/* 
+	   ignore data in other states */
 	return (QR_DONE);
 }
 
@@ -6089,9 +6072,8 @@ t_info_ack(queue_t *q, mblk_t *mp)
 		case T_COTS:
 		case T_COTS_ORD:
 			if (sl->t.state == TS_DATA_XFER) {
-				/*
-				   no attachment required 
-				 */
+				/* 
+				   no attachment required */
 				sl->state = LMI_DISABLED;
 				sl->style = LMI_STYLE1;
 				return (QR_DONE);
@@ -6104,9 +6086,8 @@ t_info_ack(queue_t *q, mblk_t *mp)
 			break;
 		case T_CLTS:
 			if (sl->t.state == TS_IDLE) {
-				/*
-				   no attachment required 
-				 */
+				/* 
+				   no attachment required */
 				sl->state = LMI_DISABLED;
 				sl->style = LMI_STYLE1;
 				return (QR_DONE);
@@ -6205,9 +6186,8 @@ t_error_ack(queue_t *q, mblk_t *mp)
 							     p->UNIX_error);
 				}
 			}
-			/*
-			   try refusing the connection 
-			 */
+			/* 
+			   try refusing the connection */
 			return t_discon_req(q, sl->t.sequence);
 		case TS_WACK_DREQ6:
 		case TS_WACK_DREQ7:
@@ -6263,9 +6243,8 @@ t_ok_ack(queue_t *q, mblk_t *mp)
 			assure(p->CORRECT_prim == T_CONN_REQ);
 			if (sl->state != LMI_UNUSABLE)
 				sl->t.state = TS_WCON_CREQ;
-			/*
-			   wait for T_CONN_CON 
-			 */
+			/* 
+			   wait for T_CONN_CON */
 			return (QR_DONE);
 		case TS_WACK_CRES:
 			assure(p->CORRECT_prim == T_CONN_RES);
@@ -6324,9 +6303,8 @@ t_unitdata_ind(queue_t *q, mblk_t *mp)
 			mblk_t *dp = mp->b_cont;
 #if 0
 			struct T_unitdata_ind *p = (typeof(p)) mp->b_rptr;
-			/*
-			   check source of packet 
-			 */
+			/* 
+			   check source of packet */
 			if (p->SRC_length
 			    && !memcmp(mp->b_rptr + p->SRC_offset, &sl->t.rem, p->SRC_length)) {
 #endif
@@ -6335,19 +6313,17 @@ t_unitdata_ind(queue_t *q, mblk_t *mp)
 #if 0
 			}
 #endif
-			/*
-			   ignore packets not from remote address 
-			 */
+			/* 
+			   ignore packets not from remote address */
 		}
-		ptrace(("%s: %p: lsc_state = %ld, rc_state = %ld, daedr_state = %ld\n", SL_TPI_MOD_NAME,
-			sl, sl->sl.statem.lsc_state, sl->sl.statem.rc_state,
+		ptrace(("%s: %p: lsc_state = %ld, rc_state = %ld, daedr_state = %ld\n",
+			SL_TPI_MOD_NAME, sl, sl->sl.statem.lsc_state, sl->sl.statem.rc_state,
 			sl->sdt.statem.daedr_state));
 		return (QR_DONE);
 	}
 	printd(("%s: %p: T_UNITDATA received while not LMI_ENABLED\n", SL_TPI_MOD_NAME, sl));
-	/*
-	   ignore data in other states 
-	 */
+	/* 
+	   ignore data in other states */
 	return (QR_DONE);
 }
 
@@ -6372,9 +6348,8 @@ t_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   ignore 
-	 */
+	/* 
+	   ignore */
 	return (QR_DONE);
 }
 
@@ -6439,9 +6414,8 @@ t_optdata_ind(queue_t *q, mblk_t *mp)
 				return t_data_ind_slow(q, mp, (p->DATA_flag & T_ODF_MORE));
 		}
 	}
-	/*
-	   ignore data in other states 
-	 */
+	/* 
+	   ignore data in other states */
 	return (QR_DONE);
 }
 
@@ -6454,9 +6428,8 @@ t_addr_ack(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
-	/*
-	   ignore 
-	 */
+	/* 
+	   ignore */
 	return (QR_DONE);
 }
 
@@ -7076,9 +7049,8 @@ sdl_commit_config(sl_t * sl, sdl_config_t * arg)
 {
 	long tdiff;
 	sl->sdl.config = *arg;
-	/*
-	   reshape traffic 
-	 */
+	/* 
+	   reshape traffic */
 	if ((tdiff = sl->sdl.timestamp - jiffies) > 0)
 		sl->sdl.bytecount += sl->sdl.tickbytes * tdiff;
 	else
@@ -7532,8 +7504,8 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	case SDL_IOC_MAGIC:
 	{
 		if (count < size || sl->state == LMI_UNATTACHED) {
-			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %d\n", SL_TPI_MOD_NAME,
-				count, size, sl->state));
+			ptrace(("%s: ERROR: ioctl count = %d, size = %d, state = %d\n",
+				SL_TPI_MOD_NAME, count, size, sl->state));
 			ret = -EINVAL;
 			break;
 		}
@@ -7626,9 +7598,8 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sl_t *sl = PRIV(q);
 	ulong oldstate = sl->state;
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_REQ) {
 		printd(("%s: %p: -> SL_PDU_REQ\n", SL_TPI_MOD_NAME, sl));
 		if ((rtn = sl_pdu_req(q, mp)) < 0)
@@ -7771,9 +7742,8 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sl_t *sl = PRIV(q);
 	ulong oldstate = sl->t.state;
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == T_UNITDATA_IND) {
 		// printd(("%s: %p: -> T_UNITDATA_IND [%d]\n", SL_TPI_MOD_NAME, sl,
 		// msgdsize(mp->b_cont)));
@@ -7978,9 +7948,8 @@ sl_r_flush(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sl_r_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_r_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -8000,9 +7969,8 @@ sl_r_prim(queue_t *q, mblk_t *mp)
 STATIC INLINE int
 sl_w_prim(queue_t *q, mblk_t *mp)
 {
-	/*
-	   Fast Path 
-	 */
+	/* 
+	   Fast Path */
 	if (mp->b_datap->db_type == M_DATA)
 		return sl_w_data(q, mp);
 	switch (mp->b_datap->db_type) {
@@ -8035,9 +8003,8 @@ sl_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), int (*wakeup)
 	}
 	if (sl_trylockq(q)) {
 		do {
-			/*
-			   Fast Path 
-			 */
+			/* 
+			   Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				ctrace(freemsg(mp));
 				break;
@@ -8105,9 +8072,8 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 	if (sl_trylockq(q)) {
 		mblk_t *mp;
 		while ((mp = getq(q))) {
-			/*
-			   Fast Path 
-			 */
+			/* 
+			   Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				ctrace(freemsg(mp));
 				continue;
@@ -8154,11 +8120,12 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 			case -ENOMEM:	/* proc must have scheduled bufcall */
 			case -EAGAIN:	/* proc must re-enable on some event */
 				if (mp->b_datap->db_type < QPCTL) {
-					ptrace(("%s: ERROR: (q stalled) %d\n", SL_TPI_MOD_NAME, rtn));
+					ptrace(("%s: ERROR: (q stalled) %d\n", SL_TPI_MOD_NAME,
+						rtn));
 					putbq(q, mp);
 					break;
 				}
-				/*
+				/* 
 				 *  Be careful not to put a priority
 				 *  message back on the queue.
 				 */
@@ -8223,16 +8190,17 @@ sl_init_caches(void)
 		printd(("%s: initialized module private structure cace\n", SL_TPI_MOD_NAME));
 	return (0);
 }
-STATIC void
+STATIC int
 sl_term_caches(void)
 {
 	if (sl_priv_cachep) {
-		if (kmem_cache_destroy(sl_priv_cachep))
+		if (kmem_cache_destroy(sl_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sl_priv_cachep", __FUNCTION__);
-		else
+			return (-EBUSY);
+		} else
 			printd(("%s: destroyed sl_priv_cachep\n", SL_TPI_MOD_NAME));
 	}
-	return;
+	return (0);
 }
 STATIC sl_t *
 sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
@@ -8249,36 +8217,33 @@ sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
 		sl->wq = WR(q);
 		sl->wq->q_ptr = sl;
 		sl->refcnt++;
-		spin_lock_init(&sl->qlock); /* "sl-queue-lock" */
+		spin_lock_init(&sl->qlock);	/* "sl-queue-lock" */
 		sl->rwait = NULL;
 		sl->wwait = NULL;
 		sl->version = 1;
 		sl->state = LMI_UNUSABLE;
 		sl->style = LMI_STYLE1;
-		spin_lock_init(&sl->lock); /* "sl-priv-lock" */
+		spin_lock_init(&sl->lock);	/* "sl-priv-lock" */
 		if ((sl->next = *slp))
 			sl->next->prev = &sl->next;
 		sl->prev = slp;
 		*slp = sl;
 		sl->refcnt++;
 		printd(("%s: linked module private structure\n", SL_TPI_MOD_NAME));
-		/*
-		   TPI configuration defaults 
-		 */
+		/* 
+		   TPI configuration defaults */
 		sl->t.state = TS_NOSTATES;
 		sl->t.serv_type = T_CLTS;
 		sl->t.sequence = 0;
 		sl->t.pdu_size = 272 + 1 + 3;
 		sl->t.opt_size = -1UL;
 		sl->t.add_size = sizeof(struct sockaddr);
-		/*
-		   LMI configuration defaults 
-		 */
+		/* 
+		   LMI configuration defaults */
 		sl->option.pvar = SS7_PVAR_ITUT_88;
 		sl->option.popt = 0;
-		/*
-		   SDL configuration defaults 
-		 */
+		/* 
+		   SDL configuration defaults */
 		sl->sdl.config.ifflags = 0;
 		sl->sdl.config.iftype = SDL_TYPE_PACKET;
 		sl->sdl.config.ifrate = 1544000;
@@ -8293,12 +8258,10 @@ sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
 		sl->sdl.timestamp = jiffies;
 		sl->sdl.tickbytes = sl->sdl.config.ifrate / HZ / 8;
 		sl->sdl.bytecount = 0;
-		/*
-		   rest zero 
-		 */
-		/*
-		   SDT configuration defaults 
-		 */
+		/* 
+		   rest zero */
+		/* 
+		   SDT configuration defaults */
 		bufq_init(&sl->sdt.tb);
 		sl_bufpool_alloc(2);
 		sl->sdt.config.Tin = 4;
@@ -8313,9 +8276,8 @@ sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
 		sl->sdt.config.m = 272;
 		sl->sdt.config.b = 8;
 		sl->sdt.config.f = SDT_FLAGS_ONE;
-		/*
-		   SL configuration defaults 
-		 */
+		/* 
+		   SL configuration defaults */
 		bufq_init(&sl->sl.rb);
 		bufq_init(&sl->sl.tb);
 		bufq_init(&sl->sl.rtb);
@@ -8346,7 +8308,8 @@ sl_alloc_priv(queue_t *q, sl_t ** slp, ushort cmajor, ushort cminor)
 		sl->sl.config.M = 5;
 		printd(("%s: setting module private structure defaults\n", SL_TPI_MOD_NAME));
 	} else
-		ptrace(("%s: ERROR: Could not allocate module private structure\n", SL_TPI_MOD_NAME));
+		ptrace(("%s: ERROR: Could not allocate module private structure\n",
+			SL_TPI_MOD_NAME));
 	return (sl);
 }
 STATIC void
@@ -8425,9 +8388,8 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			MOD_DEC_USE_COUNT;
 			return ENOMEM;
 		}
-		/*
-		   generate immediate information request 
-		 */
+		/* 
+		   generate immediate information request */
 		t_info_req(q);
 		return (0);
 	}
@@ -8447,60 +8409,122 @@ sl_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LiS Module Initialization (For unregistered driver.)
+ *  Registration and initialization
  *
  *  =========================================================================
  */
-STATIC int sl_initialized = 0;
-STATIC void
-sl_init(void)
-{
-	unless(sl_initialized, return);
-	cmn_err(CE_NOTE, SS7IP_BANNER);	/* console splash */
-	if ((sl_initialized = sl_init_caches()))
-		return;
-	sl_bufpool_init();
-	if (!(sl_initialized = lis_register_strmod(&sl_info, SL_TPI_MOD_NAME))) {
-		sl_bufpool_term();
-		sl_term_caches();
-		cmn_err(CE_WARN, "%s: couldn't register module", SL_TPI_MOD_NAME);
-		return;
-	}
-	sl_initialized = 1;
-	return;
-}
-STATIC void
-sl_terminate(void)
+#ifdef LINUX
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the SL-TPI module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw sl_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &sl_tpiinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int
+sl_register_strmod(void)
 {
 	int err;
-	ensure(sl_initialized, return);
-	if ((err = lis_unregister_strmod(&sl_info)))
-		cmn_err(CE_PANIC, "%s: couldn't unregister module", SL_TPI_MOD_NAME);
-	sl_initialized = 0;
-	sl_bufpool_term();
-	sl_term_caches();
+	if ((err = register_strmod(&sl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC int
+sl_unregister_strmod(void)
+{
+	int err;
+	if ((err = unregister_strmod(&sl_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+sl_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&sl_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+sl_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&sl_tpiinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+sl_tpiinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = sl_bufpool_init())) {
+		cmn_err(CE_WARN, "%s: could not init bufpool, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = sl_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		sl_bufpool_term();
+		return (err);
+	}
+	if ((err = sl_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		sl_term_caches();
+		sl_bufpool_term();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+sl_tpiterminate(void)
+{
+	int err;
+	if ((err = sl_bufpool_term()))
+		cmn_err(CE_WARN, "%s: could not terminate bufpool", MOD_NAME);
+	if ((err = sl_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = sl_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
 }
 
 /*
- *  =========================================================================
- *
- *  Kernel Module Initialization
- *
- *  =========================================================================
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
  */
-int
-init_module(void)
-{
-	sl_init();
-	if (sl_initialized < 0)
-		return sl_initialized;
-	return (0);
-}
+module_init(sl_tpiinit);
+module_exit(sl_tpiterminate);
 
-void
-cleanup_module(void)
-{
-	sl_terminate();
-	return;
-}
+#endif				/* LINUX */
