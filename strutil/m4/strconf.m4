@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.13 2005/02/04 23:26:52 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.15 2005/02/15 14:18:25 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/04 23:26:52 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/15 14:18:25 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -170,8 +170,12 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     # config.status idea of absolute is not absolute, might be an autoconf bug
     ac_abs_srcdir=`( cd $ac_srcdir ; /bin/pwd )`
     ac_abs_builddir=`( cd $ac_builddir ; /bin/pwd )`
-    strconf_list="`find $ac_abs_srcdir $ac_abs_builddir -follow -type f -name \"$STRCONF_STEM\" | sort | uniq`"
+    strconf_list="`find $ac_abs_srcdir/ $ac_abs_builddir/ -type f -name \"$STRCONF_STEM\" | sort | uniq`"
     for strconf_tmp in $strconf_list ; do
+        case $strconf_tmp in
+            ("$ac_abs_builddir"*/"$PACKAGE_TARNAME-$PACKAGE_VERSION-$PACKAGE_RELEASE"/*) continue ;;
+            ("$ac_abs_builddir"*/"$PACKAGE_TARNAME-bin-$PACKAGE_VERSION-$PACKAGE_RELEASE"/*) continue ;;
+        esac
         if test -r "$strconf_tmp" ; then
             strconf_configs="${strconf_configs}${strconf_configs:+ }$strconf_tmp"
         fi
@@ -222,6 +226,9 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [dnl
     AC_CONFIG_COMMANDS([strconf],
         [_STRCONF_OUTPUT_CONFIG_COMMANDS],
         [ac_aux_dir="$ac_aux_dir" \
+        PACKAGE_TARNAME="$PACKAGE_TARNAME" \
+        PACKAGE_VERSION="$PACKAGE_VERSION" \
+        PACKAGE_RELEASE="$PACKAGE_RELEASE" \
         STRCONF="$STRCONF" \
         STRCONF_STEM="$STRCONF_STEM" \
         STRCONF_SCRIPT="$STRCONF_SCRIPT" \

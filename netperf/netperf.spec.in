@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/02/07 22:23:08 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2005/02/15 14:15:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 22:23:08 $ by $Author: brian $
+# Last Modified $Date: 2005/02/15 14:15:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -203,6 +203,7 @@ other architectures as well.
 %prep
 # ---------------------------------------------------------------------------
 
+[ -L %{name} ] && rm -f %{name}
 ln -sf %{name}-%{version}-%{release} %{name}
 %setup -q -n %{name}-%{version}-%{release}
 
@@ -372,6 +373,9 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.8  2005/02/15 14:15:21  brian
+# - Remove link before linking.
+#
 # Revision 1.1.2.7  2005/02/07 22:23:08  brian
 # - Updated changelog.
 #

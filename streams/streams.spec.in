@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/02/13 12:16:46 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/02/15 14:15:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/13 12:16:46 $ by $Author: brian $
+# Last Modified $Date: 2005/02/15 14:15:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -185,6 +185,7 @@ for other architectures as well.
 %prep
 # ---------------------------------------------------------------------------
 
+[ -L %{name} ] && rm -f %{name}
 ln -sf %{name}-%{version}-%{release} %{name}
 %setup -q -n %{name}-%{version}-%{release}
 
@@ -961,15 +962,18 @@ fi
 %{_bindir}/*
 %{_sbindir}/*
 %{_libexecdir}/*test*
-%{_sysconfdir}/*
+%config %{_sysconfdir}/*
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.71  2005/02/13 12:16:46  brian
-# - Added init scrip initialization and teardown.
+# Revision 0.9.2.72  2005/02/15 14:15:30  brian
+# - Remove link before linking.
+#
+# Revision 0.9.2.40  2005/02/15 14:15:30  brian
+# - Remove link before linking.
 #
 # Revision 0.9.2.39  2005/02/13 12:16:46  brian
 # - Added init scrip initialization and teardown.
