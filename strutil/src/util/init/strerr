@@ -26,8 +26,16 @@ LOGDEVICE="/dev/streams/log"
 
 # Source the config file
 
-if [ -f /etc/sysconfig/strerr ] ; then
-    . /etc/sysconfig/strerr
+if [ -d /etc/sysconfig ] ; then
+    if [ -f /etc/sysconfig/strerr ] ; then
+	# Redhat configuration file
+	. /etc/sysconfig/strerr
+    fi
+else
+    if [ -f /etc/streams.conf ] ; then
+	# Debian configuration file
+	. /etc/streams.conf
+    fi
 fi
 
 STRERR_OPTIONS="-n\
@@ -103,7 +111,7 @@ exit $?
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/06 19:38:21 $
+# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/07 09:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -149,7 +157,7 @@ exit $?
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 19:38:21 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:53 $ by $Author: brian $
 #
 # =============================================================================
 # vim: sw=4 tw=80

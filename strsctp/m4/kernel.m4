@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/01/22 22:49:31 $
+dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/02/07 09:55:53 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/22 22:49:31 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/07 09:55:53 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -464,7 +464,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 *** appropriate built kernel source package for the target kernel
 *** "$linux_cv_k_release" and then configure again.
 *** 
-*** The following directories do no exst in the build environment:
+*** The following directories do no exist in the build environment:
 ***     $linux_cv_k_rootdir$linux_cv_k_prefix$linux_cv_k_modules/build
 ***     $linux_cv_k_rootdir$linux_cv_k_prefix/lib/modules/$linux_cv_k_release/build
 ***     $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux-$linux_cv_k_release
@@ -490,7 +490,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 *** appropriate built kernel source package for the target kernel
 *** "$linux_cv_k_release" and then configure again.
 *** 
-*** The following directories do no exst in the build environment:
+*** The following directories do not exist in the build environment:
 ***     ${linux_cv_k_build}
 *** 
 *** Check the settings of the following options before repeating:

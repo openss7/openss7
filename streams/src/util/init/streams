@@ -1,7 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# processname: strlogd
-# config: /etc/sysconfig/strlogd
+# processname: streams
 # config: /etc/sysconfig/streams
 #
 # description: This STREAMS init script is part of Linux Fast-STREAMS.  \
@@ -10,10 +9,93 @@
 #              that the STREAMS subsystem is configured and loaded.  It \
 #              is also responsible for starting the STREAMS log and trace \
 #              facilities.
+
+# Source init script functions library.
+. /etc/init.d/functions
+
+if [ -x /sbin/streams_mknod ] ; then
+    STREAMS_MKNOD='/sbin/streams_mknod'
+elif [ -x /usr/bin/streams_mknod ]; then
+    STREAMS_MKNOD='/usr/sbin/streams_mknod'
+else
+    STREAMS_MKNOD=''
+fi
+
+# Specify defaults
+
+MAKEDEVICES="no"
+REMOVEDEVICES="no"
+MOUNTSPECFS="yes"
+MOUNTPOINT="/dev/streams"
+
+# Source the config file
+
+if [ -d /etc/sysconfig ] ; then
+    if [ -f /etc/sysconfig/streams ] ; then
+	# Redhat configuration file
+	. /etc/sysconfig/streams
+    fi
+else
+    if [ -f /etc/streams.conf ] ; then
+	# Debian configuration file
+	. /etc/streams.conf
+    fi
+fi
+
+RETVAL=0
+
+umask 077
+
+start() {
+    echo "Starting STREAMS subsystem: "
+}
+
+stop() {
+}
+
+rhstatus() {
+}
+
+reload() {
+    stop
+    start
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    (start)
+	start
+	;;
+    (stop)
+	stop
+	;;
+    (status)
+	rhstatus
+	;;
+    (restart)
+	restart
+	;;
+    (reload)
+	reload
+	;;
+    (condrestart)
+	[ -f /var/log/subsys/strerr ] && restart || :
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|condrestart)\n"
+	;;
+esac
+
+exit $?
+
 #
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/06 19:38:21 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/07 09:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -59,7 +141,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 19:38:21 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:53 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -3,12 +3,18 @@
 #
 
 # Make real character devices before intializing subsystem?
-MAKEDEVICES="yes"
+MAKEDEVICES="no"
+# Remove devices after removing subsystem?
+REMOVEDEVICES="no"
+# Mount/unmount specfs file system?
+MOUNTSPECFS="yes"
+# Mount point?
+MOUNTPOINT="/dev/streams"
 
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/06 19:38:22 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/07 09:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -54,7 +60,7 @@ MAKEDEVICES="yes"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 19:38:22 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:53 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=conf

@@ -1,15 +1,42 @@
-#!/bin/sh
+#!/bin/bash
 #
 #
+# chkconfig: - 55 88
+# config: /etc/sysconfig/specfs
 # description: The SPECFS is a special shadow filesystem used for \
 #              Linux Fast-STREAMS.  The purpose of this init script \
 #              is to detect whether the specfs is supported for the \
 #              running kernel, and if it is, to configure and load \
 #              the kernel module associated with the special filesystem.
 #
+
+# Source init script functions library
+. /etc/init.d/functions
+
+# Specify defaults
+
+# Source config file
+
+if [ -d /etc/sysconfig ] ; then
+    if [ -f /etc/sysconfig/specfs.conf ] ; then
+	# Redhat configuration file
+	. /etc/sysconfig/specfs
+    fi
+else
+    if [ -f /etc/specfs.conf ] ; then
+	# Debian configuration file
+	. /etc/specfs.conf
+    fi
+fi
+
+
+RETVAL=0
+
+umask 077
+
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/06 19:38:21 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/07 09:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -55,7 +82,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 19:38:21 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:53 $ by $Author: brian $
 #
 # =============================================================================
 

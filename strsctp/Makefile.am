@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/04 22:56:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/07 09:54:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/04 22:56:36 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -217,7 +217,6 @@ libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
 streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-KERNEL_MODULES				= $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES			+=
 
 endif
@@ -384,7 +383,6 @@ libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
 streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-KERNEL_MODULES				= $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES			+=
 
 endif
@@ -396,10 +394,11 @@ EXTRA_DIST				+= $(sctp_source_FILES) $(sctp2_source_FILES)
 dist_noinst_SCRIPTS			= configure.nexusware
 EXTRA_SCRIPTS				+=
 
-KERNEL_MODCONF				= conf.modules
-KERNEL_SUBDIR				= @PACKAGE_TARNAME@
-KMODCONF_EXT				= @PACKAGE_TARNAME@
-KERNEL_MODMAPS				= $(STREAMS_MODMAP)
+export KERNEL_MODULES			= $(ADDON_OBJS)
+export KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+export KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
+export KMODCONF_EXT			= $(PACKAGE_TARNAME)
+export KERNEL_MODMAPS			= $(STREAMS_MODMAP)
 
 include am/kernel.am
 

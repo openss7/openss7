@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/04 22:56:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/07 09:54:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/04 22:56:41 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -158,7 +158,6 @@ libXNSdrvs_a_CPPFLAGS		= \
 				  $(KERNEL_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-KERNEL_MODULES			= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		+= 
 
 endif
@@ -264,7 +263,6 @@ libXNSdrvs_a_CPPFLAGS		= \
 				  $(KERNEL_MODFLAGS)
 libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-KERNEL_MODULES			= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		+= 
 
 endif
@@ -275,10 +273,11 @@ EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			+=
 
-KERNEL_MODCONF			= $(STRCONF_CONFMOD)
-KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
-KMODCONF_EXT			= $(PACKAGE_TARNAME)
-KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+export KERNEL_MODULES		= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)
+export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
+export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
+export KMODCONF_EXT		= $(PACKAGE_TARNAME)
+export KERNEL_MODMAPS		= $(STREAMS_MODMAP)
 
 include am/kernel.am
 

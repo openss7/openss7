@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# chkconfig: - 55 55
+# chkconfig: - 55 88
 # processname: strace
 # config: /etc/sysconfig/strace
 # description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is \
@@ -26,8 +26,16 @@ MODULES=""
 
 # Source the config file
 
-if [ -f /etc/sysconfig/strace ] ; then
-    . /etc/sysconfig/strace
+if [ -d /etc/sysconfig ] ; then
+    if [ -f /etc/sysconfig/strace ] ; then
+	# Redhat configuration file
+	. /etc/sysconfig/strace
+    fi
+else
+    if [ -f /etc/strace.conf ] ; then
+	# Debian configuration file
+	. /etc/strace.conf
+    fi
 fi
 
 STRACE_OPTIONS="\
@@ -103,7 +111,7 @@ exit $?
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/02/06 19:38:21 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/07 09:54:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -149,7 +157,7 @@ exit $?
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 19:38:21 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:53 $ by $Author: brian $
 #
 # =============================================================================
 # vim: sw=4 tw=80

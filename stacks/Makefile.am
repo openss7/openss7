@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/02/04 23:45:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/02/07 09:54:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/04 23:45:08 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -314,7 +314,6 @@ libSS7mods_a_CPPFLAGS		= \
 libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
-KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		+= 
 
 endif
@@ -730,7 +729,6 @@ libSS7tali_a_OBJECTS:		$(libSS7tali_a_DEPENDENCIES)
 streams-tali.o: $(libSS7tali_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		+= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
 
 endif
@@ -861,10 +859,11 @@ EXTRA_DIST			+= $(ss7_source_FILES) $(EXTRA_DOCS) $(EXTRA_TEX)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			+=
 
-KERNEL_MODCONF			= conf.modules
-KERNEL_SUBDIR			= strss7
-KMODCONF_EXT			= strss7
-KERNEL_MODMAPS			=
+export KERNEL_MODULES		= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
+export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
+export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
+export KMODCONF_EXT		= $(PACKAGE_TARNAME)
+export KERNEL_MODMAPS		= $(STREAMS_MODMAP)
 
 include am/kernel.am
 
@@ -908,13 +907,20 @@ uninstall-inet-devices:
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
 	fi
 
+else
+
+install-inet-devices:
+
+uninstall-inet-devices:
+
+endif
+
 INSTALL_EXEC_HOOK += install-inet-devices
 
 UNINSTALL_HOOK += uninstall-inet-devices
 
 .PHONY: install-inet-devices uninstall-inet-devices
 
-endif
 
 SUBDIRS = doc src
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/02/04 22:56:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/02/07 09:54:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/04 22:56:30 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -345,8 +345,8 @@ EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
-export KERNEL_SUBDIR		= streams
-export KMODCONF_EXT		= streams
+export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
+export KMODCONF_EXT		= $(PACKAGE_TARNAME)
 export KERNEL_MODMAPS		=
 
 include am/kernel.am
