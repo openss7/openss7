@@ -126,7 +126,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
         [if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
          if test -r ${d}.rpmrelease
          then with_rpm_release="`cat ${d}.rpmrelease`"
-         else with rpm_release='Custom'
+         else with_rpm_release='Custom'
          fi])
     AC_MSG_CHECKING([for rpm release])
     AC_MSG_RESULT([${with_rpm_release:-Custom}])
