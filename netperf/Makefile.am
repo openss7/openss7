@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2004/08/08 22:59:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2004/08/10 02:33:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/08 22:59:03 $ by $Author: brian $
+# Last Modified $Date: 2004/08/10 02:33:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -106,9 +106,37 @@ dist_noinst_SCRIPTS		= configure.nexusware
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS) $(sbin_PROGRAMS)
 
-man1_MANS			= netperf.1
-man8_MANS			= netserver.8
-dist_noinst_MANS		= netperf.man netserver.man
+man1_MANS			= \
+				  netperf.1 \
+				  sctp_range_script.1 \
+				  sctp_rr_script.1 \
+				  sctp_stream_script.1 \
+				  tcp_range_script.1 \
+				  tcp_rr_script.1 \
+				  tcp_stream_script.1 \
+				  udp_rr_script.1 \
+				  udp_stream_script.1 \
+				  snapshot_script.1 \
+				  arr_script.1 \
+				  packet_byte_script.1
+
+man8_MANS			= \
+				  netserver.8
+
+dist_noinst_MANS		= \
+				  netperf.man \
+				  sctp_range_script.man \
+				  sctp_rr_script.man \
+				  sctp_stream_script.man \
+				  tcp_range_script.man \
+				  tcp_rr_script.man \
+				  tcp_stream_script.man \
+				  udp_rr_script.man \
+				  udp_stream_script.man \
+				  snapshot_script.man \
+				  arr_script.man \
+				  packet_byte_script.man \
+				  netserver.man
 
 include am/man.am
 

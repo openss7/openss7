@@ -207,7 +207,15 @@ is a benchmark that can be used to measure various aspects of
 networking performance.
 Currently, its focus is on bulk data transfer and request/response
 performance using SCTP, TCP or UDP, and the Berkeley Sockets
-interface. In addition, tests for DLPI, and Unix Domain
+interface. In addition, tests for XTI,
+.[
+xti
+.]
+DLPI,
+.[
+dlpi
+.]
+and Unix Domain
 Sockets, tests for IPv6 may be conditionally compiled-in.
 .\" =========================================================================
 .SS TESTS
@@ -224,6 +232,7 @@ _
 SCTP_STREAM:Sockets:SCTP:STREAM
 SCTP_MAERTS:::MAERTS
 SCTP_SENDFILE:::SENDFILE
+_:::_
 SCTP_RR:::RR
 SCTP_NBRR:::NBRR
 SCTP_CRR:::CRR
@@ -233,6 +242,7 @@ _::_:_
 TCP_STREAM::TCP:STREAM
 TCP_MAERTS:::MAERTS
 TCP_SENDFILE:::SENDFILE
+_:::_
 TCP_RR:::RR
 TCP_NBRR:::NBRR
 TCP_CRR:::CRR
@@ -240,44 +250,56 @@ TCP_TRR:::TRR
 TCP_CC:::CC
 _::_:_
 UDP_STREAM::UDP:STREAM
+_:::_
 UDP_RR:::RR
 _:_:_:_
 XTI_SCTP_STREAM:XTI:SCTP:STREAM
+_:::_
 XTI_SCTP_RR:::RR
+XTI_SCTP_CRR:::CRR
+XTI_SCTP_TRR:::TRR
+XTI_SCTP_CC:::CC
 _::_:_
 XTI_TCP_STREAM::TCP:STREAM
+_:::_
 XTI_TCP_RR:::RR
+XTI_TCP_CRR:::CRR
+XTI_TCP_CC:::CC
 _::_:_
 XTI_UDP_STREAM::UDP:STREAM
+_:::_
 XTI_UDP_RR:::RR
 _:_:_:_
 SCTPIPV6_STREAM:IPv6 Sockets:SCTP:STREAM
+_:::_
 SCTPIPV6_RR:::RR
 SCTPIPV6_CRR:::CRR
 SCTPIPV6_TRR:::TRR
 _::_:_
 TCPIPV6_STREAM::TCP:STREAM
+_:::_
 TCPIPV6_RR:::RR
 TCPIPV6_CRR:::CRR
 TCPIPV6_TRR:::TRR
 _::_:_
 UDPIPV6_STREAM::UDP:STREAM
+_:::_
 UDPIPV6_RR:::RR
 _:_:_:_
 STREAM_STREAM:Unix Sockets:CO:STREAM
+_:::_
 STREAM_RR:::RR
-LWPSTR_STREAM::STREAM
-LWPSTR_RR::RR
 _::_:_
 DG_STREAM::CL:STREAM
+_:::_
 DG_RR:::RR
-LWPDG_STREAM::STREAM
-LWPDG_RR::RR
 _:_:_:_
 DLCO_STREAM:DLPI:CO:STREAM
+_:::_
 DLCO_RR:::RR
 _::_:_
 DLCL_STREAM::CL:STREAM
+_:::_
 DLCL_RR:::RR
 _:_:_:_
 LOC_CPU:none:none:none
@@ -311,9 +333,15 @@ tab(:);
 lbw(12n)lssss.
 BSD:BSD/POSIX Sockets Interface
 XTI:X/Open Transport Interface (XTI/TLI) XNS 5.2 SuSv2
+.[
+xti
+.]
 IPV6:POSIX IPv6 Sockets Interface
 UNIX:Unix Domain Sockets Interface
 DLPI:Data Link Provider Interface
+.[
+dlpi
+.]
 ATM:FORE ATM Interface
 HiPPI:HP-UX Interface
 .TE
@@ -385,7 +413,8 @@ of the direction from client to server.
 .\" =========================================================================
 .SS Request/Response Tests
 .PP
-Request/response performance is the second tests that can be investigated with
+Request/response performance is the second class of tests that can be
+investigated with
 .BR netperf (1).
 Generally speaking,
 .BR netperf (1)
@@ -393,69 +422,127 @@ request/response performance is quoted as \(lqtransactions per second\(rq for
 a given request and response size.  A transaction is defined as the exchange
 of a single request and a single response.  From a transaction rate, one can
 infer one way and round-trip average latency.
-
 .\" -------------------------------------------------------------------------
 .TP
-.B RR \fR\- Request, Response
+.B RR \- Request/Response:
+The Request/Response test is the simplest form of transaction performance
+test.  The client establishes a connection to the server and then continuously
+exchanges Request/Response pairs.
+These tests are applicable to both Connection-Oriented and Connectionless protocols.
 .\" -------------------------------------------------------------------------
 .TP
-.B NBRR \fR\- Non-blocking Request, Response
+.B NBRR \- Non-blocking Request/Response:
 These tests are intended to implement the same as the
-.IB * _RR
+.B RR
 tests, except that they use POSIX-style non-blocking sockets.
+These tests are applicable to both Connection-Oriented and Connectionless protocols.
+.\" =========================================================================
+.PP
+It is expected that benchmarks resulting from
+.B NBRR
+tests will be worse than benchmarks resulting from
+.B RR
+tests.  This is because blocking operation typcially works in the favor of the
+system for Request/Repsonse tests in that the system properly anticipates the
+next expected event in the blocking tests, whereas it does not anticipate in
+the non-blocking tests.
+.PP
+Because of this negative effect, and although it would be rather
+straightforward to extend other interfaces to support non-blocking
+Request/Response operation, only the Sockets API currently supports the
+.B NBRR
+tests.
+.PP
+Blocking and non-blocking Request/Response tests support the following common
+test specific options:
 .\" -------------------------------------------------------------------------
 .TP
-.B CRR \fR\- Connect, Request, Response
-.RS
-.PP
-These tests are only applicable to connection-oriented protocols.
-.PP
+\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+Specifies the local
+.RI [ LOC-RR-SIZE ]
+(or remote
+.RI [ REM-RR-SIZE ])
+request (or response) sizes.
+At least one of 
+.I LOC-RR-SIZE
+or
+.I REM-RR-SIZE
+must be specified.
+If there is no comma (`,') in the option argument, then the specified size
+applies to both the local and remote request/response size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -s " \fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.
+One of
+.I LOC-SNDBUF
+and
+.I LOC-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the local send buffer size as well as the local
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+.BI -S " \fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+Sets the remote send
+.RI ( REM-SNDBUF )
+and receive
+.RI ( REM-RCVBUF )
+buffer sizes.
+One of
+.I REM-SNDBUF
+and
+.I REM-RCVBUF
+must be specified.
+If no comman (`,') is present in the option argument, then the specified
+buffer size applies to both the remote send buffer size as well as the remote
+receive buffer size.
+.\" -------------------------------------------------------------------------
+.TP
+.B CRR \- Connect/Request/Response:
 These tests are intended to test the performance of establishing a connection,
 exchanging a request/response pair, and repeating.  It is expected that this
 would be a good starting-point for comparison of T/TCP with TCP for
 transactional workloads.  It will also look (can look) much like the
 communication pattern of http for www access.
-.PP
-A difference between the
-.IB * _CRR
-tests and the
-.IB * _TRR
-tests are that in the
-.IB * _CRR
-tests the
-.BR connect (2)
-call is made under the POSIX/BSD Sockets API and no data is sent with the
-.BR t_connect (3)
-or
-.BR t_accept (3)
-call under STREAMS XTI API.
-.RE
+The
+.B CRR
+tests are only applicable to connection-oriented protocols.
 .\" -------------------------------------------------------------------------
 .TP
-.B TRR \fR\- Transaction Request, Response
-.RS
-.PP
-These tests are only applicable to connection-oriented protocols.
-.PP
+.B TRR \- Transaction Request/Response:
 These tests are intended to test the performance of establishing a connection,
 exchanging a request/response pair, and repeating.  It is expected that this
 would be a good starting-point for comparison of T/TCP with classic TCP for
 transaction workloads.  It will also look (can look) much like the
 communication pattern of http for www access.  See also, however, the
-.IB * _CRR
+.B CRR
 tests above.
+The
+.B TRR
+tests are only applicable to connection-oriented protocols.
+.\" -------------------------------------------------------------------------
 .PP
 There is one significant difference between the way that the
-.IB * _TRR
+.B TRR
 tests and the
-.IB * _CRR
+.B CRR
 tests are implemented.  On POSIX/BSD Sockets interface, the
 .BR sendto (2)
 call is used instead of
 .BR connect (2)
 and
 .BR send (2).
-Under the STREAMS XTI API, data is sent with the
+Under the STREAMS XTI API,
+.[
+xti
+.]
+data is sent with the
 .BR t_connect (3)
 call and also with the
 .BR t_accept (3)
@@ -472,29 +559,79 @@ For SCTP there might be some more significant differences.  Unlike T/TCP and
 TCP, SCTP is able to transfer the request data with the COOKIE-ECHO and
 receive the response data with the COOKIE-ACK, reducing two message exchanges.
 When best implemented, SCTP should perform better in the
-.IB * _TRR
+.B TRR
 tests than it does in the
-.IB * _CRR
+.B CRR
 tests.
-.RE
+.PP
+In the original
+.BR netperf ,
+the
+.BR CRR " and " TRR
+tests were only implemented for
+.B TCP
+on the Sockets API.  OpenSS7 has implemented these tests also for the
+.B SCTP
+protocol on the Sockets API, as well as both the
+.BR SCTP " and " TCP
+protocols on the XTI API.
+.\" =========================================================================
+.PP
+In addition to the common test specific options for blocking and non-blocking
+Response/Request tests, the
+.BR CRR " and " TRR
+tests take the following common test specific options:
 .\" -------------------------------------------------------------------------
 .TP
-.B CC \fR\- Connect, Close
-.RS
-.PP
-These tests are only applicable to connection-oriented protocols.
-.PP
+.BI -p " \fR[\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
+Specify the minimum and maximum port numbers used for the
+.IB * _CRR
+and
+.IB * _TRR
+tests.
+At least one of
+.I MIN-PORTNUM
+or
+.I MAX-PORTNUM
+must be specified.
+If there is no comma (`,') in the option argument, then the specified port
+number applies to both the minimum and maximum.
+This option is only applicable to
+.BR SCTP " and " TCP
+tests.
+.\" -------------------------------------------------------------------------
+.TP
+.B CC \- Connect/Close:
 This test is intended to test the performance of establishing a connection,
 and then closing it again.  This test is of somewhat arcane interest since no
 packets are exchanged between the user-space processes, but it will show the
-raw overhead of establishing an SCTP association.  That service demand could
-them be compared with the sum of the service demands of a
-.I SCTP_CRR
+raw overhead of establishing an
+.B SCTP
+association or
+.B TCP
+connection.  That service demand could them be compared with the sum of the
+service demands of a
+.B CRR
 and
-.I SCTP_RR
+.B RR
 test and presumably there would be a discernable relationship between the
 tests.
-.RE
+The
+.B CC
+tests are only applicable to connection-oriented protocols.
+.\" =========================================================================
+.PP
+In the original
+.BR netperf ,
+the
+.B CC
+tests were only impleemnted for
+.B TCP
+on the Sockets API.  OpenSS7 has implemented these tests also for the
+.B SCTP
+protocol on the Sockets API, as well as both the
+.BR SCTP " and " TCP
+protocols on the XTI API.
 
 .\" =========================================================================
 .SS CPU Synchronization Tests
@@ -525,11 +662,13 @@ Valid testnames are (but not always compiled-in):
 .BR XTI_SCTP_RR ", "
 .BR XTI_SCTP_CRR ", "
 .BR XTI_SCTP_TRR ", "
+.BR XTI_SCTP_CC ", "
 .BR XTI_TCP_STREAM ", "
 .BR XTI_TCP_MAERTS ", "
 .BR XTI_TCP_RR ", "
 .BR XTI_TCP_CRR ", "
 .BR XTI_TCP_TRR ", "
+.BR XTI_TCP_CC ", "
 .BR XTI_UDP_STREAM ", "
 .BR XTI_UDP_RR ", "
 .BR SCTP_STREAM ", "
@@ -932,15 +1071,27 @@ tests as follows:
 .\" -------------------------------------------------------------------------
 .TP
 \fB-t\fR\ \fIXTI-TEST\fR
-Tests available for the X/Open Transport Interface (XTI/TLI) consist of the
-following:
+Tests available for the X/Open Transport Interface (XTI/TLI)
+.[
+xti
+.]
+consist of the following:
 .BR XTI_SCTP_STREAM ,
 .BR XTI_SCTP_RR ,
+.BR XTI_SCTP_CRR ,
+.BR XTI_SCTP_TRR ,
+.BR XTI_SCTP_CC ,
 .BR XTI_TCP_STREAM ,
 .BR XTI_TCP_RR ,
+.BR XTI_TCP_CRR ,
+.BR XTI_TCP_TRR ,
+.BR XTI_TCP_CC ,
 .BR XTI_UDP_STREAM ,
 .BR XTI_UDP_RR .
 These tests use the X/Open Transport Interface (XTI/TLI) API.
+.[
+xti
+.]
 .\" -------------------------------------------------------------------------
 .PP
 XTI test specific optoins are specified on the command line following the
@@ -1305,12 +1456,19 @@ tests as follows:
 .\" -------------------------------------------------------------------------
 .TP
 \fB-t\fR\ \fIDLPI-TEST\fR
-Tests available for the DLPI Interface consist of the following:
+Tests available for the DLPI Interface
+.[
+dlpi
+.]
+consist of the following:
 .BR DLCO_STREAM ,
 .BR DLCO_RR ,
 .BR DLCL_STREAM ,
 .BR DLCL_RR .
 These tests use the DLPI API.
+.[
+dlpi
+.]
 .\" -------------------------------------------------------------------------
 .PP
 DLPI test specific options are specified on the command line following the
@@ -1626,7 +1784,11 @@ Sockets interface to SCTP, TCP and UDP.
 
 .SS XTI API TESTS
 .PP
-The following tests utilize the X/Open XNS 5.2 XTI/TLI interface to SCTP, TCP
+The following tests utilize the X/Open XNS 5.2 XTI/TLI
+.[
+xti
+.]
+interface to SCTP, TCP
 and UDP.
 .\" -------------------------------------------------------------------------
 .TP
