@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/03 06:30:18 $
+ @(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/05 23:10:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:18 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/03 06:30:18 $"
+#ident "@(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/05 23:10:09 $"
 
 static char const ident[] =
-    "$RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/03 06:30:18 $";
+    "$RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/05 23:10:09 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #include <linux/stddef.h>
 #include <linux/types.h>
 #ifdef CONFIG_PCI
