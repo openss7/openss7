@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/18 01:02:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/24 23:03:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 01:02:22 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 23:03:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -276,8 +276,9 @@ dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
-KMODCONF_EXT			= $(PACKAGE_TARNAME)
 KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
+KMODCONF_EXT			= $(PACKAGE_TARNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP)
 
 include am/kernel.am
 

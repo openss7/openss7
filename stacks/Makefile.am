@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/01/24 07:45:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/01/24 23:03:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 07:45:09 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 23:03:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -864,6 +864,7 @@ EXTRA_SCRIPTS			=
 KERNEL_MODCONF			= conf.modules
 KERNEL_SUBDIR			= openss7
 KMODCONF_EXT			= openss7
+KERNEL_MODMAPS			=
 
 include am/kernel.am
 

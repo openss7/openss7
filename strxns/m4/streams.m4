@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.31 2005/01/24 07:33:00 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.32 2005/01/24 23:02:36 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/24 23:02:36 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -82,6 +82,7 @@ AC_DEFUN([_LINUX_STREAMS], [dnl
     _LINUX_STREAMS_OUTPUT
     AC_SUBST([STREAMS_CPPFLAGS])
     AC_SUBST([STREAMS_LDADD])
+    AC_SUBST([STREAMS_MODMAP])
 ])# _LINUX_STREAMS
 # =========================================================================
 
@@ -234,6 +235,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                     streams_dir=`(cd $streams_dir; pwd)`
                     streams_cv_lis_includes="$streams_dir $streams_bld"
                     streams_cv_lis_ldadd=`echo "$streams_here/$streams_d/LiS/libLiS.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                    streams_cv_lis_modmap=`echo "$streams_here/$streams_d/LiS/Modules.map" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
@@ -260,6 +262,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                 then
                     streams_cv_lis_includes="$streams_dir"
                     streams_cv_lis_ldadd="-lLiS"
+                    streams_cv_lis_modmap=''
                     break
                 fi
             done
@@ -345,6 +348,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                     streams_dir=`(cd $streams_dir; pwd)`
                     streams_cv_lfs_includes="$streams_dir $streams_bld"
                     streams_cv_lfs_ldadd=`echo "$streams_here/$streams_d/streams/libstreams.la" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                    streams_cv_lfs_modmap=`echo "$streams_here/$streams_d/streams/Modules.map" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                     break
                 fi
             done
@@ -371,6 +375,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                 then
                     streams_cv_lfs_includes="$streams_dir"
                     streams_cv_lfs_ldadd="-lstreams"
+                    streams_cv_lfs_modmap=''
                     break
                 fi
             done
@@ -518,6 +523,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
     esac
     STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lis_ldadd"
+    STREAMS_MODMAP="$streams_cv_lis_modmap"
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =========================================================================
 
@@ -533,6 +539,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     fi
     STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lfs_ldadd"
+    STREAMS_MODMAP="$streams_cv_lfs_modmap"
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [], [Linux Fast-STREAMS has this type.])
     AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [], [Linux Fast-STREAMS has this type.])
 ])# _LINUX_STREAMS_LFS_DEFINES

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/24 07:40:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/24 23:03:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 07:40:48 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 23:03:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -285,6 +285,7 @@ EXTRA_SCRIPTS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KMODCONF_EXT			= $(PACKAGE_TARNAME)
 KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP)
 
 include am/kernel.am
 
