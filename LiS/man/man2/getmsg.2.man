@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmsg.2.man,v 1.1.4.1 2005/03/09 23:13:56 brian Exp $
+.\" @(#) $Id: getmsg.2.man,v 1.1.4.2 2005/03/30 14:46:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/03/09 23:13:56 $ by $Author: brian $
+.\" Modified $Date: 2005/03/30 14:46:27 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -49,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMSG 2 "$Date: 2005/03/09 23:13:56 $" "$Name:  $" "Linux STREAMS System Calls"
+.TH GETMSG 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
 .SH NAME
 getmsg \- get next message off a stream
 .\"

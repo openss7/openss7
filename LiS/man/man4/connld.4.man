@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: connld.4.man,v 1.1.4.1 2005/03/09 23:13:57 brian Exp $
+.\" @(#) $Id: connld.4.man,v 1.1.4.2 2005/03/30 14:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:57 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 14:46:28 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CONNLD 4 "$Date: 2005/03/09 23:13:57 $" "$Name:  $" "Linux STREAMS Devices"
+.TH CONNLD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .\"
 .\"
 .SH NAME

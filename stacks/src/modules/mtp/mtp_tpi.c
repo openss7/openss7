@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:30:17 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/30 14:43:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:17 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:30:17 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/30 14:43:43 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:30:17 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/30 14:43:43 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -74,7 +74,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:30:17 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/30 14:43:43 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1203,7 +1203,8 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_BIND_REQ;
 	p->mtp_addr_length = add_len;
 	p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1236,7 +1237,8 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_UNBIND_REQ;
 	putnext(mtp->iq, mp);
 	return (QR_DONE);
@@ -1263,7 +1265,8 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mbl
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_CONN_REQ;
 	p->mtp_addr_length = add_len;
 	p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
@@ -1297,7 +1300,8 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_DISCON_REQ;
 	putnext(mtp->iq, mp);
 	return (QR_DONE);
@@ -1323,7 +1327,8 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_ADDR_REQ;
 	putnext(mtp->iq, mp);
 	return (QR_DONE);
@@ -1349,7 +1354,8 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_INFO_REQ;
 	putnext(mtp->iq, mp);
 	return (QR_DONE);
@@ -1376,7 +1382,8 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_OPTMGMT_REQ;
 	p->mtp_opt_length = opt_len;
 	p->mtp_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -1411,7 +1418,8 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, ulong pri, u
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_TRANSFER_REQ;
 	p->mtp_dest_length = dst_len;
 	p->mtp_dest_offset = dst_len ? sizeof(*p) : 0;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:19 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:44 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2682,7 +2682,8 @@ n_notice_ind(queue_t *q, struct sc *sc, ulong cause, struct sccp_addr *dst, stru
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_NOTICE_IND;
 	p->DEST_length = dst_len;
 	p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -2699,7 +2700,8 @@ n_notice_ind(queue_t *q, struct sc *sc, ulong cause, struct sccp_addr *dst, stru
 		bcopy(src, mp->b_wptr, src_len);
 		mp->b_wptr += PAD4(src_len);
 	}
-	qos = (typeof(qos)) mp->b_wptr++;
+	qos = (typeof(qos)) mp->b_wptr;
+	mp->b_wptr += sizeof(*qos);
 	qos->n_qos_type = N_QOS_SEL_DATA_SCCP;
 	qos->protocol_class = pcl;
 	qos->option_flags = 1;
@@ -6389,13 +6391,15 @@ sccp_send_msg(queue_t *q, mblk_t *msg)
 	if (!(mp = ss7_allocb(q, sizeof(*p) + sizeof(*a), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->mtp_primitive = MTP_TRANSFER_REQ;
 	p->mtp_dest_length = sizeof(*a);
 	p->mtp_dest_offset = sizeof(*p);
 	p->mtp_mp = m->rl.mp;
 	p->mtp_sls = m->rl.sls;
-	a = (typeof(a)) mp->b_wptr++;
+	a = (typeof(a)) mp->b_wptr;
+	mp->b_wptr += sizeof(*a);
 	*a = mt->loc;
 	a->pc = m->rl.dpc;
 	switch (m->type) {
@@ -6538,7 +6542,8 @@ sccp_enc_msg(queue_t *q, struct sp *sp, ulong dpc, ulong pri, ulong sls)
 	if ((mp = ss7_allocb(q, sizeof(*m), BPRI_MED))) {
 		mp->b_datap->db_type = M_RSE;
 		mp->b_band = 3;
-		m = (typeof(m)) mp->b_wptr++;
+		m = (typeof(m)) mp->b_wptr;
+		mp->b_wptr += sizeof(*m);
 		bzero(m, sizeof(*m));
 		m->bp = mp;
 		m->eq = q;
@@ -13230,7 +13235,8 @@ mtp_read(queue_t *q, mblk_t *pdu, struct sr *sr, ulong pri, ulong sls)
 	if (!(mp = ss7_allocb(q, sizeof(*m), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_RSE;
-	m = (typeof(m)) mp->b_wptr++;
+	m = (typeof(m)) mp->b_wptr;
+	mp->b_wptr += sizeof(*m);
 	bzero(m, sizeof(*m));
 	mp->b_cont = pdu;
 	m->bp = mp;

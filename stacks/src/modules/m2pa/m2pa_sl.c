@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:58 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:29:58 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:58 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:43 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:58 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:43 $";
 
 #include "os7/compat.h"
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:58 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:43 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -264,7 +264,8 @@ lmi_info_ack(queue_t *q, struct sl *sl)
 	lmi_info_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_info_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = sl->i_state;
@@ -339,7 +340,8 @@ lmi_error_ack(queue_t *q, struct sl *sl, long prim, long err)
 	}
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_error_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = err < 0 ? -err : 0;
 		p->lmi_reason = err < 0 ? LMI_SYSERR : err;
@@ -381,7 +383,8 @@ lmi_enable_con(queue_t *q, struct sl *sl)
 	ensure(sl->i_state == LMI_ENABLE_PENDING, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((lmi_enable_con_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = sl->i_state = LMI_ENABLED;
 		printd(("%s: %p: <- LMI_ENABLE_CON\n", MOD_NAME, sl));
@@ -403,7 +406,8 @@ lmi_disable_con(queue_t *q, struct sl *sl)
 	ensure(sl->i_state == LMI_DISABLE_PENDING, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((lmi_disable_con_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = sl->i_state = LMI_DISABLED;
 		printd(("%s: %p: <- LMI_DISABLE_CON\n", MOD_NAME, sl));
@@ -496,7 +500,8 @@ lmi_event_ind(queue_t *q, struct sl *sl, ulong oid, ulong severity, void *inf_pt
 	lmi_event_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + inf_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((lmi_event_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_EVENT_IND;
 		p->lmi_objectid = oid;
 		p->lmi_timestamp = jiffies;
@@ -521,7 +526,8 @@ sl_pdu_ind(queue_t *q, struct sl *sl, mblk_t *dp)
 	sl_pdu_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_pdu_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_PDU_IND;
 		mp->b_cont = dp;
 		printd(("%s: %p: <- SL_PDU_IND [%d]\n", MOD_NAME, sl, msgdsize(mp)));
@@ -542,7 +548,8 @@ sl_link_congested_ind(queue_t *q, struct sl *sl, ulong cong, ulong disc)
 	sl_link_cong_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_link_cong_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTED_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = cong;
@@ -565,7 +572,8 @@ sl_link_congestion_ceased_ind(queue_t *q, struct sl *sl, ulong cong, ulong disc)
 	sl_link_cong_ceased_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_link_cong_ceased_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_cong_status = cong;
@@ -588,7 +596,8 @@ sl_retrieved_message_ind(queue_t *q, struct sl *sl, mblk_t *dp)
 	sl_retrieved_msg_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_retrieved_msg_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
 		mp->b_cont = dp;
 		printd(("%s: %p: <- SL_RETRIEVED_MESSAGE_IND\n", MOD_NAME, sl));
@@ -609,7 +618,8 @@ sl_retrieval_complete_ind(queue_t *q, struct sl *sl)
 	sl_retrieval_comp_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_retrieval_comp_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
 		printd(("%s: %p: <- SL_RETRIEVAL_COMPLETE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
@@ -629,7 +639,8 @@ sl_rb_cleared_ind(queue_t *q, struct sl *sl)
 	sl_rb_cleared_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_rb_cleared_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RB_CLEARED_IND;
 		printd(("%s: %p: <- SL_RB_CLEARED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
@@ -649,7 +660,8 @@ sl_bsnt_ind(queue_t *q, struct sl *sl, ulong bsnt)
 	sl_bsnt_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_bsnt_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_BSNT_IND;
 		p->sl_bsnt = bsnt;
 		printd(("%s: %p: <- SL_BSNT_IND\n", MOD_NAME, sl));
@@ -670,7 +682,8 @@ sl_in_service_ind(queue_t *q, struct sl *sl)
 	sl_in_service_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_in_service_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_IN_SERVICE_IND;
 		printd(("%s: %p: <- SL_IN_SERVICE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
@@ -690,7 +703,8 @@ sl_out_of_service_ind(queue_t *q, struct sl *sl, ulong reason)
 	sl_out_of_service_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_out_of_service_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
 		p->sl_timestamp = jiffies;
 		p->sl_reason = reason;
@@ -712,7 +726,8 @@ sl_remote_processor_outage_ind(queue_t *q, struct sl *sl)
 	sl_rem_proc_out_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_rem_proc_out_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
 		p->sl_timestamp = jiffies;
 		printd(("%s: %p: <- SL_PROCESSOR_OUTAGE_IND\n", MOD_NAME, sl));
@@ -733,7 +748,8 @@ sl_remote_processor_recovered_ind(queue_t *q, struct sl *sl)
 	sl_rem_proc_recovered_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_rem_proc_recovered_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
 		p->sl_timestamp = jiffies;
 		printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", MOD_NAME, sl));
@@ -754,7 +770,8 @@ sl_rtb_cleared_ind(queue_t *q, struct sl *sl)
 	sl_rtb_cleared_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_rtb_cleared_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RTB_CLEARED_IND;
 		printd(("%s: %p: <- SL_RTB_CLEARED_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
@@ -774,7 +791,8 @@ sl_retrieval_not_possible_ind(queue_t *q, struct sl *sl)
 	sl_retrieval_not_poss_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((sl_retrieval_not_poss_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
 		printd(("%s: %p: <- SL_RETRIEVAL_NOT_POSSIBLE_IND\n", MOD_NAME, sl));
 		putnext(sl->oq, mp);
@@ -822,7 +840,8 @@ n_data_req(queue_t *q, struct sl *sl, ulong flags, void *qos_ptr, size_t qos_len
 	N_data_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((N_data_req_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_DATA_REQ;
 		p->DATA_xfer_flags = flags;
 		bcopy(qos_ptr, mp->b_wptr, qos_len);
@@ -846,7 +865,8 @@ n_exdata_req(queue_t *q, struct sl *sl, void *qos_ptr, size_t qos_len, mblk_t *d
 	N_exdata_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((N_exdata_req_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_EXDATA_REQ;
 		bcopy(qos_ptr, mp->b_wptr, qos_len);
 		mp->b_wptr += qos_len;
@@ -979,8 +999,8 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 2 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_PROVING_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ =
+			*(uint32_t *) mp->b_wptr++ = M2PA_PROVING_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ =
 			    __constant_htonl(2 * sizeof(uint32_t) + sizeof(filler));
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
@@ -997,12 +1017,12 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		   the status proving message for sending proving data will fill bytes. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ =
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ =
 			    __constant_htonl(4 * sizeof(uint32_t) + sizeof(filler));
-			*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnr);
-			*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnt);
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
+			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt);
+			*(uint32_t *) mp->b_wptr++ = status;
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1022,12 +1042,12 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ =
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ =
 			    __constant_htonl(5 * sizeof(uint32_t) + sizeof(filler));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = status;
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1042,10 +1062,10 @@ sl_send_proving(queue_t *q, struct sl *sl, uint32_t status)
 		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t) + sizeof(filler), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ =
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ =
 			    __constant_htonl(3 * sizeof(uint32_t) + sizeof(filler));
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = status;
 			bcopy(filler, mp->b_wptr, sizeof(filler));
 			mp->b_wptr += sizeof(filler);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
@@ -1072,9 +1092,9 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(3 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(3 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = status;
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1087,11 +1107,11 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		   draft-ietf-sigtran-m2pa-04.txt has sequence numbers in an M2PA-specific header. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(4 * sizeof(uint32_t));
-			*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnr);
-			*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnt);
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
+			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
+			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt);
+			*(uint32_t *) mp->b_wptr++ = status;
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1104,11 +1124,11 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT6_1:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = status;
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1121,9 +1141,9 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 		   messages. */
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(3 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(3 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = status;
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0)
 				return (0);
 			freeb(mp);
@@ -1135,11 +1155,11 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 	case M2PA_VERSION_DRAFT11:
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = status;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = status;
 			switch (status) {
 			case M2PA_STATUS_PROCESSOR_OUTAGE:
 			case M2PA_STATUS_PROCESSOR_OUTAGE_ENDED:
@@ -1192,9 +1212,9 @@ sl_send_ack(queue_t *q, struct sl *sl)
 	case M2PA_VERSION_DRAFT3_1:
 		if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_ACK_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(3 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->rack);
+			*(uint32_t *) mp->b_wptr++ = M2PA_ACK_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(3 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->rack);
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1218,11 +1238,11 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		   the receiver. */
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(4 * sizeof(uint32_t));
-			*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnr);
-			*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnt);
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_ACK;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
+			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
+			*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt);
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_ACK;
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1237,11 +1257,11 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		   sequence numbers expected to appear in draft-ietf-sigtran-m2pa-05.txt. */
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt);
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_ACK;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt);
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_ACK;
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1262,11 +1282,11 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		printd(("%s: %p: Sending separate ack\n", MOD_NAME, sl));
 		if ((mp = ss7_allocb(q, 5 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(5 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = M2PA_STATUS_IN_SERVICE;
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(5 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = M2PA_STATUS_IN_SERVICE;
 			if ((err = n_exdata_req(q, sl, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1289,10 +1309,10 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		printd(("%s: %p: Sending separate ack\n", MOD_NAME, sl));
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(4 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1319,10 +1339,10 @@ sl_send_ack(queue_t *q, struct sl *sl)
 		printd(("%s: %p: Sending separate ack\n", MOD_NAME, sl));
 		if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 			mp->b_datap->db_type = M_DATA;
-			*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
-			*((uint32_t *) mp->b_wptr)++ = __constant_htonl(4 * sizeof(uint32_t));
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-			*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnt & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
+			*(uint32_t *) mp->b_wptr++ = __constant_htonl(4 * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+			*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnt & 0xffffff);
 			if ((err = n_data_req(q, sl, 0, &qos, sizeof(qos), mp)) >= 0) {
 				sl->rack = 0;
 				return (0);
@@ -1352,8 +1372,8 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT3_1:
 			if ((mp = ss7_allocb(q, 2 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
-				*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
-				*((uint32_t *) mp->b_wptr)++ = htonl(dlen + 2 * sizeof(uint32_t));
+				*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
+				*(uint32_t *) mp->b_wptr++ = htonl(dlen + 2 * sizeof(uint32_t));
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -1366,10 +1386,10 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT4_1:
 			if ((mp = ss7_allocb(q, 3 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
-				*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
-				*((uint32_t *) mp->b_wptr)++ = htonl(dlen + 3 * sizeof(uint32_t));
-				*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnr);
-				*((uint16_t *) mp->b_wptr)++ = htons(sl->fsnt + 1);
+				*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
+				*(uint32_t *) mp->b_wptr++ = htonl(dlen + 3 * sizeof(uint32_t));
+				*(uint16_t *) mp->b_wptr++ = htons(sl->fsnr);
+				*(uint16_t *) mp->b_wptr++ = htons(sl->fsnt + 1);
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -1388,10 +1408,10 @@ sl_send_data(queue_t *q, struct sl *sl, mblk_t *dp)
 		case M2PA_VERSION_DRAFT11:
 			if ((mp = ss7_allocb(q, 4 * sizeof(uint32_t), BPRI_MED))) {
 				mp->b_datap->db_type = M_DATA;
-				*((uint32_t *) mp->b_wptr)++ = M2PA_DATA_MESSAGE;
-				*((uint32_t *) mp->b_wptr)++ = htonl(dlen + 4 * sizeof(uint32_t));
-				*((uint32_t *) mp->b_wptr)++ = htonl(sl->fsnr & 0xffffff);
-				*((uint32_t *) mp->b_wptr)++ = htonl((sl->fsnt + 1) & 0xffffff);
+				*(uint32_t *) mp->b_wptr++ = M2PA_DATA_MESSAGE;
+				*(uint32_t *) mp->b_wptr++ = htonl(dlen + 4 * sizeof(uint32_t));
+				*(uint32_t *) mp->b_wptr++ = htonl(sl->fsnr & 0xffffff);
+				*(uint32_t *) mp->b_wptr++ = htonl((sl->fsnt + 1) & 0xffffff);
 				mp->b_cont = db;
 				pullupmsg(mp, -1);
 				if ((err = n_data_req(q, sl, rcpt, &qos, sizeof(qos), mp)) >= 0)
@@ -2442,8 +2462,8 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint16_t)) {
 			int msu;
-			uint bsnr = ntohs(*((uint16_t *) mp->b_rptr)++);
-			uint fsnr = ntohs(*((uint16_t *) mp->b_rptr)++);
+			uint bsnr = ntohs(*(uint16_t *) mp->b_rptr++);
+			uint fsnr = ntohs(*(uint16_t *) mp->b_rptr++);
 			mlen -= 2 * sizeof(uint16_t);
 			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
 			if ((uint16_t) fsnr != (uint16_t) (sl->fsnx - msu)) {
@@ -2505,8 +2525,8 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint32_t)) {
 			int msu;
-			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
-			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			uint bsnr = ntohl(*(uint32_t *) mp->b_rptr++) & 0xffffff;
+			uint fsnr = ntohl(*(uint32_t *) mp->b_rptr++) & 0xffffff;
 			mlen -= 2 * sizeof(uint32_t);
 			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
 			if ((uint32_t) fsnr != (uint32_t) ((sl->fsnx - msu) & 0xffffff)) {
@@ -2567,8 +2587,8 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint32_t)) {
 			int msu;
-			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
-			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			uint bsnr = ntohl(*(uint32_t *) mp->b_rptr++) & 0xffffff;
+			uint fsnr = ntohl(*(uint32_t *) mp->b_rptr++) & 0xffffff;
 			mlen -= 2 * sizeof(uint32_t);
 			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
 			if ((uint32_t) fsnr != (uint32_t) ((sl->fsnx - msu) & 0xffffff)) {
@@ -2631,8 +2651,8 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint32_t)) {
 			int msu;
-			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
-			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++) & 0xffffff;
+			uint bsnr = ntohl(*(uint32_t *) mp->b_rptr++) & 0xffffff;
+			uint fsnr = ntohl(*(uint32_t *) mp->b_rptr++) & 0xffffff;
 			mlen -= 2 * sizeof(uint32_t);
 			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
 			/* In the final we discard out of sequence FSNs but do two out of three on
@@ -3760,7 +3780,7 @@ sl_recv_datack(queue_t *q, struct sl *sl, mblk_t *mp)
 	{
 		size_t mlen = mp->b_wptr - mp->b_rptr;
 		if (mlen >= sizeof(uint32_t)) {
-			if ((count = ntohl(*((uint32_t *) mp->b_wptr)++))) {
+			if ((count = ntohl(*(uint32_t *) mp->b_wptr++))) {
 				if ((err = sl_txc_datack(q, sl, count)) < 0)
 					return (err);
 				return (QR_DONE);
@@ -3971,8 +3991,8 @@ sl_recv_msg(queue_t *q, struct sl *sl, mblk_t *mp)
 	if (mp->b_wptr >= mp->b_rptr + 2 * sizeof(uint32_t)) {
 		int err;
 		unsigned char *oldp = mp->b_rptr;
-		type = *((uint32_t *) mp->b_rptr)++;
-		mlen = ntohl(*((uint32_t *) mp->b_rptr)++) - 2 * sizeof(uint32_t);
+		type = *(uint32_t *) mp->b_rptr++;
+		mlen = ntohl(*(uint32_t *) mp->b_rptr++) - 2 * sizeof(uint32_t);
 		switch (type) {
 		case M2PA_DATA_MESSAGE:
 			err = sl_recv_data(q, sl, mp);

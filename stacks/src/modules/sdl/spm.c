@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:36 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:36 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:36 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:36 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.6 $)
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:36 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -398,7 +398,8 @@ lmi_info_ack(queue_t *q, long state, caddr_t ppa_ptr, size_t ppa_len)
 	lmi_info_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = state;
@@ -426,7 +427,8 @@ lmi_ok_ack(queue_t *q, long state, long prim)
 	lmi_ok_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		p->lmi_state = state;
@@ -448,7 +450,8 @@ lmi_error_ack(queue_t *q, long state, long prim, long err, long reason)
 	lmi_error_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = err;
 		p->lmi_reason = reason;
@@ -471,7 +474,8 @@ lmi_enable_con(queue_t *q, long state)
 	lmi_enable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = state;
 		qreply(q, mp);
@@ -492,7 +496,8 @@ lmi_disable_con(queue_t *q, long state)
 	lmi_disable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = state;
 		qreply(q, mp);
@@ -540,7 +545,8 @@ lmi_error_ind(queue_t *q, long state, long error, long reason)
 	lmi_error_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = error;
 		p->lmi_reason = reason;
@@ -563,7 +569,8 @@ lmi_stats_ind(queue_t *q)
 	lmi_stats_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_STATS_IND;
 		p->lmi_interval = 0;
 		p->lmi_timestamp = jiffies;
@@ -585,7 +592,8 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level, caddr_t inf_ptr, size_t inf_le
 	lmi_event_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + inf_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_EVENT_IND;
 		p->lmi_objectid = oid;
 		p->lmi_timestamp = jiffies;

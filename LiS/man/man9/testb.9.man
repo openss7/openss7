@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: testb.9.man,v 1.1.4.2 2005/03/12 13:06:50 brian Exp $
+.\" @(#) $Id: testb.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/12 13:06:50 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TESTB 9 "$Date: 2005/03/12 13:06:50 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH TESTB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .SH NAME
 .B testb, lis_testb
 \- test is a \fISTREAMS\fR message can be allocated

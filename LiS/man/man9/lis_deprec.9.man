@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_deprec.9.man,v 1.1.2.1 2005/03/12 13:06:45 brian Exp $
+.\" @(#) $Id: lis_deprec.9.man,v 1.1.2.2 2005/03/30 14:46:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/12 13:06:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LIS_DEPREC 9 "$Date: 2005/03/12 13:06:45 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH LIS_DEPREC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .SH NAME
 .B lis_deprec
 \- deprecated LiS symbols

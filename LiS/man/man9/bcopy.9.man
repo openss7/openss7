@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcopy.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
+.\" @(#) $Id: bcopy.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BCOPY 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH BCOPY 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .SH NAME
 .B bcopy
 \- copy byte strings

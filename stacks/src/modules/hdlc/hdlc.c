@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:51 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 14:43:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:29:51 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:51 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 14:43:36 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:51 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 14:43:36 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:51 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 14:43:36 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -570,7 +570,8 @@ cd_info_ack(queue_t *q, struct cd *cd)
 	cd_info_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		*p = cd->info.cd;
 		printd(("%s: %p: <- CD_INFO_ACK\n", MOD_NAME, cd));
 		putnext(cd->oq, mp);
@@ -591,7 +592,8 @@ cd_ok_ack(queue_t *q, struct cd *cd, ulong prim)
 	cd_ok_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_OK_ACK;
 		p->cd_correct_primitive = prim;
 		switch (prim) {
@@ -643,7 +645,8 @@ cd_error_ack(queue_t *q, struct cd *cd, ulong prim, ulong error, ulong reason)
 	cd_error_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_ERROR_ACK;
 		p->cd_error_primitive = prim;
 		p->cd_errno = error;
@@ -672,7 +675,8 @@ cd_enable_con(queue_t *q, struct cd *cd)
 	cd_enable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_ENABLE_CON;
 		p->cd_state = cd_set_state(cd, CD_ENABLED);
 		printd(("%s: %p: <- CD_ENABLE_CON\n", MOD_NAME, cd));
@@ -694,7 +698,8 @@ cd_disable_con(queue_t *q, struct cd *cd)
 	cd_disable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_DISABLE_CON;
 		p->cd_state = cd_set_state(cd, CD_DISABLED);
 		printd(("%s: %p: <- CD_DISABLE_CON\n", MOD_NAME, cd));
@@ -716,7 +721,8 @@ cd_error_ind(queue_t *q, struct cd *cd, ulong error, ulong reason, ulong state, 
 	cd_error_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_ERROR_IND;
 		p->cd_state = cd_set_state(cd, state);
 		p->cd_errno = error;
@@ -742,7 +748,8 @@ cd_uintdata_ack(queue_t *q, struct cd *cd)
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		mp->b_band = 2;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_UNITDATA_ACK;
 		p->cd_state = cd_get_state(cd);
 		printd(("%s: %p: <- CD_UNITDATA_ACK\n", MOD_NAME, cd));
@@ -764,7 +771,8 @@ cd_unitdata_ind(queue_t *q, struct cd *cd, mblk_t *dp)
 	cd_unitdata_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_UNITDATA_IND;
 		p->cd_state = cd_get_state(cd);
 		p->cd_src_addr_length = 0;
@@ -793,7 +801,8 @@ cd_bad_frame_ind(queue_t *q, struct cd *cd, ulong error, mblk_t *dp)
 	cd_bad_frame_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_BAD_FRAME_IND;
 		p->cd_state = cd_get_state(cd);
 		p->cd_error = error;
@@ -818,7 +827,8 @@ cd_modem_sig_ind(queue_t *q, struct cd *cd, ulong sigs)
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		mp->b_band = 1;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->cd_primitive = CD_MODEM_SIG_IND;
 		p->cd_sigs = sigs;
 		printd(("%s: %p: <- CD_MODEM_SIG_IND\n", MOD_NAME, cd));
@@ -848,7 +858,8 @@ ch_info_req(queue_t *q, struct cd *cd)
 	struct CH_info_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_INFO_REQ;
 		printd(("%s: %p: CH_INFO_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
@@ -869,7 +880,8 @@ ch_optmgmt_req(queue_t *q, struct cd *cd)
 	struct CH_optmgmt_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_OPTMGMT_REQ;
 		printd(("%s: %p: CH_OPTMGMT_REQ ->\n", MOD_NAME, cd));
 		putnext(cd->iq, mp);
@@ -890,7 +902,8 @@ ch_attach_req(queue_t *q, struct cd *cd, size_t add_len, caddr_t add_ptr, ulong 
 	struct CH_attach_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_ATTACH_REQ;
 		p->ch_addr_length = add_len;
 		p->ch_addr_offset = add_len ? sizeof(*p) : 0;
@@ -919,7 +932,8 @@ ch_enable_req(queue_t *q, struct cd *cd)
 	struct CH_enable_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_ENABLE_REQ;
 		ch_set_state(cd, CHS_WACK_EREQ);
 		printd(("%s: %p: CH_ENABLE_REQ ->\n", MOD_NAME, cd));
@@ -941,7 +955,8 @@ ch_connect_req(queue_t *q, struct cd *cd, ulong flags)
 	struct CH_connect_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_CONNECT_REQ;
 		p->ch_conn_flags = flags;
 		p->ch_slot = 0;
@@ -965,7 +980,8 @@ ch_data_req(queue_t *q, struct cd *cd, mblk_t *dp)
 	struct CH_data_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_DATA_REQ;
 		p->ch_slot = 0;
 		mp->b_cont = dp;
@@ -988,7 +1004,8 @@ ch_disconnect_req(queue_t *q, struct cd *cd, ulong flags)
 	struct CH_disconnect_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_DISCONNECT_REQ;
 		p->ch_conn_flags = flags;
 		p->ch_slot = 0;
@@ -1012,7 +1029,8 @@ ch_disable_req(queue_t *q, struct cd *cd)
 	struct CH_disable_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_DISABLE_REQ;
 		ch_set_state(cd, CHS_WACK_RREQ);
 		printd(("%s: %p: CH_DISABLE_REQ ->\n", MOD_NAME, cd));
@@ -1034,7 +1052,8 @@ ch_detach_req(queue_t *q, struct cd *cd)
 	struct CH_detach_req *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->ch_primitive = CH_DETACH_REQ;
 		ch_set_state(cd, CHS_WACK_UREQ);
 		printd(("%s: %p: CH_DETACH_REQ ->\n", MOD_NAME, cd));

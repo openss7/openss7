@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:35 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:46 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -517,7 +517,8 @@ lmi_ok_ack_reply(queue_t *q, mblk_t *mp, int prim, int state)
 {
 	lmi_ok_ack_t *p;
 	mp->b_wptr = mp->b_rptr;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->lmi_primitive = LMI_OK_ACK;
 	p->lmi_correct_primitive = prim;
 	p->lmi_state = state;
@@ -531,7 +532,8 @@ lmi_error_ack_reply(queue_t *q, mblk_t *mp, int prim, int state, int err)
 	/* 
 	   return a negative acknowledgement */
 	mp->b_wptr = mp->b_rptr;
-	p = ((typeof(p)) mp->b_wptr)++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->lmi_primitive = LMI_ERROR_ACK;
 	p->lmi_error_primitive = prim;
 	p->lmi_state = state;
@@ -623,7 +625,8 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 		sd->iq->q_next = NULL;
 #endif
 		mp->b_wptr = mp->b_rptr;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = LMI_DETACH_REQ;
 		p->lmi_state = LMI_UNATTACHED;

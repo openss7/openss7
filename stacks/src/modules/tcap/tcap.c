@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:02 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:02 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:02 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:02 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -94,7 +94,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:02 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3558,7 +3558,8 @@ tc_info_ack(queue_t *q, struct tcap *tcap)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_INFO_ACK;
 	p->TSDU_size = FIXME;
 	p->ETSDU_size = FIXME;
@@ -3597,7 +3598,8 @@ tc_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulong xact, ul
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_BIND_ACK;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -3632,7 +3634,8 @@ tc_subs_bind_ack(queue_t *q, struct tcap *tcap)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_SUBS_BIND_ACK;
 	printd(("%s: %p: <- TC_SUBS_BIND_ACK\n", DRV_NAME, tcap));
 	ss7_oput(tcap->oq, mp);
@@ -3659,7 +3662,8 @@ tc_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_OK_ACK;
 	p->CORRECT_prim = prim;
 	printd(("%s: %p: <- TC_OK_ACK\n", DRV_NAME, tcap));
@@ -3687,7 +3691,8 @@ tc_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, ulong did, u
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->TRPI_error = etype < 0 ? TCSYSERR : etype;
@@ -3720,7 +3725,8 @@ tc_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong flags
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_OPTMGMT_ACK;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -3760,7 +3766,8 @@ tc_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct sccp_add
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_UNI_IND;
 	p->SRC_length = src_len;
 	p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -3818,7 +3825,8 @@ tc_begin_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *src, struct sccp_a
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_BEGIN_IND;
 	p->SRC_length = src_len;
 	p->SRC_offset = src_len ? sizeof(*p) : 0;
@@ -3874,7 +3882,8 @@ tc_begin_con(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ul
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_BEGIN_CON;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -3918,7 +3927,8 @@ tc_cont_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulo
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_CONT_IND;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -3961,7 +3971,8 @@ tc_end_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ulon
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_END_IND;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -4005,7 +4016,8 @@ tc_abort_ind(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong did, ul
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_ABORT_IND;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -4047,7 +4059,8 @@ tc_notice_ind(queue_t *q, struct tcap *tcap, ulong did, ulong cause)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_NOTICE_IND;
 	p->DIALOG_id = did;
 	p->REPORT_cause = cause;
@@ -4083,7 +4096,8 @@ tc_invoke_ind(queue_t *q, struct tcap *tcap, ulong did, ulong ocls, ulong iid, u
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_INVOKE_IND;
 	p->DIALOG_id = did;
 	p->OP_class = ocls;
@@ -4122,7 +4136,8 @@ tc_result_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong oper, u
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_RESULT_IND;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
@@ -4159,7 +4174,8 @@ tc_error_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong ecode)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_ERROR_IND;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
@@ -4195,7 +4211,8 @@ tc_cancel_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_CANCEL_IND;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
@@ -4230,7 +4247,8 @@ tc_reject_ind(queue_t *q, struct tcap *tcap, ulong did, ulong iid, ulong ecode)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TC_REJECT_IND;
 	p->DIALOG_id = did;
 	p->INVOKE_id = iid;
@@ -4268,7 +4286,8 @@ tr_info_ack(queue_t *q, struct tcap *tcap)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_INFO_ACK;
 	p->TSDU_size = FIXME;
 	p->ETSDU_size = FIXME;
@@ -4307,7 +4326,8 @@ tr_bind_ack(queue_t *q, struct tcap *tcap, struct sccp_addr *add, ulong xact, ul
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_BIND_ACK;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -4343,7 +4363,8 @@ tr_ok_ack(queue_t *q, struct tcap *tcap, ulong prim)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_OK_ACK;
 	p->CORRECT_prim = prim;
 	printd(("%s: %p: <- TR_OK_ACK\n", DRV_NAME, tcap));
@@ -4371,7 +4392,8 @@ tr_error_ack(queue_t *q, struct tcap *tcap, ulong prim, long etype, ulong tid)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_ERROR_ACK;
 	p->ERROR_prim = prim;
 	p->TRPI_error = etype < 0 ? TRSYSERR : etype;
@@ -4403,7 +4425,8 @@ tr_optmgmt_ack(queue_t *q, struct tcap *tcap, struct tcap_opts *opt, ulong flags
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_OPTMGMT_ACK;
 	p->OPT_length = opt_len;
 	p->OPT_offset = opt_len ? sizeof(*p) : 0;
@@ -4443,7 +4466,8 @@ tr_uni_ind(queue_t *q, struct tcap *tcap, struct sccp_addr *org, struct sccp_add
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_UNI_IND;
 	p->DEST_length = dst_len;
 	p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -4499,7 +4523,8 @@ tr_begin_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct sccp_addr *org
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_BEGIN_IND;
 	p->TRANS_id = tr->tid;
 	p->DEST_length = dst_len;
@@ -4555,7 +4580,8 @@ tr_begin_con(queue_t *q, struct tcap *tcap, struct tr *tr, struct sccp_addr *org
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_BEGIN_CON;
 	p->CORR_id = tr->cid;
 	p->TRANS_id = tr->tid;
@@ -4604,7 +4630,8 @@ tr_cont_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_opts *opt,
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_CONT_IND;
 	p->TRANS_id = tr->tid;
 	p->OPT_length = opt_len;
@@ -4646,7 +4673,8 @@ tr_end_ind(queue_t *q, struct tcap *tcap, struct tr *tr, struct tcap_opts *opt, 
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_END_IND;
 	p->CORR_id = tr->cid;
 	p->TRANS_id = tr->tid;
@@ -4690,7 +4718,8 @@ tr_abort_ind(queue_t *q, struct tcap *tcap, struct tr *tr, ulong cause, ulong or
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_ABORT_IND;
 	p->ABORT_cause = cause;
 	p->ORIGINATOR = orig;
@@ -4733,7 +4762,8 @@ tr_notice_ind(queue_t *q, struct tcap *tcap, ulong cause, struct tr *tr)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = TR_NOTICE_IND;
 	p->REPORT_cause = cause;
 	p->CORR_id = tr->cid;
@@ -5627,7 +5657,8 @@ n_conn_req(queue_t *q, struct sccp *sccp, struct sccp_addr *dst, ulong flags,
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_CONN_REQ;
 	p->DEST_length = dst_len;
 	p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -5684,7 +5715,8 @@ n_conn_res(queue_t *q, struct sccp *sccp, ulong tok, struct sccp_addr *res, ulon
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_CONN_RES;
 	p->TOKEN_value = tok;
 	p->RES_length = res_len;
@@ -5746,7 +5778,8 @@ n_discon_req(queue_t *q, struct sccp *sccp, ulong reason, struct sccp_addr *res,
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_DISCON_REQ;
 	p->DISCON_reason = reason;
 	p->RES_length = res_len;
@@ -5814,7 +5847,8 @@ n_data_req(queue_t *q, struct sccp *sccp, ulong flags, mblk_t *dp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_DATA_REQ;
 	p->DATA_xfer_flags = flags;
 	mp->b_cont = dp;
@@ -5862,7 +5896,8 @@ n_exdata_req(queue_t *q, struct sccp *sccp, mblk_t *dp)
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
 	mp->b_band = 1;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_EXDATA_REQ;
 	mp->b_cont = dp;
 	printd(("%s: %p: N_EXDATA_REQ ->\n", DRV_NAME, sccp));
@@ -5904,7 +5939,8 @@ n_info_req(queue_t *q, struct sccp *sccp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_INFO_REQ;
 	printd(("%s: %p: N_INFO_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
@@ -5935,7 +5971,8 @@ n_bind_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add, ulong cons, ulo
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_BIND_REQ;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -5983,7 +6020,8 @@ n_unbind_req(queue_t *q, struct sccp *sccp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_UNBIND_REQ;
 	sccp_set_i_state(sccp, NS_WACK_UREQ);
 	printd(("%s: %p: N_UNBIND_REQ ->\n", DRV_NAME, sccp));
@@ -6020,7 +6058,8 @@ n_unitdata_req(queue_t *q, struct sccp *sccp, struct sccp_addr *dst, mblk_t *dp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_UNITDATA_REQ;
 	p->DEST_length = dst_len;
 	p->DEST_offset = dst_len ? sizeof(*p) : 0;
@@ -6067,7 +6106,8 @@ n_optmgmt_req(queue_t *q, struct sccp *sccp, N_qos_sel_info_sccp_t * qos, ulong 
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_OPTMGMT_REQ;
 	p->QOS_length = qos_len;
 	p->QOS_offset = qos_len ? sizeof(*p) : 0;
@@ -6107,7 +6147,8 @@ n_datack_req(queue_t *q, struct sccp *sccp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_DATACK_REQ;
 	printd(("%s: %p: N_DATACK_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
@@ -6152,7 +6193,8 @@ n_reset_req(queue_t *q, struct sccp *sccp, ulong reason)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_RESET_REQ;
 	p->RESET_reason = reason;
 	sccp_set_i_state(sccp, NS_WCON_RREQ);
@@ -6193,7 +6235,8 @@ n_reset_res(queue_t *q, struct sccp *sccp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_RESET_RES;
 	sccp_set_i_state(sccp, NS_DATA_XFER);
 	printd(("%s: %p: N_RESET_RES ->\n", DRV_NAME, sccp));
@@ -6231,7 +6274,8 @@ n_inform_req(queue_t *q, struct sccp *sccp)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_INFORM_REQ;
 	printd(("%s: %p: N_INFORM_REQ ->\n", DRV_NAME, sccp));
 	ss7_oput(sccp->oq, mp);
@@ -6265,7 +6309,8 @@ n_coord_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_COORD_REQ;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -6305,7 +6350,8 @@ n_coord_res(queue_t *q, struct sccp *sccp, struct sccp_addr *add)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_COORD_RES;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
@@ -6345,7 +6391,8 @@ n_state_req(queue_t *q, struct sccp *sccp, struct sccp_addr *add, ulong status)
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
-	p = (typeof(p)) mp->b_wptr++;
+	p = (typeof(p)) mp->b_wptr;
+	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = N_STATE_REQ;
 	p->ADDR_length = add_len;
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:45 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:45 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:45 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:45 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $";
 
 #include "os7/compat.h"
 
@@ -68,7 +68,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:45 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/30 14:43:49 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -220,7 +220,8 @@ lmi_info_ack(sdl_t * sp)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_info_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = sp->state;
@@ -248,7 +249,8 @@ lmi_ok_ack(sdl_t * sp, long prim)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_ok_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		switch (sp->state) {
@@ -289,7 +291,8 @@ lmi_error_ack(sdl_t * sp, long prim, long err)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_error_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = err < 0 ? -err : 0;
 		p->lmi_reason = err < 0 ? LMI_SYSERR : err;
@@ -333,7 +336,8 @@ lmi_enable_con(sdl_t * sp)
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((lmi_enable_con_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_ENABLE_CON;
 			p->lmi_state = sp->state = LMI_ENABLED;
 			putnext(sp->iq, mp);
@@ -360,7 +364,8 @@ lmi_disable_con(sdl_t * sp)
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((lmi_disable_con_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_DISABLE_CON;
 			p->lmi_state = sp->state = LMI_DISABLED;
 			putnext(sp->iq, mp);
@@ -386,7 +391,8 @@ lmi_optmgmt_ack(sdl_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_optmgmt_ack_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -413,7 +419,8 @@ lmi_error_ind(sdl_t * sp, long err)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((lmi_error_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = err < 0 ? -err : 0;
 		p->lmi_reason = err < 0 ? LMI_SYSERR : err;
@@ -439,7 +446,8 @@ lmi_stats_ind(sdl_t * sp, ulong interval, ulong timestamp)
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((lmi_stats_ind_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_STATS_IND;
 			p->lmi_interval = interval;
 			p->lmi_timestamp = timestamp;
@@ -467,7 +475,8 @@ lmi_event_ind(sdl_t * sp, ulong oid, ulong severity, ulong timestamp)
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((lmi_event_ind_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->lmi_primitive = LMI_EVENT_IND;
 			p->lmi_objectid = oid;
 			p->lmi_timestamp = timestamp;
@@ -508,7 +517,8 @@ sdl_daedr_received_bits_ind(sdl_t * sp, ulong count, mblk_t *dp)
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((sdl_daedr_received_bits_ind_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->sdl_primitive = SDL_DAEDR_RECEIVED_BITS_IND;
 			p->sdl_count = count;
 			putnext(sp->iq, mp);
@@ -534,7 +544,8 @@ sdl_daedr_correct_su_ind(sdl_t * sp, ulong count)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((sdl_daedr_correct_su_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_DAEDR_CORRECT_SU_IND;
 		p->sdl_count = count;
 		putnext(sp->iq, mp);
@@ -557,7 +568,8 @@ sdl_daedr_su_in_error_ind(sdl_t * sp)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((sdl_daedr_su_in_error_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_DAEDR_SU_IN_ERROR_IND;
 		putnext(sp->iq, mp);
 		return (0);
@@ -579,7 +591,8 @@ sdl_daedt_transmission_request_ind(sdl_t * sp)
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((sdl_daedt_transmission_request_ind_t *) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_DAEDT_TRANSMISSION_REQUEST_IND;
 		putnext(sp->iq, mp);
 		return (0);
@@ -610,7 +623,8 @@ n_data_req(sdl_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
 	if (canputnext(sp->oq)) {
 		if ((mp = allocb(sizeof(*p) + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((N_data_req_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->PRIM_type = N_DATA_REQ;
 			p->DATA_xfer_flags = flags;
 			bcopy(qos_ptr, mp->b_wptr, qos_len);
@@ -641,7 +655,8 @@ n_exdata_req(sdl_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 	if (bcanputnext(sp->oq, 1)) {
 		if ((mp = allocb(sizeof(*p) + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((N_exdata_req_t *) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->PRIM_type = N_EXDATA_REQ;
 			bcopy(qos_ptr, mp->b_wptr, qos_len);
 			mp->b_wptr += qos_len;

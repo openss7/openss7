@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NETPERF 1L "$Date$" "$Name$" "User Commands"
+.TH NETPERF 1L "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
 .\" =========================================================================
 .\" =========================================================================
 .SH NAME

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:16 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:50 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:16 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:16 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:50 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:16 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:50 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:16 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/03/30 14:43:50 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1608,7 +1608,8 @@ sdt_t8_timeout(queue_t *q)
 	if (!spin_is_locked(&xp->qlock)) {
 		if ((mp = allocb(sizeof(ulong), BPRI_HI))) {
 			mp->b_datap->db_type = M_PCRSE;
-			*(ulong *) mp->b_wptr++ = SDT_T8_TIMEOUT;
+			*(ulong *) mp->b_wptr = SDT_T8_TIMEOUT;
+			mp->b_wptr += sizeof(ulong);
 			putq(xp->rq, mp);
 			return;
 		}

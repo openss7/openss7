@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:37 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -293,7 +293,8 @@ lmi_info_ack(queue_t *q, struct sdt *s)
 	lmi_info_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 1;
 		p->lmi_state = s->i_state;
@@ -320,7 +321,8 @@ lmi_ok_ack(queue_t *q, struct sdt *s, long prim)
 	lmi_ok_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_correct_primitive = prim;
 		switch (s->i_state) {
@@ -352,7 +354,8 @@ lmi_error_ack(queue_t *q, struct sdt *s, long prim, ulong reason, ulong errno)
 	lmi_error_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_errno = errno;
 		p->lmi_reason = reason;
@@ -394,7 +397,8 @@ lmi_enable_con(queue_t *q, struct sdt *s)
 	lmi_enable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = s->i_state;
 		printd(("%s: %p: <- LMI_ENABLE_CON\n", MOD_NAME, s));
@@ -416,7 +420,8 @@ lmi_disable_con(queue_t *q, struct sdt *s)
 	lmi_disable_con_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = s->i_state;
 		printd(("%s: %p: <- LMI_DISABLE_CON\n", MOD_NAME, s));
@@ -438,7 +443,8 @@ lmi_optmgmt_ack(queue_t *q, struct sdt *s, ulong flags, caddr_t opt_ptr, size_t 
 	lmi_optmgmt_ack_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -464,7 +470,8 @@ lmi_error_ind(queue_t *q, struct sdt *s, long error, long reason)
 	lmi_error_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = error;
 		p->lmi_reason = reason;
@@ -488,7 +495,8 @@ lmi_stats_ind(queue_t *q, struct sdt *s)
 	lmi_stats_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_STATS_IND;
 		p->lmi_interval = 0;
 		p->lmi_timestamp = jiffies;
@@ -512,7 +520,8 @@ lmi_event_ind(queue_t *q, struct sdt *s, ulong oid, ulong level, caddr_t inf_ptr
 	lmi_event_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + inf_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_EVENT_IND;
 		p->lmi_objectid = oid;
 		p->lmi_timestamp = jiffies;
@@ -543,7 +552,8 @@ sdt_rc_signal_unit_ind(queue_t *q, struct sdt *s, mblk_t *dp, ulong count)
 		sdt_rc_signal_unit_ind_t *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 			p->sdt_count = count;
 			mp->b_cont = dp;
@@ -570,7 +580,8 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct sdt *s)
 	sdt_rc_congestion_accept_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_ACCEPT_IND;
 		printd(("%s: %p: <- SDT_RC_CONGESTION_ACCEPT_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -591,7 +602,8 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct sdt *s)
 	sdt_rc_congestion_discard_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_CONGESTION_DISCARD_IND;
 		printd(("%s: %p: <- SDT_RC_CONGESTION_DISCARD_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -612,7 +624,8 @@ sdt_rc_no_congestion_ind(queue_t *q, struct sdt *s)
 	sdt_rc_no_congestion_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_RC_NO_CONGESTION_IND;
 		printd(("%s: %p: <- SDT_RC_NO_CONGESTION_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -633,7 +646,8 @@ sdt_iac_correct_su_ind(queue_t *q, struct sdt *s)
 	sdt_iac_correct_su_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_IAC_CORRECT_SU_IND;
 		printd(("%s: %p: <- SDT_IAC_CORRECT_SU_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -654,7 +668,8 @@ sdt_iac_abort_proving_ind(queue_t *q, struct sdt *s)
 	sdt_iac_abort_proving_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_IAC_ABORT_PROVING_IND;
 		printd(("%s: %p: <- SDT_IAC_ABORT_PROVING_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -675,7 +690,8 @@ sdt_lsc_link_failure_ind(queue_t *q, struct sdt *s)
 	sdt_lsc_link_failure_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_LSC_LINK_FAILURE_IND;
 		printd(("%s: %p: <- SDT_LSC_LINK_FAILURE_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -700,7 +716,8 @@ sdt_txc_transmission_request_ind(queue_t *q, struct sdt *s)
 	sdt_txc_transmission_request_ind_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdt_primitive = SDT_TXC_TRANSMISSION_REQUEST_IND;
 		printd(("%s: %p: <- SDT_TXC_TRANSMISSION_REQUEST_IND\n", MOD_NAME, s));
 		putnext(s->oq, mp);
@@ -729,7 +746,8 @@ sdl_info_req(queue_t *q, struct sdt *s)
 	lmi_info_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_REQ;
 		printd(("%s: %p: LMI_INFO_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
@@ -754,7 +772,8 @@ sdl_attach_req(queue_t *q, struct sdt *s, caddr_t ppa_ptr, size_t ppa_len)
 	lmi_attach_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ATTACH_REQ;
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
@@ -777,7 +796,8 @@ sdl_detach_req(queue_t *q, struct sdt *s)
 	lmi_detach_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DETACH_REQ;
 		printd(("%s: %p: LMI_DETACH_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
@@ -798,7 +818,8 @@ sdl_enable_req(queue_t *q, struct sdt *s)
 	lmi_enable_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_ENABLE_REQ;
 		printd(("%s: %p: LMI_ENABLE_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
@@ -819,7 +840,8 @@ sdl_disable_req(queue_t *q, struct sdt *s)
 	lmi_disable_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		printd(("%s: %p: LMI_DISABLE_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
@@ -840,7 +862,10 @@ sdl_optmgmt_req(queue_t *q, struct sdt *s, long flags, caddr_t opt_ptr, size_t o
 	lmi_optmgmt_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_OPTMGMT_REQ;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
@@ -870,7 +895,8 @@ sdl_bits_for_transmission_req(queue_t *q, struct sdt *s, mblk_t *dp)
 	sdl_bits_for_transmission_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_BITS_FOR_TRANSMISSION_REQ;
 		mp->b_cont = dp;
 		printd(("%s: %p: SDL_BITS_FOR_TRANSMISSION [%d] ->\n", MOD_NAME, s, msgdsize(dp)));
@@ -892,7 +918,8 @@ sdl_connect_req(queue_t *q, struct sdt *s)
 	sdl_connect_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_CONNECT_REQ;
 		printd(("%s: %p: SDL_CONNECT_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);
@@ -913,7 +940,8 @@ sdl_disconnect_req(queue_t *q, struct sdt *s)
 	sdl_disconnect_req_t *p;
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
 		p->sdl_primitive = SDL_DISCONNECT_REQ;
 		printd(("%s: %p: SDL_DISCONNECT_REQ ->\n", MOD_NAME, s));
 		putnext(s->iq, mp);

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: isastream.3.man,v 1.1.4.1 2005/03/09 23:13:56 brian Exp $
+.\" @(#) $Id: isastream.3.man,v 1.1.4.2 2005/03/30 14:46:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:56 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 14:46:27 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ISASTREAM 3 "$Date: 2005/03/09 23:13:56 $" "$Name:  $" "Linux STREAMS"
+.TH ISASTREAM 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B isastream
 \- determine whether an open file is \fISTREAMS\fR

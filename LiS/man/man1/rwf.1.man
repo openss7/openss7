@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rwf.1.man,v 1.1.4.1 2005/03/09 23:13:55 brian Exp $
+.\" @(#) $Id: rwf.1.man,v 1.1.4.2 2005/03/30 14:46:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 14:46:27 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXXX 1 "$Date: 2005/03/09 23:13:55 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH XXXX 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
 .\"
 .\"
 .SH NAME

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:42 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 14:43:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $";
 
 #include "os7/compat.h"
 
@@ -61,7 +61,7 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/30 14:43:47 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -194,13 +194,15 @@ sm_rput(queue_t *q, mblk_t *dp)
 		sls = (b >> 4) & 0x0f;
 		mp = allocb(sizeof(*m) + sizeof(*a), BPRI_MED);
 		mp->b_datap->db_type = M_PROTO;
-		m = ((typeof(m)) mp->b_wptr)++;
+		m = (typeof(m)) mp->b_wptr;
+		mp->b_wptr += sizeof(*m);
 		m->mtp_primitive = MTP_TRANSFER_IND;
 		m->mtp_srce_length = sizeof(*a);
 		m->mtp_srce_offset = sizeof(*m);
 		m->mtp_mp = 0;
 		m->mtp_sls = sls;
-		a = ((typeof(a)) mp->b_wptr)++;
+		a = (typeof(a)) mp->b_wptr;
+		mp->b_wptr += sizeof(*a);
 		a->ni = 0;
 		a->pc = opc;
 		a->si = sio & 0x0f;
