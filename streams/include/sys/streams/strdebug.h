@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.7 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.8 2004/08/22 22:08:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,63 +45,80 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2004/08/22 22:08:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 22:08:21 $"
 
+#undef  __never
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __rare
 #define __rare() \
 do { printk(KERN_NOTICE "%s: rare() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __seldom
 #define __seldom() \
 do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __usual
 #define __usual(__exp) \
 do { if (!(__exp)) printk(KERN_WARNING "%s: usual(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
 
+#undef  __normal
 #define __normal(__exp) \
 do { if (!(__exp)) printk(KERN_WARNING "%s: normal(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
 
+#undef  __assert
 #define __assert(__exp) \
 do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); *(int *)0 = 0; } } while(0)
 
+#undef  __assure
 #define __assure(__exp) \
 do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
 
+#undef  __ensure
 #define __ensure(__exp,__sta) \
 do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
 
+#undef  __unless
 #define __unless(__exp,__sta) \
 __ensure(!(__exp),__sta)
 
+#undef  __trace
 #define __trace() \
 do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __ptrace
 #define __ptrace(__pkspec) \
 do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#undef  __fixme
 #define __fixme(__pkspec) \
 do { printk(KERN_INFO "%s: fixme() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#undef  __todo
 #define __todo(__pkspec) \
 do { printk(KERN_INFO "%s: todo() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#undef  __ctrace
 #define __ctrace(__fnc) \
 ({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
 
+#undef  __printd
 #define __printd(__pkspec) \
 do { printk __pkspec; } while(0)
 
+#undef  __swerr
 #define __swerr() \
 do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __pswerr
 #define __pswerr(__pkspec) \
 do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
