@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/03/08 11:56:17 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/03/16 11:54:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 11:56:17 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:54:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,7 @@ m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
+m4_include([m4/devfs.m4])
 m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
@@ -722,6 +723,7 @@ AC_DEFUN([_LFS_SETUP_FIFOS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP], [dnl
     _LINUX_KERNEL
+    _LINUX_DEVFS
     _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
@@ -1077,6 +1079,7 @@ dnl strconf_cv_makedev='devices.lst'
 dnl strconf_cv_stsetup='strsetup.conf'
 dnl strconf_cv_strload='strload.conf'
     strconf_cv_package='LfS'
+    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
     _STRCONF
 ])# _LFS_STRCONF
 # =============================================================================

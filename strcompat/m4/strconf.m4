@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/14 01:17:04 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/16 09:06:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 01:17:04 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 09:06:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -149,6 +149,9 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
     AC_MSG_CHECKING([for strconf STREAMS package])
     STRCONF_PACKAGE="${strconf_cv_package:-LiS}"
     AC_MSG_RESULT([${STRCONF_PACKAGE}])
+    AC_MSG_CHECKING([for strconf minor bits])
+    STRCONF_MINORSZ="${strconf_cv_minorbits:-8}"
+    AC_MSG_RESULT([${STRCONF_MINORBITS}])
 ])# _STRCONF_SETUP
 # =============================================================================
 
@@ -186,7 +189,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	done
 	if test :"${STRCONF_CONFIG:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_CONFIG from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -194,7 +197,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_MODCONF:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_MODCONF from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --modconf=$STRCONF_MODCONF $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --modconf=$STRCONF_MODCONF $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -202,7 +205,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_MKNODES:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_MKNODES from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --makenodes=$STRCONF_MKNODES $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --makenodes=$STRCONF_MKNODES $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -210,7 +213,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_DRVCONF:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_DRVCONF from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --driverconf=$STRCONF_DRVCONF $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --driverconf=$STRCONF_DRVCONF $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -218,7 +221,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_CONFMOD:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_CONFMOD from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --confmodules=$STRCONF_CONFMOD $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --confmodules=$STRCONF_CONFMOD $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -226,7 +229,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_MAKEDEV:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_MAKEDEV from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -234,7 +237,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_STSETUP:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_STSETUP from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -242,7 +245,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_STRLOAD:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_STRLOAD from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
@@ -278,6 +281,7 @@ STRCONF_MAKEDEV="$STRCONF_MAKEDEV"
 STRCONF_STSETUP="$STRCONF_STSETUP"
 STRCONF_STRLOAD="$STRCONF_STRLOAD"
 STRCONF_PACKAGE="$STRCONF_PACKAGE"
+STRCONF_MINORSZ="$STRCONF_MINORSZ"
     ])
 ])# _STRCONF_OUTPUT_CONFIG
 # =============================================================================

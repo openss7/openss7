@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/08 19:32:09 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/16 11:54:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 19:32:09 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:54:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,7 @@ m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
+m4_include([m4/devfs.m4])
 m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
@@ -125,6 +126,7 @@ AC_DEFUN([_XNET_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNET_SETUP], [dnl
     _LINUX_KERNEL
+    _LINUX_DEVFS
     _GENKSYMS
     _LINUX_STREAMS
     with_xnet='yes'
@@ -157,6 +159,7 @@ dnl strconf_cv_makedev='devices.lst'
     strconf_cv_strload='xnetload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
+    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
     _STRCONF dnl
 ])# _XNET_STRCONF
 # =============================================================================

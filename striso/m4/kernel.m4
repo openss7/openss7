@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/03/14 12:50:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/03/16 09:07:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 12:50:15 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 09:07:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,6 +148,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_SYSMAP
     _LINUX_CHECK_KERNEL_KSYMS
     _LINUX_CHECK_KERNEL_HEADERS
+    _LINUX_CHECK_KERNEL_MINORBITS
     _LINUX_CHECK_KERNEL_COMPILER
     _LINUX_CHECK_KERNEL_MARCH
     _LINUX_CHECK_KERNEL_ARCHDIR
@@ -649,6 +650,37 @@ dnl
 # =========================================================================
 
 # =========================================================================
+# _LINUX_CHECK_KERNEL_MINORBITS
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_MINORBITS], [dnl
+    AC_CACHE_CHECK([for kernel minor device number bits], [linux_cv_minorbits], [dnl
+dnl
+dnl Just grep linux/kdev_t.h for #define MINORBITS.
+dnl
+	eval "linux_file=\"$kincludedir/linux/kdev_t.h\""
+	if test -f $linux_file
+	then
+	    linux_line="`egrep '^#[[:space:]]*define[[:space:]][[:space:]]*MINORBITS[[:space:]]' $linux_file | head -1`"
+	    linux_rslt="`echo \"$linux_line\" | sed -e 's|^#[[:space:]]*define[[:space:]][[:space:]]*MINORBITS[[:space:]][[:space:]]*\([1-9][0-9]*\)[[:space:]]*$|\1|'`"
+	    if test "${linux_rslt:-0}" -ge 8 -a "${linux_rslt:-0}" -le 20
+	    then
+		linux_cv_minorbits="$linux_rslt"
+	    fi
+	fi
+    ])
+    if test :"$linux_cv_minorbits" = :
+    then
+	AC_MSG_WARN([
+*** 
+*** Configure could not determine the number of minor bits in a minor device
+*** number for your kernel.  Configure is assuming that the kernel only has
+*** 8-bits per minor device number.  This could cause problems later.
+*** ])
+    fi
+])# _LINUX_CHECK_KERNEL_MINORBITS
+# =========================================================================
+
+# =========================================================================
 # _LINUX_CHECK_KERNEL_COMPILER
 # -------------------------------------------------------------------------
 # Ok, here we have headers and can finally check the compiler against the
@@ -680,9 +712,9 @@ dnl
 			then
 			    if echo "$linux_mod" | grep '\.gz[$]' >/dev/null 2>&1
 			    then
-				linux_com=`gunzip -dc $linux_mod | strings | grep '^GCC: (GNU) ' | head 1 2>/dev/null`
+				linux_com=`gunzip -dc $linux_mod | strings | grep '^GCC: (GNU) ' | head -1 2>/dev/null`
 			    else
-				linux_com=`cat $linux_mod | strings | grep '^GCC: (GNU) '  | head 1 2>/dev/null`
+				linux_com=`cat $linux_mod | strings | grep '^GCC: (GNU) '  | head -1 2>/dev/null`
 			    fi
 			    if echo "$linux_com" | grep '^GCC: (GNU) ' >/dev/null 2>&1
 			    then
