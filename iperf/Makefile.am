@@ -83,4 +83,8 @@ include am/rpm.am
 #
 include am/deb.am
 
+EXTRA_DIST		+= \
+			debian/README.Debian \
+			debian/TODO.Debian
+
 # vim: ft=automake

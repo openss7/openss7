@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/20 07:33:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/24 02:11:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/20 07:33:13 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:11:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -408,6 +408,9 @@ kpre				= streams-
 
 include am/kernel.am
 
+dist_modutil_DATA		= \
+				src/util/modutils/@PACKAGE_LCNAME@
+
 ##
 ## Rules for building libraries
 ##
@@ -486,6 +489,10 @@ include am/rpm.am
 ## Rules for making deb packages
 ##
 include am/deb.am
+
+EXTRA_DIST		+= \
+			debian/README.Debian \
+			debian/TODO.Debian
 
 MAINTAINERCLEANFILES	+= \
 			$(top_srcdir)/aclocal.m4 \

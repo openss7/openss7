@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/18 01:36:07 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/24 02:11:04 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -39,7 +39,7 @@ start() {
     for module in streams streams-clone streams-sth ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    echo -n "$module "
-	    insmod -k -q -- $module $redir
+	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
 	fi
     done
@@ -99,7 +99,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/18 01:36:07 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/24 02:11:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -145,7 +145,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/18 01:36:07 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:11:04 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/22 12:41:54 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/24 02:09:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/22 12:41:54 $ by $Author: brian $
+## Last Modified $Date: 2005/03/24 02:09:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -81,16 +81,19 @@ oldincludedir = @oldincludedir@
 
 configdir = @configdir@
 initrddir = @initrddir@
+modutildir = @modutildir@
 
 pkgdatadir = $(datadir)/$(PACKAGE)
 pkglibdir = $(libdir)/$(PACKAGE)
 pkgincludedir = $(includedir)/$(PACKAGE)
 
 export DH_VERBOSE = 1
+export DH_COMPAT = 4
 export DH_OPTIONS =
 
 name = $(PACKAGE)
 
+srcdir=@srcdir@
 kernel_version=@kversion@
 kernel_number=$(shell echo $(kversion) | sed -e s'|-.*$||')
 kernel_release=$(shell echo $(kversion) | sed -e s'|-|.|g')
@@ -117,28 +120,47 @@ have_init_files = 0
 have_libraries = 0
 have_preloads = 0
 
-pkg_control_files =
+pkg_control_files	=
+pkg_scripts_files	=
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-$(core_name).install
+debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
+debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
+debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
+debian/$(PACKAGE_LCNAME)-$(core_name).postrm:
+	@f=`echo "$@" | sed -e 's|^.*/||;s|$(core_name)|core|;s|$(info_name)|info|'` ; \
+	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+	test "$@" -ef "$$d$$f" && exit 0 ; \
+	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+		echo "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; \
+	}
+
+pkg_scripts_files	+= debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
+			   debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
+			   debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
+			   debian/$(PACKAGE_LCNAME)-$(core_name).postrm
+
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-$(core_name).install
 
 debian/$(PACKAGE_LCNAME)-$(core_name).install:
-	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	( echo '$(mytmpdir)$(kmoduledir)/*' ; \
+	  echo '$(mytmpdir)$(modutildir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-@WITH_KO_MODULES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-$(info_name).install
+@WITH_KO_MODULES_FALSE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-$(info_name).install
 
 debian/$(PACKAGE_LCNAME)-$(info_name).install:
 	( echo '$(mytmpdir)$(pkgincludedir)/$(kversion)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-lib.install
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-lib.install
 
 debian/$(PACKAGE_LCNAME)-lib.install:
 	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
 	  echo '$(mytmpdir)$(libdir)/*.la' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.docs
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
 	( echo "AUTHORS" ; \
@@ -151,37 +173,37 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "doc/manual" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.manpages
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
 
 debian/$(PACKAGE_LCNAME)-doc.manpages:
 	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
-@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.install
+@COOKED_MANPAGES_FALSE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.install
 
 debian/$(PACKAGE_LCNAME)-doc.install:
 	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
 	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.info
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
 
 debian/$(PACKAGE_LCNAME)-doc.info:
 	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-devel.install
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-devel.install
 
 debian/$(PACKAGE_LCNAME)-devel.install:
 	( echo '$(mytmpdir)$(pkgincludedir)/*.h' ; \
 	  echo '$(mytmpdir)$(pkgincludedir)/sys/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-#pkg_control_files += debian/$(PACKAGE_LCNAME)-source.install
+#pkg_control_files	+= debian/$(PACKAGE_LCNAME)-source.install
 
 #debian/$(PACKAGE_LCNAME)-source.install:
 #	( echo '$(mytmpdir)/usr/src/*' ) \
 #	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-util.install
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-util.install
 
 debian/$(PACKAGE_LCNAME)-util.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
@@ -190,6 +212,11 @@ debian/$(PACKAGE_LCNAME)-util.install:
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 @INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
 @INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
+
+pkg_scripts_files	+= debian/$(PACKAGE_LCNAME)-util.streams.sh
+
+debian/$(PACKAGE_LCNAME)-util.streams.sh:
+	cp -f -- $(srcdir)/src/util/init/streams.sh $@
 
 cache_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
 csite_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-config.site
@@ -232,7 +259,6 @@ build-stamp:
 		--with-base-major=$(majbase) \
 		$(PACKAGE_DEBOPTIONS) \
 		$(BUILD_CFGOPTIONS) \
-		--disable-initscripts \
 		|| { rm -f $(cache_file) ; exit 1 ; }
 	$(MAKE) -f Makefile
 	$(MAKE) -f Makefile check
@@ -247,7 +273,7 @@ clean:
 	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
 	rm -fr $(mytmpdir)
 	rm -f build-stamp
-	rm -f $(pkg_control_files)
+	rm -f $(pkg_control_files) $(pkg_scripts_files)
 	dh_clean -v
 
 install: DH_OPTIONS =
@@ -257,16 +283,17 @@ install: build
 	dh_clean -v -k
 	dh_installdirs -v
 	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
-	$(MAKE) -f debian/rules $(pkg_control_files)
+	$(MAKE) -f debian/rules $(pkg_control_files) $(pkg_scripts_files)
 	dh_install -v
 
 binary-common:
 	dh_testdir -v
 	dh_testroot -v
+	dh_installmodules -v
 	dh_installchangelogs -v
-	dh_installdocs -v
+	dh_installdocs -v -A debian/README.Debian debian/TODO.Debian
 	dh_installdebconf -v
-	dh_installinit -v
+	dh_installinit -v --init-script=streams.sh -- start 33 S . stop 33 0 6 .
 	dh_installinfo -v
 	dh_installman -v
 	dh_strip -v
@@ -300,6 +327,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.7  2005/03/24 02:09:14  brian
+# - improved debian build
+#
 # Revision 0.9.2.6  2005/03/22 12:41:54  brian
 # - good debian builds with dependencies
 #

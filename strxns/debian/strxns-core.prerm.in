@@ -1,0 +1,175 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile: strxns-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/24 02:09:16 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/03/24 02:09:16 $ by $Author: brian $
+#
+# =============================================================================
+set -e
+
+rootdir=@rootdir@
+kversion=@kversion@
+kmoduledir=@kmoduledir@
+sysconfdir=@sysconfdir@
+STRCONF_CONFMOD=@STRCONF_CONFMOD@
+STRCONF_MAJBASE=@STRCONF_MAJBASE@
+KERNEL_PRELOADS="specfs streams streams-sth streams-clone"
+KERNEL_MODULES="specfs streams streams-clone streams-fifo streams-sad streams-nsdev streams-echo streams-nuls streams-pipe streams-log streams-sth streams-pipemod streams-connld streams-sc streams-svr4compat streams-suncompat streams-uw7compat streams-osfcompat streams-aixcompat streams-hpuxcompat streams-liscompat"
+KERNEL_MODCONF=@STRCONF_CONFMOD@
+KERNEL_SUBDIR=@PACKAGE_LCNAME@
+KMODCONF_EXT=@PACKAGE_LCNAME@
+base=@PACKAGE_LCNAME@
+tmppath=/var/tmp
+
+#
+# If we are upgrading and the upgrade is for the running kernel, or we are installing new on the
+# running kernel, we have to worry about previous loaded modules for the old version or a non-deb
+# version kicking around.  This scriplet kills any streams modules that are loaded and running.
+#
+function prerm_modules() {
+    if [ ":$kversion" = ":`uname -r`" ] ; then
+	for m in $KERNEL_MODULES
+	do
+	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+#		module running, kick the stack
+		/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+		if ( /sbin/lsmod | grep -q "^$m" ) ; then
+		    fdetach -a 2>/dev/null
+		    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+		    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+			/usr/sbin/lsof | while read -a tokens; do
+			    if [ :"$tokens[4]" = :"CHR" ]; then
+				major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+				if [ $major -eq $STRCONF_MAJBASE ]; then
+				    eval "kill -HUP $tokens[1]"
+				fi
+			    fi
+			done
+			/sbin/sleep 5 # wait for processes to die and close streams
+			/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+			if ( /sbin/lsmod | grep -q "^$m" ) ; then
+			    echo "Cannot install or upgrade with $m module running." >&2
+			    exit 1
+			fi
+		    fi
+		fi
+	    fi
+	done
+    fi
+    return 0
+}
+
+function prerm_oldmods() {
+    prerm_modules
+}
+
+function prerm_preload() {
+    @WITH_KO_MODULES_FALSE@preloads=modules
+    @WITH_KO_MODULES_TRUE@preloads=modprobe.preload
+    if [ -f $sysconfdir/$preloads ] ; then
+	cp -f $sysconfdir/$preloads $tmppath/$preloads.new.$$
+	for m in $KERNEL_PRELOADS ; do
+	    sed -e "/^$m\>/d" $tmppath/$preloads.new.$$ > $tmppath/$preloads.tmp.$$
+	    mv -f $tmppath/$preloads.tmp.$$ $tmppath/$preloads.new.$$
+	done
+	chmod --reference=$sysconfdir/$preloads $tmppath/$preloads.new.$$
+	cp -fb --suffix=.rpmsave $tmppath/$preloads.new.$$ $sysconfdir/$preloads
+	rm -f $tmppath/$preloads.new.$$
+    fi
+}
+
+echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+
+case "$1" in
+
+    (remove)
+	# remove-prerm remove
+	# conflict-prerm remove in-favour package new-version
+	prerm_modules
+	prerm_preload
+	;;
+
+    (upgrade)
+	# old-prerm upgrade new-version
+	prerm_modules
+	prerm_preload
+	;;
+
+    (failed-upgrade)
+	# old-prerm upgrade new-version ... failed
+	# new-prerm failed-upgrade old-version
+	prerm_oldmods
+	prerm_preload
+	;;
+
+    (deconfigure)
+	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
+	prerm_modules
+	prerm_preload
+	;;
+
+esac
+
+# =============================================================================
+#
+# The following are debhelper script fragments under separate copyright:
+#
+# =============================================================================
+
+#DEBHELPER#
+
+# =============================================================================
+#
+# $Log: strxns-core.prerm.in,v $
+# Revision 0.9.2.1  2005/03/24 02:09:16  brian
+# - improved debian build
+#
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet

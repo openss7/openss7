@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.27 $) $Date: 2005/03/09 06:51:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.28 $) $Date: 2005/03/24 02:11:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 06:51:59 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:11:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -224,5 +224,9 @@ include am/rpm.am
 # Rules for making deb packages
 #
 include am/deb.am
+
+EXTRA_DIST		+= \
+			debian/README.Debian \
+			debian/TODO.Debian
 
 # vim: ft=automake

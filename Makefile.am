@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/17 14:33:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/24 02:10:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 14:33:13 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:10:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,8 +57,30 @@ export DEBXOPTS="-d"
 
 SUBDIRS	= @subdirs@
 
+##
+## Rules for lsms
+##
 include am/lsm.am
+
+##
+## Rules for archives
+##
 include am/archive.am
+
+##
+## Rules for making rpms
+##
+AM_RPMFLAGS 			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS 			= $(AM_RPMFLAGS)
+
 include am/rpm.am
+
+##
+## Rules for making deb packages
+##
 include am/deb.am
+
+EXTRA_DIST		+= \
+			debian/README.Debian \
+			debian/TODO.Debian
 

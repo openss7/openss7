@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/03/18 07:56:03 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/03/24 02:11:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/18 07:56:03 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:11:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,6 +77,12 @@ AC_DEFUN([AC_LFS], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
+    AC_CONFIG_FILES([debian/streams-core.preinst
+		     debian/streams-core.postinst
+		     debian/streams-core.prerm
+		     debian/streams-core.postrm
+		     debian/streams-lib.preinst
+		     src/util/modutils/streams])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

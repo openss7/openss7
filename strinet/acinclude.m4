@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/16 11:54:53 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/24 02:11:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 11:54:53 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:11:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,6 +80,11 @@ AC_DEFUN([AC_INET], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
+    AC_CONFIG_FILES([debian/strinet-core.preinst
+		     debian/strinet-core.postinst
+		     debian/strinet-core.prerm
+		     debian/strinet-core.postrm
+		     src/util/modutils/strinet])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

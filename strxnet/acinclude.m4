@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/16 11:54:59 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/24 02:11:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 11:54:59 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:11:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,6 +79,12 @@ AC_DEFUN([AC_XNET], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
+    AC_CONFIG_FILES([debian/strxnet-core.preinst
+		     debian/strxnet-core.postinst
+		     debian/strxnet-core.prerm
+		     debian/strxnet-core.postrm
+		     debian/strxnet-lib.preinst
+		     src/util/modutils/strxnet])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

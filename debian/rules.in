@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/09 08:00:25 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/24 02:09:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,15 +47,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 08:00:25 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 02:09:12 $ by $Author: brian $
 #
 # =============================================================================
 
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
-export DH_VERBOSE=1
-export DH_OPTIONS
+export DH_VERBOSE = 1
+export DH_COMPAT = 4
+export DH_OPTIONS = 
 
 build: OS7_ARCH_OPTION = --enable-indep --enable-arch
 build: build-stamp

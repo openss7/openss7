@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/03/22 12:41:39 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/03/24 02:09:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/22 12:41:39 $ by $Author: brian $
+## Last Modified $Date: 2005/03/24 02:09:13 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -84,25 +84,41 @@ pkglibdir = $(libdir)/$(PACKAGE)
 pkgincludedir = $(includedir)/$(PACKAGE)
 
 export DH_VERBOSE = 1
+export DH_COMPAT = 4
 export DH_OPTIONS =
 
 name = $(PACKAGE)
 
+srcdir=@srcdir@
 epoch = @PACKAGE_RPMEPOCH@
 base = @PACKAGE_LCNAME@
 title = @PACKAGE_TITLE@
 stitle = @PACKAGE_SHORTTITLE@
 
+pkg_control_files	=
+pkg_scripts_files	=
 
-pkg_control_files =
+##$(pkg_scripts_files):
+##	@f=`echo "$@" | sed -e 's|^.*/||;s|$(core_name)|core|;s|$(info_name)|info|'` ; \
+##	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+##	test "$@" -ef "$$d$$f" && exit 0 ; \
+##	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+##		echo "cp -f -- $$d$$f $@" ; \
+##		cp -f -- $$d$$f $@ ; \
+##	}
+##
+##pkg_scripts_files	+= debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
+##			   debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
+##			   debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
+##			   debian/$(PACKAGE_LCNAME)-$(core_name).postrm
 
-pkg_control_files += debian/${PACKAGE_LCNAME}-openss7-${VERSION}.install
+pkg_control_files	+= debian/${PACKAGE_LCNAME}-openss7.install
 
-debian/${PACKAGE_LCNAME}-openss7-${VERSION}.install:
+debian/${PACKAGE_LCNAME}-openss7.install:
 	( echo '$(mytmpdir)$(bindir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.docs
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
 
 debian/$(PACKAGE_LCNAME)-doc.docs:
 	( echo "AUTHORS" ; \
@@ -115,19 +131,19 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "LICENSE" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.manpages
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
 
 debian/$(PACKAGE_LCNAME)-doc.manpages:
 	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
-@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.install
+@COOKED_MANPAGES_FALSE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.install
 
 debian/$(PACKAGE_LCNAME)-doc.install:
 	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
 	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-##pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.info
+##pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
 ##
 ##debian/$(PACKAGE_LCNAME)-doc.info:
 ##	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
@@ -166,7 +182,6 @@ build-stamp:
 		--with-gnu-ld \
 		$(PACKAGE_DEBOPTIONS) \
 		$(BUILD_CFGOPTIONS) \
-		--disable-initscripts \
 		|| { rm -f $(cache_file) ; exit 1 ; }
 	$(MAKE) -f Makefile
 	$(MAKE) -f Makefile check
@@ -181,7 +196,7 @@ clean:
 	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
 	rm -fr $(mytmpdir)
 	rm -f build-stamp
-	rm -f $(pkg_control_files)
+	rm -f $(pkg_control_files) $(pkg_scripts_files)
 	dh_clean -v
 
 install: DH_OPTIONS =
@@ -191,14 +206,14 @@ install: build
 	dh_clean -v -k
 	dh_installdirs -v
 	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
-	$(MAKE) -f debian/rules $(pkg_control_files)
+	$(MAKE) -f debian/rules $(pkg_control_files) $(pkg_scripts_files)
 	dh_install -v
 
 binary-common:
 	dh_testdir -v
 	dh_testroot -v
 	dh_installchangelogs -v
-	dh_installdocs -v
+	dh_installdocs -v -A debian/README.Debian debian/TODO.Debian
 	dh_installdebconf -v
 	dh_installinit -v
 	dh_installinfo -v
@@ -234,6 +249,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.6  2005/03/24 02:09:13  brian
+# - improved debian build
+#
 # Revision 1.1.2.5  2005/03/22 12:41:39  brian
 # - good debian builds with dependencies
 #
