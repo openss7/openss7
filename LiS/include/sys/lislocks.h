@@ -29,7 +29,7 @@
 #ifndef SYS_LISLOCKS_H
 #define SYS_LISLOCKS_H	1
 
-#ident "@(#) LiS lislocks.h 1.13 6/6/03"
+#ident "@(#) LiS lislocks.h 1.14 6/10/03"
 
 #define	FL	char *file, int line
 
@@ -216,7 +216,7 @@ void	lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL) ;
 lis_rw_lock_t *
 	lis_rw_lock_alloc_fcn(const char *name, FL) ;
 lis_rw_lock_t *
-	lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, FL) ;
+	lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL) ;
 
 /************************************************************************
 *                           SPL Routines                                *

@@ -21,7 +21,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lislocks.c 1.23 5/30/03"
+#ident "@(#) LiS lislocks.c 1.24 6/10/03"
 
 #include <sys/LiS/linux-mdep.h>
 #include <sys/LiS/strmdbg.h>
@@ -982,7 +982,7 @@ lis_rw_lock_alloc_fcn(const char *name, FL)
 }
 
 lis_rw_lock_t *
-lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, FL)
+lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 {
     if (lock->allocated)
 	lis_free_mem_fcn((void *)lock, file, line) ;
