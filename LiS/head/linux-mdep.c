@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.113 9/30/03 20:38:58 "
+#ident "@(#) LiS linux-mdep.c 2.114 10/21/03 19:02:18 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -99,11 +99,11 @@
 
 /*  -------------------------------------------------------------------  */
 /*
- * Kludge: S/390 does not export this symbol yet.  Remove when this
- * is corrected.
+ * S/390 2.4 kernels export smp_num_cpus
+ * other 2.4 kernels export num_online_cpus()
  */
-#if defined(__s390__)
-#define NUM_CPUS		1
+#if defined(__s390__) || defined(__s390x__)
+#define NUM_CPUS		smp_num_cpus
 #elif defined(KERNEL_2_5)
 #define NUM_CPUS		num_online_cpus()
 #elif defined(KERNEL_2_3)
