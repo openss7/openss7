@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/02/10 22:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/04 10:57:44 $ by $Author: brian $
+ Last Modified $Date: 2005/02/10 22:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/02/10 22:14:54 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/02/10 22:14:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -162,9 +162,9 @@ static char const ident[] =
 #include "linux/hooks.h"
 #include "netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.22 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.23 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/02/10 22:14:54 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6873,7 +6873,7 @@ STATIC INLINE void
 sctp_send_sack(struct sock *sk)
 {
 	SCTP_PROT(sk)->sackf |= SCTP_SACKF_NOD;
-	printd(("Marking SACK from stream %p\n", sp));
+	printd(("Marking SACK from socket %p\n", sk));
 }
 
 /*
@@ -9657,7 +9657,7 @@ sctp_recv_init_ack(struct sock *sk, struct sk_buff *skb)
 	union sctp_parm *ph;
 	printd(("Received INIT-ACK on stream %p\n", sp));
 	assert(sp);
-	assert(mp);
+	assert(skb);
 	if (sk->state != SCTP_COOKIE_WAIT)
 		goto eproto;
 	iph = SCTP_IPH(skb);
