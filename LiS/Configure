@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.56 3/10/03"
+Configure_version="2.57 3/26/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -1069,44 +1069,16 @@ Do you want to do that now?"
     KVER_PATCH=`echo ${KVER}|sed -e "s/[^\.]\.[^\.]\.//"`
     KVER_PATCHNO=`echo $KVER_PATCH | sed -e 's/-.*//' -e 's/[^0-9].*//'`
     KVER_MAJORMINOR=`echo ${KVER}|sed -e "s/\.${KVER_PATCH}//"`
-    if [ "${KVER_MAJORMINOR}" != "2.0" -a	\
-         "${KVER_MAJORMINOR}" != "2.1" -a	\
-         "${KVER_MAJORMINOR}" != "2.2" -a	\
-         "${KVER_MAJORMINOR}" != "2.3" -a	\
-         "${KVER_MAJORMINOR}" != "2.4" 		\
-       ]
-    then
-	:
-       # echo Sorry, LiS does not compile Linux version $KVER_MAJORMINOR.x
-       # exit 1
-    fi
     KVER_MINOR=`echo ${KVER_MAJORMINOR}|sed -e "s/[^\.]\.//"`
     KVER_MAJOR=`echo ${KVER}|sed -e "s/\.${KVER_MINOR}\.${KVER_PATCH}//"`
+
     if [ "$KVER_MAJORMINOR" = "2.0" ]; then
 	echo
-	echo "This version of LiS has not been tested on 2.0 kernels."
-	echo "It will probably not install correctly.  It will probably"
-	echo "contain syntax errors at compile time and/or unresolved"
-	echo "externals at module load time.  You are probably better"
-	echo "off to install an older version of LiS, say LiS-2.8."
+	echo "LiS no longer supports 2.0 vintage kernels. Try LiS-2.8"
 	echo
-	echo "The installation will proceed, but be warned that there"
-	echo "is trouble ahead, and no support from the LiS authors."
-	echo
-	do_confirm
+	exit 1
     fi
-    if [ "$KVER_MAJORMINOR" = "2.0" -a $KVER_PATCHNO -lt 36 ]; then
-	echo
-	echo "The assigned system call numbers used by LiS in kernel"
-	echo "version prior to 2.0.36 are not official numbers assigned"
-	echo "by Linus.  From kernel version 2.0.36 onward these syscall"
-	echo "numbers have been assigned to LiS by Linus.  It would be"
-	echo "a good idea from an application compatibility standpoint"
-	echo "to install LiS on a more recent kernel.  This is just an"
-	echo "informational message and will not prevent LiS from installing."
-	echo
-	do_confirm
-    fi
+
     
     #
     # Verify kernel version, SMP and mod versions against the running
@@ -1140,227 +1112,72 @@ the currently running kernel?"
     # days.
     #
     if [ "$KMODULES" != "y" ]; then
-	if [ "$USING_DEFAULTS..." = "y..." ]; then
-	    CONFIG_STREAMS=k
-	fi
-        PROMPT="\n\
-Analysis of your kernel configuration suggests that your kernel\n\
-does not support loadable modules.  This is extremely rare and\n\
-is likely a result of mis-analysis of the kernel configuration\n\
-files.  You are being offered the choice to override this automatic\n\
-configuration parameter.  If you have answered this question already\n\
-in a previous configuration dialog then your previous answer will\n\
-appear as the default.\n\
-\n"
+	echo
+	echo "Analysis of your kernel configuration suggests that your kernel"
+	echo "does not support loadable modules.  This is extremely rare and"
+	echo "is likely a result of mis-analysis of the kernel configuration"
+	echo "files.  Installation will proceed as if the kernel supports"
+	echo "loadable modules."
+	echo 
     fi
 
-    PROMPT="\
-How do you want to build STREAMS for the Linux kernel?\n\
-    k = link with the linux kernel\n\
-    m = create a kernel loadable module\n\
-Please enter your choice"
-    RESPONSE="m k"
-    DEFAULT="$CONFIG_STREAMS"
-    do_read_choice
-    CONFIG_STREAMS=$RESULT
-
-    #
-    # CONFIG_MK_KERNEL
-    #
-    if [ $CONFIG_STREAMS = "k" ]; then
-	# no module versioning if linking directly into the kernel
-	KMODVERS=
-        PROMPT="\
-When you make STREAMS, do you want to also build the kernel automatically?\n\
-    y = make kernel\n\
-    n = just make LiS and leave streams.o in this directory\n\
-Please enter y or n"
-        RESPONSE="y n"
-        DEFAULT="$CONFIG_MK_KERNEL"
-        do_read_choice
-        CONFIG_MK_KERNEL=$RESULT
-    else
-        CONFIG_MK_KERNEL="n"
-    fi
-    
-    #
-    # KERN_TARGET
-    #
-    if [ $CONFIG_STREAMS = "k" -a $CONFIG_MK_KERNEL = "y" ]; then
-	PROMPT="The target to make when building a kernel."
-	PROMPT="$PROMPT  Possibilities are:\n"
-	PROMPT="${PROMPT}    1 = zImage\n"
-	PROMPT="${PROMPT}    2 = zlilo\n"
-	PROMPT="${PROMPT}    3 = bzImage\n"
-	PROMPT="${PROMPT}    4 = bzlilo\n"
-	PROMPT="${PROMPT}Please enter a number from 1-4 [default: $KTARG] \c"
-	RESPONSE="1 2 3 4"
-	DEFAULT="$KTARG"
-	do_read_choice
-
-	case $RESULT in
-	    1) RESULT=zImage;;
-	    2) RESULT=zlilo;;
-	    3) RESULT=bzImage;;
-	    4) RESULT=bzlilo;;
-	esac
-	KERN_TARGET=$RESULT
-	echo "KERN_TARGET=$RESULT" >>$CONFIG
-    else
-	echo "# KERN_TARGET not set" >>$CONFIG
-    fi
+    CONFIG_STREAMS=m
+    echo "# KERN_TARGET not set" >>$CONFIG
 
     #
     # See if the user wants STREAMS kernel loadable modules installed for
-    # easy running.
+    # easy running.  Leaving the module for later loading is what is
+    # needed for cross compiling.
     #
-    if [ "$CONFIG_STREAMS" = "m" -a "$KMODULES" = "y" ]; then
-        PROMPT="\
+    PROMPT="\
 After building STREAMS, do you want kernel loadable modules installed?\n\
 This allows you to load it by typing in \"insmod streams\".\n\
     y = install it for module loading\n\
     n = just leave modules for later \"make modules_install\"\n\
 Please enter y or n "
-        RESPONSE="y n"
-        DEFAULT="$MOD_INSTALL"
-        do_read_choice
-        MOD_INSTALL=$RESULT
-    else
-        MOD_INSTALL="n"
-    fi
+    RESPONSE="y n"
+    DEFAULT="$MOD_INSTALL"
+    do_read_choice
+    MOD_INSTALL=$RESULT
 
     #
     # MOD_INST_DIR
     #
-    if [ "$CONFIG_STREAMS" = "m" -a "$KMODULES" = "y" ]
-    then
-        PROMPT="Enter location of your kernel module directory\n"
-	PROMPT="$PROMPT              "
-	if [ "$MOD_INST_DIR..." = "..." ]; then
-	    DEFAULT=/lib/modules/$PKVER/misc
+    PROMPT="Enter location of your kernel module directory\n"
+    PROMPT="$PROMPT              "
+    if [ "$MOD_INST_DIR..." = "..." ]; then
+	DEFAULT=/lib/modules/$PKVER/misc
+	if [ ! -d $DEFAULT ]; then
+	    DEFAULT=/lib/modules/$KVER/misc
 	    if [ ! -d $DEFAULT ]; then
-		DEFAULT=/lib/modules/$KVER/misc
+		DEFAULT=/lib/modules/preferred/misc
 		if [ ! -d $DEFAULT ]; then
-		    DEFAULT=/lib/modules/preferred/misc
-		    if [ ! -d $DEFAULT ]; then
-			if [ `id -u` -eq 0 ]; then
-			    DEFAULT=/lib/modules/$PKVER/misc
+		    if [ `id -u` -eq 0 ]; then
+			DEFAULT=/lib/modules/$PKVER/misc
+			if ! mkdir $DEFAULT 2>/dev/null; then
+			    DEFAULT=/lib/modules/preferred/misc
 			    if ! mkdir $DEFAULT 2>/dev/null; then
-				DEFAULT=/lib/modules/preferred/misc
-				if ! mkdir $DEFAULT 2>/dev/null; then
-				    DEFAULT=
-				fi
+				DEFAULT=
 			    fi
-			else
-			DEFAULT=
 			fi
+		    else
+		    DEFAULT=
 		    fi
 		fi
 	    fi
-	else
-	    DEFAULT=$MOD_INST_DIR
-        fi
-        do_read_dir
-        MOD_INST_DIR=$RESULT
+	fi
+    else
+	DEFAULT=$MOD_INST_DIR
     fi
+    do_read_dir
+    MOD_INST_DIR=$RESULT
 
     #
     # STRMS_QUEUES
     #
-    # Cannot run as kernel thread on 2.0.x kernels unless LiS
-    # is linked directly into the kernel or unless we can apply
-    # the ksyms patch.
+    # Streams queues are always run as tasklets these days.
     #
-    choose_runqueues=0
-    if [ "$CONFIG_STREAMS" = "m" -a "$KVER_MAJORMINOR" = "2.0" ]; then
-        if [ $KVER_PATCHNO -ge 35 -a ! -f $KSRC/kernel/ksyms.c ]; then
-	    echo
-	    echo "In order to be able to run STREAMS queues as a kernel thread"
-	    echo "on a 2.0.x kernel we need to apply a patch to the file"
-	    echo "$KSRC/kernel/ksyms.c.  But that file is missing --"
-	    echo "perhaps your kernel source is not present.  This is"
-	    echo "nothing to be concerned about.  However, we will configure"
-	    echo "LiS to run the STREAMS queues as a \"bottom half\""
-	    echo "process with no ability to choose the \"kernel thread\""
-	    echo "method."
-	    echo
-	    do_confirm
-	    STRMS_QUEUES=b		# use bottom half by default
-        elif [ $KVER_PATCHNO -ge 35 -a -f $KSRC/kernel/ksyms.c ]; then
-	    echo
-	    echo "Because this is a 2.0.35/36 kernel we are going to set"
-	    echo "the default option for running STREAMS queues to"
-	    echo "use the \"bottom half\" method.  You can choose"
-	    echo "another method in the next menu, but the default"
-	    echo "choice will be best if you don't wish to rebuild"
-	    echo "your kernel."
-	    echo
-	    do_confirm
-	    STRMS_QUEUES=b		# use bottom half by default
-	    choose_runqueues=1		# allow user to choose
-	fi
-    else			# not installing as module, or later kernel
-	choose_runqueues=1
-    fi
-    if [ "$KVER_MAJORMINOR" = "2.0" -a $KVER_PATCHNO -lt 35 ]; then
-	echo
-	echo "You may experience some difficulty with kernel versions"
-	echo "earlier than 2.0.35.  If you see syntax errors when compiling"
-	echo "LiS or unresolved externals when loading it as a module"
-	echo "you may consider ugrading to at least 2.0.36 or configuring"
-	echo "LiS to link directly into the kernel.  If you elect to"
-	echo "link LiS directly into the kernel and you still get"
-	echo "syntax errors then you will need to upgrade your kernel"
-	echo "to at least 2.0.36."
-	echo
-	do_confirm
-    fi
-    if [ $choose_runqueues -eq 0 ]; then
-	echo
-	echo "We will configure LiS to use \"bottom half\" processing"
-	echo "for STREAMS queues.  If you want to use the kernel thread"
-	echo "technique, load your kernel source, come back to the"
-	echo "/usr/src/LiS directory and do 'make realclean; make'."
-	echo "If you don't care, just ignore this message and proceed."
-	echo
-	do_confirm
-	STRMS_QUEUES=b
-    else
-	if [ "$KVER_MAJORMINOR" = "2.0" ]; then
-	    PROMPT="\
-The STREAMS queues can be run either as a bottom half task (faster\n\
-but with restrictions on kernel constructs) or as a kernel thread\n\
-(slower but no restrictions on kernel routines used from STREAMS\n\
-service procedures).\n\
-    t = use kernel thread\n\
-    b = use bottom half processing\n\
-Please enter t or b"
-	    RESPONSE="t b"
-	    DEFAULT="$STRMS_QUEUES"
-	    do_read_choice
-	    STRMS_QUEUES=$RESULT
-	fi
-    fi
-
-    if [ "$STRMS_QUEUES" = "t" -a "$CONFIG_STREAMS" = "m" -a \
-	 "$KVER_MAJORMINOR" = "2.0" ]; then
-	echo
-	echo "               PLEASE NOTE"
-	echo "The LiS 'make' procedure will install a patch in"
-	echo "your kernel source that will allow you to run"
-	echo "the STREAMS queues as a kernel thread.  Be sure"
-	echo "to remake your kernel, run lilo, and reboot before"
-	echo "attempting to run streams.  If you get an unresolved"
-	echo "external on \"exit_files\" when you attempt to run"
-	echo "streams via \"insmod streams\" this is a sign that you"
-	echo "need to perform this procedure."
-	echo
-	echo "If you do not wish to rebuild your kernel, reconfigure"
-	echo "LiS and select 'b' for \"bottom half\" for STREAMS"
-	echo "queue processing."
-	echo
-	do_confirm
-    fi
+    STRMS_QUEUES="t"
 
     if [ $NOKSRC -eq 1 -a "$KMODVERS..." = "y..." ]; then
 	echo "No kernel symbols. Generating $LIS_HOME/include/sys/modversions.h."
