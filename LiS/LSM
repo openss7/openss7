@@ -1,0 +1,16 @@
+Title:          5LiS - "Linux  STREAMS"
+Desc1:          LiS is a STREAMS framework which is compatible with
+Desc2:          SVR4 STREAMS.  It has lots of debugging features not
+Desc3:          found in other STREAMS packages.
+Desc4:          Good to do networking and other things.
+Desc5:		It allows for installation of binary drivers.
+Author:         Francisco J. Ballesteros, Graham Wheeler, David Grothe, others
+AuthorEmail:    <dave@gcom.com>
+InfoSources1:   email <dave@gcom.com> to get in touch w/authors
+InfoSources2:   finger <LiS@gsyc.escet.urjc.es> to get preposterous .plan
+InfoSources3:   linux-streams@gsyc.escet.urjc.es  majordomo mailing list
+InfoSources4:   <http://www.gcom.com/LiS> LiS web home page
+Assistance:     assistance appreciated
+CurrentStat:    Operational
+ETA:            Available
+
