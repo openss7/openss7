@@ -39,7 +39,7 @@
 #ifndef _STRPORT_H
 #define _STRPORT_H
 
-#ident "@(#) LiS strport.h 2.5 10/7/03 15:27:10 "
+#ident "@(#) LiS strport.h 2.7 08/23/04 11:42:44 "
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -59,6 +59,16 @@
 #elif defined(PORTABLE)
 #include <sys/LiS/port-mdep.h>
 #endif /* !__MSDOS__ */
+
+/*
+ * INLINE and STATIC
+ */
+#ifndef INLINE
+#define	INLINE	
+#endif
+#ifndef STATIC
+#define	STATIC	static
+#endif
 
 /*
  * linux/types.h does not have intptr_t or uintptr_t
@@ -133,8 +143,8 @@ typedef unsigned int	uintptr_t;
 #ifdef __KERNEL__
 extern char	*lis_errmsg(int lvl) ;
 extern void	*lis_malloc(int nbytes, int class, int use_cache,
-					char *file_name,int line_nr);
-extern void	 lis_free(void *ptr, char *file_name,int line_nr);
+					char *file_name,int line_nr)_RP;
+extern void	 lis_free(void *ptr, char *file_name,int line_nr)_RP;
 #endif				/* __KERNEL__ */
 
 #endif /* _STRPORT_H */

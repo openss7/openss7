@@ -34,7 +34,7 @@
 #ifndef _MOD_H
 #define _MOD_H 1
 
-#ident "@(#) LiS mod.h 2.6 11/22/03 23:02:25 "
+#ident "@(#) LiS mod.h 2.9 08/23/04 11:42:44 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -155,6 +155,7 @@ typedef struct fmodsw {
         char               f_objname[LIS_NAMESZ+1];
         int		   f_state;	/* state of module */
 	lis_semaphore_t	   f_sem;	/* to synchronize loading */
+	int		   f_qlock_option; /* for initializing queues */
 } fmodsw_t;
 
 #define LIS_MODFLG_CLONE   0x0001       /* module is 'clone' */
@@ -169,6 +170,7 @@ typedef struct fmodsw {
 #define	LIS_MODSTATE_UNLOADED	1	/* not loaded */
 #define	LIS_MODSTATE_LOADING	2	/* loading */
 #define	LIS_MODSTATE_LOADED	3	/* loaded */
+#define	LIS_MODSTATE_UNKNOWN	4	/* not known yet */
 
 #define LIS_MODSTATE_INITED	0x100	/* initialized */
 
@@ -190,11 +192,13 @@ extern struct fmodsw lis_fmod_sw[MAX_STRMOD]; /* streams modules */
 #ifdef __KERNEL__
 
 /* Register and unregister streams modules and drivers */
-extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name);
-extern int lis_unregister_strmod(struct streamtab *strtab);
+extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name)_RP;
+extern int lis_unregister_strmod(struct streamtab *strtab)_RP;
 extern int lis_register_strdev(major_t major, struct streamtab *strtab,
-			       int nminor, const char *name);
-extern int lis_unregister_strdev(major_t major);
+			       int nminor, const char *name)_RP;
+extern int lis_unregister_strdev(major_t major)_RP;
+extern int lis_register_driver_qlock_option(major_t major, int qlock_option)_RP;
+extern int lis_register_module_qlock_option(modID_t id, int qlock_option)_RP;
 
 /* Back compatible: Will go away when no longer used */
 #define	register_strdev		lis_register_strdev
@@ -205,11 +209,13 @@ extern streamtab_t *lis_find_strdev(major_t major);
 /* Find/load a module id by name */
 extern modID_t lis_findmod(const char *name);
 extern modID_t lis_loadmod(const char *name);
+extern modID_t lis_findmod_strtab(struct streamtab *strtab);
+
 
 /* Autopush */
 extern int lis_apushm(dev_t dev, const char *mods[]);
-extern int lis_apush_set(struct strapush *ap);
-extern int lis_apush_get(struct strapush *ap);
+extern int lis_apush_set(struct strapush *ap)_RP;
+extern int lis_apush_get(struct strapush *ap)_RP;
 extern int lis_valid_mod_list(struct str_list ml);	
 
 /* mod.c initialization and cleanup functions */

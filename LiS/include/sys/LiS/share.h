@@ -42,7 +42,7 @@
 #ifndef _SHARE_H
 #define _SHARE_H 1
 
-#ident "@(#) LiS share.h 2.2 12/20/01 21:03:25 "
+#ident "@(#) LiS share.h 2.3 08/23/04 11:42:44 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -84,9 +84,9 @@ enum { STR_ERR = 0, STR_OK = 1 };
 
 #ifdef __KERNEL__
 /* extract values from a char pointer and advance the pointer */
-int lis_getint(unsigned char **p) ;				/* msg.c */
+int lis_getint(unsigned char **p) _RP;				/* msg.c */
 
-void lis_putbyte(unsigned char **p, unsigned char byte) ;	/* msg.c */
+void lis_putbyte(unsigned char **p, unsigned char byte) _RP;	/* msg.c */
 
 #if 0
 void	lis_bzero(void *ptr, int cnt) ;				/* head.c */

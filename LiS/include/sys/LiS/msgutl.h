@@ -36,7 +36,7 @@
 #ifndef _MSGUTL_H
 #define _MSGUTL_H 1
 
-#ident "@(#) LiS msgutl.h 2.1 4/4/99 11:34:29 "
+#ident "@(#) LiS msgutl.h 2.2 08/23/04 11:42:44 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -109,18 +109,18 @@
 /* msgsize - count sizes of blocks of message
  *
  */
-extern int lis_msgsize(mblk_t *mp);
+extern int lis_msgsize(mblk_t *mp)_RP;
 
 /* msgdsize - return number of data bytes in M_DATA blocks in message
  *
  */
-extern int lis_msgdsize(mblk_t *mp);
+extern int lis_msgdsize(mblk_t *mp)_RP;
 
 /* xmsgsize - count sizes of consecutive blocks of the same
  *	type as the first
  *
  */
-extern int lis_xmsgsize(mblk_t *mp);
+extern int lis_xmsgsize(mblk_t *mp)_RP;
 
 /* adjmsg - trim abs(len) bytes from a message. If len<0, trim
  *	from tail; else trim from head. If len is greater than
@@ -131,17 +131,17 @@ extern int lis_xmsgsize(mblk_t *mp);
  *	Returns 1 on success; 0 otherwise.
  *
  */
-extern int lis_adjmsg(mblk_t *mp, int length);
+extern int lis_adjmsg(mblk_t *mp, int length)_RP;
 
 /* copyb - create and return a copy of a message block
  *
  */
-extern mblk_t * lis_copyb(mblk_t *mp);
+extern mblk_t * lis_copyb(mblk_t *mp)_RP;
 
 /* lis_copymsg - create and return a copy of a message
  *
  */
-extern mblk_t * lis_copymsg(mblk_t *mp);
+extern mblk_t * lis_copymsg(mblk_t *mp)_RP;
 
 #endif				/* __KERNEL__ */
 
@@ -154,25 +154,25 @@ extern mblk_t * lis_copymsg(mblk_t *mp);
  *	The data block and data buffer are reused.
  *
  */
-extern mblk_t * lis_dupb(mblk_t *mp);
+extern mblk_t * lis_dupb(mblk_t *mp)_RP;
 
 /* lis_dupmsg - duplicate a message by duplicating the constituent
  *	data blocks.
  *
  */
-extern mblk_t * lis_dupmsg(mblk_t *mp);
+extern mblk_t * lis_dupmsg(mblk_t *mp)_RP;
 
 /*
  * lis_linkb - concatenate mp1 and mp2.
  *
  */
-extern void lis_linkb(mblk_t *mp1, mblk_t *mp2);
+extern void lis_linkb(mblk_t *mp1, mblk_t *mp2)_RP;
 
 /* unlinkb - remove first message block from a message. Return the
  *	next message block pointer, or NULL if no further blocks.
  *
  */
-extern mblk_t * lis_unlinkb(mblk_t *mp);
+extern mblk_t * lis_unlinkb(mblk_t *mp)_RP;
 
 
 /* lis_pullupmsg - attempt to merge the first len data bytes of a
@@ -184,7 +184,7 @@ extern mblk_t * lis_unlinkb(mblk_t *mp);
  *	Returns 1 on success; 0 otherwise.
  *
  */
-extern int lis_pullupmsg(mblk_t *mp, int length);
+extern int lis_pullupmsg(mblk_t *mp, int length)_RP;
 
 /*
  * lis_msgpullup
@@ -198,7 +198,7 @@ extern int lis_pullupmsg(mblk_t *mp, int length);
  * Return of NULL means there were not 'length' bytes in the orignial
  * message or that something went wrong.
  */
-extern mblk_t *lis_msgpullup(mblk_t *mp, int length);
+extern mblk_t *lis_msgpullup(mblk_t *mp, int length)_RP;
 
 
 
@@ -211,7 +211,7 @@ extern mblk_t *lis_msgpullup(mblk_t *mp, int length);
  *	only block, or -1 if bp wasn't in the message
  *
  */
-extern mblk_t * lis_rmvb(mblk_t *mp, mblk_t *bp);
+extern mblk_t * lis_rmvb(mblk_t *mp, mblk_t *bp)_RP;
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
