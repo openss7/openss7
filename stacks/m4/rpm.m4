@@ -173,7 +173,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     PACKAGE_OPTIONS=
     for arg in $ac_configure_args ; do
         if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-            eval "arg=\"$arg\""
+            eval "arg=$arg"
             if (echo "$arg" | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
                 arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
                 PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
