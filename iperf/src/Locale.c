@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -173,6 +173,7 @@ Client specific:\n\
 Miscellaneous:\n\
   -h, --help               print this message and quit\n\
   -v, --version            print version information and quit\n\
+  --copying                print copying information and quit\n\
 \n\
 [KM] Indicates options that support a K or M suffix for kilo- or mega-\n\
 \n\
@@ -225,6 +226,7 @@ Client specific:\n\
 Miscellaneous:\n\
   -h, --help               print this message and quit\n\
   -v, --version            print version information and quit\n\
+  --copying                print copying information and quit\n\
 \n\
 [KM] Indicates options that support a K or M suffix for kilo- or mega-\n\
 \n\
@@ -247,6 +249,85 @@ Report bugs to <dast@nlanr.net>\n";
 const char version[] =
 "iperf version " IPERF_VERSION " (" IPERF_VERSION_DATE ") " IPERF_THREADS "\n";
 
+const char copying[] = "\n\
+ ----------------------------------------------------------------------------\n\
+\n\
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+ All Rights Reserved.\n\
+\n\
+ This program is free software; you can redistribute it and/or modify it under\n\
+ the terms of the GNU General Public License as published by the Free Software\n\
+ Foundation; either version 2 of the License, or (at your option) any later\n\
+ version.\n\
+\n\
+ This program is distributed in the hope that it will be useful, but WITHOUT\n\
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS\n\
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more\n\
+ details.\n\
+\n\
+ You should have received a copy of the GNU General Public License along with\n\
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass\n\
+ Ave, Cambridge, MA 02139, USA.\n\
+\n\
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on\n\
+ behalf of the U.S. Government (\"Government\"), the following provisions apply\n\
+ to you.  If the Software is supplied by the Department of Defense (\"DoD\"), it\n\
+ is classified as \"Commercial Computer Software\" under paragraph 252.227-7014\n\
+ of the DoD Supplement to the Federal Acquisition Regulations (\"DFARS\") (or any\n\
+ successor regulations) and the Government is acquiring only the license rights\n\
+ granted herein (the license rights customarily provided to non-Government\n\
+ users).  If the Software is supplied to any unit or agency of the Government\n\
+ other than DoD, it is classified as \"Restricted Computer Software\" and the\n\
+ Government's rights in the Software are defined in paragraph 52.227-19 of the\n\
+ Federal Acquisition Regulations (\"FAR\") (or any successor regulations) or, in\n\
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR\n\
+ (or any successor regulations).\n\
+\n\
+ Commercial licensing and support of this software is available from OpenSS7\n\
+ Corporation at a fee.  See http://www.openss7.com/\n\
+\n\
+ ----------------------------------------------------------------------------\n\
+\n\
+ Copyright (c) 1999,2000,2001,2002,2003\n\
+ The Board of Trustees of the University of Illinois\n\
+ All Rights Reserved.\n\
+\n\
+ Permission is hereby granted, free of charge, to any person obtaining a copy of\n\
+ this software (Iperf) and associated documentation files (the \"Software\"), to\n\
+ deal in the Software without restriction, including without limitation the\n\
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or\n\
+ sell copies of the Software, and to permit persons to whom the Software is\n\
+ furnished to do so, subject to the following conditions: \n\
+\n\
+ Redistributions of source code must retain the above copyright notice, this\n\
+ list of conditions and the following disclaimers. \n\
+\n\
+ Redistributions in binary form must reproduce the above copyright notice, this\n\
+ list of conditions and the following disclaimers in the documentation and/or\n\
+ other materials provided with the distribution. \n\
+\n\
+ Neither the names of the University of Illinois, NCSA, nor the names of its\n\
+ contributors may be used to endorse or promote products derived from this\n\
+ Software without specific prior written permission. \n\
+\n\
+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n\
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n\
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n\
+ CONTIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n\
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n\
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n\
+ SOFTWARE. \n\
+\n\
+ National Laboratory for Applied Network Research \n\
+ National Center for Supercomputing Applications \n\
+ University of Illinois at Urbana-Champaign \n\
+ http://www.ncsa.uiuc.edu\n\
+\n\
+ ----------------------------------------------------------------------------\n\
+\n\
+";
 /* -------------------------------------------------------------------
  * settings
  * ------------------------------------------------------------------- */

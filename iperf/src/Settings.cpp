@@ -158,6 +158,7 @@ const struct option long_options[] =
 {"time",       required_argument, NULL, 't'},
 {"udp",              no_argument, NULL, 'u'},
 {"version",          no_argument, NULL, 'v'},
+{"copying",          no_argument, NULL, '7'},
 {"window",     required_argument, NULL, 'w'},
 {"reportexclude", required_argument, NULL, 'x'},
 {"reportstyle",required_argument, NULL, 'y'},
@@ -435,12 +436,12 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 'h': // print help and exit
 #ifndef WIN32
-            fprintf( stderr, usage_long );
+            fprintf( stdout, usage_long );
 #else
-            fprintf(stderr, usage_long1);
-            fprintf(stderr, usage_long2);
+            fprintf(stdout, usage_long1);
+            fprintf(stdout, usage_long2);
 #endif
-            exit(1);
+            exit(0);
             break;
 
         case 'i': // specify interval between periodic bw reports
@@ -549,8 +550,13 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             break;
 
         case 'v': // print version and exit
-            fprintf( stderr, version );
-            exit(1);
+            fprintf( stdout, version );
+            exit(0);
+            break;
+
+        case '7': // print copying and exit
+            fprintf( stdout, copying );
+            exit(0);
             break;
 
         case 'w': // TCP window size (socket buffer size)
