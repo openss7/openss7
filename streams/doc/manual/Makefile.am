@@ -1,5 +1,5 @@
 
-info_TEXINFOS = openss7.texi
+info_TEXINFOS = libxnet.texi SPG.texi STREAMS.texi
 
 EXTRA_DIST = gpl.texi lesser.texi fdl.texi
 
@@ -10,9 +10,9 @@ docdir = @datadir@/doc/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 install-data-local: all-local
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) openss7.pdf $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) SPG.pdf $(DESTDIR)$(docdir)
 
 uninstall-local:
 	@$(NORMAL_UNINSTALL)
-	rm -f $(DESTDIR)$(docdir)/openss7.pdf
+	rm -f $(DESTDIR)$(docdir)/SPG.pdf
 

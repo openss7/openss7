@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/03/09 22:55:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/03/13 05:46:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/09 22:55:18 $ by $Author: brian $
+# Last Modified $Date: 2004/03/13 05:46:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1138,7 +1138,7 @@ EXTRA_DIST = streams.spec.in streams.spec doc/man/streams.refs doc/man/streams.m
 	$(noinst_SCRIPTS) $(sbin_SCRIPTS) $(lfs_configs) openss7-logo-small.gif openss7-logo-small.xpm \
 	$(INET_MKDEV) $(INET_RMDEV) m4/kernel.m4 m4/rpm.m4 $(EXTRA_MAN_SOURCES)
 
-SUBDIRS = intl m4 po
+SUBDIRS = intl m4 po doc
 
 #
 # Rules for making rpms

@@ -1,0 +1,1685 @@
+% -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
+% =========================================================================
+%
+% @(#) $Id: SPG.texi,v 0.9.2.1 2004/03/13 05:46:34 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/03/13 05:46:34 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename SPG.info
+@settitle Linux Fast-STREAMS Programmer's Guide
+@setchapternewpage odd
+
+@dircategory STREAMS
+@direntry
+* SPG: (spg).                   STREAMS Programmer's Guide
+@end direntry
+
+@set xref-automatic-section-title
+
+@set EDITION 0.9.1
+@set VERSION 0.9.1
+@set UPDATED 2004-03-12
+
+@defindex op
+
+@ifinfo
+This file provides the STREAMS Programmer's Guide for Linux Fast-STREAMS.
+
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{The STREAMS Programmer's Guide for Linux Fast-STREAMS}, for Version
+@value{VERSION}.
+
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant ot the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@iftex
+@shorttitlepage STREAMS Programmer's Guide
+@end iftex
+@titlepage
+@title STREAMS Programmer's Guide
+@subtitle Edition @value{EDITION} for Linux-Fast STREAMS version @value{VERSION}
+@subtitle @value{UPDATED}
+@author Brian Bidulock  @cite{@email{bidulock@@openss7.org}}
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+All Rights Reserved. @*
+
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+@end titlepage
+@page
+
+@node Top, Acknowledgements, (dir), (dir)
+@top Main Menu
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{STREAMS Programmer's Guide for Linux Fast-STREAMS}, for Version
+@value{VERSION} of Linux Fast-STREAMS.
+
+@menu
+* Acknowledgements::
+* Overview::
+* Reference::
+* Examples::
+* Multi-Threading::
+* Conformance::
+* Portability::
+* Copying::
+* Documentation License::
+* Indices::
+
+ --- The Detailed Node Listing ---
+
+Acknowledgements
+
+* Sponsors::                    Sponsors of Linux Fast-STREAMS
+* Contributors::                Contributors to Linux Fast-STREAMS
+
+Overview
+
+* Introduction::                An Introduction to Linux Fast-STREAMS
+* Concepts::                    STREAMS Concepts
+
+Reference
+
+* Header Files::                STREAMS Header Files
+* Drivers::                     STREAMS Drivers
+* Modules::                     STREAMS Modules
+* System Calls::                STREAMS System Calls
+* Module Entry Points::         STREAMS Module Entry Points
+* Structures::                  STREAMS Structures
+* Registration::                STREAMS Module and Driver Registration Functions
+* Message Handling::            STREAMS Message Handling Functions
+* Queue Handling::              STREAMS Queue Handling Functions
+* Miscellaneous Functions::     STREAMS Miscellaneous Functions
+* Extensions::                  STREAMS Extension Functions
+* System Controls::             STREAMS System Controls
+* /proc Filesystem::            STREAMS /proc Filesystem
+
+Examples
+
+* Module Example::              STREAMS Module Example
+* Driver Example::              STREAMS Driver Example
+
+
+Multi-Threading
+
+* Configuration::               MP STREAMS Configuration
+* Asynchronous Entry Points::   MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::      MP STREAMS Asynchronous Callbacks
+* Synchronous Entry Points::    MP STREAMS Synchronous Entry Points
+* Synchronous Callbacks::       MP STREAMS Synchronous Callbacks
+
+Conformance
+
+* SVR 4.2 Compatibility::       SVR 4.2 MP DDI/DKI compatibility
+* AIX Compatibility::           AIX 5L Version 5.1 compatibility
+* HP-UX Compatibility::         HP-UX 11.0i v2 compatibility
+* OSF/1 Compatibility::         OSF/1 1.2/Digital UNIX comptatibility
+* UnixWare Compatibility::      UnixWare 7.1.3 compatibility
+* Solaris Compatibility::       Solaris 9/SunOS 5.9 compatibility
+* SUX Compatibility::           Super/UX compatibilty
+* UXP Compatibility::           UX/P compatibilty
+* LiS Compatibility::           LiS 2.16 compatibilty
+
+Portability
+
+* SVR 4.2 Portability::         Porting from SVR 4.2 MP
+* AIX Portability::             Porting from AIX 5L Version 5.1
+* HP-UX Portability::           Porting from HP-UX 11.0i v2
+* OSF/1 Portability::           Porting from OSF/1 1.2/Digital UNIX
+* UnixWare Portability::        Porting from UnixWare 7.1.3
+* Solaris Portability::         Porting from Solaris 9/SunOS 5.9
+* SUX Portability::             Porting from Super/UX
+* UXP Portability::             Porting from UX/P
+* LiS Portability::             Porting from LiS 2.16
+
+Indices
+
+* Concept Index::               Concept Index
+* Type Index::                  Type Index
+* Function Index::              Function Index
+* Variable Index::              Variable Index
+* File Index::                  File Index
+
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@iftex
+@node Acknowledgements
+@end iftex
+@ifnottex
+@node Acknowledgements, Overview, Top, Top
+@end ifnottex
+@unnumbered Acknowledgements
+@cindex credits
+
+@menu
+* Sponsors::                    Sponsors of Linux Fast-STREAMS
+* Contributors::                Contributors to Linux Fast-STREAMS
+@end menu
+
+@node Sponsors,  ,  , Acknowledgements
+@unnumberedsec Sponsors of Linux Fast-STREAMS
+@cindex sponsors
+
+Funding for completion of Linux Fast-STREAMS was provided by:
+
+OpenSS7 Corporation
+
+Additional funding for The OpenSS7 Project was provided by:
+
+@node Contributors,  ,  , Acknowledgements
+@unnumberedsec Contributors to Linux Fast-STREAMS
+@cindex contributors
+
+The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
+
+
+@node Overview, Reference, Acknowledgements, Top
+@chapter Overview of Linux Fast-STREAMS
+@cindex overview
+@menu
+* Introduction::                An Introduction to Linux Fast-STREAMS
+* Concepts::                    STREAMS Concepts
+@end menu
+
+This manual documents how to develop and port STREAMS drivers and modules for
+Linux Fast-STREAMS.
+
+@node Introduction, Concepts, , Overview
+@section Introduction
+@cpindex introduction
+
+@node Concepts, , Introduction, Overview
+@section Concepts
+@cpindex concepts
+
+
+@node Reference, Examples, Overview, Top
+@chapter Reference
+@cpindex reference
+@menu
+* Header Files::                STREAMS Header Files
+* Drivers::                     STREAMS Drivers
+* Modules::                     STREAMS Modules
+* System Calls::                STREAMS System Calls
+* Module Entry Points::         STREAMS Module Entry Points
+* Structures::                  STREAMS Structures
+* Registration::                STREAMS Module and Driver Registration Functions
+* Message Handling::            STREAMS Message Handling Functions
+* Queue Handling::              STREAMS Queue Handling Functions
+* Miscellaneous Functions::     STREAMS Miscellaneous Functions
+* Extensions::                  STREAMS Extension Functions
+* System Controls::             STREAMS System Controls
+* /proc Filesystem::            STREAMS /proc Filesystem
+@end menu
+
+@node Header Files, Drivers, , Reference
+@section Header Files
+@cpindex header files
+@menu
+Header Files
+@end menu
+
+@node Drivers, Modules, Header Files, Reference
+@section Drivers
+@cpindex drivers
+@menu
+Drivers
+@end menu
+
+@node Modules, System Calls, Drivers, Reference
+@section Modules
+@cpindex modules
+@menu
+Modules
+@end menu
+
+@node System Calls, Module Entry Points, Modules, Reference
+@section System Calls
+@cpindex system calls
+@menu
+System Calls
+@end menu
+
+@subsection New System Calls
+
+@subsubsection getmsg(2)
+@fnindex getmsg(2)
+@subsubsection getpmsg(2)
+@fnindex getpmsg(2)
+@subsubsection putmsg(2)
+@fnindex putmsg(2)
+@subsubsection putpmsg(2)
+@fnindex putpmsg(2)
+@subsubsection fattach(2)
+@fnindex fattach(2)
+@subsubsection isastream(2)
+@fnindex isastream(2)
+
+@subsection Modifications to Old System Calls
+
+@subsubsection poll(2)
+@fnindex poll(2)
+@subsubsection open(2)
+@fnindex open(2)
+@subsubsection close(2)
+@fnindex close(2)
+@subsubsection read(2)
+@fnindex read(2)
+@subsubsection readv(2)
+@fnindex readv(2)
+@subsubsection writev(2)
+@fnindex writev(2)
+@subsubsection pipe(2)
+@fnindex pipe(2)
+
+@node Module Entry Points, Structures, System Calls, Reference
+@section Module entry points
+@cpindex module entry points
+@menu
+Module Entry Points
+@end menu
+
+@node Structures, Registration, Module Entry Points, Reference
+@section Structures
+@cpindex structures
+@menu
+Structures
+@end menu
+
+@subsection STREAMS Structures
+
+@subsubsection cdevsw(9)
+@tpindex cdevsw(9)
+@subsubsection cred_t(9)
+@tpindex cred_t(9)
+@subsubsection datab(9)
+@tpindex datab(9)
+@subsubsection fmodsw(9)
+@tpindex fmodsw(9)
+@subsubsection module_info(9)
+@tpindex module_info(9)
+@subsubsection module_stat(9)
+@tpindex module_stat(9)
+@subsubsection msgb(9)
+@tpindex msgb(9)
+@subsubsection qband(9)
+@tpindex qband(9)
+@subsubsection qinit(9)
+@tpindex qinit(9)
+@subsubsection queinfo(9)
+@tpindex queinfo(9)
+@subsubsection queue(9)
+@tpindex queue(9)
+@subsubsection streamtab(9)
+@tpindex streamtab(9)
+@subsubsection streamadm(9)
+@tpindex streamadm(9)
+
+@node Registration, Message Handling, Structures, Reference
+@section Registration
+@cpindex registration
+@menu
+Registration
+@end menu
+
+@subsection Linux Fast-STREAMS Registration
+
+@subsubsection autopush_add(9)
+@fnindex autopush_add(9)
+@subsubsection autopush_del(9)
+@fnindex autopush_del(9)
+@subsubsection autopush_find(9)
+@fnindex autopush_find(9)
+@subsubsection autopush_vml(9)
+@fnindex autopush_vml(9)
+@subsubsection getadmin(9)
+@fnindex getadmin(9)
+@subsubsection getmid(9)
+@fnindex getmid(9)
+@subsubsection register_inode(9)
+@fnindex register_inode(9)
+@subsubsection register_inode_major(9)
+@fnindex register_inode_major(9)
+@subsubsection register_inode_minor(9)
+@fnindex register_inode_minor(9)
+@subsubsection register_strdev(9)
+@fnindex register_strdev(9)
+@subsubsection register_strdev_major(9)
+@fnindex register_strdev_major(9)
+@subsubsection register_strdev_minor(9)
+@fnindex register_strdev_minor(9)
+@subsubsection register_strmod(9)
+@fnindex register_strmod(9)
+@subsubsection unregister_inode(9)
+@fnindex unregister_inode(9)
+@subsubsection unregister_inode_major(9)
+@fnindex unregister_inode_major(9)
+@subsubsection unregister_inode_minor(9)
+@fnindex unregister_inode_minor(9)
+@subsubsection unregister_strdev(9)
+@fnindex unregister_strdev(9)
+@subsubsection unregister_strdev_major(9)
+@fnindex unregister_strdev_major(9)
+@subsubsection unregister_strdev_minor(9)
+@fnindex unregister_strdev_minor(9)
+@subsubsection unregister_strmod(9)
+@fnindex unregister_strmod(9)
+
+@node Message Handling, Queue Handling, Registration, Reference
+@section Message Handling
+@cpindex message handling
+@menu
+Message Handling
+@end menu
+
+@subsection STREAMS Message Handling Utilities
+
+@subsubsection adjmsg(9)
+@fnindex adjmsg(9)
+@subsubsection allocb(9)
+@fnindex allocb(9)
+@subsubsection bufcall(9)
+@fnindex bufcall(9)
+@subsubsection copyb(9)
+@fnindex copyb(9)
+@subsubsection copymsg(9)
+@fnindex copymsg(9)
+@subsubsection datamsg(9)
+@fnindex datamsg(9)
+@subsubsection dupb(9)
+@fnindex dupb(9)
+@subsubsection dupmsg(9)
+@fnindex dupmsg(9)
+@subsubsection esballoc(9)
+@fnindex esballoc(9)
+@subsubsection freeb(9)
+@fnindex freeb(9)
+@subsubsection freemsg(9)
+@fnindex freemsg(9)
+@subsubsection linkb(9)
+@fnindex linkb(9)
+@subsubsection msgdsize(9)
+@fnindex msgdsize(9)
+@subsubsection msgpullup(9)
+@fnindex msgpullup(9)
+@subsubsection pcmsg(9)
+@fnindex pcmsg(9)
+@subsubsection pullupmsg(9)
+@fnindex pullupmsg(9)
+@subsubsection rmvb(9)
+@fnindex rmvb(9)
+@subsubsection testb(9)
+@fnindex testb(9)
+@subsubsection unbufcall(9)
+@fnindex unbufcall(9)
+@subsubsection unlinkb(9)
+@fnindex unlinkb(9)
+
+@node Queue Handling, Miscellaneous Functions, Message Handling, Reference
+@section Queue Handling
+@cpindex queue handling
+@menu
+Queue Handling
+@end menu
+
+@subsection UP Queue Handling Functions
+
+@subsubsection backq(9)
+@fnindex backq(9)
+@subsubsection bcanput(9)
+@fnindex bcanput(9)
+@subsubsection canenable(9)
+@fnindex canenable(9)
+@subsubsection canput(9)
+@fnindex canput(9)
+@subsubsection enableok(9)
+@fnindex enableok(9)
+@subsubsection flushband(9)
+@fnindex flushband(9)
+@subsubsection flushq(9)
+@fnindex flushq(9)
+@subsubsection getq(9)
+@fnindex getq(9)
+@subsubsection insq(9)
+@fnindex insq(9)
+@subsubsection noenable(9)
+@fnindex noenable(9)
+@subsubsection OTHERQ(9)
+@fnindex OTHERQ(9)
+@subsubsection putbq(9)
+@fnindex putbq(9)
+@subsubsection putctl(9)
+@fnindex putctl(9)
+@subsubsection putctl1(9)
+@fnindex putctl1(9)
+@subsubsection putq(9)
+@fnindex putq(9)
+@subsubsection qenable(9)
+@fnindex qenable(9)
+@subsubsection qreply(9)
+@fnindex qreply(9)
+@subsubsection qsize(9)
+@fnindex qsize(9)
+@subsubsection RD(9)
+@fnindex RD(9)
+@subsubsection rmvq(9)
+@fnindex rmvq(9)
+@subsubsection SAMESTR(9)
+@fnindex SAMESTR(9)
+@subsubsection WR(9)
+@fnindex WR(9)
+
+@subsection MP Queue Handling Functions
+
+@subsubsection bcanputnext(9)
+@fnindex bcanputnext(9)
+@subsubsection canputnext(9)
+@fnindex canputnext(9)
+@subsubsection freezestr(9)
+@fnindex freezestr(9)
+@subsubsection put(9)
+@fnindex put(9)
+@subsubsection putnext(9)
+@fnindex putnext(9)
+@subsubsection putnextctl1(9)
+@fnindex putnextctl1(9)
+@subsubsection putnextctl(9)
+@fnindex putnextctl(9)
+@subsubsection qprocsoff(9)
+@fnindex qprocsoff(9)
+@subsubsection qprocson(9)
+@fnindex qprocson(9)
+@subsubsection strqget(9)
+@fnindex strqget(9)
+@subsubsection strqset(9)
+@fnindex strqset(9)
+@subsubsection unfreezestr(9)
+@fnindex unfreezestr(9)
+
+@node Miscellaneous Functions, Extensions, Queue Handling, Reference
+@section Miscellaneous Functions
+@cpindex miscellaneous functions
+@menu
+Miscellaneous Functions
+@end menu
+
+@subsection Miscellaneous DDI/DKI Functions
+
+@subsubsection kmem_alloc(9)
+@fnindex kmem_alloc(9)
+@subsubsection kmem_free(9)
+@fnindex kmem_free(9)
+@subsubsection kmem_zalloc(9)
+@fnindex kmem_zalloc(9)
+@subsubsection cmn_err(9)
+@fnindex cmn_err(9)
+@subsubsection bcopy(9)
+@fnindex bcopy(9)
+@subsubsection bzero(9)
+@fnindex bzero(9)
+@subsubsection copyin(9)
+@fnindex copyin(9)
+@subsubsection copyout(9)
+@fnindex copyout(9)
+@subsubsection delay(9)
+@fnindex delay(9)
+@subsubsection drv_getparm(9)
+@fnindex drv_getparm(9)
+@subsubsection drv_hztomsec(9)
+@fnindex drv_hztomsec(9)
+@subsubsection drv_hztousec(9)
+@fnindex drv_hztousec(9)
+@subsubsection drv_msectohz(9)
+@fnindex drv_msectohz(9)
+@subsubsection drv_priv(9)
+@fnindex drv_priv(9)
+@subsubsection drv_usectohz(9)
+@fnindex drv_usectohz(9)
+@subsubsection drv_usecwait(9)
+@fnindex drv_usecwait(9)
+@subsubsection max(9)
+@fnindex max(9)
+@subsubsection min(9)
+@fnindex min(9)
+@subsubsection getmajor(9)
+@fnindex getmajor(9)
+@subsubsection getminor(9)
+@fnindex getminor(9)
+@subsubsection makedevice(9)
+@fnindex makedevice(9)
+@subsubsection mknod(9)
+@fnindex mknod(9)
+@subsubsection mount(9)
+@fnindex mount(9)
+@subsubsection strlog(9)
+@fnindex strlog(9)
+@subsubsection timeout(9)
+@fnindex timeout(9)
+@subsubsection umount(9)
+@fnindex umount(9)
+@subsubsection unlink(9)
+@fnindex unlink(9)
+@subsubsection untimeout(9)
+@fnindex untimeout(9)
+
+@node Extensions, System Controls, Miscellaneous Functions, Reference
+@section Extensions
+@cpindex extensions
+@menu
+Extensions
+@end menu
+
+@subsection Common Extensions
+
+@subsubsection linkmsg(9)
+@fnindex linkmsg(9)
+@subsubsection putctl2(9)
+@fnindex putctl2(9)
+@subsubsection putnextctl2(9)
+@fnindex putnextctl2(9)
+@subsubsection weldq(9)
+@fnindex weldq(9)
+@subsubsection unweldq(9)
+@fnindex unweldq(9)
+
+@subsection Linux Fast-STREAMS Extensions
+
+@subsubsection allocq(9)
+@fnindex allocq(9)
+@subsubsection bcanget(9)
+@fnindex bcanget(9)
+@subsubsection canget(9)
+@fnindex canget(9)
+@subsubsection freeq(9)
+@fnindex freeq(9)
+@subsubsection qattach(9)
+@fnindex qattach(9)
+@subsubsection qclose(9)
+@fnindex qclose(9)
+@subsubsection qdetach(9)
+@fnindex qdetach(9)
+@subsubsection qopen(9)
+@fnindex qopen(9)
+@subsubsection setq(9)
+@fnindex setq(9)
+
+@subsection Extensions from LiS
+
+@subsubsection appq(9)
+@fnindex appq(9)
+@subsubsection esbbcall(9)
+@fnindex esbbcall(9)
+@subsubsection isdatablk(9)
+@fnindex isdatablk(9)
+@subsubsection isdatamsg(9)
+@fnindex isdatamsg(9)
+@subsubsection kmem_zalloc_node(9)
+@fnindex kmem_zalloc_node(9)
+@subsubsection msgsize(9)
+@fnindex msgsize(9)
+@subsubsection qcountstrm(9)
+@fnindex qcountstrm(9)
+@subsubsection xmsgsize(9)
+@fnindex xmsgsize(9)
+
+@subsection SVR 4.2 MP DDI/DKI Compatibility Functions
+
+@subsubsection itimeout(9)
+@fnindex itimeout(9)
+@subsubsection LOCK(9)
+@fnindex LOCK(9)
+@subsubsection LOCK_ALLOC(9)
+@fnindex LOCK_ALLOC(9)
+@subsubsection LOCK_DEALLOC(9)
+@fnindex LOCK_DEALLOC(9)
+@subsubsection major(9)
+@fnindex major(9)
+@subsubsection makedev(9)
+@fnindex makedev(9)
+@subsubsection minor(9)
+@fnindex minor(9)
+@subsubsection sleep(9)
+@fnindex sleep(9)
+@subsubsection spl0(9)
+@fnindex spl0(9)
+@subsubsection spl1(9)
+@fnindex spl1(9)
+@subsubsection spl2(9)
+@fnindex spl2(9)
+@subsubsection spl3(9)
+@fnindex spl3(9)
+@subsubsection spl4(9)
+@fnindex spl4(9)
+@subsubsection spl5(9)
+@fnindex spl5(9)
+@subsubsection spl6(9)
+@fnindex spl6(9)
+@subsubsection spl7(9)
+@fnindex spl7(9)
+@subsubsection spl(9)
+@fnindex spl(9)
+@subsubsection splx(9)
+@fnindex splx(9)
+@subsubsection SV_ALLOC(9)
+@fnindex SV_ALLOC(9)
+@subsubsection SV_BROADCAST(9)
+@fnindex SV_BROADCAST(9)
+@subsubsection SV_DEALLOC(9)
+@fnindex SV_DEALLOC(9)
+@subsubsection SV_SIGNAL(9)
+@fnindex SV_SIGNAL(9)
+@subsubsection SV_WAIT(9)
+@fnindex SV_WAIT(9)
+@subsubsection SV_WAIT_SIG(9)
+@fnindex SV_WAIT_SIG(9)
+@subsubsection TRYLOCK(9)
+@fnindex TRYLOCK(9)
+@subsubsection UNLOCK(9)
+@fnindex UNLOCK(9)
+@subsubsection vtop(9)
+@fnindex vtop(9)
+@subsubsection wakeup(9)
+@fnindex wakeup(9)
+
+@subsection AIX 5L Version 5.1 Compatibility Functions
+
+@subsubsection mi_bufcall(9)
+@fnindex mi_bufcall(9)
+@subsubsection mi_close_comm(9)
+@fnindex mi_close_comm(9)
+@subsubsection mi_next_ptr(9)
+@fnindex mi_next_ptr(9)
+@subsubsection mi_open_comm(9)
+@fnindex mi_open_comm(9)
+@subsubsection putctl2(9)
+@fnindex putctl2(9)
+@subsubsection slpstr(9)
+@fnindex slpstr(9)
+@subsubsection splx(9)
+@fnindex splx(9)
+@subsubsection str_install(9)
+@fnindex str_install(9)
+@subsubsection unweldq(9)
+@fnindex unweldq(9)
+@subsubsection wantio(9)
+@fnindex wantio(9)
+@subsubsection wantmsg(9)
+@fnindex wantmsg(9)
+@subsubsection weldq(9)
+@fnindex weldq(9)
+
+@subsection HP-UX 11.0i v2 Compatibility Functions
+
+@subsubsection putctl2(9)
+@fnindex putctl2(9)
+@subsubsection putnextctl2(9)
+@fnindex putnextctl2(9)
+@subsubsection str_install(9)
+@fnindex str_install(9)
+@subsubsection str_uninstall(9)
+@fnindex str_uninstall(9)
+@subsubsection streams_get_sleep_lock(9)
+@fnindex streams_get_sleep_lock(9)
+@subsubsection streams_put(9)
+@fnindex streams_put(9)
+@subsubsection unweldq(9)
+@fnindex unweldq(9)
+@subsubsection weldq(9)
+@fnindex weldq(9)
+
+@subsection OSF/1 1.2/Digital UNIX Compatibility Functions
+
+@subsubsection lbolt(9)
+@fnindex lbolt(9)
+@subsubsection puthere(9)
+@fnindex puthere(9)
+@subsubsection streams_open_comm(9)
+@fnindex streams_open_comm(9)
+@subsubsection streams_open_ocomm(9)
+@fnindex streams_open_ocomm(9)
+@subsubsection streams_close_comm(9)
+@fnindex streams_close_comm(9)
+@subsubsection strmod_add(9)
+@fnindex strmod_add(9)
+@subsubsection strmod_del(9)
+@fnindex strmod_del(9)
+@subsubsection time(9)
+@fnindex time(9)
+@subsubsection unweldq(9)
+@fnindex unweldq(9)
+@subsubsection weldq(9)
+@fnindex weldq(9)
+
+@subsection UnixWare 7.1.3 (OpenUnix 8) Compatibility Functions
+
+@subsubsection allocb_physreq(9)
+@fnindex allocb_physreq(9)
+@subsubsection ATOMIC_INT_ADD(9)
+@fnindex ATOMIC_INT_ADD(9)
+@subsubsection ATOMIC_INT_ALLOC(9)
+@fnindex ATOMIC_INT_ALLOC(9)
+@subsubsection ATOMIC_INT_DEALLOC(9)
+@fnindex ATOMIC_INT_DEALLOC(9)
+@subsubsection ATOMIC_INT_DECR(9)
+@fnindex ATOMIC_INT_DECR(9)
+@subsubsection ATOMIC_INT_INCR(9)
+@fnindex ATOMIC_INT_INCR(9)
+@subsubsection ATOMIC_INT_INIT(9)
+@fnindex ATOMIC_INT_INIT(9)
+@subsubsection ATOMIC_INT_READ(9)
+@fnindex ATOMIC_INT_READ(9)
+@subsubsection ATOMIC_INT_SUB(9)
+@fnindex ATOMIC_INT_SUB(9)
+@subsubsection ATOMIC_INT_WRITE(9)
+@fnindex ATOMIC_INT_WRITE(9)
+@subsubsection emajor(9)
+@fnindex emajor(9)
+@subsubsection eminor(9)
+@fnindex eminor(9)
+@subsubsection etoimajor(9)
+@fnindex etoimajor(9)
+@subsubsection getemajor(9)
+@fnindex getemajor(9)
+@subsubsection geteminor(9)
+@fnindex geteminor(9)
+@subsubsection itoemajor(9)
+@fnindex itoemajor(9)
+@subsubsection LOCK_OWNED(9)
+@fnindex LOCK_OWNED(9)
+@subsubsection MPSTR_QLOCK(9)
+@fnindex MPSTR_QLOCK(9)
+@subsubsection MPSTR_QRELE(9)
+@fnindex MPSTR_QRELE(9)
+@subsubsection MPSTR_STPLOCK(9)
+@fnindex MPSTR_STPLOCK(9)
+@subsubsection MPSTR_STPRELE(9)
+@fnindex MPSTR_STPRELE(9)
+@subsubsection msgphysreq(9)
+@fnindex msgphysreq(9)
+@subsubsection msgpullup_physreq(9)
+@fnindex msgpullup_physreq(9)
+@subsubsection msgscgth(9)
+@fnindex msgscgth(9)
+@subsubsection printf(9)
+@fnindex printf(9)
+@subsubsection RW_ALLOC(9)
+@fnindex RW_ALLOC(9)
+@subsubsection RW_DEALLOC(9)
+@fnindex RW_DEALLOC(9)
+@subsubsection RW_RDLOCK(9)
+@fnindex RW_RDLOCK(9)
+@subsubsection RW_TRYRDLOCK(9)
+@fnindex RW_TRYRDLOCK(9)
+@subsubsection RW_TRYWRLOCK(9)
+@fnindex RW_TRYWRLOCK(9)
+@subsubsection RW_UNLOCK(9)
+@fnindex RW_UNLOCK(9)
+@subsubsection RW_WRLOCK(9)
+@fnindex RW_WRLOCK(9)
+@subsubsection SLEEP_ALLOC(9)
+@fnindex SLEEP_ALLOC(9)
+@subsubsection SLEEP_DEALLOC(9)
+@fnindex SLEEP_DEALLOC(9)
+@subsubsection SLEEP_LOCK(9)
+@fnindex SLEEP_LOCK(9)
+@subsubsection SLEEP_LOCKAVAIL(9)
+@fnindex SLEEP_LOCKAVAIL(9)
+@subsubsection SLEEP_LOCKOWNED(9)
+@fnindex SLEEP_LOCKOWNED(9)
+@subsubsection SLEEP_LOCK_SIG(9)
+@fnindex SLEEP_LOCK_SIG(9)
+@subsubsection SLEEP_TRYLOCK(9)
+@fnindex SLEEP_TRYLOCK(9)
+@subsubsection SLEEP_UNLOCK(9)
+@fnindex SLEEP_UNLOCK(9)
+@subsubsection strioccall(9)
+@fnindex strioccall(9)
+
+@subsection Solaris 9/SunOS 5.9 Compatibility Functions
+@cpindex solaris
+@cpindex sunos
+
+@subsubsection ddi_create_minor_node(9)
+@fnindex ddi_create_minor_node(9)
+@subsubsection ddi_driver_major(9)
+@fnindex ddi_driver_major(9)
+@subsubsection ddi_driver_name(9)
+@fnindex ddi_driver_name(9)
+@subsubsection ddi_get_cred(9)
+@fnindex ddi_get_cred(9)
+@subsubsection ddi_getiminor(9)
+@fnindex ddi_getiminor(9)
+@subsubsection ddi_get_instance(9)
+@fnindex ddi_get_instance(9)
+@subsubsection ddi_get_lbolt(9)
+@fnindex ddi_get_lbolt(9)
+@subsubsection ddi_get_pid(9)
+@fnindex ddi_get_pid(9)
+@subsubsection ddi_get_soft_state(9)
+@fnindex ddi_get_soft_state(9)
+@subsubsection ddi_get_time(9)
+@fnindex ddi_get_time(9)
+@subsubsection ddi_remove_minor_node(9)
+@fnindex ddi_remove_minor_node(9)
+@subsubsection ddi_soft_state(9)
+@fnindex ddi_soft_state(9)
+@subsubsection ddi_soft_state_fini(9)
+@fnindex ddi_soft_state_fini(9)
+@subsubsection ddi_soft_state_free(9)
+@fnindex ddi_soft_state_free(9)
+@subsubsection ddi_soft_state_zalloc(9)
+@fnindex ddi_soft_state_zalloc(9)
+@subsubsection ddi_umem_alloc(9)
+@fnindex ddi_umem_alloc(9)
+@subsubsection mod_info(9)
+@fnindex mod_info(9)
+@subsubsection mod_install(9)
+@fnindex mod_install(9)
+@subsubsection mod_remove(9)
+@fnindex mod_remove(9)
+@subsubsection qbufcall(9)
+@fnindex qbufcall(9)
+@subsubsection queclass(9)
+@fnindex queclass(9)
+@subsubsection qtimeout(9)
+@fnindex qtimeout(9)
+@subsubsection qunbufcall(9)
+@fnindex qunbufcall(9)
+@subsubsection quntimeout(9)
+@fnindex quntimeout(9)
+@subsubsection qwait(9)
+@fnindex qwait(9)
+@subsubsection qwait_sig(9)
+@fnindex qwait_sig(9)
+@subsubsection qwriter(9)
+@fnindex qwriter(9)
+
+@subsection LiS 2.16 Compatibility Functions
+@cpindex lis
+
+@subsubsection lis_register_strdev(9)
+@fnindex lis_register_strdev(9)
+@subsubsection lis_register_strmod(9)
+@fnindex lis_register_strmod(9)
+@subsubsection lis_unregister_strdev(9)
+@fnindex lis_unregister_strdev(9)
+@subsubsection lis_unregister_strmod(9)
+@fnindex lis_unregister_strmod(9)
+
+@subsubsection lis_adjmsg(9)
+@fnindex lis_adjmsg(9)
+@subsubsection lis_allocb(9)
+@fnindex lis_allocb(9)
+@subsubsection lis_allocb_physreq(9)
+@fnindex lis_allocb_physreq(9)
+@subsubsection lis_allocq(9)
+@fnindex lis_allocq(9)
+@subsubsection lis_appq(9)
+@fnindex lis_appq(9)
+@subsubsection lis_backq(9)
+@fnindex lis_backq(9)
+@subsubsection lis_bcanput(9)
+@fnindex lis_bcanput(9)
+@subsubsection lis_bcanputnext(9)
+@fnindex lis_bcanputnext(9)
+@subsubsection lis_bcopy(9)
+@fnindex lis_bcopy(9)
+@subsubsection lis_bufcall(9)
+@fnindex lis_bufcall(9)
+@subsubsection lis_bzero(9)
+@fnindex lis_bzero(9)
+@subsubsection lis_canenable(9)
+@fnindex lis_canenable(9)
+@subsubsection lis_canput(9)
+@fnindex lis_canput(9)
+@subsubsection lis_canputnext(9)
+@fnindex lis_canputnext(9)
+@subsubsection lis_cmn_err(9)
+@fnindex lis_cmn_err(9)
+@subsubsection lis_copyb(9)
+@fnindex lis_copyb(9)
+@subsubsection lis_copymsg(9)
+@fnindex lis_copymsg(9)
+@subsubsection lis_datamsg(9)
+@fnindex lis_datamsg(9)
+@subsubsection lis_date(9)
+@fnindex lis_date(9)
+@subsubsection lis_dupb(9)
+@fnindex lis_dupb(9)
+@subsubsection lis_dupmsg(9)
+@fnindex lis_dupmsg(9)
+@subsubsection lis_enableok(9)
+@fnindex lis_enableok(9)
+@subsubsection lis_esballoc(9)
+@fnindex lis_esballoc(9)
+@subsubsection lis_esbbcall(9)
+@fnindex lis_esbbcall(9)
+@subsubsection lis_find_strdev(9)
+@fnindex lis_find_strdev(9)
+@subsubsection lis_flushband(9)
+@fnindex lis_flushband(9)
+@subsubsection lis_flushq(9)
+@fnindex lis_flushq(9)
+@subsubsection lis_freeb(9)
+@fnindex lis_freeb(9)
+@subsubsection lis_freemsg(9)
+@fnindex lis_freemsg(9)
+@subsubsection lis_freeq(9)
+@fnindex lis_freeq(9)
+@subsubsection lis_getq(9)
+@fnindex lis_getq(9)
+@subsubsection lis_insq(9)
+@fnindex lis_insq(9)
+@subsubsection lis_isdatablk(9)
+@fnindex lis_isdatablk(9)
+@subsubsection lis_isdatamsg(9)
+@fnindex lis_isdatamsg(9)
+@subsubsection lis_linkb(9)
+@fnindex lis_linkb(9)
+@subsubsection lis_mknod(9)
+@fnindex lis_mknod(9)
+@subsubsection lis_mount(9)
+@fnindex lis_mount(9)
+@subsubsection lis_msgdsize(9)
+@fnindex lis_msgdsize(9)
+@subsubsection lis_msgpullup(9)
+@fnindex lis_msgpullup(9)
+@subsubsection lis_msgsize(9)
+@fnindex lis_msgsize(9)
+@subsubsection lis_noenable(9)
+@fnindex lis_noenable(9)
+@subsubsection lis_OTHER(9)
+@fnindex lis_OTHER(9)
+@subsubsection lis_OTHERQ(9)
+@fnindex lis_OTHERQ(9)
+@subsubsection lis_pullupmsg(9)
+@fnindex lis_pullupmsg(9)
+@subsubsection lis_putbq(9)
+@fnindex lis_putbq(9)
+@subsubsection lis_putctl1(9)
+@fnindex lis_putctl1(9)
+@subsubsection lis_putctl(9)
+@fnindex lis_putctl(9)
+@subsubsection lis_putnext(9)
+@fnindex lis_putnext(9)
+@subsubsection lis_putnextctl1(9)
+@fnindex lis_putnextctl1(9)
+@subsubsection lis_putnextctl(9)
+@fnindex lis_putnextctl(9)
+@subsubsection lis_putq(9)
+@fnindex lis_putq(9)
+@subsubsection lis_qattach(9)
+@fnindex lis_qattach(9)
+@subsubsection lis_qclose(9)
+@fnindex lis_qclose(9)
+@subsubsection lis_qdetach(9)
+@fnindex lis_qdetach(9)
+@subsubsection lis_qenable(9)
+@fnindex lis_qenable(9)
+@subsubsection lis_qopen(9)
+@fnindex lis_qopen(9)
+@subsubsection lis_qprocsoff(9)
+@fnindex lis_qprocsoff(9)
+@subsubsection lis_qprocson(9)
+@fnindex lis_qprocson(9)
+@subsubsection lis_qreply(9)
+@fnindex lis_qreply(9)
+@subsubsection lis_qsize(9)
+@fnindex lis_qsize(9)
+@subsubsection lis_RD(9)
+@fnindex lis_RD(9)
+@subsubsection lis_register_strdev(9)
+@fnindex lis_register_strdev(9)
+@subsubsection lis_register_strmod(9)
+@fnindex lis_register_strmod(9)
+@subsubsection lis_rmvb(9)
+@fnindex lis_rmvb(9)
+@subsubsection lis_rmvq(9)
+@fnindex lis_rmvq(9)
+@subsubsection lis_safe_canenable(9)
+@fnindex lis_safe_canenable(9)
+@subsubsection lis_safe_enableok(9)
+@fnindex lis_safe_enableok(9)
+@subsubsection lis_safe_noenable(9)
+@fnindex lis_safe_noenable(9)
+@subsubsection lis_safe_OTHERQ(9)
+@fnindex lis_safe_OTHERQ(9)
+@subsubsection lis_safe_putnext(9)
+@fnindex lis_safe_putnext(9)
+@subsubsection lis_safe_qreply(9)
+@fnindex lis_safe_qreply(9)
+@subsubsection lis_safe_RD(9)
+@fnindex lis_safe_RD(9)
+@subsubsection lis_safe_SAMESTR(9)
+@fnindex lis_safe_SAMESTR(9)
+@subsubsection lis_safe_WR(9)
+@fnindex lis_safe_WR(9)
+@subsubsection lis_SAMESTR(9)
+@fnindex lis_SAMESTR(9)
+@subsubsection lis_stream_utils(9)
+@fnindex lis_stream_utils(9)
+@subsubsection lis_strqget(9)
+@fnindex lis_strqget(9)
+@subsubsection lis_strqset(9)
+@fnindex lis_strqset(9)
+@subsubsection lis_testb(9)
+@fnindex lis_testb(9)
+@subsubsection lis_timeout(9)
+@fnindex lis_timeout(9)
+@subsubsection lis_umount2(9)
+@fnindex lis_umount2(9)
+@subsubsection lis_umount(9)
+@fnindex lis_umount(9)
+@subsubsection lis_unbufcall(9)
+@fnindex lis_unbufcall(9)
+@subsubsection lis_unlink(9)
+@fnindex lis_unlink(9)
+@subsubsection lis_unlinkb(9)
+@fnindex lis_unlinkb(9)
+@subsubsection lis_unregister_strdev(9)
+@fnindex lis_unregister_strdev(9)
+@subsubsection lis_unregister_strmod(9)
+@fnindex lis_unregister_strmod(9)
+@subsubsection lis_untimeout(9)
+@fnindex lis_untimeout(9)
+@subsubsection lis_version(9)
+@fnindex lis_version(9)
+@subsubsection lis_WR(9)
+@fnindex lis_WR(9)
+@subsubsection lis_xmsgsize(9)
+@fnindex lis_xmsgsize(9)
+
+@node System Controls, /proc Filesystem, Extensions, Reference
+@section System Controls
+@cpindex system controls
+@menu
+System Controls
+@end menu
+
+@subsection System Controls
+
+Linux Fast-STREAMS provides and supports a number of system controls that can
+be accessed using the /proc/sys/streams/* files, with the
+@iftex
+@b{sysctl}(2)
+@end iftex
+@ifnottex
+@inforef{sysctl(2), , *manpages*}
+@end ifnottex
+interface, or using
+@iftex
+@b{sysctl}(8).
+@end iftex
+@ifnottex
+@inforef{sysctl(8), , *manpages*}.
+@end ifnottex
+
+The following STREAMS specific system controls are provided by Linux
+Fast-STREAMS:
+
+@subsubsection sys.streams.cltime
+@vrindex sys.streams.cltime
+Defines the default time interval (in milliseconds) that closing stream will
+linger for messages to clear its queues before finally closing.  Valid values
+are zero (0) or greater (MAXINT).  The default value is the traditional UNIX
+value of 15,000 milliseconds (15 seconds).  This system control defines the
+default for all new streams.  The value for a given stream can be changed with
+the
+@iftex
+@b{streamio}(7)
+@end iftex
+@ifnottex
+@inforef{streamio(7), , *manpages*}
+@end ifnottex
+IO control
+@b{I_CLTIME},
+after the stream is opened and before the stream is closed.
+
+@subsubsection sys.streams.max_apush
+@vrindex sys.streams.max_apush
+Defines the maximum number of modules that can be configured for autopush onto
+a STREAMS driver.  Valid values are zero (0) or greater (MAXINT).  The default
+value is the traditional UNIX value of 8 modules.  This system control defines
+the maximum for all new autopush configurations.  Existing autopush
+configurations are unchanged.
+
+@subsubsection sys.streams.max_mblk
+@vrindex sys.streams.max_mblk
+Defines the maximum number of combined message data blocks that will be held
+on the per-CPU free list between runs of
+@iftex
+@b{runqueues}(9).
+@end iftex
+@ifnottex
+@inforef{runqueues(9), , *manpages*}.
+@end ifnottex
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the
+traditional @i{UNIX} value of 10 blocks.  This system control defines the
+maximum for the next run of
+@iftex
+@b{runqueues}(9)
+@end iftex
+@ifnottex
+@inforef{runqueues(9), , *manpages*}
+@end ifnottex
+for all CPUs.  Increasing or decreasing this number may have a positive or
+negative performance impact.
+
+@subsubsection sys.streams.max_stramod
+@vrindex sys.streams.max_stramod
+Defines the maximum number of autopush structures that can be defined for the
+entire system.  Valid values are zero (0) or greater (@b{MAXINT}).  The
+default value is eight (8) ???????  This system control defines the
+system-wide maximum.
+
+@subsubsection sys.streams.max_strdev
+@vrindex sys.streams.max_strdev
+Defines the maximum number of streams devices.  This is normally the maximum
+number of character devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or
+greater (@b{MAXINT}).  The default value is @b{MAX_CHRDEV} (256).  This is a
+read-only system control.
+
+@subsubsection sys.streams.max_strmod
+@vrindex sys.streams.max_strmod
+Defines the maximum number of streams modules.  This is normally the maximum
+number of character devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or
+greater (@b{MAXINT}).  The default value is @b{MAX_CHRDEV} (256).  This is a
+read-only system control.
+
+@subsubsection sys.streams.msg_priority
+@vrindex sys.streams.msg_priority
+Defines whether allocation priority will honored or whether all allocations
+will be treated the same.  See
+@iftex
+@b{allocb}(9).
+@end iftex
+@ifnottex
+@inforef{allocb(9), , *manpages*}.
+@end ifnottex
+When true (non-zero), allocation priority will be honored when allocating
+message blocks.  When false (zero), allocation priority will be ignored.
+Valid values are zero (0) or non-zero.  The default value is zero (0).
+Changing this value may have a positive or negative impact on system
+performance.
+
+@subsubsection sys.streams.nband
+@vrindex sys.streams.nband
+Defines the number of queue bands available.  Valid values are zero (0) or
+greater (@b{MAXINT}).  The default value is the traditional UNIX value of 256.
+This system control defines the system wide value.  This system control is
+read-only.
+
+@subsubsection sys.streams.nstrmsgs
+@vrindex sys.streams.nstrmsgs
+Defines the maximum number of combined message data blocks that will be
+allocated.  Valid values are zero (0) or greater (@b{MAXINT}).  The default
+value is 2^12.  Changing this value may have a positive or negative impact on
+system performance.  Setting this value to a small number may be useful for
+debugging @i{STREAMS} drivers and modules.
+
+@subsubsection sys.streams.nstrpush
+@vrindex sys.streams.nstrpush
+Deinfes the maximum number of modules that can be pushed on a stream.  This
+includes both autopushed modules and modules pushed using the
+@b{I_PUSH}
+@vrindex I_PUSH
+IO control of
+@iftex
+@b{streamio}(7).
+@end iftex
+@ifnottex
+@inforef{streamio(7), , *manpages*}.
+@end ifnottex
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the
+tranditional @i{UNIX} value of 64.  This is the default values for all new
+streams.  Existing streams are unaffected.
+
+@subsubsection sys.streams.hiwat
+@vrindex sys.streams.hiwat
+Defines the default high water mark (in message bytes) for the stream head.
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is 5120.
+This is the default value for all new stream heads.  Existing stream heads are
+unaffected.  The value on existing stream heads can be changed by a driver or
+module by sending an
+@b{M_SETOPTS}
+@vrindex M_SETOPTS
+message to the stream head.
+
+@subsubsection sys.streams.lowat
+@vrindex sys.streams.lowat
+Defines the default low water mark (in mesasge bytes) for the stream head.
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is 1024.
+This is the default value for all new stream heads.  Existing stream heads are
+unaffected.  The value on existing stream heads can be changed by a driver or
+module by sending an
+@b{M_SETOPTS}
+@vrindex M_SETOPTS
+message to the stream head.
+
+@subsubsection sys.streams.maxpsz
+@vrindex sys.streams.maxpsz
+Defines the maximum packet size accepted (in message bytes) for the stream
+head.  Valid values are zero (0) or greater (@b{MAXINT}).  The default value
+is 2^12.  This is the default value for all new stream heads.  Existing stream
+heads are unaffected.  The value on existing stream heads can be changed by a
+driver or module by sending an
+@b{M_SETOPTS}
+@vrindex M_SETOPTS
+message to the stream head.
+
+@subsubsection sys.streams.minpsz
+@vrindex sys.streams.minpsz
+Defines the minimum packet size accepted (in message bytes) for the stream
+head.  Valid values are zero (0) or greater (@b{MAXINT}).  The default value
+is 0.  This is the default value for all new stream heads.  Existing stream
+heads are unaffected.  The value on existing stream heads can be changed by a
+driver or module by sending an
+@b{M_SETOPTS}
+@vrindex M_SETOPTS
+message to the stream head.
+
+@subsubsection sys.streams.reuse_fmodsw
+@vrindex sys.streams.reuse_fmodsw
+Defines whether fmodsw table entries will be reused.  When false (zero),
+fmodsw table entries will not be reused.  When true (non-zero), fmodsw table
+entries will be reused.  Valid values are zero (0) and non-zero.  The default
+value is false (zero).
+
+@subsubsection sys.streams.rtime
+@vrindex sys.streams.rtime
+Defines the time interval (in milliseconds) that the stream head will wait to
+forward held messages when SNDHOLD is set for the stream head.  Valid values
+are zero (0) or greater (@b{MAXINT}).  The default value is 10 milliseconds
+(one clock tick).  This is the system wide value for all streams.  Changing
+this value may have a positive or negative impact on system performance.
+
+@subsubsection sys.streams.strhold
+@vrindex sys.streams.strhold
+Defines whether the @b{SNDHOLD} feature is active or not.  When false (0), the
+@b{SNDHOLD} feature is deactivated.  When true (non-zero), the @b{SNDHOLD}
+feature is activated.  Valid values are zero (0) or non-zero.  The default
+value is false (0).  This is the default value for all new streams.  Existing
+streams are unaffected.  This setting can be examined and altered on an open
+stream using the
+@b{I_GWROPT}
+@vrindex I_GWROPT
+and
+@b{I_SWROPT}
+@vrindex I_SWROPT
+IO controls of
+@iftex
+@b{streamio}(7).
+@end iftex
+@ifnottex
+@inforef{streamio (7), , *manpages*}.
+@end ifnottex
+
+@subsubsection sys.streams.strctlsz
+@vrindex sys.streams.strctlsz
+Defines the maximum @i{STREAMS} control part size.  Valid values are zero (0)
+or greater (@b{MAXINT}).  The default value is 2^12.  This is the system wide
+maximum.  Existing allocations are unaffected by lowering this value.
+Changing this value can have an impact on users of
+@iftex
+@b{putpmsg}(2).
+@end iftex
+@ifnottex
+@inforef{putpmsg (2), , *manpages*}.
+@end ifnottex
+
+@subsubsection sys.streams.strmsgsz
+@vrindex sys.streams.strmsgsz
+Defines the maximum @i{STREAMS} message size.  Valid values are zero (0) or
+greater (@b{MAXINT}).  The default value is 2^18.  This is the system wide
+maximum.  Existing allocations are unaffected by lowering this value.
+Changing this value can have an impact on users of
+@iftex
+@b{write}(2),
+@end iftex
+@ifnottex
+@inforef{write (2), , *manpages*},
+@end ifnottex
+@iftex
+@b{writev}(2),
+@end iftex
+@ifnottex
+@inforef{writev (2), , *manpages*},
+@end ifnottex
+and
+@iftex
+@b{putpmsg}(2).
+@end iftex
+@ifnottex
+@inforef{putpmsg (2), , *manpages*}.
+@end ifnottex
+
+@subsubsection sys.streams.strthresh
+@vrindex sys.streams.strthresh
+Defines the maximum amount of memory that will be allocated for use by the
+STREAMS subsystem via
+@iftex
+@b{kmem_alloc}(9)
+@end iftex
+@ifnottex
+@inforef{kmem_alloc (9), , *manpages*}
+@end ifnottex
+or
+@iftex
+@b{kmem_zalloc}(9),
+@end iftex
+@ifnottex
+@inforef{kmem_zalloc (9), , *manpages*},
+@end ifnottex
+or indirectly using
+@iftex
+@b{allocb}(9)
+@end iftex
+@ifnottex
+@inforef{allocb (9), , *manpages*}
+@end ifnottex
+or allocating other @i{STREAMS} datastructures.  Valid values are zero (0) or
+greater (@b{MAXINT}).  This is the system wide maximum.  Existing allocations
+are unaffected by lowering this value.  Changing this value to a low value may
+have some use in debugging @i{STREAMS} drivers and modules.
+
+@node /proc Filesystem, , System Controls, Reference
+@section /proc Filesystem
+@cpindex /proc filesystem
+@menu
+/proc Filesystem
+@end menu
+
+@node Examples, Multi-Threading, Reference, Top
+@chapter Examples
+@cpindex examples
+@menu
+* Module Example::              STREAMS Module Example
+* Driver Example::              STREAMS Driver Example
+@end menu
+
+@node Module Example, Driver Example, , Examples
+@section Module Example
+@cpindex module example
+
+@node Driver Example, , Module Example, Examples
+@section Driver Example
+@cpindex driver example
+
+@node Multi-Threading, Conformance, Examples, Top
+@chapter Multi-Threading
+@cpindex multi-threading
+@menu
+* Configuration::               MP STREAMS Configuration
+* Asynchronous Entry Points::   MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::      MP STREAMS Asynchronous Callbacks
+* Synchronous Entry Points::    MP STREAMS Synchronous Entry Points
+* Synchronous Callbacks::       MP STREAMS Synchronous Callbacks
+@end menu
+
+@node Configuration, Asynchronous Entry Points, , Multi-Threading
+@section Configuration
+@cpindex conformance
+
+@node Asynchronous Entry Points, Asynchronous Callbacks, Configuration, Multi-Threading
+@section Asynchronous Entry Points
+@cpindex asynchronous entry points
+
+@node Asynchronous Callbacks, Synchronous Entry Points, Asynchronous Entry Points, Multi-Threading
+@section Asynchronous Callbacks
+@cpindex asynchronous callbacks
+
+@node Synchronous Entry Points, Synchronous Callbacks, Asynchronous Callbacks, Multi-Threading
+@section Synchronous Entry Points
+@cpindex synchronous entry points
+
+@node Synchronous Callbacks, , Synchronous Entry Points, Multi-Threading
+@section Synchronous Callbacks
+@cpindex synchronous callbacks
+
+@node Conformance, Portability, Multi-Threading, Top
+@chapter Conformance
+@cpindex conformance
+@menu
+* SVR 4.2 Compatibility::       SVR 4.2 MP DDI/DKI compatibility
+* AIX Compatibility::           AIX 5L Version 5.1 compatibility
+* HP-UX Compatibility::         HP-UX 11.0i v2 compatibility
+* OSF/1 Compatibility::         OSF/1 1.2/Digital UNIX comptatibility
+* UnixWare Compatibility::      UnixWare 7.1.3 compatibility
+* Solaris Compatibility::       Solaris 9/SunOS 5.9 compatibility
+* SUX Compatibility::           Super/UX compatibilty
+* UXP Compatibility::           UX/P compatibilty
+* LiS Compatibility::           LiS 2.16 compatibilty
+@end menu
+
+@node SVR 4.2 Compatibility
+@section SVR 4.2 MP DDI/DKI compatibility
+@cpindex svr 4.2 mp ddi/dki compatibility
+
+@node AIX Compatibility
+@section AIX 5L Version 5.1 compatibility
+@cpindex aix 5l version 5.1 compatibility
+
+@node HP-UX Compatibility
+@section HP-UX 11.0i v2 compatibility
+@cpindex hp-ux 11.0i v2 compatibility
+
+@node OSF/1 Compatibility
+@section OSF/1 1.2/Digital UNIX comptatibility
+@cpindex osf/1 1.2/digital unix comptatibility
+
+@node UnixWare Compatibility
+@section UnixWare 7.1.3 compatibility
+@cpindex unixware 7.1.3 compatibility
+
+@node Solaris Compatibility
+@section Solaris 9/SunOS 5.9 compatibility
+@cpindex solaris 9/sunos 5.9 compatibility
+
+@node SUX Compatibility
+@section Super/UX compatibilty
+@cpindex super/ux compatibilty
+
+@node UXP Compatibility
+@section UX/P compatibilty
+@cpindex ux/p compatibilty
+
+@node LiS Compatibility
+@section LiS 2.16 compatibilty
+@cpindex lis 2.16 compatibilty
+
+@node Portability, Copying, Conformance, Top
+@chapter Portability
+@cpindex portability
+@menu
+* SVR 4.2 Portability::         Porting from SVR 4.2 MP
+* AIX Portability::             Porting from AIX 5L Version 5.1
+* HP-UX Portability::           Porting from HP-UX 11.0i v2
+* OSF/1 Portability::           Porting from OSF/1 1.2/Digital UNIX
+* UnixWare Portability::        Porting from UnixWare 7.1.3
+* Solaris Portability::         Porting from Solaris 9/SunOS 5.9
+* SUX Portability::             Porting from Super/UX
+* UXP Portability::             Porting from UX/P
+* LiS Portability::             Porting from LiS 2.16
+@end menu
+
+@node SVR 4.2 Portability
+@section Porting from SVR 4.2 MP
+@cpindex porting from svr 4.2 mp
+
+@node AIX Portability
+@section Porting from AIX 5L Version 5.1
+@cpindex porting from aix 5l version 5.1
+
+@node HP-UX Portability
+@section Porting from HP-UX 11.0i v2
+@cpindex porting from hp-ux 11.0i v2
+
+@node OSF/1 Portability
+@section Porting from OSF/1 1.2/Digital UNIX
+@cpindex porting from osf/1 1.2/digital unix
+
+@node UnixWare Portability
+@section Porting from UnixWare 7.1.3
+@cpindex porting from unixware 7.1.3
+
+@node Solaris Portability
+@section Porting from Solaris 9/SunOS 5.9
+@cpindex porting from solaris 9/sunos 5.9
+
+@node SUX Portability
+@section Porting from Super/UX
+@cpindex porting from super/ux
+
+@node UXP Portability
+@section Porting from UX/P
+@cpindex porting from ux/p
+
+@node LiS Portability
+@section Porting from LiS 2.16
+@cpindex porting from lis 2.16
+
+@appendix Appendices
+
+@node Copying, Documentation License, Portability, Top
+@unnumbered Copying
+@include gpl.texi
+
+@node Documentation License, Indices, Copying, Top
+@unnumbered Documentation License
+@include fdl.texi
+
+@node Indices, , Documentation License, Top
+@unnumbered Indices
+@menu
+* Concept Index::               Concept Index
+* Type Index::                  Type Index
+* Function Index::              Function Index
+* Variable Index::              Variable Index
+* File Index::                  File Index
+@end menu
+
+@node Concept Index, Type Index, , Indices
+@unnumbered Concept Index
+
+@printindex cp
+
+@node Type Index, Function Index, Concept Index, Indices
+@unnumbered Type Index
+
+@printindex tp
+
+@node Function Index, Variable Index, Type Index, Indices
+@unnumbered Function and Macro Index
+
+@printindex fn
+
+@node Variable Index, File Index, Function Index, Indices
+@unnumbered Variable and Constant Macro Index
+
+@printindex vr
+
+@node File Index, , Variable Index, Indices
+@unnumbered Program and File Index
+
+@printindex pg
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+

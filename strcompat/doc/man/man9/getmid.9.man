@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getadmin.9.man,v 0.9.2.1 2004/03/13 05:46:34 brian Exp $
+.\" @(#) $Id: getmid.9.man,v 0.9 2004/03/13 05:46:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -71,85 +71,85 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETADMIN 9 "$Date: 2004/03/13 05:46:34 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETMID 9 "$Date: 2004/03/13 05:46:34 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B getadmin
-\- get the adminstration function pointer for a \fISTREAMS\fR module
+.B getmid
+\- get the \fISTREAMS\fR module id for a name
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/types.h>
-.br
-.B #include <sys/stream.h>
-.HP
-int (*\fBgetadmin\fR(modID_t \fImid\fR))();
+modID_t \fBgetmid\fR(const char *\fIname\fR);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I mid
-Module ID.
+.I name
+The name of the module.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR getadmin ()
-returns a pointer to the adminstration function as indicated by the
-.I qi_qadmin
-member of the
-.BR qinit (9)
-structure for the module.
+.BR getmid ()
+returns the module indentifier for the named driver or module.
 .\"
 .\"
 .SH RETURN
 .PP
-Returns a pointer to the adminstration function for that module, or
-.B NULL
-if no driver or module has the given identifier.
+.BR getmid ()
+returns the module identifier of the driver or module corresponding to
+.I name 
+or, if no driver or module corresponds to
+.IR name ,
+.BR getmid ()
+returns zero (0).
 .\"
 .\"
 .SH ERRORS
 .PP
-When
-.BR getadmin ()
-fails it returns
-.BR NULL .
-.BR getadmin ()
-fails when there is no module or driver for the given module Id.
+.BR getmid ()
+returns the module identifier of the module corresponding to
+.IR name ,
+or zero (0)
+if
+.I name
+does not correspond to a module.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR getadmin ()
+.BR getmid ()
 can be called from any context.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-.BR getadmin ()
-is MP-save; however, it is the caller's responsibility to ensure that the
-module or driver has not unloaded before dereferencing the resulting function
-pointer.
+.BR getmid ()
+is MP-safe; however, it is the caller's responsibility to ensure that the
+module is not unloaded and reloaded with a different module id.  Normally
+.I STREAMS
+modules have statically assigned module identifiers, so this should not
+present a problem.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR getadmin ()
+.PP
+.BR getmid ()
 first searches the character device table
 .RB ( cdevsw )
 for a
 .I STREAMS
-device with the same module identifier, then the pushable
+device with the same name, then the pushable
 .I STREAMS
 module table
 .RB ( fmodsw ).
 .PP
-The module identifier is held in the
-.I mi_idnum
+The module name is held in the
+.I mi_idname
 member of the
 .BR module_info (9)
 structure pointed to by the
@@ -157,23 +157,24 @@ structure pointed to by the
 of the
 .B qinit (9)
 structure, which is usually hard coded for each driver or module.  The module
-identifier should be a unique number for each device or module.
+name should be a unique.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR getmid (9).
+.BR getadmin (9).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR getadmin ()
+.BR getmid ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR getadmin ()
+.PP
+.BR getmid ()
 is compatible with
 .B "SVR 4.2"
 .[
@@ -190,18 +191,19 @@ and
 with the following portability considerations:
 .IP \(em
 .IR UnixWare \(rg
-show the
-.I mid
-argument of type
-.BR ushort_t .
+show the return value of type
+.BR ushort_t ,
+and the type of
+.I name
+as
+.RB ( "char *" ).
 .IP \(em
 .IR AIX \(rg,
 .IR HPUX \(rg,
 .IR UnixWare \(rg
 and
 .IR UX/P \(rg
-document this function with
-.I mid
+document this function with return value
 of type
 .BR ushort .
 .IP \(em
@@ -217,13 +219,16 @@ Under
 .[
 lfs
 .]
-.I mid
-is of type
+the return value is of type
 .BR modID_t ,
 which reduces to
-.BR ushort .
+.BR ushort ,
+and a
+.I name
+type of
+.RB ( "const char *" ).
 .IP \(em
-.BR getadmin ()
+.BR getmid ()
 is provided for source compatibility with older versions of
 .IR STREAMS .
 Binary compatibility is not guaranteed.

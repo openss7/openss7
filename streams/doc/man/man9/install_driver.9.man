@@ -1,0 +1,328 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: install_driver.9.man,v 0.9.2.1 2004/03/13 05:46:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/13 05:46:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH INSTALL_DRIVER 9 "$Date: 2004/03/13 05:46:34 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B install_driver
+\- install a device driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _HPUX_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/hpuxddi.h>
+.HP
+int \fBinstall_driver\fR(drv_info_t *\fIdinfo\fR, drv_ops_t *\fIdops\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I dinfo
+A pointer to a
+.B drv_info
+structure describing the device.
+.TP
+.I dops
+A pointer to a
+.B drv_ops
+structure describing the driver operations.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR install_driver ()
+.\"
+.\"
+.PP
+The
+.B drv_info
+structure is as follows:
+.RS
+.nf
+\fC\s-1
+typedef struct drv_info {
+        char *  di_name;
+        char *  di_class;
+        int     di_flags;
+        int     di_block_major;
+        int     di_char_major;
+        void *  di_cdio;
+        void *  di_gio_private;
+        void *  di_cdio_private;
+} drv_info_t;
+\s+1\fP
+.fi
+.TP
+.I di_name
+.PD 0
+.TP
+.I di_class
+.TP
+.I di_flags
+.TP
+.I di_block_major
+.TP
+.I di_char_major
+.TP
+.I di_cdio
+.TP
+.I di_gio_private
+.TP
+.I di_cdio_private
+.PD
+.RE
+.\"
+.\"
+.PP
+The
+.B drv_ops
+structure is as follows:
+.RS
+.nf
+\fC\s-1
+typedef struct drv_ops {
+        (*d_open)();
+        (*d_close)();
+        (*d_strategy)();
+        (*d_dump)();
+        (*d_psize)();
+        (*d_mount)();
+        (*d_read)();
+        (*d_write)();
+        (*d_ioctl)();
+        (*d_select)();
+        (*d_option1)();
+        (*d_res1)();
+        (*d_res2)();
+        (*d_res3)();
+        (*d_res4)();
+        int d_flags;
+} drv_ops_t;
+\s+1\fP
+.fi
+.TP
+.I d_open
+.PD 0
+.TP
+.I d_close
+.TP
+.I d_strategy
+.TP
+.I d_dump
+.TP
+.I d_psize
+.TP
+.I d_mount
+.TP
+.I d_read
+.TP
+.I d_write
+.TP
+.I d_ioctl
+.TP
+.I d_select
+.TP
+.I d_option1
+.TP
+.I d_res1
+.TP
+.I d_res2
+.TP
+.I d_res3
+.TP
+.I d_res4
+.TP
+.I d_flags
+.PD
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR install_driver ()
+succeeds, it returns 
+.BR DDI_SUCCESS ;
+when it fails, it returns
+.BR DDI_FAILURE .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR install_driver ()
+fails when 
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR install_driver ()
+can be called from
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR install_driver ()
+is a
+.IR HPUX \(rg-specific
+function:
+.B _HPUX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_HPUX
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR install_driver ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR install_driver ()
+is compatible with
+.IR HPUX \(rg
+with the following portablity considerations:
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.BR install_driver ()
+is provided for source level compatibility with
+.IR HPUX \(rg
+for the purpose of porting
+.IR HPUX \(rg
+drivers to
+.IR Linux \(rg.
+Because internal structures and definitions for
+.B Lnux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR HPUX \(rg,
+binaries are incompatible.
+.IP \(em
+.BR install_driver ()
+only provides functionality comparable to
+.IR HPUX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR install_driver ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HPUX \(rg
+DDI documentation.
+.[
+hpuxdoc
+.]
+.[
+hpuxspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR install_driver ()
+first appeared in
+.IR HPUX \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
