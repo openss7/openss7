@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/03/13 12:15:33 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/14 01:16:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/13 12:15:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 01:16:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,7 +74,11 @@
 AC_DEFUN([_LINUX_STREAMS], [dnl
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
-    _LINUX_STREAMS_KERNEL
+dnl
+dnl Skip kernel checks if not configuring for the kernel (i.e. no _LINUX_KERNEL)
+dnl as we do for netperf.
+dnl
+    m4_ifdef([_LINUX_KERNEL], [_LINUX_STREAMS_KERNEL])
     _LINUX_STREAMS_OUTPUT
     AC_SUBST([STREAMS_CPPFLAGS])
     AC_SUBST([STREAMS_LDADD])
@@ -526,7 +530,7 @@ AC_DEFUN([_LINUX_STREAMS_KERNEL], [dnl
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
-])
+    ])
 ])# _LINUX_STREAMS_KERNEL
 # =============================================================================
 
