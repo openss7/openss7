@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2004/12/20 19:40:01 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.9 2004/12/21 00:40:58 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/20 19:40:01 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/21 00:40:58 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -180,53 +180,33 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>]],
-                [[ip_route_output(NULL, 0, 0, 0, 0);]])
-            ],
-            [sctp_cv_have_ip_route_output='yes'],
-            [sctp_cv_have_ip_route_output='no']) ])
-    ])
-    if test :"${sctp_cv_have_ip_route_output:-no}" = :yes ; then
-        AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT], [], [Most 2.4 kernels have
-        the function ip_route_output() defined.  Newer RH kernels (EL3) use
-        the 2.6 functions and do not provide ip_route_output().  Define this
-        macro if your kernel provides ip_route_output().])
-    else
-        _LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_flow], [dnl
-            AC_MSG_ERROR([
-**** 
-**** To use the package on newer kernels requires the availability of the
-**** function ip_route_output_flow() to permit calling ip_route_connect()
-**** which is an inline in net/route.h.  I cannot find this symbol on your
-**** system and the resulting kernel module will therefore not load.
-****
-                    ])
-        ])
-        _LINUX_KERNEL_SYMBOL_EXPORT([__ip_route_output_key], [dnl
-            AC_MSG_ERROR([
-**** 
-**** To use the package on newer kernels requires the availability of the
-**** function __ip_route_output_key() to permit calling ip_route_connect()
-**** which is an inline in net/route.h.  I cannot find this symbol on your
-**** system and the resulting kernel module will therefore not load.
-****
-                    ])
-        ])
-    fi
-dnl if test :"${sctp_cv_openss7_sctp:-no}" = :yes ; then
-dnl     with_sctp='no'
-dnl     with_sctp2='no'
-dnl fi
-    if test :"${with_sctp2:-no}" = :yes ; then
-        with_sctp='no'
-    fi
-    if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu], [with_sctp='no'; with_sctp2='no'])
-    fi
-    if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
-        _LINUX_KERNEL_ENV([dnl
-            AC_CHECK_MEMBER([struct inet_protocol.protocol],
-                [sctp_cv_inet_protocol_style='old'],
-                [:], [
+                [[ip_route_output(NULL, 0, 0, 0, 0);]]) ],
+                    [sctp_cv_have_ip_route_output='yes'],
+                    [sctp_cv_have_ip_route_output='no'])
+            ])
+        if test :$sctp_cv_have_ip_route_output = :yes ; then
+            AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [], [Define if you have the explicit
+                version of ip_route_output.])
+        fi
+        AC_CHECK_HEADERS([net/xfrm.h], [], [], [
+#include <linux/config.h>
+#include <linux/sysctl.h>
+#include <linux/types.h>
+#include <linux/fcntl.h>
+#include <linux/random.h>
+#include <linux/init.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <linux/ipsec.h>
+#include <linux/poll.h>
+#include <linux/slab.h>
+#include <linux/mm.h>
+#include <linux/module.h>
+#include <linux/proc_fs.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+            ])
+        AC_CHECK_MEMBERS([struct inet_protocol.protocol, struct inet_protocol.no_policy], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -237,24 +217,8 @@ dnl fi
 #include <net/udp.h>
 #include <net/tcp.h>
 #include <net/protocol.h>
-                ])
-            AC_CHECK_MEMBER([struct inet_protocol.no_policy],
-                [sctp_cv_inet_protocol_style='new'],
-                [:], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-#include <net/protocol.h>
-                ])
-            AC_CHECK_MEMBER([struct dst_entry.path],
-                [sctp_cv_dst_entry_path='yes'],
-                [sctp_cv_dst_netry_path='no'], [
+            ])
+        AC_CHECK_MEMBERS([struct dst_entry.path], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -265,44 +229,20 @@ dnl fi
 #include <net/udp.h>
 #include <net/tcp.h>
 #include <net/dst.h>
-                ])
             ])
-    fi
-    if test :"${sctp_cv_inet_protocol_style:+set}" = :set ; then
-        case "$sctp_cv_inet_protocol_style" in
-            old)
-                AC_DEFINE_UNQUOTED([HAVE_OLD_STYLE_INET_PROTOCOL], [], [Most
-                2.4 kernels have the old style struct inet_protocol and the
-                old prototype for inet_add_protocol() and inet_del_protocol()
-                defined in <net/protocol.h>.  Some more recent RH kernels
-                (such as EL3) use the 2.6 style of structure and prototypes.
-                Define this macro if your kernel has the old style structure
-                and prototypes.])
-                ;;
-            new)
-                AC_DEFINE_UNQUOTED([HAVE_NEW_STYLE_INET_PROTOCOL], [], [Most
-                2.4 kernels have the old style struct inet_protocol and the
-                old prototype for inet_add_protocol() and inet_del_protocol()
-                defined in <net/protocol.h>.  Some more recent RH kernels
-                (such as EL3) use the 2.6 style of structure and prototypes.
-                Define this macro if your kernel has the new style structure
-                and prototypes.])
-                ;;
-        esac
-    else
-        with_sctp='no'
-        with_sctp2='no'
-    fi
-    if test :"${sctp_cv_dst_entry_path:-no}" = :yes ; then
-        AC_DEFINE_UNQUOTED([HAVE_STRUCT_DST_ENTRY_PATH], [], [Newer RHEL3
-        kernels change the destination entry structure.  Define this macro to
-        use the newer structure.])
-    fi
-    _LINUX_KERNEL_ENV([
-        AC_CHECK_TYPES([struct sockaddr_storage], [
-            AC_DEFINE_UNQUOTED([HAVE_STRUCT_SOCKADDR_STORAGE], [], [Most 2.4
-                kernels do not define struct sockaddr_storage.  Define to 1 if
-                your kernel supports struct sockaddr_storage.])], [:], [
+        AC_CHECK_MEMBERS([
+                struct sock.protinfo.af_inet.ttl,
+                struct sock.protoinfo.af_inet.uc_ttl,
+                struct sock.tp_pinfo.af_sctp], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+            ])
+        AC_CHECK_TYPES([struct sockaddr_storage], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -314,19 +254,26 @@ dnl fi
 #include <net/tcp.h>
             ])
         ])
-    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
     _LINUX_KERNEL_SYMBOL_EXPORT([icmp_err_convert])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_cmsg_send])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_getsockopt])
-    _LINUX_KERNEL_SYMBOL_EXPORT([ip_setsockopt])
+    _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
     _LINUX_KERNEL_SYMBOL_EXPORT([inet_bind])
-    _LINUX_KERNEL_SYMBOL_EXPORT([inet_multi_getname])
     _LINUX_KERNEL_SYMBOL_EXPORT([inet_getname])
     _LINUX_KERNEL_SYMBOL_EXPORT([inet_ioctl])
+    _LINUX_KERNEL_SYMBOL_EXPORT([inet_multi_getname])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_cmsg_send])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_getsockopt])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_flow])
+    _LINUX_KERNEL_SYMBOL_EXPORT([__ip_route_output_key])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ipsec_sk_policy])
+    _LINUX_KERNEL_SYMBOL_EXPORT([ip_setsockopt])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
+    _LINUX_KERNEL_SYMBOL_EXPORT([__xfrm_policy_check])
+    _LINUX_KERNEL_SYMBOL_EXPORT([xfrm_policy_delete])
+    _LINUX_KERNEL_SYMBOL_EXPORT([__xfrm_sk_clone_policy])
     sctp_cv_other_sctp='no'
     _LINUX_CHECK_KERNEL_CONFIG([for lksctp compiled in], [CONFIG_IP_SCTP],
     [sctp_cv_other_sctp='yes'])
@@ -365,33 +312,6 @@ dnl fi
                 some distros have picked up OpenSS7 patches.  If this is the
                 case you are done.])dnl
         fi
-    fi
-    _LINUX_KERNEL_ENV([
-        AC_CHECK_MEMBER([struct sock.tp_pinfo.af_sctp],
-            [sctp_cv_sock_tp_pinfo_af_sctp='yes'],
-            [sctp_cv_sock_tp_pinfo_af_sctp='no'
-             AC_DEFINE_UNQUOTED([af_sctp], [af_tcp], [If the af_sctp member
-             does not exist in struct sock.tp_pinfo then we will use the
-             af_tcp member in its stead.])dnl
-            ], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-            ])
-        ])
-    if test :"$sctp_cv_other_sctp" = :no -a :"$sctp_cv_sock_tp_pinfo_af_sctp" = :yes ; then
-        AC_MSG_WARN([
-**** 
-**** You have a really messed up kernel.  No other SCTP was detected in the
-**** kernel, but member struct sock.tp_pinfo.af_sctp is defined, which is
-**** peculiar.  If things break after this point, investigate the validity of
-**** your kernel sources.
-**** 
-        ])
     fi
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue_exclusive])
