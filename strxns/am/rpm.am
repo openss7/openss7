@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/03/20 07:33:14 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/03/20 23:01:36 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/20 07:33:14 $ by $Author: brian $
+## Last Modified $Date: 2005/03/20 23:01:36 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -305,6 +305,7 @@ RELEASE_SIGN	+= srpm-sign
 #   --without popt syntax, so we have to expand them to --defines.
 ##
 
+rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
@@ -321,10 +322,12 @@ rebuild:
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
 	done
 
+resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 resign: sign
 	@rpms="`find $(rpmdir) -name '$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' rebuild ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild" ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild ; \
 		rpms="`find $(rpmdir) -name '$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
