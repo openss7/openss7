@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.114 4/24/03 16:54:37 "
+#ident "@(#) LiS head.c 2.117 5/9/03 19:18:51 "
 
 /* BEWARE: should check:
  * tty stuff
@@ -3720,46 +3720,100 @@ retry_from_start:			/* retry point for open/close races */
 	head = lis_head_get(head) ;	/* increase ref cnt */
     else
     {					/* opening new stream */
+	int	existing_head = 1 ;
 	/*
 	 * Always get a new stream head structure for a clone open.
 	 */
-	if (!LIS_DEV_IS_CLONE(maj) &&
-	    (head = lis_lookup_stdata(&odev, from, NULL)) != NULL)
+	if (LIS_DEV_IS_CLONE(maj) ||
+	    (head = lis_lookup_stdata(&odev, from, NULL)) == NULL)
 	{
-	    if (head->sd_inode) 
-	    {
-		if (i != head->sd_inode)
-		    i = lis_old_inode( f, head->sd_inode );
-		SET_FILE_STR(f, head);
-	    }
-	    else
-	    {
-		err = -EINVAL;
-		goto error_rtn;
-	    }
+	    existing_head = 0 ;
+	    head = lis_head_get(NULL) ;	/* allocates new structure */
 	}
+	else
+	    lis_head_get(head) ;	/* incrs ref count */
 
-	head = lis_head_get(head) ;	/* incrs ref count */
-	if (!head)
+	if (!head)			/* can't proceed w/o a strm head */
 	{
 	    if (LIS_DEBUG_OPEN)
 		printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		       "    >> failed to allocate stream head <ENOSR>\n",
 		       i, I_COUNT(i), f, F_COUNT(f), this_open);
+
 	    err = -ENOSR ;
-	    goto error_rtn ;
+early_exit:				/* less to undo than at bottom */
+	    if (stdata_locked)
+		lis_up(&lis_stdata_sem);
+
+	    if (head)
+	    {
+		if (hd_locked)
+		    lis_up(&head->sd_opening) ;
+		lis_head_put(head) ;
+	    }
+
+	    CLOCKOFF(OPENTIME);
+	    lis_atomic_dec(&lis_in_syscall) ;
+	    return(err) ;
+	}
+
+	/*
+	 * In order for lis_lookup_stdata to locate this stream head
+	 * in case of a simultaneous open to this same device by another
+	 * thread, we have to plant the maj/min device id in the stream
+	 * head structure now.
+	 *
+	 * Note however, that for a just-allocated stream head structure
+	 * the reference count is still zero.
+	 */
+	head->sd_dev = odev ;
+	lis_up(&lis_stdata_sem);
+	stdata_locked = 0 ;
+	if ((err = lis_down(&head->sd_opening)) < 0)
+	    goto early_exit ;
+
+	hd_locked = 1 ;			/* now have head's opening sem */
+	/*
+	 * Two simultaneous opens to the same stream could have the
+	 * "first" thread allocate the structure and the "second"
+	 * thread go through the open code first.  The reason is
+	 * the gap in time between releasing the stdata_sem and
+	 * acquiring the opening semaphore.  Admittedly, the "second"
+	 * thread has not yet acquired the stdata_sem, so it will
+	 * likely lose the race, but in a preemptable kernel environment
+	 * thread execution can be delayed by preemption.
+	 *
+	 * So we don't treat the "existing" stream head as a re-open
+	 * unless the reference count is > 0, which means that the
+	 * full open procedure was performed on it.  Code below uses
+	 * the ref count to decide between first and subsequent opens.
+	 */
+	if (existing_head && LIS_SD_OPENCNT(head) >= 1)
+	{
+	    if (!head->sd_inode)	/* really, an assertion */
+	    {				/* kind of busted, here */
+		err = -EINVAL;
+		goto early_exit ;
+	    }
+
+	    if (i != head->sd_inode)
+		i = lis_old_inode( f, head->sd_inode );
+	    SET_FILE_STR(f, head);
 	}
     }
 
-    lis_up(&lis_stdata_sem);		/* let go global semaphore */
-    stdata_locked = 0 ;
+    if (stdata_locked)
+    {
+	lis_up(&lis_stdata_sem);	/* let go global semaphore */
+	stdata_locked = 0 ;
+    }
 
     /*
      * Releasing stdata_sem could allow this stream to be closed by
      * another thread.
      */
-    if ((err = lis_down(&head->sd_opening)) < 0)
-	goto error_rtn ;
+    if (!hd_locked && (err = lis_down(&head->sd_opening)) < 0)
+	goto early_exit ;
 
     hd_locked = 1 ;			/* now have head's opening sem */
 
