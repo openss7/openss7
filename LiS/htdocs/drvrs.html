@@ -1,0 +1,1293 @@
+<html>
+
+
+
+<head>
+
+<title>LiS Drivers</title>
+<meta name="title" content="LiS Drivers">
+<meta name="keywords" content="Linux, streams, drivers, LiS">
+<meta name="description" content="Drivers and LiS">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>LiS Drivers</h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+
+    <td width="600" height="100%" align="left" valign="top"> 
+      <h3><a name="Contents"></a><br>
+        Contents </h3>
+      <p><a href="#Introduction">Introduction</a> </p>
+      <p>STREAMS Drivers </p>
+      <blockquote><a href="#clone-drvr">clone-drvr</a> <br>
+        <a href="#fifo">fifo</a> <br>
+        <a href="#link-drvr">link-drvr</a> <br>
+        <a href="#loop-around">loop-around</a> <br>
+        <a href="#mini-mux">mini-mux</a> <br>
+        <a href="#printk">printk</a> <br>
+        <a href="#sad">sad</a></blockquote>
+      <p>Pushable Modules </p>
+      <blockquote><a href="#connld">connld</a> <br>
+        <a href="#ip_strms">ip_strms</a><br>
+        <a href="#pipemod">pipemod</a> <br>
+        <a href="#relay">relay</a> <br>
+        <a href="#relay">relay2</a> <br>
+        <a href="#timod">timod</a> <br>
+        <a href="#tirdwr">tirdwr</a></blockquote>
+      <hr>
+      <p><br>
+        &nbsp; </p>
+      <h2><a name="Introduction"></a>Introduction</h2>
+      <p><br>
+        The LiS package comes with a number of STREAMS drivers and pushable modules 
+        in source code form.&nbsp; A number of these drivers and modules are small 
+        entities that are used in the testing of LiS.&nbsp; They are included 
+        so as to make it easy for any user to run the LiS tests for themselves. 
+      </p>
+      <p>Other drivers are used to interface between STREAMS and the Linux networking 
+        subsystem (link-drvr, ip_strms).&nbsp; Still others are used to implement 
+        STREAMS based pipes and FIFOs. </p>
+      <p>A driver in STREAMS has a major and minor device number associated with 
+        it and an entry in the /dev directory.&nbsp; The driver is opened and 
+        closed just like any file. </p>
+      <p>A pushable module in STREAMS is an entity that is added to an existing 
+        STREAMS file via the <font face="Courier New, Courier, mono">I_PUSH</font> 
+        ioctl.&nbsp; These modules are known to LiS by mnemonic name, given as 
+        an argument to the <font face="Courier New, Courier, mono">I_PUSH</font> 
+        ioctl.&nbsp; There are no major and minor device numbers or /dev entries 
+        associated with pushable modules. </p>
+      <p>This document is broken down into two sections.&nbsp; The STREAMS drivers 
+        and pushable modules are documented separately.&nbsp; The driver names 
+        used in this document are the declared names that appear in the LiS <font face="Courier New, Courier, mono">Config</font> 
+        file for the particular driver. </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <br>
+      <h2><a name="clone-drvr"></a>clone-drvr</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/clone_drvr</font> </p>
+      <h4>Description</h4>
+      <p>This driver is used to assist LiS in implementing the &quot;clone&quot; 
+        open function.&nbsp; It appears under its own name as <font face="Courier New, Courier, mono">/dev/clone_drvr</font>.&nbsp; 
+        By convention, it is allocated the first major number of all the STREAMS 
+        drivers. </p>
+      <p>In order to implement clone opens, one creates a node in the /dev directory 
+        for a device whose major number is set to that of the clone driver, and 
+        whose minor number is the major number of the driver to which the clone 
+        open is to be directed. </p>
+      <p>The clone driver's open routine forwards the open call to the target 
+        driver, passing a unique flag that informs the driver that a clone open 
+        is being requested.&nbsp; The target driver then allocated a minor device 
+        number to uniquely associate with this instance of the open operation.&nbsp; 
+        The clone driver synthesizes a new major/minor &quot;device id&quot; to 
+        pass back to LiS.&nbsp; LiS recognizes the change of major/minor from 
+        the original open and takes steps to allocate control structures unique 
+        to this open. </p>
+      <p>The &quot;clone open&quot; operation is intended to make is easy to open 
+        one device from a pool of devices, such as pseudo ttys or logical connections.&nbsp; 
+        It saves application programs from having to scan a list of device mnemonics 
+        issuing trial opens until one is found that succeeds. </p>
+      <p>Note that the driver is named <font face="Courier New, Courier, mono">/dev/clone_drvr</font> 
+        instead of the more traditional SVR4 <font face="Courier New, Courier, mono">/dev/clone</font>. 
+        This is to avoid a conflict with another driver named <font face="Courier New, Courier, mono">/dev/clone</font> 
+        on Linux systems.<br>
+        &nbsp; </p>
+      <h4>Author</h4>
+      <p>David Grothe &lt;dave@gcom.com&gt; <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <p>&nbsp; </p>
+      <h2><a name="fifo"></a>fifo</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/fifo </font>(clone device)<font face="Courier New, Courier, mono"> 
+        <br>
+        /dev/fifo.0 </font></p>
+      <h4>Description</h4>
+      <p>The fifo pseudo-driver (which is internal to LiS) provides STREAMS-based 
+        fifos as single character special files, and STREAMS-based pipes as pairs 
+        of character special files which are interconnected (see pipe(3)). </p>
+      <p>STREAMS-based fifos differ from typical STREAMS-based character special 
+        files in that there are not separate stream head and driver queue pair 
+        within the STREAMS-based file. Instead, a fifo is created with only a 
+        single queue pair for the stream head. Moreover, in a typical driver queue 
+        pair, the write queue is not connected to a next queue. In a fifo, the 
+        write queue is directed to the read queue of the pair. A pipe comprises 
+        a pair of fifos, with the write queue of each pair directed to the read 
+        queue of the other. The two fifos comprising a pipe are referred to as 
+        peers, and each somewhat represents a driver to the other. As a degenerate 
+        case, a fifo is its own peer. </p>
+      <p>STREAMS modules may be pushed onto fifos and pipes, but should not expect 
+        a driver below them; instead, the SAMESTR() function should be used from 
+        the write queue of a pair to determine if the module is the lowest in 
+        the STREAMS-based file (this is called the midpoint). The structure of 
+        a fifo or pipe is preserved when modules are pushed (and popped); i.e., 
+        the write queue at the midpoint will always be directed at the read queue 
+        of the peer. </p>
+      <p>Input and output are handled at a fifo stream head as they would normally 
+        be handled at a stream head. In LiS, an fifo open() entry point exists 
+        to assign minor device numbers to new opens under the fifo major device 
+        number, and a close() entry point is used correspondingly to release them. 
+        These functions are kept in a streamtab data struc&shy; ture (as they 
+        would normally be for any STREAMS driver or module) which is private to 
+        the LiS implementation. </p>
+      <h4>Application Usage</h4>
+      <p>In the current Linux kernels, character special major numbers are limited 
+        to 16 bits, and major and minor device numbers to 8 bits each. This limits 
+        a system to 256 total major device numbers and 256 total minor devices 
+        per major device number. This is a rather severe limitation where mechanisms 
+        like fifos and pipes are concerned. </p>
+      <p>However, a driver may handle more than one major device number. The fifo 
+        pseudo-driver uses this to overcome this limitation, by supporting the 
+        automatic allocation and use of multiple major device numbers for fifos 
+        and pipes.&nbsp; Specifying more than 256 minor devices is done in the 
+        usual manner, i.e., by specifying the number of &quot;units&quot; in the 
+        appropriate <font face="Courier New, Courier, mono">Config</font> file. 
+        Enough major device numbers will be allocated to cover the requested number 
+        of minor devices (if available, else an error will occur in <font face="Courier New, Courier, mono">strconf</font>(8)). 
+        The number allocated will include one minor device per major number to 
+        be used as a fifo-specific clone minor device (specifically, minor number 
+        0), which exhibits special behavior. </p>
+      <p>Normally, when cloning is done via the clone pseudo-driver, the clone 
+        major device number is used, along with the desired actual major number 
+        as the minor device num&shy; ber. When an open() is performed on such 
+        a device, the clone open() routine in turn calls the appropriate driver's 
+        open(), with the sflag parameter set to <font face="Courier New, Courier, mono">CLONEOPEN</font>. 
+        The driver's open() is expected in this case to allocate an unused minor 
+        device number, and return it via an entirely new device number in the 
+        devp parameter. In this way, a driver can change the device number to 
+        be used for a STREAMS-based file. When minor device 0 for a specified 
+        for a fifo major device, the driver will also clone a new minor device 
+        number. However, LiS opens fifo devices differently; specifically, when 
+        an already-opened fifo-specific clone minor device is reopened, the new 
+        and subsequent opens will use the already-opened clone. Thus, using minor 
+        device 0 for a fifo when creating a file sys&shy; tem node will ensure 
+        that all concurrent opens of the associated path name will use the same 
+        STREAMS-based file; at the same time, opens of different file system nodes 
+        via different paths will open their respectively different STREAMS-based 
+        files. This is essentially how kernel-based fifos behave -applications 
+        and users of STREAMS-based fifos don't have to keep track of minor numbers 
+        to achieve this same behavior when it is desired. </p>
+      <p>It is in fact recommended that only two forms of file sys&shy; tem nodes 
+        be used for STREAMS-based fifos: the clone major number as major number 
+        with a fifo major number as minor number, to be used when every open of 
+        the associated path must clone a new fifo, and a fifo major number as 
+        major number with 0 as the minor number, to be used when new opens are 
+        to clone a new fifo but subsequent concurrent opens are to use the already 
+        opened fifo. These are represented by two device special file paths created 
+        when LiS is installed: <font face="Courier New, Courier, mono">/dev/fifo</font> 
+        for the former, and <font face="Courier New, Courier, mono">/dev/fifo.0</font> 
+        for the latter. It is recommended that these be used, possibly along with 
+        the equivalent of stat(2) to determine appropriate major device numbers 
+        for the clone and fifo pseudo-drivers, which are also determined when 
+        LiS is installed. It can be noted that pipes are actually created as instances 
+        of the former, after which the write queues are peer-connected. </p>
+      <p>The fifo pseudo-driver allocates minor devices in round-robin fashion; 
+        i.e., a list of available minor devices is kept, and once a minor number 
+        is finally closed, it is put at the end of this list. Thus, a fifo minor 
+        device which is opened and closed will not be immediately reused. <br>
+        &nbsp; </p>
+      <h4>Warnings</h4>
+      <p>Because STREAMS-based fifos and pipes are implemented as character special 
+        devices, they do not appear as pipe devices when examined with stat(2) 
+        or the equivalent (e.g., ls(1)); i.e. the S_IFIFO indication is not set 
+        in the mode - S_IFCHR is set instead, and the actual device number is 
+        indicated in the st_rdev field of the stat data structure. </p>
+      <p>Because of the potential use of multiple major numbers, applications 
+        should not depend on a fifo or pipe having a specific major device number, 
+        nor should an application depend on all fifos and pipes having the same 
+        major device number. <br>
+        &nbsp; </p>
+      <h4>See Also</h4>
+      <p>clone(9), connld(9), fifo(4), ls(1), pipe(3), pipemod(9), STREAMS(4), 
+        stat(2), strconf(8) <br>
+        &nbsp; </p>
+      <h4>Author</h4>
+      <p>John Boyd, protologos LLC. &lt;jaboydjr@netwalk.com&gt; <br>
+        &nbsp; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <p><br>
+      </p>
+      <h2><a name="link-drvr"></a>link-drvr</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/ldl</font> (clone device) 
+      </p>
+      <h4>Description</h4>
+      <p>The LDL driver provides an interface between STREAMS drivers and Linux 
+        network drivers.&nbsp; It registers itself as a client of a Linux network 
+        driver and then presents a DLPI Provider interface to STREAMS drivers, 
+        which may be pushed or linked above LDL. </p>
+      <p style="margin-bottom: 0in">The LDL is controlled by DLPI primitives from 
+        its upstream client.&nbsp; The DLPI primitives understood by this driver 
+        are as follows.&nbsp; DLPI mnemonics come from the file <font face="Courier New, Courier, mono">&lt;sys/dlpi.h&gt;</font>.&nbsp; 
+        LDL mnemonics come from the file <font face="Courier New, Courier, mono">&lt;sys/ldl.h&gt;</font>. 
+        <br>
+        &nbsp; </p>
+      <table cols=2 width=500 border=1 cellpadding=2 cellspacing=2>
+        <tr> 
+          <td width=100 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_INFO_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to return a <font face="Courier New, Courier, mono">DL_INFO_ACK</font>.&nbsp; 
+              If the stream has not been attached to a device then the returned 
+              values will consist of default values.&nbsp; If the stream has been 
+              attached then information will be returned that pertains the the 
+              underlying Linux network device.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_PHYS_ADDR_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to return a <font face="Courier New, Courier, mono">DL_PHYS_ADDR_ACK</font> 
+              (or <font face="Courier New, Courier, mono">DL_ERROR_ACK</font>).&nbsp; 
+              The response will contain the current physical address of the Linux 
+              network device.&nbsp; The option to retrieve the factory address 
+              is not implemented and will always produce a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              response.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_ATTACH_REQ</font></p>
+          </td>
+          <td> 
+            <p>The stream must be in the <font face="Courier New, Courier, mono">DL_UNATTACHED</font> 
+              state for this primitive to succeed. </p>
+            <p>The <font face="Courier New, Courier, mono">dl_ppa</font> field 
+              specifies the device number of the Linux network device to attach 
+              in its low order bits.&nbsp; In the <font face="Courier New, Courier, mono">LDL_FRAME_MASK</font> 
+              bits, the <font face="Courier New, Courier, mono">dl_ppa</font> 
+              specifies the framing type to use with the device.&nbsp; The valid 
+              framing types are: <font face="Courier New, Courier, mono">LDL_FRAME_EII</font>, 
+              <font face="Courier New, Courier, mono">LDL_FRAME_802_2</font>, 
+              <font face="Courier New, Courier, mono">LDL_FRAME_802_3</font>, 
+              <font face="Courier New, Courier, mono">LDL_FRAME_SNAP</font> and 
+              <font face="Courier New, Courier, mono">LDL_FRAME_RAW_LLC</font>. 
+            </p>
+            <p>The device number is usually obtained by issuing an <font face="Courier New, Courier, mono">LDL_FINDPPA</font> 
+              <font face="Courier New, Courier, mono">ioctl</font>.&nbsp; This 
+              <font face="Courier New, Courier, mono">ioctl</font> takes a network 
+              device mnemonic, such as &quot;<font face="Courier New, Courier, mono">etho</font>&quot;, 
+              as an argument and produces a number suitable for use as the <font face="Courier New, Courier, mono">dl_ppa</font> 
+              value in a <font face="Courier New, Courier, mono">DL_ATTACH_REQ</font>. 
+            </p>
+            <p>If the attach succeeds, LDL returns a <font face="Courier New, Courier, mono">DL_OK_ACK</font> 
+              and sets the state of the stream to <font face="Courier New, Courier, mono">DL_UNBOUND</font>.&nbsp; 
+              It returns a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              if it fails.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_DETACH_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to detach from the Linux network device.&nbsp; The stream 
+              must be in the <font face="Courier New, Courier, mono">DL_UNBOUND</font> 
+              state for this primitive to be valid. </p>
+            <p>If the detach succeeds, LDL returns a <font face="Courier New, Courier, mono">DL_OK_ACK</font> 
+              and sets the state of the stream to <font face="Courier New, Courier, mono">DL_UNATTACHED</font>.&nbsp; 
+              It returns a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              if it fails.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_BIND_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to bind an address to the stream.&nbsp; The stream must 
+              be in the <font face="Courier New, Courier, mono">DL_UNBOUND</font> 
+              state for this primitive to succeed. </p>
+            <p>The bound address is used in demultiplexing frames received from 
+              the Linux network driver.&nbsp; The SAP conveyed in the <font face="Courier New, Courier, mono">DL_BIND_REQ</font> 
+              is used to select those received frames that are sent upstream on 
+              a particular stream. </p>
+            <p>If the bind succeeds LDL returns a <font face="Courier New, Courier, mono">DL_OK_ACK</font> 
+              and sets the state of the stream to <font face="Courier New, Courier, mono">DL_IDLE</font>.&nbsp; 
+              If it fails then a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              is sent upstream.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_UNBIND_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to unbind all SAPs from the stream.&nbsp; The stream 
+              must be in the <font face="Courier New, Courier, mono">DL_IDLE</font> 
+              state for this primitive to succeed. </p>
+            <p>If the unbind succeeds, LDL returns a <font face="Courier New, Courier, mono">DL_OK_ACK</font> 
+              and sets the state of the stream to <font face="Courier New, Courier, mono">DL_UNBOUND</font>.&nbsp; 
+              If it fails then a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              is sent upstream.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_SUBS_BIND_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to add an additional SAP to the list of SAPs associated 
+              with the stream.&nbsp; The stream must be in the <font face="Courier New, Courier, mono">DL_IDLE</font> 
+              state for this primitive to succeed. </p>
+            <p>If the subs-bind succeeds, LDL returns a <font face="Courier New, Courier, mono">DL_SUBS_BIND_ACK</font>.&nbsp; 
+              If it fails then a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              is sent upstream.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_SUBS_UNBIND_REQ</font></p>
+          </td>
+          <td> 
+            <p>Causes LDL to remove the given SAP from the list of SAPs associated 
+              with the stream.&nbsp; The stream must be in the <font face="Courier New, Courier, mono">DL_IDLE</font> 
+              state for this primitive to succeed. </p>
+            <p>If the subs-unbind succeeds, LDL returns a <font face="Courier New, Courier, mono">DL_OK_ACK</font>.&nbsp; 
+              If it fails then a <font face="Courier New, Courier, mono">DL_ERROR_ACK</font> 
+              is sent upstream.&nbsp; The state of the stream is left in the <font face="Courier New, Courier, mono">DL_IDLE</font> 
+              state in either case.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_PROMISCON_REQ</font></p>
+          </td>
+          <td> 
+            <p>The intent of this primitive is to set the Linux network device 
+              into the so-called &quot;promiscuous&quot; mode of operation.&nbsp; 
+              However, it is unimplemented.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_PROMISCOFF_REQ</font></p>
+          </td>
+          <td> 
+            <p>This primitive would undo the effect of a <font face="Courier New, Courier, mono">DL_PROMISCON_REQ</font>.&nbsp; 
+              However, it is unimplemented.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">DL_UNITDATA_REQ</font></p>
+          </td>
+          <td> 
+            <p>This primitive is used to send data to the Linux network driver.&nbsp; 
+              The destination address is used to set the physical address of the 
+              receiver of the data.&nbsp; The stream must be in the <font face="Courier New, Courier, mono">DL_IDLE</font> 
+              state for this primitive to succeed. </p>
+            <p>If the stream is operating in raw mode then the address field is 
+              ignored and it is assumed that the client has completely formatted 
+              the frame for transmission by the Linux network driver. </p>
+            <p>If this primitive fails, a&nbsp; <font face="Courier New, Courier, mono">DL_UDERROR_IND</font> 
+              is sent upstream.&nbsp; There is no response in the case of success.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP> 
+            <p><font face="Courier New, Courier, mono">M_DATA</font></p>
+          </td>
+          <td> 
+            <p>An <font face="Courier New, Courier, mono">M_DATA</font> is an 
+              acceptable alternative to a <font face="Courier New, Courier, mono">DL_UNITDATA_REQ</font> 
+              for sending data on a raw-mode stream. </p>
+            <p>If the data transmission operation fails, a&nbsp; <font face="Courier New, Courier, mono">DL_UDERROR_IND 
+              </font>is sent upstream.&nbsp; There is no response in the case 
+              of success.</p>
+          </td>
+        </tr>
+      </table>
+      <p>For data received from the Linux network driver, LDL forwards a copy 
+        of the received data in a <font face="Courier New, Courier, mono">DL_UNITDATA_IND</font> 
+        DLPI message to each client whose stream is attached to the particular 
+        network driver and who has a SAP bound to the stream that matches the 
+        SAP information in the received frame.&nbsp; Note that for non-raw frame 
+        operations that the MAC header is stripped from the received frame prior 
+        to forwarding it to the client.&nbsp; The address of the sender is retained 
+        in the address field of the <font face="Courier New, Courier, mono">DL_UNITDATA_IND</font> 
+        primitive. <br>
+        &nbsp; </p>
+      <h4>Driver ioctls</h4>
+      <p style="margin-bottom: 0in">The LDL driver implements the following ioctls.&nbsp; 
+        The user codes these ioctls as type <tt>I_STR</tt> and passes a structure 
+        of type <tt><font face="Courier New, Courier, mono">struct strioctl</font></tt> 
+        to the driver.&nbsp; The <tt>ic_cmd</tt> field of this structure is decoded 
+        according to the following table.&nbsp; the <tt>ic_dp</tt> and <tt>ic_len</tt> 
+        fields delimit an argument structure which is also passed to the driver.&nbsp; 
+        The argument structure differs for each type of <tt>ic_cmd</tt>. <br>
+        &nbsp; <br>
+        &nbsp; </p>
+      <table width=676 border=1 cellpadding=2 cellspacing=3>
+        <col width=122> <col width=194> <col width=334> 
+        <tr valign=TOP> 
+          <td width=123> 
+            <p><font face="Courier New, Courier, mono">ic_cmd</font> value</p>
+          </td>
+          <td width=236> 
+            <p>Argument Structure</p>
+          </td>
+          <td width=282> 
+            <p>Description</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=123> 
+            <p><font face="Courier New, Courier, mono">LDL_SETFLAGS</font></p>
+          </td>
+          <td width=236> 
+            <p>IN/OUT:&nbsp; <br>
+              &nbsp;&nbsp;&nbsp; <font face="Courier New, Courier, mono">struct 
+              ldl_flags_ioctl</font></p>
+          </td>
+          <td width=282> 
+            <p>Used to set internal option flags for the open stream.&nbsp; See 
+              <font face="Courier New, Courier, mono">ldl.c</font> source for 
+              details.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=123> 
+            <p><font face="Courier New, Courier, mono">LDL_FINDPPA</font></p>
+          </td>
+          <td width=236> 
+            <p>IN: <font face="Courier New, Courier, mono">char[]</font> <br>
+              OUT: <font face="Courier New, Courier, mono">long</font></p>
+          </td>
+          <td width=282> 
+            <p>The agrument is an ASCII string representing a network device mnemonic 
+              such as &quot;<font face="Courier New, Courier, mono">eth0</font>.&quot;&nbsp; 
+              If such a device can be found then the argument is overwritten with 
+              a long word whose numerical value can be used as the <font face="Courier New, Courier, mono">dl_ppa</font> 
+              field of a <font face="Courier New, Courier, mono">DL_ATTACH_REQ</font>.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=123> 
+            <p><font face="Courier New, Courier, mono">LDL_GETNAME</font></p>
+          </td>
+          <td width=236> 
+            <p>IN: None <br>
+              OUT: <font face="Courier New, Courier, mono">char[]</font></p>
+          </td>
+          <td width=282> 
+            <p>This <font face="Courier New, Courier, mono">ioctl</font> returns 
+              the ASCII string form of the network device mnemonic for the stream.</p>
+          </td>
+        </tr>
+      </table>
+      <h4>Author</h4>
+      <p>Ole Husgaard &lt;sparre@login.dknet.dk&gt; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <p>&nbsp; </p>
+      <h2><a name="loop-around"></a>loop-around</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/loop_clone</font> (clone 
+        device) <br>
+        <font face="Courier New, Courier, mono">/dev/loop.1 <br>
+        /dev/loop.2</font> </p>
+      <h4>Description</h4>
+      <p>This driver is used by LiS and the <font face="Courier New, Courier, mono">strtst</font> 
+        utility to assist in the regression testing of LiS.&nbsp; It connects 
+        two streams together in a manner similar to that of a pipe.&nbsp; Messages 
+        written into one stream can be read back from the other. </p>
+      <p style="margin-bottom: 0in">The driver can be operated as a clone device 
+        with the two streams being connected via ioctls.&nbsp; A number of ioctls 
+        exist that tailor the operation of the driver.&nbsp; The user codes these 
+        ioctls as type <tt>I_STR</tt> and passes a structure of type <tt>struct 
+        strioctl</tt> to the driver.&nbsp; The <tt>ic_cmd</tt> field of this structure 
+        is decoded according to the following table.&nbsp; the <tt>ic_dp</tt> 
+        and <tt>ic_len</tt> fields delimit an argument structure which is also 
+        passed to the driver.&nbsp; The argument structure differs for each type 
+        of <tt>ic_cmd</tt>. <br>
+        &nbsp; </p>
+      <table width=670 border=1 cellpadding=2 cellspacing=3>
+        <col width=127> <col width=145> <col width=372> 
+        <tr valign=TOP> 
+          <td width=127> 
+            <p><font face="Courier New, Courier, mono">ic_cmd</font> value</p>
+          </td>
+          <td width=145> 
+            <p>Argument Structure</p>
+          </td>
+          <td width=372> 
+            <p>Description</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=127> 
+            <p><font face="Courier New, Courier, mono">LOOP_SET</font></p>
+          </td>
+          <td width=145> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=372> 
+            <p>Argument is the minor device number of the loop device to use for 
+              the other end of the connection.&nbsp; If the loop-around device 
+              had been opened by a directed open, such as to <font face="Courier New, Courier, mono">/dev/loop.1</font>, 
+              then the minor device number is known from the device node.&nbsp; 
+              If it was opened via the <font face="Courier New, Courier, mono">/dev/loop_clone</font> 
+              device then the minor device can be discovered via the <font face="Courier New, Courier, mono">LOOP_GET_DEV</font> 
+              <font face="Courier New, Courier, mono">ioctl</font>.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=127> 
+            <p><font face="Courier New, Courier, mono">LOOP_PUTNXT</font></p>
+          </td>
+          <td width=145> 
+            <p>None</p>
+          </td>
+          <td width=372> 
+            <p>Set the driver into a mode in which it will perform a direct putnext 
+              call on the other stream rather than the default behavior of using 
+              the service queue to forward the message.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=127> 
+            <p><font face="Courier New, Courier, mono">LOOP_MSGLVL</font></p>
+          </td>
+          <td width=145> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=372> 
+            <p>Set to the number of messages to queue in the service queue before 
+              forwarding to the other stream.&nbsp; Zero means forward immediately.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width=127 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">LOOP_TIMR</font></p>
+          </td>
+          <td width=145 valign=TOP> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=372> 
+            <p>Set the number of &quot;ticks&quot; to hold messages before forwarding 
+              them to the other stream.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width=127 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">LOOP_MARK</font></p>
+          </td>
+          <td width=145 valign=TOP> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=372> 
+            <p>Set the <font face="Courier New, Courier, mono">MSGMARK</font> 
+              flag for each of the next <i>n</i> messages before forwarding them 
+              to the other stream.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width=127 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">LOOP_GET_DEV</font></p>
+          </td>
+          <td width=145 valign=TOP> 
+            <p>OUT: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=372> 
+            <p>Return the minor device number of this stream.&nbsp; Useful for 
+              finding out the minor number of a clone device.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width=127 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">LOOP_BUFCALL</font></p>
+          </td>
+          <td width=145 valign=TOP> 
+            <p>None</p>
+          </td>
+          <td width=372> 
+            <p>Use the <tt>bufcall</tt> mechanism to allocate a buffer for copying 
+              the next message.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width=127 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">LOOP_CONCAT</font></p>
+          </td>
+          <td width=145 valign=TOP> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=372> 
+            <p>Concatenate this many messages into a single message and then forward 
+              on the other stream.&nbsp; One concatenation resets this value to 
+              zero and the ioctl needs to be issued again to repeat the behavior.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width=127 valign=TOP> 
+            <p><font face="Courier New, Courier, mono">LOOP_COPY</font></p>
+          </td>
+          <td width=145 valign=TOP> 
+            <p>None</p>
+          </td>
+          <td width=372> 
+            <p>From this point on, copy messages rather than passing them through 
+              to the other stream.</p>
+          </td>
+        </tr>
+      </table>
+      <h4>Author</h4>
+      <p>David Grothe &lt;dave@gcom.com&gt; plus others originally. </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="mini-mux"></a><br>
+        mini-mux</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/mux_clone</font> (clone 
+        device)<br>
+        <font face="Courier New, Courier, mono">/dev/minimux.1<br>
+        /dev/minimux.2</font></p>
+      <h4> <br>
+        Description</h4>
+      <p>This driver is used by LiS in its testing procedures. It is a small multiplexing 
+        driver that allows cascaded multiplexors to be built and torn down. The 
+        driver uses a pair of ioctls to establish connectivity between upper streams 
+        and lower streams. This allows control over how data flows through the 
+        multiplexor.</p>
+      <p>Both of these ioctls are coded as type <tt>I_STR</tt> and pass a structure 
+        of type <tt>struct strioctl</tt> to the driver.&nbsp; The <tt>ic_cmd</tt> 
+        field of this structure is decoded according to the following table.&nbsp; 
+        the <tt>ic_dp</tt> and <tt>ic_len</tt> fields delimit an argument structure 
+        which is also passed to the driver.&nbsp; The argument structure may differ 
+        for each type of <tt>ic_cmd</tt>.<br>
+        &nbsp; </p>
+      <table width=670 border=1 cellpadding=2 cellspacing=3>
+        <col width=146> <col width=90> <col width=408> 
+        <tr valign=TOP> 
+          <td width=146> 
+            <p><font face="Courier New, Courier, mono">ic_cmd</font> value</p>
+          </td>
+          <td width=90> 
+            <p>Argument Structure</p>
+          </td>
+          <td width=408> 
+            <p>Description</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=146> 
+            <p><font face="Courier New, Courier, mono">MINIMUX_UP</font></p>
+          </td>
+          <td width=90> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=408> 
+            <p>The argument is a muxid that was returned from an <font face="Courier New, Courier, mono">I_LINK</font> 
+              ioctl. This ioctl causes the lower stream indicated by the muxid 
+              to be connected to this stream. This is unidirectional linkage and 
+              only affects the upstream flow of messages.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=146> 
+            <p><font face="Courier New, Courier, mono">MINIMUX_DOWN</font></p>
+          </td>
+          <td width=90> 
+            <p>IN: <font face="Courier New, Courier, mono">int</font></p>
+          </td>
+          <td width=408> 
+            <p>The argument is a muxid that was returned from an <font face="Courier New, Courier, mono">I_LINK</font> 
+              ioctl. This ioctl causes this stream to be connected to the lower 
+              stream indicated by the muxid. This is unidirectional linkage and 
+              only affects the downstream flow of messages.</p>
+          </td>
+        </tr>
+      </table>
+      <p><br>
+        <br>
+      </p>
+      <h4>Author</h4>
+      <p>David Grothe &lt;<a href="mailto:dave@gcom.com">dave@gcom.com</a>&gt;</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="printk"></a>printk</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/printk</font></p>
+      <h4>Description</h4>
+      <p>This driver accepts messages written to it and prints them from the kernel 
+        using the kernel's <font face="Courier New, Courier, mono">printk</font> 
+        function. It is used by the LiS test software to keep messages from LiS 
+        and messages from the test program in sequence.</p>
+      <h4>Author</h4>
+      <p>David Grothe &lt;<a href="mailto:dave@gcom.com">dave@gcom.com</a>&gt;</p>
+      <hr>
+      <h2><a name="sad"></a>sad</h2>
+      <h4>Device Name</h4>
+      <p><font face="Courier New, Courier, mono">/dev/sad</font></p>
+      <h4>Description</h4>
+      <p>The STREAMS Administrative Driver manages the autopush function of LiS. 
+        Using ioctls the system administrator can provide a list of modules that 
+        are to be automatically pushed onto a given device when that device is 
+        opened. The controls are specified via the <font face="Courier, monospace">strapush</font> 
+        structure which is defined in <font face="Courier New, Courier, mono">&lt;sys/sad.h&gt;</font>.</p>
+      <p>The ioctl used by the user is of the form:</p>
+      <p style="margin-left: 0.79in"><font face="Courier, monospace">ioctl(fd, 
+        command, arg)</font></p>
+      <p>Where <font face="Courier, monospace">fd</font> is the file descriptor 
+        of the file that is open to the sad driver, <font face="Courier, monospace">command</font> 
+        and <font face="Courier, monospace">arg</font> are described in the following 
+        table.</p>
+      <table width=672 border=1 cellpadding=4 cellspacing=3>
+        <col width=127> <col width=196> <col width=311> <thead> 
+        <tr valign=TOP> 
+          <th width=127> 
+            <p align=LEFT>Command</p>
+          </th>
+          <th width=196> 
+            <p align=LEFT>Argument</p>
+          </th>
+          <th width=311> 
+            <p align=LEFT>Description</p>
+          </th>
+        </tr>
+        </thead> <tbody> 
+        <tr valign=TOP> 
+          <td width=127> 
+            <p align=LEFT><font face="Courier New, Courier, mono">SAD_SAP</font></p>
+          </td>
+          <td width=196> 
+            <p align=LEFT><font face="Courier, monospace">struct strapush *</font></p>
+          </td>
+          <td width=311> 
+            <p align=LEFT>Set the list of autopushed modules according to the 
+              <font face="Courier, monospace">sap_cmd</font> and other arguments 
+              contained within the <font face="Courier, monospace">strapush</font> 
+              structure.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=127> 
+            <p align=LEFT><font face="Courier New, Courier, mono">SAD_GAP</font></p>
+          </td>
+          <td width=196> 
+            <p align=LEFT><font face="Courier, monospace">struct strapush *</font></p>
+          </td>
+          <td width=311> 
+            <p align=LEFT>Get the list of configured autopushed modules associated 
+              with the indicated major and minor device number. The <font face="Courier, monospace">sad</font> 
+              driver fills in this structure with the names of the modules and 
+              the applicable range of minor device numbers.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=127> 
+            <p align=LEFT><font face="Courier New, Courier, mono">SAD_VML</font></p>
+          </td>
+          <td width=196> 
+            <p align=LEFT><font face="Courier, monospace">struct str_list *</font></p>
+          </td>
+          <td width=311> 
+            <p align=LEFT>Validates a list of pushable module names to verify 
+              that they are installed in LiS. The <font face="Courier, monospace">str_list</font> 
+              structure is defined in the file <font face="Courier New, Courier, mono">&lt;sys/stropts.h&gt;</font>.</p>
+          </td>
+        </tr>
+        </tbody> 
+      </table>
+      <p>&nbsp; </p>
+      <p>The <font face="Courier, monospace">strapush</font> structure used by 
+        the <font face="Courier New, Courier, mono">SAD_SAP</font> and <font face="Courier New, Courier, mono">SAD_GAP</font> 
+        ioctls contains the following fields.<br>
+      </p>
+      <table width=671 border=1 cellpadding=4 cellspacing=3>
+        <col width=301> <col width=103> <col width=229> 
+        <tr valign=TOP> 
+          <th width=301> 
+            <p align=LEFT>Field</p>
+          </th>
+          <th colspan=2 width=343> 
+            <p align=LEFT>Description</p>
+          </th>
+        </tr>
+        <tr valign=TOP> 
+          <td rowspan=5 width=301> 
+            <p><font face="Courier, monospace">unsigned sap_cmd</font></p>
+          </td>
+          <td colspan=2 width=343> 
+            <p>This is the autopush command to be executed. The values are as 
+              follows.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=103> 
+            <p><font face="Courier, monospace">SAP_ONE</font></p>
+          </td>
+          <td width=229> 
+            <p>Configure one minor device of the driver indicated by <font face="Courier, monospace">sap_major</font>.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=103> 
+            <p><font face="Courier, monospace">SAP_RANGE</font></p>
+          </td>
+          <td width=229> 
+            <p>Configure a range of minor devices of the driver indicated by sap_major. 
+              The range runs from <font face="Courier, monospace">sap_minor</font> 
+              to <font face="Courier, monospace">sap_lastminor</font>, inclusively.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=103> 
+            <p><font face="Courier, monospace">SAP_ALL</font></p>
+          </td>
+          <td width=229> 
+            <p>Configure all minor devices of the driver indicated by <font face="Courier, monospace">sap_major</font>.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=103> 
+            <p><font face="Courier, monospace">SAP_CLEAR</font></p>
+          </td>
+          <td width=229> 
+            <p>Undo all autopush configuration for the driver indicated by <font face="Courier, monospace">sap_major</font>.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=301> 
+            <p><font face="Courier, monospace">major_t sap_major</font></p>
+          </td>
+          <td colspan=2 width=343> 
+            <p>The major device number of the driver which is being configured 
+              for autopush.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=301> 
+            <p><font face="Courier, monospace">minor_t sap_minor</font></p>
+          </td>
+          <td colspan=2 width=343> 
+            <p>The minor device being configured, or the first of a range.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=301> 
+            <p><font face="Courier, monospace">minor_t sap_lastminor</font></p>
+          </td>
+          <td colspan=2 width=343> 
+            <p>The last minor device of a range to be configured.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=301> 
+            <p><font face="Courier, monospace">unsigned sap_npush</font></p>
+          </td>
+          <td colspan=2 width=343> 
+            <p>Number of modules to be pushed when the indicated device is opened.</p>
+          </td>
+        </tr>
+        <tr valign=TOP> 
+          <td width=301> 
+            <p><font face="Courier, monospace">char sap_list[MAXAPUSH][FMNAMESZ+1]</font></p>
+          </td>
+          <td colspan=2 width=343> 
+            <p>List of module names to be pushed, or list of modules names returned 
+              to user.</p>
+          </td>
+        </tr>
+      </table>
+      <p>&nbsp; </p>
+      <p>The <font face="Courier New, Courier, mono">ioctl</font> function call 
+        returns zero upon success or -1 on failure. Upon failure <font face="Courier New, Courier, mono">errno</font> 
+        is set to the error number describing the failure, usually either <font face="Courier New, Courier, mono">EFAULT</font> 
+        or <font face="Courier New, Courier, mono">EINVAL</font>.</p>
+      <p>Note that the <font face="Courier, monospace">sad</font> driver is a 
+        standard AT&amp;T STREAMS function. More comprehensive documentation for 
+        this driver can be found in the <i><a href="otherres.html">SVR4 Programmer's 
+        Guide: STREAMS</a></i>.</p>
+      <h4>Author</h4>
+      <p>Ole Husgaard &lt;sparre@login.dknet.dk&gt; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="connld"></a>connld</h2>
+      <h4>Module Name</h4>
+      <p><font face="Courier New, Courier, mono">connld</font></p>
+      <h4>Description</h4>
+      <p>The connld module provides a means to generate multiple unique STREAMS-based 
+        pipes from a single existing pipe end. connld may only be pushed (via 
+        the STREAMS I_PUSH ioctl) onto a STREAMS-based pipe. When first pushed, 
+        connld does nothing; on each subsequent open(2), connld will generate 
+        a unique STREAMS-based pipe. One end of each new pipe replaces the original 
+        pipe end from the perspective of the open call. The other end of each 
+        new pipe is sent, effectively as if by the <font face="Courier New, Courier, mono">I_SENDFD</font> 
+        <font face="Courier New, Courier, mono">ioctl</font>, to the other end 
+        of the original pipe, ostensibly to be received by a subsequent <font face="Courier New, Courier, mono">I_RECVFD</font> 
+        <font face="Courier New, Courier, mono">ioctl</font> operation.</p>
+      <h4>Application Usage</h4>
+      <p>The intent of connld is to provide a means to generate unique pipes which 
+        separately and independently connect client processes to a server process. 
+        The point of access for such clients is expected to be a path name known 
+        to all such clients and to which a pipe end may be connected (via fattach(3)) 
+        by the server process. The server establishes the original pipe, pushes 
+        connld onto the client end, and then listens via <font face="Courier New, Courier, mono">I_RECVFD</font> 
+        for new connections on the server end. A client wishing to connect to 
+        the server will open(2) the path name representing the client end, and 
+        can determine via isastream(3) whether or not the server process is active 
+        and attached. If it is, the open() call returns one end of a unique new 
+        pipe that thus connects the client to the server.</p>
+      <p>Such a server is responsible both for accepting new connections via <font face="Courier New, Courier, mono">I_RECVFD</font> 
+        on the original pipe, and for communicating with clients so connected 
+        via the received pipe ends. It would also be reasonable for such a server 
+        process to invalidate the point of access by calling fdetach(3) before 
+        terminating.</p>
+      <p>It should be noted that the poll(2) primitive may be used to indicate 
+        when an <font face="Courier New, Courier, mono">M_PASSFP</font> representing 
+        a newly passed file is available on the original server pipe end. This 
+        is reflected by the <font face="Courier New, Courier, mono">POLLIN</font> 
+        status setting in the events and revents fields of a <font face="Courier New, Courier, mono">pollfd</font> 
+        structure. Moreover, any attempt to read an <font face="Courier New, Courier, mono">M_PASSFP</font> 
+        message via the data-receiving primitives (i.e., read(2), getmsg(3), and 
+        getpmsg(3)) will fail with errno(3) returning an <font face="Courier New, Courier, mono">EBADMSG</font> 
+        indication without discarding the message.</p>
+      <p>Even so, it should be reasonable to expect only <font face="Courier New, Courier, mono">M_PASSFP</font> 
+        messages will be received on the original server pipe end, since it is 
+        not possible to carry on normal data traffic which has <font face="Courier New, Courier, mono">connld</font> 
+        on one end, since connld does not support such traffic.</p>
+      <p>The use of <font face="Courier New, Courier, mono">connld</font> can 
+        be made entirely free-standing by attaching well-known paths to both ends 
+        of the original pipe. The relevant capabilities are implemented in LiS 
+        so that the original creator of the pipe can close both ends after attaching 
+        paths to them, and the process of passing file descriptors can still be 
+        carried out via new open()'s as long as both ends remain attached.</p>
+      <h4>See Also</h4>
+      <p>fattach(3), fattach(8), fdetach(3), fifo(4), fifo(9),</p>
+      <p>pipe(3), STREAMS(4)</p>
+      <h4>History</h4>
+      <p>Unix System V Release 4 (SVR4)</p>
+      <h4>Author</h4>
+      <p>John Boyd, protologos LLC. &lt;jaboydjr@netwalk.com&gt; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="ip_strms"></a>ip_strms</h2>
+      <h4>Module Name</h4>
+      <p><font face="Courier New, Courier, mono">ip_strms</font></p>
+      <h4>Description</h4>
+      <p>This module is pushed onto an open stream to a driver which implements 
+        the DLPI STREAMS protocol. It provides an interface between the DLPI driver 
+        below and the Linux IP module above. The effect is to be able to use a 
+        STREAMS DLPI driver as a network interface below Linux TCP/IP.</p>
+      <p>The <font face="Courier New, Courier, mono">ip_strms</font> module monitors 
+        DLPI primitives sent from above on the stream file and shuttles them between 
+        the process which pushed the module onto the stream and the DLPI driver 
+        below. The <font face="Courier New, Courier, mono">ip_strms</font> module 
+        will also allow data to be exchanged between the stream user and the DLPI 
+        driver until such time as the stream is logically attached to IP as a 
+        network driver.</p>
+      <p>In order to attach the stream to IP, the user process issues an <font face="Courier New, Courier, mono">ioctl</font> 
+        of type <font face="Courier New, Courier, mono">SIOCSIFNAME</font>. This 
+        <font face="Courier New, Courier, mono">ioctl</font> causes <font face="Courier New, Courier, mono">ip_strms</font> 
+        to register itself as a network driver of the given name. From that point 
+        onward data, in the form of <font face="Courier New, Courier, mono">M_DATA</font> 
+        messages or of <font face="Courier New, Courier, mono">DL_UNITDATA_IND</font> 
+        messages, are forwarded upstream to IP rather than to the stream user. 
+        Likewise, data messages received from IP are forwarded downstream to the 
+        DLPI driver as <font face="Courier New, Courier, mono">DL_UNITDATA_REQ</font> 
+        messages. Downstream messages are completely formatted for the transmission 
+        medium and should be processed accordingly by the DLPI driver below.</p>
+      <p>After attaching to IP, the stream user must continue to remain in execution, 
+        holding the stream open. If the stream closes then <font face="Courier New, Courier, mono">ip_strms</font> 
+        will detach from IP. Also, if the stream user sends a <font face="Courier New, Courier, mono">SIOCSIFNAME</font> 
+        <font face="Courier New, Courier, mono">ioctl</font> with an empty name 
+        then <font face="Courier New, Courier, mono">ip_strms</font> will detach 
+        from IP.</p>
+      <p>The interfaces attached to IP will appear in the output of the <font face="Courier New, Courier, mono">netstat</font> 
+        and <font face="Courier New, Courier, mono">ifconfig</font> commands. 
+        An <font face="Courier New, Courier, mono">&quot;ifconfig&quot; down</font> 
+        operation on the interface will also cause a detach from IP.</p>
+      <h4>Application Processing</h4>
+      <p>The application level program which manages the connection between a 
+        DLPI driver and TCP/IP should be coded to implement the following steps.</p>
+      <ul>
+        <li>
+          <p>Open a stream to the DLPI driver. This can be a clone open.</p>
+        <li>
+          <p>Execute an <font face="Courier New, Courier, mono">I_PUSH</font> 
+            ioctl on &quot;<font face="Courier New, Courier, mono">ip_strms</font>.&quot;</p>
+        <li>
+          <p>Send the DLPI attach and bind primitives downstream.</p>
+        <li>
+          <p>Execute an <font face="Courier New, Courier, mono">SIOCSIFNAME</font> 
+            ioctl with the desired interface name. After this succeeds the DLPI 
+            driver will be connected to TCP/IP as a network driver via the <font face="Courier New, Courier, mono">ip_strms</font> 
+            module.</p>
+        <li>
+          <p>Perform any needed <font face="Courier New, Courier, mono">ifconfig</font> 
+            or <font face="Courier New, Courier, mono">route</font> commands for 
+            the interface.</p>
+        <li>
+          <p>Sleep indefinitely keeping the stream open. Killing the process will 
+            cause the stream to be detached from IP.</p>
+      </ul>
+      <h4>Author</h4>
+      <p>David Grothe &lt;<a href="mailto:dave@gcom.com">dave@gcom.com</a>&gt;</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="pipemod"></a>pipemod</h2>
+      <h4>Module Name</h4>
+      <p><font face="Courier New, Courier, mono">pipemod</font></p>
+      <h4>Description</h4>
+      <p>The <font face="Courier New, Courier, mono">pipemod</font> module has 
+        the relatively simple task of reversing the sense of the FLUSH flag bits 
+        in <font face="Courier New, Courier, mono">M_FLUSH</font> messages sent 
+        in STREAMS-based fifos and pipes. This must happen at the midpoint of 
+        a fifo or pipe, so that <font face="Courier New, Courier, mono">FLUSHR</font> 
+        becomes <font face="Courier New, Courier, mono">FLUSHW</font>, and <font face="Courier New, Courier, mono">FLUSHW</font> 
+        becomes <font face="Courier New, Courier, mono">FLUSHR</font>. <font face="Courier New, Courier, mono">pipemod</font> 
+        does this, and has no other function.</p>
+      <p>To be used appropriately, then, <font face="Courier New, Courier, mono">pipemod</font> 
+        must be the first module pushed onto a pipe end or a fifo, but it is only 
+        necessary on one end of a pipe.</p>
+      <p><font face="Courier New, Courier, mono">pipemod</font> is not needed 
+        if flush handling need not be supported, or if its function is supported 
+        by other means.</p>
+      <h4>See Also</h4>
+      <p>fifo(9), pipe(3), fifo(4), STREAMS(4)</p>
+      <h4>History</h4>
+      <p>Unix System V Release 4 (SVR4) </p>
+      <h4>Author</h4>
+      <p>John Boyd, protologos LLC. &lt;jaboydjr@netwalk.com&gt; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="relay"></a>relay, relay2</h2>
+      <h4>Module Name</h4>
+      <pre><font face="Courier New, Courier, mono">relay
+relay2</font></pre>
+      <h4> Description</h4>
+      <p>These are two names for the same module. All the module does is forward 
+        STREAMS messages along on the stream using <font face="Courier New, Courier, mono">putnext</font>. 
+        These modules are used in the testing of LiS but are not otherwise useful. 
+        One could use the source code as a starting point for coding a pushable 
+        STREAMS module.</p>
+      <h4>Author</h4>
+      <p>David Grothe &lt;<a href="mailto:dave@gcom.com">dave@gcom.com</a>&gt;</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="timod"></a>timod</h2>
+      <h4>Module Name</h4>
+      <p><font face="Courier New, Courier, mono">timod</font></p>
+      <h4>Description</h4>
+      <p>This is a primitive version of the standard AT&amp;T SVR4 <font face="Courier, monospace">timod</font> 
+        module. Its function is to convert user level ioctls to TLI primitives 
+        downstream.</p>
+      <p>Since there is no TLI Provider code within LiS, the <font face="Courier, monospace">timod</font> 
+        module could be considered to be well ahead of its time.</p>
+      <h4>Author</h4>
+      <p>Ole Husgaard &lt;sparre@login.dknet.dk&gt; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><a name="tirdwr"></a>tirdwr</h2>
+      <h4>Module Name</h4>
+      <p><font face="Courier New, Courier, mono">tirdwr</font></p>
+      <h4>Description</h4>
+      <p>This is a primitive version of the standard AT&amp;T SVR4 <font face="Courier, monospace">tirdwr</font> 
+        module. Its function is to convert user level reads and writes to appropriate 
+        TLI protocol downstream.</p>
+      <p>Since there is no TLI Provider code within LiS, the <font face="Courier, monospace">tirdwr</font> 
+        module could be considered to be well ahead of its time.</p>
+      <h4>Author</h4>
+      <p>Ole Husgaard &lt;sparre@login.dknet.dk&gt; </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr>
+      <h2><br>
+      </h2>
+      </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
