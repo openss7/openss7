@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/02 21:24:48 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 21:24:48 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/02 21:24:48 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/02 21:24:48 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/02 21:24:48 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/03 10:12:13 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -132,12 +132,12 @@ static struct module_info clone_minfo = {
 };
 
 static struct qinit clone_rinit = {
-	qi_putp:putq,
+	//qi_putp:putq,
 	qi_minfo:&clone_minfo,
 };
 
 static struct qinit clone_winit = {
-	qi_putp:putq,
+	//qi_putp:putq,
 	qi_minfo:&clone_minfo,
 };
 
@@ -195,8 +195,6 @@ static struct cdevsw clone_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-STATIC struct vfsmount *specfs = NULL;
-
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -205,13 +203,13 @@ STATIC struct vfsmount *specfs = NULL;
  *  -------------------------------------------------------------------------
  */
 
-/**
+/*
  *  clone_open: - open a clone device node
  *  @inode: the external filesystem inode
  *  @file: the external filesystem file pointer
  *
  *  clone_open() is only used to open a clone device from a character device node in an external
- *  filesystem.  This is never calle for direct opens of a specfs device node (for direct opens see
+ *  filesystem.  This is never called for direct opens of a specfs device node (for direct opens see
  *  spec_dev_open() in strspecfs.c).  The character device number from the inode is used to
  *  determine the shadow special filesystem (internal) inode and chain the open call.
  *
@@ -221,13 +219,13 @@ STATIC struct vfsmount *specfs = NULL;
 STATIC int clone_open(struct inode *inode, struct file *file)
 {
 	int err;
-	struct cdevsw *cdev;
-	dev_t dev;
 	struct str_args args;
-	void *old_data = file->private_data;
+	struct cdevsw *cdev;
 	major_t major;
 	minor_t minor;
 	modID_t modid, instance;
+	if ((err = down_interruptible(&inode->i_sem)))
+		goto exit;
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 	minor = cdev_minor(&clone_cdev, major, minor);
@@ -235,24 +233,17 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	modid = clone_cdev.d_modid;
 	err = -ENXIO;
 	if (!(cdev = cdev_get(minor)))
-		goto exit;
+		goto up_exit;
 	instance = cdev->d_modid;
 	cdev_put(cdev);
-	dev = makedevice(modid, instance);
-	args.mnt = specfs;
-	args.inode = inode;
-	args.file = file;
-	args.dev = dev;
+	args.dev = makedevice(modid, instance);
 	args.oflag = make_oflag(file);
 	args.sflag = CLONEOPEN;
 	args.crp = current_creds;
-	args.buf[0] = '\0';
-	args.name.name = args.buf;
-	args.name.len = 0;
-	args.name.hash = dev;
 	file->private_data = &args;
 	err = spec_open(inode, file);
-	file->private_data = old_data;
+      up_exit:
+	up(&inode->i_sem);
       exit:
 	return (err);
 }
@@ -303,64 +294,33 @@ int unregister_clone(struct cdevsw *cdev)
 
 EXPORT_SYMBOL_GPL(unregister_clone);
 
-/* bleedin' mercy! */
-static inline void put_filesystem(struct file_system_type *fs)
-{
-	if (fs->owner)
-		__MOD_DEC_USE_COUNT(fs->owner);
-}
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  INITIALIZATION
+ *
+ *  -------------------------------------------------------------------------
+ */
 
 static int __init clone_init(void)
 {
 	int err;
-	struct devinfo *devi;
-	struct file_system_type *fstype;
 #ifdef CONFIG_STREAMS_CLONE_MODULE
 	printk(KERN_INFO CLONE_BANNER);
 #else
 	printk(KERN_INFO CLONE_SPLASH);
 #endif
-	err = -ENODEV;
-	if (!(fstype = get_fs_type("specfs")))
-		goto exit;
-	err = PTR_ERR(specfs = kern_mount(fstype));
-	put_filesystem(fstype);
-	if (IS_ERR(specfs))
-		goto exit;
 	clone_minfo.mi_idnum = modid;
-	if ((err = register_strdrv(&clone_cdev, specfs) < 0))
-		goto no_strdrv;
-	err = -ENOMEM;
-	if (!(devi = di_alloc(&clone_cdev)))
-		goto no_devi;
-	if ((err = register_cmajor(&clone_cdev, devi, major, &clone_f_ops)) < 0)
-		goto no_cmajor;
+	if ((err = register_cmajor(&clone_cdev, major, &clone_f_ops)) < 0)
+		return (err);
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
-      no_cmajor:
-	di_put(devi);
-      no_devi:
-	unregister_strdrv(&clone_cdev, specfs);
-      no_strdrv:
-	kern_umount(specfs);
-      exit:
-	return (err);
 };
 
 static void __exit clone_exit(void)
 {
-	struct devinfo *devi;
-	if ((devi = devi_get(&clone_cdev, major))) {
-		if (unregister_cmajor(&clone_cdev, devi, major) < 0)
-			swerr();
-		di_put(devi);
-		if (unregister_strdrv(&clone_cdev, specfs) < 0)
-			swerr();
-	} else
-		swerr();
-	kern_umount(specfs);
-	return;
+	unregister_cmajor(&clone_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_CLONE_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/03 10:12:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 12:09:37 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/03 10:12:13 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/03 10:12:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/03 10:12:13 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -135,12 +135,12 @@ static struct module_info nsdev_minfo = {
 };
 
 static struct qinit nsdev_rinit = {
-	qi_putp:putq,
+	//qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
 };
 
 static struct qinit nsdev_winit = {
-	qi_putp:putq,
+	//qi_putp:putq,
 	qi_minfo:&nsdev_minfo,
 };
 
@@ -170,15 +170,9 @@ static int nsdevopen(struct inode *inode, struct file *file)
 	struct cdevsw *cdev;
 	if (!(argp = file->private_data))
 		return (-EIO);
-	if (!(cdev = cdev_match(argp->file->f_dentry->d_name.name)))
+	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
 		return (-ENOENT);
-	// argp->mnt = argp->mnt;
-	// argp->inode = argp->inode;
-	// argp->file = argp->file;
 	argp->dev = makedevice(cdev->d_modid, getminor(argp->dev));
-	argp->name.name = file->f_dentry->d_name.name;
-	argp->name.len = file->f_dentry->d_name.len;
-	argp->name.hash = file->f_dentry->d_name.hash;
 	// argp->oflag = argp->oflag;
 	// argp->sflag = argp->sflag;
 	// argp->crp = argp->crp;
@@ -186,7 +180,7 @@ static int nsdevopen(struct inode *inode, struct file *file)
 	return spec_open(inode, file);
 }
 
-struct file_operations nsdev_f_ops ____cacheline_aligned = {
+struct file_operations nsdev_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
 	open:nsdevopen,
 };
@@ -203,10 +197,83 @@ static struct cdevsw nsdev_cdev = {
 	d_name:CONFIG_STREAMS_NSDEV_NAME,
 	d_str:&nsdev_info,
 	d_flag:0,
-	d_fop:&nsdev_f_ops,
+	d_fop:&nsdev_ops,
 	d_mode:S_IFCHR,
 	d_kmod:THIS_MODULE,
 };
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for clone devices.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  nsdev_open: - open a named clone device node
+ *  @inode: the external filesystem inode
+ *  @file: the external filesystem file pointer
+ *
+ *  nsdev_open() is only used to open a named clone device from a character device node in an
+ *  external filesystem.  This is never called for direct opens of a specfs device node (for direct
+ *  opens see spec_dev_open() in strspecfs.c).  The name of the device in the external filesystem
+ *  combined with the minor device number is used to determine the shadow special filesystem
+ *  (internal) inode an chain the open call.
+ *
+ *  This is a separation point between the external and internal filesystem where we convert the
+ *  external device number to an internal device number.  The external device number is contained in
+ *  inode->i_rdev.
+ */
+
+STATIC int nsdev_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct str_args args;
+	struct cdevsw *cdev;
+	major_t major;
+	minor_t minor;
+	modID_t modid, instance;
+	if ((err = down_interruptible(&inode->i_sem)))
+		goto exit;
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+	minor = cdev_minor(&nsdev_cdev, major, minor);
+	major = nsdev_cdev.d_major;
+	modid = nsdev_cdev.d_modid;
+	err = -ENXIO;
+	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
+		goto up_exit;
+	err = -ENXIO;
+	if (cdev == &nsdev_cdev)
+		goto cdev_put_exit;	/* would loop */
+	instance = cdev->d_modid;
+	args.dev = makedevice(modid, instance);
+	args.oflag = make_oflag(file);
+	args.sflag = CLONEOPEN;
+	args.crp = current_creds;
+	file->private_data = &args;
+	err = spec_open(inode, file);
+      cdev_put_exit:
+	cdev_put(cdev);
+      up_exit:
+	up(&inode->i_sem);
+      exit:
+	return (err);
+}
+
+STATIC struct file_operations nsdev_f_ops ____cacheline_aligned = {
+	owner:THIS_MODULE,
+	open:nsdev_open,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  INITIALIZAION
+ *
+ *  -------------------------------------------------------------------------
+ */
 
 static int __init nsdev_init(void)
 {
@@ -217,7 +284,7 @@ static int __init nsdev_init(void)
 	printk(KERN_INFO NSDEV_SPLASH);
 #endif
 	nsdev_minfo.mi_idnum = modid;
-	if ((err = register_strdev(&nsdev_cdev, major)) < 0)
+	if ((err = register_cmajor(&nsdev_cdev, major, &nsdev_f_ops)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
@@ -225,7 +292,7 @@ static int __init nsdev_init(void)
 };
 static void __exit nsdev_exit(void)
 {
-	unregister_strdev(&nsdev_cdev, major);
+	unregister_cmajor(&nsdev_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_NSDEV_MODULE

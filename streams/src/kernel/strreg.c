@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/02 12:09:39 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/03 10:12:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/02 12:09:39 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/03 10:12:16 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/02 12:09:39 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/03 10:12:16 $";
 
 #define __NO_VERSION__
 
@@ -93,6 +93,7 @@ static char const ident[] =
 #include "sth.h"		/* for stream operations */
 #include "strsched.h"		/* for di_alloc and di_put */
 #include "strlookup.h"		/* cdevsw_list, etc. */
+#include "strspecfs.h"		/* for specfs_get and specfs_put */
 #include "strreg.h"		/* extern verification */
 /* 
  *  -------------------------------------------------------------------------
@@ -192,7 +193,7 @@ EXPORT_SYMBOL_GPL(unregister_strmod);
  *  @cdev: STREAMS device structure to register
  *  @mnt: mount point of the Shadow Special Filesystem
  */
-int register_strdrv(struct cdevsw *cdev, struct vfsmount *mnt)
+int register_strdrv(struct cdevsw *cdev)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
@@ -247,7 +248,7 @@ int register_strdrv(struct cdevsw *cdev, struct vfsmount *mnt)
 				break;
 			}
 		}
-		if ((err = cdev_add(mnt->mnt_root, cdev, modid))) {
+		if ((err = cdev_add(cdev, modid))) {
 			ptrace(("couldn't allocate dentry\n"));
 			break;
 		}
@@ -263,9 +264,8 @@ EXPORT_SYMBOL_GPL(register_strdrv);
 /**
  *  unregister_strdrv:
  *  @cdev: STREAMS driver structure to unregister
- *  @mnt: mount point of the Shadow Special Filesystem
  */
-int unregister_strdrv(struct cdevsw *cdev, struct vfsmount *mnt)
+int unregister_strdrv(struct cdevsw *cdev)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
@@ -297,7 +297,7 @@ int unregister_strdrv(struct cdevsw *cdev, struct vfsmount *mnt)
 			pswerr(("still have active stream heads"));
 			break;
 		}
-		cdev_del(mnt->mnt_root, cdev);
+		cdev_del(cdev);
 		printd(("STREAMS: unregistered module %s\n", cdev->d_name));
 	} while (0);
 	write_unlock(&cdevsw_lock);
@@ -306,8 +306,8 @@ int unregister_strdrv(struct cdevsw *cdev, struct vfsmount *mnt)
 
 EXPORT_SYMBOL_GPL(unregister_strdrv);
 
-/**
- *  register_cmajor: - register a character device inode
+/*
+ *  register_xinode: - register a character device inode
  *  @cdev: character device switch structure pointer
  *  @major: major device number
  *  @fops: file operations to apply to external character device nodes
@@ -319,12 +319,12 @@ EXPORT_SYMBOL_GPL(unregister_strdrv);
  *  be assigned to a free major device number by register_chrdev() and returned as a positive return
  *  value.  Any valid external major device number can be used for @major.
  *
- *  register_cmajor() can be called multiple times for the same registered cdevsw entries to
- *  register additional major device numbers for the same entry.  On each call to register_cmajor()
+ *  register_xinode() can be called multiple times for the same registered cdevsw entries to
+ *  register additional major device numbers for the same entry.  On each call to register_xinode()
  *  only one character major device number will be allocated.  If @major is zero on each call, a new
  *  available major device number will be allocated on each call.
  */
-int register_cmajor(struct cdevsw *cdev, struct devinfo *devi, major_t major, struct file_operations *fops)
+STATIC int register_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t major, struct file_operations *fops)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
@@ -365,26 +365,24 @@ int register_cmajor(struct cdevsw *cdev, struct devinfo *devi, major_t major, st
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_cmajor);
-
-/**
- *  unregister_cmajor: - unregister a special device inode
+/*
+ *  unregister_xinode: - unregister a special device inode
  *  @cdev: character device switch structure pointer
  *  @major: major device number (character special devices only)
  *
  *  Deregisters an external character device major number previously registered with
- *  register_cmajor().  @major must be the major number returned from a successful call to
- *  register_cmajor() or the special value zero (0).  When @major is specified, all major device
+ *  register_xinode().  @major must be the major number returned from a successful call to
+ *  register_xinode() or the special value zero (0).  When @major is specified, all major device
  *  numbers associated with the driver will be deregistered.  In this way, one one call to
- *  unregister_cmajor() with @major set to zero (0) is necessary after multiple successful calls to
- *  register_cmajor().
+ *  unregister_xinode() with @major set to zero (0) is necessary after multiple successful calls to
+ *  register_xinode().
  *
  *  Notices: The major device number must be the major device number returned from a successful
- *  register_cmajor() call.  cdev->d_name must have the same value as on the
- *  call to register_cmajor()
+ *  register_xinode() call.  cdev->d_name must have the same value as on the
+ *  call to register_xinode()
  *  or the call will fail.
  */
-int unregister_cmajor(struct cdevsw *cdev, struct devinfo *devi, major_t major)
+STATIC int unregister_xinode(struct cdevsw *cdev, struct devinfo *devi, major_t major)
 {
 	int err = 0;
 	write_lock(&cdevsw_lock);
@@ -432,6 +430,43 @@ int unregister_cmajor(struct cdevsw *cdev, struct devinfo *devi, major_t major)
 	} while (0);
 	write_unlock(&cdevsw_lock);
 	return (err);
+}
+
+int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
+{
+	int err;
+	struct devinfo *devi;
+	if ((err = register_strdrv(cdev)) < 0 && err != -EBUSY)
+		goto no_strdrv;
+	err = -ENOMEM;
+	if (!(devi = kmalloc(sizeof(*devi), GFP_ATOMIC)))
+		goto no_devi;
+	memset(devi, 0, sizeof(*devi));
+	if ((err = register_xinode(cdev, devi, major, fops)) < 0)
+		goto no_xinode;
+	return (err);
+      no_xinode:
+	kfree(devi);
+      no_devi:
+	unregister_strdrv(cdev);
+      no_strdrv:
+	return (err);
+}
+
+EXPORT_SYMBOL_GPL(register_cmajor);
+
+int unregister_cmajor(struct cdevsw *cdev, major_t major)
+{
+	int err;
+	struct devinfo *devi;
+	if (!(devi = devi_get(cdev, major)))
+		return (-ENXIO);
+	if ((err = unregister_xinode(cdev, devi, major)) < 0)
+		return (err);
+	kfree(devi);
+	if ((err = unregister_strdrv(cdev)) < 0 && err != -EBUSY)
+		return (err);
+	return (0);
 }
 
 EXPORT_SYMBOL_GPL(unregister_cmajor);
@@ -609,7 +644,7 @@ STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
  *  @mnt:	    the vfsmount to open
  *  @cdev:	    the STREAMS device entry
  */
-STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, int flags, struct cdevsw *cdev)
+STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct file *ext_file, struct cdevsw *cdev)
 {
 #ifdef HAVE_FILE_MOVE_ADDR
 	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
@@ -618,11 +653,12 @@ STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct vfsmount *
 	struct inode *inode = dentry->d_inode;
 	struct file *file;
 	int err;
+	struct vfsmount *mnt = specfs_get();
 	err = -ENFILE;
 	if (!(file = get_empty_filp()))
 		goto dput_error;
-	file->f_flags = flags;
-	file->f_mode = (flags + 1) & O_ACCMODE;
+	file->f_flags = ext_file->f_flags;
+	file->f_mode = (ext_file->f_flags + 1) & O_ACCMODE;
 	file->f_dentry = dentry;
 	file->f_vfsmnt = mnt;
 	file->f_pos = 0;
@@ -631,6 +667,7 @@ STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct vfsmount *
 	_file_move(file, &inode->i_sb->s_files);
 	file->f_iobuf = NULL;
 	file->f_iobuf_lock = 0;
+	file->private_data = ext_file->private_data;
 	if (file->f_op && file->f_op->open && (err = file->f_op->open(inode, file)))
 		goto error;
 	file->f_flags &= ~(O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC);
@@ -680,10 +717,12 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 	if ((node = node_get(cdev, getminor(argp->dev)))) {
 		dentry = dget(node->n_dentry);
 	} else {
-		argp->name.name = argp->buf;
-		argp->name.len = snprintf(argp->buf, sizeof(argp->buf), "%u", getminor(argp->dev));
-		argp->name.hash = argp->dev;
-		dentry = lookup_hash(&argp->name, parent);
+		char buf[32];
+		struct qstr name;
+		name.name = buf;
+		name.len = snprintf(buf, sizeof(buf), "%u", getminor(argp->dev));
+		name.hash = full_name_hash(name.name, name.len);
+		dentry = lookup_hash(&name, parent);
 	}
 	if (!dentry)
 		goto pput_exit;
@@ -699,7 +738,7 @@ int spec_open(struct inode *ext_inode, struct file *ext_file)
 		goto dput_exit;
 	up(&inode->i_sem);
 	inode = NULL;
-	file = dentry_open2(dentry, argp->mnt, ext_file->f_flags, cdev);
+	file = dentry_open2(dentry, ext_file, cdev);
 	if ((err = PTR_ERR(file)) < 0)
 		goto dput_exit;
 	if (err == 0) {

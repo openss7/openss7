@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:33 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -77,13 +77,14 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
+#include "strargs.h"		/* for struct str_args */
 #include "strsad.h"		/* for autopush */
 #include "sth.h"
 #include "fifo.h"		/* extern verification */
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/03 10:12:13 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -132,13 +133,13 @@ static struct module_info fifo_minfo = {
 	mi_lowat:STRLOW,
 };
 
-static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int fifo_close(queue_t *q, int oflag, cred_t *crp);
+static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+static int fifo_qclose(queue_t *q, int oflag, cred_t *crp);
 
 static struct qinit fifo_rinit = {
 	qi_putp:strrput,
-	qi_qopen:fifo_open,
-	qi_qclose:fifo_close,
+	qi_qopen:fifo_qopen,
+	qi_qclose:fifo_qclose,
 	qi_minfo:&fifo_minfo,
 };
 
@@ -162,18 +163,17 @@ static struct streamtab fifo_info = {
  *  -------------------------------------------------------------------------
  */
 /**
- *  fifo_open:	- STREAMS qopen procedure for fifo stream heads
+ *  fifo_qopen:	- STREAMS qopen procedure for fifo stream heads
  *  @q:		read queue of stream to open
  *  @devp:	pointer to a dev_t from which to read and into which to return the device number
  *  @oflag:	open flags
  *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
  *  @crp:	pointer to user's credentials structure
  */
-static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct stdata *sd;
 	int err = 0;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if ((sd = q->q_ptr) != NULL) {
 		/* we walk down the queue chain calling open on each of the modules and the driver */
 		queue_t *wq = WR(q), *wq_next;
@@ -182,10 +182,8 @@ static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			int new_sflag;
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			new_sflag = wq_next ? MODOPEN : sflag;
-			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp))) {
-				MOD_DEC_USE_COUNT;
+			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
 				return (err > 0 ? -err : err);
-			}
 		}
 		goto done;
 	}
@@ -200,17 +198,14 @@ static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			/* we are the driver and this *is* the open routine and there is no
 			   redirection. */
 			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp))) {
-				MOD_DEC_USE_COUNT;
+			if ((err = autopush(sd, sd->sd_cdevsw, &dev, oflag, MODOPEN, crp)))
 				return (err > 0 ? -err : err);
-			}
 			goto done;
 		}
 	}
-	MOD_DEC_USE_COUNT;
 	return (-EIO);		/* can't be opened as module or clone */
       done:
-	/* TODO: should proabably move this up to stropen */
+	err = 0;
 	switch (oflag & (FNDELAY | FWRITE | FREAD)) {
 	case (0):
 	case (FNDELAY):
@@ -267,23 +262,28 @@ static int fifo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case (FREAD | FWRITE | FNDELAY):
 		break;
 	}
-	return (err);
-	if (q->q_ptr) {
-		MOD_DEC_USE_COUNT;	/* already open */
-	} else {
-		/* lastly, attach our privates and return */
+	if (err)
+		return (err);
+	/* lastly, attach our privates and return */
+	if (!q->q_ptr)
 		q->q_ptr = WR(q)->q_ptr = sd;
-	}
 	return (0);
 }
-static int fifo_close(queue_t *q, int oflag, cred_t *crp)
+static int fifo_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	MOD_DEC_USE_COUNT;
 	return (0);
 }
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  INITIALIZATION
+ *
+ *  -------------------------------------------------------------------------
+ */
 
 static struct cdevsw fifo_cdev = {
 	d_name:CONFIG_STREAMS_FIFO_NAME,
@@ -294,6 +294,82 @@ static struct cdevsw fifo_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  Special open for clone devices.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/*
+ *  fifo_open: - open a fifo device node
+ *  @inode: the external filesystem inode
+ *  @file: the external filesystem file pointer
+ *
+ *  fifo_open() is only used to open a fifo device (named pipe) from a character device node in an
+ *  external filesystem.  This is never called for direct opens of a specfs device node (for direct
+ *  opens, see spec_dev_open() in strspecfs.c).  The character device inode is opened directly and
+ *  no inode in the shadow filesystem is addressed.
+ */
+STATIC int fifo_open(struct inode *inode, struct file *file)
+{
+	int err;
+	struct str_args args;
+	if ((err = down_interruptible(&inode->i_sem)))
+		goto exit;
+	args.dev = makedevice(fifo_cdev.d_modid, 0);
+	args.oflag = make_oflag(file);
+	args.sflag = DRVOPEN;
+	args.crp = current_creds;
+	file->private_data = &args;
+	fops_put(xchg(&file->f_op, fops_get(fifo_cdev.d_fop)));
+	err = file->f_op->open(inode, file);
+	up(&inode->i_sem);
+      exit:
+	return (err);
+}
+
+STATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
+	owner:THIS_MODULE,
+	open:fifo_open,
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  REGISTRATION
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef CONFIG_STREAMS_FIFO_OVERRIDE
+static const struct file_operations *_def_fifo_ops =
+    ((typeof(_def_fifo_ops)) HAVE_DEF_FIFO_OPS_ADDR);
+
+static struct file_operations fifo_tmp_ops;
+
+STATIC void register_fifo(void)
+{
+	fifo_tmp_ops = *_def_fifo_ops;
+	_def_fifo_ops->owner = fifo_f_ops.owner;
+	_def_fifo_ops->open = fifo_f_ops.open;
+}
+STATIC void unregister_fifo(void)
+{
+	_def_fifo_ops->open = fifo_tmp_ops.open;
+	_def_fifo_ops->owner = fifo_tmp_ops.owner;
+}
+#endif
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
+ *  INITIALIZAION
+ *
+ *  -------------------------------------------------------------------------
+ */
+
 static int __init fifo_init(void)
 {
 	int err;
@@ -303,15 +379,22 @@ static int __init fifo_init(void)
 	printk(KERN_INFO FIFO_SPLASH);
 #endif
 	fifo_minfo.mi_idnum = modid;
-	if ((err = register_strdev(&fifo_cdev, major)) < 0)
+	if ((err = register_cmajor(&fifo_cdev, major, &fifo_f_ops)) < 0)
 		return (err);
+#ifdef CONFIG_STREAMS_FIFO_OVERRIDE
+	register_fifo();	/* This is safe */
+#endif
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
+
 static void __exit fifo_exit(void)
 {
-	unregister_strdev(&fifo_cdev, major);
+#ifdef CONFIG_STREAMS_FIFO_OVERRIDE
+	unregister_fifo();	/* This is not safe... */
+#endif
+	unregister_cmajor(&fifo_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_FIFO_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 21:24:51 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $";
 
 //#define __NO_VERSION__
 
@@ -99,7 +99,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/02 21:24:51 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/03 10:12:17 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -174,8 +174,6 @@ struct streamtab str_info = {
 };
 
 #define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
-
-STATIC struct vfsmount *specfs = NULL;
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1918,31 +1916,28 @@ int strmmap(struct file *file, struct vm_area_struct *vma)
  *  @inode: shadow special filesystem device inode
  *  @file: shadow special filesystem file pointer
  *
- *  stropen() can be called by spec_open() which was called on an extenal filesystem inode, or by
- *  spec_dev_open() which was called on the internal shadow special filesystem inode.  Either way,
- *  the @file and @inode represented here are internal shadow special filesystem generated file and
- *  inode pointers.
+ *  stropen() can be called by spec_open() (or an inplace open) which was called on an extenal
+ *  filesystem inode, or by spec_dev_open() which was called on the internal shadow special
+ *  filesystem inode.  The @file and @inode represented here could be external or internal inode and
+ *  file pointer.  Either way, the open arguments are passed in the file->private_data.
  */
 int stropen(struct inode *inode, struct file *file)
 {
 	int err = 0;
-	dev_t dev = inode->i_ino;
 	struct stdata *sd;
+	struct str_args *argp = file->private_data;
 	/* first find out of we already have a stream head, or we need a new one anyway */
-	if (!(sd = sd_get((struct stdata *) inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
+	if (argp->sflag == CLONEOPEN || !(sd = sd_get((struct stdata *)inode->i_pipe))) {
 		queue_t *q;
 		struct cdevsw *cdev;
-		if (sd)
-			sd_put(sd);	/* put away old one */
-		if (!(cdev = cdrv_get(getmajor(dev))))
+		if (!(cdev = cdrv_get(getmajor(argp->dev))))
 			return (-ENXIO);
 		/* we don't have a stream yet (or want a new one), so allocate one */
 		if (!(q = allocq())) {
 			cdrv_put(cdev);
 			return (-ENOSR);
 		}
-		/* FIXME: need to find/create and attach synq.  We are going to need the devinfo
-		   structure for this.  Actually, it is the same as the cdevsw structure. */
+		/* FIXME: need to find/create and attach syncq. */
 		if (!(sd = allocsd())) {
 			cdrv_put(cdev);
 			freeq(q);
@@ -1975,7 +1970,7 @@ int stropen(struct inode *inode, struct file *file)
 			setq(q, str_info.st_rdinit, str_info.st_wrinit);
 			break;
 		}
-		if (cdev->d_flag & D_CLONE)
+		if (argp->sflag == CLONEOPEN)
 			sd->sd_flag |= STRCLONE;
 		/* don't graft onto inode just yet */
 		sd->sd_file = file;
@@ -1986,7 +1981,7 @@ int stropen(struct inode *inode, struct file *file)
 	if (!err) {
 		/* here we hold the STWOPEN bit - stream head open must clear */
 		int sflag = (sd->sd_flag & STRCLONE) ? CLONEOPEN : DRVOPEN;
-		if (!(err = qopen(sd->sd_rq, &dev, make_oflag(file), sflag, current_creds))) {
+		if (!(err = qopen(sd->sd_rq, &argp->dev, make_oflag(file), sflag, current_creds))) {
 			sd->sd_opens++;
 			sd->sd_readers += (file->f_mode & FREAD) ? 1 : 0;
 			sd->sd_writers += (file->f_mode & FWRITE) ? 1 : 0;
@@ -2854,7 +2849,7 @@ static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int strpipe(int fds[2])
 {
-	return do_spipe(fds, specfs);	/* see strpipe.c */
+	return do_spipe(fds);	/* see strpipe.c */
 }
 
 /**
@@ -3325,7 +3320,7 @@ EXPORT_SYMBOL_GPL(strrput);
  *
  *  -------------------------------------------------------------------------
  */
-/**
+/*
  *  str_open:	- STREAMS qopen procedure for stream heads
  *  @q:		read queue of stream to open
  *  @devp:	pointer to a dev_t from which to read and into which to return the device number
@@ -3336,50 +3331,44 @@ EXPORT_SYMBOL_GPL(strrput);
 static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int err;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
+	struct stdata *sd;
 	if (q->q_ptr != NULL) {
-		/* we walk down the queue chain calling open on each of the modules and the driver */
+		/* already open: we walk down the queue chain calling open on each of the modules
+		   and the driver */
 		queue_t *wq = WR(q), *wq_next;
 		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 		while ((wq = wq_next)) {
 			int new_sflag;
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			new_sflag = wq_next ? MODOPEN : sflag;
-			if ((err = qopen(wq - 1, devp, oflag, new_sflag, crp))) {
-				MOD_DEC_USE_COUNT;
-				return (err > 0 ? -err : err);
-			}
+			if ((err = qopen(wq - 1, devp, oflag, new_sflag, crp)))
+				goto error;
 		}
-		MOD_DEC_USE_COUNT;
 		return (0);	/* already open */
 	}
 	if (sflag == DRVOPEN || sflag == CLONEOPEN || WR(q)->q_next == NULL) {
-		dev_t dev = *devp;
-		struct stdata *sd;
 		if ((sd = ((struct queinfo *) q)->qu_str)) {
 			struct cdevsw *cdev = sd->sd_cdevsw;
+			struct fmodsw *fmod = (struct fmodsw *) cdev;
 			struct streamtab *st;
 			/* 1st step: attach the driver and call its open routine */
 			st = sd->sd_strtab = cdev->d_str;
-			if ((err = qattach(sd, (struct fmodsw *) cdev, &dev, oflag, sflag, crp))) {
-				MOD_DEC_USE_COUNT;
-				return (err > 0 ? -err : err);
-			}
+			if ((err = qattach(sd, fmod, devp, oflag, sflag, crp)))
+				goto error;
 			/* FIXME: move the redirected return check to upper level open call */
 			/* 2nd step: check for redirected return */
-			/* qattach() above does the right thing */
+			/* qattach() above does the right thing with regard to setq() */
 			/* 3rd step: autopush modules and call their open routines */
-			if ((err = autopush(sd, cdev, devp, oflag, MODOPEN, crp))) {
-				MOD_DEC_USE_COUNT;
-				return (err > 0 ? -err : err);
-			}
+			if ((err = autopush(sd, cdev, devp, oflag, MODOPEN, crp)))
+				goto error;
 			/* lastly, attach our privates and return */
 			q->q_ptr = WR(q)->q_ptr = sd;
 			return (0);
 		}
 	}
-	MOD_DEC_USE_COUNT;
 	return (-EIO);		/* can't be opened as module or clone */
+error:
+	return (err > 0 ? -err : err);
 }
 
 /**
@@ -3393,7 +3382,6 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	MOD_DEC_USE_COUNT;
 	return (0);
 }
 
@@ -3422,109 +3410,34 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
  */
 STATIC int cdev_open(struct inode *inode, struct file *file)
 {
-	struct cdevsw *cdev = NULL;
-	struct devnode *node = NULL;
-	int err, inplace, sflag;
-	dev_t dev;
-	err = -ENXIO;
-	switch (inode->i_mode & S_IFMT) {
-		major_t major;
-		minor_t minor;
-	case S_IFCHR:
-		major = MAJOR(kdev_t_to_nr(inode->i_rdev));
-		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
-		if (!(cdev = cdev_get(major)))
-			goto exit;
-		minor = cdev_minor(cdev, major, minor);
-		/* if we have a specified minor, use its device flags */
-		/* this is what allows us to mark minor device nodes as clone nodes */
-		sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
-		if ((node = node_get(cdev, minor)))
-			sflag = (node->n_flag & D_CLONE) ? CLONEOPEN : sflag;
-		dev = makedevice(cdev->d_modid, minor);
-		switch (cdev->d_modid) {
-#if defined CONFIG_STREAMS_FIFO_MODID || defined CONFIG_STREAMS_SOCK_MODID
-#ifdef CONFIG_STREAMS_FIFO_MODID
-		case CONFIG_STREAMS_FIFO_MODID:
-#endif
-#ifdef CONFIG_STREAMS_SOCK_MODID
-		case CONFIG_STREAMS_SOCK_MODID:
-#endif
-			inplace = 1;
-			break;
-#endif
-#ifdef CONFIG_STREAMS_CLONE_MODID
-		case CONFIG_STREAMS_CLONE_MODID:
-		{
-			struct cdevsw *c;
-			/* One additional thing that needs to be done for a clone character device
-			   is to convert the device minor number (treated as an external characeter
-			   device major number, into an internal module id */
-			err = -ENXIO;
-			if (!(c = cdev_get(getminor(dev))))
-				goto cput_exit;
-			dev = makedevice(cdev->d_modid, c->d_modid);
-			inplace = 0;
-			break;
-		}
-#endif
-		default:
-			inplace = 0;
-			break;
-		}
-		break;
-	case S_IFIFO:
-		if (!(cdev = cdev_find("fifo")))
-			goto exit;
-		dev = makedevice(cdev->d_modid, 0);
-		sflag = CLONEOPEN;
-		inplace = 1;
-		break;
-	case S_IFSOCK:
-		if (!(cdev = cdev_find("sock")))
-			goto exit;
-		dev = makedevice(cdev->d_modid, 0);
-		sflag = CLONEOPEN;
-		inplace = 1;
-		break;
-	default:
+	int err;
+	struct str_args args;
+	struct cdevsw *cdev;
+	struct devnode *node;
+	major_t major;
+	minor_t minor;
+	modID_t modid;
+	if ((err = down_interruptible(&inode->i_sem)))
 		goto exit;
-	}
-	err = -EIO;
-	if (cdev->d_fop && cdev->d_fop->open) {
-		struct str_args args;
-		args.inode = inode;
-		args.file = file;
-		args.dev = dev;
-		args.oflag = make_oflag(file);
-		args.sflag = sflag;
-		args.crp = current_creds;
-		if (inplace) {
-			/* fifo, sock and clone nodes are opened in place in the external
-			   filesystem */
-			void *old_data = file->private_data;
-			args.mnt = file->f_vfsmnt;
-			args.name.name = file->f_dentry->d_name.name;
-			args.name.len = file->f_dentry->d_name.len;
-			args.name.hash = file->f_dentry->d_name.hash;
-			fops_put(xchg(&file->f_op, fops_get(cdev->d_fop)));
-			file->private_data = &args;
-			err = file->f_op->open(inode, file);
-			file->private_data = old_data;
-		} else {
-			/* this is an out of place open */
-			void *old_data = file->private_data;
-			args.mnt = specfs;
-			args.name.name = args.buf;
-			args.name.len = snprintf(args.buf, sizeof(args.buf), "%lu", args.dev);
-			args.name.hash = args.dev;
-			file->private_data = &args;
-			err = spec_open(inode, file);
-			file->private_data = old_data;
-		}
-	}
-      cput_exit:
+	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
+	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+	err = -ENXIO;
+	if (!(cdev = cdev_get(major)))
+		goto up_exit;
+	minor = cdev_minor(cdev, major, minor);
+	major = cdev->d_major;
+	modid = cdev->d_modid;
+	args.dev = makedevice(modid, minor);
+	args.oflag = make_oflag(file);
+	args.sflag = (node = node_get(cdev, minor)) ?
+	    ((node->n_flag & D_CLONE) ? CLONEOPEN : DRVOPEN) :
+	    ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
+	args.crp = current_creds;
+	file->private_data = &args;
+	err = spec_open(inode, file);
 	cdev_put(cdev);
+      up_exit:
+	up(&inode->i_sem);
       exit:
 	return (err);
 }
@@ -3578,35 +3491,14 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
  */
 int register_strdev(struct cdevsw *cdev, major_t major)
 {
-	int err, clone_registered = 0;
-	struct devinfo *devi;
-	if ((err = register_strdrv(cdev, specfs)) < 0) {
-		if (err != -EBUSY)
-			goto no_strdrv;
-		if ((err = register_clone(cdev)) < 0)
-			goto no_devi;
-		clone_registered = 1;
-	}
-	if ((err = register_strdrv(cdev, specfs)) < 0 && err != -EBUSY)
-		goto no_strdrv;
-	if (!(devi = di_alloc(cdev))) {
-		err = -ENOMEM;
-		goto no_devi;
-	}
+	int err;
 	if (!cdev->d_fop)
 		cdev->d_fop = &strm_f_ops;
 	if (!(cdev->d_mode & S_IFMT))
 		cdev->d_mode = (cdev->d_mode & ~S_IFMT) | S_IFCHR;
-	if ((err = register_cmajor(cdev, devi, major, &cdev_f_ops)) < 0)
-		goto no_cmajor;
-	return (err);
-      no_cmajor:
-	di_put(devi);
-      no_devi:
-	if (clone_registered)
-		unregister_clone(cdev);
-	unregister_strdrv(cdev, specfs);
-      no_strdrv:
+	if ((err = register_cmajor(cdev, major, &cdev_f_ops)))
+		return (err);
+	register_clone(cdev);
 	return (err);
 }
 
@@ -3645,17 +3537,8 @@ EXPORT_SYMBOL_GPL(register_strdev);
  */
 int unregister_strdev(struct cdevsw *cdev, major_t major)
 {
-	int err;
-	struct devinfo *devi;
 	unregister_clone(cdev);
-	if (!(devi = devi_get(cdev, major)))
-		return (-ENODEV);
-	if ((err = unregister_cmajor(cdev, devi, major)) < 0)
-		return (err);
-	di_put(devi);
-	if ((err = unregister_strdrv(cdev, specfs)) < 0 && err != -EBUSY)
-		return (err);
-	return (0);
+	return unregister_cmajor(cdev, major);
 }
 EXPORT_SYMBOL_GPL(unregister_strdev);
 
@@ -3692,7 +3575,6 @@ static inline void put_filesystem(struct file_system_type *fs)
 int __init sth_init(void)
 {
 	int result;
-	struct file_system_type *fstype;
 #ifdef CONFIG_STREAMS_STH_MODULE
 	printk(KERN_INFO STH_BANNER);
 #else
@@ -3703,27 +3585,13 @@ int __init sth_init(void)
 		goto no_strmod;
 	if (modid == 0 && result >= 0)
 		modid = result;
-	if (!(fstype = get_fs_type("specfs"))) {
-		result = -ENODEV;
-		goto no_fstype;
-	}
-	if (IS_ERR(specfs = kern_mount(fstype))) {
-		result = PTR_ERR(specfs);
-		goto no_mount;
-	}
-	put_filesystem(fstype);
 	return (0);
-      no_mount:
-	put_filesystem(fstype);
-      no_fstype:
-	unregister_strmod(&sth_fmod);
       no_strmod:
 	return (result);
 }
 
 void __exit sth_exit(void)
 {
-	kern_umount(specfs);
 	unregister_strmod(&sth_fmod);
 }
 

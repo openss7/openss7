@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/01 12:04:39 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/01 12:04:39 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/01 12:04:39 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/03 10:12:17 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -269,25 +269,25 @@ MODULE_LICENSE(SPECFS_LICENSE);
  */
 STATIC int spec_dev_open(struct inode *inode, struct file *file)
 {
+	int err;
 	struct str_args args;
 	struct cdevsw *cdev;
+	err = -ENOENT;
+	/* XXX: can the module unload in our face this way? */
 	if (!(cdev = file->f_dentry->d_parent->d_inode->u.generic_ip))
-		return (-ENOENT);
-	args.mnt = file->f_vfsmnt;
-	args.inode = inode;
-	args.file = file;
+		goto exit;
 	args.dev = inode->i_ino;
-	args.name.name = file->f_dentry->d_name.name;
-	args.name.len = file->f_dentry->d_name.len;
-	args.name.hash = file->f_dentry->d_name.hash;
 	args.oflag = make_oflag(file);
 	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
 	args.crp = current_creds;
 	fops_put(xchg(&file->f_op, fops_get(cdev->d_fop)));
+	err = -EIO;
 	if (!file->f_op || !file->f_op->open)
-		return (-EIO);
+		goto exit;
 	file->private_data = &args;
-	return file->f_op->open(inode, file);
+	err = file->f_op->open(inode, file);
+      exit:
+	return (err);
 }
 
 struct file_operations spec_dev_f_ops = {
@@ -497,17 +497,13 @@ STATIC int spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
  */
 STATIC int spec_dir_open(struct inode *inode, struct file *file)
 {
+	int err;
 	struct str_args args;
 	struct cdevsw *cdev;
+	err = -ENOENT;
 	if (!(cdev = file->f_dentry->d_inode->u.generic_ip))
-		return (-ENOENT);
-	args.mnt = file->f_vfsmnt;
-	args.inode = inode;
-	args.file = file;
+		goto exit;
 	args.dev = makedevice(inode->i_ino, 0);
-	args.name.name = file->f_dentry->d_name.name;
-	args.name.len = file->f_dentry->d_name.len;
-	args.name.hash = file->f_dentry->d_name.hash;
 	args.oflag = make_oflag(file);
 	args.sflag = CLONEOPEN;
 	args.crp = current_creds;
@@ -515,7 +511,9 @@ STATIC int spec_dir_open(struct inode *inode, struct file *file)
 	if (!file->f_op || !file->f_op->open)
 		return (-EIO);
 	file->private_data = &args;
-	return file->f_op->open(inode, file);
+	err = file->f_op->open(inode, file);
+      exit:
+	return (err);
 }
 #endif
 
@@ -1441,6 +1439,32 @@ STATIC struct super_block *specfs_read_super(struct super_block *sb, void *data,
 }
 
 STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
+
+STATIC struct vfsmount *specfs_mnt = NULL;
+STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;
+STATIC int specfs_count = 0;
+
+struct vfsmount *specfs_get(void)
+{
+	spin_lock(&specfs_lock);
+	if (!specfs_mnt) {
+		if (IS_ERR(specfs_mnt = kern_mount(&spec_fs_type)))
+			specfs_mnt = NULL;
+	}
+	spin_unlock(&specfs_lock);
+	return (mntget(specfs_mnt));
+}
+
+void specfs_put(void)
+{
+	if (specfs_mnt) {
+		mntput(specfs_mnt);
+		spin_lock(&specfs_lock);
+		if (atomic_read(&specfs_mnt->mnt_count) == 1)
+			kern_umount(xchg(&specfs_mnt, NULL));
+		spin_unlock(&specfs_lock);
+	}
+}
 
 /**
  *  strspecfs_init: - initialize the shadow special filesystem

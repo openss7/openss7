@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/02 12:09:39 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/03 10:12:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/02 12:09:39 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/03 10:12:16 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/02 12:09:39 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/03 10:12:16 $";
 
 #define __NO_VERSION__
 
@@ -90,6 +90,7 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #include "strdebug.h"
 #include "sth.h"		/* for stream operations */
 #include "strsched.h"		/* for di_alloc and di_put */
+#include "strspecfs.h"		/* for specfs_get and specfs_put */
 #include "strlookup.h"		/* extern verification */
 
 /* we want macro versions of these */
@@ -958,11 +959,12 @@ STATIC struct dentry *spec_dir_alloc(struct dentry *parent, const char *name, lo
  *  @parent: parent directory entry
  *  @child: child directory entry to delete
  */
-STATIC void spec_dir_delete(struct dentry *parent, struct dentry *child)
+STATIC void spec_dir_delete(struct dentry *child)
 {
 	struct inode *base, *inode;
+	struct dentry *parent;
 	ptrace(("strreg: deallocating dentry %s from parent %s\n", child->d_name.name, parent->d_name.name));
-	if (!child || !parent)
+	if (!child || !(parent = child->d_parent))
 		return;
 	base = parent->d_inode;
 	inode = child->d_inode;
@@ -1005,12 +1007,16 @@ void fmod_del(struct fmodsw *fmod)
 
 EXPORT_SYMBOL_GPL(fmod_del);
 
-int cdev_add(struct dentry *root, struct cdevsw *cdev, modID_t modid)
+int cdev_add(struct cdevsw *cdev, modID_t modid)
 {
+	struct vfsmount *mnt;
+	if (!(mnt = specfs_get()))
+		return (-ENODEV);
 	/* get a dentry if required */
 	if (!cdev->d_dentry &&
-	    !(cdev->d_dentry = spec_dir_alloc(root, cdev->d_name, modid, cdev))) {
+	    !(cdev->d_dentry = spec_dir_alloc(mnt->mnt_root, cdev->d_name, modid, cdev))) {
 		ptrace(("couldn't allocate dentry\n"));
+		specfs_put();
 		return (-ENOMEM);
 	}
 	cdev->d_modid = modid;
@@ -1030,14 +1036,15 @@ int cdev_add(struct dentry *root, struct cdevsw *cdev, modID_t modid)
 
 EXPORT_SYMBOL_GPL(cdev_add);
 
-void cdev_del(struct dentry *root, struct cdevsw *cdev)
+void cdev_del(struct cdevsw *cdev)
 {
 	/* put away dentry if necessary */
-	spec_dir_delete(root, xchg(&cdev->d_dentry, NULL));
+	spec_dir_delete(xchg(&cdev->d_dentry, NULL));
 	/* remove from list and hash */
 	list_del_init(&cdev->d_list);
 	list_del_init(&cdev->d_hash);
 	cdev_count--;
+	specfs_put();
 }
 
 EXPORT_SYMBOL_GPL(cdev_del);
@@ -1099,7 +1106,7 @@ EXPORT_SYMBOL_GPL(node_add);
 void node_del(struct devnode *node, struct cdevsw *cdev)
 {
 	/* put away dentry if required */
-	spec_dir_delete(cdev->d_dentry, xchg(&node->n_dentry, NULL));
+	spec_dir_delete(xchg(&node->n_dentry, NULL));
 	node->n_dev = NULL;
 	node->n_modid = -1;
 	node->n_minor = -1;

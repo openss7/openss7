@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/03 10:12:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
+ Last Modified $Date: 2004/06/03 10:12:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/03 10:12:16 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/03 10:12:16 $";
 
 #define __NO_VERSION__
 
@@ -108,15 +108,19 @@ STATIC struct inode *get_spipe_inode(struct vfsmount *mnt)
 	}
 	return (inode);
 }
-long do_spipe(int *fds, struct vfsmount *mnt)
+long do_spipe(int *fds)
 {
 	struct qstr str1, str2;
 	struct file *file1, *file2;
 	struct inode *inode1, *inode2;
 	struct dentry *dentry1, *dentry2;
+	struct vfsmount *mnt;
 	char name[32];
 	int fd1, fd2;
 	int err;
+	err = -ENODEV;
+	if (!(mnt = specfs_get()))
+		goto no_mnt;
 	err = -ENFILE;
 	if (!(file1 = get_empty_filp()))
 		goto no_file1;
@@ -183,6 +187,8 @@ long do_spipe(int *fds, struct vfsmount *mnt)
 	put_filp(file1);
       no_file1:
 	goto error;
+      no_mnt:
+	specfs_put();
       error:
 	return (err);
 }

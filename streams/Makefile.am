@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2004/06/02 21:24:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2004/06/03 10:12:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/02 21:24:45 $ by $Author: brian $
+# Last Modified $Date: 2004/06/03 10:12:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -182,6 +182,7 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/sad.c \
 				include/sys/sad.h \
 				src/drivers/clone.c \
+				src/drivers/clone.h \
 				src/drivers/fifo.c \
 				src/drivers/fifo.h \
 				src/drivers/nsdev.c \
