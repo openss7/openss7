@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/11/08 06:55:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 22:55:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:55:51 $ by $Author: brian $
+# Last Modified $Date: 2005/01/22 22:55:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,8 @@ MANMACRO_PFX = strsctp
 man_MANS = \
 	man7/npi_sctp.7 \
 	man7/strsctp_soon.7 \
-	man8/sctp.8
+	man8/sctp.8 \
+	man8/strsctp_mknod.8
 
 if WITH_OPENSS7_SCTP
 else
@@ -77,7 +78,8 @@ dist_noinst_MANS = \
 	man7/npi_sctp.7.man \
 	man7/tpi_sctp.7.man \
 	man7/strsctp_soon.7.man \
-	man8/sctp.8.man
+	man8/sctp.8.man \
+	man8/strsctp_mknod.8.man
 
 EXTRA_DIST = 
 

@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/01/22 05:01:51 $
+dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/01/22 22:49:31 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/22 05:01:51 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 22:49:31 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -1130,7 +1130,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
             linux_k_defs="${linux_k_defs}${linux_k_defs:+ }-D__linux__"
             CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -mno-space-regs -mfast-indirect-calls -mdisable-fpregs"
             case "$linux_cv_march" in
-                *0.9*) CFLAGS="${CFLAGS}${CFLAGS:+ }-march=0.9" ;;
+                *1.1*) CFLAGS="${CFLAGS}${CFLAGS:+ }-march=1.1" ;;
                 *2.0*) CFLAGS="${CFLAGS}${CFLAGS:+ }-march=2.0 -mschedule=8000" ;;
                 *64*)  : ;;
                 *)     : ;;
