@@ -112,7 +112,14 @@
 #include <linux/if_ether.h>  /* Linux ethernet defs		*/
 #include <linux/skbuff.h>    /* Linux socket buffer		*/
 #ifdef KERNEL_2_1
+ /*
+  * This file is not available if kernel source is not installed
+  */
+#if !defined(NOKSRC)
 #include <net/pkt_sched.h>   /* Linux queue disciplines		*/
+#else
+void qdisc_reset(struct Qdisc *qdisc);
+#endif
 #endif
 #ifdef KERNEL_2_0
 #define atomic_read(int_ptr)	(*(int_ptr))
@@ -198,14 +205,18 @@ typedef struct { unsigned char sap[MAXSAPLEN]; } sap_t;
 /*
  *  Transmission priorities
  */
-#ifdef KERNEL_2_1
+#if defined(TC_PRIO_BULK)
 #define LDLPRI_LO	TC_PRIO_BULK
 #define LDLPRI_MED	TC_PRIO_BESTEFFORT
 #define LDLPRI_HI	TC_PRIO_INTERACTIVE
-#else
+#elif defined(SOPRI_BACKGROUND)
 #define LDLPRI_LO	SOPRI_BACKGROUND
 #define LDLPRI_MED	SOPRI_NORMAL
 #define LDLPRI_HI	SOPRI_INTERACTIVE
+#else
+#define LDLPRI_LO       0
+#define LDLPRI_MED      0
+#define LDLPRI_HI       0
 #endif
 
 /*

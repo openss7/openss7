@@ -224,6 +224,9 @@ XOPTS += -I$(LIS_INCL)
 #
 ifeq ($(LIS_TARG),linux)
 XOPTS += -I$(KSRC)/include $(MACHINE_INCL)
+ifneq ($(KSRC),/usr/src/linux)
+XOPTS += -I/usr/src/linux/include
+endif
 ifeq ($(RH_71_KLUDGE),y)
 XOPTS += -DRH_71_KLUDGE
 endif
@@ -232,6 +235,9 @@ XOPTS += -DSIGMASKLOCK
 endif
 ifeq ($(RCVOID),y)
 XOPTS += -DRCVOID
+endif
+ifeq ($(NOKSRC),1)
+XOPTS += -DNOKSRC
 endif
 endif
 

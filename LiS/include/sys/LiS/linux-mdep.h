@@ -37,7 +37,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) LiS linux-mdep.h 2.52 3/20/03 19:47:36 "
+#ident "@(#) LiS linux-mdep.h 2.53 4/15/03 18:15:20 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -52,9 +52,11 @@
 #include <sys/autoconf.h>           /* /usr/src/LiS/include/sys */
 #define _LINUX_CONFIG_H 1	    /* prevent <linux/config.h> */
 #endif
+#if !defined(NOKSRC)		/* have kernel source */
 #ifndef _SYS_TYPES_H
 #include <linux/types.h>
 #define _SYS_TYPES_H	1	/* pretend included */
+#endif
 #endif
 
 /* kernel includes go here */
@@ -91,9 +93,25 @@
 
 # endif
 #endif
-#ifndef _LINUX_TYPES_H
+
+#if defined(NOKSRC)
+
+#include <linux/types.h>        /* common system types */
+#include <linux/spinlock.h>
+#define	__need_sigset_t	1
+#include <signal.h>
+#define timespec time_h_timespec
+#include <linux/time.h>
+#undef timespec
+
+#else
+
+#if !defined(_LINUX_TYPES_H)
 #include <linux/types.h>        /* common system types */
 #endif
+
+#endif
+
 #include <linux/kdev_t.h>	/* 1.3.xx needs this */
 #include <linux/sched.h>	/* sleep,wake,... */
 #include <linux/wait.h>
