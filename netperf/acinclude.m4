@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.2 2004/08/05 20:29:01 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.4 2004/08/06 12:43:59 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,14 +53,16 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/05 20:29:01 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 12:43:59 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/public.m4])
 m4_include([m4/streams.m4])
-m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/xns.m4])
+m4_include([m4/inet.m4])
+m4_include([m4/sctp.m4])
 m4_include([m4/man.m4])
 m4_include([m4/rpm.m4])
 
@@ -74,10 +76,17 @@ AC_DEFUN([AC_NETPERF], [dnl
     _MAN_CONVERSION
     _RPM_SPEC
     _STREAMS
-    _XNS
-    _XTI
-    AM_CPPFLAGS="-I- -imacros ./config.h${xns_cv_includes:+ -I}${xns_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    AC_SUBST([AM_CPPFLAGS])
+    if test :"${streams_cv_package:-no}" != :no ; then
+        _XNS
+        _XTI
+        if test :"${xti_cv_includes:-no}" != :no ; then
+            _INET
+            _SCTP
+        fi
+    fi
+    CPPFLAGS="-I- -imacros ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    LDADD="$STREAMS_LDADD"
+    AC_SUBST([LDADD])
     _NETPERF_OUTPUT
 ])# AC_NETPERF
 # =========================================================================
@@ -116,18 +125,60 @@ AC_DEFUN([_NETPERF_OPTIONS], [dnl
              @<:@default=yes@:>@]),
         [netperf_cv_do_dlpi="$enableval"],
         [netperf_cv_do_dlpi='yes'])
+    AC_ARG_ENABLE([netperf-do-sctp],
+        AS_HELP_STRING([--enable-netperf-do-sctp],
+            [enable code to test the SCTP implementation
+             @<:@default=yes@:>@]),
+        [netperf_cv_do_sctp="$enableval"],
+        [netperf_cv_do_sctp='yes'])
+    AC_ARG_ENABLE([netperf-do-select],
+        AS_HELP_STRING([--enable-netperf-select],
+            [enable code to perform select() on receive
+             @<:@default=yes@:>@]),
+        [netperf_cv_do_select="$enableval"],
+        [netperf_cv_do_select='yes'])
+    AC_ARG_ENABLE([netperf-do-lwp],
+        AS_HELP_STRING([--enable-netperf-lwp],
+            [enable code for light weight processes
+             @<:@default=no@:>@]),
+        [netperf_cv_do_lwp="$enableval"],
+        [netperf_cv_do_lwp='no'])
+    AC_ARG_ENABLE([netperf-do-nbrr],
+        AS_HELP_STRING([--enable-netperf-nbrr],
+            [enable code for non-blocking request/response
+             @<:@default=yes@:>@]),
+        [netperf_cv_do_nbrr="$enableval"],
+        [netperf_cv_do_nbrr='yes'])
     AC_ARG_ENABLE([netperf-do-xti],
         AS_HELP_STRING([--enable-netperf-do-xti],
             [enable code to test the XTI implementation
              @<:@default=yes@:>@]),
         [netperf_cv_do_xti="$enableval"],
         [netperf_cv_do_xti='yes'])
+    AC_ARG_ENABLE([netperf-do-xti-sctp],
+        AS_HELP_STRING([--enable-netperf-do-xti-sctp],
+            [enable code to test the XTI SCTP implementation
+             @<:@default=yes@:>@]),
+        [netperf_cv_do_xti_sctp="$enableval"],
+        [netperf_cv_do_xti_sctp='yes'])
     AC_ARG_ENABLE([netperf-do-unix],
         AS_HELP_STRING([--enable-netperf-do-unix],
             [enable code to test the Unix domain implementation
              @<:@default=yes@:>@]),
         [netperf_cv_do_unix="$enableval"],
         [netperf_cv_do_unix='yes'])
+    AC_ARG_ENABLE([netperf-do-1644],
+        AS_HELP_STRING([--enable-netperf-do-1644],
+            [enable code to test the transactions
+             @<:@default=yes@:>@]),
+        [netperf_cv_do_1644="$enableval"],
+        [netperf_cv_do_1644='yes'])
+    AC_ARG_ENABLE([netperf-do-first-burst],
+        AS_HELP_STRING([--enable-netperf-do-first-burst],
+            [enable first burst code
+             @<:@default=yes@:>@]),
+        [netperf_cv_do_first_burst="$enableval"],
+        [netperf_cv_do_first_burst='yes'])
     AC_ARG_WITH([netperf-debug-log-file],
         AS_HELP_STRING([--with-netperf-debug-log-file=LOGFILE],
             [specify the LOGFILE to which debug output is written
@@ -167,9 +218,9 @@ AC_DEFUN([_NETPERF_OPTIONS], [dnl
     AC_ARG_ENABLE([netperf-do-dns],
         AS_HELP_STRING([--enable-netperf-dns],
             [enable tests that measure the performance of a DNS server
-             @<:@default=no@:>@]),
+             @<:@default=yes@:>@]),
         [netperf_cv_do_dns="$enableval"],
-        [netperf_cv_do_dns='no'])
+        [netperf_cv_do_dns='yes'])
     AC_ARG_ENABLE([netperf-use-sysctl],
         AS_HELP_STRING([--enable-netperf-use-sysctl],
             [enable CPU utilization measurements with sysctl()
@@ -182,6 +233,12 @@ AC_DEFUN([_NETPERF_OPTIONS], [dnl
              @<:@default=no@:>@]),
         [netperf_cv_use_perfstat="$enableval"],
         [netperf_cv_use_perfstat="${ac_cv_func_perfstat:-no}"])
+    AC_ARG_ENABLE([netperf-dont-wait],
+        AS_HELP_STRING([--enable-netperf-dont-wait],
+            [enable to not wait for children to exit
+             @<:@default=no@:>@]),
+        [netperf_cv_dont_wait="$enableval"],
+        [netperf_cv_dont_wait='no'])
 ])# _NETPERF_OPTIONS
 # =========================================================================
 
@@ -224,14 +281,64 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
             Define to include code to test the DLPI implementation.
         ])dnl
     fi
-    AC_MSG_RESULT([${netperf_cv_do_xti:-no}])
+    AC_MSG_RESULT([${netperf_cv_do_dlpi:-no}])
+    AC_MSG_CHECKING([for netperf do sctp])
+    if test :"${sctp_cv_openss7:-no}" = :yes ; then
+        netperf_cv_do_sctp=yes
+    else
+        netperf_cv_do_sctp=no
+    fi
+    if test :"${netperf_cv_do_sctp:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_SCTP], [], [
+            Define to include code to test the SCTP implementation.
+        ])
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_sctp:-no}])
+    AC_MSG_CHECKING([for netperf do select])
+    if test :"${netperf_cv_do_select:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_SELECT], [], [
+            Define to do select() on receive.
+        ])
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_select:-no}])
+    AC_MSG_CHECKING([for netperf do lwp])
+    if test :"${netperf_cv_do_lwp:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_LWP], [], [
+        ])
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_lwp:-no}])
+    AC_MSG_CHECKING([for netperf do nbrr])
+    if test :"${netperf_cv_do_nbrr:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_NBRR], [], [
+            Define to do non-blocking request/response.
+        ])
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_nbrr:-no}])
     AC_MSG_CHECKING([for netperf do xti])
+    if test -n "$inet_cv_includes" ; then
+        netperf_cv_do_xti=yes
+    else
+        netperf_cv_do_xti=no
+        netperf_cv_do_xti_sctp=no
+    fi
     if test :"${netperf_cv_do_xti:-no}" = :yes ; then
         AC_DEFINE_UNQUOTED([DO_XTI], [], [
             Define to include code to test the XTI implementation.
         ])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_xti:-no}])
+    AC_MSG_CHECKING([for netperf do xti sctp])
+    if test -n "$inet_cv_includes" -a -n "$sctp_cv_includes" ; then
+        netperf_cv_do_xti_sctp=yes
+    else
+        netperf_cv_do_xti_sctp=no
+    fi
+    if test :"${netperf_cv_do_xti_sctp:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_XTI_SCTP], [], [
+            Define to include code to test the XTI SCTP implementation.
+        ])dnl
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_xti_sctp:-no}])
     AC_MSG_CHECKING([for netperf do unix])
     if test :"${netperf_cv_do_unix:-no}" = :yes ; then
         AC_DEFINE_UNQUOTED([DO_UNIX], [], [
@@ -239,6 +346,20 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
         ])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_unix:-no}])
+    AC_MSG_CHECKING([for netperf do 1644])
+    if test :"${netperf_cv_do_1644:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_1644], [], [
+            Define to include code to test T/TCP vs TCP transactions.
+        ])dnl
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_first_burst:-no}])
+    AC_MSG_CHECKING([for netperf do first burst])
+    if test :"${netperf_cv_do_first_burst:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DO_FIRST_BURST], [], [
+            Define to include code to create an initial burst.
+        ])dnl
+    fi
+    AC_MSG_RESULT([${netperf_cv_do_first_burst:-no}])
     AC_MSG_CHECKING([for netperf debug log file])
     if test -n "$netperf_cv_debug_log_file" ; then
         AC_DEFINE_UNQUOTED([DEBUG_LOG_FILE], ["$netperf_cv_debug_log_file"], [
@@ -318,6 +439,12 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
         ])dnl
     fi
     AC_MSG_RESULT([${netperf_cv_do_dns:-no}])
+    AC_MSG_CHECKING([for netperf dont wait])
+    if test :"${netperf_cv_dont_wait:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([DONT_WAIT], [], [
+        ])dnl
+    fi
+    AC_MSG_RESULT([${netperf_cv_dont_wait:-no}])
 ])# _NETPERF_OUTPUT
 # =========================================================================
 

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 1.1.2.3 2004/08/06 12:44:08 brian Exp $
+dnl @(#) $Id: inet.m4,v 1.1.2.2 2004/08/06 12:44:08 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -57,48 +57,51 @@ dnl
 dnl =========================================================================
 
 # =========================================================================
-# _XTI
+# _INET
 # -------------------------------------------------------------------------
-AC_DEFUN([_XTI], [dnl
-    AC_REQUIRE([_STREAMS])dnl
-    _XTI_OPTIONS
-    _XTI_SETUP dnl
-])# _XTI
+# Check for the existence of INET header files, particularly sys/xti_inet.h.
+# INET headers files are required for building the XTI interface for SCTP.
+# Without INET header files, the INET interface to SCTP will not be built.
+# -------------------------------------------------------------------------
+AC_DEFUN([_INET], [dnl
+    AC_REQUIRE([_XTI])dnl
+    _INET_OPTIONS
+    _INET_SETUP dnl
+])# _INET
 # =========================================================================
 
 # =========================================================================
-# _XTI_OPTIONS
+# 
 # -------------------------------------------------------------------------
-AC_DEFUN([_XTI_OPTIONS], [dnl
-    AC_ARG_WITH([xti],
-                AC_HELP_STRING([--with-xti=HEADERS],
-                               [specify the XTI header file directory.
-                               @<:@default=$INCLUDEDIR/xti@:>@]),
-                [with_xti=$withval],
-                [with_xti=''])
-])# _XTI_OPTIONS
+AC_DEFUN([_INET_OPTIONS], [dnl
+    AC_ARG_WITH([inet],
+        AC_HELP_STRING([--with-inet=HEADERS],
+            [specify the INET header file directory.
+            @<:@default=$INCLUDEDIR/strinet@:>@]),
+        [with_inet="$withval"],
+        [with_inet=''])
+])# _INET_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _XTI_SETUP
+# _INET_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_XTI_SETUP], [dnl
-    _XTI_CHECK_HEADERS
-    _XTI_DEFINES
-])# _XTI_SETUP
-# =========================================================================
-
-# =========================================================================
-# _XTI_CHECK_HEADERS
-# -------------------------------------------------------------------------
-AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
-    # Test for the existence of Linux STREAMS XTI header files.  The package
-    # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
-    # files (or both) to compile.
-    if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
-        xti_cv_includes="$with_xti"
+AC_DEFUN([_INET_SETUP], [dnl
+    # Test for the existence of Linux STREAMS INET header files.  The package
+    # normally requires INET header files to compile.
+    if test ":${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ;  then
+        inet_cv_includes="$with_inet"
     else
-        eval "xti_search_path=\"
+        eval "inet_search_path=\"
+            $streams_cv_rootdir$includedir/strinet
+            $streams_cv_rootdir$streams_cv_prefix$oldincludedir/strinet
+            $streams_cv_rootdir$streams_cv_prefix/usr/include/strinet
+            $streams_cv_rootdir$streams_cv_prefix/usr/local/include/strinet
+            $streams_cv_rootdir$streams_cv_prefix/usr/src/strinet/src/include
+            $streams_cv_rootdir$oldincludedir/strinet
+            $streams_cv_rootdir/usr/include/strinet
+            $streams_cv_rootdir/usr/local/include/strinet
+            $streams_cv_rootdir/usr/src/strinet/src/include
             $streams_cv_rootdir$includedir/strxnet
             $streams_cv_rootdir$streams_cv_prefix$oldincludedir/strxnet
             $streams_cv_rootdir$streams_cv_prefix/usr/include/strxnet
@@ -107,53 +110,57 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
             $streams_cv_rootdir$oldincludedir/strxnet
             $streams_cv_rootdir/usr/include/strxnet
             $streams_cv_rootdir/usr/local/include/strxnet
-            $streams_cv_rootdir/usr/src/strxnet/src/include\""
-        xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-        xti_cv_includes=
-        for xti_dir in $xti_search_path ; do
-            AC_MSG_CHECKING([for xti include directory $xti_dir])
-            if test -d "$xti_dir" -a -r "$xti_dir/xti.h" ; then
-                xti_cv_includes="$xti_dir"
+            $streams_cv_rootdir/usr/src/strxnet/src/include
+            $streams_cv_rootdir$includedir/streams
+            $streams_cv_rootdir$streams_cv_prefix$oldincludedir/streams
+            $streams_cv_rootdir$streams_cv_prefix/usr/include/streams
+            $streams_cv_rootdir$streams_cv_prefix/usr/local/include/streams
+            $streams_cv_rootdir$streams_cv_prefix/usr/src/streams/src/include
+            $streams_cv_rootdir$oldincludedir/streams
+            $streams_cv_rootdir/usr/include/streams
+            $streams_cv_rootdir/usr/local/include/streams
+            $streams_cv_rootdir/usr/src/streams/include
+            $streams_cv_rootdir$includedir/LiS
+            $streams_cv_rootdir$streams_cv_prefix$oldincludedir/LiS
+            $streams_cv_rootdir$streams_cv_prefix/usr/include/LiS
+            $streams_cv_rootdir$streams_cv_prefix/usr/local/include/LiS
+            $streams_cv_rootdir$streams_cv_prefix/usr/src/LiS/include
+            $streams_cv_rootdir$oldincludedir/LiS
+            $streams_cv_rootdir/usr/include/LiS
+            $streams_cv_rootdir/usr/local/include/LiS
+            $streams_cv_rootdir/usr/src/LiS/include\""
+        inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+        inet_cv_includes=
+        for inet_dir in $inet_search_path ; do
+            AC_MSG_CHECKING([for inet include directory $inet_dir])
+            if test -d "$inet_dir" -a -r "$inet_dir/sys/xti_inet.h" ; then
+                inet_cv_includes="$inet_dir"
                 AC_MSG_RESULT([yes])
                 break
             fi
             AC_MSG_RESULT([no])
         done
     fi
-    AC_MSG_CHECKING([for xti include directory])
-    AC_MSG_RESULT([${xti_cv_includes:-no}])
-    if test :"${xti_cv_includes:-no}" = :no ; then
+    AC_MSG_CHECKING([for inet include directory])
+    AC_MSG_RESULT([${inet_cv_includes:-no}])
+    if test :"${inet_cv_includes:-no}" = :no ; then
         :
-#	AC_MSG_ERROR([
-#*** 
-#*** Could not find XTI include directories.  This package requires the
-#*** presence of XTI include directories to compile.  Specify the location of
-#*** XTI include directories with option --with-xti to configure and try again.
-#*** 
-#	])
-    else
-        : # this should be an XOPEN flag
-# 	AC_DEFINE([_LIS_SOURCE], [1], [Define when compiling for LiS.])
-        AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
-            Define for SuSv3.  This is necessary for LiS and LFS and strxnet
-            for that matter.
-            ])
+#        AC_MSG_ERROR([
+#***
+#*** Could not find INET include directories.  This package requires the
+#*** presence of INET include directories to compile.  Specify the location of
+#*** INET include directories with option --with-inet to configure and try again.
+#***
+#        ])
     fi
-])# _XTI_CHECK_HEADERS
+])# _INET_SETUP
 # =========================================================================
 
 # =========================================================================
-# _XTI_DEFINES
+# _INET_
 # -------------------------------------------------------------------------
-AC_DEFUN([_XTI_DEFINES], [dnl
-])# _XTI_DEFINES
-# =========================================================================
-
-# =========================================================================
-# _XTI_
-# -------------------------------------------------------------------------
-AC_DEFUN([_XTI_], [dnl
-])# _XTI_
+AC_DEFUN([_INET_], [dnl
+])# _INET_
 # =========================================================================
 
 dnl =========================================================================
@@ -164,3 +171,4 @@ dnl
 dnl =========================================================================
 dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
+

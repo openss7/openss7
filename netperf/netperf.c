@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.2 $) $Date: 2004/08/06 03:47:22 $
+ @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 10:40:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+ Last Modified $Date: 2004/08/06 10:40:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.2 $) $Date: 2004/08/06 03:47:22 $"
+#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 10:40:45 $"
 
-static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.2 $) $Date: 2004/08/06 03:47:22 $";
+static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 10:40:45 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -172,7 +172,10 @@ if (debug) {
 
 establish_control(host_name,test_port);
 
-if (strcasecmp(test_name,"SCTP_STREAM") == 0) {
+if (0) {
+}
+#ifdef DO_SCTP
+else if (strcasecmp(test_name,"SCTP_STREAM") == 0) {
 	send_sctp_stream(host_name);
 }
 else if (strcasecmp(test_name,"SCTP_MAERTS") == 0) {
@@ -202,6 +205,7 @@ else if (strcasecmp(test_name,"SCTP_NBRR") == 0) {
 	send_sctp_nbrr(host_name);
 }
 #endif /* DO_NBRR */
+#endif	/* DO_SCTP */
 else if (strcasecmp(test_name,"TCP_STREAM") == 0) {
 	send_tcp_stream(host_name);
 }
