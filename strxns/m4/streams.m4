@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.15 2004/11/07 09:31:10 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.17 2004/11/08 04:02:32 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/07 09:31:10 $ by $Author: brian $
+dnl Last Modified $Date: 2004/11/08 04:02:32 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -186,8 +186,12 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
             ])
             ;;
     esac
-    STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
-    STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
+    for streams_include in $streams_cv_includes ; do
+        STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
+    done
+    for streams_include in $streams_cv_xti_includes ; do
+        STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_include}"
+    done
     AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_package:-LiS}" = :LiS])
     AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_package:-LiS}" = :LfS])
 ])# _LINUX_STREAMS_SETUP
@@ -247,7 +251,7 @@ dnl AC_MSG_CHECKING([for streams lis include directory])
         else
             # new place for modversions
             if test -n "$streams_cv_lis_includes" -a -f "$streams_cv_lis_includes/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" ; then
-                streams_cv_lis_includes="$streams_cv_lis_includes/$linux_cv_k_release/$target_cpu -I$streams_cv_lis_includes"
+                streams_cv_lis_includes="$streams_cv_lis_includes/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
                 streams_cv_lis_modversions='yes'
             else
                 streams_cv_lis_modversions='no'
@@ -322,7 +326,7 @@ dnl AC_MSG_CHECKING([for streams lfs include directory])
         else
             # new place for modversions
             if test -n "$streams_cv_lfs_includes" -a -f "$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
-                streams_cv_lfs_includes="$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu -I$streams_lfs_includes"
+                streams_cv_lfs_includes="$streams_cv_lfs_includes/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
                 streams_cv_lfs_modversions='yes'
             else
                 streams_cv_lfs_modversions='no'
