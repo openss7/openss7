@@ -68,6 +68,8 @@ static char const ident[] = "echo.c,v (0.9.2.2) 2003/10/21 21:50:08";
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#include "sys/config.h"
+
 #include "strdebug.h"
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for ap_get/ap_put */
@@ -92,16 +94,16 @@ MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
 MODULE_LICENSE(ECHO_LICENSE);
 
 #ifndef CONFIG_STREAMS_ECHO_NAME
-#define CONFIG_STREAMS_ECHO_NAME "echo"
-//#error "CONFIG_STREAMS_ECHO_NAME must be defined."
+//#define CONFIG_STREAMS_ECHO_NAME "echo"
+#error "CONFIG_STREAMS_ECHO_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_ECHO_MODID
-#define CONFIG_STREAMS_ECHO_MODID 2
-//#error "CONFIG_STREAMS_ECHO_MODID must be defined."
+//#define CONFIG_STREAMS_ECHO_MODID 2
+#error "CONFIG_STREAMS_ECHO_MODID must be defined."
 #endif
 #ifndef CONFIG_STREAMS_ECHO_MAJOR
-#define CONFIG_STREAMS_ECHO_MAJOR 0
-//#error "CONFIG_STREAMS_ECHO_MAJOR must be defined."
+//#define CONFIG_STREAMS_ECHO_MAJOR 0
+#error "CONFIG_STREAMS_ECHO_MAJOR must be defined."
 #endif
 
 static unsigned short major = CONFIG_STREAMS_ECHO_MAJOR;

@@ -78,6 +78,8 @@ static char const ident[] =
 
 #include "strdebug.h"
 
+#include "sys/config.h"
+
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define PIPEMOD_REVISION	"LfS pipemod.c,v (0.9.2.8) 2003/10/21 21:50:19"
@@ -98,12 +100,12 @@ MODULE_SUPPORTED_DEVICE(PIPEMOD_DEVICE);
 MODULE_LICENSE(PIPEMOD_LICENSE);
 
 #ifndef CONFIG_STREAMS_PIPEMOD_NAME
-#define CONFIG_STREAMS_PIPEMOD_NAME "pipemod"
-//#error "CONFIG_STREAMS_PIPEMOD_NAME must be defined."
+//#define CONFIG_STREAMS_PIPEMOD_NAME "pipemod"
+#error "CONFIG_STREAMS_PIPEMOD_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_PIPEMOD_MODID
-#define CONFIG_STREAMS_PIPEMOD_MODID 13
-//#error "CONFIG_STREAMS_PIPEMOD_MODID must be defined."
+//#define CONFIG_STREAMS_PIPEMOD_MODID 13
+#error "CONFIG_STREAMS_PIPEMOD_MODID must be defined."
 #endif
 
 static modID_t modid = CONFIG_STREAMS_PIPEMOD_MODID;

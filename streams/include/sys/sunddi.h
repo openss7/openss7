@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9.2.2 2004/03/01 06:26:59 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.3 2004/03/02 05:31:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/01 06:26:59 $ by $Author: brian $
+ Last Modified $Date: 2004/03/02 05:31:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SUNDDI_H__
-#define __SUNDDI_H__
+#ifndef __SYS_SUNDDI_H__
+#define __SYS_SUNDDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -414,4 +414,4 @@ extern int ddi_unmap_regs(void);
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
 #endif				/* CONFIG_STREAMS_COMPAT_SUN */
 
-#endif				/* __SUNDDI_H__ */
+#endif				/* __SYS_SUNDDI_H__ */

@@ -49,13 +49,17 @@
 
  *****************************************************************************/
 
-#ifndef __LINUX_SAD_H__
-#define __LINUX_SAD_H__
+#ifndef __SYS_SAD_H__
+#define __SYS_SAD_H__
 
 #define SAD_IOC_MAGIC	'D'
 #define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/* set autopush */
 #define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/* get autopush */
 #define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/* validate modules */
+
+#ifndef MAX_APUSH
+#define MAX_APUSH 8
+#endif
 
 #define MAXAPUSH MAX_APUSH
 
@@ -75,4 +79,4 @@ struct strapush {
 #define SAP_ALL		0x03		/* add etnry for all minors */
 #define SAP_CLONE	0x04		/* mark clonable minor device */
 
-#endif				/* __LINUX_SAD_H__ */
+#endif				/* __SYS_SAD_H__ */

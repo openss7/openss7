@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRDEBUG_H__
-#define __LOCAL_STRDEBUG_H__
+#ifndef __SYS_STRDEBUG_H__
+#define __SYS_STRDEBUG_H__
 
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -177,4 +177,4 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #endif
 
-#endif				/* __LOCAL_STRDEBUG_H__ */
+#endif				/* __SYS_STRDEBUG_H__ */

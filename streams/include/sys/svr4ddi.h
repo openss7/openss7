@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __SVR4DDI_H__
-#define __SVR4DDI_H__
+#ifndef __SYS_SVR4DDI_H__
+#define __SYS_SVR4DDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -233,4 +233,4 @@ do { if (!(__exp)) { panic("assertion failed: " #__exp ", file: " __FILE__ ", li
 #warning "_SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4"
 #endif				/* CONFIG_STREAMS_COMPAT_SVR4 */
 
-#endif				/* __SVR4DDI_H__ */
+#endif				/* __SYS_SVR4DDI_H__ */

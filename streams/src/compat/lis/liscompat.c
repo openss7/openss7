@@ -926,7 +926,13 @@ const char *lis_pcibios_strerror(int error)
 EXPORT_SYMBOL_GPL(lis_pcibios_strerror);
 void lis_pcibios_init(void)
 {
-	return WARN(pcibios_init());
+#ifdef HAVE_PCIBIOS_INIT_ADDR
+	typeof(&pcibios_init) _pcibios_init
+		= (typeof(_pcibios_init))HAVE_PCIBIOS_INIT_ADDR;
+	return WARN(_pcibios_init());
+#else
+	swerr();
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_pcibios_init);
 int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
@@ -1762,7 +1768,9 @@ EXPORT_SYMBOL_GPL(lis_get_free_pages_kernel_fcn);
  */
 int lis_mknod(char *name, int mode, dev_t dev)
 {
-	asmlinkage long sys_mknod(const char *filename, int mode, dev_t dev);
+#ifdef HAVE_SYS_MKNOD_ADDR
+	asmlinkage long (*sys_mknod)(const char *filename, int mode, dev_t dev)
+		= (typeof(sys_mknod))HAVE_SYS_MKNOD_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 	old_fs = get_fs();
@@ -1770,11 +1778,17 @@ int lis_mknod(char *name, int mode, dev_t dev)
 	ret = WARN(sys_mknod(name, mode, dev));
 	set_fs(old_fs);
 	return ret;
+#else
+	swerr();
+	return (-ENOSYS);
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_mknod);
 int lis_unlink(char *name)
 {
-	asmlinkage long sys_unlink(const char *pathname);
+#ifdef HAVE_SYS_UNLINK_ADDR
+	asmlinkage long (*sys_unlink)(const char *pathname)
+		= (typeof(sys_unlink))HAVE_SYS_UNLINK_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 	old_fs = get_fs();
@@ -1782,12 +1796,18 @@ int lis_unlink(char *name)
 	ret = WARN(sys_unlink(name));
 	set_fs(old_fs);
 	return ret;
+#else
+	swerr();
+	return (-ENOSYS);
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_unlink);
 int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag, void *data)
 {
-	asmlinkage long sys_mount(char *dev_name, char *dir_name, char *type,
-				  unsigned long flags, void *data);
+#ifdef HAVE_SYS_MOUNT_ADDR
+	asmlinkage long (*sys_mount)(char *dev_name, char *dir_name, char *type,
+				  unsigned long flags, void *data)
+		= (typeof(sys_mount))HAVE_SYS_MOUNT_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 	old_fs = get_fs();
@@ -1795,11 +1815,17 @@ int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag
 	ret = WARN(sys_mount(dev_name, dir_name, fstype, rwflag, data));
 	set_fs(old_fs);
 	return ret;
+#else
+	swerr();
+	return (-ENOSYS);
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_mount);
 int lis_umount2(char *path, int flags)
 {
-	asmlinkage long sys_umount(char *name, int flags);
+#ifdef HAVE_SYS_UMOUNT_ADDR
+	asmlinkage long (*sys_umount)(char *name, int flags)
+		= (typeof(sys_umount))HAVE_SYS_UMOUNT_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 	old_fs = get_fs();
@@ -1807,18 +1833,32 @@ int lis_umount2(char *path, int flags)
 	ret = WARN(sys_umount(path, flags));
 	set_fs(old_fs);
 	return ret;
+#else
+	swerr();
+	return (-ENOSYS);
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_umount2);
 int lis_fattach(struct file *f, const char *path)
 {
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 	long do_fattach(const struct file *f, const char *path);
 	return WARN(do_fattach(f, path));
+#else
+	swerr();
+	return (-ENOSYS);
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_fattach);
 int lis_fdetach(const char *path)
 {
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 	long do_fdetach(const char *path);
 	return WARN(do_fdetach(path));
+#else
+	swerr();
+	return (-ENOSYS);
+#endif
 }
 EXPORT_SYMBOL_GPL(lis_fdetach);
 int lis_pipe(unsigned int *fd)

@@ -74,6 +74,8 @@ static char const ident[] =
 
 #include "strdebug.h"
 
+#include "sys/config.h"
+
 #define SOCKMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SOCKMOD_REVISION	"LfS sockmod.c,v (0.9.2.10) 2003/10/21 21:50:19"
@@ -94,12 +96,12 @@ MODULE_SUPPORTED_DEVICE(SOCKMOD_DEVICE);
 MODULE_LICENSE(SOCKMOD_LICENSE);
 
 #ifndef CONFIG_STREAMS_SOCKMOD_NAME
-#define CONFIG_STREAMS_SOCKMOD_NAME "sockmod"
-//#error "CONFIG_STREAMS_SOCKMOD_NAME must be defined."
+//#define CONFIG_STREAMS_SOCKMOD_NAME "sockmod"
+#error "CONFIG_STREAMS_SOCKMOD_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_SOCKMOD_MODID
-#define CONFIG_STREAMS_SOCKMOD_MODID 14
-//#error "CONFIG_STREAMS_SOCKMOD_MODID must be defined."
+//#define CONFIG_STREAMS_SOCKMOD_MODID 14
+#error "CONFIG_STREAMS_SOCKMOD_MODID must be defined."
 #endif
 
 static modID_t modid = CONFIG_STREAMS_SOCKMOD_MODID;

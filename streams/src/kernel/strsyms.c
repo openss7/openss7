@@ -119,6 +119,7 @@ static char const ident[] =
 #include "strhead.h"			/* for str_minfo */
 #include "strsysctl.h"
 #include "strfifo.h"
+#include "strattach.h"
 
 EXPORT_SYMBOL_NOVERS(adjmsg);		/* stream.h */
 EXPORT_SYMBOL_NOVERS(allocb);		/* stream.h */
@@ -276,8 +277,8 @@ EXPORT_SYMBOL_NOVERS(strthreads);	/* strsched.h */
 #endif
 
 #if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) || \
-	defined(CONFIG_STREAMS_FIFOS_MODULE) || \
-	defined(CONFIG_STREAMS_PIPES_MODULE)
+	defined(CONFIG_STREAMS_FIFO_MODULE) || \
+	defined(CONFIG_STREAMS_PIPE_MODULE)
 EXPORT_SYMBOL_NOVERS(allocsd);		/* strsched.h */
 EXPORT_SYMBOL_NOVERS(autopush);		/* strhead.h */
 EXPORT_SYMBOL_NOVERS(freesd);		/* strsched.h */
@@ -307,6 +308,10 @@ EXPORT_SYMBOL_NOVERS(sdev_put);		/* strsubr.h */
 EXPORT_SYMBOL_NOVERS(smod_get);		/* strsubr.h */
 EXPORT_SYMBOL_NOVERS(smod_put);		/* strsubr.h */
 EXPORT_SYMBOL_NOVERS(vcmn_err);		/* cmn_err.h */
+#ifdef HAVE_KERNEL_FATTACH_SUPPORT
+EXPORT_SYMBOL_NOVERS(do_fattach);	/* strattach.h */
+EXPORT_SYMBOL_NOVERS(do_fdetach);	/* strattach.h */
+#endif
 #endif
 #endif
 

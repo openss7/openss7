@@ -84,9 +84,9 @@ static char const ident[] =
 #include "strhead.h"		/* for stream operations */
 #include "strreg.h"		/* extern verification and str_args */
 
-#ifndef CONFIG_STREAMS_FIFOS_MAJOR
-#define CONFIG_STREAMS_FIFOS_MAJOR 211
-//#error "CONFIG_STREAMS_FIFOS_MAJOR must be defined."
+#ifndef CONFIG_STREAMS_FIFO_MAJOR
+#define CONFIG_STREAMS_FIFO_MAJOR 211
+//#error "CONFIG_STREAMS_FIFO_MAJOR must be defined."
 #endif
 #ifndef CONFIG_STREAMS_SOCKSYS_MAJOR
 #define CONFIG_STREAMS_SOCKSYS_MAJOR 40
@@ -277,14 +277,29 @@ static struct dentry *create_hash(struct qstr *name, struct dentry *base)
 	return (ERR_PTR(err));
 }
 
+#ifndef HAVE_FILE_MOVE_ADDR
+static void _file_move(struct file *file, struct list_head *list)
+{
+	if (!list)
+		return;
+	file_list_lock();
+	list_del(&file->f_list);
+	list_add(&file->f_list, list);
+	file_list_unlock();
+}
+#endif
+
 void file_swap_put(struct file *f1, struct file *f2)
 {
+#ifdef HAVE_FILE_MOVE_ADDR
+	typeof(&file_move) _file_move = (typeof(_file_move))HAVE_FILE_MOVE_ADDR;
+#endif
 	f1->f_op = xchg(&f2->f_op, f1->f_op);
 	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
 	f1->f_vfsmnt = xchg(&f2->f_vfsmnt, f1->f_vfsmnt);
 	f1->private_data = xchg(&f2->private_data, f1->private_data);
-	file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
-	file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
+	_file_move(f1, &f1->f_dentry->d_inode->i_sb->s_files);
+	_file_move(f2, &f2->f_dentry->d_inode->i_sb->s_files);
 	fput(f2);
 }
 
@@ -365,9 +380,9 @@ static int spec_open(struct inode *inode, struct file *file)
 	};
 	int err;
 	switch (inode->i_mode & S_IFMT) {
-#ifdef CONFIG_STREAMS_FIFOS
+#ifdef CONFIG_STREAMS_FIFO
 	case S_IFIFO:
-		args.dev = makedevice(CONFIG_STREAMS_FIFOS_MAJOR, 0);
+		args.dev = makedevice(CONFIG_STREAMS_FIFO_MAJOR, 0);
 		break;
 #endif
 #ifdef CONFIG_STREAMS_SOCKSYS

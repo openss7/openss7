@@ -71,6 +71,8 @@ static char const ident[] =
 #include "strdebug.h"
 #include "strreg.h"		/* for strm_open() and str_args */
 
+#include "sys/config.h"
+
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define CLONE_REVISION	"LfS strclone.c,v (0.9.2.10) 2003/10/21 21:50:19"
@@ -91,16 +93,16 @@ MODULE_SUPPORTED_DEVICE(CLONE_DEVICE);
 MODULE_LICENSE(CLONE_LICENSE);
 
 #ifndef CONFIG_STREAMS_CLONE_NAME
-#define CONFIG_STREAMS_CLONE_NAME "clone"
-//#error "CONFIG_STREAMS_CLONE_NAME must be defined."
+//#define CONFIG_STREAMS_CLONE_NAME "clone"
+#error "CONFIG_STREAMS_CLONE_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_CLONE_MODID
-#define CONFIG_STREAMS_CLONE_MODID 5
-//#error "CONFIG_STREAMS_CLONE_MODID must be defined."
+//#define CONFIG_STREAMS_CLONE_MODID 5
+#error "CONFIG_STREAMS_CLONE_MODID must be defined."
 #endif
 #ifndef CONFIG_STREAMS_CLONE_MAJOR
-#define CONFIG_STREAMS_CLONE_MAJOR 54
-//#error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
+//#define CONFIG_STREAMS_CLONE_MAJOR 54
+#error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
 #endif
 
 static unsigned short major = CONFIG_STREAMS_CLONE_MAJOR;

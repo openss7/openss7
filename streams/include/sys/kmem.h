@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __KMEM_H__
-#define __KMEM_H__ 1
+#ifndef __SYS_KMEM_H__
+#define __SYS_KMEM_H__ 1
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -95,4 +95,4 @@ __EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
 	return (mem);
 }
 
-#endif				/* __KMEM_H__ */
+#endif				/* __SYS_KMEM_H__ */

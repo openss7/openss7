@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __AXIDDI_H__
-#define __AXIDDI_H__
+#ifndef __SYS_AXIDDI_H__
+#define __SYS_AXIDDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -90,4 +90,4 @@ __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
 #warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
 #endif
 
-#endif				/* __AXIDDI_H__ */
+#endif				/* __SYS_AXIDDI_H__ */

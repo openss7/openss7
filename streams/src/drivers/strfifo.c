@@ -72,6 +72,8 @@
 #include "strhead.h"		/* for autopush */
 #include "strfifo.h"		/* extern verification */
 
+#include "sys/config.h"
+
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define FIFO_REVISION	"LfS strfifo.c,v (0.9.2.16) 2003/10/26 17:25:54"
@@ -91,20 +93,20 @@ MODULE_DESCRIPTION(FIFO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(FIFO_DEVICE);
 MODULE_LICENSE(FIFO_LICENSE);
 
-#ifndef CONFIG_STREAMS_FIFOS_NAME
-#define CONFIG_STREAMS_FIFOS_NAME "fifo"
-//#error "CONFIG_STREAMS_FIFOS_NAME must be defined."
+#ifndef CONFIG_STREAMS_FIFO_NAME
+//#define CONFIG_STREAMS_FIFO_NAME "fifo"
+#error "CONFIG_STREAMS_FIFO_NAME must be defined."
 #endif
-#ifndef CONFIG_STREAMS_FIFOS_MODID
-#define CONFIG_STREAMS_FIFOS_MODID 6
-//#error "CONFIG_STREAMS_FIFOS_MODID must be defined."
+#ifndef CONFIG_STREAMS_FIFO_MODID
+//#define CONFIG_STREAMS_FIFO_MODID 6
+#error "CONFIG_STREAMS_FIFO_MODID must be defined."
 #endif
-#ifndef CONFIG_STREAMS_FIFOS_MAJOR
-#define CONFIG_STREAMS_FIFOS_MAJOR 0
-//#error "CONFIG_STREAMS_FIFOS_MAJOR must be defined."
+#ifndef CONFIG_STREAMS_FIFO_MAJOR
+//#define CONFIG_STREAMS_FIFO_MAJOR 0
+#error "CONFIG_STREAMS_FIFO_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_FIFOS_MAJOR;
+static unsigned short major = CONFIG_STREAMS_FIFO_MAJOR;
 MODULE_PARM(major, "b");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 
@@ -694,8 +696,8 @@ static int fifo_wsrv(queue_t *q)
 }
 
 static struct module_info fifo_minfo = {
-	mi_idnum:CONFIG_STREAMS_FIFOS_MODID,
-	mi_idname:CONFIG_STREAMS_FIFOS_NAME,
+	mi_idnum:CONFIG_STREAMS_FIFO_MODID,
+	mi_idname:CONFIG_STREAMS_FIFO_NAME,
 	mi_minpsz:0,
 	mi_maxpsz:INFPSZ,
 	mi_hiwat:STRHIGH,
@@ -722,7 +724,7 @@ static struct streamtab fifo_info = {
 };
 
 static struct cdevsw fifo_cdev = {
-	d_name:CONFIG_STREAMS_FIFOS_NAME,
+	d_name:CONFIG_STREAMS_FIFO_NAME,
 	d_str:&fifo_info,
 	d_flag:0,
 	d_fop:&fifo_f_ops,

@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __DKI_H__
-#define __DKI_H__ 1
+#ifndef __SYS_DKI_H__
+#define __SYS_DKI_H__ 1
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -86,4 +86,4 @@ typedef struct lis_cred {
 } lis_cred_t;
 #endif
 
-#endif				/* __DKI_H__ */
+#endif				/* __SYS_DKI_H__ */

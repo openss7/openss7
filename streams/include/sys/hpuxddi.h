@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __HPUXDDI_H__
-#define __HPUXDDI_H__
+#ifndef __SYS_HPUXDDI_H__
+#define __SYS_HPUXDDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -76,4 +76,4 @@ extern spinlock_t *get_sleep_lock(void);
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"
 #endif				/* CONFIG_STREAMS_COMPAT_HPUX */
 
-#endif				/* __HPUXDDI_H__ */
+#endif				/* __SYS_HPUXDDI_H__ */

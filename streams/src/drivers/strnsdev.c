@@ -76,6 +76,8 @@ static char const ident[] =
 #include "strreg.h"
 #include "strhead.h"
 
+#include "sys/config.h"
+
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define NSDEV_REVISION	"LfS strnsdev.c,v (0.9.2.10) 2003/10/21 21:50:21"
@@ -96,16 +98,16 @@ MODULE_SUPPORTED_DEVICE(NSDEV_DEVICE);
 MODULE_LICENSE(NSDEV_LICENSE);
 
 #ifndef CONFIG_STREAMS_NSDEV_NAME
-#define CONFIG_STREAMS_NSDEV_NAME "nsdev"
-//#error "CONFIG_STREAMS_NSDEV_NAME must be defined."
+//#define CONFIG_STREAMS_NSDEV_NAME "nsdev"
+#error "CONFIG_STREAMS_NSDEV_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_NSDEV_MODID
-#define CONFIG_STREAMS_NSDEV_MODID 7
-//#error "CONFIG_STREAMS_NSDEV_MODID must be defined."
+//#define CONFIG_STREAMS_NSDEV_MODID 7
+#error "CONFIG_STREAMS_NSDEV_MODID must be defined."
 #endif
 #ifndef CONFIG_STREAMS_NSDEV_MAJOR
-#define CONFIG_STREAMS_NSDEV_MAJOR 0
-//#error "CONFIG_STREAMS_NSDEV_MAJOR must be defined."
+//#define CONFIG_STREAMS_NSDEV_MAJOR 0
+#error "CONFIG_STREAMS_NSDEV_MAJOR must be defined."
 #endif
 
 static unsigned short major = CONFIG_STREAMS_NSDEV_MAJOR;

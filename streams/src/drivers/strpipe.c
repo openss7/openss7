@@ -74,6 +74,8 @@ static char const ident[] = "strpipe.c,v (0.9.2.14) 2003/10/26 17:25:54";
 #include "strspecfs.h"		/* for specfs_mnt */
 #include "strpipe.h"		/* extern verification */
 
+#include "sys/config.h"
+
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define PIPE_REVISION	"LfS strpipe.c,v (0.9.2.14) 2003/10/26 17:25:54"
@@ -93,26 +95,26 @@ MODULE_DESCRIPTION(PIPE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPE_DEVICE);
 MODULE_LICENSE(PIPE_LICENSE);
 
-#ifndef CONFIG_STREAMS_PIPES_NAME
-#define CONFIG_STREAMS_PIPES_NAME "pipe"
-//#error "CONFIG_STREAMS_PIPES_NAME must be defined."
+#ifndef CONFIG_STREAMS_PIPE_NAME
+//#define CONFIG_STREAMS_PIPE_NAME "pipe"
+#error "CONFIG_STREAMS_PIPE_NAME must be defined."
 #endif
-#ifndef CONFIG_STREAMS_PIPES_MODID
-#define CONFIG_STREAMS_PIPES_MODID 8
-//#error "CONFIG_STREAMS_PIPES_MODID must be defined."
+#ifndef CONFIG_STREAMS_PIPE_MODID
+//#define CONFIG_STREAMS_PIPE_MODID 8
+#error "CONFIG_STREAMS_PIPE_MODID must be defined."
 #endif
-#ifndef CONFIG_STREAMS_PIPES_MAJOR
-#define CONFIG_STREAMS_PIPES_MAJOR 0
-//#error "CONFIG_STREAMS_PIPES_MAJOR must be defined."
+#ifndef CONFIG_STREAMS_PIPE_MAJOR
+//#define CONFIG_STREAMS_PIPE_MAJOR 0
+#error "CONFIG_STREAMS_PIPE_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_PIPES_MAJOR;
+static unsigned short major = CONFIG_STREAMS_PIPE_MAJOR;
 MODULE_PARM(major, "b");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allocation).");
 
 static struct module_info pipe_minfo = {
-	mi_idnum:CONFIG_STREAMS_PIPES_MODID,
-	mi_idname:CONFIG_STREAMS_PIPES_NAME,
+	mi_idnum:CONFIG_STREAMS_PIPE_MODID,
+	mi_idname:CONFIG_STREAMS_PIPE_NAME,
 	mi_minpsz:0,
 	mi_maxpsz:INFPSZ,
 	mi_hiwat:STRHIGH,
@@ -364,7 +366,7 @@ static struct file_operations pipe_ops ____cacheline_aligned = {
 };
 
 static struct cdevsw pipe_cdev = {
-	d_name:CONFIG_STREAMS_PIPES_NAME,
+	d_name:CONFIG_STREAMS_PIPE_NAME,
 	d_str:&pipe_info,
 	d_flag:D_CLONE,
 	d_fop:&pipe_f_ops,

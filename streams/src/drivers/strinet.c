@@ -52,8 +52,7 @@
 
 #ident "@(#) strinet.c,v (0.9.2.5) 2003/10/21 21:50:20"
 
-static char const ident[] =
-    "strinet.c,v (0.9.2.5) 2003/10/21 21:50:20";
+static char const ident[] = "strinet.c,v (0.9.2.5) 2003/10/21 21:50:20";
 
 /* 
  *  This driver provides the functionality of IP (Internet Protocol) over a
@@ -108,8 +107,15 @@ MODULE_DESCRIPTION(INET_DESCRIP);
 MODULE_SUPPORTED_DEVICE(INET_DEVICE);
 MODULE_LICENSE(INET_LICENSE);
 
-#ifndef INET_CMAJOR
-#define INET_CMAJOR	30
+#ifndef CONFIG_STREAMS_INET_MAJOR
+#error CONFIG_STREAMS_INET_MAJOR must be defined
+#endif
+#ifndef CONFIG_STREAMS_INET_NAME
+#error CONFIG_STREAMS_INET_NAME must be defined
+#endif
+#ifndef CONFIG_STREAMS_INET_MODID
+#error CONFIG_STREAMS_INET_MODID must be defined
+#endif
 #define IP_CMINOR	32
 #define ICMP_CMINOR	33
 #define GGP_CMINOR	34
@@ -121,15 +127,10 @@ MODULE_LICENSE(INET_LICENSE);
 #define IDP_CMINOR	40
 #define RAWIP_CMINOR	41
 #define FREE_CMINOR	50
-#endif
 
-#ifndef INET_NMAJOR
-#define INET_NMAJOR 4
-#define INET_NMINOR 256
-#endif
-
-#ifndef INET_IOC_MAGIC
-#define INET_IOC_MAGIC 'i'
+#ifndef CONFIG_STREAMS_INET_NMAJORS
+#define CONFIG_STREAMS_INET_NMAJORS 4
+#define CONFIG_STREAMS_INET_NMINORS 256
 #endif
 
 /* 
@@ -139,16 +140,13 @@ MODULE_LICENSE(INET_LICENSE);
  *
  *  =========================================================================
  */
-#define INET_MOD_NAME	"inet"
-#define INET_MOD_ID	('I'<<8|INET_IOC_MAGIC)
-
 STATIC struct module_info inet_minfo = {
-	mi_idnum:INET_MOD_ID,		/* Module ID number */
-	mi_idname:INET_MOD_NAME,	/* Module name */
-	mi_minpsz:0,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10		/* Lo water mark */
+      mi_idnum:CONFIG_STREAM_INET_MODID, /* Module ID number */
+      mi_idname:CONFIG_STREAMS_INET_NAME, /* Module name */
+      mi_minpsz:0,		/* Min packet size accepted */
+      mi_maxpsz:INFPSZ,		/* Max packet size accepted */
+      mi_hiwat:1 << 15,		/* Hi water mark */
+      mi_lowat:1 << 10		/* Lo water mark */
 };
 
 STATIC int inet_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -158,25 +156,25 @@ STATIC int inet_rput(queue_t *, mblk_t *);
 STATIC int inet_rsrv(queue_t *);
 
 STATIC struct qinit inet_rinit = {
-	qi_putp:inet_rput,		/* Read put (msg from below) */
-	qi_srvp:inet_rsrv,		/* Read queue service */
-	qi_qopen:inet_open,		/* Each open */
-	qi_qclose:inet_close,		/* Last close */
-	qi_minfo:&inet_minfo,		/* Information */
+      qi_putp:inet_rput,	/* Read put (msg from below) */
+      qi_srvp:inet_rsrv,	/* Read queue service */
+      qi_qopen:inet_open,	/* Each open */
+      qi_qclose:inet_close,	/* Last close */
+      qi_minfo:&inet_minfo,	/* Information */
 };
 
 STATIC int inet_wput(queue_t *, mblk_t *);
 STATIC int inet_wsrv(queue_t *);
 
 STATIC struct qinit inet_winit = {
-	qi_putp:inet_wput,		/* Write put (msg from above) */
-	qi_srvp:inet_wsrv,		/* Write queue service */
-	qi_minfo:&inet_minfo,		/* Information */
+      qi_putp:inet_wput,	/* Write put (msg from above) */
+      qi_srvp:inet_wsrv,	/* Write queue service */
+      qi_minfo:&inet_minfo,	/* Information */
 };
 
 STATIC struct streamtab inet_info = {
-	st_rdinit:&inet_rinit,		/* Upper read queue */
-	st_wrinit:&inet_winit,		/* Lower read queue */
+      st_rdinit:&inet_rinit,	/* Upper read queue */
+      st_wrinit:&inet_winit,	/* Lower read queue */
 };
 
 /* 
@@ -490,7 +488,8 @@ STATIC void inet_state_change(struct sock *sk);
 STATIC void inet_write_space(struct sock *sk);
 STATIC void inet_error_report(struct sock *sk);
 STATIC void inet_data_ready(struct sock *sk, int len);
-STATIC void inet_socket_put(struct socket *sock)
+STATIC void
+inet_socket_put(struct socket *sock)
 {
 	struct sock *sk;
 	if (sock) {
@@ -512,7 +511,8 @@ STATIC void inet_socket_put(struct socket *sock)
 		sock_release(sock);
 	}
 }
-STATIC void inet_socket_get(struct socket *sock, inet_t * inet)
+STATIC void
+inet_socket_get(struct socket *sock, inet_t * inet)
 {
 	struct sock *sk;
 	if (sock && (sk = sock->sk)) {
@@ -546,7 +546,8 @@ STATIC void inet_socket_get(struct socket *sock, inet_t * inet)
  *  BUFSRV calls service routine
  *  -------------------------------------------------------------------------
  */
-STATIC void inet_bufsrv(long data)
+STATIC void
+inet_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
 	if (q) {
@@ -569,7 +570,8 @@ STATIC void inet_bufsrv(long data)
  *  UNBUFCALL
  *  -------------------------------------------------------------------------
  */
-STATIC void inet_unbufcall(queue_t *q)
+STATIC void
+inet_unbufcall(queue_t *q)
 {
 	inet_t *inet = PRIV(q);
 	if (inet->rbid) {
@@ -586,7 +588,8 @@ STATIC void inet_unbufcall(queue_t *q)
  *  ALLOCB
  *  -------------------------------------------------------------------------
  */
-STATIC mblk_t *inet_allocb(queue_t *q, size_t size, int prior)
+STATIC mblk_t *
+inet_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
 	if ((mp = allocb(size, prior)))
@@ -617,7 +620,8 @@ STATIC mblk_t *inet_allocb(queue_t *q, size_t size, int prior)
  *  ESBALLOC
  *  -------------------------------------------------------------------------
  */
-STATIC mblk_t *inet_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
+STATIC mblk_t *
+inet_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
 	if ((mp = esballoc(base, size, prior, frtn)))
@@ -653,7 +657,8 @@ STATIC mblk_t *inet_esballoc(queue_t *q, unsigned char *base, size_t size, int p
  */
 #define _T_ALIGN_SIZEOF(s) \
 	((sizeof((s)) + _T_ALIGN_SIZE - 1) & ~(_T_ALIGN_SIZE - 1))
-STATIC size_t inet_opts_size(inet_t * inet, inet_opts_t * ops)
+STATIC size_t
+inet_opts_size(inet_t * inet, inet_opts_t * ops)
 {
 	size_t len = 0;
 	const size_t hlen = sizeof(struct t_opthdr);	/* 32 bytes */
@@ -741,7 +746,8 @@ STATIC size_t inet_opts_size(inet_t * inet, inet_opts_t * ops)
 	}
 	return (len);
 }
-STATIC void inet_build_opts(inet_t * inet, inet_opts_t * ops, unsigned char **p)
+STATIC void
+inet_build_opts(inet_t * inet, inet_opts_t * ops, unsigned char **p)
 {
 	struct t_opthdr *oh;
 	const size_t hlen = sizeof(struct t_opthdr);
@@ -844,7 +850,8 @@ STATIC void inet_build_opts(inet_t * inet, inet_opts_t * ops, unsigned char **p)
 		}
 	}
 }
-STATIC int inet_parse_opts(inet_t * inet, inet_opts_t * ops, unsigned char *op, size_t len)
+STATIC int
+inet_parse_opts(inet_t * inet, inet_opts_t * ops, unsigned char *op, size_t len)
 {
 	struct t_opthdr *oh;
 	for (oh = _T_OPT_FIRSTHDR_OFS(op, len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(op, len, oh, 0)) {
@@ -1021,7 +1028,8 @@ STATIC int inet_parse_opts(inet_t * inet, inet_opts_t * ops, unsigned char *op, 
 	return (0);
 }
 
-STATIC size_t inet_cmsg_size(inet_opts_t * ops, int flags)
+STATIC size_t
+inet_cmsg_size(inet_opts_t * ops, int flags)
 {
 	size_t len = 0;
 	const size_t hlen = CMSG_ALIGN(sizeof(struct cmsghdr));
@@ -1053,7 +1061,8 @@ STATIC size_t inet_cmsg_size(inet_opts_t * ops, int flags)
 	}
 	return (len);
 }
-STATIC void inet_build_cmsg(inet_opts_t * ops, struct msghdr *msg, int flags)
+STATIC void
+inet_build_cmsg(inet_opts_t * ops, struct msghdr *msg, int flags)
 {
 	struct cmsghdr *ch;
 	unsigned char *p = msg->msg_control;
@@ -1143,7 +1152,8 @@ STATIC void inet_build_cmsg(inet_opts_t * ops, struct msghdr *msg, int flags)
 #endif
 	}
 }
-STATIC int inet_parse_cmsg(struct msghdr *msg, inet_opts_t * opts)
+STATIC int
+inet_parse_cmsg(struct msghdr *msg, inet_opts_t * opts)
 {
 	struct cmsghdr *cmsg;
 	for (cmsg = CMSG_FIRSTHDR(msg); cmsg; cmsg = CMSG_NXTHDR(msg, cmsg)) {
@@ -1296,11 +1306,13 @@ STATIC inet_dflt_t opt_defaults = {
 	tcp_default_alive,
 	udp_default_csum
 };
+
 /* 
  *  CHECK Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC int inet_opt_check(inet_t * inet, inet_opts_t * opt)
+STATIC int
+inet_opt_check(inet_t * inet, inet_opts_t * opt)
 {
 	if (opt->flags) {
 		opt->flags = 0;
@@ -1336,7 +1348,8 @@ STATIC int inet_opt_check(inet_t * inet, inet_opts_t * opt)
  *  DEFAULT Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC int inet_opt_default(inet_t * inet, inet_opts_t * opt)
+STATIC int
+inet_opt_default(inet_t * inet, inet_opts_t * opt)
 {
 	int flags = opt->flags;
 	opt->flags = 0;
@@ -1387,7 +1400,8 @@ STATIC int inet_opt_default(inet_t * inet, inet_opts_t * opt)
  *  NEGOTIATE Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC int inet_opt_negotiate(inet_t * inet, inet_opts_t * opt)
+STATIC int
+inet_opt_negotiate(inet_t * inet, inet_opts_t * opt)
 {
 	struct sock *sk = NULL;
 	if (inet->sock)
@@ -1461,7 +1475,8 @@ STATIC int inet_opt_negotiate(inet_t * inet, inet_opts_t * opt)
  *  CURRENT Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC int inet_opt_current(inet_t * inet, inet_opts_t * opt)
+STATIC int
+inet_opt_current(inet_t * inet, inet_opts_t * opt)
 {
 	uint flags = opt->flags;
 	opt->flags = 0;
@@ -1520,7 +1535,8 @@ STATIC int inet_opt_current(inet_t * inet, inet_opts_t * opt)
  *  =========================================================================
  */
 #ifdef _DEBUG
-STATIC const char *state_name(long state)
+STATIC const char *
+state_name(long state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -1564,17 +1580,20 @@ STATIC const char *state_name(long state)
 	}
 }
 #endif
-STATIC void inet_set_state(inet_t * inet, long state)
+STATIC void
+inet_set_state(inet_t * inet, long state)
 {
 	inet->p.info.CURRENT_state = state;
 }
-STATIC long inet_get_state(inet_t * inet)
+STATIC long
+inet_get_state(inet_t * inet)
 {
 	return (inet->p.info.CURRENT_state);
 }
 
 #ifdef _DEBUG
-STATIC const char *tcp_state_name(int state)
+STATIC const char *
+tcp_state_name(int state)
 {
 	switch (state) {
 	case TCP_ESTABLISHED:
@@ -1619,7 +1638,8 @@ STATIC const char *tcp_state_name(int state)
  *  SOCKET CREATE
  *  ------------------------------------------------------------------------
  */
-STATIC int inet_socket(inet_t * inet)
+STATIC int
+inet_socket(inet_t * inet)
 {
 	int err;
 	int family, type, protocol;
@@ -1646,7 +1666,8 @@ STATIC int inet_socket(inet_t * inet)
  *  SOCKET BIND
  *  ------------------------------------------------------------------------
  */
-STATIC int inet_bind(inet_t * inet, inet_addr_t * add)
+STATIC int
+inet_bind(inet_t * inet, inet_addr_t * add)
 {
 	int err;
 	if (!inet || !inet->sock || !inet->sock->sk || !inet->sock->ops || !inet->sock->ops->bind)
@@ -1662,7 +1683,8 @@ STATIC int inet_bind(inet_t * inet, inet_addr_t * add)
  *  SOCKET LISTEN
  *  ------------------------------------------------------------------------
  */
-STATIC int inet_listen(inet_t * inet, uint cons)
+STATIC int
+inet_listen(inet_t * inet, uint cons)
 {
 	int err;
 	int type;
@@ -1689,11 +1711,12 @@ STATIC int inet_listen(inet_t * inet, uint cons)
  *  the next in the queue.  To do this we mimic some of the tcp_accept
  *  behavior.
  */
-STATIC int inet_accept(inet_t * inet, struct socket **newsock, mblk_t *cp)
+STATIC int
+inet_accept(inet_t * inet, struct socket **newsock, mblk_t *cp)
 {
 	struct socket *sock;
-	if (!newsock || !cp || !inet || !inet->sock || !inet->sock->sk || !inet->sock->ops ||
-	    !inet->sock->ops->accept)
+	if (!newsock || !cp || !inet || !inet->sock || !inet->sock->sk || !inet->sock->ops
+	    || !inet->sock->ops->accept)
 		return (-EFAULT);
 	if ((sock = sock_alloc())) {
 		struct sock *sk = inet->sock->sk;
@@ -1737,7 +1760,8 @@ STATIC int inet_accept(inet_t * inet, struct socket **newsock, mblk_t *cp)
  *  close the entire socket.  The next time we go to bind, we will create
  *  a fresh socket to bind.
  */
-STATIC int inet_unbind(inet_t * inet)
+STATIC int
+inet_unbind(inet_t * inet)
 {
 	if (!inet || !inet->sock || !inet->sock->sk)
 		return (-EFAULT);
@@ -1749,14 +1773,16 @@ STATIC int inet_unbind(inet_t * inet)
  *  SOCKET CONNECT
  *  ------------------------------------------------------------------------
  */
-STATIC int inet_connect(inet_t * inet, inet_addr_t * dst)
+STATIC int
+inet_connect(inet_t * inet, inet_addr_t * dst)
 {
 	int err;
-	if (!inet || !inet->sock || !inet->sock->sk || !inet->sock->ops ||
-	    !inet->sock->ops->connect)
+	if (!inet || !inet->sock || !inet->sock->sk || !inet->sock->ops
+	    || !inet->sock->ops->connect)
 		return (-EFAULT);
-	if ((err = inet->sock->ops->connect(inet->sock, (struct sockaddr *) dst, sizeof(*dst),
-					    O_NONBLOCK)) == 0 || err == -EINPROGRESS)
+	if ((err =
+	     inet->sock->ops->connect(inet->sock, (struct sockaddr *) dst, sizeof(*dst),
+				      O_NONBLOCK)) == 0 || err == -EINPROGRESS)
 		return (0);
 	return (err);
 }
@@ -1765,7 +1791,8 @@ STATIC int inet_connect(inet_t * inet, inet_addr_t * dst)
  *  SOCKET SENDMSG
  *  ------------------------------------------------------------------------
  */
-STATIC int inet_sendmsg(inet_t * inet, struct msghdr *msg, int len)
+STATIC int
+inet_sendmsg(inet_t * inet, struct msghdr *msg, int len)
 {
 	int res;
 	if (!inet || !inet->sock || !inet->sock->ops || !inet->sock->ops->sendmsg || !inet->sock->sk
@@ -1784,7 +1811,8 @@ STATIC int inet_sendmsg(inet_t * inet, struct msghdr *msg, int len)
  *  SOCKET RECVMSG
  *  ------------------------------------------------------------------------
  */
-STATIC int inet_recvmsg(inet_t * inet, struct msghdr *msg, int size)
+STATIC int
+inet_recvmsg(inet_t * inet, struct msghdr *msg, int size)
 {
 	int res;
 	int sflags = MSG_DONTWAIT | MSG_NOSIGNAL;
@@ -1808,11 +1836,12 @@ STATIC int inet_recvmsg(inet_t * inet, struct msghdr *msg, int size)
  *  shutdown rather than an abortive release.  We can try performing a
  *  protocol disconnect and see if that works better.
  */
-STATIC int inet_disconnect(inet_t * inet)
+STATIC int
+inet_disconnect(inet_t * inet)
 {
 	int err;
-	if (!inet || !inet->sock->ops || !inet->sock->ops->connect || !inet->sock->sk ||
-	    !inet->sock->sk->prot || !inet->sock->sk->prot->disconnect)
+	if (!inet || !inet->sock->ops || !inet->sock->ops->connect || !inet->sock->sk
+	    || !inet->sock->sk->prot || !inet->sock->sk->prot->disconnect)
 		return (-EFAULT);
 	if (!(err = inet->sock->sk->prot->disconnect(inet->sock->sk, O_NONBLOCK))) {
 		inet->sock->state = INET_UNCONNECTED;
@@ -1833,7 +1862,8 @@ STATIC int inet_disconnect(inet_t * inet)
  *  M_ERROR
  *  ---------------------------------------------------------------
  */
-STATIC int m_error(queue_t *q, int error)
+STATIC int
+m_error(queue_t *q, int error)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -1874,7 +1904,8 @@ STATIC int m_error(queue_t *q, int error)
  *  T_CONN_IND          11 - Connection Indication
  *  ---------------------------------------------------------------
  */
-STATIC int t_conn_ind(queue_t *q, inet_addr_t * src, inet_opts_t * opts, mblk_t *cp)
+STATIC int
+t_conn_ind(queue_t *q, inet_addr_t * src, inet_opts_t * opts, mblk_t *cp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -1915,7 +1946,8 @@ STATIC int t_conn_ind(queue_t *q, inet_addr_t * src, inet_opts_t * opts, mblk_t 
  *  T_CONN_CON          12 - Connection Confirmation
  *  ---------------------------------------------------------------
  */
-STATIC int t_conn_con(queue_t *q, inet_addr_t * res, inet_opts_t * opts, mblk_t *dp)
+STATIC int
+t_conn_con(queue_t *q, inet_addr_t * res, inet_opts_t * opts, mblk_t *dp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -1955,7 +1987,8 @@ STATIC int t_conn_con(queue_t *q, inet_addr_t * res, inet_opts_t * opts, mblk_t 
  *  T_DISCON_IND        13 - Disconnect Indication
  *  ---------------------------------------------------------------
  */
-STATIC mblk_t *t_seq_find(inet_t * inet, mblk_t *rp)
+STATIC mblk_t *
+t_seq_find(inet_t * inet, mblk_t *rp)
 {
 	mblk_t *mp;
 	if ((mp = rp)) {
@@ -1969,7 +2002,8 @@ STATIC mblk_t *t_seq_find(inet_t * inet, mblk_t *rp)
 	}
 	return (mp);
 }
-STATIC ulong t_seq_delete(inet_t * inet, mblk_t *rp)
+STATIC ulong
+t_seq_delete(inet_t * inet, mblk_t *rp)
 {
 	mblk_t *mp;
 	if ((mp = t_seq_find(inet, rp))) {
@@ -1980,8 +2014,8 @@ STATIC ulong t_seq_delete(inet_t * inet, mblk_t *rp)
 	}
 	return (0);
 }
-STATIC int t_discon_ind(queue_t *q, inet_addr_t * res, uint orig, uint reason, mblk_t *cp,
-			mblk_t *dp)
+STATIC int
+t_discon_ind(queue_t *q, inet_addr_t * res, uint orig, uint reason, mblk_t *cp, mblk_t *dp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2016,7 +2050,8 @@ STATIC int t_discon_ind(queue_t *q, inet_addr_t * res, uint orig, uint reason, m
  *  T_DATA_IND          14 - Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC int t_data_ind(queue_t *q, uint flags, mblk_t *dp)
+STATIC int
+t_data_ind(queue_t *q, uint flags, mblk_t *dp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2037,7 +2072,8 @@ STATIC int t_data_ind(queue_t *q, uint flags, mblk_t *dp)
  *  T_EXDATA_IND        15 - Expedited Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC int t_exdata_ind(queue_t *q, uint flags, mblk_t *dp)
+STATIC int
+t_exdata_ind(queue_t *q, uint flags, mblk_t *dp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2059,7 +2095,8 @@ STATIC int t_exdata_ind(queue_t *q, uint flags, mblk_t *dp)
  *  T_INFO_ACK          16 - Information acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC int t_info_ack(queue_t *q)
+STATIC int
+t_info_ack(queue_t *q)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2078,7 +2115,8 @@ STATIC int t_info_ack(queue_t *q)
  *  T_BIND_ACK          17 - Bind Acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC int t_bind_ack(queue_t *q, inet_addr_t * add, ulong conind)
+STATIC int
+t_bind_ack(queue_t *q, inet_addr_t * add, ulong conind)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2106,7 +2144,8 @@ STATIC int t_bind_ack(queue_t *q, inet_addr_t * add, ulong conind)
  *  T_ERROR_ACK         18 - Error Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int t_error_ack(queue_t *q, ulong prim, long error)
+STATIC int
+t_error_ack(queue_t *q, ulong prim, long error)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2192,7 +2231,8 @@ STATIC int t_error_ack(queue_t *q, ulong prim, long error)
  *  T_OK_ACK            19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, inet_t * as)
+STATIC int
+t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, inet_t * as)
 {
 	int err = -EFAULT;
 	inet_t *inet = PRIV(q);
@@ -2276,7 +2316,8 @@ STATIC int t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, inet_t * as)
  *  T_UNIDATA_IND       20 - Unitdata indication
  *  -------------------------------------------------------------------------
  */
-STATIC int t_unitdata_ind(queue_t *q, inet_addr_t * src, inet_opts_t * opts, mblk_t *dp)
+STATIC int
+t_unitdata_ind(queue_t *q, inet_addr_t * src, inet_opts_t * opts, mblk_t *dp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2311,8 +2352,9 @@ STATIC int t_unitdata_ind(queue_t *q, inet_addr_t * src, inet_opts_t * opts, mbl
  *  This primitive indicates to the transport user that a datagram with the
  *  specified destination address and options produced an error.
  */
-STATIC INLINE int t_uderror_ind(queue_t *q, inet_addr_t * src, inet_addr_t * dst,
-				inet_opts_t * opts, mblk_t *dp, int etype)
+STATIC INLINE int
+t_uderror_ind(queue_t *q, inet_addr_t * src, inet_addr_t * dst, inet_opts_t * opts, mblk_t *dp,
+	      int etype)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2350,7 +2392,8 @@ STATIC INLINE int t_uderror_ind(queue_t *q, inet_addr_t * src, inet_addr_t * dst
  *  T_OPTMGMT_ACK       22 - Options Management Acknowledge
  *  -------------------------------------------------------------------------
  */
-STATIC int t_optmgmt_ack(queue_t *q, ulong flags, inet_opts_t * opts)
+STATIC int
+t_optmgmt_ack(queue_t *q, ulong flags, inet_opts_t * opts)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2380,7 +2423,8 @@ STATIC int t_optmgmt_ack(queue_t *q, ulong flags, inet_opts_t * opts)
  *  T_ORDREL_IND        23 - Orderly Release Indication
  *  -------------------------------------------------------------------------
  */
-STATIC int t_ordrel_ind(queue_t *q)
+STATIC int
+t_ordrel_ind(queue_t *q)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2410,7 +2454,8 @@ STATIC int t_ordrel_ind(queue_t *q)
  *  T_OPTDATA_IND       26 - Data with Options Indication
  *  -------------------------------------------------------------------------
  */
-STATIC int t_optdata_ind(queue_t *q, uint flags, inet_opts_t * opts, mblk_t *dp)
+STATIC int
+t_optdata_ind(queue_t *q, uint flags, inet_opts_t * opts, mblk_t *dp)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2439,7 +2484,8 @@ STATIC int t_optdata_ind(queue_t *q, uint flags, inet_opts_t * opts, mblk_t *dp)
  *  T_ADDR_ACK          27 - Address Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int t_addr_ack(queue_t *q, inet_addr_t * loc, inet_addr_t * rem)
+STATIC int
+t_addr_ack(queue_t *q, inet_addr_t * loc, inet_addr_t * rem)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2473,7 +2519,8 @@ STATIC int t_addr_ack(queue_t *q, inet_addr_t * loc, inet_addr_t * rem)
  *  T_CAPABILITY_ACK    ?? - Protocol Capability Ack
  *  -------------------------------------------------------------------------
  */
-STATIC int t_capability_ack(queue_t *q, ulong caps)
+STATIC int
+t_capability_ack(queue_t *q, ulong caps)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2512,7 +2559,8 @@ STATIC int t_capability_ack(queue_t *q, ulong caps)
  *  address.  This means that connection must be accepted and then released,
  *  rather than refused.
  */
-STATIC int inet_conn_ind(queue_t *q, mblk_t *cp)
+STATIC int
+inet_conn_ind(queue_t *q, mblk_t *cp)
 {
 	inet_t *inet = PRIV(q);
 	struct sock *sk;
@@ -2583,8 +2631,8 @@ STATIC int inet_conn_ind(queue_t *q, mblk_t *cp)
  *  message and then call sendmsg on the socket with the kernel data segment.
  *  The socket will handle moving data from the mblks.
  */
-STATIC int inet_sock_sendmsg(inet_t * inet, mblk_t *mp, inet_addr_t * dst, int flags,
-			     inet_opts_t * opts)
+STATIC int
+inet_sock_sendmsg(inet_t * inet, mblk_t *mp, inet_addr_t * dst, int flags, inet_opts_t * opts)
 {
 	int err = 0;
 	int len, sdu, n;
@@ -2682,7 +2730,8 @@ STATIC int inet_sock_sendmsg(inet_t * inet, mblk_t *mp, inet_addr_t * dst, int f
  *  RECVMSG
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_sock_recvmsg(queue_t *q)
+STATIC int
+inet_sock_recvmsg(queue_t *q)
 {
 	inet_t *inet = PRIV(q);
 	mblk_t *mp;
@@ -2783,7 +2832,8 @@ STATIC int inet_sock_recvmsg(queue_t *q)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC void inet_putctl(inet_t * inet, queue_t *q, int type, void (*func) (long), struct sock *sk)
+STATIC void
+inet_putctl(inet_t * inet, queue_t *q, int type, void (*func) (long), struct sock *sk)
 {
 	int flags;
 	mblk_t *mp;
@@ -2819,7 +2869,8 @@ STATIC void inet_putctl(inet_t * inet, queue_t *q, int type, void (*func) (long)
  *  We get state changes on sockets that we hold.  We also get state changes
  *  on accepting sockets.
  */
-STATIC void _ss_sock_state_change(long data)
+STATIC void
+_ss_sock_state_change(long data)
 {
 	struct sock *sk;
 	inet_t *inet;
@@ -2831,7 +2882,8 @@ STATIC void _ss_sock_state_change(long data)
 		}
 	}
 }
-STATIC void inet_state_change(struct sock *sk)
+STATIC void
+inet_state_change(struct sock *sk)
 {
 	if (sk) {
 		inet_t *inet;
@@ -2846,7 +2898,8 @@ STATIC void inet_state_change(struct sock *sk)
  *  WRITE Available
  *  -------------------------------------------------------------------------
  */
-STATIC void _ss_sock_write_space(long data)
+STATIC void
+_ss_sock_write_space(long data)
 {
 	struct sock *sk;
 	inet_t *inet;
@@ -2858,7 +2911,8 @@ STATIC void _ss_sock_write_space(long data)
 		}
 	}
 }
-STATIC void inet_write_space(struct sock *sk)
+STATIC void
+inet_write_space(struct sock *sk)
 {
 	if (sk) {
 		inet_t *inet;
@@ -2873,7 +2927,8 @@ STATIC void inet_write_space(struct sock *sk)
  *  ERROR Available
  *  -------------------------------------------------------------------------
  */
-STATIC void _ss_sock_error_report(long data)
+STATIC void
+_ss_sock_error_report(long data)
 {
 	struct sock *sk;
 	inet_t *inet;
@@ -2885,7 +2940,8 @@ STATIC void _ss_sock_error_report(long data)
 		}
 	}
 }
-STATIC void inet_error_report(struct sock *sk)
+STATIC void
+inet_error_report(struct sock *sk)
 {
 	if (sk) {
 		inet_t *inet;
@@ -2900,7 +2956,8 @@ STATIC void inet_error_report(struct sock *sk)
  *  READ Available
  *  -------------------------------------------------------------------------
  */
-STATIC void _ss_sock_data_ready(long data)
+STATIC void
+_ss_sock_data_ready(long data)
 {
 	struct sock *sk;
 	inet_t *inet;
@@ -2912,7 +2969,8 @@ STATIC void _ss_sock_data_ready(long data)
 		}
 	}
 }
-STATIC void inet_data_ready(struct sock *sk, int len)
+STATIC void
+inet_data_ready(struct sock *sk, int len)
 {
 	if (sk) {
 		inet_t *inet;
@@ -2934,7 +2992,8 @@ STATIC void inet_data_ready(struct sock *sk, int len)
  *  T_CONN_REQ           0 - TC Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_conn_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_conn_req(queue_t *q, mblk_t *mp)
 {
 	int err = -EFAULT;
 	inet_t *inet = PRIV(q);
@@ -2944,8 +3003,8 @@ STATIC int t_conn_req(queue_t *q, mblk_t *mp)
 	if (inet_get_state(inet) != TS_IDLE)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
-	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length ||
-	    mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
+	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length
+	    || mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto einval;
 	else {
 		inet_addr_t *dst = (typeof(dst)) (mp->b_rptr + p->DEST_offset);
@@ -3001,7 +3060,8 @@ STATIC int t_conn_req(queue_t *q, mblk_t *mp)
  *  T_CONN_RES           1 - Accept previous connection indication
  *  -------------------------------------------------------------------
  */
-STATIC mblk_t *t_seq_check(inet_t * inet, ulong seq)
+STATIC mblk_t *
+t_seq_check(inet_t * inet, ulong seq)
 {
 	mblk_t *mp;
 	lis_spin_lock(&inet->conq.q_lock); {
@@ -3011,7 +3071,8 @@ STATIC mblk_t *t_seq_check(inet_t * inet, ulong seq)
 	usual(mp);
 	return (mp);
 }
-STATIC inet_t *t_tok_check(ulong acceptor)
+STATIC inet_t *
+t_tok_check(ulong acceptor)
 {
 	inet_t *as;
 	queue_t *aq = (queue_t *) acceptor;
@@ -3019,7 +3080,8 @@ STATIC inet_t *t_tok_check(ulong acceptor)
 	usual(as);
 	return (as);
 }
-STATIC int t_conn_res(queue_t *q, mblk_t *mp)
+STATIC int
+t_conn_res(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	int err = 0;
@@ -3051,8 +3113,8 @@ STATIC int t_conn_res(queue_t *q, mblk_t *mp)
 	opt_len = p->OPT_length;
 	opt_off = p->OPT_offset;
 	opt = mp->b_rptr + opt_off;
-	if (opt_len &&
-	    (mlen < opt_off + opt_len || (err = inet_parse_opts(inet, &opts, opt, opt_len))))
+	if (opt_len
+	    && (mlen < opt_off + opt_len || (err = inet_parse_opts(inet, &opts, opt, opt_len))))
 		goto badopt;
 	if (mp->b_cont != NULL && msgdsize(mp->b_cont))
 		goto baddata;
@@ -3095,7 +3157,8 @@ STATIC int t_conn_res(queue_t *q, mblk_t *mp)
  *  T_DISCON_REQ         2 - TC disconnection request
  *  -------------------------------------------------------------------
  */
-STATIC int t_discon_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_discon_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3148,7 +3211,8 @@ STATIC int t_discon_req(queue_t *q, mblk_t *mp)
  *  M_DATA
  *  -------------------------------------------------------------------
  */
-STATIC int inet_w_data(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_data(queue_t *q, mblk_t *mp)
 {
 	int flags, mlen, mmax;
 	inet_t *inet = PRIV(q);
@@ -3182,7 +3246,8 @@ STATIC int inet_w_data(queue_t *q, mblk_t *mp)
  *  T_DATA_REQ           3 - Connection-Mode data transfer request
  *  -------------------------------------------------------------------
  */
-STATIC int t_data_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_data_req(queue_t *q, mblk_t *mp)
 {
 	int flags, mlen, mmax;
 	inet_t *inet = PRIV(q);
@@ -3221,7 +3286,8 @@ STATIC int t_data_req(queue_t *q, mblk_t *mp)
  *  T_EXDATA_REQ         4 - Expedited data request
  *  -------------------------------------------------------------------
  */
-STATIC int t_exdata_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_exdata_req(queue_t *q, mblk_t *mp)
 {
 	int flags, mlen, mmax;
 	inet_t *inet = PRIV(q);
@@ -3260,7 +3326,8 @@ STATIC int t_exdata_req(queue_t *q, mblk_t *mp)
  *  T_INFO_REQ           5 - Information Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_info_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_info_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	(void) mp;
@@ -3272,7 +3339,8 @@ STATIC int t_info_req(queue_t *q, mblk_t *mp)
  *  T_BIND_REQ           6 - Bind a TS user to a transport address
  *  -------------------------------------------------------------------
  */
-STATIC int t_bind_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_bind_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3304,8 +3372,8 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
 		if ((err = inet_bind(inet, add)))
 			goto error_close;
 		inet->conind = 0;
-		if (p->CONIND_number &&
-		    (inet->p.prot.type == SOCK_STREAM || inet->p.prot.type == SOCK_SEQPACKET))
+		if (p->CONIND_number
+		    && (inet->p.prot.type == SOCK_STREAM || inet->p.prot.type == SOCK_SEQPACKET))
 			if ((err = inet_listen(inet, p->CONIND_number)))
 				goto error_close;
 		return t_bind_ack(q, &inet->src, p->CONIND_number);
@@ -3338,7 +3406,8 @@ STATIC int t_bind_req(queue_t *q, mblk_t *mp)
  *  T_UNBIND_REQ         7 - Unbind TS user from transport address
  *  -------------------------------------------------------------------
  */
-STATIC int t_unbind_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_unbind_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	if (inet_get_state(inet) != TS_IDLE)
@@ -3353,7 +3422,8 @@ STATIC int t_unbind_req(queue_t *q, mblk_t *mp)
  *  T_UNITDATA_REQ       8 -Unitdata Request 
  *  -------------------------------------------------------------------
  */
-STATIC int t_unitdata_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	size_t mlen = mp->b_wptr - mp->b_rptr;
@@ -3378,8 +3448,8 @@ STATIC int t_unitdata_req(queue_t *q, mblk_t *mp)
 		size_t opt_off = p->OPT_offset;
 		unsigned char *opt = mp->b_rptr + opt_off;
 		struct inet_opts opts = { 0L, NULL, };
-		if (opt_len &&
-		    (mlen < opt_off + opt_len || inet_parse_opts(inet, &opts, opt, opt_len)))
+		if (opt_len
+		    && (mlen < opt_off + opt_len || inet_parse_opts(inet, &opts, opt, opt_len)))
 			goto badopt;
 		else {
 			int flags = (opts.norte && *(opts.norte)) ? MSG_DONTROUTE : 0;
@@ -3409,7 +3479,8 @@ STATIC int t_unitdata_req(queue_t *q, mblk_t *mp)
  *  T_OPTMGMT_REQ        9 - Options management request
  *  -------------------------------------------------------------------
  */
-STATIC int t_optmgmt_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	int err = 0;
@@ -3427,8 +3498,8 @@ STATIC int t_optmgmt_req(queue_t *q, mblk_t *mp)
 	opt_len = p->OPT_length;
 	opt_off = p->OPT_offset;
 	opt = mp->b_rptr + opt_off;
-	if (opt_len &&
-	    (mlen < opt_off + opt_len || (err = inet_parse_opts(inet, &opts, opt, opt_len))))
+	if (opt_len
+	    && (mlen < opt_off + opt_len || (err = inet_parse_opts(inet, &opts, opt, opt_len))))
 		goto badopt;
 	switch (p->MGMT_flags) {
 	case T_CHECK:
@@ -3473,7 +3544,8 @@ STATIC int t_optmgmt_req(queue_t *q, mblk_t *mp)
  *  T_ORDREL_REQ        10 - TS user is finished sending
  *  -------------------------------------------------------------------
  */
-STATIC int t_ordrel_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_ordrel_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
@@ -3503,7 +3575,8 @@ STATIC int t_ordrel_req(queue_t *q, mblk_t *mp)
  *  T_OPTDATA_REQ       24 - Data with options request
  *  -------------------------------------------------------------------
  */
-STATIC int t_optdata_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_optdata_req(queue_t *q, mblk_t *mp)
 {
 	int err;
 	inet_t *inet = PRIV(q);
@@ -3522,8 +3595,8 @@ STATIC int t_optdata_req(queue_t *q, mblk_t *mp)
 		size_t opt_len = p->OPT_length;
 		size_t opt_off = p->OPT_offset;
 		unsigned char *opt = mp->b_rptr + opt_off;
-		if (opt_len &&
-		    (mlen < opt_off + opt_len || inet_parse_opts(inet, &opts, opt, opt_len)))
+		if (opt_len
+		    && (mlen < opt_off + opt_len || inet_parse_opts(inet, &opts, opt, opt_len)))
 			goto badopt;
 		else {
 			int flags = 0;
@@ -3558,7 +3631,8 @@ STATIC int t_optdata_req(queue_t *q, mblk_t *mp)
  *  T_ADDR_REQ          25 - Address Request
  *  -------------------------------------------------------------------
  */
-STATIC int t_addr_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_addr_req(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	(void) mp;
@@ -3588,7 +3662,8 @@ STATIC int t_addr_req(queue_t *q, mblk_t *mp)
  *  Other primitives    XX - other invalid primitives
  *  -------------------------------------------------------------------------
  */
-STATIC int t_other_req(queue_t *q, mblk_t *mp)
+STATIC int
+t_other_req(queue_t *q, mblk_t *mp)
 {
 	ulong prim = *((ulong *) mp->b_rptr);
 	return t_error_ack(q, prim, TNOTSUPPORT);
@@ -3624,7 +3699,8 @@ STATIC int t_other_req(queue_t *q, mblk_t *mp)
  *  -----------------------------------
  *  int fd = accept(int fd, struct sockaddr *addr, socklen_t *addrlen)
  */
-STATIC int so_accept(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_accept(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3648,7 +3724,8 @@ STATIC int so_accept(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_BIND
  *  -----------------------------------
  */
-STATIC int so_bind(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_bind(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3672,7 +3749,8 @@ STATIC int so_bind(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_CONNECT
  *  -----------------------------------
  */
-STATIC int so_connect(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_connect(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3696,7 +3774,8 @@ STATIC int so_connect(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETPEERNAME
  *  -----------------------------------
  */
-STATIC int so_getpeername(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_getpeername(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3720,7 +3799,8 @@ STATIC int so_getpeername(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETSOCKNAME
  *  -----------------------------------
  */
-STATIC int so_getsockname(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_getsockname(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3744,7 +3824,8 @@ STATIC int so_getsockname(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETSOCKOPT
  *  -----------------------------------
  */
-STATIC int so_getsockopt(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_getsockopt(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3768,7 +3849,8 @@ STATIC int so_getsockopt(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_LISTEN
  *  -----------------------------------
  */
-STATIC int so_listen(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_listen(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3792,7 +3874,8 @@ STATIC int so_listen(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_RECV
  *  -----------------------------------
  */
-STATIC int so_recv(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_recv(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3816,7 +3899,8 @@ STATIC int so_recv(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_RECVFROM
  *  -----------------------------------
  */
-STATIC int so_recvfrom(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_recvfrom(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3840,7 +3924,8 @@ STATIC int so_recvfrom(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SEND
  *  -----------------------------------
  */
-STATIC int so_send(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_send(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3864,7 +3949,8 @@ STATIC int so_send(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SENDTO
  *  -----------------------------------
  */
-STATIC int so_sendto(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_sendto(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3888,7 +3974,8 @@ STATIC int so_sendto(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SETSOCKOPT
  *  -----------------------------------
  */
-STATIC int so_setsockopt(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_setsockopt(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3912,7 +3999,8 @@ STATIC int so_setsockopt(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SHUTDOWN
  *  -----------------------------------
  */
-STATIC int so_shutdown(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_shutdown(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3936,7 +4024,8 @@ STATIC int so_shutdown(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SOCKET
  *  -----------------------------------
  */
-STATIC int so_socket(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_socket(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3960,7 +4049,8 @@ STATIC int so_socket(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SELECT
  *  -----------------------------------
  */
-STATIC int so_select(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_select(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -3984,7 +4074,8 @@ STATIC int so_select(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETIPDOMAIN
  *  -----------------------------------
  */
-STATIC int so_getipdomain(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_getipdomain(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4008,7 +4099,8 @@ STATIC int so_getipdomain(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SETIPDOMAIN
  *  -----------------------------------
  */
-STATIC int so_setipdomain(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_setipdomain(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4032,7 +4124,8 @@ STATIC int so_setipdomain(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_ADJTIME
  *  -----------------------------------
  */
-STATIC int so_adjtime(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_adjtime(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4056,7 +4149,8 @@ STATIC int so_adjtime(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SETREUID
  *  -----------------------------------
  */
-STATIC int so_setreuid(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_setreuid(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4080,7 +4174,8 @@ STATIC int so_setreuid(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETREGID
  *  -----------------------------------
  */
-STATIC int so_setregid(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_setregid(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4104,7 +4199,8 @@ STATIC int so_setregid(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETTIME
  *  -----------------------------------
  */
-STATIC int so_gettime(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_gettime(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4128,7 +4224,8 @@ STATIC int so_gettime(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SETTIME
  *  -----------------------------------
  */
-STATIC int so_settime(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_settime(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4152,7 +4249,8 @@ STATIC int so_settime(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_GETITIMER
  *  -----------------------------------
  */
-STATIC int so_getitimer(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_getitimer(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4176,7 +4274,8 @@ STATIC int so_getitimer(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SETITIMER
  *  -----------------------------------
  */
-STATIC int so_setitimer(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_setitimer(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4200,7 +4299,8 @@ STATIC int so_setitimer(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_RECVMSG
  *  -----------------------------------
  */
-STATIC int so_recvmsg(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_recvmsg(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4224,7 +4324,8 @@ STATIC int so_recvmsg(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SENDMSG
  *  -----------------------------------
  */
-STATIC int so_sendmsg(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_sendmsg(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4248,7 +4349,8 @@ STATIC int so_sendmsg(queue_t *q, mblk_t *mp, int *rvp)
  *  SO_SOCKPAIR
  *  -----------------------------------
  */
-STATIC int so_sockpair(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+so_sockpair(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	int err;
@@ -4268,7 +4370,8 @@ STATIC int so_sockpair(queue_t *q, mblk_t *mp, int *rvp)
 	return (-EINVAL);
 }
 
-STATIC int siocsocksys(queue_t *q, mblk_t *mp, int *rvp)
+STATIC int
+siocsocksys(queue_t *q, mblk_t *mp, int *rvp)
 {
 	inet_t *inet = PRIV(q);
 	switch (inet->ioc_call) {
@@ -4346,28 +4449,36 @@ STATIC int siocsocksys(queue_t *q, mblk_t *mp, int *rvp)
  *  -------------------------------------------------------------------------
  */
 #if 0
-STATIC int ti_getinfo(queue_t *q, mblk_t *mp)
+STATIC int
+ti_getinfo(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_optmgmt(queue_t *q, mblk_t *mp)
+STATIC int
+ti_optmgmt(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_bind(queue_t *q, mblk_t *mp)
+STATIC int
+ti_bind(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_unbind(queue_t *q, mblk_t *mp)
+STATIC int
+ti_unbind(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_getmyname(queue_t *q, mblk_t *mp)
+STATIC int
+ti_getmyname(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_getpeername(queue_t *q, mblk_t *mp)
+STATIC int
+ti_getpeername(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_setmyname(queue_t *q, mblk_t *mp)
+STATIC int
+ti_setmyname(queue_t *q, mblk_t *mp)
 {
 }
-STATIC int ti_setpeername(queue_t *q, mblk_t *mp)
+STATIC int
+ti_setpeername(queue_t *q, mblk_t *mp)
 {
 }
 #endif
@@ -4386,7 +4497,8 @@ STATIC int ti_setpeername(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_w_iocdata(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_iocdata(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	struct copyresp *resp = (typeof(resp)) mp->b_rptr;
@@ -4435,7 +4547,8 @@ STATIC int inet_w_iocdata(queue_t *q, mblk_t *mp)
  *  There are a standard set of IOCTLs for TLI.  Check the iBCS package for
  *  the numbering.
  */
-STATIC int inet_w_ioctl(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
@@ -4556,7 +4669,8 @@ STATIC int inet_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_w_proto(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	ulong prim;
@@ -4627,7 +4741,8 @@ STATIC int inet_w_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_w_flush(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
@@ -4666,7 +4781,8 @@ STATIC int inet_w_flush(queue_t *q, mblk_t *mp)
  *  inet->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int inet_r_pcrse(queue_t *q, mblk_t *mp)
+STATIC int
+inet_r_pcrse(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	inet_event_t *p = (typeof(p)) mp->b_rptr;
@@ -4798,7 +4914,8 @@ STATIC int inet_r_pcrse(queue_t *q, mblk_t *mp)
  *  inet->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int inet_r_read(queue_t *q, mblk_t *mp)
+STATIC int
+inet_r_read(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	inet_event_t *p = (typeof(p)) mp->b_rptr;
@@ -4851,7 +4968,8 @@ STATIC int inet_r_read(queue_t *q, mblk_t *mp)
  *  socket.
  *
  */
-STATIC int inet_w_read(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_read(queue_t *q, mblk_t *mp)
 {
 	inet_t *inet = PRIV(q);
 	inet_event_t *p = (typeof(p)) mp->b_rptr;
@@ -4898,7 +5016,8 @@ STATIC int inet_w_read(queue_t *q, mblk_t *mp)
  *  inet->sock->sk, sk may be a child (connection indication) of the primary
  *  socket.
  */
-STATIC int inet_r_error(queue_t *q, mblk_t *mp)
+STATIC int
+inet_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
 	inet_t *inet = PRIV(q);
@@ -4911,7 +5030,8 @@ STATIC int inet_r_error(queue_t *q, mblk_t *mp)
 	case SOCK_SEQPACKET:
 		switch (inet_get_state(inet)) {
 		default:
-			fixme(("%s: %p: FIXME: save errors for later\n", INET_MOD_NAME, inet));
+			fixme(("%s: %p: FIXME: save errors for later\n", CONFIG_STREAMS_INET_NAME,
+			       inet));
 			return (QR_DONE);
 		case TS_IDLE:
 			return (QR_DONE);
@@ -4922,7 +5042,8 @@ STATIC int inet_r_error(queue_t *q, mblk_t *mp)
 	case SOCK_RDM:
 		switch (inet_get_state(inet)) {
 		case TS_IDLE:
-			fixme(("%s: %p: FIXME: generate uderror\n", INET_MOD_NAME, inet));
+			fixme(("%s: %p: FIXME: generate uderror\n", CONFIG_STREAMS_INET_NAME,
+			       inet));
 			return (QR_DONE);
 		}
 		return (-EFAULT);
@@ -4942,7 +5063,8 @@ STATIC int inet_r_error(queue_t *q, mblk_t *mp)
  *  WRITE PUT ad SERVICE (Message from above IP-User --> IP-Provider
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_w_prim(queue_t *q, mblk_t *mp)
+STATIC int
+inet_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -4967,7 +5089,8 @@ STATIC int inet_w_prim(queue_t *q, mblk_t *mp)
  *  READ PUT ad SERVICE (Message from below IP-Provider --> IP-User
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_r_prim(queue_t *q, mblk_t *mp)
+STATIC int
+inet_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_RSE:
@@ -4994,7 +5117,8 @@ STATIC int inet_r_prim(queue_t *q, mblk_t *mp)
  *  SRVQ Service Routine
  *  -----------------------------------
  */
-STATIC int inet_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+STATIC int
+inet_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
 	mblk_t *mp;
@@ -5076,18 +5200,21 @@ STATIC int inet_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (rtn);
 }
 
-STATIC int inet_rsrv(queue_t *q)
+STATIC int
+inet_rsrv(queue_t *q)
 {
 	return inet_srvq(q, &inet_r_prim);
 }
 
-STATIC int inet_rput(queue_t *q, mblk_t *mp)
+STATIC int
+inet_rput(queue_t *q, mblk_t *mp)
 {
 	putq(q, mp);
 	return (0);
 }
 
-STATIC int inet_wput(queue_t *q, mblk_t *mp)
+STATIC int
+inet_wput(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_PROTO:
@@ -5125,7 +5252,8 @@ STATIC int inet_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC int inet_wsrv(queue_t *q)
+STATIC int
+inet_wsrv(queue_t *q)
 {
 	return inet_srvq(q, &inet_w_prim);
 }
@@ -5138,49 +5266,50 @@ STATIC int inet_wsrv(queue_t *q)
  *  =========================================================================
  */
 /* initialize the protocol switch table */
-STATIC int inet_init_proto(void)
+STATIC int
+inet_init_proto(void)
 {
 	int ret;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_ICMP, makedevice(INET_CMAJOR, ICMP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_ICMP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, ICMP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_IGMP, makedevice(INET_CMAJOR, IGMP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_IGMP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, IGMP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_IPIP, makedevice(INET_CMAJOR, IPIP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_IPIP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, IPIP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
 	     inet_alloc_proto(PF_INET, SOCK_STREAM, IPPROTO_TCP,
-			      makedevice(INET_CMAJOR, TCP_CMINOR), 0) < 0))
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, TCP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_EGP, makedevice(INET_CMAJOR, EGP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_EGP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, EGP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_PUP, makedevice(INET_CMAJOR, PUP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_PUP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, PUP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_DGRAM, IPPROTO_UDP, makedevice(INET_CMAJOR, UDP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_DGRAM, IPPROTO_UDP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, UDP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_IDP, makedevice(INET_CMAJOR, IDP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_IDP,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, IDP_CMINOR), 0) < 0))
 		goto error;
 	if ((ret =
-	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_RAW, makedevice(INET_CMAJOR, RAWIP_CMINOR),
-			      0) < 0))
+	     inet_alloc_proto(PF_INET, SOCK_RAW, IPPROTO_RAW,
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, RAWIP_CMINOR), 0) < 0))
 		goto error;
 #ifdef CONFIG_SCTP
 	if ((ret =
 	     inet_alloc_proto(PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP,
-			      makedevice(INET_CMAJOR, SCTP_CMINOR), 0) < 0))
+			      makedevice(CONFIG_STREAMS_INET_MAJOR, SCTP_CMINOR), 0) < 0))
 		goto error;
 #endif
       error:
@@ -5189,7 +5318,8 @@ STATIC int inet_init_proto(void)
 }
 
 /* terminate (empty) the protocol switch table */
-STATIC int inet_term_proto(void)
+STATIC int
+inet_term_proto(void)
 {
 	struct inet_protocol *p;
 	while ((p = inet_protosw))
@@ -5205,18 +5335,20 @@ STATIC int inet_term_proto(void)
  *  =========================================================================
  */
 STATIC kmem_cache_t *inet_priv_cachep = NULL;
-STATIC int inet_init_caches(void)
+STATIC int
+inet_init_caches(void)
 {
-	if (!inet_priv_cachep &&
-	    !(inet_priv_cachep =
-	      kmem_cache_create("inet_priv_cachep", sizeof(inet_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!inet_priv_cachep
+	    && !(inet_priv_cachep =
+		 kmem_cache_create("inet_priv_cachep", sizeof(inet_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate inet_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	}
 	return (0);
 }
-STATIC void inet_term_caches(void)
+STATIC void
+inet_term_caches(void)
 {
 	if (inet_priv_cachep) {
 		if (kmem_cache_destroy(inet_priv_cachep))
@@ -5224,8 +5356,9 @@ STATIC void inet_term_caches(void)
 	}
 	return;
 }
-STATIC inet_t *inet_alloc_priv(queue_t *q, inet_t ** slp, ushort cmajor, ushort cminor, cred_t *crp,
-			       const inet_profile_t * prof)
+STATIC inet_t *
+inet_alloc_priv(queue_t *q, inet_t ** slp, ushort cmajor, ushort cminor, cred_t *crp,
+		const inet_profile_t * prof)
 {
 	inet_t *inet;
 	if ((inet = kmem_cache_alloc(inet_priv_cachep, SLAB_ATOMIC))) {
@@ -5252,7 +5385,8 @@ STATIC inet_t *inet_alloc_priv(queue_t *q, inet_t ** slp, ushort cmajor, ushort 
 	}
 	return (inet);
 }
-STATIC void inet_free_priv(queue_t *q)
+STATIC void
+inet_free_priv(queue_t *q)
 {
 	inet_t *inet = PRIV(q);
 	int flags = 0;
@@ -5322,8 +5456,9 @@ STATIC const inet_profile_t inet_profiles[] = {
 	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}
 	 }
 };
-STATIC int inet_majors[INET_NMAJOR] = { INET_CMAJOR, };
-STATIC int inet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int inet_majors[CONFIG_STREAMS_INET_NMAJORS] = { CONFIG_STREAMS_INET_MAJOR, };
+STATIC int
+inet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int flags, mindex = 0;
 	int cmajor = getmajor(*devp);
@@ -5339,7 +5474,7 @@ STATIC int inet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (EIO);
 	}
-	if (cmajor != INET_CMAJOR || cminor < ICMP_CMINOR || cminor > RAWIP_CMINOR) {
+	if (cmajor != CONFIG_STREAMS_INET_MAJOR || cminor < ICMP_CMINOR || cminor > RAWIP_CMINOR) {
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -5353,9 +5488,9 @@ STATIC int inet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if (cminor < (*ipp)->cminor)
 				break;
 			if (cminor == (*ipp)->cminor) {
-				if (++cminor >= INET_NMINOR) {
-					if (++mindex >= INET_NMAJOR ||
-					    !(cmajor = inet_majors[mindex]))
+				if (++cminor >= CONFIG_STREAMS_INET_NMINORS) {
+					if (++mindex >= CONFIG_STREAMS_INET_NMAJORS
+					    || !(cmajor = inet_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -5363,7 +5498,7 @@ STATIC int inet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			}
 		}
 	}
-	if (mindex >= INET_NMAJOR || !cmajor) {
+	if (mindex >= CONFIG_STREAMS_INET_NMAJORS || !cmajor) {
 		lis_spin_unlock_irqrestore(&inet_lock, &flags);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
@@ -5382,7 +5517,8 @@ STATIC int inet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int inet_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+inet_close(queue_t *q, int flag, cred_t *crp)
 {
 	inet_t *inet = PRIV(q);
 	int flags;
@@ -5404,7 +5540,8 @@ STATIC int inet_close(queue_t *q, int flag, cred_t *crp)
  *  =========================================================================
  */
 STATIC int inet_initialized = 0;
-STATIC void inet_init(void)
+STATIC void
+inet_init(void)
 {
 	int err, mindex;
 #ifdef MODULE
@@ -5413,22 +5550,24 @@ STATIC void inet_init(void)
 	cmn_err(CE_NOTE, INET_SPLASH);	/* console splash */
 #endif
 	if ((err = inet_init_caches())) {
-		cmn_err(CE_PANIC, "%s: ERROR: Counld not allocated caches", INET_MOD_NAME);
+		cmn_err(CE_PANIC, "%s: ERROR: Counld not allocated caches",
+			CONFIG_STREAMS_INET_NAME);
 		inet_initialized = err;
 		return;
 	}
-	for (mindex = 0; mindex < INET_NMAJOR; mindex++) {
+	for (mindex = 0; mindex < CONFIG_STREAMS_INET_NMAJORS; mindex++) {
 		if ((err =
-		     lis_register_strdev(inet_majors[mindex], &inet_info, INET_NMINOR,
-					 INET_MOD_NAME)) < 0) {
+		     lis_register_strdev(inet_majors[mindex], &inet_info,
+					 CONFIG_STREAMS_INET_NMINORS,
+					 CONFIG_STREAMS_INET_NAME)) < 0) {
 			if (!mindex) {
-				cmn_err(CE_PANIC, "%s: Can't register 1'st major %d", INET_MOD_NAME,
-					inet_majors[0]);
+				cmn_err(CE_PANIC, "%s: Can't register 1'st
+						major %d", CONFIG_STREAMS_INET_NAME, inet_majors[0]);
 				inet_term_caches();
 				inet_initialized = err;
 				return;
 			}
-			cmn_err(CE_WARN, "%s: Can't register %d'th major", INET_MOD_NAME,
+			cmn_err(CE_WARN, "%s: Can't register %d'th major", CONFIG_STREAMS_INET_NAME,
 				mindex + 1);
 			inet_majors[mindex] = 0;
 		} else if (mindex)
@@ -5437,14 +5576,15 @@ STATIC void inet_init(void)
 	inet_initialized = 1;
 	return;
 }
-STATIC void inet_terminate(void)
+STATIC void
+inet_terminate(void)
 {
 	int err, mindex;
-	for (mindex = 0; mindex < INET_NMAJOR; mindex++) {
+	for (mindex = 0; mindex < CONFIG_STREAMS_INET_NMAJORS; mindex++) {
 		if (inet_majors[mindex]) {
 			if ((err = lis_unregister_strdev(inet_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: Can't unregister major %d\n", INET_MOD_NAME,
-					inet_majors[mindex]);
+				cmn_err(CE_PANIC, "%s: Can't unregister major %d\n",
+					CONFIG_STREAMS_INET_NAME, inet_majors[mindex]);
 			if (mindex)
 				inet_majors[mindex] = 0;
 		}
@@ -5460,14 +5600,17 @@ STATIC void inet_terminate(void)
  *
  *  =========================================================================
  */
-int init_module(void)
+int
+init_module(void)
 {
 	inet_init();
 	if (inet_initialized < 0)
 		return inet_initialized;
 	return (0);
 }
-void cleanup_module(void)
+
+void
+cleanup_module(void)
 {
 	inet_terminate();
 }

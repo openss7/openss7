@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __STROPTS_H__
-#define __STROPTS_H__
+#ifndef __SYS_STROPTS_H__
+#define __SYS_STROPTS_H__
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS
@@ -252,4 +252,4 @@ struct strpmsg {
 
 #define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678)
 
-#endif				/* __STROPTS_H__ */
+#endif				/* __SYS_STROPTS_H__ */

@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __LISDDI_H__
-#define __LISDDI_H__
+#ifndef __SYS_LISDDI_H__
+#define __SYS_LISDDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -789,4 +789,4 @@ __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
 #endif
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
-#endif				/* __LISDDI_H__ */
+#endif				/* __SYS_LISDDI_H__ */

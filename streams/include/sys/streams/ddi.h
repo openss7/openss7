@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __DDI_H__
-#define __DDI_H__ 1
+#ifndef __SYS_DDI_H__
+#define __SYS_DDI_H__ 1
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -339,4 +339,4 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 #endif
 #endif
 
-#endif				/* __DDI_H__ */
+#endif				/* __SYS_DDI_H__ */

@@ -548,6 +548,9 @@ static int socksys_close(struct inode *i, struct file *f)
 	return (0);
 }
 
+static typeof(&sock_readv_writev) _sock_readv_writev
+    = (typeof(_sock_readv_writev)) HAVE_SOCK_READV_WRITEV_ADDR;
+
 static ssize_t socksys_readv(struct file *f, const struct iovec *iov, unsigned long len,
 			     loff_t *ppos)
 {
@@ -555,7 +558,7 @@ static ssize_t socksys_readv(struct file *f, const struct iovec *iov, unsigned l
 	int i;
 	for (i = 0; i < len; i++)
 		tot_len += iov[i].iov_len;
-	return sock_readv_writev(VERIFY_WRITE, f->f_dentry->d_inode, f, iov, len, tot_len);
+	return _sock_readv_writev(VERIFY_WRITE, f->f_dentry->d_inode, f, iov, len, tot_len);
 }
 
 static ssize_t socksys_writev(struct file *f, const struct iovec *iov, unsigned long count,
@@ -565,7 +568,7 @@ static ssize_t socksys_writev(struct file *f, const struct iovec *iov, unsigned 
 	int i;
 	for (i = 0; i < count; i++)
 		tot_len += iov[i].iov_len;
-	return sock_readv_writev(VERIFY_READ, f->f_dentry->d_inode, f, iov, count, tot_len);
+	return _sock_readv_writev(VERIFY_READ, f->f_dentry->d_inode, f, iov, count, tot_len);
 }
 
 static ssize_t socksys_sendpage(struct file *f, struct page *page, int offset, size_t size,

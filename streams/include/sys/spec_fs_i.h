@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __LINUX_SPEC_FS_I_H__
-#define __LINUX_SPEC_FS_I_H__
+#ifndef __SYS_SPEC_FS_I_H__
+#define __SYS_SPEC_FS_I_H__
 
  /* Note: this is identical layout to a socket (rearranged for validation).  The minor exception is 
     that the the sock pointer points to an stdata and the proto_ops pointer points to a stream_ops
@@ -73,4 +73,4 @@ struct specfs_inode_info {
 	atomic_t s_refs;		/* reference count */
 };
 
-#endif				/* __LINUX_SPEC_FS_I_H__ */
+#endif				/* __SYS_SPEC_FS_I_H__ */

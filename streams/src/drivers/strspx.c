@@ -73,6 +73,8 @@ static char const ident[] = "strspx.c,v (0.9.2.9) 2003/10/26 17:25:55";
 #include "strhead.h"		/* for autopush */
 #include "strpipe.h"		/* for pipe stuff */
 
+#include "sys/config.h"
+
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SPX_REVISION	"LfS strspx.c,v (0.9.2.9) 2003/10/26 17:25:55"
@@ -93,16 +95,16 @@ MODULE_SUPPORTED_DEVICE(SPX_DEVICE);
 MODULE_LICENSE(SPX_LICENSE);
 
 #ifndef CONFIG_STREAMS_SPX_NAME
-#define CONFIG_STREAMS_SPX_NAME "spx"
-//#error "CONFIG_STREAMS_SPX_NAME must be defined."
+//#define CONFIG_STREAMS_SPX_NAME "spx"
+#error "CONFIG_STREAMS_SPX_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_SPX_MODID
-#define CONFIG_STREAMS_SPX_MODID 10
-//#error "CONFIG_STREAMS_SPX_MODID must be defined."
+//#define CONFIG_STREAMS_SPX_MODID 10
+#error "CONFIG_STREAMS_SPX_MODID must be defined."
 #endif
 #ifndef CONFIG_STREAMS_SPX_MAJOR
-#define CONFIG_STREAMS_SPX_MAJOR 0
-//#error "CONFIG_STREAMS_SPX_MAJOR must be defined."
+//#define CONFIG_STREAMS_SPX_MAJOR 0
+#error "CONFIG_STREAMS_SPX_MAJOR must be defined."
 #endif
 
 static unsigned short major = CONFIG_STREAMS_SPX_MAJOR;

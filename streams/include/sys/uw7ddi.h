@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __UW7DDI_H__
-#define __UW7DDI_H__
+#ifndef __SYS_UW7DDI_H__
+#define __SYS_UW7DDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -314,4 +314,4 @@ __UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp)
 #warning "_UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7"
 #endif				/* CONFIG_STREAMS_COMPAT_UW7 */
 
-#endif				/* __UW7DDI_H__ */
+#endif				/* __SYS_UW7DDI_H__ */

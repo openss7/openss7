@@ -74,6 +74,8 @@ static char const ident[] =
 #include "strsched.h"		/* for ap_get/ap_put */
 #include "strsad.h"		/* for autopush functions */
 
+#include "sys/config.h"
+
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SAD_REVISION	"LfS sad.c,v (1.1.2.9) 2003/10/21 21:50:19"
@@ -94,16 +96,16 @@ MODULE_SUPPORTED_DEVICE(SAD_DEVICE);
 MODULE_LICENSE(SAD_LICENSE);
 
 #ifndef CONFIG_STREAMS_SAD_NAME
-#define CONFIG_STREAMS_SAD_NAME "sad"
-//#error "CONFIG_STREAMS_SAD_NAME must be defined."
+//#define CONFIG_STREAMS_SAD_NAME "sad"
+#error "CONFIG_STREAMS_SAD_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_SAD_MAJOR
-#define CONFIG_STREAMS_SAD_MAJOR 0
-//#error "CONFIG_STREAMS_SAD_MAJOR must be defined."
+//#define CONFIG_STREAMS_SAD_MAJOR 0
+#error "CONFIG_STREAMS_SAD_MAJOR must be defined."
 #endif
 #ifndef CONFIG_STREAMS_SAD_MODID
-#define CONFIG_STREAMS_SAD_MODID 4
-//#error "CONFIG_STREAMS_SAD_MODID must be defined."
+//#define CONFIG_STREAMS_SAD_MODID 4
+#error "CONFIG_STREAMS_SAD_MODID must be defined."
 #endif
 
 static unsigned short major = CONFIG_STREAMS_SAD_MAJOR;

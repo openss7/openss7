@@ -2185,6 +2185,9 @@ static int str_init_caches(void)
 	return (0);
 }
 
+static typeof(&open_softirq) _open_softirq
+	= (typeof(_open_softirq))HAVE_OPEN_SOFTIRQ_ADDR;
+
 int strsched_init(void)
 {
 	int result, i;
@@ -2210,12 +2213,12 @@ int strsched_init(void)
 		t->freeevnt_head = NULL;
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
-	open_softirq(STREAMS_SOFTIRQ, runqueues, NULL);
+	_open_softirq(STREAMS_SOFTIRQ, runqueues, NULL);
 	return (0);
 }
 
 void strsched_exit(void)
 {
-	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
+	_open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
 	str_term_caches();
 }

@@ -72,6 +72,8 @@ static char const ident[] = "nuls.c,v (1.1.2.2) 2003/10/21 21:50:19";
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for ap_get/ap_put */
 
+#include "sys/config.h"
+
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define NULS_REVISION	"LfS nuls.c,v (1.1.2.2) 2003/10/21 21:50:19"
@@ -92,16 +94,16 @@ MODULE_SUPPORTED_DEVICE(NULS_DEVICE);
 MODULE_LICENSE(NULS_LICENSE);
 
 #ifndef CONFIG_STREAMS_NULS_NAME
-#define CONFIG_STREAMS_NULS_NAME "nuls"
-//#error "CONFIG_STREAMS_NULS_NAME must be defined."
+//#define CONFIG_STREAMS_NULS_NAME "nuls"
+#error "CONFIG_STREAMS_NULS_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_NULS_MODID
-#define CONFIG_STREAMS_NULS_MODID 3
-//#error "CONFIG_STREAMS_NULS_MODID must be defined."
+//#define CONFIG_STREAMS_NULS_MODID 3
+#error "CONFIG_STREAMS_NULS_MODID must be defined."
 #endif
 #ifndef CONFIG_STREAMS_NULS_MAJOR
-#define CONFIG_STREAMS_NULS_MAJOR 0
-//#error "CONFIG_STREAMS_NULS_MAJOR must be defined."
+//#define CONFIG_STREAMS_NULS_MAJOR 0
+#error "CONFIG_STREAMS_NULS_MAJOR must be defined."
 #endif
 
 static unsigned short major = CONFIG_STREAMS_NULS_MAJOR;

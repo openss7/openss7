@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/01 11:32:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/03/02 12:04:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,16 +46,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/01 11:32:21 $ by $Author: brian $
+# Last Modified $Date: 2004/03/02 12:04:52 $ by $Author: brian $
 #
 # =============================================================================
 
 #bin_PROGRAMS			= 
 
-sbin_PROGRAMS			= strmakenodes
+sbin_PROGRAMS			= \
+				autopush \
+				fattach \
+				fdetach \
+				strload \
+				strmakenodes
 
-LFS_EXTRA_TESTS			= 
-LFS_EXTRA_TOOLS			= strmakenodes
+#LFS_EXTRA_TESTS		= 
+#LFS_EXTRA_TOOLS		= strmakenodes
 
 LDADD				= libstreams.la
 
@@ -201,6 +206,30 @@ EXTRA_PROGRAMS			= strmakenodes
 #bin_PROGRAMS			= timetst strtst $(LFS_EXTRA_TESTS)
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
 
+autopush_SOURCES		= src/util/autopush.c $(top_builddir)/include/sys/config.h
+autopush_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+autopush_LDFLAGS		= -static libstreams.la
+autopush_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+autopush_CFLAGS			= @USER_CFLAGS@
+
+fattach_SOURCES			= src/util/fattach.c $(top_builddir)/include/sys/config.h
+fattach_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+fattach_LDFLAGS			= -static libstreams.la
+fattach_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+fattach_CFLAGS			= @USER_CFLAGS@
+
+fdetach_SOURCES			= src/util/fdetach.c $(top_builddir)/include/sys/config.h
+fdetach_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+fdetach_LDFLAGS			= -static libstreams.la
+fdetach_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+fdetach_CFLAGS			= @USER_CFLAGS@
+
+strload_SOURCES			= src/util/strload.c $(top_builddir)/include/sys/config.h
+strload_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+strload_LDFLAGS			= -static libstreams.la
+strload_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+strload_CFLAGS			= @USER_CFLAGS@
+
 strmakenodes_SOURCES		= src/util/strmakenodes.c $(top_builddir)/include/sys/config.h
 strmakenodes_DEPENDENCIES	= $(top_builddir)/include/sys/config.h
 strmakenodes_LDADD		=
@@ -235,7 +264,7 @@ Config.master: $(lfs_configs)
 	else exit 1; fi;
 
 clean-local:
-	rm -f @LFS_SC_CONFIG@ @LFS_SC_MODCONF@ @LFS_SC_MKNODES@ @LFS_SC_DRVCONF@ @LFS_SC_CONFMOD@ Config.master
+	rm -f @LFS_SC_CONFIG@ @LFS_SC_MODCONF@ @LFS_SC_MKNODES@ @LFS_SC_DRVCONF@ @LFS_SC_CONFMOD@ @LFS_SC_MAKEDEV@ Config.master
 
 nodist_man_MANS = \
 	doc/man/man2/fattach.2 doc/man/man2/fcntl.2 doc/man/man2/fcntl.2s doc/man/man2/getmsg.2 doc/man/man2/getpmsg.2 \

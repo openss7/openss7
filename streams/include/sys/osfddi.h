@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __OSFDDI_H__
-#define __OSFDDI_H__
+#ifndef __SYS_OSFDDI_H__
+#define __SYS_OSFDDI_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -91,4 +91,4 @@ __OSF_EXTERN_INLINE time_t time(void)
 #warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
 #endif
 
-#endif				/* __OSFDDI_H__ */
+#endif				/* __SYS_OSFDDI_H__ */

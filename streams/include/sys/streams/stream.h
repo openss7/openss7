@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __STREAM_H__
-#define __STREAM_H__ 1
+#ifndef __SYS_STREAM_H__
+#define __SYS_STREAM_H__ 1
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -1135,4 +1135,4 @@ __EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp)
 
 #define straln(a)   (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
-#endif				/* __STREAM_H__ */
+#endif				/* __SYS_STREAM_H__ */

@@ -74,6 +74,8 @@ static char const ident[] =
 
 #include "strdebug.h"
 
+#include "sys/config.h"
+
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define CONNLD_REVISION		"LfS connld.c,v (1.1.2.6) 2003/10/21 21:50:08"
@@ -94,12 +96,12 @@ MODULE_SUPPORTED_DEVICE(CONNLD_DEVICE);
 MODULE_LICENSE(CONNLD_LICENSE);
 
 #ifndef CONFIG_STREAMS_CONNLD_NAME
-#define CONFIG_STREAMS_CONNLD_NAME "connld"
-//#error "CONFIG_STREAMS_CONNLD_NAME must be defined."
+//#define CONFIG_STREAMS_CONNLD_NAME "connld"
+#error "CONFIG_STREAMS_CONNLD_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_CONNLD_MODID
-#define CONFIG_STREAMS_CONNLD_MODID 12
-//#error "CONFIG_STREAMS_CONNLD_MODID must be defined."
+//#define CONFIG_STREAMS_CONNLD_MODID 12
+#error "CONFIG_STREAMS_CONNLD_MODID must be defined."
 #endif
 
 static modID_t modid = CONFIG_STREAMS_CONNLD_MODID;

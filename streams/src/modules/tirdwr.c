@@ -80,6 +80,8 @@ static char const ident[] =
 
 #include "strdebug.h"
 
+#include "sys/config.h"
+
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_REVISION		"LfS tirdwr.c,v (0.9.2.8) 2003/10/21 21:50:22"
@@ -100,12 +102,12 @@ MODULE_SUPPORTED_DEVICE(TIRDWR_DEVICE);
 MODULE_LICENSE(TIRDWR_LICENSE);
 
 #ifndef CONFIG_STREAMS_TIRDWR_NAME
-#define CONFIG_STREAMS_TIRDWR_NAME "tirdwr"
-//#error "CONFIG_STREAMS_TIRDWR_NAME must be defined."
+//#define CONFIG_STREAMS_TIRDWR_NAME "tirdwr"
+#error "CONFIG_STREAMS_TIRDWR_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_TIRDWR_MODID
-#define CONFIG_STREAMS_TIRDWR_MODID 16
-//#error "CONFIG_STREAMS_TIRDWR_MODID must be defined."
+//#define CONFIG_STREAMS_TIRDWR_MODID 16
+#error "CONFIG_STREAMS_TIRDWR_MODID must be defined."
 #endif
 
 static modID_t modid = CONFIG_STREAMS_TIRDWR_MODID;

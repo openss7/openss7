@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sockmod.h,v 0.9.2.1 2004/02/29 19:10:08 brian Exp $
+ @(#) $Id: sockmod.h,v 0.9.2.2 2004/03/02 05:31:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/29 19:10:08 $ by $Author: brian $
+ Last Modified $Date: 2004/03/02 05:31:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LINUX_SOCKMOD_H__
-#define __LINUX_SOCKMOD_H__
+#ifndef __SYS_SOCKMOD_H__
+#define __SYS_SOCKMOD_H__
 
 #define O_SI_GETUDATA	(('I'<<8)|101)
 #define SI_SHUTDOWN	(('I'<<8)|102)
@@ -92,4 +92,4 @@ struct si_udata {
 	struct si_sockparams sockparams;
 };
 
-#endif				/* __LINUX_SOCKMOD_H__ */
+#endif				/* __SYS_SOCKMOD_H__ */

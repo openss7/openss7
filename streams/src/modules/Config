@@ -14,6 +14,7 @@ module	pipemod		pipemod
 module	connld		connld
 module	timod		timod
 module	tirdwr		tirdwr
+module	sockmod		sockmod
 
 #
 # Object name specifications
@@ -23,6 +24,7 @@ objname module	pipemod		pipemod
 objname module	connld		connld
 objname module	timod		timod
 objname module	tirdwr		tirdwr
+objname	module	sockmod		sockmod
 
 #
 # Loadable specifications
@@ -38,6 +40,7 @@ loadable pipemod
 loadable connld
 loadable timod
 loadable tirdwr
+loadable sockmod
 
 #
 # Initialization specifications

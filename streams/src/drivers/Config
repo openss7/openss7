@@ -26,13 +26,13 @@ driver	nuls		nuls	*
 driver	pipe		pipe	*
 driver	sfx		sfx	*
 driver	spx		spx	*
-driver	socksys		ss	*
+driver	socksys		socksys	*
 driver	unix		unix	*
 driver	xnet		xnet	*
 #
 # this must be 30 for iBCS compatibility
 #
-driver	inet		ss_	30
+driver	inet		inet	30
 
 #
 # Object name specifications

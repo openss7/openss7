@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __STRLOG_H__
-#define __STRLOG_H__
+#ifndef __SYS_STRLOG_H__
+#define __SYS_STRLOG_H__
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -64,4 +64,4 @@
 extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
     __attribute__ ((format(printf, 5, 6)));
 
-#endif				/* __STRLOG_H__ */
+#endif				/* __SYS_STRLOG_H__ */

@@ -85,6 +85,8 @@ static char const ident[] =
 
 #include "strdebug.h"
 
+#include "sys/config.h"
+
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define TIMOD_REVISION	"LfS timod.c,v (0.9.2.10) 2003/10/21 21:50:22"
@@ -105,12 +107,12 @@ MODULE_SUPPORTED_DEVICE(TIMOD_DEVICE);
 MODULE_LICENSE(TIMOD_LICENSE);
 
 #ifndef CONFIG_STREAMS_TIMOD_NAME
-#define CONFIG_STREAMS_TIMOD_NAME "timod"
-//#error "CONFIG_STREAMS_TIMOD_NAME must be defined."
+//#define CONFIG_STREAMS_TIMOD_NAME "timod"
+#error "CONFIG_STREAMS_TIMOD_NAME must be defined."
 #endif
 #ifndef CONFIG_STREAMS_TIMOD_MODID
-#define CONFIG_STREAMS_TIMOD_MODID 15
-//#error "CONFIG_STREAMS_TIMOD_MODID must be defined."
+//#define CONFIG_STREAMS_TIMOD_MODID 15
+#error "CONFIG_STREAMS_TIMOD_MODID must be defined."
 #endif
 
 static modID_t modid = CONFIG_STREAMS_TIMOD_MODID;

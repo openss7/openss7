@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __STRCONF_H__
-#define __STRCONF_H__
+#ifndef __SYS_STRCONF_H__
+#define __SYS_STRCONF_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -377,4 +377,4 @@ extern int apush_get(struct strapush *sap);
 extern int apush_set(struct strapush *sap);
 extern int apush_vml(struct str_list *slp);
 
-#endif				/* __STRCONF_H__ */
+#endif				/* __SYS_STRCONF_H__ */

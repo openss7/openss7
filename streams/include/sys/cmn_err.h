@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __CMN_ERR_H__
-#define __CMN_ERR_H__ 1
+#ifndef __SYS_CMN_ERR_H__
+#define __SYS_CMN_ERR_H__ 1
 
 #ifndef __KERNEL__
 #error "Do not include kernel header files in user space programs."
@@ -64,4 +64,4 @@
 extern void vcmn_err(int err_lvl, const char *fmt, va_list args);
 extern void cmn_err(int err_lvl, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
-#endif				/* __CMN_ERR_H__ */
+#endif				/* __SYS_CMN_ERR_H__ */

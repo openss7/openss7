@@ -49,8 +49,8 @@
 
  *****************************************************************************/
 
-#ifndef __STRSUBR_H__
-#define __STRSUBR_H__
+#ifndef __SYS_STRSUBR_H__
+#define __SYS_STRSUBR_H__
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -511,4 +511,4 @@ extern void sdev_put(struct cdevsw *sdev);
 extern struct fmodsw *smod_get(const char *name);
 extern void smod_put(struct fmodsw *smod);
 
-#endif				/* __STRSUBR_H__ */
+#endif				/* __SYS_STRSUBR_H__ */
