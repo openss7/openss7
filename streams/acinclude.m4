@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.25 2004/05/22 10:22:05 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.26 2004/05/23 07:24:21 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,12 +53,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/22 10:22:05 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/23 07:24:21 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/kernel.m4])
 m4_include([m4/genksyms.m4])
+m4_include([m4/xopen.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
@@ -286,6 +287,7 @@ AC_DEFUN([_LFS_SETUP_FIFOS], [
 AC_DEFUN([_LFS_SETUP], [
     _LINUX_KERNEL
     _GENKSYMS
+    _XOPEN
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _LFS_SETUP_MODULE
@@ -312,229 +314,10 @@ AC_DEFUN([_LFS_SETUP_MODULE], [
 # _LFS_CHECK_KERNEL
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CHECK_KERNEL], [
-    _LFS_CHECK_XNS
-    _LFS_CHECK_TLI
-    _LFS_CHECK_INET
-    _LFS_CHECK_XNET
-    _LFS_CHECK_SOCK
     _LFS_CONFIG_FATTACH
     _LFS_CONFIG_LIS
     _LFS_CONFIG_LFS
 ])# _LFS_CHECK_KERNEL
-# =========================================================================
-
-# =========================================================================
-# _LFS_CHECK_XNS
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CHECK_XNS], [
-    AC_ARG_WITH([xns],
-        AS_HELP_STRING([--with-xns],
-            [include xns headers in install.  @<:@default=yes@:>@]),
-        [with_xns="$withval"],
-        [with_xns='yes'])
-    AC_MSG_CHECKING([for package xns headers])
-    AC_MSG_RESULT([$with_xns])
-    if test :"$with_xns" = :yes ; then :;
-        _LFS_CONFIG_XNS
-    fi
-    AM_CONDITIONAL([WITH_XNS], test :"$with_xns" = :yes )
-])# _LFS_CHECK_XNS
-# =========================================================================
-
-# =========================================================================
-# _LFS_CHECK_TLI
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CHECK_TLI], [
-    AC_ARG_WITH([tli],
-        AS_HELP_STRING([--with-tli],
-            [include tli modules in build.  @<:@default=yes@:>@]),
-        [with_tli="$withval"],
-        [with_tli='yes'])
-    AC_MSG_CHECKING([for package tli modules])
-    AC_MSG_RESULT([$with_tli])
-    if test :"$with_tli" = :yes ; then :;
-        _LFS_CONFIG_TLI
-    fi
-    AM_CONDITIONAL([WITH_TLI], test :"$with_tli" = :yes )
-])# _LFS_CHECK_TLI
-# =========================================================================
-
-# =========================================================================
-# _LFS_CHECK_INET
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CHECK_INET], [
-    AC_ARG_WITH([inet],
-        AS_HELP_STRING([--with-inet],
-            [include inet driver in build.  @<:@default=yes@:>@]),
-        [with_inet="$withval"],
-        [with_inet='yes'])
-    AC_MSG_CHECKING([for package inet driver])
-    AC_MSG_RESULT([$with_inet])
-    if test :"$with_inet" = :yes ; then :;
-        _LFS_CONFIG_INET
-    fi
-    AM_CONDITIONAL([WITH_INET], test :"$with_inet" = :yes )
-])# _LFS_CHECK_INET
-# =========================================================================
-
-# =========================================================================
-# _LFS_CHECK_XNET
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CHECK_XNET], [
-    AC_ARG_WITH([xnet],
-        AS_HELP_STRING([--with-xnet],
-            [include xnet library in build.  @<:@default=yes@:>@]),
-        [with_xnet="$withval"],
-        [with_xnet='yes'])
-    AC_MSG_CHECKING([for package xnet library])
-    AC_MSG_RESULT([$with_xnet])
-    if test :"$with_xnet" = :yes ; then :;
-        _LFS_CONFIG_XNET
-    fi
-    AM_CONDITIONAL([WITH_XNET], test :"$with_xnet" = :yes )
-])# _LFS_CHECK_XNET
-# =========================================================================
-
-# =========================================================================
-# _LFS_CHECK_SOCK
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CHECK_SOCK], [
-    AC_ARG_WITH([sock],
-        AS_HELP_STRING([--with-sock],
-            [include sock library in build.  @<:@default=yes@:>@]),
-        [with_sock="$withval"],
-        [with_sock='yes'])
-    AC_MSG_CHECKING([for package socket library])
-    AC_MSG_RESULT([$with_sock])
-    if test :"$with_sock" = :yes ; then :;
-        _LFS_CONFIG_SOCK
-    fi
-    AM_CONDITIONAL([WITH_SOCK], test :"$with_sock" = :yes )
-])# _LFS_CHECK_SOCK
-# =========================================================================
-
-# =========================================================================
-# _LFS_CONFIG_XNS
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_XNS], [
-])# _LFS_CONFIG_XNS
-# =========================================================================
-
-# =========================================================================
-# _LFS_CONFIG_TLI
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_TLI], [
-])# _LFS_CONFIG_TLI
-# =========================================================================
-
-# =========================================================================
-# _LFS_CONFIG_INET
-# -------------------------------------------------------------------------
-# tcp_openreq_cachep            <-- extern, declared in <net/tcp.h>
-# tcp_set_keepalive             <-- extern, declared in <net/tcp.h>
-# ip_tos2prio                   <-- extern, declared in <net/route.h>
-# sysctl_rmem_default           <-- extern, declared in net/core/sock.c
-# sysctl_wmem_default           <-- extern, declared in net/core/sock.c
-# sysctl_tcp_fin_timeout        <-- extern, declared in net/ipv4/tcp.c
-# -----------------------------------------------------------------------------
-# New ones: (All only exported with IPv6 as module.)
-# tcp_sync_mss                  <-- extern, declared in <net/tcp.h>
-# tcp_write_xmit                <-- extern, declared in <net/tcp.h>
-# tcp_cwnd_application_limited  <-- extern, declared in <net/tcp.h>
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_INET], [
-    AC_CACHE_CHECK([for OpenSS7 Kernel SCTP], [lfs_cv_openss7_sctp], [
-        _LINUX_KERNEL_ENV([
-            AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <net/sctp.h>
-#ifdef SCTPCB_FLAG_CONF
-    yes_we_have_openss7_kernel_sctp
-#endif
-            ], [lfs_cv_openss7_sctp=yes], [lfs_cv_openss7_sctp=no])
-        ])
-    ])
-    if test :"${lfs_cv_openss7_sctp:-no}" = :yes ; then
-        AC_DEFINE([HAVE_OPENSS7_SCTP], [1],
-        [Define if your kernel supports the OpenSS7 Linux Kernel Sockets SCTP
-        patches.  This enables support in the INET driver for STREAMS on top
-        of the OpenSS7 Linux Kernel Sockets SCTP implementation.])
-    fi
-    _LINUX_KERNEL_SYMBOL_ADDR([tcp_openreq_cachep])
-    _LINUX_KERNEL_SYMBOL_ADDR([tcp_set_keepalive])
-    _LINUX_KERNEL_SYMBOL_ADDR([ip_tos2prio])
-    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_rmem_default])
-    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_wmem_default])
-    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_tcp_fin_timeout])
-    _LINUX_KERNEL_SYMBOL_ADDR([tcp_sync_mss])
-    _LINUX_KERNEL_SYMBOL_ADDR([tcp_write_xmit])
-    _LINUX_KERNEL_SYMBOL_ADDR([tcp_cwnd_application_limited])
-    _LINUX_KERNEL_ENV([
-        AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
-            [lfs_cv_af_inet_ttl_member_name='ttl'],
-            [:],
-            [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-            ])
-        AC_CHECK_MEMBER([struct sock.protinfo.af_inet.uc_ttl],
-            [lfs_cv_af_inet_ttl_member_name='uc_ttl'],
-            [:],
-            [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-            ])
-        ])
-    if test :"${lfs_cv_af_inet_ttl_member_name:+set}" = :set ; then
-        AC_DEFINE_UNQUOTED([USING_AF_INET_TTL_MEMBER_NAME], [$lfs_cv_af_inet_ttl_member_name], [Most
-        kernels call the time-to-live member of the af_inet structure ttl.  For some reason
-        (probably because the old ttl member as 'int' and the new uc_ttl member is 'unsigned char')
-        reported by Bala Viswanathan <balav@lsil.com> to the linux-streams mailing lfst, EL3 renames
-        the member to uc_ttl on some kernels.  Define this to the member name used (ttl or uc_ttl)
-        so that the inet driver can be properly supported.  If this is not defined, 'ttl' will be
-        used as a default.])
-    else
-        AC_MSG_WARN([
-***
-*** You have really mangled kernel header files with regards to the 'sock'
-*** structure.  The 'sock' structure on Linux 2.4 should have an af_inet.ttl
-*** member (used in stock kernels) or an af_inet.uc_ttl member (used on some RH
-*** kernels).  Your kernel headers are so bad that <net/sock.h> has neither
-*** member defined.  Winging it with 'ttl' as the member name.
-***
-        ])
-    fi
-])# _LFS_CONFIG_INET
-# =========================================================================
-
-# =========================================================================
-# _LFS_CONFIG_XNET
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_XNET], [
-])# _LFS_CONFIG_XNET
-# =========================================================================
-
-# =========================================================================
-# _LFS_CONFIG_SOCK
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_SOCK], [
-])# _LFS_CONFIG_SOCK
 # =========================================================================
 
 # =========================================================================
@@ -565,7 +348,7 @@ AC_DEFUN([_LFS_CONFIG_SOCK], [
 # 
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_FATTACH], [
-    _LINUX_KERNEL_SYMBOL_ADDR([mount_sem], [], [
+    _LINUX_KERNEL_SYMBOL_EXPORT([mount_sem], [
         AC_DEFINE_UNQUOTED([HAVE_TASK_NAMESPACE_SEM], [1],
         [Some recent 2.4 RH kernel place the mount semaphore into the task
         structure rather than using the static global mount_sem semaphore.
@@ -573,10 +356,10 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
     ])
     lfs_pipe=yes
     lfs_fattach=yes
-    _LINUX_KERNEL_SYMBOL_ADDR([clone_mnt], [], [lfs_fattach=no; lfs_pipe=no])
-    _LINUX_KERNEL_SYMBOL_ADDR([check_mnt], [], [lfs_fattach=no; lfs_pipe=no])
-    _LINUX_KERNEL_SYMBOL_ADDR([graft_tree], [], [lfs_fattach=no; lfs_pipe=no])
-    _LINUX_KERNEL_SYMBOL_ADDR([do_umount], [], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_EXPORT([check_mnt], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_EXPORT([graft_tree], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_EXPORT([do_umount], [lfs_fattach=no; lfs_pipe=no])
     AC_CACHE_CHECK([for kernel symbol support for fattach/fdetach], [lfs_cv_fattach], [
         lfs_cv_fattach="$lfs_fattach"
     ])
@@ -593,7 +376,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         [If the addresses for the necessary symbols above are defined, then
         define this to include pipe support.])
     fi
-    _LINUX_KERNEL_SYMBOL_ADDR([def_fifo_fops])
+    _LINUX_KERNEL_SYMBOL_EXPORT([def_fifo_fops])
 ])# _LFS_CONFIG_FATTACH
 # =========================================================================
 
@@ -609,27 +392,27 @@ _LFS_CONFIG_LIS
 # pcibios_init          <-- extern, declared in <linux/pci.h>
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_LIS], [
-    _LINUX_KERNEL_SYMBOL_ADDR([sys_unlink], [], [
+    _LINUX_KERNEL_SYMBOL_EXPORT([sys_unlink], [
         if test :"${linux_cv_k_marchdir}" = :parisc ; then
             AC_MSG_WARN([lis_unlink() will always return ENOSYS])
         fi
     ])
-    _LINUX_KERNEL_SYMBOL_ADDR([sys_mknod], [], [
+    _LINUX_KERNEL_SYMBOL_EXPORT([sys_mknod], [
         if test :"${linux_cv_k_marchdir}" = :parisc ; then
             AC_MSG_WARN([lis_mknod() will always return ENOSYS])
         fi
     ])
-    _LINUX_KERNEL_SYMBOL_ADDR([sys_umount], [], [
+    _LINUX_KERNEL_SYMBOL_EXPORT([sys_umount], [
         if test :"${linux_cv_k_marchdir}" = :parisc ; then
             AC_MSG_WARN([lis_umount() will always return ENOSYS])
         fi
     ])
-    _LINUX_KERNEL_SYMBOL_ADDR([sys_mount], [], [
+    _LINUX_KERNEL_SYMBOL_EXPORT([sys_mount], [
         if test :"${linux_cv_k_marchdir}" = :parisc ; then
             AC_MSG_WARN([lis_mount() will always return ENOSYS])
         fi
     ])
-    _LINUX_KERNEL_SYMBOL_ADDR([pcibios_init])
+    _LINUX_KERNEL_SYMBOL_EXPORT([pcibios_init])
 ])# _LFS_CONFIG_LIS
 # =========================================================================
 
@@ -643,8 +426,8 @@ AC_DEFUN([_LFS_CONFIG_LIS], [
 # sock_readv_writev     <-- extern, declared in <linux/net.h>
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_LFS], [
-    _LINUX_KERNEL_SYMBOL_ADDR([file_move])
-    _LINUX_KERNEL_SYMBOL_ADDR([open_softirq], [], [
+    _LINUX_KERNEL_SYMBOL_EXPORT([file_move])
+    _LINUX_KERNEL_SYMBOL_EXPORT([open_softirq], [
         AC_MSG_ERROR([
 *** 
 *** Compiling Linux Fast STREAMS requires the availability of the kernel
@@ -657,7 +440,7 @@ AC_DEFUN([_LFS_CONFIG_LFS], [
 *** 
         ])
     ])
-    _LINUX_KERNEL_SYMBOL_ADDR([sock_readv_writev])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sock_readv_writev])
 ])# _LFS_CONFIG_LFS
 # =========================================================================
 

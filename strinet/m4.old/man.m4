@@ -2,11 +2,12 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/05/23 07:24:25 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.1 2004/05/23 07:24:25 brian Exp $
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -57,69 +58,75 @@ dnl Last Modified $Date: 2004/05/23 07:24:25 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/genksyms.m4])
-m4_include([m4/xopen.m4])
-m4_include([m4/man.m4])
-m4_include([m4/public.m4])
-m4_include([m4/rpm.m4])
-m4_include([m4/libraries.m4])
-m4_include([m4/strconf.m4])
-
 # =========================================================================
-# AC_INET
+# _MAN_CONVERSION
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_INET], [
-    _INET_OPTIONS
-    _MAN_CONVERSION
-    _PUBLIC_RELEASE
-    _RPM_SPEC
-    _LDCONFIG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    _XOPEN
-    INET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $XNET_INCLUDES])
-    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])
-    AC_SUBST([USER_CFLAGS])
-    AC_SUBST([INET_INCLUDES])
-    CPPFLAGS=
-    CFLAGS=
-    _INET_SETUP
-    _INET_OUTPUT
-])# AC_INET
+AC_DEFUN([_MAN_CONVERSION],
+[
+    _MAN_CONVERSION_OPTIONS
+    _MAN_CONVERSION_SETUP
+    _MAN_CONVERSION_OUTPUT
+])# _MAN_CONVERSION
 # =========================================================================
 
 # =========================================================================
-# _INET_OPTIONS
+# _MAN_CONVERSION_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_OPTIONS], [
-])# _INET_OPTIONS
+AC_DEFUN([_MAN_CONVERSION_OPTIONS],
+[
+])# _MAN_CONVERSION_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _INET_SETUP
+# _MAN_CONVERSION_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_SETUP], [
-])# _INET_SETUP
+AC_DEFUN([_MAN_CONVERSION_SETUP],
+[
+    AC_ARG_WITH([cooked-manpages],
+        AS_HELP_STRING([--with-cooked-manpages],
+            [convert manual pages to remove macro dependencies and grefer
+            references.  @<:@default=no@:>@]),
+        [with_cooked_manpages=$withval],
+        [with_cooked_manpages='no'])
+    AC_MSG_CHECKING([for manpage conversion])
+    if test :"${with_cooked_manpages:-no}" != :no ; then
+        AC_MSG_RESULT([yes])
+        AC_ARG_VAR([SOELIM], [Roff source elminiation command])
+        AC_ARG_VAR([REFER], [Roff references command])
+        AC_ARG_VAR([TBL], [Roff table command])
+        AC_ARG_VAR([PIC], [Roff picture command])
+        AC_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+        AC_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+        AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+        AC_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+    else
+        AC_MSG_RESULT([no])
+    fi
+    AC_ARG_ENABLE([compress-manpages],
+        AS_HELP_STRING([--disable-compress-manpages],
+            [compress manpges with gzip -9 or leave them uncompressed.
+            @<:@default=yes@:>@]),
+        [enable_compress_manpages=$enableval],
+        [enable_compress_manpages='yes'])
+    AC_MSG_CHECKING([for manpage compression])
+    if test :"${enable_compress_manpages:-yes}" != :yes ; then
+        AC_MSG_RESULT([no])
+    else
+        AC_MSG_RESULT([yes])
+        AC_ARG_VAR([GZIP], [Manpages compression commands])
+        AC_PATH_PROGS([GZIP], [gzip], [/usr/bin/gzip], [$PATH:/usr/local/bin:/usrs/bin:/bin])
+    fi
+])# _MAN_CONVERSION_SETUP
 # =========================================================================
 
 # =========================================================================
-# _INET_
+# _MAN_CONVERSION_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_], [
-])# _INET_
+AC_DEFUN([_MAN_CONVERSION_OUTPUT],
+[
+    AM_CONDITIONAL([COOKED_MANPAGES], test :"${with_cooked_manpages:-no}" != :no )
+    AM_CONDITIONAL([COMPRESS_MANPAGES], test :"${enable_compress_manpages:-yes}" = :yes )
+])# _MAN_CONVERSION_OUTPUT
 # =========================================================================
 
 dnl =========================================================================

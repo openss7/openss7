@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/05/23 07:24:25 brian Exp $
+dnl @(#) rpm.m4,v 0.9.2.1 2004/01/13 16:11:35 brian Exp
 dnl
 dnl =========================================================================
 dnl
@@ -53,73 +53,44 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/23 07:24:25 $ by $Author: brian $
+dnl Last Modified 2004/01/13 16:11:35 by brian
 dnl 
 dnl =========================================================================
 
-m4_include([m4/kernel.m4])
-m4_include([m4/streams.m4])
-m4_include([m4/genksyms.m4])
-m4_include([m4/xopen.m4])
-m4_include([m4/man.m4])
-m4_include([m4/public.m4])
-m4_include([m4/rpm.m4])
-m4_include([m4/libraries.m4])
-m4_include([m4/strconf.m4])
-
 # =========================================================================
-# AC_INET
+# _LDCONFIG
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_INET], [
-    _INET_OPTIONS
-    _MAN_CONVERSION
-    _PUBLIC_RELEASE
-    _RPM_SPEC
-    _LDCONFIG
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    _LINUX_KERNEL
-    _LINUX_STREAMS
-    _XOPEN
-    INET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $XNET_INCLUDES])
-    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])
-    AC_SUBST([USER_CFLAGS])
-    AC_SUBST([INET_INCLUDES])
-    CPPFLAGS=
-    CFLAGS=
-    _INET_SETUP
-    _INET_OUTPUT
-])# AC_INET
+AC_DEFUN([_LDCONFIG], [
+    _LDCONFIG_SPEC_OPTIONS
+    _LDCONFIG_SPEC_SETUP
+    _LDCONFIG_SPEC_OUTPUT
+])# _LDCONFIG
 # =========================================================================
 
 # =========================================================================
-# _INET_OPTIONS
+# _LDCONFIG_SPEC_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_OPTIONS], [
-])# _INET_OPTIONS
+AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [
+])# _LDCONFIG_SPEC_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _INET_SETUP
+# _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_SETUP], [
-])# _INET_SETUP
+AC_DEFUN([_LDCONFIG_SPEC_SETUP], [
+    AC_ARG_VAR([LDCONFIG], [Configure loader command])
+    AC_PATH_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${LDCONFIG:-no}" = :no ; then
+        AC_MSG_WARN([Could not find ldconfig program in PATH.])
+    fi
+])# _LDCONFIG_SPEC_SETUP
 # =========================================================================
 
 # =========================================================================
-# _INET_
+# _LDCONFIG_SPEC_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_], [
-])# _INET_
+AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [
+])# _LDCONFIG_SPEC_OUTPUT
 # =========================================================================
 
 dnl =========================================================================

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: public.m4,v 0.9 2004/04/03 12:44:17 brian Exp $
+dnl @(#) $Id: public.m4,v 0.9.2.1 2004/05/23 07:24:25 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/03 12:44:17 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/23 07:24:25 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -64,42 +64,50 @@ dnl site.  See http://www.openss7.org/ for more information.
 dnl -------------------------------------------------------------------------
 
 # =========================================================================
-# AC_PUBLIC_RELEASE
+# _PUBLIC_RELEASE
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_PUBLIC_RELEASE],
+AC_DEFUN([_PUBLIC_RELEASE],
 [
-    _PUBLIC_OPTIONS
-    _PUBLIC_SETUP
-])# AC_PUBLIC_RELEASE
+    _PUBLIC_RELEASE_OPTIONS
+    _PUBLIC_RELEASE_SETUP
+    _PUBLIC_RELEASE_OUTPUT
+])# _PUBLIC_RELEASE
 # =========================================================================
 
 # =========================================================================
-# _PUBLIC_OPTIONS
+# _PUBLIC_RELEASE_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_PUBLIC_OPTIONS],
+AC_DEFUN([_PUBLIC_RELEASE_OPTIONS],
+[
+])# _PUBLIC_RELEASE_OPTIONS
+# =========================================================================
+
+# =========================================================================
+# _PUBLIC_RELEASE_SETUP
+# -------------------------------------------------------------------------
+AC_DEFUN([_PUBLIC_RELEASE_SETUP],
+[
+])# _PUBLIC_RELEASE_SETUP
+# =========================================================================
+
+# =========================================================================
+# _PUBLIC_RELEASE_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_PUBLIC_RELEASE_OUTPUT],
 [
     AC_ARG_ENABLE([public],
-                  AC_HELP_STRING([--enable-public],
-                                 [enable public release.  @<:@default=yes@:>@]),
-                  [enable_public=$enableval],
-                  [enable_public=''])
-])# _PUBLIC_OPTIONS
-# =========================================================================
-
-# =========================================================================
-# _PUBLIC_SETUP
-# -------------------------------------------------------------------------
-AC_DEFUN([_PUBLIC_SETUP],
-[
-    AC_CACHE_CHECK([for public release], [rel_cv_public], [dnl
-        if test :"$enable_public" = :no ; then
-            rel_cv_public=no
-        else
-            rel_cv_public=yes
-        fi
-    ])
-    AM_CONDITIONAL(PUBLIC_RELEASE, test:"$rel_cv_public" = :yes)
-])# _PUBLIC_SETUP
+        AS_HELP_STRING([--disable-public],
+            [disable public release.  @<:@default=no@:>@]),
+        [enable_public=$enableval],
+        [enable_public='yes'])
+    AC_MSG_CHECKING([for public release])
+    if test :"${enable_public:-yes}" != :yes ; then
+        AC_MSG_RESULT([no])
+    else
+        AC_MSG_RESULT([yes])
+    fi
+    AM_CONDITIONAL(PUBLIC_RELEASE, test :"${enable_public:-yes}" = :yes)
+])# _PUBLIC_RELEASE_OUTPUT
 # =========================================================================
 
 # =========================================================================

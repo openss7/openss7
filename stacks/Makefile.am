@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/14 20:40:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/23 08:06:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/14 20:40:16 $ by $Author: brian $
+# Last Modified $Date: 2004/05/23 08:06:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -238,6 +238,7 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= libSS7sctp.a
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
+				  src/modules/inet/inet.c \
 				  src/modules/m2pa/m2pa_sl.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
@@ -250,6 +251,10 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \
 				  src/modules/ss7sctp/sdl_sctp.c \
+				  src/modules/ti/timod.c \
+				  src/include/timod.h \
+				  src/modules/ti/tirdwr.c \
+				  src/include/tirdwr.h \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/x400pfw.h \
@@ -579,6 +584,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/dl/dl_v52.c \
 				  src/modules/dl/dl_v5ua.c \
 				  src/modules/hdlc/hdlc.c \
+				  src/modules/inet/inet.c \
 				  src/modules/isdn/isdn.c \
 				  src/modules/isup/isup.c \
 				  src/modules/lm/lm.c \
@@ -601,6 +607,10 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \
 				  src/modules/ss7sctp/sdl_sctp.c \
+				  src/modules/ti/timod.c \
+				  src/include/timod.h \
+				  src/modules/ti/tirdwr.c \
+				  src/include/tirdwr.h \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/sl_x400p.c \

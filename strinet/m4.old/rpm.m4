@@ -2,12 +2,11 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $
+dnl @(#) rpm.m4,v 0.9.2.1 2004/01/13 16:11:35 brian Exp
 dnl
 dnl =========================================================================
 dnl
 dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -54,59 +53,58 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/03 12:44:17 $ by $Author: brian $
+dnl Last Modified 2004/01/13 16:11:35 by brian
 dnl 
 dnl =========================================================================
 
 # =========================================================================
-# AC_RPM_SPEC
+# _RPM_SPEC
 # -------------------------------------------------------------------------
 # Common things that need to be done in setting up an RPM spec file from an
 # RPM.spec.in file.
 # -------------------------------------------------------------------------
-AC_DEFUN(AC_RPM_SPEC,
-[
+AC_DEFUN([_RPM_SPEC], [
     _RPM_SPEC_OPTIONS
     _RPM_SPEC_SETUP
     _RPM_SPEC_OUTPUT
-])# AC_RPM_SPEC
+])# _RPM_SPEC
 # =========================================================================
 
 # =========================================================================
 # _RPM_SPEC_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_OPTIONS,
-[
-    AC_ARG_WITH([rpm-epoch],
-        AC_HELP_STRING([--with-rpm-epoch=EPOCH],
-            [specify the EPOCH for the RPM spec file.
-            @<:@default=1@:>@]),
-        [with_rpm_epoch=$withval],
-        [with_rpm_epoch=1])
-    AC_ARG_WITH([rpm-release],
-        AC_HELP_STRING([--with-rpm-release=RELEASE],
-            [specify the RELEASE for the RPM spec file.
-            @<:@default=1@:>@]),
-        [with_rpm_release=$withval],
-        [with_rpm_release='1'])
+AC_DEFUN([_RPM_SPEC_OPTIONS], [
 ])# _RPM_SPEC_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _RPM_SPEC_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_SETUP,
-[
+AC_DEFUN([_RPM_SPEC_SETUP], [
     # two extra subsitutions for the RPM spec file
+    AC_ARG_WITH([rpm-epoch],
+        AS_HELP_STRING([--with-rpm-epoch=EPOCH],
+            [specify the EPOCH for the RPM spec file.  @<:@default=1@:>@]),
+        [with_rpm_epoch=$withval],
+        [with_rpm_epoch=1])
+    AC_MSG_CHECKING([for rpm epoch])
+    AC_MSG_RESULT([${with_rpm_epoch:-1}])
     PACKAGE_EPOCH="${with_rpm_epoch:-1}"
     AC_SUBST(PACKAGE_EPOCH)
     AC_DEFINE_UNQUOTED([PACKAGE_EPOCH], [$PACKAGE_EPOCH], [The RPM Epoch. This
         defaults to 1.])
+    AC_ARG_WITH([rpm-release],
+        AS_HELP_STRING([--with-rpm-release=RELEASE],
+            [specify the RELEASE for the RPM spec file.
+            @<:@default=Custom@:>@]),
+        [with_rpm_release=$withval],
+        [with_rpm_release='Custom'])
+    AC_MSG_CHECKING([for rpm release])
+    AC_MSG_RESULT([${with_rpm_release:-Custom}])
     PACKAGE_RELEASE="${with_rpm_release:-Custom}"
     AC_SUBST(PACKAGE_RELEASE)
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
-        Release. This defaults to "Custom".])
-    PACKAGE_OPTIONS=
+        Release. This defaults to Custom.])
     for arg in $ac_configure_args ; do
         if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
             eval "arg=$arg"
@@ -117,14 +115,46 @@ AC_DEFUN(_RPM_SPEC_SETUP,
         fi
     done
     AC_SUBST(PACKAGE_OPTIONS)
+    AC_ARG_VAR([RPMBUILD], [Build rpms command])
+    AC_PATH_TOOL([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${RPMBUILD:-no}" = :no ; then
+        AC_MSG_WARN([Could not find rpmbuild program in PATH.])
+    fi
+    AC_ARG_VAR([RPM], [Rpm command])
+    AC_PATH_TOOL([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${RPM:-no}" = :no ; then
+        AC_MSG_WARN([Could not find rpm program in PATH.])
+    fi
+    AC_ARG_WITH([gpg-user],
+        AS_HELP_STRING([--with-gpg-user=USERNAME],
+            [specify the USER for signing RPMs and tarballs.
+            @<:@default=${USER}@:>@]),
+        [with_gpg_user=$withval],
+        [with_gpg_user=${USER}])
+    AC_ARG_VAR([GPGUSER], [GPG user name])
+    AC_MSG_CHECKING([for gpg user])
+    GPGUSER="${with_gpg_user:-$USER}"
+    AC_MSG_RESULT([$GPGUSER])
+    AC_ARG_VAR([GPG], [PGP signature command])
+    AC_PATH_TOOL([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${GPG:-no}" = :no ; then
+        AC_MSG_WARN([Could not find gpg program in PATH.])
+    fi
+    AC_MSG_CHECKING([for gpg home])
+    AC_ARG_VAR([HOME], [User's home directory])
+    AC_ARG_VAR([GPGHOME], [GPG home directory])
+    if test -z "$GPGHOME" ; then
+        GPGHOME="${HOME}${HOME:+/}.gnupg"
+    fi
+    AC_MSG_RESULT([$GPGHOME])
+    AM_CONDITIONAL([BUILD_RPMS], test :"${RPMBUILD:-no}" != :no )
 ])# _RPM_SPEC_SETUP
 # =========================================================================
 
 # =========================================================================
 # _RPM_SPEC_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_OUTPUT,
-[
+AC_DEFUN([_RPM_SPEC_OUTPUT], [
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/20 18:19:35 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/23 08:40:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/20 18:19:35 $ by $Author: brian $
+# Last Modified $Date: 2004/05/23 08:40:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,10 +119,10 @@ Obsoletes:      SS7 SIGTRAN H323 ISDN
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
-%if %{Build_lfs}
+%if %{BUILD_lfs}
 Requires:       streams >= 0.7a
 %endif
-%if %{Build_lis}
+%if %{BUILD_lis}
 Requires:       LiS >= 2.16.18-15
 %endif
 Provides:       SS7 SIGTRAN H323 ISDN
@@ -137,10 +137,10 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-%if %{Build_lfs}
+%if %{BUILD_lfs}
 BuildRequires:  streams-devel >= 0.7a
 %endif
-%if %{Build_lis}
+%if %{BUILD_lis}
 BuildRequires:  LiS-devel >= 2.16.18-15
 %endif
 Autoreq:        true
@@ -298,10 +298,10 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 Summary:        OpenSS7 core kernel modules.
 Group:          System Environment/Kernel
 Requires:       kernel = %{kernel_version}
-%if %{Build_lfs}
+%if %{BUILD_lfs}
 Requires:       streams-core-%{kernel_version} >= 0.7a
 %endif
-%if %{Build_lis}
+%if %{BUILD_lis}
 Requires:       LiS-core-%{kernel_version} >= 2.16.18-15
 %endif
 Autoreq:        true
@@ -577,8 +577,10 @@ development of OpenSS7 applications, modules and drivers.
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
     for n in %{name} libxnet ; do
-        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --info-dir=%{_infodir} $n
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
         fi
     done
 fi
@@ -588,8 +590,10 @@ fi
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
     for n in %{name} libxnet ; do
-        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} $n
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
         fi
     done
 fi
@@ -617,10 +621,10 @@ Summary:        OpenSS7 headers, lib and doc.
 Group:          Development/System
 Requires:       %{name}-lib = %{version}-%{base_release}
 Requires:       %{name}-doc = %{version}-%{base_release}
-%if %{Build_lfs}
+%if %{BUILD_lfs}
 Requires:       streams-devel >= 0.7a
 %endif
-%if %{Build_lis}
+%if %{BUILD_lis}
 Requires:       LiS-devel >= 2.16.18-15
 %endif
 Prefix:         %{_libdir}
@@ -767,12 +771,21 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.16  2004/05/20 18:19:35  brian
-# - make before DESTDIR on install
+# Revision 0.9.2.18  2004/05/23 08:40:54  brian
+# - Corrected info install.
 #
-# Revision 0.9.2.15  2004/05/16 19:18:02  brian
-# - Updated info install.
-#
+
+* Sun May 23 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.17  2004/05/23 07:44:31  brian
+- Corrected %if error.
+
+* Thu May 20 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.16  2004/05/20 18:19:35  brian
+- make before DESTDIR on install
+
+* Sun May 16 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.15  2004/05/16 19:18:02  brian
+- Updated info install.
 
 * Sun May 16 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.14  2004/05/16 02:41:18  brian
