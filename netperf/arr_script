@@ -1,4 +1,4 @@
-#
+#!/bin/sh
 # a script that can be used to measure aggregate netperf performance,
 # original author is Mike Traynor. Modifications to create the
 # "netperf TCP_ARR test" by rick jones
@@ -44,7 +44,7 @@ set_default_parms() {
 }
 
 usage() {
-more << @EOF
+more << EOF
 
 $*
 
@@ -92,7 +92,7 @@ $*
         scale_script -n 4 -lla -d /dev/lan0,/dev/lan0 /dev/lan1,/dev/lan0 \\
           LGs37U1 LGs37U2
         
-@EOF
+EOF
 }
 
 check_usage() {
@@ -136,7 +136,7 @@ check_usage() {
 }
 
 display_headstone() {
-cat << @EOF
+cat << EOF
 
 $TESTNAME Aggregate REQUEST/RESPONSE TEST to $REM_HOST_LIST
 Local /Remote
@@ -144,12 +144,12 @@ Socket Size   Request  Resp.   Elapsed  Trans.     Num.
 Send   Recv   Size     Size    Time     Rate       Concurrent
 bytes  Bytes  bytes    bytes   secs.    per sec    Netperfs
 
-@EOF
+EOF
 }
 
 display_test_banner() {
-cat << @EOF
-@EOF
+cat << EOF
+EOF
 }
 
 build_sap_list() {
