@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/07 06:09:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/08 00:58:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 06:09:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:58:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -284,7 +284,21 @@ include am/kernel.am
 ##
 ## Rules for building libraries
 ##
-include am/libraries.am
+##include am/libraries.am
+##
+PKGINCL				= include/sys/$(PACKAGE_NAME)
+
+##AUTOCONFIG_H			= $(PKGINCL)/config.h
+##
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
+
+EXPORT_SRCFILES			=
+
+EXPORT_VERFILES			=
+
+GENKSYMS_CPPFLAGS		= \
+				-I./src -I$(srcdir)/src \
+				$(XNS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols
@@ -298,7 +312,10 @@ include am/strconf.am
 
 if RPM_BUILD_USER
 
-SUBDIRS = include doc
+SUBDIRS = include doc tests
+
+endif
+
 if INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
