@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 11:45:57 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 12:23:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -65,55 +65,7 @@ static char const ident[] =
  *  library has superior syncrhonization across a fork() and provides a
  *  conforming t_sync() library call.
  */
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
-#   error ****
-#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
-#   error ****  to compile the timod module.
-#   error ****
-#endif
-
-#ifdef LINUX
-#   include <linux/config.h>
-#   include <linux/version.h>
-#   ifndef HAVE_SYS_LIS_MODULE_H
-#	ifdef MODVERSIONS
-#	    include <linux/modversions.h>
-#	endif
-#	include <linux/module.h>
-#	include <linux/modversions.h>
-#	ifndef __GENKSYMS__
-#	    if defined HAVE_SYS_LIS_MOVERSIONS_H
-#		include <sys/LiS/modversions.h>
-#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#		include <sys/streams/modversions.h>
-#	    endif
-#	endif
-#	include <linux/init.h>
-#   else
-#	include <sys/LiS/module.h>
-#   endif
-#endif
-
-#include <sys/kmem.h>
-#include <sys/cmn_err.h>
-
-#include <sys/stream.h>
-
-#ifdef LFS
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/strdebug.h>
-#include <sys/debug.h>
-#endif
-#include <sys/ddi.h>
+#include "compat.h"
 
 /*
    These are for TPI definitions 
@@ -131,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -143,34 +95,39 @@ static char const ident[] =
 #define TIMOD_SPLASH	TIMOD_DEVICE	" - " \
 			TIMOD_REVISION	"\n"
 
+#ifdef LINUX
 MODULE_AUTHOR(TIMOD_CONTACT);
 MODULE_DESCRIPTION(TIMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TIMOD_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(TIMOD_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
-#ifndef TIMOD_MOD_NAME
-#   ifdef CONFIG_STREAMS_TIMOD_NAME
-#	define TIMOD_MOD_NAME CONFIG_STREAMS_TIMOD_NAME
-#   else
-#	define TIMOD_MOD_NAME "timod"
-#   endif
-#endif
+#ifdef LFS
+#define TIMOD_MOD_ID		CONFIG_STREAMS_TIMOD_MODID
+#define TIMOD_MOD_NAME		CONFIG_STREAMS_TIMOD_NAME
+#endif				/* LFS */
 
-#ifndef TIMOD_MOD_ID
-#   ifdef CONFIG_STREAMS_TIMOD_MODID
-#	define TIMOD_MOD_ID CONFIG_STREAMS_TIMOD_MODID
-#   else
-#	define TIMOD_MOD_ID 0
-#   endif
-#endif
+/*
+ *  =========================================================================
+ *
+ *  STREAMS Definitions
+ *
+ *  =========================================================================
+ */
 
-modID_t modid = TIMOD_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for TIMOD.");
+#define MOD_ID		TIMOD_MOD_ID
+#define MOD_NAME	TIMOD_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	TIMOD_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	TIMOD_SPLASH
+#endif				/* MODULE */
 
 static struct module_info timod_minfo = {
-	mi_idnum:TIMOD_MOD_ID,		/* Module ID number */
-	mi_idname:TIMOD_MOD_NAME,	/* Module name */
+	mi_idnum:MOD_ID,		/* Module ID number */
+	mi_idname:MOD_NAME,		/* Module name */
 	mi_minpsz:0,			/* Min packet size accepted */
 	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
 	mi_hiwat:1,			/* Hi water mark */
@@ -195,7 +152,7 @@ static struct qinit timod_winit = {
 	qi_minfo:&timod_minfo,		/* Information */
 };
 
-static struct streamtab timod_info = {
+MODULE_STATIC struct streamtab timodinfo = {
 	st_rdinit:&timod_rinit,		/* Upper read queue */
 	st_wrinit:&timod_winit,		/* Upper write queue */
 };
@@ -226,24 +183,26 @@ timod_init_caches(void)
 {
 	if (!timod_priv_cachep
 	    && !(timod_priv_cachep =
-		 kmem_cache_create(TIMOD_MOD_NAME, sizeof(struct timod), 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL))) {
-		cmn_err(CE_WARN, "%s: %s: Cannot allocate timod_priv_cachep", TIMOD_MOD_NAME,
+		 kmem_cache_create(MOD_NAME, sizeof(struct timod), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
+		cmn_err(CE_WARN, "%s: %s: Cannot allocate timod_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);
 	}
 	return (0);
 }
 
-static void
+static int
 timod_term_caches(void)
 {
 	if (timod_priv_cachep) {
-		if (kmem_cache_destroy(timod_priv_cachep))
-			cmn_err(CE_WARN, "%s: %s: did not destroy timod_priv_cachep",
-				TIMOD_MOD_NAME, __FUNCTION__);
+		if (kmem_cache_destroy(timod_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: %s: did not destroy timod_priv_cachep", MOD_NAME,
+				__FUNCTION__);
+			return (-EBUSY);
+		}
 	}
-	return;
+	return (0);
 }
 
 static struct timod *
@@ -260,13 +219,11 @@ timod_alloc_priv(queue_t *q)
 		priv->flags = 0;
 		priv->qlen = 0;
 		priv->cons = 0;
-		/*
-		   we are a module with no service routine so our hiwat, lowat shouldn't matter;
+		/* we are a module with no service routine so our hiwat, lowat shouldn't matter;
 		   however, our minpsz, maxpsz do because we are the first queue under the stream
 		   head.  We do not want to alter the characteristics of the transport packet sizes
 		   so we copy them here. This will allow the stream head to exhibit the same
-		   behaviour as before we were pushed. 
-		 */
+		   behaviour as before we were pushed. */
 		priv->wq->q_minpsz = priv->wq->q_next->q_minpsz;
 		priv->wq->q_maxpsz = priv->wq->q_next->q_maxpsz;
 		q->q_ptr = WR(q)->q_ptr = priv;
@@ -329,9 +286,9 @@ timod_rput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 #if defined LIS
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			TIMOD_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
@@ -345,10 +302,8 @@ timod_rput(queue_t *q, mblk_t *mp)
 		p = (typeof(p)) mp->b_rptr;
 		if (!(dp = xchg(&priv->iocblk, NULL)))
 			goto pass_along;
-		/*
-		   we are expecting a response, but only intercept the expected response, pass
-		   along others 
-		 */
+		/* we are expecting a response, but only intercept the expected response, pass
+		   along others */
 		ioc = (typeof(ioc)) dp->b_rptr;
 		switch (p->type) {
 		case T_OK_ACK:
@@ -364,9 +319,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 			case TI_SETMYNAME:
 				switch (priv->state) {
 				case TS_WACK_CRES:
-					/*
-					   but could be TS_DATA_XFER for same stream connect 
-					 */
+					/* but could be TS_DATA_XFER for same stream connect */
 					priv->state = (priv->cons && --priv->cons > 0)
 					    ? TS_WRES_CIND : TS_IDLE;
 					break;
@@ -466,9 +419,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 			putnext(q, dp);
 			return (0);
 		}
-		/*
-		   not expecting anything, but do state tracking 
-		 */
+		/* not expecting anything, but do state tracking */
 	      pass_along:
 		switch (p->type) {
 		case T_CONN_IND:
@@ -516,9 +467,7 @@ timod_rput(queue_t *q, mblk_t *mp)
 				priv->state = TS_WCON_CREQ;
 				break;
 			case TS_WACK_CRES:
-				/*
-				   FIXME: depends 
-				 */
+				/* FIXME: depends */
 				priv->state = TS_DATA_XFER;
 				break;
 			case TS_WACK_DREQ6:
@@ -582,9 +531,9 @@ timod_wput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 #if defined LIS
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			TIMOD_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
@@ -595,14 +544,12 @@ timod_wput(queue_t *q, mblk_t *mp)
 		mblk_t *dp;
 		int err;
 	case M_IOCTL:
-		/*
-		   Most of the ioctls provided here are to acheive atomic and thread-safe
+		/* Most of the ioctls provided here are to acheive atomic and thread-safe
 		   operations on the stream for use by the XTI/TLI library.  Each ioctl takes a TPI 
 		   message in the buffer and results in sending the TPI message downstream.  We
 		   strip off and keep the io control block for latter response correlation.  We
 		   also track the state of the stream and the number of outstanding connection
-		   indications. 
-		 */
+		   indications. */
 		ioc = (typeof(ioc)) mp->b_rptr;
 		err = -EFAULT;
 		if (!(dp = unlinkb(mp)))
@@ -825,9 +772,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 		return (0);
 	case M_PROTO:
 	case M_PCPROTO:
-		/*
-		   this is just to do state tracking 
-		 */
+		/* this is just to do state tracking */
 		if (mp->b_wptr < mp->b_rptr + sizeof(p->type))
 			break;
 		p = (typeof(p)) mp->b_rptr;
@@ -954,9 +899,7 @@ timod_pop(queue_t *q)
 				qreply(q, mp);
 			}
 		}
-		/*
-		   fall through 
-		 */
+		/* fall through */
 	case TS_DATA_XFER:
 		if ((mp = allocb(sizeof(struct T_discon_req), BPRI_WAITOK))) {
 			struct T_discon_req *prim = ((typeof(prim)) mp->b_wptr)++;
@@ -1022,17 +965,14 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 #if defined LIS
-	/*
-	   protect against LiS bugs 
-	 */
+	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", TIMOD_MOD_NAME,
-			__FUNCTION__);
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;
 	}
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			TIMOD_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
 #endif				/* defined LIS */
@@ -1048,91 +988,116 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 }
 
 /*
- *  -------------------------------------------------------------------------
+ *  =========================================================================
  *
  *  Registration and initialization
  *
+ *  =========================================================================
+ */
+#ifdef LINUX
+/*
+ *  Linux Registration
  *  -------------------------------------------------------------------------
  */
-#if defined LFS
-static struct fmodsw timod_fmod = {
-	f_name:TIMOD_MOD_NAME,
-	f_str:&timod_info,
-	f_flag:0,
-	f_kmod:THIS_MODULE,
+
+unsigned short modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LFS
+
+STATIC struct fmodsw timod_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &timodinfo,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
 };
 
-static int
-timod_register_module(void)
+STATIC int
+timod_register_strmod(void)
 {
 	int err;
 	if ((err = register_strmod(&timod_fmod)) < 0)
 		return (err);
-	if (modid == 0 && err > 0)
+	return (0);
+}
+
+STATIC int
+timod_unregister_strmod(void)
+{
+	int err;
+	if ((err = unregister_strmod(&timod_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+#ifdef LIS
+
+STATIC int
+timod_register_strmod(void)
+{
+	int err;
+	if ((err = lis_register_strmod(&timodinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	return (0);
+}
+
+STATIC int
+timod_unregister_strmod(void)
+{
+	int err;
+	if ((err = lis_unregister_strmod(&timodinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+timodinit(void)
+{
+	int err;
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = timod_init_caches())) {
+		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = timod_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
+		timod_term_caches();
+		return (err);
+	}
+	if (modid == 0)
 		modid = err;
 	return (0);
 }
-static void
-timod_unregister_module(void)
-{
-	return (void) unregister_strmod(&timod_fmod);
-}
 
-#elif defined LIS
-
-static int
-timod_register_module(void)
-{
-	int ret;
-	if ((ret = lis_register_strmod(&timod_info, TIMOD_MOD_NAME)) != LIS_NULL_MID) {
-		if (modid == 0)
-			modid = ret;
-		return (0);
-	}
-	/*
-	   LiS is not too good on giving informative errors here. 
-	 */
-	return (EIO);
-}
-static void
-timod_unregister_module(void)
-{
-	/*
-	   LiS provides detailed errors here when they are discarded. 
-	 */
-	return (void) lis_unregister_strmod(&timod_info);
-}
-
-#endif
-
-static int __init
-timod_init(void)
+MODULE_STATIC void __exit
+timodterminate(void)
 {
 	int err;
-#ifdef MODULE
-	printk(KERN_INFO TIMOD_BANNER);	/* banner message */
-#else
-	printk(KERN_INFO TIMOD_SPLASH);	/* console splash */
-#endif
-	if ((err = timod_init_caches())) {
-		cmn_err(CE_WARN, "%s: could not init caches, err = %d", TIMOD_MOD_NAME, -err);
-		return (err);
-	}
-	if ((err = timod_register_module())) {
-		timod_term_caches();
-		cmn_err(CE_WARN, "%s: could not register module, err = %d", TIMOD_MOD_NAME, -err);
-		return (err);
-	}
-	return (0);
-};
-
-static void __exit
-timod_exit(void)
-{
-	timod_unregister_module();
-	timod_term_caches();
+	if ((err = timod_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = timod_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;
-};
+}
 
-module_init(timod_init);
-module_exit(timod_exit);
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
+module_init(timodinit);
+module_exit(timodterminate);
+
+#endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,51 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 13:22:48 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 12:23:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $";
 
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
-#   error ****
-#   error ****  One of _LIS_SOURCE or _LFS_SOURCE must be defined
-#   error ****  to compile the ip_to_dlpi driver.
-#   error ****
-#endif
-
-#ifdef LINUX
-#   include <linux/config.h>
-#   include <linux/version.h>
-#   ifndef HAVE_SYS_LIS_MODULE_H
-#	ifdef MODVERSIONS
-#	    include <linux/modversions.h>
-#	endif
-#	include <linux/module.h>
-#	include <linux/modversions.h>
-#	ifndef __GENKSYMS__
-#	    if defined HAVE_SYS_LIS_MODVERSIONS_H
-#		include <sys/LiS/modversions.h>
-#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#		include <sys/streams/modversions.h>
-#	    endif
-#	endif
-#	include <linux/init.h>
-#   else
-#	include <sys/LiS/module.h>
-#   endif
-#endif
+#include "compat.h"
 
 #include <linux/bitops.h>
 
@@ -103,85 +68,60 @@ static char const ident[] =
 #include <linux/if_arp.h>
 #include <net/arp.h>
 
-#include <linux/slab.h>
-
-#include <sys/kmem.h>
-#include <sys/cmn_err.h>
-
-#include <sys/stream.h>
-
-#ifdef LFS
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/strdebug.h>
-#include <sys/debug.h>
-#endif
-
-#include <sys/ddi.h>
 #include <sys/dlpi.h>
 
-#ifndef LFS
-#include "debug.h"
-#endif
-
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
 #define IP2XINET_BANNER		IP2XINET_DESCRIP	"\n" \
-				IP2XINET_COPYRIGHT	"\n" \
+				IP2XINET_EXTRA		"\n" \
 				IP2XINET_REVISION	"\n" \
+				IP2XINET_COPYRIGHT	"\n" \
 				IP2XINET_DEVICE		"\n" \
-				IP2XINET_CONTACT	"\n"
-#define IP2XINET_SPLASH		IP2XINET_DEVICE		" - " \
-				IP2XINET_REVISION	"\n"
+				IP2XINET_CONTACT
+#define IP2XINET_SPLASH		IP2XINET_DEVICE		"\n" \
+				IP2XINET_REVISION
 
+#ifdef LINUX
 MODULE_AUTHOR(IP2XINET_CONTACT);
 MODULE_DESCRIPTION(IP2XINET_DESCRIP);
 MODULE_SUPPORTED_DEVICE(IP2XINET_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(IP2XINET_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
-#ifndef IP2XINET_MOD_NAME
-#   ifdef CONFIG_STREAMS_IP2XINET_NAME
-#	define IP2XINET_MOD_NAME CONFIG_STREAMS_IP2XINET_NAME
-#   else
-#	define IP2XINET_MOD_NAME "ip2xinet"
-#   endif
+#ifdef LFS
+#define IP2XINET_DRV_ID		CONFIG_STREMS_IP2XINET_MODID
+#define IP2XINET_DRV_NAME	CONFIG_STREMS_IP2XINET_NAME
+#define IP2XINET_CMAJORS	CONFIG_STREMS_IP2XINET_NMAJORS
+#define IP2XINET_CMAJOR_0	CONFIG_STREMS_IP2XINET_MAJOR
+#define IP2XINET_UNITS		CONFIG_STREMS_IP2XINET_NMINORS
+#endif				/* LFS */
+
+#define DRV_ID		IP2XINET_DRV_ID
+#define DRV_NAME	IP2XINET_DRV_NAME
+#define CMAJORS		IP2XINET_CMAJORS
+#define CMAJOR_0	IP2XINET_CMAJOR_0
+#define UNITS		IP2XINET_UNITS
+
+#ifdef MODULE
+#define DRV_BANNER	IP2XINET_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	IP2XINET_SPLASH
+#endif				/* MODULE */
+
+#ifndef UNITS
+#define UNITS 8
 #endif
-
-#ifndef IP2XINET_MOD_ID
-#   ifdef CONFIG_STREAMS_IP2XINET_MOD_ID
-#	define IP2XINET_MOD_ID CONFIG_STREAMS_IP2XINET_MOD_ID
-#   else
-#	define IP2XINET_MOD_ID 568
-#   endif
-#endif
-
-#ifndef IP2XINET_CMAJOR
-#   ifdef CONFIG_STREAMS_IP2XINET_MAJOR
-#	define IP2XINET_CMAJOR CONFIG_STREAMS_IP2XINET_MAJOR
-#   else
-#	define IP2XINET_CMAJOR 0
-#   endif
-#endif
-
-#ifndef IP2XINET_NMINOR
-#define IP2XINET_NMINOR 8
-#endif
-
-unsigned short modid = IP2XINET_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID number for IP2XINET driver (0 for allocation).");
-
-unsigned short major = IP2XINET_CMAJOR;
-MODULE_PARM(major, "h");
-MODULE_PARM_DESC(major, "Major device number for IP2XINET driver (0 for allocation).");
 
 STATIC struct module_info ip2xinet_minfo = {
-	.mi_idnum = IP2XINET_MOD_ID,	/* Module ID number */
-	.mi_idname = IP2XINET_MOD_NAME,	/* Module name */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = 8192,		/* Max packet size accepted */
 	.mi_hiwat = 8192,		/* Hi water mark */
@@ -322,7 +262,8 @@ static int ip2xinet_numopen = 0;	/* How many times ip2xinet was opened as a STRE
 
 char kernel_version[] = UTS_RELEASE;
 
-int ip2xinetinit(void)
+int
+ip2xinetinit(void)
 {
 	if (0 == init_linuxip())
 		return 1;
@@ -349,7 +290,8 @@ int ip2xinetinit(void)
  *
  ************************************************************************/
 
-int ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+int
+ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	mblk_t *bp;
 	minor_t minor;
@@ -419,20 +361,20 @@ int ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
  *
  ************************************************************************/
 
-int ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
+int
+ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
 {
 	(void) oflag;
 	(void) credp;
 #if defined LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", IP2XINET_DRV_NAME,
-			__FUNCTION__);
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
 		goto quit;
 	}
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			IP2XINET_DRV_NAME, __FUNCTION__);
+			DRV_NAME, __FUNCTION__);
 		goto quit;
 	}
 #endif				/* defined LIS */
@@ -467,7 +409,8 @@ int ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
  *
  ************************************************************************/
 
-int ip2xinet_uwput(queue_t *q, mblk_t *mp)
+int
+ip2xinet_uwput(queue_t *q, mblk_t *mp)
 {
 
 	int i;
@@ -629,7 +572,8 @@ int ip2xinet_uwput(queue_t *q, mblk_t *mp)
  *      instead.
  *
  ************************************************************************/
-int ip2xinet_ursrv(queue_t *q)
+int
+ip2xinet_ursrv(queue_t *q)
 {
 	mblk_t *mp;
 
@@ -650,7 +594,8 @@ int ip2xinet_ursrv(queue_t *q)
  *      devices from sending us stuff.
  *
  ************************************************************************/
-int ip2xinet_lwsrv(queue_t *q)
+int
+ip2xinet_lwsrv(queue_t *q)
 {
 	mblk_t *mp;
 	int allsent = 1;
@@ -715,7 +660,8 @@ int ip2xinet_lwsrv(queue_t *q)
  *
  ************************************************************************/
 
-int ip2xinet_lrput(queue_t *q, mblk_t *mp)
+int
+ip2xinet_lrput(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp;
 	union DL_primitives *dp;
@@ -988,12 +934,14 @@ int ip2xinet_num_ip_opened = 0;
 
 void ip2xinet_rx(struct net_device *dev, struct sk_buff *skb);
 
-void do_BUG(const char *file, int line)
+void
+do_BUG(const char *file, int line)
 {
 	return;
 }
 
-int ip2xinet_send_down_bind(queue_t *q)
+int
+ip2xinet_send_down_bind(queue_t *q)
 {
 	mblk_t *mp;
 	dl_bind_req_t *bindmp;
@@ -1018,7 +966,8 @@ int ip2xinet_send_down_bind(queue_t *q)
  * Open and close
  */
 
-int ip2xinet_devopen(struct net_device *dev)
+int
+ip2xinet_devopen(struct net_device *dev)
 {
 	int i;
 	int err;
@@ -1062,7 +1011,8 @@ int ip2xinet_devopen(struct net_device *dev)
 	return 0;
 }
 
-int ip2xinet_release(struct net_device *dev)
+int
+ip2xinet_release(struct net_device *dev)
 {
 	queue_t *q;
 	mblk_t *mp;
@@ -1109,7 +1059,8 @@ int ip2xinet_release(struct net_device *dev)
  * Configuration changes (passed on by ifconfig)
  * Not that we actually do anything with them.
  */
-int ip2xinet_config(struct net_device *dev, struct ifmap *map)
+int
+ip2xinet_config(struct net_device *dev, struct ifmap *map)
 {
 	spin_lock(ip2xinet_lock);
 	if (dev->flags & IFF_UP) {	/* can't act on a running interface */
@@ -1142,7 +1093,8 @@ int ip2xinet_config(struct net_device *dev, struct ifmap *map)
  * This routine is called from the lrput routine.  We should already hold
  * the driver lock when we are called from there.
  */
-void ip2xinet_rx(struct net_device *dev, struct sk_buff *skb)
+void
+ip2xinet_rx(struct net_device *dev, struct sk_buff *skb)
 {
 	struct ip2xinet_priv *privp = (struct ip2xinet_priv *) dev->priv;
 
@@ -1164,7 +1116,8 @@ void ip2xinet_rx(struct net_device *dev, struct sk_buff *skb)
  * This routine is called from ip2xinet_tx. That function
  * grabbed the driver lock when it was called.
  */
-void ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
+void
+ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
 {
 	/* This function deals with hw details, while all other procedures are rather
 	   device-independent */
@@ -1245,7 +1198,8 @@ void ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
 /*
  * Transmit a packet (called by the kernel)
  */
-int ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
+int
+ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 {
 	if (skb == NULL) {
 		return 0;
@@ -1271,7 +1225,8 @@ int ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 /*
  * Ioctl commands 
  */
-int ip2xinet_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+int
+ip2xinet_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 {
 	return 0;
 }
@@ -1279,7 +1234,8 @@ int ip2xinet_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 /*
  * Return statistics to the caller
  */
-struct net_device_stats *ip2xinet_stats(struct net_device *dev)
+struct net_device_stats *
+ip2xinet_stats(struct net_device *dev)
 {
 	struct ip2xinet_priv *priv = (struct ip2xinet_priv *) dev->priv;
 
@@ -1289,7 +1245,8 @@ struct net_device_stats *ip2xinet_stats(struct net_device *dev)
 	return &priv->stats;
 }
 
-int ip2xinet_rebuild_header(struct sk_buff *skb)
+int
+ip2xinet_rebuild_header(struct sk_buff *skb)
 {
 	struct ethhdr *eth = (struct ethhdr *) (skb->data);
 	// return arp_find(&(eth->h_dest),skb);
@@ -1301,8 +1258,9 @@ int ip2xinet_rebuild_header(struct sk_buff *skb)
  * hardware addresses that were previousely retrieved, its job is to organise
  * the information passed to it as arguments
  */
-int ip2xinet_hard_header(struct sk_buff *skb, struct net_device *dev, unsigned short type,
-			 void *daddr, void *saddr, unsigned len)
+int
+ip2xinet_hard_header(struct sk_buff *skb, struct net_device *dev, unsigned short type,
+		     void *daddr, void *saddr, unsigned len)
 {
 	struct ethhdr *eth = (struct ethhdr *) skb_push(skb, ETH_HLEN);
 
@@ -1343,7 +1301,8 @@ int ip2xinet_hard_header(struct sk_buff *skb, struct net_device *dev, unsigned s
  * The change in MTU (Maximum Transfer Unit)
  * must be communicated to xinet
  */
-int ip2xinet_change_mtu(struct net_device *dev, int new_mtu)
+int
+ip2xinet_change_mtu(struct net_device *dev, int new_mtu)
 {
 	/* check ranges */
 
@@ -1365,7 +1324,8 @@ int ip2xinet_change_mtu(struct net_device *dev, int new_mtu)
  * NOTE: This is different from the init() function that can be called from
  *       streams
  */
-int ip2xinet_devinit(struct net_device *dev)
+int
+ip2xinet_devinit(struct net_device *dev)
 {
 	/* Assign other fields in dev, using ether_setup() and some hand assignments */
 	ether_setup(dev);
@@ -1405,7 +1365,8 @@ struct net_device ip2xinet_devs[NUMIP2XINET];
  * Finally, the module stuff
  */
 
-int init_linuxip(void)
+int
+init_linuxip(void)
 {
 
 	int result, i, device_present = 0;
@@ -1432,7 +1393,8 @@ int init_linuxip(void)
 	return device_present ? 0 : -ENODEV;
 }
 
-void cleanup_linuxip(void)
+void
+cleanup_linuxip(void)
 {
 	int i;
 
@@ -1441,16 +1403,27 @@ void cleanup_linuxip(void)
 	}
 }
 
+#ifdef LINUX
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID number for IP2XINET driver (0 for allocation).");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Major device number for IP2XINET driver (0 for allocation).");
+#endif				/* LINUX */
+
 #ifdef LFS
 STATIC struct cdevsw ip2xinet_cdev = {
-	.d_name = IP2XINET_MOD_NAME,
+	.d_name = DRV_NAME,
 	.d_str = &ip2xinet_info,
 	.d_flag = 0,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
-int __init ip2xinet_init(void)
+int __init
+ip2xinet_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_IP2XINET_MODULE
@@ -1464,7 +1437,9 @@ int __init ip2xinet_init(void)
 		major = err;
 	return (0);
 }
-void __exit ip2xinet_exit(void)
+
+void __exit
+ip2xinet_exit(void)
 {
 	return (void) unregister_strdev(&ip2xinet_cdev, major);
 }
@@ -1477,7 +1452,8 @@ module_exit(ip2xinet_exit);
 #elif defined LIS
 
 STATIC int ip2xinet_initialized = 0;
-STATIC void ip2xinet_init(void)
+STATIC void
+ip2xinet_init(void)
 {
 	int err;
 	if (ip2xinet_initialized != 0)
@@ -1494,9 +1470,8 @@ STATIC void ip2xinet_init(void)
 		ip2xinet_initialized = err;
 		return;
 	}
-	if ((err =
-	     lis_register_strdev(major, &ip2xinet_info, IP2XINET_NMINOR, IP2XINET_MOD_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: Cannot register major %d\n", IP2XINET_MOD_NAME, major);
+	if ((err = lis_register_strdev(major, &ip2xinet_info, UNITS, DRV_NAME)) < 0) {
+		cmn_err(CE_WARN, "%s: Cannot register major %d\n", DRV_NAME, major);
 		kmem_free((void *) ip2xinet_lock, sizeof(*ip2xinet_lock));
 		ip2xinet_lock = NULL;
 		ip2xinet_initialized = err;
@@ -1522,15 +1497,15 @@ STATIC void ip2xinet_init(void)
 	}
 	return;
 }
-STATIC void ip2xinet_terminate(void)
+STATIC void
+ip2xinet_terminate(void)
 {
 	int err;
 	if (ip2xinet_initialized <= 0)
 		return;
 	if (major) {
 		if ((err = lis_unregister_strdev(major)) < 0)
-			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", IP2XINET_MOD_NAME,
-				major);
+			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", DRV_NAME, major);
 		major = 0;
 	}
 	cleanup_linuxip();
@@ -1541,7 +1516,9 @@ STATIC void ip2xinet_terminate(void)
 	ip2xinet_initialized = 0;
 	return;
 }
-int init_module(void)
+
+int
+init_module(void)
 {
 	(void) major;
 	ip2xinet_init();
@@ -1549,7 +1526,9 @@ int init_module(void)
 		return ip2xinet_initialized;
 	return (0);
 }
-void cleanup_module(void)
+
+void
+cleanup_module(void)
 {
 	return ip2xinet_terminate();
 }

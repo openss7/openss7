@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 12:23:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/21 11:04:31 $ by $Author: brian $
+# Last Modified $Date: 2004/09/02 12:23:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -144,13 +144,27 @@ sctp_source_FILES			= \
 					  src/drivers/sctp_output.h \
 					  src/drivers/sctp_route.h \
 					  src/drivers/sctp_t.h \
-					  src/include/os7/debug.h \
+					  src/include/os7/allocb.h \
+					  src/include/os7/bufpool.h \
 					  src/include/os7/bufq.h \
+					  src/include/os7/compat.h \
+					  src/include/os7/debug.h \
+					  src/include/os7/lock.h \
+					  src/include/os7/priv.h \
+					  src/include/os7/queue.h \
+					  src/include/os7/timer.h \
 					  strconf.h
 sctp2_source_FILES			= \
 					  src/drivers/sctp2.c \
-					  src/include/os7/debug.h \
+					  src/include/os7/allocb.h \
+					  src/include/os7/bufpool.h \
 					  src/include/os7/bufq.h \
+					  src/include/os7/compat.h \
+					  src/include/os7/debug.h \
+					  src/include/os7/lock.h \
+					  src/include/os7/priv.h \
+					  src/include/os7/queue.h \
+					  src/include/os7/timer.h \
 					  strconf.h
 if WITH_HMAC_MD5
 sctp2_source_FILES			+= \
@@ -297,13 +311,27 @@ sctp_source_FILES			= \
 					  src/drivers/sctp_output.h \
 					  src/drivers/sctp_route.h \
 					  src/drivers/sctp_t.h \
-					  src/include/os7/debug.h \
+					  src/include/os7/allocb.h \
+					  src/include/os7/bufpool.h \
 					  src/include/os7/bufq.h \
+					  src/include/os7/compat.h \
+					  src/include/os7/debug.h \
+					  src/include/os7/lock.h \
+					  src/include/os7/priv.h \
+					  src/include/os7/queue.h \
+					  src/include/os7/timer.h \
 					  strconf.h
 sctp2_source_FILES			= \
 					  src/drivers/sctp2.c \
-					  src/include/os7/debug.h \
+					  src/include/os7/allocb.h \
+					  src/include/os7/bufpool.h \
 					  src/include/os7/bufq.h \
+					  src/include/os7/compat.h \
+					  src/include/os7/debug.h \
+					  src/include/os7/lock.h \
+					  src/include/os7/priv.h \
+					  src/include/os7/queue.h \
+					  src/include/os7/timer.h \
 					  strconf.h
 if WITH_HMAC_MD5
 sctp2_source_FILES			+= \

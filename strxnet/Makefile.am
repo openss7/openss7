@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/04 06:01:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/09/02 12:23:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/04 06:01:26 $ by $Author: brian $
+# Last Modified $Date: 2004/09/02 12:23:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,7 +128,15 @@ EXTRA_LIBRARIES			=
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
 				  src/modules/timod.c \
-				  src/modules/debug.h \
+				  src/include/os7/allocb.h \
+				  src/include/os7/bufpool.h \
+				  src/include/os7/bufq.h \
+				  src/include/os7/compat.h \
+				  src/include/os7/debug.h \
+				  src/include/os7/lock.h \
+				  src/include/os7/priv.h \
+				  src/include/os7/queue.h \
+				  src/include/os7/timer.h \
 				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
@@ -136,7 +144,16 @@ mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= -I./src/modules -I$(srcdir)/src/modules -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libXNETmods_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules \
+				  -I$(srcdir)/src/modules \
+				  -imacros \
+				  ./strconf.h \
+				  $(XNET_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
@@ -220,7 +237,15 @@ EXTRA_LIBRARIES			=
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
 				  src/modules/timod.c \
-				  src/modules/debug.h \
+				  src/include/os7/allocb.h \
+				  src/include/os7/bufpool.h \
+				  src/include/os7/bufq.h \
+				  src/include/os7/compat.h \
+				  src/include/os7/debug.h \
+				  src/include/os7/lock.h \
+				  src/include/os7/priv.h \
+				  src/include/os7/queue.h \
+				  src/include/os7/timer.h \
 				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
@@ -228,7 +253,16 @@ mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= -I./src/modules -I$(srcdir)/src/modules -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libXNETmods_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules \
+				  -I$(srcdir)/src/modules \
+				  -imacros \
+				  ./strconf.h \
+				  $(XNET_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)

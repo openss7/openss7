@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/06 09:11:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/09/02 12:24:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/06 09:11:48 $ by $Author: brian $
+# Last Modified $Date: 2004/09/02 12:24:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,8 +100,15 @@ EXTRA_LIBRARIES			=
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
-				  src/drivers/debug.h \
-				  src/drivers/bufq.h \
+				  src/include/os7/allocb.h \
+				  src/include/os7/bufpool.h \
+				  src/include/os7/bufq.h \
+				  src/include/os7/compat.h \
+				  src/include/os7/debug.h \
+				  src/include/os7/lock.h \
+				  src/include/os7/priv.h \
+				  src/include/os7/queue.h \
+				  src/include/os7/timer.h \
 				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
@@ -109,7 +116,17 @@ mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
 libINETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libINETmods_a_CPPFLAGS		= -I./src/include -I$(srcdir)/src/include -I./src/modules -I$(srcdir)/src/modules -I./src/drivers -I$(srcdir)/src/drivers -imacros ./strconf.h $(INET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libINETmods_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules \
+				  -I$(srcdir)/src/modules \
+				  -I./src/drivers \
+				  -I$(srcdir)/src/drivers \
+				  -imacros strconf.h \
+				  $(INET_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libINETmods_a_OBJECTS) $(ADDON_OBJS)
@@ -167,8 +184,15 @@ EXTRA_LIBRARIES			=
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
-				  src/drivers/debug.h \
-				  src/drivers/bufq.h \
+				  src/include/os7/allocb.h \
+				  src/include/os7/bufpool.h \
+				  src/include/os7/bufq.h \
+				  src/include/os7/compat.h \
+				  src/include/os7/debug.h \
+				  src/include/os7/lock.h \
+				  src/include/os7/priv.h \
+				  src/include/os7/queue.h \
+				  src/include/os7/timer.h \
 				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
@@ -176,7 +200,17 @@ mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
 libINETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libINETmods_a_CPPFLAGS		= -I./src/include -I$(srcdir)/src/include -I./src/modules -I$(srcdir)/src/modules -I./src/drivers -I$(srcdir)/src/drivers -imacros ./strconf.h $(INET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libINETmods_a_CPPFLAGS		= \
+				  -I./src/include/os7 \
+				  -I$(srcdir)/src/include/os7 \
+				  -I./src/modules \
+				  -I$(srcdir)/src/modules \
+				  -I./src/drivers \
+				  -I$(srcdir)/src/drivers \
+				  -imacros strconf.h \
+				  $(INET_INCLUDES) \
+				  $(KERNEL_CPPFLAGS) \
+				  $(KERNEL_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libINETmods_a_OBJECTS) $(ADDON_OBJS)

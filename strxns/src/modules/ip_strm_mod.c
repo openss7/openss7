@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,50 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 13:22:48 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 12:23:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $";
 
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
-#   error ****
-#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
-#   error **** to compile the ip_strm_mod module.
-#   error ****
-#endif
-
-#ifdef LINUX
-#   include <linux/config.h>
-#   include <linux/version.h>
-#   ifndef HAVE_SYS_LIS_MODULE_H
-#	ifdef MODVERSIONS
-#	    include <linux/modversions.h>
-#	endif
-#	include <linux/module.h>
-#	include <linux/modversions.h>
-#	ifndef __GENKSYMS__
-#	    if defined HAVE_SYS_LIS_MOVERSIONS_H
-#		include <sys/LiS/modversions.h>
-#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#		include <sys/streams/modversions.h>
-#	    endif
-#	endif
-#	include <linux/init.h>
-#   else
-#	include <sys/LiS/module.h>
-#   endif
-#endif
+#include "compat.h"
 
 #include <linux/slab.h>
 
@@ -105,68 +71,50 @@ static char const ident[] =
 #include <linux/types.h>
 #include <linux/if_arp.h>
 
-#include <sys/kmem.h>
-#include <sys/cmn_err.h>
-
-#include <sys/stream.h>
-
-#ifdef LFS
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/strdebug.h>
-#include <sys/debug.h>
-#endif
-
-#include <sys/ddi.h>
-
 #include <sys/dlpi.h>
 
-#ifndef LFS
-#include "debug.h"
-#endif
-
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
+#define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
-#define IP_TO_STREAMS_BANNER		IP_TO_STREAMS_DESCRIP		"\n" \
-					IP_TO_STREAMS_COPYRIGHT	"\n" \
+#define IP_TO_STREAMS_BANNER		IP_TO_STREAMS_DESCRIP	"\n" \
+					IP_TO_STREAMS_EXTRA	"\n" \
 					IP_TO_STREAMS_REVISION	"\n" \
-					IP_TO_STREAMS_DEVICE		"\n" \
-					IP_TO_STREAMS_CONTACT		"\n"
-#define IP_TO_STREAMS_SPLASH		IP_TO_STREAMS_DEVICE		" - " \
-					IP_TO_STREAMS_REVISION	"\n"
+					IP_TO_STREAMS_COPYRIGHT	"\n" \
+					IP_TO_STREAMS_DEVICE	"\n" \
+					IP_TO_STREAMS_CONTACT
+#define IP_TO_STREAMS_SPLASH		IP_TO_STREAMS_DEVICE	"\n" \
+					IP_TO_STREAMS_REVISION
 
+#ifdef LINUX
 MODULE_AUTHOR(IP_TO_STREAMS_CONTACT);
 MODULE_DESCRIPTION(IP_TO_STREAMS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(IP_TO_STREAMS_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(IP_TO_STREAMS_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
-#ifndef IP_TO_STREAMS_MOD_NAME
-#   ifdef CONFIG_STREAMS_IP_TO_STREAMS_NAME
-#	define IP_TO_STREAMS_MOD_NAME CONFIG_STREAMS_IP_TO_STREAMS_NAME
-#   else
-#	define IP_TO_STREAMS_MOD_NAME "ip_strms"
-#   endif
-#endif
+#ifdef LFS
+#define IP_TO_STREAMS_MOD_ID	CONFIG_STREAMS_IP_TO_STREAMS_MODID
+#define IP_TO_STREAMS_MOD_NAME	CONFIG_STREAMS_IP_TO_STREAMS_NAME
+#endif				/* LFS */
 
-#ifndef IP_TO_STREAMS_MOD_ID
-#   ifdef CONFIG_STREAMS_IP_TO_STREAMS_MODID
-#	define IP_TO_STREAMS_MOD_ID CONFIG_STREAMS_IP_TO_STREAMS_MODID
-#   else
-#	define IP_TO_STREAMS_MOD_ID 0
-#   endif
-#endif
+#define MOD_ID		IP_TO_STREAMS_MOD_ID
+#define MOD_NAME	IP_TO_STREAMS_MOD_NAME
 
-modID_t modid = IP_TO_STREAMS_MOD_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
+#ifdef MODULE
+#define MOD_BANNER	IP_TO_STREAMS_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	IP_TO_STREAMS_SPLASH
+#endif				/* MODULE */
 
 STATIC struct module_info ip_to_streams_minfo = {
-	.mi_idnum = IP_TO_STREAMS_MOD_ID,	/* Module ID number */
-	.mi_idname = IP_TO_STREAMS_MOD_NAME,	/* Module name */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = 20000,		/* Hi water mark */
@@ -316,7 +264,8 @@ unsigned long ip_to_streams_debug_mask = 0;
  *  point is called when the IP_STRM module is first pushed onto the stack as
  *  well as each time that a module is pushed above it.
  */
-STATIC int ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
+STATIC int
+ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 {
 	int err;
 	ip_to_streams_minor_t *minor_ptr;
@@ -383,7 +332,8 @@ STATIC int ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cre
  *
  *  
  */
-STATIC int ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
+STATIC int
+ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 {
 	ip_to_streams_minor_t *minor_ptr;
 	(void) oflag;
@@ -393,13 +343,12 @@ STATIC int ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 #if defined LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.",
-			IP_TO_STREAMS_MOD_NAME, __FUNCTION__);
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;
 	}
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			IP_TO_STREAMS_MOD_NAME, __FUNCTION__);
+			MOD_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
 #endif
@@ -435,7 +384,8 @@ STATIC int ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 * ioctl is to be forwarded downstream.  Return 0 if we handled it here.	*
 *									*
 ************************************************************************/
-int ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
+int
+ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp;
 	ip_to_streams_minor_t *minor_ptr;
@@ -523,7 +473,8 @@ int ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 *									*
 ************************************************************************/
 
-STATIC int ip_to_streams_wput(queue_t *q, mblk_t *mp)
+STATIC int
+ip_to_streams_wput(queue_t *q, mblk_t *mp)
 {
 	ip_to_streams_minor_t *minor_ptr;
 
@@ -685,8 +636,9 @@ STATIC int ip_to_streams_wput(queue_t *q, mblk_t *mp)
 *		and the 'mp' has been placed into the 'q'.		*
 *									*
 ************************************************************************/
-mblk_t *ip_to_streams_allocb(queue_t *q, mblk_t *mp, int type, int size, int priority, int head,
-			     int *bufcall_id)
+mblk_t *
+ip_to_streams_allocb(queue_t *q, mblk_t *mp, int type, int size, int priority, int head,
+		     int *bufcall_id)
 {
 	mblk_t *msg;
 
@@ -712,7 +664,8 @@ mblk_t *ip_to_streams_allocb(queue_t *q, mblk_t *mp, int type, int size, int pri
 * We will use the mp given to us if we can.				*
 *									*
 ************************************************************************/
-int ip_to_streams_m_error(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int errno, int retry)
+int
+ip_to_streams_m_error(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int errno, int retry)
 {
 	if (ip_to_streams_debug_mask & DBG_SQUAWK)
 		cmn_err(CE_CONT, "\nip_to_streams_m_error: called\n");
@@ -767,8 +720,9 @@ int ip_to_streams_m_error(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int err
 * Return 1 if succeed, 0 if deferred.					*
 *									*
 ************************************************************************/
-int ip_to_streams_error_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long err_prim,
-			    long tli_error, long unix_error, int retry)
+int
+ip_to_streams_error_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long err_prim,
+			long tli_error, long unix_error, int retry)
 {
 	dl_error_ack_t *p;
 
@@ -822,7 +776,8 @@ int ip_to_streams_error_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long 
 * Return 1 if succeed, 0 if deferred.					*
 *									*
 ************************************************************************/
-int ip_to_streams_ok_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long ok_prim, int retry)
+int
+ip_to_streams_ok_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long ok_prim, int retry)
 {
 	dl_ok_ack_t *p;
 
@@ -884,7 +839,8 @@ int ip_to_streams_ok_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long ok_
 *									*
 ************************************************************************/
 
-STATIC int ip_to_streams_rsrv(queue_t *q)
+STATIC int
+ip_to_streams_rsrv(queue_t *q)
 {
 	ip_to_streams_minor_t *minor_ptr;
 	int done;
@@ -939,7 +895,8 @@ STATIC int ip_to_streams_rsrv(queue_t *q)
 *									*
 ************************************************************************/
 
-STATIC int ip_to_streams_wsrv(queue_t *q)
+STATIC int
+ip_to_streams_wsrv(queue_t *q)
 {
 	ip_to_streams_minor_t *minor_ptr;
 	mblk_t *mp;
@@ -1009,7 +966,8 @@ STATIC int ip_to_streams_wsrv(queue_t *q)
 * Return 1 if succeed in handling msg, 0 if deferred.			*
 *									*
 ************************************************************************/
-int ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
+int
+ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 {
 	queue_t *q = minor_ptr->dl_wrq;
 	long *lp;
@@ -1053,7 +1011,8 @@ int ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry
 * Handle a message from below.						*
 *									*
 ************************************************************************/
-STATIC int ip_to_streams_rput(queue_t *q, mblk_t *mp)
+STATIC int
+ip_to_streams_rput(queue_t *q, mblk_t *mp)
 {
 	ip_to_streams_minor_t *minor_ptr = q->q_ptr;
 	struct ism_dev *dev;
@@ -1198,7 +1157,8 @@ STATIC int ip_to_streams_rput(queue_t *q, mblk_t *mp)
 * Convert from a streams msg buffer to a Linux skbuf			*
 *									*
 ************************************************************************/
-int convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
+int
+convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 {
 	struct sk_buff *skb;
 	int len;
@@ -1285,7 +1245,8 @@ int convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 #define SKB_FREE(skb)    dev_kfree_skb(skb, FREE_WRITE)
 #endif
 
-static int ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
+static int
+ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 {
 	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 	dl_unitdata_req_t *dl;
@@ -1401,7 +1362,8 @@ static int ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 *									*
 *									*
 ************************************************************************/
-int ip_strm_ioctl(struct ism_dev *dev, struct ifreq *ifr, int cmd)
+int
+ip_strm_ioctl(struct ism_dev *dev, struct ifreq *ifr, int cmd)
 {
 	return (-EINVAL);
 
@@ -1414,7 +1376,8 @@ int ip_strm_ioctl(struct ism_dev *dev, struct ifreq *ifr, int cmd)
 * return a pointer to the stats area					*
 *									*
 ************************************************************************/
-static struct enet_statistics *get_stats(struct ism_dev *dev)
+static struct enet_statistics *
+get_stats(struct ism_dev *dev)
 {
 	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
@@ -1441,7 +1404,8 @@ static struct enet_statistics *get_stats(struct ism_dev *dev)
 *									*
 ************************************************************************/
 
-int ip_strm_open(struct ism_dev *dev)
+int
+ip_strm_open(struct ism_dev *dev)
 {
 	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
@@ -1493,7 +1457,8 @@ int ip_strm_open(struct ism_dev *dev)
 * instate this IP interface.						*
 *									*
 ************************************************************************/
-int ip_strm_close(struct ism_dev *dev)
+int
+ip_strm_close(struct ism_dev *dev)
 {
 	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
@@ -1511,7 +1476,8 @@ int ip_strm_close(struct ism_dev *dev)
 * Initialize the dlpi -> sk_buf device. 				*
 *									*
 ************************************************************************/
-int ip_strm_init(struct ism_dev *dev)
+int
+ip_strm_init(struct ism_dev *dev)
 {
 #ifndef KERNEL_2_1
 	int i;
@@ -1550,15 +1516,22 @@ int ip_strm_init(struct ism_dev *dev)
 	return (0);
 }
 
+#ifdef LINUX
+modID_t modid = MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
+#endif				/* LINUX */
+
 #if defined LFS
 STATIC struct fmodsw ip_to_streams_fmod = {
-	.f_name = IP_TO_STREAMS_MOD_NAME,
+	.f_name = MOD_NAME,
 	.f_str = &ip_to_streams_info,
 	.f_flag = 0,
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC int ip_to_streams_register_module(void)
+STATIC int
+ip_to_streams_register_module(void)
 {
 	int err;
 	if ((err = register_strmod(&ip_to_streams_fmod)) < 0)
@@ -1567,16 +1540,17 @@ STATIC int ip_to_streams_register_module(void)
 		modid = err;
 	return (0);
 };
-STATIC void ip_to_streams_unregister_module(void)
+STATIC void
+ip_to_streams_unregister_module(void)
 {
 	return (void) unregister_strmod(&ip_to_streams_fmod);
 }
 #elif defined LIS
-STATIC int ip_to_streams_register_module(void)
+STATIC int
+ip_to_streams_register_module(void)
 {
 	int ret;
-	if ((ret =
-	     lis_register_strmod(&ip_to_streams_info, IP_TO_STREAMS_MOD_NAME)) != LIS_NULL_MID) {
+	if ((ret = lis_register_strmod(&ip_to_streams_info, MOD_NAME)) != LIS_NULL_MID) {
 		if (modid == 0)
 			modid = ret;
 		return (0);
@@ -1584,30 +1558,28 @@ STATIC int ip_to_streams_register_module(void)
 	/* LiS is not too good on giving informative errors here. */
 	return (EIO);
 }
-STATIC void ip_to_streams_unregister_module(void)
+STATIC void
+ip_to_streams_unregister_module(void)
 {
 	/* LiS provides detailed error here when they are discarded. */
 	return (void) lis_unregister_strmod(&ip_to_streams_info);
 }
 #endif
 
-STATIC int __init ip_to_streams_init(void)
+STATIC int __init
+ip_to_streams_init(void)
 {
 	int err;
-#ifdef MODULE
-	cmn_err(CE_NOTE, IP_TO_STREAMS_BANNER);	/* banner message */
-#else
-	cmn_err(CE_NOTE, IP_TO_STREAMS_SPLASH);	/* console splash */
-#endif
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = ip_to_streams_register_module())) {
-		cmn_err(CE_WARN, "%s: could not register module, err = %d", IP_TO_STREAMS_MOD_NAME,
-			-err);
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, -err);
 		return (err);
 	}
 	return (0);
 };
 
-STATIC void __exit ip_to_streams_exit(void)
+STATIC void __exit
+ip_to_streams_exit(void)
 {
 	ip_to_streams_unregister_module();
 	return;

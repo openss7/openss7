@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,56 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 13:22:48 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 12:23:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $";
 
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if defined LFS && !defined _SVR4_SOURCE
-#define CONFIG_STREAMS_COMPAT_SVR4
-#define _SVR4_SOURCE
-#endif
-
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
-#   error ****
-#   error ****  One of _LIS_SOURCE or _LFS_SOURCE must be defined
-#   error ****  to compile the ip_to_dlpi driver.
-#   error ****
-#endif
-
-#ifdef LINUX
-#   include <linux/config.h>
-#   include <linux/version.h>
-#   ifndef HAVE_SYS_LIS_MODULE_H
-#	ifdef MODVERSIONS
-#	    include <linux/modversions.h>
-#	endif
-#	include <linux/module.h>
-#	include <linux/modversions.h>
-#	ifndef __GENKSYMS__
-#	    if defined HAVE_SYS_LIS_MODVERSIONS_H
-#		include <sys/LiS/modversions.h>
-#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#		include <sys/streams/modversions.h>
-#	    endif
-#	endif
-#	include <linux/init.h>
-#   else
-#	include <sys/LiS/module.h>
-#   endif
-#endif
+#include "compat.h"
 
 #include <linux/bitops.h>
 
@@ -105,21 +65,6 @@ static char const ident[] =
 #include <linux/skbuff.h>	/* Linux socket buffer */
 #include <net/pkt_sched.h>	/* Linux queue disciplines */
 
-#include <linux/slab.h>
-
-#include <sys/kmem.h>
-#include <sys/cmn_err.h>
-
-#include <sys/stream.h>
-
-#ifdef LFS
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/strdebug.h>
-#include <sys/debug.h>
-#endif
-
-#include <sys/ddi.h>
 #include <sys/dlpi.h>
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
@@ -133,77 +78,54 @@ static char const ident[] =
 
 #include <sys/ldl.h>
 
-#ifndef LFS
-#include "debug.h"
-#endif
-
-#ifdef LFS
-#define ALLOC(__s) kmem_alloc((__s), KM_NOSLEEP)
-#define FREE(__p) kmem_free((__p), sizeof(*(__p)))
-#define SPLSTR(__pl) ({ (__pl) = spl7(); (void)0; })
-#define SPLX(__pl) splx(__pl)
-#else
-typedef lis_flags_t pl_t;
-#endif
-
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2004/08/23 13:22:48 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
 #define LDL_BANNER	LDL_DESCRIP	"\n" \
-			LDL_COPYRIGHT	"\n" \
+			LDL_EXTRA	"\n" \
 			LDL_REVISION	"\n" \
+			LDL_COPYRIGHT	"\n" \
 			LDL_DEVICE	"\n" \
-			LDL_CONTACT	"\n"
-#define LDL_SPLASH	LDL_DEVICE	" - " \
-			LDL_REVISION	"\n"
+			LDL_CONTACT
+#define LDL_SPLASH	LDL_DEVICE	"\n" \
+			LDL_REVISION
 
+#ifdef LINUX
 MODULE_AUTHOR(LDL_CONTACT);
 MODULE_DESCRIPTION(LDL_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LDL_DEVICE);
+#ifdef MODULE_LICENSE
 MODULE_LICENSE(LDL_LICENSE);
+#endif				/* MODULE_LICENSE */
+#endif				/* LINUX */
 
-#ifndef LDL_DRV_NAME
-#   ifdef CONFIG_STREAMS_LDL_NAME
-#	define LDL_DRV_NAME CONFIG_STREAMS_LDL_NAME
-#   else
-#	define LDL_DRV_NAME "ldl"
-#   endif
-#endif
+#ifdef LFS
+#define LDL_DRV_ID	CONFIG_STREAMS_LDL_MODID
+#define LDL_DRV_NAME	CONFIG_STREAMS_LDL_NAME
+#define LDL_CMAJORS	CONFIG_STREAMS_LDL_NMAJORS
+#define LDL_CMAJOR_0	CONFIG_STREAMS_LDL_MAJOR
+#define LDL_UNITS	CONFIG_STREAMS_LDL_NMINORS
+#endif				/* LFS */
 
-#ifndef LDL_DRV_ID
-#   ifdef CONFIG_STREAMS_LDL_DRV_ID
-#	define LDL_DRV_ID CONFIG_STREAMS_LDL_DRV_ID
-#   else
-#	define LDL_DRV_ID 0x7253
-#   endif
-#endif
+#define DRV_ID		LDL_DRV_ID
+#define DRV_NAME	LDL_DRV_NAME
+#define CMAJORS		LDL_CMAJORS
+#define CMAJOR_0	LDL_CMAJOR_0
+#define UNITS		LDL_UNITS
 
-#ifndef LDL_CMAJOR_0
-#   ifdef CONFIG_STREAMS_LDL_MAJOR
-#	define LDL_CMAJOR_0 CONFIG_STREAMS_LDL_MAJOR
-#   else
-#	define LDL_CMAJOR_0 0
-#   endif
-#endif
-
-#ifndef LDL_NMINOR
-#define LDL_NMINOR 255
-#endif
-
-unsigned short modid = LDL_DRV_ID;
-MODULE_PARM(modid, "h");
-MODULE_PARM_DESC(modid, "Module ID number for LDL driver (0 for allocation).");
-
-unsigned short major = LDL_CMAJOR_0;
-MODULE_PARM(major, "h");
-MODULE_PARM_DESC(major, "Major device number for LDL driver (0 for allocation).");
+#ifdef MODULE
+#define DRV_BANNER	LDL_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	LDL_SPLASH
+#endif				/* MODULE */
 
 STATIC struct module_info ldl_minfo = {
-	.mi_idnum = LDL_DRV_ID,		/* Module ID number */
-	.mi_idname = LDL_DRV_NAME,	/* Module name */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 4,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = 0x10000,		/* Hi water mark */
@@ -306,155 +228,6 @@ struct streamtab ldl_info = {
  * loopback interface. When this is detected, we could set skb->dst.
  * 
  */
-
-#if 0
-#ifdef DEBUG
-#undef DEBUG			/* unused symbol that causes a warning */
-#endif
-
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/modversions.h>
-#include <linux/module.h>
-
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
-#define	KERNEL_2_0
-#else
-#define	KERNEL_2_1
-# if LINUX_VERSION_CODE > KERNEL_VERSION(2,3,0)
-# define KERNEL_2_3
-# endif
-#endif
-
-#include <linux/spinlock.h>
-
-#ifndef LFS
-#include "debug.h"
-#include <sys/stream.h>		/* stream.h comes first */
-#include <sys/stropts.h>
-#endif
-
- /* 
-  * irda uses queue_t which interferes with our use later
-  */
-#define queue_t	irda_queue_t
-#include <asm/byteorder.h>	/* ntohs() etc..  */
-#include <linux/errno.h>
-#include <linux/string.h>	/* memcpy() and family */
-# ifdef RH_71_KLUDGE		/* boogered up incls in 2.4.2 */
-#  undef CONFIG_HIGHMEM		/* b_page has semi-circular reference */
-# endif
-#include <linux/netdevice.h>	/* Linux netdevice header */
-#include <linux/if_arp.h>	/* Linux netdevice types */
-#include <linux/if_ether.h>	/* Linux ethernet defs */
-#include <linux/skbuff.h>	/* Linux socket buffer */
-#ifdef KERNEL_2_1
- /* 
-  * This file is not available if kernel source is not installed
-  */
-#if !defined(NOKSRC)
-#include <net/pkt_sched.h>	/* Linux queue disciplines */
-#else
-void qdisc_reset(struct Qdisc *qdisc);
-#endif
-#endif
-#ifdef KERNEL_2_0
-#define atomic_read(int_ptr)	(*(int_ptr))
-#define	ARPHRD_HDLC		513	/* 2.1 compatibility */
-#endif
-#undef queue_t			/* allow visibility again */
-
-#ifdef LFS
-#define CONFIG_STREAMS_COMPAT_LIS_MODULE
-#define _LIS_SOURCE
-#define CONFIG_STREAMS_COMPAT_SVR4_MODULE
-#define _SVR4_SOURCE
-#include "debug.h"
-#include <sys/stream.h>		/* stream.h comes first */
-#include <sys/stropts.h>
-#include <sys/kmem.h>
-#undef ALLOC
-#define ALLOC(__s) kmem_alloc((__s), KM_NOSLEEP)
-#undef FREE
-#define FREE(__p) kmem_free((__p), sizeof(*(__p)))
-#undef ASSERT
-#define ASSERT(__c) assert((__c))
-#undef SPLSTR
-#define SPLSTR(__pl) ({ (__pl) = spl7(); (void)0; })
-#undef SPLX
-#define SPLX(__pl) splx(__pl)
-#else
-# ifndef pl_t
-#  ifdef INT_PSW
-typedef int pl_t;
-#  else
-typedef unsigned long pl_t;
-#  endif
-#  define pl_t pl_t
-# endif
-#endif
-
-#include <sys/dlpi.h>
-#include <sys/dki.h>
-#include <sys/ddi.h>
-
-#include <sys/ldl.h>
-
-#ifndef LFS
-#include <sys/LiS/config.h>
-#include <sys/osif.h>
-#endif
-
-#if defined(KERNEL_2_3)
-
-#define ldldev		net_device
-#define driver_started(dev)	 1
-#define	START_BH_ATOMIC(dev)	spin_lock_bh(&(dev)->queue_lock)
-#define	END_BH_ATOMIC(dev)	spin_unlock_bh(&(dev)->queue_lock)
-
-#else
-
-#define ldldev		device
-#define netif_queue_stopped(dev) ((dev)->tbusy)
-#define driver_started(dev)	 ((dev)->start)
-#define	START_BH_ATOMIC(dev)	start_bh_atomic()
-#define	END_BH_ATOMIC(dev)	end_bh_atomic()
-
-#endif
-
-#if defined(ARPHRD_IEEE802_TR)
-#define	IS_ARPHRD_IEEE802_TR(dev) (dev)->type == ARPHRD_IEEE802_TR
-#else
-#define	IS_ARPHRD_IEEE802_TR(dev) 0
-#endif
-
-#if defined(KERNEL_2_1) && defined(LISMODVERS)
-/*extern void qdisc_reset(struct Qdisc *qdisc);*/
-#endif
-
-/*
- *  Some configuration sanity checks
- */
-#ifdef LFS
-#define LDL_
-#define LDL__CMAJOR_0 CONFIG_STREAMS_LDL__MAJOR
-#undef LDL_N_MINOR
-#define LDL_N_MINOR CONFIG_STREAMS_LDL__NMINORS
-#define LDL__CMAJORS CONFIG_STREAMS_LDL__NMAJORS
-#endif
-
-#ifndef LDL_
-#error Not configured
-#endif
-
-#if !defined(LDL__CMAJORS) || LDL__CMAJORS != 1
-#error There should be exactly one major number
-#endif
-
-#if !defined(LDL__CMAJOR_0)
-#error The major number should be defined
-#endif
-#endif
 
 #if defined(KERNEL_2_3)
 
@@ -686,7 +459,8 @@ STATIC char *ldl_pkt_type(unsigned saptype);
 STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt);
 STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp);
 
-STATIC void ldl_bfr_dump(char *msg, void *ptr, int len, int alldata)
+STATIC void
+ldl_bfr_dump(char *msg, void *ptr, int len, int alldata)
 {
 	unsigned char *p = ptr;
 	int bytes = 0;
@@ -714,12 +488,14 @@ STATIC void ldl_bfr_dump(char *msg, void *ptr, int len, int alldata)
 		printk("\n");
 }
 
-STATIC void ldl_mp_dump(char *msg, mblk_t *mp, int alldata)
+STATIC void
+ldl_mp_dump(char *msg, mblk_t *mp, int alldata)
 {
 	ldl_bfr_dump(msg, mp->b_rptr, mp->b_wptr - mp->b_rptr, alldata);
 }
 
-STATIC void ldl_mp_data_dump(char *msg, mblk_t *mp, int alldata)
+STATIC void
+ldl_mp_data_dump(char *msg, mblk_t *mp, int alldata)
 {
 	for (; mp != NULL && mp->b_datap->db_type != M_DATA; mp = mp->b_cont) ;
 	if (mp == NULL)
@@ -728,7 +504,8 @@ STATIC void ldl_mp_data_dump(char *msg, mblk_t *mp, int alldata)
 	ldl_mp_dump(msg, mp, alldata);
 }
 
-STATIC void ldl_skbuff_dump(char *msg, struct sk_buff *skb, int alldata)
+STATIC void
+ldl_skbuff_dump(char *msg, struct sk_buff *skb, int alldata)
 {
 #define	L	unsigned long
 	int cnt;
@@ -750,7 +527,8 @@ STATIC void ldl_skbuff_dump(char *msg, struct sk_buff *skb, int alldata)
 #undef L
 }
 
-STATIC char *ldl_framing_type(unsigned long framing)
+STATIC char *
+ldl_framing_type(unsigned long framing)
 {
 	switch (framing & LDL_FRAME_MASK) {
 	case LDL_FRAME_EII:
@@ -767,7 +545,8 @@ STATIC char *ldl_framing_type(unsigned long framing)
 	return ("LDL_FRAME_UNKNOWN");
 }
 
-STATIC char *ldl_pkt_type(unsigned saptype)
+STATIC char *
+ldl_pkt_type(unsigned saptype)
 {
 	switch (saptype) {
 #ifdef ETH_P_ECHO
@@ -858,7 +637,8 @@ STATIC char *ldl_pkt_type(unsigned saptype)
  *
  *  Notice that sap_create is always called under SPLSTR()
  */
-STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
+STATIC int
+sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 {
 	struct pt *pt, *npt;
 	struct sap *sap;
@@ -953,7 +733,8 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
  *
  *  Returns 0 on success, -1 if not found.
  */
-STATIC int sap_destroy(struct dl *dl, struct sap *sap)
+STATIC int
+sap_destroy(struct dl *dl, struct sap *sap)
 {
 	pl_t psw;
 	struct pt *pt, *opt;
@@ -1048,7 +829,8 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 /*
  *  sap_destroy_all  - remove and destroy all packet types (sap) from a device.
  */
-STATIC void sap_destroy_all(struct dl *dl)
+STATIC void
+sap_destroy_all(struct dl *dl)
 {
 	int ret;
 
@@ -1079,7 +861,8 @@ STATIC void sap_destroy_all(struct dl *dl)
  *
  *  Not reentrant.
  */
-STATIC INLINE void hangup_set(struct dl *dl)
+STATIC INLINE void
+hangup_set(struct dl *dl)
 {
 	if ((dl->flags & LDLFLAG_HANGUP) == 0) {
 		/* 
@@ -1106,7 +889,8 @@ STATIC INLINE void hangup_set(struct dl *dl)
 /*
  *  hangup_do  - do the actual hangup on an endpoint
  */
-STATIC INLINE void hangup_do(struct dl *dl)
+STATIC INLINE void
+hangup_do(struct dl *dl)
 {
 	pl_t psw;
 
@@ -1176,7 +960,8 @@ STATIC INLINE void hangup_do(struct dl *dl)
  *
  *  Not reentrant, returns NULL if not found.
  */
-STATIC INLINE struct ndev *ndev_find(struct ldldev *dev)
+STATIC INLINE struct ndev *
+ndev_find(struct ldldev *dev)
 {
 	struct ndev *ndev;
 
@@ -1191,7 +976,8 @@ STATIC INLINE struct ndev *ndev_find(struct ldldev *dev)
  *
  *  Not reentrant, returns NULL on failure.
  */
-STATIC struct ndev *ndev_get(dl_ulong ppa)
+STATIC struct ndev *
+ndev_get(dl_ulong ppa)
 {
 	dl_ulong i;
 	struct ldldev *dev;
@@ -1225,7 +1011,8 @@ STATIC struct ndev *ndev_get(dl_ulong ppa)
  *
  *  Not reentrant.
  */
-STATIC void ndev_attach(struct ndev *ndev, struct dl *dl)
+STATIC void
+ndev_attach(struct ndev *ndev, struct dl *dl)
 {
 	ASSERT(ndev != NULL);
 	ASSERT(ndev->magic == NDEV_MAGIC);
@@ -1244,7 +1031,8 @@ STATIC void ndev_attach(struct ndev *ndev, struct dl *dl)
  *
  *  Not reentrant.
  */
-STATIC void ndev_free(struct ndev *ndev)
+STATIC void
+ndev_free(struct ndev *ndev)
 {
 	ASSERT(ndev != NULL);
 	ASSERT(ndev->magic == NDEV_MAGIC);
@@ -1268,7 +1056,8 @@ STATIC void ndev_free(struct ndev *ndev)
  *
  *  Not reentrant.
  */
-STATIC void ndev_release(struct dl *dl)
+STATIC void
+ndev_release(struct dl *dl)
 {
 	struct ndev *ndev = dl->ndev;
 	struct dl **dlp;
@@ -1312,7 +1101,8 @@ STATIC void ndev_release(struct dl *dl)
  *  The hard flag is set if the netdevice is removed.
  *  Not reentrant.
  */
-STATIC void ndev_down(struct ndev *ndev, int hard)
+STATIC void
+ndev_down(struct ndev *ndev, int hard)
 {
 	struct dl *dl;
 
@@ -1335,7 +1125,8 @@ STATIC void ndev_down(struct ndev *ndev, int hard)
  *
  *  Not reentrant.
  */
-STATIC void ndev_wr_wakeup_endp(struct ndev *ndev)
+STATIC void
+ndev_wr_wakeup_endp(struct ndev *ndev)
 {
 	struct dl *dl;
 
@@ -1354,7 +1145,8 @@ STATIC void ndev_wr_wakeup_endp(struct ndev *ndev)
  *
  *  Not reentrant.
  */
-STATIC void ndev_wr_wakeup(struct ndev *ndev)
+STATIC void
+ndev_wr_wakeup(struct ndev *ndev)
 {
 	ASSERT(ndev->magic == NDEV_MAGIC);
 	ASSERT(ndev->sleeping);
@@ -1368,7 +1160,8 @@ STATIC void ndev_wr_wakeup(struct ndev *ndev)
 	ndev_wr_wakeup_endp(ndev);
 }
 
-STATIC void tx_congestion_timeout(caddr_t dp)
+STATIC void
+tx_congestion_timeout(caddr_t dp)
 {
 	pl_t psw;
 	struct ndev *ndev = (struct ndev *) dp;
@@ -1389,7 +1182,8 @@ STATIC void tx_congestion_timeout(caddr_t dp)
  *
  *  Not reentrant.
  */
-STATIC void ndev_wr_sleep(struct ndev *ndev)
+STATIC void
+ndev_wr_sleep(struct ndev *ndev)
 {
 	ASSERT(!ndev->sleeping);
 
@@ -1407,7 +1201,8 @@ STATIC void ndev_wr_sleep(struct ndev *ndev)
  *  Need to adjust amount of outstanding data on the netdevice write queue,
  *  and possibly free our ndev structure if no longer in use.
  */
-STATIC void ndev_skb_destruct(struct sk_buff *skb)
+STATIC void
+ndev_skb_destruct(struct sk_buff *skb)
 {
 	struct ndev *ndev;
 
@@ -1444,7 +1239,8 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 
 #if defined(KERNEL_2_1)
 
-STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+STATIC int
+ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 {
 	pl_t psw;
 	int ret;
@@ -1488,7 +1284,8 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 
 #elif defined(too_complicated_KERNEL_2_1)
 
-STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+STATIC int
+ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 {
 	pl_t psw;
 	struct ldldev *dev;
@@ -1540,7 +1337,8 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 
 #else
 
-STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
+STATIC int
+ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
 {
 	atomic_add(skb->truesize, &ndev->wr_cur);
 	(struct ndev *) skb->sk = ndev;
@@ -1561,7 +1359,8 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
 /*
  *  device_notification  - device notification callback.
  */
-STATIC int device_notification(struct notifier_block *notifier, unsigned long event, void *ptr)
+STATIC int
+device_notification(struct notifier_block *notifier, unsigned long event, void *ptr)
 {
 	struct ldldev *dev = ptr;
 	struct ndev *d;
@@ -1600,12 +1399,14 @@ STATIC struct notifier_block dl_notifier = {
 	0
 };
 
-STATIC INLINE int notifier_register(void)
+STATIC INLINE int
+notifier_register(void)
 {
 	return register_netdevice_notifier(&dl_notifier);
 }
 
-STATIC INLINE int notifier_unregister(void)
+STATIC INLINE int
+notifier_unregister(void)
 {
 	return unregister_netdevice_notifier(&dl_notifier);
 }
@@ -1616,7 +1417,8 @@ STATIC INLINE int notifier_unregister(void)
 /*                                                                          */
 /****************************************************************************/
 
-STATIC void dl_bufcallback(long idx)
+STATIC void
+dl_bufcallback(long idx)
 {
 	struct dl *dl = &dl_dl[idx];
 
@@ -1627,7 +1429,8 @@ STATIC void dl_bufcallback(long idx)
 	qenable(WR(dl->rq));
 }
 
-STATIC int dl_bufcall(struct dl *dl, mblk_t *mp, int size)
+STATIC int
+dl_bufcall(struct dl *dl, mblk_t *mp, int size)
 {
 	ASSERT(!dl->bufwait);
 	if ((dl->bufwait = bufcall(size, BPRI_HI, dl_bufcallback, dl - dl_dl)) == 0) {
@@ -1647,7 +1450,8 @@ STATIC int dl_bufcall(struct dl *dl, mblk_t *mp, int size)
 /*
  *  Translate from DLPI priority to Linux netdevice priority
  */
-STATIC INLINE int pri_dlpi2netdevice(dl_ulong pri)
+STATIC INLINE int
+pri_dlpi2netdevice(dl_ulong pri)
 {
 	ASSERT(pri >= 0);
 	ASSERT(pri <= 100);
@@ -1663,7 +1467,8 @@ STATIC INLINE int pri_dlpi2netdevice(dl_ulong pri)
  *  freed, read and write pointers are reset, and 1 is returned.
  *  Otherwise, the message is untouched and 0 is returned.
  */
-STATIC INLINE int reuse_msg(mblk_t *mp, dl_ushort size)
+STATIC INLINE int
+reuse_msg(mblk_t *mp, dl_ushort size)
 {
 	mblk_t *bp;
 
@@ -1685,7 +1490,8 @@ STATIC INLINE int reuse_msg(mblk_t *mp, dl_ushort size)
 /*
  *  Convert mp to DL_OK_ACK.
  */
-STATIC INLINE void make_dl_ok_ack(mblk_t *mp, dl_ulong primitive)
+STATIC INLINE void
+make_dl_ok_ack(mblk_t *mp, dl_ulong primitive)
 {
 	dl_ok_ack_t *ackp;
 
@@ -1701,7 +1507,8 @@ STATIC INLINE void make_dl_ok_ack(mblk_t *mp, dl_ulong primitive)
 /*
  *  Convert mp to DL_ERROR_ACK.
  */
-STATIC INLINE void make_dl_error_ack(mblk_t *mp, dl_ulong primitive, dl_ulong err, dl_ulong uerr)
+STATIC INLINE void
+make_dl_error_ack(mblk_t *mp, dl_ulong primitive, dl_ulong err, dl_ulong uerr)
 {
 	dl_error_ack_t *ackp;
 
@@ -1724,7 +1531,8 @@ STATIC INLINE void make_dl_error_ack(mblk_t *mp, dl_ulong primitive, dl_ulong er
  *  (But if bufcall fails *mp is freed and set to NULL
  *   and a bogus DONE is returned to avoid hanging.)
  */
-STATIC INLINE int do_ok_ack(struct dl *dl, mblk_t **mp, dl_ulong primitive)
+STATIC INLINE int
+do_ok_ack(struct dl *dl, mblk_t **mp, dl_ulong primitive)
 {
 	if (!reuse_msg(*mp, DL_OK_ACK_SIZE)) {
 		mblk_t *bp;
@@ -1752,8 +1560,8 @@ STATIC INLINE int do_ok_ack(struct dl *dl, mblk_t **mp, dl_ulong primitive)
  *  (But if bufcall fails mp is freed and a bogus DONE is returned
  *   to avoid hanging.)
  */
-STATIC int reply_error_ack(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulong err,
-			   dl_ulong uerr)
+STATIC int
+reply_error_ack(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulong err, dl_ulong uerr)
 {
 	if (!reuse_msg(mp, DL_ERROR_ACK_SIZE)) {
 		mblk_t *bp;
@@ -1808,7 +1616,8 @@ STATIC int reply_error_ack(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulo
  *  Ethernet II
  */
 
-STATIC int eth_ii_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_ii_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(dl->sap_len == 2);
 	if (len < 14)
@@ -1829,7 +1638,8 @@ STATIC int eth_ii_want(struct dl *dl, unsigned char *fr, int len)
 	return 1;
 }
 
-STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -1869,7 +1679,8 @@ STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_ii_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+eth_ii_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 	unsigned short dsap;
@@ -1894,7 +1705,8 @@ STATIC int eth_ii_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct s
 /*
  *  Ethernet 802.2
  */
-STATIC int eth_8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(dl->sap_len == 1);
 
@@ -1950,7 +1762,8 @@ STATIC int eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 	return 0;
 }
 
-STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -1991,7 +1804,8 @@ STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+eth_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 	unsigned char dsap;
@@ -2019,7 +1833,8 @@ STATIC int eth_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct
 /*
  *  Ethernet RAW 802.2
  */
-STATIC int eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(dl->sap_len == 1);
 
@@ -2044,7 +1859,8 @@ STATIC int eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
 	return 1;
 }
 
-STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -2085,7 +1901,8 @@ STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 
@@ -2102,7 +1919,8 @@ STATIC int eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, str
  *  Ethernet SNAP
  */
 
-STATIC int eth_snap_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_snap_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(dl->sap_len == 2);
 	if (len < 22 || ntohs(*(unsigned short *) (fr + 12)) < 8
@@ -2128,7 +1946,8 @@ STATIC int eth_snap_want(struct dl *dl, unsigned char *fr, int len)
 	return 1;
 }
 
-STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -2172,7 +1991,8 @@ STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+eth_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 	unsigned short dsap;
@@ -2205,7 +2025,8 @@ STATIC int eth_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct
  *  Ethernet 802.3 IPX
  */
 
-STATIC int ipx_8023_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+ipx_8023_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(dl->sap_len == 0);
 	/* Must have a complete IPX header */
@@ -2219,7 +2040,8 @@ STATIC int ipx_8023_want(struct dl *dl, unsigned char *fr, int len)
 	return 1;
 }
 
-STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -2255,7 +2077,8 @@ STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int ipx_8023_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+ipx_8023_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 
@@ -2321,7 +2144,8 @@ typedef struct tr_llc_frm_hdr {
 #define     FCF_MAC     	0x00	/* MAC frame */
 #define     FCF_LLC     	0x40	/* LLC frame */
 
-STATIC int tr_8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+tr_8022_want(struct dl *dl, unsigned char *fr, int len)
 {				/* patterned after eth_8022_want */
 	tr_hdr_t *trp;
 	tr_llc_frm_hdr_t *llcp;
@@ -2406,7 +2230,8 @@ STATIC int tr_8022_want(struct dl *dl, unsigned char *fr, int len)
  * Strip the token ring addresses from the frame.  Also strip out the
  * route information and the LLC header.
  */
-STATIC mblk_t *tr_8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+tr_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -2456,7 +2281,8 @@ STATIC mblk_t *tr_8022_rcvind(struct dl *dl, mblk_t *dp)
  * Data buffer contains the data part of an LLC frame.  Add the LLC
  * header and the token ring MAC header.
  */
-STATIC int tr_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+tr_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	tr_hdr_t *trp;
 	tr_llc_frm_hdr_t *llcp;
@@ -2497,12 +2323,14 @@ STATIC int tr_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct 
 /*
  *  HDLC Raw
  */
-STATIC int hdlc_raw_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+hdlc_raw_want(struct dl *dl, unsigned char *fr, int len)
 {
 	return 1;		/* take everything */
 }
 
-STATIC mblk_t *hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -2526,7 +2354,8 @@ STATIC mblk_t *hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int hdlc_raw_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+hdlc_raw_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	return 1;
 }
@@ -2535,19 +2364,22 @@ STATIC int hdlc_raw_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct
  *  FDDI 802.2
  */
 
-STATIC int fddi_8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+fddi_8022_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(0);
 	return 0;
 }
 
-STATIC mblk_t *fddi_8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+fddi_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	ASSERT(0);
 	return NULL;
 }
 
-STATIC int fddi_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+fddi_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	ASSERT(0);
 	return 0;
@@ -2557,19 +2389,22 @@ STATIC int fddi_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struc
  *  FDDI SNAP
  */
 
-STATIC int fddi_snap_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+fddi_snap_want(struct dl *dl, unsigned char *fr, int len)
 {
 	ASSERT(0);
 	return 0;
 }
 
-STATIC mblk_t *fddi_snap_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+fddi_snap_rcvind(struct dl *dl, mblk_t *dp)
 {
 	ASSERT(0);
 	return NULL;
 }
 
-STATIC int fddi_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
+STATIC int
+fddi_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	ASSERT(0);
 	return 0;
@@ -2585,7 +2420,8 @@ STATIC int fddi_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struc
 /*                                                                          */
 /****************************************************************************/
 
-STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
+STATIC INLINE void
+dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 {
 	mblk_t *mp;
 
@@ -2644,7 +2480,8 @@ STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 #endif
 }
 
-void mblk_destructor(char *arg)
+void
+mblk_destructor(char *arg)
 {
 	kfree_skb((struct sk_buff *) arg);
 }
@@ -2670,7 +2507,8 @@ void mblk_destructor(char *arg)
  *  otherwise our M_PROTO message could go upstream before any
  *  M_PCPROTO messages queued on our read queue.
  */
-STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
+STATIC int
+rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 {
 	mblk_t *dp;
 	struct dl *dl, *last = NULL;
@@ -2787,7 +2625,8 @@ STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type 
 /*
  *  Try to send an unitdata error upstream
  */
-STATIC void send_uderror(struct dl *dl, char *addr, int addrlen, dl_ulong err, dl_ulong uerr)
+STATIC void
+send_uderror(struct dl *dl, char *addr, int addrlen, dl_ulong err, dl_ulong uerr)
 {
 	mblk_t *mp;
 	dl_uderror_ind_t *nakp;
@@ -2823,7 +2662,8 @@ STATIC void send_uderror(struct dl *dl, char *addr, int addrlen, dl_ulong err, d
 #define	TXE_NULL	5
 #define	TXE_BADPRIO	6
 
-STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
+STATIC int
+tx_failed(struct dl *dl, mblk_t *mp, int err)
 {
 	dl_unitdata_req_t *reqp = (dl_unitdata_req_t *) mp->b_rptr;
 	static dl_unitdata_req_t dummy;	/* all zeros */
@@ -2878,7 +2718,8 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
  *  Return transmission priority, or -1 in case of congestion, or -2 if invalid
  */
 #ifndef KERNEL_2_1
-STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
+STATIC INLINE int
+tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
 {
 	int p_min, p_max;
 
@@ -2922,7 +2763,8 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
 	return p_max;
 }
 #else
-STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
+STATIC INLINE int
+tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
 {
 	int p_min, p_max;
 
@@ -2949,7 +2791,8 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
 }
 #endif
 
-STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+tx_func_proto(struct dl *dl, mblk_t *mp)
 {
 	dl_unitdata_req_t *reqp;
 	mblk_t *dmp;
@@ -3064,7 +2907,8 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+tx_func_raw(struct dl *dl, mblk_t *mp)
 {
 	mblk_t *omp = mp;
 	struct sk_buff *skb;
@@ -3137,7 +2981,8 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 /*                                                                          */
 /****************************************************************************/
 
-STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_info(struct dl *dl, mblk_t *mp)
 {
 	dl_info_ack_t *ackp;
 	dl_qos_cl_sel1_t *qos;
@@ -3268,7 +3113,8 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_phys_addr(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_phys_addr(struct dl *dl, mblk_t *mp)
 {
 	dl_phys_addr_req_t *reqp;
 	dl_phys_addr_ack_t *ackp;
@@ -3312,7 +3158,8 @@ STATIC INLINE int ws_phys_addr(struct dl *dl, mblk_t *mp)
 	}
 }
 
-STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 {
 	dl_set_phys_addr_req_t *reqp;
 	int err;
@@ -3375,7 +3222,8 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_attach(struct dl *dl, mblk_t *mp)
 {
 	struct ndev *ndev;
 	struct ldldev *dev;
@@ -3589,7 +3437,8 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_detach(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_detach(struct dl *dl, mblk_t *mp)
 {
 	pl_t psw;
 
@@ -3615,7 +3464,8 @@ STATIC INLINE int ws_detach(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_bind(struct dl *dl, mblk_t *mp)
 {
 	dl_bind_req_t *reqp;
 	dl_bind_ack_t *ackp;
@@ -3733,7 +3583,8 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_unbind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_unbind(struct dl *dl, mblk_t *mp)
 {
 	pl_t psw;
 
@@ -3779,7 +3630,8 @@ STATIC INLINE int ws_unbind(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_subs_bind(struct dl *dl, mblk_t *mp)
 {
 	dl_subs_bind_req_t *reqp;
 	dl_subs_bind_ack_t *ackp;
@@ -3919,7 +3771,8 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 	}
 }
 
-STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_subs_unbind(struct dl *dl, mblk_t *mp)
 {
 	dl_subs_unbind_req_t *reqp;
 	int saplen;
@@ -4007,7 +3860,8 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_udqos(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_udqos(struct dl *dl, mblk_t *mp)
 {
 	dl_udqos_req_t *reqp;
 	dl_qos_cl_sel1_t *qos;
@@ -4052,7 +3906,8 @@ STATIC INLINE int ws_udqos(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_promiscon(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_promiscon(struct dl *dl, mblk_t *mp)
 {
 	dl_promiscon_req_t *reqp;
 
@@ -4084,7 +3939,8 @@ STATIC INLINE int ws_promiscon(struct dl *dl, mblk_t *mp)
 	}
 }
 
-STATIC INLINE int ws_promiscoff(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_promiscoff(struct dl *dl, mblk_t *mp)
 {
 	dl_promiscoff_req_t *reqp;
 
@@ -4116,7 +3972,8 @@ STATIC INLINE int ws_promiscoff(struct dl *dl, mblk_t *mp)
 	}
 }
 
-STATIC INLINE int ws_enabmulti(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_enabmulti(struct dl *dl, mblk_t *mp)
 {
 	dl_enabmulti_req_t *reqp;
 
@@ -4143,7 +4000,8 @@ STATIC INLINE int ws_enabmulti(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_disabmulti(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_disabmulti(struct dl *dl, mblk_t *mp)
 {
 	dl_disabmulti_req_t *reqp;
 
@@ -4154,7 +4012,8 @@ STATIC INLINE int ws_disabmulti(struct dl *dl, mblk_t *mp)
 	return 0;
 }
 
-STATIC INLINE int ws_error(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulong err)
+STATIC INLINE int
+ws_error(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulong err)
 {
 	if (reply_error_ack(dl, mp, primitive, err, 0) == RETRY)
 		return RETRY;
@@ -4172,14 +4031,16 @@ STATIC INLINE int ws_error(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulo
 /*                                                                          */
 /****************************************************************************/
 
-STATIC INLINE int ioc_nak(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ioc_nak(struct dl *dl, mblk_t *mp)
 {
 	mp->b_datap->db_type = M_IOCNAK;
 	qreply(WR(dl->rq), mp);
 	return DONE;
 }
 
-STATIC INLINE int ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	struct ldl_flags_ioctl *flg;
 	mblk_t *dp;
@@ -4208,7 +4069,8 @@ STATIC INLINE int ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	struct ldldev *dev;
 	dl_ulong ppa;
@@ -4243,7 +4105,8 @@ STATIC INLINE int ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
 	int len;
@@ -4274,7 +4137,8 @@ STATIC INLINE int ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
 
@@ -4300,7 +4164,8 @@ STATIC INLINE int ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
 	unsigned long *lp;
@@ -4328,7 +4193,8 @@ STATIC INLINE int ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t 
 /* End of: IOCTL routine helpers.                                           */
 /****************************************************************************/
 
-STATIC int ldl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int
+ldl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	dev_t i;
 
@@ -4384,7 +4250,8 @@ STATIC int ldl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return 0;
 }
 
-STATIC int ldl_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+ldl_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct dl **dlp, *dl = (struct dl *) q->q_ptr;
 	pl_t psw;
@@ -4438,7 +4305,8 @@ STATIC int ldl_close(queue_t *q, int flag, cred_t *crp)
 	return 0;
 }
 
-STATIC int write_service_raw(struct dl *dl, mblk_t *mp)
+STATIC int
+write_service_raw(struct dl *dl, mblk_t *mp)
 {
 	ASSERT(dl != NULL);
 	ASSERT(dl->magic == DL_MAGIC);
@@ -4464,7 +4332,8 @@ STATIC int write_service_raw(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC int write_service(struct dl *dl, mblk_t *mp)
+STATIC int
+write_service(struct dl *dl, mblk_t *mp)
 {
 	dl_ulong primitive;
 
@@ -4530,7 +4399,8 @@ STATIC int write_service(struct dl *dl, mblk_t *mp)
 	}
 }
 
-STATIC int do_ioctl(struct dl *dl, mblk_t *mp)
+STATIC int
+do_ioctl(struct dl *dl, mblk_t *mp)
 {
 	struct iocblk *iocp;
 
@@ -4561,7 +4431,8 @@ STATIC int do_ioctl(struct dl *dl, mblk_t *mp)
 /*
  *  Write queue put routine
  */
-STATIC int ldl_wput(queue_t *q, mblk_t *mp)
+STATIC int
+ldl_wput(queue_t *q, mblk_t *mp)
 {
 	unsigned char msg_type = mp->b_datap->db_type;
 	dl_ulong primitive;
@@ -4620,7 +4491,8 @@ STATIC int ldl_wput(queue_t *q, mblk_t *mp)
 /*
  *  Write queue service routine
  */
-STATIC int ldl_wsrv(queue_t *q)
+STATIC int
+ldl_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 	struct dl *dl = (struct dl *) q->q_ptr;
@@ -4652,7 +4524,8 @@ STATIC int ldl_wsrv(queue_t *q)
 /*
  *  Read queue service routine
  */
-STATIC int ldl_rsrv(queue_t *q)
+STATIC int
+ldl_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 	while (canputnext(q)) {
@@ -4668,30 +4541,39 @@ STATIC int ldl_rsrv(queue_t *q)
 	return (0);
 }
 
+#ifdef LINUX
+unsigned short modid = DRV_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID number for LDL driver (0 for allocation).");
+
+unsigned short major = CMAJOR_0;
+MODULE_PARM(major, "h");
+MODULE_PARM_DESC(major, "Major device number for LDL driver (0 for allocation).");
+#endif				/* LINUX */
+
 #ifdef LFS
 STATIC struct cdevsw ldl_cdev = {
-	.d_name = LDL_DRV_NAME,
+	.d_name = DRV_NAME,
 	.d_str = &ldl_info,
 	.d_flag = 0,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
-int __init ldl_init(void)
+int __init
+ldl_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_LDL_MODULE
-	cmn_err(CE_NOTE, LDL_BANNER);
-#else
-	cmn_err(CE_NOTE, LDL_SPLASH);
-#endif
+	cmn_err(CE_NOTE, DRV_BANNER);
 	if ((err = register_strdev(&ldl_cdev, major)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
 	return (0);
 }
-void __exit ldl_exit(void)
+
+void __exit
+ldl_exit(void)
 {
 	return (void) unregister_strdev(&ldl_cdev, major);
 }
@@ -4704,14 +4586,15 @@ module_exit(ldl_exit);
 #elif defined LIS
 
 STATIC int ldl_initialized = 0;
-STATIC void ldl_init(void)
+STATIC void
+ldl_init(void)
 {
 	int err;
 	if (ldl_initialized != 0)
 		return;
-	cmn_err(CE_NOTE, LDL_BANNER);	/* console splash */
-	if ((err = lis_register_strdev(major, &ldl_info, LDL_NMINOR, LDL_DRV_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: Cannot register major %d\n", LDL_DRV_NAME, major);
+	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
+	if ((err = lis_register_strdev(major, &ldl_info, UNITS, DRV_NAME)) < 0) {
+		cmn_err(CE_WARN, "%s: Cannot register major %d\n", DRV_NAME, major);
 		ldl_initialized = err;
 		return;
 	}
@@ -4722,20 +4605,23 @@ STATIC void ldl_init(void)
 	}
 	return;
 }
-STATIC void ldl_terminate(void)
+STATIC void
+ldl_terminate(void)
 {
 	int err;
 	if (ldl_initialized <= 0)
 		return;
 	if (major) {
 		if ((err = lis_unregister_strdev(major)) < 0)
-			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", LDL_DRV_NAME, major);
+			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", DRV_NAME, major);
 		major = 0;
 	}
 	ldl_initialized = 0;
 	return;
 }
-int init_module(void)
+
+int
+init_module(void)
 {
 	(void) major;
 	ldl_init();
@@ -4743,7 +4629,9 @@ int init_module(void)
 		return ldl_initialized;
 	return (0);
 }
-void cleanup_module(void)
+
+void
+cleanup_module(void)
 {
 	return ldl_terminate();
 }

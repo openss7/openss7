@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.4 2004/08/31 07:19:38 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.5 2004/09/02 12:23:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 12:23:14 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -135,5 +135,14 @@ typedef int tid_t;
 #else				/* LINUX */
 #define MODULE_STATIC STATIC
 #endif				/* LINUX */
+
+#ifdef LFS
+#define ALLOC(__s) kmem_alloc((__s), KM_NOSLEEP)
+#define FREE(__p) kmem_free((__p), sizeof(*(__p)))
+#define SPLSTR(__pl) ({ (__pl) = spl7(); (void)0; })
+#define SPLX(__pl) splx(__pl)
+#else				/* LFS */
+typedef lis_flags_t pl_t;
+#endif				/* LFS */
 
 #endif				/* __LOCAL_COMPAT_H__ */
