@@ -1,0 +1,160 @@
+#
+# LiS RPM FOR ease of development.
+# -------------------------------
+#
+# Version 1.1 11/23/03
+
+%define lisversion LISVERSION
+Summary: Linux STREAMS
+Name: LiS
+Version: %{lisversion}
+Release: 1
+License: LGPL
+Group: System Environment/Kernel
+URL: http://www.gcom.com/home/linux/lis/
+Packager: LiS Makefile for testing
+ExclusiveOS: Linux
+Vendor: www.gcom.com
+
+BuildRoot: LISROOT/rpm-root
+%define _topdir LISROOT
+
+
+
+
+
+# Description is copied from the LiS home page (see URL above)
+# 
+%description
+Linux STREAMS (LiS) is a software package that comprises an
+implementation of SVR4 compatible STREAMS for Linux. It takes the form
+of a loadable module for the Linux kernel.
+
+LiS includes two adapter drivers to assist in interfacing STREAMS
+drivers to the Linux Kernel's TCP/IP protocols. One driver
+(ip_strm_mod) acts as an IP interface driver. It fits below IP using
+standard ifconfig procedures. It, in turn, communicates downstream
+with any STREAMS driver using the DLPI protocol in a fashion similar
+to the manner in which IP on Unix systems interfaces to lower
+interface drivers. This allows a DLPI STREAMS driver to act as an
+interface driver to Linux TCP/IP.
+
+A second driver (ldl) sits on top of any existing Linux IP interface
+driver and presents a DLPI interface to STREAMS drivers above. This
+allows any STREAMS driver that communicates downstream using DLPI to
+utilize the services of existing Linux drivers for Ethernet, token
+ring, etc.
+
+LiS is licensed using the GNU General Public Library License (except
+for ldl, which is licensed under the standard GNU Public
+License). This means that you can link proprietary STREAMS drivers
+with LiS and load the entirety into the Linux kernel without violating
+license restrictions. This licensing arrangement is intended to
+encourage commercial software vendors to port STREAMS based driver
+packages to Linux.
+
+%package devel
+Summary: Linux STREAMS development kit
+Group: Development/Libraries
+Requires: LiS == %{lisversion}
+
+%description devel
+This package contains the header files and static libraries needed to
+develop applications & kernel modules based on Linux STREAMS (LiS).
+
+%package modules
+Summary: Linux STREAMS kernel modules
+Group: System Environment/Kernel
+Requires: LiS ==  %{lisversion}
+Provides: LiS-modules
+
+
+%description modules
+This package contains the kernel components of Linux STREAMS LiS.  It
+is tightly coupled with the kernel version
+%{kernelsname}-%{kernelbuildnum}.
+
+It is required to actually run LiS, but not to develop STREAMS
+applications or modules.
+
+# 
+# Disable build root strip policy (mandatory for kernel modules)
+# 
+%define __spec_install_post /usr/lib/rpm/brp-compress || :
+
+
+
+%post modules
+		depmod -aue 
+
+
+%post
+## Part To be run at each post install.
+ldconfig
+## In case of upgrade it worth it to re-create
+strmakenodes -r
+strmakenodes
+## Same principle Remove if present then add again (good for upgrade)
+ awk 'BEGIN        { suppress="no" }
+     /#BEGIN LiS/ { suppress="yes" }
+                  { if (suppress=="no") print }  
+     /#END LiS/   { suppress="no" }' /etc/modules.conf > /etc/modules.conf.new
+
+ if [ $? -eq 0 ]; then
+    mv -f /etc/modules.conf.new /etc/modules.conf
+ fi
+echo "#BEGIN LiS" >> /etc/modules.conf
+cat >> /etc/modules.conf < /usr/lib/LiS/etc/modules.conf
+echo "#END LiS" >> /etc/modules.conf
+
+%preun modules
+strms_down
+
+%preun
+if [ "$1" = "0" ] ; then # Means No more LiS is there (no upgrade) 
+	strmakenodes -r
+fi
+
+
+%postun modules
+		depmod -aue
+
+%postun
+ldconfig
+if [ "$1" = "0" ] ; then # Means No more LiS is there (no upgrade) 
+ awk 'BEGIN        { suppress="no" }
+     /#BEGIN LiS/ { suppress="yes" }
+                  { if (suppress=="no") print }  
+     /#END LiS/   { suppress="no" }' /etc/modules.conf > /etc/modules.conf.new
+
+ if [ $? -eq 0 ]; then
+    mv -f /etc/modules.conf.new /etc/modules.conf
+ fi
+fi
+
+%files
+%defattr(-, root, root)
+/etc/modules-LiS.conf
+/usr/lib/libLiS.so
+/usr/lib/libpLiS.so
+/usr/sbin
+/usr/bin
+/usr/share/man
+%doc %{lisname}/COPYING
+%doc %{lisname}/LSM
+%doc %{lisname}/README
+%doc %{lisname}/VOLUNTEERS
+%doc %{lisname}/version
+%doc %{lisname}/htdocs
+
+%files modules
+%defattr(-, root, root)
+/lib/modules
+
+%files devel
+%defattr(-, root, root)
+/usr/lib/libLiS.a
+/usr/lib/LiS/include
+
+
+
