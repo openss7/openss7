@@ -5,14 +5,12 @@ EXTRA_DIST = gpl.texi lesser.texi fdl.texi
 
 all-local: ps pdf
 
-docdir = @datadir@/doc/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
-
 install-data-local: all-local
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) strxnet.pdf $(DESTDIR)$(docdir)
+	$(mkinstalldirs) $(DESTDIR)$(DOCDIR)/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
+	$(INSTALL_DATA) strxnet.pdf $(DESTDIR)$(DOCDIR)/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 
 uninstall-local:
 	@$(NORMAL_UNINSTALL)
-	rm -f $(DESTDIR)$(docdir)/strxnet.pdf
+	rm -f $(DESTDIR)$(DOCDIR)/@PACKAGE_TARNAME@-@PACKAGE_VERSION@/strxnet.pdf
 

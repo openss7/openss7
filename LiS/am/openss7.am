@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/04 00:14:29 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:37:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/04 00:14:29 $ by $Author: brian $
+# Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,5 +74,13 @@ AM_CTAGSFLAGS = --c-types=+px
 #
 ifnames:
 	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
+
+#
+# Collected phonys from other automake fragments.
+#
+.PHONY: install-modules post-modules uninstall-modules postun-modules \
+	post-libraries postun-libraries \
+	clean-local-manpages install-local-manpages uninstall-local-manpages \
+	srpm rpms 
 
 # vim: ft=automake

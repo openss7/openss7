@@ -1,0 +1,153 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:31:27 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/04/05 12:31:27 $ by $Author: brian $
+#
+# =============================================================================
+
+all-am: $(KERNEL_MODULES)
+
+#STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
+
+install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
+	@list='$(KERNEL_MODULES)'; for p in $$list; do \
+		if test -f $$p; then \
+			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
+			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
+			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
+			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULE)" ; then \
+				echo "$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
+				$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
+			fi ; \
+		else :; fi ; \
+	done
+	@if test -n "$(KERNEL_MODCONF)" ; then \
+		echo "$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)" ; \
+		$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT) ; \
+	fi
+
+install-exec-local: install-modules
+
+post-modules:
+	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+		if ( grep -q 'include.*modules.$(KMODCONF_EXT)' $(DESTDIR)$(krootdir)/etc/modules.conf ) ; then :; else \
+			if ( grep -q 'BEGIN LiS' $(DESTDIR)$(krootdir)/etc/modules.conf ) ; then \
+				sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' $(DESTDIR)/etc/modules.conf > $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			else \
+				cp -f $(DESTDIR)$(krootdir)/etc/modules.conf $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			fi ; \
+			echo 'prune modules.$(KMODCONF_EXT)' >> $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			echo 'if -f /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			echo 'include /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			echo 'endif' >> $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			chmod --reference=$(DESTDIR)$(krootdir)/etc/modules.conf $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			cp -fb --suffix=.$(KMODCONF_EXT).bak $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ $(DESTDIR)$(krootdir)/etc/modules.conf ; \
+			rm -f $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+		fi ; \
+		if test -r $(DESTDIR)$(krootdir)/boot/System.map-$(kversion) -a -x /sbin/depmod ; then \
+			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $(DESTDIR)$(krootdir)/etc/modules.conf -F $(DESTDIR)$(krootdir)/boot/System.map-$(kversion) $(kversion)" ; \
+			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $(DESTDIR)$(krootdir)/etc/modules.conf -F $(DESTDIR)$(krootdir)/boot/System.map-$(kversion) $(kversion) ; \
+		fi ; \
+		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-devices ; \
+	fi
+
+#
+# The install-exec-hook target is run after the files have been installed.  It
+# is essentially equivalent to the rpm %post, but it is only exectued when the
+# install directory is fully configured for kernel modules.  (That is, this
+# does not run when building an rpm, because the binaries are installed in a
+# temporary, unconfigured directory.)  This is for alien systems and embedded
+# targets that cannot build from packages.
+#
+install-exec-hook: post-modules
+
+uninstall-modules:
+	@$(NORMAL_UNINSTALL)
+	@list='$(KERNEL_MODULES)'; for p in $$list; do \
+		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
+		echo "$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+		$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
+	done
+	rm -f $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)
+
+uninstall-local: uninstall-modules
+
+postun-modules:
+	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+		r=no ; \
+		for f in $(DESTDIR)$(krootdir)/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
+			if test -f $$f ; then r=yes ; fi ; \
+		done ; \
+		if test ":$$r" = :yes ; then \
+			sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $(DESTDIR)$(krootdir)/etc/modules.conf > $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			chmod --reference=$(DESTDIR)$(krootdir)/etc/modules.conf $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+			cp -fb --suffix=.$(KMODCONF_EXT).bak $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ $(DESTDIR)$(krootdir)/etc/modules.conf ; \
+			rm -f $(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$ ; \
+		fi ; \
+		if test -r $(DESTDIR)$(krootdir)/boot/System.map-$(kversion) -a -x /sbin/depmod ; then \
+			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $(DESTDIR)$(krootdir)/etc/modules.conf -F $(DESTDIR)$(krootdir)/boot/System.map-$(kversion) $(kversion)" ; \
+			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $(DESTDIR)$(krootdir)/etc/modules.conf -F $(DESTDIR)$(krootdir)/boot/System.map-$(kversion) $(kversion) ; \
+		fi ; \
+		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
+	fi
+
+#
+# The uninstall-hook target is run after the files have been removed.  It is
+# essentially equivalent to the rpm %postun, but it is only executed when the
+# uninstall directory is fully configured for kernel modules.  (That is, this
+# does not run when building an rpm, because the binaries are installed in a
+# temporary, unconfigured directory.)  This is for alien systems and embedded
+# targets that cannot build from packages.
+#
+uninstall-hook: postun-modules
+
+#.PHONY: install-modules post-modules uninstall-modules postun-modules
+
+# vim: ft=automake

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 
  $Log: tihdr.h,v $
+ Revision 0.9.2.1  2004/04/05 12:39:05  brian
+ - Working up XNET release.
+
  Revision 0.9  2004/04/03 22:37:08  brian
  - Initial cut of new strxnet rpm release.
 
@@ -72,8 +75,20 @@
 #ifndef _TIHDR_H
 #define _TIHDR_H
 
-#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $"
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
 #include <sys/tihdr.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* _TIHDR_H */

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/04 00:14:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/05 12:39:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,21 +46,29 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/04 00:14:29 $ by $Author: brian $
+# Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 #
 # =============================================================================
 
 if PUBLIC_RELEASE
 
 libexec_PROGRAMS		= \
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp \
 				  test-tirdwr \
 				  test-timod \
 				  test-xnet \
 				  test-xnet_thr
 
 EXTRA_PROGRAMS			= \
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp \
 				  test-tirdwr \
-				  test-timod
+				  test-timod \
+				  test-xnet \
+				  test-xnet_thr
 
 sbin_PROGRAMS			= \
 				  xnetmakenodes
@@ -70,6 +78,21 @@ xnetmakenodes_DEPENDENCIES	= strconf.h
 xnetmakenodes_LDDADD		=
 xnetmakenodes_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
 xnetmakenodes_CFLAGS		= @USER_CFLAGS@
+
+test_inet_raw_SOURCES		= src/test/test-inet_raw.c
+test_inet_raw_LDFLAGS		= -lLiS
+test_inet_raw_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+test_inet_raw_CFLAGS		= @USER_CFLAGS@
+
+test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
+test_inet_tcp_LDFLAGS		= -lLiS
+test_inet_tcp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+test_inet_tcp_CFLAGS		= @USER_CFLAGS@
+
+test_inet_udp_SOURCES		= src/test/test-inet_udp.c
+test_inet_udp_LDFLAGS		= -lLiS
+test_inet_udp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+test_inet_udp_CFLAGS		= @USER_CFLAGS@
 
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDFLAGS		= -lLiS
@@ -83,12 +106,12 @@ test_timod_CFLAGS		= @USER_CFLAGS@
 
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDFLAGS		= -lLiS -lxnet
-test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -I$(srcdir)/src/include/xti
+test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
 test_xnet_CFLAGS		= @USER_CFLAGS@
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDFLAGS		= -lLiS -lpthread -lxnet
-test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT -I$(srcdir)/src/include/xti
+test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT
 test_xnet_thr_CFLAGS		= @USER_CFLAGS@
 
 ADDON_LIBS			= 
@@ -102,36 +125,58 @@ libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib @XNET_I
 libxnet_la_CFLAGS		= @USER_CFLAGS@
 libxnet_la_LIBADD		= 
 
-noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
+noinst_LIBRARIES		= libXNETmods.a libXNETdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= 
 
-nodist_EXTRA_libXNETmods_a_SOURCES	= \
+nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
 				  src/modules/timod.c \
-				  ./strconf.h
+				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= -I./src/include -I@srcdir@/src/include -I./src/modules -I@srcdir@/src/modules -I./src/drivers -I@srcdir@/src/drivers -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libXNETmods_a_CPPFLAGS		= -I./src/modules -I@srcdir@/src/modules -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
 libXNETmods_a_CFLAGS		= @KERNEL_CFLAGS@
 
-KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
+nodist_EXTRA_libXNETdrvs_a_SOURCES = \
+				  src/drivers/inet.c \
+				  src/drivers/bufq.h \
+				  src/drivers/debug.h \
+				  ./config.h ./strconf.h
+
+drvs_source_FILES		= $(nodist_EXTRA_libXNETdrvs_a_SOURCES)
+
+nodist_libXNETdrvs_a_SOURCES	= $(drvs_source_FILES)
+
+libXNETdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
+libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I@srcdir@/src/drivers -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libXNETdrvs_a_CFLAGS		= @KERNEL_CFLAGS@
+
+KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
 else
 
 libexec_PROGRAMS		= \
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp \
 				  test-tirdwr \
 				  test-timod \
 				  test-xnet \
 				  test-xnet_thr
 
 EXTRA_PROGRAMS			= \
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp \
 				  test-tirdwr \
-				  test-timod
+				  test-timod \
+				  test-xnet \
+				  test-xnet_thr
 
 sbin_PROGRAMS			= \
 				  xnetmakenodes
@@ -141,6 +186,21 @@ xnetmakenodes_DEPENDENCIES	= strconf.h
 xnetmakenodes_LDDADD		=
 xnetmakenodes_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
 xnetmakenodes_CFLAGS		= @USER_CFLAGS@
+
+test_inet_raw_SOURCES		= src/test/test-inet_raw.c
+test_inet_raw_LDFLAGS		= -lLiS
+test_inet_raw_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+test_inet_raw_CFLAGS		= @USER_CFLAGS@
+
+test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
+test_inet_tcp_LDFLAGS		= -lLiS
+test_inet_tcp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+test_inet_tcp_CFLAGS		= @USER_CFLAGS@
+
+test_inet_udp_SOURCES		= src/test/test-inet_udp.c
+test_inet_udp_LDFLAGS		= -lLiS
+test_inet_udp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
+test_inet_udp_CFLAGS		= @USER_CFLAGS@
 
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDFLAGS		= -lLiS
@@ -154,12 +214,12 @@ test_timod_CFLAGS		= @USER_CFLAGS@
 
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDFLAGS		= -lLiS -lxnet
-test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -I$(srcdir)/src/include/xti
+test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
 test_xnet_CFLAGS		= @USER_CFLAGS@
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDFLAGS		= -lLiS -lpthread -lxnet
-test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT -I$(srcdir)/src/include/xti
+test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT
 test_xnet_thr_CFLAGS		= @USER_CFLAGS@
 
 ADDON_LIBS			= 
@@ -176,23 +236,39 @@ libxnet_la_LIBADD		=
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= 
 
-nodist_EXTRA_libXNETmods_a_SOURCES	= \
+nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
 				  src/modules/timod.c \
-				  ./strconf.h
+				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= -I./src/include -I@srcdir@/src/include -I./src/modules -I@srcdir@/src/modules -I./src/drivers -I@srcdir@/src/drivers -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libXNETmods_a_CPPFLAGS		= -I./src/modules -I@srcdir@/src/modules -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
 libXNETmods_a_CFLAGS		= @KERNEL_CFLAGS@
 
-KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
+nodist_EXTRA_libXNETdrvs_a_SOURCES = \
+				  src/drivers/inet.c \
+				  src/drivers/bufq.h \
+				  src/drivers/debug.h \
+				  ./config.h ./strconf.h
+
+drvs_source_FILES		= $(nodist_EXTRA_libXNETdrvs_a_SOURCES)
+
+nodist_libXNETdrvs_a_SOURCES	= $(drvs_source_FILES)
+
+libXNETdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
+libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I@srcdir@/src/drivers -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+libXNETdrvs_a_CFLAGS		= @KERNEL_CFLAGS@
+
+KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
 endif
+
+include am/libraries.am
 
 KERNEL_MODCONF			= conf.modules
 KERNEL_SUBDIR			= xnet
@@ -201,7 +277,7 @@ KMODCONF_EXT			= xnet
 MANMACRO_PFX			= strxnet
 mansrcdir			= $(srcdir)/doc/man
 
-include kernel.am
+include am/kernel.am
 
 nodist_man_MANS = \
 	doc/man/man3/t_accept.3 \
@@ -314,7 +390,7 @@ nodist_man_MANS = \
 	doc/man/man7/xxx.7 \
 	doc/man/man8/xxx.8
 
-EXTRA_MAN_SOURCES = \
+noinst_man_MANS = \
 	doc/man/man3/t_accept.3.man \
 	doc/man/man3/t_addleaf.3.man \
 	doc/man/man3/t_alloc.3.man \
@@ -425,31 +501,44 @@ EXTRA_MAN_SOURCES = \
 	doc/man/man7/xxx.7.man \
 	doc/man/man8/xxx.8.man
 
-#
-#   Need to generate "cooked" man pages from the source man pages.  This is
-#   for systems that will not do not do grefer on man pages.
-#
-$(nodist_man_MANS): %: %.man
-	@d="`echo $@ | sed -e 's|/[^/]*$$||'`" ; \
-	p="`echo $< | sed -e 's|/[^/]*$$||;s|/[^/]*$$||'`" ; \
-	$(mkinstalldirs) $$d ; \
-	echo "cat $< | ( cd $$p ; soelim 2>/dev/null | refer ) | sed -e '/^\.lf/d;/^\.\\\"/d;/^\.so.*\.man/s/\.man//' > $@" ; \
-	cat $< | ( cd $$p ; soelim 2>/dev/null | refer ) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
+include am/man.am
 
 nobase_include_HEADERS = \
-	src/include/xti/xti.h \
-	src/include/sys/xti.h \
+	src/include/ticlts.h \
+	src/include/ticots.h \
+	src/include/ticotsord.h \
+	src/include/tihdr.h \
+	src/include/timod.h \
+	src/include/tirdwr.h \
+	src/include/xti.h \
+	src/include/xti_inet.h \
+	src/include/sys/ticlts.h \
+	src/include/sys/ticots.h \
+	src/include/sys/ticotsord.h \
 	src/include/sys/tihdr.h \
 	src/include/sys/timod.h \
-	src/include/xti.h \
-	src/include/tihdr.h \
-	src/include/timod.h
+	src/include/sys/tirdwr.h \
+	src/include/sys/tli.h \
+	src/include/sys/tpi.h \
+	src/include/sys/xti.h \
+	src/include/sys/xti_inet.h \
+	src/include/sys/xti_ip.h \
+	src/include/sys/xti_sctp.h \
+	src/include/sys/xti_tcp.h \
+	src/include/sys/xti_udp.h \
+	src/include/xti/xti.h \
+	src/include/xti/xti_inet.h \
+	src/include/xti/xti_ip.h \
+	src/include/xti/xti_sctp.h \
+	src/include/xti/xti_tcp.h \
+	src/include/xti/xti_udp.h
 
-noinst_SCRIPTS = \
+dist_noinst_SCRIPTS = \
 	$(auxdir)/strconf-sh
 
 strconf_FILES = \
-	src/modules/lis.conf
+	src/modules/lis.conf \
+	src/drivers/lis.conf
 
 #
 #   Need to override the following two automake rules to strip the first two
@@ -498,10 +587,15 @@ devices.lst: Config.master $(STRCONF_SCRIPT)
 xnetmakenodes.c: Config.master $(STRCONF_SCRIPT)
 	$(STRCONF) --makenodes=xnetmakenodes.c Config.master
 
-clean-local:
+clean-config:
 	rm -f Config.master conf.modules strconf.h devices.lst xnetmakenodes.c
 
+.PHONY: clean-config
+
+clean-local: clean-config
+
 $(libXNETmods_a_OBJECTS): strconf.h
+$(libXNETdrvs_a_OBJECTS): strconf.h
 
 install-devices: $(STRMAKENODES)
 	$(STRMAKENODES)
@@ -511,13 +605,19 @@ uninstall-devices: $(STRMAKENODES)
 
 all-am: conf.modules strconf.h devices.lst
 
-xnet_source_FILES		= $(mods_source_FILES)
+xnet_source_FILES		= $(mods_source_FILES) $(drvs_source_FILES)
 
 EXTRA_DOCS = 
 
-EXTRA_DIST = strxnet.spec openss7-logo-small.gif $(EXTRA_MAN_SOURCES) $(noinst_SCRIPTS) \
-	     doc/man/strxnet.macros doc/man/strxnet.refs $(strconf_FILES) \
-	     $(xnet_source_FILES) $(EXTRA_DOCS)
+EXTRA_DIST = \
+	strxnet.spec \
+	openss7-logo-small.gif \
+	$(noinst_man_MANS) \
+	doc/man/strxnet.macros \
+	doc/man/strxnet.refs \
+	$(strconf_FILES) \
+	$(xnet_source_FILES) \
+	$(EXTRA_DOCS)
 
 SUBDIRS = intl m4 po doc
 
@@ -527,12 +627,12 @@ SUBDIRS = intl m4 po doc
 AM_RPMFLAGS = --define "_kversion @kversion@"
 AM_SRPMFLAGS =
 
-include rpm.am
+include am/rpm.am
 
 #
 #   General rules
 #
 
-include openss7.am
+include am/openss7.am
 
 # vim: ft=automake

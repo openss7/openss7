@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:07 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:31:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+# Last Modified $Date: 2004/04/05 12:31:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
 	@list='$(KERNEL_MODULES)'; for p in $$list; do \
 		if test -f $$p; then \
-			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|_|-|g'`" ; \
+			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
 			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
 			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULE)" ; then \
@@ -72,6 +72,10 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 		echo "$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)" ; \
 		$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT) ; \
 	fi
+
+install-exec-local: install-modules
+
+post-modules:
 	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
 		if ( grep -q 'include.*modules.$(KMODCONF_EXT)' $(DESTDIR)$(krootdir)/etc/modules.conf ) ; then :; else \
 			if ( grep -q 'BEGIN LiS' $(DESTDIR)$(krootdir)/etc/modules.conf ) ; then \
@@ -94,40 +98,28 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-devices ; \
 	fi
 
-install-exec-local:
-	$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-modules
-
-#	@if test -r $(DESTDIR)$(krootdir)/etc/ld.so.conf -a -r $(DESTDIR)$(krootdir)/etc/ld.so.cache -a -x /sbin/ldconfig ; then \
-#		echo "/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir)" ; \
-#		/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir) ; \
-#	fi
-
 #
-# This install target is run after the files have been installed.  It is
-# essentially equivalent to the rpm %post, but it is only executed when the
-# install directory is fully configured for kernel modules and shared
-# libraries.  (That is, this does not run when building an rpm, because the
-# binaries are installed in a temporary, unconfigured directory.)  This is for
-# alien systems that cannot build from packages.
+# The install-exec-hook target is run after the files have been installed.  It
+# is essentially equivalent to the rpm %post, but it is only exectued when the
+# install directory is fully configured for kernel modules.  (That is, this
+# does not run when building an rpm, because the binaries are installed in a
+# temporary, unconfigured directory.)  This is for alien systems and embedded
+# targets that cannot build from packages.
 #
-#install-exec-hook:
-
-install-data-local: $(man_MANS) $(mansrcdir)/$(MANMACRO_PFX).macros $(mansrcdir)/$(MANMACRO_PFX).refs
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(mandir)
-	$(INSTALL_DATA) $(mansrcdir)/$(MANMACRO_PFX).macros $(DESTDIR)$(mandir)
-	$(INSTALL_DATA) $(mansrcdir)/$(MANMACRO_PFX).refs   $(DESTDIR)$(mandir)
-
-#install-data-hook:
+install-exec-hook: post-modules
 
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
 	@list='$(KERNEL_MODULES)'; for p in $$list; do \
-		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|_|-|g'`" ; \
+		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
 		echo "$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 		$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
 	done
 	rm -f $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)
+
+uninstall-local: uninstall-modules
+
+postun-modules:
 	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
 		r=no ; \
 		for f in $(DESTDIR)$(krootdir)/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
@@ -146,24 +138,16 @@ uninstall-modules:
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
 	fi
 
-uninstall-local:
-	$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-modules
-	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
-	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
-
-#	@if test -r $(DESTDIR)$(krootdir)/etc/ld.so.conf -a -r $(DESTDIR)$(krootdir)/etc/ld.so.cache -a -x /sbin/ldconfig ; then \
-#		echo "/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir)" ; \
-#		/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir) ; \
-#	fi
-
 #
-# This uninstall target is run after the files have been removed.  It is
+# The uninstall-hook target is run after the files have been removed.  It is
 # essentially equivalent to the rpm %postun, but it is only executed when the
-# uninstall directory is fully configured for kernel modules and shared
-# libraries.  (That is, this does not run when building an rpm, because the
-# binaries are installed in a temporary, unconfigured directory.)  This is for
-# alien systems that cannot build from packages.
+# uninstall directory is fully configured for kernel modules.  (That is, this
+# does not run when building an rpm, because the binaries are installed in a
+# temporary, unconfigured directory.)  This is for alien systems and embedded
+# targets that cannot build from packages.
 #
-#uninstall-hook:
+uninstall-hook: postun-modules
+
+#.PHONY: install-modules post-modules uninstall-modules postun-modules
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:07 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/05 12:37:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,56 +47,40 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+# Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   These are some rules that I use for generating source and binary RPMs
-#   using automake.  I need to package releases using RPM.  The following
-#   rules accomplish that for most packages.
-#
+AUTOMAKE_OPTIONS = gnits 1.7 dist-bzip2 std-options -Wall
 
-distdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
-
-RPMOPTS = -vv \
-	--define "__source_payload w9.bzdio" \
-	--define "__binary_payload w9.bzdio" \
-	--define "_topdir `(cd $(top_builddir); pwd)`" \
-	--define "_icon openss7-logo-small.gif" \
-	--define "_kversion $(PACKAGE_KVERSION)" \
-	@PACKAGE_OPTIONS@
-
-RPMTARGET = $(target)
+ACLOCAL_AMFLAGS = -I m4
 
 #
-#   This builds a source RPM for the current target.
-#   Note: rpm demands icon in current directory
+# Have the makefile regenerate libtool if necessary
 #
-dist dist-all: distdir $(top_builddir)/openss7-logo-small.gif
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
-	$(am__remove_distdir)
-	$(mkinstalldirs) $(top_builddir)/BUILD $(top_builddir)/SRPMS $(top_builddir)/SPECS $(top_builddir)/SOURCES $(top_builddir)/RPMS
-	@if [ ! -e openss7-logo-small.gif ] ; then \
-		echo "cp -f $(top_srcdir)/openss7-logo-small.gif ."; \
-		cp -f $(top_srcdir)/openss7-logo-small.gif .; \
-	fi
-	rpmbuild -ts $(RPMOPTS) $(SRPMFLAGS) $(AM_SRPMFLAGS) --target $(target) -- $(distdir).tar.bz2
+$(OBJECTS): libtool
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
 
-#   This is the type of thing that needs to be included in the master makefile
-#   to build rpms for the current target, we also build any defined
-#   AM_RPMTARGETS
 #
-rpms: dist
-	@for t in $(RPMTARGET) $(AM_RPMTARGETS) ; do \
-		echo "rpmbuild --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t --" SRPMS/*.src.rpm; \
-		rpmbuild --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t -- SRPMS/*.src.rpm; \
-	done
+# I use vim, not emacs.  The following triggers Automake 1.7 to include
+# targets for making vim tags files along with emacs TAGS files.
+#
+CTAGS = ctags
+AM_CTAGSFLAGS = --c-types=+px
 
-srpm: dist
+#
+# A rule to generate an ifnames.log file
+#
+ifnames:
+	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
 
-.PHONY: srpm rpms # dist-srpm dist-rpms
+#
+# Collected phonys from other automake fragments.
+#
+.PHONY: install-modules post-modules uninstall-modules postun-modules \
+	post-libraries postun-libraries \
+	clean-local-manpages install-local-manpages uninstall-local-manpages \
+	srpm rpms 
 
 # vim: ft=automake
-

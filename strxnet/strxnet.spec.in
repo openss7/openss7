@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:07 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+# Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,8 @@
 # rpmbuild will not build a binary rpm when it has no %files section
 %define BUILD_modules 1
 %define BUILD_tools   1
+%define BUILD_lis     0
+%define BUILD_lfs     1
 
 #
 # there are three ways to pass kernel version to the build process:
@@ -73,15 +75,19 @@
 %define kernel_source %(echo %{_kversion} | sed -e 's|BOOT||')
 %define kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %define kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
-%define core_name core-%{_kversion}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
 %{?_without_modules: %{expand: %%define BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%define BUILD_tools   0}}
+%{?_without_lis:     %{expand: %%define BUILD_lis     0}}
+%{?_without_lfs:     %{expand: %%define BUILD_lfs     0}}
+
 %{?_with_modules:    %{expand: %%define BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%define BUILD_tools   1}}
+%{?_with_lis:        %{expand: %%define BUILD_lis     1}}
+%{?_with_lfs:        %{expand: %%define BUILD_lfs     1}}
 
 # we have some more options that control configure for the build
 
@@ -205,8 +211,22 @@ preferred_cflags="-freorder-blocks"
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
-    %{?_with_public:        --enable-public} \
-    %{?_without_public:     --disable-public}
+    --with-rpm-epoch=@PACKAGE_EPOCH@ \
+    --with-rpm-release=@PACKAGE_RELEASE@ \
+    %{?_with_lis:                %{_with_lis}} \
+    %{?_without_lis:             %{_without_lis}} \
+    %{?_with_lfs:                %{_with_lfs}} \
+    %{?_without_lfs:             %{_without_lfs}} \
+    %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
+    %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
+    %{?_with_k_debug:             --enable-k-debug} \
+    %{?_without_k_debug:          --disable-k-debug} \
+    %{?_with_k_test:              --enable-k-test} \
+    %{?_without_k_test:           --disable-k-test} \
+    %{?_with_k_safe:              --enable-k-safe} \
+    %{?_without_k_safe:           --disable-k-safe} \
+    %{?_with_public:              --enable-public} \
+    %{?_without_public:           --disable-public}
 
 make
 #make pdf
@@ -231,9 +251,9 @@ mkdir -p $RPM_BUILD_ROOT/dev/xnet
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
 %if %__debug_package
-(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" make install)
+(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" make install)
 %else
-(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" make install-strip)
+(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" make install-strip)
 %endif
 
 # get the installed info directory out of the build root
@@ -255,28 +275,28 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 
 
 # ===========================================================================
-%package %{core_name}
+%package lfs-%{_kversion}
 
-Summary:        OpenSS7 STREAMS INET core kernel modules.
+Summary:        OpenSS7 STREAMS INET LfS kernel modules.
 Group:          System Environment/Kernel
 Requires:       kernel = %{kernel_version}
-Requires:       LiS-core-%{kernel_version} >= 2.16.18-10
+Requires:       streams-core-%{kernel_version} >= 0.9.2
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
 %endif
 
 # ---------------------------------------------------------------------------
-%description %{core_name}
-The %{name}-%{core_name} package contains the kernel modules that provide the
-Linux kernel INET STREAMS drivers and modules.  This also includes assorted
-drivers and modules for additional protocol stacks such as SCTP.  This package
-is heavily tied to the kernel for which it and the LiS STREAMS facility was
-compiled.  This package applies to kernel version %{kernel_version} and
-requires an LiS 2.16.18-10 (or better) STREAMS package compiled for the same
-kernel.
+%description lfs-%{_kversion}
+The %{name}-lfs-%{_kversion} package contains the kernel modules that provide
+the Linux kernel INET STREAMS drivers and modules.  This also includes
+assorted drivers and modules for additional protocol stacks such as SCTP.
+This package is heavily tied to the kernel for which it and the LiS STREAMS
+facility was compiled.  This package applies to kernel version %{kernel_version}
+and requires an LiS 2.16.18-10 (or better) STREAMS package compiled for the
+same kernel.
 
-%pre %{core_name}
+%pre lfs-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
@@ -303,7 +323,7 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
     exit 1
 fi
 
-%post %{core_name}
+%post lfs-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
@@ -335,7 +355,7 @@ if [ $1 = 1 ] ; then
     fi
 fi
 
-%preun %{core_name}
+%preun lfs-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
@@ -361,7 +381,7 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
     exit 1
 fi
 
-%postun %{core_name}
+%postun lfs-%{_kversion}
 # ---------------------------------------------------------------------------
 
 if [ $1 = 0 ]; then
@@ -423,13 +443,195 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 fi
 
 %if %{BUILD_modules}
-%files %{core_name}
+%if %{BUILD_lfs}
+%files lfs-%{_kversion}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/xnet
 %attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.xnet
 /%{_lib}/modules/%{kernel_version}/xnet/*
 %endif
+%endif
+
+# ===========================================================================
+%package lis-%{_kversion}
+
+Summary:        OpenSS7 STREAMS INET LiS kernel modules.
+Group:          System Environment/Kernel
+Requires:       kernel = %{kernel_version}
+Requires:       LiS-core-%{kernel_version} >= 2.16.18-10
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description lis-%{_kversion}
+The %{name}-lis-%{_kversion} package contains the kernel modules that provide
+the Linux kernel INET STREAMS drivers and modules.  This also includes
+assorted drivers and modules for additional protocol stacks such as SCTP.
+This package is heavily tied to the kernel for which it and the LiS STREAMS
+facility was compiled.  This package applies to kernel version %{kernel_version}
+and requires an LiS 2.16.18-10 (or better) STREAMS package compiled for the
+same kernel.
+
+%pre lis-%{_kversion}
+# ---------------------------------------------------------------------------
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   if we are upgrading and the upgrade is for the running kernel, or we are
+#   installing new on the running kernel, we have to worry about previous
+#   loaded modules for the old version or a non-rpm version
+    ( lsmod | grep -q '^streams' ) || exit 0
+#   modules running, kick the stack
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    fdetach -a 2>/dev/null
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge 230 ]; then
+                eval "kill -HUP $tokens[1]"
+            fi
+        fi
+    done
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    echo 'Cannot install or upgrade with streams modules running.' >&2
+    exit 1
+fi
+
+%post lis-%{_kversion}
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then
+#   This is the end of a fresh install.
+#   Check that our line is in the modules.xnet file
+    if ( grep -q 'include.*modules.xnet' /etc/modules.conf ) ; then
+        :
+    else
+#       if not, check for an old non-rpm OpenSS7
+        if ( grep -q 'BEGIN LiS' /etc/modules.conf ) ; then
+            sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
+        else
+            cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
+        fi
+        echo 'prune modules.xnet' >> /etc/modules.conf.tmp.$$
+        echo 'if -f /lib/modules/`uname -r`/modules.xnet' >> /etc/modules.conf.tmp.$$
+        echo 'include /lib/modules/`uname -r`/modules.xnet' >> /etc/modules.conf.tmp.$$
+        echo 'endif' >> /etc/modules.conf.tmp.$$
+        chmod --referenc=/etc/modules.conf /etc/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmsave /etc/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f /etc/modules.conf.tmp.$$
+    fi
+    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   this is a running kernel, do a depmod on the modules directory for
+        depmod -ae
+    else
+#   non-running kernels a depmod will be performed on boot by depmod anyway
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+    fi
+fi
+
+%preun lis-%{_kversion}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   We are about to uninstall for good on a running kernel then we have to
+#   worry about which modules are running
+    ( lsmod | grep -q '^streams' ) || exit 0
+#   modules running, kick the stack
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    fdetach -a
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge 230 ]; then
+                eval "kill -KILL $tokens[1]"
+            fi
+        fi
+    done
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    echo "Cannot uninstall with streams modules running." >&2
+    exit 1
+fi
+
+%postun lis-%{_kversion}
+# ---------------------------------------------------------------------------
+
+if [ $1 = 0 ]; then
+#   this is the last stage of a removal we are going away: we need to see if
+#   we need to remove our line from modules.conf and remove our devices
+    remove_line=yes
+    for file in /lib/modules/*/modules.xnet ; do
+        if [ -f $file ] ; then
+            remove_line=no
+            break
+        fi
+    done
+    if [ ":$remove_line" = :yes ] ; then
+        sed -e '/prune modules.xnet/,/endif/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
+        chmod --reference=/etc/modules.conf /etc/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmorig /etc/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f /etc/modules.conf.tmp.$$
+    fi
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   this is a running kernel, do a depmod on the modules directory for
+    depmod -ae
+else
+#   non-running kernels a depmod will be performed on boot but depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   one more kick at killing any loaded modules on uninstall, last stage of
+#   the upgrade on a running kernel for upgrade.
+    ( lsmod | grep -q '^streams' ) || exit 0
+#   modules running, kick the stack
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    fdetach -a
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    insmod -ar streams
+    lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge 230 ]; then
+                if [ $1 = 0 ] ; then
+#                   extreme prejudice for removal
+                    eval "kill -KILL $tokens[1]"
+                else
+#                   try to get them to reload for 
+                    eval "kill -HUP $tokens[1]"
+                fi
+            fi
+        fi
+    done
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    echo "Error: modules may be still loaded" >&2
+    lsmod | grep '^streams' >&2
+    echo "you may have to reboot" >&2
+    exit 1
+fi
+
+%if %{BUILD_modules}
+%if %{BUILD_lis}
+%files lis-%{_kversion}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir /%{_lib}/modules/%{kernel_version}/xnet
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.xnet
+/%{_lib}/modules/%{kernel_version}/xnet/*
+%endif
+%endif
+
 
 # ===========================================================================
 %package dev
@@ -567,9 +769,7 @@ fi
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual/*.texi
-%doc doc/drafts/*/*.txt
-%doc doc/drafts/*/*.pdf
-%{_datadir}/doc/%{name}-%{version}/*
+%doc %{_docdir}/%{name}-%{version}/*.pdf
 %{_infodir}/*
 %endif
 
@@ -619,8 +819,8 @@ pages necessary for developing OpenSS7 STREAMS INET application programs.
 %defattr(-,root,root)
 %{_libdir}/*.a
 %{_includedir}/*
-%{_mandir}/%{name}.refs
-%{_mandir}/%{name}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 #%{_mandir}/man2/*
 %{_mandir}/man3/*
 %{_mandir}/man4/*
@@ -711,10 +911,10 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #%{_bindir}/*
-#%{_sbindir}/*
+%{_sbindir}/*
 %{_libexecdir}/*
-%{_mandir}/%{name}.refs
-%{_mandir}/%{name}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 #%{_mandir}/man1/*
 %{_mandir}/man8/*
 %endif
@@ -723,6 +923,9 @@ utilities and commands associated with the OpenSS7 STREAMS INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
+# Revision 0.9.2.1  2004/04/05 12:39:05  brian
+# - Working up XNET release.
+#
 # Revision 0.9  2004/04/03 22:37:07  brian
 # - Initial cut of new strxnet rpm release.
 #

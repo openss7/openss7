@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9 2004/04/03 22:37:07 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/04/05 12:39:05 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,13 +53,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/public.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/streams.m4])
+m4_include([m4/man.m4])
 m4_include([m4/rpm.m4])
 
 # =========================================================================
@@ -67,20 +68,22 @@ m4_include([m4/rpm.m4])
 # -------------------------------------------------------------------------
 AC_DEFUN(AC_XNET,
 [
+    ac_default_prefix='/usr'
     _XNET_OPTIONS
+    AC_MAN_CONVERSION
     AC_PUBLIC_RELEASE
     # user CPPFLAGS and CFLAGS
     USER_CPPFLAGS="${CPPFLAGS}"
     USER_CFLAGS="${CFLAGS}"
     _XNET_SETUP
-    XNET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${streams_cv_includes:+ -I}${streams_cv_includes}"
+    XNET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     AC_MSG_NOTICE([final user CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user INCLUDES  = $XNET_INCLUDES])
-    AC_MSG_NOTICE([final kern MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kern NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kern CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kernel MODFLAGS  = $KERNEL_MODFLAGS])
+    AC_MSG_NOTICE([final kernel NOVERSION = $KERNEL_NOVERSION])
+    AC_MSG_NOTICE([final kernel CPPFLAGS  = $KERNEL_CPPFLAGS])
+    AC_MSG_NOTICE([final kernel CFLAGS    = $KERNEL_CFLAGS])
     AC_SUBST([USER_CPPFLAGS])
     AC_SUBST([USER_CFLAGS])
     AC_SUBST([XNET_INCLUDES])

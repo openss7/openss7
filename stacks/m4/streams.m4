@@ -1,8 +1,8 @@
 dnl =========================================================================
-dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
+dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9 2004/04/03 22:37:07 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.1 2004/04/05 12:39:05 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -65,6 +65,13 @@ dnl modules to run with LiS.  Eventually, this file will determine whether
 dnl GCOM's LiS is being used or whether OpenSS7's LfS (Linux Fast STREAMS) is
 dnl being used.
 dnl -------------------------------------------------------------------------
+dnl Interesting enough, there is no need to have LiS or LfS loaded on the build
+dnl machine to compile modules.  Only the proper header files are required.  It
+dnl is, not a good idea to install both sets of kernel modules for the same
+dnl kernel.  For an rpm build, whether kernel modules are being built for LiS or
+dnl LfS is determined using the the with_lis or with_lfs flags to the build.  If
+dnl both are specified, it defaults to LfS.
+dnl -------------------------------------------------------------------------
 
 # =========================================================================
 # AC_LINUX_STREAMS
@@ -72,98 +79,199 @@ dnl -------------------------------------------------------------------------
 AC_DEFUN([AC_LINUX_STREAMS],
 [
     AC_REQUIRE([AC_LINUX_KERNEL])
-    _STREAMS_OPTIONS
-    _STREAMS_SETUP
+    _LINUX_STREAMS_OPTIONS
+    _LINUX_STREAMS_SETUP
+    _LINUX_STREAMS_OUTPUT
 ])# AC_LINUX_STREAMS
 # =========================================================================
 
 # =========================================================================
-# _STREAMS_LIS_OPTIONS
+# _LINUX_STREAMS_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_STREAMS_],
+AC_DEFUN([_LINUX_STREAMS_OPTIONS],
 [
     AC_ARG_WITH([lis],
-                AC_HELP_STRING([--with-lis=HEADERS],
-                               [specify the LiS header file directory.
-                                @<:@default=INCLUDEDIR/LiS@:>@]),
-                [with_lis=$withval],
-                [with_lis=''])
-])# _STREAMS_
+        AC_HELP_STRING([--with-lis=HEADERS], [specify the LiS header file
+            directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
+            [with_lis=$withval],
+            [with_lis=''])
+    AC_ARG_WITH([lfs],
+        AC_HELP_STRING([--with-lfs=HEADERS], [specify the LfS header file
+            directory. @<:@default=INCLUDEDIR/LfS@:>@]),
+            [with_lfs=$withval],
+            [with_lfs=''])
+])# _LINUX_STREAMS_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _STREAMS_SETUP
+# _LINUX_STREAMS_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_STREAMS_SETUP],
+AC_DEFUN([_LINUX_STREAMS_SETUP],
 [
-    _STREAMS_LIS_CHECK_HEADERS
-    _STREAMS_LIS_DEFINES
-])# _STREAMS_SETUP
-# =========================================================================
-
-# =========================================================================
-# _STREAMS_LIS_CHECK_HEADERS
-# -------------------------------------------------------------------------
-AC_DEFUN([_STREAMS_LIS_CHECK_HEADERS],
-[
-    AC_CACHE_CHECK([for LiS header files], [streams_cv_includes], [dnl
-	if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
-	then
-	    # compiling for the running kernel
-	    eval "lis_search_path=\"
-		${with_lis}
-		${includedir}/LiS
-		${oldincludedir}/LiS
-		/usr/include/LiS
-		/usr/local/include/LiS
-		/usr/src/LiS/include
-                \""
-	else
-	    # building for another environment
-	    eval "lis_search_path=\"
-		${with_lis}
-		${linux_cv_module_prefix}/${includedir}/LiS
-		${linux_cv_module_prefix}/${oldincludedir}/LiS
-		${linux_cv_module_prefix}/usr/include/LiS
-		${linux_cv_module_prefix}/usr/local/include/LiS
-		${linux_cv_module_prefix}/usr/src/LiS/include
-		${includedir}/LiS
-		${oldincludedir}/LiS
-		/usr/src/LiS/include
-                \""
-	fi
-	lis_search_path=`echo "$lis_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	streams_cv_includes=
-	for lis_dir in $lis_search_path
-	do
-	    if test -d $lis_dir -a -r $lis_dir/stropts.h
-	    then
-		streams_cv_includes="$lis_dir"
-		break
-	    fi
-	done
+    AC_CACHE_CHECK([for kernel STREAMS header files], [streams_cv_includes], [dnl
+        if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+            _LINUX_STREAMS_LIS_CHECK_HEADERS
+            if test :"${lis_cv_includes:-no}" != :no ; then
+                streams_cv_includes="$lis_cv_includes"
+                streams_cv_package="LiS"
+            fi
+        fi
+        if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+            _LINUX_STREAMS_LFS_CHECK_HEADERS
+            if test :"${lfs_cv_includes:-no}" != :no ; then
+                streams_cv_includes="$lfs_cv_includes"
+                streams_cv_package="LFS"
+            fi
+        fi
+        if test :"${streams_cv_includes:-no}" = :no ; then
+            if test :"${with_lis:-no}" != :no ; then
+                AC_MSG_ERROR([
+*** 
+*** Linux GCOM STREAMS was specified with the --with-lis flag, however,
+*** configure could not find the LiS include directories.  This package requires
+*** the presense of LiS include directories when the --with-lis flag is
+*** specified.  Specify the correct location of LiS include directories with the
+*** argument to option --with-lis to configure and try again.
+*** 
+                ])
+            fi
+            if test :"${with_lfs:-no}" != :no ; then
+                AC_MSG_ERROR([
+*** 
+*** Linux Fast STREAMS was specified with the --with-lfs flag, however,
+*** configure could not find the LfS include directories.  This package requires
+*** the presense of LfS include directories when the --with-lfs flag is
+*** specified.  Specify the correct location of LfS include directories with the
+*** argument to option --with-lfs to configure and try again.
+*** 
+                ])
+            fi
+            AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS include directories.  This package
+*** requires the presence of STREAMS include directories.  Specify the correct
+*** location of Linux GCOM STREAMS (LiS) include directories with the --with-lis
+*** option to configure, or the correct location of Linux Fast STREAMS (LfS)
+*** include directories with the --with-lfs option to configure, and try again.
+*** 
+            ])
+        fi
     ])
-    if test :"${streams_cv_includes:-no}" = :no
-    then
-	AC_MSG_ERROR([
-*** 
-*** Could not find LiS include directories.  This package requires the
-*** presence of LiS include directories to compile.  Specify the location of
-*** LiS include directories with option --with-lis to configure and try again.
-*** 
-	])
-    else
-	AC_DEFINE([_LIS_SOURCE], [1], [Define when compiling for LiS.])
-    fi
-])# _STREAMS_LIS_CHECK_HEADERS
+    STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
+])# _LINUX_STREAMS_SETUP
 # =========================================================================
 
 # =========================================================================
-# _STREAMS_LIS_DEFINES
+# _LINUX_STREAMS_LIS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-AC_DEFUN([_STREAMS_LIS_DEFINES],
+# Test for the existence of Linux STREAMS header files.  The package normally
+# requires either Linux STREAMS or Linux Fast-STREAMS header files (or both)
+# to compile.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
 [
-    AC_REQUIRE([AC_LINUX_KERNEL])
+    lis_cv_includes=
+    if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
+    then
+        # compiling for the running kernel
+        eval "lis_search_path=\"
+            ${with_lis}
+            ${includedir}/LiS
+            ${oldincludedir}/LiS
+            /usr/include/LiS
+            /usr/local/include/LiS
+            /usr/src/LiS/include
+            \""
+    else
+        # building for another environment
+        eval "lis_search_path=\"
+            ${with_lis}
+            ${linux_cv_module_prefix}/${includedir}/LiS
+            ${linux_cv_module_prefix}/${oldincludedir}/LiS
+            ${linux_cv_module_prefix}/usr/include/LiS
+            ${linux_cv_module_prefix}/usr/local/include/LiS
+            ${linux_cv_module_prefix}/usr/src/LiS/include
+            ${includedir}/LiS
+            ${oldincludedir}/LiS
+            /usr/src/LiS/include
+            \""
+    fi
+    lis_search_path=`echo "$lis_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+    for lis_dir in $lis_search_path ; do
+        if test -d $lis_dir -a -r $lis_dir/sys/stream.h ; then
+            lis_cv_includes="$lis_dir"
+            break
+        fi
+    done
+])# _LINUX_STREAMS_LIS_CHECK_HEADERS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_STREAMS_LFS_CHECK_HEADERS
+# -------------------------------------------------------------------------
+# Test for the existence of Linux Fast-STREAMS header files.  The package
+# normally requires either Linux STREAMS or Linux Fast-STREAMS header files
+# (or both) to compile.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS],
+[
+    lfs_cv_includes=
+    if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no ; then
+        # compiling for the running kernel
+        eval "lfs_search_path=\"
+            ${with_lfs}
+            ${includedir}
+            ${oldincludedir}
+            /usr/include
+            /usr/local/include
+            /usr/src/streams/src/include
+            \""
+    else
+        # building for another environment
+        eval "lfs_search_path=\"
+            ${with_lfs}
+            ${linux_cv_module_prefix}/${includedir}
+            ${linux_cv_module_prefix}/${oldincludedir}
+            ${linux_cv_module_prefix}/usr/include
+            ${linux_cv_module_prefix}/usr/local/include
+            ${linux_cv_module_prefix}/usr/src/streams/src/include
+            ${includedir}
+            ${oldincludedir}
+            /usr/src/streams/src/include
+            \""
+    fi
+    lfs_search_path=`echo "$lfs_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+    for lfs_dir in $lfs_search_path ; do
+        if test -d $lfs_dir -a -r $lfs_dir/sys/stream.h ; then
+            lfs_cv_includes="$lfs_dir"
+            break
+        fi
+    done
+])# _LINUX_STREAMS_LFS_CHECK_HEADERS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_STREAMS_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_OUTPUT],
+[
+    case "$streams_cv_package" in
+        LiS)
+            _LINUX_STREAMS_LIS_DEFINES
+            : ;;
+        LfS)
+            _LINUX_STREAMS_LFS_DEFINES
+            : ;;
+    esac
+    AC_SUBST([STREAMS_CPPFLAGS])
+])# _LINUX_STREAMS_OUTPUT
+# =========================================================================
+
+# =========================================================================
+# _LINUX_STREAMS_LIS_DEFINES
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
+[
     case "$linux_cv_march" in
 	alpha*)			: ;;
 	arm*)			: ;;
@@ -175,68 +283,86 @@ AC_DEFUN([_STREAMS_LIS_DEFINES],
 	mips*)			: ;;
 	hppa*)			: ;;
 	ppc* | powerpc*)	
-	    AC_DEFINE([_PPC_LIS_], [1], [Define when compiling for PPC.  This
-		define is only used for linux kernel target.  This is really the
-		wrong way to go about doing this: the function should be checked
-		for by autoconf instead of placing the architectural dependencies
-		in the LiS source.  The define is used in <LiS/include/sys/osif.h>
-		and "head/osif.c" to determine whether PCI BIOS is present; in
-		(head/linux-mdep.c) to determine whether cpu binding is possible;
-		to determine whether spin_is_locked() is available in
-		"head/linux/lislocks.c"; in "head/mod.c" to determine whether to
-		define struct pt_regs; and in <LiS/include/sys/lislocks.h> to
-		determine the size of semaphore memory.])
+            # Define when compiling for PPC.  This define is only used for linux
+            # kernel target.  This is really the wrong way to go about doing
+            # this: the function should be checked for by autoconf instead of
+            # placing the architectural dependencies in the LiS source.  The
+            # define is used in <LiS/include/sys/osif.h> and "head/osif.c" to
+            # determine whether PCI BIOS is present; in (head/linux-mdep.c) to
+            # determine whether cpu binding is possible; to determine whether
+            # spin_is_locked() is available in "head/linux/lislocks.c"; in
+            # "head/mod.c" to determine whether to define struct pt_regs; and in
+            # <LiS/include/sys/lislocks.h> to determine the size of semaphore
+            # memory.
+            #
+            STREAMS_CPPFLAGS="-D_PPC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390x*)			
-	    AC_DEFINE([_S390X_LIS_], [1], [Define when compiling for S390X.  This
-		define is only used for the linux kernel target.  This is really
-		the wrong way to go about doing this: the function should be
-		checked for by autoconf instead of placing the architectural
-		depdendencies in the LiS source.  The define is used in
-		"head/linux-mdep.c" to determine whether lis_pci_cleanup exists;
-		"head/linux/exports.c" to determine whether a bunch of functions
-		are available; "head/osif.c" to determine whether a bunch of PCI
-		DMA mapping functions are available; "include/sys/osif.h" to
-		determine whether a bunch of PCI DMA mapping functions are
-		available.])
+            # Define when compiling for S390X.  This define is only used for the
+            # linux kernel target.  This is really the wrong way to go about
+            # doing this: the function should be checked for by autoconf instead
+            # of placing the architectural depdendencies in the LiS source.  The
+            # define is used in "head/linux-mdep.c" to determine whether
+            # lis_pci_cleanup exists; "head/linux/exports.c" to determine
+            # whether a bunch of functions are available; "head/osif.c" to
+            # determine whether a bunch of PCI DMA mapping functions are
+            # available; "include/sys/osif.h" to determine whether a bunch of
+            # PCI DMA mapping functions are available.
+            #
+            STREAMS_CPPFLAGS="-D_S390X_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390*)			
-	    AC_DEFINE([_S390_LIS_], [1], [Define when compiling for S390.
-		Strangely enough, _S390_LIS_ is never checked without _S390X_LIS_.
-		Rendering it as an alias for the above.])
+            # Define when compiling for S390.  Strangely enough, _S390_LIS_ is
+            # never checked without _S390X_LIS_.  Rendering it as an alias for
+            # the above.
+            #
+            STREAMS_CPPFLAGS="-D_S390_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sh*)			: ;;
 	sparc64*)		
-	    AC_DEFINE([_SPARC64_LIS_], [1], [Define when compiling for Sparc64.
-		This define is only used for the linux kernel target.  This is
-		really the wrong way to go about doing this: the function should
-		be checked for by autoconf instead of placing the architectural
-		dependencies in the LiS source.  The define is used to determine
-		when ioremap functions are not available <LiS/include/osif.h>.
-		Strangely enough, none of the other checks are performed as for
-		_SPARC_LIS_ below.])
+            # Define when compiling for Sparc64.  This define is only used for
+            # the linux kernel target.  This is really the wrong way to go about
+            # doing this: the function should be checked for by autoconf instead
+            # of placing the architectural dependencies in the LiS source.  The
+            # define is used to determine when ioremap functions are not
+            # available <LiS/include/osif.h>.  Strangely enough, none of the
+            # other checks are performed as for _SPARC_LIS_ below.
+	    #
+            STREAMS_CPPFLAGS="-D_SPARC64_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sparc*)			
-	    AC_DEFINE([_SPARC_LIS_], [1], [Define when compiling for Sparc.  This
-		define is used for the linux kernel target.  This is really the
-		wrong way to go about doing this: the function should be checked
-		for by autoconf instead of placing architectural depedencies in
-		the LiS source.  The define is used to determine when ioremap
-		functions are not available <LiS/include/osif.h>, when PCI BIOS is
-		not present (head/osif.c), and when <linux/poll.h> is missing
-		POLLMSG <LiS/include/sys/poll.h>])
+            # Define when compiling for Sparc.  This define is used for the
+            # linux kernel target.  This is really the wrong way to go about
+            # doing this: the function should be checked for by autoconf instead
+            # of placing architectural depedencies in the LiS source.  The
+            # define is used to determine when ioremap functions are not
+            # available <LiS/include/osif.h>, when PCI BIOS is not present
+            # (head/osif.c), and when <linux/poll.h> is missing POLLMSG
+            # <LiS/include/sys/poll.h>
+            #
+            STREAMS_CPPFLAGS="-D_SPARC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	*)			: ;;
     esac
-])# _STREAMS_LIS_DEFINES
+    STREAMS_CPPFLAGS="-D_LIS_SOURCE${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+])# _LINUX_STREAMS_LIS_DEFINES
 # =========================================================================
 
 # =========================================================================
-# _STREAMS_
+# _LINUX_STREAMS_LFS_DEFINES
 # -------------------------------------------------------------------------
-AC_DEFUN([_STREAMS_],
+AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES],
 [
-])# _STREAMS_
+    STREAMS_CPPFLAGS="-D_LFS_SOURCE${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+])# _LINUX_STREAMS_LFS_DEFINES
+# =========================================================================
+
+# =========================================================================
+# _LINUX_STREAMS_
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_],
+[
+])# _LINUX_STREAMS_
 # =========================================================================
 
 dnl =========================================================================
@@ -245,5 +371,5 @@ dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl 
 dnl =========================================================================
-dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
+dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================

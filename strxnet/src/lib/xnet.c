@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -91,9 +91,9 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include <sys/types.h>
 #include <sys/stropts.h>
 #include <sys/poll.h>
-#include <xti/xti.h>
-#include <sys/tihdr.h>
-#include <sys/timod.h>
+#include <xti.h>
+#include <tihdr.h>
+#include <timod.h>
 
 #if 0
 #pragma weak getpmsg
@@ -5906,10 +5906,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.1 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9 $)
- * @date \$Date: 2004/04/03 22:37:08 $
+ * @version \$Name:  $(\$Revision: 0.9.2.1 $)
+ * @date \$Date: 2004/04/05 12:39:05 $
  *
  * @}
  */

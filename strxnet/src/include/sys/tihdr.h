@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 
  $Log: tihdr.h,v $
+ Revision 0.9.2.1  2004/04/05 12:39:05  brian
+ - Working up XNET release.
+
  Revision 0.9  2004/04/03 22:37:08  brian
  - Initial cut of new strxnet rpm release.
 
@@ -60,13 +63,15 @@
 #ifndef _SYS_TIHDR_H
 #define _SYS_TIHDR_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+#if !defined _TIHDR_H && !defined __KERNEL__
+#error ****
+#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
+#error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <tihdr.h>
+#error **** INSTEAD OF <sys/tihdr.h>.
+#error ****
+#endif				/* !defined _TIHDR_H && !defined __KERNEL__ */
 
 #define T_CURRENT_VERSION 5
 
@@ -100,6 +105,7 @@ typedef u_int32_t t_uscalar_t;
 #define TNOREL		17	/* No orderly release indication		*/	/* not TLI */
 #define TNOTSUPPORT	18	/* Not supported */
 #define TSTATECHNG	19	/* State is currently changing			*/	/* not TLI */
+
 #define TNOSTRUCTYPE	20	/* Structure type not supported			*/	/* not TLI */
 #define TBADNAME	21	/* Bad transport provider name			*/	/* not TLI */
 #define TBADQLEN	22	/* Listener queue length limit is zero		*/	/* not TLI */
@@ -207,6 +213,7 @@ typedef u_int32_t t_uscalar_t;
 #define T_DEFAULT	0x0010	/* Get default options */
 #define T_SUCCESS	0x0020	/* Success */
 #define T_FAILURE	0x0040	/* Failure */
+
 #define T_CURRENT	0x0080	/* Get current options */
 #define T_PARTSUCCESS	0x0100	/* Partial success */
 #define T_READONLY	0x0200	/* Option is read only */
@@ -733,12 +740,6 @@ struct opthdr {
 #endif
 #ifndef T_SNDZERO
 #define T_SNDZERO	1	/* Must match <sys/stropts.h>: SNDZERO */
-#endif
-
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
 #endif
 
 #endif				/* _SYS_TIHDR_H */

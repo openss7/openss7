@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 
  $Log: timod.h,v $
+ Revision 0.9.2.1  2004/04/05 12:39:05  brian
+ - Working up XNET release.
+
  Revision 0.9  2004/04/03 22:37:08  brian
  - Initial cut of new strxnet rpm release.
 
@@ -60,13 +63,15 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+#if !defined _TIMOD_H && !defined __KERNEL__
+#error ****
+#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
+#error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <timod.h>
+#error **** INSTEAD OF <sys/timod.h>.
+#error ****
+#endif				/* !defined _TIMOD_H && !defined __KERNEL__ */
 
 #define TIMOD			('T'<<8)
 #define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */
@@ -148,11 +153,5 @@ struct ti_sync_ack {
 };
 
 #define TSA_EXP_QUEUED		01
-
-#ifndef __KERNEL__
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
 
 #endif				/* _SYS_TIMOD_H */

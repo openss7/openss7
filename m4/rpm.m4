@@ -2,12 +2,11 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:07 $
+dnl @(#) $Id: rpm.m4,v 0.9.2.1 2004/04/05 12:39:05 brian Exp $
 dnl
 dnl =========================================================================
 dnl
 dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -54,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -64,7 +63,7 @@ dnl =========================================================================
 # Common things that need to be done in setting up an RPM spec file from an
 # RPM.spec.in file.
 # -------------------------------------------------------------------------
-AC_DEFUN(AC_RPM_SPEC,
+AC_DEFUN([AC_RPM_SPEC],
 [
     _RPM_SPEC_OPTIONS
     _RPM_SPEC_SETUP
@@ -75,7 +74,7 @@ AC_DEFUN(AC_RPM_SPEC,
 # =========================================================================
 # _RPM_SPEC_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_OPTIONS,
+AC_DEFUN([_RPM_SPEC_OPTIONS],
 [
     AC_ARG_WITH([rpm-epoch],
         AC_HELP_STRING([--with-rpm-epoch=EPOCH],
@@ -86,16 +85,16 @@ AC_DEFUN(_RPM_SPEC_OPTIONS,
     AC_ARG_WITH([rpm-release],
         AC_HELP_STRING([--with-rpm-release=RELEASE],
             [specify the RELEASE for the RPM spec file.
-            @<:@default=1@:>@]),
+            @<:@default=Custom@:>@]),
         [with_rpm_release=$withval],
-        [with_rpm_release='1'])
+        [with_rpm_release='Custom'])
 ])# _RPM_SPEC_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _RPM_SPEC_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_SETUP,
+AC_DEFUN([_RPM_SPEC_SETUP],
 [
     # two extra subsitutions for the RPM spec file
     PACKAGE_EPOCH="${with_rpm_epoch:-1}"
@@ -105,7 +104,7 @@ AC_DEFUN(_RPM_SPEC_SETUP,
     PACKAGE_RELEASE="${with_rpm_release:-Custom}"
     AC_SUBST(PACKAGE_RELEASE)
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
-        Release. This defaults to "Custom".])
+        Release. This defaults to Custom.])
     PACKAGE_OPTIONS=
     for arg in $ac_configure_args ; do
         if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
@@ -123,7 +122,7 @@ AC_DEFUN(_RPM_SPEC_SETUP,
 # =========================================================================
 # _RPM_SPEC_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_OUTPUT,
+AC_DEFUN([_RPM_SPEC_OUTPUT],
 [
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
 ])# _RPM_SPEC_OUTPUT

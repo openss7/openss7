@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $
+ @(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 22:37:08 $ by $Author: brian $
+ Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 
  $Log: timod.h,v $
+ Revision 0.9.2.1  2004/04/05 12:39:05  brian
+ - Working up XNET release.
+
  Revision 0.9  2004/04/03 22:37:08  brian
  - Initial cut of new strxnet rpm release.
 
@@ -72,8 +75,20 @@
 #ifndef _TIMOD_H
 #define _TIMOD_H
 
-#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:08 $"
+#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $"
+
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
 #include <sys/timod.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
 #endif				/* _TIMOD_H */

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 22:37:07 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/03 22:37:07 $ by $Author: brian $
+# Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -167,7 +167,6 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [
     _LINUX_CHECK_KERNEL_ARCHDIR
     _LINUX_CHECK_KERNEL_MACHDIR
     _LINUX_SETUP_KERNEL_CFLAGS
-    _LINUX_SETUP_KERNEL_DEBUG
     _LINUX_CHECK_KERNEL_VERSIONS
     PACKAGE_KNUMBER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
     AC_SUBST(PACKAGE_KNUMBER)
@@ -795,30 +794,6 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [
     linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
     CPPFLAGS="${linux_k_defs}${linux_tmp:+ -nostdinc} -I${linux_cv_k_includes}${linux_tmp:+ -I}${linux_tmp}${CPPFLAGS:+ }${CPPFLAGS}"
 ])# _LINUX_SETUP_KERNEL_CFLAGS
-# =========================================================================
-
-# =========================================================================
-# _LINUX_SETUP_KERNEL_DEBUG
-# -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG],
-[
-    AC_CACHE_CHECK([for kernel debugging], [linux_cv_debug], [dnl
-        if test :"$enable_k_debug" = :yes ; then
-            linux_cv_debug=_DEBUG
-        else
-            if test :"$enable_k_test" = :yes ; then
-                linux_cv_debug=_TEST
-            else
-                if test :"$enable_k_safe" != :no ; then
-                    linux_cv_debug=_SAFE
-                else
-                    linux_cv_debug=_NONE
-                fi
-            fi
-        fi
-    ])
-    CPPFLAGS="-D${linux_cv_debug:-_NONE}${CPPFLAGS:+ }${CPPFLAGS}"
-])# _LINUX_SETUP_KERNEL_DEBUG
 # =========================================================================
 
 # =========================================================================
