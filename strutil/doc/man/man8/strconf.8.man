@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strconf.8.man,v 0.9.2.2 2004/03/07 22:49:11 brian Exp $
+.\" @(#) $Id: strconf.8.man,v 0.9.2.3 2004/04/17 23:14:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCONF 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux STREAMS"
+.TH STRCONF 8 "$Date: 2004/04/17 23:14:57 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B strconf \-
 STREAMS configuration utility

@@ -1,0 +1,292 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: N_BIND_REQ.7.man,v 0.9.2.1 2004/04/17 23:05:19 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 23:05:19 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH N_BIND_REQ 7 "$Date: 2004/04/17 23:05:19 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.BR N_BIND_REQ " (" N_bind_req_t )
+\- Bind Protocol Address Request
+.SH SYNOPSIS
+.PP
+The format of the message is one
+.B M_PROTO
+message block and its structure is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    ulong PRIM_type;            /* always N_BIND_REQ */
+    ulong ADDR_length;          /* length of address */
+    ulong ADDR_offset;          /* offset of address */
+    ulong CONIND_number;        /* req # of conn-indications to be queued */
+    ulong BIND_flags;           /* flags associated with N_BIND_REQ */
+    ulong PROTOID_length;       /* length of the protocol id */
+    ulong PROTOID_offset;       /* offset of protocol id */
+} N_bind_req_t;
+
+/* Flags associated with N_BIND_REQ */
+
+#define DEFAULT_LISTENER  0x00000001L
+#define TOKEN_REQUEST     0x00000002L
+#define DEFAULT_DEST      0x00000004L
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+This primitive requests that the NS provider bind a NS user entity to a
+network address and negotiate the number of connect indications allowed to be
+outstanding by the NS provider for the specified NS user entity being bound.
+.SH PARAMETERS
+.PP
+.TP
+.I PRIM_type
+Is the primitive type.
+
+.TP
+.I ADDR_length
+Is the length in bytes of the network address to be bound to the stream.
+
+.TP
+.I ADDR_offset
+Is the offset from the beginning of the
+.B M_PROTO block
+where the network address begins.
+
+.TP
+.I CONIND_number
+Is the requested number of connect indications allowed to be outstanding by
+the NS provider for the specified protocol address.  (If the number of
+outstanding connect indications equals
+.IR CONIND_number ,
+the NS provider need not discard further incoming connect indications, but may
+choose to queue them internally until the number of outstanding connect
+indications drops below the
+.IR CONIND_number .)
+Only one stream per network address is allowed to have a
+.I CONIND_number
+value greater than zero.  This indicates to the network provider that this
+stream is the listener stream for the NS user.  This stream will be used by the
+NS provider for connect indications for that network address.  If a stream is
+bound as a listener stream, it will not be able to initiate connect requests.
+If the NS user attempts to send an
+.BR N_CONN_REQ (7)
+primitive down this stream,
+an
+.BR N_ERROR_ACK (7)
+message will be sent to the NS user by the NS provider with an error value fo
+.BR NACCESS .
+This field should be ignored in CLNS.
+
+.TP
+.I BIND_flags
+Bind flags\-any of the following flags:
+.RS
+
+.TP
+.B DEFAULT_LISTENER
+When set, this flag indicates that this stream is the "default listener
+stream".  This stream is used to pass connect indications for all incoming
+calls that contain protocol identifiers that are not bound to any other
+listener, or when a listener stream with
+.I CONIND_number
+value of greater than zero is not found.  Also, the default listener will
+receive all incoming call indications that contain no user data.
+
+Only one default listener stream is allowed per occurrence of
+.BR NPI .
+An attempt to bind a default listener stream when one is already bound should
+result in an error (of type
+.BR NBOUND ).
+
+The
+.B DEFAULT_LISTENER
+flag is ignored in CLNS.
+
+.TP
+.B TOKEN_REQUEST
+When set, this flag indicates to the NS provider that the NS user has
+requested that a "token" be assigned to the stream (to be used in the NC
+response message), and the token value be returned to the NS user via the
+.BR N_BIND_ACK (7)
+primitive.  The token assigned by the NS provider can then be used
+by the NS user in a subsequent
+.BR N_CONN_RES (7)
+primitive to identify the stream on which the NC is to be established.  The
+.B TOKEN_REQUEST
+flag is ignored in CLNS.
+
+.TP
+.B DEFAULT_DEST
+When set, this flag indicates that this stream is the "default destination
+stream." This stream will receive all packets destined for the NSAP specified
+in the bind request.  If no NSAP is indicated in the bind request, then this
+stream should receive all packets destined to an NSAP which is bound to no
+other stream.  Only one default destination stream per NSAP is allowed per
+occurrence of
+.BR NPI .
+An attempt to bind a default destination stream to an NSAP when one is already
+bound should result in an error of type
+.BR NBOUND .
+
+The
+.B DEFAULT_DEST
+flag is ignored in the CONS.
+.RE
+
+.TP
+.I PROTOID_length
+Is the length in bytes of the protocol ids to be bound to the stream.
+
+.TP
+.I PROTOID_offset
+Is the offset from the beginning of the
+.B M_PROTO
+block where the protocol id
+begins.
+.SH STATE
+.PP
+This primitive is valid in state
+.B NS_UNBND
+(see Appendix B).
+.SH "NEW STATE"
+.PP
+The new state is
+.BR NE_WACK_BREQ .
+.SH RESPONSE
+.PP
+The NS provider will generate one of the following acknowledgments upon
+receipt ofthe
+.BR N_BIND_REQ (7)
+primitive:
+.HP
+.B Successful: 
+Correct acknowledgment of the primitive is indicated via the
+.BR N_BIND_ACK (7)
+primitive.
+.HP
+.B Non-fatal errors: 
+These errors will be indicated via the
+.BR N_ERROR_ACK (7)
+primitive.  The applicable
+non-fatal errors are as follows:
+.SH ERRORS
+.PP
+.TP
+.RB [ NBADADDR ]
+The network address was in an incorrect format or the address contained illegal
+information.  It is not intended to indicate protocol errors.
+.TP
+.RB [ NBOUND ]
+The NS user attempted to bind a second stream to a network address with the
+.I CONIND_number
+set to a non-zero value, or attempted to bind a second stream with the
+.B DEFAULT_LISTENER
+flag value set to non-zero.
+.TP
+.RB [ NNOADDR ]
+The NS provider could not allocate an address.
+.TP
+.RB [ NACCESS ]
+The user did not have proper permissions for the use of the requested address.
+.TP
+.RB [ NOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ NSYSERR ]
+A system error has occurred and the Linux system error is indicated in the
+primitive.
+.TP
+.RB [ NNOPROTOID ]
+Protocol identifier could not be allocated.
+.SH "CONFORMING TO"
+.PP
+This interface conforms to NPI Revision 2.
+.[
+npi
+.]
+.SH "HISTORY"
+.PP
+The Network Provider Interface first appeared in SVR4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

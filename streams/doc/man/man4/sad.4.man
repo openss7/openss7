@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: sad.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: sad.4.man,v 0.9.2.3 2004/04/17 23:14:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SAD 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH SAD 4 "$Date: 2004/04/17 23:14:55 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -114,7 +114,7 @@ using the
 system call as follows:
 .HP 12
 .BI "int ioctl(int " fd ", int " cmd ", int" arg );
-.TP 12
+.TP
 .I fd
 is an open file descriptor for the
 .RI \*(lq /dev/sad/admin \*(rq
@@ -171,7 +171,7 @@ struct strapush {
 \s+1\fP
 .fi
 .RE
-.TP 12
+.TP
 .I sap_cmd
 Specifies the command to execute when setting the autopush list for a
 .IR STREAMS (4)
@@ -179,7 +179,7 @@ driver.
 .I sap_cmd
 can be one of the following values:
 .RS 12
-.TP 12
+.TP
 .B SAP_CLEAR
 Requests that the autopush list for the
 .IR STREAMS (4)
@@ -235,7 +235,7 @@ and
 .I sap_minor
 device number to set to be a clonable minor device.
 .RE
-.TP 12
+.TP
 .I sap_major
 Specifies the major device number of the
 .IR STREAMS (4)
@@ -244,7 +244,7 @@ the command specified in
 .IR sap_cmd .
 .I sap_major
 is significant for all autopush commands.
-.TP 12
+.TP
 .I sap_minor
 Specifies the minor device number, or initial minor device number in a range,
 of the
@@ -254,7 +254,7 @@ driver for which to exexcute the autopush command.
 is only significant for autopush commands
 .BR SAP_CLEAR ", " SAP_ONE " and " SAP_RANGE ,
 and is ignored otherwise.
-.TP 12
+.TP
 .I sap_lastminor
 Specifies the minor device number of the last minor device in a range for the
 .IR STREAMS (4)
@@ -263,7 +263,7 @@ driver for which to execute the autopush command.
 is only significant for autopush commands
 .BR SAP_RANGE ,
 and is ignored otherwise.
-.TP 12
+.TP
 .I sap_npush
 Specifies the number of module names in the
 .I sap_list
@@ -272,7 +272,7 @@ member array.
 is only significant for autopush commands
 .I SAP_ONE ", " SAP_RANGE " and " SAP_ALL ,
 and is ignored otherwise.
-.TP 12
+.TP
 .I sap_list
 Specifies an array containing
 .I sap_npush
@@ -300,32 +300,32 @@ returns -1, does not alter autopush list for any
 device, and sets
 .IR errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP
 .RB [ EFAULT ]
 .I arg
 is
 .B NULL
 or points outside the caller's valid address space.
-.TP 12
+.TP
 .RB [ EINVAL ]
 .IR sap_major ", " sap_minor " or " sap_lastminor
 was invalid.
-.TP 12
+.TP
 .RB [ EINVAL ]
 .I sap_nlist
 is less than one or greater than
 .BR MAXAPUSH .
-.TP 12
+.TP
 .RB [ EINVAL ]
 .I sap_list
 contained invalid information (e.g. the names are not null terminated).
-.TP 12
+.TP
 .RB [ EHOSTR ]
 .IR sap_major ", " sap_minor " and " sap_lastminor
 specify a character device that is not a
 .IR STREAMS (4)
 device.
-.TP 12
+.TP
 .RB [ EEXIST ]
 .IR sap_major ", " sap_minor " and " sap_lastminor
 specify a
@@ -334,7 +334,7 @@ device that is already configured for autopush and the
 .I sap_cmd
 was
 .BR SAP_ONE ", " SAP_RANGE " or " SAP_ALL .
-.TP 12
+.TP
 .RB [ ERANGE ]
 .I sap_minor
 was not the first minor an a range previously set with
@@ -343,7 +343,7 @@ and the
 .I sap_cmd
 was
 .BR SAP_CLEAR .
-.TP 12
+.TP
 .RB [ ERANGE ]
 .I sap_lastminor
 is less than or equal to
@@ -352,7 +352,7 @@ and the
 .I sap_cmd
 was
 .BR SAP_RANGE .
-.TP 12
+.TP
 .RB [ ENODEV ]
 the device specified by
 .IR sap_major " and " sap_minor
@@ -360,7 +360,7 @@ is not configured with an autopush list and the
 .I sap_cmd
 was
 .BR SAP_CLEAR .
-.TP 12
+.TP
 .RB [ ENSOR ]
 .IR STREAMS (4)
 resources could not be allocated to complete the command.
@@ -394,25 +394,25 @@ struct strapush {
 \s+1\fP
 .fi
 .RE
-.TP 12
+.TP
 .I sap_cmd
 This member is ignored on call an is unchanged on return.
-.TP 12
+.TP
 .I sap_major
 This member specifies the major device number of the
 .IR STREAMS (4)
 driver for which
 to retrieve the current autopush list.
-.TP 12
+.TP
 .I sap_minor
 This member specifies the minor device number of the
 .IR STREAMS (4)
 driver for which
 to retreive the current autopush list.
-.TP 12
+.TP
 .I sap_lastminor
 This member is ignored on call an is unchanged on return.
-.TP 12
+.TP
 .I sap_npush
 Indicates on successful return the number of modules in the autopush list for
 the
@@ -421,7 +421,7 @@ device specified in the
 .IR sap_major " and " sap_minor
 members.
 Upon failure, this member remains unchanged.
-.TP 12
+.TP
 .I sap_list
 Indicates on successful return the null terminated names of the
 .I sap_npush
@@ -462,25 +462,25 @@ Upon failure,
 returns -1, does not alter any members, and sets
 .IR errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP
 .RB [ EFAULT ]
 .I arg
 is
 .B NULL
 or points outside the caller's valid address space.
-.TP 12
+.TP
 .RB [ EINVAL ]
 The device specified by
 .IR sap_major " and " sap_minor
 is invalid.
-.TP 12
+.TP
 .RB [ ENOSTR ]
 The device specified by
 .IR sap_major " and " sap_minor
 is not a
 .IR STREAMS (4)
 device.
-.TP 12
+.TP
 .RB [ ENODEV ]
 The device specified by
 .IR sap_major " and " sap_minor
@@ -508,9 +508,9 @@ struct str_list {
 \s+1\fP
 .fi
 .RE
-.TP 12
+.TP
 .I sl_nmods
-.TP 12
+.TP
 .I sl_modlist
 .RS 12
 .nf
@@ -545,19 +545,19 @@ returns one (1) if an invalid module name is present in the list, or returns
 minus one (-1) and sets
 .IR errno (3)
 to an appropriate error number as follows:
-.TP 12
+.TP
 .RB [ EFAULT ]
 .I arg
 is
 .B NULL
 or points outside the caller's valid address space.
-.TP 12
+.TP
 .RB [ EFAULT ]
 .I sl_modlist
 is
 .B NULL
 or points outside the caller's valid address space.
-.TP 12
+.TP
 .RB [ EINVAL ]
 .I sl_nmods
 is less than one (1).

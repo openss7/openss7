@@ -1,0 +1,237 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CD_ATTACH_REQ.7.man,v 0.9.2.1 2004/04/17 23:05:09 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 23:05:09 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CD_ATTACH_REQ 7 "$Date: 2004/04/17 23:05:09 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.B CD_ATTACH_REQ
+\- attach to a physical point of attachment
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    cd_ulong cd_primitive;
+    cd_ulong cd_ppa;
+} cd_attach_req_t;
+.\"
+.\"#define CD_STYLE1       0x00    /* PPA is implicitly bound */
+.\"#define CD_STYLE2       0x01    /* PPA must be explicitly bound */
+.\"#define CD_STYLE_1      CD_STYLE1
+.\"#define CD_STYLE_2      CD_STYLE2
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This user originated primitive requests that
+the requesting stream be attached to the physical device indicated by the
+Physical Point of Attachment (PPA).
+.PP
+When a Style 2 CDI stream is first opened, it is opened in the
+.BR CD_UNATTACHED
+state and is not associated with a Physical Point of Appearance (PPA).  The
+.B CD_ATTACH_REQ
+primitive requests that the provider associated the stream with the specified
+PPA and move the stream to the
+.B CD_DISABLED
+state.
+.PP
+Style 1 CDI streams open in the
+.BR CD_DISABLED
+state, and a
+.B CD_ATTACH_REQ
+primitive issued on a Style 1 stream will fail.
+.PP
+This primitive is only valid for devices that return
+.B CD_STYLE2
+in the
+.I cd_ppa_style
+field in a
+.BR CD_INFO_ACK (7).
+.SS Addressing
+.PP
+A Physical Point of Appearance corresponds to the hardware interface
+associated with a specific communications device.  A PPA number is associated
+with each hardware interface for a specific provider or device.
+PPA numbers are are a
+.BR cd_ulong ,
+but which PPA number corresponds to which Physical Point of Appearance is a
+provider-specific configuration matter.
+Specific providers should document the mapping of PPA numbers to actual
+Physical Points of Appearance as part of the provider-specific documentation.
+.SS Parameters
+This primitive contains the following parameters:
+.TP
+.I cd_primitive
+Specifies the primitives type.
+.TP
+.I cd_ppa
+Specifies the Physical Point of Attachment (PPA).  The format of this field is
+provider- and device-specific.
+.SS State
+This primitive is only valid in state
+.BR CD_UNATTACHED .
+The new state is
+.BR CD_DISABLED .
+.SH RESPONSE
+This primitive requires the provider to return an acknowledgment indicating
+the success or failure of the
+.BR CD_ATTACH_REQ .
+.PP
+.B "Successful:"
+When successful, the provider responds with a
+.BR CD_OK_ACK (7)
+primitive acknowledging successful processing of the
+.BR CD_ATTACH_REQ .
+The new state is
+.BR CD_DISABLED .
+.PP
+.B "Unsuccessful (non-fatal errors):"
+When unsuccessful, the provider responds with a
+.BR CD_ERROR_ACK (7)
+indicating the non-fatal error.
+The state is unchanged.
+.SH ERRORS
+.B "Non-Fatal Errors:"
+.\".TP
+.\".RB [ CD_BADADDRESS ]
+.\"Address was invalid.
+.\".TP
+.\".RB [ CD_BADADDRTYPE ]
+.\"Invalid address type.
+.\".TP
+.\".RB [ CD_BADDIAL ]
+.\"Dial information was invalid.
+.\".TP
+.\".RB [ CD_BADDIALTYPE ]
+.\"Invalid dial information type.
+.\".TP
+.\".RB [ CD_BADDISPOSAL ]
+.\"Invalid disposal parameter.
+.\".TP
+.\".RB [ CD_BADFRAME ]
+.\"Defective SDU received.
+.TP
+.RB [ CD_BADPPA ]
+Invalid PPA identifier.
+.TP
+.RB [ CD_BADPRIM ]
+Unrecognized primitive.
+.\".TP
+.\".RB [ CD_DISC ]
+.\"Disconnected.
+.TP
+.RB [ CD_EVENT ]
+Protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+Device has become unusable.
+.\".TP
+.\".RB [ CD_INITFAILED ]
+.\"Line initialization failed.
+.TP
+.RB [ CD_NOTSUPP ]
+Primitive not supported by this device.
+.TP
+.RB [ CD_OUTSTATE ]
+Primitive was issued from an invalid state.
+.TP
+.RB [ CD_PROTOSHORT ]
+M_PROTO block too short.
+.\".TP
+.\".RB [ CD_READTIMEOUT ]
+.\"Read request timed out before data arrived.
+.TP
+.RB [ CD_SYSERR ]
+UNIX system error.
+.\".TP
+.\".RB [ CD_WRITEFAIL ]
+.\"Unitdata request failed.
+.SH FILES
+<sys/cdi.h>
+.SH "SEE ALSO"
+.BR CD_DETACH_REQ (7),
+.BR CD_ERROR_ACK (7),
+.BR CD_INFO_ACK (7),
+.BR CD_OK_ACK (7).
+.SH "CONFORMING TO"
+.PP
+This interface conforms to CDI with Gcom extensions.
+.SH "HISTORY"
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.TI

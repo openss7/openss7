@@ -1,0 +1,3 @@
+.so N_RESET_CON.7.man
+
+

@@ -1,0 +1,1 @@
+.so DL_RESET_CON.7.man

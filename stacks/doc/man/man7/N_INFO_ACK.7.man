@@ -1,0 +1,352 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: N_INFO_ACK.7.man,v 0.9.2.1 2004/04/17 23:05:20 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 23:05:20 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH N_INFO_ACK 7 "$Date: 2004/04/17 23:05:20 $" "$Name:  $" "Linux Fast-STREAMS"
+.SH NAME
+.BR N_INFO_ACK " (" N_info_ack_t )
+\- network information acknowledgement
+.SH DESCRIPTION
+This primitive indicates to the NS user any relevant protocol-dependent
+parameters.  (Note: In the future, this primitive will be modified such that
+it will allow the NPI to accept either sub-network point of attachment
+addresses or network addresses.) It should be initiated in response to the
+.BR N_INFO_REQ (7)
+primitive.
+.SH SYNOPSIS
+The format of this message is one
+.B M_PCPROTO
+message block and its structure is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    ulong PRIM_type;            /* always N_INFO_ACK */
+    ulong NSDU_size;            /* maximum NSDU size */
+    ulong ENSDU_size;           /* maximum ENSDU size */
+    ulong CDATA_size;           /* connect data size */
+    ulong DDATA_size;           /* discon data size */
+    ulong ADDR_size;            /* address size */
+    ulong ADDR_length;          /* address length */
+    ulong ADDR_offset;          /* address offset */
+    ulong QOS_length;           /* length of default QOS values */
+    ulong QOS_offset;           /* offset of default QOS values 
+                                   from the beginning of block */
+    ulong QOS_range_length;     /* length of range of QOS
+                                   values */
+    ulong QOS_range_offset;     /* offset of range of QOS
+                                   values from the beginning of 
+                                   block */
+    ulong OPTIONS_flags;        /* bit masking for options
+                                   supported */
+    ulong NIDU_size;            /* network interface data unit
+                                   size */
+    long SERV_type;             /* service type */
+    ulong CURRENT_state;        /* current state */
+    ulong PROVIDER_type;        /* type of provider */
+    ulong NODU_size;            /* optimal NSDU size */
+    ulong PROTOID_length;       /* length of bound protocol ids 
+                                 */
+    ulong PROTOID_offset;       /* offset of bound protocol ids 
+                                 */
+    ulong NPI_version;          /* version number of NPI that's 
+                                   supported */
+} N_info_ack_t;
+
+/* Flags to indicate support of NS provider options */
+#define REC_CONF_OPT    0x00000001L
+#define EX_DATA_OPT     0x00000002L
+#define DEFAULT_RC_SEL  0x00000004L
+
+/* Service types supported by the NS provider */
+#define N_CONS      1
+#define N_CLNS      2
+
+/* Valid provider types */
+#define N_SNICFP    1
+#define N_SUBNET    2
+\fR\s+1
+.fi
+.SH PARAMETERS
+The above fields have the following meaning:
+.TP
+.I PRIM_type
+Indicates the primitive type.
+
+.TP
+.I NSDU_size
+Specifies the maximum size (in octets) of a Network Service Data Unit (NSDU)
+supported by the NS provider.
+
+.TP
+.I ENSDU_size
+Specifies the maximum size (in octets) of an Expedited Network Service Data
+Unit (ENSDU) supported by the NS provider.
+
+.TP
+.I CDATA_size
+Specifies the maximum number of octets of data that may be associated with
+connection establishment primitives.
+
+.TP
+.I DDATA_size
+Specifies the maximum number of octets of data that may be associated with the
+disconnect primitives.
+
+.TP
+.I ADDR_size
+Specifies the maximum size (in decimal digits) of a network address.
+
+.TP
+.I ADDR_length
+Specifies the length in bytes of the network address bound on the
+.I STREAM
+on which the
+.BR N_INFO_REQ (7)
+was issued (a network address is bound to a
+.I STREAM
+via a
+.BR N_BIND_REQ (7)).
+
+.TP
+.I ADDR_offset
+Specifies the offset of the bound network address from the beginning of the
+.B M_PCPROTO
+message block (this field should be ignored if the
+.I ADDR_length
+field is zero).
+
+.TP
+.I QOS_length
+in an addendum to this document.  In the connection-mode environment, when this
+primitive is invoked before the NC is established on the stream, the values
+returned specify the default values supported by the NS provider.  When this
+primitive is invoked after a NC has been established on the stream, the values
+returned indicate the negotiated values for the QOS parameters.  In the
+connection-less environment, these values represent the default or the
+selected QOS parameter values.  In case a QOS parameter is not supported by the
+NS Provider, a value of
+.B QOS_UNKNOWN
+will be returned.  In the case where no QOS parameters are supported by the NS
+provider, this field will be zero.
+
+.TP
+.I QOS_offset
+Indicates the offset of the QOS parameters from the beginning of the
+.B M_PCPROTO
+message block.
+
+.TP
+.I QOS_range_length
+Indicates the length in bytes, of the available range of QOS parameters
+values supported by the NS provider.  These ranges are used by the NS user to
+select QOS parameter values that are valid with the NS provider.  QOS parameter
+values are selected, or the default values altered via the
+.BR N_OPTMGMT_REQ (7)
+primitive.  In the connection-mode environment, the values for end-to-end QOS
+parameters may be specified with
+the
+.B N_CONN
+primitives for negotiation.  If the NS provider does not support a certain QOS
+parameter, its value will be set to
+.BR QOS_UNKNOWN .
+In the case where no QOS parameters are supported by the NS provider, the
+length of this field will be zero.
+
+.TP
+.I QOS_range_offset
+Indicates the offset of the range of QOS parameter values from the beginning of
+the
+.B M_PCPROTO
+message block.
+
+.TP
+.I OPTIONS_flags
+Defines flags that indicate whether the options described below are supported
+by the NS provider.  The possible options are receipt confirmation, expedited
+data and default selection for use of receipt confirmation.
+.RS
+
+.TP
+.B REC_CONF_OPT
+When set, it indicates that the NS provider supports receipt confirmation.
+This flag is used only in the connection-mode environment.
+
+.TP
+.B EX_DATA_OPT
+When set, it indicates that the NS provider supports expedited data transfer.
+This flag is used only in the connection-mode environment.
+
+.TP
+.B DEFAULT_RC_SEL
+When set, it indicates that the default selection is for the use of receipt
+confirmation for every
+.BR N_DATA_REQ (7)
+primitive (This parameter is applicable only when use of receipt confirmation
+is successfully negotiated via the
+.B N_CONN
+primitives).  This flag is used only in the connection-mode environment.
+.RE
+
+.TP
+.I NIDU_size
+This indicates the amount of user data that may be present in a
+.B N_DATA
+primitive.  The
+.I NIDU_size
+should not be larger than the NSDU_size specification.
+
+.TP
+.I SERV_type
+Specifies the service type supported by the NS provider.  The possible values
+can be
+.BR N_CONS ,
+.BR N_CLNS ,
+(or both as indicated by using
+.BR N_CONS|N_CLNS ).
+.RS
+
+.TP
+.B N_CONS
+When set, it indicates that the NS provider supports connection-mode
+network services.
+
+.TP
+.B N_CLNS
+When set, it indicates that the NS provider supports connection-less network
+services.
+.RE
+
+.TP
+.I CURRENT_state
+This indicates the current state of the NS provider.
+
+.TP
+.I PROVIDER_type
+This indicates the type of NS provider.  The possible values can be
+.B N_SNICFP
+or
+.BR N_SUBNET .
+The value
+.B N_SNICFP
+indicates that the provider is the Subnetwork Independent Convergence
+Function/Protocol sub-layer of the network layer.  The value
+.B N_SUBNET
+indicates that the provider is a subnetwork.
+
+.TP
+.I NODU_size
+This specifies the optimal NSDU size (in octets) of an NSDU given the current
+routing information.
+
+.TP
+.I PROTOID_length
+This specifies the length of the protocol ids that were bound using the
+.BR N_BIND_REQ .
+
+.TP
+.I PROTOID_offset
+This specifies the offset of the protocol ids that were bound using the
+.BR N_BIND_REQ .
+
+.TP
+.I NPI_version
+This indicates the current version of NPI that is supported.
+.SH STATE
+This primitive is valid in any state in response to a
+.BR N_INFO_REQ (7)
+primitive.
+SH "NEW STATE"
+The state remains the same.
+.SH "CONFORMING TO"
+.PP
+This interface conforms to NPI Revision 2.
+.[
+npi
+.]
+.SH "HISTORY"
+.PP
+The Network Provider Interface first appeared in SVR4.
+.[
+svr4
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2
