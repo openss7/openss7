@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 00:22:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,7 +100,7 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
     AC_PATH_TOOL([AUTOM4TE], [autom4te], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${AUTOM4TE:-no}" = :no ; then
 	AC_MSG_WARN([Could not find autom4te program in PATH.])
-	AUTOM4TE='autom4te'
+	AUTOM4TE=/usr/bin/autom4te
     fi
 ])# _AUTOTEST_SETUP_AUTOM4TE
 # ===========================================================================

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/07 13:15:31 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/03/08 00:22:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 13:15:31 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -306,36 +306,28 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
     AC_ARG_VAR([DEPMOD], [Build kernel module dependencies command])
-    if test :"${cross_compiling:-no}" = :no
-    then
-	AC_PATH_TOOL([DEPMOD], [depmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    else
-	AC_MSG_CHECKING([for depmod])
-	AC_MSG_RESULT([${DEPMOD:-no}])
+    AC_PATH_TOOL([DEPMOD], [depmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "${DEPMOD:-no}" = :no ; then
+	AC_MSG_WARN([Could not find depmod program in PATH.])
+	DEPMOD=/sbin/depmod
     fi
     AC_ARG_VAR([MODPROBE], [Probe kernel module dependencies command])
-    if test :"${cross_compiling:-no}" = :no
-    then
-	AC_PATH_TOOL([MODPROBE], [modprobe], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    else
-	AC_MSG_CHECKING([for modprobe])
-	AC_MSG_RESULT([${MODPROBE:-no}])
+    AC_PATH_TOOL([MODPROBE], [modprobe], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "${MODPROBE:-no}" = :no ; then
+	AC_MSG_WARN([Could not find depmod program in PATH.])
+	MODPROBE=/sbin/modprobe
     fi
     AC_ARG_VAR([LSMOD], [List kernel modules command])
-    if test :"${cross_compiling:-no}" = :no
-    then
-	AC_PATH_TOOL([LSMOD], [lsmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    else
-	AC_MSG_CHECKING([for lsmod])
-	AC_MSG_RESULT([${LSMOD:-no}])
+    AC_PATH_TOOL([LSMOD], [lsmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "${LSMOD:-no}" = :no ; then
+	AC_MSG_WARN([Could not find lsmod program in PATH.])
+	LSMOD=/sbin/lsmod
     fi
     AC_ARG_VAR([LSOF], [List open files command])
-    if test :"${cross_compiling:-no}" = :no
-    then
-	AC_PATH_TOOL([LSOF], [lsof], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    else
-	AC_MSG_CHECKING([for lsof])
-	AC_MSG_RESULT([${LSOF:-no}])
+    AC_PATH_TOOL([LSOF], [lsof], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "${LSOF:-no}" = :no ; then
+	AC_MSG_WARN([Could not find lsof program in PATH.])
+	LSOF=/sbin/lsof
     fi
 ])# _LINUX_CHECK_KERNEL_TOOLS
 # =========================================================================

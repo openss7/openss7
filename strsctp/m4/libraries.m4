@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 00:22:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,7 @@ AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
     AC_PATH_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${LDCONFIG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find ldconfig program in PATH.])
+	LDCONFIG=/sbin/ldconfig
     fi
 ])# _LDCONFIG_SPEC_SETUP
 # =========================================================================

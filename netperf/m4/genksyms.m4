@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 09:46:35 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/08 00:22:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 09:46:35 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,32 +88,37 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
 	GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
     AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
-    AC_PATH_TOOL([GENKSYMS], [genksyms], [/sbin/genksyms], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${GENKSYMS:-no}" = :no -o ! -x "${GENKSYMS}" ; then
-	AC_MSG_WARN([Could not find executable genksyms program in PATH.])
+    AC_PATH_TOOL([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${GENKSYMS:-no}" = :no ; then
+	AC_MSG_WARN([Could not find genksyms program in PATH.])
+	GENKSYMS=/sbin/genksyms
     fi
     AC_ARG_VAR([KGENKSYMS], [Generate kernel symbols command])
-    AC_PATH_TOOL([KGENKSYMS], [genksyms], [${kbuilddir}/scripts/genksyms/genksyms], [${kbuilddir}/scripts/genksyms])
-    if test :"${KGENKSYMS:-no}" = :no -o ! -x "${KGENKSYMS}" ; then
+    AC_PATH_TOOL([KGENKSYMS], [genksyms], [], [${kbuilddir}/scripts/genksyms])
+    if test :"${KGENKSYMS:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable kernel genksyms program in $kbuilddir/scripts/genksyms.])
+	KGENKSYMS='${kbuilddir}/scripts/genksyms/genksyms'
     fi
 dnl AC_ARG_VAR([MODPOST], [Kernel module post processing command])
-dnl AC_PATH_TOOL([MODPOST], [modpost], [${kbuilddir}/scripts/mod/modpost], [${kbuilddir}/scripts:${kbuilddir}/scripts/mod])
-dnl if test :"${MODPOST:-no}" = :no -o ! -x "${MODPOST}" ; then
+dnl AC_PATH_TOOL([MODPOST], [modpost], [], [${kbuilddir}/scripts:${kbuilddir}/scripts/mod])
+dnl if test :"${MODPOST:-no}" = :no ; then
 dnl	AC_MSG_WARN([Could not find executable kernel modpost program in $kbuilddir/scripts.])
+dnl	MODPOST='${kbuilddir}/scripts/mod/modpost'
 dnl fi
 dnl
 dnl This is a weird place to put these I know, but genksyms.am needs it
 dnl
     AC_ARG_VAR([OBJDUMP], [Dump object files])
-    AC_PATH_TOOL([OBJDUMP], [objdump], [/usr/bin/objdump], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${OBJDUMP:-no}" = :no -o ! -x "${OBJDUMP}" ; then
+    AC_PATH_TOOL([OBJDUMP], [objdump], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${OBJDUMP:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable objdump program in $PATH.])
+	OBJDUMP=/usr/bin/objdump
     fi
     AC_ARG_VAR([NM], [List object file symbols])
-    AC_PATH_TOOL([NM], [nm], [/usr/bin/nm], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${NM:-no}" = :no -o ! -x "${NM}" ; then
+    AC_PATH_TOOL([NM], [nm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${NM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable nm program in $PATH.])
+	NM=/usr/bin/nm
     fi
 ])# _KSYMS_SETUP
 # =============================================================================

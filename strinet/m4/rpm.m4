@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/07 08:56:49 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/03/08 00:22:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 08:56:49 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -336,11 +336,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     AC_PATH_TOOL([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find rpm program in PATH.])
+	RPM=/bin/rpm
     fi
     AC_ARG_VAR([RPMBUILD], [Build rpms command])
     AC_PATH_TOOL([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPMBUILD:-${RPM:-no}}" = :no ; then
 	AC_MSG_WARN([Could not find rpmbuild program in PATH.])
+	RPMBUILD=/usr/bin/rpmbuild
     fi
     if test :"${RPMBUILD:-no}" = :no ; then
 	RPMBUILD="$RPM"

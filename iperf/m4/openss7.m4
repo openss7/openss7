@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/20 14:29:20 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/08 00:57:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 14:29:20 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:57:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -199,6 +199,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
     AC_PATH_TOOL([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GPG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find gpg program in PATH.])
+	GPG=/usr/bin/gpg
     fi
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg user])

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/07 08:58:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/08 00:58:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 08:58:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 00:58:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -308,8 +308,8 @@ include am/kernel.am
 ##
 ##include am/libraries.am
 ##
-##PKGINCL			= include/sys/$(PACKAGE_NAME)
-##
+PKGINCL				= include/sys/$(PACKAGE_NAME)
+
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
