@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $
+ @(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/10/16 11:55:52 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/22 14:34:53 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2002/10/16 11:55:52 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $"
+#ident "@(#) $RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/10/16 11:55:52 $"
 
-static char const ident[] = "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/22 14:34:53 $";
+static char const ident[] =
+    "$RCSfile: test-sctpc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/10/16 11:55:52 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -148,6 +149,137 @@ int len = MSG_LEN;
 
 int nodelay = 1;
 
+unsigned char my_msg[8192] =
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.";
+unsigned char ur_msg[8192];
+
 int test_sctpc(void)
 {
 	int fd;
@@ -156,45 +288,14 @@ int test_sctpc(void)
 	long inp_count = 0, out_count = 0;
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
-	unsigned char my_msg[] =
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[2048];
+
 	fprintf(stderr, "Opening socket\n");
 	if ((fd = socket(PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP)) < 0) {
 		perror("socket");
 		goto dead;
 	}
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
+		ntohs(loc_addr.sin_port));
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
 		goto dead;
@@ -233,7 +334,8 @@ int test_sctpc(void)
 #endif
 			printf
 			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes, inp_count ? rtt_delay / inp_count : 0);
+			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes,
+			     inp_count ? rtt_delay / inp_count : 0);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -256,7 +358,8 @@ int test_sctpc(void)
 		}
 		if (pfd[0].revents & POLLIN) {
 			int rtn;
-			if ((rtn = recv(fd, ur_msg + inp_offset, len - inp_offset, MSG_DONTWAIT)) < 0) {
+			if ((rtn =
+			     recv(fd, ur_msg + inp_offset, len - inp_offset, MSG_DONTWAIT)) < 0) {
 				if (errno == EINTR || errno == EAGAIN)
 					goto skip_pollin;
 				perror("recv");
@@ -272,9 +375,16 @@ int test_sctpc(void)
 						perror("gettimeofday");
 						goto dead;
 					}
-					if (tnow.tv_sec < tv->tv_sec || (tnow.tv_sec == tv->tv_sec && tnow.tv_usec < tv->tv_usec))
-						fprintf(stderr, "time: %ld.%06ld before %ld.%06ld\n", tnow.tv_sec, tnow.tv_usec, tv->tv_sec, tv->tv_usec);
-					rtt_delay += (tnow.tv_sec - tv->tv_sec) * 1000000 + tnow.tv_usec - tv->tv_usec;
+					if (tnow.tv_sec < tv->tv_sec ||
+					    (tnow.tv_sec == tv->tv_sec &&
+					     tnow.tv_usec < tv->tv_usec))
+						fprintf(stderr,
+							"time: %ld.%06ld before %ld.%06ld\n",
+							tnow.tv_sec, tnow.tv_usec, tv->tv_sec,
+							tv->tv_usec);
+					rtt_delay +=
+					    (tnow.tv_sec - tv->tv_sec) * 1000000 + tnow.tv_usec -
+					    tv->tv_usec;
 					inp_count++;
 					inp_offset = 0;
 				}
@@ -291,7 +401,8 @@ int test_sctpc(void)
 					goto dead;
 				}
 			}
-			if ((rtn = send(fd, my_msg + out_offset, len - out_offset, MSG_DONTWAIT)) < 0) {
+			if ((rtn =
+			     send(fd, my_msg + out_offset, len - out_offset, MSG_DONTWAIT)) < 0) {
 				if (errno == EINTR || errno == EAGAIN)
 					goto skip_pollout;
 				perror("send");
@@ -378,8 +489,8 @@ int main(int argc, char **argv)
 				break;
 			case 5:	/* length */
 				len = atoi(optarg);
-				if (len > 2048) {
-					len = 2048;
+				if (len > 8192) {
+					len = 8192;
 				}
 				break;
 			case 6:	/* nagle */
@@ -411,8 +522,8 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			len = atoi(optarg);
-			if (len > 2048)
-				len = 2048;
+			if (len > 8192)
+				len = 8192;
 			break;
 		case 'n':
 			nodelay = 0;

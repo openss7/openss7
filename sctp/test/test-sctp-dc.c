@@ -1,64 +1,65 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/23 15:24:58 $
+@(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/10/16 11:55:52 $
 
- -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
+Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
 
- All Rights Reserved.
+All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+Unauthorized distribution or duplication is prohibited.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written
- authorization of the copyright holder, and licensors, if any.
+This software and related documentation is protected by copyright and
+distributed under licenses restricting its use, copying, distribution and
+decompilation.  No part of this software or related documentation may be
+reproduced in any form by any means without the prior written
+authorization of the copyright holder, and licensors, if any.
 
- The recipient of this document, by its retention and use, warrants that
- the recipient will protect this information and keep it confidential, and
- will not disclose the information contained in this document without the
- written permission of its owner.
+The recipient of this document, by its retention and use, warrants that
+the recipient will protect this information and keep it confidential, and
+will not disclose the information contained in this document without the
+written permission of its owner.
 
- The author reserves the right to revise this software and documentation
- for any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of
- the technical arts, or the reflection of changes in the design of any
- techniques, or procedures embodied, described, or referred to herein.
- The author is under no obligation to provide any feature listed herein.
+The author reserves the right to revise this software and documentation
+for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of
+the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.
+The author is under no obligation to provide any feature listed herein.
 
- -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
- behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"),
- it is classified as "Commercial Computer Software" under paragraph
- 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
- ("DFARS") (or any successor regulations) and the Government is acquiring
- only the license rights granted herein (the license rights customarily
- provided to non-Government users).  If the Software is supplied to any unit
- or agency of the Government other than DoD, it is classified as "Restricted
- Computer Software" and the Government's rights in the Software are defined
- in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
- of the NASA Supplement to the FAR (or any successor regulations).
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"),
+it is classified as "Commercial Computer Software" under paragraph
+252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+("DFARS") (or any successor regulations) and the Government is acquiring
+only the license rights granted herein (the license rights customarily
+provided to non-Government users).  If the Software is supplied to any unit
+or agency of the Government other than DoD, it is classified as "Restricted
+Computer Software" and the Government's rights in the Software are defined
+in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+of the NASA Supplement to the FAR (or any successor regulations).
 
- -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
 
- -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/23 15:24:58 $ by <bidulock@openss7.org>
+Last Modified $Date: 2002/10/16 11:55:52 $ by <bidulock@openss7.org>
 
- *****************************************************************************/
+*****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/23 15:24:58 $"
+#ident "@(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/10/16 11:55:52 $"
 
-static char const ident[] = "$RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/23 15:24:58 $";
+static char const ident[] =
+    "$RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/10/16 11:55:52 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -148,6 +149,137 @@ int len = MSG_LEN;
 
 int nodelay = 1;
 
+unsigned char my_msg[8192] =
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.\0"
+    "This is a good short test message that has some 64 bytes in it.";
+unsigned char ur_msg[8192];
+
 int test_sctpc(void)
 {
 	int fd;
@@ -156,45 +288,13 @@ int test_sctpc(void)
 	long inp_count = 0, out_count = 0;
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
-	unsigned char my_msg[] =
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[2048];
 	fprintf(stderr, "Opening socket\n");
 	if ((fd = socket(PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP)) < 0) {
 		perror("socket");
 		goto dead;
 	}
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
+		ntohs(loc_addr.sin_port));
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
 		goto dead;
@@ -222,7 +322,8 @@ int test_sctpc(void)
 		if (timer_timeout) {
 			printf
 			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes, inp_count ? rtt_delay / inp_count : 0);
+			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes,
+			     inp_count ? rtt_delay / inp_count : 0);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -243,7 +344,9 @@ int test_sctpc(void)
 		if (mode) {
 			if (pfd[0].revents & POLLIN) {
 				int rtn;
-				if ((rtn = recv(fd, ur_msg + inp_offset, len - inp_offset, MSG_DONTWAIT)) < 0) {
+				if ((rtn =
+				     recv(fd, ur_msg + inp_offset, len - inp_offset,
+					  MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("recv");
@@ -259,9 +362,16 @@ int test_sctpc(void)
 							perror("gettimeofday");
 							goto dead;
 						}
-						if (tnow.tv_sec < tv->tv_sec || (tnow.tv_sec == tv->tv_sec && tnow.tv_usec < tv->tv_usec))
-							fprintf(stderr, "time: %ld.%06ld before %ld.%06ld\n", tnow.tv_sec, tnow.tv_usec, tv->tv_sec, tv->tv_usec);
-						rtt_delay += (tnow.tv_sec - tv->tv_sec) * 1000000 + tnow.tv_usec - tv->tv_usec;
+						if (tnow.tv_sec < tv->tv_sec ||
+						    (tnow.tv_sec == tv->tv_sec &&
+						     tnow.tv_usec < tv->tv_usec))
+							fprintf(stderr,
+								"time: %ld.%06ld before %ld.%06ld\n",
+								tnow.tv_sec, tnow.tv_usec,
+								tv->tv_sec, tv->tv_usec);
+						rtt_delay +=
+						    (tnow.tv_sec - tv->tv_sec) * 1000000 +
+						    tnow.tv_usec - tv->tv_usec;
 						inp_count++;
 						inp_offset = 0;
 						mode = 0;
@@ -279,7 +389,9 @@ int test_sctpc(void)
 						goto dead;
 					}
 				}
-				if ((rtn = send(fd, my_msg + out_offset, len - out_offset, MSG_DONTWAIT)) < 0) {
+				if ((rtn =
+				     send(fd, my_msg + out_offset, len - out_offset,
+					  MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("send");
@@ -368,8 +480,8 @@ int main(int argc, char **argv)
 				break;
 			case 5:	/* length */
 				len = atoi(optarg);
-				if (len > 2048) {
-					len = 2048;
+				if (len > 8192) {
+					len = 8192;
 				}
 				break;
 			case 6:	/* nagle */
@@ -401,8 +513,8 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			len = atoi(optarg);
-			if (len > 2048)
-				len = 2048;
+			if (len > 8192)
+				len = 8192;
 			break;
 		case 'n':
 			nodelay = 0;

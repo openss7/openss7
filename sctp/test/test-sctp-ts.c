@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/23 15:24:58 $
+ @(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/10/16 11:55:53 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/23 15:24:58 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2002/10/16 11:55:53 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/23 15:24:58 $"
+#ident "@(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/10/16 11:55:53 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/23 15:24:58 $";
+    "$RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/10/16 11:55:53 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -85,11 +85,9 @@ void usage(void)
 	fprintf(stderr, "Usage:  test-sctps [options]\n");
 	fprintf(stderr, "Options:\n");
 	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
-	fprintf(stderr,
-		"      port specifies both the local and remote port number\n");
+	fprintf(stderr, "      port specifies both the local and remote port number\n");
 	fprintf(stderr, "  -l, --loc_host loc_host   (default: 0.0.0.0)\n");
-	fprintf(stderr,
-		"      loc_host specifies the local (bind) host for the SCTP\n");
+	fprintf(stderr, "      loc_host specifies the local (bind) host for the SCTP\n");
 	fprintf(stderr, "      socket with optional local port number\n");
 	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
 	fprintf(stderr, "      time give the time in seconds between reports\n");
@@ -144,6 +142,8 @@ int len = MSG_LEN;
 
 int nodelay = 1;
 
+unsigned char ur_msg[8192];
+
 int test_sctps(void)
 {
 	int lfd, fd;
@@ -152,7 +152,6 @@ int test_sctps(void)
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
 //      unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[len];
 	unsigned char *my_msg = ur_msg;
 
 	fprintf(stderr, "Opening socket\n");
@@ -197,8 +196,7 @@ int test_sctps(void)
 		if (timer_timeout) {
 			printf
 			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes,
-			     inp_bytes - out_bytes);
+			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -288,8 +286,7 @@ int main(int argc, char **argv)
 			{"length", 1, 0, 'w'},
 			{"nagle", 0, 0, 'n'}
 		};
-		c = getopt_long(argc, argv, "l:r:t:hp:w:n", long_options,
-				&option_index);
+		c = getopt_long(argc, argv, "l:r:t:hp:w:n", long_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -311,8 +308,8 @@ int main(int argc, char **argv)
 				break;
 			case 5:	/* length */
 				len = atoi(optarg);
-				if (len > 2048) {
-					len = 2048;
+				if (len > 8192) {
+					len = 8192;
 				}
 				break;
 			case 6:	/* nagle */
@@ -339,8 +336,8 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			len = atoi(optarg);
-			if (len > 2048)
-				len = 2048;
+			if (len > 8192)
+				len = 8192;
 			break;
 		case 'n':
 			nodelay = 0;

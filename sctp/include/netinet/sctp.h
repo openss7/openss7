@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.2 2002/05/08 13:06:13 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.3 2002/10/16 11:56:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/05/08 13:06:13 $ by $Author: brian $
+ Last Modified $Date: 2002/10/16 11:56:26 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #include <features.h>
 #include <sys/types.h>
@@ -139,6 +139,17 @@ struct sctp_astat {
 #define SCTP_CKSUM_TYPE		28
 #define SCTP_DEBUG_OPTIONS	29
 #define SCTP_STATUS		30
+#define SCTP_ALI		31
+#define SCTP_PR			32
+#define SCTP_DISPOSITION	33
+#define SCTP_LIFETIME		34
+#define SCTP_ADD		35
+#define SCTP_ADD_IP		36
+#define SCTP_DEL_IP		37
+#define SCTP_SET		38
+#define SCTP_SET_IP		39
+#define SCTP_ECN		40
+#define SCTP_MAX_BURST		41
 
 /*
  *  HMAC settings for cookie verification for use with SCTP_MAC_TYPE socket
