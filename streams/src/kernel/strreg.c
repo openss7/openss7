@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/09 22:56:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $"
 
-static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $";
 
 #define __NO_VERSION__
 
@@ -746,15 +746,19 @@ int unregister_strdev_minor(dev_t dev, struct cdevsw *cdev)
  */
 int register_strdev(dev_t dev, struct cdevsw *cdev)
 {
+#if 0
 	if (getminor(dev) != 0)
 		return register_strdev_minor(dev, cdev);
+#endif
 	return register_strdev_major(dev, cdev);
 }
 
 int unregister_strdev(dev_t dev, struct cdevsw *cdev)
 {
+#if 0
 	if (getminor(dev) != 0)
 		return unregister_strdev_minor(dev, cdev);
+#endif
 	return unregister_strdev_major(dev, cdev);
 }
 

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.7 2004/03/02 05:33:17 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.8 2004/03/09 22:55:18 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/02 05:33:17 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/09 22:55:18 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -338,6 +338,8 @@ AC_DEFUN([_LFS_SETUP], [
     LFS_SC_CONFMOD='conf.modules'
     LFS_SC_MAKEDEV='devices.lst'
     LFS_SC_MKNODES='src/util/strmakenodes.c'
+    LFS_SC_STSETUP='strsetup.conf'
+    LFS_SC_STRLOAD='strload.conf'
     # all our config substitutions
     AC_SUBST(LFS_SC_CONFIG)
     AC_SUBST(LFS_SC_CONFMOD)
@@ -346,6 +348,8 @@ AC_DEFUN([_LFS_SETUP], [
     AC_SUBST(LFS_SC_MAJBASE)
     AC_SUBST(LFS_SC_MKNODES)
     AC_SUBST(LFS_SC_MODCONF)
+    AC_SUBST(LFS_SC_STSETUP)
+    AC_SUBST(LFS_SC_STRLOAD)
 ])# _LFS_SETUP
 # =========================================================================
 
@@ -405,6 +409,14 @@ AC_DEFUN([_LFS_OUTPUT_CONFIG], [
               AC_MSG_NOTICE([creating $LFS_SC_MAKEDEV from $lfs_configs])
               eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strmknods=$LFS_SC_MAKEDEV $lfs_configs"
           fi
+          if test :"${LFS_SC_STSETUP:+set}" = :set; then
+              AC_MSG_NOTICE([creating $LFS_SC_STSETUP from $lfs_configs])
+              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strsetup=$LFS_SC_STSETUP $lfs_configs"
+          fi
+#         if test :"${LFS_SC_STRLOAD:+set}" = :set; then
+#             AC_MSG_NOTICE([creating $LFS_SC_STRLOAD from $lfs_configs])
+#             eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strload=$LFS_SC_STRLOAD $lfs_configs"
+#         fi
 ])# _LFS_OUTPUT_CONFIG
 # =============================================================================
 

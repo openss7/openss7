@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: strsetup.8.man,v 0.9.2.4 2004/03/07 22:49:11 brian Exp $
+.\" @(#) $Id: strsetup.8.man,v 0.9.2.5 2004/03/09 22:55:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/09 22:55:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRSETUP 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRSETUP 8 "$Date: 2004/03/09 22:55:53 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -81,8 +81,22 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.HP
-.BR strsetup " [" -cdfi ]
+.HP 12
+\fBstrsetup\fR [\fIoptions\fR] {\fB-c\fR|\fB--config\fR}
+.PD 0
+.HP 12
+\fBstrsetup\fR [\fIoptions\fR] {\fB-i\fR|\fB--install\fR}
+.HP 12
+\fBstrsetup\fR [\fIoptions\fR] {\fB-f\fR|\fB--filename\fR} \fIFILENAME\fR
+.HP 12
+\fBstrsetup\fR [\fIoptions\fR] {\fB-d\fR|\fB--delete\fR}
+.HP 12
+\fBstrsetup\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrsetup\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrsetup\fR {\fB-C\fR|\fB--copying\fR}
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -127,6 +141,48 @@ apporpriate for the current kernel configuration.
 By default, this uses the configuration file
 .BR /etc/sysconf/streams/strsetup.conf .
 If no file exists or is specified, only clone devices will be created.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-D\fR, \fB--debug\fR [\fILEVEL\fr]
+Increase or specify the debug output
+.IR LEVEL .
+When a debug
+.I LEVEL
+has been specified,
+.B strerr
+will log to
+.BR stdout ,
+prints debug messages to
+.BR stderr ,
+and will not place itself in the background.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase or specify the verbosity
+.I LEVEL
+of the output.  This option may be repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B strsetup
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B strsetup
+displays versions information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B strsetup
+displays copying and copyright information on
+.I stdout
+and exits.
 .\"
 .\"
 .SH "FILE FORMAT"
@@ -351,6 +407,9 @@ the default configuration file.
 .SH "SEE ALSO"
 .PP
 .BR strsetup.conf (5),
+.BR scls (8),
+.BR strload (8),
+.BR sc (4).
 .\"
 .\"
 .SH BUGS
@@ -370,19 +429,19 @@ provides
 for compatibility with
 .BR OSF \(rg
 with the following portability considerations:
-.IP \(bu
+.IP \(em
 .BR OSF \(rg
 does not document long options.
-.IP \(bu
+.IP \(em
 .BR OSF \(rg
 does not document the
-.BR 0q ", " -v ", " -h ", " -V " or " -C
-opoptions.
-.IP \(bu
+.BR -q ", " -v ", " -h ", " -V " or " -C
+options.
+.IP \(em
 Options
 .BR --help " and " --version
 are provided for compatibility with GNU coding standards.
-.IP \(bu
+.IP \(em
 The format of the output from the
 .B strsetup
 command with the

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/03/09 22:56:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $"
 
-static char const ident[] = "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $";
 
 #define __NO_VERSION__
 #define EXPORT_SYMTAB
@@ -241,17 +241,17 @@ EXPORT_SYMBOL_NOVERS(quntimeout);	/* sunddi.h */
 
 EXPORT_SYMBOL_GPL(register_inode);		/* strconf.h */
 EXPORT_SYMBOL_GPL(register_inode_major);	/* strconf.h */
-EXPORT_SYMBOL_GPL(register_inode_minor);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(register_inode_minor);	/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strdev);		/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strdev_major);	/* strconf.h */
-EXPORT_SYMBOL_GPL(register_strdev_minor);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(register_strdev_minor);	/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strmod);		/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_inode);		/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_inode_major);	/* strconf.h */
-EXPORT_SYMBOL_GPL(unregister_inode_minor);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(unregister_inode_minor);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strdev);		/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strdev_major);	/* strconf.h */
-EXPORT_SYMBOL_GPL(unregister_strdev_minor);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(unregister_strdev_minor);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strmod);		/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_add);		/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_del);		/* strconf.h */
@@ -264,11 +264,16 @@ EXPORT_SYMBOL_GPL(specfs_mnt);		/* strspecfs.h */
 
 #if	defined(CONFIG_STREAMS_CLONE_MODULE) || \
 	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
+	defined(CONFIG_STREAMS_SC_MODULE) || \
 	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
 EXPORT_SYMBOL_NOVERS(fmodsw);		/* strreg.h */
 EXPORT_SYMBOL_NOVERS(cdevsw);		/* strreg.h */
 EXPORT_SYMBOL_NOVERS(strm_open);	/* strreg.h */
 EXPORT_SYMBOL_NOVERS(sdev_open);	/* strreg.h */
+EXPORT_SYMBOL_NOVERS(fmodsw_list);	/* strreg.h */
+EXPORT_SYMBOL_NOVERS(cdevsw_list);	/* strreg.h */
+EXPORT_SYMBOL_NOVERS(fmod_count);	/* strreg.h */
+EXPORT_SYMBOL_NOVERS(cdev_count);	/* strreg.h */
 #endif
 
 #if	defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)

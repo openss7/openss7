@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/03/08 21:34:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/03/09 22:55:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/08 21:34:18 $ by $Author: brian $
+# Last Modified $Date: 2004/03/09 22:55:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,13 +64,13 @@ sbin_PROGRAMS			= \
 				strace \
 				strerr \
 				strinfo \
-				strload \
-				strsetup \
 				strvf \
 				strmakenodes
 
 sbin_SCRIPTS			= \
-				$(srcdir)/src/util/strclean
+				$(srcdir)/src/util/strclean \
+				$(srcdir)/src/util/strload \
+				$(srcdir)/src/util/strsetup
 
 libexec_PROGRAMS		= \
 				test-inet_raw \
@@ -313,17 +313,17 @@ strinfo_LDFLAGS			= -static libstreams.la
 strinfo_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
 strinfo_CFLAGS			= @USER_CFLAGS@
 
-strload_SOURCES			= src/util/strload.c $(top_builddir)/include/sys/config.h
-strload_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
-strload_LDFLAGS			= -static libstreams.la
-strload_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
-strload_CFLAGS			= @USER_CFLAGS@
+#strload_SOURCES		= src/util/strload.c $(top_builddir)/include/sys/config.h
+#strload_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+#strload_LDFLAGS		= -static libstreams.la
+#strload_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+#strload_CFLAGS			= @USER_CFLAGS@
 
-strsetup_SOURCES		= src/util/strsetup.c $(top_builddir)/include/sys/config.h
-strsetup_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
-strsetup_LDFLAGS		= -static libstreams.la
-strsetup_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
-strsetup_CFLAGS			= @USER_CFLAGS@
+#strsetup_SOURCES		= src/util/strsetup.c $(top_builddir)/include/sys/config.h
+#strsetup_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+#strsetup_LDFLAGS		= -static libstreams.la
+#strsetup_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+#strsetup_CFLAGS		= @USER_CFLAGS@
 
 strvf_SOURCES			= src/util/strvf.c $(top_builddir)/include/sys/config.h
 strvf_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
@@ -379,19 +379,25 @@ STRCONF				= $(SHELL) $(STRCONF_SCRIPT)
 STRMAKENODES			= ./strmakenodes
 
 @LFS_SC_CONFIG@: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) -h@LFS_SC_CONFIG@ -b@LFS_SC_MAJBASE@ Config.master
+	$(STRCONF) --hconfig=@LFS_SC_CONFIG@ -b@LFS_SC_MAJBASE@ Config.master
 
 @LFS_SC_MODCONF@: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) -o@LFS_SC_MODCONF@ -b@LFS_SC_MAJBASE@ Config.master
+	$(STRCONF) --modconf=@LFS_SC_MODCONF@ -b@LFS_SC_MAJBASE@ Config.master
 
 @LFS_SC_DRVCONF@: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) -l@LFS_SC_DRVCONF@ -b@LFS_SC_MAJBASE@ Config.master
+	$(STRCONF) --driverconf=@LFS_SC_DRVCONF@ -b@LFS_SC_MAJBASE@ Config.master
 
 @LFS_SC_CONFMOD@: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) -L@LFS_SC_CONFMOD@ -b@LFS_SC_MAJBASE@ Config.master
+	$(STRCONF) --confmodules=@LFS_SC_CONFMOD@ -b@LFS_SC_MAJBASE@ Config.master
 
 @LFS_SC_MKNODES@: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) -m@LFS_SC_MKNODES@ -b@LFS_SC_MAJBASE@ Config.master
+	$(STRCONF) --makenodes=@LFS_SC_MKNODES@ -b@LFS_SC_MAJBASE@ Config.master
+
+@LFS_SC_STSETUP@: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --strsetup=@LFS_SC_STSETUP@ -b@LFS_SC_MAJBASE@ Config.master
+
+@LFS_SC_STRLOAD@: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --strload=@LFS_SC_STRLOAD@ -b@LFS_SC_MAJBASE@ Config.master
 
 Config.master: $(lfs_configs)
 	@if test -n "$(lfs_configs)"; then \
