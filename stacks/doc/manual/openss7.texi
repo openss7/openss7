@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.1 2004/08/21 10:14:38 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.2 2004/10/12 09:49:07 brian Exp $
 %
 % =========================================================================
 %
@@ -53,38 +53,37 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/21 10:14:38 $ by $Author: brian $
+% Last Modified $Date: 2004/10/12 09:49:07 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename openss7.info
 @settitle OpenSS7
-@setchapternewpage odd
 
 @dircategory OpenSS7
 @direntry
 * OpenSS7: (openss7).		An open SS7, SIGTRAN, ISDN, VoIP package.
 @end direntry
 
-@set xref-automatic-section-title
+@include texi/args.texi
 
-@set EDITION 0.9.1
 @set VERSION 0.9.1
 @set UPDATED 2004-1-14
 
 @defindex op
 
 @ifinfo
-This file document the OpenSS7 package.
+This file document the @value{PACKAGE_TITLE} package.
 
-This is Edition @value{EDITION}, last updated @value{UPDATE}, of
-@cite{The OpenSS7 XNS/XTI Library Reference Manual}, for Version
-@value{VERSION}.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
+@cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
 
-Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+Copyright @copyright{} 2001-2004 @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000 @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
-All Rights Reserved.
+All Rights Reserved. @*
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -106,99 +105,152 @@ Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
 
-@iftex
-@shorttitlepage The OpenSS7 Reference Manual
-@end iftex
+@ignore
+@shorttitlepage @value{PACKAGE_TITLE} Installation and Reference Manual
+@end ignore
 @titlepage
-@title The OpenSS7 Reference Manual
-@subtitle Edition @value{EDITION} for OpenSS7 version @value{VERSION}
-@subtitle @value{UPDATED}
-@author Brian Bidulock @cite{@email<bidulock@@openss7.org>}
+@titlefont{@value{PACKAGE_TITLE}}
+@sp 0.2
+@title Installation and Reference Manual
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
+@noindent
 Published by OpenSS7 Corporation @*
 1469 Jefferys Crescent @*
 Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
+@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
 
+@noindent
 Permission is granted to copy and distribute modified versions of this manual
 under the conditions for verbatim copying, provided that the entire resulting
 derived work is distribtued under the terms of a permission notice identical
 to this one.
 
+@noindent
 Permission is granted to copy and distribute translations of this manual into
 another language, under the same conditions as for modified versions.
+
+@vskip 0pt
 @end titlepage
 @page
 
-@node Top, Acknowledgements, (dir), (dir)
-@top OpenSS7
-This is Edition @value{EDITION}, last updated @value{UPDATED}, of
-@cite{The OpenSS7 Reference Manual}, for Version @value{VERSION} of the
-OpenSS7 package.
-
+@iftex
+@headings off
+@everyheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} @| @emph{Released under the GFDL} @| @thispage
+@end iftex
 @ifnottex
+@ifinfo
+@node Top
+@top @value{PACKAGE_TITLE}
+@end ifinfo
+@ifnotinfo
+@node Top
+@end ifnotinfo
+@end ifnottex
+@c
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{PACKAGE_TITLE} Installation and Reference Manual}, for
+Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
+@value{PACKAGE_TITLE} package.
+
 @menu
 * Acknowledgements::		Sponsors and Contributors
-* Introduction::		Introduction to the OpenSS7 Project
-* Reference::			Reference to OpenSS7 Components
-* Conformance::			Conformance of OpenSS7 Components
-* Installation::		Package Installation
-* Development Schedule::	Development Schedule for Future Components
-* Bugs::			Known Bugs
 
-* Public License::		GNU General Public License
-* Documentation License::	GNU Free Dcoumentation License
+* Introduction::		Introduction to the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
 
-* Concept Index::		Index of Concepts
-* Type Index::			Index of Types
-* Function Index::		Index of Functions
-* Variable Index::		Index of Variables
-* File Index::			Index of Files
+* GPL::				GNU General Public License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
 
- --- The Detailed Node Listing ---
+* Indices::			Index of Indices
+@end menu
+
+@ignore
+@menu
+ ----- detailed node listing -----
 
 Acknowledgements
 
-* Sponsors::			Sponsors of the OpenSS7 Project
+* Sponsors::			Sponsors of the package
 * Contributors::		People who contributed to the development of
-				the OpenSS7 Project.
+				the package
+Introduction
+
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
 
 Reference
 
-* Overview::			Overview of OpenSS7 components
-* Components::			Detailed component descriptions
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
 
 Conformance
 
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Bugs::			Known Bugs
+* Schedule::			Development and Bug Fix Schedule
+
 Installation
 
-Bugs
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removal::			Removal of the package
+* Loading::			Loading the package
 
-Development Schedule
+Indices
 
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
 @end menu
-@end ifnottex
+@end ignore
 
 @c --------------------------------------------------------------------------
 
-@iftex
 @node Acknowledgements
-@end iftex
-@ifnottex
-@node Acknowledgements, Sponsors, Top, Top
-@end ifnottex
 @unnumbered Acknowledgements
 @cindex credits
+
+As with most open source projects, this project would not have been possible without the valiant
+effors and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
+Community}.
 
 @menu
 * Sponsors::			Sponsors of the OpenSS7 Project
@@ -206,7 +258,7 @@ Development Schedule
 				the OpenSS7 Project.
 @end menu
 
-@node Sponsors, Contributors, Acknowledgements, Acknowledgements
+@node Sponsors
 @unnumberedsec Sponsors of the OpenSS7 Project
 @cindex sponsors
 
@@ -217,43 +269,139 @@ Funding for completion of the OpenSS7 Project was provided by:
 @item Performance Technologies
 @item Motorola
 @item HOB International
+@item Comverse
+@item Sonus Networks
 @end table
 
-@node Contributors, Introduction, Sponsors, Acknowledgements
-@unnumberedsec Contributors to the OpenSS7 Project
+@node Contributors
+@unnumberedsec Contributors
 @cindex contributors
 
-The primary contributor to the OpenSS7 Project is Brian F. G. Bidulock.
+The primary contributor to the @value{PACKAGE_TITLE} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list
+of significant contributors to the project:
 
-The following is a list of significant contributors to the project:
-
-@table @var
+@itemize
 @item Per Berquist
 @item John Boyd
 @item Chuck Winters
 @item Tom Chandler
+@item Gurol Ackman
 @item Others
-@end table
+@end itemize
 
-@node Introduction, Reference, Contributors, Top
-@chapter Introduction to the OpenSS7 Project
+@node Introduction
+@chapter Introduction
 @cindex introduction
 
 This manual documents the design, implementation, installation, operation and
-future development schedule of the OpenSS7 Project.
+future development schedule of the @value{PACKAGE_TITLE} package.
 
-@node Reference, Overview, Introduction, Top
+@c --------------------------------------------------------------------------
+
+@menu
+* Notice::			Notice
+* Overview::			Overview of this document
+* Organization::		Organization of this document
+* Conventions::			Conventions in this document
+@end menu
+
+@node Notice
+@section Notice
+@cindex notice
+
+@cindex licensing
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from X/Open publications and other sources).  Consult the permission notices
+contains in the documentation for more information.  This document is released under the @cite{GNU
+Free Documentation License} (@pxref{FDL}) with all sections invariant.
+
+@node Overview
+@section Overview
+@cindex overview
+
+This mamual documents the design, implementation, installation, operation and future development of
+the @value{PACKAGE_TITLE} package.
+
+The @value{PACKAGE_TITLE} packages is an SS7, SIGTRAN, ISDN, VoIP package for Linux that can be used
+with @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS,
+Linux Fast-STREAMS (LfS) Reference Manual},} or @cite{Linux STREAMS}@footnote{@xref{Top, Linux
+STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.  It includes
+development tools, header files and manual pages for
+
+@itemize
+@item @cite{Communications Device Interface (CDI)},
+@item @cite{Data Link Provider Interface (DLPI)},
+@item @cite{Network Provider Interface (NPI)},
+@item @cite{Transport Provider Interface (TPI)},
+@item @cite{Signalling Data Link Interface (SDLI)},
+@item @cite{Signalling Data Terminal Interface (SDTI)},
+@item @cite{Message Transfer Part Interface (MTPI)},
+@item @cite{Call Control Interface (CCI)},
+@item @cite{Transaction Interface (TRI)},
+@item @cite{Transaction Component Interface (TCI)}, and,
+@item @cite{Mobile Application Part Interface (MAPI)}.
+@end itemize
+
+@noindent
+Also, it provides STREAMS drivers and modules for SS7, SIGTRAN, ISDN and VoIP including:
+
+@itemize
+@item 
+@end itemize
+
+The @value{PACKAGE_TITLE} package is essential to the development and support of SS7 and ISDN
+newtorking and call control modules and drivers and provides a fundamental set of SS7 header files
+and manual pages for such development.
+
+The @value{PACKAGE_TITLE} does @strong{not} provide the STREAMS components.  See the manuals
+referenced above.
+
+@node Organization
+@section Organization
+@cindex organization
+
+This document is organized (loosely) into several sections as follows:
+
+@ifnottex
+@menu
+  Introduction::		This introduction
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+@end menu
+@end ifnottex
+@iftex
+@table @asis
+@item @ref{Introduction}
+This introduction
+@item @ref{Reference}
+Contents of the package
+@item @ref{Conformance}
+Conformance of the package
+@item @ref{Releases}
+Release of the package
+@item @ref{Installation}
+Installation of the package
+@end table
+@end iftex
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+@c --------------------------------------------------------------------------
+
+@node Reference
 @chapter Reference
 @cpindex reference
 
+@c --------------------------------------------------------------------------
+
 @menu
-* Overview::			An overview of the OpenSS7 package.
-* Components::			Reference of OpenSS7 package components.
-
- --- The Detailed Node Listing ---
-
-Components
-
 * Applications::		OpenSS7 Applications
 * SS7 Stack::			Signalling System No. 7 Stack
 * ISDN Stack::			Integrated Services Digital Network Stack
@@ -262,6 +410,12 @@ Components
 * MG Stack::			Media Gateway Stack
 * Transport Stack::		Data Transport Stack
 * Device Drivers::		Hardware Device Drivers
+@end menu
+
+
+@ignore
+@menu
+ ----- detailed node listing -----
 
 Applications
 
@@ -337,40 +491,18 @@ Device Drivers
 * CPC388::			PTI CPC-388 Drivers
 
 @end menu
+@end ignore
 
-@node Overview,  Components,  Reference, Reference
-@section Overview
-@cpindex overview
-
-@menu
-@end menu
-
-@node Components,  Applications,  Overview, Reference
-@section Components
-@cpindex components
-
-@menu
-* Applications::		OpenSS7 Applications
-* SS7 Stack::			Signalling System No. 7 Stack
-* ISDN Stack::			Integrated Services Digital Network Stack
-* SIGTRAN Stack::		Signalling Transport Stack
-* VoIP Stack::			Voice over IP Stack
-* MG Stack::			Media Gateway Stack
-* Transport Stack::		Data Transport Stack
-* Device Drivers::		Hardware Device Drivers
-@end menu
-
-@page
-@node Applications, SS7 Stack,  Components, Reference
-@subsection Applications
+@node Applications
+@section Applications
 @cpindex applications
 
 @menu
 @end menu
 
 @page
-@node SS7 Stack,  SDL,  Applications, Reference
-@subsection SS7 Protocol Stack
+@node SS7 Stack
+@section SS7 Protocol Stack
 @cpindex ss7 protocol stack
 
 @menu
@@ -383,30 +515,37 @@ Device Drivers
 * BSSAP::			Base Station System Application Part
 @end menu
 
-@node SDL, SDT, SS7 Stack, SS7 Stack
-@subsubsection Signalling Data Link (SDL)
-
-@node SDT, SL, SDL, SS7 Stack
-@subsubsection Signalling Data Terminal (SDT)
-
-@node SL, MTP, SDT, SS7 Stack
-@subsubsection Signalling Link (SL)
-
-@node MTP, SCCP, SL, SS7 Stack
-@subsubsection Message Transfer Part (MTP)
-
-@node SCCP, TCAP, MTP, SS7 Stack
-@subsubsection Signalling Connection Control Part (SCCP)
-
-@node TCAP, BSSAP, SCCP, SS7 Stack
-@subsubsection Transaction Capabilities Application Part (TCAP)
-
-@node BSSAP, ISDN Stack, TCAP, SS7 Stack
-@subsubsection Base Station System Application Part (BSSAP)
+@page
+@node SDL
+@subsection Signalling Data Link (SDL)
 
 @page
-@node ISDN Stack, HDLC,  BSSAP, Reference
-@subsection ISDN Protocol Stack
+@node SDT
+@subsection Signalling Data Terminal (SDT)
+
+@page
+@node SL
+@subsection Signalling Link (SL)
+
+@page
+@node MTP
+@subsection Message Transfer Part (MTP)
+
+@page
+@node SCCP
+@subsection Signalling Connection Control Part (SCCP)
+
+@page
+@node TCAP
+@subsection Transaction Capabilities Application Part (TCAP)
+
+@page
+@node BSSAP
+@subsection Base Station System Application Part (BSSAP)
+
+@page
+@node ISDN Stack
+@section ISDN Protocol Stack
 @cpindex ISDN protocol stack
 
 @menu
@@ -425,48 +564,61 @@ Device Drivers
 * DPNSS/DASS::			PNOC DPNSS/DASS Layer 3
 @end menu
 
-@node HDLC,  ISDN LAPB,  ISDN Stack, ISDN Stack
-@subsubsection  High-Level Data Link Communication
-
-@node ISDN LAPB,  X.25 LAPB,  HDLC, ISDN Stack
-@subsubsection ISDN Link Access Procedure (Balanced)
-
-@node X.25 LAPB,  ISDN LAPD,  ISDN LAPB, ISDN Stack
-@subsubsection X.25 Link Access Procedure (Balanced)
-
-@node ISDN LAPD,  ISDN LAPF,  X.25 LAPB, ISDN Stack
-@subsubsection ISDN Link Access Procedure (D-Channel)
-
-@node ISDN LAPF,  ISDN Q.931,  ISDN LAPD, ISDN Stack
-@subsubsection ISDN Link Access Procedure (Frame Relay)
-
-@node ISDN Q.931,  ISDN Frame Relay,  ISDN LAPF, ISDN Stack
-@subsubsection ISDN Level 3 Q.931
-
-@node ISDN Frame Relay,  X.213,  ISDN Q.931, ISDN Stack
-@subsubsection ISDN Frame Relay
-
-@node X.213, V5.2,  ISDN Frame Relay, ISDN Stack
-@subsubsection ISO/OSI NP X.213
-
-@node V5.2, GR-303,  X.213, ISDN Stack
-@subsubsection ETSI V5.2
-
-@node GR-303, DPNSS,  V5.2, ISDN Stack
-@subsubsection Telcordia GR-303-CORE
-
-@node DPNSS, IDLC,  GR-303, ISDN Stack
-@subsubsection PNOC DPNSS (Link)
-
-@node IDLC, DPNSS/DASS,  DPNSS, ISDN Stack
-@subsubsection IDLC
-
-@node DPNSS/DASS, SIGTRAN Stack,  IDLC, ISDN Stack
-@subsubsection PNOC DPNSS/DASS (Level 3)
+@page
+@node HDLC
+@subsection  High-Level Data Link Communication
 
 @page
-@node SIGTRAN Stack,  IPSS7,  DPNSS/DASS, Reference
-@subsection SIGTRAN Protocol Stack
+@node ISDN LAPB
+@subsection ISDN Link Access Procedure (Balanced)
+
+@page
+@node X.25 LAPB
+@subsection X.25 Link Access Procedure (Balanced)
+
+@page
+@node ISDN LAPD
+@subsection ISDN Link Access Procedure (D-Channel)
+
+@page
+@node ISDN LAPF
+@subsection ISDN Link Access Procedure (Frame Relay)
+
+@page
+@node ISDN Q.931
+@subsection ISDN Level 3 Q.931
+
+@page
+@node ISDN Frame Relay
+@subsection ISDN Frame Relay
+
+@page
+@node X.213
+@subsection ISO/OSI NP X.213
+
+@page
+@node V5.2
+@subsection ETSI V5.2
+
+@page
+@node GR-303
+@subsection Telcordia GR-303-CORE
+
+@page
+@node DPNSS
+@subsection PNOC DPNSS (Link)
+
+@page
+@node IDLC
+@subsection IDLC
+
+@page
+@node DPNSS/DASS
+@subsection PNOC DPNSS/DASS (Level 3)
+
+@page
+@node SIGTRAN Stack
+@section SIGTRAN Protocol Stack
 @cpindex SIGTRAN protocol stack
 
 @menu
@@ -485,48 +637,61 @@ Device Drivers
 * TALI::			Tekelec's Adaptation Layer Interface
 @end menu
 
-@node IPSS7,  M2PA,  SIGTRAN Stack, SIGTRAN Stack
-@subsubsection SS7 over IP
-
-@node M2PA,  M2UA,  IPSS7, SIGTRAN Stack
-@subsubsection MTP Level 2 Peer-to-Peer Adaptation Layer
-
-@node M2UA,  M3UA,  M2PA, SIGTRAN Stack
-@subsubsection MTP Level 2 User Adaptation Layer
-
-@node M3UA,  ISUA,  M2UA, SIGTRAN Stack
-@subsubsection MTP Level 3 User Adaptation Layer
-
-@node ISUA,  BUA,  M3UA, SIGTRAN Stack
-@subsubsection ISUP User Adaptation Layer
-
-@node BUA,  SUA,  ISUA, SIGTRAN Stack
-@subsubsection BICC User Adaptation Layer
-
-@node SUA,  TUA,  BUA, SIGTRAN Stack
-@subsubsection SCCP User Adaptation Layer
-
-@node TUA,  IUA,  SUA, SIGTRAN Stack
-@subsubsection TCAP User Adaptation Layer
-
-@node IUA,  GR303UA,  TUA, SIGTRAN Stack
-@subsubsection ISDN Q.921 User Adaptation Layer
-
-@node GR303UA,  V5UA,  IUA, SIGTRAN Stack
-@subsubsection GR-303 User Adaptation Layer
-
-@node V5UA,  DUA,  GR303UA, SIGTRAN Stack
-@subsubsection V5.2 User Adaptation Layer
-
-@node DUA,  TALI,  V5UA, SIGTRAN Stack
-@subsubsection DPNSS/DASS User Adaptation Layer
-
-@node TALI,  VoIP Stack,  DUA, SIGTRAN Stack
-@subsubsection Tekelec Adaptation Layer Interface
+@page
+@node IPSS7
+@subsection SS7 over IP
 
 @page
-@node VoIP Stack,  H225,  TALI, Reference
-@subsection VoIP Protocol Stack
+@node M2PA
+@subsection MTP Level 2 Peer-to-Peer Adaptation Layer
+
+@page
+@node M2UA
+@subsection MTP Level 2 User Adaptation Layer
+
+@page
+@node M3UA
+@subsection MTP Level 3 User Adaptation Layer
+
+@page
+@node ISUA
+@subsection ISUP User Adaptation Layer
+
+@page
+@node BUA
+@subsection BICC User Adaptation Layer
+
+@page
+@node SUA
+@subsection SCCP User Adaptation Layer
+
+@page
+@node TUA
+@subsection TCAP User Adaptation Layer
+
+@page
+@node IUA
+@subsection ISDN Q.921 User Adaptation Layer
+
+@page
+@node GR303UA
+@subsection GR-303 User Adaptation Layer
+
+@page
+@node V5UA
+@subsection V5.2 User Adaptation Layer
+
+@page
+@node DUA
+@subsection DPNSS/DASS User Adaptation Layer
+
+@page
+@node TALI
+@subsection Tekelec Adaptation Layer Interface
+
+@page
+@node VoIP Stack
+@section VoIP Protocol Stack
 @cpindex VoIP protocol stack
 
 @menu
@@ -535,18 +700,21 @@ Device Drivers
 * SIPT::			Session Initiation Protocol - Transport
 @end menu
 
-@node H225,  BICC,  VoIP Stack, VoIP Stack
-@subsubsection H.225
-
-@node BICC,  SIPT,  H225, VoIP Stack
-@subsubsection Bearer Indexed Call Control (BICC)
-
-@node SIPT,  MG Stack,  BICC, VoIP Stack
-@subsubsection Session Initiation Protocol (SIP) Transport (SIP-T)
+@page
+@node H225
+@subsection H.225
 
 @page
-@node MG Stack,  MGCP,  SIPT, Reference
-@subsection Media Gateway Protocol Stack
+@node BICC
+@subsection Bearer Indexed Call Control (BICC)
+
+@page
+@node SIPT
+@subsection Session Initiation Protocol (SIP) Transport (SIP-T)
+
+@page
+@node MG Stack
+@section Media Gateway Protocol Stack
 @cpindex media gateway protocol stack
 
 @menu
@@ -556,21 +724,25 @@ Device Drivers
 * CH::				Channel
 @end menu
 
-@node MGCP,  H.248,  MG Stack, MG Stack
-@subsubsection Media Gateway Control Protocol
-
-@node H.248,  MX,  MGCP, MG Stack
-@subsubsection MEGACO/H.248
-
-@node MX,  CH,  H.248, MG Stack
-@subsubsection Multiplex (MX)
-
-@node CH,  Transport Stack,  MX, MG Stack
-@subsubsection Channel (CH)
+@page
+@node MGCP
+@subsection Media Gateway Control Protocol
 
 @page
-@node Transport Stack,  IP,  CH, Reference
-@subsection Transport Protocol Stack
+@node H.248
+@subsection MEGACO/H.248
+
+@page
+@node MX
+@subsection Multiplex (MX)
+
+@page
+@node CH
+@subsection Channel (CH)
+
+@page
+@node Transport Stack
+@section Transport Protocol Stack
 @cpindex transport
 
 @menu
@@ -582,27 +754,33 @@ Device Drivers
 * SSCOP::			Service Specific Connection Oriented Protocol
 @end menu
 
-@node IP,  UDP,  Transport Stack, Transport Stack
-@subsubsection Internet Protocol
-
-@node UDP,  TCP,  IP, Transport Stack
-@subsubsection User Datagram Protocol
-
-@node TCP,  SCTP,  UDP, Transport Stack
-@subsubsection Transmission Control Protocol
-
-@node SCTP,  RTP/RTCP,  TCP, Transport Stack
-@subsubsection Signalling Connection Transport Protocol
-
-@node RTP/RTCP,  SSCOP,  SCTP, Transport Stack
-@subsubsection Real-time Transport (Control) Protocol
-
-@node SSCOP,  Device Drivers,  RTP/RTCP, Transport Stack
-@subsubsection Service Specific Connection Oriented Protocol
+@page
+@node IP
+@subsection Internet Protocol
 
 @page
-@node Device Drivers,  X400P-SS7,  SSCOP, Reference
-@subsection Device Drivers
+@node UDP
+@subsection User Datagram Protocol
+
+@page
+@node TCP
+@subsection Transmission Control Protocol
+
+@page
+@node SCTP
+@subsection Signalling Connection Transport Protocol
+
+@page
+@node RTP/RTCP
+@subsection Real-time Transport (Control) Protocol
+
+@page
+@node SSCOP
+@subsection Service Specific Connection Oriented Protocol
+
+@page
+@node Device Drivers
+@section Device Drivers
 @cpindex device drivers
 @cpindex device
 @cpindex drivers
@@ -614,80 +792,119 @@ Device Drivers
 * CPC388::			PTI CPC-388 Drivers
 @end menu
 
-@node X400P-SS7, ACB56, Device Drivers, Device Drivers
-@subsubsection Digium Drivers
+@page
+@node X400P-SS7
+@subsection Digium Drivers
 @cindex x400p t400p t100p e400p e100p te405p te410p
 
-@node ACB56, CPC384, X400P-SS7, Device Drivers
-@subsubsection SeaLevel ACB56 Drivers
-
-@node CPC384, CPC388, ACB56, Device Drivers
-@subsubsection PTI CPC 384 Driver
-
-@node CPC388, Conformance, CPC384, Device Drivers
-@subsubsection PTI CPC 388 Driver
-
+@page
+@node ACB56
+@subsection SeaLevel ACB56 Drivers
 
 @page
-@node Conformance, Installation, CPC388, Top
+@node CPC384
+@subsection PTI CPC 384 Driver
+
+@page
+@node CPC388
+@subsection PTI CPC 388 Driver
+
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node Conformance
 @chapter Conformance
 @cindex conformance
 
-@page
-@node Installation, Development Schedule, Conformance, Top
+@menu
+@end menu
+
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node Installation
 @chapter Installation
 @cindex installation
 
-@page
-@node Development Schedule, Bugs, Installation, Top
-@chapter Development Schedule
-@cindex development schedule
-@cindex development
-@cindex schedule
+@include texi/install.texi
 
-@page
-@node Bugs, Public License, Development Schedule, Top
-@chapter Bugs
-@cindex bugs
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
 
-@node Public License, Documentation License, Bugs, Top
-@appendix Public License
-@include gpl.texi
+@node GPL
+@appendix GPL
+@cindex license GPL
 
-@node Documentation License, Concept Index, Public License, Top
-@appendix Documentation License
-@include fdl.texi
+@include texi/gpl.texi
 
-@page
-@node Concept Index, Type Index, Documentation License, Top
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node LGPL
+@appendix LGPL
+@cindex license LGPL
+
+@include texi/lesser.texi
+
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node FDL
+@appendix FDL
+@cindex license FDL
+
+@include texi/fdl.texi
+
+@c --------------------------------------------------------------------------
+@c --------------------------------------------------------------------------
+
+@node Indices
 @appendix Indices
-@appendixsec Concept Index
+@cindex indices
 
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+@end menu
+
+@node Concept Index
+@appendixsec Concept Index
 @printindex cp
 
-@page
-@node Type Index, Function Index, Concept Index, Top
+@node Type Index
 @appendixsec Type Index
-
 @printindex tp
 
-@page
-@node Function Index, Variable Index, Type Index, Top
+@node Function Index
 @appendixsec Function and Macro Index
-
 @printindex fn
 
-@page
-@node Variable Index, File Index, Function Index, Top
+@node Variable Index
 @appendixsec Variable and Constant Macro Index
-
 @printindex vr
 
-@page
-@node File Index, , Variable Index, Top
+@node File Index
 @appendixsec Program and File Index
-
 @printindex pg
+
+@node Option Index
+@appendixsec Index of Configuration Options
+@printindex op
+
+@c --------------------------------------------------------------------------
 
 @page
 @shortcontents
@@ -695,6 +912,4 @@ Device Drivers
 @contents
 @bye
 
-
-
-
+@c --------------------------------------------------------------------------

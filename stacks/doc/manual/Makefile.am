@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/08/17 03:56:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/10/12 09:49:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,33 +46,22 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/17 03:56:57 $ by $Author: brian $
+# Last Modified $Date: 2004/10/12 09:49:06 $ by $Author: brian $
 #
 # =============================================================================
 
-info_TEXINFOS		= openss7.texi
+info_TEXINFOS		= openss7.texi libxnet.texi
 
 EXTRA_info_TEXINFOS	= \
-			  args.texi \
-			  install.texi \
+			  configure.texi \
 			  releases.texi \
-			  gpl.texi \
-			  lesser.texi \
-			  fdl.texi
+			  rpm.texi \
+			  texi/args.texi \
+			  texi/fdl.texi \
+			  texi/gpl.texi \
+			  texi/install.texi \
+			  texi/lesser.texi
 
-AM_MAKEINFOFLAGS	= --force --footnote-style=separate --commands-in-node-names
-AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections --commands-in-node-names
-
-EXTRA_DIST		= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS)
-
-#
-# This breaks distcheck (I think it's the INFO_DEPS dependency;
-# however, distcheck is not run in maintainer mode
-#
-if MAINTAINER_MODE
-$(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
-endif
-
-all-local: info ps pdf html
+include ../../am/info.am
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.1 2004/05/12 10:15:04 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.2 2004/10/12 09:49:07 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/05/12 10:15:04 $ by $Author: brian $
+% Last Modified $Date: 2004/10/12 09:49:07 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -540,7 +540,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/05/12 10:15:04 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/10/12 09:49:07 $.
 
 @subsubheading AUTHOR
 @format
@@ -704,7 +704,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/05/12 10:15:04 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/10/12 09:49:07 $.
 @end flushleft
 @end format
 
@@ -1026,11 +1026,11 @@ trouble, troubleshooting.
 
 @node Copying, Documentation License, Bugs, Top
 @unnumbered Copying
-@include lesser.texi
+@include texi/lesser.texi
 
 @node Documentation License, Concept Index, Copying, Top
 @unnumbered Dcoumentation License
-@include fdl.texi
+@include texi/fdl.texi
 
 @node Concept Index, Type Index, Documentation License, Top
 @unnumbered Concept Index
