@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/07 07:18:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 07:18:14 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -57,7 +57,7 @@
 #include <linux/interrupt.h>	/* for in_irq() and friends */
 
 #ifndef __SCHED_EXTERN_INLINE
-#define __SCHED_EXTERN_INLINE extern inline
+#define __SCHED_EXTERN_INLINE extern __inline__
 #endif
 
 #ifndef STREAMS_SOFTIRQ
