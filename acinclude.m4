@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.3 2005/01/23 08:56:14 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.4 2005/01/23 21:21:50 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/23 08:56:14 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/23 21:21:50 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -75,7 +75,7 @@ m4_include([m4/strconf.m4])
 # AC_OS7
 # -------------------------------------------------------------------------
 AC_DEFUN([AC_OS7], [dnl
-    _OPENSS7_PACKAGE([OPENSS7], [OpenSS7 Master Package])
+    _OPENSS7_PACKAGE([OpenSS7], [OpenSS7 Master Package])
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _RPM_SPEC
@@ -95,8 +95,8 @@ dnl AC_MSG_NOTICE([final kern CPPFLAGS  = $KERNEL_CPPFLAGS])
 dnl AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
 dnl AC_MSG_NOTICE([final kern MODFLAGS  = $KERNEL_MODFLAGS])
 dnl AC_MSG_NOTICE([final kern NOVERSION = $KERNEL_NOVERSION])
-    vars=`(set) 2>&1 | egrep '^(ac|man|rpm|linux|xns|xti|inet|sctp|streams)_cv_.*=' | sed -e 's|=.*||;s|^|declare -x |;s|$|; |'`
-    echo $vars
-    eval "$vars"
+#   vars=`(set) 2>&1 | egrep '^(ac|man|rpm|linux|xns|xti|inet|sctp|streams)_cv_.*=' | sed -e 's|=.*||;s|^|declare -x |;s|$|; |'`
+#   echo $vars
+#   eval "$vars"
 ])# AC_OS7
 # =========================================================================

@@ -9,3 +9,4 @@ intl
 COPYING
 INSTALL
 *.log
+configure.scan

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/23 08:56:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/23 21:21:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,19 +46,32 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/23 08:56:14 $ by $Author: brian $
+# Last Modified $Date: 2005/01/23 21:21:50 $ by $Author: brian $
 #
 # =============================================================================
 
 include am/openss7.am
 
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-exec-recursive install-info-recursive \
-	install-recursive installcheck-recursive installdirs-recursive \
-	pdf-recursive ps-recursive uninstall-info-recursive \
-	uninstall-recursive
+srpm-recursive rpms-recursive rebuild-recursive sign-recursive resign-recursive:
+	@set fnord $$MAKEFLAGS ; \
+	amf=$$2 ; \
+	target=`echo $@ | sed -e 's|-recursive||'` ; \
+	list='$(SUBDIRS)' ; for subdir in $$list ; do \
+	     	test "$$subdir" = "." && continue ; \
+		echo "Making $$target in $$subdir" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$target) \
+		    || case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+	done ; \
+	test -z "$$fail"
 
-RECURSIVE_TARGETS += rpms-recursive srpm-recursive sign-recursive resign-recursive rebuild-recursive
+srpm: srpm-recursive
+
+rpms: rpms-recursive
+
+rebuild: rebuild-recursive
+
+sign: sign-recursive
+
+resign: resign-recursive
 
 SUBDIRS	= @subdirs@
