@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $
+ @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $"
+#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $";
+static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
 #endif
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 19:43:13 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -144,7 +144,7 @@ static struct streamtab nsdev_info = {
  *  -------------------------------------------------------------------------
  *  This is rather simple.  We are going to do a redirected open on the a new
  *  device with the major device number mapped according to name.  We do this
- *  by nesting another sdev_open() inside the first one with an adjusted
+ *  by nesting another spec_open() inside the first one with an adjusted
  *  device number. It helps that the orginal file and dentry pointer is stored
  *  with the args passed as fsdata attached to the dentry.  We use this to
  *  find the original file pointer and dentry and get the name of the opened
@@ -181,7 +181,7 @@ static int nsdevopen(struct inode *inode, struct file *file)
 		if (cdev_max && (len_max == name->len || len_max > 2)) {
 			argp->dev = makedevice(cdev_max->d_major, getminor(argp->dev));
 			argp->sflag = DRVOPEN;	/* this is a directed open */
-			return sdev_open(inode, file, file->f_vfsmnt, xchg(&file->f_dentry->d_fsdata, NULL));
+			return spec_open(inode, file, xchg(&file->f_dentry->d_fsdata, NULL));
 		}
 #ifdef CONFIG_KMOD
 		{
@@ -220,7 +220,7 @@ static int open_nsdev(struct inode *inode, struct file *file)
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
 	file->f_op = &nsdev_f_ops;
-	return sdev_open(inode, file, specfs_mnt, &args);
+	return spec_open(inode, file, &args);
 }
 
 static struct file_operations nsdev_ops ____cacheline_aligned = {
@@ -244,18 +244,20 @@ static int __init nsdev_init(void)
 #else
 	printk(KERN_INFO NSDEV_SPLASH);
 #endif
-	if ((err = register_inode(major, &nsdev_cdev, &nsdev_ops)) < 0)
+	if ((err = register_strdrv(&nsdev_cdev)) < 0)
 		return (err);
+	if ((err = register_cmajor(&nsdev_cdev, major, &nsdev_ops)) < 0) {
+		unregister_strdrv(&nsdev_cdev);
+		return (err);
+	}
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 static void __exit nsdev_exit(void)
 {
-	int err;
-	if ((err = unregister_inode(major, &nsdev_cdev)))
-		return (void) (err);
-	return (void) (0);
+	unregister_cmajor(&nsdev_cdev, 0);
+	unregister_strdrv(&nsdev_cdev);
 };
 
 module_init(nsdev_init);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:03 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $";
 
 /* 
  *  This is TIRDWR an TLI read/write module for TPI Version 2 transport
@@ -65,8 +65,8 @@ static char const ident[] =
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -86,7 +86,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
+#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

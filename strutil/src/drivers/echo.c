@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.8 $
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -279,7 +279,7 @@ static int __init echo_init(void)
 #else
 	printk(KERN_INFO ECHO_SPLASH);
 #endif
-	if ((err = register_strdev(major, &echo_cdev)) < 0)
+	if ((err = register_strdev(&echo_cdev, major)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -287,7 +287,7 @@ static int __init echo_init(void)
 };
 static void __exit echo_exit(void)
 {
-	unregister_strdev(major, &echo_cdev);
+	unregister_strdev(&echo_cdev, major);
 };
 
 module_init(echo_init);

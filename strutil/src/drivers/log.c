@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.4 $)
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:42:01 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/03 06:30:20 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -333,7 +333,7 @@ log_init(void)
 #else
 	printk(KERN_INFO LOG_SPLASH);
 #endif
-	if ((err = register_strdev(major, &log_cdev)) < 0)
+	if ((err = register_strdev(&log_cdev, major)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -342,7 +342,7 @@ log_init(void)
 static void __exit
 log_exit(void)
 {
-	unregister_strdev(major, &log_cdev);
+	unregister_strdev(&log_cdev, major);
 }
 
 module_init(log_init);

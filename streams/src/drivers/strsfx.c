@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -73,14 +73,14 @@ static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.9
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strspecfs.h"		/* for specfs_mnt */
+#include "strspecfs.h"		/* for spec_open() */
 #include "strfifo.h"		/* for fifo stuff */
 
 #include "sys/config.h"
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -514,7 +514,7 @@ static int open_sfx(struct inode *inode, struct file *file)
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
 	file->f_op = &sfx_f_ops;	/* fops_get already done */
-	return sdev_open(inode, file, specfs_mnt, &args);
+	return spec_open(inode, file, &args);
 }
 
 static struct file_operations sfx_ops ____cacheline_aligned = {
@@ -539,18 +539,20 @@ static int __init sfx_init(void)
 #else
 	printk(KERN_INFO SFX_SPLASH);
 #endif
-	if ((err = register_inode(major, &sfx_cdev, &sfx_ops)) < 0)
+	if ((err = register_strdrv(&sfx_cdev)) < 0)
 		return (err);
+	if ((err = register_cmajor(&sfx_cdev, major, &sfx_ops)) < 0) {
+		unregister_strdrv(&sfx_cdev);
+		return (err);
+	}
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 static void __exit sfx_exit(void)
 {
-	int err;
-	if ((err = unregister_inode(major, &sfx_cdev)))
-		return (void) (err);
-	return (void) (0);
+	unregister_cmajor(&sfx_cdev, 0);
+	unregister_strdrv(&sfx_cdev);
 };
 
 module_init(sfx_init);

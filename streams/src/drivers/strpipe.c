@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>
 #include <linux/modversions.h>
 
@@ -73,14 +76,14 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* fort sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strspecfs.h"		/* for specfs_mnt */
+#include "strspecfs.h"		/* for spec_open() */
 #include "strpipe.h"		/* extern verification */
 
 #include "sys/config.h"
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -362,7 +365,7 @@ static int open_pipe(struct inode *inode, struct file *file)
 	      name:{args.buf, 0, 0},
 	};
 	file->f_op = &pipe_f_ops;	/* fops_get already done */
-	return sdev_open(inode, file, specfs_mnt, &args);
+	return spec_open(inode, file, &args);
 }
 
 static struct file_operations pipe_ops ____cacheline_aligned = {
@@ -387,18 +390,20 @@ static int __init pipe_init(void)
 #else
 	printk(KERN_INFO PIPE_SPLASH);
 #endif
-	if ((err = register_inode(major, &pipe_cdev, &pipe_ops)) < 0)
+	if ((err = register_strdrv(&pipe_cdev)) < 0)
 		return (err);
+	if ((err = register_cmajor(&pipe_cdev, major, &pipe_ops)) < 0) {
+		unregister_strdrv(&pipe_cdev);
+		return (err);
+	}
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 static void __exit pipe_exit(void)
 {
-	int err;
-	if ((err = unregister_inode(major, &pipe_cdev)))
-		return (void) (err);
-	return (void) (0);
+	unregister_cmajor(&pipe_cdev, 0);
+	unregister_strdrv(&pipe_cdev);
 };
 
 module_init(pipe_init);

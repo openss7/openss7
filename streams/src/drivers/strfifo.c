@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 19:43:13 $
+ @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 19:43:13 $"
+#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 19:43:13 $";
+static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>
 #include <linux/modversions.h>
 
@@ -72,7 +75,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/ddi.h>
 
 #include "strdebug.h"
-#include "strspecfs.h"		/* sdev_open and struct str_args */
+#include "strspecfs.h"		/* spec_open and struct str_args */
 #include "strsched.h"		/* allocsd(), freesd() */
 #include "strhead.h"		/* for autopush */
 #include "strfifo.h"		/* extern verification */
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 19:43:13 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"
@@ -815,18 +818,20 @@ static int __init fifo_init(void)
 #else
 	printk(KERN_INFO FIFO_SPLASH);
 #endif
-	if ((err = register_inode(major, &fifo_cdev, &fifo_ops)) < 0)
+	if ((err = register_strdrv(&fifo_cdev)) < 0)
 		return (err);
+	if ((err = register_cmajor(&fifo_cdev, major, &fifo_ops)) < 0) {
+		unregister_strdrv(&fifo_cdev);
+		return (err);
+	}
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 static void __exit fifo_exit(void)
 {
-	int err;
-	if ((err = unregister_inode(major, &fifo_cdev)))
-		return (void) (err);
-	return (void) (0);
+	unregister_cmajor(&fifo_cdev, 0);
+	unregister_strdrv(&fifo_cdev);
 };
 
 module_init(fifo_init);

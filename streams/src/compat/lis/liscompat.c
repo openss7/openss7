@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/modversions.h>
 
@@ -118,7 +121,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:00 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:18 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2141,7 +2144,7 @@ int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, con
 	cdev->d_kmod = NULL;
 	atomic_set(&cdev->d_count, 0);
 	INIT_LIST_HEAD(&cdev->d_apush);
-	if ((err = WARN(register_strdev(major, cdev))) < 0)
+	if ((err = WARN(register_strdev(cdev, major))) < 0)
 		kmem_free(cdev, sizeof(*cdev));
 	return (err);
 }
@@ -2163,7 +2166,7 @@ int lis_unregister_strdev(major_t major)
 	cdev_put(cdev);
 	/* we should be able to accept a cdev of NULL so that we don't need to export cdev_get and
 	   cdev_put when liscomp is loaded as a module */
-	if ((err = unregister_strdev(major, cdev)) == 0)
+	if ((err = unregister_strdev(cdev, major)) == 0)
 		kmem_free(cdev, sizeof(*cdev));
 	return (err);
 }

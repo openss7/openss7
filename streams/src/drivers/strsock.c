@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 #include <linux/smp_lock.h>
 #include <linux/slab.h>
 
@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile: strsock.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Library (SOCKSYS) Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

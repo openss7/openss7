@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:13 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:13 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:13 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $";
 
 #define __NO_VERSION__
 
@@ -91,6 +91,7 @@ static char const ident[] =
 #include "strdebug.h"
 #include "strhead.h"		/* for stream operations */
 #include "strspecfs.h"		/* for str_args */
+#include "strsched.h"		/* for di_get and di_put */
 #include "strreg.h"		/* extern verification */
 
 #ifndef CONFIG_STREAMS_FIFO_MAJOR
@@ -131,6 +132,7 @@ struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, 
 struct list_head cdevsw_hash[STRDEV_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
 
 STATIC struct cdevsw *cdevsw_major_cache = NULL;	/* L1 major cache */
+STATIC struct cdevsw *cdevsw_modid_cache = NULL;	/* LI modid cache */
 STATIC struct fmodsw *fmodsw_modid_cache = NULL;	/* L1 modid cache */
 STATIC struct cdevsw *cdevsw_mname_cache = NULL;	/* L1 mname cache */
 STATIC struct fmodsw *fmodsw_mname_cache = NULL;	/* L1 mname cache */
@@ -180,11 +182,35 @@ STATIC struct cdevsw *__cdev_lookup(major_t major)
 	else {
 		struct list_head *pos;
 		list_for_each(pos, strdev_hash_slot(major)) {
+			struct devinfo *devi = list_entry(pos, struct devinfo, di_list);
+			if (devi->major != major)
+				continue;
+			return ((cdevsw_major_cache = devi->di_dev));
+		}
+		return (NULL);
+	}
+}
+
+/**
+ *  __cdrv_lookup: - look up a cdev by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *
+ *  Look up a STREAMS module by module identifier in the fmodsw hashes without locking or
+ *  acquisition of the result.  This function can be called multiple times with the same @modid with
+ *  very little performance impact.
+ */
+STATIC struct cdevsw *__cdrv_lookup(modID_t modid)
+{
+	if (cdevsw_modid_cache && cdevsw_modid_cache->d_str->st_rdinit->qi_minfo->mi_idnum == modid)
+		return (cdevsw_modid_cache);
+	else {
+		struct list_head *pos;
+		list_for_each(pos, strmod_hash_slot(modid)) {
 			struct cdevsw *cdev;
 			cdev = list_entry(pos, struct cdevsw, d_hash);
-			if (cdev->d_major != major)
+			if (cdev->d_str->st_rdinit->qi_minfo->mi_idnum != modid)
 				continue;
-			return ((cdevsw_major_cache = cdev));
+			return ((cdevsw_modid_cache = cdev));
 		}
 		return (NULL);
 	}
@@ -262,16 +288,15 @@ STATIC struct devnode *__node_search(const struct cdevsw *cdev, const char *name
 	return (NULL);
 }
 
-/**
- *  cdev_lookup: - look up a cdev by major device number in cdev hashes
+/*
+ *  __cdev_lookup_locked: - look up a cdev by major device number in cdev hashes
  *  @major: major device number to look up
  *  @load: flag indicating whether to attempt to demand load the module
  */
-STATIC struct cdevsw *cdev_lookup(major_t major, int load)
+STATIC struct cdevsw *__cdev_lookup_locked(major_t major, int load)
 {
 	struct cdevsw *cdev = NULL;
 	int reload;
-	read_lock(&cdevsw_lock);
 #ifdef CONFIG_KMOD
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
@@ -307,20 +332,53 @@ STATIC struct cdevsw *cdev_lookup(major_t major, int load)
 #else
 	cdev = __cdev_lookup(major);
 #endif				/* CONFIG_KMOD */
-	read_unlock(&cdevsw_lock);
 	return (cdev);
 }
 
-/**
- *  fmod_lookup: - look up a fmod by module identifier in fmod hashes
+/*
+ *  __cdrv_lookup_locked: - look up a cdev by module identifier in fmod hashes
  *  @modid: module identifier to look up
  *  @load: flag indicating whether to attempt to demand load the module
  */
-STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
+STATIC struct cdevsw *__cdrv_lookup_locked(modID_t modid, int load)
+{
+	struct cdevsw *cdev = NULL;
+	int reload;
+#ifdef CONFIG_KMOD
+	for (reload = load ? 0 : 1; reload < 2; reload++) {
+		do {
+			char modname[64];
+			if ((cdev = __cdrv_lookup(modid)))
+				break;
+			if (!load)
+				break;
+			read_unlock(&fmodsw_lock);
+			snprintf(modname, sizeof(modname), "streams-modid-%d", modid);
+			request_module(modname);
+			read_lock(&fmodsw_lock);
+			if ((cdev = __cdrv_lookup(modid)))
+				break;
+		} while (0);
+		/* try to acquire the module */
+		if (cdev && cdev->d_str && try_inc_mod_count(cdev->d_kmod))
+			break;
+		cdev = NULL;
+	}
+#else
+	cdev = __cdrv_lookup(modid);
+#endif				/* CONFIG_KMOD */
+	return (cdev);
+}
+
+/*
+ *  __fmod_lookup_locked: - look up a fmod by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct fmodsw *__fmod_lookup_locked(modID_t modid, int load)
 {
 	struct fmodsw *fmod = NULL;
 	int reload;
-	read_lock(&fmodsw_lock);
 #ifdef CONFIG_KMOD
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
@@ -344,8 +402,84 @@ STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
 #else
 	fmod = __fmod_lookup(modid);
 #endif				/* CONFIG_KMOD */
+	return (fmod);
+}
+
+/*
+ *  __devi_lookup_locked: - look up a devinfo by device and major device number
+ *  @cdev:	cdevsw structure for the driver
+ *  @major:	major device number to look up
+ */
+STATIC struct devinfo *__devi_lookup_locked(struct cdevsw *cdev, major_t major)
+{
+	struct devinfo *devi = NULL;
+	if (cdev && cdev->d_majors.next) {
+		struct list_head *pos;
+		list_for_each(pos, &cdev->d_majors) {
+			struct devinfo *d = list_entry(pos, struct devinfo, di_list);
+			if (d->major == major) {
+				devi = d;
+				break;
+			}
+		}
+	}
+	return (devi);
+}
+
+/**
+ *  cdev_lookup: - look up a cdev by major device number in cdev hashes
+ *  @major: major device number to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct cdevsw *cdev_lookup(major_t major, int load)
+{
+	struct cdevsw *cdev;
+	read_lock(&cdevsw_lock);
+	cdev = __cdev_lookup_locked(major, load);
+	read_unlock(&cdevsw_lock);
+	return (cdev);
+}
+
+/**
+ *  cdrv_lookup: - look up a cdev by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct cdevsw *cdrv_lookup(modID_t modid, int load)
+{
+	struct cdevsw *cdev;
+	read_lock(&fmodsw_lock);
+	cdev = __cdrv_lookup_locked(modid, load);
+	read_unlock(&fmodsw_lock);
+	return (cdev);
+}
+
+/**
+ *  fmod_lookup: - look up a fmod by module identifier in fmod hashes
+ *  @modid: module identifier to look up
+ *  @load: flag indicating whether to attempt to demand load the module
+ */
+STATIC struct fmodsw *fmod_lookup(modID_t modid, int load)
+{
+	struct fmodsw *fmod;
+	read_lock(&fmodsw_lock);
+	fmod = __fmod_lookup_locked(modid, load);
 	read_unlock(&fmodsw_lock);
 	return (fmod);
+}
+
+/**
+ *  devi_lookup: - look up a devinfo by device and major device number
+ *  @cdev:	cdevsw structure for the driver
+ *  @major:	major device number to look up
+ */
+STATIC struct devinfo *devi_lookup(struct cdevsw *cdev, major_t major)
+{
+	struct devinfo *devi;
+	read_lock(&cdevsw_lock);
+	devi = __devi_lookup_locked(cdev, major);
+	read_unlock(&cdevsw_lock);
+	return (devi);
 }
 
 /**
@@ -568,153 +702,15 @@ struct devnode *node_find(const struct cdevsw *cdev, const char *name)
  *  -------------------------------------------------------------------------
  */
 
-/**
- *  register_inode: - unregister a special device inode
- *  @major: major device number (character special devices only)
- *  @cdev: character device switch structure pointer
- *  @fops: file operations to apply to external special device nodes
- *
- *  Registers and extenal character special device major number with the Linux operating system.
- *  @fops is the file operations that will be used to open the character device.  These operations
- *  only need an open procedure as they will be replaced with the operations of the shadow special
- *  filesystem node which are contained in the @cdev structure in the d_ops member.
- *
- *  The major device number can be specified as zero (0), in which case the major device number will
- *  be assigned to a free major device number by register_chrdev() and returned as a positive return
- *  value.
- */
-int register_inode(major_t major, struct cdevsw *cdev, struct file_operations *fops)
-{
-	int err = 0;
-	write_lock(&cdevsw_lock);	/* always this order, never the other way around */
-	write_lock(&fmodsw_lock);
-	do {
-		struct cdevsw *c;
-		modID_t modid;
-		struct module_info *mi;
-		err = -EINVAL;
-		if (major >= MAX_STRDEV || !cdev || !cdev->d_name || !cdev->d_name[0])
-			break;
-		{
-			struct streamtab *st;
-			struct qinit *qi;
-			err = -EINVAL;
-			if (!(st = cdev->d_str) || !(qi = st->st_rdinit) || !(mi = qi->qi_minfo))
-				break;
-		}
-		err = -EBUSY;
-		if ((c = cdev_lookup(major, 0)) && c != cdev)
-			break;
-		if ((c = (struct cdevsw *) smod_search(cdev->d_name, 0)) && c != cdev)
-			break;
-		if (!(modid = mi->mi_idnum)) {
-			/* find a free module id */
-			modid = 0x7fff;
-			while (modid && (c = (struct cdevsw *) fmod_lookup(modid, 0)) && c != cdev)
-				modid--;
-			err = -ENXIO;
-			if (!modid)	/* table full */
-				break;
-		} else {
-			/* use specified module id */
-			err = -EBUSY;
-			if ((c = (struct cdevsw *) fmod_lookup(modid, 0)) && c != cdev)
-				break;
-		}
-		/* register the character device */
-		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0)
-			break;
-		if (err > 0 && major == 0)
-			major = err;
-		{
-			if (!cdev->d_list.next)
-				INIT_LIST_HEAD(&cdev->d_list);
-			if (!cdev->d_mod_hash.next)
-				INIT_LIST_HEAD(&cdev->d_mod_hash);
-			if (!cdev->d_hash.next)
-				INIT_LIST_HEAD(&cdev->d_hash);
-			if (!cdev->d_nodes.next)
-				INIT_LIST_HEAD(&cdev->d_nodes);
-			if (!cdev->d_apush.next)
-				INIT_LIST_HEAD(&cdev->d_apush);
-			if (!cdev->d_stlist.next)
-				INIT_LIST_HEAD(&cdev->d_stlist);
-			if (!list_empty(&cdev->d_list)) {
-				list_del_init(&cdev->d_list);
-				cdev_count--;
-			}
-			list_add(&cdev->d_list, &cdevsw_list);
-			cdev_count++;
-			if (!list_empty(&cdev->d_mod_hash)) {
-				list_del_init(&cdev->d_mod_hash);
-				fmod_count--;
-			}
-			mi->mi_idnum = modid;
-			list_add(&cdev->d_mod_hash, strmod_hash_slot(modid));
-			fmod_count++;
-			if (!list_empty(&cdev->d_hash))
-				list_del_init(&cdev->d_hash);
-			list_add(&cdev->d_hash, strdev_hash_slot(major));
-		}
-		err = major;
-	} while (0);
-	write_unlock(&fmodsw_lock);
-	write_unlock(&cdevsw_lock);
-	return (err);
-}
-
-/**
- *  unregister_inode: - unregister a special device inode
- *  @major: major device number (character special devices only)
- *  @cdev: character device switch structure pointer
- *
- *  Deregisters an external character device major number previously registered with
- *  register_inode().
- *
- *  Notices: The major device number must be the major device number returned from a successful
- *  register_inode() call.  cdev->d_name must have the same value as on the call to register_inode()
- *  or the call will fail.
- */
-int unregister_inode(major_t major, struct cdevsw *cdev)
-{
-	int err = 0;
-	write_lock(&cdevsw_lock);
-	write_lock(&fmodsw_lock);
-	do {
-		err = -EINVAL;
-		if (major >= MAX_STRDEV || !cdev || !cdev->d_name || !cdev->d_name[0])
-			break;
-		err = -ENXIO;
-		if (!cdev->d_list.next || list_empty(&cdev->d_list))
-			break;
-		err = -EPERM;
-		if (major && major != cdev->d_major)
-			break;
-		if ((err = unregister_chrdev(major, cdev->d_name)) < 0)
-			break;
-		major = cdev->d_major;
-		{
-			list_del_init(&cdev->d_list);
-			cdev_count--;
-			list_del_init(&cdev->d_mod_hash);
-			fmod_count--;
-			list_del_init(&cdev->d_hash);
-		}
-		err = major;
-	} while (0);
-	write_unlock(&fmodsw_lock);
-	write_unlock(&cdevsw_lock);
-	return (err);
-}
-
-/**
- *  register_strmod: - register STREAMS module
+/*
+ *  __register_strmod_locked: - register STREAMS module
  *  @fmod: STREAMS module structure to register
+ *  @head: list head in which to include structure
+ @  @cntp: pointer to list counter
  */
-int register_strmod(struct fmodsw *fmod)
+int __register_strmod_locked(struct fmodsw *fmod, struct list_head *head, int *cntp)
 {
 	int err = 0;
-	write_lock(&fmodsw_lock);
 	do {
 		modID_t modid;
 		struct fmodsw *f = NULL;
@@ -735,7 +731,7 @@ int register_strmod(struct fmodsw *fmod)
 		if (!(modid = mi->mi_idnum)) {
 			/* find a free module id */
 			modid = 0xffff;
-			while (modid && (f = fmod_lookup(modid, 0)) && f != fmod)
+			while (modid && (f = __fmod_lookup_locked(modid, 0)) && f != fmod)
 				modid--;
 			err = -ENXIO;
 			if (!modid)	/* table full */
@@ -744,33 +740,33 @@ int register_strmod(struct fmodsw *fmod)
 		} else {
 			/* use specified module id */
 			err = -EBUSY;
-			if ((f = fmod_lookup(modid, 0)) && f != fmod)
+			if ((f = __fmod_lookup_locked(modid, 0)) && f != fmod)
 				break;
 		}
-		{
+		if (f != fmod) {
 			if (!list_empty(&fmod->f_list)) {
 				list_del_init(&fmod->f_list);
 				list_del_init(&fmod->f_hash);
-				fmod_count--;
+				*cntp = *cntp - 1;
 			}
-			list_add(&fmod->f_list, &fmodsw_list);
+			list_add(&fmod->f_list, head);
 			list_add(&fmod->f_hash, strmod_hash_slot(modid));
-			fmod_count++;
+			*cntp = *cntp + 1;
 		}
 		err = modid;
 	} while (0);
-	write_unlock(&fmodsw_lock);
 	return (err);
 }
 
-/**
- *  unregister_strmod:
+/*
+ *  __unregister_strmod_locked:
  *  @fmod: STREAMS module structure to unregister
+ *  @head: list head in which to include structure
+ *  @cntp: pointer to list counter
  */
-int unregister_strmod(struct fmodsw *fmod)
+int __unregister_strmod_locked(struct fmodsw *fmod, int *cntp)
 {
 	int err = 0;
-	write_lock(&fmodsw_lock);
 	do {
 		err = -EINVAL;
 		if (!fmod || !fmod->f_name || !fmod->f_name[0])
@@ -783,12 +779,208 @@ int unregister_strmod(struct fmodsw *fmod)
 			if (!list_empty(&fmod->f_list)) {
 				list_del_init(&fmod->f_list);
 				list_del_init(&fmod->f_hash);
-				fmod_count--;
+				*cntp = *cntp - 1;
 			}
 		}
 	} while (0);
+	return (err);
+}
+
+/*
+ *  __register_major_locked: - register a character device inode
+ *  @major: major device number
+ *  @cdev: character device switch structure pointer
+ *  @fops: file operations to apply to external character device nodes
+ */
+STATIC int __register_major_locked(major_t major, struct cdevsw *cdev, struct file_operations *fops)
+{
+	struct devinfo *di = NULL;
+	int err = 0;
+	do {
+		struct cdevsw *c;
+		err = -EINVAL;
+		if (!cdev || !cdev->d_name || !cdev->d_name[0])
+			break;
+		err = -EINVAL;
+		/* ensure that the device is registered */
+		if (!cdev->d_list.next || list_empty(&cdev->d_list))
+			break;
+		err = -EBUSY;
+		if ((c = __cdev_lookup_locked(major, 0)) && c != cdev)
+			break;
+		err = -ENOMEM;
+		if (!(di = di_get(cdev)))
+			break;
+		/* register the character device */
+		if ((err = register_chrdev(major, cdev->d_name, fops)) < 0)
+			break;
+		if (err > 0 && major == 0)
+			major = err;
+		{
+			di->major = major;
+			di->minor = 0;	/* FIXME */
+			list_add_tail(&di->di_list, &cdev->d_majors);
+		}
+		err = major;
+	} while (0);
+	if (err < 0 && di)
+		di_put(di);
+	return (err);
+}
+
+/*
+ *  __unregister_major_locked: - unregister a special device inode
+ *  @major: major device number (character special devices only)
+ *  @cdev: character device switch structure pointer
+ */
+STATIC int __unregister_major_locked(major_t major, struct cdevsw *cdev)
+{
+	int err = 0;
+	write_lock(&cdevsw_lock);
+	do {
+		struct devinfo *devi;
+		struct cdevsw *c;
+		err = -EINVAL;
+		if (!cdev || !cdev->d_name || !cdev->d_name[0])
+			break;
+		if (major) {
+			/* deregister one specific major device number */
+			err = -ENXIO;
+			if (!(c = __cdev_lookup_locked(major, 0)))	/* lookup without demand
+									   loading */
+				break;
+			err = -EPERM;
+			if (c != cdev)
+				break;
+			err = -EIO;
+			if (!(devi = __devi_lookup_locked(cdev, major))) {
+				swerr();
+				break;
+			}
+			if ((err = unregister_chrdev(major, cdev->d_name)) < 0)
+				break;
+			list_del_init(&devi->di_list);
+			di_put(devi);
+		} else {
+			struct list_head *pos;
+			/* deregister all major device numbers */
+			list_for_each(pos, &cdev->d_majors) {
+				devi = list_entry(pos, struct devinfo, di_list);
+				unregister_chrdev(devi->major, cdev->d_name);
+				list_del_init(&devi->di_list);
+				di_put(devi);
+			}
+		}
+		err = 0;
+	} while (0);
+	write_unlock(&cdevsw_lock);
+	return (err);
+}
+
+/**
+ *  register_strmod: - register STREAMS module
+ *  @fmod: STREAMS module structure to register
+ */
+int register_strmod(struct fmodsw *fmod)
+{
+	int err;
+	write_lock(&fmodsw_lock);
+	err = __register_strmod_locked((void *) fmod, &fmodsw_list, &fmod_count);
 	write_unlock(&fmodsw_lock);
 	return (err);
+}
+
+/**
+ *  unregister_strmod:
+ *  @fmod: STREAMS module structure to unregister
+ */
+int unregister_strmod(struct fmodsw *fmod)
+{
+	int err;
+	write_lock(&fmodsw_lock);
+	err = __unregister_strmod_locked((void *) fmod, &fmod_count);
+	write_unlock(&fmodsw_lock);
+	return (err);
+}
+
+/**
+ *  register_strdrv: - register STREAMS driver
+ *  @cdev: STREAMS device structure to register
+ */
+int register_strdrv(struct cdevsw *cdev)
+{
+	int err;
+	write_lock(&cdevsw_lock);
+	err = __register_strmod_locked((void *) cdev, &cdevsw_list, &cdev_count);
+	write_unlock(&cdevsw_lock);
+	return (err);
+}
+
+/**
+ *  unregister_strdrv:
+ *  @cdev: STREAMS driver structure to unregister
+ */
+int unregister_strdrv(struct cdevsw *cdev)
+{
+	int err;
+	write_lock(&cdevsw_lock);
+	err = __unregister_strmod_locked((void *) cdev, &cdev_count);
+	write_unlock(&cdevsw_lock);
+	return (err);
+}
+
+/**
+ *  register_cmajor: - register a character device inode
+ *  @major: major device number
+ *  @cdev: character device switch structure pointer
+ *  @fops: file operations to apply to external character device nodes
+ *
+ *  Registers and extenal character special device major number with Linux outside the STREAMS
+ *  subsystem.  @fops is the file operations that will be used to open the character device.
+ *
+ *  The major device number can be specified as zero (0), in which case the major device number will
+ *  be assigned to a free major device number by register_chrdev() and returned as a positive return
+ *  value.  Any valid external major device number can be used for @major.
+ *
+ *  register_cmajor() can be called multiple times for the same registered cdevsw entries to register
+ *  additional major device numbers for the same entry.  On each call to
+ *  register_cmajor() only one
+ *  character major device number will be allocated.  If @major is zero on each call, a new
+ *  available major device number will be allocated on each call.
+ */
+int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops)
+{
+	int ret;
+	write_lock(&cdevsw_lock);
+	ret = __register_major_locked(major, cdev, fops);
+	write_unlock(&cdevsw_lock);
+	return (ret);
+}
+
+/**
+ *  unregister_cmajor: - unregister a special device inode
+ *  @cdev: character device switch structure pointer
+ *  @major: major device number (character special devices only)
+ *
+ *  Deregisters an external character device major number previously registered with
+ *  register_cmajor().  @major must be the major number returned from a successful call to
+ *  register_cmajor() or the special value zero (0).  When @major is specified, all major device
+ *  numbers associated with the driver will be deregistered.  In this way, one one call to
+ *  unregister_cmajor() with @major set to zero (0) is necessary after multiple successful calls to
+ *  register_cmajor().
+ *
+ *  Notices: The major device number must be the major device number returned from a successful
+ *  register_cmajor() call.  cdev->d_name must have the same value as on the
+ *  call to register_cmajor()
+ *  or the call will fail.
+ */
+int unregister_cmajor(struct cdevsw *cdev, major_t major)
+{
+	int ret;
+	write_lock(&cdevsw_lock);
+	ret = __unregister_major_locked(major, cdev);
+	write_unlock(&cdevsw_lock);
+	return (ret);
 }
 
 /**
@@ -847,12 +1039,19 @@ qi_qadmin_t getadmin(modID_t modid)
 	return (qadmin);
 }
 
+/**
+ *  strreg_init: - initialize the registeration module
+ */
 int strreg_init(void)
 {
 	init_cdev_hash();
 	init_fmod_hash();
 	return (0);
 }
+
+/**
+ *  strreg_init: - deinitialize the registeration module
+ */
 void strreg_exit(void)
 {
 	return;

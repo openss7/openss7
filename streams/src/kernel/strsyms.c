@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:14 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:14 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/04/30 19:43:14 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/03 06:30:21 $";
 
 #define __NO_VERSION__
 #define EXPORT_SYMTAB
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
+#include <linux/modversions.h>
+#endif
 #include <linux/module.h>
 #include <linux/modversions.h>
 
@@ -242,11 +245,13 @@ EXPORT_SYMBOL(qtimeout);	/* sunddi.h */
 EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
 #endif
 
-EXPORT_SYMBOL_GPL(register_inode);	/* strconf.h */
+EXPORT_SYMBOL_GPL(register_cmajor);	/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strdev);	/* strconf.h */
+EXPORT_SYMBOL_GPL(register_strdrv);	/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strmod);	/* strconf.h */
-EXPORT_SYMBOL_GPL(unregister_inode);	/* strconf.h */
+EXPORT_SYMBOL_GPL(unregister_cmajor);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strdev);	/* strconf.h */
+EXPORT_SYMBOL_GPL(unregister_strdrv);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strmod);	/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_add);	/* strconf.h */
 EXPORT_SYMBOL_GPL(autopush_del);	/* strconf.h */
@@ -256,7 +261,7 @@ EXPORT_SYMBOL_GPL(autopush_find);	/* strconf.h */
 EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* strsysctl.h */
 
 EXPORT_SYMBOL_GPL(specfs_mnt);	/* strspecfs.h */
-EXPORT_SYMBOL_GPL(sdev_open);	/* strspecfs.h */
+EXPORT_SYMBOL_GPL(spec_open);	/* strspecfs.h */
 
 #if	defined(CONFIG_STREAMS_CLONE_MODULE) || \
 	defined(CONFIG_STREAMS_NSDEV_MODULE) || \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/30 19:43:13 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/30 19:43:13 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/03 06:30:20 $"
 
 static char const ident[] =
-    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/30 19:43:13 $";
+    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/03 06:30:20 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 #include <linux/kernel.h>	/* for FASTCALL() */
 #include <linux/sched.h>	/* for send_sig_info() */
 #include <linux/spinlock.h>
@@ -87,7 +87,7 @@ static char const ident[] =
 #include "strsad.h"		/* for autopush_find */
 #include "strutil.h"		/* for q locking and puts and gets */
 #include "strattach.h"		/* for do_fattach/do_fdetach/do_spipe */
-#include "strspecfs.h"		/* for specfs_mnt */
+#include "strspecfs.h"		/* for spec_open() */
 
 #include "sys/config.h"
 
@@ -1933,7 +1933,7 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
  *  @inode: shadow special filesystem device inode
  *  @file: shadow special filesystem file pointer
  *
- *  Because stropen() is called by spec_open() on the filesystem device, the inode represented here
+ *  Because stropen() is called by sdev_open() on the filesystem device, the inode represented here
  *  is the shadow inode and the file is the shadow file pointer. We don't have to do any swapping,
  *  just return the error code. Because it is a specfs inode, the dentry has our d_fsdata.
  */
@@ -3442,7 +3442,7 @@ static int open_strm(struct inode *inode, struct file *file)
 		name:{args.buf, 0, 0},
 	};
 	file->f_op = &strm_f_ops;	/* fops_get already done */
-	return sdev_open(inode, file, specfs_mnt, &args);
+	return spec_open(inode, file, &args);
 }
 
 static struct file_operations strm_ops ____cacheline_aligned = {
@@ -3460,11 +3460,11 @@ static struct file_operations strm_ops ____cacheline_aligned = {
  */
 
 /**
- *  spec_open: - open a character special device node
+ *  sdev_open: - open a character special device node
  *  @inode: the character device inode
  *  @file: the user file pointer
  *
- *  spec_open() is only used to open a stream from a character device node in an external
+ *  sdev_open() is only used to open a stream from a character device node in an external
  *  filesystem.  This is never called for direct opens of a specfs device node.  It is also not used
  *  for direct opens of fifos, pipes or sockets.  Those devices provide their own file operations to
  *  the main operating system.  The character device number from the inode is used to determine the
@@ -3473,7 +3473,7 @@ static struct file_operations strm_ops ____cacheline_aligned = {
  *  This is the separation point where we can convert the external device number to an internal
  *  device number.  The external device number is contained in inode->i_rdev.
  */
-STATIC int spec_open(struct inode *inode, struct file *file)
+STATIC int sdev_open(struct inode *inode, struct file *file)
 {
 	struct char_device *cd;
 	struct cdevsw *cdev;
@@ -3496,14 +3496,14 @@ STATIC int spec_open(struct inode *inode, struct file *file)
 	if (!(cdev = cdev_get(getmajor(args.dev))))
 		return (-ENXIO);
 	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
-	err = sdev_open(inode, file, specfs_mnt, &args);
+	err = spec_open(inode, file, &args);
 	cdev_put(cdev);
 	return (err);
 }
 
-STATIC struct file_operations spec_f_ops ____cacheline_aligned = {
+STATIC struct file_operations sdev_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
-	open:spec_open,
+	open:sdev_open,
 };
 
 /* 
@@ -3516,8 +3516,8 @@ STATIC struct file_operations spec_f_ops ____cacheline_aligned = {
 
 /**
  *  register_strdev: - register a STREAMS device against a device major number
- *  @major: requested major device number or 0 for automatic major selection
  *  @cdev: STREAMS character device structure to register
+ *  @major: requested major device number or 0 for automatic major selection
  *
  *  register_strdev() registers the device specified by the @cdev to the device major number
  *  specified by @major.
@@ -3548,19 +3548,26 @@ STATIC struct file_operations spec_f_ops ____cacheline_aligned = {
  *  allocate its &struct cdevsw structure using an approach more likened to the Solaris &struct
  *  cb_ops.
  */
-int register_strdev(major_t major, struct cdevsw *cdev)
+int register_strdev(struct cdevsw *cdev, major_t major)
 {
+	int err;
 	if (!cdev)
 		return (-EINVAL);
+	if ((err = register_strdrv(cdev)) < 0)
+		return (err);
 	cdev->d_fop = &strm_f_ops;
 	cdev->d_mode = (cdev->d_mode & S_IFMT) | S_IFCHR;
-	return register_inode(major, cdev, &spec_f_ops);
+	if ((err = register_cmajor(cdev, major, &sdev_f_ops)) < 0) {
+		unregister_strdrv(cdev);
+		return (err);
+	}
+	return (err);
 }
 
 /**
  *  unregister_strdev: - unregister previously registered STREAMS device
- *  @major: major device number to unregister or 0 for all majors
  *  @cdev: STREAMS character device structure to unregister
+ *  @major: major device number to unregister or 0 for all majors
  *
  *  unregister_strdev() unregisters the device specified by the @cdev from the device major number
  *  specified by @dev.  Only the getmajor(@dev) component of @dev is significant and the
@@ -3588,9 +3595,14 @@ int register_strdev(major_t major, struct cdevsw *cdev)
  *  -[%EPERM]	The device number specified does not belong to the &struct cdev structure specified
  *		and permission is therefore denied.
  */
-int unregister_strdev(major_t major, struct cdevsw *cdev)
+int unregister_strdev(struct cdevsw *cdev, major_t major)
 {
-	return unregister_inode(major, cdev);
+	int err, ret = 0;
+	if ((err = unregister_cmajor(cdev, major)) < 0)
+		ret = err;
+	if ((err = unregister_strdrv(cdev)) < 0 && ret == 0)
+		ret = err;
+	return (ret);
 }
 
 /* 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:02 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:02 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:21 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 #include <asm/atomic.h>		/* for atomic operations */
 #include <asm/bitops.h>		/* for atomic bit operations */
 #include <linux/compiler.h>	/* for expected/unexpected */

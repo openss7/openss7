@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 19:43:14 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/03 06:30:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -66,7 +66,7 @@ typedef struct str_args {
 	char buf[32];
 } str_args_t;
 
-extern int sdev_open(struct inode *i, struct file *f, struct vfsmount *mnt, struct str_args *argp);
+extern int spec_open(struct inode *i, struct file *f, struct str_args *argp);
 
 /* initialization for main */
 extern int strspecfs_init(void);

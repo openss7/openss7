@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <linux/spinlock.h>
@@ -78,14 +78,14 @@ static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.9
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strspecfs.h"		/* for specfs_mnt */
+#include "strspecfs.h"		/* for spec_open() */
 #include "strpipe.h"		/* for pipe stuff */
 
 #include "sys/config.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/30 10:42:01 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/03 06:30:20 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -551,7 +551,7 @@ static int open_spx(struct inode *inode, struct file *file)
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
 	file->f_op = &spx_f_ops;	/* fops_get already done */
-	return sdev_open(inode, file, specfs_mnt, &args);
+	return spec_open(inode, file, &args);
 }
 
 static struct file_operations spx_ops ____cacheline_aligned = {
@@ -576,18 +576,20 @@ static int __init spx_init(void)
 #else
 	printk(KERN_INFO SPX_SPLASH);
 #endif
-	if ((err = register_inode(major, &spx_cdev, &spx_ops)) < 0)
+	if ((err = register_strdrv(&spx_cdev)) < 0)
 		return (err);
+	if ((err = register_cmajor(&spx_cdev, major, &spx_ops)) < 0) {
+		unregister_strdrv(&spx_cdev);
+		return (err);
+	}
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 static void __exit spx_exit(void)
 {
-	int err;
-	if ((err = unregister_inode(major, &spx_cdev)))
-		return (void) (err);
-	return (void) (0);
+	unregister_cmajor(&spx_cdev, 0);
+	unregister_strdrv(&spx_cdev);
 };
 
 module_init(spx_init);

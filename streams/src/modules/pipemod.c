@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:03 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -65,8 +65,8 @@ static char const ident[] =
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -84,7 +84,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:03 $"
+#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:21 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.5 2004/04/30 10:42:00 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.6 2004/05/03 06:30:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:17 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/30 10:42:00 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/03 06:30:17 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -355,11 +355,13 @@ extern int lis_unregister_strmod(struct streamtab *strtab);
 #warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
-extern int register_inode(major_t major, struct cdevsw *cdev, struct file_operations *fops);
-extern int register_strdev(major_t major, struct cdevsw *cdev);
+extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
+extern int register_strdev(struct cdevsw *cdev, major_t major);
+extern int register_strdrv(struct cdevsw *cdev);
 extern int register_strmod(struct fmodsw *fmod);
-extern int unregister_inode(major_t major, struct cdevsw *cdev);
-extern int unregister_strdev(major_t major, struct cdevsw *cdev);
+extern int unregister_cmajor(struct cdevsw *cdev, major_t major);
+extern int unregister_strdev(struct cdevsw *cdev, major_t major);
+extern int unregister_strdrv(struct cdevsw *cdev);
 extern int unregister_strmod(struct fmodsw *fmod);
 
 extern int autopush_add(struct strapush *sap);

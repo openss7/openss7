@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/30 10:42:01 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/03 06:30:20 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -333,7 +333,7 @@ spx_init(void)
 #else
 	printk(KERN_INFO SPX_SPLASH);
 #endif
-	if ((err = register_strdev(major, &spx_cdcev)) < 0)
+	if ((err = register_strdev(&spx_cdcev, major)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -343,5 +343,5 @@ spx_init(void)
 static void __exit
 spx_exit(void)
 {
-	unregister_strdev(major, &spx_cdev);
+	unregister_strdev(&spx_cdev, major);
 };

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 
-static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $";
+static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.8 $
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:01 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:20 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -280,7 +280,7 @@ nuls_init(void)
 #else
 	printk(KERN_INFO NULS_SPLASH);
 #endif
-	if ((err = register_strdev(major, &nuls_cdev)) < 0)
+	if ((err = register_strdev(&nuls_cdev, major)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -289,7 +289,7 @@ nuls_init(void)
 static void __exit
 nuls_exit(void)
 {
-	unregister_strdev(major, &nuls_cdev);
+	unregister_strdev(&nuls_cdev, major);
 };
 
 module_init(nuls_init);

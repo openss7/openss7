@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.8 2004/04/30 10:42:00 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.9 2004/05/03 06:30:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 10:42:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/03 06:30:17 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/30 10:42:00 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/03 06:30:17 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,8 +63,8 @@
 #endif				/* HAVE_LINUX_FAST_STREAMS */
 
 #include <linux/config.h>
-#include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/module.h>
 #include <linux/types.h>	/* for various types */
 typedef unsigned char uchar;		/* idiots! */
 #include <asm/system.h>		/* for xchg */
@@ -550,10 +550,11 @@ struct fmodsw {
 	uint f_flag;			/* module flags */
 	int f_regs;			/* number of registrations */
 	atomic_t f_count;		/* open count */
+	int f_modid;			/* module id */
+	struct dentry *f_dentry;	/* specfs directory entry */
 	int f_sqlvl;			/* q sychronization level */
 	struct syncq *f_syncq;		/* synchronization queue */
 	struct module *f_kmod;		/* kernel module */
-	struct inode *f_inode;		/* specfs directory inode */
 };
 
 struct file_operations;
@@ -564,8 +565,8 @@ struct devnode {
 	struct streamtab *n_str;	/* streamtab for node */
 	uint n_flag;			/* node flags */
 	atomic_t n_count;		/* open count */
-	int n_index;			/* node index */
-	struct inode *n_inode;		/* specfs device inode */
+	int n_minor;			/* node minor device number */
+	struct dentry *n_dentry;	/* specfs directory entry */
 };
 #define N_MAJOR		0x01	/* major device node */
 
@@ -576,15 +577,16 @@ struct cdevsw {
 	struct streamtab *d_str;	/* pointer to streamtab for driver */
 	uint d_flag;			/* driver flags */
 	atomic_t d_count;		/* open count */
+	int d_major;			/* base major device number */
+	struct dentry *d_dentry;	/* specfs directory entry */
 	int d_sqlvl;			/* q sychronization level */
 	struct syncq *d_syncq;		/* synchronization queue */
 	struct module *d_kmod;		/* kernel module */
-	struct inode *d_inode;		/* specfs directory inode */
 	/* above must match fmodsw */
 	mode_t d_mode;			/* inode mode */
-	int d_major;			/* major device number */
 	struct file_operations *d_fop;	/* file operations */
 	struct list_head d_hash;	/* list of device hashes in slot */
+	struct list_head d_majors;	/* major device nodes for this device */
 	struct list_head d_nodes;	/* minor device nodes */
 	struct list_head d_apush;	/* autopush list */
 	struct stdata *d_plinks;	/* permanent links for this device */
