@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/07 09:54:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/13 09:20:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -270,7 +270,7 @@ endif
 endif
 
 EXTRA_DIST			+= $(mods_source_FILES) $(drvs_source_FILES)
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= $(libXNSmods_a_OBJECTS) $(libXNSdrvs_a_OBJECTS) $(ADDON_OBJS)

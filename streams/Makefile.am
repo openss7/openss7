@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/02/10 12:26:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/02/13 09:20:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/10 12:26:14 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -340,7 +340,7 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
@@ -614,6 +614,24 @@ if RPM_BUILD_USER
 SUBDIRS = include doc tests
 
 endif
+
+if INSTALL_INITSCRIPTS
+
+dist_initrd_SCRIPTS		= \
+				src/util/init/specfs \
+				src/util/init/strace \
+				src/util/init/streams \
+				src/util/init/strerr
+
+dist_config_DATA		= \
+				src/util/sysconfig/specfs \
+				src/util/sysconfig/strace \
+				src/util/sysconfig/streams \
+				src/util/sysconfig/strerr
+
+endif
+
+include am/init.am
 
 #
 # Rules for making rpms

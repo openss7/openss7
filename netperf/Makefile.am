@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2005/02/02 10:54:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.22 $) $Date: 2005/02/13 09:20:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/02 10:54:07 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,7 +122,7 @@ netserver_SOURCES		= netserver.c
 netserver_LDADD			= libnetperf.la $(NETPERF_LDADD)
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS)
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/02/07 09:54:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/13 09:20:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -277,7 +277,7 @@ endif
 xnet_source_FILES		= $(mods_source_FILES)
 
 EXTRA_DIST			+= $(xnet_source_FILES)
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)

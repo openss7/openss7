@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/06 06:44:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/13 09:20:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 06:44:00 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -101,7 +101,7 @@ atconfig: $(top_builddir)/config.status
 # my rule
 EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
 # my rule
-dist_noinst_SCRIPTS	= $(TESTSUITE)
+dist_noinst_SCRIPTS	+= $(TESTSUITE)
 
 # my rule
 all-testsuite: $(TESTSUITE)

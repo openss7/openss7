@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/07 09:54:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/13 09:20:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -391,7 +391,7 @@ endif
 
 EXTRA_DIST				+= $(sctp_source_FILES) $(sctp2_source_FILES)
 
-dist_noinst_SCRIPTS			= configure.nexusware
+dist_noinst_SCRIPTS			+= configure.nexusware
 EXTRA_SCRIPTS				+=
 
 export KERNEL_MODULES			= $(ADDON_OBJS)

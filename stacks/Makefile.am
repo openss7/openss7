@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/02/07 09:54:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/13 09:20:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 09:54:18 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -856,7 +856,7 @@ EXTRA_TEX += \
 
 
 EXTRA_DIST			+= $(ss7_source_FILES) $(EXTRA_DOCS) $(EXTRA_TEX)
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)

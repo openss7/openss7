@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/10 12:25:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/13 09:20:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/10 12:25:40 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -256,7 +256,7 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX) $(sctp_source_FILES)
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= $(ADDON_OBJS)

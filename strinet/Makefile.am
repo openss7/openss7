@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/07 09:54:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/13 09:20:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/07 09:54:19 $ by $Author: brian $
+# Last Modified $Date: 2005/02/13 09:20:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -226,7 +226,7 @@ endif
 inet_source_FILES		= $(mods_source_FILES)
 
 EXTRA_DIST			+= $(inet_source_FILES)
-dist_noinst_SCRIPTS		= configure.nexusware
+dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+=
 
 export KERNEL_MODULES		= $(libINETmods_a_OBJECTS) $(ADDON_OBJS)
