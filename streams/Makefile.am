@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/02/01 18:59:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/02/04 08:57:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/01 18:59:42 $ by $Author: brian $
+# Last Modified $Date: 2005/02/04 08:57:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -343,11 +343,11 @@ EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			+=
 
-KERNEL_MODULES			= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
-KERNEL_MODCONF			= $(STRCONF_CONFMOD)
-KERNEL_SUBDIR			= streams
-KMODCONF_EXT			= streams
-KERNEL_MODMAPS			=
+export KERNEL_MODULES		= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
+export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
+export KERNEL_SUBDIR		= streams
+export KMODCONF_EXT		= streams
+export KERNEL_MODMAPS		=
 
 include am/kernel.am
 

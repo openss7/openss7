@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.22 2005/01/22 06:40:32 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.24 2005/02/04 10:57:44 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 06:40:32 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/04 10:57:44 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -255,6 +255,42 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
             AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [], [Define if you have the explicit
                 version of ip_route_output.])
         fi
+        AC_CACHE_CHECK([for kernel sk_filter with 2 arguments], [linux_cv_have_sk_filter_2_args], [dnl
+            AC_COMPILE_IFELSE([
+                AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>]],
+                [[sk_filter((struct sk_buff *)NULL, 0);]]) ],
+                [linux_cv_have_sk_filter_2_args='yes'],
+                [linux_cv_have_sk_filter_2_args='no'])
+        ])
+        if test :$linux_cv_have_sk_filter_2_args = :yes ; then
+            AC_DEFINE_UNQUOTED([HAVE_SK_FILTER_2_ARGS], [], [Define if function sk_filter takes 2
+            arguments.])
+        fi
+        AC_CACHE_CHECK([for kernel sk_filter with 3 arguments], [linux_cv_have_sk_filter_3_args], [dnl
+            AC_COMPILE_IFELSE([
+                AC_LANG_PROGRAM([[
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>]],
+                [[sk_filter((struct sock *)NULL, (struct sk_buff *)NULL, 0);]]) ],
+                [linux_cv_have_sk_filter_3_args='yes'],
+                [linux_cv_have_sk_filter_3_args='no'])
+        ])
+        if test :$linux_cv_have_sk_filter_3_args = :yes ; then
+            AC_DEFINE_UNQUOTED([HAVE_SK_FILTER_3_ARGS], [], [Define if function sk_filter takes 3
+            arguments.])
+        fi
     ])
     _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [
 #include <linux/config.h>
@@ -290,7 +326,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
                           struct dst_entry.path,
                           struct sk_buff.h.sh,
                           struct sock.protinfo.af_inet.ttl,
-                          struct sock.protoinfo.af_inet.uc_ttl,
+                          struct sock.protinfo.af_inet.uc_ttl,
                           struct sock.tp_pinfo.af_sctp], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>

@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 22:39:18 $
+dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/04 08:47:26 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/25 22:39:18 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/04 08:47:26 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -263,34 +263,18 @@ AC_DEFUN([_XOPEN_SETUP_INET], [dnl
         patches.  This enables support in the INET driver for STREAMS on top
         of the OpenSS7 Linux Kernel Sockets SCTP implementation.])
     fi
-    # these are critical
     if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([tcp_openreq_cachep], [with_inet='no'])
-    fi
-    if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([tcp_set_keepalive], [with_inet='no'])
-    fi
-    if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([ip_tos2prio], [with_inet='no'])
-    fi
-    if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([tcp_sync_mss], [with_inet='no'])
-    fi
-    if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([tcp_write_xmit], [with_inet='no'])
-    fi
-    if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([tcp_cwnd_application_limited], [with_inet='no'])
-    fi
-    # these are not critical
-    if test :"$with_inet" = :yes ; then
-        _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_default])
-        _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_default])
-        _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_tcp_fin_timeout])
-        _LINUX_KERNEL_ENV([dnl
-            AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
-                [xopen_cv_af_inet_ttl_member_name='ttl'],
-                [:], [
+        _LINUX_KERNEL_SYMBOLS([tcp_openreq_cachep,
+                               tcp_set_keepalive,
+                               ip_tos2prio,
+                               tcp_sync_mss,
+                               tcp_write_xmit,
+                               tcp_cwnd_application_limited,
+                               sysctl_rmem_default,
+                               sysctl_wmem_default,
+                               sysctl_tcp_fin_timeout])
+        _LINUX_CHECK_MEMBERS([struct sock.protinfo.af_inet.ttl,
+                              struct sock.protinfo.af_inet.uc_ttl], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -300,31 +284,11 @@ AC_DEFUN([_XOPEN_SETUP_INET], [dnl
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-                ])
-            AC_CHECK_MEMBER([struct sock.protinfo.af_inet.uc_ttl],
-                [xopen_cv_af_inet_ttl_member_name='uc_ttl'],
-                [:], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-                ]) ])
-        if test :"${xopen_cv_af_inet_ttl_member_name:+set}" = :set ; then
-            AC_DEFINE_UNQUOTED([USING_AF_INET_TTL_MEMBER_NAME], [$xopen_cv_af_inet_ttl_member_name], [Most
-            kernels call the time-to-live member of the af_inet structure ttl.  For some reason
-            (probably because the old ttl member as 'int' and the new uc_ttl member is 'unsigned char')
-            reported by Bala Viswanathan <balav@lsil.com> to the linux-streams mailing list, EL3 renames
-            the member to uc_ttl on some kernels.  Define this to the member name used (ttl or uc_ttl)
-            so that the inet driver can be properly supported.  If this is not defined, 'ttl' will be
-            used as a default.])
-        else
-            with_inet='no'
-        fi
+#include <net/protocol.h>
+#ifdef HAVE_NET_DST_H
+#include <net/dst.h>
+#endif
+        ])
     fi
 ])# _XOPEN_SETUP_INET
 # =============================================================================

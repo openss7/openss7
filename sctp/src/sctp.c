@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/13 12:51:12 $ by $Author: brian $
+ Last Modified $Date: 2005/02/04 10:57:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -162,9 +162,9 @@ static char const ident[] =
 #include "linux/hooks.h"
 #include "netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.20 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.22 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/04 10:57:44 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4502,11 +4502,11 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb, struct sock *
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
-#ifdef HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_TTL
+#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
-#elif HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_UC_TTL
+#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			iph->ttl = ip->uc_ttl;
-#endif				/* HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_UC_TTL */
+#endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = sk->protocol;
@@ -4625,11 +4625,11 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
-#ifdef HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_TTL
+#if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
-#elif HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_UC_TTL
+#elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		iph->ttl = ip->uc_ttl;
-#endif				/* HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_UC_TTL */
+#endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 		iph->daddr = sd->daddr;	/* XXX */
 		iph->saddr = sd->saddr;
 		iph->protocol = sk->protocol;
@@ -15530,11 +15530,12 @@ STATIC int
 sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 {
 #ifdef CONFIG_FILTER
-	/* FIXME need a config parameter to select between the two */
-#if 0
+#if defined HAVE_SK_FILTER_2_ARGS
 	if (sk->filter && sk_filter(skb, sk->filter))
-#else
+#elif defined HAVE_SK_FILTER_3_ARGS
 	if (sk->filter && sk_filter(sk, skb, 1))
+#else
+#error HAVE_SK_FILTER_2_ARGS or HAVE_SK_FILTER_3_ARGS must be defined.
 #endif
 		goto discard;
 #endif				/* CONFIG_FILTER */

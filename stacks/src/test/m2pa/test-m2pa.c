@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 09:16:05 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:48 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/26 09:16:05 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/02/04 08:56:48 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 09:16:05 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:48 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 09:16:05 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:48 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -76,12 +76,8 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <limits.h>
 #include <stdint.h>
 #include <sys/types.h>
-
-/* Its a weird place to get htonl, but on recent GNU headers, asm/byteorder.h no
-   longer contains the htonl stuff. */
+#include <endian.h>
 #include <netinet/in.h>
-/* Need this for __constant_htonl and friends */
-#include <asm/byteorder.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -100,6 +96,18 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
+
+#if __BYTE_ORDER == __BIG_ENDIAN
+#   define __constant_ntohl(x)	(x)
+#   define __constant_ntohs(x)	(x)
+#   define __constant_htonl(x)	(x)
+#   define __constant_htons(x)	(x)
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+#   define __constant_ntohl(x)	__bswap_constant_32(x)
+#   define __constant_ntohs(x)	__bswap_constant_16(x)
+#   define __constant_htonl(x)	__bswap_constant_32(x)
+#   define __constant_htons(x)	__bswap_constant_16(x)
+#endif
 
 #define SUCCESS		 0
 #define FAILURE		 1
