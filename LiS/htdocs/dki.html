@@ -1,0 +1,2135 @@
+<html>
+
+
+
+<head>
+
+<title>LiS Driver/Kernel Interface</title>
+<meta name="title" content="LiS Driver/Kernel Interface">
+<meta name="keywords" content="Linux, streams, driver, kernel, interface, dki, LiS">
+<meta name="description" content="The LiS Driver/Kernel Interface (DKI)">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="89" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="673" height="75"> 
+      <div align="center"> 
+        <h2><font face="Times New Roman,Times">LiS Driver/Kernel Interface (DKI)</font></h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+    <td width="673" height="100%" align="left" valign="top"> 
+      <h2> <a name="Contents"></a><font face="Times New Roman,Times">Contents</font></h2>
+      <table width="75%" border="0">
+        <tr> 
+          <td><font face="Times New Roman,Times"><a href="#Introduction">Introduction</a></font></td>
+        </tr>
+        <tr> 
+          <td><font face="Times New Roman,Times"><a href="#Operating System Interface Routines">Operating 
+            System Interface Routines</a></font></td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#PCI BIOS Interface">PCI 
+                BIOS Interface</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#PCI Interface">PCI 
+                Interface</a></font> </p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#IRQ Interface">IRQ 
+                Interface</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#I/O Memory Mapping">I/O 
+                Memory Mapping</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#I/O Port Access">I/O 
+                Port Access</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#Memory Allocation">Memory 
+                Allocation</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#DMA Routines">DMA 
+                Routines</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#Delay Routines">Delay 
+                Routines</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#Printing Routines">Printing 
+                Routines</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#Timer Routines">Timer 
+                Routines</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#Sleep and Wakeup Routines">Sleep 
+                and Wakeup Routines</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#ThreadCreation">Thread Creation</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote>
+              <p><a href="#majorminordev_t">Major/Minor Device Numbering (dev_t)</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td><font face="Times New Roman,Times"><a href="#LiS Memory Allocation">LiS 
+            Memory Allocation</a></font></td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><font face="Times New Roman,Times"><a href="#LiS malloc and free Equivalents">LiS 
+                "malloc" and "free" Equivalents</a></font></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiSKernelMemoryAllocators">LiS Kernel Memory Allocators</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiS Page Allocator">LiS Page Allocator</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td><font face="Times New Roman,Times"><a href="#LiS PCI Interface">LiS 
+            PCI Interface</a></font></td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#The LiS PCI Device Structure">The LiS PCI Device Structure</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiS PCI Search Routines">LiS PCI Search Routines</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiS PCI Configuration Space Routines">LiS PCI Configuration 
+                Space Routines</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td><a href="#LiS Atomic Functions">LiS Atomic Functions</a></td>
+        </tr>
+        <tr> 
+          <td><a href="#LiS%20Locks">LiS Locks</a></td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiS Spin Locks">LiS Spin Locks</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#Lock Nesting">Lock Nesting</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiSReadWriteLocks">LiS Read/Write Locks</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiS Interrupt Enable/Disable">LiS Interrupt Enable/Disable</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiS Semaphores">LiS Semaphores</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#Debugging_Spin_Locks">Debugging Spin Locks</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#Debugging_Semaphores">Debugging Semaphores</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td><a href="#STREAMS Utility Routines">STREAMS Utility Routines</a></td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#flush_band">Flushing Queue Bands</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#utility-prototypes">Utility Prototypes</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#A-D">A-D</a> <a href="#E-K">E-K</a> <a href="#L-P">L-P</a> 
+                <a href="#Q-S">Q-S</a> <a href="#T-Z">T-Z</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td><a href="#syscalls">System Calls from within the Kernel</a></td>
+        </tr>
+      </table>
+      <blockquote>&nbsp;</blockquote>
+      <hr width="100%">
+      <h2> <a name="Introduction"></a><font face="Times New Roman,Times">Introduction</font></h2>
+      <p><br>
+        Linux STREAMS (LiS) provides for an interface between STREAMS drivers 
+        and the surrounding kernel environment.&nbsp; This interface has grown 
+        over time and is likely to expand in the future. 
+      <p>In the Linux kernel, much of the interface between drivers and other 
+        kernel modules and the core kernel services, such as memory allocation 
+        and synchronization primitives, is implemented in macros and inline functions 
+        declared in kernel header files.&nbsp; This technique was used (probably) 
+        out of considerations of efficiency (defined as execution speed) and a 
+        consideration that there were no version problems with such constructs 
+        because one could always recompile one's drivers in the context of the 
+        new kernel.&nbsp; The only "kernel primitives" compatibility that has 
+        been attempted from one kernel release to the next is source code compatibility. 
+      <p>The real world of paying customers is quite different.&nbsp; And, as 
+        it happens, the world of paying customers seems to impinge upon LiS considerably. 
+      <p>In this world, the customers do not want to rebuild the kernel.&nbsp; 
+        They don't want to build the kernel at all.&nbsp; They want to install 
+        a distribution with a binary kernel that was configured only at install 
+        time.&nbsp; They then want to install add-on binary packages, and they 
+        expect these packages to operate correctly with their kernel. 
+      <p>When these add-on packages consist of STREAMS based protocol drivers, 
+        LiS is usually the only piece of code that is recompiled from source upon 
+        installation into the customer's environment.&nbsp; The STREAMS drivers 
+        themselves are typically distributed in binary and linked in with LiS.&nbsp; 
+        The resulting module is then typically loaded using "modprobe" or some 
+        equivalent command. 
+      <p>In these circumstances it is highly desirable for LiS to "buffer" the 
+        interface between the STREAMS drivers and the kernel environment.&nbsp; 
+        This allows the STREAMS driver writers to deliver smaller binary packages 
+        to their customers and minimizes the number of different versions of those 
+        packages that must be maintained by the STREAMS driver writers.&nbsp; 
+        Ideally, LiS would be able to present a uniform DKI that would support 
+        one version of a user's STREAMS driver across all versions of the Linux 
+        kernel. 
+      <p>This ultimate goal is probably not achievable, but it is possible to 
+        insulate STREAMS drivers from the Linux kernel to a considerable extent.&nbsp; 
+        This is possible in part due to the implied DKI of a STREAMS driver.&nbsp; 
+        A STREAMS driver most likely will confine itself to the SVR4 types of 
+        DKI calls which have syntax and semantics that do not change over time.&nbsp; 
+        The main challenges come from the use of constructs, such as PCI configuration 
+        and interrupt service routines, that go outside the SVR4 DKI and must 
+        use services of the Linux kernel more-or-less directly. 
+      <p>In general, LiS attempts to replace inline functions and macros with 
+        actual subroutine calls to perform kernel operations.&nbsp; This allows 
+        the STREAMS driver to be compiled once with references to these routines, 
+        with the routines themselves being compiled in the context of the specific 
+        kernel version at package installation time.&nbsp; Thus, the STREAMS drivers 
+        do not have to be sensitive to differences in kernel versions. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr width="100%">
+      <h2> <a name="Operating System Interface Routines"></a><font face="Times New Roman,Times">Operating 
+        System Interface Routines</font></h2>
+      <p><br>
+        In the file <font face="Courier New, Courier, mono">&lt;sys/osif.h></font>, 
+        LiS provides insulation routines for a number of commonly used kernel 
+        functions.&nbsp; These functions are used with their Linux kernel names, 
+        but those names are redefined in <font face="Courier New, Courier, mono">&lt;sys/osif.h></font> 
+        to be subroutine calls on functions that are actually defined in the file 
+        <font face="Courier New, Courier, mono">osif.c</font> within LiS.&nbsp; 
+        The <font face="Courier New, Courier, mono">osif.c</font> file is compiled 
+        at LiS installation time and is sensitive to kernel version information. 
+      <p>In order to use this interface, you include the header files that you 
+        would normally include to use the kernel functions, and then include <font face="Courier New, Courier, mono">&lt;sys/osif.h></font> 
+        after all of the kernel include files.&nbsp; This allows for the redefinition 
+        of the names. 
+      <p>The kernel functions provided via <font face="Courier New, Courier, mono">&lt;sys/osif.h></font> 
+        are as follows, grouped by type of function. 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="PCI BIOS Interface"></a><font face="Times New Roman,Times">PCI 
+        BIOS Interface</font></h3>
+      <p><br>
+        These are routines that utilize or simulate the original PCI BIOS interface 
+        of the 2.0 series of kernels.&nbsp; The names of these routines are changed 
+        via defines.&nbsp; Use them as if the prototypes were as follows.&nbsp; 
+        You can use these routines on 2.2 kernels even though they represent the 
+        2.0 style of inteface. <br>
+        &nbsp; 
+      <blockquote> 
+        <pre><tt>#if LINUX_VERSION_CODE &lt; 0x020100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          /* 2.0 kernel */</tt> 
+<tt>unsigned long pcibios_init(unsigned long memory_start,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned long memory_end) ;</tt> 
+<tt>#else&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                /* 2.1 or 2.2 kernel */</tt> 
+<tt>void pcibios_init(void) ;</tt> 
+<tt>#endif</tt> 
+<tt>int pcibios_find_class(unsigned int&nbsp;&nbsp; class_code,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned short index,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *dev_fn) ;</tt> 
+<tt>int pcibios_find_device(unsigned short vendor,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned short dev_id,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned short index,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *dev_fn) ;</tt> 
+<tt>int pcibios_read_config_byte(unsigned char&nbsp; bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; dev_fn,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; where,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *val) ;</tt> 
+<tt>int pcibios_read_config_word(unsigned char&nbsp;&nbsp; bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned char&nbsp;&nbsp; dev_fn,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp;&nbsp; where,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned short *val) ;</tt> 
+<tt>int pcibios_read_config_dword(unsigned char&nbsp; bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; dev_fn,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; where,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned int&nbsp; *val) ;</tt> 
+<tt>int pcibios_write_config_byte(unsigned char&nbsp; bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; dev_fn,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; where,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; val) ;</tt> 
+<tt>int pcibios_write_config_word(unsigned char&nbsp;&nbsp; bus,</tt>          
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp;&nbsp; dev_fn,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp;&nbsp; where,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned short&nbsp; val) ;</tt> 
+<tt>int pcibios_write_config_dword(unsigned char&nbsp; bus,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; dev_fn,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp; where,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned int&nbsp;&nbsp; val) ;</tt> 
+<tt>const char *pcibios_strerror(int error) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="PCI Interface"></a><font face="Times New Roman,Times">PCI 
+        Interface</font></h3>
+      <p>These routines constitute the PCI interface as implemented in the 2.2 
+        series of kernels.&nbsp; Please note that these are filtered calls to 
+        the operating system and still depend directly upon the kernel structure 
+        "<font face="Courier New, Courier, mono">struct pci_dev</font>".&nbsp; 
+        LiS provides a more abstract interface to PCI that does not depend upon 
+        the direct definition kernel structures.&nbsp; The <a href="#LiS PCI Interface">LiS 
+        PCI interface</a> is to be preferred since it provides more insulation 
+        against changes in the kernel. <br>
+        &nbsp; </p>
+      <blockquote> 
+        <pre><tt>struct pci_dev&nbsp; *pci_find_device(unsigned int vendor,</tt>          
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned int device,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;struct pci_dev *from);</tt> 
+<tt>struct pci_dev&nbsp; *pci_find_class(unsigned int class, struct pci_dev *from);</tt> 
+<tt>struct pci_dev&nbsp; *pci_find_slot(unsigned int bus, unsigned int devfn);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; pci_read_config_byte(struct pci_dev *dev, u8 where, u8 *val);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; pci_read_config_word(struct pci_dev *dev, u8 where, u16 *val);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; pci_read_config_dword(struct pci_dev *dev, u8 where, u32 *val);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; pci_write_config_word(struct pci_dev *dev, u8 where, u16 val);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val);</tt> 
+<tt>void&nbsp;&nbsp;&nbsp; pci_set_master(struct pci_dev *dev);</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="IRQ Interface"></a><font face="Times New Roman,Times">IRQ 
+        Interface</font></h3>
+      <p>These are the routines that are used to attach and detach interrupt service 
+        routines to hardware interrupts. </p>
+      <blockquote> 
+        <pre><tt>int&nbsp; request_irq(unsigned int&nbsp; irq,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (*handler)(int, void *, void *),</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned long flags,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const char&nbsp;&nbsp; *device,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *dev_id) ;</tt> 
+<tt>void free_irq(unsigned int irq, void *dev_id) ;</tt> 
+<tt>void disable_irq(unsigned int irq) ;</tt> 
+<tt>oid enable_irq(unsigned int irq) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="I/O Memory Mapping"></a><font face="Times New Roman,Times">I/O 
+        Memory Mapping</font></h3>
+      <p>These are the routines that are typically used to map PCI bus or physical 
+        addresses to CPU virtual addresses.&nbsp; LiS includes some backward compatibility 
+        here to older kernel versions. </p>
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *ioremap_nocache(unsigned long offset, unsigned long size) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iounmap(void *addr) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *vremap(unsigned long offset, unsigned long size) ;</tt> 
+<tt>unsigned long virt_to_phys(volatile void *addr) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *phys_to_virt(unsigned long addr) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="I/O Port Access"></a><font face="Times New Roman,Times">I/O 
+        Port Access</font></h3>
+      <p>These are the routines that allow a driver to register I/O ports. </p>
+      <blockquote> 
+        <pre><tt>int&nbsp; check_region(unsigned int from, unsigned int extent) ;</tt> 
+<tt>void</tt> <tt>request_region(unsigned int from,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned int extent,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const char&nbsp; *name) ;</tt> 
+<tt>void release_region(unsigned int from, unsigned int extent) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="Memory Allocation"></a><font face="Times New Roman,Times">Memory 
+        Allocation</font></h3>
+      <p><br>
+        These are the kernel routines that can be used to allocate memory.&nbsp; 
+        LiS also has a more insulated abstraction for kernel memory allocation.&nbsp; 
+        It is recommended that you use the <a href="#LiS Memory Allocation">LiS 
+        memory allocator</a> versions rather than the direct kernel versions. 
+      </p>
+      <blockquote> 
+        <pre><tt>void *kmalloc(size_t nbytes, int type) ;</tt> 
+<tt>void&nbsp; kfree(const void *ptr) ;</tt> 
+<tt>void *vmalloc(unsigned long size);</tt> 
+<tt>void&nbsp; vfree(void *ptr) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="DMA Routines"></a><font face="Times New Roman,Times">DMA Routines</font></h3>
+      <p><br>
+        These are the routines that are used to allocate a main-board old-style 
+        DMA channel for use by your driver.&nbsp; These are not much used anymore. 
+      <blockquote> 
+        <pre><tt>int&nbsp; request_dma(unsigned int dma_nr, const char *device_id)          ;</tt> 
+<tt>void free_dma(unsigned int dma_nr) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="Delay Routines"></a><font face="Times New Roman,Times">Delay 
+        Routines</font></h3>
+      <p>This is the routine that simply spins the CPU for a given number of microseconds.&nbsp; 
+        LiS also redefines the symbol "<font face="Courier New, Courier, mono">jiffies</font>" 
+        to a subroutine call to help insulate STREAMS drivers from changes in 
+        the way the kernel keeps track of time.&nbsp; Remember, the redefinition 
+        is accomplished using C language defines, so the following declarations 
+        describe the effective usage of these symbols, not their literal definition. 
+      </p>
+      <blockquote> 
+        <pre><tt>void udelay(long micro_secs) ;</tt> 
+<tt>unsigned long jiffies ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="Printing Routines"></a><font face="Times New Roman,Times">Printing 
+        Routines</font></h3>
+      <p><br>
+        These are the most commonly used printf-like routines in the kernel.&nbsp; 
+        STREAMS drivers would be more portable if they used the <font face="Courier New, Courier, mono">cmn_err</font> 
+        routine instead or printk. 
+      <blockquote> 
+        <pre><tt>int printk(const char *fmt, ...) ;</tt>
+<tt>int sprintf(char *bfr, const char *fmt, ...) ;</tt>
+<tt>int vsprintf(char *bfr, const char *fmt, va_list args) ;</tt> </pre>
+      </blockquote>
+      <p>&nbsp; <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="Timer Routines"></a><font face="Times New Roman,Times">Timer 
+        Routines</font></h3>
+      <p><br>
+        These are the the routines that start and stop kernel timers.&nbsp; STREAMS 
+        drivers would be more portable if they used the standard "<font face="Courier New, Courier, mono"><a href="#timeout">timeout</a></font>" 
+        routine. 
+      <blockquote> 
+        <pre><tt>void add_timer(struct timer_list * timer);</tt> 
+<tt>int&nbsp; del_timer(struct timer_list * timer);</tt></pre>
+      </blockquote>
+      <p>The following routine converts time in micro seconds to system &quot;ticks&quot;. 
+        The &quot;ticks&quot; value is suitable for use with the <font face="Courier New, Courier, mono">timeout</font> 
+        routine. Note that if the <font face="Courier New, Courier, mono">micro_sec</font> 
+        parameter is less than the number of micro seconds in a system tick then 
+        the routine returns zero.</p>
+      <blockquote> 
+        <pre>unsigned lis_usectohz(unsigned micro_sec);</pre>
+      </blockquote>
+      <p>The following routine is an LiS abstraction of the C library routine 
+        <font face="Courier New, Courier, mono">gettimeofday</font>. Note the 
+        absence of the time zone parameter.</p>
+      <blockquote> 
+        <pre><tt>void lis_gettimeofday(struct timeval *tv); </tt></pre>
+      </blockquote>
+      <p>The following two kernel routines are called via the LiS osif.c code.</p>
+      <blockquote> 
+        <pre>void do_gettimeofday( struct timeval *tp ) ;
+void do_settimeofday( struct timeval *tp ) ; </pre>
+      </blockquote>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="Sleep and Wakeup Routines"></a><font face="Times New Roman,Times">Sleep 
+        and Wakeup Routines</font></h3>
+      <p><br>
+        These are the kernel routines for sleeping using wait queues.&nbsp; STREAMS 
+        drivers should not be using these since only "<font face="Courier New, Courier, mono">open</font>" 
+        and "<font face="Courier New, Courier, mono">close</font>" routines are 
+        allowed to sleep, and for those cases, <a href="#LiS Semaphores">LiS semaphores</a> 
+        would provide better insulation from the kernel.&nbsp; STREAMS "put" and 
+        "service" routines should use <a href="#LiS Spin Locks">LiS spin locks</a> 
+        for mutual exclusion. 
+      <blockquote> 
+        <pre><tt>void sleep_on(OSIF_WAIT_Q_ARG) ;</tt> 
+<tt>void interruptible_sleep_on(OSIF_WAIT_Q_ARG) ;</tt> 
+<tt>void wake_up(OSIF_WAIT_Q_ARG) ;</tt> 
+<tt>void wake_up_interruptible(OSIF_WAIT_Q_ARG) ;</tt></pre>
+      </blockquote>
+      <hr size=1 width="60%">
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <h3><font face="Times New Roman,Times"><a name="ThreadCreation"></a>Thread 
+        Creation</font></h3>
+      <p>A STREAMS driver in LiS can create kernel threads if it so chooses. The 
+        following routine simplifies this task. It consolidates all of the kernel 
+        manipulations involved with the creation of a kernel thread into one place, 
+        thus removing references to these kernel functions from STREAMS driver 
+        code.</p>
+      <h4>Prototype</h4>
+      <blockquote> 
+        <pre>int lis_thread_start(int (*fcn)(void *), void *arg, const char *name) ;</pre>
+      </blockquote>
+      <h4>Arguments</h4>
+      <table width="75%">
+        <tr> 
+          <td width="6%">&nbsp;</td>
+          <td width="16%" valign="top"> 
+            <pre>fcn</pre>
+          </td>
+          <td width="78%"> 
+            <p>The function that is to be used as the entry point for the thread.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="6%">&nbsp;</td>
+          <td width="16%" valign="top"> 
+            <pre>arg</pre>
+          </td>
+          <td width="78%"> 
+            <p>The argument passed to the function.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="6%">&nbsp;</td>
+          <td width="16%" valign="top"> 
+            <pre>name</pre>
+          </td>
+          <td width="78%"> 
+            <p>An ASCII name associated with the thread. This name should be less 
+              than 16 characters in length. It will be the name of the thread 
+              that displays in a <font face="Courier New, Courier, mono">ps</font> 
+              listing.</p>
+          </td>
+        </tr>
+      </table>
+      <h4>Operation</h4>
+      <p><font face="Courier New, Courier, mono">lis_thread_start</font> creates 
+        a new thread, performs some operations prior to entering the <font face="Courier New, Courier, mono">fcn</font>, 
+        and then calls <font face="Courier New, Courier, mono">fcn</font> which 
+        acts as the &quot;main&quot; routine for the thread. The <font face="Courier New, Courier, mono">arg</font> 
+        parameter is passed to <font face="Courier New, Courier, mono">fcn</font>.</p>
+      <p>Before <font face="Courier New, Courier, mono">fcn</font> is entered, 
+        the newly created thread will have shed all user space files and mapped 
+        memory. Thus, it is a kernel-only thread.</p>
+      <p>All signals are still enabled. Note that when the kernel goes down for 
+        reboot all processes are first sent a SIGTERM. Once those have been processed, 
+        all processes are then sent a SIGKILL. It is the implementor's choice 
+        which of these it pays attention to in order to exit prior to a reboot. 
+      </p>
+      <p>The <font face="Courier New, Courier, mono">fcn</font> is entered with 
+        the "big kernel lock" NOT held, just as it would be for calling the "kernel_thread" 
+        function directly. On 2.2 kernels, the <font face="Courier New, Courier, mono">fcn</font> 
+        should get this lock so that it can utilize kernel services safely. </p>
+      <p>The user's <font face="Courier New, Courier, mono">fcn</font> returns 
+        a value when it exits and that value is returned to the kernel. It is 
+        not clear that anything actually pays any attention to this returned value. 
+        It particular, it is not visible to the thread that started the new thread. 
+      </p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr size=1 width="60%">
+      <h3><font face="Times New Roman,Times"><a name="majorminordev_t"></a>Major/Minor 
+        Device Numbering (dev_t)</font></h3>
+      <p>In STREAMS the <font face="Courier New, Courier, mono">dev_t</font> structure 
+        is used to combine a major device number and a minor device number into 
+        a single integer length quantity. The Linux kernel restricts these numbers 
+        to the range 0 to 255 (8-bit values).</p>
+      <p>LiS provides a typedef for <font face="Courier New, Courier, mono">dev_t</font> 
+        that results in an unsigned integer quantity.</p>
+      <p>The Linux kernel, on the other hand, defines a structure of type <font face="Courier New, Courier, mono">kdev_t</font> 
+        that it uses internally for this same purpose. The <font face="Courier New, Courier, mono">kdev_t</font> 
+        type is an actual structure, and not an integer. Furthermore, the kernel 
+        defines a routine named makedevice that generates one of these structures, 
+        given the major and minor numbers as integers. It appears that eventually 
+        the kernel will use this structure exclusively and will expand the numbering 
+        space for both major and minor device numbers.</p>
+      <p>This has caused LiS to use non-standard nomenclature for handling its 
+        <font face="Courier New, Courier, mono">dev_t</font> structures, since 
+        the routine makedevice is not compatible with the LiS <font face="Courier New, Courier, mono">dev_t</font> 
+        structure.</p>
+      <p>LiS now provides the following operations on <font face="Courier New, Courier, mono">dev_t</font> 
+        structures. Most of these functions are provided by macros, so the following 
+        are &quot;virtual&quot; prototypes. </p>
+      <table width="98%" border="1">
+        <tr> 
+          <td width="44%"><font face="Courier New, Courier, mono" size="-1">int 
+            MAJOR(dev_t dev)</font></td>
+          <td width="56%">Extracts the major device number</td>
+        </tr>
+        <tr> 
+          <td width="44%"><font face="Courier New, Courier, mono" size="-1">int 
+            MINOR(dev_t dev)</font></td>
+          <td width="56%">Extracts the minor device number</td>
+        </tr>
+        <tr> 
+          <td width="44%"><font face="Courier New, Courier, mono" size="-1">dev_t 
+            MKDEV(int maj, int min)</font></td>
+          <td width="56%">Combines a major and minor device number into a dev_t</td>
+        </tr>
+        <tr> 
+          <td width="44%"><font face="Courier New, Courier, mono" size="-1">int 
+            DEV_SAME(dev_t d1, dev_t d2)</font></td>
+          <td width="56%">True if the two devices are the same</td>
+        </tr>
+        <tr> 
+          <td width="44%"><font face="Courier New, Courier, mono" size="-1">int 
+            DEV_TO_INT(dev_t dev)</font></td>
+          <td width="56%">Converts dev_t to an int</td>
+        </tr>
+      </table>
+      <p>The sample drivers that come with LiS now use these constructs to manipulate 
+        device structures and can serve as examples for their usage.</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> 
+      <hr width="100%">
+      <h2> <a name="LiS Memory Allocation"></a>LiS Memory Allocation</h2>
+      <p>LiS provides for several different styles of memory allocation, all of 
+        them insulated from the Linux kernel.&nbsp; These routines allow your 
+        driver to allocate memory in several different ways while still maintaining 
+        compatibility with different versions of the Linux kernel, with no driver 
+        recompilation required. </p>
+      <p>To use the LiS memory allocation routines include the file <font face="Courier New, Courier, mono">&lt;sys/lismem.h></font> 
+        in your STREAMS driver source code. <br>
+        &nbsp; 
+      <h3> <a name="LiS malloc and free Equivalents"></a>LiS "malloc" and "free" 
+        Equivalents</h3>
+      <p>The first group of memory allocation routines are the routines that play 
+        the role of "malloc" and "free."&nbsp; These routines keep a master linked 
+        list of all allocated memory areas.&nbsp; This list can be printed out 
+        via an ioctl to LiS.&nbsp; Each allocated area is tagged with the file 
+        name and line number of the code that caused it to be allocated.&nbsp; 
+        Each area contains a guard word at the front and back to enable the allocator 
+        to detect "off by one" accesses outside the allocated area. </p>
+      <p>LiS uses this allocator internally for allocating queues, messages and 
+        other internal data structures.&nbsp; This would be the allocator of choice 
+        for STREAMS drivers to use to allocate instance structures. </p>
+      <p>Memory allocated in this manner is ultimately allocated by the kernel 
+        routine "kmalloc".&nbsp; As such, it is not guaranteed to be DMA-able 
+        (in the old style), or to occupy physically contiguous memory locations.&nbsp; 
+        <a href="#LiSKernelMemoryAllocators">See below</a> for routines that can 
+        be used to allocate these types of memory areas. </p>
+      <p>The routines are as follows: </p>
+      <blockquote> 
+        <pre><tt>void *ALLOC(int nbytes) ;</tt> 
+<tt>void *ALLOCF(int nbytes, char *tag) ;</tt> 
+<tt>void&nbsp; FREE(void *ptr) ;</tt></pre>
+      </blockquote>
+      <p>The <font face="Courier New, Courier, mono">ALLOC</font> and <font face="Courier New, Courier, mono">FREE</font> 
+        routines are analogous to "malloc" and "free".&nbsp; The <font face="Courier New, Courier, mono">ALLOCF</font> 
+        routine includes a character string which is prepended to the file name 
+        stored as the location from which the allocation occurred.&nbsp; It can 
+        serve as a tag for the type of memory being allocated. </p>
+      <p>Usage examples: 
+      <blockquote> 
+        <pre><tt>ptr = ALLOC(456) ;</tt> 
+<tt>FREE(ptr) ;</tt> 
+<tt>ptr = ALLOCF(578, "Instance: ") ;</tt> 
+<tt>FREE(ptr) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <br>
+      <h3> <a name="LiSKernelMemoryAllocators"></a>LiS Kernel Memory Allocators</h3>
+      <p>These routines use the LiS malloc/free internal routines to allow for 
+        more flexibility in the options used when calling the kernel allocator.&nbsp; 
+        These routines all lead to a call on "kmalloc" with appropriate options.&nbsp; 
+        It is worth noting that the numerical value of the constants used in calling 
+        the kernel's "kmalloc" routine changed between the 2.2 and 2.4 versions 
+        of the kernel.&nbsp; Thus, drivers which called the kernel's "kmalloc" 
+        directly have to be recompiled to run in a 2.4 kernel.&nbsp; STREAMS drivers 
+        using the memory allocation interface defined here could run without modification 
+        and without a recompilation on both kernels, assuming that the drivers 
+        otherwise did not use any direct kernel functions. </p>
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp; *lis_alloc_atomic(int nbytes) ;</tt>          
+<tt>void&nbsp;&nbsp;&nbsp; *lis_alloc_kernel(int nbytes) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp; *lis_alloc_dma(int nbytes) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp; *lis_free_mem(void *mem_area) ;</tt></pre>
+      </blockquote>
+      <p>These routines pass the allocation options <font face="Courier New, Courier, mono">GFP_ATOMIC</font>, 
+        <font face="Courier New, Courier, mono">GFP_KERNEL</font>, and <font face="Courier New, Courier, mono">GFP_DMA</font>, 
+        respectively, to "kmalloc" when allocating the memory.&nbsp; LiS takes 
+        care of passing the proper values to the kernel routine so that driver 
+        code can remain portable. </p>
+      <p>The routine <font face="Courier New, Courier, mono">lis_free_mem</font> 
+        returns a NULL pointer for the convenience of the caller. 
+      <p>The kernel's <font face="Courier New, Courier, mono">kmalloc</font> is 
+        restricted as to the number of bytes that it will allocate. The LiS routines 
+        do not have this restriction. If the number of requested bytes is larger 
+        than 16K the LiS allocation routines will call the page allocator to allocate 
+        the memory. The <font face="Courier New, Courier, mono">lis_free_mem</font> 
+        routine knows whether to free pages or to use the kernel's <font face="Courier New, Courier, mono">kfree</font> 
+        routine. 
+      <p>Usage Examples: 
+      <blockquote> 
+        <pre>ptr = lis_alloc_kernel(sizeof(structure)) ; 
+ptr = lis_free_mem(ptr) ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          /* returns NULL pointer */</pre>
+      </blockquote>
+      <p><br>
+        <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="LiS Page Allocator"></a>LiS Page Allocator</h3>
+      <p>These routines allow a STREAMS driver to allocate memory directly from 
+        the kernel's page allocator.&nbsp; Memory allocated in this manner occupies 
+        physically contiguous locations and is suitable for use with bus master 
+        DMA PCI devices. </p>
+      <p>Unlike the kernel's page allocator, the size that is specified when calling 
+        the LiS page allocator is in bytes, not "order", or other encoding of 
+        page size.&nbsp; LiS calculates the number of pages based upon the requested 
+        size. 
+      <p>Also, LiS does not require you to pass the size of the area when freeing 
+        the page. 
+      <p>The routines are as follows: 
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp; *lis_get_free_pages(int nbytes) ;</tt>          
+<tt>void&nbsp;&nbsp;&nbsp; *lis_free_pages(void *ptr) ;</tt></pre>
+      </blockquote>
+      <p>The lis_free_pages routine returns a NULL pointer for the convenience 
+        of the caller. </p>
+      <p><tt>Usage Examples:</tt> </p>
+      <blockquote> 
+        <pre><tt>ptr = lis_get_free_pages(1024*kbytes) ;</tt> 
+<tt>ptr = lis_free_pages(ptr) ;</tt></pre>
+      </blockquote>
+      <p><br>
+        <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr width="100%">
+      <h2> <a name="LiS PCI Interface"></a>LiS PCI Interface</h2>
+      <p>In order to assist in the portability of STREAMS drivers across different 
+        versions of the Linux kernel, LiS provides an abstraction of the PCI configuration 
+        interface.&nbsp; It defines a data structure that is used to describe 
+        a PCI device and a set of routines that perform operations on PCI configuration 
+        space. </p>
+      <p>Using these abstractions, a STREAMS driver can be portable from the 2.2 
+        kernel to the 2.4 kernel with no recompilation required.&nbsp; The LiS 
+        structures completely hide the kernel data structures and PCI configuration 
+        space operations from the STREAMS driver. 
+      <p>To use this interface include the file <font face="Courier New, Courier, mono">&lt;sys/lispci.h></font> 
+        in your STREAMS driver source code. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="The LiS PCI Device Structure"></a>The LiS PCI Device Structure</h3>
+      <p>This structure is distinct from a similar structure which is defined 
+        by the Linux kernel, but which differs significantly between the 2.2 and 
+        2.4 kernels.&nbsp; The LiS version of this structure is oriented towards 
+        providing just enough information to allow a driver to operate the PCI 
+        device, without being concerned about the details of PCI bus topology. 
+      </p>
+      <p>This structure is used to return information to the STREAMS driver concerning 
+        devices that meet certain criteria, such as device class or manufacturer 
+        devide identification. 
+      <blockquote> 
+        <pre><tt>#define LIS_PCI_MEM_CNT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* # mem addrs */</tt> 
+<tt>typedef struct lis_pci_dev</tt> 
+<tt>{</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          bus ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* bus number */</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          dev_fcn ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* device/function code */</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          vendor ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* vendor id */</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          device ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* device id */</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          class ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* class type */</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          hdr_type ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* PCI header type */</tt> 
+    <tt>unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          irq ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* IRQ number */
+    </tt><tt>unsigned long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          mem_addrs[LIS_PCI_MEM_CNT] ;</tt>
+    <tt>void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;         *user_ptr ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;/* private for user */</tt> </pre>
+        <pre><tt>} lis_pci_dev_t ;</tt> </pre>
+      </blockquote>
+      <p>The <i>bus</i> field contains the bus number on which the device is located.&nbsp; 
+        LiS obtains this information from the kernel. </p>
+      <p>The <i>dev_fcn</i> field contains an encoding of the device number on 
+        the bus and the function number within the device that this particular 
+        structure pertains to.&nbsp; The pair <i>bus</i> and <i>dev_fcn</i> uniquely 
+        identifies a device in the PCI subsystem.&nbsp; Devices can be searched 
+        for on the PCI bus by <i>bus</i> number and <i>dev_fcn</i> value (see 
+        below). 
+      <p>Given a <i>dev_fcn</i> value, a pair of macros will extract the "device" 
+        portion and the "function number" portion from it. 
+      <p>&nbsp; 
+      <table width="98%" border="0" cellpadding="0">
+        <tr> 
+          <td width="9%">&nbsp;</td>
+          <td width="44%" valign="top"> 
+            <pre><tt><font face="Courier New, Courier, mono">#define LIS_PCI_DEV(devfcn)</font></tt></pre>
+          </td>
+          <td width="47%" valign="top"> 
+            <p>Extracts the "device" portion</p>
+          </td>
+        </tr>
+        <tr> 
+          <td width="9%">&nbsp;</td>
+          <td width="44%" valign="top"> 
+            <pre><tt><font face="Courier New, Courier, mono">#define LIS_PCI_FCN(devfcn)</font></tt></pre>
+          </td>
+          <td width="47%" valign="top"> 
+            <p>Extracts the "function number" portion</p>
+          </td>
+        </tr>
+      </table>
+      <p>Given a device number and a function number, the following macro will 
+        synthesize a <i>dev_fcn</i> value suitable for use in searching the bus. 
+      </p>
+      <table width="98%" border="0" cellpadding="0">
+        <tr> 
+          <td width="9%">&nbsp;</td>
+          <td width="44%" valign="top"> 
+            <pre><tt><font face="Courier New, Courier, mono">#define LIS_MK_DEV_FCN(dev,fcn)</font></tt></pre>
+          </td>
+          <td width="47%" valign="top"> 
+            <p>Put <font face="Courier New, Courier, mono">dev</font> and <font face="Courier New, Courier, mono">fcn</font> 
+              together</p>
+          </td>
+        </tr>
+      </table>
+      <p><br>
+        The <i>vendor</i> and <i>device</i> fields contain the vendor id (manuracturer 
+        code) and the vendor's device identifier for the device.&nbsp; Devices 
+        can be searched for on the PCI bus by <i>vendor</i> and <i>device</i> 
+        identifier (see below). </p>
+      <p>The <i>class</i> field contains the class code associated with the device.&nbsp; 
+        Devices can be searched for on the PCI bus by <i>class</i> code (see below). 
+      <p>The <i>hdr_type</i> field gives the type information for the PCI configuration 
+        space header. 
+      <p>The <i>irq</i> field gives the IRQ number that is assigned to this device.&nbsp; 
+        This is the number that is used to attach an interrupt service routine 
+        to the device. 
+      <p>The <i>mem_addrs</i> field contains a list of addresses associated with 
+        the device.&nbsp; These are raw PCI bus addresses and are not mapped into 
+        the address space of the processor.&nbsp; Empty slots contain the value 
+        zero. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="LiS PCI Search Routines"></a>LiS PCI Search Routines</h3>
+      <p>These routines allow the STREAMS driver to find devices on the PCI bus 
+        and obtain a pointer to the lis_pci_dev_t structure for the device. </p>
+      <p> 
+      <hr size=1 width="60%">
+      <blockquote> 
+        <pre><tt>lis_pci_dev_t&nbsp;&nbsp; *lis_pci_find_device(unsigned vendor, unsigned device,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_dev_t *previous_struct) ;</tt> </pre>
+      </blockquote>
+      <p>Find the device by vendor identification and vendor device identification.&nbsp; 
+        By passing in the pointer to the previous structure returned it is possible 
+        to find all devices of a given type. 
+      <p>The routine returns NULL if there are no (more) devices for the given 
+        vender and device identifiers. 
+      <p>Usage example: 
+      <p><br>
+      <blockquote> 
+        <pre><tt>lis_pci_dev_t&nbsp;&nbsp;&nbsp; *pcip = NULL ;</tt></pre>
+        <pre><tt>while ((pcip = lis_pci_find_device(0x109e, 0x8474, pcip)) != NULL)</tt>
+<tt>{</tt>
+     <tt>pcip points to a unique device from this vendor</tt>            
+<tt>}</tt> </pre>
+      </blockquote>
+      <hr size=1 width="60%">
+      <blockquote> 
+        <pre><tt>lis_pci_dev_t&nbsp;&nbsp; *lis_pci_find_class(unsigned class,</tt> <tt>
+                                    lis_pci_dev_t *previous_struct) ;</tt> </pre>
+      </blockquote>
+      <p>Find the device by class.&nbsp; The usage is similar to lis_pci_find_device 
+        in that you can use a pointer to loop through all devices of a given class. 
+      <p>The function returns NULL if there are no (more) devices of the given 
+        class. 
+      <p> 
+      <hr size=1 width="60%">
+      <blockquote> 
+        <pre><tt>lis_pci_dev_t&nbsp;&nbsp; *lis_pci_find_slot(unsigned bus, unsigned dev_fcn) ;</tt> </pre>
+      </blockquote>
+      <p>Find the device by slot number.&nbsp; If you know the bus number (zero 
+        for most simple Intel PC systems) and the <i>dev_fcn</i>, you can obtain 
+        the PCI configuration information for that particular "slot".&nbsp; Use 
+        the <tt>LIS_MK_DEV_FCN </tt>macro to synthesize the <i>dev_fcn</i> value 
+        from the "device" (slot) number and the function number. 
+      <p>The function returns NULL if there is no device in that slot. 
+      <p>Note that this routine only returns one structure since it is not meaningful 
+        to process a list of devices for the same slot. <br>
+        &nbsp; 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="LiS PCI Configuration Space Routines"></a>LiS PCI Configuration 
+        Space Routines</h3>
+      <p>The following routines are used to read and write PCI configuration space 
+        for a particular device.&nbsp; Configuration space can be accessed by 
+        byte, word (16 bit) or dword (32 bit). </p>
+      <p>Each routine takes a pointer to an <font face="Courier New, Courier, mono">lis_pci_dev_t</font> 
+        structure as an argument.&nbsp; It also takes an index value which is 
+        the byte offset from the base of the configuration space for the device 
+        at which the given byte/word/dword is to be read or written. 
+      <p>Care should be exercised when writing to configuration space since many 
+        of these values are determined by the PCI BIOS at system boot time. 
+      <p>The lis_pci_set_master routine sets the "bus master DMA" bit for the 
+        given device.&nbsp; This is used for devices that perform bus master DMA. 
+      <p>The routines are as follows: 
+      <blockquote> 
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_read_config_byte(lis_pci_dev_t *dev,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; index,</tt> 
+         <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *rtn_val);</tt>          </pre>
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_read_config_word(lis_pci_dev_t&nbsp; *dev,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; index,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned short *rtn_val);</tt> </pre>
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_read_config_dword(lis_pci_dev_t *dev,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; index,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned long&nbsp; *rtn_val);</tt> </pre>
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_write_config_byte(lis_pci_dev_t *dev,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; index,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned char&nbsp;&nbsp; val);</tt> </pre>
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_write_config_word(lis_pci_dev_t&nbsp; *dev,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; index,</tt>            
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned short&nbsp;&nbsp; val);</tt> </pre>
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;lis_pci_write_config_dword(lis_pci_dev_t *dev,</tt> 
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; index,</tt>            
+           <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned long&nbsp;&nbsp;&nbsp; val);</tt> </pre>
+        <pre><tt>void&nbsp;&nbsp;&nbsp;lis_pci_set_master(lis_pci_dev_t *dev);</tt> </pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr width="100%">
+      <h2> <a name="LiS Atomic Functions"></a>LiS Atomic Functions</h2>
+      <p>LiS provides for atomic integers implemented in a portable fashion.&nbsp; 
+        To declare an LiS portable atomic integer use the following declaration 
+        syntax: </p>
+      <blockquote> 
+        <pre><tt>lis_atomic_t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; myatom ;</tt> </pre>
+      </blockquote>
+      <p>LiS then provides the following operations on variables of this type. 
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp; lis_atomic_set(lis_atomic_t *atomic_addr, int valu) ;</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; lis_atomic_read(lis_atomic_t *atomic_addr) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp; lis_atomic_add(lis_atomic_t *atomic_addr, int amt) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp; lis_atomic_sub(lis_atomic_t *atomic_addr, int amt) ;</tt> 
+<tt>void&nbsp;&nbsp;&nbsp; lis_atomic_inc(lis_atomic_t *atomic_addr) ;</tt>          
+<tt>void&nbsp;&nbsp;&nbsp; lis_atomic_dec(lis_atomic_t *atomic_addr) ;</tt>          
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; lis_atomic_dec_and_test(lis_atomic_t *atomic_addr) ;</tt> </pre>
+      </blockquote>
+      <p>Of these, only <font face="Courier New, Courier, mono">lis_atomic_dec_and_test</font> 
+        needs any explanation.&nbsp; This routine performs an <font face="Courier New, Courier, mono">atomic_dec</font> 
+        on the variable and returns true if the counter reached zero via that 
+        decrement operation.&nbsp; Note that by the time the routine returns some 
+        other CPU with access to the same variable may have changed its value.&nbsp; 
+        So the return reports only on the instantaneous value of the variable. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr width="100%">
+      <h2> <a name="LiS Locks"></a>LiS Locks</h2>
+      <p>LiS provides an abstraction and an insulated interface to the Linux kernel 
+        for spin locks, interrupt disabling and semaphores.&nbsp; If you use this 
+        interface in your STREAMS driver you can utilize these kernel services 
+        on different versions of the Linux kernel without the necessity of recompiling 
+        your driver for each version of the kernel. </p>
+      <p>The LiS locks are especially useful in consideration of Linux kernels 
+        compiled with and without the SMP option set.&nbsp; The spin locks and 
+        semaphores of the Linux kernel are implemented using external inline functions.&nbsp; 
+        These functions are coded in assembly language and generate different 
+        sequences of instructions depending upon the compile time setting of the 
+        SMP option.&nbsp; Spin locks and semaphores compiled with SMP reset will 
+        not function properly on a multi-CPU system running an SMP kernel. 
+      <p>The LiS locks mechanism solves this problem by abstracting the locking 
+        primitives into actual subroutines, not inlines, defined within LiS.&nbsp; 
+        Since LiS is compiled from source code when it is installed the subroutines 
+        in LiS have the correct setting of SMP for the locking primitives.&nbsp; 
+        This allows the STREAMS driver code to be compiled once and the object 
+        code reused for multiple installations with varying options. 
+      <p>The following sections document the spin locks, interrupt disabling and 
+        semaphore mechanisms offered by LiS.&nbsp; To use these mechanisms include 
+        the file &lt;sys/lislocks.h> in your STREAMS driver source code. 
+      <p>In choosing the appropriate type of lock to use, one must bear in mind 
+        that STREAMS drivers are not allowed to "sleep" in "put" and "service" 
+        procedures, only in "open" and "close" routines.&nbsp; That means that 
+        spin locks are the mutual exclusion mechanism of choice for "put" and 
+        "service" procedures.&nbsp; It is reasonable to use sleeping semaphores 
+        in "open" and "close" routines. 
+      <p>The simple interrupt exclusion mechanism can be used to exclude only 
+        interrupt routine execution for a section of code.&nbsp; However, this 
+        mechanism does not exclude other "put" or "service" procedures that may 
+        be executed on other CPUs.&nbsp; This may not be much of a consideration 
+        since LiS acquires a lock in the queue structure before executing the 
+        "put" or "service" procedure pointed to by that queue. 
+      <p>However, it could happen that the "read put/service" and "write put/service" 
+        procedures get executed simultaneously since there are two different locks 
+        in the STREAMS queues, one in the read queue and one in the write queue.&nbsp; 
+        In this case, the STREAMS driver code would need to use spin locks to 
+        protect data structures shared between the read and write "put" or "service" 
+        procedures. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="LiS Spin Locks"></a>LiS Spin Locks</h3>
+      <p>LiS provides an implementation of spin locks that utilizes the Linux 
+        kernel's spin lock mechanism to perform the actual locking functions.&nbsp; 
+        The LiS implementation adds features to the kernel spin locks such as 
+        the following: </p>
+      <ul>
+        <li> LiS spin locks are nestable.&nbsp; The same thread can acquire the 
+          same lock and release it in nested fashion.</li>
+        <li> LiS spin locks are more debuggable.&nbsp; The LiS lock structure 
+          contains an ASCII name for the lock which makes it easier to identify 
+          in debugging situations.</li>
+        <li> LiS maintains a lock trace table.&nbsp; A debugging option for LiS 
+          causes it to log all spin lock operations to a trace table which can 
+          be printed out via an option to the <i>streams</i> command.</li>
+        <li> LiS spin locks are portable.&nbsp; A STREAMS driver can utilize the 
+          same LiS lock mechanism across different versions of the Linux kernel.&nbsp; 
+          This pushes the kernel differences into LiS and out of the STREAMS driver 
+          code.</li>
+        <li> LiS spin locks are documented.&nbsp; You don't have to read the kernel 
+          source code to figure out how to use them.</li>
+      </ul>
+      <p>For these reasons I highly recommend that STREAMS drivers use the LiS 
+        spin lock implementation in place of the direct kernel spin locks.&nbsp; 
+        The portability aspect of LiS spin locks cannot be overemphasized.&nbsp; 
+        Different Linux kernel compile-time options can lead to a proliferation 
+        of STREAMS driver code versions, or the necessity of always compiling 
+        the driver from source when it is installed.&nbsp; LiS spin locks allow 
+        a STREAMS driver to be compiled independently of kernel options with only 
+        the binary needed at driver installation time. </p>
+      <p>To declare a spin lock, use the typedef <font face="Courier New, Courier, mono">lis_spin_lock_t</font>, 
+        as in the following: 
+      <blockquote> 
+        <pre><tt>lis_spin_lock_t&nbsp;&nbsp;&nbsp; mylock ;</tt></pre>
+      </blockquote>
+      <p>LiS spin locks must be initialized before they are used.&nbsp; There 
+        is one initialization routine no matter which style of locking you intend 
+        to use. </p>
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp; lis_spin_lock_init(lis_spin_lock_t *lock, const char *name) ;</tt> </pre>
+      </blockquote>
+      <p>This routine initializes the spin lock and associates an ASCII string 
+        name with it.&nbsp; The pointer name is saved in the lock structure for 
+        later use in printing out the lock trace table.&nbsp; It is the caller's 
+        responsibility to ensure that the name resides in memory that will persist 
+        for the duration of the existence of the lock. 
+      <p><a name="dynamicspinlocks"></a>You can also use dynamically allocated 
+        spin locks. This technique allows your STREAMS driver to be completely 
+        immune from changes in kernel version regarding the size of a spin lock 
+        since your driver only has to store a pointer to the allocated lock. The 
+        allocation and deallocation routines are as follows. 
+      <blockquote>
+        <pre>lis_spin_lock_t *lis_spin_lock_alloc(const char *name);
+lis_spin_lock_t *lis_spin_lock_free(lis_spin_lock_t *lock, const char *name);</pre>
+      </blockquote>
+      <p>The allocation function returns a pointer to the spin lock, or NULL if 
+        the memory could not be allocated. The free function returns a NULL pointer 
+        for the convenience of the caller.
+      <p>For further information on spin locks, see the section on <a href="#Debugging_Spin_Locks">debugging 
+        spin locks</a>. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <p>To lock and unlock a spinlock, use any of the following pairs of routines.&nbsp; 
+        If you use the first routine to lock the spin lock then be sure to use 
+        its companion unlock routine.&nbsp; For nesting considerations, <a href="#Lock Nesting">see 
+        below</a>. 
+      <p> 
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp; lis_spin_lock(lis_spin_lock_t *lock) ;</tt>
+<tt>void&nbsp;&nbsp;&nbsp; lis_spin_unlock(lis_spin_lock_t *lock) ;</tt>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; lis_spin_trylock(lis_spin_lock_t *lock) ;</tt></pre>
+      </blockquote>
+      <p>These routines are to be called only from background processing to lock 
+        and unlock a spin lock.&nbsp; The trylock routine locks the spin lock 
+        if it is available, returning "true", or leaves it unlocked if it is unavailable, 
+        returning "false". 
+      <p>Background processing means any STREAMS driver processing that does not 
+        occur at interrupt time.&nbsp; These routines lock the lock but do not 
+        exclude interrupt routines from execution.&nbsp; Thus, your interrupt 
+        service routine can still be called whether or not your driver is holding 
+        a spin lock that was locked with one of these routines. 
+      <p>You can nest pairs of calls to these routines from the same thread of 
+        execution.&nbsp; <a href="#Lock Nesting">See below</a> for more information 
+        on lock nesting. 
+      <p>Usage example: <br>
+        &nbsp; 
+      <blockquote> 
+        <pre><tt>lis_spin_lock(&amp;mylock) ;</tt>
+<tt>...</tt>
+<tt>lis_spin_unlock(&amp;mylock) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp; lis_spin_lock_irq(lis_spin_lock_t *lock) ;</tt>
+<tt>void&nbsp;&nbsp;&nbsp; lis_spin_unlock_irq(lis_spin_lock_t *lock);</tt></pre>
+      </blockquote>
+      <p>This pair of routines locks the spin lock with interrupts disabled for 
+        the duration of the holding of the lock.&nbsp; The routine <font face="Courier New, Courier, mono">lis_spin_lock_irq 
+        </font>re-enables interrupts after unlocking the lock. 
+      <p>You can use this technique to exclude interrupt routine execution.&nbsp; 
+        However, it is not advisable for interrupt routines themselves, or any 
+        routines called from an interrupt routine, to use this mechanism since 
+        the unlock primitive unconditionally enables interrupts, which may not 
+        be desirable from inside an interrupt routine. 
+      <p>These routines may be used in nested fashion.&nbsp; Only the outermost 
+        unlock routine will actually enable interrupts.&nbsp; <a href="#Lock Nesting">See 
+        below</a> for more information about lock nesting. 
+      <p>Usage example: 
+      <blockquote> 
+        <pre><tt>lis_spin_lock_irq(&amp;mylock) ;</tt>
+<tt>...</tt>
+<tt>lis_spin_unlock_irq(&amp;mylock) ;</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <blockquote> 
+        <pre>void&nbsp;&nbsp;&nbsp; lis_spin_lock_irqsave(lis_spin_lock_t *lock, int *flags) ;
+void&nbsp;&nbsp;&nbsp; lis_spin_unlock_irqrestore(lis_spin_lock_t *lock,int *flags) ;</pre>
+      </blockquote>
+      <p>This pair of routines is similar to the "<font face="Courier New, Courier, mono">spin_lock_irq</font>" 
+        routines in that the locking routine disables interrupts.&nbsp; However, 
+        it saves the interrupt state in the integer argument whose pointer is 
+        passed to the locking routine.&nbsp; The unlock routine then restores 
+        the interrupt state after unlocking the lock. 
+      <p>These routines are suitable for use by routines that are called both 
+        from interrupt level and from background.&nbsp; They also have the effect, 
+        when used in an interrupt routine, of excluding multiple execution of 
+        an interrupt routine on multiple CPUs in an SMP system. 
+      <p>These routines may be used in nested fashion.&nbsp; Only the outermost 
+        unlock routine will actually restore the interrupt state.&nbsp; <a href="#Lock Nesting">See 
+        below</a> for more information about lock nesting. 
+      <p>Usage example: 
+      <blockquote> 
+        <pre><tt>lis_spin_lock_t&nbsp;&nbsp;&nbsp; mylock ;</tt>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags ;</tt></pre>
+        <pre><tt>lis_spin_lock_irqsave(&amp;mylock, &amp;flags) ;</tt>
+<tt>...</tt>
+<tt>lis_spin_unlock_irqrestore(&amp;mylock, &amp;flags) ;</tt></pre>
+      </blockquote>
+      <p>Note that the unlock routine is passed the <i>address</i> of the flags 
+        just as in calling the lock routine. </p>
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="Lock Nesting"></a>Lock Nesting</h3>
+      <p>LiS spin locks can be locked and unlocked in nested fashion.&nbsp; When 
+        doing so, it is always best to use the same pair of lock and unlock routines 
+        at all levels of nesting for the same lock.&nbsp; Mixing different types 
+        of locking can lead to unexpected results and non-portable behavior. </p>
+      <p>LiS allows a single thread to lock spin locks in nested fashion.&nbsp; 
+        That is, the second and subsequent calls to the lock routine from a single 
+        thread will not spin on the lock because of finding it in a locked state 
+        from the first call.&nbsp; Also, every unlock call except the last one, 
+        the one that balances the first locking call, does not unlock the lock.&nbsp; 
+        Only the outermost unlock call causes the lock to be unlocked. 
+      <p>If the nesting is via <font face="Courier New, Courier, mono">lis_spin_lock_irq</font>, 
+        then only the outermost unlock call enables interrupts.&nbsp; If the nesting 
+        is via <font face="Courier New, Courier, mono">lis_spin_lock_irqsave</font>, 
+        then only the outermost unlock call restores the interrupt state. 
+      <p>When two or more threads attempt to lock a spin lock "simultaneously" 
+        only one thread is allowed to proceed at a time.&nbsp; The other threads 
+        "spin", that is, the CPUs executing the other threads are executing a 
+        loop that tests the lock repeatedly until it becomes available.&nbsp; 
+        Consequently, it is advisable to use locks to protect the execution of 
+        fairly short pieces of code if there is any likelihood of contention for 
+        the lock.&nbsp; While one thread is holding the lock, other CPUs may be 
+        idling waiting for it. 
+      <p>In the context of locking, "simultaneously" means any time from the moment 
+        of the first thread locking the spin lock until that thread unlocks the 
+        lock.&nbsp; If another thread attempts to lock the spin lock at any point 
+        in that interval then it will "spin." 
+      <p>When multiple threads use multiple spin locks to protect multiple resources, 
+        it is always a good idea if all threads execute "lock" operations on the 
+        multiple spin locks in the same order.&nbsp; It is also highly recommended 
+        that they execute "unlock" operations in the exact reverse order as the 
+        "lock" operations.&nbsp; This avoids so-called "deadly embrace" situations 
+        in which process A acquires spin lock A, process B acquires spin lock 
+        B, and then process A waits on B while process B waits on A. <br>
+        &nbsp; 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3>LiS Read/Write Locks<a name="LiSReadWriteLocks"></a></h3>
+      <p>LiS offers an abstraction of the kernel's read/write locks. The LiS abstractions 
+        allow STREAMS drivers to use these locks without concern for changes that 
+        occur from one version of the kernel to the next.</p>
+      <p>A read/write lock is declared as a special data object of type lis_rw_lock_t. 
+        There are two types of routines to manipulate these locks. One set operates 
+        on the lock as a &quot;read&quot; lock. The other set operates on the 
+        lock as a &quot;write&quot; lock.</p>
+      <p>There can be multiple threads owning the lock in read mode. There can 
+        only be one thread that owns the lock in write mode. Furthermore, in order 
+        to acquire the lock in write mode, all the owners of the read mode lock 
+        must give it up.</p>
+      <p>The locks are used in the obvious way. If you only need to read the protected 
+        structure you use the read lock routine. If you need to change the structure 
+        you use the write lock routine.</p>
+      <p>Note that once you have a read lock you must give it up in order to get 
+        the same lock as a write lock.</p>
+      <p>The lock manipulation routines also allow for &quot;regular&quot;, &quot;irq&quot; 
+        and &quot;irqsave&quot; manipulations of the read/write locks, just as 
+        with spin locks.</p>
+      <p>You must initialize your lock before using it, just as with spin locks. 
+        And in parallel to spin locks LiS provides two initialization routines. 
+        One operates directly on the read/write lock, and the other allocates 
+        memory dynamically for the lock. You can deallocate the dynamically allocated 
+        lock by calling the &quot;free&quot; routine.</p>
+      <p>The following is a listing of the read/write lock routines in LiS. The 
+        prototypes are in the file &lt;sys/lislocks.h&gt;.</p>
+      <pre>void           lis_rw_read_lock(lis_rw_lock_t *lock) ;
+void           lis_rw_write_lock(lis_rw_lock_t *lock) ;
+void           lis_rw_read_unlock(lis_rw_lock_t *lock) ;
+void           lis_rw_write_unlock(lis_rw_lock_t *lock) ;
+
+
+void           lis_rw_read_lock_irq(lis_rw_lock_t *lock) ;
+void           lis_rw_write_lock_irq(lis_rw_lock_t *lock) ;
+void           lis_rw_read_unlock_irq(lis_rw_lock_t *lock) ;
+void           lis_rw_write_unlock_irq(lis_rw_lock_t *lock) ;
+
+
+void           lis_rw_read_lock_irqsave(lis_rw_lock_t *lock, int *flags) ;
+void           lis_rw_write_lock_irqsave(lis_rw_lock_t *lock, int *flags) ;
+void           lis_rw_read_unlock_irqrestore(lis_rw_lock_t *lock, int *flags) ;
+void           lis_rw_write_unlock_irqrestore(lis_rw_lock_t *lock, int *flags);
+
+
+void           lis_rw_lock_init(lis_rw_lock_t *lock, const char *name) ;
+lis_rw_lock_t *lis_rw_lock_alloc(const char *name) ;
+lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
+      <p>&nbsp;</p>
+      <p><br>
+        &nbsp; <a href="#Contents">Back to Contents</a> </p>
+      <hr size=1 width="60%">
+      <h3> <a name="LiS Interrupt Enable/Disable"></a>LiS Interrupt Enable/Disable</h3>
+      <p>LiS provides primitives for enabling and disabling interrupts modelled 
+        after the SVR4 SPL mechanism.&nbsp; There is one routine that is used 
+        to disable interrupts and another one for enabling interrupts.&nbsp; The 
+        routines are as follows: </p>
+      <blockquote> 
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp; lis_splstr(void) ;</tt>
+<tt>void&nbsp;&nbsp;&nbsp; lis_splx(int x) ;</tt></pre>
+      </blockquote>
+      <p>The <font face="Courier New, Courier, mono">lis_splstr</font> routine 
+        is used to disable interrupts.&nbsp; It returns a value that must be passed 
+        to <font face="Courier New, Courier, mono">lis_splx</font> when it it 
+        desired to restore the interrupt level to its previous state.&nbsp; These 
+        two routines are implemented using the primitives <font face="Courier New, Courier, mono">lis_spin_lock_irqsave</font> 
+        and <font face="Courier New, Courier, mono">lis_spin_unlock_irqrestore</font>. 
+      <p>These routines can be used from background code ("put" and "service" 
+        procedures, or "open" and "close" routines), or from interrupt level.&nbsp; 
+        LiS itself uses these routines to protect STREAMS structures from ill-timed 
+        modification by interrupt routines.&nbsp; Many LiS utility routines, such 
+        as putq, getq and qenable, call these routines within themselves. 
+      <p>It is safe, and occurs frequently, to use these routines in a nested 
+        fashion.&nbsp; When using these routines in a nested fashion be sure that 
+        the value returned by the call to <font face="Courier New, Courier, mono">lis_splstr</font> 
+        at level <i>n</i> is the value passed back to <font face="Courier New, Courier, mono">lis_splx</font> 
+        at level <i>n</i>.&nbsp; The nesting rules for these routines are otherwise 
+        the same as for the pair <font face="Georgia, Times New Roman, Times, serif">lis_spin_lock_irqsave</font> 
+        and <font face="Georgia, Times New Roman, Times, serif">lis_spin_unlock_irqrestore</font>. 
+      <p>Usage examples: 
+      <blockquote> 
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x, y ;</tt></pre>
+        <pre><tt>x = lis_splstr() ;</tt>
+<tt>...</tt>
+<tt>y = lis_splstr() ;</tt>
+<tt>...</tt>
+<tt>lis_splx(y) ;</tt>
+<tt>...</tt>
+<tt>lis_splx(x) ;</tt></pre>
+      </blockquote>
+      <p>For further information on these routines see the section on <a href="#Debugging_Spin_Locks">debugging 
+        spin locks</a>. 
+      <p> <br>
+        <a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <h3> <a name="LiS Semaphores"></a>LiS Semaphores</h3>
+      <p>LiS provides an implementation of semaphores that is built upon the Linux 
+        kernel's semaphores.&nbsp; The LiS implementation adds features to the 
+        kernel semaphores such as the following: </p>
+      <ul>
+        <li> LiS semaphores are more debuggable.&nbsp; The LiS semaphore structure 
+          contains fields that save the file name and line number of the semaphore 
+          owner.&nbsp; This makes it easier to debug drivers which utilize semaphores.</li>
+        <li> LiS semaphores retain error information.&nbsp; When a "down" operation 
+          fails, LiS saves the error number in the semaphore structure for post 
+          mortem analysis.</li>
+        <li> LiS semaphores are portable.&nbsp; A STREAMS driver can utilize the 
+          same LiS semaphore mechanism across different versions of the Linux 
+          kernel.&nbsp; This pushes the kernel differences into LiS and out of 
+          the STREAMS driver code.</li>
+        <li>LiS semaphores can be easily allocated dynamically so your driver 
+          is completely immune from Linux kernel version considerations.</li>
+        <li> LiS semaphores are documented.&nbsp; You don't have to read the kernel 
+          source code to figure out how to use them.</li>
+      </ul>
+      <p>For these reasons I highly recommend that STREAMS drivers use the LiS 
+        semaphore implementation in place of the direct kernel semaphores.&nbsp; 
+        The portability aspect of LiS semaphores cannot be overemphasized.&nbsp; 
+        Different Linux kernel compile-time options can lead to a proliferation 
+        of STREAMS driver code versions, or the necessity of always compiling 
+        the driver from source when it is installed.&nbsp; LiS semaphores allow 
+        a STREAMS driver to be compiled independently of kernel options with only 
+        the binary needed at driver installation time. </p>
+      <p>To declare an LiS semaphore, use a declaration similar to the following: 
+      <blockquote> 
+        <pre><tt>lis_semaphore_t&nbsp;&nbsp;&nbsp; mysem ;</tt></pre>
+      </blockquote>
+      <p>LiS semaphores must be initialized before they are used.&nbsp; Use the 
+        following routine to initialize a declared semaphore. </p>
+      <blockquote> 
+        <pre><tt>void&nbsp;&nbsp;&nbsp;&nbsp; lis_sem_init(lis_semaphore_t *,int);</tt></pre>
+      </blockquote>
+      <p>If you initialize the semaphore to 0, then the first "down" operation 
+        on the semaphore will wait.&nbsp; If you initialize it to 1, then the 
+        first "down" operation will not wait.&nbsp; If you initialize it to <i>n</i>, 
+        then the first <i>n</i> "down" operations will not wait. 
+      <p><a name="dynamicsemaphores"></a>You can also allocate semaphores dynamically 
+        using the following routine. 
+      <blockquote> 
+        <pre><tt>lis_semaphore_t&nbsp;&nbsp;&nbsp;&nbsp; *lis_sem_alloc(int);</tt></pre>
+      </blockquote>
+      <p>This routine uses the kernel's memory allocator to allocate space for 
+        the semaphore. The <font face="Courier New, Courier, mono">lis_sem_destroy</font> 
+        routine will deallocate it for you. The advantage of using this routine 
+        is that your STREAMS driver only has to have a pointer to the semaphore, 
+        not a semaphore structure itself. This adds an extra level of protection 
+        of your driver from kernel version considerations.
+      <p>You can use the semaphore value to manage a pool of resources by initializing 
+        a semaphore to the number of items in the resource and having a driver 
+        open routine perform a "down" operation on the semaphore.&nbsp; This causes 
+        the open operations to be queued until the resource is available.
+      <p>LiS semaphores should be explicitly destroyed when they are no longer 
+        needed, typically from your STREAMS driver close routine. This operation 
+        is accomplished via the following routine.
+      <blockquote> 
+        <pre><tt>lis_semaphore_t&nbsp;&nbsp;&nbsp;&nbsp; *lis_sem_destroy(lis_semaphore_t *,int);</tt></pre>
+      </blockquote>
+      <p>This routine returns a NULL pointer for the convenience of the caller.
+      <p>For further information on semaphores, see the section on <a href="#Debugging_Semaphores">debugging 
+        semaphores</a>. 
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr size=1 width="60%">
+      <p>The following two routines are used to acquire and release a semaphore. 
+      <blockquote> 
+        <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lis_down(lis_semaphore_t *sem) ;</tt>
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp; lis_up(lis_semaphore_t *sem) ;</tt></pre>
+      </blockquote>
+      <p>The routine <font face="Courier New, Courier, mono">lis_down</font> returns 
+        0 for success and a negative error code for failure.&nbsp; The caller 
+        has not acquired the semaphore unless the routine returns zero. 
+      <p>One reason for a negative return could be that the calling task was signalled 
+        while waiting for the semaphore to become available.&nbsp; If this has 
+        occurred the return code will be set to -EINTR. 
+      <p>Semaphores cannot be used in nested fashion.&nbsp; Care must be exercised 
+        that a single thread only performs one "down" operation on a given semaphore. 
+      <p>When multiple threads use multiple semaphores to protect multiple resources, 
+        it is always a good idea if all threads execute "down" operations on the 
+        multiple semaphores in the same order.&nbsp; It is also highly recommended 
+        that they execute "up" operations in the exact reverse order as the "down" 
+        operations.&nbsp; This avoids so-called "deadly embrace" situations in 
+        which process A acquires semaphore A, process B acquires semaphore B, 
+        and then process A waits on B while process B waits on A. 
+      <p>Semaphores should be used only in STREAMS driver "open" and "close" routines.&nbsp; 
+        STREAMS driver "put" and "service" procedures are not allowed to sleep.&nbsp; 
+        They should use spin locks instead of semaphores. 
+      <p>Usage example: 
+      <blockquote> 
+        <pre><tt>if (lis_down(&amp;mysem) == 0)</tt>
+<tt>{</tt>
+   <tt> ...</tt>
+    <tt>lis_up(&amp;mysem) ;</tt>
+<tt>}</tt></pre>
+      </blockquote>
+      <a href="#Contents">Back to Contents</a> <br>
+      &nbsp; 
+      <hr size=1 width="60%">
+      <h3>Debugging Spin Locks<a name="Debugging_Spin_Locks"></a></h3>
+      <p>LiS spin lock structures contain fields that assist in the debugging 
+        of spin-lock related problems. The LiS spin lock structure contains the 
+        following fields.</p>
+      <table width="96%" border="1" bordercolor="#FFFFFF">
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%"><i>Field</i></td>
+          <td width="62%"><i>Description</i></td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">spin_lock_mem</font></td>
+          <td width="62%" valign="top">An opaque memory area that contains the 
+            kernel's spin lock structure.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">name</font></td>
+          <td width="62%" valign="top">Pointer to an ASCII name for the lock. 
+            This allows one to readily identify the function of the lock (assuming 
+            that it is aptly named).</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">taskp</font></td>
+          <td width="62%" valign="top">A (void *) which is really a (struct task_struct 
+            *) pointer. It points to the task that originally acquired the lock, 
+            or is NULL if no task has acquired the lock.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">spinner_file, 
+            spinner_line</font></td>
+          <td width="62%" valign="top">File and line number of the most recent 
+            call to one of the lis_spin_lock functions. This tells which line 
+            of code most recently tried to get the lock.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">owner_file, 
+            owner_line</font></td>
+          <td width="62%" valign="top">File and line number of the call to one 
+            of the lis_spin_lock functions that first acquired the lock. These 
+            fields are set at the same time as the taskp field.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">unlocker_file, 
+            unlocker_line</font></td>
+          <td width="62%" valign="top">File and line number of the call to one 
+            of the lis_spin_unlock functions that performed the final unlock on 
+            the lock, thus making it available for another thread. These fields 
+            are set at the same time as the taskp field is set to NULL.</td>
+        </tr>
+      </table>
+      <p>If a thread owns the lock then its value of the <font face="Courier New, Courier, mono">current</font> 
+        task pointer will be in <font face="Courier New, Courier, mono">taskp</font>. 
+        If there is no other thread spinning on the lock, and if the lock has 
+        not been acquired in a nested fashion, then the spinner and owner fields 
+        will indicate the same file and line number.</p>
+      <p>If the <font face="Courier New, Courier, mono">spinner</font> and <font face="Courier New, Courier, mono">owner</font> 
+        fields are different and if the <font face="Courier New, Courier, mono">taskp</font> 
+        is non-NULL then if the thread that most recently called one of the <font face="Courier New, Courier, mono">lis_spin_lock</font> 
+        routines is different from the task that owns the lock, then that other 
+        task is spinning on the lock. By examination of the lock you can see which 
+        task owns the lock and where in the code it was acquired. This is often 
+        enough information to figure out why a deadlock is occurring.</p>
+      <p>A &quot;deadly embrace&quot; occurs when two threads each need to acquire 
+        two spin locks but they acquire them in the opposite order from each other. 
+        Under circumstances of contention each process owns the lock that the 
+        other is spinning on and will not release the lock until it acquires the 
+        other lock. Thus, both threads spin forever.</p>
+      <p>Note that the LiS <font face="Courier New, Courier, mono">splstr</font> 
+        and <font face="Courier New, Courier, mono">splx</font> functions are 
+        written in terms of LiS spin locks. LiS does not use these routines internally. 
+        They are provided to the user for backwards compatibility. However, it 
+        is important to know that these routines are spin locks in disguise. This 
+        means that the order of use of these functions mixed in with explicit 
+        spin lock manipulations may also lead to deadly embraces.</p>
+      <p><a name="spl-track"></a>An effective technique for troubleshooting these 
+        kinds of problems is to use the two-machine kernel debugger, <a href="http://www.gcom.com/home/linux/kgdb.html">kgdb</a>. 
+        With this setup you can break into the target machine and look at memory 
+        using high level debugging techniques, including printing out of structures. 
+        Using kgdb you can find out where each CPU is executing, look at the corresponding 
+        source code lines, observe the locks that are involved, and then print 
+        out the <font face="Courier New, Courier, mono">lis_spin_lock_t</font> 
+        structures for the specific locks. Oftentimes the information contained 
+        in the two locks will immediately reveal the nature of the deadly embrace.</p>
+      <p>It is also possible to have LiS trace all lock and semaphore operations. 
+        One of the LiS debug bits enables this function. To set this debug bit 
+        use the following command.</p>
+      <blockquote> 
+        <p><font face="Courier New, Courier, mono">streams -d0x0x80000</font></p>
+      </blockquote>
+      <p>This causes LiS to make entries in a global trace buffer named <font face="Courier New, Courier, mono">lis_spl_track</font>. 
+        The global pointer <font face="Courier New, Courier, mono">lis_spl_track_ptr</font> 
+        indicates the next location in the table into which an entry is to be 
+        placed, which means that it points to the oldest entry in the buffer. 
+        Entries in the buffer are of type <font face="Courier New, Courier, mono">spl_track_t</font>.</p>
+      <p>The fields of this structure are as follows.</p>
+      <table width="96%" border="1" bordercolor="#FFFFFF">
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%"><i>Field</i></td>
+          <td width="62%"><i>Description</i></td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">type</font></td>
+          <td width="62%" valign="top"> 
+            <table width="77%" border="1" bordercolor="#FFFFFF">
+              <tr bordercolor="#FFFFFF"> 
+                <td colspan="2">The type of entry as follows. </td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right"><i>Value</i></div>
+                </td>
+                <td width="77%"><i>Meaning</i></td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right">1</div>
+                </td>
+                <td width="77%">splstr</td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right">2</div>
+                </td>
+                <td width="77%">splx</td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right">3</div>
+                </td>
+                <td width="77%">spin lock</td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right">4</div>
+                </td>
+                <td width="77%">spin unlock</td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right">5</div>
+                </td>
+                <td width="77%">semaphore down</td>
+              </tr>
+              <tr bordercolor="#FFFFFF"> 
+                <td width="23%"> 
+                  <div align="right">6</div>
+                </td>
+                <td width="77%">semaphore up</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">cpu</font></td>
+          <td width="62%" valign="top">The cpu number of the processor which made 
+            this entry.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">addr</font></td>
+          <td width="62%" valign="top">The address of the spin lock or semaphore 
+            involved in the operation.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">tskp</font></td>
+          <td width="62%" valign="top">The task pointer for the task that made 
+            this entry.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">state</font></td>
+          <td width="62%" valign="top">Nesting value for spin locks, count field 
+            of the semaphore.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">file, 
+            line</font></td>
+          <td width="62%" valign="top">File and line number of the call to the 
+            LiS locking or semaphore routine that caused this entry to be made.</td>
+        </tr>
+      </table>
+      <p>The trace buffer contains 4096 of these entries, maintained in a circular 
+        fashion. By printing out these entries you can see the history of lock 
+        manipulation within LiS. The command <font face="Courier New, Courier, mono">streams 
+        -p</font> causes LiS to print out this table from within the kernel. The 
+        resulting output can be found in <font face="Courier New, Courier, mono">/var/log/messages</font> 
+        (typically). However, in practice the system is usually hung when you 
+        need this information so you end up printing it from within the debugger.</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr size=1 width="60%">
+      <h3>Debugging Semaphores<a name="Debugging_Semaphores"></a></h3>
+      <p>LiS semaphore structures contain fields that assist in the debugging 
+        of semaphore related problems. The LiS semaphore structure contains the 
+        following fields.</p>
+      <table width="96%" border="1" bordercolor="#FFFFFF">
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%"><i>Field</i></td>
+          <td width="62%"><i>Description</i></td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">sem_mem</font></td>
+          <td width="62%" valign="top">An opaque memory area that contains the 
+            kernel's semaphore structure.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">taskp</font></td>
+          <td width="62%" valign="top">A (void *) which is really a (struct task_struct 
+            *) pointer. It points to the task that most recently acquired the 
+            semaphore, or is NULL if no task has acquired the semaphore. The taskp 
+            is set to NULL just prior to calling the kernel's <font face="Courier New, Courier, mono">up</font> 
+            routine on the semaphore. Thus it stays NULL if no other task is pending 
+            on the semaphore.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">downer_file, 
+            downer_line</font></td>
+          <td width="62%" valign="top">File and line number of the most recent 
+            call to the lis_down function. This tells which line of code most 
+            recently tried to get the semaphore.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">owner_file, 
+            owner_line</font></td>
+          <td width="62%" valign="top">File and line number of the call to the 
+            lis_down function that acquired the semaphore. These fields are set 
+            at the same time as the taskp field.</td>
+        </tr>
+        <tr bordercolor="#FFFFFF"> 
+          <td width="10%">&nbsp;</td>
+          <td width="28%" valign="top"><font face="Courier New, Courier, mono">upper_file, 
+            upper_line</font></td>
+          <td width="62%" valign="top">File and line number of the call to the 
+            lis_up function. These fields are set at the same time as the taskp 
+            field is set to NULL.</td>
+        </tr>
+      </table>
+      <p>If the <font face="Courier New, Courier, mono">taskp</font> field is 
+        non-NULL then the semaphore is owned by the task so indicated. If it is 
+        NULL then the semaphore is unowned. The <font face="Courier New, Courier, mono">upper</font> 
+        fields show where the semaphore was last released.</p>
+      <p>If the <font face="Courier New, Courier, mono">downer</font> and <font face="Courier New, Courier, mono">owner</font> 
+        fields both indicate the same file and line number then that is an indication 
+        that the semaphore was acquired at that location in the program. If they 
+        are different, and if the <font face="Courier New, Courier, mono">taskp</font> 
+        is non-NULL, that is an indication that there is a task waiting on the 
+        semaphore at the <font face="Courier New, Courier, mono">downer</font> 
+        location. The <font face="Courier New, Courier, mono">owner</font> fields 
+        show where the semaphore was acquired.</p>
+      <p>Bear in mind that semaphore acquisitions do not nest as is the case with 
+        spin locks. Therefore, if the same thread calls <font face="Courier New, Courier, mono">lis_down</font> 
+        without calling <font face="Courier New, Courier, mono">lis_up</font> 
+        on the same semaphore then the thread will be deadlocked. The <font face="Courier New, Courier, mono">downer</font> 
+        and <font face="Courier New, Courier, mono">owner</font> fields will usually 
+        offer a clue to this type of deadlock.</p>
+      <p>You can also use the LiS <a href="#spl-track">lock trace buffer mechanism</a> 
+        to assist in debugging semaphore usage.</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <p> 
+      <hr width="100%">
+      <h2> <a name="STREAMS Utility Routines"></a>STREAMS Utility Routines</h2>
+      <p>The following routines are available to LiS STREAMS drivers.&nbsp; These 
+        are standard AT&amp;T SVR4 utility routines.&nbsp; They (hopefully) have 
+        the same semantics in LiS as they do in SVR4 STREAMS. </p>
+      <p>These routines are presented here in alphabetical order with no description.&nbsp; 
+        Please refer to the <a href="/dev_web/linux/lis/otherres.html">AT&amp;T 
+        SVR4 STREAMS</a> documentation for the descriptions of these routines. 
+      <hr size=1 width="60%">
+      <h3><a name="flush_band"></a>Flushing Queue Bands</h3>
+      <p>A special note on flushing queue bands is in order. The rules for flushing 
+        queues are a bit complex, so we wish to review them here in some detail. 
+      <p>First some definitions and some things that affect all queue flushing. 
+        The term &quot;data message&quot; in the context of queue flushing means 
+        messages of type <font face="Courier New, Courier, mono">M_DATA</font>, 
+        <font face="Courier New, Courier, mono">M_PROTO</font>, <font face="Courier New, Courier, mono">M_PCPROTO</font> 
+        or <font face="Courier New, Courier, mono">M_DELAY</font>. All other message 
+        types are considered &quot;non-data messages&quot;. You may find it less 
+        than intuitive that <font face="Courier New, Courier, mono">M_PCPROTO</font> 
+        is considered a &quot;data message&quot;. 
+      <p>The term &quot;ordinary message&quot; in the context of queue flushing 
+        means messages of type <font face="Courier New, Courier, mono">M_DATA</font>, 
+        <font face="Courier New, Courier, mono">M_PROTO</font>, <font face="Courier New, Courier, mono">M_BREAK</font>, 
+        <font face="Courier New, Courier, mono">M_CTL</font>, <font face="Courier New, Courier, mono">M_DELAY</font>, 
+        <font face="Courier New, Courier, mono">M_IOCTL</font>, <font face="Courier New, Courier, mono">M_PASSFP</font>, 
+        <font face="Courier New, Courier, mono">M_RSE</font>, <font face="Courier New, Courier, mono">M_SETOPTS</font> 
+        or <font face="Courier New, Courier, mono">M_SIG</font>. Please note that 
+        <font face="Courier New, Courier, mono">M_PCPROTO</font> is not on this 
+        list. 
+      <p>The <font face="Courier New, Courier, mono">flag</font> argument of <font face="Courier New, Courier, mono">FLUSHDATA</font> 
+        means that only &quot;data messages&quot; are to be flushed. The <font face="Courier New, Courier, mono">flag</font> 
+        argument of <font face="Courier New, Courier, mono">FLUSHALL</font> means 
+        that &quot;all&quot; messages are to be flushed. As we shall see, in flushing 
+        queue bands whether a message gets flushed or not depends upon what the 
+        meaning of the word &quot;all&quot; is. 
+      <p>First, let's take the case of the routine <font face="Courier New, Courier, mono">flushq(q,flag)</font>. 
+        If <font face="Courier New, Courier, mono">flag</font> is set to <font face="Courier New, Courier, mono">FLUSHDATA</font> 
+        then all &quot;data messages&quot; in the entire queue, including all 
+        queue bands, are flushed. If the <font face="Courier New, Courier, mono">flag</font> 
+        is set to <font face="Courier New, Courier, mono">FLUSHALL</font> then 
+        the entire queue is flushed.</p>
+      <p>The case of the routine <font face="Courier New, Courier, mono">flushband(q,band,flag)</font> 
+        is more complicated.</p>
+      <p>If the <font face="Courier New, Courier, mono">band</font> argument is 
+        <i>zero</i> then special rules apply. In this case, only &quot;ordinary&quot; 
+        messages are flushed from the queue. The value of the <font face="Courier New, Courier, mono">flag</font> 
+        parameter does not influence the operation. In Solaris STREAMS this behavior 
+        does not occur. They flush either &quot;data messages&quot; or &quot;all&quot; 
+        messages on band zero. Comments in the Solaris 8 source code indicate 
+        that the author of the flush code was somewhat confused on this point.</p>
+      <p>If the <font face="Courier New, Courier, mono">band</font> argument is 
+        <i>non-zero</i> then the specific band of the queue is flushed in a manner 
+        similar to that of <font face="Courier New, Courier, mono">flushq</font>. 
+        That is, the <font face="Courier New, Courier, mono">flag</font> argument 
+        of <font face="Courier New, Courier, mono">FLUSHDATA</font> means just 
+        flush &quot;data messages&quot; and the value of <font face="Courier New, Courier, mono">FLUSHALL</font> 
+        means flush &quot;all&quot; messages from the specific band.</p>
+      <p>One further item needs some attention. Whenever an <font face="Courier New, Courier, mono">M_PCPROTO</font> 
+        (or other &quot;high priority&quot;) message is inserted into a STREAMS 
+        queue it is queued ahead of all messages in any queue band. This means 
+        that an <font face="Courier New, Courier, mono">M_PCPROTO</font> cannot 
+        be directed to a queue band. It also means that <font face="Courier New, Courier, mono">flushband</font> 
+        can never flush an <font face="Courier New, Courier, mono">M_PCPROTO</font>, 
+        or any other &quot;high priority&quot; message from the queue. In order 
+        to flush <font face="Courier New, Courier, mono">M_PCPROTO</font>s you 
+        must call <font face="Courier New, Courier, mono">flushq</font> and flush 
+        the entire queue of either &quot;data messages&quot; or &quot;all&quot; 
+        messages. </p>
+      <p><a href="#Contents">Back to Contents</a><br>
+      </p>
+      <h3>Utility Prototypes<a name="utility-prototypes"></a></h3>
+      <p><a href="#A-D">A-D</a> <a href="#E-K">E-K</a> <a href="#L-P">L-P</a> 
+        <a href="#Q-S">Q-S</a> <a href="#T-Z">T-Z</a></p>
+      <h4>A-D<a name="A-D"></a></h4>
+      <pre><tt>int          adjmsg(mblk_t *mp, int length);</tt>
+<tt>struct msgb *allocb(int size, unsigned int priority);</tt> </pre>
+      <hr size=1 width="60%">
+      <pre><tt>queue_t *backq(queue_t *q);</tt>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bcanput(queue_t *q, unsigned char band);</tt>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bcanputnext(queue_t *q, unsigned char band);</tt>
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp; bcopy(void *src, void *dst, int nbytes) ;</tt>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bufcall(unsigned size, int priority, void (*function)(long), long arg);</tt> 
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp; bzero(void *addr, int nbytes) ;</tt> </pre>
+      <hr size=1 width="60%">
+      <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp; canput(queue_t *q);</tt>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; canputnext(queue_t *q);</tt>
+<tt>void&nbsp;&nbsp;&nbsp; cmn_err(int err_lvl, char *fmt, ...) ;</tt>       
+<tt>mblk_t *copyb(mblk_t *mp);
+</tt><tt>mblk_t *copymsg(mblk_t *mp);</tt> </pre>
+      <hr size=1 width="60%">
+      <pre><tt>#define datamsg(type)&nbsp;&nbsp; -- true if msg->b_datap->db_type is data</tt>
+<tt>mblk_t *dupb(mblk_t *mp);
+</tt><tt>mblk_t *dupmsg(mblk_t *mp);</tt> </pre>
+      <p><a href="#Contents">Back to Contents</a></p>
+      <h4>E-K<a name="E-K"></a></h4>
+      <pre>
+<tt>void&nbsp;&nbsp;&nbsp; enableok(queue_t *q);</tt> 
+<tt>mblk_t *esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; esbbcall(int priority, void (*function)(long), long arg);</tt>
+</pre>
+      <hr size=1 width="60%">
+      <pre><tt>void    <a href="#flush_band"><font face="Courier New, Courier, mono">flushband</font></a>(queue_t *q, unsigned char band, int flag);
+void    <a href="#flush_band"><font face="Courier New, Courier, mono">flushq</font></a>(queue_t *q, int flag);
+void    freeb(mblk_t *bp);
+void    freemsg(mblk_t *mp);</tt></pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; getmajor(dev_t dev) ;</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; getminor(dev_t dev) ;</tt> 
+<tt>mblk_t *getq(queue_t *q);</tt></pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>int&nbsp; insq(queue_t *q, mblk_t *emp, mblk_t *mp);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre><tt>void   *kmem_alloc(int siz, int wait_code);
+void   *kmem_zalloc(int siz, int wait_code);
+void    kmem_free(void *ptr,int siz);</tt></pre>
+      <p><a href="#Contents">Back to Contents</a></p>
+      <h4>L-P<a name="L-P"></a></h4>
+      <pre><tt>void    linkb(mblk_t *mp1, mblk_t *mp2);</tt></pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; msgdsize(mblk_t *mp);</tt> 
+<tt>mblk_t *msgpullup(mblk_t *mp, int length);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; msgsize(mblk_t *mp);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>void noenable(queue_t *q);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>queue_t *OTHERQ(queue_t *q);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>int&nbsp; pullupmsg(mblk_t *mp, int length);</tt> 
+<tt>int&nbsp; putbq(queue_t *q, mblk_t *mp);</tt> 
+<tt>int&nbsp; putctl(queue_t *q, int type);</tt> 
+<tt>int&nbsp; putctl1(queue_t *q, int type, int param);</tt> 
+<tt>void putnext(queue_t *q, mblk_t *mp);</tt> 
+<tt>int&nbsp; putnextctl(queue_t *q, int type);</tt> 
+<tt>int&nbsp; putnextctl1(queue_t *q, int type, int param);</tt> 
+<tt>int&nbsp; putq(queue_t *q, mblk_t *mp);</tt> 
+</pre>
+      <p><a href="#Contents">Back to Contents</a></p>
+      <h4>Q-S<a name="Q-S"></a></h4>
+      <pre>
+<tt>void qenable(queue_t *q);</tt> 
+<tt>void qreply(queue_t *q, mblk_t *mp);</tt> 
+<tt>int&nbsp; qsize(queue_t *q);</tt> 
+<tt>void qprocsoff(queue_t *rdq) ;</tt> 
+<tt>void qprocson(queue_t *rdq) ;</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>queue_t *RD(queue_t *q);</tt>
+<tt>queue_t *WR(queue_t *q);</tt>
+<tt>queue_t *OTHERQ(queue_t *q);</tt><tt>
+mblk_t&nbsp; *rmvb(mblk_t *mp, mblk_t *bp);</tt> 
+<tt>void&nbsp;&nbsp;&nbsp;&nbsp; rmvq(queue_t *q, mblk_t *mp);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>int&nbsp; SAMESTR(queue_t *q);</tt> 
+<tt>int&nbsp; strqget(queue_t *q, qfields_t what, unsigned char band, long *val);</tt> 
+<tt>int&nbsp; strqset(queue_t *q, qfields_t what, unsigned char band, long val);</tt> 
+</pre>
+      <p><a href="#Contents">Back to Contents</a></p>
+      <h4>T-Z<a name="T-Z"></a></h4>
+      <pre>
+<tt>int&nbsp; testb(int size, unsigned int priority);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre><a name="timeout"></a>
+<tt>#define HZ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -- ticks per second</tt> 
+<tt>typedef void&nbsp;&nbsp;&nbsp; timo_fcn_t(caddr_t arg) ;</tt> 
+<tt>toid_t&nbsp;         timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks);</tt>
+<tt>toid_t          lis_untimeout(toid_t id) ;</tt>        
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>void&nbsp;&nbsp;&nbsp; unbufcall(int bcid);</tt> 
+<tt>mblk_t *unlinkb(mblk_t *mp);</tt> 
+<tt>int&nbsp;&nbsp;&nbsp;&nbsp; untimeout(int id) ;</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>queue_t *WR(queue_t *q);</tt> 
+</pre>
+      <hr size=1 width="60%">
+      <pre>
+<tt>int&nbsp; xmsgsize(mblk_t *mp);</tt> 
+       &nbsp;        </pre>
+      <p><a href="#Contents">Back to Contents</a> 
+      <p> 
+      <hr width="100%">
+      <h2>System Calls from within the Kernel<a name="syscalls"></a></h2>
+      <p>LiS provides STREAMS drivers with a few system calls that can be made 
+        from within the kernel. These calls are intended to allow STREAMS drivers 
+        to manage their device special files through which the drivers are accessed. 
+        For example, by using the lis_mknod function a dynamically loaded driver 
+        can register itself with LiS, obtain a major device number and make its 
+        &quot;/dev&quot; entries at module load time. Using the lis_unlink function 
+        it can remove these &quot;/dev&quot; entries when the module unloads.</p>
+      <p>The semantics of the following routines are exactly the same as the user 
+        level routines of the same names without the &quot;lis_&quot; prefix. 
+        This is so because these routines are really just wrappers on a kernel 
+        system call. We list the function prototypes here but leave the detailed 
+        documentation to &quot;man pages&quot; and other documentation.</p>
+      <p>The following function prototypes exist in the file &lt;sys/dki.h&gt;.</p>
+      <pre><tt>int lis_mknod(char *name, int mode, dev_t dev) ; </tt></pre>
+      <pre><tt>int lis_unlink(char *name) ;</tt></pre>
+      <pre><tt>int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag, void *data) ; </tt></pre>
+      <pre><tt>int lis_umount(char *file, int flags) ; </tt></pre>
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr width="100%">
+      <p>&nbsp;</p>
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
