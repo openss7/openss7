@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/06 09:47:53 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/06 23:10:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 23:10:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/06 09:47:53 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/06 23:10:11 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/06 09:47:53 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/06 23:10:11 $";
 
 #define __NO_VERSION__
 
@@ -942,10 +942,10 @@ STATIC struct dentry *spec_dir_alloc(struct dentry *parent, const char *name, lo
 	str.name = name;
 	str.len = strnlen(name, FMNAMESZ);
 	str.hash = full_name_hash(str.name, str.len);
-	down(&base->i_sem);
+	// down(&base->i_sem); /* don't do this: we hold a cdevsw lock */
 	if ((dentry = d_alloc(parent, &str)))
 		d_add(dentry, iget4(base->i_sb, ino, NULL, opaque));
-	up(&base->i_sem);
+	// up(&base->i_sem); /* don't do this: we hold a cdevsw lock */
 	if (dentry && !dentry->d_inode) {
 		dput(dentry);
 		dentry = NULL;
@@ -962,9 +962,9 @@ STATIC void spec_dir_delete(struct dentry *child)
 {
 	struct inode *base, *inode;
 	struct dentry *parent;
-	ptrace(("strreg: deallocating dentry %s from parent %s\n", child->d_name.name, parent->d_name.name));
 	if (!child || !(parent = child->d_parent))
 		return;
+	ptrace(("strreg: deallocating dentry %s from parent %s\n", child->d_name.name, parent->d_name.name));
 	base = parent->d_inode;
 	inode = child->d_inode;
 	triple_down(&base->i_sem, &base->i_zombie, &inode->i_zombie);

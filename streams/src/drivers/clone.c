@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:50 $ by $Author: brian $
+ Last Modified $Date: 2004/06/06 23:08:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/06 09:47:50 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/06 23:08:27 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -264,16 +264,30 @@ int register_clone(struct cdevsw *cdev)
 {
 	int err;
 	struct devnode *cmin;
-	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC)))
-		return (-ENOMEM);
-	memset(cmin, 0, sizeof(*cmin));
-	cmin->n_name = cdev->d_name;
-	cmin->n_flag = clone_cdev.d_flag;
-	cmin->n_mode = clone_cdev.d_mode;
-	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0) {
-		kfree(cmin);
-		return (err);
+	ptrace(("registering clone minor for %s\n", cdev->d_name));
+	err = -ENOMEM;
+	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC))) {
+		printd(("could not allocate minor devnode structure\n"));
+		goto error;
 	}
+	memset(cmin, 0, sizeof(*cmin));
+	INIT_LIST_HEAD(&cmin->n_list);
+	INIT_LIST_HEAD(&cmin->n_hash);
+	cmin->n_name = cdev->d_name;
+	cmin->n_str = cdev->d_str;
+	cmin->n_flag = clone_cdev.d_flag;
+	cmin->n_modid = cdev->d_modid;
+	cmin->n_major = clone_cdev.d_major;
+	cmin->n_mode = clone_cdev.d_mode;
+	cmin->n_minor = cdev->d_major;
+	cmin->n_dev = &clone_cdev;
+	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_modid)) < 0) {
+		printd(("could not register minor node for %s, err = %d\n", cdev->d_name, -err));
+		kfree(cmin);
+		goto error;
+	}
+	printd(("STREAMS: registered clone minor for %s\n", cdev->d_name));
+      error:
 	return (err);
 }
 

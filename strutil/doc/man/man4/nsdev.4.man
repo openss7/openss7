@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: nsdev.4.man,v 0.9.2.5 2004/05/14 07:59:52 brian Exp $
+.\" @(#) $Id: nsdev.4.man,v 0.9.2.6 2004/06/06 23:06:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/14 07:59:52 $ by $Author: brian $
+.\" Last Modified $Date: 2004/06/06 23:06:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NSDEV 4 "$Date: 2004/05/14 07:59:52 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH NSDEV 4 "$Date: 2004/06/06 23:06:58 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stropts.h>
 .HP
-.BI "int " fd " = open(" \*(lq/dev/xxxyyy\*(rq ", " oflags );
+.BI "int " fd " = open(" \*(lq/dev/xxx.yyy\*(rq ", " oflags );
 .\"
 .\"
 .SH DESCRIPTION
@@ -119,7 +119,7 @@ component of the device number,
 .B nsdev
 looks for a registered
 .I STREAMS
-device with the same initial substring as the name of the device opened
+device with the same initial substring (before a dot) as the name of the device opened
 .RI ( xxx
 in the
 .RI \(lq SYNOPSIS \(rq
@@ -135,10 +135,9 @@ requests that the kernel load the module named
 .BI streams- xxx\fR,
 where
 .I xxx
-is the longest initial substring of the device name that contains only alpha
-characters and the underscore (\(lq_\(rq) character.  This makes it possiblt
-to create Named STREAMS Devices knowing only the character major device number
-associated with the
+is the longest initial substring of the device name that does not contain a
+period (\(lq.\(rq) character.  This makes it possible to create Named STREAMS
+Devices knowing only the character major device number associated with the
 .B nsdev
 driver and demand load other
 .I STREAMS
@@ -167,7 +166,7 @@ major device number as a minor number.  This is a traditional clone device
 application to the
 .B nsdev
 pseudo-device driver.
-This arragngement has the characteristic that when such a
+This arrangement has the characteristic that when such a
 .BR clone (4)
 device is opened, it chains the open call to the
 .B nsdev
@@ -188,7 +187,7 @@ can be used to create named clone devices.  A named clone device can be
 created by assigning the
 .B ndev
 major device number to devices with the name
-.BI clone yyy
+.BI clone. yyy
 and assigning the traditional clone device minor number (see
 .BR clone (4)).
 .\"
@@ -252,9 +251,9 @@ lfs
 shadow special device nodes call
 .BR nsdev_open ()
 from
-.BR chrdev_open ()
+.BR cdev_open ()
 instead of
-.BR strm_open ()
+.BR spec_open ()
 permitting the
 .B nsdev
 device to intercept and redirect the open call to the appropriate device.
@@ -274,13 +273,13 @@ Named STREAMS Device:
 .SS
 Named STREAMS Device Example
 .PP
-If the following is peformed to create the device (assuming that major device
+If the following is performed to create the device (assuming that major device
 number 56 is the major device number of the Named STREAMS Device):
 .sp
 .nf
 \fC\s-1\
-$> mknod -m 0666 /dev/streams04 c 56 3
-$> ln -s /dev/streams04 /dev/ticlts
+$> mknod -m 0666 /dev/mystream.04 c 56 3
+$> ln -s /dev/mystream.04 /dev/ticlts
 \s+1\fP
 .fi
 .sp
@@ -289,7 +288,7 @@ then opening
 will result in opening minor device number
 .I 3
 of the
-.RB \*(lq streams \*(rq
+.RB \*(lq mystream \*(rq
 device.
 The device will be opened with the
 .I sflag
@@ -298,7 +297,7 @@ argument to
 set to
 .B DRVOPEN
 unless the device has had cloning set using
-.BR DF_CLONE
+.BR D_CLONE
 during registration of the major or minor device nodes (see
 .BR register_strdev (9)),
 or unless
@@ -322,20 +321,20 @@ major device number is 74):
 .sp
 .nf
 \fC\s-1\
-$> mknod -m 0666 /dev/streams00 c 56 0
-$> mknod -m 0666 /dev/streams c 74 56
-$> ln -s /dev/streams my_super_clone_device
+$> mknod -m 0666 /dev/mystream.00 c 56 0
+$> mknod -m 0666 /dev/mystream c 74 56
+$> ln -s /dev/mystream my_super_clone_device
 \s+1\fP
 .fi
 .sp
 then opening either
 .RB \*(lq my_super_clone_device \*(rq
 or
-.RB \*(lq /dev/streams \*(rq
+.RB \*(lq /dev/mystream \*(rq
 will result in opening minor device number
 .I 0
 of the
-.RB \*(lq streams \*(rq
+.RB \*(lq mystream \*(rq
 device with the
 .I sflag
 argument to
@@ -393,7 +392,7 @@ Although
 .B nsdev
 is
 .B Linux Fast-STREAMS
-specific, the operation of this device is a filesystem artifice and is
+specific, the operation of this device is a file system artifice and is
 transparent to both the
 .I STREAMS
 device user and the
@@ -405,6 +404,7 @@ When the
 is opened directly, the driver has no indication that it has been opened via
 the Named STREAMS Device and, for all intents and purposes, appears to the
 driver as having been opened as a direct minor node of the driver.
+.PP
 See
 .BR STREAMS (9)
 for additional compatibility information.
