@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: genconf.h.in,v 1.1.6.2 2005/03/11 01:39:41 brian Exp $
+ @(#) $Id: genconf.h.in,v 1.1.6.3 2005/04/01 06:22:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/11 01:39:41 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 06:22:34 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -67,5 +67,13 @@
 #define LIS_ATOMIC_STATS 1
 #endif
 #endif
+
+/* following are for osif */
+#undef HAVE_KFUNC_PCI_FIND_CLASS
+#undef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#undef HAVE_KFUNC_PCI_DMA_SYNC_SG
+#undef HAVE_KFUNC_SLEEP_ON
+#undef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#undef HAVE_KFUNC_SLEEP_ON_TIMEOUT
 
 #endif				/* __SYS_LIS_GENCONF_H__ */

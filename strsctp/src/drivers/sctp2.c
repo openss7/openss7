@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/01 09:52:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:26 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/01 09:52:29 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/01 09:52:29 $";
 
 #include "sctp_compat.h"
 #include "sctp_hooks.h"
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:26 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/01 09:52:29 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -932,8 +932,8 @@ DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 struct sctp_mib sctp_statistics[NR_CPUS * 2];
 #endif				/* DEFINE_SNMP_STAT */
 #else				/* HAVE_OPENSS7_SCTP || HAVE_LKSCTP_SCTP */
-#ifdef DECLARE_SNMP_STAT
-DECLARE_SNMP_STAT(struct sctp_mib, sctp_statistics);
+#ifdef DEFINE_SNMP_STAT
+DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 #endif				/* DEFINE_SNMP_STAT */
 #endif				/* HAVE_OPENSS7_SCTP || HAVE_LKSCTP_SCTP */
 
@@ -1750,8 +1750,6 @@ struct sctp_tcb {
  *
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE void sctp_unlockq(queue_t *q);
-
 #define sctp_init_lock(__sp) spin_lock_init(&((__sp)->qlock))
 #define sctp_locked(__sp) ((__sp)->users > 0)
 #define release_sctp(__sp) sctp_unlockq((__sp)->rq)
@@ -1767,6 +1765,29 @@ STATIC INLINE void sctp_unlockq(queue_t *q);
 #define sctp_unlock_bh(__sp) spin_unlock_bh(&((__sp)->qlock))
 
 STATIC spinlock_t sctp_protolock = SPIN_LOCK_UNLOCKED;
+
+STATIC void sctp_cleanup_read(struct sctp *sp);
+STATIC void ___sctp_transmit_wakeup(struct sctp *sp);
+
+STATIC INLINE void
+sctp_unlockq(queue_t *q)
+{
+	struct sctp *sp = SCTP_PRIV(q);
+	sctp_lock_bh(sp);
+	if (sp->rwait)
+		qenable(xchg(&sp->rwait, NULL));
+	else
+		sctp_cleanup_read(sp);	/* deliver to userq what is possible */
+	if (sp->wwait)
+		qenable(xchg(&sp->wwait, NULL));
+	else
+		___sctp_transmit_wakeup(sp);	/* reply to peer what is necessary */
+	if (--sp->users < 0) {
+		swerr();
+		sp->users = 0;
+	}
+	sctp_unlock_bh(sp);
+}
 
 /*
  *  =========================================================================
@@ -4297,6 +4318,30 @@ sctp_verify_cookie(sctp_t *sp, struct sctp_cookie *ck)
 }
 
 /*
+ *  CONGESTION/RECEIVE WINDOW AVAILABILITY
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *
+ *  Calculate of the remaining space in the current packet, how much is available for use by data
+ *  according to the current peer receive window, the current destination congestion window, and the
+ *  current outstanding data bytes in flight.
+ *
+ *  This is called iteratively as each data chunk is tested for bundling into the current message.
+ *  The usable length returned does not include the data chunk header.
+ */
+STATIC INLINE size_t
+sctp_avail(sctp_t *sp, struct sctp_daddr *sd)
+{
+	size_t cwnd, rwnd, swnd, awnd;
+	cwnd = sd->cwnd + sd->mtu + 1;
+	cwnd = (cwnd > sd->in_flight) ? cwnd - sd->in_flight : 0;
+	rwnd = sp->p_rwnd;
+	rwnd = (rwnd > sp->in_flight) ? rwnd - sp->in_flight : 0;
+	swnd = (cwnd < rwnd) ? cwnd : rwnd;
+	awnd = (sp->in_flight) ? swnd : cwnd;
+	return awnd;
+}
+
+/*
  *  =========================================================================
  *
  *  IP OUTPUT: ROUTING FUNCTIONS
@@ -4312,7 +4357,6 @@ sctp_verify_cookie(sctp_t *sp, struct sctp_cookie *ck)
  *  -------------------------------------------------------------------------
  *  Break a tie between two equally rated routes.
  */
-STATIC INLINE size_t sctp_avail(sctp_t *sp, struct sctp_daddr *sd);
 STATIC INLINE struct sctp_daddr *
 sctp_break_tie(sctp_t *sp, struct sctp_daddr *sd1, struct sctp_daddr *sd2)
 {
@@ -5141,30 +5185,6 @@ struct sctp_bundle_cookie {
 	size_t swnd;			/* remaining send window */
 	size_t pbuf;			/* peer buffer */
 };
-
-/*
- *  CONGESTION/RECEIVE WINDOW AVAILABILITY
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *
- *  Calculate of the remaining space in the current packet, how much is available for use by data
- *  according to the current peer receive window, the current destination congestion window, and the
- *  current outstanding data bytes in flight.
- *
- *  This is called iteratively as each data chunk is tested for bundling into the current message.
- *  The usable length returned does not include the data chunk header.
- */
-STATIC INLINE size_t
-sctp_avail(sctp_t *sp, struct sctp_daddr *sd)
-{
-	size_t cwnd, rwnd, swnd, awnd;
-	cwnd = sd->cwnd + sd->mtu + 1;
-	cwnd = (cwnd > sd->in_flight) ? cwnd - sd->in_flight : 0;
-	rwnd = sp->p_rwnd;
-	rwnd = (rwnd > sp->in_flight) ? rwnd - sp->in_flight : 0;
-	swnd = (cwnd < rwnd) ? cwnd : rwnd;
-	awnd = (sp->in_flight) ? swnd : cwnd;
-	return awnd;
-}
 
 STATIC mblk_t *sctp_alloc_chk(struct sctp *sp, size_t clen, size_t dlen);
 /*
@@ -6065,7 +6085,7 @@ sctp_error_report(struct sctp *sp, int err)
  *  address).
  *
  */
-STATIC INLINE int sctp_abort(struct sctp *sp, t_uscalar_t origin, t_scalar_t reason);
+STATIC int sctp_abort(struct sctp *sp, t_uscalar_t origin, t_scalar_t reason);
 /*
  *  This version for use by bottom halves that have the socket or stream locked so that it will not
  *  attempt to lock the socket or stream on disconnect.
@@ -6427,6 +6447,36 @@ sctp_retr_con(struct sctp *sp)
 	return (-EFAULT);
 }
 
+#ifdef SCTP_CONFIG_ECN
+/*
+ *  SEND ECNE (Explicit Congestion Notification Echo)
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *  Just mark an ECNE chunk to be sent with the next SACK (and don't delay SACKs).
+ */
+STATIC INLINE void
+sctp_send_ecne(struct sctp *sp)
+{
+	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
+		printd(("Marking ECNE from stream %p\n", sp));
+		sp->sackf |= SCTP_SACKF_ECN;
+	}
+}
+
+/*
+ *  SEND CWR (Congestion Window Reduction)
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *  Just mark a CWR chunk to be bundled with the next DATA.
+ */
+STATIC INLINE void
+sctp_send_cwr(struct sctp *sp)
+{
+	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
+		printd(("Marking CWR from stream %p\n", sp));
+		sp->sackf |= SCTP_SACKF_CWR;
+	}
+}
+#endif				/* SCTP_CONFIG_ECN */
+
 /*
  *  =========================================================================
  *
@@ -6434,9 +6484,6 @@ sctp_retr_con(struct sctp *sp)
  *
  *  =========================================================================
  */
-#ifdef SCTP_CONFIG_ECN
-STATIC INLINE void sctp_send_cwr(struct sctp *sp);
-#endif				/* SCTP_CONFIG_ECN */
 STATIC void sctp_send_heartbeat(struct sctp *sp, struct sctp_daddr *sd);
 /*
  *  ASSOCIATION TIMEOUT FUNCTION
@@ -6613,6 +6660,27 @@ sctp_cookie_timeout(caddr_t data)
 	goto done;
 }
 
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+/*
+ *  SEND FORWARD TSN
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+STATIC INLINE void
+sctp_send_forward_tsn(struct sctp *sp)
+{
+	struct sctp_daddr *sd;
+	/* PR-SCTP 3.5 (F2) */
+	sp->sackf |= SCTP_SACKF_FSN;
+	for (sd = sp->daddr; sd; sd = sd->next) {
+		if (sd->flags & SCTP_DESTF_FORWDTSN) {
+			if (!sd->in_flight && sctp_timeout_pending(&sd->timer_retrans))
+				sd_del_timeout(sd, &sd->timer_retrans);
+			sd->flags &= ~SCTP_DESTF_FORWDTSN;
+		}
+	}
+}
+#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
+
 /*
  *  RETRANS TIMEOUT (T3-rtx)
  *  -------------------------------------------------------------------------
@@ -6620,9 +6688,6 @@ sctp_cookie_timeout(caddr_t data)
  *  that we should mark all outstanding DATA chunks for retransmission and start a retransmission
  *  cycle.
  */
-#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-STATIC INLINE void sctp_send_forward_tsn(struct sctp *sp);
-#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 STATIC void
 sctp_retrans_timeout(caddr_t data)
 {
@@ -8000,36 +8065,6 @@ sctp_send_shutdown_complete(struct sctp *sp)
 	return;
 }
 
-#ifdef SCTP_CONFIG_ECN
-/*
- *  SEND ECNE (Explicit Congestion Notification Echo)
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Just mark an ECNE chunk to be sent with the next SACK (and don't delay SACKs).
- */
-STATIC INLINE void
-sctp_send_ecne(struct sctp *sp)
-{
-	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
-		printd(("Marking ECNE from stream %p\n", sp));
-		sp->sackf |= SCTP_SACKF_ECN;
-	}
-}
-
-/*
- *  SEND CWR (Congestion Window Reduction)
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Just mark a CWR chunk to be bundled with the next DATA.
- */
-STATIC INLINE void
-sctp_send_cwr(struct sctp *sp)
-{
-	if (sp->l_caps & sp->p_caps & SCTP_CAPS_ECN) {
-		printd(("Marking CWR from stream %p\n", sp));
-		sp->sackf |= SCTP_SACKF_CWR;
-	}
-}
-#endif				/* SCTP_CONFIG_ECN */
-
 #ifdef SCTP_CONFIG_ADD_IP
 /*
  *  ABORT ASCONF
@@ -8221,27 +8256,6 @@ sctp_send_asconf_ack(struct sctp *sp, caddr_t rptr, size_t rlen)
 	return;
 }
 #endif				/* SCTP_CONFIG_ADD_IP */
-
-#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-/*
- *  SEND FORWARD TSN
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-STATIC INLINE void
-sctp_send_forward_tsn(struct sctp *sp)
-{
-	struct sctp_daddr *sd;
-	/* PR-SCTP 3.5 (F2) */
-	sp->sackf |= SCTP_SACKF_FSN;
-	for (sd = sp->daddr; sd; sd = sd->next) {
-		if (sd->flags & SCTP_DESTF_FORWDTSN) {
-			if (!sd->in_flight && sctp_timeout_pending(&sd->timer_retrans))
-				sd_del_timeout(sd, &sd->timer_retrans);
-			sd->flags &= ~SCTP_DESTF_FORWDTSN;
-		}
-	}
-}
-#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 
 /*
  *  SENDING WITHOUT TCB  (Responding to OOTB packets)
@@ -12000,7 +12014,7 @@ sctp_reset(struct sctp *sp)
  *  Non-locking version for use from within timeouts (runninga at bottom-half so don't do
  *  bottom-half locks).
  */
-STATIC INLINE int
+STATIC int
 sctp_abort(struct sctp *sp, t_uscalar_t origin, t_scalar_t reason)
 {
 	printd(("INFO: Disconnect on stream %p\n", sp));
@@ -13059,26 +13073,6 @@ sctp_trylockq(queue_t *q)
 	}
 	sctp_unlock_bh(sp);
 	return (res);
-}
-
-STATIC INLINE void
-sctp_unlockq(queue_t *q)
-{
-	struct sctp *sp = SCTP_PRIV(q);
-	sctp_lock_bh(sp);
-	if (sp->rwait)
-		qenable(xchg(&sp->rwait, NULL));
-	else
-		sctp_cleanup_read(sp);	/* deliver to userq what is possible */
-	if (sp->wwait)
-		qenable(xchg(&sp->wwait, NULL));
-	else
-		___sctp_transmit_wakeup(sp);	/* reply to peer what is necessary */
-	if (--sp->users < 0) {
-		swerr();
-		sp->users = 0;
-	}
-	sctp_unlock_bh(sp);
 }
 
 /*
@@ -21204,6 +21198,11 @@ sctp_build_check_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsign
 	swerr();
 	return (-EFAULT);
 }
+
+/*
+   recreate this structure because it is used by an inline 
+ */
+__u8 ip_tos2prio[16] = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
 
 /*
  *  Process Options

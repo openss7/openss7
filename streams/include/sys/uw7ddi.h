@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: uw7ddi.h,v 0.9.2.9 2005/03/31 06:53:23 brian Exp $
+ @(#) $Id: uw7ddi.h,v 0.9.2.10 2005/04/01 06:22:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 06:22:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:23 $"
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:47 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -159,18 +159,7 @@ __UW7_EXTERN_INLINE minor_t eminor(dev_t dev)
 extern int etoimajor(major_t emajor);
 extern int itoemajor(major_t imajor, int prevemaj);
 
-__UW7_EXTERN_INLINE int printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-__UW7_EXTERN_INLINE int printf(char *fmt, ...)
-{
-	va_list args;
-	int n;
-	char printf_buf[1024];
-	va_start(args, fmt);
-	n = vsnprintf(printf_buf, sizeof(printf_buf), fmt, args);
-	va_end(args);
-	printk("%s", printf_buf);
-	return (n);
-}
+int printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 
 __UW7_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp)
 {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:30 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/01 06:22:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:30 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 06:22:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:30 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/01 06:22:56 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:30 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/01 06:22:56 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:30 $"
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/01 06:22:56 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -280,8 +280,20 @@ int itoemajor(major_t imajor, int prevemaj)
 
 EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */
 
-//__UW7_EXTERN_INLINE int printf(char *fmt, ...);
-//EXPORT_SYMBOL(printf);                        /* uw7ddi.h */
+int printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+int printf(char *fmt, ...)
+{
+	va_list args;
+	int n;
+	char printf_buf[1024];
+	va_start(args, fmt);
+	n = vsnprintf(printf_buf, sizeof(printf_buf), fmt, args);
+	va_end(args);
+	printk("%s", printf_buf);
+	return (n);
+}
+
+EXPORT_SYMBOL(printf);                        /* uw7ddi.h */
 
 __UW7_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp);
 EXPORT_SYMBOL(LOCK_OWNED);	/* uw7ddi.h */

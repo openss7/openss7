@@ -179,7 +179,9 @@ EXPORT_SYMBOL_GPL(lis_osif_do_gettimeofday);
 EXPORT_SYMBOL_GPL(lis_osif_do_settimeofday);
 EXPORT_SYMBOL_GPL(lis_osif_pci_disable_device);
 EXPORT_SYMBOL_GPL(lis_osif_pci_enable_device);
+#if HAVE_KFUNC_PCI_FIND_CLASS
 EXPORT_SYMBOL_GPL(lis_osif_pci_find_class);
+#endif
 EXPORT_SYMBOL_GPL(lis_osif_pci_find_device);
 EXPORT_SYMBOL_GPL(lis_osif_pci_find_slot);
 EXPORT_SYMBOL_GPL(lis_osif_pci_module_init);
@@ -210,9 +212,13 @@ EXPORT_SYMBOL_GPL(lis_pci_disable_device);
 EXPORT_SYMBOL_GPL(lis_pci_dma_handle_to_32);
 EXPORT_SYMBOL_GPL(lis_pci_dma_handle_to_64);
 EXPORT_SYMBOL_GPL(lis_pci_dma_supported);
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 EXPORT_SYMBOL_GPL(lis_pci_dma_sync_single);
+#endif
 EXPORT_SYMBOL_GPL(lis_pci_enable_device);
+#if HAVE_KFUNC_PCI_FIND_CLASS
 EXPORT_SYMBOL_GPL(lis_pci_find_class);
+#endif
 EXPORT_SYMBOL_GPL(lis_pci_find_device);
 EXPORT_SYMBOL_GPL(lis_pci_find_slot);
 EXPORT_SYMBOL_GPL(lis_pci_free_consistent);
@@ -347,8 +353,12 @@ EXPORT_SYMBOL_GPL(lis_zmalloc);
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_alloc_consistent);
 EXPORT_SYMBOL_GPL(lis_osif_pci_dma_supported);
+#if HAVE_KFUNC_PCI_DMA_SYNC_SG
 EXPORT_SYMBOL_GPL(lis_osif_pci_dma_sync_sg);
+#endif
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 EXPORT_SYMBOL_GPL(lis_osif_pci_dma_sync_single);
+#endif
 EXPORT_SYMBOL_GPL(lis_osif_pci_free_consistent);
 EXPORT_SYMBOL_GPL(lis_osif_pci_map_sg);
 EXPORT_SYMBOL_GPL(lis_osif_pci_map_single);

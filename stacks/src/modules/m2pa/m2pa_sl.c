@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:06 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:06 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 06:22:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:06 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:06 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $";
 
 #include "os7/compat.h"
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:06 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2374,7 +2374,88 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 	return (-EPROTO);
 }
 
-STATIC INLINE int sl_rb_congestion_function(queue_t *q, struct sl *sl);
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  RECEIVE CONGESTION ALGORITHM
+ *
+ *  --------------------------------------------------------------------------
+ *
+ *  These congestion functions are implementation dependent.  We should define
+ *  a congestion onset level and set congestion accept at that point.  We
+ *  should also define a second congestion onset level and set congestion
+ *  discard at that point.  For STREAMS, the upstream congestion can be
+ *  detected in two ways: 1) canputnext(): is the upstream module flow
+ *  controlled; and, 2) canput(): are we flow controlled.  If the upstream
+ *  module is flow controlled, then we can accept MSUs and place them on our
+ *  own read queue.  If we are flow contolled, then we have no choice but to
+ *  discard the message.  In addition, and because upstream message processing
+ *  times are likely more sensitive to the number of backlogged messages than
+ *  they are to the number of backlogged message octets, we have some
+ *  configurable thresholds of backlogging and keep track of backlogged
+ *  messages.
+ *
+ *  --------------------------------------------------------------------------
+ */
+STATIC INLINE int
+sl_rb_congestion_function(queue_t *q, struct sl *sl)
+{
+	int err;
+	if (!(sl->flags & MF_L3_CONG_DETECT)) {
+		if (sl->flags & MF_L2_CONG_DETECT) {
+			if (sl->rb.q_msgs <= sl->sl.config.rb_abate && canputnext(sl->oq)) {
+				if (sl->flags & MF_LOC_BUSY)
+					if ((err =
+					     sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
+						return (err);
+				sl->flags &= ~MF_LOC_BUSY;
+				sl->flags &= ~MF_CONG_DISCARD;
+				sl->flags &= ~MF_CONG_ACCEPT;
+				sl->rack += xchg(&sl->rmsu, 0);
+				sl->flags &= ~MF_L2_CONG_DETECT;
+			}
+		} else {
+			if (sl->rb.q_msgs >= sl->sl.config.rb_discard || !canput(sl->oq)) {
+				sl->flags |= MF_CONG_DISCARD;
+				if (!(sl->flags & MF_LOC_BUSY)) {
+					if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
+						return (err);
+					printd(("%s: %p: Receive congestion: congestion discard\n",
+						MOD_NAME, sl));
+					printd(("%s:   sl->rb.q_msgs           = %12u\n",
+						MOD_NAME, sl->rb.q_msgs));
+					printd(("%s:   sl->sl.config.rb_discard   = %12lu\n",
+						MOD_NAME, sl->sl.config.rb_discard));
+					printd(("%s:   canput                  = %12s\n",
+						MOD_NAME, canput(sl->oq) ? "YES" : "NO"));
+					sl->sl.stats.sl_sibs_sent++;
+					sl->flags |= MF_LOC_BUSY;
+				}
+				sl->flags |= MF_L2_CONG_DETECT;
+			} else {
+				if (sl->rb.q_msgs >= sl->sl.config.rb_accept || !canputnext(sl->oq)) {
+					sl->flags |= MF_CONG_ACCEPT;
+					if (!(sl->flags & MF_LOC_BUSY)) {
+						if ((err =
+						     sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
+							return (err);
+						printd(("%s: %p: Receive congestion: congestion accept\n", MOD_NAME, sl));
+						printd(("%s:   sl->rb.q_msgs           = %12u\n",
+							MOD_NAME, sl->rb.q_msgs));
+						printd(("%s:   sl->sl.config.rb_accept    = %12lu\n", MOD_NAME, sl->sl.config.rb_accept));
+						printd(("%s:   cantputnext?            = %12s\n",
+							MOD_NAME,
+							canputnext(sl->oq) ? "YES" : "NO"));
+						sl->sl.stats.sl_sibs_sent++;
+						sl->flags |= MF_LOC_BUSY;
+					}
+					sl->flags |= MF_L2_CONG_DETECT;
+				}
+			}
+		}
+	}
+	return (0);
+}
 
 STATIC void
 sl_rx_wakeup(queue_t *q)
@@ -2446,7 +2527,60 @@ sl_rx_wakeup(queue_t *q)
 		((int16_t)((uint16_t)(__s2)-(uint16_t)(__s1))) : \
 		((int16_t)((uint16_t)(__s1)-(uint16_t)(__s2))))
 
-STATIC INLINE int sl_txc_datack(queue_t *q, struct sl *sl, ulong count);
+STATIC int sl_check_congestion(queue_t *q, struct sl *sl);
+STATIC INLINE int
+sl_txc_datack(queue_t *q, struct sl *sl, ulong count)
+{
+	int err;
+	if (!count)
+		printd(("%s: %p: WARNING: ack called with zero count\n", MOD_NAME, sl));
+	switch (sl_get_state(sl)) {
+	case MS_IN_SERVICE:
+	case MS_PROCESSOR_OUTAGE:
+	case MS_ALIGNED_READY:
+	case MS_ALIGNED_NOT_READY:
+		while (count--) {
+			if (sl->rtb.q_msgs) {
+				freemsg(bufq_dequeue(&sl->rtb));
+				sl->tack--;
+				qenable(sl->iq);
+			} else {
+				if (sl->back) {
+					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
+						if ((err =
+						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+								   0, NULL, 0)) < 0)
+							return (err);
+					if ((err =
+					     sl_lsc_out_of_service(q, sl,
+								   SL_FAIL_ABNORMAL_BSNR)) < 0)
+						return (err);
+					printd(("%s: %p: Link failed: Abnormal BSNR\n",
+						MOD_NAME, sl));
+					return (0);
+				}
+				printd(("%s: %p: Received bad acknowledgement acks = %lu\n",
+					MOD_NAME, sl, count + 1));
+				sl->back++;
+				return (0);
+			}
+		}
+		sl->back = 0;
+		if (sl->rtb.q_count == 0) {
+			sl_timer_stop(sl, t7);
+			sl_timer_stop(sl, t6);
+		} else if (!(sl->flags & (MF_REM_BUSY | MF_RPO)))
+			sl_timer_start(sl, t7);
+		sl->flags &= ~MF_RTB_FULL;
+		sl_check_congestion(q, sl);
+		sl_tx_wakeup(q);
+		return (0);
+	default:
+		ptrace(("%s: %p: Received ACK in unexpected state %lu\n", MOD_NAME, sl,
+			sl_get_state(sl)));
+		return (0);
+	}
+}
 
 STATIC INLINE int
 sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
@@ -2773,60 +2907,6 @@ sl_tx_wakeup(queue_t *q)
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
 		return;
-	}
-}
-STATIC int sl_check_congestion(queue_t *q, struct sl *sl);
-STATIC INLINE int
-sl_txc_datack(queue_t *q, struct sl *sl, ulong count)
-{
-	int err;
-	if (!count)
-		printd(("%s: %p: WARNING: ack called with zero count\n", MOD_NAME, sl));
-	switch (sl_get_state(sl)) {
-	case MS_IN_SERVICE:
-	case MS_PROCESSOR_OUTAGE:
-	case MS_ALIGNED_READY:
-	case MS_ALIGNED_NOT_READY:
-		while (count--) {
-			if (sl->rtb.q_msgs) {
-				freemsg(bufq_dequeue(&sl->rtb));
-				sl->tack--;
-				qenable(sl->iq);
-			} else {
-				if (sl->back) {
-					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
-						if ((err =
-						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
-								   0, NULL, 0)) < 0)
-							return (err);
-					if ((err =
-					     sl_lsc_out_of_service(q, sl,
-								   SL_FAIL_ABNORMAL_BSNR)) < 0)
-						return (err);
-					printd(("%s: %p: Link failed: Abnormal BSNR\n",
-						MOD_NAME, sl));
-					return (0);
-				}
-				printd(("%s: %p: Received bad acknowledgement acks = %lu\n",
-					MOD_NAME, sl, count + 1));
-				sl->back++;
-				return (0);
-			}
-		}
-		sl->back = 0;
-		if (sl->rtb.q_count == 0) {
-			sl_timer_stop(sl, t7);
-			sl_timer_stop(sl, t6);
-		} else if (!(sl->flags & (MF_REM_BUSY | MF_RPO)))
-			sl_timer_start(sl, t7);
-		sl->flags &= ~MF_RTB_FULL;
-		sl_check_congestion(q, sl);
-		sl_tx_wakeup(q);
-		return (0);
-	default:
-		ptrace(("%s: %p: Received ACK in unexpected state %lu\n", MOD_NAME, sl,
-			sl_get_state(sl)));
-		return (0);
 	}
 }
 STATIC INLINE int
@@ -3524,89 +3604,6 @@ sl_lsc_retrieval_request_and_fsnc(queue_t *q, struct sl *sl, ulong fsnc)
 	if ((err = sl_retrieval_not_possible_ind(q, sl)) < 0)
 		return (err);
 	return (-EPROTO);
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  RECEIVE CONGESTION ALGORITHM
- *
- *  --------------------------------------------------------------------------
- *
- *  These congestion functions are implementation dependent.  We should define
- *  a congestion onset level and set congestion accept at that point.  We
- *  should also define a second congestion onset level and set congestion
- *  discard at that point.  For STREAMS, the upstream congestion can be
- *  detected in two ways: 1) canputnext(): is the upstream module flow
- *  controlled; and, 2) canput(): are we flow controlled.  If the upstream
- *  module is flow controlled, then we can accept MSUs and place them on our
- *  own read queue.  If we are flow contolled, then we have no choice but to
- *  discard the message.  In addition, and because upstream message processing
- *  times are likely more sensitive to the number of backlogged messages than
- *  they are to the number of backlogged message octets, we have some
- *  configurable thresholds of backlogging and keep track of backlogged
- *  messages.
- *
- *  --------------------------------------------------------------------------
- */
-STATIC INLINE int
-sl_rb_congestion_function(queue_t *q, struct sl *sl)
-{
-	int err;
-	if (!(sl->flags & MF_L3_CONG_DETECT)) {
-		if (sl->flags & MF_L2_CONG_DETECT) {
-			if (sl->rb.q_msgs <= sl->sl.config.rb_abate && canputnext(sl->oq)) {
-				if (sl->flags & MF_LOC_BUSY)
-					if ((err =
-					     sl_send_status(q, sl, M2PA_STATUS_BUSY_ENDED)) < 0)
-						return (err);
-				sl->flags &= ~MF_LOC_BUSY;
-				sl->flags &= ~MF_CONG_DISCARD;
-				sl->flags &= ~MF_CONG_ACCEPT;
-				sl->rack += xchg(&sl->rmsu, 0);
-				sl->flags &= ~MF_L2_CONG_DETECT;
-			}
-		} else {
-			if (sl->rb.q_msgs >= sl->sl.config.rb_discard || !canput(sl->oq)) {
-				sl->flags |= MF_CONG_DISCARD;
-				if (!(sl->flags & MF_LOC_BUSY)) {
-					if ((err = sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
-						return (err);
-					printd(("%s: %p: Receive congestion: congestion discard\n",
-						MOD_NAME, sl));
-					printd(("%s:   sl->rb.q_msgs           = %12u\n",
-						MOD_NAME, sl->rb.q_msgs));
-					printd(("%s:   sl->sl.config.rb_discard   = %12lu\n",
-						MOD_NAME, sl->sl.config.rb_discard));
-					printd(("%s:   canput                  = %12s\n",
-						MOD_NAME, canput(sl->oq) ? "YES" : "NO"));
-					sl->sl.stats.sl_sibs_sent++;
-					sl->flags |= MF_LOC_BUSY;
-				}
-				sl->flags |= MF_L2_CONG_DETECT;
-			} else {
-				if (sl->rb.q_msgs >= sl->sl.config.rb_accept || !canputnext(sl->oq)) {
-					sl->flags |= MF_CONG_ACCEPT;
-					if (!(sl->flags & MF_LOC_BUSY)) {
-						if ((err =
-						     sl_send_status(q, sl, M2PA_STATUS_BUSY)) < 0)
-							return (err);
-						printd(("%s: %p: Receive congestion: congestion accept\n", MOD_NAME, sl));
-						printd(("%s:   sl->rb.q_msgs           = %12u\n",
-							MOD_NAME, sl->rb.q_msgs));
-						printd(("%s:   sl->sl.config.rb_accept    = %12lu\n", MOD_NAME, sl->sl.config.rb_accept));
-						printd(("%s:   cantputnext?            = %12s\n",
-							MOD_NAME,
-							canputnext(sl->oq) ? "YES" : "NO"));
-						sl->sl.stats.sl_sibs_sent++;
-						sl->flags |= MF_LOC_BUSY;
-					}
-					sl->flags |= MF_L2_CONG_DETECT;
-				}
-			}
-		}
-	}
-	return (0);
 }
 
 /*

@@ -142,6 +142,7 @@ lis_pci_dev_t   * _RP lis_pci_find_device(unsigned vendor, unsigned device,
 
 } /* lis_pci_find_device */
 
+#if HAVE_KFUNC_PCI_FIND_CLASS
 /************************************************************************
 *                          lis_pci_find_class                           *
 *************************************************************************
@@ -180,6 +181,7 @@ lis_pci_dev_t   * _RP lis_pci_find_class(unsigned class,
     return(p) ;
 
 } /* lis_pci_find_class */
+#endif
 
 /************************************************************************
 *                          lis_pci_find_slot                            *
@@ -454,6 +456,7 @@ void * _RP lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
     return(NULL) ;
 }
 
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 /************************************************************************
 *                      lis_pci_dma_sync_single                          *
 *************************************************************************
@@ -481,6 +484,7 @@ void  _RP lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
 		        size,
 			direction);
 }
+#endif
 
 /************************************************************************
 *                            Miscellaneous                              *

@@ -248,11 +248,13 @@ struct pci_dev  * _RP lis_osif_pci_find_device(unsigned int vendor,
     return(pci_find_device(vendor, device, from)) ;
 }
 
+#if HAVE_KFUNC_PCI_FIND_CLASS
 struct pci_dev  * _RP lis_osif_pci_find_class(unsigned int class,
 					 struct pci_dev *from)
 {
     return(pci_find_class(class, from)) ;
 }
+#endif
 
 struct pci_dev  * _RP lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 {
@@ -384,17 +386,21 @@ void  _RP lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
     pci_unmap_sg(hwdev, sg, nents, direction) ;
 }
 
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 void  _RP lis_osif_pci_dma_sync_single(struct pci_dev *hwdev,
 			   dma_addr_t dma_handle, size_t size, int direction)
 {
     pci_dma_sync_single(hwdev, dma_handle, size, direction) ;
 }
+#endif
 
+#if HAVE_KFUNC_PCI_DMA_SYNC_SG
 void  _RP lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
 			   struct scatterlist *sg, int nelems, int direction)
 {
     pci_dma_sync_sg(hwdev, sg, nelems, direction) ;
 }
+#endif
 
 int  _RP lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
 {

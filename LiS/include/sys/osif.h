@@ -116,10 +116,12 @@
 #undef pci_find_device
 #endif
 #define	pci_find_device			lis_osif_pci_find_device
+#if HAVE_KFUNC_PCI_FIND_CLASS
 #ifdef pci_find_class
 #undef pci_find_class
 #endif
 #define	pci_find_class			lis_osif_pci_find_class
+#endif
 #ifdef pci_find_slot
 #undef pci_find_slot
 #endif
@@ -206,14 +208,18 @@
 #undef pci_unmap_sg
 #endif
 #define pci_unmap_sg lis_osif_pci_unmap_sg
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 #ifdef pci_dma_sync_single
 #undef pci_dma_sync_single
 #endif
 #define pci_dma_sync_single lis_osif_pci_dma_sync_single
+#endif
+#if HAVE_KFUNC_PCI_DMA_SYNC_SG
 #ifdef pci_dma_sync_sg
 #undef pci_dma_sync_sg
 #endif
 #define pci_dma_sync_sg lis_osif_pci_dma_sync_sg
+#endif
 #ifdef pci_dma_supported
 #undef pci_dma_supported
 #endif
@@ -507,8 +513,10 @@ const char *lis_pcibios_strerror(int error) _RP;
 struct pci_dev	*lis_osif_pci_find_device(unsigned int vendor,
 				 unsigned int device,
 				 struct pci_dev *from)_RP;
+#if HAVE_KFUNC_PCI_FIND_CLASS
 struct pci_dev	*lis_osif_pci_find_class(unsigned int class,
 					 struct pci_dev *from)_RP;
+#endif
 struct pci_dev	*lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)_RP;
 
 int	lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 *val)_RP;
@@ -543,10 +551,14 @@ extern int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
 	                             int nents, int direction)_RP;
 extern void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
 	                                int nents, int direction)_RP;
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 extern void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev,
 			   dma_addr_t dma_handle, size_t size, int direction)_RP;
+#endif
+#if HAVE_KFUNC_PCI_DMA_SYNC_SG
 extern void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
 			   struct scatterlist *sg, int nelems, int direction)_RP;
+#endif
 extern int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)_RP;
 extern int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)_RP;
 extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg)_RP;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:23 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/01 09:52:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
+ Last Modified $Date: 2005/04/01 09:52:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:23 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/01 09:52:16 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:23 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/01 09:52:16 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -117,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:23 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/01 09:52:16 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -485,19 +485,31 @@ int lis_get_pipe(struct file **f0, struct file **f1)
 EXPORT_SYMBOL_GPL(lis_get_pipe);
 int lis_ioc_fattach(struct file *f, char *path)
 {
+#if HAVE_KERNEL_FATTACH_SUPPORT
 	return lis_fattach(f, path);
+#else
+	return (-ENOSYS);
+#endif
 }
 
 EXPORT_SYMBOL_GPL(lis_ioc_fattach);
 int lis_ioc_fdetach(char *path)
 {
+#if HAVE_KERNEL_FATTACH_SUPPORT
 	return lis_fdetach(path);
+#else
+	return (-ENOSYS);
+#endif
 }
 
 EXPORT_SYMBOL_GPL(lis_ioc_fdetach);
 int lis_ioc_pipe(unsigned int *fildes)
 {
+#if HAVE_KERNEL_PIPE_SUPPORT
 	return lis_pipe(fildes);
+#else
+	return (-ENOSYS);
+#endif
 }
 
 EXPORT_SYMBOL_GPL(lis_ioc_pipe);
@@ -811,12 +823,16 @@ void lis_spl0_fcn(char *file, int line)
 
 EXPORT_SYMBOL_GPL(lis_spl0_fcn);
 volatile unsigned long lis_queuerun_cnts[NR_CPUS] = { 0, };
+
 EXPORT_SYMBOL_GPL(lis_queuerun_cnts);
 volatile unsigned long lis_runq_cnts[NR_CPUS] = { 0, };
+
 EXPORT_SYMBOL_GPL(lis_runq_cnts);
 volatile unsigned long lis_setqsched_cnts[NR_CPUS] = { 0, };
+
 EXPORT_SYMBOL_GPL(lis_setqsched_cnts);
 volatile unsigned long lis_setqsched_isr_cnts[NR_CPUS] = { 0, };
+
 EXPORT_SYMBOL_GPL(lis_setqsched_isr_cnts);
 
 mblk_t *lis_get_passfp(void)
@@ -907,7 +923,7 @@ EXPORT_SYMBOL_GPL(lis_del_timer);
 /* This one is just plain silly. */
 int lis_getint(unsigned char **p)
 {
-	int retval = *((int *)(*p));
+	int retval = *((int *) (*p));
 	p += sizeof(int);
 	return retval;
 }
@@ -1130,7 +1146,7 @@ int lis_request_dma(unsigned int dma_nr, const char *device_id)
 
 EXPORT_SYMBOL_GPL(lis_request_dma);
 #if HAVE_KTYPE_IRQRETURN_T
-int lis_request_irq(unsigned int irq, irqreturn_t (*handler) (int, void *, struct pt_regs *),
+int lis_request_irq(unsigned int irq, irqreturn_t(*handler) (int, void *, struct pt_regs *),
 		    unsigned long flags, const char *device, void *dev_id)
 {
 	return WARN(request_irq(irq, handler, flags, device, dev_id));
@@ -1190,12 +1206,14 @@ struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev, dma64_addr_t dma
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_to_page);
+#if HAVE_KFUNC_PCI_FIND_CLASS
 struct pci_dev *lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
 {
 	return WARN(pci_find_class(class, from));
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_find_class);
+#endif
 struct pci_dev *lis_osif_pci_find_device(unsigned int vendor, unsigned int device,
 					 struct pci_dev *from)
 {
@@ -1497,31 +1515,34 @@ void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_add
 {
 	return WARN(pci_dac_dma_sync_single(pdev, dma_addr, len, direction));
 }
+EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single);
 #endif
 
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
-void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
-				      int direction)
+void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev, dma64_addr_t dma_addr,
+					      size_t len, int direction)
 {
 	return WARN(pci_dac_dma_sync_single_for_cpu(pdev, dma_addr, len, direction));
 }
+EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single_for_cpu);
 #endif
 
 #if HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
-void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr, size_t len,
-				      int direction)
+void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev, dma64_addr_t dma_addr,
+						 size_t len, int direction)
 {
 	return WARN(pci_dac_dma_sync_single_for_device(pdev, dma_addr, len, direction));
 }
+EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single_for_device);
 #endif
 
-EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_sync_single);
 void lis_osif_pci_disable_device(struct pci_dev *dev)
 {
 	return WARN(pci_disable_device(dev));
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_disable_device);
+#if HAVE_KFUNC_PCI_DMA_SYNC_SG
 void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int nelems,
 			      int direction)
 {
@@ -1529,6 +1550,8 @@ void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev, struct scatterlist *sg, int
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_dma_sync_sg);
+#endif
+#if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
 void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, size_t size,
 				  int direction)
 {
@@ -1536,6 +1559,7 @@ void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev, dma_addr_t dma_handle, 
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_dma_sync_single);
+#endif
 void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size, void *vaddr,
 				  dma_addr_t dma_handle)
 {
@@ -1952,6 +1976,7 @@ EXPORT_SYMBOL_GPL(lis_stdata_cnt);
 lis_atomic_t lis_strcount = 0;
 EXPORT_SYMBOL_GPL(lis_strcount);
 lis_atomic_t lis_strstats[24][4] = { {0,}, };
+
 EXPORT_SYMBOL_GPL(lis_strstats);
 void lis_atomic_add(lis_atomic_t *atomic_addr, int amt)
 {
@@ -2152,6 +2177,7 @@ int lis_umount2(char *path, int flags)
 }
 
 EXPORT_SYMBOL_GPL(lis_umount2);
+#if HAVE_KERNEL_FATTACH_SUPPORT
 int lis_fattach(struct file *f, const char *path)
 {
 	long do_fattach(const struct file *f, const char *path);
@@ -2166,6 +2192,8 @@ int lis_fdetach(const char *path)
 }
 
 EXPORT_SYMBOL_GPL(lis_fdetach);
+#endif				/* HAVE_KERNEL_FATTACH_SUPPORT */
+#if HAVE_KERNEL_PIPE_SUPPORT
 int lis_pipe(unsigned int *fd)
 {
 	long do_spipe(int *fd);
@@ -2173,6 +2201,7 @@ int lis_pipe(unsigned int *fd)
 }
 
 EXPORT_SYMBOL_GPL(lis_pipe);
+#endif				/* HAVE_KERNEL_PIPE_SUPPORT */
 
 void lis_fdetach_all(void)
 {
@@ -2310,6 +2339,7 @@ int __init liscomp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 static
 #endif
