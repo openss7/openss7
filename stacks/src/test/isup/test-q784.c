@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/29 11:24:30 $
 
  -----------------------------------------------------------------------------
 
@@ -47,14 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/27 06:24:29 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/29 11:24:30 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/29 11:24:30 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/29 11:24:30 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -999,7 +999,7 @@ send(int msg)
 		*d++ = pmsg.cpc;
 		*d++ = pmsg.tmr;
 		p = d + 2;
-		*d++ = p - d;	/* pointer to cdpn */
+		*d = p - d; d++;	/* pointer to cdpn */
 		pmsg.cdpn.len = strnlen(pmsg.cdpn.num, 24);
 		*p++ = 3 + ((pmsg.cdpn.len + 1) >> 1) + 1;	/* pointer to optional parameters */
 		*p++ = 2 + ((pmsg.cdpn.len + 1) >> 1);	/* cdpn len */
@@ -1008,7 +1008,7 @@ send(int msg)
 		for (i = 0; i < pmsg.cdpn.len; i += 2)
 			*p++ = (pmsg.cdpn.num[i] & 0x0f) | ((pmsg.cdpn.num[i + 1] & 0x0f) << 4);
 		/* optional parameters */
-		*d++ = p - d;
+		*d = p - d; d++;
 		/* O cgpn */
 		*p++ = ISUP_PT_CGPN;
 		pmsg.cdpn.len = strnlen(pmsg.cgpn.num, 24);
@@ -1027,7 +1027,7 @@ send(int msg)
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_SAM;
 		p = d + 2;
-		*d++ = p - d;	/* pointer to subn */
+		*d = p - d; d++;	/* pointer to subn */
 		pmsg.subn.len = strnlen(pmsg.subn.num, 100) + 1;
 		*p++ = 1 + ((pmsg.subn.len + 1) >> 1);	/* subn len */
 		*p++ = (pmsg.subn.len & 0x1) ? 0x80 : 0x00;
@@ -3249,7 +3249,7 @@ pt_decode_data(struct strbuf data)
 		imsg.tmr = *d++;
 		if (d > e)
 			goto decode_error;
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e)
 			goto decode_error;
 		imsg.cdpn.len = (*p++ - 2) << 1;
@@ -3274,7 +3274,7 @@ pt_decode_data(struct strbuf data)
 		     imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (SAM);
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e)
 			goto decode_error;
 		imsg.subn.len = (*p++ - 2) << 1;
@@ -3335,7 +3335,8 @@ pt_decode_data(struct strbuf data)
 		FFLUSH(stdout);
 		ret = (ACM);
 	      decode_bci:
-		imsg.bci = ((ulong) (*d++)) | (((ulong) (*d++)) << 8);
+		imsg.bci = ((ulong) (*d++));
+		imsg.bci |= (((ulong) (*d++)) << 8);
 		if (d > e)
 			goto decode_error;
 		goto decode_opt;
@@ -3367,7 +3368,7 @@ pt_decode_data(struct strbuf data)
 		FFLUSH(stdout);
 		ret = (REL);
 	      decode_caus:
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e)
 			goto decode_error;
 		imsg.caus.len = *p++;
@@ -3457,7 +3458,7 @@ pt_decode_data(struct strbuf data)
 		FFLUSH(stdout);
 		ret = (GRS);
 	      decode_rs:
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e) {
 			printf("**** ERROR: pointer out of range p = %p, e = %p\n", p, e);
 			FFLUSH(stdout);
@@ -3628,7 +3629,7 @@ pt_decode_data(struct strbuf data)
 		     imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CQR);
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e)
 			goto decode_error;
 		imsg.rs.len = *p++;
@@ -3641,7 +3642,7 @@ pt_decode_data(struct strbuf data)
 			if (p > e)
 				goto decode_error;
 		}
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e)
 			goto decode_error;
 		imsg.csi.len = *p++;
@@ -3669,7 +3670,7 @@ pt_decode_data(struct strbuf data)
 		     imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (USR);
-		p = d + *d++;
+		p = d + *d; d++;
 		if (p > e)
 			goto decode_error;
 		imsg.uui.len = *p++;
@@ -3861,7 +3862,7 @@ pt_decode_data(struct strbuf data)
 		goto decode_error;
 	goto done;
       decode_opt:
-	p = d + *d++;
+	p = d + *d; d++;
 	if (p > e)
 		goto decode_error;
 	if (*p++) ;		/* have optional parameters */

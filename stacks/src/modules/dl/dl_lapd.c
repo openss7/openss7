@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/29 11:24:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
+ Last Modified $Date: 2005/01/29 11:24:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/29 11:24:30 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/29 11:24:30 $";
 
 #include "compat.h"
 
@@ -68,7 +68,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:38 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/29 11:24:30 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -4074,7 +4074,7 @@ dl_bind_req(queue_t *q, mblk_t *mp)
 		}
 		hash = ((dl->dlc.dl_sap + dl->dlc.dl_tei) & DL_BIND_HASHMASK);
 		for (d2 = cd->bind.hash[hash]; d2; d2 = d2->bind.next)
-			if (d2->dlc.dl_sap == p->dl_sap && d2->dlc.dl_tei == -1U)
+			if (d2->dlc.dl_sap == p->dl_sap && d2->dlc.dl_tei == 0xff)
 				goto bound;
 	}
 	dl->dlc.dl_sap = p->dl_sap;
@@ -4171,7 +4171,7 @@ dl_subs_bind_req(queue_t *q, mblk_t *mp)
 	default:
 		goto unsupported;
 	}
-	if (dl->dlc.dl_tei != -1U)
+	if (dl->dlc.dl_tei != 0xff)
 		goto toomany;
 	bcopy(mp->b_rptr + p->dl_subs_sap_offset, &tei, sizeof(tei));
 	if (dl->conind) {
@@ -4327,14 +4327,14 @@ dl_connect_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 		if (p->dl_dest_addr_length < sizeof(dl->dlc.dl_tei))
 			goto badaddr;
-		if (dl->dlc.dl_tei != -1U)
+		if (dl->dlc.dl_tei != 0xff)
 			goto badaddr;	/* a tei is already assigned */
 		bcopy(mp->b_rptr + p->dl_dest_addr_offset, &tei, sizeof(tei));
 		if (tei > 127)
 			goto badaddr;
 		if (tei == 127 && dl->cred.cr_uid != 0)
 			goto access;
-	} else if ((tei = dl->dlc.dl_tei) == -1U) {
+	} else if ((tei = dl->dlc.dl_tei) == 0xff) {
 		todo(("request assignment of a TEI\n"));
 		goto badaddr;	/* for now */
 	}

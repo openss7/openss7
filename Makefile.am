@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/26 22:13:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/29 11:23:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,12 +46,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:13:02 $ by $Author: brian $
+# Last Modified $Date: 2005/01/29 11:23:05 $ by $Author: brian $
 #
 # =============================================================================
 
 include am/openss7.am
 
-include am/rpm.am
+srpm rpms rebuild sign resign:
+	@list='$(subdirs)' ; for subdir in $$list ; do \
+		echo "Making $@ in $$subdir" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@) || exit 1 ; \
+	done
 
 SUBDIRS	= @subdirs@

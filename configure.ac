@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/26 22:23:55 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/29 11:23:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:23:55 $ by $Author: brian $
+# Last Modified $Date: 2005/01/29 11:23:05 $ by $Author: brian $
 #
 # =============================================================================
 
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.8 2005/01/26 22:23:55 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.9 2005/01/29 11:23:05 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7], [0.9.2], [bugs@openss7.org], [openss7])
 
@@ -72,7 +72,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([openss7], AC_PACKAGE_VERSION-1)
+AM_INIT_AUTOMAKE([openss7], AC_PACKAGE_VERSION[-1])
 AM_MAINTAINER_MODE
 
 dnl
