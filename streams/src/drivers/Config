@@ -24,8 +24,8 @@ driver	nsdev		nsdev	*
 driver	echo		echo	*
 driver	nuls		nuls	*
 driver	pipe		pipe	*
-driver	sfx		sfx	*
-driver	spx		spx	*
+#driver	sfx		sfx	*
+#driver	spx		spx	*
 driver	socksys		socksys	*
 driver	unix		unix	*
 driver	xnet		xnet	*
@@ -47,8 +47,8 @@ objname	driver	nsdev		nsdev
 objname	driver	echo		echo
 objname	driver	nuls		nuls
 objname	driver	pipe		pipe
-objname	driver	sfx		sfx
-objname	driver	spx		spx
+#objname	driver	sfx		sfx
+#objname	driver	spx		spx
 objname	driver	socksys		socksys
 objname	driver	unix		unix
 objname	driver	xnet		xnet
@@ -76,8 +76,8 @@ loadable nsdev
 loadable echo
 loadable nuls
 loadable pipe
-loadable sfx
-loadable spx
+#loadable sfx
+#loadable spx
 loadable socksys
 loadable unix
 loadable xnet
@@ -116,8 +116,8 @@ node	/dev/nsdev	     c	*	nsdev		0
 node	/dev/echo	     c	*	clone		echo
 node	/dev/nuls	     c	*	clone		nuls
 node	/dev/pipe	     c	*	pipe		0
-node	/dev/sfx	     c	*	sfx		0
-node	/dev/spx	     c	*	spx		0
+#node	/dev/sfx	     c	*	sfx		0
+#node	/dev/spx	     c	*	spx		0
 node	/dev/socksys	     c	*	socksys		0
 node	/dev/unix	     c	*	unix		0
 node	/dev/xnet	     c	*	xnet		0

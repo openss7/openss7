@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -116,12 +116,12 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "strdebug.h"
-#include "strhead.h"
+#include "sth.h"
 #include "strsad.h"
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:36:57 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:09 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2076,25 +2076,15 @@ int lis_umount2(char *path, int flags)
 EXPORT_SYMBOL_GPL(lis_umount2);
 int lis_fattach(struct file *f, const char *path)
 {
-#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 	long do_fattach(const struct file *f, const char *path);
 	return WARN(do_fattach(f, path));
-#else
-	swerr();
-	return (-ENOSYS);
-#endif
 }
 
 EXPORT_SYMBOL_GPL(lis_fattach);
 int lis_fdetach(const char *path)
 {
-#ifdef HAVE_KERNEL_FATTACH_SUPPORT
 	long do_fdetach(const char *path);
 	return WARN(do_fdetach(path));
-#else
-	swerr();
-	return (-ENOSYS);
-#endif
 }
 
 EXPORT_SYMBOL_GPL(lis_fdetach);

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/24 18:13:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/05 23:10:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/24 18:13:41 $ by $Author: brian $
+# Last Modified $Date: 2004/05/05 23:10:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,8 +88,13 @@ nobase_nodist_pkginclude_HEADERS = \
 	sys/versions/suncompat.ver \
 	sys/versions/svr4compat.ver \
 	sys/versions/uw7compat.ver \
-	sys/versions/strpipe.ver \
-	sys/versions/strsyms.ver
+	sys/versions/strattach.ver \
+	sys/versions/strreg.ver \
+	sys/versions/strsad.ver \
+	sys/versions/strsched.ver \
+	sys/versions/strspecfs.ver \
+	sys/versions/strsyms.ver \
+	sys/versions/sth.ver
 
 nobase_include_HEADERS = \
 	xti.h \

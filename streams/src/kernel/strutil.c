@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:37:00 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 20:46:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:37:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 20:46:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:37:00 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 20:46:41 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/04 21:37:00 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 20:46:41 $";
 
 #define __NO_VERSION__
 
@@ -85,7 +85,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "strdebug.h"
-#include "strhead.h"		/* for str_minfo */
+#include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "strsched.h"		/* for current_context() */
 #include "strutil.h"		/* for q locking and puts and gets */
@@ -1245,7 +1245,7 @@ static void _put(queue_t *q, mblk_t *mp)
 {
 	struct syncq *isq;
 	unsigned long flags;
-#if defined(CONFIG_STREAMS_COMPAT_AIX)
+#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
 	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
 #endif
 	if ((isq = q->q_syncq)) {
@@ -1612,7 +1612,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 	struct streamtab *st;
 	queue_t *q;
 	dev_t odev;
-	struct cdevsw *sdev;
+	struct cdevsw *cdev;
 	int err;
 	if (!(q = allocq()))
 		goto enomem;
@@ -1627,19 +1627,19 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 		/* magic garden */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
-			if (!(sdev = cdrv_get(getmajor(*devp))))
+			if (!(cdev = cdrv_get(getmajor(*devp))))
 				goto enoent;
-			if (!(st = sdev->d_str))
+			if (!(st = cdev->d_str))
 				goto put_noent;
-			setsq(q, (struct fmodsw *) sdev, 0);
-			cdrv_put(sdev);
+			setsq(q, (struct fmodsw *) cdev, 0);
+			cdrv_put(cdev);
 		}
 	} else if (odev != *devp)
 		swerr();
 	qprocson(q);		/* in case qopen() forgot */
 	return (0);
       put_noent:
-	cdev_put(sdev);
+	cdrv_put(cdev);
       enoent:
 	err = -ENOENT;
 	qdetach(q, oflag, crp);	/* need to call close */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/04 21:36:59 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/04 21:36:59 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/04 21:36:59 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/05 23:10:10 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -144,6 +147,9 @@ struct strapush *autopush_find(dev_t dev)
       notfound:
 	return ((struct strapush *) api);
 }
+#if defined CONFIG_STREAMS_SAD_MODULE
+EXPORT_SYMBOL(autopush_find);
+#endif
 
 int autopush_add(struct strapush *sap)
 {
@@ -184,6 +190,9 @@ int autopush_add(struct strapush *sap)
       error:
 	return (err);
 }
+#if defined CONFIG_STREAMS_SAD_MODULE
+EXPORT_SYMBOL(autopush_add);
+#endif
 
 int autopush_del(struct strapush *sap)
 {
@@ -203,6 +212,9 @@ int autopush_del(struct strapush *sap)
       error:
 	return (err);
 }
+#if defined CONFIG_STREAMS_SAD_MODULE
+EXPORT_SYMBOL(autopush_del);
+#endif
 
 int autopush_vml(struct str_mlist *smp, int nmods)
 {
@@ -222,6 +234,9 @@ int autopush_vml(struct str_mlist *smp, int nmods)
       einval:
 	return (-EINVAL);
 }
+#if defined CONFIG_STREAMS_SAD_MODULE
+EXPORT_SYMBOL(autopush_vml);
+#endif
 
 int apush_set(struct strapush *sap)
 {
@@ -265,3 +280,57 @@ int apush_vml(struct str_list *slp)
 {
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
 }
+
+/**
+ *  autopush: - perform autopush operations on a newly opened stream
+ *  @sd: newly opened stream head
+ *  @cdev: character device switch table entry (driver) for the stream
+ *  @oflag: open flags
+ *  @sflag: stream flag (%MODOPEN or %CLONEOPEN or %DRVOPEN)
+ *  @crp: pointer to user credentials structure
+ */
+int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
+{
+	struct apinfo *api;
+	int err;
+	if ((api = (typeof(api)) autopush_find(*devp)) != NULL) {
+		int k;
+		for (k = 0; k < MAX_APUSH; k++) {
+			struct fmodsw *fmod;
+			dev_t dev;
+			if (api->api_sap.sap_list[k][0] == 0)
+				break;
+			if (!(fmod = fmod_find(api->api_sap.sap_list[k]))) {
+				err = -EIO;
+				goto abort_autopush;
+			}
+			dev = *devp;	/* don't change dev nr */
+			if (fmod->f_str == NULL) {
+				fmod_put(fmod);
+				err = -EIO;
+				goto abort_autopush;
+			}
+			if ((err = qattach(sd, fmod, &dev, oflag, sflag, crp))) {
+				fmod_put(fmod);
+				goto abort_autopush;
+			}
+			atomic_inc(&fmod->f_count);
+		}
+	}
+	return (0);
+      abort_autopush:
+	{
+		/* detach everything, including the driver */
+		queue_t *wq = sd->sd_wq;
+		if (wq)
+			while (wq->q_next && SAMESTR(wq))
+				qdetach(wq->q_next - 1, oflag, crp);
+		return (err);
+	}
+}
+#if defined CONFIG_STREAMS_STH_MODULE || \
+    defined CONFIG_STREAMS_FIFO_MODULE || \
+    defined CONFIG_STREAMS_PIPE_MODULE || \
+    defined CONFIG_STREAMS_SOCK_MODULE
+EXPORT_SYMBOL(autopush);
+#endif

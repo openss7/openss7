@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/05/04 21:36:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/05/05 23:10:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/04 21:36:55 $ by $Author: brian $
+# Last Modified $Date: 2004/05/05 23:10:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,8 +100,6 @@ libLfSkernel_a_SOURCES		= \
 				src/kernel/strmain.c \
 				src/kernel/strprocfs.c \
 				src/kernel/strprocfs.h \
-				src/kernel/strsad.c \
-				src/kernel/strsad.h \
 				src/kernel/strsched.c \
 				src/kernel/strsched.h \
 				src/kernel/strspecfs.c \
@@ -113,6 +111,8 @@ libLfSkernel_a_SOURCES		= \
 				src/kernel/strutil.h \
 				src/kernel/strreg.c \
 				src/kernel/strreg.h \
+				src/kernel/strsad.c \
+				src/kernel/strsad.h \
 				src/kernel/strdebug.h
 
 libLfSkernel_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
@@ -130,26 +130,26 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/nuls.c \
 				src/drivers/sad.c \
 				include/sys/sad.h \
-				src/drivers/strclone.c \
-				src/drivers/strfifo.c \
-				src/drivers/strfifo.h \
-				src/drivers/strnsdev.c \
-				src/drivers/strpipe.c \
-				src/drivers/strpipe.h \
-				src/drivers/strsock.c \
-				src/drivers/strsock.h \
-				src/drivers/strspx.c \
-				src/drivers/strsfx.c \
+				src/drivers/clone.c \
+				src/drivers/fifo.c \
+				src/drivers/fifo.h \
+				src/drivers/nsdev.c \
+				src/drivers/pipe.c \
+				src/drivers/pipe.h \
+				src/drivers/sock.c \
+				src/drivers/sock.h \
 				include/log.h \
 				include/sys/log.h \
 				include/strlog.h \
 				include/sys/strlog.h \
 				src/drivers/log.h \
 				src/drivers/log.c
-#				src/drivers/strinet.c
-#				src/drivers/strsocksys.c
-#				src/drivers/strunix.c
-#				src/drivers/strxnet.c
+#				src/drivers/inet.c
+#				src/drivers/socksys.c
+#				src/drivers/unix.c
+#				src/drivers/xnet.c
+#				src/drivers/sfx.c
+#				src/drivers/spx.c
 
 
 libLfSdrivers_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
@@ -163,8 +163,8 @@ libLfSdrivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLfSdrivers_a_OBJECTS): $(libLfSdrivers_a_DEPENDENCIES)
 
 libLfSmodules_a_SOURCES		= \
-				src/kernel/strhead.c \
-				src/kernel/strhead.h \
+				src/modules/sth.c \
+				src/modules/sth.h \
 				src/modules/connld.c \
 				src/modules/pipemod.c \
 				src/modules/sockmod.c \
@@ -308,6 +308,12 @@ strace_CFLAGS			= $(USER_CFLAGS)
 #strclean_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 #strclean_CFLAGS		= $(USER_CFLAGS)
 
+@srcdir@/src/util/strclean.c:
+	touch $@
+
+@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
+	touch $@
+
 strerr_SOURCES			= src/util/strerr.c include/sys/config.h
 strerr_DEPENDENCIES		= include/sys/config.h
 strerr_LDFLAGS			= -static libstreams.la
@@ -326,11 +332,23 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 #strload_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 #strload_CFLAGS			= $(USER_CFLAGS)
 
+@srcdir@/src/util/strload.c:
+	touch $@
+
+@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
+	touch $@
+
 #strsetup_SOURCES		= src/util/strsetup.c include/sys/config.h
 #strsetup_DEPENDENCIES		= include/sys/config.h
 #strsetup_LDFLAGS		= -static libstreams.la
 #strsetup_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 #strsetup_CFLAGS		= $(USER_CFLAGS)
+
+@srcdir@/src/util/strsetup.c:
+	touch $@
+
+@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
+	touch $@
 
 strvf_SOURCES			= src/util/strvf.c include/sys/config.h
 strvf_DEPENDENCIES		= include/sys/config.h
@@ -389,10 +407,13 @@ EXPORT_SRCFILES = \
 	src/compat/sun/suncompat.c \
 	src/compat/svr4/svr4compat.c \
 	src/compat/uw7/uw7compat.c \
-	src/drivers/strpipe.c \
-	src/drivers/strfifo.c \
-	src/kernel/strhead.c \
-	src/kernel/strsyms.c
+	src/kernel/strattach.c \
+	src/kernel/strreg.c \
+	src/kernel/strsad.c \
+	src/kernel/strsched.c \
+	src/kernel/strspecfs.c \
+	src/kernel/strsyms.c \
+	src/modules/sth.c
 
 EXPORT_VERFILES = \
 	include/sys/versions/aixcompat.ver \
@@ -402,10 +423,13 @@ EXPORT_VERFILES = \
 	include/sys/versions/suncompat.ver \
 	include/sys/versions/svr4compat.ver \
 	include/sys/versions/uw7compat.ver \
-	include/sys/versions/strpipe.ver \
-	include/sys/versions/strfifo.ver \
-	include/sys/versions/strhead.ver \
-	include/sys/versions/strsyms.ver
+	include/sys/versions/strattach.ver \
+	include/sys/versions/strreg.ver \
+	include/sys/versions/strsad.ver \
+	include/sys/versions/strsched.ver \
+	include/sys/versions/strspecfs.ver \
+	include/sys/versions/strsyms.ver \
+	include/sys/versions/sth.ver
 
 PKGINCL = include/sys
 

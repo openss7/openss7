@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/04 21:37:00 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/05 23:10:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:37:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/04 21:37:00 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/05 23:10:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/04 21:37:00 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/05 23:10:10 $";
 
-#define __NO_VERSION__
-#define EXPORT_SYMTAB
+//#define __NO_VERSION__
+//#define EXPORT_SYMTAB
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,9 +121,9 @@ static char const ident[] =
 #include "strspecfs.h"
 #include "strsched.h"
 #include "strreg.h"
-#include "strhead.h"		/* for str_minfo */
+#include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"
-#include "strfifo.h"
+#include "fifo.h"
 #include "strattach.h"
 
 EXPORT_SYMBOL(adjmsg);		/* stream.h */
@@ -246,75 +246,94 @@ EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
 #endif
 
 EXPORT_SYMBOL_GPL(register_cmajor);	/* strconf.h */
-EXPORT_SYMBOL_GPL(register_strdev);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(register_strdev);	/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strdrv);	/* strconf.h */
 EXPORT_SYMBOL_GPL(register_strmod);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_cmajor);	/* strconf.h */
-EXPORT_SYMBOL_GPL(unregister_strdev);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(unregister_strdev);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strdrv);	/* strconf.h */
 EXPORT_SYMBOL_GPL(unregister_strmod);	/* strconf.h */
-EXPORT_SYMBOL_GPL(autopush_add);	/* strconf.h */
-EXPORT_SYMBOL_GPL(autopush_del);	/* strconf.h */
-EXPORT_SYMBOL_GPL(autopush_vml);	/* strconf.h */
-EXPORT_SYMBOL_GPL(autopush_find);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(autopush_add);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(autopush_del);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(autopush_vml);	/* strconf.h */
+//EXPORT_SYMBOL_GPL(autopush_find);	/* strconf.h */
 
 EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* strsysctl.h */
+EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);	/* strsysctl.h */
 
 EXPORT_SYMBOL_GPL(specfs_mnt);	/* strspecfs.h */
-EXPORT_SYMBOL_GPL(strm_open);	/* strspecfs.h */
+//EXPORT_SYMBOL_GPL(strm_open);	/* strspecfs.h */
 
-#if	defined(CONFIG_STREAMS_CLONE_MODULE) || \
-	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
-	defined(CONFIG_STREAMS_SC_MODULE) || \
-	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-EXPORT_SYMBOL(fmodsw_list);	/* strreg.h */
-EXPORT_SYMBOL(cdevsw_list);	/* strreg.h */
-EXPORT_SYMBOL(fmod_count);	/* strreg.h */
-EXPORT_SYMBOL(cdev_count);	/* strreg.h */
+#if	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
+	defined(CONFIG_STREAMS_SC_MODULE)
+//EXPORT_SYMBOL(fmodsw_list);	/* strreg.h */
+//EXPORT_SYMBOL(cdevsw_list);	/* strreg.h */
+//EXPORT_SYMBOL(fmod_count);	/* strreg.h */
+//EXPORT_SYMBOL(cdev_count);	/* strreg.h */
+#endif
+
+#if	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
+EXPORT_SYMBOL(fmod_str);	/* strreg.h */
 #endif
 
 #if	defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
 EXPORT_SYMBOL(strthreads);	/* strsched.h */
 #endif
 
+//EXPORT_SYMBOL(cdrv_get);	/* strreg.h */
+//EXPORT_SYMBOL(cdrv_put);	/* strreg.h */
+
+//EXPORT_SYMBOL(ap_get);		/* strsched.h */
+//EXPORT_SYMBOL(ap_grab);		/* strsched.h */
+//EXPORT_SYMBOL(ap_put);		/* strsched.h */
+
+//EXPORT_SYMBOL(alloclk);		/* strsched.h */
+//EXPORT_SYMBOL(freelk);		/* strsched.h */
+
+EXPORT_SYMBOL(qpop);		/* stream.h */
+EXPORT_SYMBOL(qpush);		/* stream.h */
+
 #if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) || \
 	defined(CONFIG_STREAMS_FIFO_MODULE) || \
 	defined(CONFIG_STREAMS_PIPE_MODULE)
-EXPORT_SYMBOL(allocsd);		/* strsched.h */
-EXPORT_SYMBOL(autopush);	/* strhead.h */
-EXPORT_SYMBOL(freesd);		/* strsched.h */
-EXPORT_SYMBOL(sd_get);		/* strsched.h */
-EXPORT_SYMBOL(sd_put);		/* strsched.h */
-//EXPORT_SYMBOL(strclose);	/* strhead.h */
-//EXPORT_SYMBOL(strfasync);	/* strhead.h */
-//EXPORT_SYMBOL(strflush);	/* strhead.h */
-//EXPORT_SYMBOL(strioctl);	/* strhead.h */
-//EXPORT_SYMBOL(strllseek);	/* strhead.h */
-//EXPORT_SYMBOL(strmmap);		/* strhead.h */
-//EXPORT_SYMBOL(stropen);		/* strhead.h */
-//EXPORT_SYMBOL(strpoll);		/* strhead.h */
-//EXPORT_SYMBOL(strread);		/* strhead.h */
-//EXPORT_SYMBOL(strreadv);	/* strhead.h */
-//EXPORT_SYMBOL(strsendpage);	/* strhead.h */
-//EXPORT_SYMBOL(strwrite);	/* strhead.h */
-//EXPORT_SYMBOL(strwritev);	/* strhead.h */
-EXPORT_SYMBOL(strgetpmsg);	/* strhead.h */
-EXPORT_SYMBOL(strputpmsg);	/* strhead.h */
+//EXPORT_SYMBOL(allocsd);		/* strsched.h */
+//EXPORT_SYMBOL(autopush);	/* sth.h */
+//EXPORT_SYMBOL(freesd);		/* strsched.h */
+//EXPORT_SYMBOL(sd_get);		/* strsched.h */
+//EXPORT_SYMBOL(sd_put);		/* strsched.h */
+//EXPORT_SYMBOL(strclose);	/* sth.h */
+//EXPORT_SYMBOL(strfasync);	/* sth.h */
+//EXPORT_SYMBOL(strflush);	/* sth.h */
+//EXPORT_SYMBOL(strioctl);	/* sth.h */
+//EXPORT_SYMBOL(strllseek);	/* sth.h */
+//EXPORT_SYMBOL(strmmap);		/* sth.h */
+//EXPORT_SYMBOL(stropen);		/* sth.h */
+//EXPORT_SYMBOL(strpoll);		/* sth.h */
+//EXPORT_SYMBOL(strread);		/* sth.h */
+//EXPORT_SYMBOL(strreadv);	/* sth.h */
+//EXPORT_SYMBOL(strsendpage);	/* sth.h */
+//EXPORT_SYMBOL(strwrite);	/* sth.h */
+//EXPORT_SYMBOL(strwritev);	/* sth.h */
+//EXPORT_SYMBOL(strgetpmsg);	/* sth.h */
+//EXPORT_SYMBOL(strputpmsg);	/* sth.h */
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(apush_get);	/* strconf.h */
 EXPORT_SYMBOL(apush_set);	/* strconf.h */
 EXPORT_SYMBOL(apush_vml);	/* strconf.h */
-EXPORT_SYMBOL(cdev_get);	/* strsubr.h, strreg.c */
-EXPORT_SYMBOL(cdev_put);	/* strsubr.h, strreg.c */
-EXPORT_SYMBOL(cdev_find);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(cdev_get);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(cdev_put);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(cdev_find);	/* strsubr.h, strreg.c */
 EXPORT_SYMBOL(fmod_get);	/* strsubr.h, strreg.c */
 EXPORT_SYMBOL(fmod_put);	/* strsubr.h, strreg.c */
 EXPORT_SYMBOL(fmod_find);	/* strsubr.h, strreg.c */
 EXPORT_SYMBOL(node_find);	/* strsubr.h, strreg.c */
 EXPORT_SYMBOL(vcmn_err);	/* cmn_err.h */
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
-EXPORT_SYMBOL(do_fattach);	/* strattach.h */
-EXPORT_SYMBOL(do_fdetach);	/* strattach.h */
+//EXPORT_SYMBOL(do_fattach);	/* strattach.h */
+//EXPORT_SYMBOL(do_fdetach);	/* strattach.h */
+#endif
+#ifdef HAVE_KERNEL_PIPE_SUPPORT
+//EXPORT_SYMBOL(do_spipe);	/* strspecfs.h */
 #endif
 #endif
 #endif

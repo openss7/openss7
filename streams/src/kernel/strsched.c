@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:59 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:59 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:59 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:10 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:59 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/05 23:10:10 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #include <linux/compiler.h>
 #include <linux/spinlock.h>
 #include <linux/slab.h>
@@ -114,7 +118,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "strdebug.h"
-#include "strhead.h"		/* for str_minfo */
+#include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "strsched.h"		/* for in_stream */
 #include "strutil.h"		/* for q locking and puts and gets */
@@ -122,7 +126,7 @@ static char const ident[] =
 #define __SCHED_EXTERN_INLINE extern
 #include "strsched.h"		/* verification of externs */
 
-static struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
+struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
 /* 
@@ -459,7 +463,9 @@ static void devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct devinfo *di = obj;
 		bzero(di, sizeof(*di));
 		INIT_LIST_HEAD(&di->di_list);
+#ifdef CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &di->di_next);
+#endif
 	}
 }
 struct devinfo *di_get(struct cdevsw *cdev)
@@ -467,10 +473,12 @@ struct devinfo *di_get(struct cdevsw *cdev)
 	struct devinfo *di;
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
 	if ((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+#ifdef CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
+#endif
 		atomic_inc(&si->si_cnt);
 		if (atomic_read(&si->si_cnt) > si->si_hwl)
 			si->si_hwl = atomic_read(&si->si_cnt);
@@ -478,7 +486,6 @@ struct devinfo *di_get(struct cdevsw *cdev)
 		di->di_dev = cdev;
 		atomic_set(&di->di_count, 0);
 		di->di_info = cdev->d_str->st_rdinit->qi_minfo;
-		INIT_LIST_HEAD(&di->di_list);
 	}
 	return (di);
 }
@@ -496,16 +503,20 @@ void di_put(struct devinfo *di)
 	if (di) {
 		if (atomic_dec_and_test(&di->di_refs)) {
 			struct strinfo *si = &Strinfo[DYN_DEVINFO];
+#ifdef CONFIG_STREAMS_DEBUG
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &di->di_next);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
+#endif
 			atomic_dec(&si->si_cnt);
 			list_del_init(&di->di_list);
 			/* clean it up before putting it back in the cache */
 			bzero(di, sizeof(*di));
 			INIT_LIST_HEAD(&di->di_list);
+#ifdef CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &di->di_next);
+#endif
 			kmem_cache_free(si->si_cache, di);
 		}
 		return;
@@ -526,7 +537,9 @@ static void modinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct modinfo *mi = obj;
 		bzero(mi, sizeof(*mi));
 		INIT_LIST_HEAD(&mi->mi_list);
+#ifdef CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
+#endif
 	}
 }
 struct modinfo *mi_get(struct fmodsw *fmod)
@@ -534,10 +547,12 @@ struct modinfo *mi_get(struct fmodsw *fmod)
 	struct modinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
 	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
+#ifdef CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
 		write_unlock_irqrestore(&si->si_rwlock, flags);
+#endif
 		atomic_inc(&si->si_cnt);
 		if (atomic_read(&si->si_cnt) > si->si_hwl)
 			si->si_hwl = atomic_read(&si->si_cnt);
@@ -545,7 +560,6 @@ struct modinfo *mi_get(struct fmodsw *fmod)
 		mi->mi_mod = fmod;
 		atomic_set(&mi->mi_count, 0);
 		mi->mi_info = fmod->f_str->st_rdinit->qi_minfo;
-		INIT_LIST_HEAD(&mi->mi_list);
 	}
 	return (mi);
 }
@@ -563,16 +577,20 @@ void mi_put(struct modinfo *mi)
 	if (mi) {
 		if (atomic_dec_and_test(&mi->mi_refs)) {
 			struct strinfo *si = &Strinfo[DYN_MODINFO];
+#ifdef CONFIG_STREAMS_DEBUG
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &mi->mi_next);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
+#endif
 			atomic_dec(&si->si_cnt);
 			list_del_init(&mi->mi_list);
 			/* clean it up before putting it back in the cache */
 			bzero(mi, sizeof(*mi));
 			INIT_LIST_HEAD(&mi->mi_list);
+#ifdef CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
+#endif
 			kmem_cache_free(si->si_cache, mi);
 		}
 		return;
@@ -855,6 +873,9 @@ struct linkblk *alloclk(void)
 	}
 	return (l);
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL(alloclk);
+#endif
 void freelk(struct linkblk *l)
 {
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
@@ -870,6 +891,9 @@ void freelk(struct linkblk *l)
 	atomic_dec(&si->si_cnt);
 	kmem_cache_free(si->si_cache, li);
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL(freelk);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -2184,6 +2208,9 @@ struct stdata *allocsd(void)
 	}
 	return (sd);
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL(allocsd);
+#endif
 static void __freesd(struct stdata *sd)
 {
 	struct strinfo *si = &Strinfo[DYN_STREAM];
@@ -2216,6 +2243,9 @@ struct stdata *sd_get(struct stdata *sd)
 	}
 	return (sd);
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL(sd_get);
+#endif
 void sd_put(struct stdata *sd)
 {
 	if (sd) {
@@ -2232,6 +2262,9 @@ void sd_put(struct stdata *sd)
 	swerr();
 	return;
 }
+#ifdef CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL(sd_put);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------

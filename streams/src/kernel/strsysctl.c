@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/03 06:30:21 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/03 06:30:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 19:32:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/03 06:30:21 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/03 06:30:21 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/05 19:32:54 $";
 
 #define __NO_VERSION__
 
@@ -75,9 +75,13 @@ static char const ident[] =
 #include <sys/strsubr.h>
 
 #include "strdebug.h"
-#include "strhead.h"		/* for str_minfo */
+#include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* extern verification */
 
+int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
+int sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
+int sysctl_str_hiwat = STRHIGH;		/* stream head default hi water mark */
+int sysctl_str_lowat = STRLOW;		/* stream head default lo water mark */
 int sysctl_str_cltime = 1500;		/* close wait time in msec */
 int sysctl_str_rtime = 1;		/* HZ to wait to forward held msg */
 int sysctl_str_nstrpush = 64;		/* maximum number of pushed modules */

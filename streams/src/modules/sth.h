@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/04 21:39:14 $
+ @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/05 23:10:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:39:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __LOCAL_STRHEAD_H__
-#define __LOCAL_STRHEAD_H__
+#ifndef __LOCAL_STH_H__
+#define __LOCAL_STH_H__
 
 //extern loff_t strllseek(struct file *file, loff_t off, int whence);
 //extern ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos);
@@ -78,8 +78,8 @@ extern struct file_operations strm_f_ops;
 
 extern struct smodule_info str_minfo;	/* for strsysctl.c */
 
-extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
-		    cred_t *crp);
+extern int strrput(queue_t *q, mblk_t *mp);
+extern int strwsrv(queue_t *q);
 
 /* make SVR4.2 oflag from file flags and mode */
 #define make_oflag(__f) \
@@ -90,4 +90,4 @@ extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int ofl
 extern int sth_init(void);
 extern void sth_exit(void);
 
-#endif				/* __LOCAL_STRHEAD_H__ */
+#endif				/* __LOCAL_STH_H__ */

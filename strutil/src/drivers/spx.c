@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/04 21:36:58 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:58 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 19:32:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/04 21:36:58 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/04 21:36:58 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -68,6 +68,7 @@ static char const ident[] =
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
+#include <sys/kmem.h>
 #include <sys/ddi.h>
 
 #include "strdebug.h"
@@ -77,7 +78,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/04 21:36:58 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 19:32:53 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -104,7 +105,7 @@ MODULE_LICENSE(SPX_LICENSE);
 #error CONFIG_STREAMS_SPX_MODID must be defined.
 #endif
 
-static unsigned short major = CONFIG_STREAM_SPX_MAJOR;
+static unsigned short major = CONFIG_STREAMS_SPX_MAJOR;
 MODULE_PARM(major, "b");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
 
@@ -121,7 +122,6 @@ static struct spx *spx_list = NULL;
 
 static int spx_rput(queue_t *q, mblk_t *mp)
 {
-	int err = 0;
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHR) {
@@ -138,7 +138,6 @@ static int spx_rput(queue_t *q, mblk_t *mp)
 
 static int spx_wput(queue_t *q, mblk_t *mp)
 {
-	int err = 0;
 	struct spx *p = q->q_ptr;
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
@@ -173,7 +172,7 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 		   passing of M_PROTO and M_PCPROTO messages as well, regardless of whether it is
 		   just a loop-back device or whether it is an unnamed pipe. */
 		if (p->init == 0 && mp->b_wptr >= mp->b_rptr + sizeof(long)) {
-			queue_t *oq;
+			queue_t *oq = NULL;
 			struct spx *x;
 			/* not necessarily aligned */
 			bcopy(mp->b_rptr, oq, sizeof(*oq));
@@ -181,7 +180,7 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 			spin_lock(&spx_lock);
 			for (x = spx_list; x && x->q != oq; x = x->next) ;
 			if (x && x->q == oq) {
-				weld(WR(q), oq, WR(oq), q, NULL, NULL, NULL);
+				weldq(WR(q), oq, WR(oq), q, NULL, NULL, NULL);
 				spin_unlock(&spx_lock);
 				/* FIXME: welding is probably not enough.  We probably have to link 
 				   the two stream heads together, pipe-style as well as setting
@@ -200,6 +199,7 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 	if (p->init == 0)
 		p->init = 1;
 	return (0);
+#if 0
       nak:
 	{
 		union ioctypes *ioc;
@@ -210,6 +210,7 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 		qreply(q, mp);
 		return (0);
 	}
+#endif
 }
 
 static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
@@ -221,7 +222,7 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);	/* can't open as module */
-	if ((p = kmem_alloc(sizeof(*p), KN_NOSLEEP)))	/* we could sleep */
+	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
 		return (ENOMEM);	/* no memory */
 	bzero(p, sizeof(*p));
 	switch (sflag) {
@@ -268,7 +269,7 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 static int spx_close(queue_t *q, int oflag, cred_t *crp)
 {
-	static spx *p;
+	struct spx *p;
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	spin_lock(&spx_lock);
@@ -298,12 +299,12 @@ static struct qinit spx_rqinit = {
 	qi_putp:spx_rput,
 	qi_qopen:spx_open,
 	qi_qclose:spx_close,
-	qi_minfo:spx_minfo,
+	qi_minfo:&spx_minfo,
 };
 
 static struct qinit spx_wqinit = {
 	qi_putp:spx_wput,
-	qi_minfo:spx_minfo,
+	qi_minfo:&spx_minfo,
 };
 
 static struct streamtab spx_info = {
@@ -314,7 +315,7 @@ static struct streamtab spx_info = {
 static struct cdevsw spx_cdev = {
 	d_name:CONFIG_STREAMS_SPX_NAME,
 	d_str:&spx_info,
-	d_flag:DF_CLONE,
+	d_flag:D_CLONE,
 	d_fop:NULL,
 	d_mode:S_IFCHR,
 	d_kmod:THIS_MODULE,
@@ -328,7 +329,7 @@ static int __init spx_init(void)
 #else
 	printk(KERN_INFO SPX_SPLASH);
 #endif
-	if ((err = register_strdev(&spx_cdcev, major)) < 0)
+	if ((err = register_strdev(&spx_cdev, major)) < 0)
 		return (err);
 	if (err > 0)
 		major = err;
@@ -339,3 +340,6 @@ static void __exit spx_exit(void)
 {
 	unregister_strdev(&spx_cdev, major);
 };
+
+module_init(spx_init);
+module_exit(spx_exit);

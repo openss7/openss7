@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/05 19:32:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 19:32:54 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -102,11 +102,6 @@ extern int sysctl_str_max_strdev;	/* max streams devices */
 extern int sysctl_str_max_strmod;	/* max streams modules */
 extern int sysctl_str_max_mblk;		/* max of headers on free list */
 extern int sysctl_str_msg_priority;	/* observer message allocation priority */
-
-#define sysctl_str_maxpsz	str_minfo.mi_maxpsz
-#define sysctl_str_minpsz	str_minfo.mi_minpsz
-#define sysctl_str_hiwat	str_minfo.mi_hiwat
-#define sysctl_str_lowat	str_minfo.mi_lowat
 
 /* initialization for main */
 extern int strsysctl_init(void);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/04 21:37:00 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/05 23:10:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:37:00 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/04 21:37:00 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/05 23:10:10 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/04 21:37:00 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/05 23:10:10 $";
 
 #define __NO_VERSION__
 
@@ -64,6 +64,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+
 #include <linux/compiler.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
@@ -93,10 +94,10 @@ static char const ident[] =
 #include <sys/kmem.h>
 
 #include "strdebug.h"
-#include "strhead.h"
-#include "strfifo.h"
-#include "strpipe.h"
-#include "strsock.h"
+#include "sth.h"
+#include "fifo.h"
+#include "pipe.h"
+#include "sock.h"
 #include "strsched.h"
 #include "strreg.h"		/* for cdevsw_list */
 #include "strspecfs.h"		/* for str_args */
@@ -264,6 +265,9 @@ void file_swap_put(struct file *f1, struct file *f2)
 STATIC struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, int flags,
 				 struct cdevsw *cdev, struct str_args *argp)
 {
+#ifdef HAVE_FILE_MOVE_ADDR
+	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+#endif
 	static LIST_HEAD(kill_list);
 	struct inode *inode = dentry->d_inode;
 	struct file *file;
@@ -278,7 +282,7 @@ STATIC struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, in
 	file->f_pos = 0;
 	file->f_reada = 0;
 	file->f_op = fops_get(cdev->d_fop);
-	file_move(file, &inode->i_sb->s_files);
+	_file_move(file, &inode->i_sb->s_files);
 	file->f_iobuf = NULL;
 	file->f_iobuf_lock = 0;
 	if (file->f_op && file->f_op->open && (err = file->f_op->open(inode, file)))
@@ -287,7 +291,7 @@ STATIC struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, in
 	return (file);
       error:
 	fops_put(file->f_op);
-	file_move(file, &kill_list);	/* out of the way.. */
+	_file_move(file, &kill_list);	/* out of the way.. */
 	file->f_dentry = NULL;
 	file->f_vfsmnt = NULL;
 	put_filp(file);
@@ -381,6 +385,9 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
       exit:
 	return (err);
 }
+#if defined CONFIG_STREAMS_STH_MODULE || CONFIG_STREAMS_NSDEV_MODULE
+EXPORT_SYMBOL(strm_open);
+#endif
 
 /**
  *  spec_open: - open a stream from an external character special device, fifo, or socket.
@@ -1373,6 +1380,105 @@ static struct super_block *specfs_read_super(struct super_block *sb, void *data,
       fail:
 	return (NULL);
 }
+
+#if defined HAVE_KERNEL_PIPE_SUPPORT
+static struct inode *get_spipe_inode(void)
+{
+	struct inode *inode;
+	if ((inode = new_inode(specfs_mnt->mnt_sb))) {
+		struct spec_sb_info *sbi = inode->i_sb->u.generic_sbp;
+		inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
+		inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
+		inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
+		inode->u.generic_ip = NULL;
+		inode->i_mode = S_IFIFO | sbi->sbi_mode;
+		inode->i_fop = fops_get(&spec_dev_f_ops);
+		inode->i_rdev = to_kdev_t(NODEV);
+	}
+	return (inode);
+}
+long do_spipe(int *fds)
+{
+	struct qstr str1, str2;
+	struct file *file1, *file2;
+	struct inode *inode1, *inode2;
+	struct dentry *dentry1, *dentry2;
+	char name[32];
+	int fd1, fd2;
+	int err;
+	err = -ENFILE;
+	if (!(file1 = get_empty_filp()))
+		goto no_file1;
+	if (!(file2 = get_empty_filp()))
+		goto no_file2;
+	if (!(inode1 = get_spipe_inode()))
+		goto no_inode1;
+	if (!(inode2 = get_spipe_inode()))
+		goto no_inode2;
+	if ((fd1 = err = get_unused_fd()) < 0)
+		goto no_fd1;
+	if ((fd2 = err = get_unused_fd()) < 0)
+		goto no_fd2;
+	snprintf(name, sizeof(name), "[%lu]", inode1->i_ino);
+	str1.name = name;
+	str1.len = strlen(name);
+	str1.hash = inode1->i_ino;
+	if (!(dentry1 = d_alloc(specfs_mnt->mnt_sb->s_root, &str1)))
+		goto no_dentry1;
+	d_add(dentry1, inode1);
+	snprintf(name, sizeof(name), "[%lu]", inode2->i_ino);
+	str2.name = name;
+	str2.len = strlen(name);
+	str2.hash = inode1->i_ino;
+	if (!(dentry2 = d_alloc(specfs_mnt->mnt_sb->s_root, &str2)))
+		goto no_dentry2;
+	d_add(dentry2, inode2);
+	/* FIXME: need to call open for each dentry */
+	/* file 1 */
+	file1->f_vfsmnt = mntget(specfs_mnt);
+	file1->f_dentry = dget(dentry1);
+	file1->f_pos = 0;
+	file1->f_flags = O_RDWR;
+	file1->f_op = &spec_dev_f_ops;
+	file1->f_mode = 3;
+	file1->f_version = 0;
+	/* file 2 */
+	file2->f_vfsmnt = mntget(specfs_mnt);
+	file2->f_dentry = dget(dentry2);
+	file1->f_pos = 0;
+	file1->f_flags = O_RDWR;
+	file1->f_op = &spec_dev_f_ops;
+	file1->f_mode = 3;
+	file1->f_version = 0;
+	/* */
+	fd_install(fd1, file1);
+	fd_install(fd2, file2);
+	fds[0] = fd1;
+	fds[1] = fd2;
+	return (0);
+      no_dentry2:
+	dput(dentry1);
+      no_dentry1:
+	put_unused_fd(fd2);
+      no_fd2:
+	put_unused_fd(fd1);
+      no_fd1:
+	iput(inode2);
+      no_inode2:
+	iput(inode1);
+      no_inode1:
+	put_filp(file2);
+      no_file2:
+	put_filp(file1);
+      no_file1:
+	goto error;
+      error:
+	return (err);
+}
+#if defined CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL(do_spipe);
+#endif
+#endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
 
 struct vfsmount *specfs_mnt;
 

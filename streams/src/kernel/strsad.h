@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/05 23:10:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 23:10:10 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSAD_H__
 #define __LOCAL_STRSAD_H__
 
-extern struct strapush *autopush_find(dev_t dev);
-extern int autopush_add(struct strapush *sap);
-extern int autopush_del(struct strapush *sap);
-extern int autopush_vml(struct str_mlist *smp, int nmods);
+// defined in sys/strconf.h
+//extern int autopush_add(struct strapush *sap);
+//extern int autopush_del(struct strapush *sap);
+//extern int autopush_vml(struct str_mlist *smp, int nmods);
+//extern struct strapush *autopush_find(dev_t dev);
+//extern int apush_set(struct strapush *sap);
+//extern int apush_get(struct strapush *sap);
+//extern int apush_vml(struct str_list *slp);
 
-extern int apush_set(struct strapush *sap);
-extern int apush_get(struct strapush *sap);
-extern int apush_vml(struct str_list *slp);
+extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
+		    cred_t *crp);
 
 #endif				/* __LOCAL_STRSAD_H__ */
