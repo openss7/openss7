@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.17 2004/11/08 04:02:32 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.18 2004/11/08 06:52:32 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/11/08 04:02:32 $ by $Author: brian $
+dnl Last Modified $Date: 2004/11/08 06:52:32 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -164,7 +164,6 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [
         LiS)
             if test -z "$with_lis" ; then
                 PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lis"
-                strconf_cv_package='LiS'
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
             fi
             AC_MSG_RESULT([--with-lis])
@@ -172,7 +171,6 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
         LfS)
             if test -z "$with_lfs" ; then
                 PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lfs"
-                strconf_cv_package='LfS'
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
             fi
             AC_MSG_RESULT([--with-lfs])

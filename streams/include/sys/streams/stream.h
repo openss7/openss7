@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.24 2004/08/31 07:27:56 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.25 2004/11/08 04:02:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:27:56 $ by $Author: brian $
+ Last Modified $Date: 2004/11/08 04:02:31 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/08/31 07:27:56 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/11/08 04:02:31 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -98,8 +98,10 @@ typedef unsigned long __streams_dev_t;
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
 
+#include "sys/streams/config.h"		/* build specific configuration file */
+
 #ifndef __GENKSYMS__
-#include "sys/streams/modversions.h"
+#include "sys/streams/modversions.h"	/* build specific module versions file */
 #endif
 
 #include <sys/strdebug.h>	/* for debugging assertions */

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2004/11/06 10:21:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2004/11/08 04:02:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/06 10:21:02 $ by $Author: brian $
+# Last Modified $Date: 2004/11/08 04:02:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -456,6 +456,10 @@ test_streams_CFLAGS		= $(LFS_CFLAGS)
 endif
 
 PKGINCL				= include/sys/$(PACKAGE_NAME)
+
+AUTOCONFIG_H			= $(PKGINCL)/config.h
+
+EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 EXPORT_SRCFILES			= \
 				src/compat/aix/aixcompat.c \
