@@ -187,6 +187,11 @@ function MM_swapImage() { //v3.0
 
   <tr> 
     <td width="600" height="100%" align="left" valign="top"> 
+      <h2><font color="#000000" size="+0">LiS-2.16 Kernel and Driver Compatibility</font></h2>
+      <p>LiS-2.16 is a small change from LiS-2.15. The change is that it no longer 
+        uses Linux system calls to implement getpmsg and putpmsg. Instead it overloads 
+        the read and write file system functions with particular values for the 
+        count parameter, values that are otherwise invalid.</p>
       <h2><font color="#000000" size="+0">LiS-2.15 Kernel and Driver Compatibility</font></h2>
       <p>LiS-2.15 continues to insulate STREAMS drivers from the Linux kernel. 
         It works with 2.2, 2.4, and 2.5 versions of the kernel. Support for 2.0 

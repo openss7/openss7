@@ -123,7 +123,7 @@ function MM_swapImage() { //v3.0
 
   <tr> 
 
-    <td rowspan="2" width="100" align="left" valign="top"> 
+    <td rowspan="2" width="101" align="left" valign="top"> 
       <table width="90" border="0" cellspacing="0" cellpadding="0">
         <tr> 
           <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
@@ -173,8 +173,7 @@ function MM_swapImage() { //v3.0
       </table>
     </td>
 
-    <td width="600" height="75"> 
-
+    <td width="599" height="75"> 
       <div align="center"> 
 
         <h2>Installation of LiS </h2>
@@ -187,8 +186,7 @@ function MM_swapImage() { //v3.0
 
   <tr> 
 
-    <td width="600" height="100%" align="left" valign="top"> 
-
+    <td width="599" height="100%" align="left" valign="top"> 
       <p>Installation of LiS is performed using a configuration script and then 
 
         running &quot;make&quot;. If you run &quot;make&quot; with no configuration 
@@ -209,7 +207,7 @@ function MM_swapImage() { //v3.0
 
       <blockquote> 
 
-        <p><font size="2" face="Courier New">cd /usr/src/LiS-2.12</font> <font size="2">(Or 
+        <p><font size="2" face="Courier New">cd /usr/src/LiS-2.16</font> <font size="2">(Or 
           wherever you installed the files)</font><br>
 
           <font size="2" face="Courier New">make</font><br>
@@ -249,7 +247,7 @@ function MM_swapImage() { //v3.0
         face="Courier New">make very-clean</font>. When it completes you can then 
         do <font size="2"
 
-        face="Courier New">rm -rf /usr/src/LiS-2.12 </font>(or whatever version 
+        face="Courier New">rm -rf /usr/src/LiS-2.16 </font>(or whatever version 
         of LiS you are removing). For more information about uninstalling LiS, 
         click <a
 
@@ -427,36 +425,16 @@ function MM_swapImage() { //v3.0
         version of LiS that can be used for &quot;laboratory&quot; testing. The 
         QNX alternative is not useful.</p>
 
-      <h2><font size="4"><b>Module or Kernel</b></font> </h2>
-
-      <p>The next question posed by the <font face="Courier New, Courier, mono">Configure</font> 
-        script is whether you want to run LiS as a separate loadable module or 
-        link it into the kernel. The default is to run as a separate module. It 
-        used to be useful to link LiS into the kernel when you wanted to use GDB 
-        to debug kernel based STREAMS drivers. However, the kernel GDB tools are 
-        now sophisticated enough that it is just as easy to debug LiS as a loadable 
-        module. </p>
-
       <h2><font size="4"><b>Kernel Source Location</b> </font></h2>
 
       <p><font face="Courier New, Courier, mono">Configure</font> asks you for 
         the location of your kernel source tree. The default is <font face="Courier New, Courier, mono">/usr/src/linux</font> 
         and likely suffices for the vast majority of cases. Once <font face="Courier New, Courier, mono">Configure</font> 
         has this information it can determine the version of the kernel for which 
-        you are compiling LiS. The kernel version makes a difference in the amount 
-        of patching that must go into the kernel. Older (2.0) kernels require 
-        patching, new ones (2.2 and 2.4) do not. </p>
-
-      <p>If you are compiling for the kernel located in <font face="Courier New, Courier, mono">/usr/src/linux</font> 
-        and the kernel version is 2.0.36 or 2.2.0 or later there is no patching 
-        of the kernel required to install LiS as a module. To link directly with 
-        the kernel, the &quot;make&quot; of LiS will insert a small patch into 
-        the kernel to cause LiS to be linked into the kernel and to arrange to 
-        call the LiS initialization routine at boot time. </p>
-
-      <p>We recommend that you use kernel version 2.0.36 or 2.2.x for installing 
-        the latest version of LiS. This latest version of LiS has been tested 
-        with 2.2 kernels only. It may not install or run properly on older kernels.</p>
+        you are compiling LiS.</p>
+      <p>Kernel version 2.0.x is no longer supported and the LiS installation 
+        will fail if <font face="Courier New, Courier, mono">Configure</font> 
+        detects this kernel version.</p>
 
       <p>If your kernel source has not had &quot;menuconfig&quot; run on it yet, 
         <font face="Courier New, Courier, mono">Configure</font> will propose 
@@ -521,35 +499,10 @@ function MM_swapImage() { //v3.0
         case you may think that you have successfully compiled and booted a new 
         kernel when, in fact, you are running on your old kernel.</p>
 
-      <h2><font size="4"><b>Automatic Kernel Building</b> </font></h2>
-
-      <p>If you answered the first question posed by <font face="Courier New, Courier, mono">Configure</font> 
-        by indicating that you wish to have LiS linked directly in with the kernel, 
-        <font face="Courier New, Courier, mono">Configure</font> now offers you 
-        the option of having a &quot;make&quot; in the LiS directory also proceed 
-        to a &quot;make&quot; in your indicated kernel directory. The default, 
-        selected by hitting Enter/Return, is not to do so. </p>
-
-      <p>If you elected to have an LiS build perform a kernel build automatically 
-        then <font face="Courier New, Courier, mono">Configure</font> will now 
-        ask you which kernel build target you would like to have used. The default 
-        is <font face="Courier New, Courier, mono">bzImage</font>, the theory 
-        being that you may be installing large STREAMS drivers into the kernel 
-        and therefore will need a &quot;big&quot; kernel image. LiS will add about 
-        85K of code and data to your kernel size. The default is not <font face="Courier New, Courier, mono">bzlilo</font> 
-        based on the idea that you likely are using this machine as a development 
-        machine and intend to run the resulting LiS module on a different system. 
-      </p>
-
-      <p>In any case, you can select the kernel &quot;make&quot; target that suits 
-
-        your needs. </p>
-
       <h2><font size="4"><b>LiS Module Location</b></font> </h2>
 
-      <p>If you have elected to build LiS as an installable module, rather than 
-        to link directly into the kernel, you will be asked whether or not you 
-        wish the &quot;make&quot; to copy the resulting <font face="Courier New, Courier, mono">streams.o</font> 
+      <p>You will be asked whether or not you wish the &quot;make&quot; to copy 
+        the resulting <font face="Courier New, Courier, mono">streams.o</font> 
         file to the modules directory associated with your selected kernel version. 
         The alternative is to have &quot;make&quot; build <font face="Courier New, Courier, mono">streams.o</font> 
         in the LiS directory and simply leave it there for manual copying later. 
