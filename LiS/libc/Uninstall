@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# $1 is the name of the LiS shared library
+#
+#
+# must be root
+#
+if [ `id -u` != "0" ]; then
+    exit 0
+fi
+
+# For backward compatibility we are going to remove *LiS*.so and *LiS*.a
+# in /lib, just to make sure that libs installed by previous versions
+# of LiS get removed.
+#
+rm -f /lib/*LiS*.so /lib/*LiS*.a 2>/dev/null
+
+exit 0
