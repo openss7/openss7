@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/12/20 13:49:37 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/12/20 20:18:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,14 +51,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/20 13:49:37 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/20 20:18:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.2 2004/12/20 13:49:37 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.3 2004/12/20 20:18:29 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7 Linux Native SCTP], [0.2.20], [bugs@openss7.org], [sctp])
 
@@ -81,7 +81,7 @@ if test :"$infodir"       = :'${prefix}/info' ; then infodir='${prefix}/share/in
 if test :"$mandir"        = :'${prefix}/man'  ; then mandir='${prefix}/share/man'   ; fi
 
 AC_CONFIG_SRCDIR([src/sctp.c])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([config.h include/linux/hooks.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

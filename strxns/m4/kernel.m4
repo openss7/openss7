@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/12/01 22:33:53 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/12/20 18:47:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/01 22:33:53 $ by $Author: brian $
+# Last Modified $Date: 2004/12/20 18:47:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1131,22 +1131,48 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
 ])# _LINUX_SETUP_KERNEL_DEBUG
 # =========================================================================
 
+# =============================================================================
+# _LINUX_CHECK_KERNEL_CONFIG_internal([CHECKING-LABEL], CONFIG-NAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
+    if test -n "$1" ; then linux_tmp="$1" ; else linux_tmp="for kernel $2" ; fi
+    AS_VAR_PUSHDEF([linux_config], [linux_cv_$2])dnl
+    AC_CACHE_CHECK([$linux_tmp], [linux_cv_$2], [dnl
+        AC_EGREP_CPP([\<yes_we_have_$2_defined\>], [
+#include <linux/version.h>
+#include <linux/config.h>
+#ifdef $2
+    yes_we_have_$2_defined
+#endif
+        ], [AS_VAR_SET([linux_config], ['yes'])], [AS_VAR_SET([linux_config], ['no'])]) ])
+    linux_tmp=AS_VAR_GET([linux_config])
+    if test :"${linux_tmp:-no}" = :yes ; then :; $3
+    else :; $4
+    fi
+    AS_VAR_POPDEF([linux_config])dnl
+])# _LINUX_CHECK_KERNEL_CONFIG_internal
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_CONFIG([CHECKING-LABEL], CONFIG-NAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_KERNEL_CONFIG_internal([$1], [$2], [$3], [$4]) ])
+])# _LINUX_CHECK_KERNEL_CONFIG
+# =========================================================================
+
 # =========================================================================
 # _LINUX_CHECK_KERNEL_REGPARM
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
-    AC_CACHE_CHECK([for kernel SuSE production kernel], [linux_cv_k_regparm], [dnl
-        AC_EGREP_CPP([\<yes_we_have_kernel_regparm\>], [
-#include <linux/version.h>
-#include <linux/config.h>
-#ifdef CONFIG_REGPARM
-    yes_we_have_kernel_regparm
-#endif
-        ], [linux_cv_k_regparm=yes], [linux_cv_k_regparm=no]) ])
-    if test :"${linux_cv_k_regparm:-no}" = :yes
-    then
-        CFLAGS="${CFLAGS}${CFLAGS:+ }-mregparm=3"
-    fi
+    _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel SuSE production kernel],
+        [CONFIG_REGPARM],
+        [linux_cv_k_regparm=yes # for historical reasons
+         CFLAGS="${CFLAGS}${CFLAGS:+ }-mregparm=3"],
+        [linux_cv_k_regparm=no])
 ])# _LINUX_CHECK_KERNEL_REGPARM
 # =========================================================================
 
@@ -1154,18 +1180,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
 # _LINUX_CHECK_KERNEL_VERSIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
-    AC_CACHE_CHECK([for kernel symbol versioning], [linux_cv_k_versions], [dnl
-        AC_EGREP_CPP([\<yes_we_have_kernel_versions\>], [
-#include <linux/version.h>
-#include <linux/config.h>
-#ifdef CONFIG_MODVERSIONS
-    yes_we_have_kernel_versions
-#endif
-        ], [linux_cv_k_versions=yes], [linux_cv_k_versions=no]) ])
-    if test :"${linux_cv_k_versions:-no}" = :yes
-    then
-        KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODVERSIONS"
-    fi
+    _LINUX_CHECK_KERNEL_CONFIG_internal([for kernel symbol versioning],
+        [CONFIG_MODVERSIONS],
+        [linux_cv_k_versions=yes # for historical reasons
+         KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODVERSIONS"],
+        [linux_cv_k_versions=no])
     AC_SUBST([KERNEL_MODFLAGS])dnl
     KERNEL_NOVERSION="-D__NO_VERSION__"
     AC_SUBST([KERNEL_NOVERSION])dnl
@@ -1268,7 +1287,11 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [dnl
         AS_VAR_SET([linux_symbol_export], ["$linux_tmp"]) ])
     linux_tmp=AS_VAR_GET([linux_symbol_export])
     if test :"${linux_tmp:-no}" != :no 
-    then :; $3
+    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1_EXPORT), [], [The symbol $1
+            is not exported by most kernels.  Define this if the symbol $1
+            is exported by your kernel so that kernel modules can be supported
+            properly.])
+        $3
     else :; _LINUX_KERNEL_SYMBOL_ADDR([$1], [$2], [$3])
     fi
     AS_VAR_POPDEF([linux_symbol_export])dnl

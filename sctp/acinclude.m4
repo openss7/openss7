@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.3 2004/12/20 16:32:30 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2004/12/20 19:40:01 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/20 16:32:30 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/20 19:40:01 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -110,6 +110,8 @@ AC_DEFUN([_SCTP_OPTIONS], [dnl
 # _SCTP_SETUP_DEBUG
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_SETUP_DEBUG], [dnl
+    AC_DEFINE_UNQUOTED([CONFIG_SCTP_MODULE], [], [Always define this for the
+                        autoconf configuration.])
     case "$linux_cv_debug" in
     _DEBUG)
         AC_DEFINE_UNQUOTED([CONFIG_SCTP_DEBUG], [], [Define to perform
@@ -321,15 +323,49 @@ dnl fi
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_cmsg_send])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_getsockopt])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_setsockopt])
+    _LINUX_KERNEL_SYMBOL_EXPORT([inet_bind])
+    _LINUX_KERNEL_SYMBOL_EXPORT([inet_multi_getname])
+    _LINUX_KERNEL_SYMBOL_EXPORT([inet_getname])
+    _LINUX_KERNEL_SYMBOL_EXPORT([inet_ioctl])
     sctp_cv_other_sctp='no'
     _LINUX_CHECK_KERNEL_CONFIG([for lksctp compiled in], [CONFIG_IP_SCTP],
     [sctp_cv_other_sctp='yes'])
     _LINUX_CHECK_KERNEL_CONFIG([for lksctp as module], [CONFIG_IP_SCTP_MODULE],
     [sctp_cv_other_sctp='yes'])
-    _LINUX_CHECK_KERNEL_CONFIG([for openss7 sctp patched in], [CONFIG_SCTP],
-    [sctp_cv_other_sctp='yes'])
-    _LINUX_CHECK_KERNEL_CONFIG([for openss7 sctp as module], [CONFIG_SCTP_MODULE],
-    [sctp_cv_other_sctp='yes'])
+    if test :$sctp_cv_other_sctp = :yes ; then
+        AH_VERBATIM([HAVE_LKSCTP_SCTP],
+                    m4_text_wrap([Some more recent 2.4.25 and greater kernels have this poorman
+                                  version of SCTP included in the kernel.  Define this symbol if you
+                                  have such a bastardized kernel.  When we have such a kernel we
+                                  need to define lksctp's header wrapper defines so that none of the
+                                  lksctp header files are included (we use our own instead).  */],
+                                  [   ], [/* ])[
+#undef HAVE_LKSCTP_SCTP
+#ifdef HAVE_LKSCTP_SCTP
+#define __net_sctp_command_h__ 1
+#define __net_sctp_compat_h__ 1
+#define __net_sctp_h__ 1
+#define __net_sctp_user_h__ 1
+#define __sctp_constants_h__ 1
+#define __sctp_structs_h__ 1
+#define __sctp_tsnmap_h__ 1
+#define __sctp_ulpevent_h__ 1
+#define __sctp_ulpqueue_h__ 1
+#endif])
+        AC_DEFINE([HAVE_LKSCTP_SCTP])
+    else
+        _LINUX_CHECK_KERNEL_CONFIG([for openss7 sctp patched in], [CONFIG_SCTP],
+        [sctp_cv_other_sctp='yes'])
+        _LINUX_CHECK_KERNEL_CONFIG([for openss7 sctp as module], [CONFIG_SCTP_MODULE],
+        [sctp_cv_other_sctp='yes'])
+        if test :$sctp_cv_other_sctp = :yes ; then
+            AC_DEFINE_UNQUOTED([HAVE_OPENSS7_SCTP], [], [Some kernels may
+                already have the premium OpenSS7 implementation of SCTP
+                included.  A number of kernel rpms were released this way and
+                some distros have picked up OpenSS7 patches.  If this is the
+                case you are done.])dnl
+        fi
+    fi
     _LINUX_KERNEL_ENV([
         AC_CHECK_MEMBER([struct sock.tp_pinfo.af_sctp],
             [sctp_cv_sock_tp_pinfo_af_sctp='yes'],
@@ -360,18 +396,41 @@ dnl fi
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue_exclusive])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([alloc_skb])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([create_proc_entry])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([del_timer])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([dev_base])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([do_softirq])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([free_pages])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([__generic_copy_to_user])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([__get_free_pages])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([__get_user_4])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([icmp_err_convert])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_accept])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_add_protocol])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_addr_type])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_bind])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_del_protocol])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_family_ops])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_getname])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_getsockopt])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_ioctl])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_recvmsg])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_register_protosw])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_release])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_sendmsg])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_setsockopt])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_shutdown])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_stream_connect])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_unregister_protosw])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_cmsg_recv])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_fragment])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_getsockopt])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_key])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([__ip_select_ident])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_send_check])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_setsockopt])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([irq_stat])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([jiffies])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([kfree])
@@ -392,9 +451,11 @@ dnl _LINUX_KERNEL_SYMBOL_EXPORT([__out_of_line_bug])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([panic])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([__pollwait])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([printk])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([proc_net])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([___pskb_trim])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([put_cmsg])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([__release_sock])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([remove_proc_entry])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([remove_wait_queue])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([schedule_timeout])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
@@ -408,6 +469,9 @@ dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_realloc_headroom])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_under_panic])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sk_free])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sk_run_filter])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_no_mmap])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_no_sendpage])
+dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_no_socketpair])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_wake_async])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_wfree])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sprintf])
