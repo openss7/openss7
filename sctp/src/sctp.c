@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/13 03:31:15 $ by $Author: brian $
+ Last Modified $Date: 2005/01/13 12:51:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -162,9 +162,9 @@ static char const ident[] =
 #include "linux/hooks.h"
 #include "netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.19 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.20 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/13 03:31:15 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/13 12:51:12 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -194,9 +194,9 @@ MODULE_LICENSE(SCTP_LICENSE);
 
 #if SOCKETS
 #define skb_next(__skb) \
-	(((__skb)->next != (struct sk_buff *) (__skb)->list) ? (__skb)->next : NULL)
+	(((__skb)->next != ((struct sk_buff *) (__skb)->list)) ? (__skb)->next : NULL)
 #define skb_prev(__skb) \
-	(((__skb)->prev != (struct sk_buff *) (__skb)->list) ? (__skb)->prev : NULL)
+	(((__skb)->prev != ((struct sk_buff *) (__skb)->list)) ? (__skb)->prev : NULL)
 #endif				/* SOCKETS */
 
 /*
@@ -633,7 +633,7 @@ struct sctp_opt {
 	ulong rto_max;			/* default rto maximum */
 	size_t rtx_path;		/* default path max retrans */
 	ulong hb_itvl;			/* default hb interval */
-	uint8_t options;		/* options flags */
+	uint8_t debug;			/* debug flags */
 	int user_amps;			/* user max assoc payload size */
 };
 
@@ -1177,6 +1177,10 @@ struct sctp_cookie {
 	uint32_t p_rwnd;		/* perr a_rwnd */
 	uint16_t n_istr;		/* number of inbound streams */
 	uint16_t n_ostr;		/* number of outbound streams */
+	uint32_t l_caps;		/* local capabilities */
+	uint32_t p_caps;		/* peer capabilities */
+	uint32_t l_ali;			/* local adaptation layer information */
+	uint32_t p_ali;			/* peer adaptation layer information */
 	uint32_t l_ttag;		/* local tie tag */
 	uint32_t p_ttag;		/* peer tie tag */
 	uint16_t danum;			/* number of dest transport addresses */
@@ -4334,7 +4338,7 @@ sctp_update_routes(struct sock *sk, int force_reselect)
 		sp->taddr = sctp_choose_best(sp);
 		usual(sp->taddr);
 #if (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) && defined SCTP_CONFIG_ERROR_GENERATOR
-		if ((sp->options & SCTP_OPTION_BREAK)
+		if ((sp->debug & SCTP_OPTION_BREAK)
 		    && (sp->taddr == sp->daddr || sp->taddr == sp->daddr->next)
 		    && sp->taddr->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 			ptrace(("Primary sp->taddr %03d.%03d.%03d.%03d chosen poorly on %p\n",
@@ -4565,24 +4569,24 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 	hlen = (dev->hard_header_len + 15) & ~15;
 	tlen = sizeof(struct iphdr) + plen;
 #if (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) && defined SCTP_CONFIG_ERROR_GENERATOR
-	if ((sp->options & SCTP_OPTION_DBREAK) && sd->daddr == 0x010000ff
+	if ((sp->debug & SCTP_OPTION_DBREAK) && sd->daddr == 0x010000ff
 	    && ++break_packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 		if (break_packets > SCTP_CONFIG_BREAK_GENERATOR_LIMIT)
 			break_packets = 0;
 		return;
 	}
-	if ((sp->options & SCTP_OPTION_BREAK)
+	if ((sp->debug & SCTP_OPTION_BREAK)
 	    && (sd == sp->daddr || sd == sp->daddr->next)
 	    && ++sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 		return;
 	}
-	if ((sp->options & SCTP_OPTION_DROPPING)
+	if ((sp->debug & SCTP_OPTION_DROPPING)
 	    && ++sd->packets > SCTP_CONFIG_ERROR_GENERATOR_LEVEL) {
 		if (sd->packets > SCTP_CONFIG_ERROR_GENERATOR_LIMIT)
 			sd->packets = 0;
 		return;
 	}
-	if ((sp->options & SCTP_OPTION_RANDOM)
+	if ((sp->debug & SCTP_OPTION_RANDOM)
 	    && ++sd->packets > 2 * SCTP_CONFIG_ERROR_GENERATOR_LEVEL) {
 		if (!(random() & 0x7f)) {
 			printd(("WARNING: Dropping packet\n"));
@@ -5495,7 +5499,7 @@ sctp_bundle_more(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skb, in
 	/* initialize argument cookie */
 	cookie.dpp = &(cb->next);
 	cookie.mlen = skb->len;
-	cookie.mrem = cookie.mlen < sd->dmps + hlen ? sd->dmps + hlen - cookie.mlen : 0;
+	cookie.mrem = (cookie.mlen < sd->dmps + hlen) ? sd->dmps + hlen - cookie.mlen : 0;
 	cookie.swnd = sctp_avail(sp, sd);
 	cookie.pbuf = sp->p_rbuf >> 1;
 	if (((sp->sackf & SCTP_SACKF_NOW) && !sk->backlog.head)
@@ -8116,11 +8120,11 @@ sctp_rtt_calc(struct sctp_daddr *sd, unsigned long time)
 	/* RFC 2960 6.3.1 (C7) */
 	sd->rto = (sd->rto_max < sd->rto) ? sd->rto_max : sd->rto;
 #if (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) && defined SCTP_CONFIG_ERROR_GENERATOR
-	if (sd->retransmits && (sd->sp->options & SCTP_OPTION_BREAK)
+	if (sd->retransmits && (sd->sp->debug & SCTP_OPTION_BREAK)
 	    && (sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL))
-		ptrace(("Aaaarg! Reseting counts for address %d.%d.%d.%d\n",
-			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
-			(sd->daddr >> 24) & 0xff));
+		_ptrace(("Aaaarg! Reseting counts for address %d.%d.%d.%d\n",
+			 (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
+			 (sd->daddr >> 24) & 0xff));
 #endif				/* (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) &&
 				   defined SCTP_CONFIG_ERROR_GENERATOR */
 	sd->dups = 0;
@@ -8250,8 +8254,8 @@ sctp_cumm_ack(struct sock *sk, uint32_t ack)
 					/* credit destination (later) */
 					normal(sd->in_flight >= sd->ack_accum + dlen);
 					sd->ack_accum =
-					    sd->in_flight >
-					    sd->ack_accum + dlen ? sd->ack_accum +
+					    (sd->in_flight >
+					    sd->ack_accum + dlen) ? sd->ack_accum +
 					    dlen : sd->in_flight;
 				}
 				/* credit association (now) */
@@ -8996,8 +9000,8 @@ sctp_recv_sack(struct sock *sk, struct sk_buff *skb)
 							/* credit destination */
 							normal(sd->in_flight >= dlen);
 							sd->in_flight =
-							    sd->in_flight >
-							    dlen ? sd->in_flight - dlen : 0;
+							    (sd->in_flight >
+							    dlen) ? sd->in_flight - dlen : 0;
 						}
 						/* credit association */
 						normal(sp->in_flight >= dlen);
@@ -9383,6 +9387,7 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 	unsigned char *errp = NULL;
 	struct sctp_cookie ck;
 	struct sk_buff *unrec = NULL;
+	uint32_t p_caps, p_ali;
 #ifdef SCTP_CONFIG_THROTTLE_PASSIVEOPENS
 	static ulong last_init = 0;
 	if (last_init && jiffies < last_init + sp->throttle)
@@ -9410,7 +9415,8 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 		goto invalid_parm;
 	if (!(unrec = alloc_skb(skb->len, GFP_ATOMIC)))
 		goto enobufs;
-	sp->p_caps = 0;
+	p_ali = 0;
+	p_caps = 0;
 	for (ph = (union sctp_parm *) pptr;
 	     pptr + sizeof(ph->ph) <= pend && pptr + (plen = ntohs(ph->ph.len)) <= pend;
 	     pptr += PADC(plen), ph = (union sctp_parm *) pptr) {
@@ -9446,7 +9452,7 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 		case SCTP_PTYPE_ECN_CAPABLE:
 			if (plen < sizeof(ph->ecn_capable))
 				goto init_bad_parm;
-			sp->p_caps |= SCTP_CAPS_ECN;
+			p_caps |= SCTP_CAPS_ECN;
 			INET_ECN_xmit(sk);
 			break;
 #endif				/* SCTP_CONFIG_ECN */
@@ -9454,8 +9460,8 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 		case SCTP_PTYPE_ALI:
 			if (plen < sizeof(ph->ali))
 				goto init_bad_parm;
-			sp->p_ali = ntohl(ph->ali.ali);
-			sp->p_caps |= SCTP_CAPS_ALI;
+			p_ali = ntohl(ph->ali.ali);
+			p_caps |= SCTP_CAPS_ALI;
 			break;
 #endif				/* defined(SCTP_CONFIG_ADD_IP) ||
 				   defined(SCTP_CONFIG_ADAPTATION_LAYER_INFO) */
@@ -9463,7 +9469,7 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 		case SCTP_PTYPE_PR_SCTP:
 			if (plen < sizeof(ph->pr_sctp))
 				goto init_bad_parm;
-			sp->p_caps |= SCTP_CAPS_PR;
+			p_caps |= SCTP_CAPS_PR;
 			break;
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 		default:
@@ -9515,6 +9521,10 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 		ck.p_rwnd = ntohl(m->a_rwnd);
 		ck.n_istr = istrs;
 		ck.n_ostr = ostrs;
+		ck.l_caps = sp->l_caps;
+		ck.p_caps = p_caps;
+		ck.l_ali = sp->l_ali;
+		ck.p_ali = p_ali;
 		ck.danum = anum;
 		_printd(("INFO: ck.timestamp = %lu\n", ck.timestamp));
 		_printd(("INFO: ck.lifespan  = %lu\n", ck.lifespan));
@@ -9530,6 +9540,10 @@ sctp_recv_init(struct sock *sk, struct sk_buff *skb)
 		_printd(("INFO: ck.p_rwnd    = %u\n", ck.p_rwnd));
 		_printd(("INFO: ck.n_istr    = %hu\n", ck.n_istr));
 		_printd(("INFO: ck.n_ostr    = %hu\n", ck.n_ostr));
+		_printd(("INFO: ck.l_caps    = %u\n", ck.l_caps));
+		_printd(("INFO: ck.p_caps    = %u\n", ck.p_caps));
+		_printd(("INFO: ck.l_ali     = %u\n", ck.l_ali));
+		_printd(("INFO: ck.p_ali     = %u\n", ck.p_ali));
 		_printd(("INFO: ck.danum     = %u\n", ck.danum));
 	}
 	/* RFC 2960 5.2.2 Note */
@@ -9865,6 +9879,10 @@ sctp_update_from_cookie(struct sock *sk, struct sctp_cookie *ck)
 	sp->inet.id = ck->v_tag ^ jiffies;
 	sp->n_istr = ck->n_istr;
 	sp->n_ostr = ck->n_ostr;
+	sp->l_caps = ck->l_caps;
+	sp->p_caps = ck->p_caps;
+	sp->l_ali = ck->l_ali;
+	sp->p_ali = ck->p_ali;
 	sp->t_tsn = ck->v_tag;
 	sp->t_ack =
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
@@ -13804,7 +13822,7 @@ sctp_passive_connect(struct sock *lsk, struct sk_buff *skb, int *errp)
 	skb_queue_head_init(&sp->ackq);
 	/* TODO: handle IP options sk->protinfo.af_inet.opt */
 	/* initialize hash linkage */
-	sp->options = lsp->options;
+	sp->debug = lsp->debug;
 	/* *INDENT-OFF* */
 	/* association defaults */
 	sp->max_istr	= lsp->max_istr;
@@ -14351,7 +14369,7 @@ sctp_setsockopt(struct sock *sk, int level, int optname, char *optval, int optle
 	}
 	case SCTP_DEBUG_OPTIONS:
 	{
-		sp->options = val;
+		sp->debug = val;
 		return (0);
 	}
 #ifdef SCTP_CONFIG_ECN
@@ -14657,7 +14675,7 @@ sctp_getsockopt(struct sock *sk, int level, int optname, char *optval, int *optl
 	}
 	case SCTP_DEBUG_OPTIONS:
 	{
-		val = sp->options;
+		val = sp->debug;
 		break;
 	}
 #ifdef SCTP_CONFIG_ECN

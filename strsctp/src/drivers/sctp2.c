@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/12 09:05:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/13 12:55:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $";
 
 #include "compat.h"
 
@@ -160,7 +160,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/13 12:55:44 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -190,9 +190,9 @@ MODULE_LICENSE(SCTP_LICENSE);
 
 #if SOCKETS
 #define skb_next(__skb) \
-	(((__skb)->next != (struct sk_buff *) (__skb)->list) ? (__skb)->next : NULL)
+	(((__skb)->next != ((struct sk_buff *) (__skb)->list)) ? (__skb)->next : NULL)
 #define skb_prev(__skb) \
-	(((__skb)->prev != (struct sk_buff *) (__skb)->list) ? (__skb)->prev : NULL)
+	(((__skb)->prev != ((struct sk_buff *) (__skb)->list)) ? (__skb)->prev : NULL)
 #endif				/* SOCKETS */
 
 /*
@@ -553,6 +553,7 @@ struct sctp_daddr {
 #define SCTP_DESTF_DROPPING	0x0080	/* DEST is dropping packets */
 #define SCTP_DESTF_FORWDTSN	0x0100	/* DEST has forward tsn outstanding */
 #define SCTP_DESTF_NEEDVRFY	0x0200	/* DEST needs to be verified SCTP IG 2.36 */
+#define SCTP_DESTF_ELIGIBLE	0x0400	/* DEST is eligible for FR */
 #define SCTP_DESTM_DONT_USE	(SCTP_DESTF_INACTIVE| \
 				 SCTP_DESTF_UNUSABLE| \
 				 SCTP_DESTF_ROUTFAIL| \
@@ -5615,7 +5616,7 @@ sctp_bundle_data_retrans(struct sctp *sp,	/* association */
 			size_t plen = PADC(sizeof(struct sctp_data) + dlen);
 			if (plen > ckp->mrem && plen <= sd->dmps)
 				goto wait_for_next_packet;
-			if (dlen > ckp->swnd && cb->sacks != 4)
+			if (dlen > ckp->swnd && cb->sacks != SCTP_FR_COUNT)
 				goto congested;
 			if (!(db = dupmsg(mp)))
 				goto enobufs;
@@ -5791,7 +5792,7 @@ sctp_bundle_more(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp, int nonagle
 	/* initialize argument cookie */
 	cookie.dpp = &(mp->b_next);
 	cookie.mlen = msgdsize(mp);
-	cookie.mrem = cookie.mlen < sd->dmps + hlen ? sd->dmps + hlen - cookie.mlen : 0;
+	cookie.mrem = (cookie.mlen < sd->dmps + hlen) ? sd->dmps + hlen - cookie.mlen : 0;
 	cookie.swnd = sctp_avail(sp, sd);
 	cookie.pbuf = sp->p_rbuf >> 1;
 	if ((sp->sackf & SCTP_SACKF_NOW && !sp->rq->q_count)
@@ -7049,7 +7050,7 @@ sctp_life_timeout(caddr_t data)
 			size_t dlen = cb->dlen;
 			if (sd) {
 				/* credit destination (now) */
-				sd->in_flight = sd->in_flight > dlen ? sd->in_flight - dlen : 0;
+				sd->in_flight = (sd->in_flight > dlen) ? sd->in_flight - dlen : 0;
 				if (!sd->in_flight) {
 					sd_del_timeout(sd, &sd->timer_retrans);
 #ifdef SCTP_CONFIG_ADD_IP
@@ -7152,7 +7153,7 @@ sctp_send_data(struct sctp *sp, struct sctp_strm *st, t_uscalar_t flags, mblk_t 
 		amps = sp->amps;
 		used = sndq->q_count;
 		swnd = sctp_avail(sp, sd);
-		awnd = swnd > used ? swnd - used : 0;
+		awnd = (swnd > used) ? swnd - used : 0;
 		if (plen > awnd || plen > amps) {
 			if (plen <= amps || awnd < amps >> 1) {	/* SWS avoidance */
 				_ptrace(("EBUSY: plen = %u, amps = %u, awnd = %u, swnd = %u, used = %u\n", plen, amps, awnd, swnd, used));
@@ -7161,7 +7162,7 @@ sctp_send_data(struct sctp *sp, struct sctp_strm *st, t_uscalar_t flags, mblk_t 
 			}
 			if (!(bp = sctp_dupmsg(sp, dp)))
 				goto enobufs;
-			dlen = awnd < amps ? amps >> 1 : amps;
+			dlen = (awnd < amps) ? amps >> 1 : amps;
 			ensure(dlen > sizeof(struct sctp_data), freemsg(bp); return (-EFAULT));
 			dlen -= sizeof(struct sctp_data);
 			ensure(dlen < mlen, freemsg(bp); return (-EFAULT));
@@ -8515,9 +8516,9 @@ sctp_rtt_calc(struct sctp_daddr *sd, unsigned long time)
 	/* RFC 2960 6.3.1 (G1) */
 	sd->rttvar = sd->rttvar ? sd->rttvar : 1;
 	/* RFC 2960 6.3.1 (C6) */
-	sd->rto = sd->rto_min > sd->rto ? sd->rto_min : sd->rto;
+	sd->rto = (sd->rto_min > sd->rto) ? sd->rto_min : sd->rto;
 	/* RFC 2960 6.3.1 (C7) */
-	sd->rto = sd->rto_max < sd->rto ? sd->rto_max : sd->rto;
+	sd->rto = (sd->rto_max < sd->rto) ? sd->rto_max : sd->rto;
 #if (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) && defined SCTP_CONFIG_ERROR_GENERATOR
 	if (sd->retransmits && (sd->sp->debug & SCTP_OPTION_BREAK)
 	    && (sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL))
@@ -8563,7 +8564,7 @@ sctp_dest_calc(struct sctp *sp)
 			if (sd->cwnd <= sd->ssthresh) {
 				/* RFC 2960 7.2.1 */
 				if (sd->in_flight > sd->cwnd)
-					sd->cwnd += accum < sd->mtu ? accum : sd->mtu;
+					sd->cwnd += (accum < sd->mtu) ? accum : sd->mtu;
 			} else {
 				/* RFC 2960 7.2.2 */
 				sd->partial_ack += accum;
@@ -8574,18 +8575,23 @@ sctp_dest_calc(struct sctp *sp)
 			}
 			/* credit of destination (accum) */
 			normal(sd->in_flight >= accum);
-			sd->in_flight = sd->in_flight > accum ? sd->in_flight - accum : 0;
+			sd->in_flight = (sd->in_flight > accum) ? sd->in_flight - accum : 0;
 			/* RFC 2960 6.3.2 (R3) */
 			sd_del_timeout(sd, &sd->timer_retrans);
 			sd->ack_accum = 0;
 		}
 		if (sd->flags & SCTP_DESTF_DROPPING) {
 			/* RFC 2960 7.2.4 (2), 7.2.3 */
-			sd->ssthresh = sd->cwnd >> 1 > sd->mtu << 1 ? sd->cwnd >> 1 : sd->mtu << 1;
+			sd->ssthresh =
+			    ((sd->cwnd >> 1) > (sd->mtu << 1)) ? sd->cwnd >> 1 : sd->mtu << 1;
 			sd->cwnd = sd->ssthresh;
 			/* SCTP IG Section 2.9 */
 			sd->partial_ack = 0;
 			sd->flags &= ~SCTP_DESTF_DROPPING;
+		}
+		if (sd->flags & SCTP_DESTF_ELIGIBLE) {
+			rare();
+			sd->flags &= ~SCTP_DESTF_ELIGIBLE;
 		}
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 		sd->flags &= ~SCTP_DESTF_FORWDTSN;
@@ -8635,7 +8641,7 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 			/* RFC 2960 6.3.1 (C5) */
 			if (cb->trans < 2) {
 				/* remember latest transmitted packet acked for rtt calc */
-				sd->when = sd->when > cb->when ? sd->when : cb->when;
+				sd->when = (sd->when > cb->when) ? sd->when : cb->when;
 			}
 			if (cb->flags & SCTPCB_FLAG_RETRANS) {
 				cb->flags &= ~SCTPCB_FLAG_RETRANS;
@@ -8647,13 +8653,13 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 					/* credit destination (later) */
 					normal(sd->in_flight >= sd->ack_accum + dlen);
 					sd->ack_accum =
-					    sd->in_flight >
-					    sd->ack_accum + dlen ? sd->ack_accum +
+					    (sd->in_flight >
+					    sd->ack_accum + dlen) ? sd->ack_accum +
 					    dlen : sd->in_flight;
 				}
 				/* credit association (now) */
 				normal(sp->in_flight >= dlen);
-				sp->in_flight = sp->in_flight > dlen ? sp->in_flight - dlen : 0;
+				sp->in_flight = (sp->in_flight > dlen) ? sp->in_flight - dlen : 0;
 			}
 		} else {
 			/* can't reneg cummulatively acked chunks */
@@ -8869,7 +8875,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 #ifdef SCTP_CONFIG_ECN
 	int is_ce = INET_ECN_is_ce(SCTP_IPH(mp)->tos);
 #endif				/* SCTP_CONFIG_ECN */
-	int newd, data;			/* number of new data chunks */
+	int newd, data, progress = 0;	/* number of new data chunks */
 	sctp_tcb_t *cb;
 	struct sctp_data *m;
 	printd(("Received DATA on stream %p\n", sp));
@@ -9027,6 +9033,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 				cb->next = (*gap)->tail->next;
 				(*gap)->tail->next = cb;
 				(*gap)->tail = cb;
+				progress = 1;
 			} else {
 				/* try next gap */
 				continue;
@@ -9037,6 +9044,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 				(*gap)->tail = cb->next->tail;
 				_usual(sp->ngaps);
 				sp->ngaps--;
+				progress = 1;
 			}
 			break;
 		}
@@ -9158,7 +9166,15 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		}
 	}
 	/* RFC 2960 7.2.4 */
-	if (sp->ngaps) {
+	if (sp->ngaps && !progress) {
+		/* IMPLEMENTATION NOTE:- If we have gaps then we should send a SACK with gap
+		   reports immediately; however, it is better not to send so many SACKs and gap
+		   reports when the peer is making progress on filling the gaps.  Consider that a
+		   retransmission filling a gap is not so different than a retransmission that
+		   simply moves the cummulative ack point forward, and that in the latter case we
+		   do normal delayed acknowledgements.  So, when the peer is making progress on
+		   filling a gap, we do not issue a SACK immediately, but perform normal delayed
+		   acknowledgement. */
 		sp->sackf |= SCTP_SACKF_GAP;
 	}
 	/* RFC 2960 6.2 */
@@ -9282,7 +9298,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 		/* process renegs, fast retransmission cannot occur because we have no gaps */
 		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(dp);
-			/* RFC 2960 6.3.2 (R4) reneg */
+			/* RFC 2960 6.3.2 (R4) (reneg) */
 			if (cb->flags & SCTPCB_FLAG_SACKED) {
 				struct sctp_daddr *sd = cb->daddr;
 				cb->flags &= ~SCTPCB_FLAG_SACKED;
@@ -9295,7 +9311,7 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			}
 		}
 	} else {
-		int growth = 0;
+		int eligible = 0;
 		{
 			struct sctp_daddr *sd;
 			/* We skip gap analysis if we are running ultra-fast destinations with data 
@@ -9318,19 +9334,40 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			}
 			/* move to the acks */
 			dp = bufq_head(&sp->rtxq);
-			for (; dp && before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_next)
-				SCTP_TCB(dp)->flags |= SCTPCB_FLAG_NACK;
+			for (; dp && before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_next) {
+				sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+				struct sctp_daddr *sd = cb->daddr;
+				cb->flags |= SCTPCB_FLAG_NACK;
+				if (sd && !(sd->flags & SCTP_DESTF_ELIGIBLE)
+				    && (cb->flags & SCTPCB_FLAG_ACK)
+				    && !(cb->flags & SCTPCB_FLAG_SACKED)
+				    && (cb->sacks < SCTP_FR_COUNT)) {
+					sd->flags |= SCTP_DESTF_ELIGIBLE;
+					eligible++;
+				}
+			}
 			/* sack the acks */
-			for (; dp && !after(SCTP_TCB(dp)->tsn, end); dp = dp->b_next)
-				SCTP_TCB(dp)->flags |= SCTPCB_FLAG_ACK;
+			for (; dp && !after(SCTP_TCB(dp)->tsn, end); dp = dp->b_next) {
+				sctp_tcb_t *cb = SCTP_SKB_CB(skd);
+				struct sctp_daddr *sd = cb->daddr;
+				cb->flags |= SCTPCB_FLAG_ACK;
+				if (sd && !(sd->flags & SCTP_DESTF_ELIGIBLE)
+				    && (cb->flags & SCTPCB_FLAG_NACK)
+				    && !(cb->flags & SCTPCB_FLAG_SACKED)
+				    && (cb->sacks < SCTP_FR_COUNT)) {
+					sd->flags |= SCTP_DESTF_ELIGIBLE;
+					eligible++;
+				}
+			}
 		}
 		/* walk the whole retrans buffer looking for holes and renegs */
 		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(dp);
+			struct sctp_daddr *sd = cb->daddr;
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+			/* msg was dropped */
 			if ((cb->flags & SCTPCB_FLAG_DROPPED)) {
-				cb->flags &= ~SCTPCB_FLAG_ACK;
-				cb->flags &= ~SCTPCB_FLAG_NACK;
+				cb->flags &= ~(SCTPCB_FLAG_ACK | SCTPCB_FLAG_NACK);
 				continue;
 			}
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
@@ -9339,11 +9376,15 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 				cb->flags &= ~SCTPCB_FLAG_ACK;
 				if (cb->flags & SCTPCB_FLAG_NACK) {
 					cb->flags &= ~SCTPCB_FLAG_NACK;
-					if (cb->sacks < SCTP_FR_COUNT)
-						growth = 1;
+					if (sd && (sd->flags & SCTP_DESTF_ELIGIBLE)
+					    && !(cb->flags & SCTPCB_FLAG_SACKED)
+					    && (cb->sacks < SCTP_FR_COUNT)) {
+						sd->flags &= ~SCTP_DESTF_ELIGIBLE;
+						eligible--;
+					}
+
 				}
 				if (!(cb->flags & SCTPCB_FLAG_SACKED)) {
-					struct sctp_daddr *sd = cb->daddr;
 					cb->flags |= SCTPCB_FLAG_SACKED;
 					sp->nsack++;
 					/* RFC 2960 6.3.1 (C5) */
@@ -9363,8 +9404,8 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 							/* credit destination */
 							normal(sd->in_flight >= dlen);
 							sd->in_flight =
-							    sd->in_flight >
-							    dlen ? sd->in_flight - dlen : 0;
+							    (sd->in_flight >
+							    dlen) ? sd->in_flight - dlen : 0;
 						}
 						/* credit association */
 						normal(sp->in_flight >= dlen);
@@ -9378,10 +9419,17 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			if (cb->flags & SCTPCB_FLAG_NACK) {
 				cb->flags &= ~SCTPCB_FLAG_NACK;
 				/* RFC 2960 7.2.4 */
-				if (!growth && !(cb->flags & SCTPCB_FLAG_RETRANS)
+				if (eligible > 0 && (!sd || (sd->flags & SCTP_DESTF_ELIGIBLE))
+				    && !(cb->flags & SCTPCB_FLAG_RETRANS)
 				    && ++(cb->sacks) == SCTP_FR_COUNT) {
+					/* IMPLEMENTATION NOTE:- Performing fast retransmission can
+					   be bad when large or many chunks have gotten reordered or
+					   delayed (and gap reported) yet progress on those gaps are
+					   (now) being reported, it indicates that reordered or
+					   delayed packets are now arriving and fast retransmission
+					   should not be considered, because the packets are not
+					   likely missing. */
 					size_t dlen = cb->dlen;
-					struct sctp_daddr *sd = cb->daddr;
 					/* RFC 2960 7.2.4 (1) */
 					cb->flags |= SCTPCB_FLAG_RETRANS;
 					sp->nrtxs++;
@@ -9400,7 +9448,6 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 				}
 				/* RFC 2960 6.3.2 (R4) (reneg) */
 				if (cb->flags & SCTPCB_FLAG_SACKED) {
-					struct sctp_daddr *sd = cb->daddr;
 					cb->flags &= ~SCTPCB_FLAG_SACKED;
 					ensure(sp->nsack, sp->nsack = 1);
 					sp->nsack--;
@@ -12910,7 +12957,7 @@ sctp_cleanup_read(struct sctp *sp)
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 			struct sctp_strm *st = cb->st;
 			int ord = !(cb->flags & SCTPCB_FLAG_URG);
-			int more = !(cb->flags & SCTPCB_FLAG_LAST_FRAG) ? SCTP_STRMF_MORE : 0;
+			int more = (!(cb->flags & SCTPCB_FLAG_LAST_FRAG)) ? SCTP_STRMF_MORE : 0;
 			ensure(st, return);
 			if (!sctp_data_ind
 			    (sp, cb->ppi, cb->sid, cb->ssn, cb->tsn, ord, more, mp->b_cont)) {
@@ -13785,8 +13832,8 @@ n_error_ack(struct sctp *sp, int prim, int err)
 	p = (N_error_ack_t *) mp->b_wptr;
 	p->PRIM_type = N_ERROR_ACK;
 	p->ERROR_prim = prim;
-	p->NPI_error = err < 0 ? NSYSERR : err;
-	p->UNIX_error = err < 0 ? -err : 0;
+	p->NPI_error = (err < 0) ? NSYSERR : err;
+	p->UNIX_error = (err < 0) ? -err : 0;
 	mp->b_wptr += sizeof(*p);
 	switch (sp->i_state) {
 	case NS_WACK_OPTREQ:
@@ -14473,8 +14520,8 @@ n_error_reply(struct sctp *sp, int err)
 	}
 	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
 		mp->b_datap->db_type = M_ERROR;
-		*(mp->b_wptr)++ = err < 0 ? -err : err;
-		*(mp->b_wptr)++ = err < 0 ? -err : err;
+		*(mp->b_wptr)++ = (err < 0) ? -err : err;
+		*(mp->b_wptr)++ = (err < 0) ? -err : err;
 		putnext(sp->rq, mp);
 		return (0);
 	}
@@ -22791,8 +22838,8 @@ t_error_ack(struct sctp *sp, t_uscalar_t prim, t_scalar_t err)
 	p = ((struct T_error_ack *) mp->b_wptr)++;
 	p->PRIM_type = T_ERROR_ACK;
 	p->ERROR_prim = prim;
-	p->TLI_error = err < 0 ? TSYSERR : err;
-	p->UNIX_error = err < 0 ? -err : 0;
+	p->TLI_error = (err < 0) ? TSYSERR : err;
+	p->UNIX_error = (err < 0) ? -err : 0;
 	switch (sp->i_state) {
 #ifdef TS_WACK_OPTREQ
 	case TS_WACK_OPTREQ:
@@ -23636,8 +23683,8 @@ t_error_reply(struct sctp *sp, int err)
 	}
 	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
 		mp->b_datap->db_type = M_ERROR;
-		*(mp->b_wptr)++ = err < 0 ? -err : err;
-		*(mp->b_wptr)++ = err < 0 ? -err : err;
+		*(mp->b_wptr)++ = (err < 0) ? -err : err;
+		*(mp->b_wptr)++ = (err < 0) ? -err : err;
 		putnext(sp->rq, mp);
 		local_bh_disable();
 		bh_lock_sctp(sp);
