@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/25 09:15:25 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/02/25 12:49:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 09:15:25 $ by $Author: brian $
+# Last Modified $Date: 2005/02/25 12:49:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,30 +76,27 @@ AC_DEFUN([_LINUX_KERNEL], [dnl
 # _LINUX_KERNEL_ENV_FUNCTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN_ONCE([_LINUX_KERNEL_ENV_FUNCTIONS], [dnl
-linux_env_nest=0
-linux_kernel_env_push() {
-    if ! ((linux_env_nest))
-    then
-dnl	move user flags out of the way temporarily
-	linux_user_cppflags="$CPPFLAGS"
-	linux_user_cflags="$CFLAGS"
-	linux_user_ldflags="$LDFLAGS"
-    fi
-	CPPFLAGS="$KERNEL_CPPFLAGS"
-	CFLAGS="$KERNEL_CFLAGS"
-	LDFLAGS="$KERNEL_LDFLAGS"
-    ((linux_env_nest++))
+linux_flag_nest=0
+linux_flags_push() {
+    eval "linux_${linux_flag_nest}_cppflags=\"\$CPPFLAGS\""
+    eval "linux_${linux_flag_nest}_cflags=\"\$CFLAGS\""
+    eval "linux_${linux_flag_nest}_ldflags=\"\$LDFLAGS\""
+    ((linux_flag_nest++))
 }
-linux_kernel_env_pop() {
-    ((linux_env_nest--))
-    if ! ((linux_env_nest))
-    then
-dnl	move user flags back where they were
-	CPPFLAGS="$linux_user_cppflags"
-	CFLAGS="$linux_user_cflags"
-	LDFLAGS="$linux_user_ldflags"
-    fi
-}dnl
+linux_flags_pop() {
+    ((linux_flag_nest--))
+    eval "CPPFLAGS=\"\$linux_${linux_flag_nest}_cppflags\""
+    eval "CFLAGS=\"\$linux_${linux_flag_nest}_cflags\""
+    eval "LDFLAGS=\"\$linux_${linux_flag_nest}_ldflags\""
+}
+linux_kernel_env_push() {
+    linux_flags_push
+dnl We need safe versions of these flags without warnings or strange optimizations
+dnl but with module flags included
+    CPPFLAGS=`echo " $KERNEL_MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
+    CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
+    LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9]]*| -O2|g;s|^ *||;s| *$||'`
+}
 ])# _LINUX_KERNEL_ENV_FUNCTIONS
 
 # =============================================================================
@@ -110,7 +107,7 @@ AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
     AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
     linux_kernel_env_push
 $1
-    linux_kernel_env_pop
+    linux_flags_pop
 ])# _LINUX_KERNEL_ENV_BARE
 # =============================================================================
 
@@ -1090,7 +1087,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	then
 	    linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
 	fi
-	eval "linux_cv_k_cflags=`echo \"\$linux_cv_k_cflags\" | sed -e 's| -O[[0-9]]? | \$linux_cflags |'`" ])
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9]]* | $linux_cflags |"` ])
     CFLAGS="$linux_cv_k_cflags"
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} -I${kbuilddir} cppflag-check`"
@@ -1445,7 +1442,6 @@ $2],
 AC_DEFUN([_LINUX_CHECK_MEMBER], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_MEMBER_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_MEMBER
 # =============================================================================
@@ -1458,7 +1454,6 @@ AC_DEFUN([_LINUX_CHECK_MEMBER], [dnl
 AC_DEFUN([_LINUX_CHECK_MEMBERS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_MEMBERS_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_MEMBERS
 # =============================================================================
@@ -1503,7 +1498,6 @@ $2],
 AC_DEFUN([_LINUX_CHECK_TYPE], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_TYPE_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_TYPE
 # =============================================================================
@@ -1514,7 +1508,6 @@ AC_DEFUN([_LINUX_CHECK_TYPE], [dnl
 AC_DEFUN([_LINUX_CHECK_TYPES], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_TYPES_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_TYPES
 # =============================================================================
@@ -1558,7 +1551,6 @@ $2],
 AC_DEFUN([_LINUX_CHECK_HEADER], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_HEADER_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_HEADER
 # =============================================================================
@@ -1569,7 +1561,6 @@ AC_DEFUN([_LINUX_CHECK_HEADER], [dnl
 AC_DEFUN([_LINUX_CHECK_HEADERS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_HEADERS_internal([$1], [$2], [$3], [$4])])
 ])# _LINUX_CHECK_HEADERS
 # =============================================================================
@@ -1604,7 +1595,6 @@ $4
 AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     _LINUX_KERNEL_ENV([dnl
-	CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 	_LINUX_CHECK_KERNEL_CONFIG_internal([$1], [$2], [$3], [$4]) ])
 ])# _LINUX_CHECK_KERNEL_CONFIG
 # =========================================================================
@@ -1710,7 +1700,6 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
 		fi
 	    else
 		_LINUX_KERNEL_ENV([dnl
-		    CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
 		    AC_EGREP_CPP([\<yes_symbol_$1_is_exported\>], [
 #include <linux/config.h>
 #include <linux/version.h>
