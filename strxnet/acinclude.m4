@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.4 2004/05/17 08:32:51 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/05/18 07:20:56 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/17 08:32:51 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/18 07:20:56 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -336,6 +336,7 @@ AC_DEFUN([_XNET_SETUP_SCTP], [
         patches.  This enables support in the INET driver for STREAMS on top
         of the OpenSS7 Linux Kernel Sockets SCTP implementation.])
     fi
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], test :"${lfs_cv_openss7_sctp:-no}" = :yes)
 ])# _XNET_SETUP_SCTP
 # =========================================================================
 
