@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-dev.prerm.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: lis-dev.prerm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 12:55:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,36 +48,29 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
 
+function remove_dev_prerm() { :
+}
 
+function conflict_dev_prerm() { :
+}
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+function upgrade_dev_prerm() { :
+}
 
-case "$1" in
+function failed_upgrade_dev_prerm() { :
+}
 
-    (remove) :
-	# remove-prerm remove
-	# conflict-prerm remove in-favour package new-version
-	;;
+function deconfigure_dev_prerm() { :
+}
 
-    (upgrade) :
-	# old-prerm upgrade new-version
-	;;
+subpkg=dev
 
-    (failed-upgrade) :
-	# old-prerm upgrade new-version ... failed
-	# new-prerm failed-upgrade old-version
-	;;
-
-    (deconfigure) :
-	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
-	;;
-
-esac
+@mscript_prerm@
 
 # =============================================================================
 #
@@ -90,6 +83,9 @@ esac
 # =============================================================================
 #
 # $Log: lis-dev.prerm.in,v $
+# Revision 1.1.2.2  2005/03/26 12:55:34  brian
+# - working up debian scripts
+#
 # Revision 1.1.2.1  2005/03/26 03:11:22  brian
 # - Reworking maintainance scripts
 #

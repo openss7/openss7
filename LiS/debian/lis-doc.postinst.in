@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-doc.postinst.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: lis-doc.postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 12:55:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,53 +48,24 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
 
+function configure_doc_postinst() { :
+}
 
+subpkg=doc
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
-
-case "$1" in
-
-    (configure) :
-	# configure-postinst configure [most-recently-configured-version]
-	;;
-
-    (abort-upgrade) :
-	# old-prerm upgrade new-version ... failed
-	# new-prerm failed-upgrade new-version ... failed
-	# old-posinst abort-upgrade new-version
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: abort upgrade" > &2
-	;;
-
-    (abort-remove) :
-	# conflict-prerm remove in-favour package new-version ... failed
-	# conflict-postinst abort-remove in-favour package new-version
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: abort remove" > &2
-	;;
-
-    (abort-deconfigure) :
-	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version .. failed
-	# deconfigure-postinst abort-deconfigurein-favour package-being-installed-but-failed version removing conflicting-package version
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: abort reconfigure" > &2
-	;;
-
-esac
-
-# =============================================================================
-#
-# The following are debhelper script fragments under separate copyright:
-#
-# =============================================================================
-
-#DEBHELPER#
+@mscript_postinst@
 
 # =============================================================================
 #
 # $Log: lis-doc.postinst.in,v $
+# Revision 1.1.2.2  2005/03/26 12:55:34  brian
+# - working up debian scripts
+#
 # Revision 1.1.2.1  2005/03/26 03:11:22  brian
 # - Reworking maintainance scripts
 #

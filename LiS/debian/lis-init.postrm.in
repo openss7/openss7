@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-init.postrm.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: lis-init.postrm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 12:55:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,63 +48,36 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
 
+function remove_init_postrm() { :
+}
 
+function purge_init_postrm() { :
+}
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+function upgrade_init_postrm() { :
+}
 
-case "$1" in
+function failed_upgrade_init_postrm() { :
+}
 
-    (remove) :
-	# remove-postrm remove
-	;;
+function disappear_init_postrm() { :
+}
 
-    (purge) :
-	# remove-postrm purge
-	;;
+subpkg=init
 
-    (upgrade) :
-	# old-postrm upgrade new-version
-	;;
-
-    (failed-upgrade) :
-	# old-postrm upgrade new-version ... failed
-	# new-postrm failed-upgrade old-version
-	;;
-
-    (abort-install) :
-	# new-preinst install [old-version] ... failed
-	# new-postrm abort-install [old-version]
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: abort install." > &2
-	;;
-
-    (abort-upgrade) :
-	# new-preinst upgrade old-version ... failed
-	# new-postrm abort-upgrade old-version
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: abort upgrade." > &2
-	;;
-
-    (disappear) :
-	# disappear-postrm disappear overwriter overwriter-version
-	;;
-
-esac
-
-# =============================================================================
-#
-# The following are debhelper script fragments under separate copyright:
-#
-# =============================================================================
-
-#DEBHELPER#
+@mscript_postrm@
 
 # =============================================================================
 #
 # $Log: lis-init.postrm.in,v $
+# Revision 1.1.2.2  2005/03/26 12:55:34  brian
+# - working up debian scripts
+#
 # Revision 1.1.2.1  2005/03/26 03:11:22  brian
 # - Reworking maintainance scripts
 #

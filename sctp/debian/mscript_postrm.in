@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/26 03:11:23 $
+# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 12:55:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,13 +48,55 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 03:11:23 $ by $Author: brian $
+## Last Modified $Date: 2005/03/26 12:55:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
 [ ":${subpkg+set}" = ":set" ] || subpkg=
 
+echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 
+case "$1" in
+
+    (remove) :
+	# remove-postrm remove
+	eval "remove_${subpkg}_postrm"
+	;;
+
+    (purge) :
+	# remove-postrm purge
+	eval "purge_${subpkg}_postrm"
+	;;
+
+    (upgrade) :
+	# old-postrm upgrade new-version
+	eval "upgrade_${subpkg}_postrm"
+	;;
+
+    (failed-upgrade) :
+	# old-postrm upgrade new-version ... failed
+	# new-postrm failed-upgrade old-version
+	eval "failed_upgrade_${subpkg}_postrm"
+	;;
+
+    (abort-install) :
+	# new-preinst install [old-version] ... failed
+	# new-postrm abort-install [old-version]
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	;;
+
+    (abort-upgrade) :
+	# new-preinst upgrade old-version ... failed
+	# new-postrm abort-upgrade old-version
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
+	;;
+
+    (disappear) :
+	# disappear-postrm disappear overwriter overwriter-version
+	eval "disappear_${subpkg}_postrm"
+	;;
+
+esac
 
 ## =============================================================================
 ##
@@ -67,10 +109,13 @@
 ## =============================================================================
 ##
 ## $Log: mscript_postrm.in,v $
-## Revision 0.9.2.1  2005/03/26 03:11:23  brian
-## - Reworking maintainance scripts
+## Revision 0.9.2.2  2005/03/26 12:55:35  brian
+## - working up debian scripts
 ##
-## Revision 1.1  2005/03/26 03:11:23  brian
+## Revision 1.2  2005/03/26 12:55:35  brian
+## - working up debian scripts
+##
+## Revision 1.1.2.1  2005/03/26 03:11:22  brian
 ## - Reworking maintainance scripts
 ##
 ## Revision 1.1.2.1  2005/03/24 02:09:14  brian

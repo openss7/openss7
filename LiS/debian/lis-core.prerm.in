@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/26 12:55:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -110,49 +110,41 @@ function prerm_preload() {
     fi
 }
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+function remove_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-case "$1" in
+function conflict_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-    (remove) :
-	# remove-prerm remove
-	# conflict-prerm remove in-favour package new-version
-	prerm_modules
-	prerm_preload
-	;;
+function upgrade_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-    (upgrade) :
-	# old-prerm upgrade new-version
-	prerm_modules
-	prerm_preload
-	;;
+function failed_upgrade_core_prerm() { :
+    prerm_oldmods
+    prerm_preload
+}
 
-    (failed-upgrade) :
-	# old-prerm upgrade new-version ... failed
-	# new-prerm failed-upgrade old-version
-	prerm_oldmods
-	prerm_preload
-	;;
+function deconfigure_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-    (deconfigure) :
-	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
-	prerm_modules
-	prerm_preload
-	;;
+subpkg=core
 
-esac
-
-# =============================================================================
-#
-# The following are debhelper script fragments under separate copyright:
-#
-# =============================================================================
-
-#DEBHELPER#
+@mscript_prerm@
 
 # =============================================================================
 #
 # $Log: lis-core.prerm.in,v $
+# Revision 1.1.2.3  2005/03/26 12:55:34  brian
+# - working up debian scripts
+#
 # Revision 1.1.2.2  2005/03/26 03:11:22  brian
 # - Reworking maintainance scripts
 #

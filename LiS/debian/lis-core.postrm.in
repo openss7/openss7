@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.postrm.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 03:11:21 $
+# @(#) $RCSfile: lis-core.postrm.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/26 12:55:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:21 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -79,59 +79,34 @@ function postrm_depmod() {
     fi
 }
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+function remove_core_postrm() { :
+    @WITH_KO_MODULES_FALSE@postrm_modconf
+    postrm_preload
+    postrm_depmod
+}
 
-case "$1" in
+function purge_core_postrm() { :
+}
 
-    (remove) :
-	# remove-postrm remove
-	@WITH_KO_MODULES_FALSE@postrm_modconf
-	postrm_preload
-	postrm_depmod
-	;;
+function upgrade_core_postrm() { :
+}
 
-    (purge) :
-	# remove-postrm purge
-	;;
+function failed_upgrade_core_postrm() { :
+}
 
-    (upgrade) :
-	# old-postrm upgrade new-version
-	;;
+function disappear_core_postrm() { :
+}
 
-    (failed-upgrade) :
-	# old-postrm upgrade new-version ... failed
-	# new-postrm failed-upgrade old-version
-	;;
+subpkg=core
 
-    (abort-install) :
-	# new-preinst install [old-version] ... failed
-	# new-postrm abort-install [old-version]
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
-	;;
-
-    (abort-upgrade) :
-	# new-preinst upgrade old-version ... failed
-	# new-postrm abort-upgrade old-version
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
-	;;
-
-    (disappear) :
-	# disappear-postrm disappear overwriter overwriter-version
-	;;
-
-esac
-
-# =============================================================================
-#
-# The following are debhelper script fragments under separate copyright:
-#
-# =============================================================================
-
-#DEBHELPER#
+@mscript_postrm@
 
 # =============================================================================
 #
 # $Log: lis-core.postrm.in,v $
+# Revision 1.1.2.3  2005/03/26 12:55:34  brian
+# - working up debian scripts
+#
 # Revision 1.1.2.2  2005/03/26 03:11:21  brian
 # - Reworking maintainance scripts
 #
