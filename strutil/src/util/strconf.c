@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:12:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $"
 
 static char const ident[] =
-    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -88,10 +88,10 @@ void version(int argc, char *argv[])
 	if (verbose < 0)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
@@ -104,9 +104,9 @@ Usage:\n\
     %1$s [options] {-h|--push} module_list\n\
     %1$s [options] (-p|--pop} [{-a|--all}|{-u|--upto} module_list]\n\
     %1$s [options] (-f|--file}\n\
-    %1$s {-h, --help}\n\
-    %1$s {-V, --version\n\
-    %1$s {-C, --copying\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version\n\
+    %1$s {-C|--copying\n\
 ", argv[0]);
 }
 
@@ -119,19 +119,19 @@ Usage:\n\
     %1$s [options] {-h|--push} module_list\n\
     %1$s [options] (-p|--pop} [{-a|--all}|{-u|--upto} module_list]\n\
     %1$s [options] (-f|--file}\n\
-    %1$s {-h, --help}\n\
-    %1$s {-V, --version\n\
-    %1$s {-C, --copying\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version\n\
+    %1$s {-C|--copying\n\
 Options:\n\
     -l, --load\n\
         specifies that the listed drivers, modules or STREAMS executive are\n\
-	to be loaded\n\
+        to be loaded\n\
     -u, --unload\n\
         specifies that the listed drivers, modules or STREAMS executive are\n\
-	to be unloaded\n\
+        to be unloaded\n\
     -Q, --query\n\
         specifies that the listed drivers, modules or STREAMS executive are\n\
-	to be queried\n\
+        to be queried\n\
     -f, --file FILE\n\
         specifies configuration file from which to take configuration information\n\
     -d, --drivers DRIVER[,DRIVER]\n\
@@ -139,15 +139,15 @@ Options:\n\
     -m, --modules MODULE[,MODULE]\n\
         specifies a comma separated list of modules to load, unload or query\n\
     -v, --verbose\n\
-	verbose output\n\
+        verbose output\n\
     -q, --quiet\n\
-	suppress normal output\n\
+        suppress normal output\n\
     -h, --help, -?\n\
-	print this usage message and exits\n\
+        print this usage message and exits\n\
     -V, --version\n\
-	print the version and exits\n\
+        print the version and exits\n\
     -C, --copying\n\
-	print the copyright and exits\n\
+        print the copyright and exits\n\
 ", argv[0]);
 }
 
@@ -159,7 +159,7 @@ void copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -232,6 +232,7 @@ int main(int argc, char *argv[])
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long_only(argc, argv, "h:pu:af:dqvHVC?", long_options, &option_index);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/14 21:12:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:12:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/14 21:12:00 $"
 
 static char const ident[] =
-    "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/14 21:12:00 $";
 
 /*
  *  AIX Utility: strclean - Cleans up the STREAMS error logger.
@@ -89,10 +89,10 @@ static void version(int argc, char **argv)
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
@@ -103,9 +103,9 @@ static void usage(int argc, char **argv)
 	fprintf(stderr, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
@@ -116,9 +116,9 @@ static void help(int argc, char **argv)
 	fprintf(stdout, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Options:\n\
     -b, --basename BASENAME\n\
         file basename, default: 'strvf'\n\
@@ -151,7 +151,7 @@ static void copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -231,6 +231,7 @@ int main(int argc, char *argv[])
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long_only(argc, argv, "qdvhVC?", long_options, &option_index);

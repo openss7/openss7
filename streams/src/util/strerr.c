@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/14 21:53:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/14 21:53:25 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/14 21:53:25 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -104,10 +104,10 @@ static void version(int argc, char **argv)
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
@@ -118,9 +118,9 @@ static void usage(int argc, char **argv)
 	fprintf(stderr, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
@@ -131,9 +131,9 @@ static void help(int argc, char **argv)
 	fprintf(stdout, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Options:\n\
     -a, --admin MAILID\n\
         specify a mail address for notifications, default: 'root'\n\
@@ -172,7 +172,7 @@ static void copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -248,12 +248,12 @@ RETSIGTYPE alm_handler(int signum)
 
 int alm_catch(void)
 {
-	sig_register(SIGALRM, &alm_handler);
+	return sig_register(SIGALRM, &alm_handler);
 }
 
 int alm_block(void)
 {
-	sig_register(SIGALRM, NULL);
+	return sig_register(SIGALRM, NULL);
 }
 
 int alm_action(void)
@@ -270,12 +270,12 @@ RETSIGTYPE hup_handler(int signum)
 
 int hup_catch(void)
 {
-	sig_register(SIGALRM, &hup_handler);
+	return sig_register(SIGALRM, &hup_handler);
 }
 
 int hup_block(void)
 {
-	sig_register(SIGALRM, NULL);
+	return sig_register(SIGALRM, NULL);
 }
 
 int hup_action(void)
@@ -314,12 +314,12 @@ RETSIGTYPE trm_handler(int signum)
 
 int trm_catch(void)
 {
-	sig_register(SIGALRM, &trm_handler);
+	return sig_register(SIGALRM, &trm_handler);
 }
 
 int trm_block(void)
 {
-	sig_register(SIGALRM, NULL);
+	return sig_register(SIGALRM, NULL);
 }
 
 void strerr_exit(int retval);
@@ -329,6 +329,7 @@ int trm_action(void)
 	trm_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGTERM, shutting down");
 	strerr_exit(0);
+	return (0); /* should be no return */
 }
 
 void sig_catch(void)
@@ -497,6 +498,7 @@ int main(int argc, char *argv[])
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long_only(argc, argv, "a:d:nb:o:e:l:qDvhVC?", long_options,
@@ -591,7 +593,6 @@ int main(int argc, char *argv[])
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
-			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
@@ -644,7 +645,7 @@ int main(int argc, char *argv[])
 					continue;
 				if (dat.len <= 0)
 					continue;
-				fprintf(stdout, "%lu", lc->seq_no);
+				fprintf(stdout, "%d", lc->seq_no);
 				fprintf(stdout, " %s", ctime(&lc->ltime));
 				fprintf(stdout, "%lu", (unsigned long) lc->ttime);
 				fprintf(stdout, "%3d", lc->level);

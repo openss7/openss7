@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 21:53:25 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 21:53:25 $"
 
 static char const ident[] =
-    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 21:53:25 $";
 
 /* 
  * SVR 4.2 utility: strchg - Changes stream configuration.
@@ -85,10 +85,10 @@ void version(int argc, char *argv[])
 	if (verbose < 0)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
@@ -101,9 +101,9 @@ Usage:\n\
     %1$s [options] {-h|--push} MODULE_LIST\n\
     %1$s [options] (-p|--pop} [{-a|--all}|{-u|--upto} MODULE]\n\
     %1$s [options] (-f|--file} FILE\n\
-    %1$s {-H, --help}\n\
-    %1$s {-V, --version\n\
-    %1$s {-C, --copying\n\
+    %1$s {-H|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
@@ -116,35 +116,35 @@ Usage:\n\
     %1$s [options] {-h|--push} MODULE[,MODULE]\n\
     %1$s [options] (-p|--pop} [{-a|--all}|{-u|--upto} MODULE]\n\
     %1$s [options] (-f|--file} FILE\n\
-    %1$s {-H, --help}\n\
-    %1$s {-V, --version\n\
-    %1$s {-C, --copying\n\
+    %1$s {-H|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Options:\n\
     -h, --push MODULE[,MODULE]\n\
         specifies a module (or comma separated list of modules) to push\n\
-	onto the stream\n\
+        onto the stream\n\
     -p, --pop\n\
-	requests that the topmost module be popped from the stream\n\
+        requests that the topmost module be popped from the stream\n\
     -a, --all\n\
         specifies that all modules, not just the topmost module, are\n\
-	to be popped from the stream\n\
+        to be popped from the stream\n\
     -u, --upto MODULE\n\
         specifies that modules up to, but not including, the specified\n\
-	module are to be popped from the stream, instead of just the\n\
-	topmost module\n\
+        module are to be popped from the stream, instead of just the\n\
+        topmost module\n\
     -f, --file FILE\n\
-	specifies that the module stack is to conform to the module stack\n\
-	specification contained in the specified file\n\
+        specifies that the module stack is to conform to the module stack\n\
+        specification contained in the specified file\n\
     -v, --verbose\n\
-	verbose output\n\
+        verbose output\n\
     -q, --quiet\n\
-	suppress normal output\n\
+        suppress normal output\n\
     -H, --help, -?\n\
-	print this usage message and exits\n\
+        print this usage message and exits\n\
     -V, --version\n\
-	print the version and exits\n\
+        print the version and exits\n\
     -C, --copying\n\
-	print the copyright and exits\n\
+        print the copyright and exits\n\
 ", argv[0]);
 }
 
@@ -156,7 +156,7 @@ void copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -226,6 +226,7 @@ int main(int argc, char *argv[])
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long(argc, argv, "h:pu:af:qvHVC?", long_options, &option_index);
@@ -307,7 +308,6 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}

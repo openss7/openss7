@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:25 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:25 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -85,10 +85,10 @@ static void version(int argc, char **argv)
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
@@ -98,10 +98,10 @@ static void usage(int argc, char **argv)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [ { -c | --count } | { -l | --long } ] [module ...]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s [options] [{-c|--count}|{-l|--long}] [MODULE ...]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
@@ -111,12 +111,12 @@ static void help(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [ { -c | --count } | { -l | --long } ] [module ...]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s [options] [{-c|--count}|{-l|--long}] [MODULE ...]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Arguments:\n\
-    module ...\n\
+    MODULE ...\n\
 	specific drivers and modules to list instead of all drivers and\n\
 	modules\n\
 Options:\n\
@@ -143,7 +143,7 @@ static void copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -208,7 +208,7 @@ void printit(struct sc_mlist *l, int cmd)
 		fprintf(stdout, "\t%lu", l->ms.ms_scnt);
 		fprintf(stdout, "\t%lu", l->ms.ms_ocnt);
 		fprintf(stdout, "\t%lu", l->ms.ms_acnt);
-		fprintf(stdout, "\t%lx", l->ms.ms_flags);
+		fprintf(stdout, "\t%x", l->ms.ms_flags);
 	}
 	fprintf(stdout, "\n");
 };
@@ -233,6 +233,7 @@ int main(int argc, char **argv)
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
 		c = getopt_long_only(argc, argv, "lcdqvhVC?", long_options, &option_index);
@@ -307,7 +308,6 @@ int main(int argc, char **argv)
 		default:
 		      bad_option:
 			optind--;
-		      bad_nonopt:
 			if (output > 0 || debug > 0) {
 				if (optind < argc) {
 					fprintf(stderr, "%s: syntax error near '", argv[0]);
@@ -319,7 +319,6 @@ int main(int argc, char **argv)
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
-			      bad_usage:
 				usage(argc, argv);
 			}
 			exit(2);
@@ -379,7 +378,6 @@ int main(int argc, char **argv)
 		exit(ret);
 	} else {
 		/* have no module name arguments - operate on all */
-		int ret = 0;
 		for (i = 0; i < count; i++)
 			printit(&list->sc_mlist[i], command);
 	}

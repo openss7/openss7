@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:53:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:24 $"
 
 static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:24 $";
 
 /* 
  *  autopush(8)
@@ -70,9 +70,15 @@ static char const ident[] =
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <getopt.h>
 
-#include <sys/stropts.h>
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
+#include <stropts.h>
+#include <sys/sysmacros.h>
+#include <sys/ioctl.h>
+
 #include <sys/sad.h>
 
 #define MAX_MAJOR_DEVICE    254
@@ -81,92 +87,147 @@ static char const ident[] =
 #define SAD_USER_FILENAME   "/dev/sad/user"
 #define SAD_ADMIN_FILENAME  "/dev/sad/admin"
 
-static int debug = 0;
 static int output = 1;
+static int debug = 0;
 
 static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] {-f|--file} filename\n\
-    %1$s [options] {-g|--get} [{-M [major|name]|-N name} [-m minor]]\n\
-    %1$s [options] {-r|--reset} [{-M [major|name]|-N name} [-m minor]]\n\
-    %1$s [options] {-s|--set} {-M [major|name]|-N name} [-m minor [-l lastminor]] module ...\n\
-    %1$s [options] {-c|--clone} {-M [major|name]|-N name} [-m minor]\n\
+    %1$s [options] {-f|--file} FILENAME\n\
+    %1$s [options] {-g|--get} [{-M [MAJOR|NAME]|-N NAME} [-m MINOR]]\n\
+    %1$s [options] {-r|--reset} [{-M [MAJOR|NAME]|-N NAME} [-m MINOR]]\n\
+    %1$s [options] {-s|--set} {-M [MAJOR|NAME]|-N NAME} [-m MINOR [-l LASTMINOR]] MODULE ...\n\
+    %1$s [options] {-c|--clone} {-M [MAJOR|NAME]|-N NAME} [-m MINOR]\n\
     %1$s [options] {-v|--verify} module ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] {-f|--file} filename\n\
-    %1$s [options] {-g|--get} [{-M [major|name]|-N name} [-m minor]]\n\
-    %1$s [options] {-r|--reset} [{-M [major|name]|-N name} [-m minor]]\n\
-    %1$s [options] {-s|--set} {-M [major|name]|-N name} [-m minor [-l lastminor]] module ...\n\
-    %1$s [options] {-c|--clone} {-M [major|name]|-N name} [-m minor]\n\
-    %1$s [options] {-v|--verify} module ...\n\
+    %1$s [options] {-f|--file} FILENAME\n\
+    %1$s [options] {-g|--get} [{-M [MAJOR|NAME]|-N NAME} [-m MINOR]]\n\
+    %1$s [options] {-r|--reset} [{-M [MAJOR|NAME]|-N NAME} [-m MINOR]]\n\
+    %1$s [options] {-s|--set} {-M [MAJOR|NAME]|-N NAME} [-m MINOR [-l LASTMINOR]] MODULE ...\n\
+    %1$s [options] {-c|--clone} {-M [MAJOR|NAME]|-N NAME} [-m MINOR]\n\
+    %1$s [options] {-v|--verify} MODULE ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Arguments:\n\
-    filename\n\
+    FILENAME\n\
         filename from which to load autopush configuration\n\
-    module ...\n\
+    MODULE ...\n\
         list of module names to set or verify\n\
 Options:\n\
-    -f, --file filename\n\
-        filename from which to read autopush configuration\n\
+    -f, --file FILENAME\n\
+        FILENAME from which to read autopush configuration\n\
     -g, --get\n\
         get the autopush list for the specified device (if no device\n\
         is specified, get list for all devices)\n\
     -r, --reset\n\
         reset (clear) the autopush list for the specified device (if\n\
         no device specified, reset list for all devices)\n\
-    -s, --set module ...\n\
-        set the autopush list for the specified device\n\
+    -s, --set MODULE ...\n\
+        set the autopush MODULE list for the specified device\n\
     -c, --clone\n\
         set as clonable minro the specified device\n\
-    -v, --verify module ...\n\
-        verify the module list (that names are valid and loaded)\n\
-    -N, --name name\n\
-        specify the device name (cannot be used with -M)\n\
-    -M, --major [major|name]\n\
-        specify the major device number or name (cannot be used with -N)\n\
-    -m, --minor minor\n\
-        specify the minor device number (used with -M or -N)\n\
-    -l, --lastminor lastminor\n\
-        specify the last minor device number in a range (used with -s)\n\
-    -d, --debug\n\
-        sets debugging verbosity\n\
+    -v, --verify MODULE ...\n\
+        verify the MODULE list (that names are valid and loaded)\n\
+    -N, --name NAME\n\
+        specify the device NAME (cannot be used with -M)\n\
+    -M, --major [MAJOR|NAME]\n\
+        specify the MAJOR device number or NAME (cannot be used with -N)\n\
+    -m, --minor MINOR\n\
+        specify the MINOR device number (used with -M or -N)\n\
+    -l, --lastminor LASTMINOR\n\
+        specify the LASTMINOR device number in a range (used with -s)\n\
     -q, --quiet\n\
-        suppress output\n\
-    -h, --help\n\
-        prints this usage information and exits\n\
+        suppress normal output (equivalent to --debug=0)\n\
+    -d, --debug [LEVEL]\n\
+        increase or set debugging verbosity\n\
+    -x, --verbose [LEVEL]\n\
+        increase or set output verbosity\n\
+    -h, --help, -?, --?\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        prints the version and exits\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permission and exit\n\
 ", argv[0]);
 }
 
-static int sad_cmd(int fd, int cmd, struct strapush *sap)
+static void copying(int argc, char *argv[])
+{
+	if (!output && !debug)
+		return;
+	fprintf(stdout, "\
+--------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+--------------------------------------------------------------------------------\n\
+This program is free software; you can  redistribute  it and/or modify  it under\n\
+the terms  of the GNU General Public License  as  published by the Free Software\n\
+Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
+version.\n\
+\n\
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received a copy of the GNU  General  Public License  along with\n\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
+Cambridge, MA 02139, USA.\n\
+--------------------------------------------------------------------------------\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
+the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
+as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the  license rights granted\n\
+herein (the license rights customarily provided to non-Government users). If the\n\
+Software is supplied to any unit or agency of the Government  other than DoD, it\n\
+is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
+Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
+regulations).\n\
+--------------------------------------------------------------------------------\n\
+Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
+Corporation at a fee.  See http://www.openss7.com/\n\
+--------------------------------------------------------------------------------\n\
+", ident);
+}
+
+static int
+sad_cmd(int fd, int cmd, struct strapush *sap)
 {
 	struct strioctl ioc = {
 		ic_cmd:cmd,
@@ -176,7 +237,8 @@ static int sad_cmd(int fd, int cmd, struct strapush *sap)
 	};
 	return ioctl(fd, I_STR, &ioc);
 }
-static int sad_vml(int fd, struct str_list *sml)
+static int
+sad_vml(int fd, struct str_list *sml)
 {
 	struct strioctl ioc = {
 		ic_cmd:I_STR,
@@ -187,8 +249,8 @@ static int sad_vml(int fd, struct str_list *sml)
 	return ioctl(fd, I_STR, &ioc);
 }
 
-static int autopush_set(char *devname, int major, int minor, int lastminor, int nmods,
-			char **modlist)
+static int
+autopush_set(char *devname, int major, int minor, int lastminor, int nmods, char **modlist)
 {
 	int i;
 	if (debug) {
@@ -202,7 +264,8 @@ static int autopush_set(char *devname, int major, int minor, int lastminor, int 
 	return (1);
 }
 
-static int autopush_cln(char *devname, int major, int minor)
+static int
+autopush_cln(char *devname, int major, int minor)
 {
 	if (debug)
 		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
@@ -210,7 +273,8 @@ static int autopush_cln(char *devname, int major, int minor)
 	return (1);
 }
 
-static int autopush_ver(int nmods, char **modlist)
+static int
+autopush_ver(int nmods, char **modlist)
 {
 	int i, fd;
 	union {
@@ -242,7 +306,8 @@ static int autopush_ver(int nmods, char **modlist)
 	return (0);
 }
 
-static int autopush_get(char *devname, int major, int minor)
+static int
+autopush_get(char *devname, int major, int minor)
 {
 	struct strapush sap;
 	int header = 0;
@@ -270,9 +335,9 @@ static int autopush_get(char *devname, int major, int minor)
 				perror(__FUNCTION__);
 			return (1);
 		}
-		if (output) {
+		if (output || debug) {
 			printf("DeviceName Major Minor Lastminor Modules\n");
-			printf("%10s       %3d   %3d   %3s       ", sap.sap_module, sap.sap_major,
+			printf("%10s       %3ld   %3ld   %3s       ", sap.sap_module, sap.sap_major,
 			       sap.sap_minor, "-");
 		}
 		close(fd);
@@ -301,19 +366,20 @@ static int autopush_get(char *devname, int major, int minor)
 			}
 		}
 		if (!header) {
-			if (output)
+			if (output || debug)
 				printf("DeviceName Major Minor Lastminor Modules\n");
 			header = 1;
 		}
-		if (output)
-			printf("%10s       %3d   %3d   %3s       ", sap.sap_module,
-			       sap.sap_major, sap.sap_minor, "-");
+		if (output || debug)
+			printf("%10s       %3ld   %3ld   %3s       ", sap.sap_module, sap.sap_major,
+			       sap.sap_minor, "-");
 	}
 	close(fd);
 	return (0);
 }
 
-static int autopush_res(char *devname, int major, int minor)
+static int
+autopush_res(char *devname, int major, int minor)
 {
 	struct strapush sap;
 	int header = 0;
@@ -339,9 +405,9 @@ static int autopush_res(char *devname, int major, int minor)
 				perror(__FUNCTION__);
 			return (1);
 		}
-		if (output) {
+		if (output || debug) {
 			printf("DeviceName Major Minor Lastminor Modules\n");
-			printf("%10s       %3d   %3d   %3s       ", sap.sap_module, sap.sap_major,
+			printf("%10s       %3ld   %3ld   %3s       ", sap.sap_module, sap.sap_major,
 			       sap.sap_minor, "-");
 		}
 		close(fd);
@@ -370,19 +436,20 @@ static int autopush_res(char *devname, int major, int minor)
 			}
 		}
 		if (!header) {
-			if (output)
+			if (output || debug)
 				printf("DeviceName Major Minor Lastminor Modules\n");
 			header = 1;
 		}
-		if (output)
-			printf("%10s       %3d   %3d   %3s       ", sap.sap_module,
-			       sap.sap_major, sap.sap_minor, "-");
+		if (output || debug)
+			printf("%10s       %3ld   %3ld   %3s       ", sap.sap_module, sap.sap_major,
+			       sap.sap_minor, "-");
 	}
 	close(fd);
 	return (0);
 }
 
-static int autopush_fil(char *filename)
+static int
+autopush_fil(char *filename)
 {
 	char buffer[1024];
 	char *line;
@@ -400,10 +467,11 @@ static int autopush_fil(char *filename)
 		int tokenind;
 		int major = -1, minor = -1, lastminor = -1;
 		unsigned char devname[FMNAMESZ + 1] = "";
-		for (str = line, tokenind = 0, sap.sap_npush = 0; tokenind < MAXAPUSH + 3 &&
-		     (token = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL; str = NULL, tokenind++) {
+		for (str = line, tokenind = 0, sap.sap_npush = 0;
+		     tokenind < MAXAPUSH + 3
+		     && (token = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL;
+		     str = NULL, tokenind++) {
 			switch (tokenind) {
-				int i;
 				char *end;
 			case 0:	/* major | name */
 				if (token[0] == '#')
@@ -433,9 +501,9 @@ static int autopush_fil(char *filename)
 				lastminor = strtol(token, &end, 0);
 				if (end[0] != '\0')
 					break;
-				if (lastminor != -1 &&
-				    (lastminor < 0 || lastminor > MAX_MINOR_DEVICE ||
-				     lastminor < minor))
+				if (lastminor != -1
+				    && (lastminor < 0 || lastminor > MAX_MINOR_DEVICE
+					|| lastminor < minor))
 					break;
 				continue;
 			default:	/* module name (tokenind - 3) */
@@ -491,11 +559,13 @@ static int autopush_fil(char *filename)
 		continue;
 	}
 	fclose(file);
+	return (0);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-	int c;
+	int c, val;
 	unsigned char filename[256] = "";
 	unsigned char devname[FMNAMESZ + 1] = "";
 	int major = -1;
@@ -511,34 +581,41 @@ int main(int argc, char **argv)
 		OPTION_CLONE,
 	} option = OPTION_NONE;
 	while (1) {
+#ifdef _GNU_SOURCE
 		int option_index = 0;
 		static struct option long_options[] = {
-			{"file", 1, 0, 'f'},
-			{"set", 0, 0, 's'},
-			{"get", 0, 0, 'g'},
-			{"reset", 0, 0, 'r'},
-			{"clone", 0, 0, 'c'},
-			{"verify", 0, 0, 'v'},
-			{"name", 1, 0, 'N'},
-			{"major", 1, 0, 'M'},
-			{"minor", 1, 0, 'm'},
-			{"lastminor", 1, 0, 'l'},
-			{"debug", 0, 0, 'd'},
-			{"help", 0, 0, 'h'},
-			{"version", 0, 0, 'V'},
-			{"quiet", 0, 0, 'q'},
+			/* *INDENT-OFF* */
+			{ "file",	required_argument,	NULL, 'f' },
+			{ "set",	no_argument,		NULL, 's' },
+			{ "get",	no_argument,		NULL, 'g' },
+			{ "reset",	no_argument,		NULL, 'r' },
+			{ "clone",	no_argument,		NULL, 'c' },
+			{ "verify",	no_argument,		NULL, 'v' },
+			{ "name",	required_argument,	NULL, 'N' },
+			{ "major",	required_argument,	NULL, 'M' },
+			{ "minor",	required_argument,	NULL, 'm' },
+			{ "lastminor",	required_argument,	NULL, 'l' },
+			{ "quiet",	no_argument,		NULL, 'q' },
+			{ "debug",	optional_argument,	NULL, 'd' },
+			{ "verbose",	optional_argument,	NULL, 'x' },
+			{ "version",	no_argument,		NULL, 'V' },
+			{ "copying",	no_argument,		NULL, 'C' },
+			{ "help",	no_argument,		NULL, 'h' },
+			{ "?",		no_argument,		NULL, 'h' },
+			{ 0, }
+			/* *INDENT-ON* */
 		};
-		c = getopt_long_only(argc, argv, "hf:sgrcM:m:N:l:vVdq", long_options,
+		c = getopt_long_only(argc, argv, "f:sgrcM:m:N:l:vqd::x::VCh?", long_options,
 				     &option_index);
+#else				/* _GNU_SOURCE */
+		c = getopt(argc, argv, "f:sgrcM:m:N:l:vqd::x::VCh?");
+#endif				/* _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
 		case 0:
 			usage(argc, argv);
 			exit(2);
-		case 'h':	/* -h, --help */
-			help(argc, argv);
-			exit(0);
 		case 'f':	/* -f, --file filename */
 			if (option != OPTION_NONE)
 				goto bad_option;
@@ -561,8 +638,8 @@ int main(int argc, char **argv)
 			option = OPTION_RESET;
 			break;
 		case 'M':	/* -M, --major [ major | name ] */
-			if (option == OPTION_NONE || option == OPTION_FILE ||
-			    option == OPTION_VERIFY || *devname != 0)
+			if (option == OPTION_NONE || option == OPTION_FILE
+			    || option == OPTION_VERIFY || *devname != 0)
 				goto bad_option;
 			if ('0' <= *optarg && *optarg <= '9') {
 				/* -M, --major major */
@@ -575,16 +652,16 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'm':	/* -m, --minor minor */
-			if (option == OPTION_NONE || option == OPTION_FILE ||
-			    option == OPTION_VERIFY || minor != -1)
+			if (option == OPTION_NONE || option == OPTION_FILE
+			    || option == OPTION_VERIFY || minor != -1)
 				goto bad_option;
 			minor = atoi(optarg);
 			if (minor < 0 || minor > MAX_MINOR_DEVICE)
 				goto bad_option;
 			break;
 		case 'N':	/* -N, --name name */
-			if (option == OPTION_NONE || option == OPTION_FILE ||
-			    option == OPTION_VERIFY || major != -1)
+			if (option == OPTION_NONE || option == OPTION_FILE
+			    || option == OPTION_VERIFY || major != -1)
 				goto bad_option;
 			strncpy(devname, optarg, FMNAMESZ);
 			break;
@@ -605,35 +682,73 @@ int main(int argc, char **argv)
 				goto bad_option;
 			option = OPTION_CLONE;
 			break;
-		case 'V':	/* -V, --version */
-			version(argc, argv);
-			exit(0);
-		case 'd':	/* -d, --debug */
-			debug += 1;
-			break;
 		case 'q':	/* -q, --quiet */
 			output = 0;
 			debug = 0;
 			break;
+			break;
+		case 'd':	/* -d, --debug [LEVEL] */
+			if (debug)
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				debug++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			debug = val;
+			break;
+		case 'x':	/* -x, --verbose [LEVEL] */
+			if (debug)
+				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				output++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			output = val;
+			break;
+		case 'h':	/* -h, --help, -? --? */
+			if (debug)
+				fprintf(stderr, "%s: printing help message\n", argv[0]);
+			help(argc, argv);
+			exit(0);
+		case 'V':	/* -V, --version */
+			if (debug)
+				fprintf(stderr, "%s: printing version message\n", argv[0]);
+			version(argc, argv);
+			exit(0);
+		case 'C':	/* -C, --copying */
+			if (debug)
+				fprintf(stderr, "%s: printing copying message\n", argv[0]);
+			copying(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
 			optind--;
-		      syntax_error:
-			if (optind < argc) {
-				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-				for (; optind < argc; optind++)
-					fprintf(stderr, "%s ", argv[optind]);
-				fprintf(stderr, "\n");
+		      bad_nonopt:
+			if (output > 0 || debug > 0) {
+				if (optind < argc) {
+					fprintf(stderr, "%s: syntax error near '", argv[0]);
+					while (optind < argc)
+						fprintf(stderr, "%s ", argv[optind++]);
+					fprintf(stderr, "'\n");
+				} else {
+					fprintf(stderr, "%s: missing option or argument", argv[0]);
+					fprintf(stderr, "\n");
+				}
+				fflush(stderr);
+				usage(argc, argv);
 			}
-			usage(argc, argv);
 			exit(2);
 		}
 	}
 	switch (option) {
 	case OPTION_FILE:
 		if (optind < argc)
-			goto syntax_error;
+			goto bad_nonopt;
 		exit(autopush_fil(filename));
 	case OPTION_SET:
 		if (optind >= argc)
@@ -643,22 +758,22 @@ int main(int argc, char **argv)
 				fprintf(stderr, "%s: too many ( %d > %d ) module names\n", argv[0],
 					argc - optind, MAXAPUSH);
 			optind += MAXAPUSH;
-			goto syntax_error;
+			goto bad_nonopt;
 		}
 		exit(autopush_set(devname, major, minor, lastminor, argc - optind, &argv[optind]));
 	case OPTION_GET:
 		if (optind < argc)
-			goto syntax_error;
+			goto bad_nonopt;
 		exit(autopush_get(devname, major, minor));
 	case OPTION_RESET:
 	      option_reset:
 		if (optind < argc)
-			goto syntax_error;
+			goto bad_nonopt;
 		if ((*devname == 0 && major == -1) || minor == -1) {
 			if (debug)
 				fprintf(stderr, "%s: one of -N or -M and -m must be set\n",
 					argv[0]);
-			goto syntax_error;
+			goto bad_nonopt;
 		}
 		exit(autopush_res(devname, major, minor));
 	case OPTION_VERIFY:
@@ -669,17 +784,17 @@ int main(int argc, char **argv)
 				fprintf(stderr, "%s: too many ( %d > %d ) module names\n", argv[0],
 					argc - optind, MAXAPUSH);
 			optind += MAXAPUSH;
-			goto syntax_error;
+			goto bad_nonopt;
 		}
 		exit(autopush_ver(argc - optind, &argv[optind]));
 	case OPTION_CLONE:
 		if (optind < argc)
-			goto syntax_error;
+			goto bad_nonopt;
 		if ((*devname == 0 && major == -1) || minor == -1) {
 			if (debug)
 				fprintf(stderr, "%s: one of -N or -M and -m must be set\n",
 					argv[0]);
-			goto syntax_error;
+			goto bad_nonopt;
 		}
 		exit(autopush_cln(devname, major, minor));
 	default:

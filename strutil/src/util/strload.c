@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 21:12:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:12:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 21:12:00 $"
 
 static char const ident[] =
-    "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/14 21:12:00 $";
 
 /*
  * AIX Utility: Loads and configures STREAMS.
@@ -79,81 +79,87 @@ static char const ident[] =
 #include <sys/ioctl.h>
 
 int debug = 0;
-int verbose = 1;
+int output = 1;
 
 void version(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (output < 0)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
 void usage(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (output < 0)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [{-l, --load}]\n\
-    %1$s [options] {-u, --unload}\n\
-    %1$s [options] {-Q, --query}\n\
-    %1$s {-h, --help}\n\
-    %1$s {-V, --version\n\
+    %1$s [options] [{-l|--load}]\n\
+    %1$s [options] {-u|--unload}\n\
+    %1$s [options] {-Q|--query}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
 void help(int argc, char *argv[])
 {
-	if (verbose < 0)
+	if (output < 0)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [{-l, --load}]\n\
-    %1$s [options] {-u, --unload}\n\
-    %1$s [options] {-Q, --query}\n\
-    %1$s {-h, --help}\n\
-    %1$s {-V, --version\n\
+    %1$s [options] [{-l|--load}]\n\
+    %1$s [options] {-u|--unload}\n\
+    %1$s [options] {-Q|--query}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Options:\n\
     -l, --load\n\
         specifies that the listed drivers, modules or STREAMS executive are\n\
-	to be loaded\n\
+        to be loaded\n\
     -u, --unload\n\
         specifies that the listed drivers, modules or STREAMS executive are\n\
-	to be unloaded\n\
+        to be unloaded\n\
     -Q, --query\n\
         specifies that the listed drivers, modules or STREAMS executive are\n\
-	to be queried\n\
+        to be queried\n\
     -f, --file FILE\n\
         specifies configuration file from which to take configuration information\n\
     -d, --drivers DRIVER[,DRIVER]\n\
         specifies a comma separated list of drivers to load, unload or query\n\
     -m, --modules MODULE[,MODULE]\n\
         specifies a comma separated list of modules to load, unload or query\n\
-    -v, --verbose\n\
-	verbose output\n\
     -q, --quiet\n\
-	suppress normal output\n\
-    -h, --help, -?\n\
-	print this usage message and exits\n\
+        suppress normal output (equivalent to --debug=0)\n\
+    -D, --debug [LEVEL]\n\
+        increase or set debugging verbosity\n\
+    -v, --output [LEVEL]\n\
+        increase or set output verbosity\n\
+    -h, --help, -?, --?\n\
+        print this usage information and exit\n\
     -V, --version\n\
-	print the version and exits\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permission and exit\n\
 ", argv[0]);
 }
 
 static void copying(int argc, char *argv[])
 {
-	if (verbose < 1 && !debug)
+	if (output < 1 && !debug)
 		return;
 	fprintf(stdout, "\
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -211,15 +217,18 @@ int main(int argc, char *argv[])
 			{"drivers",	optional_argument,	NULL, 'd'},
 			{"modules",	optional_argument,	NULL, 'm'},
 			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "luQf:d::m::qvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "luQf:d::m::qD::v::hVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "luQf:d::m::qvhV?");
+		c = getopt(argc, argv, "luQf:d::m::qD::v::hVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -252,16 +261,26 @@ int main(int argc, char *argv[])
 				goto bad_option;
 			break;
 		case 'q':
-			verbose = -1;
+			output = 0;
+			debug = 0;
 			break;
-		case 'v':
+		case 'D':
 			if (optarg == NULL) {
-				verbose++;
+				debug++;
 				break;
 			}
 			if ((val = strtol(optarg, NULL, 0)) < 0)
 				goto bad_option;
-			verbose = val;
+			debug = val;
+			break;
+		case 'v':
+			if (optarg == NULL) {
+				output++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			output = val;
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
@@ -275,15 +294,20 @@ int main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (optind < argc && verbose) {
-				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-				while (optind < argc)
-					fprintf(stderr, "%s ", argv[optind++]);
-				fprintf(stderr, "\n");
+			if (output > 0 || debug > 0) {
+				if (optind < argc) {
+					fprintf(stderr, "%s: syntax error near '", argv[0]);
+					while (optind < argc)
+						fprintf(stderr, "%s ", argv[optind++]);
+					fprintf(stderr, "\n");
+				} else {
+					fprintf(stderr, "%s: missing option or argument", argv[0]);
+					fprintf(stderr, "\n");
+				}
 				fflush(stderr);
+			      bad_usage:
+				usage(argc, argv);
 			}
-		      bad_usage:
-			usage(argc, argv);
 			exit(2);
 		}
 	}

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:12:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $"
 
 static char const ident[] =
-    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:56 $";
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $";
 
 /* 
  *  SVR 4.2: fdetach(8)
@@ -75,8 +75,6 @@ static char const ident[] =
 #endif
 
 #include <stropts.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
@@ -88,10 +86,10 @@ static void version(int argc, char **argv)
 	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Distributed under GPL Version 2, included here by reference.\n\
+%2$s\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 2, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
@@ -101,10 +99,10 @@ static void usage(int argc, char **argv)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [path]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s [options] [PATH]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
@@ -114,12 +112,12 @@ static void help(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [path]\n\
-    %1$s { -h |--help }\n\
-    %1$s { -V |--version }\n\
-    %1$s { -C |--copying }\n\
+    %1$s [options] [PATH]\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Arguments:\n\
-    path\n\
+    PATH\n\
         the path to the mounted STREAMS-special file\n\
 Options:\n\
     -q, --quiet\n\
@@ -128,12 +126,12 @@ Options:\n\
         increase or set debugging verbosity\n\
     -v, --verbose [LEVEL]\n\
         increase or set output verbosity\n\
-    -h, --help\n\
-        prints this usage information and exits\n\
+    -h, --help, -?, --?\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        prints the version and exits\n\
+        print version and exit\n\
     -C, --copying\n\
-        prints copying permissions and exits\n\
+        print copying permission and exit\n\
 ", argv[0]);
 }
 
@@ -145,7 +143,7 @@ static void copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -191,18 +189,19 @@ int main(int argc, char **argv)
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			{"debug",	optional_argument,	NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'd'},
 			{"verbose",	optional_argument,	NULL, 'v'},
-			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
-			{"?",		no_argument,		NULL, 'H'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"?",		no_argument,		NULL, 'h'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long_only(argc, argv, "dqvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "qd::v::VCh?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "dqvhVC?");
+		c = getopt(argc, argv, "qd::v::VCh?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -212,7 +211,13 @@ int main(int argc, char **argv)
 		switch (c) {
 		case 0:
 			goto bad_usage;
-		case 'd':	/* -d, --debug */
+		case 'q':	/* -q, --quiet */
+			if (debug)
+				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
+			output = 0;
+			debug = 0;
+			break;
+		case 'd':	/* -d, --debug [LEVEL] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -223,13 +228,7 @@ int main(int argc, char **argv)
 				goto bad_option;
 			debug = val;
 			break;
-		case 'q':	/* -q, --quiet */
-			if (debug)
-				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
-			output = 0;
-			debug = 0;
-			break;
-		case 'v':	/* -v, --verbose */
+		case 'v':	/* -v, --verbose [LEVEL] */
 			if (debug)
 				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -241,7 +240,6 @@ int main(int argc, char **argv)
 			output = val;
 			break;
 		case 'h':	/* -h, --help */
-		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
 			help(argc, argv);
