@@ -51,11 +51,172 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.124 8/18/03 14:07:32 "
+#ident "@(#) LiS head.c 2.129 10/9/03 20:07:46 "
 
-/* BEWARE: should check:
- * tty stuff
- */
+
+/*  -------------------------------------------------------------------  */
+
+#if 0
+
+Analysis of open/close locking
+==============================
+
+It is important to ensure that open and close are synchronized properly.  In
+particular, races involving the opening and closing of the same stream must be
+resolved.  The following is a list of considerations in this system.
+
+* Every stdata structure has a unique {major,minor} device identifier.
+
+* Multiple open streams to the same dev must flow through the same stdata.
+
+* The driver`s open routine can alter the values of the {major,minor}.
+
+* A simultaneous close and an open to the same dev must be resolved.
+
+The resolution of a simultaneous close and open goes as follows:
+
+- The two operations must be serialized.
+
+- If the close goes first then the open is treated as an open of a new stream.
+
+- If the open goes first then the close simply decrements the open count and
+  otherwise leaves the stdata structure intact.
+
+There are factors that complicate the simple serialization of these two
+operations.  They are as follows:
+
+1) A STREAMS driver open procedure can sleep, as can a driver`s close procedure.
+   This means that either of these two operations can take in indefinite period
+   of time.
+
+2) (1) means that a global semaphore cannot be used to serialize the two
+   operations.  The semaphore might be held indefinitely due to sleeps in
+   driver open and close routines.
+
+3) A clone open, or other driver open activity, can change the {major,minor}
+   device that the stream represents.  This leads, in effect, to a re-open
+   of the newly designated stream.
+
+The synchronization of these operations involves the following general
+mechanisms.
+
+i) The lis_stdata_sem is a semaphore that protects the linked list of stdata
+   structures from alteration.  This list is searched at open time to compare
+   the {maj,min} device id being opened with the device ids of all existing
+   open streams.  By this mechanism the open routine discovers that the
+   requested open should use an existing stdata structure.  If no such struct
+   is found in the list then a new one is allocated, placed in the list and
+   tagged with the {maj,min} of the device being opened, all under protection
+   of the lis_stdata_sem.  This semaphore cannot be held indefinitely.
+
+ii) The hd->sd_opening semaphore is used to exclude the open and close routine
+    (or multiple opens) for a particular stream.  This semaphore exists within
+    the stdata structure for the stream and thus can be held indefinitely if an
+    open or a close routine sleeps.
+
+iii) The stdata structures contain a reference count, not to be confused with
+     the open count which count the number of outstanding references to the
+     structure.  Whenever any operation, such as open, close, read, write, is
+     in process on an stdata structure the reference count is incremented for
+     the duration of the operation.  When the reference count goes to zero then
+     the structure is deallocated.
+
+iv) The mechanism in (iii) is used to allow the stdata structure to contain
+    state information concerning whether it is in the process of being opened
+    or closed and that state information can persist after the stream has been
+    closed.  The information is valid as long as some routine has an
+    outstanding reference to the stdata structure.
+
+v) Mechanisms (ii), (iii) and (iv) allow the open routine to discover that it
+   has lost a race with the close routine and work from a newly allocated
+   structure instead of using the now-closed structure that was originally
+   found in the linked list.
+
+The races that need to be resolved can be characterized at a high level by the
+following matrix:
+
+
+	     | Open   | Close  |
+    ---------+--------+--------+
+     Open    |   A    |   C    |
+    ---------+--------+--------+
+     Close   |   C    |   B    |
+    ---------+--------+--------+
+
+A) Open vs Open
+
+   In this case one of the opens gets the stdata_sem first and gets to search
+   the list of streams.  If it finds the dev then the open process consists of
+   incrementing the open count, otherwise it allocates the stdata structure.
+
+   The second open will find the stdata structure and proceed on the path of
+   incrementing the open count.
+
+   When reopening a stream the open routine of every module in the stream is
+   called.  It is assumed in this case that the device id will not change.
+
+B) Close vs Close
+
+   Both the stdata_sem and the sd_opening semaphores are acquired by the close
+   routine.  Only the last close executes the close_action procedure on the
+   stream.
+
+   In the cast of the "last close", the close routine sets the STRCLOSE flag in
+   the stdata structure.  This flag prevents the stdata structure from being
+   found in a search of the linked list for a new stream.  Thus, the open count
+   of the stream can never increase again once it has been decremented to zero
+   by the close routine.
+
+   The close_action routine dismantles the stream.
+
+C) Open vs Close
+
+   The open routine cannot find a stream in the stdata list if it is in the
+   process of being dismantled by the close routine.  This is because the
+   STRCLOSE flag makes such a stream invisible, even if the stdata structure
+   itself remains allocated.  Thus, the open routine is working with a newly
+   allocated stdata or one that is not in the middle of a final close.
+
+   However, there is one tricky problem with open.  Due to (i), above, it is
+   not allowed to hold the stdata_sem indefinitely.  However, due to (ii),
+   above, the sd_opening semaphore may be held indefinitely.  This means that
+   the open routine must not be holding the stdata_sem when it goes to acquire
+   the sd_opening semaphore.  Releasing the sdata_sem allows another open or a
+   close to execute prior to acquiring the sd_opening semaphore.
+
+   Thus, the open routine must be able to tell which of three cases occurred
+   once it has the sd_opening semaphore:
+
+   1. A final close occurred.
+   2. Another open occurred.
+   3. Neither occurred.
+
+   Detecting #1 is simply a matter of checking the STRCLOSE flag once the
+   sd_opening semaphore is acquired.  If this flag is set then the stdata is
+   being closed.  This instance of the stdata structure is abandoned and the
+   open procedure repeats from the beginning, searching for an existing stdata
+   or allocating a new one.
+
+   If case #2 occurred the open procedure that executed first will have
+   incremented the open count for the stdata structure.  The second open will
+   detect this and follow the short path through the code.
+
+   Case #3 is when the open count still equals zero after acquiring the
+   sd_opening semaphore.  This leads to the long form of the open involving
+   building the stream, etc.
+
+   The close routine really has an easier time of it.  After acquiring the
+   sd_opening semaphore it simply decrements the open count and looks to see if
+   it reached zero.  If so, it sets the STRCLOSE flag and releases the
+   sd_opening semaphore.  (It acquires the stdata_sem for the duration of
+   setting the STRCLOSE flag.)  The STRCLOSE flag will prevent the open routine
+   from attempting to use this stdata structure.
+
+   Obviously, if the open routine performed its entire function before the
+   close routine is entered then the close routine will find the open count to
+   be non-zero and will not dismantle the stream.
+
+#endif
 
 
 /*  -------------------------------------------------------------------  */
@@ -2338,7 +2499,7 @@ bad_ioc_seq( mblk_t *mp, stdata_t *hd)
 
 /*  -------------------------------------------------------------------  */
 
-/* Call every open procedure in this queue
+/* Call every open procedure in this stream
  */
 static int
 open_mods( stdata_t *head, dev_t *devp, int flags, cred_t *creds )
@@ -2465,6 +2626,60 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq)
     LIS_QISRUNLOCK(q, &psw) ;
     lis_freemsg(mp);
     return(0) ;				/* done */
+}
+
+/*  -------------------------------------------------------------------  */
+/* lis_stream_error
+ *
+ * Handles setting error conditions on a stream head.  Used by M_ERROR
+ * processing and file closing.
+ *
+ * Pass 0 for error code to reset error flag.  Pass -1 for error code
+ * to ignore that particular flag.  Pass positive error code to set that
+ * error code in the stream head structure.
+ */
+void	lis_stream_error(stdata_t *shead, int rderr, int wrerr)
+{
+    if (rderr == 0)
+    {
+	shead->sd_rerror = 0 ;
+	CLR_SD_FLAG(shead,STRDERR);
+    }
+    else if (rderr > 0 && rderr != NOERROR)
+    {
+	shead->sd_rerror = rderr ;
+	SET_SD_FLAG(shead,STRDERR);
+    }
+
+    if (wrerr == 0)
+    {
+	shead->sd_werror = 0 ;
+	CLR_SD_FLAG(shead,STWRERR);
+    }
+    else if (wrerr > 0 && wrerr != NOERROR)
+    {
+	shead->sd_werror = wrerr ;
+	SET_SD_FLAG(shead,STWRERR);
+    }
+
+    /*
+     * Wakeups and signals are performed whether there is an error or not, just
+     * by virtue of calling this routine.
+     */
+    if (F_ISSET(shead->sd_sigflags,S_ERROR))
+	kill_procs(shead->sd_siglist,SIGPOLL,S_ERROR);
+
+    if (   POLL_WAITING(shead)
+	|| F_ISSET(shead->sd_flag,STRSELPND)
+       )
+	lis_wake_up_poll(shead,POLLERR);
+
+    lis_wake_up_all_wwrite(shead);
+    lis_wake_up_all_wread(shead);
+    lis_wake_up_all_read_sem(shead);
+
+    if (F_ISSET(shead->sd_flag,IOCWAIT))
+	lis_wake_up_wiocing(shead);
 }
 
 /*  -------------------------------------------------------------------  */
@@ -2602,7 +2817,7 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 	break;
     case M_ERROR:
 	{
-	    unsigned char	errnum ;
+	    unsigned char	rderr, wrerr ;
 
 	    CP(mp,0) ;
 	    switch (mp->b_wptr - mp->b_rptr) 	/* how many bytes?  */
@@ -2615,65 +2830,19 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 		 * Fall into the one-byte case
 		 */
 	    case 1:				/* set errnum for both sides */
-		errnum = *mp->b_rptr++;
-		if (errnum != NOERROR)
-		{
-		    shead->sd_rerror = errnum ;
-		    shead->sd_werror = errnum ;
-
-		    if (errnum == 0)
-			CLR_SD_FLAG(shead,STRDERR|STWRERR);
-		    else
-			SET_SD_FLAG(shead,STRDERR|STWRERR);
-		}
+		rderr = *mp->b_rptr++;
+		wrerr = rderr ;
+		lis_stream_error(shead, rderr, wrerr) ;
 		break ;
 
 	    case 2:				/* set two sides individually */
-		errnum = *mp->b_rptr++;
-		if (errnum != NOERROR)
-		{
-		    shead->sd_rerror = errnum ;
-
-		    if (errnum == 0)
-			CLR_SD_FLAG(shead,STRDERR);
-		    else
-			SET_SD_FLAG(shead,STRDERR);
-		}
-
-		errnum = *mp->b_rptr++;
-		if (errnum != NOERROR)
-		{
-		    shead->sd_werror = errnum ;
-
-		    if (errnum == 0)
-			CLR_SD_FLAG(shead,STWRERR);
-		    else
-			SET_SD_FLAG(shead,STWRERR);
-		}
-
+		rderr = *mp->b_rptr++;
+		wrerr = *mp->b_rptr++;
+		lis_stream_error(shead, rderr, wrerr) ;
 		break ;
 	    }
 
 	    lis_freemsg(mp);
-	    if (F_ISSET(shead->sd_sigflags,S_ERROR))
-		kill_procs(shead->sd_siglist,SIGPOLL,S_ERROR);
-
-	    if (   POLL_WAITING(shead)
-		|| F_ISSET(shead->sd_flag,STRSELPND)
-	       )
-		lis_wake_up_poll(shead,POLLERR);
-
-	    lis_wake_up_all_wwrite(shead);
-	    lis_wake_up_all_wread(shead);
-	    lis_wake_up_all_read_sem(shead);
-	    if (   (shead->sd_werror || shead->sd_rerror)
-		&& F_ISSET(shead->sd_flag,IOCWAIT)
-	       )
-		lis_wake_up_wiocing(shead);
-#if 0				/* let close do the mflush */
-	    if (shead->sd_werror || shead->sd_rerror)
-		lis_snd_mflush(LIS_WR(q),FLUSHW,0);
-#endif
 	    break;
 	}
     case M_HANGUP:
@@ -3628,6 +3797,12 @@ int lis_open_fifo(struct inode *i, struct file *f, stdata_t *head,
  *  references to each other.
  */
 
+static int get_sd_opening_sem(stdata_t *head)
+{
+    CP(head,head->sd_dev) ;
+    return(lis_down(&head->sd_opening)) ;
+}
+
 int 
 lis_stropen( struct inode *i, struct file *f )
 {
@@ -3635,11 +3810,14 @@ lis_stropen( struct inode *i, struct file *f )
     cred_t	   creds;
     dev_t	   odev ;
     dev_t	   ndev ;
+    static dev_t   zdev ;		/* zero device id */
     int		   err = 0;
     int		   hd_locked = 0;
     int		   stdata_locked = 0 ;	/* have stdata_sem */
     int		   dev_is_clone ;	/* opening the clone driver */
     int		   maj, mnr;
+    int		   existing_head = 0 ;
+    int		   f_count = F_COUNT(f) ;	/* file open count */
     unsigned long  time_cell = 0;
     unsigned long  this_open ;
 #if defined(KERNEL_2_3)
@@ -3686,7 +3864,7 @@ lis_stropen( struct inode *i, struct file *f )
 	printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 	       "    << i_rdev=(%d,%d) f_flags=0x%x"
 	       " <[%d] %d LiS inode(s), %d open stream(s)>\n",
-	       i, I_COUNT(i), f, F_COUNT(f), this_open,
+	       i, I_COUNT(i), f, f_count, this_open,
 	       STR_KMAJOR(i->i_rdev), STR_KMINOR(i->i_rdev), f->f_flags,
 	       lis_atomic_read(&lis_mnt_cnt),
 	       lis_atomic_read(&lis_inode_cnt),
@@ -3702,6 +3880,9 @@ lis_stropen( struct inode *i, struct file *f )
     }
 
     /*
+     * For more information about race conditions see "Analysis of
+     * open/close locking" near the top of this file.
+     *
      * Get a stream head structure to associate with the file.
      * The principle of STREAMS is that if a program opens some
      * particular {maj,min} device then all such opens should funnel
@@ -3748,10 +3929,13 @@ retry_from_start:			/* retry point for open/close races */
 
     stdata_locked = 1 ;			/* need "up" when exit */
     if ((head = FILE_STR(f)) != NULL)
+    {
+	existing_head = 1 ;
 	head = lis_head_get(head) ;	/* increase ref cnt */
+	CP(head,odev) ;
+    }
     else
     {					/* opening new stream */
-	int	existing_head = 1 ;
 	/*
 	 * Always get a new stream head structure for a clone open.
 	 */
@@ -3761,9 +3945,20 @@ retry_from_start:			/* retry point for open/close races */
 	    existing_head = 0 ;
 	    head = lis_head_get(NULL) ;	/* allocates new structure */
 	    CP(head,odev) ;
+	    /*
+	     * In order for lis_lookup_stdata to locate this stream head
+	     * in case of a simultaneous open to this same device by another
+	     * thread, we have to plant the maj/min device id in the stream
+	     * head structure now.
+	     *
+	     * Note however, that for a just-allocated stream head structure
+	     * the reference count is still zero.
+	     */
+	    head->sd_dev = odev ;
 	}
 	else
 	{
+	    existing_head = 1 ;
 	    lis_head_get(head) ;	/* incrs ref count */
 	    CP(head,odev) ;
 	}
@@ -3773,57 +3968,10 @@ retry_from_start:			/* retry point for open/close races */
 	    if (LIS_DEBUG_OPEN)
 		printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		       "    >> failed to allocate stream head <ENOSR>\n",
-		       i, I_COUNT(i), f, F_COUNT(f), this_open);
+		       i, I_COUNT(i), f, f_count, this_open);
 
 	    err = -ENOSR ;
 	    goto error_rtn ;
-	}
-
-	/*
-	 * In order for lis_lookup_stdata to locate this stream head
-	 * in case of a simultaneous open to this same device by another
-	 * thread, we have to plant the maj/min device id in the stream
-	 * head structure now.
-	 *
-	 * Note however, that for a just-allocated stream head structure
-	 * the reference count is still zero.
-	 */
-	head->sd_dev = odev ;
-	lis_up(&lis_stdata_sem);
-	stdata_locked = 0 ;
-	CP(head,odev) ;
-	if ((err = lis_down(&head->sd_opening)) < 0)
-	    goto error_rtn ;
-
-	CP(head,odev) ;
-	hd_locked = 1 ;			/* now have head's opening sem */
-	/*
-	 * Two simultaneous opens to the same stream could have the
-	 * "first" thread allocate the structure and the "second"
-	 * thread go through the open code first.  The reason is
-	 * the gap in time between releasing the stdata_sem and
-	 * acquiring the opening semaphore.  Admittedly, the "second"
-	 * thread has not yet acquired the stdata_sem, so it will
-	 * likely lose the race, but in a preemptable kernel environment
-	 * thread execution can be delayed by preemption.
-	 *
-	 * So we don't treat the "existing" stream head as a re-open
-	 * unless the open count is > 0, which means that the
-	 * full open procedure was performed on it.  Code below uses
-	 * the open count to decide between first and subsequent opens.
-	 */
-	if (existing_head && LIS_SD_OPENCNT(head) >= 1)
-	{
-	    if (!head->sd_inode)	/* really, an assertion */
-	    {				/* kind of busted, here */
-		err = -EINVAL;
-		goto error_rtn ;
-	    }
-
-	    CP(head,odev) ;
-	    if (i != head->sd_inode)
-		i = lis_old_inode( f, head->sd_inode );
-	    SET_FILE_STR(f, head);
 	}
     }
 
@@ -3836,13 +3984,31 @@ retry_from_start:			/* retry point for open/close races */
     /*
      * Releasing stdata_sem could allow this stream to be closed by
      * another thread.
+     *
+     * We want to get the stream's opening semaphore under circumstances
+     * in which there is not other open in progress on this stream.
      */
-    CP(head,odev) ;
-    if (!hd_locked && (err = lis_down(&head->sd_opening)) < 0)
+    if ((err = get_sd_opening_sem(head)) < 0)
 	goto error_rtn ;
 
     CP(head,odev) ;
     hd_locked = 1 ;			/* now have head's opening sem */
+
+    /*
+     * If the sd_dev does not match the device that we are trying to open
+     * then we are in a race with another open.  Most likely is that this
+     * head was used for a clone open and the sd_dev changed.
+     *
+     * We need to start over.
+     */
+    if (existing_head && !DEV_SAME(head->sd_dev, odev))
+    {					/* clone open changed sd_dev */
+	CP(head,odev) ;
+	lis_up(&head->sd_opening) ;
+	hd_locked = 0 ;
+	lis_head_put(head) ;
+	goto retry_from_start ;		/* start over again */
+    }
 
     /*
      * We now have the head to use and are protected against further
@@ -3874,7 +4040,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	goto retry_from_start ;
     }
 
-    SET_FILE_STR(f, head);			/* point file to strm hd */
+    SET_FILE_STR(f, head);		/* point file to strm hd */
 
     /*
      * If this is a reopen of an existing stream then there is
@@ -3887,7 +4053,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	{
 	    printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		   "    >> hd@0x%p MAGIC 0x%lx!=0x%lx <EINVAL>\n",
-		   i, I_COUNT(i), f, F_COUNT(f), this_open,
+		   i, I_COUNT(i), f, f_count, this_open,
 		   head, head->magic, STDATA_MAGIC) ;
 	    err = -EINVAL ;
 	    head = NULL ;		/* pretend no strm head */
@@ -3932,7 +4098,8 @@ reuse_head:				/* changed maj/mnr from clone open */
      * See below for more.
      */
     CP(head,odev) ;
-    if (LIS_DEV_CAN_REOPEN(maj)) {
+    if (LIS_DEV_CAN_REOPEN(maj))
+    {
         /*
 	 *  cloned minor devices of this major can be reopened -
 	 *
@@ -3952,7 +4119,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	if (LIS_DEBUG_OPEN)
 	    printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		   "    >> <= %c@0x%p/++%d <can reopen>\n",
-		   i, I_COUNT(i), f, F_COUNT(f), this_open,
+		   i, I_COUNT(i), f, f_count, this_open,
 #if defined(LINUX) && defined(KERNEL_2_3)
 		   'd', head->sd_from, D_COUNT(head->sd_from)
 #else
@@ -4034,6 +4201,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	stdata_t	*other_hd ;
 	const char	*clone_name[32] ;
 
+retry_clone:
 	/*
 	 * If the clone open redirects us to an existing stream then
 	 * we need to close the stream just opened and open the
@@ -4051,7 +4219,6 @@ reuse_head:				/* changed maj/mnr from clone open */
 	from = FILE_INODE(f);
 #endif
 	other_hd = lis_lookup_stdata( &ndev, from, head );
-	lis_up(&lis_stdata_sem);		/* let go global semaphore */
 	memcpy(clone_name, head->sd_name, sizeof(clone_name)) ;
 	/*
 	 * If the device id got changed by the clone driver then the
@@ -4067,24 +4234,98 @@ reuse_head:				/* changed maj/mnr from clone open */
 	 *
 	 * If a non-clone driver changes its dev then we will presume that
 	 * we need to call the driver open routine for the new dev.
-	 *
-	 * The semantics here are a bit fuzzy and might lead to an extra
-	 * call to a driver open routine.
 	 */
 	if (other_hd != NULL)		/* have stdata struct already */
 	{					/* use it instead of head */
+	    int	closing ;
+	    int ocnt ;
+
 	    lis_head_get(other_hd) ;
+	    lis_up(&lis_stdata_sem);		/* let go global semaphore */
+	    if ((err = get_sd_opening_sem(other_hd)) < 0)
+	    {
+		lis_head_put(other_hd) ;	/* give back use count */
+		goto error_rtn ;
+	    }
+
+	    /*
+	     * Perhaps the designated stream is closing.  In that case
+	     * we can't use it.  Also, the open count had better be at
+	     * least equal to 1 since this claims to be a re-use of
+	     * an open stream.
+	     */
+	    closing = F_ISSET(other_hd->sd_flag,STRCLOSE) ;
+	    ocnt = LIS_SD_OPENCNT(other_hd) ;
+	    if (closing || ocnt < 1)
+	    {
+		if ( LIS_DEBUG_OPEN )
+		    printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
+			   "    >> <clone->closing-strm> h@0x%p/%d/%d \"%s\"\n",
+			   i, I_COUNT(i), f, f_count, this_open,
+			   other_hd,
+			   LIS_SD_REFCNT(other_hd), ocnt, other_hd->sd_name);
+
+		lis_up(&other_hd->sd_opening) ;	/* unlock head struct */
+		lis_head_put(other_hd) ;	/* give back use count */
+		if (ocnt < 1 && !closing)
+		{				/* kind of busted */
+		    err = -EBUSY ;
+		    goto error_rtn ;
+		}
+
+		goto retry_clone ;		/* search again */
+	    }
+
 	    CP(other_hd,ndev) ;
 	    if ( LIS_DEBUG_OPEN )
 		printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		       "    >> <clone->existing> h@0x%p/%d/%d \"%s\"\n",
-		       i, I_COUNT(i), f, F_COUNT(f), this_open,
+		       i, I_COUNT(i), f, f_count, this_open,
 		       other_hd,
 		       LIS_SD_REFCNT(other_hd), LIS_SD_OPENCNT(other_hd),
 		       other_hd->sd_name);
-	    
+#if 0
+	    /*
+	     * I think that this check and warning is not necessary since
+	     * we are about to call the close routine on the cloned
+	     * stream.  This gives the user's driver a chance to undo
+	     * any pointer assignments.
+	     *
+	     * When we go to the reuse_head label we will then call the
+	     * driver open routine on the reopened stream represented
+	     * by other_hd, which will notify the driver of the additional
+	     * use of that stream.
+	     */
+	    if (      head->sd_wq->q_next ->q_ptr != NULL
+		|| RD(head->sd_wq->q_next)->q_ptr != NULL
+	       )
+		printk("\nA STREAMS clone open to %s has modified the\n"
+		       "device to indicate %s.  This stream is already\n"
+		       "open and will be used for this open.  However,\n"
+		       "the clone driver's open routine set the q_ptr\n"
+		       "of the stream passed to it to a non-NULL value.\n"
+		       "This is probably a bug in the driver and should\n"
+		       "be fixed since the queue itself is about to be\n"
+		       "deallocated\n", clone_name, other_hd->sd_name) ;
+#endif
 	    CP(head,odev) ;
+	    if (!existing_head)
+		head->sd_dev = zdev ;		/* clobber device nr */
+
 	    lis_up(&head->sd_opening) ;		/* done with this head */
+	    hd_locked = 0 ;
+	    /*
+	     * Once the sd_opening semaphore is let go a simultaneous open or a
+	     * close can proceed on the stream.  We are about to close
+	     * the stream ourselves.
+	     *
+	     * If there is a simulteneous open/close racing for this stream
+	     * then one or the other occurs first, serialized by sd_opening.
+	     * If the open goes first then our close will just decrement
+	     * the open count for the stream and leave it intact.  If our
+	     * close goes first then the opener will find the STRCLOSE flag
+	     * set and retry with a new stream head structure.
+	     */
 	    lis_atomic_dec(&lis_in_syscall) ;	/* "done" with a system call */
 
 	    lis_runqueues() ;			/* no locks owned */
@@ -4093,20 +4334,30 @@ reuse_head:				/* changed maj/mnr from clone open */
 	    head = other_hd ;			/* use "found" stream */
 	    odev = ndev ;			/* switch to new device */
 	    CP(head,odev) ;
-	    if ((err = lis_down(&head->sd_opening)) < 0)
-		goto error_rtn ;
+	    hd_locked = 1 ;			/* we own sd_opening already */
+	    SET_FILE_STR(f, head);		/* point file to new strm hd */
 	    CP(head,odev) ;
 	    lis_atomic_inc(&lis_in_syscall) ;	/* processing a system call */
-	    if (!dev_is_clone)
-		goto reuse_head ;		/* call new drvr open routine */
+
+	    /*
+	     * Because this stream is already open we treat this device
+	     * assignment like a re-open of the stream.  That means that
+	     * we will call the driver's open routine.  If the clone open
+	     * generated this {maj,min} by mistake then this gives the
+	     * driver a chance to refuse the open.
+	     */
+	    goto reuse_head ;		/* call new drvr open routine */
 	}
 
 	/*
-	 * It's a clone open using either a new or existing stream.  The
-	 * common case is using a new stream.  But we go through here
-	 * in either case.
+	 * This is the case in which the clone open is going to use the
+	 * same stream head that was used to call the clone driver, but
+	 * with the new dev value filled in.
+	 *
+	 * We still own the sd_opening semaphore on this stream.
 	 */
 	CP(head,ndev) ;
+	lis_up(&lis_stdata_sem);		/* let go global semaphore */
 	SET_FILE_STR(f, head);			/* point file to strm hd */
 	head->sd_strtab = LIS_DEVST(STR_MAJOR(ndev)).f_str;
 	head->sd_dev = ndev ;
@@ -4126,7 +4377,7 @@ reuse_head:				/* changed maj/mnr from clone open */
 	    printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 		   "    >> <clone->new> h@0x%p/%d/%d \"%s\""
 		   " i@0x%p/%d\n",
-		   i, I_COUNT(i), f, F_COUNT(f), this_open,
+		   i, I_COUNT(i), f, f_count, this_open,
 		   head,
 		   LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
 		   head->sd_name,
@@ -4218,7 +4469,19 @@ successful_rtn:					/* returning success */
 			     oldd, oldd_cnt, oldmnt, oldmnt_cnt);
 #endif
 
-    lis_atomic_inc(&head->sd_opencnt) ;	/* count opens to stream */
+    /*
+     * Increment our open count for the first open of the file.  For
+     * subsequent opens leave the open count alone since we will only
+     * get one call to close and that is when the file's count goes
+     * to zero.  Similarly, we need to "put" the head structure because
+     * we called "get" for this open, but there will be no matching close.
+     */
+    if (f_count == 1)
+	lis_atomic_inc(&head->sd_opencnt) ;	/* count opens to stream */
+    else
+    if (f_count > 1)
+	lis_head_put(head) ;
+
     if (hd_locked)
     {
 	CP(head,odev) ;
@@ -4230,7 +4493,7 @@ successful_rtn:					/* returning success */
 	printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld\n"
 	       "    >> h@0x%p/%d/%d \"%s\""
 	       " i@0x%p/%d rq@0x%p wq@0x%p\n",
-	       i, I_COUNT(i), f, F_COUNT(f), this_open,
+	       i, I_COUNT(i), f, f_count, this_open,
 	       head,
 	       LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
 	       head->sd_name,
@@ -4252,7 +4515,7 @@ successful_rtn:					/* returning success */
 	lis_print_stream(head) ;
 	printk("lis_stropen(i@0x%p/%d,f@0x%p/%d)#%ld done OK...\n"
 	       "    >> <[%d] %d LiS inode(s), %d open stream(s)>\n",
-	       i, I_COUNT(i), f, F_COUNT(f), this_open,
+	       i, I_COUNT(i), f, f_count, this_open,
 	       lis_atomic_read(&lis_mnt_cnt),
 	       lis_atomic_read(&lis_inode_cnt),
 	       lis_atomic_read(&lis_stdata_cnt)) ;
@@ -7135,6 +7398,7 @@ static void close_action(stdata_t *head)
 	CP(head,0) ;
     }
 
+    lis_stream_error(head, EIO, EIO) ;		/* wake up syscalls */
     lis_free_elist(&head->sd_siglist);		/* do in signal masks */
     if (head->sd_mux.mx_hd != NULL)		/* is a ctl stream */
     {
@@ -7229,6 +7493,11 @@ lis_doclose( struct inode *i, struct file *f, stdata_t *head, cred_t *creds )
 
     CLOCKON() ;
 
+    /*
+     * For information about race conditions see "Analysis of
+     * open/close locking" near the top of this file.
+     *
+     */
     if (head == NULL || head->magic != STDATA_MAGIC)
     {
 	printk("lis_doclose(...,h@0x%p,...)"
@@ -7304,8 +7573,7 @@ lis_doclose( struct inode *i, struct file *f, stdata_t *head, cred_t *creds )
      * go about closing the stream without being bothered from
      * above.  There are still driver races to be considered.
      */
-    sem_err  = lis_down_nintr_head(head, &lis_stdata_sem);
-    sem2_err = lis_down(&head->sd_opening) ;
+    sem2_err = lis_down_nintr_head(head, &head->sd_opening) ;
 
     lis_del_from_elist(&head->sd_siglist,PID(f),S_ALL);
 
@@ -7358,8 +7626,15 @@ lis_doclose( struct inode *i, struct file *f, stdata_t *head, cred_t *creds )
 
     if (opencnt == 0)				/* last open */
     {
+	/*
+	 * Since the STRCLOSE flag is important to stream lookups, acquire
+	 * the stdata semaphore before changing this flag.
+	 */
+	sem_err  = lis_down_nintr_head(head, &lis_stdata_sem);
 	head->sd_creds = *creds ;		/* closer's credentials */
 	SET_SD_FLAG(head, STRCLOSE) ;		/* mark as closing */
+	if (sem_err == 0)			/* if <0 we're really busted */
+	    lis_up(&lis_stdata_sem);		/* allow opens again */
 
 	/*
 	 * Release the semaphore before calling close_action.  i_unlink
@@ -7368,17 +7643,12 @@ lis_doclose( struct inode *i, struct file *f, stdata_t *head, cred_t *creds )
 	if (sem2_err == 0)			/* if <0 we're really busted */
 	    lis_up(&head->sd_opening);		/* allows open on this strm */
 
-	if (sem_err == 0)			/* if <0 we're really busted */
-	    lis_up(&lis_stdata_sem);		/* allow opens again */
-
 	close_action(head) ;			/* perform close functions */
     }
-    else
+    else					/* not the last close */
     {
 	if (sem2_err == 0)			/* if <0 we're really busted */
 	    lis_up(&head->sd_opening);		/* allows open on this strm */
-	if (sem_err == 0)			/* if <0 we're really busted */
-	    lis_up(&lis_stdata_sem);		/* allow opens again */
     }
 
     CP(head,0) ;

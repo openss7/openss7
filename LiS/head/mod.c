@@ -32,7 +32,7 @@
  *    nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS mod.c 2.17 12/15/02 18:00:04 "
+#ident "@(#) LiS mod.c 2.19 10/9/03 20:11:22 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -467,7 +467,7 @@ static int apush_validate(autopush_list_t *list)
 
 		if (lis_fmod_sw[mod].f_str != NULL)
 			continue; /* registered */
-#ifdef LIS_LOADABLE_SUPPORT
+#if defined(LIS_LOADABLE_SUPPORT)
 		if (mod > MOD_OBJNAMES_SIZE)
 			return -1; /* not registered or configured */
 #else
@@ -490,7 +490,7 @@ static int apush_conf(major_t major, autopush_t *a)
 
 	if (lis_fstr_sw[major].f_str == NULL) {
 		/* Driver is not present */
-#ifdef LIS_LOADABLE_SUPPORT
+#if defined(LIS_LOADABLE_SUPPORT)
 		/* Is it a configured loadable? */
 		if (find_drv_objname(major) < 0)
 			return -ENODEV;
@@ -661,29 +661,15 @@ lis_register_strmod(struct streamtab *strtab, const char *name)
 	if (name == NULL)
 		return LIS_NULL_MID;
 
-	if ((i = find_mod_objname(name)) >= 0) {
-		id = i + 1;
-		if (lis_fmod_sw[id].f_str != NULL) {
-			printk("Unable to register configured "
-			       "loadable module \"%s\", slot in use.\n",
-			       name);
-			return LIS_NULL_MID;
-		}
-	}
+	/* See if the module is already registered */
+	for (id = 1; id < lis_fmodcnt; ++id)
+		if (lis_fmod_sw[id].f_str == strtab)
+		    return(id) ;	/* return existing slot number */
 
-	if (id == LIS_NULL_MID) {
-#ifdef LIS_LOADABLE_SUPPORT
-		/* Not a configured loadable: Find a free id */
-		for (id = MOD_OBJNAMES_SIZE + 1; id < lis_fmodcnt; ++id)
-			if (lis_fmod_sw[id].f_str == NULL)
-				break;
-#else
-		/* Find a free id */
-		for (id = 1; id < lis_fmodcnt; ++id)
-			if (lis_fmod_sw[id].f_str == NULL)
-				break;
-#endif
-	}
+	/* Find a free id */
+	for (id = 1; id < lis_fmodcnt; ++id)
+		if (lis_fmod_sw[id].f_str == NULL)
+			break;
 
 	if (id == lis_fmodcnt) {
 		if (id == MAX_STRMOD) {
@@ -727,7 +713,7 @@ lis_unregister_strmod(struct streamtab *strtab)
 	slot->f_name[0] = '\0';
 
 	id = slot - lis_fmod_sw;
-#ifdef LIS_LOADABLE_SUPPORT
+#if defined(LIS_LOADABLE_SUPPORT)
 	if (id > MOD_OBJNAMES_SIZE)
 		apush_drop_mod(id);
 #else
@@ -1053,7 +1039,7 @@ int lis_apushm(dev_t dev, const char *mods[])
 		ASSERT(mod > 0);
 		ASSERT(mod < MAX_STRMOD);
 
-#ifdef LIS_LOADABLE_SUPPORT
+#if defined(LIS_LOADABLE_SUPPORT)
 		if (lis_fmod_sw[mod].f_str != NULL)
 			mods[i] = lis_fmod_sw[mod].f_name;
 		else {
@@ -1097,10 +1083,20 @@ int lis_apush_set(struct strapush *ap)
 	/* Get module IDs */
 	for (i = 0; i < ap->sap_npush; ++i) {
 		/* Is this module a configured loadable? */
+#if 0
+		FIXME: find_mod_objname returns the index into the 
+			   lis_mod_objnames table, not the slot number
+			   in the fmod switch.  There may be some intent 
+			   here to add non-loaded/non-registered modules
+			   to an autopush list.  If that makes any sense
+			   to do, it isn-t being done by this code, but
+			   the code is computing an incorrect slot number.
+			   DMG 9/12/03
 		if ((j = find_mod_objname(ap->sap_list[i])) >= 0) {
 			a->push.mod[i] = j + 1;
 			continue;
 		}
+#endif
 		/* Nope, is it registered? */
 		for (j = lis_fmodcnt; j > 0; --j) {
 			if (!strcmp(ap->sap_list[i], lis_fmod_sw[j].f_name)) {
@@ -1162,7 +1158,7 @@ int lis_apush_get(struct strapush *ap)
 		ASSERT(id > 0);
 		ASSERT(id < MAX_STRMOD);
 
-#ifdef LIS_LOADABLE_SUPPORT
+#if defined(LIS_LOADABLE_SUPPORT)
 		if (lis_fmod_sw[id].f_str != NULL)
 			strncpy(ap->sap_list[i],
 				lis_fmod_sw[id].f_name, LIS_NAMESZ + 1);
@@ -1218,7 +1214,7 @@ void lis_init_mod(void)
 	memset(apush,       0, sizeof apush);
 	memset(apush_nref,  0, sizeof apush_nref);
 
-#ifdef LIS_LOADABLE_SUPPORT
+#if defined(LIS_LOADABLE_SUPPORT)
 	lis_fmodcnt = MOD_OBJNAMES_SIZE + 1;
 #else
 	lis_fmodcnt = 1;

@@ -1,7 +1,7 @@
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
-#ident "@(#) cdi.h 1.19 7/24/01"
+#ident "@(#) cdi.h %R%.%L% %G%"
 
 /*
  * cdi.h header for Communications Device Interface
@@ -58,6 +58,7 @@
 #define CD_DISABLE_PENDING      0x07    /* Waiting ack of disable req */
 #define CD_OUTPUT_ACTIVE        0x08    /* Output section active only */
 #define	CD_XRAY			0x09	/* Xray-ing another ppa */
+#define CD_NOT_AUTH		0x0A	/* Not authorized, unusable */
 
 /*
  * CD_ERROR_ACK and CD_ERROR_IND error return values
