@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/23 07:24:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/22 19:46:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:22 $ by $Author: brian $
+# Last Modified $Date: 2004/06/22 19:46:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -252,7 +252,6 @@ xns_man_MANS	= \
 	man7/N_OPTMGMT_REQ.7 \
 	man7/N_optmgmt_req_t.7 \
 	man7/npi.7 \
-	man7/npi_sctp.7 \
 	man7/N_RESET_CON.7 \
 	man7/N_reset_con_t.7 \
 	man7/N_RESET_IND.7 \
@@ -331,7 +330,6 @@ tli_man_MANS	= \
 	man7/T_ordrel_req.7 \
 	man7/tpi.7 \
 	man7/tpi_ip.7 \
-	man7/tpi_sctp.7 \
 	man7/tpi_tcp.7 \
 	man7/tpi_udp.7 \
 	man7/T_UDERROR_IND.7 \
@@ -409,7 +407,6 @@ xnet_man_MANS	= \
 	man3/xnet.3 \
 	man3/xti.3 \
 	man3/xti_ip.3 \
-	man3/xti_sctp.3 \
 	man3/xti_tcp.3 \
 	man3/xti_udp.3
 
@@ -437,22 +434,30 @@ sock_man_MANS	= \
 	man4/sockmod.4 \
 	man4/socksys.4
 
+sctp_man_MANS	=
+
 man_MANS	= $(xti_man_MANS)
 
 if WITH_XNS
 man_MANS	+= $(xns_man_MANS)
+sctp_man_MANS	+= man7/npi_sctp.7
 endif
 if WITH_TLI
 man_MANS	+= $(tli_man_MANS)
+sctp_man_MANS	+= man7/tpi_sctp.7
 endif
 if WITH_INET
 man_MANS	+= $(inet_man_MANS)
 endif
 if WITH_XNET
 man_MANS	+= $(xnet_man_MANS)
+sctp_man_MANS	+= man3/xti_sctp.3
 endif
 if WITH_SOCK
 man_MANS	+= $(sock_man_MANS)
+endif
+if WITH_OPENSS7_SCTP
+man_MANS	+= $(sctp_man_MANS)
 endif
 
 xti_dist_noinst_MANS	=
@@ -655,7 +660,6 @@ xns_dist_noinst_MANS	= \
 	man7/N_OPTMGMT_REQ.7.man \
 	man7/N_optmgmt_req_t.7.man \
 	man7/npi.7.man \
-	man7/npi_sctp.7.man \
 	man7/N_RESET_CON.7.man \
 	man7/N_reset_con_t.7.man \
 	man7/N_RESET_IND.7.man \
@@ -734,7 +738,6 @@ tli_dist_noinst_MANS	= \
 	man7/T_ordrel_req.7.man \
 	man7/tpi.7.man \
 	man7/tpi_ip.7.man \
-	man7/tpi_sctp.7.man \
 	man7/tpi_tcp.7.man \
 	man7/tpi_udp.7.man \
 	man7/T_UDERROR_IND.7.man \
@@ -812,7 +815,6 @@ xnet_dist_noinst_MANS	= \
 	man3/xnet.3.man \
 	man3/xti.3.man \
 	man3/xti_ip.3.man \
-	man3/xti_sctp.3.man \
 	man3/xti_tcp.3.man \
 	man3/xti_udp.3.man
 
@@ -840,13 +842,19 @@ sock_dist_noinst_MANS	= \
 	man4/sockmod.4.man \
 	man4/socksys.4.man
 
+sctp_dist_noinst_MANS	= \
+	man7/npi_sctp.7.man \
+	man7/tpi_sctp.7.man \
+	man3/xti_sctp.3.man
+
 dist_noinst_MANS	= \
 	$(xti_dist_noinst_MANS) \
 	$(xns_dist_noinst_MANS) \
 	$(tli_dist_noinst_MANS) \
 	$(inet_dist_noinst_MANS) \
 	$(xnet_dist_noinst_MANS) \
-	$(sock_dist_noinst_MANS)
+	$(sock_dist_noinst_MANS) \
+	$(sctp_dist_noinst_MANS)
 
 include ../../am/man.am
 
