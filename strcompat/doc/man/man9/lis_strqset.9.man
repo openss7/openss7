@@ -1,0 +1,1 @@
+.so strqset.9.man

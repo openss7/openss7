@@ -1,1 +1,1 @@
-.so lis_mknod.9.man
+.so soon.9.man

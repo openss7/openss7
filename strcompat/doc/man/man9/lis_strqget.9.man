@@ -1,0 +1,1 @@
+.so strqget.9.man

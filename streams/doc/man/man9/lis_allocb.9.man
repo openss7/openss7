@@ -1,0 +1,1 @@
+.so allocb.9.man

@@ -1,0 +1,1 @@
+.so freeq.9.man

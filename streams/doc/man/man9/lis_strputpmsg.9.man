@@ -1,0 +1,1 @@
+.so strputpmsg.9.man

@@ -1,0 +1,1 @@
+.so setqsched.9.man

@@ -1,0 +1,1 @@
+.so register_strmod.9.man

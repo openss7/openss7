@@ -1,0 +1,1 @@
+.so allocq.9.man

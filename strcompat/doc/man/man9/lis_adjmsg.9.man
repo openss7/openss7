@@ -1,0 +1,1 @@
+.so adjmsg.9.man

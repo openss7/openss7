@@ -1,0 +1,1 @@
+.so insq.9.man

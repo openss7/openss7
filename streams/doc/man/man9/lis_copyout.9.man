@@ -1,0 +1,1 @@
+.so copyout.9.man

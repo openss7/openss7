@@ -1,0 +1,1 @@
+.so unregister_strdev.9.man
