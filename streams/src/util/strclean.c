@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:38:56 $
+ @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 10:19:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:38:56 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 10:19:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:38:56 $"
+#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 10:19:59 $"
 
-static char const ident[] = "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:38:56 $";
+static char const ident[] = "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 10:19:59 $";
 
 /*
  *  AIX Utility: strclean - Cleans up the STREAMS error logger.
@@ -75,6 +75,13 @@ static char const ident[] = "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2
 
 static int output = 1;
 static int debug = 0;
+
+char basname[256] = "";
+char outpdir[256] = "";
+char outfile[256] = "";
+char errfile[256] = "";
+char outpath[256] = "";
+char errpath[256] = "";
 
 static void
 version(int argc, char **argv)
@@ -115,9 +122,17 @@ Usage:\n\
     %1$s { -V |--version }\n\
     %1$s { -C |--copying }\n\
 Options:\n\
+    -b, --basename BASENAME\n\
+        file basename, default: 'strvf'\n\
+    -d, --directory DIRECTORY\n\
+        directory in which to search for log files\n\
+    -o, --outfile OUTFILE\n\
+        remove files named OUTFILE, default: ${BASENAME}.mm-dd\n\
+    -e, --errfile ERRFILE\n\
+        remove files named ERRFILE, default: ${BASENAME}.errors\n\
     -q, --quiet\n\
         suppress output\n\
-    -d, --debug [LEVEL]\n\
+    -D, --debug [LEVEL]\n\
         increase or set debugging verbosity\n\
     -v, --verbose [LEVEL]\n\
         increase or set output verbosity\n\
@@ -180,6 +195,25 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 void
 strclean(int argc, char *argv[])
 {
+	if (basname[0] == '\0') {
+		snprintf(basname, sizeof(basname), "%s", "strvf");
+	}
+	if (outpdir[0] == '\0') {
+		snprintf(outpdir, sizeof(outpdir), "/var/adm/streams");
+		snprintf(outpdir, sizeof(outpdir), "/var/log/streams");
+	}
+	{
+		if (outfile[0] == '\0') {
+			snprintf(outfile, sizeof(outfile), "%s.[0-9][0-9]-[0-9][0-9]", basename);
+		}
+		snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
+	}
+	{
+		if (errfile[0] == '\0') {
+			snprintf(errfile, sizeof(errfile), "%s.errors", basename);
+		}
+		snprintf(errpath, sizeof(errpath), "%s/%s", outpdir, errfile);
+	}
 }
 
 int
@@ -191,6 +225,10 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"basename",	required_argument,	NULL, 'b'},
+			{"directory",	required_argument,	NULL, 'd'},
+			{"outfile",	required_argument,	NULL, 'o'},
+			{"errfile",	required_argument,	NULL, 'e'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -210,6 +248,18 @@ main(int argc, char *argv[])
 			break;
 		}
 		switch (c) {
+		case 'b':
+			strncpy(basname, optarg, sizeof(basname));
+			break;
+		case 'd':
+			strncpy(outpdir, optarg, sizeof(outpdir));
+			break;
+		case 'o':
+			strncpy(outfile, optarg, sizeof(outfile));
+			break;
+		case 'e':
+			strncpy(errfile, optarg, sizeof(errfile));
+			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
