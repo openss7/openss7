@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.11 2004/05/07 03:33:01 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.12 2004/05/08 19:21:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:01 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:13 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -77,7 +77,7 @@ typedef unsigned char uchar;		/* idiots! */
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
 
 #ifndef __GENKSYMS__
-#include "sys/modversions.h"
+#include "sys/streams/modversions.h"
 #endif
 
 #include <sys/dki.h>		/* for cred_t */

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/07 07:18:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/08 19:21:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/07 07:18:14 $ by $Author: brian $
+# Last Modified $Date: 2004/05/08 19:21:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,23 +80,23 @@ nobase_pkginclude_HEADERS = \
 	sys/uw7ddi.h
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/modversions.h \
-	sys/versions/aixcompat.ver \
-	sys/versions/hpuxcompat.ver \
-	sys/versions/liscompat.ver \
-	sys/versions/osfcompat.ver \
-	sys/versions/suncompat.ver \
-	sys/versions/svr4compat.ver \
-	sys/versions/uw7compat.ver \
-	sys/versions/strattach.ver \
-	sys/versions/strreg.ver \
-	sys/versions/strsad.ver \
-	sys/versions/strsched.ver \
-	sys/versions/strspecfs.ver \
-	sys/versions/strsysctl.ver \
-	sys/versions/strutil.ver \
-	sys/versions/strsyms.ver \
-	sys/versions/sth.ver
+	sys/streams/modversions.h \
+	sys/streams/versions/aixcompat.ver \
+	sys/streams/versions/hpuxcompat.ver \
+	sys/streams/versions/liscompat.ver \
+	sys/streams/versions/osfcompat.ver \
+	sys/streams/versions/suncompat.ver \
+	sys/streams/versions/svr4compat.ver \
+	sys/streams/versions/uw7compat.ver \
+	sys/streams/versions/strattach.ver \
+	sys/streams/versions/strreg.ver \
+	sys/streams/versions/strsad.ver \
+	sys/streams/versions/strsched.ver \
+	sys/streams/versions/strspecfs.ver \
+	sys/streams/versions/strsysctl.ver \
+	sys/streams/versions/strutil.ver \
+	sys/streams/versions/strsyms.ver \
+	sys/streams/versions/sth.ver
 
 nobase_include_HEADERS = \
 	xti.h \

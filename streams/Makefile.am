@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2004/05/07 07:18:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2004/05/08 19:21:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/07 07:18:12 $ by $Author: brian $
+# Last Modified $Date: 2004/05/08 19:21:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -418,24 +418,24 @@ EXPORT_SRCFILES = \
 	src/modules/sth.c
 
 EXPORT_VERFILES = \
-	include/sys/versions/aixcompat.ver \
-	include/sys/versions/hpuxcompat.ver \
-	include/sys/versions/liscompat.ver \
-	include/sys/versions/osfcompat.ver \
-	include/sys/versions/suncompat.ver \
-	include/sys/versions/svr4compat.ver \
-	include/sys/versions/uw7compat.ver \
-	include/sys/versions/strattach.ver \
-	include/sys/versions/strreg.ver \
-	include/sys/versions/strsad.ver \
-	include/sys/versions/strsched.ver \
-	include/sys/versions/strspecfs.ver \
-	include/sys/versions/strsysctl.ver \
-	include/sys/versions/strutil.ver \
-	include/sys/versions/strsyms.ver \
-	include/sys/versions/sth.ver
+	include/sys/streams/versions/aixcompat.ver \
+	include/sys/streams/versions/hpuxcompat.ver \
+	include/sys/streams/versions/liscompat.ver \
+	include/sys/streams/versions/osfcompat.ver \
+	include/sys/streams/versions/suncompat.ver \
+	include/sys/streams/versions/svr4compat.ver \
+	include/sys/streams/versions/uw7compat.ver \
+	include/sys/streams/versions/strattach.ver \
+	include/sys/streams/versions/strreg.ver \
+	include/sys/streams/versions/strsad.ver \
+	include/sys/streams/versions/strsched.ver \
+	include/sys/streams/versions/strspecfs.ver \
+	include/sys/streams/versions/strsysctl.ver \
+	include/sys/streams/versions/strutil.ver \
+	include/sys/streams/versions/strsyms.ver \
+	include/sys/streams/versions/sth.ver
 
-PKGINCL = include/sys
+PKGINCL = include/sys/streams
 
 GENKSYMS_CPPFLAGS = \
 	-I./src/compat -I$(srcdir)/src/compat \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $
+ @(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/08 19:21:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $"
+#ident "@(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/08 19:21:15 $"
 
 static char const ident[] =
-    "$RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $";
+    "$RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/08 19:21:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <linux/slab.h>
 
 #ifndef __GENKSYMS__
-#include <sys/modversions.h>
+#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/stropts.h>
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $"
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/08 19:21:15 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"

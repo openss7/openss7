@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:15 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:15 $";
 
 #define __NO_VERSION__
 
@@ -68,7 +68,7 @@ static char const ident[] =
 #include <linux/proc_fs.h>
 
 #ifndef __GENKSYMS__
-#include <sys/modversions.h>
+#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/strsubr.h>
@@ -548,29 +548,29 @@ static int get_streams_stdata_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", sd_wropt");
 	len += snprintf(page + len, maxlen - len, ", sd_eropt");
 	len += snprintf(page + len, maxlen - len, ", sd_iocid");
-	len += snprintf(page + len, maxlen - len, ", sd_iocwait");
-	len += snprintf(page + len, maxlen - len, ", sd_sidp");
-	len += snprintf(page + len, maxlen - len, ", sd_pgidp");
+//	len += snprintf(page + len, maxlen - len, ", sd_iocwait");
+//      len += snprintf(page + len, maxlen - len, ", sd_sidp");
+//      len += snprintf(page + len, maxlen - len, ", sd_pgidp");
 	len += snprintf(page + len, maxlen - len, ", sd_wroff");
 	len += snprintf(page + len, maxlen - len, ", sd_rerror");
 	len += snprintf(page + len, maxlen - len, ", sd_werror");
 	len += snprintf(page + len, maxlen - len, ", sd_opens");
 	len += snprintf(page + len, maxlen - len, ", sd_readers");
 	len += snprintf(page + len, maxlen - len, ", sd_writers");
-	len += snprintf(page + len, maxlen - len, ", sd_rwaiters");
-	len += snprintf(page + len, maxlen - len, ", sd_wwaiters");
+//      len += snprintf(page + len, maxlen - len, ", sd_rwaiters");
+//      len += snprintf(page + len, maxlen - len, ", sd_wwaiters");
 	len += snprintf(page + len, maxlen - len, ", sd_pushcnt");
 	len += snprintf(page + len, maxlen - len, ", sd_nanchor");
 	len += snprintf(page + len, maxlen - len, ", sd_sigflags");
 	len += snprintf(page + len, maxlen - len, ", sd_siglist");
-	// len += snprintf(page + len, maxlen - len, ", sd_waitq");
-	len += snprintf(page + len, maxlen - len, ", sd_mark");
+//	len += snprintf(page + len, maxlen - len, ", sd_waitq");
+//      len += snprintf(page + len, maxlen - len, ", sd_mark");
 	len += snprintf(page + len, maxlen - len, ", sd_closetime");
-	len += snprintf(page + len, maxlen - len, ", sd_rtime");
-	// len += snprintf(page + len, maxlen - len, ", sd_qlock");
+//	len += snprintf(page + len, maxlen - len, ", sd_rtime");
+//	len += snprintf(page + len, maxlen - len, ", sd_qlock");
 	len += snprintf(page + len, maxlen - len, ", sd_owner");
 	len += snprintf(page + len, maxlen - len, ", sd_nest");
-	// len += snprintf(page + len, maxlen - len, ", sd_mutex");
+//	len += snprintf(page + len, maxlen - len, ", sd_mutex");
 	len += snprintf(page + len, maxlen - len, ", sd_links");
 	len += snprintf(page + len, maxlen - len, ", sd_link_next");
 	len += snprintf(page + len, maxlen - len, ", sd_linkblk");
@@ -593,29 +593,29 @@ static int get_streams_stdata(char *page, ssize_t maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_wropt);
 	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_eropt);
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_iocid);
-	len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_iocwait);
-	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_sidp);
-	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_pgidp);
+//      len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_iocwait);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_sidp);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_pgidp);
 	len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_wroff);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_rerror);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_werror);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_opens);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_readers);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_writers);
-	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_rwaiters);
-	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_wwaiters);
+//      len += snprintf(page + len, maxlen - len, ", %d", sd->sd_rwaiters);
+//      len += snprintf(page + len, maxlen - len, ", %d", sd->sd_wwaiters);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_pushcnt);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_nanchor);
 	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_sigflags);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_siglist);
-	// len += snprintf(page + len, maxlen - len, ", %p", sd->sd_waitq);
-	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mark);
+//	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_waitq);
+//      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mark);
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_closetime);
-	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_rtime);
-	// len += snprintf(page + len, maxlen - len, ", %p", sd->sd_qlock);
+//	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_rtime);
+//	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_qlock);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_owner);
 	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_nest);
-	// len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mutex);
+//	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_mutex);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_links);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_link_next);
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_linkblk);

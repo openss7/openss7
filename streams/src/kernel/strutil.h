@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/08 19:21:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -408,8 +408,10 @@ static __inline__ void shared_leavesq(queue_t *q)
 					/* if not in streams; run them later */
 					qschedevents(q);
 			}
+#if 0
 			if (waitqueue_active(&sq->sq_waitq))
 				wake_up_all(&sq->sq_waitq);
+#endif
 			sq->sq_count = 0;
 		}
 		spin_unlock_irqrestore(&sq->q_lock, flags);
@@ -438,8 +440,10 @@ static __inline__ void exclus_leavesq(queue_t *q)
 				/* if not in streams; run them later */
 				qschedevents(q);
 		}
+#if 0
 		if (waitqueue_active(&sq->sq_waitq))
 			wake_up_all(&sq->sq_waitq);
+#endif
 		sq->sq_count = 0;
 		spin_unlock_irqrestore(&sq->q_lock, flags);
 	}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:15 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 07:18:15 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:15 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:15 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $";
 
 #define __NO_VERSION__
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <linux/interrupt.h>	/* for in_interrupt() */
 
 #ifndef __GENKSYMS__
-#include <sys/modversions.h>
+#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/cmn_err.h>	/* for CE_ constants */

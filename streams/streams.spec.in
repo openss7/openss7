@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/04/25 07:42:33 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/08 19:21:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 07:42:33 $ by $Author: brian $
+# Last Modified $Date: 2004/05/08 19:21:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -219,6 +219,8 @@ preferred_cflags="-freorder-blocks"
     %{?_without_k_test:           --disable-k-test} \
     %{?_with_k_safe:              --enable-k-safe} \
     %{?_without_k_safe:           --disable-k-safe} \
+    %{?_with_k_inline:            --enable-k-inline} \
+    %{?_without_k_inline:         --disable-k-inline} \
     %{?_with_compat_svr4:         --enable-compat-svr4} \
     %{?_without_compat_svr4:      --disable-compat-svr4} \
     %{?_with_compat_sol8:         --enable-compat-sol8} \
@@ -777,8 +779,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.14  2004/04/25 07:42:33  brian
-# - Updated change log.
+# Revision 0.9.2.15  2004/05/08 19:21:12  brian
+# - Commenting out unused structure members.
+#
+# Revision 1.15  2004/05/08 19:21:12  brian
+# - Commenting out unused structure members.
 #
 # Revision 1.14  2004/04/25 07:42:33  brian
 # - Updated change log.

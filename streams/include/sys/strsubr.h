@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.8 2004/05/07 03:33:01 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.9 2004/05/08 19:21:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:01 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:01 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/08 19:21:13 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -133,7 +133,7 @@ typedef struct syncq {
 	spinlock_t sq_lock;		/* spin lock for this structure */
 	int sq_count;			/* no of threads inside (negative for exclusive) */
 	struct task_struct *sq_owner;	/* exclusive owner */
-	wait_queue_head_t sq_waitq;	/* waiters */
+//	wait_queue_head_t sq_waitq;	/* waiters */
 	struct strevent *sq_head;	/* head of event queue */
 	struct strevent **sq_tail;	/* tail of event queue */
 	struct syncq *sq_outer;		/* synch queue outside this one (if any) */
@@ -160,32 +160,32 @@ struct stdata {
 	ulong sd_wropt;			/* write options */
 	ulong sd_eropt;			/* error options */
 	ulong sd_iocid;			/* sequence id for active ioctl */
-	ushort sd_iocwait;		/* number of procs awaiting ioctl */
-	struct task_struct *sd_sidp;	/* controlling session id */
-	struct task_struct *sd_pgidp;	/* controlling process group */
+//	ushort sd_iocwait;		/* number of procs awaiting ioctl */
+//	struct task_struct *sd_sidp;	/* controlling session id */
+//	struct task_struct *sd_pgidp;	/* controlling process group */
 	ushort sd_wroff;		/* write offset */
 	int sd_rerror;			/* read error */
 	int sd_werror;			/* write error */
 	int sd_opens;			/* number of successful opens */
 	int sd_readers;			/* number of streampipe readers */
 	int sd_writers;			/* number of streampipe writers */
-	int sd_rwaiters;		/* number of waiters on read */
-	int sd_wwaiters;		/* number of waiters on write */
+//	int sd_rwaiters;		/* number of waiters on read */
+//	int sd_wwaiters;		/* number of waiters on write */
 	int sd_pushcnt;			/* number of modules pushed */
 	int sd_nanchor;			/* number of modules anchored */
 	int sd_sigflags;		/* signal flags */
 	struct fasync_struct *sd_siglist;	/* list of procs for SIGPOLL */
 	// struct pollhead sd_polllist; /* list of poll wakeup functions */
 	wait_queue_head_t sd_waitq;	/* waiters */
-	mblk_t *sd_mark;		/* pointer to marked message */
+//	mblk_t *sd_mark;		/* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
-	ulong sd_rtime;			/* time to forward held message */
+//	ulong sd_rtime;			/* time to forward held message */
 	rwlock_t sd_qlock;		/* lock for queues under this stream */
 	struct task_struct *sd_owner;	/* exclusive lock owner */
 	int sd_nest;			/* lock nesting */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */
-	struct semaphore sd_mutex;	/* mutex for system calls */
+//	struct semaphore sd_mutex;	/* mutex for system calls */
 	struct stdata *sd_clone;	/* clone streams */
 	struct stdata *sd_links;	/* linked streams */
 	struct stdata *sd_link_next;	/* next linked stream */
@@ -385,11 +385,13 @@ struct queinfo {
 	queue_t rq;			/* read queue */
 	queue_t wq;			/* write queue */
 	struct stdata *qu_str;		/* stream head for this queue pair */
+#if 0
 	union {
 		struct fmodsw *fmod;	/* streams module */
 		struct cdevsw *cdev;	/* streams driver */
 	} qu_u;
 	int qu_flags;			/* queue pair flags */
+#endif
 	atomic_t qu_refs;		/* references to this structure */
 	wait_queue_head_t qu_qwait;	/* wait queue for qwait */
 	rwlock_t qu_lock;		/* procs lock */
@@ -399,8 +401,10 @@ struct queinfo {
 	struct queinfo *qu_prev;
 };
 
+#if 0
 #define qu_mod qu_u.fmod
 #define qu_dev qu_u.cdev
+#endif
 
 enum {
 	QU_MODULE_BIT,			/* queue pair is for module */

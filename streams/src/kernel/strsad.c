@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:16 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:16 $";
 
 #define __NO_VERSION__
 
@@ -66,7 +66,7 @@ static char const ident[] =
 #include <linux/modversions.h>
 
 #ifndef __GENKSYMS__
-#include <sys/modversions.h>
+#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/stropts.h>

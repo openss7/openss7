@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:14 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 07:18:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:14 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:14 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $";
 
 #define __NO_VERSION__
 
@@ -85,7 +85,7 @@ static char const ident[] =
 // #include <asm/atomic.h>
 
 #ifndef __GENKSYMS__
-#include <sys/modversions.h>
+#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/stropts.h>
@@ -761,6 +761,8 @@ queue_t *allocq(void)
 		queue_t *wq = rq + 1;
 		struct queinfo *qu = (struct queinfo *) rq;
 		atomic_set(&qu->qu_refs, 1);
+		rq->q_other = wq;
+		wq->q_other = rq;
 #ifdef CONFIG_STREAMS_DEBUG
 		{
 			unsigned long flags;
@@ -912,7 +914,9 @@ static void syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct syncq *sq = obj;
 		bzero(sq, sizeof(*sq));
 		spin_lock_init(&sq->sq_lock);
+#if 0
 		init_waitqueue_head(&sq->sq_waitq);
+#endif
 		sq->sq_head = NULL;
 		sq->sq_tail = &sq->sq_head;
 		atomic_set(&sq->sq_refs, 0);
@@ -963,10 +967,12 @@ void sq_put(struct syncq **sqp)
 				pswerr(("events lost!\n"));
 			sq->sq_head = NULL;
 			sq->sq_tail = &sq->sq_head;
+#if 0
 			if (waitqueue_active(&sq->sq_waitq))
 				pswerr(("destroying syncq with waiters!\n"));
 			wake_up_all(&sq->sq_waitq);
 			init_waitqueue_head(&sq->sq_waitq);
+#endif
 			kmem_cache_free(si->si_cache, sq);
 		}
 	}
@@ -2221,7 +2227,7 @@ static void clear_shinfo(struct shinfo *sh)
 	sd->sd_eropt = RERRNORM | WERRNORM;
 	init_waitqueue_head(&sd->sd_waitq);
 	slockinit(sd);
-	init_MUTEX(&sd->sd_mutex);
+//	init_MUTEX(&sd->sd_mutex);
 }
 static void shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {

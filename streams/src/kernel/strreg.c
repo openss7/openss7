@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/07 03:33:04 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/08 19:21:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
+ Last Modified $Date: 2004/05/08 19:21:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/07 03:33:04 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/08 19:21:15 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/07 03:33:04 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/08 19:21:15 $";
 
 #define __NO_VERSION__
 
@@ -77,7 +77,7 @@ static char const ident[] =
 #include <asm/hardirq.h>
 
 #ifndef __GENKSYMS__
-#include <sys/modversions.h>
+#include <sys/streams/modversions.h>
 #endif
 
 #include <sys/kmem.h>		/* for kmem_ */
