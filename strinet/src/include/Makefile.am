@@ -1,7 +1,6 @@
-# vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/27 05:47:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,56 +46,74 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/03 12:44:16 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 05:47:04 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   These are some rules that I use for generating source and binary RPMs
-#   using automake.  I need to package releases using RPM.  The following
-#   rules accomplish that for most packages.
-#
+xti_headers	=
 
-distdir = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
+xns_headers	= \
+	sys/cdi.h \
+	sys/dlpi.h \
+	sys/npi.h
 
-RPMOPTS = -vv \
-	--define "__source_payload w9.bzdio" \
-	--define "__binary_payload w9.bzdio" \
-	--define "_topdir `(cd $(top_builddir); pwd)`" \
-	--define "_icon openss7-logo-small.gif" \
-	--define "_kversion $(PACKAGE_KVERSION)" \
-	@PACKAGE_OPTIONS@
+tli_headers	= \
+	sys/ticlts.h \
+	sys/ticots.h \
+	sys/ticotsord.h \
+	sys/tihdr.h \
+	sys/timod.h \
+	sys/tirdwr.h \
+	sys/tiuser.h \
+	sys/tli.h \
+	sys/tpi.h \
+	ticlts.h \
+	ticots.h \
+	ticotsord.h \
+	tihdr.h \
+	timod.h \
+	tirdwr.h \
+	tiuser.h
 
-RPMTARGET = $(target)
+inet_headers	=
 
-#
-#   This builds a source RPM for the current target.
-#   Note: rpm demands icon in current directory
-#
-dist dist-all: distdir $(top_builddir)/openss7-logo-small.gif
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
-	$(am__remove_distdir)
-	$(mkinstalldirs) $(top_builddir)/BUILD $(top_builddir)/SRPMS $(top_builddir)/SPECS $(top_builddir)/SOURCES $(top_builddir)/RPMS
-	@if [ ! -e openss7-logo-small.gif ] ; then \
-		echo "cp -f $(top_srcdir)/openss7-logo-small.gif ."; \
-		cp -f $(top_srcdir)/openss7-logo-small.gif .; \
-	fi
-	rpmbuild -ts $(RPMOPTS) $(SRPMFLAGS) $(AM_SRPMFLAGS) --target $(target) -- $(distdir).tar.bz2
+xnet_headers	= \
+	sys/xti_atm.h \
+	sys/xti.h \
+	sys/xti_inet.h \
+	sys/xti_ip.h \
+	sys/xti_local.h \
+	sys/xti_mosi.h \
+	sys/xti_osi.h \
+	sys/xti_sctp.h \
+	sys/xti_tcp.h \
+	sys/xti_udp.h \
+	sys/xti_xti.h \
+	xti.h \
+	xti_inet.h
 
-#   This is the type of thing that needs to be included in the master makefile
-#   to build rpms for the current target, we also build any defined
-#   AM_RPMTARGETS
-#
-rpms: dist
-	@for t in $(RPMTARGET) $(AM_RPMTARGETS) ; do \
-		echo "rpmbuild --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t --" SRPMS/*.src.rpm; \
-		rpmbuild --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t -- SRPMS/*.src.rpm; \
-	done
+sock_headers	= \
+	sys/sockmod.h
 
-srpm: dist
+nobase_pkginclude_HEADERS = $(xti_headers)
 
-.PHONY: srpm rpms # dist-srpm dist-rpms
+if WITH_XNS
+nobase_pkginclude_HEADERS += $(xns_headers)
+endif
+if WITH_TLI
+nobase_pkginclude_HEADERS += $(tli_headers)
+endif
+if WITH_INET
+nobase_pkginclude_HEADERS += $(inet_headers)
+endif
+if WITH_XNET
+nobase_pkginclude_HEADERS += $(xnet_headers)
+endif
+if WITH_SOCK
+nobase_pkginclude_HEADERS += $(sock_headers)
+endif
+
+nobase_nodist_pkginclude_HEADERS = 
+#	sys/strxnet/modversions.h
 
 # vim: ft=automake
-
