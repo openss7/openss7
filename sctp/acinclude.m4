@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.20 2005/01/11 08:28:49 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.21 2005/01/12 08:55:36 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/11 08:28:49 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/12 08:55:36 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -566,6 +566,7 @@ if (s3 < s4 + s5 - s2 - s6) {
             sock_no_sendpage,
             sock_no_socketpair,
             sock_wake_async,
+            sock_wfree,
             sprintf,
             sysctl_intvec,
             sysctl_ip_default_ttl,
@@ -629,6 +630,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             undefined.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_throttle_heartbeats])
+# SCTP_CONFIG_DISCARD_OOTB
     AC_MSG_CHECKING([for sctp dicard out-of-the-blue])
     AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
     AC_ARG_ENABLE([sctp-discard-ootb],
@@ -765,9 +767,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp ecn])
     AC_ARG_ENABLE([sctp-ecn],
         AS_HELP_STRING([--enable-sctp-ecn],
-            [enable Explicit Congestion Notification. @<:@default=disabled@:>@]),
+            [enable Explicit Congestion Notification. @<:@default=enabled@:>@]),
         [sctp_cv_ecn="$enableval"],
-        [sctp_cv_ecn='no'])
+        [sctp_cv_ecn='yes'])
     if test :"$sctp_cv_ecn" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ECN], [], [
             This enables support for Explicit Congestion Notification (ECN)
@@ -780,9 +782,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp lifetimes])
     AC_ARG_ENABLE([sctp-lifetimes],
         AS_HELP_STRING([--enable-sctp-lifetimes],
-            [enable SCTP message lifetimes. @<:@default=disabled@:>@]),
+            [enable SCTP message lifetimes. @<:@default=enabled@:>@]),
         [sctp_cv_lifetimes="$enableval"],
-        [sctp_cv_lifetimes='no'])
+        [sctp_cv_lifetimes='yes'])
     if test :"$sctp_cv_lifetimes" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_LIFETIMES], [], [
             This enables support for message lifetimes as described in RFC 2960.
@@ -795,9 +797,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp add ip])
     AC_ARG_ENABLE([sctp-add-ip],
         AS_HELP_STRING([--enable-sctp-add-ip],
-            [enable ADD-IP. @<:@default=disabled@:>@]),
+            [enable ADD-IP. @<:@default=enabled@:>@]),
         [sctp_cv_add_ip="$enableval"],
-        [sctp_cv_add_ip='no'])
+        [sctp_cv_add_ip='yes'])
     if test :"$sctp_cv_add_ip" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADD_IP], [], [
             This enables support for ADD-IP as described in
@@ -810,9 +812,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp adaptation layer info])
     AC_ARG_ENABLE([sctp-adaptation-layer-info],
         AS_HELP_STRING([--enable-sctp-adaptation-layer-info],
-            [enable ALI. @<:@default=disabled@:>@]),
+            [enable ALI. @<:@default=enabled@:>@]),
         [sctp_cv_adaptation_layer_info="$enableval"],
-        [sctp_cv_adaptation_layer_info='no'])
+        [sctp_cv_adaptation_layer_info='yes'])
     if test :"$sctp_cv_adaptation_layer_info" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADAPTATION_LAYER_INFO], [], [
             This enables support for the Adaptation Layer Information parameter
@@ -825,9 +827,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp partial reliability])
     AC_ARG_ENABLE([sctp-partial-reliability],
         AS_HELP_STRING([--enable-sctp-partial-reliability],
-            [enable SCTP Partial Reliability (PR-SCTP). @<:@default=disabled@:>@]),
+            [enable SCTP Partial Reliability (PR-SCTP). @<:@default=enabled@:>@]),
         [sctp_cv_partial_reliability="$enableval"],
-        [sctp_cv_partial_reliability='no'])
+        [sctp_cv_partial_reliability='yes'])
     if test :"$sctp_cv_partial_reliability" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_PARTIAL_RELIABILITY], [], [
             This enables support for PR-SCTP as described in

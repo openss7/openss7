@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2005/01/11 04:23:07 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.7 2005/01/12 09:04:23 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/11 04:23:07 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/12 09:04:23 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -521,6 +521,7 @@ dnl fi
             alloc_skb,
             create_proc_entry,
             del_timer,
+            dev_base_lock,
             dev_base,
             do_softirq,
             free_pages,
@@ -531,6 +532,7 @@ dnl fi
             inet_add_protocol,
             inet_addr_type,
             inet_del_protocol,
+            inetdev_lock,
             inet_family_ops,
             inet_getsockopt,
             inet_recvmsg,
@@ -554,6 +556,7 @@ dnl fi
             kill_proc,
             kmem_cache_alloc,
             kmem_cache_create,
+            kmem_cache_destroy,
             kmem_cache_free,
             kmem_find_general_cachep,
             __lock_sock,
@@ -566,9 +569,14 @@ dnl fi
             panic,
             __pollwait,
             printk,
+            proc_dointvec_jiffies,
+            proc_dointvec_minmax,
+            proc_dointvec,
+            proc_doulongvec_ms_jiffies_minmax,
             proc_net,
             ___pskb_trim,
             put_cmsg,
+            register_sysctl_table,
             __release_sock,
             remove_proc_entry,
             remove_wait_queue,
@@ -590,6 +598,11 @@ dnl fi
             sock_wake_async,
             sock_wfree,
             sprintf,
+            sysctl_intvec,
+            sysctl_ip_default_ttl,
+            sysctl_jiffies,
+            sysctl_local_port_range,
+            unregister_sysctl_table,
             __wake_up], [], [dnl
             AC_MSG_WARN([
 **** 
@@ -649,6 +662,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
             undefined.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_throttle_heartbeats])
+# SCTP_CONFIG_DISCARD_OOTB
     AC_MSG_CHECKING([for sctp dicard out-of-the-blue])
     AC_REQUIRE([_SCTP_OTHER_SCTP])dnl
     AC_ARG_ENABLE([sctp-discard-ootb],
@@ -785,9 +799,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp ecn])
     AC_ARG_ENABLE([sctp-ecn],
         AS_HELP_STRING([--enable-sctp-ecn],
-            [enable Explicit Congestion Notification. @<:@default=disabled@:>@]),
+            [enable Explicit Congestion Notification. @<:@default=enabled@:>@]),
         [sctp_cv_ecn="$enableval"],
-        [sctp_cv_ecn='no'])
+        [sctp_cv_ecn='yes'])
     if test :"$sctp_cv_ecn" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ECN], [], [
             This enables support for Explicit Congestion Notification (ECN)
@@ -800,9 +814,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp lifetimes])
     AC_ARG_ENABLE([sctp-lifetimes],
         AS_HELP_STRING([--enable-sctp-lifetimes],
-            [enable SCTP message lifetimes. @<:@default=disabled@:>@]),
+            [enable SCTP message lifetimes. @<:@default=enabled@:>@]),
         [sctp_cv_lifetimes="$enableval"],
-        [sctp_cv_lifetimes='no'])
+        [sctp_cv_lifetimes='yes'])
     if test :"$sctp_cv_lifetimes" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_LIFETIMES], [], [
             This enables support for message lifetimes as described in RFC 2960.
@@ -815,9 +829,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp add ip])
     AC_ARG_ENABLE([sctp-add-ip],
         AS_HELP_STRING([--enable-sctp-add-ip],
-            [enable ADD-IP. @<:@default=disabled@:>@]),
+            [enable ADD-IP. @<:@default=enabled@:>@]),
         [sctp_cv_add_ip="$enableval"],
-        [sctp_cv_add_ip='no'])
+        [sctp_cv_add_ip='yes'])
     if test :"$sctp_cv_add_ip" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADD_IP], [], [
             This enables support for ADD-IP as described in
@@ -830,9 +844,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp adaptation layer info])
     AC_ARG_ENABLE([sctp-adaptation-layer-info],
         AS_HELP_STRING([--enable-sctp-adaptation-layer-info],
-            [enable ALI. @<:@default=disabled@:>@]),
+            [enable ALI. @<:@default=enabled@:>@]),
         [sctp_cv_adaptation_layer_info="$enableval"],
-        [sctp_cv_adaptation_layer_info='no'])
+        [sctp_cv_adaptation_layer_info='yes'])
     if test :"$sctp_cv_adaptation_layer_info" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_ADAPTATION_LAYER_INFO], [], [
             This enables support for the Adaptation Layer Information parameter
@@ -845,9 +859,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     AC_MSG_CHECKING([for sctp partial reliability])
     AC_ARG_ENABLE([sctp-partial-reliability],
         AS_HELP_STRING([--enable-sctp-partial-reliability],
-            [enable SCTP Partial Reliability (PR-SCTP). @<:@default=disabled@:>@]),
+            [enable SCTP Partial Reliability (PR-SCTP). @<:@default=enabled@:>@]),
         [sctp_cv_partial_reliability="$enableval"],
-        [sctp_cv_partial_reliability='no'])
+        [sctp_cv_partial_reliability='yes'])
     if test :"$sctp_cv_partial_reliability" = :yes ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_PARTIAL_RELIABILITY], [], [
             This enables support for PR-SCTP as described in

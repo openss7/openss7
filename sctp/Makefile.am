@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/11 08:28:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/01/12 08:55:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/11 08:28:49 $ by $Author: brian $
+# Last Modified $Date: 2005/01/12 08:55:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -212,12 +212,20 @@ noinst_LIBRARIES		= $(ADDON_LIBS)
 EXTRA_LIBRARIES			= libSCTPmodl.a
 
 nodist_EXTRA_libSCTPmodl_a_SOURCES = \
+				  src/sctp_adler32.h \
 				  src/sctp_adler32.c \
+				  src/sctp_crc32c.h \
 				  src/sctp_crc32c.c \
+				  src/sctp_hmac_md5.h \
 				  src/sctp_hmac_md5.c \
+				  src/sctp_hmac_sha1.h \
 				  src/sctp_hmac_sha1.c \
+				  src/sctp_md5.h \
 				  src/sctp_md5.c \
+				  src/sctp_sha1.h \
 				  src/sctp_sha1.c \
+				  src/sctp_debug.h \
+				  src/sctp_namespace.h \
 				  src/sctp.c
 
 sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/11 08:29:59 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:29:59 $ by $Author: brian $
+ Last Modified $Date: 2005/01/12 09:05:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/11 08:29:59 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/11 08:29:59 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $";
 
 #include "compat.h"
 
@@ -160,7 +160,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/11 08:29:59 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/12 09:05:54 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -338,9 +338,9 @@ STATIC int min_sctp_max_burst = 1;
 #define sctp_default_ali		0
 #define sctp_default_add		T_NO
 #define sctp_default_set		T_NO
-#define sctp_default_add_ip		INADDR_ANY
-#define sctp_default_del_ip		INADDR_ANY
-#define sctp_default_set_ip		INADDR_ANY
+#define sctp_default_add_ip		(struct sockaddr_in){AF_INET, 0, {INADDR_ANY}}
+#define sctp_default_del_ip		(struct sockaddr_in){AF_INET, 0, {INADDR_ANY}}
+#define sctp_default_set_ip		(struct sockaddr_in){AF_INET, 0, {INADDR_ANY}}
 #define sctp_default_pr			T_NO
 #define sctp_default_lifetime		T_UNSPEC
 #define sctp_default_disposition	T_UNSPEC
@@ -621,9 +621,9 @@ struct sctp_options {
 #if defined SCTP_CONFIG_ADD_IP
 		t_uscalar_t add;	/* T_SCTP_ADD */
 		t_uscalar_t set;	/* T_SCTP_SET */
-		t_uscalar_t add_ip;	/* T_SCTP_ADD_IP */
-		t_uscalar_t del_ip;	/* T_SCTP_DEL_IP */
-		t_uscalar_t set_ip;	/* T_SCTP_SET_IP */
+		struct sockaddr_in add_ip;	/* T_SCTP_ADD_IP */
+		struct sockaddr_in del_ip;	/* T_SCTP_DEL_IP */
+		struct sockaddr_in set_ip;	/* T_SCTP_SET_IP */
 #endif
 #if defined SCTP_CONFIG_PARTIAL_RELIABILITY
 		t_uscalar_t pr;		/* T_SCTP_PR */
@@ -6107,7 +6107,7 @@ sctp_route_response(struct sctp *sp)
  *  performance impact so we will leave it for now.
  */
 #ifdef SCTP_CONFIG_ADD_IP
-STATIC void sctp_send_asconf(struct sock *sk);
+STATIC void sctp_send_asconf(struct sctp *sp);
 #endif				/* SCTP_CONFIG_ADD_IP */
 STATIC void
 ___sctp_transmit_wakeup(struct sctp *sp)
@@ -6121,8 +6121,8 @@ ___sctp_transmit_wakeup(struct sctp *sp)
 	if ((1 << sp->state) & ~(SCTPF_SENDING | SCTPF_RECEIVING))
 		goto skip;
 #ifdef SCTP_CONFIG_ADD_IP
-	if (sk->state == SCTP_ESTABLISHED && sp->sackf & SCTP_SACKF_ASC)
-		sctp_send_asconf(sk);
+	if (sp->state == SCTP_ESTABLISHED && sp->sackf & SCTP_SACKF_ASC)
+		sctp_send_asconf(sp);
 #endif				/* SCTP_CONFIG_ADD_IP */
 	/* SCTP IG 2.8, 2.14 */
 //      for (i = 0, n = 0; i < loop_max && n <= sp->max_burst; i++) {
@@ -6968,7 +6968,7 @@ sctp_asconf_timeout(caddr_t data)
  *  -------------------------------------------------------------------------
  */
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-STATIC INLINE void sctp_send_forward_tsn(struct sock *sk);
+STATIC INLINE void sctp_send_forward_tsn(struct sctp *sp);
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 STATIC void
 sctp_life_timeout(caddr_t data)
@@ -9576,6 +9576,7 @@ sctp_recv_error(struct sctp *sp, mblk_t *mp)
 #if defined(SCTP_CONFIG_ADD_IP)||defined(SCTP_CONFIG_PARTIAL_RELIABILITY)||defined(SCTP_CONFIG_ADAPTATION_LAYER_INFO)
 	{
 		struct sctpphdr *ph = (typeof(ph)) (eh + 1);
+		int plen;
 		if (elen < sizeof(*eh) + sizeof(*ph))
 			goto emsgsize;
 		if ((plen = ntohs(ph->len)) < sizeof(*ph) || PADC(plen) + mp->b_rptr > mp->b_wptr)
@@ -11142,7 +11143,7 @@ sctp_recv_asconf(struct sctp *sp, mblk_t *mp)
 					eh = ((typeof(eh)) bptr)++;
 					eh->code = __constant_htons(SCTP_CAUSE_SOURCE_ADDR);
 					eh->len = htons(sizeof(*eh) + plen);
-					bcopy(ptr, bptr, plen);
+					bcopy(pptr, bptr, plen);
 					bptr += plen;
 					rlen += sizeof(*er) + sizeof(*eh) + plen;
 					continue;
@@ -12682,7 +12683,7 @@ sctp_init_struct(struct sctp *sp)
 {
 	(void) sp;
 	ptrace(("Initializing stream sp=%p\n", sp));
-	sp->sackf = SCTP_SACKF_NOD;	/* don't delay first sack */
+	sp->sackf = SCTP_SACKF_NEW;	/* don't delay first sack */
 	/* initialize timers */
 	sp_init_timeout(sp, &sp->timer_init, &sctp_init_timeout);
 	sp_init_timeout(sp, &sp->timer_cookie, &sctp_cookie_timeout);
@@ -13634,11 +13635,11 @@ n_info_ack(struct sctp *sp)
 {
 	mblk_t *mp;
 	N_info_ack_t *p;
-	N_qos_sel_info_sctp_t *q;
-	N_qos_range_info_sctp_t *r;
+	N_qos_sel_info_sctp_t *qos;
+	N_qos_range_info_sctp_t *qor;
 	size_t add_len = sp->sanum ? sizeof(uint16_t) + sp->sanum * sizeof(uint32_t) : 0;
-	size_t qos_len = sizeof(*q);
-	size_t qor_len = sizeof(*r);
+	size_t qos_len = sizeof(*qos);
+	size_t qor_len = sizeof(*qor);
 	size_t pro_len = sizeof(uint32_t);
 	struct sctp_saddr *ss = sp->saddr;
 	if (!(mp = sctp_allocb(sp, sizeof(*p) + add_len + qos_len + qor_len + pro_len, BPRI_MED)))
@@ -13673,33 +13674,33 @@ n_info_ack(struct sctp *sp)
 		*((uint16_t *) mp->b_wptr)++ = sp->sport;
 	for (; ss; ss = ss->next)
 		*((uint32_t *) mp->b_wptr)++ = ss->saddr;
-	q = (N_qos_sel_info_sctp_t *) mp->b_wptr;
-	q->n_qos_type = N_QOS_SEL_INFO_SCTP;
+	qos = (N_qos_sel_info_sctp_t *) mp->b_wptr;
+	qos->n_qos_type = N_QOS_SEL_INFO_SCTP;
 	if ((1 << sp->i_state) & (NSF_UNBND | NSF_IDLE | NSF_WCON_CREQ)) {
-		q->i_streams = sp->max_istr;
-		q->o_streams = sp->req_ostr;
+		qos->i_streams = sp->max_istr;
+		qos->o_streams = sp->req_ostr;
 	} else {
-		q->i_streams = sp->n_istr;
-		q->o_streams = sp->n_ostr;
+		qos->i_streams = sp->n_istr;
+		qos->o_streams = sp->n_ostr;
 	}
-	q->ppi = sp->ppi;
-	q->sid = sp->sid;
-	q->max_inits = sp->max_inits;
-	q->max_retrans = sp->max_retrans;
-	q->ck_life = sp->ck_life;
-	q->ck_inc = sp->ck_inc;
-	q->hmac = sp->hmac;
-	q->throttle = sp->throttle;
-	q->max_sack = sp->max_sack;
-	q->rto_ini = sp->rto_ini;
-	q->rto_min = sp->rto_min;
-	q->rto_max = sp->rto_max;
-	q->rtx_path = sp->rtx_path;
-	q->hb_itvl = sp->hb_itvl;
-	mp->b_wptr += sizeof(*q);
-	r = (N_qos_range_info_sctp_t *) mp->b_wptr;
-	r->n_qos_type = N_QOS_RANGE_INFO_SCTP;
-	mp->b_wptr += sizeof(*r);
+	qos->ppi = sp->ppi;
+	qos->sid = sp->sid;
+	qos->max_inits = sp->max_inits;
+	qos->max_retrans = sp->max_retrans;
+	qos->ck_life = sp->ck_life;
+	qos->ck_inc = sp->ck_inc;
+	qos->hmac = sp->hmac;
+	qos->throttle = sp->throttle;
+	qos->max_sack = sp->max_sack;
+	qos->rto_ini = sp->rto_ini;
+	qos->rto_min = sp->rto_min;
+	qos->rto_max = sp->rto_max;
+	qos->rtx_path = sp->rtx_path;
+	qos->hb_itvl = sp->hb_itvl;
+	mp->b_wptr += sizeof(*qos);
+	qor = (N_qos_range_info_sctp_t *) mp->b_wptr;
+	qor->n_qos_type = N_QOS_RANGE_INFO_SCTP;
+	mp->b_wptr += sizeof(*qor);
 	*((uint32_t *) mp->b_wptr)++ = sp->ppi;
 	putnext(sp->rq, mp);
 	return (0);
@@ -15970,7 +15971,7 @@ sctp_parse_conn_opts(struct sctp *sp, unsigned char *ip, size_t ilen, int reques
 					goto einval;
 				if (*valp != T_YES && *valp != T_NO)
 					goto einval;
-				if (*valp == T_YES && !sysctl_sctp_ecn)
+				if (*valp == T_YES && !sctp_defaults.sctp.ecn)
 					goto eacces;
 				sp->options.sctp.ecn = *valp;
 				sctp_set_bit(_T_BIT_SCTP_ECN, sp->options.flags);
@@ -18467,28 +18468,28 @@ sctp_build_conn_con_opts(struct sctp *sp, unsigned char *op, size_t olen)
 	if (sctp_tst_bit(_T_BIT_SCTP_ADD_IP, sp->options.flags)) {
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_ADD_IP;
-		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+		oh->len = _T_LENGTH_SIZEOF(struct sockaddr_in);
 		oh->status = T_SUCCESS;
 		/* absolute requirement */
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.add_ip;
+		*((struct sockaddr_in *) T_OPT_DATA(oh)) = sp->options.sctp.add_ip;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (sctp_tst_bit(_T_BIT_SCTP_DEL_IP, sp->options.flags)) {
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_DEL_IP;
-		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+		oh->len = _T_LENGTH_SIZEOF(struct sockaddr_in);
 		oh->status = T_SUCCESS;
 		/* absolute requirement */
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.del_ip;
+		*((struct sockaddr_in *) T_OPT_DATA(oh)) = sp->options.sctp.del_ip;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (sctp_tst_bit(_T_BIT_SCTP_SET_IP, sp->options.flags)) {
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SET_IP;
-		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+		oh->len = _T_LENGTH_SIZEOF(struct sockaddr_in);
 		oh->status = T_SUCCESS;
 		/* absolute requirement */
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.set_ip;
+		*((struct sockaddr_in *) T_OPT_DATA(oh)) = sp->options.sctp.set_ip;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 #endif				/* defined SCTP_CONFIG_ADD_IP */
@@ -19134,7 +19135,7 @@ sctp_build_default_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsi
 				oh->name = T_SCTP_ADD_IP;
 				oh->len = _T_LENGTH_SIZEOF(sctp_defaults.sctp.add_ip);
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sctp_defaults.sctp.add_ip;
+				*((struct sockaddr_in *) T_OPT_DATA(oh)) = sctp_defaults.sctp.add_ip;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -19145,7 +19146,7 @@ sctp_build_default_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsi
 				oh->name = T_SCTP_DEL_IP;
 				oh->len = _T_LENGTH_SIZEOF(sctp_defaults.sctp.del_ip);
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sctp_defaults.sctp.del_ip;
+				*((struct sockaddr_in *) T_OPT_DATA(oh)) = sctp_defaults.sctp.del_ip;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -19156,7 +19157,7 @@ sctp_build_default_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsi
 				oh->name = T_SCTP_SET_IP;
 				oh->len = _T_LENGTH_SIZEOF(sctp_defaults.sctp.set_ip);
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sctp_defaults.sctp.set_ip;
+				*((struct sockaddr_in *) T_OPT_DATA(oh)) = sctp_defaults.sctp.set_ip;
 				if (ih->name != T_ALLOPT)
 					continue;
 #endif				/* defined SCTP_CONFIG_ADD_IP */
@@ -19862,7 +19863,7 @@ sctp_build_current_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsi
 				oh->len = _T_LENGTH_SIZEOF(sp->options.sctp.add_ip);
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.add_ip;
+				*((struct sockaddr_in *) T_OPT_DATA(oh)) = sp->options.sctp.add_ip;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -19874,7 +19875,7 @@ sctp_build_current_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsi
 				oh->len = _T_LENGTH_SIZEOF(sp->options.sctp.del_ip);
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.del_ip;
+				*((struct sockaddr_in *) T_OPT_DATA(oh)) = sp->options.sctp.del_ip;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -19886,7 +19887,7 @@ sctp_build_current_options(struct sctp *sp, unsigned char *ip, size_t ilen, unsi
 				oh->len = _T_LENGTH_SIZEOF(sp->options.sctp.set_ip);
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sp->options.sctp.set_ip;
+				*((struct sockaddr_in *) T_OPT_DATA(oh)) = sp->options.sctp.set_ip;
 				if (ih->name != T_ALLOPT)
 					continue;
 #endif				/* defined SCTP_CONFIG_ADD_IP */
@@ -22230,7 +22231,7 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 			}
 			case T_SCTP_ADD_IP:
 			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+				struct sockaddr_in *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option T_SCTP_ADD_IP\n", DRV_NAME, sp));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ADD_IP;
@@ -22244,6 +22245,7 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 				}
 				sp->options.sctp.add_ip = *valp;
 				/* set value on stream */
+				sctp_add_ip(sp, valp);
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -22251,7 +22253,7 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 			}
 			case T_SCTP_DEL_IP:
 			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+				struct sockaddr_in *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option T_SCTP_DEL_IP\n", DRV_NAME, sp));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DEL_IP;
@@ -22265,6 +22267,7 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 				}
 				sp->options.sctp.del_ip = *valp;
 				/* set value on stream */
+				sctp_del_ip(sp, valp);
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -22272,7 +22275,7 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 			}
 			case T_SCTP_SET_IP:
 			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+				struct sockaddr_in *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option T_SCTP_SET_IP\n", DRV_NAME, sp));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_SET_IP;
@@ -22286,6 +22289,7 @@ sctp_build_negotiate_options(struct sctp *sp, unsigned char *ip, size_t ilen, un
 				}
 				sp->options.sctp.set_ip = *valp;
 				/* set value on stream */
+				sctp_set_ip(sp, valp);
 				if (ih->name != T_ALLOPT)
 					continue;
 #endif				/* defined SCTP_CONFIG_ADD_IP */

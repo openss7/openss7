@@ -1,0 +1,229 @@
+/*****************************************************************************
+
+ @(#) $Id: sctp_debug.h,v 0.9.2.1 2005/01/12 08:40:48 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2005/01/12 08:40:48 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ifndef __LOCAL_SCTP_DEBUG_H__
+#define __LOCAL_SCTP_DEBUG_H__
+
+#ident "@(#) $RCSfile: sctp_debug.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+
+/*
+ *  =========================================================================
+ *
+ *  Debugging Macros
+ *
+ *  =========================================================================
+ */
+#define __never() \
+	do { printk(KERN_EMERG "%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); *(int *)0 = 0; } while(0)
+#define __rare() \
+	do { printk(KERN_NOTICE "%s: rare() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+#define __seldom() \
+	do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+#define __usual(__exp) \
+	do { if (!(__exp)) printk(KERN_WARNING "%s: usual(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
+#define __normal(__exp) \
+	do { if (!(__exp)) printk(KERN_WARNING "%s: normal(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
+#define __assert(__exp) \
+	do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); *(int *)0 = 0; } } while(0)
+#define __assure(__exp) \
+	do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
+#define __ensure(__exp,__sta) \
+	do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
+#define __trace() \
+	do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+#define __ptrace(__pkspec) \
+	do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+#define __fixme(__pkspec) \
+	do { printk(KERN_INFO "%s: fixme() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+#define __todo(__pkspec) \
+	do { printk(KERN_INFO "%s: todo() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+#define __ctrace(__fnc) \
+	({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
+#define __printd(__pkspec) \
+	do { printk __pkspec; } while(0)
+#define __swerr() \
+	do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+#define __pswerr(__pkspec) \
+	do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+
+/* These are for completely suppressing a debugging macro. */
+
+#define    _never()		do { } while(0)
+#define     _rare()		do { } while(0)
+#define   _seldom()		do { } while(0)
+#define    _usual(__exp)	do { } while(0)
+#define  _unusual(__exp)	do { } while(0)
+#define   _normal(__exp)	do { } while(0)
+#define _abnormal(__exp)	do { } while(0)
+#define   _assert(__exp)	do { } while(0)
+#define   _assure(__exp)	do { } while(0)
+#define   _ensure(__exp,__sta)	do { } while(0)
+#define   _unless(__exp,__sta)	do { } while(0)
+#define    _trace()		do { } while(0)
+#define   _ptrace(__pks)	do { } while(0)
+#define   _ctrace(__fnc)	(__fnc)
+#define    _fixme(__pks)	do { } while(0)
+#define     _todo(__pks)	do { } while(0)
+#define   _printd(__pks)	do { } while(0)
+#define    _swerr()		do { } while(0)
+#define   _pswerr(__pks)	do { } while(0)
+
+#if defined(SCTP_CONFIG_DEBUG)
+
+#define    never()		__never()
+#define     rare()		__rare()
+#define   seldom()		__seldom()
+#define    usual(__exp)		__usual(__exp)
+#define  unusual(__exp)		__usual(!(__exp))
+#define   normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__normal(!(__exp))
+#define   assert(__exp)		__assert(__exp)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		__trace()
+#define   ptrace(__pks)		__ptrace(__pks)
+#define   ctrace(__fnc)		__ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		__printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
+#define STATIC
+#define INLINE
+
+#elif defined(SCTP_CONFIG_TEST)
+
+#define    never()		__never()
+#define     rare()		__rare()
+#define   seldom()		__seldom()
+#define    usual(__exp)		__usual(__exp)
+#define  unusual(__exp)		__usual(!(__exp))
+#define   normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__normal(!(__exp))
+#define   assert(__exp)		__assert(__exp)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
+#define STATIC static
+#define INLINE __inline__
+
+#elif defined(SCTP_CONFIG_SAFE)
+
+#define    never()		do { *(int *)0 = 0; } while(0)
+#define     rare()		_rare()
+#define   seldom()		_seldom()
+#define    usual(__exp)		_usual(__exp)
+#define  unusual(__exp)		_unusual(__exp)
+#define   normal(__exp)		_normal(__exp)
+#define abnormal(__exp)		_abnormal(__exp)
+#define   assert(__exp)		{ if (!(__exp)) *(int *)0 = 0; } while(0)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
+#define STATIC static
+#define INLINE __inline__
+
+#else
+
+#define    never()		_never()
+#define     rare()		_rare()
+#define   seldom()		_seldom()
+#define    usual(__exp)		_usual(__exp)
+#define  unusual(__exp)		_unusual(__exp)
+#define   normal(__exp)		_normal(__exp)
+#define abnormal(__exp)		_abnormal(__exp)
+#define   assert(__exp)		_assert(__exp)
+#define   assure(__exp)		_assure(__exp)
+#define   ensure(__exp,__sta)	_ensure(__exp,__sta)
+#define   unless(__exp,__sta)	_unless(__exp,__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		_todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
+#define STATIC static
+#define INLINE __inline__
+
+#endif
+
+#ifdef SCTP_CONFIG_MODULE
+#define __SCTP_STATIC STATIC
+#define __SCTP_INIT
+#else
+#define __SCTP_STATIC
+#define __SCTP_INIT __init
+#endif
+
+#endif				/* __LOCAL_SCTP_DEBUG_H__ */

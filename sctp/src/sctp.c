@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/11 08:28:54 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:28:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/12 09:03:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/11 08:28:54 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/11 08:28:54 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -162,9 +162,9 @@ static char const ident[] =
 #include "linux/hooks.h"
 #include "netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.16 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.18 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/11 08:28:54 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/12 09:03:09 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9170,9 +9170,10 @@ sctp_recv_error(struct sock *sk, struct sk_buff *skb)
 	{
 		sctp_t *sp = SCTP_PROT(sk);
 		struct sctpphdr *ph = (typeof(ph)) (eh + 1);
+		int plen;
 		if (elen < sizeof(*eh) + sizeof(*ph))
 			goto emsgsize;
-		if ((plen = ntohs(ph->len)) < sizeof(*ph) || PADC(plen) + mp->b_rptr > mp->b_wptr)
+		if ((plen = ntohs(ph->len)) < sizeof(*ph) || PADC(plen) > skb->len)
 			goto emsgsize;
 		switch (ph->type) {
 #if defined(SCTP_CONFIG_ADD_IP)
@@ -10577,7 +10578,7 @@ sctp_recv_asconf(struct sock *sk, struct sk_buff *skb)
 	if (sk->state != SCTP_ESTABLISHED)
 		goto discard;
 	asn = ntohl(m->asn);
-	if (mp->b_wptr < mp->b_rptr + sizeof(*m))
+	if (skb->len < sizeof(*m))
 		goto emsgsize;
 	if (asn == sp->p_asn + 1) {
 		/* ADD-IP 4.2 Rule C1 & C2 */
@@ -10723,7 +10724,7 @@ sctp_recv_asconf(struct sock *sk, struct sk_buff *skb)
 					rlen += sizeof(*sr);
 					continue;
 				}
-				if (a->addr == SCTP_IPH(skB)->saddr) {
+				if (a->addr == SCTP_IPH(skb)->saddr) {
 					/* request to delete source address */
 					er = ((typeof(er)) bptr)++;
 					er->ph.type = SCTP_PTYPE_ERROR_CAUSE;
@@ -11694,7 +11695,7 @@ sctp_conn_req(struct sock *sk, uint16_t dport, struct sockaddr_in *dsin, size_t 
 	sp->t_tsn = sp->v_tag;
 	sp->t_ack =
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-	    sl->l_fsn =
+	    sp->l_fsn =
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 	    sp->m_tsn =
 #ifdef SCTP_CONFIG_ADD_IP
@@ -12430,7 +12431,7 @@ sctp_init_struct(struct sock *sk)
 {
 	sctp_t *sp = SCTP_PROT(sk);
 	ptrace(("Initializing socket sk=%p\n", sk));
-	sp->sackf = SCTP_SACKF_NOD;	/* don't delay first sack */
+	sp->sackf = SCTP_SACKF_NEW;	/* don't delay first sack */
 	/* initialize timers */
 	sp_init_timeout(sp, &sp->timer_init, &sctp_init_timeout);
 	sp_init_timeout(sp, &sp->timer_cookie, &sctp_cookie_timeout);

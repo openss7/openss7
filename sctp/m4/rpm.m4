@@ -487,7 +487,6 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
             [specify the rpm top directory.  @<:@default=$rpm_tmp@:>@]),
         [with_topdir="$withval"],
         [with_topdir="$rpm_tmp"])
-    AC_MSG_WARN([Absolute top build directory is $rpm_tmp.])
     AC_CACHE_CHECK([for rpm top build directory], [rpm_cv_topdir], [dnl
         case :"$with_topdir" in
             :no | :NO)
