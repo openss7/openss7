@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/24 12:27:20 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/02/07 07:14:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 07:14:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -125,9 +125,9 @@ TBL_PNGS = $(TBL_TBLS:%.tbl=%.png)
 TBL_JPGS = $(TBL_TBLS:%.tbl=%.jpg)
 TBL_TXTS = $(TBL_TBLS:%.tbl=%.txt)
 
-.tbl.dvi: ; groff -t -Tdvi -ms $< > $@
+.tbl.dvi: ; groff -t -Tdvi -ms $< > $@ || :
 
-$(TBL_PSS)  : %.ps  : %.tbl ; groff -t -Tps -ms $< > $@ 2>/dev/null
+$(TBL_PSS)  : %.ps  : %.tbl ; groff -t -Tps -ms $< > $@ 2>/dev/null || :
 $(TBL_EPSS) : %.eps : %.ps  ; ps2epsi $< $@
 $(TBL_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $<
 $(TBL_PNGS) : %.png : %.eps ; convert -antialias $< $@
