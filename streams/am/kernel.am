@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/24 23:02:36 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/26 20:10:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 23:02:36 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 20:10:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -273,6 +273,8 @@ TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
 			   ksysmap='$(ksysmap)' \
 			   KERNEL_MODULES='$(KERNEL_MODULES)' \
 			   KERNEL_MODMAPS='$(KERNEL_MODMAPS)'
+CLEANFILES		+= check_modules.log
+DISTCLEANFILES		+= *.err *.out
 endif
 
 else
@@ -282,6 +284,8 @@ all-kernel:
 endif
 
 ALL_LOCAL += all-kernel
+
+CLEANFILES += Modules.map
 
 .PHONY: all-kernel install-modules post-modules uninstall-modules postun-modules
 
