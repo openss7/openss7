@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/12/28 03:48:26 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2004/12/29 21:31:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/28 03:48:26 $ by $Author: brian $
+# Last Modified $Date: 2004/12/29 21:31:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ Release:        @PACKAGE_RELEASE@%{extrarelease}
 %else
 Release:        @PACKAGE_RELEASE@
 %endif
-License:        GPL
+License:        BSD/GPL
 Group:          System Environment/Base
 %if %{?url: 1}%{!?url: 0}
 URL:            %{url}
@@ -100,7 +100,7 @@ Conflicts:      %{base}-%{_conflict}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 %endif
 Provides:       iperf
-BuildRequires:  sctp-devel >= 0.2.20
+#BuildRequires:  sctp-devel >= 0.2.20
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
@@ -181,8 +181,8 @@ preferred_cflags="$preferred_cflags -freorder-blocks"
 fi
 %endif
 
-%define cache_file ../%{_target_platform}.cache
-%define csite_file ../config.site
+%define cache_file ../%{_target_platform}-config.cache
+%define csite_file ../%{_target_platform}-config.site
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
@@ -197,7 +197,7 @@ fi
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
     CXXCPP="${CXXCPP:-$CPP}" \
     CONFIG_SITE="%{csite_file}" \
-    --cache-file=%{cache_file} \
+    --cache-file="%{cache_file}" \
     --build=%{_build} \
     --host=%{_target_platform} \
     --prefix=%{_prefix} \
@@ -252,7 +252,7 @@ make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install-strip
 %files
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc AUTHORS ChangeLog COPYING INSTALL LICENSE NEWS README THANKS
 %doc *.lsm
 %{_bindir}/*
 %{_mandir}/man*/*
@@ -261,6 +261,15 @@ make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install-strip
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.4  2004/12/29 21:31:50  brian
+# - Straighten out cache and site files.
+#
+# Revision 1.1.2.3  2004/12/29 20:45:08  brian
+# - Build dependencies are not necessary.
+#
+# Revision 1.1.2.2  2004/12/29 19:58:24  brian
+# - Added copyright headers.
+#
 # Revision 1.1.2.1  2004/12/28 03:48:26  brian
 # - First stab at rpm release.
 #
