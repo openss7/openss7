@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2005/02/03 12:34:53 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2005/02/06 06:42:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/03 12:34:53 $ by $Author: brian $
+# Last Modified $Date: 2005/02/06 06:42:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -451,7 +451,7 @@ fi
 %if %{BUILD_libs}
 %doc ABOUT-NLS
 %endif
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual LICENSE
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS LICENSE
 %doc %{name}-%{version}-@PACKAGE_RELEASE@.lsm
 #%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
@@ -578,6 +578,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.15  2005/02/06 06:42:29  brian
+# - no manual for iperf yet.
+#
 # Revision 1.1.2.14  2005/02/03 12:34:53  brian
 # - Spec file grand rework.
 #

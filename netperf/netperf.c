@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2005/01/22 13:25:44 $
+ @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2005/02/06 06:43:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 13:25:44 $ by $Author: brian $
+ Last Modified $Date: 2005/02/06 06:43:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2005/01/22 13:25:44 $"
+#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2005/02/06 06:43:02 $"
 
-static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2005/01/22 13:25:44 $";
+static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.5 $) $Date: 2005/02/06 06:43:02 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -100,8 +100,7 @@ static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.
       MODIFICATION, OR DISTRIBUTION OF THE SOFTWARE OR DOCUMENTATION.
  
 */
-char	netperf_id[]="\
-@(#)netperf.c (c) Copyright 1993-2004 Hewlett-Packard Company. Version 2.3";
+char	netperf_id[]="@(#)netperf.c (c) Copyright 1993-2004 Hewlett-Packard Company. Version 2.3";
 
 #include <stdio.h>
 #if HAVE_SYS_TYPES_H

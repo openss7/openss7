@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/01/26 22:12:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/06 06:44:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:27 $ by $Author: brian $
+# Last Modified $Date: 2005/02/06 06:44:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,10 +79,7 @@ package.m4: $(top_srcdir)/configure
 # my rule
 TESTSUITE_DEPS		= \
 			testsuite.at \
-			dummy1.m4 \
-			dummy2.m4 \
-			dummy3.m4 \
-			dummy4.m4 \
+			kernel.at \
 			package.m4
 
 # my rule
@@ -131,7 +128,7 @@ installcheck-inet:
 
 # my rule
 installcheck-test: $(TESTSUITE)
-	$(SHELL) $< -x -v
+	$(SHELL) $<
 
 # my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal \

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.10 2005/02/04 12:55:39 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.11 2005/02/06 06:45:14 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/04 12:55:39 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/06 06:45:14 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -335,8 +335,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
                           struct sk_buff.h.sh,
                           struct sock.protinfo.af_inet.ttl,
                           struct sock.protinfo.af_inet.uc_ttl,
-                          struct sock.tp_pinfo.af_sctp,
-                          struct sockaddr_storage.ss_family], [], [], [
+                          struct sock.tp_pinfo.af_sctp], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>

@@ -1,7 +1,7 @@
 # vim: ft=sh sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/15 19:35:01 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/06 06:44:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/15 19:35:01 $ by $Author: brian $
+# Last Modified $Date: 2005/02/06 06:44:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -123,6 +123,7 @@ at_DESTDIR="@DESTDIR@"
 at_exec_prefix="@exec_prefix@"
 at_kmoduledir="@kmoduledir@"
 at_krootdir="@krootdir@"
+at_ksysmap="@ksysmap@"
 at_kversion="@kversion@"
 at_libdir="@libdir@"
 at_libexecdir="@libexecdir@"
@@ -133,7 +134,6 @@ at_prefix="@prefix@"
 at_sbindir="@sbindir@"
 at_sharedstatedir="@sharedstatedir@"
 at_sysconfdir="@sysconfdir@"
-
 
 #
 #   The following needs to be performed by the individual test suites instead
