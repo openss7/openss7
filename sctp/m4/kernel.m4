@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/03/21 08:32:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/03/22 10:38:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/21 08:32:15 $ by $Author: brian $
+# Last Modified $Date: 2005/03/22 10:38:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -156,6 +156,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_CONFIGDIR
     _LINUX_CHECK_KERNEL_BOOT
     _LINUX_CHECK_KERNEL_DOT_CONFIG
+    _LINUX_CHECK_KERNEL_FILES
     _LINUX_SETUP_KERNEL_CFLAGS
     _LINUX_SETUP_KERNEL_DEBUG
     _LINUX_CHECK_KERNEL_REGPARM
@@ -417,10 +418,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 	    eval "k_build_search_path=\"
 		${kmoduledir:+${DESTDIR}${kmoduledir}/build}
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/build
+		${DESTDIR}${rootdir}/usr/src/kernel-source-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-2.4
 		${DESTDIR}${rootdir}/usr/src/linux
 		${DESTDIR}/lib/modules/${kversion}/build
+		${DESTDIR}/usr/src/kernel-source-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-2.4
 		${DESTDIR}/usr/src/linux\""
@@ -428,7 +431,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 	    linux_cv_k_build=
 	    for linux_dir in $k_build_search_path ; do
 		AC_MSG_CHECKING([for kernel build directory... $linux_dir])
-		if test -d "$linux_dir" -a -r "$linux_dir/include/linux/version.h"
+		if test -d "$linux_dir" -a -r "$linux_dir/Makefile" -a -d "$linux_dir/kernel"
 		then
 		    linux_cv_k_build="$linux_dir"
 		    AC_MSG_RESULT([yes])
@@ -503,12 +506,17 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [dnl
 	    linux_cv_k_sysmap="$with_k_sysmap"
 	else
 dnl
-dnl	    There is a problem with using redhat /boot system maps.  Redhat
-dnl	    builds multiple kernels of the same name for different
-dnl	    architectures.  So, for example, there is a 2.4.21-15.EL kernel
-dnl	    built for i386, another built for i586, and yet another built for
-dnl	    i686.  These all have different system map files, but only one is
-dnl	    installed on a system.
+dnl	    There is a problem with using redhat /boot system maps.  Redhat builds multiple kernels
+dnl	    of the same name for different architectures.  So, for example, there is a 2.4.21-15.EL
+dnl	    kernel built for i386, another built for i586, and yet another built for i686.  These
+dnl	    all have different system map files, but only one is installed on a system.
+dnl
+dnl	    There is also a problem here with debian, the deb has a different system map for each
+dnl	    kernel architecture (i.e. System.map-2.4.18-1-686 and System.map-2.4.18-1-k7), but the
+dnl	    version number is not included in the filename.  So, the version on one of these files
+dnl	    could be 2.4.18-13.1, another could be 2.4.18-12 and they do not necessarily match the
+dnl	    running kernel.  In fact, on debian, there is no way to tell which exact version of the
+dnl	    kernel is running.
 dnl
 	    eval "k_sysmap_search_path=\"
 		${kbuilddir}/System.map-${kversion}
@@ -548,11 +556,25 @@ dnl
 		case "$linux_cv_k_sysmap" in
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (redhat|whitebox)
+			    (mandrake)
 dnl
-dnl				Unfortunately the redhat system map files are
-dnl				unreliable because the are not unique for each
-dnl				architecture.
+dnl				Mandrakelinux blends the debian architecture name in the kernel
+dnl				image name approach with the Redhat kernel version number in the
+dnl				kernel image name approach to yeild reliable system map files.
+dnl
+				;;
+			    (redhat|whitebox|debian|suse|*)
+dnl
+dnl				Unfortunately the redhat system map files are unreliable because the
+dnl				are not unique for each architecture.  The system map file has to be
+dnl				checked against the architecture for which we are building.
+dnl
+dnl				Unfortunately the debian system map files are unreliable because
+dnl				they are not unique by kernel version.  The system map file has to
+dnl				be checked against the kernel version for which we are building.
+dnl
+dnl				I don't really know how SuSE or others fair in this situation yet,
+dnl				but I assume it is like the rest.
 dnl
 				AC_MSG_WARN([
 *** 
@@ -563,10 +585,6 @@ dnl
 *** This may cause problems later if you have mismatches between the target
 *** kernel and the kernel symbols contained in that file.
 *** ])
-				;;
-			    (mandrake)
-				;;
-			    (*)
 				;;
 			esac
 			;;
@@ -1285,6 +1303,80 @@ dnl
     kconfig="$linux_cv_k_config"
     AC_SUBST([kconfig])dnl
 ])# _LINUX_CHECK_KERNEL_DOT_CONFIG
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_FILES
+# -------------------------------------------------------------------------
+# Check that some distribution specific things about the file that we have found
+# are consistent towards a successful build.  Things to check are the rpm/deb
+# versions and architectures on the System.map file, the config file, the kernel
+# modules directory, the kernel build directory, the kernel headers directory.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
+    AC_CACHE_CHECK([for kernel package release], [linux_cv_k_version], [dnl
+	linux_cv_k_version=unknown
+	case "$target_vendor" in
+	    (debian)
+		linux_pkg=`dpkg -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
+		if test -n "$linux_pkg" ; then
+		    linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
+		else
+		    linux_ver=
+		fi
+		linux_cv_k_version="${linux_ver:-unknown}"
+		;;
+	    (mandrake|redhat|whitebox|suse|*)
+		linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_cv_k_sysmap 2>/dev/null`
+		linux_cv_k_version="${linux_ver:-unknown}"
+		;;
+	esac
+    ])
+    if test ":${linux_cv_k_version:-unknown}" != :unknown
+    then
+	krelease="$linux_cv_k_version"
+    else
+	krelease=
+    fi
+    AC_SUBST([krelease])
+    AC_MSG_CHECKING([for kernel file sanity])
+	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_includes $linux_cv_k_config\""
+	case "$target_vendor" in
+	    (mandrake)
+dnl
+dnl		Mandrakelinux is built correctly.
+dnl
+		;;
+	    (debian)
+dnl
+dnl		Debian can have a mismatch in kernel version.
+dnl
+		linux_cv_vers=
+		for linux_file in $linux_cv_files
+		do
+		    linux_pkg=`dpkg -S $linux_file 2>/dev/null | cut -f1 -d:` || linux_pkg=
+		    if test -n "$linux_pkg" ; then
+			linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
+		    else
+			linux_ver=
+		    fi
+		    linux_cv_vers="${linux_cv_vers:+$linux_cv_vers }'$linux_ver'"
+		done
+		;;
+	    (redhat|whitebox|suse)
+dnl
+dnl		Redhat and variants can have a mismatch in kernel architecture.
+dnl
+		linux_cv_archs=
+		for linux_file in $linux_cv_files
+		do
+		    linux_arch=`rpm -q --qf "%{ARCH}" --whatprovides $linux_file 2>/dev/null`
+		    linux_cv_archs="${linux_cv_archs:+$linux_cv_archs }'$linux_arch'"
+		done
+		;;
+	esac
+    AC_MSG_RESULT([ok])
+])# _LINUX_CHECK_KERNEL_FILES
 # =========================================================================
 
 # =========================================================================
