@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: RELEASE-NOTES,v 0.9.2.6 2003/05/08 00:29:35 brian Exp $
+# $Id: RELEASE-NOTES,v 0.9.2.7 2003/05/08 21:44:36 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -29,9 +29,16 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2003/05/08 00:29:35 $ by $Author: brian $
+# Last Modified $Date: 2003/05/08 21:44:36 $ by $Author: brian $
 # 
 # *****************************************************************************
+
+Release linux-sctp-0.2.16 (Prerelease2-16)
+
+	Updated PR-SCTP implementation, removed special debugs, minor tweaks.
+
+	Performance testing on this release indicate that it rivals Linux TCP
+	for throughput performance.
 
 Release linux-sctp-0.2.15 (Prerelease2-15)
 
@@ -43,7 +50,8 @@ Release linux-sctp-0.2.14 (Prerelease2-14)
 
 Release linux-sctp-0.2.13 (Prerelease2-13)
 
-	Bug fixes.
+	Bug fixes.  Alot of testing has been performed at this point.  This is
+	very stable code now and all documented features function.
 
 Release linux-sctp-0.2.4: (Prerelease2-4)
 
@@ -66,7 +74,7 @@ Release linxu-sctp-0.2:  (Prerelease2)
     Here's what works well:
 
 	The code handles socket semantics for SOCK_STREAM and SOCK_SEQPACKET
-	will and performs orderly establishment and teardown of associations
+	well and performs orderly establishment and teardown of associations
 	correctly.  All of the socket semantics tested by the test program
 	work correctly.  Multihoming and Nagle work correctly.  Multiple
 	checksums and HMAC algorithms work correctly.  Gap reports, sacks,
