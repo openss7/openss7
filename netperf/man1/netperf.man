@@ -1,3 +1,61 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: $ by $Author: $
+.\"
+.\" =========================================================================
 .TH netperf 1L ""
 .SH NAME
 
@@ -13,7 +71,7 @@ netperf \- a network performance benchmark
 is a benchmark that can be used to measure various aspects of
 networking performance.
 Currently, its focus is on bulk data transfer and request/response
-performance using either TCP or UDP, and the Berkeley Sockets
+performance using SCTP, TCP or UDP, and the Berkeley Sockets
 interface. In addition, tests for DLPI, and Unix Domain
 Sockets, tests for IPv6 may be conditionally compiled-in.
 
@@ -94,15 +152,38 @@ Valid testnames are (but not always compiled-in):
 .RS
 .RS
 .nf
+.I XTI_SCTP_STREAM
+.I XTI_SCTP_MAERTS
+.I XTI_SCTP_RR
+.I XTI_SCTP_CRR
+.I XTI_SCTP_TRR
+.I XTI_TCP_STREAM
+.I XTI_TCP_MAERTS
+.I XTI_TCP_RR
+.I XTI_TCP_CRR
+.I XTI_TCP_TRR
+.I XTI_UDP_STREAM
+.I XTI_UDP_RR
+.I SCTP_STREAM
+.I SCTP_MAERTS
+.I SCTP_RR
+.I SCTP_CRR
+.I SCTP_TRR
 .I TCP_STREAM
 .I TCP_MAERTS
 .I TCP_RR
 .I TCP_CRR
+.I TCP_TRR
 .I UDP_STREAM
 .I UDP_RR
+.I SCTPIPV6_STREAM
+.I SCTPIPV6_RR
+.I SCTPIPV6_CRR
+.I SCTPIPV6_TRR
 .I TCPIPV6_STREAM
 .I TCPIPV6_RR
 .I TCPIPV6_CRR
+.I TCPIPV6_TRR
 .I UDPIPV6_STREAM
 .I UDPIPV6_RR
 .I DLCO_STREAM
