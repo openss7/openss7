@@ -1,0 +1,426 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: specfs.5.man,v 0.9.2.1 2004/04/16 17:14:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SPECFS 5 "$Date: 2004/04/16 17:14:54 $" "$Name:  $" "Linux Fast-STREAMS System File Formats"
+.\"
+.\"
+.SH NAME
+.B specfs
+\- \fISTREAMS\fR special device shadow filesystem
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B spec
+filesystem is a
+.B Linux
+filesystem
+(see
+.BR fs (5))
+that provides a
+.I STREAMS
+special shadow filesystem that supports
+.I STREAMS
+special character devices.
+The
+.B spec
+filesystem is always loaded and present in the kernel when the
+.B streams
+kernel module is loaded.
+.PP
+When
+.BR open (2)
+is performed on a character special device corresponding to a
+.I STREAMS
+driver, the inode attached to the filepointer associated with the opening file
+descriptor is replaced is an inode from the
+.B spec
+filesystem that represents a minor node of the
+.I STREAMS
+character special device.  The original inode (as a device in the
+.B /dev
+directory) no longer plays a part until another
+.BR open (2)
+is performed.  This is in fitting with the description of the
+.I vnode
+and
+.I snode
+in
+.RI \(lq "The Magic Garden" \(rq.
+.\"
+.\"
+.PP
+In support of naming streams (see
+.BR fattach (2),
+.BR fattach (3),
+.BR fdetach (3)
+and
+.BR fdetach (8))
+directory entries (devices) in the
+.B spec
+filesystem can be mounted on files in other filesystems.
+The
+.B Linux
+kernel supports file on file mounting, and the
+.BR fattach (3)
+and
+.BR fdetach (3)
+user functions are provided by
+.B Linux Fast-STREAMS
+to permit mounting and unmounting of device nodes from the
+.I spec
+filesystem on regular files in other filesystems.
+.\"
+.\"
+.PP
+As an additional feature, the entire
+.B spec
+filesystem is mountable.  Recommended practice is to create a mount point in
+the device directory
+.B /dev/streams
+and mount the
+.B spec
+filesystem there with a command similar to the following in a boot script:
+.PP
+.RS
+.nf
+\fC\s-1\
+mount -t spec none /dev/streams
+\s+1\fP
+.fi
+.RE
+.PP
+It is also possible to mount the
+.B spec
+filesystem at more than one mount point in more than one filesystem.  The
+directory hierarchy that is rooted at the mount point is identical to all
+mount points.
+This permits the
+.B spec
+filesystem to be mounted on the
+.B /device
+mount point in a fashion similar to
+.IR Solaris \(rg.
+See
+.BR mount (8)
+for additional information.
+.\"
+.\"
+.SH "DIRECTORY FORMAT"
+.PP
+.PP
+When mounted at
+.BR /dev/streams ,
+the
+.B spec
+filesystem exhibits a number of special properties:
+.IP 1. \w'1.\(em'u
+Attempting to read the
+.BI /dev/streams/ devname /
+directory, where the 
+.BI /dev/streams/ devname /
+directory does not yet exist, will result in an attempt to load the
+.I STREAMS
+kernel module named
+.BI /dev/streams/ devname /
+and if that is not successful, the kernel module named
+.BI streams- devname\fR.
+.IP 2.
+Attempting to
+.BR open (2)
+a character special device in a device directory named
+.BI /dev/streams/ devname / nnnn
+will result in the
+.RI \(lq nnnn 'th\(rq
+instance of the
+.I devname
+driver being opened.
+.IP 3.
+Calls to the
+.I Solaris \(rg
+SUNDDI functions
+.BR ddi_create_minor_node (9)
+and
+.BR ddi_remove_minor_node (9)
+from within a
+.I STREAMS
+driver will create or remove the named node from the
+.BR /dev/streams/
+directory.
+.PP
+The behaviour is similar in some respects to the
+.IR Solaris \(rg
+.B /device
+filesystem, the
+.B Linux
+.BR devfs ,
+and the
+.B Linux
+.BR ptsfs .
+.PP
+These characteristics greatly simply device naming and numbering.  A simple
+symbolic link within the
+.B /dev
+filesystem is sufficient to demand load the necessary kernel module and open
+the appropriate instances of the
+.I STREAMS
+device without need to reference device major or device minor numbers.  For a
+discussion of the other methods of deivce naming and numbering, see the
+.RI \(lq "Device Numbering" \(rq
+section of the
+.BR "Linux Fast-STREAMS Programmer's Guide" ,
+.BR SPG (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+For minor device instance numbers between 0 and 1023, inclusive, device nodes
+in a
+.BI /dev/streams/ devname /\fR,
+subdirectory such as
+.BI /dev/streams/ devname /299\fR,
+will return to
+.BR stat (2),
+.BR fstat (2)
+or
+.BR lstat (2)
+the external (real) device number in the
+.I st_dev
+field of the
+.B stat
+structure.
+.I STREAMS
+devices other than pipes or fifos will return
+.B S_IFCHR
+in the
+.I st_mode
+field indicating that the device is a character special device.
+.PP
+Mounting the
+.B spec
+filesystem presents some unique secuirty concerns listed below.  The most
+secure approach is to not mount the filesystem.
+.IP a) \w'm)\(em'u
+Any user with create permission to the
+.B /dev/streams
+mount point can cause an almost arbitrary kernel module aliased
+.BI /dev/streams/ devname /
+or
+.BI streams- devname
+to be loaded by simply listing or entering the
+.BI /dev/streams/ devname /
+subdirectory.
+.IP b)
+Any user with the permissions to open or create a device node in a
+.BI /dev/streams/ devname /
+subdirectory can create a new stream or open an existing stream.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.B spec
+filesystem is implemented with the
+.I STREAMS
+executive kernel module,
+.BR streams ,
+as a normal pseudo-filesystem under
+.B Linux .
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.BI /dev/streams/ devname / nnnn
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR fs (5),
+.BR mount (8),
+.BR umount (8),
+.BR fattach (3),
+.BR fdetach (3),
+.BR fdetach (8),
+.BR SPG (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B spec
+filesystem is compatible with
+descriptions of
+.I STREAMS
+internals for
+.IR "SVR 4" ,
+.[
+magic
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Although the
+.B spec
+filesystem can be mounted at the
+.B /device
+mount point similar to
+.IR Solaris \(rg,
+the device hierarchy presented at the
+.B /device
+mount point is not the same as
+.IR Solaris \(rg.
+.IP \(em
+Attempts have been made to make the implementation function in the same manner
+as the
+.I vnode
+and
+.I snode
+Special Shadow Filesystem
+described for
+.I SVR 4
+in
+.RI \(lq "The Magic Garden" \(rg;
+.[
+magic
+.]
+however, there are many differences and access to the
+.B spec
+filesystem should be left internal to the
+.I STREAMS
+executive and its structures should not be accessed directly by
+portable
+.I STREAMS
+drivers.
+.IP \(em
+Neither source nor binary compatibility of the
+.B spec
+filesystem is guaranteed.
+.IP \(em
+The
+.B spec
+filesystem is provide for compatibilty with
+.I SVR 4
+for the purpose of porting
+.I STREAMS
+drivers to
+.BR Linux .
+Because internal structures and definitions differ, binaries are incompatible.
+.IP \(em
+The
+.B spec
+filesystem only provides functionality comparable to
+.I SVR 4
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by the
+.B spec
+filesystem in support of
+.RI non- STREAMS
+devices is not supported.
+.PP
+See
+.BR STREAMS (9)
+for more compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Descriptions of the
+.B spec
+filesystem in
+.RI \(lq "The Magic Garden" \(rq.
+.[
+magic
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B spec
+filesystem first appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
+ @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
 
-static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
+static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,13 +71,14 @@ static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.6
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
-#include "strpipe.h"		/* for pipe stuff */
+#include "strspecfs.h"		/* for specfs_mnt */
+#include "strfifo.h"		/* for fifo stuff */
 
 #include "sys/config.h"
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -120,7 +121,7 @@ static struct module_info sfx_minfo = {
 	mi_lowat:STRLOW,
 };
 
-extern struct file_operations pipe_f_ops;
+extern struct file_operations fifo_f_ops;
 
 #define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
 #define sdev_lookup(__i) ((struct cdevsw *)(__i)->i_cdev->data)
@@ -131,7 +132,7 @@ extern struct file_operations pipe_f_ops;
  */
 static loff_t sfxllseek(struct file *file, loff_t off, int whence)
 {
-	return pipe_f_ops.llseek(file, off, whence);
+	return fifo_f_ops.llseek(file, off, whence);
 }
 
 /* 
@@ -168,7 +169,7 @@ static mblk_t *sfxwaitread(struct stdata *sd, long *timeo)
 #endif
 static ssize_t sfxread(struct file *file, char *buf, size_t len, loff_t *ppos)
 {
-	return pipe_f_ops.read(file, buf, len, ppos);
+	return fifo_f_ops.read(file, buf, len, ppos);
 }
 
 /* 
@@ -177,7 +178,7 @@ static ssize_t sfxread(struct file *file, char *buf, size_t len, loff_t *ppos)
  */
 static ssize_t sfxwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 {
-	return pipe_f_ops.write(file, buf, len, ppos);
+	return fifo_f_ops.write(file, buf, len, ppos);
 }
 
 /* 
@@ -186,7 +187,7 @@ static ssize_t sfxwrite(struct file *file, const char *buf, size_t len, loff_t *
  */
 static unsigned int sfxpoll(struct file *file, struct poll_table_struct *poll)
 {
-	return pipe_f_ops.poll(file, poll);
+	return fifo_f_ops.poll(file, poll);
 }
 
 /* 
@@ -195,30 +196,7 @@ static unsigned int sfxpoll(struct file *file, struct poll_table_struct *poll)
  */
 static int sfxioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
 {
-	struct stdata *sd = stri_lookup(file);
-	switch (cmd) {
-	case I_FDINSERT:
-	{
-		struct stdata *sd2;
-		/* I_FDINSERT for sfx is a rather special ioctl.  It is used under UnixWare7 to
-		   connect two disjoint stream heads into a STREAMS-based bidirectional pipe. */
-		if (!sd || sd->sd_other)
-			break;
-		/* Once the pipes ends are connected, we no longer consider this IO control as
-		   special. */
-		sd2 = stri_lookup(f2);
-		if (!sd2)
-			return (-EINVAL);	/* XXX */
-		/* link stream heads */
-		sd->sd_other = sd2;
-		sd2->sd_other = sd;
-		/* link queues */
-		sd->sd_wq->q_next = sd2->sd_rq;
-		sd2->sd_wq->q_next = sd->sd_rq;
-		return (0);
-	}
-	}
-	return pipe_f_ops.ioctl(inode, file, cmd, arg);
+	return fifo_f_ops.ioctl(inode, file, cmd, arg);
 }
 
 /* 
@@ -227,7 +205,7 @@ static int sfxioctl(struct inode *inode, struct file *file, unsigned int cmd, un
  */
 static int sfxmmap(struct file *file, struct vm_area_struct *vma)
 {
-	return pipe_f_ops.mmap(file, vma);
+	return fifo_f_ops.mmap(file, vma);
 }
 
 /* 
@@ -245,7 +223,7 @@ static int sfxopen(struct inode *inode, struct file *file)
 	int err = 0;
 	struct stdata *sd;
 	/* first find out if we already have a stream head (or need a new one anyway) */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sdev_lookup(inode)->d_flag & D_CLONE)) {
+	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
 		/* We only do not have a stream head on initial open of the inode.  This only
 		   occurs in response to a pipe(2) or s_pipe(3) system call */
 		queue_t *q;
@@ -333,7 +311,7 @@ static int sfxopen(struct inode *inode, struct file *file)
  */
 static int sfxflush(struct file *file)
 {
-	return pipe_f_ops.flush(file);
+	return fifo_f_ops.flush(file);
 }
 
 /* 
@@ -360,7 +338,7 @@ static int sfxclose(struct inode *inode, struct file *file)
  */
 static int sfxfasync(int fd, struct file *file, int on)
 {
-	return pipe_f_ops.fasync(fd, file, on);
+	return fifo_f_ops.fasync(fd, file, on);
 }
 
 /* 
@@ -369,7 +347,7 @@ static int sfxfasync(int fd, struct file *file, int on)
  */
 static ssize_t sfxreadv(struct file *file, const struct iovec *iov, unsigned long len, loff_t *ppos)
 {
-	return pipe_f_ops.readv(file, iov, len, ppos);
+	return fifo_f_ops.readv(file, iov, len, ppos);
 }
 
 /* 
@@ -379,7 +357,7 @@ static ssize_t sfxreadv(struct file *file, const struct iovec *iov, unsigned lon
 static ssize_t sfxwritev(struct file *file, const struct iovec *iov, unsigned long count,
 			 loff_t *ppos)
 {
-	return pipe_f_ops.writev(file, iov, count, ppos);
+	return fifo_f_ops.writev(file, iov, count, ppos);
 }
 
 /* 
@@ -389,7 +367,7 @@ static ssize_t sfxwritev(struct file *file, const struct iovec *iov, unsigned lo
 static ssize_t sfxsendpage(struct file *file, struct page *page, int offset, size_t size,
 			   loff_t *ppos, int more)
 {
-	return pipe_f_ops.sendpage(file, page, offset, size, ppos, more);
+	return fifo_f_ops.sendpage(file, page, offset, size, ppos, more);
 }
 
 #ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
@@ -400,7 +378,7 @@ static ssize_t sfxsendpage(struct file *file, struct page *page, int offset, siz
 static int sfxputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int band,
 		      int flags)
 {
-	return pipe_f_ops.putpmsg(file, ctlp, datp, band, flags);
+	return fifo_f_ops.putpmsg(file, ctlp, datp, band, flags);
 }
 
 /* 
@@ -410,7 +388,7 @@ static int sfxputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 static int sfxgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *band,
 		      int *flagsp)
 {
-	return pipe_f_ops.getpmsg(file, ctlp, datp, band, flagsp);
+	return fifo_f_ops.getpmsg(file, ctlp, datp, band, flagsp);
 }
 #endif
 
@@ -435,6 +413,23 @@ struct file_operations sfx_f_ops __cacheline_aligned = {
 #endif
 };
 
+static int sfx_rput(queue_t *q, mblk_t *mp)
+{
+	return (0);
+}
+static int sfx_rsrv(queue_t *q)
+{
+	return (0);
+}
+static int sfx_wput(queue_t *q, mblk_t *mp)
+{
+	return (0);
+}
+static int sfx_wsrv(queue_t *q)
+{
+	return (0);
+}
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -451,7 +446,7 @@ static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		queue_t *wq = WR(q), *wq_next;
 		wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 		while ((wq = wq_next)) {
-			/* all opens are module opens on pipes, there is no driver */
+			/* all opens are module opens on fifos, there is no driver */
 			wq_next = SAMESTR(wq) ? wq->q_next : NULL;
 			if ((err = qopen(wq - 1, devp, oflag, MODOPEN, crp)))
 				goto error;
@@ -463,7 +458,7 @@ static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		dev_t dev = *devp;
 		struct stdata *sd;
 		if ((sd = ((struct queinfo *) q)->qu_str)) {
-			struct cdevsw *sdev = sd->sd_inode->i_cdev->data;
+			struct cdevsw *sdev = sd->sd_cdevsw;
 			/* 1st step: attach the driver and call its open routine */
 			/* we are the driver and this *is* the open routine */
 			/* 2nd step: check for redirected return */
@@ -516,7 +511,7 @@ static int open_sfx(struct inode *inode, struct file *file)
 	};
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
-	file->f_ops = &sfx_f_ops;	/* fops_get already done */
+	file->f_op = &sfx_f_ops;	/* fops_get already done */
 	return sdev_open(inode, file, specfs_mnt, &args);
 }
 
@@ -538,9 +533,9 @@ static int __init sfx_init(void)
 {
 	int err;
 #ifdef MODULE
-	printk(KERN_INFO FIFO_BANNER);
+	printk(KERN_INFO SFX_BANNER);
 #else
-	printk(KERN_INFO FIFO_SPLASH);
+	printk(KERN_INFO SFX_SPLASH);
 #endif
 	if ((err = register_inode(makedevice(major, 0), &sfx_cdev, &sfx_ops)) < 0)
 		return (err);

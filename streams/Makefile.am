@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/03/16 01:58:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/04/16 19:24:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/16 01:58:32 $ by $Author: brian $
+# Last Modified $Date: 2004/04/16 19:24:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -139,6 +139,8 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/strpipe.h \
 				src/drivers/strsock.c \
 				src/drivers/strsock.h \
+				src/drivers/strspx.c \
+				src/drivers/strsfx.c \
 				include/log.h \
 				include/sys/log.h \
 				include/strlog.h \
@@ -147,9 +149,7 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/log.c \
 				$(top_builddir)/$(LFS_SC_CONFIG)
 #				src/drivers/strinet.c
-#				src/drivers/strsfx.c
 #				src/drivers/strsocksys.c
-#				src/drivers/strspx.c
 #				src/drivers/strunix.c
 #				src/drivers/strxnet.c
 
@@ -207,15 +207,14 @@ libLfScompat_a_CFLAGS		= @KERNEL_CFLAGS@
 streams.o: $(libLfSkernel_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
+include am/libraries.am
+
 KERNEL_MODULES			= streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 KERNEL_MODCONF			= $(LFS_SC_CONFMOD)
 KERNEL_SUBDIR			= streams
 KMODCONF_EXT			= streams
 
-MANMACRO_PFX			= streams
-mansrcdir			= $(srcdir)/doc/man
-
-include kernel.am
+include am/kernel.am
 
 libstreams_la_SOURCES		= \
 				lib/libc/fattach.c \
@@ -405,6 +404,9 @@ Config.master: $(lfs_configs)
 		cat $(lfs_configs) > Config.master < /dev/null; \
 	else exit 1; fi;
 
+MANMACRO_PFX			= streams
+mansrcdir			= $(srcdir)/doc/man
+
 nodist_man_MANS = \
 	doc/man/man1/strchg.1 doc/man/man1/strconf.1 doc/man/man1/strreset.1 doc/man/man1/xxx.1 doc/man/man2/fattach.2 \
 	doc/man/man2/fcntl.2s doc/man/man2/getmsg.2 doc/man/man2/getpmsg.2 \
@@ -553,7 +555,7 @@ nodist_man_MANS = \
 	doc/man/man9/ddi_soft_state.9 doc/man/man9/ddi_soft_state_fini.9 doc/man/man9/ddi_soft_state_free.9 \
 	doc/man/man9/ddi_soft_state_init.9 doc/man/man9/ddi_soft_state_zalloc.9 doc/man/man9/ddi_umem_alloc.9 \
 	doc/man/man9/ddi_umem_free.9 doc/man/man9/delay.9 doc/man/man9/detach.9 doc/man/man9/drv_getparm.9 \
-	doc/man/man9/drv_htztousec.9 doc/man/man9/drv_hztomsec.9 doc/man/man9/drv_hztousec.9 \
+	doc/man/man9/drv_hztomsec.9 doc/man/man9/drv_hztousec.9 \
 	doc/man/man9/drv_msectohz.9 doc/man/man9/drv_priv.9 doc/man/man9/drv_usectohz.9 doc/man/man9/drv_usecwait.9 \
 	doc/man/man9/dtimeout.9 doc/man/man9/dupb.9 doc/man/man9/dupmsg.9 doc/man/man9/emajor.9 doc/man/man9/eminor.9 \
 	doc/man/man9/enableok.9 doc/man/man9/enableq.9 doc/man/man9/esballoc.9 doc/man/man9/esbbcall.9 \
@@ -752,7 +754,7 @@ nodist_man_MANS = \
 	doc/man/man9/unweldq.9 doc/man/man9/vtop.9 doc/man/man9/wakeup.9 doc/man/man9/wantio.9 doc/man/man9/wantmsg.9 \
 	doc/man/man9/weldq.9 doc/man/man9/WR.9 doc/man/man9/xmsgsize.9
 
-EXTRA_MAN_SOURCES = \
+noinst_man_MANS = \
 	doc/man/man1/strchg.1.man doc/man/man1/strconf.1.man doc/man/man1/strreset.1.man doc/man/man1/xxx.1.man \
 	doc/man/man2/fattach.2.man doc/man/man2/fcntl.2s.man doc/man/man2/getmsg.2.man \
 	doc/man/man2/getpmsg.2.man doc/man/man2/pipe.2s.man \
@@ -928,7 +930,7 @@ EXTRA_MAN_SOURCES = \
 	doc/man/man9/ddi_soft_state_free.9.man doc/man/man9/ddi_soft_state_init.9.man \
 	doc/man/man9/ddi_soft_state_zalloc.9.man doc/man/man9/ddi_umem_alloc.9.man doc/man/man9/ddi_umem_free.9.man \
 	doc/man/man9/delay.9.man doc/man/man9/detach.9.man doc/man/man9/drv_getparm.9.man \
-	doc/man/man9/drv_htztousec.9.man doc/man/man9/drv_hztomsec.9.man doc/man/man9/drv_hztousec.9.man \
+	doc/man/man9/drv_hztomsec.9.man doc/man/man9/drv_hztousec.9.man \
 	doc/man/man9/drv_msectohz.9.man doc/man/man9/drv_priv.9.man doc/man/man9/drv_usectohz.9.man \
 	doc/man/man9/drv_usecwait.9.man doc/man/man9/dtimeout.9.man doc/man/man9/dupb.9.man doc/man/man9/dupmsg.9.man \
 	doc/man/man9/emajor.9.man doc/man/man9/eminor.9.man doc/man/man9/enableok.9.man doc/man/man9/enableq.9.man \
@@ -1166,25 +1168,7 @@ EXTRA_MAN_SOURCES = \
 	doc/man/man9/unweldq.9.man doc/man/man9/vtop.9.man doc/man/man9/wakeup.9.man doc/man/man9/wantio.9.man \
 	doc/man/man9/wantmsg.9.man doc/man/man9/weldq.9.man doc/man/man9/WR.9.man doc/man/man9/xmsgsize.9.man
 
-$(nodist_man_MANS): %: %.man
-	@d="`echo $@ | sed -e 's|/[^/]*$$||'`" ; \
-	p="`echo $< | sed -e 's|/[^/]*$$||;s|/[^/]*$$||'`" ; \
-	p=`( cd $$p ; pwd )` ; \
-	$(mkinstalldirs) $$d ; \
-	echo "cat $< | ( cd $$p ; refer ) | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man//' > $@" ; \
-	cat $< | ( cd $$p ; refer ) | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man//' > $@ ;
-#	m="`echo $< | sed -e 's|/[^/]*$$||'`" ; \
-#	m=`( cd $$m ; pwd )` ; \
-#	echo "cat $< | soelim -I $$p -I $$m | ( cd $$p ; refer ) | sed -e '/^\.lf/d' > $@" ; \
-#	set +e ; \
-#	cat $< | soelim -I $$p -I $$m | ( cd $$p ; refer ) | sed -e '/^\.lf/d' > $@ ;
-
-clean-local:
-	rm -f @LFS_SC_CONFIG@ @LFS_SC_MODCONF@ @LFS_SC_MKNODES@ @LFS_SC_DRVCONF@ @LFS_SC_CONFMOD@ @LFS_SC_MAKEDEV@ Config.master
-	@for f in $(nodist_man_MANS) ; do \
-		echo "rm -f $$f" ; \
-		rm -f $$f ; \
-	done
+include am/man.am
 
 nobase_pkginclude_HEADERS = include/stropts.h include/tihdr.h include/timod.h \
 	include/sys/aixddi.h include/sys/cmn_err.h include/sys/ddi.h include/sys/debug.h include/sys/dki.h \
@@ -1255,7 +1239,7 @@ uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
 
 EXTRA_DIST = streams.spec.in streams.spec doc/man/streams.refs doc/man/streams.macros \
 	$(noinst_SCRIPTS) $(sbin_SCRIPTS) $(lfs_configs) openss7-logo-small.gif openss7-logo-small.xpm \
-	$(INET_MKDEV) $(INET_RMDEV) m4/kernel.m4 m4/rpm.m4 $(EXTRA_MAN_SOURCES)
+	$(INET_MKDEV) $(INET_RMDEV) m4/kernel.m4 m4/rpm.m4 $(noinst_man_MANS)
 
 SUBDIRS = intl m4 po doc
 
@@ -1265,11 +1249,11 @@ SUBDIRS = intl m4 po doc
 AM_RPMFLAGS = --define "_kversion @PACKAGE_KVERSION@"
 AM_SRPMFLAGS =
 
-include rpm.am
+include am/rpm.am
 
 #
 # General rules
 #
-include openss7.am
+include am/openss7.am
 
 # vim: ft=automake

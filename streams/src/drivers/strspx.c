@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
+ @(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#ident "@(#) $RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
 
-static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
+static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -60,6 +60,11 @@ static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/sched.h>
+#include <linux/spinlock.h>
+#include <linux/fs.h>		/* for file */
+#include <linux/file.h>		/* for fget */
 
 #include <sys/stropts.h>
 #include <sys/stream.h>
@@ -71,13 +76,14 @@ static char const ident[] = "$RCSfile: strspx.c,v $ $Name:  $($Revision: 0.9.2.6
 #include "strreg.h"		/* for struct str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strhead.h"		/* for autopush */
+#include "strspecfs.h"		/* for specfs_mnt */
 #include "strpipe.h"		/* for pipe stuff */
 
 #include "sys/config.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -123,7 +129,6 @@ static struct module_info spx_minfo = {
 extern struct file_operations pipe_f_ops;
 
 #define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
-#define sdev_lookup(__i) ((struct cdevsw *)(__i)->i_cdev->data)
 
 /* 
  *  SPXLSEEK
@@ -196,19 +201,25 @@ static unsigned int spxpoll(struct file *file, struct poll_table_struct *poll)
 static int spxioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct stdata *sd = stri_lookup(file);
-	switch (cmd) {
-	case I_FDINSERT:
-	{
+	/* Once the pipes ends are connected, we no longer consider this IO control as special. */
+	if (cmd == I_FDINSERT && sd && sd->sd_other == NULL) {
+		/* I_FDINSERT for spx is a rather special ioctl.  It is used under UnixWare7 and
+		   possibly AIX to connect two disjoint stream heads into a STREAMS-based
+		   bidirectional pipe. */
+		struct strfdinsert *fdi = (typeof(fdi)) arg;
 		struct stdata *sd2;
-		/* I_FDINSERT for spx is a rather special ioctl.  It is used under UnixWare7 to
-		   connect two disjoint stream heads into a STREAMS-based bidirectional pipe. */
-		if (!sd || sd->sd_other)
-			break;
-		/* Once the pipes ends are connected, we no longer consider this IO control as
-		   special. */
-		sd2 = stri_lookup(f2);
-		if (!sd2)
-			return (-EINVAL);	/* XXX */
+		struct file *f2;
+		int err;
+		if ((err = verify_area(VERIFY_READ, fdi, sizeof(*fdi))) < 0)
+			goto error;
+		if (!(f2 = fget(fdi->fildes)))
+			goto einval;
+		if (!(sd2 = stri_lookup(f2)))
+			goto einval;
+		/* TODO: we have the other stream head: we need to make sure that this stream head
+		   corresponds to an spx stream head. */
+		/* FIXME: we should probably take some locks before linking stream heads and queues 
+		 */
 		/* link stream heads */
 		sd->sd_other = sd2;
 		sd2->sd_other = sd;
@@ -216,7 +227,11 @@ static int spxioctl(struct inode *inode, struct file *file, unsigned int cmd, un
 		sd->sd_wq->q_next = sd2->sd_rq;
 		sd2->sd_wq->q_next = sd->sd_rq;
 		return (0);
-	}
+	      einval:
+		err = -EINVAL;
+		goto error;
+	      error:
+		return (err);
 	}
 	return pipe_f_ops.ioctl(inode, file, cmd, arg);
 }
@@ -245,7 +260,7 @@ static int spxopen(struct inode *inode, struct file *file)
 	int err = 0;
 	struct stdata *sd;
 	/* first find out if we already have a stream head (or need a new one anyway) */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sdev_lookup(inode)->d_flag & D_CLONE)) {
+	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || sd->sd_cdevsw->d_flag & D_CLONE) {
 		/* We only do not have a stream head on initial open of the inode.  This only
 		   occurs in response to a pipe(2) or s_pipe(3) system call */
 		queue_t *q;
@@ -392,6 +407,7 @@ static ssize_t spxsendpage(struct file *file, struct page *page, int offset, siz
 	return pipe_f_ops.sendpage(file, page, offset, size, ppos, more);
 }
 
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
 /* 
  *  SPXPUTPMSG
  *  -------------------------------------
@@ -411,6 +427,7 @@ static int spxgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *dat
 {
 	return pipe_f_ops.getpmsg(file, ctlp, datp, band, flagsp);
 }
+#endif
 
 struct file_operations spx_f_ops __cacheline_aligned = {
 	owner:THIS_MODULE,
@@ -432,6 +449,23 @@ struct file_operations spx_f_ops __cacheline_aligned = {
 	putpmsg:spxputpmsg,
 #endif
 };
+
+static int spx_rput(queue_t *q, mblk_t *mp)
+{
+	return (0);
+}
+static int spx_rsrv(queue_t *q)
+{
+	return (0);
+}
+static int spx_wput(queue_t *q, mblk_t *mp)
+{
+	return (0);
+}
+static int spx_wsrv(queue_t *q)
+{
+	return (0);
+}
 
 /* 
  *  -------------------------------------------------------------------------
@@ -461,7 +495,7 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		dev_t dev = *devp;
 		struct stdata *sd;
 		if ((sd = ((struct queinfo *) q)->qu_str)) {
-			struct cdevsw *sdev = sd->sd_inode->i_cdev->data;
+			struct cdevsw *sdev = sd->sd_cdevsw;
 			/* 1st step: attach the driver and call its open routine */
 			/* we are the driver and this *is* the open routine */
 			/* 2nd step: check for redirected return */
@@ -514,7 +548,7 @@ static int open_spx(struct inode *inode, struct file *file)
 	};
 	args.dev = makedevice(major, 0);
 	args.sflag = CLONEOPEN;
-	file->f_ops = &spx_f_ops;	/* fops_get already done */
+	file->f_op = &spx_f_ops;	/* fops_get already done */
 	return sdev_open(inode, file, specfs_mnt, &args);
 }
 
@@ -527,7 +561,7 @@ static struct cdevsw spx_cdev = {
 	d_name:CONFIG_STREAMS_SPX_NAME,
 	d_str:&spx_info,
 	d_flag:D_CLONE,
-	d_fop:&spx_ops,
+	d_fop:&spx_f_ops,
 	d_mode:S_IFIFO,
 	d_kmod:THIS_MODULE,
 };
@@ -536,9 +570,9 @@ static int __init spx_init(void)
 {
 	int err;
 #ifdef MODULE
-	printk(KERN_INFO PIPE_BANNER);
+	printk(KERN_INFO SPX_BANNER);
 #else
-	printk(KERN_INFO PIPE_SPLASH);
+	printk(KERN_INFO SPX_SPLASH);
 #endif
 	if ((err = register_inode(makedevice(major, 0), &spx_cdev, &spx_ops)) < 0)
 		return (err);

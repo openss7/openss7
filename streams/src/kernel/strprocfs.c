@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $"
 
-static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $";
 
 #define __NO_VERSION__
 
@@ -97,6 +97,78 @@ static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
 		va_end(args);
 	}
 	return (count);
+}
+
+/* called by proc file system to list the registered STREAMS devices */
+static int get_streams_drivers_list(char *page, char **start, off_t offset, int length)
+{
+	int len = 0;
+	static const ssize_t maxlen = 1024;
+	int num = 0;
+	off_t begin, pos;
+	char buffer[maxlen + 1];
+	struct list_head *cur;
+	if (offset < maxlen) {
+		get_streams_driver_hdr(buffer, maxlen - 1);
+		len = snprintf(page + len, "%-*s\n", maxlen - 1, buffer);
+	}
+	pos = maxlen;
+	read_lock(&cdevsw_lock);
+	list_for_each(cur, &cdevsw_list) {
+		struct cdevsw *d = list_entry(cur, struct cdevsw, d_list);
+		if ((pos += maxlen) > offset) {
+			get_streams_driver(buffer, maxlen - 1, d);
+			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
+			if (pos >= offset + length)
+				break;
+		}
+		num++;
+	}
+	read_unlock(&cdevsw_lock);
+	begin = len - (pos - offset);
+	*start = page + begin;
+	len -= begin;
+	if (len > length)
+		len = length;
+	if (len < 0)
+		len = 0;
+	return (len);
+}
+
+/* called by proc file system to list the registered STREAMS modules */
+static int get_streams_modules_list(char *page, char **start, off_t offset, int length)
+{
+	int len = 0;
+	static const ssize_t maxlen = 1024;
+	int num = 0;
+	off_t begin, pos;
+	char buffer[maxlen + 1];
+	struct list_head *cur;
+	if (offset < maxlen) {
+		get_streams_module_hdr(buffer, maxlen - 1);
+		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
+	}
+	pos = maxlen;
+	read_lock(&fmodsw_lock);
+	list_for_each(cur, &fmodsw_list) {
+		struct fmodsw *f = list_entry(cur, struct fmodsw, f_list);
+		if ((pos += maxlen) > offset) {
+			get_streams_module(buffer, maxlen - 1, f);
+			len += sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
+			if (pos >= offset + length)
+				break;
+		}
+		num++;
+	}
+	read_unlock(&fmodsw_lock);
+	begin = len - (pos - offset);
+	*start = page + begin;
+	len -= begin;
+	if (len > length)
+		len = length;
+	if (len < 0)
+		len = 0;
+	return (len);
 }
 
 static int get_streams_module_info_hdr(char *page, ssize_t maxlen)
@@ -198,12 +270,12 @@ static int get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, "st");
 	len += snprintf(page + len, maxlen - len, ", st_rdinit { ");
 	len += get_streams_qinit_hdr(page + len, maxlen - len);
-	len += snprintf(page + len, maxlen - len, " }, st_wrinit { ");
-	len += get_streams_qinit_hdr(page + len, maxlen - len);
+//	len += snprintf(page + len, maxlen - len, " }, st_wrinit { ");
+//	len += get_streams_qinit_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, st_muxrinit { ");
 	len += get_streams_qinit_hdr(page + len, maxlen - len);
-	len += snprintf(page + len, maxlen - len, " }, st_muxwinit { ");
-	len += get_streams_qinit_hdr(page + len, maxlen - len);
+//	len += snprintf(page + len, maxlen - len, " }, st_muxwinit { ");
+//	len += get_streams_qinit_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
@@ -215,12 +287,12 @@ static int get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamta
 		goto done;
 	len += snprintf(page + len, maxlen - len, ", %p { ", st->st_rdinit);
 	len += get_streams_qinit(page + len, maxlen - len, st->st_rdinit);
-	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_wrinit);
-	len += get_streams_qinit(page + len, maxlen - len, st->st_wrinit);
+//	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_wrinit);
+//	len += get_streams_qinit(page + len, maxlen - len, st->st_wrinit);
 	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_muxrinit);
 	len += get_streams_qinit(page + len, maxlen - len, st->st_muxrinit);
-	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_muxwinit);
-	len += get_streams_qinit(page + len, maxlen - len, st->st_muxwinit);
+//	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_muxwinit);
+//	len += get_streams_qinit(page + len, maxlen - len, st->st_muxwinit);
 	len += snprintf(page + len, maxlen - len, " }");
       done:
 	return (len);
@@ -1270,10 +1342,12 @@ int strprocfs_init(void)
 	proc_str = proc_mkdir("streams", NULL);
 	if (!proc_str)
 		return (-ENOMEM);
-	create_proc_info_entry("drivers", 0444, proc_str, get_streams_cdevsw_list);
-	create_proc_info_entry("modules", 0444, proc_str, get_streams_fmodsw_list);
+	create_proc_info_entry("drivers", 0444, proc_str, get_streams_drivers_list);
+	create_proc_info_entry("modules", 0444, proc_str, get_streams_modules_list);
 	create_proc_info_entry("strinfo", 0444, proc_str, get_streams_strinfo_list);
 #ifdef CONFIG_STREAMS_DEBUG
+	create_proc_info_entry("cdevsw", 0444, proc_str, get_streams_cdevsw_list);
+	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
 	create_proc_info_entry("stdata", 0444, proc_str, get_streams_shinfo_list);
 	create_proc_info_entry("queue", 0444, proc_str, get_streams_queinfo_list);
 	create_proc_info_entry("msgb", 0444, proc_str, get_streams_mbinfo_list);
@@ -1294,6 +1368,8 @@ void strprocfs_exit(void)
 	remove_proc_entry("modules", proc_str);
 	remove_proc_entry("strinfo", proc_str);
 #ifdef CONFIG_STREAMS_DEBUG
+	remove_proc_entry("cdevsw", proc_str);
+	remove_proc_entry("fmodsw", proc_str);
 	remove_proc_entry("stdata", proc_str);
 	remove_proc_entry("queue", proc_str);
 	remove_proc_entry("msgb", proc_str);

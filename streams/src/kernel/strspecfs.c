@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $"
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $";
 
 #define __NO_VERSION__
 
@@ -232,7 +232,26 @@ static int spec_dir_i_getattr(struct dentry *, struct iattr *)
 }
 
 static struct inode_operations spec_dir_i_ops = {
-	lookup:spec_dir_i_lookup,
+      create:spec_dir_i_create,
+      lookup:spec_dir_i_lookup,
+      link:spec_dir_i_link,
+      unlink:spec_dir_i_unlink,
+      symlink:spec_dir_i_symlink,
+      mkdir:spec_dir_i_mkdir,
+      rmdir:spec_dir_i_rmdir,
+      mknod:spec_dir_i_mknod,
+      rename:spec_dir_i_rename,
+      readlink:spec_dir_i_readlink,
+      follow_link:spec_dir_i_follow_link,
+      truncate:spec_dir_i_truncate,
+      permission:spec_dir_i_permission,
+      revalidate:spec_dir_i_revalidate,
+      setattr:spec_dir_i_setattr,
+      getattr:spec_dir_i_getattr,
+//      setxattr:spec_dir_i_setxattr,
+//      getxattr:spec_dir_i_getxattr,
+//      listxattr:spec_dir_i_listxattr,
+//      removexattr:spec_dir_i_removexattr,
 };
 #endif
 

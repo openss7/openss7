@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: nsdev.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: nsdev.4.man,v 0.9.2.3 2004/04/16 17:14:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NSDEV 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH NSDEV 4 "$Date: 2004/04/16 17:14:54 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -89,10 +89,11 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 .B nsdev
-is a \*(lqNamed STREAMS Device\*(rq pseudo-device driver similar to
+is a \*(lqNamed STREAMS Device\*(rq pseudo-device driver similar in some
+respects to
 .BR clone (4).
 .B nsdev
-is perhaps the only major device number that is ever needed by a
+is perhaps the only assigned major device number that is ever needed by a
 .I STREAMS
 device driver.
 .PP
@@ -120,14 +121,76 @@ looks for a registered
 .I STREAMS
 device with the same initial substring as the name of the device opened
 .RI ( xxx
-in the SYNOPSIS above).
+in the
+.RI \(lq SYNOPSIS \(rq
+above).
 .PP
-All minor device opened via the
+If no registered
+.I STREAMS
+device can be found that match the initial substring,
+.IR xxx ,
+of the device name, the
 .B nsdev
-pseudo-device driver are considered clonable minor devices a similar manner
-to
+requests that the kernel load the module named
+.BI streams- xxx\fR,
+where
+.I xxx
+is the longest initial substring of the device name that contains only alpha
+characters and the underscore (\(lq_\(rq) character.  This makes it possiblt
+to create Named STREAMS Devices knowing only the character major device number
+associated with the
+.B nsdev
+driver and demand load other
+.I STREAMS
+modules and drivers that may then dynamically allocated their major device
+numbers (or not allocate any major device numbers at all).
+.PP
+For additional information on device numbers, see the
+.RI \(lq "Device Numbering" \(rq
+section of the
+.BR "Linux Fast-STREAMS Programmer's Guide" ,
+.BR SPG (9).
+.\"
+.SS
+Super Cloning
+.PP
+The
+.B nsdev
+supports the concept of super cloning when used in conjunction with the
+traditional
 .BR clone (4)
-treating all major devices opened as a clonable major device.
+device.
+A super clone device has the clone device major device number as a major
+number and the
+.B nsdev
+major device number as a minor number.  This is a traditional clone device
+application to the
+.B nsdev
+pseudo-device driver.
+This arragngement has the characteristic that when such a
+.BR clone (4)
+device is opened, it chains the open call to the
+.B nsdev
+with the
+.B CLONEOPEN
+flag set in
+.IR sflag .
+The Named STREAMS Device then chains the open to the device number derived
+from the device name and the minor device number (in this case zero (0)) as
+normal.
+.\"
+.SS
+Named Clone Devices
+.PP
+The
+.B nsdev
+can be used to create named clone devices.  A named clone device can be
+created by assigning the
+.B ndev
+major device number to devices with the name
+.BI clone yyy
+and assigning the traditional clone device minor number (see
+.BR clone (4)).
 .\"
 .\"
 .SH NOTICES
@@ -138,7 +201,7 @@ of the
 .B nsdev
 can result in the loading of (or an attempt to load) the kernel module
 named
-.RI \*(lq streams-\fBxxx\fP.o \*(rq.
+.BI streams- xxx\fR.
 .PP
 If the device opened is a symbolic link, the name of the actual file is the
 name used for determining the
@@ -151,7 +214,10 @@ device number of the cloned device.
 .PP
 .B nsdev
 is used by the
-.I Linux Fast-STREAMS
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
 system provided drivers to limit the use of major device numbers to a single
 major device number for the
 .I STREAMS
@@ -160,30 +226,136 @@ Clonable minor devices are allocated against a single
 .I STREAMS
 system major device number rather than allocating new major device numbers for
 each facility.
+.PP
+When
+.B nsdev
+loads, it assigns a major device number either statically or dynamically.  In
+either event, the major device number associated with the
+.B nsdev
+can be found by search the
+.B /proc/devices
+file for the major device number assigned to
+.RB \*(lq nsdev \*(rq.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B nsdev
+is not implemented as a normal
+.I STREAMS
+driver: it is implemented as a shadow special device node under
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.B Linux Fast-STREAMS
+shadow special device nodes call
+.BR nsdev_open ()
+from
+.BR chrdev_open ()
+instead of
+.BR strm_open ()
+permitting the
+.B nsdev
+device to intercept and redirect the open call to the appropriate device.
+This is consitent with the descriptions for the internal
+.BR clone_open ()
+under
+.IR "SVR 4" .
+.[
+magic
+.]
 .\"
 .\"
 .SH EXAMPLES
 .PP
-If the following is peformed to create the device:
+Following are some examples of how to use the
+Named STREAMS Device:
+.SS
+Named STREAMS Device Example
+.PP
+If the following is peformed to create the device (assuming that major device
+number 56 is the major device number of the Named STREAMS Device):
 .sp
 .nf
+\fC\s-1\
 $> mknod -m 0666 /dev/streams04 c 56 3
 $> ln -s /dev/streams04 /dev/ticlts
+\s+1\fP
 .fi
 .sp
 then opening
-.RI \*(lq /dev/ticlts \*(rq
+.RB \*(lq /dev/ticlts \*(rq
 will result in opening minor device number
 .I 3
 of the
-.RI \*(lq streams \*(rq
+.RB \*(lq streams \*(rq
 device.
+The device will be opened with the
+.I sflag
+argument to
+.BR qopen (9)
+set to
+.B DRVOPEN
+unless the device has had cloning set using
+.BR DF_CLONE
+during registration of the major or minor device nodes (see
+.BR register_strdev (9)),
+or unless
+.BR SAP_CLONE
+was set using the
+STREAMS Administrative Driver
+.BR sad (4)
+for the ultimate device node.  In either of these later cases, the device will
+be opened with a
+.I sflag
+argument of
+.BR CLONEOPEN .
+.SS
+Super Clone Example
+.PP
+If the following is performed to create a
+.BR clone (4)
+device in addition to the above example (assuming that the
+.BR clone (4)
+major device number is 74):
+.sp
+.nf
+\fC\s-1\
+$> mknod -m 0666 /dev/streams00 c 56 0
+$> mknod -m 0666 /dev/streams c 74 56
+$> ln -s /dev/streams my_super_clone_device
+\s+1\fP
+.fi
+.sp
+then opening either
+.RB \*(lq my_super_clone_device \*(rq
+or
+.RB \*(lq /dev/streams \*(rq
+will result in opening minor device number
+.I 0
+of the
+.RB \*(lq streams \*(rq
+device with the
+.I sflag
+argument to
+.BR qopen (9)
+being set to
+.BR CLONEOPEN .
+For additional information on the super cloning technique using the Named
+STREAMS Device, see
+.BR clone (4).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR open (2),
+.BR qopen (9),
+.BR register_strdev (9),
 .BR clone (4),
-.BR sad (4).
+.BR sad (4),
+.BR SPG (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -192,11 +364,57 @@ device.
 has no known bugs.
 .\"
 .\"
+.SH COMPATIBLITY
+.PP
+.B nsdev
+is compatible with
+.I SVR 4.2
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UXP/V \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B nsdev
+is a
+.B Linux Fast-STREAMS
+specific device.
+.IP \(em
+Although
+.B nsdev
+is
+.B Linux Fast-STREAMS
+specific, the operation of this device is a filesystem artifice and is
+transparent to both the
+.I STREAMS
+device user and the
+.I STREAMS
+device driver itself.
+.IP \(em
+When the
+.B nsdev
+is opened directly, the driver has no indication that it has been opened via
+the Named STREAMS Device and, for all intents and purposes, appears to the
+driver as having been opened as a direct minor node of the driver.
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
 .SH CONFORMANCE
 .PP
 .B nsdev
 is a
-.I Linux Fast-STREAMS
+.B Linux Fast-STREAMS
 specific mechanism.
 .\"
 .\"
@@ -204,7 +422,7 @@ specific mechanism.
 .PP
 .B nsdev
 first appeared in
-.IR "Linux Fast-STREAMS" .
+.BR "Linux Fast-STREAMS" .
 .\"
 .\"
 .[

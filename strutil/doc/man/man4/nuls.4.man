@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: nuls.4.man,v 0.9.2.3 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: nuls.4.man,v 0.9.2.4 2004/04/16 17:14:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NULS 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Modules"
+.TH NULS 4 "$Date: 2004/04/16 17:14:54 $" "$Name:  $" "Linux Fast-STREAMS Modules"
 .\"
 .\"
 .SH NAME
@@ -95,16 +95,16 @@ is a file descriptor for a null stream opened using the
 .BR open (2)
 system call on one of the following devices:
 .TP
-.RI \*(lq /dev/nuls \*(rq
+.RB \*(lq /dev/nuls \*(rq
 This device is accessible to all users.
 .PP
 The
 .B nuls
 device is characterized by the following behavior:
-.IP \(em
-All data written to 
-.B /dev/nuls
-with
+.IP \(em \w'\(em\(em'u
+All data written to  the
+.B nuls
+device with
 .BR write (2),
 .BR writev (2),
 .BR putmsg (2)
@@ -112,9 +112,9 @@ and
 .BR putpmsg (2)
 is discarded.
 .IP \(em
-All attempts to read
-.B /dev/nuls
-with
+All attempts to read the
+.B nuls
+device with
 .BR read (2),
 .BR readv (2),
 .BR getmsg (2)
@@ -129,11 +129,11 @@ and
 (see
 .BR null (4),
 .BR zero (4)),
-.B /dev/nuls
+.B nuls
 is a
 .B STREAMS
 null device with the following additional characteristics:
-.IP \(em
+.IP \(em \w'\(em\(em'u
 .I STREAMS
 modules can be pushed and popped from the device.
 .IP \(em
@@ -147,7 +147,7 @@ The device can be linked under a multiplexing driver.
 .\"
 .SH IOCTLS
 .PP
-.B /dev/nuls
+.B nuls
 does not support any I/O controls of its own and all I/O controls delivered to
 the driver will return an
 .IR errno (3)
@@ -166,9 +166,9 @@ device.
 .PP
 Pushing a
 .I STREAMS
-module that reponsds to administrative I/O controls on
-.B /dev/nuls
-is a method of providing administrative drivers without consuming major device
+module that reponsds to administrative I/O controls on the
+.B nuls
+device is a method of providing administrative drivers without consuming major device
 numbers.
 .\"
 .\"
@@ -177,7 +177,7 @@ numbers.
 The
 .B nuls
 device is used on systems that provide the older
-.BR "SVR 3"
+.IR "SVR 3"
 .[
 svr3
 .]
@@ -200,10 +200,10 @@ The
 device is used with the
 .BR sc (4)
 module as on
-.BR AIX \(rg,
-.BR HPUX \(rg,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
 and
-.BR OSF \(rg
+.IR OSF \(rg
 systems in support of the
 .BR autopush (8),
 .BR scls (8),
@@ -231,6 +231,14 @@ for
 .BR fdetach (3).
 .\"
 .\"
+.SH IMPLEMENTATION
+.PP
+.B nuls
+is implemented as a regular
+.I STREAMS
+pseudo-device driver.
+.\"
+.\"
 .\".SH EXAMPLES
 .\".PP
 .\"
@@ -255,15 +263,16 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-.BR /dev/nuls
-is compatible with
-.BR "SVR 4.2" ,
-.BR AIX \(rg,
-.BR HPUX \(rg,
+The
+.B nuls
+device is compatible with
+.IR "SVR 4.2" ,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
 and
-.BR OSF \(rg
+.IR OSF \(rg
 with the following portability considerations:
-.IP \(em
+.IP \(em \w'\(em\(em'u
 .B /dev/nuls
 can be used instead of
 .B /dev/null
@@ -274,15 +283,15 @@ for any purpose for which those devices are used.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 .[
 svr42cr
 .]
 and
-.BR AIX \(rg,
-.BR HPUX \(rg,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
 and
-.BR OSF \(rg
+.IR OSF \(rg
 documentation.
 .[
 aixdoc
@@ -300,15 +309,15 @@ osfdoc
 The
 .B nuls
 device first appeared in
-.B SVR 4.2
+.I SVR 4.2
 .[
 svr42
 .]
 implementations for
-.BR AIX \(rg,
-.BR HPUX \(rg,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
 and
-.BR OSF \(rg.
+.IR OSF \(rg.
 
 .\"
 .\"

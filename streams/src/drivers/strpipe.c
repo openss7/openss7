@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -115,8 +115,8 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allo
 static struct module_info pipe_minfo = {
 	mi_idnum:CONFIG_STREAMS_PIPE_MODID,
 	mi_idname:CONFIG_STREAMS_PIPE_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
+	mi_minpsz:STRMINPSZ,
+	mi_maxpsz:STRMAXPSZ,
 	mi_hiwat:STRHIGH,
 	mi_lowat:STRLOW,
 };
@@ -138,8 +138,8 @@ static int pipeopen(struct inode *inode, struct file *file)
 	struct str_args *argp = file->f_dentry->d_fsdata;
 	int err = 0;
 	struct stdata *sd;
-	/* first find out of we already have a stream head */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe))) {
+	/* first find out of we already have a stream head, or we need a new one anyway */
+	if (!(sd = sd_get((struct stdata *)inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
 		/* We only do not have a stream head on initial open of the inode.  This only
 		   occurs in response to a pipe(2) or s_pipe(3) system call */
 		queue_t *q;
@@ -351,13 +351,13 @@ static struct streamtab pipe_info = {
 static int open_pipe(struct inode *inode, struct file *file)
 {
 	struct str_args args = {
-		file:file,
-		oflag:make_oflag(file),
-		crp:current_creds,
-		name:{args.buf, 0, 0},
+	      file:file,
+	      dev:makedevice(major, 0),
+	      oflag:make_oflag(file),
+	      sflag:CLONEOPEN,
+	      crp:current_creds,
+	      name:{args.buf, 0, 0},
 	};
-	args.dev = makedevice(major, 0);
-	args.sflag = CLONEOPEN;
 	file->f_op = &pipe_f_ops;	/* fops_get already done */
 	return sdev_open(inode, file, specfs_mnt, &args);
 }

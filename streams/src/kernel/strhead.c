@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/16 17:14:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/16 17:14:54 $"
 
-static char const ident[] = "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 12:17:48 $";
+static char const ident[] = "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/16 17:14:54 $";
 
 #define __NO_VERSION__
 
@@ -84,6 +84,7 @@ static char const ident[] = "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.
 #include "strsad.h"		/* for autopush_find */
 #include "strutil.h"		/* for q locking and puts and gets */
 #include "strattach.h"		/* for do_fattach/do_fdetach */
+#include "strspecfs.h"		/* for specfs_mnt */
 
 #include "sys/config.h"
 
@@ -139,7 +140,6 @@ struct streamtab str_info = {
 };
 
 #define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
-#define sdev_lookup(__i) ((struct cdevsw *)(__i)->i_cdev->data)
 
 /* 
  *  -------------------------------------------------------------------------
@@ -737,8 +737,11 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
 		goto einval;
 	if ((err = verify_area(VERIFY_READ, fdi->ctlbuf.buf, fdi->ctlbuf.len)) < 0)
 		goto einval;
+	if (fdi->databuf.len <= 0)
+		goto no_databuf;
 	if ((err = verify_area(VERIFY_READ, fdi->databuf.buf, fdi->databuf.len)) < 0)
 		goto einval;
+      no_databuf:
 	if (fdi->ctlbuf.len > sysctl_str_strctlsz)
 		goto erange;
 	{
@@ -1701,10 +1704,12 @@ int stropen(struct inode *inode, struct file *file)
 	struct str_args *argp = file->f_dentry->d_fsdata;
 	int err = 0;
 	struct stdata *sd;
-	/* first find out if we already have a stream head */
-	if (!(sd = sd_get((struct stdata *)inode->i_pipe))) {
+	/* first find out of we already have a stream head, or we need a new one anyway */
+	if (!(sd = sd_get((struct stdata *) inode->i_pipe)) || (sd->sd_cdevsw->d_flag & D_CLONE)) {
 		queue_t *q;
 		struct cdevsw *cdev;
+		if (sd)		/* put away old one */
+			sd_put(sd);
 		/* we don't have a stream yet (or want a new one), so allocate one */
 		if (!(cdev = sdev_get(argp->dev)))
 			return (-ENXIO);
@@ -1745,7 +1750,7 @@ int stropen(struct inode *inode, struct file *file)
 		setq(q, str_info.st_rdinit, str_info.st_wrinit);
 		/* grafting onto inode */
 		sd->sd_inode = inode;	/* shadow inode */
-		inode->i_pipe = (void *)sd;
+		inode->i_pipe = (void *) sd;
 		stri_lookup(file) = (void *) sd;
 		/* done setup, do the open */
 	} else
@@ -2620,6 +2625,34 @@ int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned 
 /* 
  *  -------------------------------------------------------------------------
  *
+ *  Stream Head file operations
+ *
+ *  -------------------------------------------------------------------------
+ */
+struct file_operations strm_f_ops ____cacheline_aligned = {
+	owner:THIS_MODULE,
+	llseek:strllseek,
+	read:strread,
+	write:strwrite,
+	poll:strpoll,
+	ioctl:strioctl,
+	mmap:strmmap,
+	open:stropen,
+	flush:strflush,
+	release:strclose,
+	fasync:strfasync,
+	readv:strreadv,
+	writev:strwritev,
+	sendpage:strsendpage,
+#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
+	getpmsg:strgetpmsg,
+	putpmsg:strputpmsg,
+#endif
+};
+
+/* 
+ *  -------------------------------------------------------------------------
+ *
  *  SRVP Write Service Procedure
  *
  *  -------------------------------------------------------------------------
@@ -2997,6 +3030,27 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
+#if 0
+static int open_strm(struct inode *inode, struct file *file)
+{
+	struct str_args args = {
+	      file:file,
+	      dev:kdev_t_to_nr(inode->i_rdev),
+	      oflag:make_oflag(file),
+	      sflag:DRVOPEN,
+	      crp:current_creds,
+	      name:{args.buf, 0, 0},
+	};
+	file->f_op = &strm_f_ops;	/* fops_get already done */
+	return sdev_open(inode, file, specfs_mnt, &args);
+}
+
+static struct file_operations strm_ops ____cacheline_aligned = {
+      owner:THIS_MODULE,
+      open:open_strm,
+};
+#endif
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -3004,26 +3058,6 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
  *
  *  -------------------------------------------------------------------------
  */
-struct file_operations strm_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	llseek:strllseek,
-	read:strread,
-	write:strwrite,
-	poll:strpoll,
-	ioctl:strioctl,
-	mmap:strmmap,
-	open:stropen,
-	flush:strflush,
-	release:strclose,
-	fasync:strfasync,
-	readv:strreadv,
-	writev:strwritev,
-	sendpage:strsendpage,
-#ifdef HAVE_PUTPMSG_GETPMSG_FILE_OPS
-	getpmsg:strgetpmsg,
-	putpmsg:strputpmsg,
-#endif
-};
 
 /* Note: we do not register stream heads - the above operations are exported and used by all
    regular STREAMS devices */
