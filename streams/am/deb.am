@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/20 09:03:13 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/21 01:55:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:03:13 $ by $Author: brian $
+# Last Modified $Date: 2005/02/21 01:55:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,12 +102,10 @@ dsc-sign: $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
 	@if ! ${GPG} --verify -- $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc >/dev/null 2>&1 ; then \
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
-		pass="$(GPGPASSWD)" ; pass="$${pass:+ --passphrase-fd 0}" ; \
-		pipe="$(GPGPASSWD)" ; pipe="$${pipe:+ (echo $$pipe;echo ''; echo '') | }" ; \
 		echo "rm -f $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.asc" ; \
 		rm -f $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.asc ; \
-		echo "$(GPG) --clearsign -a$$user$$home$$pass -- $<" ; \
-		eval "$$pipe $(GPG) --clearsign -a$$user$$home$$pass -- $<" ; \
+		echo "$(GPG) --clearsign --passphrase-fd 0 -a$$user$$home -- $<" ; \
+		$(GPG) --clearsign --passphrase-fd 0 -a$$user$$home -- $< ; \
 		echo "mv -f $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.asc $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc" ; \
 		mv -f $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.asc $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc ; \
 	fi

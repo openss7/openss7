@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/20 09:03:27 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/21 01:55:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 09:03:27 $ by $Author: brian $
+# Last Modified $Date: 2005/02/21 01:55:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,10 +98,8 @@ $(DIST_SIGNATURES): %.asc : %
 		rm -f -- $@ ; \
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
-		pass="$(GPGPASSWD)" ; pass="$${pass:+ --passphrase-fd 0}" ; \
-		pipe="$(GPGPASSWD)" ; pipe="$${pipe:+ (echo $$pipe; echo ''; echo '') | }" ; \
-		echo "$(GPG) -ba$$user$$home$$pass -- $<" ; \
-		eval "$$pipe $(GPG) -ba$$user$$home$$pass -- $<" ; \
+		echo "$(GPG) -ba --passphrase-fd 0 $$user$$home -- $<" ; \
+		$(GPG) -ba --passphrase-fd 0 $$user$$home -- $< ; \
 	fi
 
 deb-rules-check:
