@@ -1,0 +1,1098 @@
+<html>
+
+
+
+<head>
+
+<title>Configuration</title>
+<meta name="title" content="LiS Configuration">
+<meta name="keywords" content="Linux, streams, conf, config, configuration, LiS">
+<meta name="description" content="How to configure LiS">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>Configuration</h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+    <td width="600" height="100%" align="left" valign="top"> 
+      <h2><a name="contents"></a>Contents</h2>
+      <table width="75%" border="1">
+        <tr> 
+          <td> 
+            <p><a href="#Introduction">Introduction</a></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#config_files">Config Files</a></p>
+          </td>
+        </tr>
+        <tr> 
+          <td><a href="#SVR4">SVR4 Compatibility</a></td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#loadable_drivers">Loadable STREAMS Drivers and Modules</a></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#strconf_utility">The strconf Utility</a></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#config_file_syntax">Configuration File Syntax</a></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#driver">Driver Specification</a>&nbsp;</p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#module">Module Specification</a>&nbsp;</p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#node">Node Specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#device">Device Specifications</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#initialization">Driver Initialization Specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#termination">Driver Termination Specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#interrupt">Driver Interrupt Specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#objname">Object Name Specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#loadable">Loadable specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#autopush">Autopush Specification</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#tunable_params">Tunable Parameter Specification</a>&nbsp;</p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#space.c">The Space.c File</a>&nbsp;</p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#example">A Simple Example</a></p>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <p><a href="#installing_driver">Installing Your Driver</a></p>
+          </td>
+        </tr>
+      </table>
+      <p>&nbsp;</p>
+      <h2><font size="+0">Introduction<a name="Introduction"></a></font></h2>
+      <p>When LiS is built, its makefiles gather configuration information about 
+        the STREAMS drivers that are to be linked in with LiS. This information 
+        comes from several ASCII files within the LiS directory tree.&nbsp; </p>
+      <p>Once all of the configuration information is consolidated into a single 
+        file, the file is processed by a utility program <font face="Courier New, Courier, mono">strconf</font> 
+        to produce several output files, which, in turn, are input to the final 
+        stages of the LiS build process.&nbsp; 
+      <p>This document describes this process and the <font face="Courier New, Courier, mono">strconf</font> 
+        program itself.&nbsp;
+      <p><a href="#contents">Back to Contents</a>
+      <h2> <font size=+0><a name="config_files"></a>Config Files</font>&nbsp;</h2>
+      <p>There are several locations in the LiS directory tree in which a file 
+        by the special name <i>Config</i> appears. Each <i>Config</i> file describes 
+        configuration information for one or more STREAMS drivers. These <i>Config</i> 
+        files are all concatenated together for processing by the <i>strconf</i> 
+        utility program.&nbsp; </p>
+      <p>Drivers that are built into LiS are located in the directory <font face="Courier New, Courier, mono">/usr/src/LiS/drivers/str</font>. 
+        This directory contains a <i>Config</i> file which describes these drivers 
+        for the <i>strconf</i> program. In this case a single <i>Config</i> file 
+        describes multiple drivers.&nbsp; 
+      <p>Drivers that are added to LiS in binary form at build time reside in 
+        subdirectories of the directory <font face="Courier New, Courier, mono">/usr/src/LiS/pkg</font>. 
+        Each subdirectory contains a <i>Config</i> file for its own driver. All 
+        such <i>Config</i> files are concatenated into the directory <font face="Courier New, Courier, mono">/usr/src/LiS/pkg</font> 
+        into a file named <i>config.pkg</i>.&nbsp; 
+      <p>During the LiS build procedure, in the directory /usr/src/LiS, the <i>Config</i> 
+        file from the <font face="Courier New, Courier, mono">drivers/str</font> 
+        directory is concatenated with the <i>config.pkg</i> file into a file 
+        named <i>Config.master</i>. This file is processed by the <i>strconf</i> 
+        utility to produce the files <i>config.h</i>, <i>modconf.</i>c and <i>makenodes.c</i>.&nbsp; 
+      <p>The <i>config.h</i> file is available to be included in the compilation 
+        of individual <i>Space.c</i> files which appear in the <font face="Courier New, Courier, mono">/usr/src/LiS/pkg</font> 
+        subdirectories. The contents of the <i>config.h</i> file summarize the 
+        information contained in the <i>Config</i> files in C language #defines 
+        which can be used for building driver configuration tables.&nbsp; It is 
+        placed in the directory <font face="Courier New, Courier, mono">/usr/src/LiS/include/sys/LiS</font>. 
+      <p>The <i>modconf.c</i> file is compiled as a component of LiS. It contains 
+        initialized tables for all of the STREAMS drivers and pushable modules 
+        that LiS is configured to manage.&nbsp; 
+      <p>The <i>makenodes.c</i> file is compiled into a utility program, <i>makenodes</i>, 
+        which will create all of the entries for STREAMS drivers in the <font face="Courier New, Courier, mono">/dev</font> 
+        directory.&nbsp; 
+      <p><a href="#contents">Back to Contents</a> 
+      <h2><font size="+0"><a name="SVR4"></a>SVR4 Compatibility</font></h2>
+      <p>Configuration of drivers in LiS is similar in flavor to the method used 
+        in SVR4, but is different in almost all details. Included with LiS is 
+        a PERL script (nodeconfig.pl) that can be used to process an SVR4 <font face="Courier New, Courier, mono"><b>Node(4dsp)</b></font> 
+        file into an LiS <font face="Courier New, Courier, mono">Config</font> 
+        file. This is an unsupported contribution from an LiS user.
+      <p><a href="#contents">Back to Contents</a> 
+      <h2> <font size=+0><a name="loadable_drivers"></a>Loadable STREAMS Drivers 
+        and Modules</font><font size=+1>&nbsp;</font></h2>
+      <p>In order to support loadable STREAMS drivers and modules, the LiS configuration 
+        file language contains keywords to support the notion of object files.&nbsp; 
+      </p>
+      <p>An object file contains one or more drivers or modules. It is typically 
+        a file with suffix "<font face="Courier New, Courier, mono">.o</font>" 
+        containing linkable object code built by compiling C language source with 
+        the "<font face="Courier New, Courier, mono">-c</font>" option.&nbsp; 
+      <p>By default, object files are linked with LiS at compile time, but you 
+        can use the "<font face="Courier New, Courier, mono"><a href="#loadable">loadable</a></font>" 
+        keyword in a <font face="Courier New, Courier, mono">Config</font> file 
+        to specify that an object file should be considered a kernel loadable 
+        module. This allows individual STREAMS drivers or modules to have the 
+        status of Linux loadable modules.&nbsp; 
+      <p>For an example of this observe how the &quot;<font face="Courier New, Courier, mono">ldl</font>&quot; 
+        driver is built and installed as a part of the LiS package itself. The 
+        driver source resides in <font face="Courier New, Courier, mono">drivers/str/linux</font>. 
+        The <font face="Courier New, Courier, mono">Config</font> file that contains 
+        enties for &quot;<font face="Courier New, Courier, mono">ldl</font>&quot; 
+        is in <font face="Courier New, Courier, mono">drivers/str</font>. You 
+        can observe the LiS build process to see how the driver is named and copied 
+        to the <a href="#lib_modules">appropriate subdirectory of <font face="Courier New, Courier, mono">/lib/modules</font></a>.
+      <p>You can place a <font face="Courier New, Courier, mono">Config</font> 
+        file in a subdirectory of the pkg directory without placing any driver 
+        object code there. This is sufficient for LiS to process your <font face="Courier New, Courier, mono">Config</font> 
+        file entries and make proper preparations for your loadable driver, such 
+        as assigning it a major device number. See the <a href="compiled.html#dynamic_loading">document 
+        section on installing pre-compiled drivers</a> for more information on 
+        this process.
+      <p>If the kernel is configured with support for kerneld(8), a loadable module 
+        will be <a href="demand.html#demand_loading">demand loaded</a>. All kernel 
+        module names defined within LiS begin with the prefix "<font face="Courier New, Courier, mono">streams</font>" 
+        to avoid name clashes with other Linux kernel modules.&nbsp; 
+      <p>For a non-clone device, the kernel will demand load the module under 
+        the name "char-major-nn". This will cause kerneld(8) to autoload a Linux 
+        kernel module using the aliases in <font face="Courier New, Courier, mono">/etc/conf.modules</font> 
+        (or <font face="Courier New, Courier, mono">/etc/modules.conf</font>). 
+        If <font face="Courier New, Courier, mono">/etc/conf.modules</font> contains 
+        an alias for a STREAMS driver then the driver can be autoloaded via this 
+        mechanism. To the kernel a loadable STREAMS driver is just a character 
+        driver known by its major device number.&nbsp; 
+      <p>When the clone device is opened for a major configured in a loadable 
+        object file "<font face="Courier New, Courier, mono">myobj</font>" (for 
+        example), LiS will ask kerneld(8) to load "<font face="Courier New, Courier, mono">streams-myobj</font>". 
+        If this fails, LiS tries to demand load a module named "<font face="Courier New, Courier, mono">char-major-</font><i>nn</i>". 
+        If this also fails, an error is logged and the open fails.&nbsp; 
+      <p>When the name of a STREAMS module "<font face="Courier New, Courier, mono">mymod</font>" 
+        configured in a loadable object file "<font face="Courier New, Courier, mono">myobj</font>" 
+        is used for <font face="Courier New, Courier, mono">I_PUSH</font>, LiS 
+        demand loads a kernel module named "<font face="Courier New, Courier, mono">streams-myobj</font>". 
+        If this fails, LiS will try to demand load a kernel module named "<font face="Courier New, Courier, mono">streams-mymod</font>". 
+        If this also fails, an error is logged and the <font face="Courier New, Courier, mono">I_PUSH</font> 
+        fails.&nbsp; 
+      <p>When an unknown module name "<font face="Courier New, Courier, mono">mymod</font>" 
+        is used for <font face="Courier New, Courier, mono">I_PUSH</font>, LiS 
+        tries to demand load a kernel module named "<font face="Courier New, Courier, mono">streams-mymod</font>".&nbsp; 
+      <p>The <font face="Courier New, Courier, mono">strconf</font> utility will 
+        emit a file with the aliases needed for kerneld(8) support. This file 
+        can be incorporated into the file <font face="Courier New, Courier, mono">/etc/conf.modules</font>. 
+        Refer to the "<font face="Courier New, Courier, mono">-L</font>" option 
+        for the <font face="Courier New, Courier, mono">strconf</font> utility, 
+        below.&nbsp; 
+      <p><a href="#contents">Back to Contents</a> 
+      <h1> <font size=+2><a name="strconf_utility"></a>The strconf Utility</font>&nbsp;</h1>
+      <p>In order to construct a <font face="Courier New, Courier, mono">Config</font> 
+        file, it is useful to know the syntax of the contents of the file. The 
+        <font face="Courier New, Courier, mono">strconf</font> utility is used 
+        to process a <font face="Courier New, Courier, mono">Config</font> file 
+        and generate the output files mentioned above.&nbsp; </p>
+      <h2> <font size=+1>Command Line Syntax</font>&nbsp;</h2>
+      <blockquote>strconf <i>options input-file</i></blockquote>
+      <p>The options for <i>strconf</i> consist of zero or more of the following.&nbsp; 
+        <br>
+        &nbsp; </p>
+      <table border=0 cellspacing=0 cellpadding=7 >
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-b</font><i>number</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p><a name="major-base"></a>Set the base major number for automatic 
+              assignment of major device numbers. The LiS Configure script, run 
+              from the top level &quot;make&quot;, uses the value of the environment 
+              variable LIS_MAJOR_BASE to set this parameter, or a default value 
+              if this variable is not defined. By defining this symbol in your 
+              environment you can override the default base for major device numbers.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-h</font><i>file</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>Set the output header file name to something other than the default 
+              "<font face="Courier New, Courier, mono">config.h</font>".</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-l</font><i>file</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>Set the output driver configuration makefile include file name 
+              to something other than the default "<font face="Courier New, Courier, mono">drvrconf.mk</font>".</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-L</font><i>file</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>Set the output Linux loadable module configuration file name to 
+              something other than the default "<font face="Courier New, Courier, mono">conf.modules</font>".</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-m</font><i>file</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>Set the output file name for the program that will make the nodes 
+              to something other than "<font face="Courier New, Courier, mono">makenodes.c</font>". 
+              This program is compiled and then run to create all the <font face="Courier New, Courier, mono">/dev</font> 
+              entries for the STREAMS drivers.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-M</font><i>name</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>The name of the mknod() routine to call in the <font face="Courier New, Courier, mono">makenodes.c</font> 
+              program. The default is "<font face="Courier New, Courier, mono">mknod</font>".</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-o</font><i>file</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>Set the output file name to something other than the default name 
+              "<font face="Courier New, Courier, mono">modconf.c</font>". This 
+              is the file that must be linked in with STREAMS.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-p</font><i>perm</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>Set default permissions to something other than <font face="Courier New, Courier, mono">0666</font> 
+              for <font face="Courier New, Courier, mono">/dev</font> entries 
+              created by the <font face="Courier New, Courier, mono">makenodes.c</font> 
+              program.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="6">&nbsp;</td>
+          <td valign=TOP width="15%" height="6"><font face="Courier New, Courier, mono">-r</font><i>name</i></td>
+          <td valign=TOP width="76%" height="6"> 
+            <p>The name of the routine to build in <font face="Courier New, Courier, mono">makenodes.c</font>. 
+              The default is "<font face="Courier New, Courier, mono">main</font>".</p>
+          </td>
+        </tr>
+      </table>
+      <p>The <i>input-file</i> parameter is the name of the file containing the 
+        configuration information in ASCII.&nbsp; 
+      <p>Example:&nbsp; 
+      <p><font face="Courier New"><font size="-1" face="Courier New, Courier, mono">strconf 
+        -b51 config.master</font></font> 
+      <p>This command bases the major device numbers for STREAMS drivers at 51 
+        and outputs files to the standard places.&nbsp; 
+      <p><a href="#contents">Back to Contents</a> 
+      <h2> <font size=+1><a name="config_file_syntax"></a>Configuration File Syntax</font>&nbsp;</h2>
+      <p>The input to the <i>strconf</i> program is informally referred to as 
+        a <i>Config</i> file. This file consists of lines of ASCII text which 
+        is interpreted by the <i>strconf</i> program.&nbsp; </p>
+      <p>Blank lines are ignored. The "#" serves as a comment symbol, terminating 
+        any line on which it appears.&nbsp; 
+      <p>Input to <i>strconf</i> consists of a series of tokens, which are strings 
+        of ASCII characters with no embedded white space. Some tokens are keywords 
+        known to <i>strconf</i>; some are numbers in C language syntax; some are 
+        identifiers supplied by the user to give names to drivers, etc. Tokens 
+        are separated from one another by white space.&nbsp; 
+      <p>Each line in the file is self-contained. That is, a construct consisting 
+        of a keyword followed by its arguments must all appear on the same line 
+        of the file.&nbsp; 
+      <p><i>Strconf</i> processes lines for the following constructs.&nbsp; 
+      <p><a href="#contents">Back to Contents</a> 
+      <h3> <font size=+0><b><a name="driver"></a>Driver Specification</b>&nbsp;</font></h3>
+      <blockquote>driver <i>driver-name prefix major minors&nbsp;</i></blockquote>
+      <p><i>driver-name</i> is the name of the STREAMS driver (not pushable module), 
+        for example <i>loop-around</i>. It is any string of characters not including 
+        "white space" characters.&nbsp; </p>
+      <p><i>prefix</i> is alphanumeric, plus underscore, and will be prefixed 
+        to any table entries referencing variables within this driver. For example, 
+        the prefix <i>loop_</i> will be used to derive the reference to the <i>streamtab</i> 
+        entry <i>loop_info</i>. The driver must have a variable declared within 
+        it by the name <i>prefix</i>info of type <i>struct streamtab</i>.&nbsp; 
+      <p><i>major</i> specifies the major device number that will be assigned 
+        to the device. The character "*" means that the config program will choose 
+        the <a href="#major-base">major number</a>. A numeric value is used as 
+        it is given.&nbsp; 
+      <p><i>minors</i> is the number of minors the device has. If this field is 
+        omitted, the number 1 will be used. The value of this field is not used 
+        for anything except to generate a #define in the <i>config.h</i> output 
+        file.&nbsp; 
+      <p>Example:&nbsp; 
+      <blockquote><tt>driver loop-around loop_ *</tt></blockquote>
+      <p>This declares a driver which has the name "loop-around" for reference 
+        purposes within the <i>strconf</i> program. Its prefix is "loop_", and 
+        the <i>strconf</i> program is to assign its major device number.&nbsp; 
+      </p>
+      <p><a href="#contents">Back to Contents</a> </p>
+      <h3> <b><font size=+0><a name="module"></a>Module Specification</font></b>&nbsp;</h3>
+      <blockquote>module <i>name prefix</i></blockquote>
+      <p><i>name</i> is the name of the module, for example <i>relay-mod</i>. 
+        It is any string of characters not including "white space" characters.&nbsp; 
+      </p>
+      <p><i>prefix</i> is alphanumeric, plus underscore, and will be prefixed 
+        to any table entries referencing variables within this module. For example, 
+        the prefix <i>relay_</i> will be used to derive the reference to the <i>streamtab</i> 
+        entry <i>relay_info</i>. The module must have a variable declared within 
+        it by the name <i>prefix</i>info of type <i>struct streamtab</i>.&nbsp; 
+      <p>Example:&nbsp; 
+      <blockquote><tt>module relay-mod relay_</tt></blockquote>
+      <p>This example declares a pushable module to be referred to internally 
+        as "relay-mod". Its prefix is "relay_".&nbsp; </p>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <b><font size=+0><a name="node"></a>Node Specification</font></b>&nbsp;</h3>
+      <blockquote>node <i>dev-name type perm major minor</i></blockquote>
+      <p>The keyword "node" introduces this entry.&nbsp; </p>
+      <p><i>dev-name</i> is the full path name of the device file to be created, 
+        for example, /dev/loop.&nbsp; 
+      <p><i>type</i> is the type of file to create. This consists of a single 
+        letter as follows:&nbsp; <br>
+        &nbsp; 
+      <table border=0 cellspacing=0 cellpadding=7 >
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">b</font></td>
+          <td valign=TOP width="82%" height="18">block special device (S_IFBLK)</td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">c</font></td>
+          <td valign=TOP width="82%" height="18">character special device (S_IFCHR)</td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">p</font></td>
+          <td valign=TOP width="82%" height="18">pipe device (S_IFIFO)</td>
+        </tr>
+      </table>
+      <p><i>perm</i> is the device permissions to use, 0666 gives everyone permission 
+        to use the device. <i>perm</i> can be "*" in which case default permissions 
+        are supplied (see -p command line option).&nbsp; 
+      <p><i>major</i> is the major device number to assign to this entry. It can 
+        be a number, but is usually the <i>name</i> of the associated driver entry. 
+        The <a href="#major-base">major</a> specified for the named driver is 
+        then used.&nbsp; 
+      <p><i>minor</i> is the minor device number to assign to this entry. It can 
+        be a number or the name of another driver. If the name form is used then 
+        the major number of the other driver is used as the minor number of the 
+        device being created.&nbsp; 
+      <p>Example:&nbsp; 
+      <ul>
+        <pre><tt>node /dev/loop c * loop-around 1&nbsp;
+
+node /dev/loop_clone c * clone-drvr loop-around</tt></pre>
+      </ul>
+      <p>The first example defines a device /dev/loop as a character special device 
+        with default permissions as minor device 1 of the "loop-around" driver.&nbsp; 
+      </p>
+      <p>The second example defines a device /dev/loop_clone as a character device 
+        with default permissions with major device number equal to that assigned 
+        to the driver named "clone-drvr" and minor device number equal to that 
+        assigned to the driver named "loop-around".&nbsp; 
+      <p><a href="#contents">Back to Contents</a> 
+      <h3> <b><font size=+0><a name="device"></a>Device Specifications</font>&nbsp;</b></h3>
+      <p>These entries are used to describe the configuration of each physical 
+        device or port of a multi-port device on the system. Those familiar with 
+        the Unix sdevice file format will see some similarity to this format. 
+        The syntax for this type of entry is as follows:&nbsp; </p>
+      <blockquote>device <i>driver-name unit port nports irq-share irq mem mem-size 
+        dma1 dma2</i></blockquote>
+      <p>All 11 fields must be on the same line. Only the "device" keyword and 
+        <i>driver-name</i> fields are mandatory.&nbsp; </p>
+      <p><i>driver-name</i> is the name of the driver that handles the device. 
+        It must match the name of a declared driver in this file.&nbsp; 
+      <p><i>unit</i> is the unit number of the device being declared. A unit number 
+        means anything that the driver writer wants it to. It is assumed to be 
+        a small integer that will index a configuration table that is built from 
+        #defines generated by running this program. If this field is missing it 
+        is set to -1.&nbsp; 
+      <p><i>port</i> is the I/O port that the device uses. Set to -1 if the device 
+        does not use any I/O ports. If this field is missing it is set to -1.&nbsp; 
+      <p><i>nports</i> is the number of consecutive I/O ports used by the driver. 
+        If <i>ports</i> is -1 then <i>nports</i> can be any value, zero is suggested. 
+        If this field is missing it is set to zero.&nbsp; 
+      <p><i>irq-share</i> is a letter-coded field as follows:&nbsp; <br>
+        &nbsp; 
+      <table border=0 cellspacing=0 cellpadding=7 >
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">n</font></td>
+          <td valign=TOP width="82%" height="18">No sharing of IRQ</td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">s</font></td>
+          <td valign=TOP width="82%" height="18">Sharing of IRQ</td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">S</font></td>
+          <td valign=TOP width="82%" height="18">Sharing of IRQ but only with 
+            the same driver</td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="18">&nbsp;</td>
+          <td valign=TOP width="9%" height="18"><font face="Courier New, Courier, mono">x</font></td>
+          <td valign=TOP width="82%" height="18">Don't care, the device does not 
+            use an IRQ</td>
+        </tr>
+      </table>
+      <p>If the irq-share field is missing it is defaulted to the value corresponding 
+        to "<font face="Courier New, Courier, mono">x</font>".&nbsp; 
+      <p><i>irq</i> is the interrupt number for the device. The value -1 is used 
+        when the device does not have an interrupt. If this value is specified 
+        then it is assumed that there exists a routine with the name <i>prefix</i>intr, 
+        where <i>prefix</i> is the driver prefix specified in the driver section. 
+        If this field is missing it is set to -1.&nbsp; 
+      <p><i>mem</i> is the shared-memory address used by this device, if any. 
+        Set to 0 if the device does not use shared memory. If this field is missing 
+        it is set to zero.&nbsp; 
+      <p><i>mem-size</i> is the amount of shared memory used, in bytes. If this 
+        field is missing it is set to zero.&nbsp; 
+      <p><i>dma1</i> and <i>dma2</i> specify up to two DMA channels used by this 
+        device. Set to -1 if no DMA channels are being used. If either of these 
+        fields is missing it is set to -1.&nbsp; 
+      <p>The device entry causes a set of #defines to be generated into the file 
+        <i>config.h</i>. This file may be #included into a driver configuration 
+        file to load tables, etc. The form of the #defines in the <i>config.h</i> 
+        file is compatible with the form used by Unix SVR4. Thus, if you are porting 
+        a STREAMS driver from SVR4 you can use a variant of your <i>System</i> 
+        file entries as the device entries and use the resulting <i>config.h</i> 
+        file in your existing <i>Space.c</i> file.&nbsp; 
+      <p>The present implementation of LiS does not dispatch interrupts for STREAMS 
+        drivers. It is possible that some future version will do so, in which 
+        case the IRQ specifications will be more meaningful. At present these 
+        specifications only cause entries to be generated in the <i>config.h</i> 
+        file. You can utilize this information in a <i>Space.c</i> file to build 
+        a table that your driver uses to attach its IRQ from its initialization 
+        routine.&nbsp; 
+      <p>Example:&nbsp; 
+      <blockquote><font face="Courier New"><font size=-1>device cdip 0 0x310 8 
+        S 10 0xD0000 0x4000</font></font></blockquote>
+      <p>This example declares a device entry for the driver named "cdip". Its 
+        unit number field is zero. It has eight I/O ports starting at port address 
+        0x310. The device can share IRQ10 with other devices of the same driver. 
+        It has shared memory based at 0xD0000 which is 16K bytes (0x4000) in size. 
+        It does not use any DMA channels.&nbsp; </p>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <b><font size=+0><a name="initialization"></a>Driver Initialization 
+        Specification</font></b>&nbsp;</h3>
+      <blockquote>initialize <i>driver-name</i></blockquote>
+      <p>The <i>driver-name</i> is the name of the driver whose "init" routine 
+        is to be called. The driver must supply a routine such as the following:&nbsp; 
+      </p>
+      <blockquote> 
+        <pre><tt>void <i><font face="Times New Roman">prefix</font></i>init(void)
+{
+}</tt></pre>
+      </blockquote>
+      <p>Example:&nbsp; </p>
+      <blockquote><tt>initialize loop-around</tt></blockquote>
+      <p>This leads to a call to the routine <font face="Courier New, Courier, mono">loop_init()</font> 
+        since "<font face="Courier New, Courier, mono">loop_</font>" is the associated 
+        prefix for the "<font face="Courier New, Courier, mono">loop-around</font>" 
+        driver. This routine is called by LiS when LiS is initialized. If LiS 
+        is linked with the kernel then this call occurs at system boot time. If 
+        it is loaded as a module then the call occurs at module initialization 
+        time for LiS.&nbsp; </p>
+      <p><a href="#contents">Back to Contents</a><br>
+        &nbsp; <br>
+      </p>
+      <h3> <b><font size=+0><a name="termination"></a>Driver Termination Specification</font></b>&nbsp;</h3>
+      <blockquote>terminate <i>driver-name</i></blockquote>
+      <p>The <i>driver-name</i> is the name of the driver whose "term" routine 
+        is to be called. The driver must supply a routine such as the following:&nbsp; 
+      </p>
+      <blockquote> 
+        <pre><tt>void <i><font face="Times New Roman">prefix</font></i>term(void)
+{
+}</tt></pre>
+      </blockquote>
+      <p>Example:&nbsp; </p>
+      <blockquote><tt>terminate loop-around</tt></blockquote>
+      <p>This leads to a call to the routine <font face="Courier New, Courier, mono">loop_term()</font> 
+        since "<font face="Courier New, Courier, mono">loop_</font>" is the associated 
+        prefix for the "<font face="Courier New, Courier, mono">loop-around</font>" 
+        driver. This routine is called by LiS when LiS is terminating. If LiS 
+        is linked with the kernel then this call never occurs because LiS is never 
+        terminated. If LiS is loaded as a module then the call occurs at module 
+        termination time for LiS. This occurs just prior to unloading LiS from 
+        memory. <br>
+        &nbsp; <br>
+        &nbsp; <a href="#contents">Back to Contents</a></p>
+      <h3> <b><font size=+0><a name="interrupt"></a>Driver Interrupt Specification</font></b>&nbsp;</h3>
+      <blockquote>interrupt <i>driver-name</i></blockquote>
+      <p>The <i>driver-name</i> is the name of the driver whose "intr" routine 
+        is to be attached. The driver must supply a routine such as the following:&nbsp; 
+      </p>
+      <blockquote> 
+        <pre><tt>void <i><font face="Times New Roman">prefix</font></i>intr(void)
+{
+}</tt></pre>
+      </blockquote>
+      <p>Example:&nbsp; </p>
+      <blockquote><tt>interrupt loop-around</tt></blockquote>
+      <p>This causes LiS to register the driver's interrupt routine for each of 
+        the IRQs used in the driver's device specifications.&nbsp; This occurs 
+        at module init time within LiS.&nbsp; The routine is unregistered when 
+        LiS is unloaded. </p>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <font size=+0><b><a name="objname"></a>Object Name Specification</b>&nbsp;</font></h3>
+      <blockquote>objname <i>type name object-name</i></blockquote>
+      <p>The keyword "<font face="Courier New, Courier, mono">objname</font>" 
+        specifies the base name of the object code file for a driver or module. 
+        Several drivers and modules may reside in the same object file. If an 
+        <i>object-name</i> is never specified for a driver or module, the <i>object-name</i> 
+        defaults to the name of the driver or module.&nbsp; </p>
+      <p><i>type</i> is either "<font face="Courier New, Courier, mono">driver</font>" 
+        for a streams driver or "<font face="Courier New, Courier, mono">module</font>" 
+        for a streams module.&nbsp; 
+      <p><i>name</i> is the name of the driver or module.&nbsp; 
+      <p><i>object-name</i> is the base name of the object code file used for 
+        this driver or module.&nbsp; 
+      <p>The purpose of this keyword is twofold:&nbsp; 
+      <ol>
+        <li> It specifies to the drivers/str make process the names of the object 
+          files that need to be compiled. These names need not be the same as 
+          the configuration names.</li>
+        <li> If <i>name</i> is also specified as loadable and the Linux kernel 
+          is compiled with kerneld(8) support, LiS will demand load <i>name</i> 
+          by asking kerneld(8) for "streams-<i>object-name</i>".</li>
+      </ol>
+      <p>Example:&nbsp; </p>
+      <blockquote> 
+        <p><tt>objname driver loop-around loop</tt></p>
+      </blockquote>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <b><font size=+0><a name="loadable"></a>Loadable specification</font></b>&nbsp;</h3>
+      <blockquote>loadable <i>object-name</i></blockquote>
+      <p>The keyword "<font face="Courier New, Courier, mono">loadable</font>" 
+        specifies that an object code file (as specified by the "objname" keyword) 
+        is a Linux kernel loadable module. If the kernel is compiled with kerneld(8) 
+        support, LiS will ask kerneld(8) to <a href="demand.html">load the module 
+        on demand</a>.&nbsp; </p>
+      <p>Please note that you will have to explicitly declare <i>object-name</i> 
+        with the "objname" keyword first. Default <i>object-names</i> will not 
+        do for this keyword, as they may be changed later in the configuration 
+        file.&nbsp; 
+      <p><i>Object-name</i> is the base name of the object code file.&nbsp; 
+      <p>Example:&nbsp; 
+      <blockquote> 
+        <p><tt>loadable loop</tt></p>
+      </blockquote>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <b><font size=+0><a name="autopush"></a>Autopush Specification</font></b>&nbsp;</h3>
+      <blockquote>autopush <i>driver-name minor last-minor module-list</i></blockquote>
+      <p>The keyword "<font face="Courier New, Courier, mono">autopush</font>" 
+        specifies a list of modules that should be pushed onto a stream when it 
+        is opened.&nbsp; </p>
+      <p><i>driver-name</i> is the name of a driver. The <font face="Courier New, Courier, mono">autopush</font> 
+        specification only applies to this driver.&nbsp; 
+      <p><i>minor</i> specifies the first minor device number that this <font face="Courier New, Courier, mono">autopush</font> 
+        specification applies to. If <i>minor</i> is -1, <i>last-minor</i> is 
+        ignored and the <font face="Courier New, Courier, mono">autopush</font> 
+        applies to all minors of this driver.&nbsp; 
+      <p><i>last-minor</i> specifies the last minor in a range that this <font face="Courier New, Courier, mono">autopush</font> 
+        specification applies to. If <i>last-minor</i> is 0, this <font face="Courier New, Courier, mono">autopush</font> 
+        specification applies only to the single minor device number <i>minor</i>, 
+        otherwise <i>last-minor</i> must be greater than <i>minor </i>and the 
+        autopush applies to all minor devices of the named driver from <i>minor</i> 
+        to <i>last-minor</i> inclusively.&nbsp; 
+      <p><i>module-list</i> is a list of one or more STREAMS modules that should 
+        be pushed onto the stream when it is opened. The leftmost module is pushed 
+        first.&nbsp; 
+      <dir> 
+        <li> <b>Warning: Autopush status is currently "complete, untested".</b>&nbsp;</li>
+      </dir>
+      Example:&nbsp; 
+      <blockquote> 
+        <p><tt>autopush loop-around 8 15 relay</tt></p>
+      </blockquote>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <font size=+0><b><a name="tunable_params"></a>Tunable Parameter Specification</b>&nbsp;</font></h3>
+      <p>This type of entry allows you to insert define text into the output file 
+        (config.h default). These values can be used as parameters for drivers 
+        or the streams package itself.&nbsp; </p>
+      <p>The syntax is:&nbsp; 
+      <blockquote>define <i>name value</i></blockquote>
+      <p>The <i>name</i> is the identifier that is being defined. It must be constructed 
+        of characters that comprise a legal C language identifier.&nbsp; </p>
+      <p>The <i>value</i> is any text up to the end of the line.&nbsp; 
+      <p>The output for this entry is of the form:&nbsp; 
+      <blockquote>#define <i>name value</i></blockquote>
+      <p>Example:&nbsp; </p>
+      <blockquote><tt>define MAX_PORTS 16</tt></blockquote>
+      <p>Generates the following in the output file:&nbsp; </p>
+      <blockquote> 
+        <p><tt>#define MAX_PORTS 16</tt></p>
+      </blockquote>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h3> <font size=+0><b><a name="space.c"></a>The Space.c File</b>&nbsp;</font></h3>
+      <p>The <i>Space.c</i> file plays a role in LiS configuration similar to 
+        the file of the same name in Unix SVR4. It is a file associated with each 
+        driver package which contains configuration information for the driver. 
+        It is compiled during the LiS build phase.&nbsp; </p>
+      <p>The <i>Space.c</i> file can utilize information obtained by processing 
+        the <i>Config</i> files using <i>strconf</i>. This processing is automatic 
+        and is a part of the LiS build procedure. The <i>strconf</i> utility is 
+        run prior to compiling the <i>Space.c</i> file for each driver package.&nbsp; 
+      <p>The <i>Space.c</i> file can include the file <i>config.h</i> which contains 
+        #defines for the information gleaned from the <i>Config</i> files. This 
+        allows the <i>Space.c</i> file for a particular driver to capture this 
+        information in a table that the driver can consult during initialization. 
+        The LiS build procedure supplies the proper "<font face="Courier New, Courier, mono">-I</font>" 
+        command line option to make the <i>config.h</i> file visible when compiling 
+        the <i>Space.c</i> files.&nbsp; 
+      <p>The #defines generated by strconf are of the following form.&nbsp; 
+      <p>For each driver:&nbsp; <br>
+        &nbsp; 
+      <table border=0 cellspacing=0 cellpadding=7 width="82%" >
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix</i> 1</tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix</i>_CTLS 
+            <i>Nr-device-entries</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix</i>_UNITS 
+            <i>minors</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix</i>_CMAJORS 
+            <i>majors</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix</i>_CMAJOR_0 
+            <i>assigned-major-device-number</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix</i>_TYPE 
+            -1</tt></td>
+        </tr>
+      </table>
+      <p>For each declared device:&nbsp; <br>
+        &nbsp; 
+      <table border=0 cellspacing=0 cellpadding=7 width="61%" >
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit</i> 
+            1</tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_SIOA 
+            port</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_EIOA 
+            port+nports-1</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_VECT 
+            irq</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_SCMA 
+            mem</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_ECMA 
+            mem+mem-size-1</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_CHAN 
+            dma1</i></tt></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="9%" height="10">&nbsp;</td>
+          <td valign=TOP width="91%" height="10"><tt>#define <i>prefix_unit_CHAN 
+            dma2</i></tt></td>
+        </tr>
+      </table>
+      <p><a href="#contents">Back to Contents</a></p>
+      <h2> <b><font size=+1><a name="example"></a>A Simple Example</font></b>&nbsp;</h2>
+      <p>Let us suppose that you have a STREAMS driver for which you have chosen 
+        the prefix "<font face="Courier New, Courier, mono">xylo_</font>". You 
+        need to make a <font face="Courier New, Courier, mono">Config</font> file 
+        to go with your driver. In the <font face="Courier New, Courier, mono">Config</font> 
+        file you need to declare the existence of your driver as follows.&nbsp; 
+      </p>
+      <blockquote><tt>driver mydrvr xylo_ *</tt></blockquote>
+      <p>By doing this you are declaring that you have a driver named "<font face="Courier New, Courier, mono">mydrvr</font>" 
+        which uses the symbol-name prefix "<font face="Courier New, Courier, mono">xylo_</font>" 
+        and you don't care what its major device number is. The "<font face="Courier New, Courier, mono">mydrvr</font>" 
+        is a name that you make up that is not used anywhere but in the <font face="Courier New, Courier, mono">Config</font> 
+        file to refer to this driver. The "<font face="Courier New, Courier, mono">xylo_</font>" 
+        is the prefix that you used in coding your driver. It is used to synthesize 
+        the name "<font face="Courier New, Courier, mono">xylo_info</font>", the 
+        main <font face="Courier New, Courier, mono">streamtab</font> structure 
+        for your driver. The "<font face="Courier New, Courier, mono">*</font>" 
+        says that you don't care what <a href="#major-base">major number</a> your 
+        driver is assigned. The "n-minors" field is a place to say how many minor 
+        devices your driver handles, but it is not used anywhere, and thus is 
+        left empty.&nbsp; </p>
+      <p>Use the "<font face="Courier New, Courier, mono">driver</font>" declaration 
+        for hardware drivers and STREAMS multiplexor drivers.&nbsp; 
+      <p>If your driver had been a pushable module rather than an actual driver 
+        then you would have used, something like the following.&nbsp; 
+      <blockquote><tt>module mydrvr xylo_</tt></blockquote>
+      <p>You will probably want some <font face="Courier New, Courier, mono">/dev</font> 
+        entries made so that you can access your driver via the stream head and 
+        the file system. Do that by including a "<font face="Courier New, Courier, mono">node</font>" 
+        section of the <font face="Courier New, Courier, mono">Config</font> file. 
+        For example:&nbsp; </p>
+      <pre>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type&nbsp; perm&nbsp;&nbsp;&nbsp; major&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; minor
+node&nbsp;&nbsp;&nbsp; /dev/xylo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mydrvr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0
+node&nbsp;&nbsp;&nbsp; /dev/xylo_clone&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; c&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clone-drvr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mydrvr
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+      <p>In this case we have added an entry that opens minor device zero (<font face="Courier New, Courier, mono">/dev/xylo</font>) 
+        and a clone entry that will open your driver via the STREAMS clone driver 
+        (<font face="Courier New, Courier, mono">/dev/xylo_clone</font>). The 
+        name "<font face="Courier New, Courier, mono">clone-drvr</font>" is always 
+        present when LiS processes your <font face="Courier New, Courier, mono">Config</font> 
+        file.&nbsp; </p>
+      <p>The clone driver is a special feature of STREAMS. You can read all about 
+        it in the <a href="otherres.html">reference documents</a>, or the <a href="drvrs.html">drivers 
+        page</a> of the LiS documentation, but the gist of the idea is to make 
+        it easy for an application program to open a file to the STREAM and always 
+        get an available minor device. In the case of a non-clone device, the 
+        application has to "guess" as to which minor device numbers are unused. 
+        For a clone device, the driver itself assigns the minor device number 
+        and always picks one that is unused for the newly opened file.&nbsp; 
+      <p>The mechanism for the clone device involves the use of a special driver, 
+        the clone driver. It is declared in a <font face="Courier New, Courier, mono">Config</font> 
+        file just like any other STREAMS driver under the name &quot;clone-drvr&quot;. 
+        The clone driver has a specified major device number. It also has minor 
+        devices that are opened via directed (non-clone) opens. The minor device 
+        numbers of the clone driver are the <i>major</i> device numbers of another 
+        STREAMS driver. The clone driver's open routine calls the open routine 
+        of the second STREAMS driver by using the <i>minor</i> device number of 
+        the open to <font face="Courier New, Courier, mono">/dev/clone_drvr</font> 
+        as the <i>major</i> device number of the driver whose open routine is 
+        to be called.&nbsp; 
+      <p>This is why the entry in the "node" section of the <font face="Courier New, Courier, mono">Config</font> 
+        file for a clone device has the name of the clone driver in the major 
+        number field and the name of the driver which eventually gets the open 
+        call in its minor number field.&nbsp; 
+      <p>Note that the <i>cflag</i> parameter to the driver open routine will 
+        indicate a clone open if the open has passed through the clone driver. 
+        This allows your driver to distinguish between directed (non-clone) opens 
+        and clone opens.&nbsp; 
+      <p><a href="#contents">Back to Contents</a>
+      <h2> <b><a name="installing_driver"></a>Installing Your Driver</b>&nbsp;</h2>
+      <p>To install your driver so that it is linked with LiS when LiS is built 
+        you need to do the following.&nbsp; </p>
+      <p>Go to the directory <font face="Courier New, Courier, mono">/usr/src/LiS/pkg</font>. 
+        Make a subdirectory for your driver. For example, <tt><font face="Courier New, Courier, mono">mkdir 
+        xylo</font></tt>.&nbsp; 
+      <p><a name="lib_modules"></a>Then copy the object code (<font face="Courier New, Courier, mono">.o</font>) 
+        file for your driver into that directory. Also copy your driver's <font face="Courier New, Courier, mono">Config</font> 
+        file to that directory.&nbsp; For a loadable driver, do not copy your 
+        driver's object code file to the <font face="Courier New, Courier, mono">pkg/xylo</font> 
+        subdirectory, instead, copy it to <font face="Courier New, Courier, mono">/lib/modules/</font><i>kernel-version</i><font face="Courier New, Courier, mono">/misc/streams-xylo.o</font>. 
+        There are special considerations for <a href="demand.html#demand_loading">demand 
+        loadable drivers</a>.
+      <p>If your driver needs to build any tables for configuration based on the 
+        <font face="Courier New, Courier, mono">config.h</font> file that is generated 
+        from running the LiS <font face="Courier New, Courier, mono">strconf</font> 
+        utility then you need to create a file named <font face="Courier New, Courier, mono">Space.c</font> 
+        and copy it to the <font face="Courier New, Courier, mono">pkg/xylo</font> 
+        directory.&nbsp; 
+      <p>You also need to create a <font face="Courier New, Courier, mono">Makefile</font> 
+        for your<font face="Courier New, Courier, mono"> pkg/xylo</font> directory. 
+        If you do not have a <font face="Courier New, Courier, mono">Space.c</font> 
+        file then your <font face="Courier New, Courier, mono">Makefile</font> 
+        can consist of just the following.&nbsp; 
+      <blockquote><tt>nothing:</tt></blockquote>
+      <p>If you have a <font face="Courier New, Courier, mono">Space.c</font> 
+        file then your <font face="Courier New, Courier, mono">Makefile</font> 
+        can consist of this.&nbsp; </p>
+      <blockquote><tt>include ../proto/Makefile</tt></blockquote>
+      <p>The <font face="Courier New, Courier, mono">../proto/Makefile</font> 
+        contains a rule to compile your <font face="Courier New, Courier, mono">Space.c</font> 
+        file into <font face="Courier New, Courier, mono">Space.o</font>.&nbsp; 
+      </p>
+      <p>That is all you have to do. The LiS build will concatenate your <font face="Courier New, Courier, mono">Config</font> 
+        file with the LiS built-in <font face="Courier New, Courier, mono">Config</font> 
+        file and produce a <font face="Courier New, Courier, mono">config.h</font> 
+        file. It will enter your directory and perform a "make". It will then 
+        link in all files ending in "<font face="Courier New, Courier, mono">.o</font>" 
+        from your directory into the <font face="Courier New, Courier, mono">streams.o</font> 
+        file.&nbsp; The <font face="Courier New, Courier, mono">streams.o</font> 
+        file is the file that is loaded when the command <font face="Courier New, Courier, mono">insmod 
+        streams</font> is executed. 
+      <p><a href="#contents">Back to Contents</a> </p>
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
