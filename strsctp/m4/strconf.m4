@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.6 2004/08/23 13:06:12 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.8 2004/08/31 05:41:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/23 13:06:12 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/31 05:41:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -163,11 +163,12 @@ AC_DEFUN([_STRCONF_SETUP], [dnl
 # strconf script to generate the output files.
 # -------------------------------------------------------------------------
 AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
-    AC_MSG_NOTICE([searching for $STRCONF_INPUT input files in  $ac_abs_srcdir and $ac_abs_builddir])
+    AC_MSG_NOTICE([searching for $STRCONF_INPUT input files in  $ac_srcdir and $ac_builddir])
     strconf_configs=
-#   ac_abs_srcdir=`( cd $ac_srcdir ; /bin/pwd )`
-#   ac_abs_builddir=`( cd $ac_builddir ; /bin/pwd )`
-    strconf_list="`find $ac_srcdir $ac__builddir -follow -type f -name \"$STRCONF_STEM\" | sort | uniq`"
+    # config.status idea of absolute is not absolute, might be an autoconf bug
+    ac_abs_srcdir=`( cd $ac_srcdir ; /bin/pwd )`
+    ac_abs_builddir=`( cd $ac_builddir ; /bin/pwd )`
+    strconf_list="`find $ac_abs_srcdir $ac_abs_builddir -follow -type f -name \"$STRCONF_STEM\" | sort | uniq`"
     for strconf_tmp in $strconf_list ; do
         if test -r "$strconf_tmp" ; then
             strconf_configs="${strconf_configs}${strconf_configs:+ }$strconf_tmp"
