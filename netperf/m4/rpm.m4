@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/02/23 01:57:03 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/07 08:56:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/23 01:57:03 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 08:56:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -256,9 +256,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_CACHE_CHECK([for rpm BUILD directory], [rpm_cv_builddir], [dnl
 	# rpmbuilddir needs to be absolute
 	if test -z "${rpm_cv_dist_extra}" ; then
-	    rpm_cv_builddir="`pwd`"
+	    rpm_cv_builddir='$(PACKAGE_DISTDIR)'
 	else
-	    rpm_cv_builddir="`pwd`/$rpm_cv_dist_extra"
+	    rpm_cv_builddir='$(PACKAGE_DISTDIR)'"/$rpm_cv_dist_extra"
 	fi
     ])
     rpmbuilddir="$rpm_cv_builddir"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/07 08:58:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 12:23:14 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 08:58:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/07 08:58:55 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/07 08:58:55 $";
 
 #include "compat.h"
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/09/02 12:23:14 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/07 08:58:55 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -269,7 +269,6 @@ ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 {
 	int err;
 	ip_to_streams_minor_t *minor_ptr;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
 
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
 		cmn_err(CE_NOTE, "ip_to_streams_open: q=%p sflag=%d", q, sflag);
@@ -311,7 +310,6 @@ ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 	qprocson(q);
 	return (0);		/* success */
       quit:
-	MOD_DEC_USE_COUNT;
 	return (err);
 
 }				/* ip_to_streams_open */
@@ -370,7 +368,6 @@ ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 	kmem_free(q->q_ptr, sizeof(*minor_ptr));
 	q->q_ptr = NULL;	/* zot the q ptrs */
 	WR(q)->q_ptr = NULL;	/* zot the q ptrs */
-	MOD_DEC_USE_COUNT;
 	goto quit;
       quit:
 	return (0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.6 2005/02/04 12:54:14 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.7 2005/03/07 08:58:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/04 12:54:14 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 08:58:55 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -60,25 +60,10 @@
  *  Unfortunately this is necessary for older non-rpm LIS releases.
  */
 #ifdef LINUX
-#   include <linux/config.h>
-#   include <linux/version.h>
-#   ifndef HAVE_SYS_LIS_MODULE_H
-#	ifdef MODVERSIONS
-#	    include <linux/modversions.h>
-#	endif			/* MODVERSIONS */
-#	include <linux/module.h>
-#	include <linux/modversions.h>
-#	ifndef __GENKSYMS__
-#	    if defined HAVE_SYS_LIS_MODVERSIONS_H
-#		include <sys/LiS/modversions.h>
-#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#		include <sys/streams/modversions.h>
-#	    endif
-#	endif			/* __GENKSYMS__ */
-#	include <linux/init.h>
-#   else			/* HAVE_SYS_LIS_MODULE_H */
-#	include <sys/LiS/module.h>
-#   endif			/* HAVE_SYS_LIS_MODULE_H */
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
 #endif				/* LINUX */
 
 #ifdef LINUX

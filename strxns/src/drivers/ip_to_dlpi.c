@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/07 08:58:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 14:31:29 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 08:58:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/07 08:58:54 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/07 08:58:54 $";
 
 #include "compat.h"
 
@@ -73,7 +73,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2005/03/07 08:58:54 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -344,8 +344,6 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	sop->so_lowat = ip2xinet_minfo.mi_lowat;
 	putnext(q, bp);
 
-	MOD_INC_USE_COUNT;
-
 	*devp = makedevice(getmajor(*devp), 0);
 	return 0;
 }
@@ -389,7 +387,6 @@ ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
 	flushq(WR(q), FLUSHALL);
 	q->q_ptr = NULL;
 	WR(q)->q_ptr = NULL;
-	MOD_DEC_USE_COUNT;
 	spin_unlock(ip2xinet_lock);
 	goto quit;
       quit:
@@ -1011,7 +1008,6 @@ ip2xinet_devopen(struct net_device *dev)
 	else
 		netif_stop_queue(dev);	/* wait until DL_IDLE, then kernel can tx */
 
-	MOD_INC_USE_COUNT;
 	spin_unlock(ip2xinet_lock);
 	return 0;
 }
@@ -1026,7 +1022,6 @@ ip2xinet_release(struct net_device *dev)
 	spin_lock(ip2xinet_lock);
 	privp->state = 0;
 	netif_stop_queue(dev);	/* can't transmit any more */
-	MOD_DEC_USE_COUNT;
 	ip2xinet_num_ip_opened--;
 	/* BEFORE ANYTHING CHECK THAT we're in IDLE */
 	if (ip2xinet_status.ip2x_dlstate != DL_IDLE) {
@@ -1359,7 +1354,9 @@ ip2xinet_devinit(struct net_device *dev)
 	if (dev->priv == NULL)
 		return -ENOMEM;
 	memset(dev->priv, 0, sizeof(struct ip2xinet_priv));
+#if HAVE_KFUNC_DEV_INIT_BUFFERS
 	dev_init_buffers(dev);
+#endif
 	ip2xinet_status.ip2x_dlstate = UNLINKED;
 	return 0;
 }

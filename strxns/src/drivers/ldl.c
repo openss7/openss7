@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/22 14:31:29 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/07 08:58:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 14:31:29 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 08:58:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/22 14:31:29 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/07 08:58:54 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/22 14:31:29 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/07 08:58:54 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/01/22 14:31:29 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/03/07 08:58:54 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -711,8 +711,20 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		pt->pt.type = saptype;
 		pt->pt.dev = dl->ndev->dev;
 		pt->pt.func = rcv_func;
+#if HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV
+		pt->pt.af_packet_priv = (void *) 1;	/* indicate "new style" packet handler */
+#elif HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA
 		pt->pt.data = (void *) 1;	/* indicate "new style" packet handler */
+#else
+#error Must have HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA or HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV defined.
+#endif
+#if HAVE_KMEM_STRUCT_PACKET_TYPE_NEXT
 		pt->pt.next = NULL;
+#elif HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST
+		pt->pt.list = (struct list_head)LIST_HEAD_INIT(pt->pt.list);
+#else
+#error Must have HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT or HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST defined.
+#endif
 		spin_unlock(&first_pt_lock);
 		dev_add_pack(&pt->pt);
 	} else {
@@ -4248,7 +4260,6 @@ ldl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	} else
 		spin_unlock(&first_open_lock);
 
-	MOD_INC_USE_COUNT;
 	qprocson(q);
 	return 0;
 }
@@ -4303,7 +4314,6 @@ ldl_close(queue_t *q, int flag, cred_t *crp)
 	} else
 		spin_unlock(&first_open_lock);
 
-	MOD_DEC_USE_COUNT;
 	qprocsoff(q);
 	return 0;
 }
