@@ -287,7 +287,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
             rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
         fi
     ])
-    PACKAGE_RPMDIST="${rpm_cv_dist_vendor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
+    PACKAGE_RPMDIST="${rpm_cv_dist_flavor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
     case $rpm_cv_dist_flavor in
         White?Box*)
             case $rpm_cv_dist_release in
@@ -564,6 +564,8 @@ dnl          fi
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).lsm)
+    AC_CONFIG_FILES([.rpmextra])
+    AC_CONFIG_FILES([.rpmdist])
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================
 
