@@ -1,0 +1,700 @@
+% -*- texinfo -*- vim: ft=texinfo
+% =========================================================================
+%
+% @(#) $Id: strinet.texi,v 0.9 2004/04/03 12:44:16 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/04/03 12:44:16 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename strinet.info
+@settitle OpenSS7
+@setchapternewpage odd
+
+@dircategory OpenSS7
+@direntry
+* OpenSS7: (strinet).		An open SS7, SIGTRAN, ISDN, VoIP package.
+@end direntry
+
+@set xref-automatic-section-title
+
+@set EDITION 0.9.1
+@set VERSION 0.9.1
+@set UPDATED 2004-1-14
+
+@defindex op
+
+@ifinfo
+This file document the OpenSS7 package.
+
+This is Edition @value{EDITION}, last updated @value{UPDATE}, of
+@cite{The OpenSS7 XNS/XTI Library Reference Manual}, for Version
+@value{VERSION}.
+
+Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copyring, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@iftex
+@shorttitlepage The OpenSS7 Reference Manual
+@end iftex
+@titlepage
+@title The OpenSS7 Reference Manual
+@subtitle Edition @value{EDITION} for OpenSS7 version @value{VERSION}
+@subtitle @value{UPDATED}
+@author Brian Bidulock @cite{@email<bidulock@@openss7.org>}
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+All Rights Reserved. @*
+
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distribtued under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+@end titlepage
+@page
+
+@node Top, Acknowledgements, (dir), (dir)
+@top OpenSS7
+This is Edition @value{EDITION}, last updated @value{UPDATED}, of
+@cite{The OpenSS7 Reference Manual}, for Version @value{VERSION} of the
+OpenSS7 package.
+
+@ifnottex
+@menu
+* Acknowledgements::		Sponsors and Contributors
+* Introduction::		Introduction to the OpenSS7 Project
+* Reference::			Reference to OpenSS7 Components
+* Conformance::			Conformance of OpenSS7 Components
+* Installation::		Package Installation
+* Development Schedule::	Development Schedule for Future Components
+* Bugs::			Known Bugs
+
+* Public License::		GNU General Public License
+* Documentation License::	GNU Free Dcoumentation License
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Types
+* Function Index::		Index of Functions
+* Variable Index::		Index of Variables
+* File Index::			Index of Files
+
+ --- The Detailed Node Listing ---
+
+Acknowledgements
+
+* Sponsors::			Sponsors of the OpenSS7 Project
+* Contributors::		People who contributed to the development of
+				the OpenSS7 Project.
+
+Reference
+
+* Overview::			Overview of OpenSS7 components
+* Components::			Detailed component descriptions
+
+Conformance
+
+Installation
+
+Bugs
+
+Development Schedule
+
+@end menu
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@iftex
+@node Acknowledgements
+@end iftex
+@ifnottex
+@node Acknowledgements, Sponsors, Top, Top
+@end ifnottex
+@unnumbered Acknowledgements
+@cindex credits
+
+@menu
+* Sponsors::			Sponsors of the OpenSS7 Project
+* Contributors::		People who contributed to the development of
+				the OpenSS7 Project.
+@end menu
+
+@node Sponsors, Contributors, Acknowledgements, Acknowledgements
+@unnumberedsec Sponsors of the OpenSS7 Project
+@cindex sponsors
+
+Funding for completion of the OpenSS7 Project was provided by:
+
+@table @var
+@item Lockheed Martin
+@item Performance Technologies
+@item Motorola
+@item HOB International
+@end table
+
+@node Contributors, Introduction, Sponsors, Acknowledgements
+@unnumberedsec Contributors to the OpenSS7 Project
+@cindex contributors
+
+The primary contributor to the OpenSS7 Project is Brian F. G. Bidulock.
+
+The following is a list of significant contributors to the project:
+
+@table @var
+@item Per Berquist
+@item John Boyd
+@item Chuck Winters
+@item Tom Chandler
+@item Others
+@end table
+
+@node Introduction, Reference, Contributors, Top
+@chapter Introduction to the OpenSS7 Project
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and
+future development schedule of the OpenSS7 Project.
+
+@node Reference, Overview, Introduction, Top
+@chapter Reference
+@cpindex reference
+
+@menu
+* Overview::			An overview of the OpenSS7 package.
+* Components::			Reference of OpenSS7 package components.
+
+ --- The Detailed Node Listing ---
+
+Components
+
+* Applications::		OpenSS7 Applications
+* SS7 Stack::			Signalling System No. 7 Stack
+* ISDN Stack::			Integrated Services Digital Network Stack
+* SIGTRAN Stack::		Signalling Transport Stack
+* VoIP Stack::			Voice over IP Stack
+* MG Stack::			Media Gateway Stack
+* Transport Stack::		Data Transport Stack
+* Device Drivers::		Hardware Device Drivers
+
+Applications
+
+SS7 Stack
+
+* SDL::				Signalling Data Link
+* SDT::				Signalling Data Terminal
+* SL::				Signalling Link
+* MTP::				Message Transfer Part
+* SCCP::			Signalling Connection Control Part
+* TCAP::			Transaction Capabilities Application Part
+* BSSAP::			Base Station System Application Part
+
+ISDN Stack
+
+* HDLC::			High-Level Data Link Control
+* ISDN LAPB::			ISDN Link Access Procedure (Balanced)
+* X.25 LAPB::			X.25 Link Access Procedure (Balanced)
+* ISDN LAPD::			ISDN Link Access Procedure (D-Channel)
+* ISDN LAPF::			ISDN Link Access Procedure (Frame Relay)
+* ISDN Q.931::			ISDN Level 3 Q.931
+* ISDN Frame Relay::		ISDN Frame Relay
+* X.213::			ISO Network Protocol X.213
+* V5.2::			ESTI V5.2
+* GR-303::			Telcordia GR-303-CORE
+* DPNSS::			PNOC DPNSS Layer 2
+* IDLC::			Integrated Digital Loop Carrier
+* DPNSS/DASS::			PNOC DPNSS/DASS Layer 3
+
+SIGTRAN Stack
+
+* IPSS7::			SS7 over IP
+* M2PA::			MTP Level 2 Peer-to-Perr Adatpataion Layer
+* M2UA::			MTP Level 2 User Adaptation Layer
+* M3UA::			MTP Level 3 user Adaptation Layer
+* ISUA::			ISUP User Adaptation Layer
+* BUA::				BICC User Adaptation Layer
+* SUA::				SCCP User Adaptation Layer
+* TUA::				TCAP User Adaptation Layer
+* IUA::				ISDN Q.921 User Adpatation Layer
+* GR303UA::			GR-303 User Adpatation Layer
+* V5UA::			V5.2 User Adaptation Layer
+* DUA::				DPNSS/DASS User Adaptation Layer
+* TALI::			Tekelec's Adaptation Layer Interface
+
+VoIP Stack
+
+* H225::			H.225.0
+* BICC::			Bearer Indexed Call Control
+* SIPT::			Session Initiation Protocol - Transport
+
+MG Stack
+
+* MGCP::			Media Gateway Control Protocol
+* H.248::			MEGACO/H.248
+* MX::				Multiplex
+* CH::				Channel
+
+Transport Stack
+
+* IP::				Internet Protocol
+* UDP::				User Datagram Protocol
+* TCP::				Transmission Control Protocol
+* SCTP::			Stream Control Transmission Protocol
+* RTP/RTCP::			Real-Time (Control) Protocol
+* SSCOP::			Service Specific Connection Oriented Protocol
+
+Device Drivers
+
+* X400P-SS7::			E400P/T400P Driver
+* ACB56::			SeaLevel ACB56 Driver
+* CPC384::			PTI CPC-384 Drivers
+* CPC388::			PTI CPC-388 Drivers
+
+@end menu
+
+@node Overview,  Components,  Reference, Reference
+@section Overview
+@cpindex overview
+
+@menu
+@end menu
+
+@node Components,  Applications,  Overview, Reference
+@section Components
+@cpindex components
+
+@menu
+* Applications::		OpenSS7 Applications
+* SS7 Stack::			Signalling System No. 7 Stack
+* ISDN Stack::			Integrated Services Digital Network Stack
+* SIGTRAN Stack::		Signalling Transport Stack
+* VoIP Stack::			Voice over IP Stack
+* MG Stack::			Media Gateway Stack
+* Transport Stack::		Data Transport Stack
+* Device Drivers::		Hardware Device Drivers
+@end menu
+
+@page
+@node Applications, SS7 Stack,  Components, Reference
+@subsection Applications
+@cpindex applications
+
+@menu
+@end menu
+
+@page
+@node SS7 Stack,  SDL,  Applications, Reference
+@subsection SS7 Protocol Stack
+@cpindex ss7 protocol stack
+
+@menu
+* SDL::				Signalling Data Link
+* SDT::				Signalling Data Terminal
+* SL::				Signalling Link
+* MTP::				Message Transfer Part
+* SCCP::			Signalling Connection Control Part
+* TCAP::			Transaction Capabilities Application Part
+* BSSAP::			Base Station System Application Part
+@end menu
+
+@node SDL, SDT, SS7 Stack, SS7 Stack
+@subsubsection Signalling Data Link (SDL)
+
+@node SDT, SL, SDL, SS7 Stack
+@subsubsection Signalling Data Terminal (SDT)
+
+@node SL, MTP, SDT, SS7 Stack
+@subsubsection Signalling Link (SL)
+
+@node MTP, SCCP, SL, SS7 Stack
+@subsubsection Message Transfer Part (MTP)
+
+@node SCCP, TCAP, MTP, SS7 Stack
+@subsubsection Signalling Connection Control Part (SCCP)
+
+@node TCAP, BSSAP, SCCP, SS7 Stack
+@subsubsection Transaction Capabilities Application Part (TCAP)
+
+@node BSSAP, ISDN Stack, TCAP, SS7 Stack
+@subsubsection Base Station System Application Part (BSSAP)
+
+@page
+@node ISDN Stack, HDLC,  BSSAP, Reference
+@subsection ISDN Protocol Stack
+@cpindex ISDN protocol stack
+
+@menu
+* HDLC::			High-Level Data Link Control
+* ISDN LAPB::			ISDN Link Access Procedure (Balanced)
+* X.25 LAPB::			X.25 Link Access Procedure (Balanced)
+* ISDN LAPD::			ISDN Link Access Procedure (D-Channel)
+* ISDN LAPF::			ISDN Link Access Procedure (Frame Relay)
+* ISDN Q.931::			ISDN Level 3 Q.931
+* ISDN Frame Relay::		ISDN Frame Relay
+* X.213::			ISO Network Protocol X.213
+* V5.2::			ESTI V5.2
+* GR-303::			Telcordia GR-303-CORE
+* DPNSS::			PNOC DPNSS Layer 2
+* IDLC::			Integrated Digital Loop Carrier
+* DPNSS/DASS::			PNOC DPNSS/DASS Layer 3
+@end menu
+
+@node HDLC,  ISDN LAPB,  ISDN Stack, ISDN Stack
+@subsubsection  High-Level Data Link Communication
+
+@node ISDN LAPB,  X.25 LAPB,  HDLC, ISDN Stack
+@subsubsection ISDN Link Access Procedure (Balanced)
+
+@node X.25 LAPB,  ISDN LAPD,  ISDN LAPB, ISDN Stack
+@subsubsection X.25 Link Access Procedure (Balanced)
+
+@node ISDN LAPD,  ISDN LAPF,  X.25 LAPB, ISDN Stack
+@subsubsection ISDN Link Access Procedure (D-Channel)
+
+@node ISDN LAPF,  ISDN Q.931,  ISDN LAPD, ISDN Stack
+@subsubsection ISDN Link Access Procedure (Frame Relay)
+
+@node ISDN Q.931,  ISDN Frame Relay,  ISDN LAPF, ISDN Stack
+@subsubsection ISDN Level 3 Q.931
+
+@node ISDN Frame Relay,  X.213,  ISDN Q.931, ISDN Stack
+@subsubsection ISDN Frame Relay
+
+@node X.213, V5.2,  ISDN Frame Relay, ISDN Stack
+@subsubsection ISO/OSI NP X.213
+
+@node V5.2, GR-303,  X.213, ISDN Stack
+@subsubsection ETSI V5.2
+
+@node GR-303, DPNSS,  V5.2, ISDN Stack
+@subsubsection Telcordia GR-303-CORE
+
+@node DPNSS, IDLC,  GR-303, ISDN Stack
+@subsubsection PNOC DPNSS (Link)
+
+@node IDLC, DPNSS/DASS,  DPNSS, ISDN Stack
+@subsubsection IDLC
+
+@node DPNSS/DASS, SIGTRAN Stack,  IDLC, ISDN Stack
+@subsubsection PNOC DPNSS/DASS (Level 3)
+
+@page
+@node SIGTRAN Stack,  IPSS7,  DPNSS/DASS, Reference
+@subsection SIGTRAN Protocol Stack
+@cpindex SIGTRAN protocol stack
+
+@menu
+* IPSS7::			SS7 over IP
+* M2PA::			MTP Level 2 Peer-to-Perr Adatpataion Layer
+* M2UA::			MTP Level 2 User Adaptation Layer
+* M3UA::			MTP Level 3 user Adaptation Layer
+* ISUA::			ISUP User Adaptation Layer
+* BUA::				BICC User Adaptation Layer
+* SUA::				SCCP User Adaptation Layer
+* TUA::				TCAP User Adaptation Layer
+* IUA::				ISDN Q.921 User Adpatation Layer
+* GR303UA::			GR-303 User Adpatation Layer
+* V5UA::			V5.2 User Adaptation Layer
+* DUA::				DPNSS/DASS User Adaptation Layer
+* TALI::			Tekelec's Adaptation Layer Interface
+@end menu
+
+@node IPSS7,  M2PA,  SIGTRAN Stack, SIGTRAN Stack
+@subsubsection SS7 over IP
+
+@node M2PA,  M2UA,  IPSS7, SIGTRAN Stack
+@subsubsection MTP Level 2 Peer-to-Peer Adaptation Layer
+
+@node M2UA,  M3UA,  M2PA, SIGTRAN Stack
+@subsubsection MTP Level 2 User Adaptation Layer
+
+@node M3UA,  ISUA,  M2UA, SIGTRAN Stack
+@subsubsection MTP Level 3 User Adaptation Layer
+
+@node ISUA,  BUA,  M3UA, SIGTRAN Stack
+@subsubsection ISUP User Adaptation Layer
+
+@node BUA,  SUA,  ISUA, SIGTRAN Stack
+@subsubsection BICC User Adaptation Layer
+
+@node SUA,  TUA,  BUA, SIGTRAN Stack
+@subsubsection SCCP User Adaptation Layer
+
+@node TUA,  IUA,  SUA, SIGTRAN Stack
+@subsubsection TCAP User Adaptation Layer
+
+@node IUA,  GR303UA,  TUA, SIGTRAN Stack
+@subsubsection ISDN Q.921 User Adaptation Layer
+
+@node GR303UA,  V5UA,  IUA, SIGTRAN Stack
+@subsubsection GR-303 User Adaptation Layer
+
+@node V5UA,  DUA,  GR303UA, SIGTRAN Stack
+@subsubsection V5.2 User Adaptation Layer
+
+@node DUA,  TALI,  V5UA, SIGTRAN Stack
+@subsubsection DPNSS/DASS User Adaptation Layer
+
+@node TALI,  VoIP Stack,  DUA, SIGTRAN Stack
+@subsubsection Tekelec Adaptation Layer Interface
+
+@page
+@node VoIP Stack,  H225,  TALI, Reference
+@subsection VoIP Protocol Stack
+@cpindex VoIP protocol stack
+
+@menu
+* H225::			H.225.0
+* BICC::			Bearer Indexed Call Control
+* SIPT::			Session Initiation Protocol - Transport
+@end menu
+
+@node H225,  BICC,  VoIP Stack, VoIP Stack
+@subsubsection H.225
+
+@node BICC,  SIPT,  H225, VoIP Stack
+@subsubsection Bearer Indexed Call Control (BICC)
+
+@node SIPT,  MG Stack,  BICC, VoIP Stack
+@subsubsection Session Initiation Protocol (SIP) Transport (SIP-T)
+
+@page
+@node MG Stack,  MGCP,  SIPT, Reference
+@subsection Media Gateway Protocol Stack
+@cpindex media gateway protocol stack
+
+@menu
+* MGCP::			Media Gateway Control Protocol
+* H.248::			MEGACO/H.248
+* MX::				Multiplex
+* CH::				Channel
+@end menu
+
+@node MGCP,  H.248,  MG Stack, MG Stack
+@subsubsection Media Gateway Control Protocol
+
+@node H.248,  MX,  MGCP, MG Stack
+@subsubsection MEGACO/H.248
+
+@node MX,  CH,  H.248, MG Stack
+@subsubsection Multiplex (MX)
+
+@node CH,  Transport Stack,  MX, MG Stack
+@subsubsection Channel (CH)
+
+@page
+@node Transport Stack,  IP,  CH, Reference
+@subsection Transport Protocol Stack
+@cpindex transport
+
+@menu
+* IP::				Internet Protocol
+* UDP::				User Datagram Protocol
+* TCP::				Transmission Control Protocol
+* SCTP::			Stream Control Transmission Protocol
+* RTP/RTCP::			Real-Time (Control) Protocol
+* SSCOP::			Service Specific Connection Oriented Protocol
+@end menu
+
+@node IP,  UDP,  Transport Stack, Transport Stack
+@subsubsection Internet Protocol
+
+@node UDP,  TCP,  IP, Transport Stack
+@subsubsection User Datagram Protocol
+
+@node TCP,  SCTP,  UDP, Transport Stack
+@subsubsection Transmission Control Protocol
+
+@node SCTP,  RTP/RTCP,  TCP, Transport Stack
+@subsubsection Signalling Connection Transport Protocol
+
+@node RTP/RTCP,  SSCOP,  SCTP, Transport Stack
+@subsubsection Real-time Transport (Control) Protocol
+
+@node SSCOP,  Device Drivers,  RTP/RTCP, Transport Stack
+@subsubsection Service Specific Connection Oriented Protocol
+
+@page
+@node Device Drivers,  X400P-SS7,  SSCOP, Reference
+@subsection Device Drivers
+@cpindex device drivers
+@cpindex device
+@cpindex drivers
+
+@menu
+* X400P-SS7::			E400P/T400P Driver
+* ACB56::			SeaLevel ACB56 Driver
+* CPC384::			PTI CPC-384 Drivers
+* CPC388::			PTI CPC-388 Drivers
+@end menu
+
+@node X400P-SS7, ACB56, Device Drivers, Device Drivers
+@subsubsection Digium Drivers
+@cindex x400p t400p t100p e400p e100p te405p te410p
+
+@node ACB56, CPC384, X400P-SS7, Device Drivers
+@subsubsection SeaLevel ACB56 Drivers
+
+@node CPC384, CPC388, ACB56, Device Drivers
+@subsubsection PTI CPC 384 Driver
+
+@node CPC388, Conformance, CPC384, Device Drivers
+@subsubsection PTI CPC 388 Driver
+
+
+@page
+@node Conformance, Installation, CPC388, Top
+@chapter Conformance
+@cindex conformance
+
+@page
+@node Installation, Development Schedule, Conformance, Top
+@chapter Installation
+@cindex installation
+
+@page
+@node Development Schedule, Bugs, Installation, Top
+@chapter Development Schedule
+@cindex development schedule
+@cindex development
+@cindex schedule
+
+@page
+@node Bugs, Public License, Development Schedule, Top
+@chapter Bugs
+@cindex bugs
+
+@node Public License, Documentation License, Bugs, Top
+@appendix Public License
+@include gpl.texi
+
+@node Documentation License, Concept Index, Public License, Top
+@appendix Documentation License
+@include fdl.texi
+
+@page
+@node Concept Index, Type Index, Documentation License, Top
+@appendix Indices
+@appendixsec Concept Index
+
+@printindex cp
+
+@page
+@node Type Index, Function Index, Concept Index, Top
+@appendixsec Type Index
+
+@printindex tp
+
+@page
+@node Function Index, Variable Index, Type Index, Top
+@appendixsec Function and Macro Index
+
+@printindex fn
+
+@page
+@node Variable Index, File Index, Function Index, Top
+@appendixsec Variable and Constant Macro Index
+
+@printindex vr
+
+@page
+@node File Index, , Variable Index, Top
+@appendixsec Program and File Index
+
+@printindex pg
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
+
+
+

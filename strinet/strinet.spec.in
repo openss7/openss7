@@ -1,0 +1,761 @@
+# vim: ft=spec sw=4 et
+# =============================================================================
+# 
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:16 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/04/03 12:44:16 $ by $Author: brian $
+#
+# =============================================================================
+
+%define base_release @PACKAGE_RELEASE@
+
+# default is to build kernel modules and tools
+# conditional builds of binary rpms relies on the sneaky spec trick that
+# rpmbuild will not build a binary rpm when it has no %files section
+%define BUILD_modules 1
+%define BUILD_tools   1
+
+#
+# there are three ways to pass kernel version to the build process:
+#    define _kversion in /usr/lib/rpm/macros, /etc/rpm/macros or ~/.rpmmacros
+#    define _kversion on the rpmbuild command line
+#    define PACKAGE_KVERSION environment variable
+#    just let it default to `uname -r`
+#
+%{!?_kversion:%{expand: %%define _kversion %(env | grep PACKAGE_KVERSION | sed -e 's|.*=||')}}
+%{!?_kversion:%{expand: %%define _kversion %(uname -r)}}
+
+%define kernel_version %{_kversion}
+%define kernel_source %(echo %{_kversion} | sed -e 's|BOOT||')
+%define kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
+%define kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
+%define core_name core-%{_kversion}
+
+# because we only need to build the tools binaries once for each architecture,
+# but need to build the modules binaries once for each architecture and kernel
+# version, we accept the --with[out] options "modules" and "tools"
+%{?_without_modules: %{expand: %%define BUILD_modules 0}}
+%{?_without_tools:   %{expand: %%define BUILD_tools   0}}
+%{?_with_modules:    %{expand: %%define BUILD_modules 1}}
+%{?_with_tools:      %{expand: %%define BUILD_tools   1}}
+
+# we have some more options that control configure for the build
+
+Summary:        OpenSS7 STREAMS INET for Linux
+Name:           @PACKAGE_TARNAME@
+Epoch:          @PACKAGE_EPOCH@
+Version:        @PACKAGE_VERSION@
+Release:        @PACKAGE_RELEASE@
+License:        GPL
+Group:          System Environment/Kernel
+%if %{?_vendor: 1}%{!?_vendor: 0}
+Vendor:         %{_vendor}
+%endif
+%if %{?_distribution: 1}%{!?_distribution: 0}
+Distribution:   %{_distribution}
+%endif
+%if %{?disturl: 1}%{!?disturl: 0}
+URL:            %disturl
+%endif
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+ExclusiveArch:  i386 i686 i586 athlon x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
+ExclusiveOs:    Linux
+Source:         %{name}-%{version}-%{release}.tar.bz2
+Obsoletes:      %{name}
+Obsoletes:      INET
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+Requires:       kernel >= 2.4.7
+Requires:       kernel < 2.5
+Requires:       LiS >= 2.16.18-10
+Provides:       INET
+BuildRequires:  kernel-source >= 2.4
+%ifarch s390 s390x
+BuildRequires:  gcc >= 2.95.3
+%else
+%ifarch %{all_ppc}
+BuildRequires:  gcc >= 2.96-75
+%else
+BuildRequires:  gcc >= 2.96-98
+%endif
+%endif
+BuildRequires:  gcc >= 2.96
+BuildRequires:  LiS-devel >= 2.16.18-10
+Autoreq:        true
+
+# ---------------------------------------------------------------------------
+%description
+The %{name} package includes kernel modules, STREAMS drivers, modules,
+libraries, utilities, test programs, daemons, and development environment for
+the development and execution of Internet Protocols (INET) protocol stack
+components and applications for the STREAMS environment.  This distribution is
+only currently applicable to 2.4 kernels and was targetted at ix86 and ppc
+architectures, but should build and install for other architectures as well.
+
+%prep
+# ---------------------------------------------------------------------------
+# let rpm do its job (but tell it where to find things)
+
+%setup -q -n %{name}-%{version}-%{release}
+
+%build
+# ---------------------------------------------------------------------------
+
+rm -rf build-%{_target_cpu}
+mkdir  build-%{_target_cpu}
+cd     build-%{_target_cpu}
+
+preferred_cflags="%{optflags}"
+
+%ifarch %{ix86}
+preferred_cflags="-march=%{_target_cpu} -D__USE_STRING_INLINES -fstrict-aliasing"
+%endif
+
+%ifarch alphaev6
+preferred_cflags="-mcpu=ev6"
+%endif
+
+%ifarch sparc
+preferred_cflags="-m32 -fcall-used-g7"
+%endif
+
+%ifarch sparcv9
+preferred_cflags="-m32 -mcpu=ultrasparc -fcall-used-g7"
+%endif
+
+%ifarch sparc64
+preferred_cflags="-m64 -mcpu=ultrasparc -mvis -fcall-used-g7"
+%endif
+
+%ifnarch ia64 s390 s390x ppc ppciseries ppc64
+preferred_cflags="-freorder-blocks"
+%endif
+
+../configure \
+    CC=${CC} \
+    CFLAGS=${CFLAGS:-$preferred_cflags} \
+    LDFLAGS=${LDFLAGS} \
+    CPPFLAGS=${CPPFLAGS} \
+    CPP=${CPP} \
+    CXX=${CXX:-$CC} \
+    CXXFLAGS=${CXXFLAGS:-$preferred_cflags} \
+    CXXCPP=${CXXCPP:-$CPP} \
+    --build=%{_build} \
+    --host=%{_target_platform} \
+    --prefix=%{_prefix} \
+    --exec-prefix=%{_exec_prefix} \
+    --bindir=%{_bindir} \
+    --sbindir=%{_sbindir} \
+    --sysconfdir=%{_sysconfdir} \
+    --datadir=%{_datadir} \
+    --includedir=%{_includedir} \
+    --libdir=%{_libdir} \
+    --libexecdir=%{_libexecdir} \
+    --localstatedir=%{_localstatedir} \
+    --sharedstatedir=%{_sharedstatedir} \
+    --mandir=%{_mandir} \
+    --infodir=%{_infodir} \
+    --disable-maintainer-mode \
+    --disable-dependency-tracking \
+    --with-gnu-ld \
+    --with-k-release=%{kernel_version} \
+    --with-k-modules=/%{_lib}/modules/%{kernel_version} \
+    %{?_with_public:        --enable-public} \
+    %{?_without_public:     --disable-public}
+
+make
+#make pdf
+
+%install
+# ---------------------------------------------------------------------------
+# we use libtoolized install-strip to strip binaries, modules, shared and
+# static libraries appropriately.  we keep the brp-compress to compress man
+# pages and any architectural post install procedures.
+
+# %define __os_install_post /usr/lib/rpm/brp-compress || :
+
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+# take our configured source and move it for the source package
+mkdir -p $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
+
+# add a directory for our devices
+mkdir -p $RPM_BUILD_ROOT/dev/inet
+
+# Note: RH9 assembles debug information while stripping, so we install
+# unstripped if the __debug_package macro is defined
+%if %__debug_package
+(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" make install)
+%else
+(cd build-%{_target_cpu}; DESTDIR="$RPM_BUILD_ROOT" make install-strip)
+%endif
+
+# get the installed info directory out of the build root
+[ -e "$RPM_BUILD_ROOT/%{_infodir}/dir" ] && rm -f "$RPM_BUILD_ROOT/%{_infodir}/dir"
+
+# create a device list
+sh scripts/strconf-sh -b190 --strmknods=devices.lst build-%{_target_cpu}/Config.master
+
+rm -rf build-%{_target_cpu}
+
+# tar and move the sources for source release
+tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
+ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
+
+%clean
+# ---------------------------------------------------------------------------
+
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+
+# ===========================================================================
+%package %{core_name}
+
+Summary:        OpenSS7 STREAMS INET core kernel modules.
+Group:          System Environment/Kernel
+Requires:       kernel = %{kernel_version}
+Requires:       LiS-core-%{kernel_version} >= 2.16.18-10
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description %{core_name}
+The %{name}-%{core_name} package contains the kernel modules that provide the
+Linux kernel INET STREAMS drivers and modules.  This also includes assorted
+drivers and modules for additional protocol stacks such as SCTP.  This package
+is heavily tied to the kernel for which it and the LiS STREAMS facility was
+compiled.  This package applies to kernel version %{kernel_version} and
+requires an LiS 2.16.18-10 (or better) STREAMS package compiled for the same
+kernel.
+
+%pre %{core_name}
+# ---------------------------------------------------------------------------
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   if we are upgrading and the upgrade is for the running kernel, or we are
+#   installing new on the running kernel, we have to worry about previous
+#   loaded modules for the old version or a non-rpm version
+    ( lsmod | grep -q '^streams' ) || exit 0
+#   modules running, kick the stack
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    fdetach -a 2>/dev/null
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge 230 ]; then
+                eval "kill -HUP $tokens[1]"
+            fi
+        fi
+    done
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    echo 'Cannot install or upgrade with streams modules running.' >&2
+    exit 1
+fi
+
+%post %{core_name}
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then
+#   This is the end of a fresh install.
+#   Check that our line is in the modules.inet file
+    if ( grep -q 'include.*modules.inet' /etc/modules.conf ) ; then
+        :
+    else
+#       if not, check for an old non-rpm OpenSS7
+        if ( grep -q 'BEGIN LiS' /etc/modules.conf ) ; then
+            sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
+        else
+            cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
+        fi
+        echo 'prune modules.inet' >> /etc/modules.conf.tmp.$$
+        echo 'if -f /lib/modules/`uname -r`/modules.inet' >> /etc/modules.conf.tmp.$$
+        echo 'include /lib/modules/`uname -r`/modules.inet' >> /etc/modules.conf.tmp.$$
+        echo 'endif' >> /etc/modules.conf.tmp.$$
+        chmod --referenc=/etc/modules.conf /etc/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmsave /etc/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f /etc/modules.conf.tmp.$$
+    fi
+    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   this is a running kernel, do a depmod on the modules directory for
+        depmod -ae
+    else
+#   non-running kernels a depmod will be performed on boot by depmod anyway
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+    fi
+fi
+
+%preun %{core_name}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   We are about to uninstall for good on a running kernel then we have to
+#   worry about which modules are running
+    ( lsmod | grep -q '^streams' ) || exit 0
+#   modules running, kick the stack
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    fdetach -a
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge 230 ]; then
+                eval "kill -KILL $tokens[1]"
+            fi
+        fi
+    done
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    echo "Cannot uninstall with streams modules running." >&2
+    exit 1
+fi
+
+%postun %{core_name}
+# ---------------------------------------------------------------------------
+
+if [ $1 = 0 ]; then
+#   this is the last stage of a removal we are going away: we need to see if
+#   we need to remove our line from modules.conf and remove our devices
+    remove_line=yes
+    for file in /lib/modules/*/modules.inet ; do
+        if [ -f $file ] ; then
+            remove_line=no
+            break
+        fi
+    done
+    if [ ":$remove_line" = :yes ] ; then
+        sed -e '/prune modules.inet/,/endif/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
+        chmod --reference=/etc/modules.conf /etc/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmorig /etc/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f /etc/modules.conf.tmp.$$
+    fi
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   this is a running kernel, do a depmod on the modules directory for
+    depmod -ae
+else
+#   non-running kernels a depmod will be performed on boot but depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   one more kick at killing any loaded modules on uninstall, last stage of
+#   the upgrade on a running kernel for upgrade.
+    ( lsmod | grep -q '^streams' ) || exit 0
+#   modules running, kick the stack
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    fdetach -a
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    insmod -ar streams
+    lsof | while read -a tokens; do
+        if [ :"$tokens[4]" = :"CHR" ]; then
+            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+            if [ $major -ge 230 ]; then
+                if [ $1 = 0 ] ; then
+#                   extreme prejudice for removal
+                    eval "kill -KILL $tokens[1]"
+                else
+#                   try to get them to reload for 
+                    eval "kill -HUP $tokens[1]"
+                fi
+            fi
+        fi
+    done
+    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
+    ( lsmod | grep -q '^streams' ) || exit 0
+    echo "Error: modules may be still loaded" >&2
+    lsmod | grep '^streams' >&2
+    echo "you may have to reboot" >&2
+    exit 1
+fi
+
+%if %{BUILD_modules}
+%files %{core_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir /%{_lib}/modules/%{kernel_version}/inet
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.inet
+/%{_lib}/modules/%{kernel_version}/inet/*
+%endif
+
+# ===========================================================================
+%package dev
+
+Summary:        OpenSS7 STREAMS INET devices.
+Group:          System Environment/Base
+Requires:       dev >= 3.3
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description dev
+The %{name}-dev package contains the device definitions necessary to run
+applications programs and utilities developed for OpenSS7 STREAMS INET.
+
+%if %{BUILD_tools}
+# ---------------------------------------------------------------------------
+%files dev -f devices.lst
+%defattr(-,root,root)
+%endif
+
+# ===========================================================================
+%package lib
+
+Summary:        OpenSS7 STREAMS INET run-time libraries.
+Group:          System Environment/Libraries
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description lib
+The %{name}-lib package contains the run-time shared libraries necessary to
+run applications programs and utilities developed for OpenSS7 STREAMS INET.
+
+%pre lib
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ] ; then
+#   this is supposed to be a fresh install
+#   see if there are any libraries hanging around from a non-rpm install
+    old_libs="`( ldconfig -p | grep '\<lib.*inet\> | cut '-d ' -f4 ) 2>/dev/null`"
+    if [ -n "$old_libs" ] ; then
+#       old libraries hanging around, delete them
+        echo "warning: Deleting old non-rpm libraries $old_libs" >&2
+        rm -f $old_libs
+    fi
+else
+    :
+#   upgrade, let RPM do its job
+fi
+
+%post lib
+# ---------------------------------------------------------------------------
+# do a load config
+if [ $1 = 0 ] ; then
+#   end of fresh install, do ldconfig
+    ldconfig >/dev/null
+else
+    :
+#   upgrade, wait for old postun
+fi
+
+%preun lib
+# ---------------------------------------------------------------------------
+# noting really
+
+%postun lib
+# ---------------------------------------------------------------------------
+# whether complete removal or upgrade, do a load config
+ldconfig
+
+%if %{BUILD_tools}
+%files lib
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#%{_libdir}/*.so*
+#%{_libdir}/*.la
+#%{_datadir}/locale/*
+%endif
+
+# ===========================================================================
+%package doc
+
+Summary:        OpenSS7 STREAMS INET manpages and doc.
+Group:          Documentation
+Conflicts:      texinfo < 3.11
+Prereq:         /sbin/install-info
+Prefix:         %{_docdir}
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description doc
+The %{name}-doc package contains html documentation for the development of
+OpenSS7 STREAMS INET applications, modules and drivers.
+
+%pre doc
+# ---------------------------------------------------------------------------
+# nothing really
+
+%post doc
+# ---------------------------------------------------------------------------
+if [ -x /sbin/install-info ] ; then
+    # older rpm versions do not compress info files
+    if test -f %{_infodir}/%{name}.info ; then
+        /sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir
+    elif test -f %{_infodir}/%{name}.info.gz ; then
+        /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    fi
+fi
+
+%preun doc
+# ---------------------------------------------------------------------------
+if [ "$1" = 0 -a -x /sbin/install-info ] ; then
+    # older rpm versions do not compress info files
+    if test -f %{_infodir}/%{name}.info ; then
+        /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir
+    elif test -f %{_infodir}/%{name}.info.gz ; then
+        /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    fi
+fi
+
+%postun doc
+# ---------------------------------------------------------------------------
+# nothing really
+
+%if %{BUILD_tools}
+%files doc
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc doc/manual/*.texi
+%doc doc/drafts/*/*.txt
+%doc doc/drafts/*/*.pdf
+%{_datadir}/doc/%{name}-%{version}/*
+%{_infodir}/*
+%endif
+
+# ===========================================================================
+%package devel
+
+Summary:        OpenSS7 STREAMS INET headers, lib and doc.
+Group:          Development/System
+Requires:       %{name}-lib = %{version}-%{base_release}
+Requires:       %{name}-doc = %{version}-%{base_release}
+Requires:       LiS-devel >= 2.16.16
+Prefix:         %{_libdir}
+Prefix:         %{_includedir}
+Prefix:         %{_mandir}
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description devel
+The %{name}-devel package contains library archives for static compilation,
+and headers files to develop OpenSS7 STREAMS INET applications.  This also
+includes the header files and static libraries required to compile OpenSS7
+STREAMS INET applications programs.  In addition it contains all of the manual
+pages necessary for developing OpenSS7 STREAMS INET application programs.
+
+%pre devel
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%post devel
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%preun devel
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%postun devel
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%if %{BUILD_tools}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#%{_libdir}/*.a
+%{_includedir}/*
+%{_mandir}/%{name}.refs
+%{_mandir}/%{name}.macros
+#%{_mandir}/man2/*
+%{_mandir}/man3/*
+%{_mandir}/man4/*
+%{_mandir}/man5/*
+%{_mandir}/man7/*
+#%{_mandir}/man9/*
+%endif
+
+
+# ===========================================================================
+%package source
+
+Summary:        OpenSS7 STREAMS INET source package.
+Group:          Development/System
+Prefix:         %{_usrsrc}
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description source
+The %{name}-source package contains the source code necessary for building the
+%{name} release.  It includes the autoconf configuration utilities
+necessary to create and distribute this rpm.
+
+%pre source
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%post source
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%preun source
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%postun source
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%if %{BUILD_tools}
+%files source
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_usrsrc}/%{name}-%{version}-%{release}
+%{_usrsrc}/*
+%endif
+
+# ===========================================================================
+%package util
+
+Summary:        OpenSS7 STREAMS INET admin utilities.
+Group:          System Environment/Base
+Requires:       %{name}-lib = %{version}-%{base_release}
+Prefix:         %{_bindir}
+Prefix:         %{_sbindir}
+Prefix:         %{_mandir}
+Autoreq:        true
+%if %{?_icon: 1}%{!?_icon: 0}
+Icon:           %{_icon}
+%endif
+
+# ---------------------------------------------------------------------------
+%description util
+The %{name}-util package provides adminstrative and configuration test
+utilities and commands associated with the OpenSS7 STREAMS INET package.
+
+%pre util
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%post util
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%preun util
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%postun util
+# ---------------------------------------------------------------------------
+# let rpm do its job
+
+%if %{BUILD_tools}
+%files util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#%{_bindir}/*
+#%{_sbindir}/*
+%{_libexecdir}/*
+%{_mandir}/%{name}.refs
+%{_mandir}/%{name}.macros
+#%{_mandir}/man1/*
+%{_mandir}/man8/*
+%endif
+
+# ===========================================================================
+%changelog
+# ---------------------------------------------------------------------------
+# $Log: strinet.spec.in,v $
+# Revision 0.9  2004/04/03 12:44:16  brian
+# - Initial cut of new strinet package.
+#
+* Sun Feb 22 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.5  2004/02/22 07:30:09  brian
+- Added documentation.
+
+* Tue Feb 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.4  2004/02/17 06:30:25  brian
+- Added public release option.
+
+* Wed Jan 21 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.3  2004/01/21 23:25:47  brian
+- Corrected info install for older RPM versions.
+
+* Wed Jan 21 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.2  2004/01/21 21:24:50  brian
+- Updated and tested M2PA to Draft10.
+
+* Mon Jan 19 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2004/01/19 22:57:08  brian
+- Corrected info install.
+
+* Sat Jan 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9  2004/01/17 07:50:03  brian
+- Added files for 0.9 baseline autoconf release.
+
+* Sat Jan 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1  2004/01/17 02:15:32  brian
+- Added spec file.
+
+* Sun Jan 11 2004 Brian Bidulock <bidulock@openss7.org>
+- Began this RPM build for OpenSS7.
+- Borrowed heavily from the OpenSS7 LiS build.
+
+# vim: ft=spec sw=4 et
