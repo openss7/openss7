@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 12:56:25 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/16 14:42:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/04 12:56:25 $ by $Author: brian $
+ Last Modified $Date: 2005/02/16 14:42:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 12:56:25 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/16 14:42:26 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 12:56:25 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/16 14:42:26 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -636,12 +636,13 @@ static int
 __xnet_u_max_tsdu(struct _t_user *user)
 {
 	return ((user->info.tsdu == T_INFINITE
-		 || user->info.tsdu == T_INVALID) ? MAXINT : (user->info.tsdu >= 0 ? user->info.tsdu : 0));
+		 || user->info.tsdu == 0) ? MAXINT : (user->info.tsdu >= 0 ? user->info.tsdu : 0));
 }
 static int
 __xnet_u_max_etsdu(struct _t_user *user)
 {
-	return (user->info.etsdu == T_INFINITE ? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
+	return ((user->info.etsdu == T_INFINITE
+		|| user->info.etsdu == 0) ? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
 }
 static int
 __xnet_u_max_connect(struct _t_user *user)
@@ -1796,6 +1797,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 			int len;
 			switch ((len = user->info.tsdu)) {
 			case T_INFINITE:
+			case 0:
 				len = _T_DEFAULT_DATALEN;
 			default:
 				if (!(udata->udata.buf = (char *) malloc(len))) {
@@ -1807,7 +1809,6 @@ __xnet_t_alloc(int fd, int type, int fields)
 					goto badalloc;
 				}
 				udata->udata.maxlen = len;
-			case 0:
 				break;
 			case T_INVALID:
 				if (fields != T_ALL) {
@@ -5890,10 +5891,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.8 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.9 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.8 $)
- * @date \$Date: 2005/02/04 12:56:25 $
+ * @version \$Name:  $(\$Revision: 0.9.2.9 $)
+ * @date \$Date: 2005/02/16 14:42:26 $
  *
  * @}
  */

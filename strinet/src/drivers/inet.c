@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/04 08:58:40 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/04 08:58:40 $ by $Author: brian $
+ Last Modified $Date: 2005/02/16 14:42:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/04 08:58:40 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/04 08:58:40 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -211,7 +211,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/04 08:58:40 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/02/16 14:42:29 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -12662,7 +12662,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
 STATIC int
 ss_w_data(queue_t *q, mblk_t *mp)
 {
-	int mlen, mmax;
+	long mlen, mmax;
 	struct msghdr msg;
 	ss_t *ss = PRIV(q);
 	if (ss->p.info.SERV_type == T_CLTS)
@@ -12672,10 +12672,8 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	mmax = ss->p.info.TIDU_size;
-	if (mmax < ss->p.info.TSDU_size && ss->p.info.TSDU_size != T_INVALID)
-		mmax = ss->p.info.ETSDU_size;
-	if (mlen > mmax)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen < mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen < mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -12684,7 +12682,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET) ? MSG_EOR : 0;
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
-	ptrace(("%s: ERROR: message too large %d > %d\n", DRV_NAME, mlen, mmax));
+	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));
 	goto error;
       outstate:
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
@@ -12706,7 +12704,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
 STATIC int
 t_data_req(queue_t *q, mblk_t *mp)
 {
-	int mlen, mmax;
+	long mlen, mmax;
 	ss_t *ss = PRIV(q);
 	const struct T_data_req *p = (typeof(p)) mp->b_rptr;
 	struct msghdr msg;
@@ -12719,10 +12717,8 @@ t_data_req(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	mmax = ss->p.info.TIDU_size;
-	if (mmax < ss->p.info.TSDU_size && ss->p.info.TSDU_size != T_INVALID)
-		mmax = ss->p.info.ETSDU_size;
-	if (mlen > mmax)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen < mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen < mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -12731,7 +12727,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0;
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
-	ptrace(("%s: ERROR: message too large %d > %d\n", DRV_NAME, mlen, mmax));
+	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));
 	goto error;
       outstate:
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
@@ -12756,7 +12752,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_exdata_req(queue_t *q, mblk_t *mp)
 {
-	int mlen, mmax;
+	long mlen, mmax;
 	ss_t *ss = PRIV(q);
 	const struct T_exdata_req *p = (typeof(p)) mp->b_rptr;
 	struct msghdr msg;
@@ -12769,10 +12765,8 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	mmax = ss->p.info.TIDU_size;
-	if (mmax < ss->p.info.ETSDU_size && ss->p.info.ETSDU_size != T_INVALID)
-		mmax = ss->p.info.ETSDU_size;
-	if (mlen > mmax)
+	if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen < mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen < mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -12782,7 +12776,7 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	    MSG_OOB | ((ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0);
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
-	ptrace(("%s: ERROR: message too large %d > %d\n", DRV_NAME, mlen, mmax));
+	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));
 	goto error;
       outstate:
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
@@ -12957,6 +12951,7 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_unitdata_req(queue_t *q, mblk_t *mp)
 {
+	long mmax;
 	ss_t *ss = PRIV(q);
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
@@ -12964,7 +12959,8 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (dlen == 0 && !(ss->p.info.PROVIDER_flag & T_SNDZERO))
 		goto baddata;
-	if (dlen > ss->p.info.TSDU_size || dlen > ss->p.info.TIDU_size)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && dlen > mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && dlen > mmax) || mmax == T_INVALID)
 		goto baddata;
 	if (ss_get_state(ss) != TS_IDLE)
 		goto outstate;
@@ -14121,7 +14117,7 @@ STATIC const ss_profile_t ss_profiles[] = {
 	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_INET, SOCK_STREAM, IPPROTO_TCP},
-	 {T_INFO_ACK, T_INVALID, 1, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 0, 1, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
 	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
@@ -14151,12 +14147,12 @@ STATIC const ss_profile_t ss_profiles[] = {
 	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_UNIX, SOCK_STREAM, 0},
-	 {T_INFO_ACK, T_INVALID, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 0, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
 	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
 	{{PF_UNIX, SOCK_STREAM, 0},
-	 {T_INFO_ACK, T_INVALID, T_INVALID, T_INVALID, T_INVALID,
+	 {T_INFO_ACK, 0, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
 	  T_INFINITE, 0xffff, T_COTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 	,
@@ -14167,7 +14163,7 @@ STATIC const ss_profile_t ss_profiles[] = {
 #if defined HAVE_OPENSS7_SCTP
 	,
 	{{PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP},
-	 {T_INFO_ACK, T_INVALID, T_INVALID, 536, T_INVALID,
+	 {T_INFO_ACK, T_INFINITE, T_INFINITE, 536, T_INVALID,
 	  8 * sizeof(struct sockaddr_in),
 	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 #endif				/* defined HAVE_OPENSS7_SCTP */
