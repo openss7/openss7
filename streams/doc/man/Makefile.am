@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/24 21:27:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/25 07:38:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,12 +46,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/24 21:27:05 $ by $Author: brian $
+# Last Modified $Date: 2004/04/25 07:38:09 $ by $Author: brian $
 #
 # =============================================================================
 
 MANMACRO_PFX			= streams
-mansrcdir			= $(srcdir)
 
 man_MANS = \
 	man1/strchg.1 \
@@ -2227,14 +2226,16 @@ dist_noinst_MANS = \
 man_MACROS = $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
 
 EXTRA_DIST = \
-	$(mansrcdir)/$(MANMACRO_PFX).refs \
-	$(mansrcdir)/$(MANMACRO_PFX).macros \
+	$(MANMACRO_PFX).refs \
+	$(MANMACRO_PFX).macros \
 	$(dist_noinst_MANS)
 
 if COOKED_MANPAGES
 
 $(man_MANS):: %: %.man
-	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	@p=`echo $@ | sed -e 's|/[^/]*$$||'` ; \
+	$(mkdir_p) $$p ; \
+	echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
 $(man_MANS):: $(man_MACROS)
@@ -2243,18 +2244,20 @@ install-manpages:
 
 uninstall-manpages:
 
-EXTRA_DIST += \
-	$(man_MANS)
+#EXTRA_DIST += \
+#	$(man_MANS)
 
 else
 
 $(man_MANS): %: %.man
-	@echo "converting (strip) manpage $< to $@" ; \
+	@p=`echo $@ | sed -e 's|/[^/]*$$||'` ; \
+	$(mkdir_p) $$p ; \
+	echo "converting (strip) manpage $< to $@" ; \
 	cat $< | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
 install-manpages: $(man_MANS) $(man_MACROS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(mandir)
+	$(mkdir_p) $(DESTDIR)$(mandir)
 	@for f in $(man_MACROS) ; do \
 		if test -x $$f ; then d=; else d=$(srcdir)/ ; fi ; \
 		echo "$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir)" ; \

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/15 10:19:08 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/25 07:34:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/15 10:19:08 $ by $Author: brian $
+# Last Modified $Date: 2004/04/25 07:34:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -209,24 +209,23 @@ preferred_cflags="-freorder-blocks"
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
     --with-rpm-epoch=@PACKAGE_EPOCH@ \
     --with-rpm-release=@PACKAGE_RELEASE@ \
-    --with-base-major=@STR_BASE_MAJOR@ \
-    %{?_with_lis:                %{_with_lis}} \
-    %{?_without_lis:             %{_without_lis}} \
-    %{?_with_lfs:                %{_with_lfs}} \
-    %{?_without_lfs:             %{_without_lfs}} \
-    %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
-    %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
+    --with-base-major=@STRCONF_MAJBASE@ \
+    %{?_with_cooked_manpages:     %{_with_cooked_manpages}} \
+    %{?_without_cooked_manpages:  %{_without_cooked_manpages}} \
+    %{?_with_public:              --enable-public} \
+    %{?_without_public:           --disable-public} \
     %{?_with_k_debug:             --enable-k-debug} \
     %{?_without_k_debug:          --disable-k-debug} \
     %{?_with_k_test:              --enable-k-test} \
     %{?_without_k_test:           --disable-k-test} \
     %{?_with_k_safe:              --enable-k-safe} \
     %{?_without_k_safe:           --disable-k-safe} \
-    %{?_with_public:              --enable-public} \
-    %{?_without_public:           --disable-public}
+    %{?_with_lis:                 %{_with_lis}} \
+    %{?_without_lis:              %{_without_lis}} \
+    %{?_with_lfs:                 %{_with_lfs}} \
+    %{?_without_lfs:              %{_without_lfs}}
 
 make
-#make pdf
 
 %install
 # ---------------------------------------------------------------------------
@@ -256,8 +255,8 @@ mkdir -p $RPM_BUILD_ROOT/dev/ss7
 # get the installed info directory out of the build root
 [ -e "$RPM_BUILD_ROOT/%{_infodir}/dir" ] && rm -f "$RPM_BUILD_ROOT/%{_infodir}/dir"
 
-# create a device list
-sh scripts/strconf-sh -b@STR_BASE_MAJOR@ --strmknods=devices.lst build-%{_target_cpu}/Config.master
+# copy up device list
+[ -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ ] && cp -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ .
 
 rm -rf build-%{_target_cpu}
 
@@ -466,7 +465,7 @@ applications programs and utilities developed for OpenSS7.
 
 %if %{BUILD_tools}
 # ---------------------------------------------------------------------------
-%files dev -f devices.lst
+%files dev -f @STRCONF_MAKEDEV@
 %defattr(-,root,root)
 %endif
 
@@ -584,9 +583,9 @@ fi
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual/*.texi
+%doc doc/manual/*.pdf
 %doc doc/drafts/*/*.txt
 %doc doc/drafts/*/*.pdf
-%{_datadir}/doc/%{name}-%{version}/*
 %{_infodir}/*
 %endif
 
@@ -636,8 +635,8 @@ developing OpenSS7 application programs.
 %defattr(-,root,root)
 #%{_libdir}/*.a
 %{_includedir}/*
-%{_mandir}/%{name}.refs
-%{_mandir}/%{name}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 #%{_mandir}/man2/*
 %{_mandir}/man3/*
 %{_mandir}/man4/*
@@ -730,8 +729,8 @@ test utilities and commands associated with the OpenSS7 package.
 #%{_bindir}/*
 #%{_sbindir}/*
 %{_libexecdir}/*
-%{_mandir}/%{name}.refs
-%{_mandir}/%{name}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 #%{_mandir}/man1/*
 %{_mandir}/man8/*
 %endif
@@ -740,12 +739,27 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.6  2004/04/15 10:19:08  brian
-# - Working up release package.
+# Revision 0.9.2.8  2004/04/25 07:34:24  brian
+# - Updated changelog.
 #
-# Revision 0.9.2.5  2004/02/22 07:30:09  brian
-# - Added documentation.
-#
+
+* Sun Apr 25 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.7  2004/04/25 07:33:00  brian
+- Updated streams configuration.
+- Updated to newer build process based on autoconf 2.59.
+- Copy devices.lst instead of generating it.
+- Put prebuilt distributed pdf manuals in doc directory.
+- Don't attempt to install .refs or .macros when manpages are cooked.
+- Updated changelog.
+
+* Thu Apr 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.6  2004/04/15 10:19:08  brian
+- Working up release package.
+
+* Sun Feb 22 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.5  2004/02/22 07:30:09  brian
+- Added documentation.
+
 * Tue Feb 17 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.4  2004/02/17 06:30:25  brian
 - Added public release option.
