@@ -1,0 +1,75 @@
+.TH iperf 1 "January 16, 2003"
+.\"
+.SH NAME
+iperf \- Modified version of a tool for measuring maximum TCP and UDP bandwidth
+in the sense that also a bandwidth for TCP may be specified
+.\"
+.SH DESCRIPTION
+This program
+.I iperf
+is the modified version of the original
+.B iperf
+program.
+This version allows that also a bandwidth for
+.I TCP
+may be specified.
+This can be done with the option
+.B \-a
+which was not available in the original version.
+.\"
+.SH USAGE
+.nf
+sage: iperf [-s|-c host] [-p port] [-t secs] [-w bytes] ...
+       iperf [-h|--help] [-v|--version]
+
+Client/Server:
+  -f, --format    [kmKM]   format to report: Kbits, Mbits, KBytes, MBytes
+  -i, --interval  #        seconds between periodic bandwidth reports
+  -l, --len       #[KM]    length of buffer to read or write (default 8 KB)
+  -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)
+  -p, --port      #        server port to listen on/connect to
+  -u, --udp                use UDP rather than TCP
+  -w, --window    #[KM]    TCP window size (socket buffer size)
+  -B, --bind      <host>   bind to <host>, an interface or multicast address
+  -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)
+  -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm
+  -V, --IPv6Version        Set the domain to IPv6
+Server specific:
+  -s, --server             run in server mode
+  -D, --daemon             run the server as a daemon
+
+Client specific:
+  -a, --tcp_bandwidth \    for TCP, bandwidth to send at in bits/sec
+		  #[KM]    (default no bandwidth limit used)
+  -b, --bandwidth #[KM]    for UDP, bandwidth to send at in bits/sec
+                           (default 1 Mbit/sec, implies -u)
+  -c, --client    <host>   run in client mode, connecting to <host>
+  -n, --num       #[KM]    number of bytes to transmit (instead of -t)
+  -t, --time      #        time in seconds to transmit for (default 10 secs)
+  -F, --fileinput <name>   input the data to be transmitted from a file
+  -I, --stdin              input the data to be transmitted from stdin
+  -P, --parallel  #        number of parallel client threads to run
+  -S, --tos       #        set type-of-service for outgoing packets
+  -T, --ttl       #        time-to-live, for multicast (default 1)
+  -W, --windowSizeSuggest  Run the client so as to suggest a suitable window size (default off)
+
+Miscellaneous:
+  -h, --help               print this message and quit
+  -v, --version            print version information and quit
+
+[KM] Indicates options that support a K or M suffix for kilo- or mega-
+
+The TCP window size option can be set by the environment variable
+TCP_WINDOW_SIZE. Most other options can be set by an environment variable
+IPERF_<long option name>, such as IPERF_BANDWIDTH.
+
+Report bugs to <dast@nlanr.net>
+.fi
+.\"
+.SH ORIGINAL IPERF DOCUMENTATION
+.\"
+.IP "@[DOC_DIR]/*.html"
+The local documentation.
+.\"
+.IP "http://dast.nlanr.net/Projects/Iperf/iperfdocs_1.6.5.html"
+The Iperf V.\ 1.6.5 User Docs.

@@ -32,4 +32,31 @@ iperf_SOURCES = \
 		stdio.c \
 		tcp_window_size.c
 
+iperf_DEPENDENCIES = \
+		../include/Client.hpp \
+		../include/Condition.h \
+		../include/Extractor.h \
+		../include/List.h \
+		../include/Listener.hpp \
+		../include/Locale.h \
+		../include/Mutex.h \
+		../include/PerfSocket.hpp \
+		../include/Reporter.h \
+		../include/Server.hpp \
+		../include/Settings.hpp \
+		../include/SocketAddr.h \
+		../include/Thread.h \
+		../include/Timestamp.hpp \
+		../include/delay.hpp \
+		../include/gettimeofday.h \
+		../include/gnu_getopt.h \
+		../include/headers.h \
+		../include/inet_aton.h \
+		../include/report_CSV.h \
+		../include/report_default.h \
+		../include/service.h \
+		../include/snprintf.h \
+		../include/util.h \
+		../include/version.h
+
 iperf_LDADD = $(LIBCOMPAT_LDADDS)

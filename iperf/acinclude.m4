@@ -1,0 +1,6 @@
+m4_include([m4/acx_pthread.m4])
+m4_include([m4/dast.m4])
+m4_include([m4/rpm.m4])
+m4_include([m4/man.m4])
+m4_include([m4/openss7.m4])
+m4_include([m4/public.m4])

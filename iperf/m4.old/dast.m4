@@ -9,7 +9,7 @@ AH_TEMPLATE([bool])
 AH_TEMPLATE([true])
 AH_TEMPLATE([false])
 
-AC_DEFUN(DAST_CHECK_BOOL, [
+AC_DEFUN([DAST_CHECK_BOOL], [
 
 AC_CHECK_SIZEOF(bool)
 if test "$ac_cv_sizeof_bool" = 0 ; then
@@ -39,7 +39,7 @@ dnl Check for the type as AC_CHECK_TYPE does. Define HAVE_<type>
 dnl if type exists; don't define <type> to anything if it doesn't exist.
 dnl Useful if there is no well-defined default type, such as int32_t
 
-AC_DEFUN(DAST_REPLACE_TYPE, [
+AC_DEFUN([DAST_REPLACE_TYPE], [
 
 AC_CACHE_CHECK(for $1, ac_cv_type_$1,
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[$ac_includes_default]],
@@ -70,7 +70,7 @@ fi
 
 ])
 
-AC_DEFUN(DAST_REPLACE_TYPE_UNSIGNED, [
+AC_DEFUN([DAST_REPLACE_TYPE_UNSIGNED], [
 
 AC_CACHE_CHECK(for $1, ac_cv_type_$1,
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[$ac_includes_default]],
@@ -104,7 +104,7 @@ fi
 dnl DAST_CHECK_ARG
 dnl Check for the 3rd arguement to accept
 
-AC_DEFUN(DAST_ACCEPT_ARG, [
+AC_DEFUN([DAST_ACCEPT_ARG], [
   if test -z "$ac_cv_accept_arg" ; then
     AC_LANG_SAVE
     AC_LANG_CPLUSPLUS
@@ -121,10 +121,10 @@ AC_DEFUN(DAST_ACCEPT_ARG, [
 ])
 
 dnl Configure paths for Web100.  Based off of Owen Taylor's gtk.m4 from gtk+-1.2.10
-dnl AM_PATH_WEB100([EXACT-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
+dnl DAST_PATH_WEB100([EXACT-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for Web100, and define WEB100_CFLAGS and WEB100_LIBS
 dnl
-AC_DEFUN(AM_PATH_WEB100,
+AC_DEFUN([DAST_PATH_WEB100],
 [
 web100_success=""
 

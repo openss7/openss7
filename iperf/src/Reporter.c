@@ -500,8 +500,12 @@ void ReportServerUDP( thread_Settings *agent, server_hdr *server ) {
             stats->mFormat = agent->mFormat;
             stats->jitter = ntohl( server->jitter1 );
             stats->jitter += ntohl( server->jitter2 ) / (double)rMillion;
+#ifdef HAVE_INT64_t
             stats->TotalLen = (((max_size_t) ntohl( server->total_len1 )) << 32) +
                                   ntohl( server->total_len2 ); 
+#else
+            stats->TotalLen = ntohl( server->total_len2 ); 
+#endif
             stats->startTime = 0;
             stats->endTime = ntohl( server->stop_sec );
             stats->endTime += ntohl( server->stop_usec ) / (double)rMillion;

@@ -1,0 +1,261 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/12/28 03:48:26 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/12/28 03:48:26 $ by $Author: brian $
+#
+# =============================================================================
+
+AM_INFOINCLUDES		= -I $(top_srcdir)/scripts -I $(top_builddir)/scripts -I $(srcdir)
+AM_MAKEINFOHTMLFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --number-sections --no-split --no-validate --no-headers
+AM_MAKEINFOFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --paragraph-indent=asis --number-sections --fill-column=80 --no-validate --force
+AM_MAKEINFOTEXTFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --paragraph-indent=asis --number-sections --fill-column=80 --no-validate --force --no-headers
+AM_MAKEINFOSGMLFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names
+
+DVIPS			= dvips -t letter
+
+.texi.txt:
+	$(MAKEINFO) $(AM_MAKEINFOTEXTFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) -o $@ $<
+
+.texi.sgml:
+	$(MAKEINFO) --docbook $(AM_MAKEINFOSGMLFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) -o $@ $<
+
+TXTS  = $(info_TEXINFOS:%.texi=%.txt)
+SGMLS = $(info_TEXINFOS:%.texi=%.sgml)
+
+txt-am: $(TXTS)
+sgml-am: $(SGMLS)
+
+txt: txt-am
+sgml: sgml-am
+
+clean-txt:
+	if test -n "$(TXTS)" ; then \
+		echo "rm -f $(TXTS)" ; \
+		rm -f $(TXTS) ; \
+	fi
+
+clean-sgml:
+	if test -n "$(SGMLS)" ; then \
+		echo "rm -f $(SGMLS)" ; \
+		rm -f $(SGMLS) ; \
+	fi
+
+FIG_PSS  = $(FIG_FIGS:%.fig=%.ps)
+FIG_EPSS = $(FIG_FIGS:%.fig=%.eps)
+FIG_PDFS = $(FIG_FIGS:%.fig=%.pdf)
+FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
+FIG_JPGS = $(FIG_FIGS:%.fig=%.jpg)
+FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
+
+SUFFIXES = .fig .eps .pdf .png .jpg .ps .txt
+
+$(FIG_PSS) : %.ps  : %.fig ; fig2dev -L  ps $< $@
+$(FIG_EPSS): %.eps : %.fig ; fig2dev -L eps $< $@
+$(FIG_PDFS): %.pdf : %.fig ; fig2dev -L pdf $< $@
+$(FIG_PNGS): %.png : %.eps ; convert -antialias $< $@
+$(FIG_JPGS): %.jpg : %.eps ; convert -antialias $< $@
+$(FIG_TXTS): txts-am
+
+txts-am:
+	@ txts="$(FIG_TXTS) $(PNG_TXTS) $(PS_TXTS)" ; for i in $$txts ; do \
+		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
+			if test -f $(srcdir)/$$i ; then \
+				echo "cp -pf $(srcdir)/$$i $$i" ; \
+				cp -pf $(srcdir)/$$i $$i ; \
+			else \
+				echo "touch $$i" ; \
+				touch $$i ; \
+			fi ; \
+		fi ; \
+	done
+
+TBL_PSS  = $(TBL_TBLS:%.tbl=%.ps)
+TBL_EPSS = $(TBL_TBLS:%.tbl=%.eps)
+TBL_PDFS = $(TBL_TBLS:%.tbl=%.pdf)
+TBL_PNGS = $(TBL_TBLS:%.tbl=%.png)
+TBL_JPGS = $(TBL_TBLS:%.tbl=%.jpg)
+TBL_TXTS = $(TBL_TBLS:%.tbl=%.txt)
+
+.tbl.dvi: ; groff -t -Tdvi -ms $< > $@
+
+$(TBL_PSS)  : %.ps  : %.tbl ; groff -t -Tps -ms $< > $@ 2>/dev/null
+$(TBL_EPSS) : %.eps : %.ps  ; ps2epsi $< $@
+$(TBL_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $<
+$(TBL_PNGS) : %.png : %.eps ; convert -antialias $< $@
+$(TBL_JPGS) : %.jpg : %.eps ; convert -antialias $< $@
+$(TBL_TXTS) : %.txt : %.tbl ; ( echo ""; groff -t -Tascii -ms -P-b -P-u -P-o $< | sed -e '/^[[:space:]]*$$/d'; echo "" ) > $@
+
+pngs-am:
+	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
+		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
+			if test -f $(srcdir)/$$i ; then \
+				echo "cp -pf $(srcdir)/$$i $$i" ; \
+				cp -pf $(srcdir)/$$i $$i ; \
+			else \
+				echo "touch $$i" ; \
+				touch $$i ; \
+			fi ; \
+		fi ; \
+	done
+
+PNG_PSS  = $(PNG_PNGS:%.png=%.ps)
+PNG_EPSS = $(PNG_PNGS:%.png=%.eps)
+PNG_PDFS = $(PNG_PNGS:%.png=%.pdf)
+PNG_JPGS = $(PNG_PNGS:%.png=%.jpg)
+PNG_TXTS = $(PNG_PNGS:%.png=%.txt)
+
+$(PNG_PSS)  : %.ps  : %.png ; convert -density 144 $< $@
+$(PNG_EPSS) : %.eps : %.ps  ; ps2epsi $< $@
+$(PNG_PDFS) : %.pdf : %.eps ; epstopdf --outfile=$@ $<
+$(PNG_JPGS) : %.jpg : %.png ; convert -density 144 $< $@
+
+$(PNG_PNGS) : pngs-am
+$(PNG_TXTS) : txts-am
+
+PS_EPSS = $(PS_PSS:%.ps=%.eps)
+PS_PDFS = $(PS_PSS:%.ps=%.pdf)
+PS_PNGS = $(PS_PSS:%.ps=%.png)
+PS_JPGS = $(PS_PSS:%.ps=%.jpg)
+PS_TXTS = $(PS_PSS:%.ps=%.txt)
+
+$(PS_EPSS): %.eps : %.ps  ; ps2epsi $< $@
+$(PS_PDFS): %.pdf : %.eps ; epstopdf --outfile=$@ $<
+$(PS_PNGS): %.png : %.eps ; convert -antialias $< $@
+$(PS_JPGS): %.jpg : %.eps ; convert -antialias $< $@
+
+$(PS_TXTS): txts-am
+
+IMG_EPSS = $(FIG_EPSS) $(TBL_EPSS) $(PNG_EPSS) $(PS_EPSS)
+IMG_PDFS = $(FIG_PDFS) $(TBL_PDFS) $(PNG_PDFS) $(PS_PDFS)
+IMG_PNGS = $(FIG_PNGS) $(TBL_PNGS) $(PNG_PNGS) $(PS_PNGS)
+IMG_TXTS = $(FIG_TXTS) $(TBL_TXTS) $(PNG_TXTS) $(PS_TXTS)
+IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
+
+#
+# I know this is ugly and GNU make specified, but...  If you are using autoconf we
+# pretty much assume you have some GNU tools around...
+# also, automake misses dependencies for ps files
+#
+
+$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS) $(EXTRA_info_TEXINFOS)
+$(HTMLS)     : %.html : %.texi $(IMG_PNGS) $(EXTRA_info_TEXINFOS)
+$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
+$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS) $(EXTRA_info_TEXINFOS)
+
+#
+# Don't distribute .ps manuals, they are way too big
+#
+EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(FIG_FIGS) $(FIG_TXTS) $(TBL_TBLS) $(PNG_PNGS) $(PS_PSS)
+EXTRA_DIST	+= $(PDFS)
+EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
+
+#
+# distcheck is not run in maintainer mode, and we need this, otherwise distcheck
+# breaks because it otherwise attempts to place the info files into the source
+# directory for some arcane reason
+#
+if MAINTAINER_MODE
+$(INFO_DEPS) : %.info : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
+endif
+
+texi/args.texi:
+	@ if test ! -e texi -a -e $(top_builddir)/scripts/texi ; then \
+		echo "$(LN_S) $(top_builddir)/scripts/texi texi" ; \
+		$(LN_S) $(top_builddir)/scripts/texi texi ; \
+	fi
+
+clean-figs:
+	@ figs="$(FIG_FIGS)" ; for i in $$figs ; do \
+		d=`echo $$i | sed -e 's|\.fig||'` ; \
+		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-tbls:
+	@ tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
+		d=`echo $$i | sed -e 's|\.tbl||'` ; \
+		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-pngs:
+	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
+		d=`echo $$i | sed -e 's|\.png||'` ; \
+		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-pss:
+	@ pss="$(PS_PSS)" ; for i in $$pss ; do \
+		d=`echo $$i | sed -e 's|\.ps||'` ; \
+		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+	done
+
+clean-texi:
+	@ if test -L texi ; then \
+		echo "rm -f texi" ; \
+		rm -f texi ; \
+	fi
+
+.PHONY: txts-am pngs-am clean-txt clean-figs clean-tbls clean-pngs clean-pss clean-texi
+
+CLEAN_LOCAL += clean-txt clean-figs clean-tbls clean-pngs clean-pss clean-texi
+
+if MAINTAINER_MODE
+
+#
+# Only build docs in maintainer mode.
+#
+ALL_LOCAL += info html ps pdf txt # sgml
+
+endif
+
+# vim: ft=automake

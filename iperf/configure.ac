@@ -4,10 +4,21 @@ dnl Process this file with autogen.sh to produce configure files
 dnl ===================================================================
 
 
-AC_INIT(Iperf,2.0.1)
-AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
+AC_PREREQ(2.59)
+AC_INIT([Iperf],[2.0.1],[bugs@openss7.org],[iperf])
 
+AC_CONFIG_SRCDIR([src/Client.cpp])
+AC_CONFIG_HEADER([config.h])
+
+AC_CONFIG_AUX_DIR([scripts])
+AC_CONFIG_MACRO_DIR([m4])
+
+AC_CANONICAL_TARGET
+
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+AM_MAINTAINER_MODE
+
+AC_GNU_SOURCE
 
 AC_ARG_ENABLE(ipv6, AC_HELP_STRING([--disable-ipv6],
 	    [disable ipv6 support (default is autodetect)]), 
@@ -53,8 +64,8 @@ dnl check for -lpthread
 if test "$enable_threads" != no; then
   ACX_PTHREAD()
     if test "$acx_pthread_ok" = yes; then
-      AC_DEFINE([HAVE_POSIX_THREAD], 1,)
-      AC_DEFINE([_REENTRANT], 1,)
+      AC_DEFINE([HAVE_POSIX_THREAD], 1, [Define for threads.])
+      AC_DEFINE([_REENTRANT], 1, [Define for threads.])
     fi
 fi
 
@@ -72,7 +83,7 @@ dnl ===================================================================
 
 AC_C_CONST
 AC_TYPE_SIZE_T
-AC_CHECK_TYPES(ssize_t,,AC_DEFINE_UNQUOTED(ssize_t, int))
+AC_CHECK_TYPES(ssize_t,,AC_DEFINE_UNQUOTED(ssize_t, int, [Define ssize_t type.]))
 AC_HEADER_TIME
 AC_STRUCT_TM
 
@@ -127,9 +138,9 @@ fi
 AC_DEFINE_UNQUOTED([Socklen_t], $ac_cv_accept_arg, [Define 3rd arg of accept])
 
 dnl Checks for library functions.
-AC_FUNC_FORK
-AC_FUNC_MALLOC
-AC_FUNC_MEMCMP
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
+if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MEMCMP fi
 AC_FUNC_SELECT_ARGTYPES
 AC_TYPE_SIGNAL
 AC_FUNC_STRFTIME
@@ -257,7 +268,7 @@ if test -d "/proc/web100"; then
 if test -e "/proc/web100/header"; then
 if test -f "/proc/web100/header"; then
 if test -r "/proc/web100/header"; then
-AM_PATH_WEB100()
+DAST_PATH_WEB100()
 if test "$web100_success" = yes; then 
 AC_DEFINE([HAVE_WEB100], 1, [Define if Web100 is desired and available])
 fi fi fi fi fi fi
@@ -282,9 +293,15 @@ AC_SUBST(STRIP_DUMMY)
 AC_SUBST(STRIP_BEGIN)
 AC_SUBST(STRIP_END)
 
+_OPENSS7_PACKAGE([IPERF], [OpenSS7 IPERF Utility])
+_PUBLIC_RELEASE
+_MAN_CONVERSION
+_RPM_SPEC
+
 AC_CONFIG_FILES([Makefile
 		compat/Makefile
 		doc/Makefile
+		doc/man/Makefile
 		include/Makefile
 		src/Makefile])
 AC_OUTPUT
