@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/15 07:35:18 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 03:37:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/15 07:35:18 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 03:37:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,7 +72,7 @@ AC_DEFUN([_KSYMS_OPTIONS], [
 dnl AC_ARG_ENABLE([k-versions],
 dnl     AS_HELP_STRING([--enable-k-versions],
 dnl         [version all symbols @<:@default=automatic@:>@]),
-dnl     [enable_k_versions=$enableval],
+dnl     [enable_k_versions="$enableval"],
 dnl     [enable_k_versions=''])
 ])# _KSYMS_OPTIONS
 # =============================================================================
@@ -81,7 +81,7 @@ dnl     [enable_k_versions=''])
 # _KSYMS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_SETUP], [
-    AC_CACHE_CHECK([for SMP kernel], [ksyms_cv_smp], [
+    AC_CACHE_CHECK([for genksyms smp kernel], [ksyms_cv_smp], [
         AC_EGREP_CPP([\<yes_we_have_an_smp_kernel\>], [
 #include <linux/version.h>
 #include <linux/config.h>

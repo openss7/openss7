@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/23 07:24:23 $
+# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 03:37:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:23 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 03:37:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,7 @@ AC_DEFUN([_XOPEN], [
 # _XOPEN_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_OPTIONS], [
+    _XOPEN_OPENSS7_SCTP
     _XOPEN_CHECK_SCTP
     _XOPEN_CHECK_XNS
     _XOPEN_CHECK_TLI
@@ -196,7 +197,7 @@ AC_DEFUN([_XOPEN_SETUP], [
 # _XOPEN_OPENSS7_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_OPENSS7_SCTP], [
-    AC_CACHE_CHECK([for OpenSS7 Kernel SCTP], [xopen_cv_openss7_sctp], [
+    AC_CACHE_CHECK([for xopen sctp openss7 kernel], [xopen_cv_openss7_sctp], [
         _LINUX_KERNEL_ENV([
             AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
 #include <linux/config.h>

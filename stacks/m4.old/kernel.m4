@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/23 07:24:24 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/24 03:37:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:24 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 03:37:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,9 +56,9 @@
 # _LINUX_KERNEL
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL], [
-    _LINUX_KERNEL_OPTIONS
     AC_REQUIRE([AC_CANONICAL_TARGET])
-    _LINUX_KERNEL_ENV([
+    _LINUX_KERNEL_OPTIONS
+    _LINUX_KERNEL_ENV_BARE([
         CPPFLAGS=
         CFLAGS=
         LDFLAGS=
@@ -74,12 +74,9 @@ AC_DEFUN([_LINUX_KERNEL], [
 # =============================================================================
 
 # =============================================================================
-# _LINUX_KERNEL_ENV([COMMANDS])
+# _LINUX_KERNEL_ENV_BARE([COMMANDS])
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_ENV], [
-    # protect against nesting
-    if test :"${linux_env-user}" = :user
-    then
+AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [
         # move user flags out of the way temporarily
         linux_tmp_cppflags="$CPPFLAGS"
         linux_tmp_cflags="$CFLAGS"
@@ -87,12 +84,25 @@ AC_DEFUN([_LINUX_KERNEL_ENV], [
         CPPFLAGS="$KERNEL_CPPFLAGS"
         CFLAGS="$KERNEL_CFLAGS"
         LDFLAGS="$KERNEL_LDFLAGS"
-        linux_env='kernel'
         $1
         # move user flags back where they were
         CPPFLAGS="$linux_tmp_cppflags"
         CFLAGS="$linux_tmp_cflags"
         LDFLAGS="$linux_tmp_ldflags"
+])# _LINUX_KERNEL_ENV_BARE
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_ENV([COMMANDS])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_ENV], [
+    # make sure we have kernel environment
+    AC_REQUIRE([_LINUX_KERNEL])
+    # protect against nesting
+    if test :$linux_env != :kernel
+    then
+        linux_env='kernel'
+        _LINUX_KERNEL_ENV_BARE([$1])
         linux_env='user'
     fi
 ])# _LINUX_KERNEL_ENV
@@ -293,16 +303,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_PREFIX], [
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_ROOTDIR], [
     AC_ARG_VAR([DESTDIR], [Cross build root directory])
-    AC_ARG_VAR([NEXUSWARE_PREFIX], [Nexusware cross-build root])
     AC_ARG_WITH([k-rootdir],
         AS_HELP_STRING([--with-k-rootdir=DIR],
             [specify the root directory for configure.
-            @<:@default=${DESTDIR:-${NEXUSWARE_PREFIX:-/}}@:>@]),
+            @<:@default=${DESTDIR:-/}@:>@]),
         [with_k_rootdir="$withval"],
-        [with_k_rootdir="${DESTDIR:-$NEXUSWARE_PREFIX}"])
+        [with_k_rootdir="$DESTDIR"])
     AC_MSG_CHECKING([for kernel root directory])
     linux_cv_k_rootdir="$with_k_rootdir"
-    if test -z "$DESTDIR" ; then DESTDIR="$NEXUSWARE_PREFIX" ; fi
     AC_MSG_RESULT([${linux_cv_k_rootdir:-no}])
 ])# _LINUX_CHECK_KERNEL_ROOTDIR
 # =========================================================================
@@ -1012,6 +1020,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [
 # _LINUX_KERNEL_SYMBOL_ADDR(SYMBOLNAME, [ACTION-IF-NOT-FOUND], [ACTION-IF-FOUND])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [
+    AC_REQUIRE([_LINUX_KERNEL])
     AS_VAR_PUSHDEF([linux_symbol_addr], [linux_cv_$1_addr])
     AC_CACHE_CHECK([for kernel symbol $1 address], linux_symbol_addr, [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" 
@@ -1049,6 +1058,7 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [
 # not exported, an attempt will be made to rip it from the system maps.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [
+    AC_REQUIRE([_LINUX_KERNEL])
     AS_VAR_PUSHDEF([linux_symbol_export], [linux_cv_$1_export])
     AC_CACHE_CHECK([for kernel symbol $1 export], linux_symbol_export, [
         linux_tmp='no'
@@ -1056,14 +1066,14 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [
         then
             if ( $EGREP -q  '(\<$1_R........\>|\<$1\>)' $linux_cv_k_ksyms 2>/dev/null )
             then
-                linux_tmp='yes'
+                linux_tmp="yes ($linux_cv_k_ksyms)"
             fi
         else
             if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" 
             then
                 if ( $EGREP -q '\<__ksymtab_$1\>' $linux_cv_k_sysmap 2>/dev/null )
                 then
-                    linux_tmp='yes'
+                    linux_tmp="yes ($linux_cv_k_sysmap)"
                 fi
             else
                 _LINUX_KERNEL_ENV([
@@ -1076,11 +1086,11 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [
 #ifdef $1
         yes_symbol_$1_is_exported
 #endif
-                    ], [linux_tmp='yes'])
+                    ], [linux_tmp='yes (linux/modversions.h)'])
                 ])
             fi
         fi
-        AS_VAR_SET([linux_symbol_export], [$linux_tmp])
+        AS_VAR_SET([linux_symbol_export], ["$linux_tmp"])
     ])
     AS_VAR_POPDEF([linux_symbol_export])
     if test :"${linux_tmp:-no}" != :no 
