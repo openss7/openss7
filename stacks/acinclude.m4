@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/04/25 08:49:16 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2004/05/11 09:24:42 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/25 08:49:16 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/11 09:24:42 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -72,16 +72,15 @@ m4_include([m4/strconf.m4])
 AC_DEFUN([AC_SS7], [
     ac_default_prefix='/usr'
     _SS7_OPTIONS
-    AC_MAN_CONVERSION
-    AC_PUBLIC_RELEASE
-    AC_RPM_SPEC
-    AC_LDCONFIG
-    AC_STRCONF
+    _MAN_CONVERSION
+    _PUBLIC_RELEASE
+    _RPM_SPEC
+    _LDCONFIG
     # user CPPFLAGS and CFLAGS
     USER_CPPFLAGS="${CPPFLAGS}"
     USER_CFLAGS="${CFLAGS}"
-    AC_LINUX_KERNEL
-    AC_LINUX_STREAMS
+    _LINUX_KERNEL
+    _LINUX_STREAMS
     SS7_INCLUDES="-I- -imacros ./config.h ${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I./src/include -I${srcdir}/src/include"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
@@ -96,6 +95,7 @@ AC_DEFUN([AC_SS7], [
     AC_SUBST([SS7_INCLUDES])
     CPPFLAGS=
     CFLAGS=
+    _SS7_STRCONF
 ])# AC_SS7
 # =========================================================================
 
@@ -114,6 +114,25 @@ AC_DEFUN([_SS7_OPTIONS], [
                   [enable_sctp2=$enableval],
                   [enable_sctp2=''])
 ])# _SS7_OPTIONS
+# =========================================================================
+
+# =========================================================================
+# _SS7_STRCONF
+# -------------------------------------------------------------------------
+AC_DEFUN([_SS7_STRCONF], [
+    strconf_cv_stem='lis.conf'
+dnl strconf_cv_input='Config.master'
+    strconf_cv_majbase=180
+    strconf_cv_config='strconf.h'
+    strconf_cv_modconf='modconf.h'
+dnl strconf_cv_drvconf='drvconf.mk'
+dnl strconf_cv_confmod='conf.modules'
+dnl strconf_cv_makedev='devices.lst'
+    strconf_cv_mknodes='ss7makenodes.c'
+dnl strconf_cv_stsetup='strsetup.conf'
+dnl strconf_cv_strload='strload.conf'
+    _STRCONF
+])# _SS7_STRCONF
 # =========================================================================
 
 # =========================================================================

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.4 2004/04/25 08:49:17 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.5 2004/05/11 09:24:44 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/25 08:49:17 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/11 09:24:44 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -74,16 +74,16 @@ dnl both are specified, it defaults to LfS.
 dnl -------------------------------------------------------------------------
 
 # =========================================================================
-# AC_LINUX_STREAMS
+# _LINUX_STREAMS
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_LINUX_STREAMS],
+AC_DEFUN([_LINUX_STREAMS],
 [
-    AC_REQUIRE([AC_LINUX_KERNEL])
+    AC_REQUIRE([_LINUX_KERNEL])
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
     _LINUX_STREAMS_OUTPUT
     AC_SUBST([STREAMS_CPPFLAGS])
-])# AC_LINUX_STREAMS
+])# _LINUX_STREAMS
 # =========================================================================
 
 # =========================================================================
@@ -101,12 +101,6 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS],
             directory. @<:@default=INCLUDEDIR/LfS@:>@]),
             [with_lfs=$withval],
             [with_lfs=''])
-    AC_ARG_WITH([base-major],
-        AS_HELP_STRING([--with-base-major=MAJOR], [specify the base major
-            device number for static major device numbering.
-            @<:@default=185@:>@]),
-            [with_base_major=$withval],
-            [with_base_major=''])
 ])# _LINUX_STREAMS_OPTIONS
 # =========================================================================
 
@@ -284,19 +278,6 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT],
             _LINUX_STREAMS_LFS_DEFINES
             : ;;
     esac
-    STR_BASE_MAJOR=185
-    if test :"${with_base_major:+set}" = :set ; then
-        case "$with_base_major" in
-            no | No | nO | NO)
-                ;;
-            yes | Yes | YEs | YeS | YES)
-                ;;
-            *)
-                STR_BASE_MAJOR="$with_base_major"
-                ;;
-        esac
-    fi
-    AC_SUBST([STR_BASE_MAJOR])
 ])# _LINUX_STREAMS_OUTPUT
 # =========================================================================
 

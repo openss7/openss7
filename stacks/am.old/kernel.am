@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/25 05:55:30 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/11 09:24:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 05:55:30 $ by $Author: brian $
+# Last Modified $Date: 2004/05/11 09:24:43 $ by $Author: brian $
 #
 # =============================================================================
 
 all-am: $(KERNEL_MODULES)
 
-#STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
+STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 
 install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 	@$(NORMAL_INSTALL)
@@ -62,7 +62,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_MODCONF)
 			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
 			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
-			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULE)" ; then \
+			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
 				echo "$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
 				$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
 			fi ; \

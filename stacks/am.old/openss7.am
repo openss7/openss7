@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/25 05:55:30 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/11 09:24:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 05:55:30 $ by $Author: brian $
+# Last Modified $Date: 2004/05/11 09:24:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +80,7 @@ ifnames:
 .PHONY: install-modules post-modules uninstall-modules postun-modules \
 	post-libraries postun-libraries \
 	clean-local-manpages install-local-manpages uninstall-local-manpages \
-	srpm rpms \
+	srpm rpms sign distclean-rpms distclean-sign \
 	dep ksyms-am clean-ksyms
 
 # vim: ft=automake

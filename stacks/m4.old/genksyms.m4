@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/25 08:49:17 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/11 09:24:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,36 +48,33 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 08:49:17 $ by $Author: brian $
+# Last Modified $Date: 2004/05/11 09:24:43 $ by $Author: brian $
 #
 # =============================================================================
 
 # =============================================================================
-# AC_GENKSYMS
+# _GENKSYMS
 # -----------------------------------------------------------------------------
-AC_DEFUN([AC_GENKSYMS], [
-    AC_REQUIRE([AC_LINUX_KERNEL])
+AC_DEFUN([_GENKSYMS], [
+    AC_REQUIRE([_LINUX_KERNEL])
     _KSYMS_OPTIONS
-    ksyms_tmp_cppflags="$CPPFLAGS"
-    ksyms_tmp_cflags="$CFLAGS"
-    CPPFLAGS="$KERNEL_CPPFLAGS"
-    CFLAGS="$KERNEL_CFLAGS"
-    _KSYMS_SETUP
-    CPPFLAGS="$ksyms_tmp_cppflags"
-    CFLAGS="$ksyms_tmp_cflags"
+    _LINUX_KERNEL_ENV([
+        _KSYMS_SETUP
+    ])
     _KSYMS_OUTPUT
-])# AC_GENKSYMS
+])# _GENKSYMS
 # =============================================================================
 
 # =============================================================================
 # _KSYMS_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_OPTIONS], [
-#   AC_ARG_ENABLE([k-versions],
-#       AS_HELP_STRING([--enable-k-versions],
-#           [version all symbols @<:@default=automatic@:>@]),
-#       [enable_k_versions=$enableval],
-#       [enable_k_versions=''])
+dnl AC_ARG_ENABLE([k-versions],
+dnl     AS_HELP_STRING([--enable-k-versions],
+dnl         [version all symbols @<:@default=automatic@:>@]),
+dnl     [enable_k_versions=$enableval],
+dnl     [enable_k_versions=''])
+    AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
 ])# _KSYMS_OPTIONS
 # =============================================================================
 
@@ -99,14 +96,9 @@ AC_DEFUN([_KSYMS_SETUP], [
     else
         GENKSYMS_SMP_PREFIX=''
     fi
-    AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
     AC_PATH_TOOL([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GENKSYMS:-no}" = :no ; then
-        AC_MSG_WARN([
-***
-*** Could not find genksyms program in PATH.
-***
-        ])
+        AC_MSG_WARN([Could not find genksyms program in PATH.])
     fi
 ])# _KSYMS_SETUP
 # =============================================================================

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/25 07:34:24 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/11 09:24:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 07:34:24 $ by $Author: brian $
+# Last Modified $Date: 2004/05/11 09:24:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -220,6 +220,8 @@ preferred_cflags="-freorder-blocks"
     %{?_without_k_test:           --disable-k-test} \
     %{?_with_k_safe:              --enable-k-safe} \
     %{?_without_k_safe:           --disable-k-safe} \
+    %{?_with_k_inline:            --enable-k-inline} \
+    %{?_without_k_inline:         --disable-k-inline} \
     %{?_with_lis:                 %{_with_lis}} \
     %{?_without_lis:              %{_without_lis}} \
     %{?_with_lfs:                 %{_with_lfs}} \
@@ -739,9 +741,13 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.8  2004/04/25 07:34:24  brian
-# - Updated changelog.
+# Revision 0.9.2.9  2004/05/11 09:24:18  brian
+# - Added new configure options.
 #
+
+* Sun Apr 25 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.8  2004/04/25 07:34:24  brian
+- Updated changelog.
 
 * Sun Apr 25 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.7  2004/04/25 07:33:00  brian

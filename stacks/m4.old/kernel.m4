@@ -53,25 +53,44 @@
 # =============================================================================
 
 # =============================================================================
-# AC_LINUX_KERNEL
+# _LINUX_KERNEL
 # -----------------------------------------------------------------------------
-AC_DEFUN([AC_LINUX_KERNEL], [
+AC_DEFUN([_LINUX_KERNEL], [
     _LINUX_KERNEL_OPTIONS
     AC_REQUIRE([AC_CANONICAL_TARGET])
+    _LINUX_KERNEL_ENV([
+        CPPFLAGS=
+        CFLAGS=
+        LDFLAGS=
+        _LINUX_KERNEL_SETUP
+        KERNEL_CPPFLAGS="$CPPFLAGS"
+        KERNEL_CFLAGS="$CFLAGS"
+        KERNEL_LDFLAGS="$LDFLAGS"
+        AC_SUBST(KERNEL_CPPFLAGS)
+        AC_SUBST(KERNEL_CFLAGS)
+        AC_SUBST(KERNEL_LDFLAGS)
+    ])
+])# _LINUX_KERNEL
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_ENV([COMMANDS])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_ENV], [
+    # these can't be nested, yet...
     # move user flags out of the way temporarily
-    linux_tmp_cppflags="${CPPFLAGS}"
-    linux_tmp_cflags="${CFLAGS}"
-    CPPFLAGS=
-    CFLAGS=
-    _LINUX_KERNEL_SETUP
-    KERNEL_CPPFLAGS="${CPPFLAGS}"
-    KERNEL_CFLAGS="${CFLAGS}"
-    AC_SUBST(KERNEL_CPPFLAGS)
-    AC_SUBST(KERNEL_CFLAGS)
+    linux_tmp_cppflags="$CPPFLAGS"
+    linux_tmp_cflags="$CFLAGS"
+    linux_tmp_ldflags="$LDFLAGS"
+    CPPFLAGS="$KERNEL_CPPFLAGS"
+    CFLAGS="$KERNEL_CFLAGS"
+    LDFLAGS="$KERNEL_LDFLAGS"
+    $1
     # move user flags back where they were
-    CPPFLAGS="${linux_tmp_cppflags}"
-    CFLAGS="${linux_tmp_cflags}"
-])# AC_LINUX_KERNEL
+    CPPFLAGS="$linux_tmp_cppflags"
+    CFLAGS="$linux_tmp_cflags"
+    LDFLAGS="$linux_tmp_ldflags"
+])# _LINUX_KERNEL_ENV
 # =============================================================================
 
 # =============================================================================
@@ -131,25 +150,48 @@ AC_DEFUN([_LINUX_KERNEL_OPTIONS], [
                                  [enable kernel module run-time debugging.
                                  @<:@default=no@:>@]),
                   [enable_k_debug=$enableval],
-                  [enable_k_debug=''])
+                  [enable_k_debug='no'])
     AC_ARG_ENABLE([k-test],
                   AS_HELP_STRING([--enable-k-test],
                                  [enable kernel module run-time testing.
                                  @<:@default=no@:>@]),
                   [enable_k_test=$enableval],
-                  [enable_k_test=''])
+                  [enable_k_test='no'])
     AC_ARG_ENABLE([k-safe],
                   AS_HELP_STRING([--enable-k-safe],
                                  [enable kernel module run-time safety checks.
                                  @<:@default=yes@:>@]),
                   [enable_k_safe=$enableval],
-                  [enable_k_safe=''])
-    AC_ARG_ENABLE([k-install],
-                  AS_HELP_STRING([--enable-k-install],
-                                 [specify whether kernel modules will be
-                                 installed.  @<:@default=yes@:>@]),
-                  [enable_k_install=$enableval],
-                  [enable_k_install=''])
+                  [enable_k_safe='yes'])
+    AC_ARG_ENABLE([k-inline],
+                  AS_HELP_STRING([--enable-k-inline],
+                                 [enable kernel inline functions.
+                                 @<:@default=no@:>@]),
+                  [enable_k_inline=$enableval],
+                  [enable_k_inline='no'])
+    AC_ARG_WITH([k-optimize],
+                  AS_HELP_STRING([--with-k-optimize=HOW],
+                                 [specify optimization, normal, size, speed
+                                 or quick. @<:@default=normal@:>@]),
+                  [with_k_optimize=$withval],
+                  [with_k_optimize='normal'])
+    AC_ARG_ENABLE([modules],
+                  AS_HELP_STRING([--disable-modules],
+                                 [disable kernel modules, prepare object for
+                                 linking into the kernel.
+                                 @<:@default=no@:>@]),
+                  [enable_modules=$enableval],
+                  [enable_modules='yes'])
+dnl AC_ARG_ENABLE([k-install],
+dnl               AS_HELP_STRING([--enable-k-install],
+dnl                              [specify whether kernel modules will be
+dnl                              installed.  @<:@default=yes@:>@]),
+dnl               [enable_k_install=$enableval],
+dnl               [enable_k_install='yes'])
+    AC_ARG_VAR([DEPMOD], [Build kernel module dependencies command])
+    AC_ARG_VAR([MODPROBE], [Probe kernel module dependencies command])
+    AC_ARG_VAR([LSMOD], [List kernel modules command])
+    AC_ARG_VAR([LSOF], [List open files command])
 ])# _LINUX_KERNEL_OPTIONS
 # =============================================================================
 
@@ -158,6 +200,7 @@ AC_DEFUN([_LINUX_KERNEL_OPTIONS], [
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_SETUP], [
     _LINUX_CHECK_KERNEL_RELEASE
+    _LINUX_CHECK_KERNEL_LINKAGE
     _LINUX_CHECK_KERNEL_MODULES
     _LINUX_CHECK_KERNEL_BUILD
     _LINUX_CHECK_KERNEL_SYSMAP
@@ -260,6 +303,23 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [
 # =========================================================================
 
 # =========================================================================
+# _LINUX_CHECK_KERNEL_LINKAGE
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [
+    AC_MSG_CHECKING([for kernel linkage])
+    if test :"${enable_modules:-yes}" != :yes ; then
+        linux_cv_modules='no'
+        linux_tmp='linkable object'
+    else
+        linux_cv_modules='yes'
+        linux_tmp='loadable modules'
+        KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
+    fi
+    AC_MSG_RESULT([$linux_tmp])
+])# _LINUX_CHECK_KERNEL_LINKAGE
+# =========================================================================
+
+# =========================================================================
 # _LINUX_CHECK_KERNEL_MODULES
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
@@ -285,7 +345,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
         then
             if test :"${with_k_release:-no}" = :no
             then
-                AC_MSG_WARN([
+                if test :"linux_cv_modules" != :yes
+                then
+                    AC_MSG_WARN([
 *** 
 *** You have not specified --with-k-release, so the build is for the running
 *** kernel version
@@ -302,7 +364,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
 *** you need to specify --with-k-release even if it does not differ from the
 *** build machine kernel version.
 *** 
-                ])
+                    ])
+                fi
             fi
         else
             if test :"${with_k_release:-no}" = :no
@@ -313,7 +376,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
                 else
                     linux_tmp='also does not exist'
                 fi
-                AC_MSG_WARN([
+                if test :"$linux_cv_modules" != :yes
+                then
+                    AC_MSG_WARN([
 *** 
 *** You have not specified --with-k-release, so the build is for the running
 *** kernel version
@@ -330,7 +395,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
 *** --with-k-release even if it does not differ from the build machine kernel
 *** version.
 *** 
-                ])
+                    ])
+                fi
             fi
         fi
     fi
@@ -338,12 +404,35 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
     kmoduledir="${linux_cv_k_modules}"
     AC_SUBST(krootdir)
     AC_SUBST(kmoduledir)
-    AC_ARG_VAR([DEPMOD], [Build kernel module dependencies command])
     AC_PATH_TOOL([DEPMOD], [depmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${DEPMOD:-no}" = :no ; then
         AC_MSG_WARN([
 ***
 *** Could not find depmod program in PATH.
+***
+        ])
+    fi
+    AC_PATH_TOOL([MODPROBE], [modprobe], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${MODPROBE:-no}" = :no ; then
+        AC_MSG_WARN([
+***
+*** Could not find modprobe program in PATH.
+***
+        ])
+    fi
+    AC_PATH_TOOL([LSMOD], [lsmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${LSMOD:-no}" = :no ; then
+        AC_MSG_WARN([
+***
+*** Could not find lsmod program in PATH.
+***
+        ])
+    fi
+    AC_PATH_TOOL([LSOF], [lsof], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${LSOF:-no}" = :no ; then
+        AC_MSG_WARN([
+***
+*** Could not find lsof program in PATH.
 ***
         ])
     fi
@@ -645,7 +734,20 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [
     # CFLAGS, that way the user can override these settings for better tuning.
     #
     # CFLAGS="-Wall -Wstrict-prototypes -Wno-trigraphs -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common"
-    CFLAGS="-Wall -Wno-trigraphs -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common"
+    CFLAGS="-Wall -Wno-trigraphs"
+    if test :"${enable_k_inline:-no}" != :no ; then
+        CFLAGS="$CFLAGS${CFLAGS:+ }-Winline"
+    fi
+    case "${with_k_optimize:-normal}" in
+        size)   CFLAGS="$CFLAGS${CFLAGS:+ }-Os" ;;
+        speed)  CFLAGS="$CFLAGS${CFLAGS:+ }-O3" ;;
+        quick)  CFLAGS="$CFLAGS${CFLAGS:+ }-O0" ;;
+        *)      CFLAGS="$CFLAGS${CFLAGS:+ }-O2" ;;
+    esac
+    CFLAGS="$CFLAGS${CFLAGS:+ }-fomit-frame-pointer -fno-strict-aliasing -fno-common"
+    if test :"${enable_k_inline:-no}" != :no ; then
+        CFLAGS="$CFLAGS${CFLAGS:+ }-finline-functions"
+    fi
     linux_k_defs='-D__KERNEL__ -DLINUX'
     case "$linux_cv_march" in
         alpha*)
@@ -810,41 +912,39 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [
 # _LINUX_SETUP_KERNEL_DEBUG
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [
-    linux_tmp=
+    AC_MSG_CHECKING([for kernel debugging])
+    linux_cv_debug='_NONE'
     if test :"${enable_k_safe:-yes}" != :no ; then
-        linux_tmp='_SAFE'
+        linux_cv_debug='_SAFE'
     fi
-    if test "${enable_k_test:-no}" != :no ; then
-        linux_tmp='_TEST'
+    if test :"${enable_k_test:-no}" != :no ; then
+        linux_cv_debug='_TEST'
     fi
-    if test "${enable_k_debug:-no}" != :no ; then
-        linux_tmp='_DEBUG'
+    if test :"${enable_k_debug:-no}" != :no ; then
+        linux_cv_debug='_DEBUG'
     fi
-    case "$linux_tmp" in
+    case "$linux_cv_debug" in
         _DEBUG)
-            linux_cv_debug='_DEBUG'
             AC_DEFINE_UNQUOTED([_DEBUG], [], [Define for kernel symbol
             debugging.  This has the effect of defeating inlines, making
             static declarations global, and activating all debugging macros.])
             ;;
         _TEST)
-            linux_cv_debug='_TEST'
             AC_DEFINE_UNQUOTED([_TEST], [], [Define for kernel testing.  This
             has the same effect as _DEBUG for now.])
             ;;
         _SAFE)
-            linux_cv_debug='_SAFE'
             AC_DEFINE_UNQUOTED([_SAFE], [], [Define for kernel safety.  This
             has the effect of enabling safety debugging macros.  This is the
             default.])
             ;;
         *)
-            linux_cv_debug='_NONE'
             AC_DEFINE_UNQUOTED([_NONE], [], [Define for maximum performance
             and minimum size.  This has the effect of disabling all safety
             debugging macros.])
             ;;
     esac
+    AC_MSG_RESULT([$linux_cv_debug])
 ])# _LINUX_SETUP_KERNEL_DEBUG
 # =========================================================================
 
@@ -863,9 +963,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [
     ])
     if test :"${linux_cv_k_versions:-no}" = :yes
     then
-        KERNEL_MODFLAGS="-DMODULE -DMODVERSIONS"
-    else
-        KERNEL_MODFLAGS="-DMODULE"
+        KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODVERSIONS"
     fi
     AC_SUBST([KERNEL_MODFLAGS])
     KERNEL_NOVERSION="-D__NO_VERSION__"
