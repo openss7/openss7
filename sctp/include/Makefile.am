@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/26 22:13:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/02 04:39:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:13:01 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 04:39:06 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../am/openss7.am
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 nobase_include_HEADERS = \
 	netinet/sctp.h
+
+## PKG_BUILD_ARCH
+endif
 
 EXTRA_DIST += \
 	linux/sctp.h \

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/26 22:12:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/02 04:39:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:57 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 04:39:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,11 +54,17 @@ include ../../am/openss7.am
 
 MANMACRO_PFX			= sctp
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
 man_MANS = \
 	man7/sctp.7
 
 dist_noinst_MANS = \
 	man7/sctp.7.man
+
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/man.am
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/24 02:10:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/04/02 04:39:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:10:53 $ by $Author: brian $
+# Last Modified $Date: 2005/04/02 04:39:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,11 @@ dist_sysconf_DATA =
 
 lib_LTLIBRARIES			=
 
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= 
 
@@ -171,9 +175,11 @@ test_sctp_sc_CFLAGS		= $(USER_CFLAGS)
 
 sbin_PROGRAMS			=
 
+## RPM_BUILD_USER
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSCTPmodl.a
 ADDON_MODS			= sctp.o
@@ -219,6 +225,10 @@ sctp.o: combined-sctp.o
 
 CLEANFILES += combined-sctp.o
 
+## RPM_BUILD_KERNEL
+endif
+
+## PKG_BUILD_ARCH
 endif
 
 EXTRA_DIST			+= $(sctp_source_FILES)
@@ -278,33 +288,41 @@ include am/genksyms.am
 ##include am/strconf.am
 ##
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = include doc tests
 
+## RPM_BUILD_USER
+endif
+
 if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
 
 if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+## WITH_RCSD_DIRECTORY
 else
+## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
+## ! WITH_RCSD_DIRECTORY
 endif
 
 dist_config_DATA		=
 
 dist_sysconf_DATA		+=
 
+## INSTALL_INITSCRIPTS
 endif
 
 ##
 ## Rules for init scripts
 ##
 include am/init.am
-
-endif
 
 ##
 ## Rules for lsms
