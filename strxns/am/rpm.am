@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/03/08 19:32:14 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/03/09 06:51:29 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/08 19:32:14 $ by $Author: brian $
+## Last Modified $Date: 2005/03/09 06:51:29 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -255,7 +255,7 @@ RELEASE		+= srpm
 # current target, we also build any defined AM_RPMTARGETS
 ##
 one-rpm: $(rpm_spec_file) $(rpm_source_files) $(rpm_directories)
-	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) --target $(RPMTARGET) -- $<
+	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
 ##
 # This below is pretty obfuscated, but it is what we need to rebujild and rpm once for LiS and
@@ -322,10 +322,10 @@ rebuild:
 	done
 
 resign: sign
-	@rpms="`find $(rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir) -name '$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) rebuild ; \
-		rpms="`find $(rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+		rpms="`find $(rpmdir) -name '$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -350,7 +350,7 @@ resign: sign
 # to do this too.  The same is true for build files.
 ##
 distclean-rpm:
-	$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
+	$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
 
 DISTCLEAN_LOCAL	+= distclean-rpm
 
@@ -366,11 +366,11 @@ DISTCLEANFILES	+= \
 # cycle).  Therefore we provide a special set of release targets for this purpose.
 ##
 release-clean-rpm:
-	$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
+	$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
 
 RELEASECLEANFILES += \
 		$(srpm) \
-		$(rpmdir)/*/$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+		$(rpmdir)/*/$(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 
 RELEASE_CLEAN_LOCAL += \
 		release-clean-rpm

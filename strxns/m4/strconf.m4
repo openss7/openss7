@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/09 02:56:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 02:56:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -168,8 +168,8 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     strconf_list="`find $ac_abs_srcdir/ $ac_abs_builddir/ -type f -name \"$STRCONF_STEM\" | sort | uniq`"
     for strconf_tmp in $strconf_list ; do
 	case $strconf_tmp in
-	    ("$ac_abs_builddir"*/"$PACKAGE_TARNAME-$PACKAGE_VERSION-$PACKAGE_RELEASE"/*) continue ;;
-	    ("$ac_abs_builddir"*/"$PACKAGE_TARNAME-bin-$PACKAGE_VERSION-$PACKAGE_RELEASE"/*) continue ;;
+	    ("$ac_abs_builddir"*/"$PACKAGE-$VERSION"/*) continue ;;
+	    ("$ac_abs_builddir"*/"$PACKAGE-bin-$VERSION"/*) continue ;;
 	esac
 	if test -r "$strconf_tmp" ; then
 	    strconf_configs="${strconf_configs}${strconf_configs:+ }$strconf_tmp"
@@ -221,6 +221,8 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [dnl
     AC_CONFIG_COMMANDS([strconf],
 	[_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 ac_aux_dir="$ac_aux_dir"
+PACKAGE="$PACKAGE"
+VERSION="$VERSION"
 PACKAGE_TARNAME="$PACKAGE_TARNAME"
 PACKAGE_VERSION="$PACKAGE_VERSION"
 PACKAGE_RELEASE="$PACKAGE_RELEASE"

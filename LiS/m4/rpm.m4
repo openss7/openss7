@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/03/08 00:22:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/09 03:40:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 03:40:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,7 +69,53 @@ AC_DEFUN([_RPM_SPEC], [dnl
 # _RPM_SPEC_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
+    _RPM_OPTIONS_RPM_EPOCH
+    _RPM_OPTIONS_RPM_RELEASE
 ])# _RPM_SPEC_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _RPM_OPTIONS_RPM_EPOCH
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_OPTIONS_RPM_EPOCH], [dnl
+    AC_MSG_CHECKING([for rpm epoch])
+    AC_ARG_WITH([rpm-epoch],
+	AS_HELP_STRING([--with-rpm-epoch=EPOCH],
+	    [specify the EPOCH for the package file.  @<:@default=auto@:>@]),
+	[with_rpm_epoch="$withval"],
+	[if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
+	 if test -r ${d}.rpmepoch
+	 then with_rpm_epoch="`cat ${d}.rpmepoch`"
+	 else with_rpm_epoch=0
+	 fi])
+    AC_MSG_RESULT([${with_rpm_epoch:-0}])
+    PACKAGE_RPMEPOCH="${with_rpm_epoch:-0}"
+    AC_SUBST([PACKAGE_RPMEPOCH])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMEPOCH], [$PACKAGE_RPMEPOCH], [The RPM Epoch.
+			This defaults to 0.])
+])# _RPM_OPTIONS_RPM_EPOCH
+# =============================================================================
+
+# =============================================================================
+# _RPM_OPTIONS_RPM_RELEASE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_OPTIONS_RPM_RELEASE], [dnl
+    AC_MSG_CHECKING([for rpm release])
+    AC_ARG_WITH([rpm-release],
+	AS_HELP_STRING([--with-rpm-release=RELEASE],
+	    [specify the RELEASE for the package files.  @<:@default=auto@:>@]),
+	[with_rpm_release="$withval"],
+	[if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
+	 if test -r ${d}.rpmrelease
+	 then with_rpm_release="`cat ${d}.rpmrelease`"
+	 else with_rpm_release=1
+	 fi])
+    AC_MSG_RESULT([${with_rpm_release:-1}])
+    PACKAGE_RPMRELEASE="${with_rpm_release:-1}"
+    AC_SUBST([PACKAGE_RPMRELEASE])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMRELEASE], ["$PACKAGE_RPMRELEASE"], [The RPM
+			Release. This defaults to 1.])
+])# _RPM_OPTIONS_RPM_RELEASE
 # =============================================================================
 
 # =============================================================================
@@ -363,10 +409,10 @@ AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
     if test :"${enable_public:-yes}" != :yes ; then
 	PACKAGE="${PACKAGE_TARNAME}"
-	VERSION="bin-${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+	VERSION="bin-${PACKAGE_VERSION}.${PACKAGE_RELEASE}"
     else
 	PACKAGE="${PACKAGE_TARNAME}"
-	VERSION="${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+	VERSION="${PACKAGE_VERSION}.${PACKAGE_RELEASE}"
     fi
 ])# _RPM_SPEC_OUTPUT
 # =============================================================================

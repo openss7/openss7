@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/05 11:08:49 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/09 03:41:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/05 11:08:49 $ by $Author: brian $
+## Last Modified $Date: 2005/03/09 03:41:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,13 +77,13 @@ if BUILD_DPKG
 ##
 
 ##
-# Because we *are* the upstream source, we always use debign version 0 and pack the RPM release
+# Because we *are* the upstream source, we always use debian version @PACKAGE_DEBRELEASE@ and pack the RPM release
 # number onto the upstream version, but with a period instead of a dash to suppress warnings from
 # dpkg-source.
 ##
-debianpkg		= $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)_0
-debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
-debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
+debianpkg		= $(PACKAGE_TARNAME)-$(VERSION)_$(PACKAGE_DEBRELEASE)
+debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION)-$(PACKAGE_DEBRELEASE)
+debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE)-$(VERSION)-$(PACKAGE_DEBRELEASE)
 debian_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
 debian_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
 debian_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
