@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/02 10:43:02 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/03 12:34:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/02 10:43:02 $ by $Author: brian $
+# Last Modified $Date: 2005/02/03 12:34:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,10 +78,13 @@
 %global majbase @STRCONF_MAJBASE@
 %global makedev @STRCONF_MAKEDEV@
 %global base @PACKAGE_TARNAME@
-%global infofiles %{name}
 %global title @PACKAGE_TITLE@
 %global stitle @PACKAGE_SHORTTITLE@
-%global libname ss7
+
+%global modules     inet m2pa sdlm sdl sdl_sctp sdt sdt_sctp sdt_tpi sl_mux sl sl_tpi sm_mod spm timod tirdwr x100p-ss7 X400p-ss7
+%global libraries   ss7
+%global tools       strss7_mknod test-m2pa test-q781 test-tcpc test-tcps test-udpc test-udps test-x100p test-x400p
+%global infofiles   %{name}
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -132,8 +135,6 @@
 %global _kmodext lis
 %global _conflict streams
 %endif
-# FIXME: there are way more modules that this
-%global _modules    x400 x100
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
@@ -220,10 +221,10 @@ modules, libraries, utilities, test programs, daemons, and development
 environment for the development and execution of Signalling System No. 7
 (SS7), Signalling Transport (SIGTRAN), Integrated Service Digital Network
 (ISDN), Voice over IP (VoIP), Media Gateway Control (MGC), Media Gateway (MG),
-Switching protocol stack components and applications for the %{_STREAMS}
-STREAMS environment.  This distribution is only currently applicable to 2.4
-kernes and was targetted at ix86 and ppc architectures, but should build and
-install for other architectures as well.
+Switching protocol stack components and applications for the
+%{_STREAMS} STREAMS environment.  This distribution is only currently
+applicable to 2.4 kernels and was targetted at ix86 and ppc architectures, but
+should build and install for other architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -321,10 +322,6 @@ fi
     %{?_without_modules:         %disable %_without_modules} \
     %{?_with_lis:                %_with_lis} \
     %{?_with_lfs:                %_with_lfs} \
-    %{?_with_sctp:                          %_with_sctp} \
-    %{?_without_sctp:                       %_without_sctp} \
-    %{?_with_sctp2:                         %_with_sctp2} \
-    %{?_without_sctp2:                      %_without_sctp2} \
     %{?_with_sctp_slow_verification:        %enable %_with_sctp_slow_verification} \
     %{?_without_sctp_slow_verification:     %disable %_without_sctp_slow_verification} \
     %{?_with_sctp_throttle_heartbeats:      %enable %_with_sctp_throttle_heartbeats} \
@@ -357,6 +354,10 @@ fi
     %{?_without_sctp_debug:                 %disable %_without_sctp_debug} \
     %{?_with_sctp_error_generator:          %enable %_with_sctp_error_generator} \
     %{?_without_sctp_error_generator:       %disable %_without_sctp_error_generator} \
+    %{?_with_sctp:                          %_with_sctp} \
+    %{?_without_sctp:                       %_without_sctp} \
+    %{?_with_sctp2:                         %_with_sctp2} \
+    %{?_without_sctp2:                      %_without_sctp2} \
     %{?_with_xns:                           %_with_xns} \
     %{?_without_xns:                        %_without_xns} \
     %{?_with_tli:                           %_with_tli} \
@@ -375,7 +376,7 @@ make check
 %install
 # ---------------------------------------------------------------------------
 
-# in case they were not cleaned
+# in case it was not cleaned
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
 %if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
@@ -443,10 +444,10 @@ Release:        %{fullrelease}
 The %{name}-%{_streams}-%{core_name} package contains the kernel modules
 that provide the Linux kernel %{stitle} %{_STREAMS} STREAMS drivers and modules.
 This also includes assorted drivers and modules for additional protocol stacks
-such as SIGTRAN, ISDN and VoIP.  This package is heavily tied to the kernel for
-which it and the %{_STREAMS} STREAMS facility was compiled.  This package
-applies to kernel version %{kernel_version} and requires a %{_STREAMS} STREAMS
-package compiled for the same kernel.
+such as SIGTRAN.  This package is heavily tied to the kernel for which it and the
+%{_STREAMS} STREAMS facility was compiled.  This package applies to kernel
+version %{kernel_version} and requires a %{_STREAMS} STREAMS package compiled
+for the same kernel.
 
 %pre %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
@@ -454,14 +455,15 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
 #   installing new on the running kernel, we have to worry about previous
 #   loaded modules for the old version or a non-rpm version
-    for m in %{_modules} ; do
-        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+    for m in %{modules} ; do
+        m="streams-$m"
+        if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           module running, kick the stack
-            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+            /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^$m" ) ; then
                 fdetach -a 2>/dev/null
-                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^$m" ) ; then
                     /usr/sbin/lsof | while read -a tokens; do
                         if [ :"$tokens[4]" = :"CHR" ]; then
                             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
@@ -470,9 +472,10 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
                             fi
                         fi
                     done
-                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
-                        echo "Cannot install or upgrade with streams-$m module running." >&2
+                    /sbin/sleep 5 # wait for processes to die and close streams
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                        echo "Cannot install or upgrade with $m module running." >&2
                         exit 1
                     fi
                 fi
@@ -553,14 +556,15 @@ fi
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
 #   worry about which modules are running
-    for m in %{_modules} ; do
-        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+    for m in %{modules} ; do
+        m="streams-$m"
+        if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           modules running, kick the stack
-            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+            /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^$m" ) ; then
                 fdetach -a
-                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^$m" ) ; then
                     /usr/sbin/lsof | while read -a tokens; do
                         if [ :"$tokens[4]" = :"CHR" ]; then
                             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
@@ -569,9 +573,10 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
                             fi
                         fi
                     done
-                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
-                        echo "Cannot uninstall with streams-$m module running." >&2
+                    /sbin/sleep 5 # wait for processes to die and close streams
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                        echo "Cannot uninstall with $m module running." >&2
                         exit 1
                     fi
                 fi
@@ -612,15 +617,16 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   one more kick at killing any loaded modules on uninstall, last stage of
 #   the upgrade on a running kernel for upgrade.
     reboot='no'
-    for m in %{_modules} ; do
-        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+    for m in %{modules} ; do
+        m="streams-$m"
+        if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #           modules running, kick the stack
-            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+            /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^$m" ) ; then
                 fdetach -a
-                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
-                    /sbin/insmod -ar "streams-$m"
+                /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^$m" ) ; then
+                    /sbin/insmod -ar "$m"
                     /usr/sbin/lsof | while read -a tokens; do
                         if [ :"$tokens[4]" = :"CHR" ]; then
                             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
@@ -629,16 +635,17 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #                                   extreme prejudice for removal
                                     eval "kill -KILL $tokens[1]"
                                 else
-#                                   try to get them to reload for 
+#                                   try to get them to reload for upgrade
                                     eval "kill -HUP $tokens[1]"
                                 fi
                             fi
                         fi
                     done
-                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
-                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /sbin/sleep 5 # wait for processes to die and close streams
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^$m" ) ; then
                         echo "Error: modules may be still loaded" >&2
-                        /sbin/lsmod | grep "^streams-$m" >&2
+                        /sbin/lsmod | grep "^$m" >&2
                         reboot='yes'
                     fi
                 fi
@@ -666,6 +673,7 @@ fi
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
 Group:          System Environment/Base
 Requires:       dev >= 3.3
+Obsoletes:      %{name}-devs
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
 Icon:           %{_xpm}
@@ -718,6 +726,7 @@ Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_datadir}/locale
 Requires:       %{_streams}-lib >= %{_strvers}
+Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
@@ -739,12 +748,14 @@ necessary to run applications programs and utilities developed for OpenSS7
 if [ $1 = 0 ] ; then
 #   this is supposed to be a fresh install
 #   see if there are any libraries hanging around from a non-rpm install
-    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*%{libname}\> | cut '-d ' -f4 ) 2>/dev/null`"
-    if [ -n "$old_libs" ] ; then
+    libs="%{libraries}" ; for lib in $libs ; do
+        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+        if [ -n "$old_libs" ] ; then
 #       old libraries hanging around, delete them
-        echo "warning: Deleting old non-rpm libraries $old_libs" >&2
-        rm -f $old_libs
-    fi
+            echo "warning: Deleting old non-rpm libraries $old_libs" >&2
+            rm -f $old_libs
+        fi
+    done
 else
     :
 #   upgrade, let RPM do its job
@@ -783,12 +794,8 @@ Group:          Documentation
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
-#Requires:       %{_streams}-doc >= %{_strvers}
-#Requires:       strxns-doc >= %{epoch}:%{version}
-#Requires:       strxnet-doc >= %{epoch}:%{version}
-#Requires:       strinet-doc >= %{epoch}:%{version}
-#Requires:       strsctp-doc >= %{epoch}:%{version}
 Conflicts:      texinfo < 3.11
+Obsoletes:      %{name}-docs
 Prereq:         /sbin/install-info
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
@@ -841,7 +848,8 @@ fi
 %if %{BUILD_libs}
 %doc ABOUT-NLS
 %endif
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual doc/specs doc/projects doc/drafts
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc doc/specs doc/projects doc/drafts
 %doc %{name}-%{version}-@PACKAGE_RELEASE@.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
@@ -856,17 +864,6 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
 Group:          Development/System
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
-#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
-#Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
-#Requires:       strxns-%{_streams}-lib >= %{epoch}:%{version}
-#Requires:       strxns-doc >= %{epoch}:%{version}
-#Requires:       strxnet-%{_streams}-lib >= %{epoch}:%{version}
-#Requires:       strxnet-doc >= %{epoch}:%{version}
-#Requires:       strinet-%{_streams}-lib >= %{epoch}:%{version}
-#Requires:       strinet-doc >= %{epoch}:%{version}
-#Requires:       strsctp-%{_streams}-lib >= %{epoch}:%{version}
-#Requires:       strsctp-doc >= %{epoch}:%{version}
-#Requires:       %{_streams}-devel >= %{_strvers}
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
 Icon:           %{_xpm}
@@ -936,7 +933,8 @@ Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
 Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{_streams}-lib >= %{_strvers}
-Conflicts:      %{_conflict}-lib
+Obsoletes:      %{name}-%{_streams}-utils
+Conflicts:      %{_conflict}-util
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
 Icon:           %{_xpm}
@@ -952,6 +950,22 @@ The %{name}-%{_streams}-util package provides adminstrative and configuration
 test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %{stitle} package.
 
+%pre %{_streams}-util
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ]; then
+# this is a fresh install, look for old non-rpm tools
+    tools="%{tools}" ; for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+            eval "rm -f $location"
+            location="`which $tool 2>/dev/null`"
+        done
+    done
+else
+    :
+#   upgrade, let rpm do its job
+fi
+
 %if %{BUILD_tools}
 %files %{_streams}-util
 # ---------------------------------------------------------------------------
@@ -965,34 +979,47 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.5  2005/02/02 10:43:02  brian
-# - Build in builddir again.
+# Revision 0.9.2.6  2005/02/03 12:34:54  brian
+# - Spec file grand rework.
 #
-# Revision 0.9.2.4  2005/02/01 19:01:24  brian
-# - Working up master build.
-#
-# Revision 0.9.2.3  2005/01/29 11:22:40  brian
-# - Have master build working well.
-#
-# Revision 0.9.2.2  2005/01/27 08:30:29  brian
-# - Get tarball and srpm names right.
-#
-# Revision 0.9.2.1  2005/01/25 22:39:17  brian
-# - added files with new package name
-#
-# Revision 0.9.2.59  2005/01/21 08:40:07  brian
-# - Work around mandrake spec-helper for uncooked manpages.
-#
-# Revision 0.9.2.58  2005/01/20 00:52:05  brian
-# - Go back to quick no dependencies compile.
-#
-# Revision 0.9.2.57  2005/01/19 07:38:35  brian
-# - Added checks and autotest options to configure.
-#
-# Revision 0.9.2.56  2005/01/18 20:23:46  brian
-# - Also reference makedev file one down.
-#
-# Revision 0.9.2.55  2005/01/18 13:31:21  brian
+
+* Wed Feb  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.5  2005/02/02 10:43:02  brian
+- Build in builddir again.
+
+* Tue Feb  1 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.4  2005/02/01 19:01:24  brian
+- Working up master build.
+
+* Sat Jan 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.3  2005/01/29 11:22:40  brian
+- Have master build working well.
+
+* Thu Jan 27 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.2  2005/01/27 08:30:29  brian
+- Get tarball and srpm names right.
+
+* Tue Jan 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2005/01/25 22:39:17  brian
+- added files with new package name
+
+* Fri Jan 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.59  2005/01/21 08:40:07  brian
+- Work around mandrake spec-helper for uncooked manpages.
+
+* Thu Jan 20 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.58  2005/01/20 00:52:05  brian
+- Go back to quick no dependencies compile.
+
+* Wed Jan 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.57  2005/01/19 07:38:35  brian
+- Added checks and autotest options to configure.
+
+* Tue Jan 18 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.56  2005/01/18 20:23:46  brian
+- Also reference makedev file one down.
+
+- Revision 0.9.2.55  2005/01/18 13:31:21  brian
 # - Support multiple builds on same NFS mount.
 #
 

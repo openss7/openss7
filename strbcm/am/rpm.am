@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/02/03 00:09:09 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/02/03 12:36:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/03 00:09:09 $ by $Author: brian $
+# Last Modified $Date: 2005/02/03 12:36:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -170,7 +170,7 @@ srpm: $(PACKAGE_RPMTOPDIR)/SRPMS/$(distdir).src.rpm
 #   to build rpms for the current target, we also build any defined
 #   AM_RPMTARGETS
 #
-all-rpms: \
+one-rpm: \
 	$(PACKAGE_TARNAME).spec \
 	$(PACKAGE_RPMTOPDIR)/SOURCES/$(distdir).tar.gz \
 	$(PACKAGE_RPMTOPDIR)/SOURCES/$(distdir).tar.bz2 \
@@ -184,25 +184,25 @@ all-rpms: \
 	done
 	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
-lis-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
+lis-rpm:
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' one-rpm
 
-lfs-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' all-rpms
+lfs-rpm:
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' one-rpm
 
 AM_RPMSMAKETARGETS =
 
 if WITH_LIS
-AM_RPMSMAKETARGETS += lis-rpms
+AM_RPMSMAKETARGETS += lis-rpm
 endif
 if WITH_LFS
-AM_RPMSMAKETARGETS += lfs-rpms
+AM_RPMSMAKETARGETS += lfs-rpm
 endif
 if WITH_LIS
 else
 if WITH_LFS
 else
-AM_RPMSMAKETARGETS += all-rpms
+AM_RPMSMAKETARGETS += one-rpm
 endif
 endif
 
@@ -229,19 +229,20 @@ sign: \
 #   --without popt syntax, so we have to expand them to --defines.
 #
 
-rebuild:
+rebuild all-rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
+	rpmtarg=`echo $@ | sed -e 's|rebuild|rpm|'` ; \
 	for t in $$targets ;  do \
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" rpms || :; \
+				echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
 			fi ; \
 		done ; \
-		echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" rpms || :; \
+		echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
 	done
 
 resign: sign
@@ -281,6 +282,13 @@ rebuild: $(DIST_ARCHIVES)
 resign: sign
 
 endif
+
+all-dist all-srpm all-rpms all-sign all-resign:
+	@list='$(subdirs)' ; for subdir in $$list ; do \
+		target=`echo $@ | sed -e 's|^all-||'` ; \
+		echo "Making $$target in $$subdir" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="$(RPMXOPTS)" $$target) || exit 1 ; \
+	done
 
 clean-lsms:
 
@@ -383,7 +391,8 @@ DISTCLEAN_LOCAL += distclean-lsms distclean-archives distclean-srpm distclean-rp
 MAINTAINER_CLEAN_LOCAL += maintainer-clean-lsms maintainer-clean-archives maintainer-clean-srpm \
 	maintainer-clean-rpms maintainer-clean-sign
 
-.PHONY: srpm rpms all-rpms lis-rpms lfs-rpms sign rebuild resign \
+.PHONY: srpm rpms one-rpm lis-rpm lfs-rpm sign rebuild resign \
+	all-dist all-srpm all-rpms all-sign all-resign all-rebuild \
 	clean-lsms clean-archives clean-rpms clean-sign distclean-lsms distclean-archives \
 	distclean-srpm distclean-rpms distclean-sign maintainer-clean-lsms \
 	maintainer-clean-archives maintainer-clean-srpm maintainer-clean-rpms maintainer-clean-sign

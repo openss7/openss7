@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/01 18:58:37 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/03 12:34:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/01 18:58:37 $ by $Author: brian $
+# Last Modified $Date: 2005/02/03 12:34:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,8 @@
 # rpmbuild will not build a binary rpm when it has no %files section
 %global BUILD_modules 1
 %global BUILD_tools   1
+%global BUILD_lis     1
+%global BUILD_lfs     0
 
 #
 # there are three ways to pass kernel version to the build process:
@@ -76,18 +78,28 @@
 %global majbase @STRCONF_MAJBASE@
 %global makedev @STRCONF_MAKEDEV@
 %global base @PACKAGE_TARNAME@
-%global infofiles %{name} STREAMS SPG porting
+%global infofiles %{name} STREAMS SPG porting libxnet
 %global title @PACKAGE_TITLE@
 %global stitle @PACKAGE_SHORTTITLE@
 %global libnames streams LiS xnet sockets
+%global tools ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes strxnet_mknod test-xnet test-xnet_thr
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
 %{?_without_modules: %{expand: %%global BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%global BUILD_tools   0}}
+%{?_without_lis:     %{expand: %%global BUILD_lis     0}}
+%{?_without_lis:     %{expand: %%global BUILD_lfs     1}}
+%{?_without_lfs:     %{expand: %%global BUILD_lfs     0}}
+%{?_without_lfs:     %{expand: %%global BUILD_lis     1}}
+
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%global BUILD_tools   1}}
+%{?_with_lis:        %{expand: %%global BUILD_lis     1}}
+%{?_with_lis:        %{expand: %%global BUILD_lfs     0}}
+%{?_with_lfs:        %{expand: %%global BUILD_lfs     1}}
+%{?_with_lfs:        %{expand: %%global BUILD_lis     0}}
 
 %define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
@@ -102,11 +114,38 @@
 %global MAKE_devs     0
 %endif
 
+%global _streams lis
+%global _ksubdir lis
+%global _kmodext lis
+%if %{BUILD_lfs}
+%global _STREAMS LfS
+%global _streams streams
+%global _strvers 0.7a
+%global _ksubdir streams
+%global _kmodext streams
+%global _conflict LiS
+%endif
+%if %{BUILD_lis}
+%global _STREAMS LiS
+%global _streams LiS
+%global _strvers 2:2.16.18
+%global _ksubdir lis
+%global _kmodext lis
+%global _conflict streams
+%endif
+
+%global _modules    timod tirdwr inet
+
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %global fullrelease @PACKAGE_RELEASE@%{extrarelease}
+%global _builddir %{_builddir}/%{extrarelease}
 
-Summary:	%{title}
+# a macro to build require one package of the same version as another
+%define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+
+Summary:        %{title} for Linux
 %if %{?_without_public: 0}%{!?_without_public: 1}
 Name:           @PACKAGE_TARNAME@
 %else
@@ -181,29 +220,11 @@ for other architectures as well.
 %prep
 # ---------------------------------------------------------------------------
 
-rm -rf   %{name}-%{version}-%{fullrelease}
-rm -rf   %{name}-%{version}-%{fullrelease}-tmp.$$
-mkdir -p %{name}-%{version}-%{fullrelease}-tmp.$$
-cd       %{name}-%{version}-%{fullrelease}-tmp.$$
-bzip2 -dc %{_sourcedir}/%{name}-%{version}-%{release}.tar.bz2 | tar -xf-
-STATUS=$?
-if [ $STATUS -eq 0 ] ; then
-mv -f    %{name}-%{version}-%{release} ../%{name}-%{version}-%{fullrelease}
-fi
-cd       ..
-rm -rf   %{name}-%{version}-%{fullrelease}-tmp.$$
-if [ $STATUS -ne 0 ] ; then
-exit $STATUS
-fi
-cd       %{name}-%{version}-%{fullrelease}
-[ `id -u` = '0' ] && chown -Rhf root .
-[ `id -u` = '0' ] && chgrp -Rhf root .
-chmod -Rf a+rX,g-w,o-w .
+ln -sf %{name}-%{version}-%{release} %{name}
+%setup -q -n %{name}-%{version}-%{release}
 
 %build
 # ---------------------------------------------------------------------------
-
-cd %{_builddir}/%{name}-%{version}-%{fullrelease}
 
 preferred_cflags="%{optflags}"
 
@@ -235,13 +256,7 @@ fi
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
 
-%define mybuilddir %{buildroot}/%{_target_platform}-%{kernel_version}-%{fullrelease}-build
-
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
-mkdir -p %{mybuilddir}
-cd %{mybuilddir}
-
-%{_builddir}/%{name}-%{version}-%{fullrelease}/configure \
+./configure \
     CC="${CC}" \
     CFLAGS="${CFLAGS:-$preferred_cflags}" \
     LDFLAGS="${LDFLAGS}" \
@@ -275,6 +290,29 @@ cd %{mybuilddir}
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
     --with-base-major=%{majbase} \
+    %{?_with_checks:             %enable %_with_checks} \
+    %{?_without_checks:          %disable %_without_checks} \
+    %{?_with_autotest:           %enable %_with_autotest} \
+    %{?_without_autotest:        %disable %_without_autotest} \
+    %{?_with_k_optimize:         %_with_k_optimize} \
+    %{?_with_cooked_manpages:    %_with_cooked_manpages} \
+    %{?_without_cooked_manpages: %_without_cooked_manpages} \
+    %{?_with_public:             %enable %_with_public} \
+    %{?_without_public:          %disable %_without_public} \
+    %{?_with_k_debug:            %enable %_with_k_debug} \
+    %{?_without_k_debug:         %disable %_without_k_debug} \
+    %{?_with_k_test:             %enable %_with_k_test} \
+    %{?_without_k_test:          %disable %_without_k_test} \
+    %{?_with_k_safe:             %enable %_with_k_safe} \
+    %{?_without_k_safe:          %disable %_without_k_safe} \
+    %{?_with_k_inline:           %enable %_with_k_inline} \
+    %{?_without_k_inline:        %disable %_without_k_inline} \
+    %{?_with_tools:              %enable %_with_tools} \
+    %{?_without_tools:           %disable %_without_tools} \
+    %{?_with_modules:            %enable %_with_modules} \
+    %{?_without_modules:         %disable %_without_modules} \
+    %{?_with_lis:                %_with_lis} \
+    %{?_with_lfs:                %_with_lfs} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -283,24 +321,26 @@ make check
 %install
 # ---------------------------------------------------------------------------
 
-cd %{_builddir}/%{name}-%{version}-%{fullrelease}
+# in case it was not cleaned
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
 %if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
 # we are going to create debug packages, so we need to install unstripped binaries.
-make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
 %else
 # use libtoolized install-strip to strip binaries, modules, shared and static libraries.
-make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 %endif
 
-# copy out our devices list and then destroy the build directory
-cp -pf %{mybuilddir}/%{makedev} .
-make -C %{mybuilddir} distclean
+# copy out our devices list
+# cp -pf %{mybuilddir}/%{makedev} .
 
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
 
 %if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+# clean out binaries and auxilliary files
+make mostlyclean
 # punch rpm release to Custom
 echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
@@ -312,14 +352,285 @@ ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
 %endif
 
 # stupid mandrake spec-helper will compress our macros files otherwise
-@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="sctp.refs sctp.macros
+@COOKED_MANPAGES_FALSE@                              iperf.refs iperf.macros
+@COOKED_MANPAGES_FALSE@                              lis.refs lis.macros
+@COOKED_MANPAGES_FALSE@                              streams.refs streams.macros
+@COOKED_MANPAGES_FALSE@                              strxns.refs strxns.macros
+@COOKED_MANPAGES_FALSE@                              strxnet.refs strxnet.macros
+@COOKED_MANPAGES_FALSE@                              strinet.refs strinet.macros
+@COOKED_MANPAGES_FALSE@                              strsctp.refs strsctp.macros
+@COOKED_MANPAGES_FALSE@                              netperf.refs netperf.macros
+@COOKED_MANPAGES_FALSE@                              strss7.refs strss7.macros"
 
 %clean
 # ---------------------------------------------------------------------------
 
-cd %{_builddir}/%{name}-%{version}-%{fullrelease}
-
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+
+# ===========================================================================
+%package %{_streams}-%{core_name}
+
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
+Group:          System Environment/Kernel
+Prefix:         /%{_lib}/modules/%{kernel_version}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
+Prereq:         /sbin/depmod
+Prereq:         /sbin/lsmod
+Prereq:         /sbin/insmod
+Prereq:         /sbin/modprobe
+Prereq:         /usr/sbin/lsof
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_streams}-%{core_name}
+The %{name}-%{_streams}-%{core_name} package contains the kernel modules
+that provide the Linux kernel %{stitle} %{_STREAMS} STREAMS drivers and modules.
+This also includes assorted drivers and modules for additional protocol stacks
+such as XNET.  This package is heavily tied to the kernel for which it and the
+%{_STREAMS} STREAMS facility was compiled.  This package applies to kernel
+version %{kernel_version} and requires a %{_STREAMS} STREAMS package compiled
+for the same kernel.
+
+%pre %{_streams}-%{core_name}
+# ---------------------------------------------------------------------------
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   if we are upgrading and the upgrade is for the running kernel, or we are
+#   installing new on the running kernel, we have to worry about previous
+#   loaded modules for the old version or a non-rpm version
+    for m in %{_modules} ; do
+        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+#           module running, kick the stack
+            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                fdetach -a 2>/dev/null
+                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /usr/sbin/lsof | while read -a tokens; do
+                        if [ :"$tokens[4]" = :"CHR" ]; then
+                            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ $major -eq %{majbase} ]; then
+                                eval "kill -HUP $tokens[1]"
+                            fi
+                        fi
+                    done
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                        echo "Cannot install or upgrade with streams-$m module running." >&2
+                        exit 1
+                    fi
+                fi
+            fi
+        fi
+    done
+fi
+
+%post %{_streams}-%{core_name}
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then
+#   This is the end of a fresh install.
+#   Check that our line is in the modules.%{base} file
+    for base in %{_ksubdir} strxns strxnet strinet strsctp strss7 ; do
+        conf_old=/etc/modules.conf
+        if ( grep -q "include.*modules.$base" $conf_old ) ; then :; else
+            streams_dir=/%{_lib}/modules/%{kernel_version}/misc
+            streams_prf=/%{_lib}/modules/preferred/misc
+            conf_new=%{_tmppath}/modules.conf.new.$$
+            cp -f $conf_old $conf_new
+#       if not, check for an old non-rpm LiS
+            if ( grep -q 'BEGIN LiS' $conf_old ) ; then
+                conf_tmp=%{_tmppath}/modules.conf.tmp.$$
+                list=`find /%{_lib}/modules/%{kernel_version}/$base -name "*.o"`
+                for p in $list ; do
+                    m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                    sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
+                    mv -f $conf_tmp $conf_new
+#               Remove conflicting modules.
+                    rm -f $streams_dir/$m.o
+                    rm -f $streams_prf/$m.o
+                done
+            fi
+#       check for forced over installs of older LiS or LfS rpm installations
+#       or installs over older LiS or LfS autoconf installations
+            streams_dir=/%{_lib}/modules/%{kernel_version}/%{_ksubdir}
+            streams_prf=/%{_lib}/modules/preferred/%{_ksubdir}
+            streams_old=/%{_lib}/modules/%{kernel_version}/modules.%{_kmodext}
+            if [ -d $streams_dir -a -f $streams_old ] ; then
+                streams_new=%{_tmppath}/modules.%{_kmodext}.new.$$
+                streams_tmp=%{_tmppath}/modules.%{_kmodext}.tmp.$$
+                cp -f $streams_old $streams_new
+                list=`find /%{_lib}/modules/%{kernel_version}/$base -name "*.o"`
+                for p in $list ; do
+                    m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                    sed -e '/alias.*\<'$m'\>/d' $streams_new > $streams_tmp
+                    mv -f $streams_tmp $streams_new
+#               Remove conflicting modules.
+                    rm -f $streams_dir/$m.o
+                    rm -f $streams_prf/$m.o
+                done
+#           can't make backups in modules directory
+                chmod --reference=$streams_old $streams_new
+                cp -f $streams_new $streams_old
+                rm -f $streams_new
+            fi
+            echo "prune modules.$base" >> $conf_new
+            echo "if -f /lib/modules/`uname -r`/modules.$base" >> $conf_new
+            echo "include /lib/modules/`uname -r`/modules.$base" >> $conf_new
+            echo "endif" >> $conf_new
+            chmod --reference=$conf_old $conf_new
+            cp -fb --suffix=.rpmsave $conf_new $conf_old
+            rm -f $conf_new
+        fi
+    done
+fi
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    /sbin/depmod -ae
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
+#   non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
+
+%preun %{_streams}-%{core_name}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   We are about to uninstall for good on a running kernel then we have to
+#   worry about which modules are running
+    for m in %{_modules} ; do
+        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+#           modules running, kick the stack
+            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                fdetach -a
+                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /usr/sbin/lsof | while read -a tokens; do
+                        if [ :"$tokens[4]" = :"CHR" ]; then
+                            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ $major -eq %{majbase} ]; then
+                                eval "kill -KILL $tokens[1]"
+                            fi
+                        fi
+                    done
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                        echo "Cannot uninstall with streams-$m module running." >&2
+                        exit 1
+                    fi
+                fi
+            fi
+        fi
+    done
+fi
+
+%postun %{_streams}-%{core_name}
+# ---------------------------------------------------------------------------
+
+if [ $1 = 0 ]; then
+#   this is the last stage of a removal we are going away: we need to see if
+#   we need to remove our line from modules.conf and remove our devices
+    remove_line=yes
+    for base in %{_ksubdir} strxns strxnet strinet strsctp strss7 ; do
+        for file in /lib/modules/*/modules.$base ; do
+            if [ -f $file ] ; then
+                remove_line=no
+                break
+            fi
+        done
+        if [ ":$remove_line" = :yes ] ; then
+            sed -e '/prune modules.$base/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
+            chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
+            cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
+            rm -f %{_tmppath}/modules.conf.tmp.$$
+        fi
+    done
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    /sbin/depmod -ae
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
+#   non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
+if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+#   one more kick at killing any loaded modules on uninstall, last stage of
+#   the upgrade on a running kernel for upgrade.
+    reboot='no'
+    for m in %{_modules} ; do
+        if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+#           modules running, kick the stack
+            /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+            if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                fdetach -a
+                /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                    /sbin/insmod -ar "streams-$m"
+                    /usr/sbin/lsof | while read -a tokens; do
+                        if [ :"$tokens[4]" = :"CHR" ]; then
+                            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ $major -eq %{majbase} ]; then
+                                if [ $1 = 0 ] ; then
+#                                   extreme prejudice for removal
+                                    eval "kill -KILL $tokens[1]"
+                                else
+#                                   try to get them to reload for 
+                                    eval "kill -HUP $tokens[1]"
+                                fi
+                            fi
+                        fi
+                    done
+                    /sbin/modprobe -r `/sbin/lsmod | grep "^streams-$m" | cut -f1 '-d '`
+                    if ( /sbin/lsmod | grep -q "^streams-$m" ) ; then
+                        echo "Error: modules may be still loaded" >&2
+                        /sbin/lsmod | grep "^streams-$m" >&2
+                        reboot='yes'
+                    fi
+                fi
+            fi
+        fi
+    done
+    if [ "$reboot" = 'yes' ]; then
+        echo "you may have to reboot" >&2
+        exit 1
+    fi
+fi
+
+%if %{BUILD_modules}
+%files %{_streams}-%{core_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir /%{_lib}/modules/%{kernel_version}/%{_ksubdir}
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{_ksubdir}
+/%{_lib}/modules/%{kernel_version}/%{_ksubdir}/*
+%dir /%{_lib}/modules/%{kernel_version}/strxns
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strxns
+/%{_lib}/modules/%{kernel_version}/strxns/*
+%dir /%{_lib}/modules/%{kernel_version}/strxnet
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strxnet
+/%{_lib}/modules/%{kernel_version}/strxnet/*
+%dir /%{_lib}/modules/%{kernel_version}/strinet
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strinet
+/%{_lib}/modules/%{kernel_version}/strinet/*
+%dir /%{_lib}/modules/%{kernel_version}/strsctp
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strsctp
+/%{_lib}/modules/%{kernel_version}/strsctp/*
+%dir /%{_lib}/modules/%{kernel_version}/strss7
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.strss7
+/%{_lib}/modules/%{kernel_version}/strss7/*
+%endif
 
 # ===========================================================================
 %package %{core_name}
@@ -402,6 +713,30 @@ if [ $1 = 1 ] ; then
                 rm -f $streams_dir/$m.o
                 rm -f $streams_prf/$m.o
             done
+        fi
+#       check for forced over installs of older LiS or LfS rpm installations
+#       or installs over older LiS or LfS autoconf installations
+        streams_dir=/%{_lib}/modules/%{kernel_version}/%{_ksubdir}
+        streams_prf=/%{_lib}/modules/preferred/%{_ksubdir}
+        streams_old=/%{_lib}/modules/%{kernel_version}/modules.%{_kmodext}
+        if [ -d $streams_dir -a -f $streams_old ] ; then
+            streams_new=%{_tmppath}/modules.%{_kmodext}.new.$$
+            streams_tmp=%{_tmppath}/modules.%{_kmodext}.tmp.$$
+            cp -f $streams_old $streams_new
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
+            for p in $list ; do
+                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' $streams_new > $streams_tmp
+                mv -f $streams_tmp $streams_new
+#               Remove conflicting modules.
+                rm -f $streams_dir/$m.o
+                rm -f $streams_prf/$m.o
+            done
+#           can't make backups in modules directory
+            chmod --reference=$streams_old $streams_new
+            cp -f $streams_new $streams_old
+            rm -f $streams_new
         fi
         echo 'prune modules.%{base}' >> $conf_new
         echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
@@ -508,6 +843,15 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
     exit 1
 fi
 
+%if %{BUILD_modules}
+%files %{core_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir /%{_lib}/modules/%{kernel_version}/%{base}
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
+/%{_lib}/modules/%{kernel_version}/%{base}/*
+%endif
+
 # ===========================================================================
 %package %{info_name}
 
@@ -586,7 +930,7 @@ fi
 %defattr(-,root,root)
 %endif
 %if %{BUILD_devs}
-%files dev -f %{name}-%{version}-%{fullrelease}/%{makedev}
+%files dev -f %{makedev}
 %defattr(-,root,root)
 %endif
 
@@ -653,7 +997,7 @@ fi
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
-#%{_datadir}/locale/*
+%{_datadir}/locale/*
 %endif
 
 # ===========================================================================
@@ -715,17 +1059,11 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%if %{BUILD_libs}
-#%doc %{name}-%{version}-%{fullrelease}/ABOUT-NLS
-#%endif
-%doc %{name}-%{version}-%{fullrelease}/AUTHORS
-%doc %{name}-%{version}-%{fullrelease}/ChangeLog
-%doc %{name}-%{version}-%{fullrelease}/COPYING
-%doc %{name}-%{version}-%{fullrelease}/INSTALL
-%doc %{name}-%{version}-%{fullrelease}/NEWS
-%doc %{name}-%{version}-%{fullrelease}/README
-%doc %{name}-%{version}-%{fullrelease}/THANKS
-%doc %{name}-%{version}-%{fullrelease}/doc/manual
+%if %{BUILD_libs}
+%doc ABOUT-NLS
+%endif
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc %{name}-%{version}-@PACKAGE_RELEASE@.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -771,6 +1109,87 @@ manual pages necessary for developing %{title} application programs.
 %endif
 
 # ===========================================================================
+%package source
+
+Summary:        %{title} source package.
+Group:          Development/System
+Prefix:         %{_usrsrc}
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description source
+The %{name}-source package contains the source code necessary for building the
+%{name} release.  It includes the autoconf configuration utilities necessary
+to create and distribute this rpm.
+
+%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+%files source
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
+%{_usrsrc}/%{name}
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*
+%endif
+
+# ===========================================================================
+%package %{_streams}-util
+
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
+Group:          System Environment/Base
+Prefix:         %{_bindir}
+Prefix:         %{_sbindir}
+Prefix:         %{_libexecdir}
+Obsoletes:      %{name}-%{_streams}-utils
+Conflicts:      %{_conflict}-util
+Autoreq:        true
+%if %{?_xpm: 1}%{!?_xpm: 0}
+Icon:           %{_xpm}
+%endif
+%if %{?_gif: 1}%{!?_gif: 0}
+Icon:           %{_gif}
+%endif
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_streams}-util
+The %{name}-%{_streams}-util package provides adminstrative and configuration
+test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
+%{stitle} package.
+
+%pre %{_streams}-util
+# ---------------------------------------------------------------------------
+if [ $1 = 0 ]; then
+# this is a fresh install, look for old non-rpm tools
+    tools="%{tools}" ; for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+            eval "rm -f $location"
+            location="`which $tool 2>/dev/null`"
+        done
+    done
+else
+    :
+#   upgrade, let rpm do its job
+fi
+
+%if %{BUILD_tools}
+%files %{_streams}-util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#%{_bindir}/*
+%{_sbindir}/*
+%{_libexecdir}/*test*
+%endif
+
+# ===========================================================================
 %package util
 
 Summary:        %{title} admin utilities.
@@ -799,12 +1218,11 @@ utilities and commands associated with the %{title} package.
 if [ $1 = 0 ]; then
 # this is a fresh install, look for old non-rpm tools
     if [ -n "`which fattach 2>/dev/null`" ]; then
-        for prog in ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes
-        do
-            location="`which $prog 2>/dev/null`"
+        tools="%{tools}" ; for tool in $tools ; do
+            location="`which $tool 2>/dev/null`"
             while [ -n "$location" -a -x "$location" ] ; do
                 eval "rm -f $location"
-                location="`which $prog 2>/dev/null`"
+                location="`which $tool 2>/dev/null`"
             done
         done
     fi
@@ -841,6 +1259,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 0.9.2.6  2005/02/03 12:34:52  brian
+# - Spec file grand rework.
+#
 # Revision 0.9.2.5  2005/02/01 18:58:37  brian
 # - Working up master build.
 #

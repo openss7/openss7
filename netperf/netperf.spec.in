@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/02/02 10:43:01 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/02/03 12:34:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/02 10:43:01 $ by $Author: brian $
+# Last Modified $Date: 2005/02/03 12:34:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -351,7 +351,7 @@ Release:        %{fullrelease}
 The %{name}-%{_streams} package includes netperf test programs optioned and
 compiled for use with OpenSS7 Linux Native SCTP sockets interface as well as
 OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The
-purpose of this package is to be able to perform comparison tests agains TCP
+purpose of this package is to be able to perform comparison tests against TCP
 and SCTP.  This distribution is currently only applicable to Linux release and
 was targetted at ix86 and ppc architectures, but should build and install for
 other architectures as well.
@@ -372,33 +372,45 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.5  2005/02/02 10:43:01  brian
-# - Build in builddir again.
+# Revision 1.1.2.6  2005/02/03 12:34:53  brian
+# - Spec file grand rework.
 #
-# Revision 1.1.2.4  2005/02/01 19:01:24  brian
-# - Working up master build.
-#
-# Revision 1.1.2.3  2005/01/29 11:22:39  brian
-# - Have master build working well.
-#
-# Revision 1.1.2.2  2005/01/27 08:30:29  brian
-# - Get tarball and srpm names right.
-#
-# Revision 1.1.2.1  2005/01/25 03:41:15  brian
-# - Get manpages to pass check_mans.
-#
-# Revision 1.1.2.26  2005/01/21 08:39:40  brian
-# - Work around mandrake spec-helper for uncooked manpages.
-#
-# Revision 1.1.2.25  2005/01/20 00:51:59  brian
-# - Go back to quick no dependencies compile.
-#
-# Revision 1.1.2.24  2005/01/19 07:38:25  brian
-# - Added checks and autotest options to configure.
-#
-# Revision 1.1.2.23  2005/01/18 13:31:18  brian
-# - Support multiple builds on same NFS mount.
-#
+
+* Wed Feb  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.5  2005/02/02 10:43:01  brian
+- Build in builddir again.
+
+* Tue Feb  1 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.4  2005/02/01 19:01:24  brian
+- Working up master build.
+
+* Sat Jan 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.3  2005/01/29 11:22:39  brian
+- Have master build working well.
+
+* Thu Jan 27 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.2  2005/01/27 08:30:29  brian
+- Get tarball and srpm names right.
+
+* Tue Jan 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.1  2005/01/25 03:41:15  brian
+- Get manpages to pass check_mans.
+
+* Fri Jan 21 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.26  2005/01/21 08:39:40  brian
+- Work around mandrake spec-helper for uncooked manpages.
+
+* Thu Jan 20 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.25  2005/01/20 00:51:59  brian
+- Go back to quick no dependencies compile.
+
+* Wed Jan 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.24  2005/01/19 07:38:25  brian
+- Added checks and autotest options to configure.
+
+* Tue Jan 18 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.23  2005/01/18 13:31:18  brian
+- Support multiple builds on same NFS mount.
 
 * Tue Jan 18 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.22  2005/01/18 10:42:34  brian

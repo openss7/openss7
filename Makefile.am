@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/02/02 10:44:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/03 12:36:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,35 +46,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/02 10:44:22 $ by $Author: brian $
+# Last Modified $Date: 2005/02/03 12:36:21 $ by $Author: brian $
 #
 # =============================================================================
 
 include am/openss7.am
 
-RPMXOPTS="--nodeps"
-
-export RPMXOPTS
-
-dist srpm rpms sign resign:
-	@list='$(subdirs)' ; for subdir in $$list ; do \
-		echo "Making $@ in $$subdir" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="--nodeps" $@) || exit 1 ; \
-	done
-
-rebuild:
-	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
-	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
-	for t in $$targets ;  do \
-		for k in $$kernels ; do \
-			k=`basename $$k` ; \
-			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS=\"--nodeps --define \"_without_tools --without-tools\"\" kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="--nodeps --define \"_without_tools --without-tools\"" kversion="$$k" RPMTARGET="$$t" rpms || :; \
-			fi ; \
-		done ; \
-		echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS=\"--nodeps --define \"_without_modules --without-modules\"\" kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="--nodeps --define \"_without_modules --without-modules\"" kversion="$$k" RPMTARGET="$$t" rpms || :; \
-	done
+export RPMXOPTS="--nodeps"
 
 SUBDIRS	= @subdirs@
+
+include am/rpm.am
+
