@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/17 08:33:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/17 22:23:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/17 08:33:12 $ by $Author: brian $
+# Last Modified $Date: 2004/05/17 22:23:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -87,48 +87,48 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= @XNET_INCLUDES@ @USER_CPPFLAGS@
-@PACKAGE_TARNAME@_mknod_CFLAGS		= @USER_CFLAGS@
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_LDFLAGS		= -lLiS
-test_tirdwr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_tirdwr_CFLAGS		= @USER_CFLAGS@
+test_tirdwr_LDADD		= $(STREAMS_LDADD)
+test_tirdwr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
-test_timod_LDFLAGS		= -lLiS
-test_timod_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_timod_CFLAGS		= @USER_CFLAGS@
+test_timod_LDADD		= $(STREAMS_LDADD)
+test_timod_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CFLAGS		= $(USER_CFLAGS)
 endif
 
 if WITH_INET
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
-test_inet_raw_LDFLAGS		= -lLiS
-test_inet_raw_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_inet_raw_CFLAGS		= @USER_CFLAGS@
+test_inet_raw_LDADD		= $(STREAMS_LDADD)
+test_inet_raw_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
-test_inet_tcp_LDFLAGS		= -lLiS
-test_inet_tcp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_inet_tcp_CFLAGS		= @USER_CFLAGS@
+test_inet_tcp_LDADD		= $(STREAMS_LDADD)
+test_inet_tcp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDFLAGS		= -lLiS
-test_inet_udp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_inet_udp_CFLAGS		= @USER_CFLAGS@
+test_inet_udp_LDADD		= $(STREAMS_LDADD)
+test_inet_udp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 endif
 
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDFLAGS		= libxnet.la -lLiS
-test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_xnet_CFLAGS		= @USER_CFLAGS@
+test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
+test_xnet_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDFLAGS		= libxnet.la -lLiS -lpthread
-test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT
-test_xnet_thr_CFLAGS		= @USER_CFLAGS@
+test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
+test_xnet_thr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
+test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 endif
 
 ADDON_LIBS			= 
@@ -138,9 +138,9 @@ if WITH_XNET
 lib_LTLIBRARIES			+= libxnet.la
 
 libxnet_la_SOURCES		= src/lib/xnet.c gettext.h
-libxnet_la_LDFLAGS		= -lLiS -version-info 0:0:0
-libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib @XNET_INCLUDES@ @USER_CPPFLAGS@ -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
-libxnet_la_CFLAGS		= @USER_CFLAGS@
+libxnet_la_LDFLAGS		= -version-info 0:0:0
+libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(XNET_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
 endif
 
@@ -157,8 +157,8 @@ mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= -I./src/modules -I@srcdir@/src/modules -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
-libXNETmods_a_CFLAGS		= @KERNEL_CFLAGS@
+libXNETmods_a_CPPFLAGS		= -I./src/modules -I$(srcdir)/src/modules -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNETdrvs_a_SOURCES = \
 				  src/drivers/inet.c \
@@ -171,8 +171,8 @@ drvs_source_FILES		= $(nodist_EXTRA_libXNETdrvs_a_SOURCES)
 nodist_libXNETdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNETdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I@srcdir@/src/drivers -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
-libXNETdrvs_a_CFLAGS		= @KERNEL_CFLAGS@
+libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I$(srcdir)/src/drivers -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libXNETdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
@@ -212,48 +212,43 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS	= @XNET_INCLUDES@ @USER_CPPFLAGS@
-@PACKAGE_TARNAME@_mknod_CFLAGS		= @USER_CFLAGS@
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
-test_tirdwr_LDFLAGS		= -lLiS
-test_tirdwr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_tirdwr_CFLAGS		= @USER_CFLAGS@
+test_tirdwr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
-test_timod_LDFLAGS		= -lLiS
-test_timod_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_timod_CFLAGS		= @USER_CFLAGS@
+test_timod_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CFLAGS		= $(USER_CFLAGS)
 endif
 
 if WITH_INET
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
-test_inet_raw_LDFLAGS		= -lLiS
-test_inet_raw_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_inet_raw_CFLAGS		= @USER_CFLAGS@
+test_inet_raw_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
-test_inet_tcp_LDFLAGS		= -lLiS
-test_inet_tcp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_inet_tcp_CFLAGS		= @USER_CFLAGS@
+test_inet_tcp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDFLAGS		= -lLiS
-test_inet_udp_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_inet_udp_CFLAGS		= @USER_CFLAGS@
+test_inet_udp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 endif
 
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDFLAGS		= libxnet.la -lLiS
-test_xnet_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@
-test_xnet_CFLAGS		= @USER_CFLAGS@
+test_xnet_LDADD			= libxnet.la
+test_xnet_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDFLAGS		= libxnet.la -lLiS -lpthread
-test_xnet_thr_CPPFLAGS		= @XNET_INCLUDES@ @USER_CPPFLAGS@ -D_REENTRANT
-test_xnet_thr_CFLAGS		= @USER_CFLAGS@
+test_xnet_thr_LDADD		= libxnet.la -lpthread
+test_xnet_thr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
+test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 endif
 
 ADDON_LIBS			= 
@@ -263,9 +258,9 @@ if WITH_XNET
 lib_LTLIBRARIES			+= libxnet.la
 
 libxnet_la_SOURCES		= src/lib/xnet.c gettext.h
-libxnet_la_LDFLAGS		= -lLiS -version-info 0:0:0
-libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib @XNET_INCLUDES@ @USER_CPPFLAGS@ -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
-libxnet_la_CFLAGS		= @USER_CFLAGS@
+libxnet_la_LDFLAGS		= $(STREAMS_LDADD) -version-info 0:0:0
+libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib $(XNET_INCLUDES) $(USER_CPPFLAGS) -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
 endif
 
@@ -282,8 +277,8 @@ mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 nodist_libXNETmods_a_SOURCES	= $(mods_source_FILES)
 
 libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETmods_a_CPPFLAGS		= -I./src/modules -I@srcdir@/src/modules -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
-libXNETmods_a_CFLAGS		= @KERNEL_CFLAGS@
+libXNETmods_a_CPPFLAGS		= -I./src/modules -I$(srcdir)/src/modules -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNETdrvs_a_SOURCES = \
 				  src/drivers/inet.c \
@@ -296,8 +291,8 @@ drvs_source_FILES		= $(nodist_EXTRA_libXNETdrvs_a_SOURCES)
 nodist_libXNETdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNETdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I@srcdir@/src/drivers -imacros ./strconf.h @XNET_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
-libXNETdrvs_a_CFLAGS		= @KERNEL_CFLAGS@
+libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I$(srcdir)/src/drivers -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
+libXNETdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
@@ -311,8 +306,8 @@ dist_noinst_SCRIPTS		=
 EXTRA_SCRIPTS			=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
-KMODCONF_EXT			= @PACKAGE_TARNAME@
-KERNEL_SUBDIR			= @PACKAGE_TARNAME@
+KMODCONF_EXT			= $(PACKAGE_TARNAME)
+KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
 
 include am/kernel.am
 
