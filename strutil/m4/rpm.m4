@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: rpm.m4,v 0.9.2.28 2005/02/07 01:54:37 brian Exp $
+dnl @(#) $Id: rpm.m4,v 0.9.2.31 2005/02/17 12:51:05 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/07 01:54:37 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 12:51:05 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -647,6 +647,13 @@ dnl          fi
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
+    if test :"${enable_public:-yes}" != :yes ; then
+        PACKAGE="${PACKAGE_TARNAME}"
+        VERSION="bin-${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    else
+        PACKAGE="${PACKAGE_TARNAME}"
+        VERSION="${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    fi
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================
 
