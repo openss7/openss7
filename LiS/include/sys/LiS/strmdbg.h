@@ -305,7 +305,7 @@ const char *lis_basename(const char *filename);
 /*                             Print Buffer				 */
 
 #define	LIS_PRINT_BUFFER_SIZE		50000	/* large-ish buffer */
-extern void	lis_bprintf(char *fmt, ...) ;	/* print into buffer */
+extern void	lis_bprintf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));	/* print into buffer */
 extern void	lis_flush_print_buffer(void) ;	/* print out the buffer */
 
 #endif

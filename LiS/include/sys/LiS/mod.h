@@ -134,17 +134,29 @@ typedef struct lis_module_info {
 /*
  *  Per-Module statistic record
  */
+
+/* use non-standard but MP-safe statistics */
+#define LIS_ATOMIC_STATS
+
 typedef struct module_stat {
   SHARE
     char *ms_xptr;              /* pointer to private statistics */
     short ms_xsize;             /* length of private statistics buffer */
     uint ms_flags;              /* bool stats -- for future use */
   EXPORT
+#ifndef LIS_ATOMIC_STATS
     long ms_pcnt;               /* count of calls to put proc */
     long ms_scnt;               /* count of calls to service proc */
     long ms_ocnt;               /* count of calls to open proc */
     long ms_ccnt;               /* count of calls to close proc */
     long ms_acnt;               /* count of calls to admin proc */
+#else
+    lis_atomic_t ms_pcnt;               /* count of calls to put proc */
+    lis_atomic_t ms_scnt;               /* count of calls to service proc */
+    lis_atomic_t ms_ocnt;               /* count of calls to open proc */
+    lis_atomic_t ms_ccnt;               /* count of calls to close proc */
+    lis_atomic_t ms_acnt;               /* count of calls to admin proc */
+#endif
 } module_stat_t;
 
 typedef struct fmodsw {

@@ -33,6 +33,10 @@
 
 #ident "@(#) LiS version.c 2.18 10/12/04 16:25:34 "
 
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
 
 char	lis_version[] = "2.18.0" ;
 char	lis_date[]    = "10/13/04" ;

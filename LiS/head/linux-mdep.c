@@ -3,7 +3,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.8 1996/01/26 16:53:01 dave Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.9.4.1 2003/12/10 11:09:02 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -48,6 +48,10 @@
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
 
+#undef __NO_VERSION__
+#undef  MODULE
+#define MODULE 1
+
 #include <sys/LiS/linux-mdep.h>
 #include <sys/lislocks.h>
 #include <linux/module.h>
@@ -71,7 +75,7 @@
 #include <sys/stream.h>		/* LiS entry points */
 #include <sys/cmn_err.h>
 #include <sys/poll.h>
-#include <sys/types.h>
+#include <linux/types.h>
 #include <linux/mm.h>
 #include <linux/file.h>
 #include <linux/fs.h>		/* linux file sys externs */
@@ -82,6 +86,7 @@
 #endif
 #include <linux/pipe_fs_i.h>
 #include <linux/mount.h>
+#include <linux/proc_fs.h>	/* for stats in /proc/LiS */
 #if defined(FATTACH_VIA_MOUNT)
 #include <linux/capability.h>
 #endif
@@ -127,6 +132,20 @@ char	*lis_stropts_file =
 #endif
 ;
 
+/*
+ * Load STREAMS module with panic_when_killed=1 (default) to call panic()
+ * when assertions fail; otherwise, failed assertions call BUG().
+ */
+int lis_panic_when_killed = 1;
+
+/* 
+ * For running a given number of STREAMS threads on SMP
+ * machine. default is zero (use every available CPUs)
+ *
+ * FIXME: current implementation works only with lis_nthreads=1
+ */
+int lis_nthreads = 0;
+
 /************************************************************************
 *                      System Call Support                              *
 *************************************************************************
@@ -138,15 +157,6 @@ char	*lis_stropts_file =
 
 static int	lis_errnos[LIS_NR_CPUS] ;
 #define	errno	lis_errnos[smp_processor_id()]
-
-#define __NR_syscall_mknod	__NR_mknod
-#define __NR_syscall_unlink	__NR_unlink
-#define __NR_syscall_mount	__NR_mount
-#if defined(_ASM_IA64_UNISTD_H)
-#define __NR_syscall_umount2	__NR_umount
-#else
-#define __NR_syscall_umount2	__NR_umount2
-#endif
 
 /*
  * For gcc 3.3.3 the combination of inlining these functions and the
@@ -161,11 +171,58 @@ static int	lis_errnos[LIS_NR_CPUS] ;
 #define	_NI	__attribute__((noinline))
 #endif
 
-static _NI _syscall3(long,syscall_mknod,const char *,file,int,mode,int,dev)
-static _NI _syscall1(long,syscall_unlink,const char *,file)
-static _NI _syscall5(long,syscall_mount,char *,dev,char *,dir,
-			char *,type,unsigned long,flg,void *,data)
-static _NI _syscall2(long,syscall_umount2,char *,file,int,flags)
+/* PARISC cannot handle in-kernel system calls in the same way as external
+ * calls.  Therefore we rip the necessary symbols in the configuration script
+ * and perform a dynamic linkage.  This is done for all architectures when the
+ * addresses are available. */
+
+#ifdef HAVE_SYS_MKNOD_ADDR
+static asmlinkage long (*syscall_mknod) (const char *filename, int mode, dev_t dev)
+    = (typeof(syscall_mknod)) HAVE_SYS_MKNOD_ADDR;
+#elif defined _HPPA_LIS_
+#define syscall_mknod(name,mode,dev) (-ENOSYS)
+#else
+#define __NR_syscall_mknod	__NR_mknod
+static _NI _syscall3(long, syscall_mknod, const char *, file, int, mode, int, dev)
+#endif
+
+#ifdef HAVE_SYS_UNLINK_ADDR
+static asmlinkage long (*syscall_unlink) (const char *pathname)
+    = (typeof(syscall_unlink)) HAVE_SYS_UNLINK_ADDR;
+#elif defined _HPPA_LIS_
+#define syscall_unlink(name) (-ENOSYS)
+#else
+#define __NR_syscall_unlink	__NR_unlink
+static _NI _syscall1(long, syscall_unlink, const char *, file)
+#endif
+
+#ifdef HAVE_SYS_MOUNT_ADDR
+static asmlinkage long (*syscall_mount) (char *dev_name, char *dir_name, char *type,
+					 unsigned long flags, void *data)
+    = (typeof(syscall_mount)) HAVE_SYS_MOUNT_ADDR;
+#elif defined _HPPA_LIS_
+#define syscall_mount(dev_name,dir_name,type,flags,data) (-ENOSYS)
+#else
+#define __NR_syscall_mount	__NR_mount
+static _NI _syscall5(long, syscall_mount, char *, dev, char *, dir, char *, type,
+			unsigned long, flg, void *, data)
+#endif
+
+#ifdef HAVE_SYS_UMOUNT_ADDR
+asmlinkage long (*syscall_umount2) (char *name, int flags)
+    = (typeof(syscall_umount2)) HAVE_SYS_UMOUNT_ADDR;
+#elif defined _HPPA_LIS_
+#define syscall_umount2(name,flags) (-ENOSYS)
+#else
+#if defined(_ASM_IA64_UNISTD_H)
+#define __NR_syscall_umount2	__NR_umount
+#else
+#define __NR_syscall_umount2	__NR_umount2
+#endif
+static _NI _syscall2(long, syscall_umount2, char *, file, int, flags)
+#endif
+
+#undef _NI
 
 /************************************************************************
 *                            lis_assert_fail                            *
@@ -173,16 +230,15 @@ static _NI _syscall2(long,syscall_umount2,char *,file,int,flags)
 *									*
 * This is called when the ASSERT() macro fails.                         *
 *									*
-* It sends a warning message to the kernel logger, but does nothing     *
-* else.                                                        		*
+* It sends a warning message to the kernel logger and kills the STREAMS *
+* subsystem with lis_bug						*
 *									*
 ************************************************************************/
 void _RP lis_assert_fail(const char *expr, const char *objname,
 		         const char *file, unsigned int line)
 {
-        printk(KERN_CRIT "%s: assert(%s) failed in file %s, line %u\n",
-	       objname, expr, file, line);
-        /* We cannot just abort() the kernel here :-( */
+	lis_bug(file, line, "assert(%s) failed in module %s",
+		expr, objname);
 }
 
 /************************************************************************
@@ -808,7 +864,10 @@ lis_untmout( struct timer_list *tl)
 ************************************************************************/
 long	_RP lis_time_till(long target_time)
 {
-    return( target_time - jiffies*(1000/HZ) ) ;
+	if ( ((1000 / HZ) * HZ) == 1000 ) /* ie: HZ == 100 */
+		return target_time - jiffies * (1000 / HZ) ;
+	else						/* ie: HZ == 1024 */
+		return (((target_time * HZ) / 1000 - jiffies) * 1000) / HZ ;
 
 } /* lis_time_till */
 
@@ -823,7 +882,10 @@ long	_RP lis_time_till(long target_time)
 ************************************************************************/
 long	_RP lis_target_time(long milli_sec)
 {
-    return( jiffies*(1000/HZ) + milli_sec ) ;
+	if ( ((1000 / HZ) * HZ) == 1000 ) /* ie: HZ == 100 */
+		return jiffies * (1000 / HZ) + milli_sec ;
+	else						/* ie: HZ == 1024 */
+		return ((jiffies + (milli_sec * HZ) / 1000) * 1000) / HZ ;
 
 } /* lis_target_time */
 
@@ -837,7 +899,10 @@ long	_RP lis_target_time(long milli_sec)
 ************************************************************************/
 long	_RP lis_milli_to_ticks(long milli_sec)
 {
-    return(milli_sec/(1000/HZ)) ;
+	if ( ((1000/HZ)*HZ) == 1000 ) /* ie: HZ == 100 */
+		return milli_sec / (1000/HZ) ;
+	else						/* ie: HZ == 1024 */
+    return (milli_sec*HZ) / 1000 ;
 }
 
 
@@ -3011,7 +3076,10 @@ lis_ioc_fdetach( char *path )
 
     if (tmp && !IS_ERR(tmp)) {
 	if (strcmp( tmp, "*" ) == 0)
-	    lis_fdetach_all();
+	   {
+	     lis_fdetach_all();
+	     error = -errno;
+	   }
 	else
 	    error = lis_fdetach(path);  /* arg must be in user space */
 	putname(tmp);
@@ -3712,6 +3780,66 @@ ioctl32_end:
 }
 #endif
 
+#ifdef LIS_ATOMIC_STATS
+static struct proc_dir_entry *lis_proc_file = NULL;
+
+static int lis_write_qstats(char *buf, struct module_stat *ms)
+{
+	return sprintf(buf,
+		       "% 8d% 8d% 8d% 8d% 8d\n",
+		       lis_atomic_read(&ms->ms_pcnt),
+		       lis_atomic_read(&ms->ms_scnt),
+		       lis_atomic_read(&ms->ms_ocnt),
+		       lis_atomic_read(&ms->ms_ccnt),
+		       lis_atomic_read(&ms->ms_acnt));
+}
+
+static int lis_write_mstats(char *buf, struct streamtab *st, int rq)
+{
+	struct qinit *qi = (rq ? st->st_rdinit : st->st_wrinit);
+
+	if(!qi || !qi->qi_mstat)
+		return sprintf(buf, "\n");
+	else
+		return lis_write_qstats(buf, qi->qi_mstat);
+}
+
+static int lis_proc_read(char *page, char **start, off_t off, int count,
+			 int *eof, void *data)
+{
+	extern struct streamtab strmhd_info;
+
+	int len = 0, i;
+
+	len += sprintf(page+len, "%18s: %8s %8s %8s %8s %8s\n",
+		       "driver/module", "#put", "#srvc", "#open", "#close", "#admin");
+	len += sprintf(page+len, "%15s.rq:", "HEAD");
+	len += lis_write_mstats(page+len, &strmhd_info, 1);
+	len += sprintf(page+len, "%15s.wq:", "HEAD");
+	len += lis_write_mstats(page+len, &strmhd_info, 0);
+	for(i = 0; i < MAX_STRDEV; i++) {
+		struct streamtab *st = lis_fstr_sw[i].f_str;
+		if(st == NULL)
+			continue;
+		len += sprintf(page+len, "(d)%12s.rq:", lis_fstr_sw[i].f_name);
+		len += lis_write_mstats(page+len, st, 1);
+		len += sprintf(page+len, "(d)%12s.wq:", lis_fstr_sw[i].f_name);
+		len += lis_write_mstats(page+len, st, 0);
+	}
+	for(i = 0; i < MAX_STRMOD; i++) {
+		struct streamtab *st = lis_fmod_sw[i].f_str;
+		if(st == NULL)
+			continue;
+		len += sprintf(page+len, "(m)%12s.rq:", lis_fmod_sw[i].f_name);
+		len += lis_write_mstats(page+len, st, 1);
+		len += sprintf(page+len, "(m)%12s.wq:", lis_fmod_sw[i].f_name);
+		len += lis_write_mstats(page+len, st, 0);
+	}
+	return len;
+}
+
+#endif /* LIS_ATOMIC_STATS */
+
 int lis_init_module( void )
 {
     extern char	*lis_poll_file ;
@@ -3720,6 +3848,13 @@ int lis_init_module( void )
     printk(
 	"==================================================================\n"
 	"Linux STREAMS Subsystem loading...\n");
+
+    /*
+     * FIXME: single threading only support 0 & 1 value at this time.
+     * Any non-1 value is trimmed down to 0, to trigger the usual LiS
+     * behavior
+     */
+    lis_nthreads = (lis_nthreads == 1);
 
     current->fs->umask = 0 ;		/* can set any permissions */
 
@@ -3783,6 +3918,11 @@ int lis_init_module( void )
  
     register_ioctl32_conversion(I_STR,lis_ioctl32_str);
 #endif
+#ifdef LIS_ATOMIC_STATS
+    lis_proc_file = create_proc_read_entry("LiS", 0444, NULL,
+					   lis_proc_read, NULL);
+
+#endif
 
     printk(
 	"Linux STREAMS Subsystem ready.\n"
@@ -3843,6 +3983,11 @@ void cleanup_module( void )
    lis_fdetach_all();
 #endif
 
+#ifdef LIS_ATOMIC_STATS
+   if(lis_proc_file != NULL)
+	   remove_proc_entry("LiS", NULL);
+#endif
+
    /*
     * Make sure no streams modules are running,
     * and de-register devices unregister_netdev (dev);
@@ -3851,7 +3996,7 @@ void cleanup_module( void )
     lis_kill_qsched() ;			/* drivers/str/runq.c */
     lis_terminate_head();
 
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
     {
         extern void	lis_pci_cleanup(void) ;
         lis_pci_cleanup() ;
@@ -4158,7 +4303,7 @@ void	lis_start_qsched(void)
     int		ncpus ;
     char	name[16] ;
 
-    ncpus = NUM_CPUS ;
+    ncpus = lis_nthreads? 1:NUM_CPUS ;
     lis_num_cpus = ncpus ;
     for (cpu = 0; cpu < ncpus; cpu++)
     {
@@ -4170,7 +4315,8 @@ void	lis_start_qsched(void)
 
 	sprintf(name, "LiS-%s:%u", lis_version, cpu) ;
 	lis_runq_pids[cpu] = lis_thread_start(lis_thread_runqueues,
-							  (void *)cpu, name) ;
+					      (void *)(long)cpu, /* __LP64__ */
+					      name) ;
 	if (lis_runq_pids[cpu] < 0)		/* failed to fork */
 	{
 	    printk("lis_start_qsched: %s: lis_thread_start error %d\n",
@@ -4499,7 +4645,6 @@ int	_RP lis_unlink(char *name)
     set_fs(old_fs);
     return(ret < 0 ? -errno : ret) ;
 }
-
 
 #if defined(FATTACH_VIA_MOUNT)
 /*

@@ -1,0 +1,179 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: untimeout.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNTIMEOUT 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B untimeout, lis_untimeout
+\- stop a timer
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/dki.h>
+.HP 8
+.BI "toid_t " retval " = untimeout(toid_t " tid );
+.SH DESCRIPTION
+.PP
+.BR untimeout ()
+stops a timer previously started with
+.BR timeout (9).
+.I tid
+is the timer identifier that was returned from a previous call to
+.BR timeout (9).
+.PP
+.BR untimeout ()
+is typically used to stop timers before they expire, and to deallocate timers
+before a stream is closed.
+.SH "RETURN VALUES"
+.PP
+.BR untimeout ()
+returns a
+.B timo_t
+defined as follows:
+.sp
+.nf
+typedef int toid_t;
+typedef int timeout_id_t;
+.fi
+.PP
+The return value from
+.BR untimeout ()
+is undefined and ignored.
+.SH ERRORS
+.PP
+.BR untimeout ()
+fails silently
+.IR "" ( retval
+is ignored) when
+the timer associated with the timer identifier
+.I tid
+no longer exists or is invalid.
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+provides a wrapper to Linux Kernel timer functions to implement
+.BR timeout ().
+.BR LiS 's
+implementation
+.[
+LiS
+.]
+creates a Linux timer structure, assigns it a sequential
+integer timer identifier, and places it in a timer list.
+Whenever
+.B LiS
+.[
+LiS
+.]
+stops a timer, it checks the list for the integer timer identifier with
+interrupts disabled.  This is an exhaustive linear search.  This is
+inefficient.
+.IR STREAMS (4)
+modules or drivers that stop timers often will experience poorer performance
+than if the Linux kernel timer facility was used
+directly.
+.SH "SEE ALSO"
+.PP
+.BR timeout (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR untimeout ()
+first appeared in SVR 2.
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -2,7 +2,7 @@
  * <stropts> --- STREAMS ops.
  * Author          : gram & nemo
  * Created On      : Mon Oct 17 11:37:12 1994
- * RCS Id          ; $Id: stropts.h,v 1.4 1996/01/29 17:36:02 dave Exp $
+ * RCS Id          ; $Id: stropts.h,v 1.1.1.2 2003/04/24 16:54:55 brian Exp $
  * Last Modified By: David Grothe
  *                 :
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros
@@ -192,8 +192,8 @@ int	getpmsg(int fd, struct strbuf *ctlptr,
 			struct strbuf *dataptr,
 			int *bandp,
 			int *flagsp) ;
-int	getmsg(int fd, void *ctlptr, void *dataptr, int *flagsp) ;
-int	putmsg(int fd, void *ctlptr, void *dataptr, int flags) ;
+int	getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp) ;
+int	putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags) ;
 int	fattach(int fd, const char *path) ;
 int	fdetach(const char *path) ;
 int	isastream(int fd) ;

@@ -45,7 +45,11 @@
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
+#ifdef LINUX
+#include <linux/errno.h>
+#else
 #include <sys/errno.h>
+#endif
 #include <sys/cmn_err.h>
 
 #include <sys/LiS/head.h>    /* for lis_strrput/lis_strwsrv */
@@ -57,7 +61,7 @@
 /*
  *  Some configuration sanity checks
  */
-#ifndef FIFO_
+#ifndef FIFO__DRV
 #error Not configured
 #endif
 

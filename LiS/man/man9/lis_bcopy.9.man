@@ -1,0 +1,1 @@
+.so man9/bcopy.9.man

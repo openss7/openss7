@@ -1,0 +1,818 @@
+diff -rauN LiS-2.16-old/Makefile LiS-2.16/Makefile
+--- LiS-2.16-old/Makefile	2004-06-03 18:52:23.000000000 +0200
++++ LiS-2.16/Makefile	2004-06-03 19:11:45.000000000 +0200
+@@ -173,6 +173,10 @@
+ ifeq ($(LIS_TARG),user)
+ TODO += streams.o libc util
+ endif
++#
++# Testsuite has only be tested on linux.. but is not OS dependant.
++#
++TODO += testsuite
+ 
+ all: $(TODO)
+ 
+@@ -195,6 +199,7 @@
+ 	install -d $(LIS_ROOT)/usr/sbin
+ 	find include -type f -name "*.h" -print -exec install -m 644 {} $(LIS_ROOT)/usr/lib/LiS/{} \;
+ 	install -m 555 strms_down strms_status strms_up $(LIS_ROOT)/usr/sbin
++	$(MAKE) -C testsuite $@
+ 
+ 
+ modules_install: streams.o modules
+@@ -225,6 +230,7 @@
+ 	- ./update_conf.modules
+ 	- (cd $(MOD_INST_DIR); rm -f streams.o streams-*.o)
+ endif
++	- $(MAKE) -C testsuite $@
+ 
+ else		# from LIS_TARG  == linux
+ 
+@@ -244,6 +250,7 @@
+ 	-$(MAKE) -C $(DRVROBJ) $@
+ 	-$(MAKE) -C $(UTILOBJ) $@
+ 	-$(MAKE) -C $(LIS_HOME)/pkg $@
++	-$(MAKE) -C $(LIS_HOME)/testsuite $@
+ 
+ 
+ realclean: clean
+@@ -286,6 +293,8 @@
+ util: libc FORCE
+ 	$(MAKE) -C $(UTILOBJ)
+ 
++testsuite: testsuite/wrapper/wrapper
++	$(MAKE) -C testsuite
+ 
+ #
+ # The following four rules takes care of building streams.o
+diff -rauN LiS-2.16-old/testsuite/config/default.exp LiS-2.16/testsuite/config/default.exp
+--- LiS-2.16-old/testsuite/config/default.exp	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/config/default.exp	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,15 @@
++
++# size of expect's match buffer (default is 2000, much slower and unnecessary)
++match_max 1000
++
++# path to executables (FIXME: set on runtest command line or config file)
++set WRAPPER_EXEC "./wrapper/wrapper"
++set STRTST_EXEC "/usr/bin/strtst"
++set NETPERF_EXEC "/opt/netperf/netperf"
++set NETSERVER_EXEC "/opt/netperf/netserver"
++
++# strtst MT tests are run with this many threads successively
++set num_threads {2 4 10}
++
++# netperf tests are run with this many concurrent processes
++set num_processes [concat 1 $num_threads]
+diff -rauN LiS-2.16-old/testsuite/Makefile LiS-2.16/testsuite/Makefile
+--- LiS-2.16-old/testsuite/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/Makefile	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,28 @@
++LIS_HOME = $(shell pwd)/..
++-include ../config.mk
++SUBDIRS = $(shell find . -mindepth 1 -maxdepth 1 -follow -type d | grep -v CVS)
++
++
++all: wrapper
++
++wrapper: wrapper/wrapper.c
++	$(MAKE) -C wrapper;
++
++
++clean:
++	$(MAKE) -C wrapper clean;
++
++install:
++	install -d $(LIS_ROOT)/usr/LiS/testsuite/config
++	install config/default.exp $(LIS_ROOT)/usr/LiS/testsuite/config
++	install -d $(LIS_ROOT)/usr/LiS/testsuite/wrapper
++	install wrapper/wrapper $(LIS_ROOT)/usr/LiS/testsuite/wrapper/
++	install -d $(LIS_ROOT)/usr/LiS/testsuite/strtst
++	install strtst/strtst.exp $(LIS_ROOT)/usr/LiS/testsuite/strtst
++	install -d $(LIS_ROOT)/usr/LiS/testsuite/netperf
++	install netperf/netperf.exp $(LIS_ROOT)/usr/LiS/testsuite/netperf
++	install netperf/netperf.diff $(LIS_ROOT)/usr/LiS/testsuite/netperf
++	install README	$(LIS_ROOT)/usr/LiS/testsuite/
++
++uninstall:
++	- rm -rf $(LIS_ROOT)/usr/LiS/testsuite	
+\ Pas de fin de ligne à la fin du fichier.
+diff -rauN LiS-2.16-old/testsuite/netperf/netperf.diff LiS-2.16/testsuite/netperf/netperf.diff
+--- LiS-2.16-old/testsuite/netperf/netperf.diff	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/netperf/netperf.diff	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,70 @@
++diff -ru netperf-2.2pl2-orig/makefile netperf-2.2pl2/makefile
++--- netperf-2.2pl2-orig/makefile	Sat Jun 22 00:42:53 2002
+++++ netperf-2.2pl2/makefile	Thu Jul 10 14:42:17 2003
++@@ -37,7 +37,7 @@
++ # You may safely ignore that warning.
++ #
++ 
++-CC = cc
+++CC = gcc
++ 
++ # Adding flags to CFLAGS enables some non-mainline features. For
++ # more information, please consult the source code.
++@@ -91,7 +91,11 @@
++ #
++ 
++ LOG_FILE=DEBUG_LOG_FILE="\"/tmp/netperf.debug\""
++-CFLAGS = -Ae -O -D$(LOG_FILE) -DUSE_PSTAT -DHAVE_SENDFILE -DDO_FIRST_BURST
+++LISHOME=/usr/src/LiS
+++#CFLAGS = -Ae -O -D$(LOG_FILE) -DUSE_PSTAT -DHAVE_SENDFILE -DDO_FIRST_BURST
+++CFLAGS = -D$(LOG_FILE) -DDO_DLPI -DHISTOGRAM -DUSE_PROC_STAT -DDONT_WAIT \
+++ -DLINUX -DINLINE=inline -DSTATIC=static -I$(LISHOME)/include -DHAVE_MIN \
+++ -g -O2 -Wall
++ 
++ # Some platforms, and some options, require additional libraries.
++ # you can add to the "LIBS =" line to accomplish this. if you find
++@@ -111,7 +115,7 @@
++ # -L/POSIXC60/lib -lunix -lm -lsocket - for MPE/iX
++ # -lkstat               - required for -DUSE_KSTAT on Solaris
++ 
++-LIBS= -lm
+++LIBS= -lm -L$(LISHOME)/libc -lLiS -g
++ 
++ # ---------------------------------------------------------------
++ # it should not be the case that anything below this line needs to
++diff -ru netperf-2.2pl2-orig/nettest_dlpi.c netperf-2.2pl2/nettest_dlpi.c
++--- netperf-2.2pl2-orig/nettest_dlpi.c	Sat Jun 22 00:42:53 2002
+++++ netperf-2.2pl2/nettest_dlpi.c	Wed Jan 29 16:18:02 2003
++@@ -1809,6 +1809,10 @@
++   data_req->dl_dest_addr_length = dlpi_cl_stream_response->station_addr_len;
++   /* there is a dl_priority structure too, but I am ignoring it for */
++   /* the time being. */
+++#if 1 /* XXX SRI */
+++  data_req->dl_priority.dl_min = DL_QOS_DONT_CARE;
+++  data_req->dl_priority.dl_max = DL_QOS_DONT_CARE;
+++#endif
++   sctl_message.len = sizeof(dl_unitdata_req_t) + 
++     data_req->dl_dest_addr_length;
++   
++@@ -2633,6 +2637,10 @@
++     data_req->dl_dest_addr_length = dlpi_cl_rr_response->station_addr_len;
++     /* there is a dl_priority structure too, but I am ignoring it for */
++     /* the time being. */
+++#if 1 /* XXX SRI */
+++    data_req->dl_priority.dl_min = DL_QOS_DONT_CARE;
+++    data_req->dl_priority.dl_max = DL_QOS_DONT_CARE;
+++#endif
++     sctl_message.len = sizeof(dl_unitdata_req_t) + 
++       data_req->dl_dest_addr_length;
++   }
++@@ -3199,6 +3207,10 @@
++ 	  data_ind->dl_src_addr_length);
++     data_req->dl_dest_addr_length = data_ind->dl_src_addr_length;
++     data_req->dl_primitive = DL_UNITDATA_REQ;
+++#if 1 /* XXX SRI */
+++    data_req->dl_priority.dl_min = DL_QOS_DONT_CARE;
+++    data_req->dl_priority.dl_max = DL_QOS_DONT_CARE;
+++#endif
++     sctl_message.len = sizeof(dl_unitdata_req_t) +
++       data_ind->dl_src_addr_length;
++     if(putmsg(data_descriptor,
+diff -rauN LiS-2.16-old/testsuite/netperf/netperf.exp LiS-2.16/testsuite/netperf/netperf.exp
+--- LiS-2.16-old/testsuite/netperf/netperf.exp	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/netperf/netperf.exp	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,142 @@
++#
++# DejaGnu testsuite for LiS
++# test cases running netperf
++# one and several processes
++# local and remote
++#
++
++# regexp matching strtst error reports
++set fail_matcher {wrapper: child process [0-9]+ exited abnormally}
++# regexp matching wrapper statistics report
++set wrapper_matcher {wrapper: test finished successfully; max latency ([0-9]+) max load ([0-9]+\.[0-9]+)}
++# number of parallel jobs
++set num_progs 1
++
++#
++# helper: spawn wrapper and netperf with args
++#
++proc spawn_netperf { args } {
++    global WRAPPER_EXEC NETPERF_EXEC spawn_id num_progs
++    set cmd [concat spawn $WRAPPER_EXEC -n $num_progs $NETPERF_EXEC $args]
++    #print $cmd
++    eval $cmd
++}
++
++#
++# do_* helpers: most common actions in expect
++#
++proc do_eof { test } {
++    print "$test: EOF!"
++    fail $test
++}
++proc do_timeout { test } {
++    print "$test: timeout!"
++    fail $test
++    exec kill -TERM [exp_pid]
++}
++proc do_fail { test } {
++    global expect_out
++    print "$expect_out(1,string)"
++    fail $test
++}
++proc do_wrapper { test max_latency max_load } {
++    global expect_out
++    set latency $expect_out(1,string)
++    set load $expect_out(2,string)
++#    print "$test: latency $latency load $load"
++    if { $latency > $max_latency } {
++	print "$test: latency $latency is above max_latency $max_latency!"
++	fail $test
++	return
++    }
++    if { $load > $max_load } {
++	print "$test: load $load is above max_load $max_load!"
++	fail $test
++	return
++    }
++    pass $test
++}
++
++#
++# check correct installation of programs
++#
++set timeout 3
++spawn_netperf -h
++expect {
++    -gl "Usage:" { }
++    default { error "Cannot run netperf! Bad install, aborting testsuite" }
++}
++close ; wait
++
++#
++# run DLPI STREAM test
++#
++proc netperf_stream { duration host ppa msize } {
++    global fail_matcher wrapper_matcher expect_out spawn_id num_progs
++
++    set timeout [expr ($duration * 1.2) + 5]
++
++    set test [string map {" " "_"} "netperf stream $host $num_progs"]
++    print "$test: run $num_progs x netperf DLCL_STREAM for $duration seconds against $host (msg size $msize bytes)"
++    spawn_netperf -l $duration -H $host -t DLCL_STREAM -- -D /dev/ldl -p $ppa -s16%02d -m $msize
++    set i1 0
++    set i2 0
++    set t_sender 0
++    set t_receiver 0
++    expect {
++	-re "$fail_matcher" { do_fail $test }
++ 	-re {\s+-1\s+\d+\s+\d+\.\d+\s+(\d+)\s+\d+\s+(\d+\.\d+)\s+[\r\n]} {
++	    set sender($i1) $expect_out(2,string)
++# 	    print "$test: sender bitrate $sender($i1)"
++	    set t_sender [expr $t_sender + $sender($i1)]
++	    incr i1
++ 	    exp_continue
++ 	}
++ 	-re {\s+-1\s+\d+\.\d+\s+(\d+)\s+(\d+\.\d+)\s+[\r\n]} {
++            set receiver($i2) $expect_out(2,string)
++ #	    print "$test: receiver bitrate $receiver($i2)"
++            set t_receiver [expr $t_receiver + $receiver($i2)]
++            incr i2
++ 	    exp_continue
++ 	}
++	-re "$wrapper_matcher" { 
++	    if { [expr $t_receiver / $t_sender] < 0.90 } {
++		print "$test: total sender bitrate $t_sender"
++		print "$test: total receiver bitrate $t_receiver"
++		print "$test: more than 10% packet lost!"
++		fail $test
++	    } else {
++		do_wrapper $test 2 2.0
++	    }
++	}
++	eof { do_eof $test }
++	timeout { do_timeout $test }
++    }
++    close ; wait
++}
++
++#
++# first, start netserver
++#
++spawn sh -c "trap '' 1 ; exec $NETSERVER_EXEC"
++set timeout 3
++expect {
++    -re {^Starting netserver at port.*already in use[\r\n]+$} {
++	notice netserver already running
++    }
++    -re {^Starting netserver at port \d+[\r\n]+$} { }
++    default { error "Cannot run netserver! Bad install, aborting testsuite" }
++}
++close ; wait
++
++#
++# now, run all these tests!
++#
++
++foreach num_progs $num_processes {
++    foreach time {10 100} {
++	foreach size {100 1450} {
++	    netperf_stream $time localhost 0 $size
++	}
++    }
++}
+diff -rauN LiS-2.16-old/testsuite/README LiS-2.16/testsuite/README
+--- LiS-2.16-old/testsuite/README	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/README	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,23 @@
++Patches
++-------
++
++ - a patch to netperf 2.2pl2 enables netperf to use LiS
++
++Test suite
++----------
++
++The test suite depends on a working installation of DejaGnu.
++
++The tests can be restricted to one of the test programs by telling
++runtest (the DejaGnu test driver) to test only one tool, eg:
++  $ cd testsuite
++  $ runtest --tool netperf
++  <...>
++  $ runtest --tool strtst
++  <...>
++
++runtest can produce a very detailed log with runtest -debug
++
++
++
++
+diff -rauN LiS-2.16-old/testsuite/strtst/strtst.exp LiS-2.16/testsuite/strtst/strtst.exp
+--- LiS-2.16-old/testsuite/strtst/strtst.exp	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/strtst/strtst.exp	2004-06-03 19:21:41.000000000 +0200
+@@ -0,0 +1,186 @@
++#
++# DejaGnu testsuite for LiS
++# test cases running strtst
++# single and multithreaded
++#
++
++# list of strtst tests
++set test_list [list open ioctl rdopt write timer putmsg poll mux clone \
++		   bufcall sad fifo passfd band flush autopush mt_open]
++# list of strtst tests that can run multithreaded (MT) (remove band for now on)
++set MT_test_list [list open putmsg poll bufcall fifo passfd flush]
++# regexp matching strtst error reports
++set fail_matcher {([\r\n][^\r\n]*BEGIN FAILURE.+TEST FAILED[^\r\n]*[\r\n])}
++# regexp matching wrapper statistics report
++set wrapper_matcher {wrapper: test finished successfully; max latency ([0-9]+) max load ([0-9]+\.[0-9]+)}
++
++#
++# helper: spawn wrapper and strtst with args
++#
++proc spawn_strtst { args } {
++    global WRAPPER_EXEC STRTST_EXEC spawn_id
++    set cmd [concat spawn $WRAPPER_EXEC $STRTST_EXEC -m0 $args]
++    #print $cmd
++    eval $cmd
++}
++
++#
++# do_* helpers: most common actions in expect
++#
++proc do_eof { test } {
++    print "$test: EOF!"
++    fail $test
++}
++proc do_timeout { test } {
++    print "$test: timeout!"
++    fail $test
++    exec kill -TERM [exp_pid]
++}
++proc do_fail { test } {
++    global expect_out
++    print "$expect_out(1,string)"
++    fail $test
++}
++proc do_wrapper { test max_latency max_load } {
++    global expect_out
++    set latency $expect_out(1,string)
++    set load $expect_out(2,string)
++#    print "$test: latency $latency load $load"
++    if { $latency > $max_latency } {
++	print "$test: latency $latency is above max_latency $max_latency!"
++	fail $test
++	return
++    }
++    if { $load > $max_load } {
++	print "$test: load $load is above max_load $max_load!"
++	fail $test
++	return
++    }
++    pass $test
++}
++
++#
++# check correct installation of programs
++#
++set timeout 3
++spawn_strtst -h
++expect {
++    -gl "^Usage:" { }
++    default { error "Cannot run strtst! Bad install, aborting testsuite" }
++}
++close ; wait
++
++#
++# run each strtst test once
++#
++proc strtst_one { } {
++    global fail_matcher wrapper_matcher test_list expect_out
++
++    set timeout 120
++
++    foreach t $test_list {
++	set test "strtst_$t"
++	print "$test: run strtst single threaded, one test: $t"
++	spawn_strtst $t
++	expect {
++	    -re "$wrapper_matcher" { do_wrapper $test 2 2.0 }
++	    -re "$fail_matcher" { do_fail $test }
++	    eof { do_eof $test }
++	    timeout { do_timeout $test }
++	}
++	close ; wait
++    }
++}
++
++#
++# run all strtst tests
++#
++proc strtst_all { } {
++    global fail_matcher wrapper_matcher expect_out
++
++    set timeout 120
++
++    set test "strtst_all"
++    print "$test: run strtst single threaded, all tests"
++    spawn_strtst -m0
++    expect {
++	-re "$wrapper_matcher" { do_wrapper $test 2 2.0 }
++	-re "$fail_matcher" { do_fail $test }
++	eof { do_eof $test }
++	timeout { do_timeout $test }
++    }
++    close ; wait
++}
++
++#
++# run each strtst test with $nthreads concurrent threads
++#
++proc strtst_mt_one { nthreads } {
++    global MT_test_list test_list fail_matcher wrapper_matcher expect_out
++
++    set timeout [expr 120 * $nthreads]
++
++    foreach t $test_list {
++	set test [string map {" " "_"} "strtst mt$nthreads $t"]
++	print "$test: run strtst multithreaded, $nthreads threads, one test: $t"
++	spawn_strtst -n $nthreads $t
++	expect {
++	    -re "$wrapper_matcher" {
++		if { [lsearch $MT_test_list $t] >= 0} {
++		    do_wrapper $test 2 [expr 2.0 * $nthreads ]
++		} else {
++		    # non MT tests are not expected to pass!
++		    xpass $test
++		}
++	    }
++	    -re "$fail_matcher" { do_fail $test }
++	    -gl "^Usage:" {
++		if { [lsearch $MT_test_list $t] >= 0} {
++		    fail $test
++		} else {
++		    # non MT tests are expected to fail this way
++		    xfail $test
++		}
++	    }
++	    eof { do_eof $test }
++	    timeout { do_timeout $test }
++	}
++	close ; wait
++    }
++}
++
++#
++# run all strtst tests with $nthreads concurrent threads
++#
++proc strtst_mt_all { nthreads } {
++    global fail_matcher wrapper_matcher expect_out
++
++    set timeout [expr 120 * $nthreads]
++
++    set test [string map {" " "_"} "strtst mt$nthreads all"]
++    print "$test: run strtst multithreaded, $nthreads threads, all MT tests"
++    spawn_strtst -n $nthreads
++    expect {
++	-re "$wrapper_matcher" { do_wrapper $test 2 [expr 2.0 * $nthreads] }
++	-re "$fail_matcher" { do_fail $test }
++	eof { do_eof $test }
++	timeout { do_timeout $test }
++    }
++    close ; wait
++}
++
++#
++# now, run all these tests!
++#
++
++strtst_one
++
++strtst_all
++
++foreach n $num_threads {
++    strtst_mt_one $n
++}
++
++foreach n $num_threads {
++    strtst_mt_all $n
++}
+diff -rauN LiS-2.16-old/testsuite/wrapper/Makefile LiS-2.16/testsuite/wrapper/Makefile
+--- LiS-2.16-old/testsuite/wrapper/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/wrapper/Makefile	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,14 @@
++OBJS := wrapper.o
++CC := gcc
++CFLAGS := -g -Wall
++
++all: wrapper
++
++wrapper: $(OBJS)
++	$(CC) -o $@ $(OBJS)
++
++%.o: %.c
++	$(CC) $(CFLAGS) -c $<
++
++clean:
++	-rm -f wrapper *.o
+diff -rauN LiS-2.16-old/testsuite/wrapper/wrapper.c LiS-2.16/testsuite/wrapper/wrapper.c
+--- LiS-2.16-old/testsuite/wrapper/wrapper.c	1970-01-01 01:00:00.000000000 +0100
++++ LiS-2.16/testsuite/wrapper/wrapper.c	2004-06-03 19:03:54.000000000 +0200
+@@ -0,0 +1,260 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <string.h>
++#include <signal.h>
++#include <sys/time.h>
++#include <strings.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++
++#define MAX_TEST_INSTANCES 256
++pid_t test_pid[MAX_TEST_INSTANCES];
++int num_instances = 1;
++long max_latency = 0;
++double max_load = 0.0;
++
++void sig_chld(int sig)
++{
++	/* empty handler required
++	   otherwise SIGCHLD is SIG_IGN and select() isn't interrupted */
++}
++
++void kill_test(void)
++{
++	int i;
++
++	for(i = 0; i < MAX_TEST_INSTANCES; i++)
++		if(test_pid[i] != 0)
++			kill(test_pid[i], SIGTERM);
++	for(i = 0; i < MAX_TEST_INSTANCES; i++)
++		if(test_pid[i] != 0)
++			waitpid(test_pid[i], NULL, 0);
++}
++
++void sig_term(int signum)
++{
++	printf("\nwrapper: exiting on signal %d\n", signum);
++	exit(1);
++}
++
++void mangle_argv(int i, char **argv)
++{
++	char *s;
++	while(*argv != NULL) {
++		if(strchr(*argv, '%') == NULL) {
++			argv++;
++			continue;
++		}
++		s = malloc(strlen(*argv)+20);
++		if(!s) {
++			perror("malloc");
++			exit(1);
++		}
++		sprintf(s, *argv, i);
++/* 		printf("%s => %s\n", *argv, s); */
++		*argv = s;
++		argv++;
++	}
++}
++
++int spawn_test(char *progname, char **argv)
++{
++	int i;
++
++	fflush(stdout);
++	atexit(kill_test);
++	for(i = 0; i < num_instances; i++) {
++		switch(test_pid[i] = fork()) {
++		case -1:
++			perror("fork");
++			test_pid[i] = 0;
++			exit(1);
++		case 0: /* in child */
++			mangle_argv(i, argv);
++			execvp(progname, argv);
++			perror("execvp");
++			memset(test_pid, 0, sizeof(test_pid));
++			exit(1);
++		default: /* in parent */
++			break;
++		}
++	}
++	return 0;
++}
++
++void sample_latency(void)
++{
++	static struct timeval prev_time, curr_time;
++	long latency;
++
++	if(curr_time.tv_sec == 0) { /* initial call */
++		if(gettimeofday(&curr_time, NULL)) {
++			perror("gettimeofday");
++			exit(1);
++		}
++		return;
++	}
++
++	/* measure responsiveness (roughly) */
++	prev_time = curr_time;
++	if(gettimeofday(&curr_time, NULL)) {
++		perror("gettimeofday");
++		exit(1);
++	}
++	latency = curr_time.tv_sec - prev_time.tv_sec;
++	if(latency > max_latency)
++		max_latency = latency;
++}
++
++void sample_load(void)
++{
++	static int fd = -1;
++	static char buf[256];
++	double load;
++	char *endptr;
++
++	if(fd < 0) {
++		fd = open("/proc/loadavg", O_RDONLY);
++		if(fd < 0) {
++			perror("open");
++			exit(1);
++		}
++	}
++	/* measure system load (first field in /proc/loadavg) */
++	if(lseek(fd, 0, SEEK_SET) < 0) {
++		perror("lseek");
++		exit(1);
++	}
++	if(read(fd, buf, sizeof(buf)) < 0) {
++		perror("read");
++		exit(1);
++	}
++	*index(buf, ' ') = '\0';
++	load = strtod(buf, &endptr);
++	if(*endptr != '\0') {
++		fprintf(stderr, "strtod: error in conversion of '%s'\n",
++			buf);
++		exit(1);
++	}
++	if(load > max_load)
++		max_load = load;
++}
++
++void wait4test(void)
++{
++	int status;
++	pid_t child;
++	struct timeval tv;
++	int i;
++
++	sample_latency(); /* initial call */
++	sample_load();
++
++	for(;;) {
++		/* sample system status:
++		   system load, LiS mem, responsiveness */
++		/* TBD */
++
++		sample_latency();
++		sample_load();
++
++		/* check if we have any zombie pending */
++		for(;;) {
++			if((child = waitpid(-1, &status, WNOHANG)) < 0) {
++				perror("waitpid");
++				exit(1);
++			}
++			if(child == 0)
++				break;
++			if(!WIFEXITED(status) || (WEXITSTATUS(status) != 0)) {
++				printf("\nwrapper: child process %i exited abnormally\n",
++				       child);
++				exit(1);
++			}
++			/* child exited with 0 */
++			for(i = 0; i < MAX_TEST_INSTANCES; i++) {
++				if(test_pid[i] == child) {
++					test_pid[i] = 0;
++					if(--num_instances == 0)
++						return;
++					break;
++				}
++			}
++		}
++
++		/* still some children running, wait for any signal
++		   (including SIGCHLD) */
++		tv.tv_sec = 1;
++		tv.tv_usec = 0;
++		select(0, NULL, NULL, NULL, &tv);
++
++	}
++}
++
++void report(void)
++{
++	printf("\nwrapper: test finished successfully; max latency %ld max load %.2f\n",
++	       max_latency, max_load);
++}
++
++void usage(char *progname)
++{
++	fprintf(stderr, 
++		"Usage: %s [-n <num instances>] /path/to/testprog [test args...]\n",
++		progname);
++	exit(1);
++}
++
++int main(int argc, char **argv)
++{
++	int c;
++	char *ptr;
++
++	if(argc < 2)
++		usage(argv[0]);
++	while((c = getopt(argc, argv, "+n:")) != -1) {
++		switch((char)c) {
++		case 'n':
++			/* number of processes */
++			num_instances = strtoul(optarg, &ptr, 0);
++			if(*ptr != '\0')
++				usage(argv[0]);
++			if(num_instances > MAX_TEST_INSTANCES) {
++				fprintf(stderr,
++					"%s: max number of instances exceeded (%d)\n",
++					argv[0], MAX_TEST_INSTANCES);
++				exit(1);
++			}
++			break;
++		default:
++			usage(argv[0]);
++		}
++	}
++
++	/* 
++	 * signal handler for SIGCHLD required
++	 * by default SIGCHLD is SIG_IGN and select() is not interrupted
++	 * signal handlers for SIGHUP, SIGTERM and SIGINT
++	 */
++	if((signal(SIGCHLD, sig_chld) == SIG_ERR)
++		|| (signal(SIGHUP, sig_term) == SIG_ERR)
++		|| (signal(SIGTERM, sig_term) == SIG_ERR)
++		|| (signal(SIGINT, sig_term) == SIG_ERR)) {
++		perror("signal");
++		exit(1);
++	}
++
++	/* start test program */
++	spawn_test(argv[optind], argv+optind);
++
++	/* gather stats until test program exits */
++	wait4test();
++
++	/* report stats */
++	report();
++	
++	return 0;
++}

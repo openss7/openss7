@@ -1,0 +1,651 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.1 2005/03/09 23:14:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LIS_UNDOC 9 "$Date: 2005/03/09 23:14:12 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B lis_undoc
+\- undocumented LiS symbols
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBundocumented_symbol\fR()
+.SH DESCRIPTION
+.PP
+.hy 6
+These are undocumented LiS symbols:
+.TP
+.BR lis_add_timer ,
+.PD 0
+.TP
+.BR lis_alloc_atomic_fcn ,
+.TP
+.BR lis_alloc_dma_fcn ,
+.TP
+.BR lis_alloc_kernel_fcn ,
+.TP
+.BR lis_apush_get ,
+.TP
+.BR lis_apushm ,
+.TP
+.BR lis_apush_set ,
+.TP
+.BR lis_assert_fail ,
+.TP
+.BR lis_atomic_add ,
+.TP
+.BR lis_atomic_dec ,
+.TP
+.BR lis_atomic_dec_and_test ,
+.TP
+.BR lis_atomic_inc ,
+.TP
+.BR lis_atomic_read ,
+.TP
+.BR lis_atomic_set ,
+.TP
+.BR lis_atomic_sub ,
+.TP
+.BR lis_backq_fcn ,
+.TP
+.BR lis_basename ,
+.TP
+.BR lis_bcanputnext_anyband ,
+.TP
+.BR lis_bprintf ,
+.TP
+.BR lis_can_unload ,
+.TP
+.BR lis_check_guard ,
+.TP
+.BR lis_check_mem ,
+.TP
+.BR lis_check_mem_region ,
+.TP
+.BR lis_check_q_magic ,
+.TP
+.BR lis_check_region ,
+.TP
+.BR lis_check_umem ,
+.TP
+.BR lis_clone_major ,
+.TP
+.BR lis_copyin ,
+.TP
+.BR lis_copyout ,
+.TP
+.BR lis_debug_mask2 ,
+.TP
+.BR lis_debug_mask ,
+.TP
+.BR lis_dec_mod_cnt_fcn ,
+.TP
+.BR lis_del_timer ,
+.TP
+.BR lis_disable_irq ,
+.TP
+.BR lis_dobufcall ,
+.TP
+.BR lis_doclose ,
+.TP
+.BR lis_down_fcn ,
+.TP
+.BR lis_dsecs ,
+.TP
+.BR lis_enable_intr ,
+.TP
+.BR lis_enable_irq ,
+.TP
+.BR lis_fattach ,
+.TP
+.BR lis_fdetach ,
+.TP
+.BR lis_fdetach_all ,
+.TP
+.BR lis_fdetach_stream ,
+.TP
+.BR lis_fifo_close_sync ,
+.TP
+.BR lis_fifo_open_sync ,
+.TP
+.BR lis_fifo_write_sync ,
+.TP
+.BR lis_file_inode ,
+.TP
+.BR lis_file_str ,
+.TP
+.BR lis_flush_print_buffer ,
+.TP
+.BR lis_fmod_sw ,
+.TP
+.BR lis_free ,
+.TP
+.BR lis_freedb ,
+.TP
+.BR lis_free_dma ,
+.TP
+.BR lis_free_irq ,
+.TP
+.BR lis_free_mem_fcn ,
+.TP
+.BR lis_free_pages_fcn ,
+.TP
+.BR lis_free_passfp ,
+.TP
+.BR lis_fstr_sw ,
+.TP
+.BR lis_get_fifo ,
+.TP
+.BR lis_get_free_pages_atomic_fcn ,
+.TP
+.BR lis_get_free_pages_fcn ,
+.TP
+.BR lis_get_free_pages_kernel_fcn ,
+.TP
+.BR lis_getint ,
+.TP
+.BR lis_get_passfp ,
+.TP
+.BR lis_get_pipe ,
+.TP
+.BR lis_gettimeofday ,
+.TP
+.BR lis_hitime ,
+.TP
+.BR lis_inc_mod_cnt_fcn ,
+.TP
+.BR lis_init_bufcall ,
+.TP
+.BR lis_in_syscall ,
+.TP
+.BR lis_interruptible_sleep_on ,
+.TP
+.BR lis_ioc_fattach ,
+.TP
+.BR lis_ioc_fdetach ,
+.TP
+.BR lis_ioc_pipe ,
+.TP
+.BR lis_ioremap ,
+.TP
+.BR lis_ioremap_nocache ,
+.TP
+.BR lis_iounmap ,
+.TP
+.BR lis_jiffies ,
+.TP
+.BR lis_kernel_down ,
+.TP
+.BR lis_kernel_up ,
+.TP
+.BR lis_kernel_version ,
+.TP
+.BR lis__kfree ,
+.TP
+.BR lis_kfree ,
+.TP
+.BR lis_kill_pg ,
+.TP
+.BR lis_kill_proc ,
+.TP
+.BR lis__kmalloc ,
+.TP
+.BR lis_kmalloc ,
+.TP
+.BR lis_loadable_load ,
+.TP
+.BR lis_maj_min_name ,
+.TP
+.BR lis_major ,
+.TP
+.BR lis_malloc ,
+.TP
+.BR lis_max_mem ,
+.TP
+.BR lis_membar ,
+.TP
+.BR lis_milli_to_ticks ,
+.TP
+.BR lis_msecs ,
+.TP
+.BR lis_msg_type_name ,
+.TP
+.BR lis_num_cpus ,
+.TP
+.BR lis_old_inode ,
+.TP
+.BR lis_open_cnt ,
+.TP
+.BR lis_osif_cli ,
+.TP
+.BR lis_osif_do_gettimeofday ,
+.TP
+.BR lis_osif_do_settimeofday ,
+.TP
+.BR lis_osif_pci_alloc_consistent ,
+.TP
+.BR lis_osif_pci_dac_dma_supported ,
+.TP
+.BR lis_osif_pci_dac_dma_sync_single ,
+.TP
+.BR lis_osif_pci_dac_dma_to_offset ,
+.TP
+.BR lis_osif_pci_dac_dma_to_page ,
+.TP
+.BR lis_osif_pci_dac_page_to_dma ,
+.TP
+.BR lis_osif_pci_dac_set_dma_mask ,
+.TP
+.BR lis_osif_pci_disable_device ,
+.TP
+.BR lis_osif_pci_dma_supported ,
+.TP
+.BR lis_osif_pci_dma_sync_sg ,
+.TP
+.BR lis_osif_pci_dma_sync_single ,
+.TP
+.BR lis_osif_pci_enable_device ,
+.TP
+.BR lis_osif_pci_find_class ,
+.TP
+.BR lis_osif_pci_find_device ,
+.TP
+.BR lis_osif_pci_find_slot ,
+.TP
+.BR lis_osif_pci_free_consistent ,
+.TP
+.BR lis_osif_pci_map_page ,
+.TP
+.BR lis_osif_pci_map_sg ,
+.TP
+.BR lis_osif_pci_map_single ,
+.TP
+.BR lis_osif_pci_module_init ,
+.TP
+.BR lis_osif_pci_read_config_byte ,
+.TP
+.BR lis_osif_pci_read_config_dword ,
+.TP
+.BR lis_osif_pci_read_config_word ,
+.TP
+.BR lis_osif_pci_set_dma_mask ,
+.TP
+.BR lis_osif_pci_set_master ,
+.TP
+.BR lis_osif_pci_unmap_page ,
+.TP
+.BR lis_osif_pci_unmap_sg ,
+.TP
+.BR lis_osif_pci_unmap_single ,
+.TP
+.BR lis_osif_pci_unregister_driver ,
+.TP
+.BR lis_osif_pci_write_config_byte ,
+.TP
+.BR lis_osif_pci_write_config_dword ,
+.TP
+.BR lis_osif_pci_write_config_word ,
+.TP
+.BR lis_osif_sg_dma_address ,
+.TP
+.BR lis_osif_sg_dma_len ,
+.TP
+.BR lis_osif_sti ,
+.TP
+.BR lis_own_spl ,
+.TP
+.BR lis_pci_alloc_consistent ,
+.TP
+.BR lis_pcibios_find_class ,
+.TP
+.BR lis_pcibios_find_device ,
+.TP
+.BR lis_pcibios_init ,
+.TP
+.BR lis_pcibios_present ,
+.TP
+.BR lis_pcibios_read_config_byte ,
+.TP
+.BR lis_pcibios_read_config_dword ,
+.TP
+.BR lis_pcibios_read_config_word ,
+.TP
+.BR lis_pcibios_strerror ,
+.TP
+.BR lis_pcibios_write_config_byte ,
+.TP
+.BR lis_pcibios_write_config_dword ,
+.TP
+.BR lis_pcibios_write_config_word ,
+.TP
+.BR lis_pci_cleanup ,
+.TP
+.BR lis_pci_disable_device ,
+.TP
+.BR lis_pci_dma_handle_to_32 ,
+.TP
+.BR lis_pci_dma_handle_to_64 ,
+.TP
+.BR lis_pci_dma_supported ,
+.TP
+.BR lis_pci_dma_sync_single ,
+.TP
+.BR lis_pci_enable_device ,
+.TP
+.BR lis_pci_find_class ,
+.TP
+.BR lis_pci_find_device ,
+.TP
+.BR lis_pci_find_slot ,
+.TP
+.BR lis_pci_free_consistent ,
+.TP
+.BR lis_pci_map_single ,
+.TP
+.BR lis_pci_read_config_byte ,
+.TP
+.BR lis_pci_read_config_dword ,
+.TP
+.BR lis_pci_read_config_word ,
+.TP
+.BR lis_pci_set_dma_mask ,
+.TP
+.BR lis_pci_set_master ,
+.TP
+.BR lis_pci_unmap_single ,
+.TP
+.BR lis_pci_write_config_byte ,
+.TP
+.BR lis_pci_write_config_dword ,
+.TP
+.BR lis_pci_write_config_word ,
+.TP
+.BR lis_phys_to_virt ,
+.TP
+.BR lis_pipe ,
+.TP
+.BR lis_poll_2_1 ,
+.TP
+.BR lis_poll_bits ,
+.TP
+.BR lis_poll_events ,
+.TP
+.BR lis_poll_file ,
+.TP
+.BR lis_print_block ,
+.TP
+.BR lis_print_data ,
+.TP
+.BR lis_printk ,
+.TP
+.BR lis_print_mem ,
+.TP
+.BR lis_print_msg ,
+.TP
+.BR lis_print_queue ,
+.TP
+.BR lis_print_queues ,
+.TP
+.BR lis_print_spl_track ,
+.TP
+.BR lis_print_stream ,
+.TP
+.BR lis_putbyte ,
+.TP
+.BR lis_qcountstrm ,
+.TP
+.BR lis_queue_name ,
+.TP
+.BR lis_queuerun_cnts ,
+.TP
+.BR lis_queues_running ,
+.TP
+.BR lis_recvfd ,
+.TP
+.BR lis_release_mem_region ,
+.TP
+.BR lis_release_region ,
+.TP
+.BR lis_request_dma ,
+.TP
+.BR lis_request_irq ,
+.TP
+.BR lis_request_mem_region ,
+.TP
+.BR lis_request_region ,
+.TP
+.BR lis_runq_cnts ,
+.TP
+.BR lis_runq_req_cnt ,
+.TP
+.BR lis_rw_lock_alloc_fcn ,
+.TP
+.BR lis_rw_lock_free_fcn ,
+.TP
+.BR lis_rw_lock_init_fcn ,
+.TP
+.BR lis_rw_read_lock_fcn ,
+.TP
+.BR lis_rw_read_lock_irq_fcn ,
+.TP
+.BR lis_rw_read_lock_irqsave_fcn ,
+.TP
+.BR lis_rw_read_unlock_fcn ,
+.TP
+.BR lis_rw_read_unlock_irq_fcn ,
+.TP
+.BR lis_rw_read_unlock_irqrestore_fcn ,
+.TP
+.BR lis_rw_write_lock_fcn ,
+.TP
+.BR lis_rw_write_lock_irq_fcn ,
+.TP
+.BR lis_rw_write_lock_irqsave_fcn ,
+.TP
+.BR lis_rw_write_unlock_fcn ,
+.TP
+.BR lis_rw_write_unlock_irq_fcn ,
+.TP
+.BR lis_rw_write_unlock_irqrestore_fcn ,
+.TP
+.BR lis_safe_putmsg ,
+.TP
+.BR lis_secs ,
+.TP
+.BR lis_sem_alloc ,
+.TP
+.BR lis_sem_destroy ,
+.TP
+.BR lis_sem_init ,
+.TP
+.BR lis_sendfd ,
+.TP
+.BR lis_seq_cntr ,
+.TP
+.BR lis_set_file_str ,
+.TP
+.BR lis_setq ,
+.TP
+.BR lis_setqsched ,
+.TP
+.BR lis_setqsched_cnts ,
+.TP
+.BR lis_setqsched_isr_cnts ,
+.TP
+.BR lis_sleep_on ,
+.TP
+.BR lis_spin_is_locked_fcn ,
+.TP
+.BR lis_spin_lock_alloc_fcn ,
+.TP
+.BR lis_spin_lock_fcn ,
+.TP
+.BR lis_spin_lock_free_fcn ,
+.TP
+.BR lis_spin_lock_init_fcn ,
+.TP
+.BR lis_spin_lock_irq_fcn ,
+.TP
+.BR lis_spin_lock_irqsave_fcn ,
+.TP
+.BR lis_spin_trylock_fcn ,
+.TP
+.BR lis_spin_unlock_fcn ,
+.TP
+.BR lis_spin_unlock_irq_fcn ,
+.TP
+.BR lis_spin_unlock_irqrestore_fcn ,
+.TP
+.BR lis_spl0_fcn ,
+.TP
+.BR lis_splstr_fcn ,
+.TP
+.BR lis_splx_fcn ,
+.TP
+.BR lis_sprintf ,
+.TP
+.BR lis_stdata_cnt ,
+.TP
+.BR lis_strclose ,
+.TP
+.BR lis_strcount ,
+.TP
+.BR lis_strgetpmsg ,
+.TP
+.BR lis_strioctl ,
+.TP
+.BR lis_strm_name ,
+.TP
+.BR lis_strm_name_from_queue ,
+.TP
+.BR lis_stropen ,
+.TP
+.BR lis_stropts_file ,
+.TP
+.BR lis_strputpmsg ,
+.TP
+.BR lis_strread ,
+.TP
+.BR lis_strstats ,
+.TP
+.BR lis_strwrite ,
+.TP
+.BR lis_thread_start ,
+.TP
+.BR lis_thread_stop ,
+.TP
+.BR lis_timeout_fcn ,
+.TP
+.BR lis_udelay ,
+.TP
+.BR lis_up_fcn ,
+.TP
+.BR lis_usecs ,
+.TP
+.BR lis_usectohz ,
+.TP
+.BR lis_valid_mod_list ,
+.TP
+.BR lis_vfree ,
+.TP
+.BR lis_virt_to_phys ,
+.TP
+.BR lis_vmalloc ,
+.TP
+.BR lis_vremap ,
+.TP
+.BR lis_vsprintf ,
+.TP
+.BR lis_wake_up ,
+.TP
+.BR lis_wake_up_interruptible ,
+.TP
+.BR lis_zmalloc .
+.PD
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -36,7 +36,7 @@
 /*
  *  Some configuration sanity checks
  */
-#ifndef SAD_
+#ifndef SAD__DRV
 #error Not configured
 #endif
 

@@ -1,0 +1,6 @@
+LiS-2.16.18.22 (0) experimental; urgency=low
+
+  * Initial stab at debian build system.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Thu, 17 Feb 2005 23:13:02 -0700
+

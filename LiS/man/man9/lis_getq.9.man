@@ -1,0 +1,1 @@
+.so man9/getq.9.man

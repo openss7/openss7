@@ -41,7 +41,7 @@
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
-#include <sys/errno.h>
+#include <linux/errno.h>
 #include <sys/cmn_err.h>
 
 #include <sys/LiS/head.h>
@@ -50,7 +50,7 @@
 /*
  *  Some configuration sanity checks
  */
-#ifndef CONNLD_
+#ifndef CONNLD__MOD
 #error Not configured
 #endif
 
@@ -251,7 +251,7 @@ static int _RP connld_open( queue_t *q, dev_t *devp,
 	    CE_CONT,
 	    "connld_open(q@0x%xp, 0x%x, 0x%x,0x%x, ...)#%d "
 	    "head@0x%p/%d/%d OK\n",
-	    q, *devp, flag, sflag, (int)q->q_ptr,
+	    (int)q, *devp, flag, sflag, (int)q->q_ptr,
 	    head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head) );
 #endif
 

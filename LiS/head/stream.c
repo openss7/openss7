@@ -220,7 +220,7 @@ scan_loop_bottom:
 	    || (lis_qhead == NULL && lis_qtail != NULL)
 	   )
 	    printk("LiS: queuerun before: Qhead error: "
-		   "lis_qhead=%lx lis_qtail=%lx\n",
+		   "lis_qhead=%p lis_qtail=%p\n",
 		   lis_qhead, lis_qtail) ;
 #endif
 	lis_qhead = q->q_link ;			/* remove it from the list */
@@ -235,7 +235,7 @@ scan_loop_bottom:
 	    || (lis_qhead == NULL && lis_qtail != NULL)
 	   )
 	    printk("LiS: queuerun after: Qhead error: "
-		   "lis_qhead=%lx lis_qtail=%lx\n",
+		   "lis_qhead=%p lis_qtail=%p\n",
 		   lis_qhead, lis_qtail) ;
 
 #endif
@@ -345,6 +345,7 @@ qsched_loop_bottom:
 
 }/*queuerun*/
 
+extern int lis_nthreads;	/* module parameter from linux-mdep.c */
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */

@@ -1,0 +1,362 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: qopen.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QOPEN 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B qopen, lis_qopen
+\- call a \fISTREAMS\fR module or driver open routine
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " retval " = qopen(queue_t *" q ", dev_t *" devp ", int " flag ", cred_t *" credp );
+.SH DESCRIPTION
+.PP
+.BR qopen ()
+is an internal
+.IR STREAMS (4)
+function which invokes a
+.IR STREAMS (4)
+module or driver open
+routine.
+.PP
+.I q
+is a pointer to the read queue of a newly allocated queue pair for the module
+or driver,  allocated with
+.BR allocq (9).
+.PP
+.I devp
+is a pointer to a
+.B dev_t
+device number.
+For a driver,
+.B devp
+points to the device number of the
+.IR STREAMS (4)
+character special file that was
+opened that invoked the driver's open routine.
+A driver open routine returns the resulting device
+number to the area pointed to by
+.IR devp .
+See
+.BR makedevice (9).
+For a module,
+.B devp
+points to the device number of the
+.IR STREAMS (4)
+character special file under whose
+stream file the module is being pushed.  A module open routine does not alter
+the device number but may use the passed in device number to determine which
+device the module is ultimately being pushed over.
+.PP
+.I flag
+contains open flags for use by the stream or drivers open routine and will
+contain one of:
+.TP 12
+.B DRVOPEN
+the module was opened as a
+.IR STREAMS (4)
+driver.
+.TP 12
+.B MODOPEN
+the module was opened as a
+.IR STREAMS (4)
+module.
+.TP 12
+.B CLONEOPEN
+the module was opened via the
+.BR clone (4)
+driver.
+.PP
+.I credp
+points to a
+.B cred_t
+structure which provides the credentials of the process invoking the open,
+structured as follows:
+.sp
+.nf
+\fC\s-2\
+typedef int o_uid_t;
+typedef int o_gid_t;
+typedef unsigned char uchar;
+
+typedef struct cred {
+    uid_t cr_uid;                               /* effective user id */
+    gid_t cr_gid;                               /* effective group id */
+    uid_t cr_ruid;                              /* real user id */
+    gid_t cr_rgid;                              /* real group id */
+} cred_t;
+\fR\s+2
+.fi
+.SH CAVEATS
+.PP
+.BR qopen ()
+is an internal
+.IR STREAMS (4)
+function that is not intended to be called
+directly by the module writer.  See
+.BR open (2s)
+and
+.B I_PUSH
+under
+.BR streamio (2).
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR qopen ()
+returns zero (0) and the device number associated with a driver in the area
+pointed to by
+.IR devp .
+Upon failure,
+.BR qopen ()
+returns a negative error number.
+.SH ERRORS
+When
+.BR qopen ()
+fails, it returns a negative error number as follows:
+.TP 12
+.RB [ ENOPKG ]
+the module has no qopen routine.
+.PP
+.BR qopen ()
+can also return any error returned by the modules qopen routine.  In general,
+the following errors are provided by module qopen routines:
+.TP 12
+.RB [ EXNIO ]
+the qopen routine for the module or driver failed.
+.TP 12
+.RB [ EIO ]
+a module was opened as a driver, or visa versa.
+.TP 12
+.RB [ EPERM ]
+the opening process did not have sufficient credentials to open the specified
+device or push the specified module.
+.TP 12
+.RB [ ENOMEM ]
+memory could not be allocated to hold the module or driver's private
+structures.
+.TP 12
+.RB [ ENOSR "], [" ENOBUFS ]
+a buffer could not be allocated as part of the open.
+.TP 12
+.RB [ ENOSR ]
+a
+.IR STREAMS (4)
+resource could not be allocated as part of the open.
+.SH EXAMPLES
+.PP
+Following is an example of a module open routine:
+.sp
+.nf
+\fC\s-2\
+static priv_t *xxx_opens = NULL;
+
+int xxx_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
+{
+    int err;
+    MOD_INC_USE_COUNT;          /* keep module from unloading */
+    if (q->q_ptr != NULL) {
+        MOD_DEC_USE_COUNT;
+        return (0);             /* already open */
+    }
+    if (sflag == MODOPEN || WR(q)->q_next != NULL) {
+        int cmajor = getmajor(*devp);
+        int cminor = getminor(*devp);
+        priv_t *x;
+        /* test for multiple push */
+        for (x = xxx_opens; x; x = x->next) {
+            if (x->u.dev.cmajor == cmajor && x->u.dev.cminor == cminor) {
+                MOD_DEC_USE_COUNT;
+                return (ENXIO);
+            }
+        }
+        if (!(xxx_alloc_priv(q, &xxx_opens, devp, crp))) {
+            MOD_DEC_USE_COUNT;
+            return (ENOMEM);
+        }
+        return (0);
+    }
+    MOD_DEC_USE_COUNT;
+    return (EIO);
+}
+\fR\s+2
+.fi
+.PP
+Following is an example of a driver open routine:
+.sp
+.nf
+\fC\s-2\
+int ss_majors[SS_NMAJOR] = { SS_CMAJOR, };
+int ss_open(queue_t * q, dev_t * devp, int flag, int sflag,
+            cred_t * crp)
+{
+    int flags, mindex = 0;
+    int cmajor = getmajor(*devp);
+    int cminor = getminor(*devp);
+    ss_t *ss, **ipp = &ss_opens;
+    const ss_profile_t *prof;
+    MOD_INC_USE_COUNT;          /* keep module from unloading in our
+                                   face */
+    if (q->q_ptr != NULL) {
+        MOD_DEC_USE_COUNT;
+        return (0);             /* already open */
+    }
+    if (sflag == MODOPEN || WR(q)->q_next) {
+        ptrace(("%s: ERROR: can't push as module\n", SS_MOD_NAME));
+        MOD_DEC_USE_COUNT;
+        return (EIO);
+    }
+    if (cmajor != SS_CMAJOR || cminor < ICMP_CMINOR ||
+        cminor > RAWIP_CMINOR) {
+        MOD_DEC_USE_COUNT;
+        return (ENXIO);
+    }
+    prof = &ss_profiles[cminor - ICMP_CMINOR];
+    cminor = FREE_CMINOR;
+    lis_spin_lock_irqsave(&ss_lock, &flags);
+    for (; *ipp; ipp = &(*ipp)->next) {
+        if (cmajor != (*ipp)->cmajor)
+            break;
+        if (cmajor == (*ipp)->cmajor) {
+            if (cminor < (*ipp)->cminor)
+                break;
+            if (cminor == (*ipp)->cminor) {
+                if (++cminor >= SS_NMINOR) {
+                    if (++mindex >= SS_NMAJOR ||
+                        !(cmajor = ss_majors[mindex]))
+                        break;
+                    cminor = 0;
+                }
+                continue;
+            }
+        }
+    }
+    if (mindex >= SS_NMAJOR || !cmajor) {
+        ptrace(("%s: ERROR: no device numbers available\n",
+                SS_MOD_NAME));
+        lis_spin_unlock_irqrestore(&ss_lock, &flags);
+        MOD_DEC_USE_COUNT;
+        return (ENXIO);
+    }
+    printd(("%s: opened character device %d:%d\n", SS_MOD_NAME, cmajor,
+            cminor));
+    *devp = makedevice(cmajor, cminor);
+    if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
+        ptrace(("%s: ERROR: No memory\n", SS_MOD_NAME));
+        lis_spin_unlock_irqrestore(&ss_lock, &flags);
+        MOD_DEC_USE_COUNT;
+        return (ENOMEM);
+    }
+    lis_spin_unlock_irqrestore(&ss_lock, &flags);
+    return (0);
+}
+\fR\s+2
+.fi
+.SH "SEE ALSO"
+.BR open (2s),
+.BR streamio (2),
+.BR qclose (9),
+.BR qattach (9),
+.BR qdetach (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR qopen ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

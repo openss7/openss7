@@ -489,7 +489,7 @@ extern int lis_qsize(queue_t *)_RP;
 /* Insert message(3) after message(2) or at start 
  */
 #ifdef __KERNEL__
-extern void lis_appq(queue_t *, mblk_t *, mblk_t *)_RP;
+extern int lis_appq(queue_t *, mblk_t *, mblk_t *) _RP;
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */

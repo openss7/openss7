@@ -1,0 +1,283 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: esbbcall.9.man,v 1.1.4.1 2005/03/09 23:13:59 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:59 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ESBBCALL 9 "$Date: 2005/03/09 23:13:59 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B esbbcall
+\- installs a buffer callback for an extended \fISTREAMS\fR message block
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " retval " = esbbcall(int " priority ", void (*" function ")(long), long " arg );
+.SH DESCRIPTION
+.PP
+When allocation of a message block fails as a result of a failed call to
+.BR esballoc (9),
+the service routine should place a
+.IR STREAMS (4)
+message that invoked
+.BR esballoc (9)
+call back on the queue with
+.BR putbq (9)
+and call the
+.BR esbbcall ()
+function with the queue's service routine as the
+.I function
+argument and a pointer to the queue as the
+.I arg
+argument to the call.  The
+.I priority
+argument should be the same as the
+.I priority
+argument issued to the
+.BR esballoc (9).
+.PP
+In this way, the queue service routine will be recalled once there is
+sufficient memory to allocate the requested message block.
+.PP
+The arguments to
+.BR esbbcall ()
+are interpreted as follows:
+.TP 12
+.I priority
+The priority of the requested message.  The priority can be one of the
+following values:
+.RS
+.TP 12
+.B BPRI_LO
+The message block needed is for a low priority buffer.
+.TP 12
+.B BPRI_MED
+The message block needed is for a medium priority buffer.
+.TP 12
+.B BPRI_HI
+The message block needed is for a high priority buffer.
+.PP
+The
+.I priority
+argument is ignored by SVR 4.2
+.[
+svr42
+.]
+and later
+.IR STREAMS (4)
+implementations.  This
+argument is only used by SVR 3
+.[
+svr3
+.]
+implementations.
+This should be the priority which was provided to the failed
+.BR esballoc (9)
+call.
+.RE
+.TP
+.I function
+The callback function to invoke when a buffer of the required size and message
+of the requested priority becomes available.  This is normally the service
+routine which failed a call to
+.BR esballoc (9).
+.TP
+.I arg
+The argument to pass to the callback function.  This is normally a pointer to
+the queue whose service function failed the
+.BR esballoc (9).
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR esbbcall ()
+returnes true (1) and the sepcified
+.I function
+will be called with the specified
+.I arg
+at a later time when buffers of the necessary size become available.
+.PP
+Upon failure,
+.BR esbbcall ()
+returns false (0) and no call will be generated to the specified
+.IR function .
+.SH ERRORS
+.PP
+When
+.BR esbbcall ()
+encounters an error, it returns false (0).
+.PP
+.BR esbbcall ()
+returns false (0) when the function pointer to the callback function,
+.I function
+is
+.BR NULL ,
+or
+.BR esbbcall ()
+cannot allocate the necessary internal structures.
+.SH CAVEATS
+.PP
+The
+.B LiS
+.[
+LiS
+.]
+implementation of
+.BR esbbcall ()
+does not actually generate a callback function once a message block of the
+appropriate priority becomes available.  Instead,
+.B LiS
+.[
+LiS
+.]
+starts a timer.  When the timer expires, the ability to allocate the necessary
+buffers is checked and the callback function invoked if it is now able to
+allocate the necessary structures.  This is not entirely consistent with
+SVR 4.2
+.[
+svr42
+.]
+operation.
+.PP
+.B LiS
+.[
+LiS
+.]
+builds a linked list of buffer call structures and assigns an integer id to
+each structure.  Searches for unique buffer ides when ids are assigned and
+searches for buffer ids when
+.BR unbufcall (9)
+is called are linear searches that are slow and inefficient.  In fact,
+\*(lqThe Magic Garden\*(rq
+.[
+magic
+.]
+explains that in SVR 4.2
+.[
+svr42
+.]
+a
+.BR esbbcall ()
+results in the creation of a
+.B strevent
+structure which is linked to the
+.I strbcalls
+system variable and sets the
+.I strbcwait
+flag which then causes
+.BR kmem_free ()
+to set the
+.IR qrunflag .
+At no point in this process is an integer id assigned to the
+.B strevent
+structure.  This means that
+.B LiS
+.[
+LiS
+.]
+meaninglessly assigns an integer id to the buffer call structure and the
+inefficiencies of linear searches are pointless.
+.SH "SEE ALSO"
+.PP
+.BR putbq (9),
+.BR esballoc "(9) and "
+.BR unbufcall (9).
+.SH HISTORY
+.PP
+.BR esbbcall ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

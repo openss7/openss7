@@ -1,0 +1,680 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: LiS.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LiS 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B LiS
+\- introduction to \fISTREAMS\fR kernel functions
+.SH SYNOPSIS
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/cmn_err.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/dki.h>
+.SH DESCRIPTION
+.PP
+.SS "Header Files"
+.HP
+.B <sys/stropts.h>
+.HP
+.B <sys/stream.h>
+.HP
+.B <sys/cmn_err.h>
+.HP
+.B <sys/ddi.h>
+.HP
+.B <sys/dki.h>
+.PP
+.SS "Common Drivers"
+.HP
+.BR fifo (4)
+\-
+first-in first-out special file, named pipe
+.HP
+.BR clone (4)
+\-
+the STREAMS clone driver
+.HP
+.BR sad (4)
+\-
+the STREAMS administrative driver
+.SS "Common Modules"
+.PP
+.HP
+.BR pipemod (4)
+\-
+STREAMS module supporting flush handling in STREAMS fifos and pipes
+.HP
+.BR ldl (4)
+\-
+a STREAMS DLPI interface to Linux network devices
+.HP
+.BR connld (4)
+\-
+STREAMS module supporting the generation of unique new STREAMS pipes from
+an existing pipe end
+.HP
+.BR timod (4)
+\-
+a STREAMS XTI/TLI compatibility interface
+.HP
+.BR tirdwr (4)
+\-
+a STREAMS XTI/TLI read write comptibility interface
+.SS "System Calls"
+.PP
+.HP
+.BR getmsg (2)
+\-
+get next message from a STREAMS character device
+.HP
+.BR getpmsg (2s)
+\-
+get next message from a STREAMS character device
+.HP
+.BR putmsg (2)
+\-
+put a message to a STREAMS character device
+.HP
+.BR putpmsg (2s)
+\-
+put a message to a STREAMS character device
+.HP
+.BR poll (2)
+\-
+wait for some event on a STREAMS character device
+.HP
+.BR fattach (3)
+\-
+attach a STREAMS open file to a path name in the file system
+.HP
+.BR fdetach (3)
+\-
+detach a STREAMS file from a path name in the file system
+.HP
+.BR isastream (3)
+\-
+determine whether an open file is a STREAMS character device
+.HP
+.BR open (2)
+\-
+open and possibly create a file or device
+.HP
+.BR close (2)
+\-
+close a file descriptor
+.HP
+.BR read "(2), " readv (2)
+\-
+read from a file descriptor
+.HP
+.BR write "(2), " writev (2)
+\-
+write to a file descriptor
+.HP
+.BR pipe (3)
+\-
+create a STREAMS pipe
+.HP
+.BR ioctl (2)
+\-
+control device
+.HP
+.BR streamio (2)
+\-
+STREAMS ioctl commands
+.SS "Module and Driver Registration Functions"
+.HP
+.BR lis_register_strmod (9)
+\-
+register a STREAMS module
+.HP
+.BR lis_unregister_strmod (9)
+\-
+deregister a STREAMS module
+.HP
+.BR lis_register_strdev (9)
+\-
+register a STREAMS device
+.HP
+.BR lis_unregister_strdev (9)
+\-
+unregister a STREAMS device
+.HP
+.BR lis_find_strdev (9)
+\-
+finds a streamtab entry for a device
+.SS "Message Handling Functions"
+.PP
+.HP
+.BR adjmsg (9)
+\-
+trim bytes from the front or back of a STREAMS message
+.HP
+.BR allocb (9)
+\-
+allocate a STREAMS message and data block
+.HP
+.BR allocb_physreq (9)
+\-
+allocate a STREAMS message and data block
+.HP
+.BR allocq (9)
+\-
+allocate a STREAMS queue pair
+.HP
+.BR bufcall (9)
+\-
+install a STREAMS buffer callback
+.HP
+.BR copyb (9)
+\-
+copy a STREAMS message block
+.HP
+.BR copymsg (9)
+\-
+copy a STREAMS message
+.HP
+.BR datamsg (9)
+\-
+tests a STREAMS message type for data
+.HP
+.BR dupb (9)
+\-
+duplicate a STREAMS message block
+.HP
+.BR dupmsg (9)
+\-
+duplicate a STREAMS message
+.HP
+.BR esballoc (9)
+\-
+allocate a STREAMS message and data block with a caller supplied data buffer
+.HP
+.BR esbbcall (9)
+\-
+installs a buffer callback for an extended STREAMS message block
+.HP
+.BR freeb (9)
+\-
+frees a STREAMS message block
+.HP
+.BR freemsg (9)
+\-
+frees a STREAMS message
+.HP
+.BR isdatablk (9)
+\-
+tests a STREAMS data block for data type
+.HP
+.BR isdatamsg (9)
+\-
+tests a STREAMS data block for data type
+.HP
+.BR linkb (9)
+\-
+link a message block to a STREAMS message
+.HP
+.BR msgdsize (9)
+\-
+calculate the size of the data in a STREAMS message
+.HP
+.BR msgpullup (9)
+\-
+pull up bytes in a STREAMS message
+.HP
+.BR msgsize (9)
+\-
+calculate the size of the message blocks in a STREAMS message
+.\".HP
+.\".BR msgutil (9)
+.\"\-
+.\"STREAMS message utilities
+.HP
+.BR pullupmsg (9)
+\-
+pull up the bytes in a STREAMS message
+.HP
+.BR rmvb (9)
+\-
+remove a message block from a STREAMS message
+.HP
+.BR testb (9)
+\-
+test is a STREAMS message can be allocated
+.HP
+.BR unbufcall (9)
+\-
+removes a STREAMS buffer callback
+.HP
+.BR unlinkb (9)
+\-
+unlink a message block from a STREAMS message
+.HP
+.BR xmsgsize (9)
+\-
+calculate the size of message blocks in a STREAMS message
+.SS "Queue Handling Functions"
+.PP
+.HP
+.BR appq (9)
+\-
+append a STREAMS message after another
+.HP
+.BR backq (9)
+\-
+find the upstream or downstream STREAMS queue
+.HP
+.BR bcanput (9)
+\-
+test flow control on a STREAMS message queue
+.HP
+.BR bcanputnext (9)
+\-
+test flow control on a STREAMS message queue
+.HP
+.BR canenable (9)
+\-
+test whether a STREAMS message queue can be scheduled
+.HP
+.BR canput (9)
+\-
+test flow control on a STREAMS message queue
+.HP
+.BR canputnext (9)
+\-
+test flow control on a STREAMS message queue
+.HP
+.BR enableok (9)
+\-
+allows a STREAMS message queue to be scheduled
+.HP
+.BR flushband (9)
+\-
+flushes band STREAMS messages from a message queue
+.HP
+.BR flushq (9)
+\-
+flushes messages from a STREAMS message queue
+.HP
+.BR freeq (9)
+\-
+deallocate a STREAMS queue pair
+.HP
+.BR getq (9)
+\-
+gets a message from a STREAMS message queue
+.HP
+.BR insq (9)
+\-
+inserts a message into a STREAMS message queue
+.HP
+.BR noenable (9)
+\-
+disables a STREAMS message queue from being scheduled
+.HP
+.BR OTHER (9)
+\-
+return the other queue of a STREAMS queue pair
+.HP
+.BR OTHERQ (9)
+\-
+return the other queue of a STREAMS queue pair
+.HP
+.BR putbq (9)
+\-
+puts a message back on a STREAMS message queue
+.HP
+.BR putctl1 (9)
+\-
+puts a 1 byte control message on a STREAMS message queue
+.HP
+.BR putctl (9)
+\-
+puts a control message on a STREAMS message queue
+.HP
+.BR putnext (9)
+\-
+puts a message on the downstream STREAMS message queue
+.HP
+.BR putnextctl1 (9)
+\-
+puts a 1 byte control message on the downstream STREAMS message queue
+.HP
+.BR putnextctl (9)
+\-
+puts a control message on the downstream STREAMS message queue
+.HP
+.BR putq (9)
+\-
+puts a message on a STREAMS message queue
+.HP
+.BR qattach (9)
+\-
+attach a module onto a STREAMS file
+.HP
+.BR qclose (9)
+\-
+closes a STREAMS module or driver
+.HP
+.BR qdetach (9)
+\-
+detach a module from a STREAMS file
+.HP
+.BR qenable (9)
+\-
+schedules a STREAMS message queue service routine
+.HP
+.BR qopen (9)
+\-
+call a STREAMS module or driver open routine
+.HP
+.BR qprocsoff (9)
+\-
+disables STREAMS message queue processing for multi-processing
+.HP
+.BR qprocson (9)
+\-
+enables a STREAMS message queue for multi-processing
+.HP
+.BR qreply (9)
+\-
+replys to a message from a STREAMS message queue
+.HP
+.BR qsize (9)
+\-
+return the number of messages on a queue
+.HP
+.BR RD (9)
+\-
+return the read queue of a STREAMS queue pair
+.HP
+.BR rmvq (9)
+\-
+remove a message from a STREAMS message queue
+.HP
+.BR SAMESTR (9)
+\-
+test for STREAMS pipe or fifo
+.HP
+.BR strqget (9)
+\-
+gets information about a STREAMS message queue
+.HP
+.BR strqset (9)
+\-
+sets attributes of a STREAMS message queue
+.HP
+.BR WR (9)
+\-
+return the write queue of a STREAMS queue pair
+.SS "Miscellaneous Functions"
+.PP
+.HP
+.BR bcopy (9)
+\-
+copy byte strings
+.HP
+.BR bzero (9)
+\-
+zero a byte string
+.HP
+.BR cmn_err (9)
+\-
+print a kernel command error
+.HP
+.BR getmajor (9)
+\-
+get the major device number for a device
+.HP
+.BR getminor (9)
+\-
+get the minor device number for a device
+.HP
+.BR kmem_alloc (9)
+\-
+allocate kernel memory
+.HP
+.BR kmem_free (9)
+\-
+deallocates kernel memory
+.HP
+.BR kmem_zalloc (9)
+\-
+allocate kernel memory
+.HP
+.BR lis_date (9)
+\-
+the version and release date of LiS
+.HP
+.BR lis_version (9)
+\-
+the version and release date of LiS
+.HP
+.BR makedevice (9)
+\-
+create a device from major and minor device numbers
+.HP
+.BR mknod (9)
+\-
+create a special or ordinary file
+.HP
+.BR mount (9)
+\-
+mount a file system
+.HP
+.BR strlog (9)
+\-
+pass a message to the STREAMS logger
+.HP
+.BR timeout (9)
+\-
+start a timer
+.HP
+.BR umount (9)
+\-
+unmount a filesystem
+.HP
+.BR unlink (9)
+\-
+remove a file
+.HP
+.BR untimeout (9)
+\-
+stop a timer
+.SH "RETURN VALUES"
+.PP
+.SH ERRORS
+.PP
+.SH CAVEATS
+.PP
+.SH "SEE ALSO"
+.PP
+.BR adjmsg (9),
+.BR allocb (9),
+.BR allocb_physreq (9),
+.BR allocq (9),
+.BR appq (9),
+.BR backq (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bcopy (9),
+.BR bufcall (9),
+.BR bzero (9),
+.BR canenable (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR cmn_err (9),
+.BR connld (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR datamsg (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR enableok (9),
+.BR esballoc (9),
+.BR esbbcall (9),
+.BR fifo (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR freeq (9),
+.BR getmajor (9),
+.BR getminor (9),
+.BR getq (9),
+.BR insq (9),
+.BR isdatablk (9),
+.BR isdatamsg (9),
+.BR linkb (9),
+.BR lis_date (9),
+.BR lis_register_strdev (9),
+.BR lis_register_strmod (9),
+.BR lis_unregister_strdev (9),
+.BR lis_unregister_strmod (9),
+.BR lis_version (9),
+.BR makedevice (9),
+.BR mknod (9),
+.BR mount (9),
+.BR msgdsize (9),
+.BR msgpullup (9),
+.BR msgsize (9),
+.\".BR msgutil (9),
+.BR noenable (9),
+.BR OTHER (9),
+.BR OTHERQ (9),
+.BR pullupmsg (9),
+.BR putbq (9),
+.BR putctl1 (9),
+.BR putctl (9),
+.BR putnext (9),
+.BR putnextctl1 (9),
+.BR putnextctl (9),
+.BR putq (9),
+.BR qattach (9),
+.BR qclose (9),
+.BR qdetach (9),
+.BR qenable (9),
+.BR qopen (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR RD (9),
+.BR rmvb (9),
+.BR rmvq (9),
+.BR SAMESTR (9),
+.BR stream_utils (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR testb (9),
+.BR timeout (9),
+.BR umount (9),
+.BR unbufcall (9),
+.BR unlink (9),
+.BR unlinkb (9),
+.BR untimeout (9),
+.BR WR (9),
+.BR xmsgsize (9).
+
+
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

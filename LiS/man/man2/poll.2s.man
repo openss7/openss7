@@ -1,0 +1,630 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: poll.2s.man,v 1.1.4.1 2005/03/09 23:13:56 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:56 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH POLL 2 "$Date: 2005/03/09 23:13:56 $" "$Name:  $" "Linux STREAMS System Calls"
+.SH NAME
+.B poll
+\- wait for some event on a \fISTREAMS\fP special file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/poll.h>
+.HP 8
+.BI "int poll(struct pollfd *" fds ", unsigned int " nfds ", int " timeout );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fds
+a pointer to an array of
+.B pollfd
+structures describing the file descriptors and events to be polled.
+.TP
+.I nfds
+the number of
+.B pollfd
+structures in the
+.I fds
+array.
+.TP
+.I timeout
+a timeout, in milliseconds.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR poll ()
+is called with a specification of the file descriptors and events to detect on those file
+descriptors in the array pointed to by
+.I fds .
+The number of file descriptors to poll is provided in
+.I nfds .
+A time interval after which
+.BR poll ()
+will return if no other event is detected can be specified in milliseconds in the
+.I timeout
+argument.
+.PP
+Each file descriptor is described by a
+.B pollfd
+structure element in the array pointed to by the
+.I fds
+argument.
+Each structure element contains the file descriptor to monitor in the
+.I fd
+member, and the event flags specifying the events to detect in the
+.I events
+member.  The
+.I revents
+is used by
+.BR poll ()
+to return the detected events, and is set for each element in the array prior to return.
+.PP
+The
+.B pollfd
+structure has members as follows:
+.nf
+\fC\s-2
+struct pollfd {
+        int fd;
+        short events;
+        short revents;
+};
+\s+2\fP
+.fi
+.TP
+.I fd
+specifies a file descriptor to poll.
+.TP
+.I events
+specifies the events on this file descriptor that will cause
+.BR poll ()
+to exit.
+See
+.RI \*(lq EVENTS \*(rq,
+below.
+.TP
+.I revents
+specifies the status of the file descriptor upon successful return from
+.BR poll .
+See
+.RI \*(lq EVENTS \*(rq,
+below.
+.\"
+.\"
+.SS EVENTS
+.PP
+Events that can be specified in the
+.I events
+member or indicated in the
+.I revents
+member are as follows:
+.TP \w'POLLWRNORM\(em'u
+.B POLLIN
+Normal-priority data may be read from
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_PROTO (9)
+or
+.BR M_DATA (9)
+message (in any band) arrives at the stream head and is generated even when the
+data available is of zero length.
+See
+.BR getmsg (2s).
+.TP
+.B POLLPRI
+High-priority data may be read from
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_PCPROTO (9)
+and
+.BR M_DATA (9)
+message arrives at the stream head and is generated even when the data available
+is of zero length.
+.TP
+.B POLLOUT
+Normal (band 0) data may be written to
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when band zero high water mark thresholds have
+not been exceeded, or when band zero becomes back-enabled (falls below the low
+water mark threshold).
+.TP
+.B POLLRDNORM
+Normal (band 0) data may be read from
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_PROTO (9)
+or
+.BR M_DATA (9)
+message (in band zero (0)) arrives at the stream head and is generated even when
+the data available is of zero length.
+See
+.BR getmsg (2s).
+.TP
+.B POLLRDBAND
+Priority (band > 0) data may be read from
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_PROTO (9)
+or
+.BR M_DATA (9)
+message (in a band greater than zero) arrives at the stream head and is
+generated even when the data available is of zero length.
+See
+.BR getpmsg (2s).
+.TP
+.B POLLWRNORM
+Normal (band 0) data may be written to
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when band zero high water mark thresholds have
+not been exceeded, or when band zero becomes back-enabled (falls below the low
+water makr threshold).
+.TP
+.B POLLWRBAND
+Priority (band > 0) data may be written to
+.I fd
+without blocking.
+For
+.IR STREAMS (4)
+special files, this event occurs when any non-zero band high water mark
+thresholds have not been exceeded, or when any non-zero band becomes
+back-enabled (falls below the low water mark threshold).  This event only occurs
+for bands that have been written to at least once.
+.PP
+In addition to the events described above, the following events can also be
+indicated in the
+.I revents
+member:
+(If these events are specified in the
+.I events
+member, they are ignored by
+.BR poll ()).
+.TP \w'POLLWRNORM\(em'u
+.B POLLERR
+An error has occured on the file.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_ERROR (9)
+message arrives at the stream head.
+.TP
+.B POLLHUP
+A hangup has occured on the file.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_HANGUP (9)
+message arrives at the stream head or the stream is closing.  A stream cannot be
+writable while this event is in force.
+.TP
+.B POLLNVAL
+The corresponding
+.I fd
+is invalid.
+.TP
+.B POLLMSG
+A pending signal has occured on the file.
+For
+.IR STREAMS (4)
+special files, this event occurs when a
+.BR M_SIG (9)
+message arrives at the stream head.
+.PP
+.BR POLLIN ", " POLLPRI ", " POLLOUT ", " POLLRDNORM ", " POLLRDBAND ", " POLLWRNORM " and " POLLWRBAND
+are only set in the
+.I revents
+member if they have been requested in the corresponding
+.I events
+member.
+.BR POLLMSG ", " POLLERR ", " POLLHUP " and " POLLNVAL
+are always set in the
+.I revents
+member if true, regardless of whether they were requested in the corresponding
+.I events
+member.
+.\"
+.\"
+.PP
+In each
+.B pollfd
+structure,
+.BR poll ()
+clears the
+.I revents
+member except that where the applicat requested a report on a condition by
+setting one of the bits of
+.I events
+listed above,
+.BR poll ()
+sets the corresponding bit in
+.I revents
+if the requested condition is true.
+In addition
+.BR poll ()
+sets the
+.BR POLLHUP ", " POLLERR " and " POLLNVAL
+flag in
+.I revents
+if the condition is true, even if the application did not set the corresponding
+bit in
+.IR events .
+.PP
+If none of the defined events have occured on any selected file descriptor,
+.BR poll ()
+waits at least
+.I timeout
+milliseconds for an event to occur on any of the selected file descriptors.  If
+the value of
+.I timeout
+is zero (0),
+.BR poll ()
+returns immediately.  If the value of
+.I timeout
+is minus one (-1),
+.BR poll ()
+blocks until a requested event occurs or until the call is interrupted.
+.PP
+The
+.BR poll ()
+function is not affected by the
+.BR O_NONBLOCK
+file flag (see
+.BR open (2)
+or
+.BR fcntl (2)).
+That is,
+.BR poll ()
+will always block awaiting a specified event, a timeout, or interruption.
+.PP
+The
+.BR poll ()
+function supports regular files, terminal and pseudo-terminal devices,
+.IR STREAMS -based
+files, FIFOs and pipes.  The behavior of
+.BR poll ()
+on elements of
+.I fds
+that refer to other types of file is unspecified.
+.PP
+Regular files always poll true for reading and writing.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR poll ()
+will return the positive number of file descriptors with returned event information.
+.PP
+When
+.BR poll ()
+times out, it will return zero (0).
+.PP
+Upon failure,
+.BR poll ()
+will return -1 and set
+.IR errno (3)
+as described under
+.IR \*(lqERRORS , \*(rq
+below.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR poll ()
+fails, it returns minus one (-1) and sets
+.IR errno (3)
+to an appropriate error number as follows:
+.TP
+.RB [ EBADF ]
+An invalid
+.I fd
+member was given in one of the
+.B pollfd
+structures specified by the
+.I fds
+argument.
+This error is not specified by SUSv2
+.[
+SUSv2
+.]
+or POSIX.
+.TP
+.RB [ ENOMEM ]
+There was insufficient memory to allocate file descriptor tables.
+This error is not specified by SUSv2
+.[
+SUSv2
+.]
+or POSIX (see
+.RB [ EAGAIN ],
+below).
+.TP
+.RB [ EFAULT ]
+The
+.I fds
+argument specifies an address outside the caller's valid address range.
+.TP
+.RB [ EINTR ]
+A signal was caught during
+.BR poll ().
+.TP
+.RB [ EINVAL ]
+The
+.I nfds
+argument is greater that
+.RB { NR_OPEN },
+or one of the
+.I fd
+members refers to a
+.I STREAM
+or multiplexer that is linked (directly or indirectly) downstream from a multiplexer.
+.TP
+.RB [ EAGAIN ]
+The allocation of internal data structures failed but a subsequent request may succeed.
+.\"
+.\"
+.SH MT-LEVEL
+.PP
+.BR poll ()
+is MT-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B POLLMSG
+flag
+is
+.BR Linux -specific
+and is not specifies by
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+or
+POSIX.
+Portable programs should avoid its use.
+.\"
+.\"
+.SH BUGS
+.PP
+.BR poll ()
+has no known bugs.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (4),
+.BR M_PROTO (9),
+.BR M_DATA (9),
+.BR getmsg (2s),
+.IR STREAMS (4),
+.BR M_PCPROTO (9),
+.BR M_DATA (9),
+.BR getmsg (2s),
+.BR getpmsg (2s),
+.BR M_ERROR (9),
+.BR M_HANGUP (9),
+.BR M_SIG (9),
+.BR open (2),
+.BR fcntl (2),
+.IR errno (3),
+.BR streamio (7).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR poll ()
+is compatible with SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+The
+.B Linux
+kernel returns
+.RB [ ENOMEM ]
+if a internal poll data structure cannot be allocated.  The SUSv2
+.[
+SUSv2
+.]
+error that should be returned is
+.RB [ EAGAIN ].
+.B LiS
+.[
+LiS
+.]
+also inappropriately returns
+.RB [ ENOMEM ]
+when internal data structures cannot be allocated.
+.IP \(em
+.RB [ EFAULT ]
+is not specified by
+SUSv2
+.[
+SUSv2
+.]
+but is obvious.
+.IP \(em
+.B LiS
+.[
+LiS
+.]
+does not appear to return
+.RB [ EINVAL ]
+when a stream is linked under a multiplexer, but instead returns
+.B POLLNVAL
+for that file descriptor.
+.PP
+.B Linux STREAMS
+only affects the use of
+.BR poll ()
+on
+.I STREAMS
+special files.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR poll ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

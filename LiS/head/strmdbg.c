@@ -57,6 +57,11 @@ typedef struct mem_link
     char		 file_name[32] ;
     int	 		 line_nr ;
 
+    unsigned char	__pad[SMP_CACHE_BYTES
+			      - ((2 * sizeof(struct mem_link *)
+			      + sizeof(long) - 32 * sizeof(char)
+			      + sizeof(int)) % SMP_CACHE_BYTES)];
+
 } mem_link_t ;
 
 typedef struct mem_link_space
@@ -108,6 +113,7 @@ char			*lis_nxt_print_ptr = lis_print_buffer ;
 static lis_spin_lock_t	 lis_print_buffer_lock ;
 static int		 lock_initialized ;
 
+__attribute__ ((format(printf, 1, 2)))
 void	lis_bprintf(char *fmt, ...)
 {
     extern char	 lis_cmn_err_buf[];

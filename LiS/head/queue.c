@@ -1337,7 +1337,7 @@ lis_qenable(queue_t *q)
 	|| (lis_qhead == NULL && lis_qtail != NULL)
        )
 	printk("LiS: qenable before: Qhead error: "
-	       "lis_qhead=%lx lis_qtail=%lx\n",
+	       "lis_qhead=%p lis_qtail=%p\n",
 	       lis_qhead, lis_qtail) ;
 #endif
     q->q_link = NULL;
@@ -1351,7 +1351,7 @@ lis_qenable(queue_t *q)
 	|| (lis_qhead == NULL && lis_qtail != NULL)
        )
 	printk("LiS: qenable after: Qhead error: "
-	       "lis_qhead=%lx lis_qtail=%lx\n",
+	       "lis_qhead=%p lis_qtail=%p\n",
 	       lis_qhead, lis_qtail) ;
 
     lis_cpfl((void *) lis_qhead, (long) lis_qtail,
@@ -2011,19 +2011,18 @@ lis_freeq( queue_t *q )
  * This is the same as inserting mp2 just in front of the next
  * message after mp1.
  */
-void _RP
+int _RP
 lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 {
     if (mp1 == NULL || mp2 == NULL )
-      return;
+      return 0;
 
     if (!LIS_CHECK_Q_MAGIC(q))
     {
-	freemsg(mp2) ;
-	return ;
+	return 0;
     }
 
-    if (!lis_insq(q, mp1->b_next, mp2)) freemsg(mp2) ;
+    return lis_insq(q, mp1->b_next, mp2) ;
 
 }/*lis_appq*/
 

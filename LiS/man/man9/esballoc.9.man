@@ -1,0 +1,269 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: esballoc.9.man,v 1.1.4.1 2005/03/09 23:13:59 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:59 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ESBALLOC 9 "$Date: 2005/03/09 23:13:59 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B esballoc
+\- allocate a \fISTREAMS\fR message and data block with a caller supplied data buffer
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "mblk_t *" mp " = esballoc(unsigned char *" base ", int " size, ", int " priority ", frtn_t *" freeinfo );
+.SH DESCRIPTION
+.PP
+.B ESBALLOC
+is used where the
+.IR STREAMS (4)
+driver needs control over the location, allocation and deallocation of data
+buffers.  This may be because the data buffers are subject to some physical
+contraints (e.g. must be allocated in DMA-able memory, or must exist in
+dual-ported RAM or in a decriptor ring).  This may also be because some other
+mechanism outside of
+.IR STREAMS (4)
+has already allocated and passed the data buffer to a
+.IR STREAMS (4)
+driver.
+.PP
+Where it is not necessary that the caller provide the data buffer,
+.BR allocb (9)
+is more appropriate.
+.PP
+.B ESBALLOC
+allocates a message block and a data block using the caller supplied data
+buffer at
+.I base
+of the specified
+.IR size " and " priority .
+.PP
+The
+.I priority
+can be one of the following values:
+.TP 12
+.B BPRI_LO
+The caller requests a low priority message buffer.
+.TP 12
+.B BPRI_MED
+The caller requests a medium priority message buffer.
+.TP 12
+.B BPRI_HI
+The caller requests a high priority message buffer.
+.PP
+The data buffer of length
+.I size
+has already been allocated by the caller and is pointed to by the argument
+.IR base .
+In addition,
+.B ESBALLOC
+accepts a pointer to a
+.B free_rtn
+structure that contains the following elements:
+.TP
+.BI "void (*" free_func ")(char *)"
+A function pointer
+.I free_func
+to a function returning void and taking a single character
+pointer argument.  This function should perform whatever actions are necessary
+to free the buffer pointed to by
+.I base
+in the call to
+.BR ESBALLOC .
+.TP
+.BI "char *" free_arg
+A character pointer argument
+.I free_arg
+that will be passed to a call to
+.I free_func
+when the message block returned by
+.B ESBALLOC
+is freed with
+.BR freeb "(9) or " freemsg (9).
+.PP
+The allocated message block will have a data block type of
+.BR M_DATA .
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.B ESBALLOC
+returns a pointer,
+.IR mp ,
+to the allocated message block.
+.PP
+Upon failure,
+.B ESBALLOC
+returns a
+.B NULL
+message pointer,
+.IR mp .
+.SH ERRORS
+.PP
+When an error occurs,
+.BR ESBALLOC
+will return a
+.B NULL
+message pointer,
+.IR mp .
+.PP
+.BR ESBALLOC
+will fail if
+.I base
+is
+.BR NULL ,
+or if
+.I freeinfo
+is
+.BR NULL ,
+or there is insufficient memory to allocate the necessary datastructures for
+the message block or data block.
+.PP
+Failure to allocate a message block is typically followed by a call to
+.BR esbbcall (9).
+.SH CAVEATS
+.PP
+As with other post-SVR 4.2
+.[
+svr42
+.]
+compliant
+.IR STREAMS (4)
+implementations,
+.B LiS
+.[
+LiS
+.]
+ignores the
+.I priority
+argument to
+.BR ESBALLOC .
+The message block
+.I priority
+was an SVR 3
+.[
+svr3
+.]
+concept which was found not to be useful, primarily due to
+priority inversion.
+For a history of the
+.I priority
+mechanism and a discussion as to why the mechanism was abandonned in SVR 4.2,
+.[
+svr42
+.]
+see \*(lqThe Magic Garden\*(rq section 7.2.2.
+.[
+magic
+%S 7.2.2
+.]
+.SH "SEE ALSO"
+.PP
+.BR freeb (9),
+.BR freemsg (9),
+.BR bufcall "(9), and "
+.BR esbbcall (9).
+.SH HISTORY
+.PP
+.B ESBALLOC
+first appeared in SVR 3 STREAMS
+.[
+svr3
+.]
+and continued in SVR 4.2 STREAMS.
+.[
+svr42
+.]
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -3,7 +3,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.15 1996/01/27 00:40:26 dave Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.5 2003/08/18 14:07:57 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -39,6 +39,16 @@
 
 #ident "@(#) LiS linux-mdep.h 2.78 09/16/04 11:41:59 "
 
+#ifdef __KERNEL__
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#endif
+
+/* Here follows complete drivel: */
+
+
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
 
@@ -63,6 +73,7 @@
  * We set the include marker that prevents the <linux/config.h> from
  * including its own autoconf.h.
  */
+#ifdef __KERNEL__
 #ifdef LISAUTOCONF
 #include <sys/autoconf.h>           /* /usr/src/LiS/include/sys */
 #define _LINUX_CONFIG_H 1	    /* prevent <linux/config.h> */
@@ -71,6 +82,9 @@
 #ifndef _SYS_TYPES_H
 #include <linux/types.h>
 #define _SYS_TYPES_H	1	/* pretend included */
+#endif
+#else
+#include <sys/types.h>
 #endif
 #endif
 
@@ -82,14 +96,6 @@
  * versions.
  */
 #define queue_t	irda_queue_t
-#ifdef MODVERSIONS
-# ifdef LISMODVERS
-# include <sys/modversions.h>           /* /usr/src/LiS/include/sys */
-# else
-# include <linux/modversions.h>
-# endif
-#endif
-#include <linux/version.h>
 #ifndef KERNEL_VERSION
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 #endif
@@ -319,6 +325,13 @@ extern void lis_assert_fail(const char *expr, const char *objname,
  * from STREAMS drivers we help insulate them from kernel changes.
  */
 typedef	volatile long		lis_atomic_t ;
+/*
+ * Bad idea.  LDL foolishes exposes this to user space with a ioctl structure
+ * in ldl_gstats_ioctl.  Therefore, long can be 64 bits or 32 bits or 31 bits
+ * depending on the architecture.  Give up using ldl on non-32 bit
+ * architectures. --bb
+ */
+#define lis_atomic_t lis_atomic_t
 
 void	lis_atomic_set(lis_atomic_t *atomic_addr, int valu) _RP;
 int	lis_atomic_read(lis_atomic_t *atomic_addr) _RP;

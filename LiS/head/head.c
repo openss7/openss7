@@ -3,7 +3,7 @@
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.25 1996/01/29 18:12:19 dave Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.10 2003/11/23 19:58:44 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -226,12 +226,17 @@ C) Open vs Close
 /* LiS implementation modules used */
 
 #include <sys/stream.h>
+#ifdef LINUX_POLL
+#define	USE_LINUX_POLL_H	1
+#include <linux/poll.h>
+#else
 #include <sys/poll.h>
+#endif
 #include <sys/LiS/errmsg.h>
 #if !defined(ERANGE) && defined(LINUX)
 #undef _ERRNO_H
 #define __need_Emath 1
-#included <errnos.h>
+#include <errnos.h>
 #endif
 #include <sys/lismem.h>			/* for lis_free_all_pages */
 #include <sys/osif.h>
@@ -551,6 +556,10 @@ struct module_info	strmhd_wrminfo =
 		,0xF000			/* mi_lowat */
 		} ;
 
+struct module_stat	strmhd_rdmstat = { }; /* all counters == 0 */
+
+struct module_stat	strmhd_wrmstat = { }; /* all counters == 0 */
+
 struct qinit	strmhd_rdinit =
 		{lis_strrput		/* qi_putp */
 		,lis_strrsrv		/* qi_srvp */
@@ -558,7 +567,7 @@ struct qinit	strmhd_rdinit =
 		,NULL			/* qi_qclose */
 		,NULL			/* qi_qadmin */
 		,&strmhd_rdminfo	/* qi_minfo */
-		,NULL			/* qi_mstat */
+		,&strmhd_rdmstat	/* qi_mstat */
 		} ;
 
 struct qinit	strmhd_wrinit =
@@ -568,7 +577,7 @@ struct qinit	strmhd_wrinit =
 		,NULL			/* qi_qclose */
 		,NULL			/* qi_qadmin */
 		,&strmhd_wrminfo	/* qi_minfo */
-		,NULL			/* qi_mstat */
+		,&strmhd_wrmstat	/* qi_mstat */
 		} ;
 
 struct streamtab strmhd_info = {
@@ -1725,12 +1734,21 @@ copyin_msgpart( struct file *f, stdata_t *hd, mblk_t **m, char *sb, int wroff )
 	return(0) ;				/* not an error */
 
     /* This prevents an oops when the stream is hung up */
-    if (F_ISSET(hd->sd_flag,STRHUP|STRCLOSE))
+    if (F_ISSET(hd->sd_flag,STRCLOSE))
+    {
+        if (LIS_DEBUG_PUTMSG)
+          printk("copyin_msgpart: stream %s: stream is closed or closing\n",
+                  hd->sd_name) ;
+        return(-EIO);
+    }
+
+    /* bb - When hung up a stream head must return ENXIO, this is clear */
+    if (F_ISSET(hd->sd_flag,STRHUP))
     {
         if (LIS_DEBUG_PUTMSG)
           printk("copyin_msgpart: stream %s: stream has received M_HANGUP\n",
                   hd->sd_name) ;
-        return(-EIO);
+        return(-ENXIO);
     }
 
     /* The if and else if should never happen. But if the conditions
@@ -2860,7 +2878,7 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq)
 {
     int		msgs_before = lis_qsize(q) ;
     lis_flags_t	psw ;
-    mblk_t     *xp ;
+    mblk_t     *xp, *tmp = NULL ;
 
     if ( LIS_DEBUG_FLUSH )
 	printk("lis_head_flush: "
@@ -2904,8 +2922,13 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq)
 	     */
 	    while ((xp = lis_get_rput_q(shead)) != NULL)
 	    {
-		msgs_before++ ;
-		freemsg(xp) ;
+	        /*
+		 * All messages are temporary saved in a local list.
+		 * Correct action will be taken after flush is complete.
+		 * Unqueueing now will preserves q_count value.
+		 */
+		xp->b_next = tmp ;
+		tmp = xp ;
 	    }
 	}
 	/*
@@ -2924,6 +2947,29 @@ int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq)
 	LIS_RDQISRUNLOCK(shead->sd_rq, &psw) ;
 
 	*mp->b_rptr &= ~FLUSHR ;		/* turn off flush read bit */
+	    /*
+	     * Do not discard messages corresponding to
+	     * an in-progress ioctl (IOCWAIT flag).
+	     * Discarding them could let the ioctl sleeping for ever
+	     * (unless timeout is activated)
+	     * Re-queuing now (after flush) preserves q_count value.
+	     */
+	    LIS_QISRLOCK(q, &psw) ;
+	    while ( (xp = tmp) != NULL )
+	    {
+		tmp = xp->b_next ;
+		xp->b_next = NULL ;
+		if ( F_ISSET(shead->sd_flag, IOCWAIT) )
+		    lis_put_rput_q(shead, xp) ;
+		else
+		{
+		    msgs_before++ ;
+		    freemsg(xp) ;
+		}
+	    }
+	    LIS_QISRUNLOCK(q, &psw) ;
+
+
 	LisDownCounter(MSGQDSTRHD, msgs_before - lis_qsize(q)) ;
     }
 
@@ -3784,6 +3830,14 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
      * Use RTN to return below here.
      */
     iocb->ioc_id = hd->sd_iocseq =  lis_incr(&lis_iocseq);
+    /*
+     * Reset items that could be not clean after a previous failing ioctl
+     * (ioctl returning on signal or error)
+     * - semaphore > 0
+     * - sd_iocblk != NULL
+     */
+    lis_sem_init(&hd->sd_wiocing, 0) ;
+    hd->sd_iocblk = NULL ;
 
   again:				/* wioc lock is always held when here */
     if (err < 0)
@@ -3910,7 +3964,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	       )
 	    {
 		if (err < 0)
-		    cr->cp_rval=(caddr_t)(-err);
+		    cr->cp_rval=(caddr_t)(long)(-err);
 		else
 		    cr->cp_rval=(caddr_t)ENOMEM;
 		if (dat != NULL)
@@ -3938,7 +3992,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	    if ((err=lis_check_umem(f,VERIFY_WRITE,ubuf,len)) >= 0){
 		dat=lis_unlinkb(mioc);
 		if ((err = copyout_blks(f,ubuf,len,dat)) < 0)
-		    cr->cp_rval=(caddr_t)(-err);
+		    cr->cp_rval=(caddr_t)(long)(-err);
 		else
 		    cr->cp_rval=0;
 	    } 
@@ -5080,12 +5134,22 @@ lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
 	    RTN(-hd->sd_werror);
 	}
 
-	if (F_ISSET(hd->sd_flag,STRHUP|STRCLOSE))
+	if (F_ISSET(hd->sd_flag,STRCLOSE))
+	{
+	    if (LIS_DEBUG_WRITE)
+	      printk("strwrite: stream %s: stream is closed or closing\n",
+		      hd->sd_name) ;
+	    RTN(-ENODEV);
+	}
+
+	/* bb - was incorrect, stream must return ENXIO rather than ENODEV
+	 * when M_HANGUP received, this is clear. */
+	if (F_ISSET(hd->sd_flag,STRHUP))
 	{
 	    if (LIS_DEBUG_WRITE)
 	      printk("strwrite: stream %s: stream has received M_HANGUP\n",
 		      hd->sd_name) ;
-	    RTN(-ENODEV);
+	    RTN(-ENXIO);
 	}
 
 	/* write packets until all data has been written. */
@@ -8357,5 +8421,6 @@ void lis_terminate_final(void)
 /*----------------------------------------------------------------------
 # Local Variables:      ***
 # change-log-default-name: "~/src/prj/streams/src/NOTES" ***
+# c-basic-offset: 4 ***
 # End: ***
   ----------------------------------------------------------------------*/

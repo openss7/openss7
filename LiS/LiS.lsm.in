@@ -1,0 +1,25 @@
+Begin4
+Title:			@PACKAGE_NAME@ - "Linux STREAMS"
+Version:		@PACKAGE_VERSION@-@PACKAGE_RELEASE@
+Entered-date:		@PACKAGE_DATE@
+Entered-by:		bidulock@openss7.org (Brian Bidulock)
+Description:		@PACKAGE_NAME@ is a STREAMS framework that is
+			compatible with SVR4 STREAMS.  It has lots of
+			debugging features not found in other STREAMS
+			packages.  Good to do networking and other things.
+			It allows for installation of binary drivers.
+Keywords:		STREAMS, SVR4, LiS
+Author:			<dave@gcom.com> (David Grothe) et al
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Original-site:		http://www.gcom.com/
+			@PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz
+Primary-site:		http://www.openss7.org/
+			1.44MB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.bz2
+			1.74MB @PACKAGE_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@.tar.gz
+Platforms:		Linux
+Requires:		Linux kernel 2.4
+Copying-policy:		GPL
+Comment:		Report bugs to @PACKAGE_BUGREPORT@
+			linux-streams@gsyc.escet.urjc.es  majordomo mailing list
+			<http://www.gcom.com/LiS> LiS web home page
+End

@@ -1,0 +1,1 @@
+.so man9/lis_mknod.9.man

@@ -1,0 +1,1 @@
+.so man9/putctl1.9.man

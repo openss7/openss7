@@ -1,0 +1,23 @@
+Patches
+-------
+
+ - a patch to netperf 2.2pl2 enables netperf to use LiS
+
+Test suite
+----------
+
+The test suite depends on a working installation of DejaGnu.
+
+The tests can be restricted to one of the test programs by telling
+runtest (the DejaGnu test driver) to test only one tool, eg:
+  $ cd testsuite
+  $ runtest --tool netperf
+  <...>
+  $ runtest --tool strtst
+  <...>
+
+runtest can produce a very detailed log with runtest -debug
+
+
+
+

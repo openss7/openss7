@@ -1,0 +1,70 @@
+diff -ru netperf-2.2pl2-orig/makefile netperf-2.2pl2/makefile
+--- netperf-2.2pl2-orig/makefile	Sat Jun 22 00:42:53 2002
++++ netperf-2.2pl2/makefile	Thu Jul 10 14:42:17 2003
+@@ -37,7 +37,7 @@
+ # You may safely ignore that warning.
+ #
+ 
+-CC = cc
++CC = gcc
+ 
+ # Adding flags to CFLAGS enables some non-mainline features. For
+ # more information, please consult the source code.
+@@ -91,7 +91,11 @@
+ #
+ 
+ LOG_FILE=DEBUG_LOG_FILE="\"/tmp/netperf.debug\""
+-CFLAGS = -Ae -O -D$(LOG_FILE) -DUSE_PSTAT -DHAVE_SENDFILE -DDO_FIRST_BURST
++LISHOME=/usr/src/LiS
++#CFLAGS = -Ae -O -D$(LOG_FILE) -DUSE_PSTAT -DHAVE_SENDFILE -DDO_FIRST_BURST
++CFLAGS = -D$(LOG_FILE) -DDO_DLPI -DHISTOGRAM -DUSE_PROC_STAT -DDONT_WAIT \
++ -DLINUX -DINLINE=inline -DSTATIC=static -I$(LISHOME)/include -DHAVE_MIN \
++ -g -O2 -Wall
+ 
+ # Some platforms, and some options, require additional libraries.
+ # you can add to the "LIBS =" line to accomplish this. if you find
+@@ -111,7 +115,7 @@
+ # -L/POSIXC60/lib -lunix -lm -lsocket - for MPE/iX
+ # -lkstat               - required for -DUSE_KSTAT on Solaris
+ 
+-LIBS= -lm
++LIBS= -lm -L$(LISHOME)/libc -lLiS -g
+ 
+ # ---------------------------------------------------------------
+ # it should not be the case that anything below this line needs to
+diff -ru netperf-2.2pl2-orig/nettest_dlpi.c netperf-2.2pl2/nettest_dlpi.c
+--- netperf-2.2pl2-orig/nettest_dlpi.c	Sat Jun 22 00:42:53 2002
++++ netperf-2.2pl2/nettest_dlpi.c	Wed Jan 29 16:18:02 2003
+@@ -1809,6 +1809,10 @@
+   data_req->dl_dest_addr_length = dlpi_cl_stream_response->station_addr_len;
+   /* there is a dl_priority structure too, but I am ignoring it for */
+   /* the time being. */
++#if 1 /* XXX SRI */
++  data_req->dl_priority.dl_min = DL_QOS_DONT_CARE;
++  data_req->dl_priority.dl_max = DL_QOS_DONT_CARE;
++#endif
+   sctl_message.len = sizeof(dl_unitdata_req_t) + 
+     data_req->dl_dest_addr_length;
+   
+@@ -2633,6 +2637,10 @@
+     data_req->dl_dest_addr_length = dlpi_cl_rr_response->station_addr_len;
+     /* there is a dl_priority structure too, but I am ignoring it for */
+     /* the time being. */
++#if 1 /* XXX SRI */
++    data_req->dl_priority.dl_min = DL_QOS_DONT_CARE;
++    data_req->dl_priority.dl_max = DL_QOS_DONT_CARE;
++#endif
+     sctl_message.len = sizeof(dl_unitdata_req_t) + 
+       data_req->dl_dest_addr_length;
+   }
+@@ -3199,6 +3207,10 @@
+ 	  data_ind->dl_src_addr_length);
+     data_req->dl_dest_addr_length = data_ind->dl_src_addr_length;
+     data_req->dl_primitive = DL_UNITDATA_REQ;
++#if 1 /* XXX SRI */
++    data_req->dl_priority.dl_min = DL_QOS_DONT_CARE;
++    data_req->dl_priority.dl_max = DL_QOS_DONT_CARE;
++#endif
+     sctl_message.len = sizeof(dl_unitdata_req_t) +
+       data_ind->dl_src_addr_length;
+     if(putmsg(data_descriptor,

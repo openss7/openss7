@@ -1,0 +1,167 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: OTHERQ.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH OTHER 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B OTHER, OTHERQ
+\- return the other queue of a \fISTREAMS\fR queue pair
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "queue_t *" oq " = OTHER(" q );
+.HP 8
+.BI "queue_t *" oq " = OTHERQ(" q );
+.SH DESCRIPTION
+.PP
+.BR OTHERQ ()
+returns the other queue associated with the queue pair indicated by the queue
+pointer
+.IR q ,
+regardless of whether
+.I q
+points to the read queue or the write queue of the queue pair.
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR OTHERQ ()
+returns a pointer to the other queue of the queue pair referenced by
+.IR q .
+.PP
+Upon failure,
+.BR OTHERQ ()
+returns
+.BR NULL .
+.PP
+.BR OTHERQ ()
+is typically and often used to find the opposite queue from a pointer to one of
+the queues in a queue pair.
+.SH ERRORS
+.PP
+When
+.BR OTHERQ ()
+fails, it returns
+.BR NULL .
+.BR OTHERQ ()
+fails when the queue pointer
+.I q
+is
+.BR NULL ;
+.I q
+does not point to a valid queue structure;
+.I q->q_other
+is
+.BR NULL ;
+.I q->q_other
+does not point to a valid queue structure.
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+implements
+.BR OTHERQ ()
+as a function rather than as the more obvious
+macro:
+.sp
+.nf
+#define OTHERQ(__q) __q->q_other
+.fi
+.PP
+The
+.B LiS
+.[
+LiS
+.]
+function call is inefficient, particularly as this function is called often
+and regularly.
+.SH "SEE ALSO"
+.PP
+.BR RD (9),
+.BR WR (9),
+.BR SAMESTR (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.b
+.[
+LiS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -102,7 +102,7 @@ int	port_suser(struct file *fp) ;
 #define	lis_kill_proc	port_kill_proc		/* signal a process */
 #define	lis_kill_pg	port_kill_pg		/* signal a process group */
 
-int	port_printf(char *fmt, ...) ;		/* printf routine */
+int	port_printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));		/* printf routine */
 #define	printk		port_printf
 #define PRINTK		port_printf
 

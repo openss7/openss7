@@ -40,7 +40,7 @@
 #ifdef __KERNEL__
 
 void    lis_cmn_err_init(void) ;	/* not exported */
-void	lis_cmn_err(int err_lvl, char *fmt, ...) _RP;
+void	lis_cmn_err(int err_lvl, char *fmt, ...) _RP __attribute__ ((format(printf, 2, 3)));
 #define	cmn_err		lis_cmn_err
 
 typedef      void  (*lis_print_trace_t)   (char *bfrp) ;

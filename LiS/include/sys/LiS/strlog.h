@@ -62,7 +62,7 @@
 #ifdef __KERNEL__
 extern int
 lis_strlog(short mid, short sid, char level, unsigned short flags,
-	   char *fmt, ... );
+	   char *fmt, ... ) __attribute__ ((format(printf, 5, 6)));
 #endif				/* __KERNEL__ */
 
 

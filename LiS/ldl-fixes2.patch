@@ -1,0 +1,189 @@
+diff -rauN LiS-2.16-old/drivers/str/linux/ldl.c LiS-2.16/drivers/str/linux/ldl.c
+--- LiS-2.16-old/drivers/str/linux/ldl.c	2003-12-31 16:16:37.000000000 +0100
++++ LiS-2.16/drivers/str/linux/ldl.c	2004-06-04 13:39:43.000000000 +0200
+@@ -406,6 +406,10 @@
+ 	0x04000		/* Low water mark: 16 Kb	*/
+ };
+ 
++STATIC struct module_stat dl_rdmstat = { }; /* all counters == 0 */
++
++STATIC struct module_stat dl_wrmstat = { }; /* all counters == 0 */
++
+ STATIC struct qinit dl_rinit = 
+ {
+ 	NULL,		/* No read put		*/
+@@ -414,7 +418,7 @@
+ 	dl_close,	/* Last close		*/
+ 	NULL,		/* Reserved		*/
+ 	&dl_minfo,	/* Information		*/
+-	NULL		/* No statistics	*/
++	&dl_rdmstat	/* Statistics		*/
+ };
+ 
+ STATIC struct qinit dl_winit = 
+@@ -425,7 +429,7 @@
+ 	NULL,		/* Ignored		*/
+ 	NULL,		/* Reserved		*/
+ 	&dl_minfo,	/* Information		*/
+-	NULL		/* No statistics	*/
++	&dl_wrmstat	/* Statistics		*/
+ };
+ 
+ #ifdef MODULE
+@@ -672,7 +676,7 @@
+ 		pt->pt.type = saptype;
+ 		pt->pt.dev = dl->ndev->dev;
+ 		pt->pt.func = rcv_func;
+-		pt->pt.data = NULL;
++		pt->pt.data = (void *)1; /* indicate "new style" packet handler */
+ 		pt->pt.next = NULL;
+ 		lis_spin_unlock(&first_pt_lock);
+ 		dev_add_pack(&pt->pt);
+@@ -1117,7 +1121,7 @@
+ 	ndev_wr_wakeup_endp(ndev);
+ }
+ 
+-#ifndef KERNEL_2_1		/* old 2.0 kernel, not supported anymore */
++
+ 
+ STATIC void tx_congestion_timeout(caddr_t dp)
+ {
+@@ -1153,7 +1157,7 @@
+ 	else
+ 		printk("ldl: ndev_wr_sleep() failed\n");
+ }
+-#endif
++
+ 
+ /*
+  *  This is the skb destructor callback.
+@@ -1180,17 +1184,16 @@
+ 	ASSERT(ndev->magic == NDEV_MAGIC);
+ 
+ 	ASSERT(atomic_read(&ndev->wr_cur) >= skb->truesize);
++	atomic_sub(skb->truesize, &ndev->wr_cur);
+ 
+ 	if (ndev->dev != NULL) {
+ 		if (atomic_read(&ndev->wr_cur) <= ndev->wr_min) {
+ 			if (ndev->sleeping)
+ 				ndev_wr_wakeup(ndev);
+-			atomic_sub(skb->truesize, &ndev->wr_cur);
+ 		}
+ 	} else {
+ 		ASSERT(ndev->endpoints == NULL);
+ 
+-		atomic_sub(skb->truesize, &ndev->wr_cur);
+ 		if (atomic_read(&ndev->wr_cur) == 0)
+ 			ndev_free(ndev);
+ 	}
+@@ -1200,6 +1203,9 @@
+ 
+ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+ {
++	int psw;
++	int ret;
++
+ 	ASSERT(skb != NULL);
+ 	ASSERT(ndev != NULL);
+ 	ASSERT(ndev->magic == NDEV_MAGIC);
+@@ -1210,8 +1216,31 @@
+ 	atomic_add(skb->truesize, &ndev->wr_cur);
+ 	(struct ndev *)skb->sk = ndev;
+ 	skb->destructor = ndev_skb_destruct;
+-	dev_queue_xmit(skb);
+-	return DONE;
++
++	if (atomic_read(&ndev->wr_cur) <= ndev->wr_max) {
++		switch (dev_queue_xmit(skb)) {
++		case NET_XMIT_SUCCESS:
++		default:
++			return DONE;
++
++		case NET_XMIT_DROP:
++			return RETRY;
++
++		case NET_XMIT_CN:
++		case NET_XMIT_POLICED:
++			ret = DONE;
++			break;
++		}
++	} else {
++		kfree_skb(skb);
++		ret = RETRY;
++	}
++
++	SPLSTR(psw);
++	if (!ndev->sleeping)
++		ndev_wr_sleep(ndev);
++	SPLX(psw);
++	return ret;
+ }
+ 
+ #elif defined(too_complicated_KERNEL_2_1)
+@@ -2398,6 +2427,11 @@
+ #endif
+ }
+ 
++void mblk_destructor(char *arg)
++{
++	kfree_skb((struct sk_buff*)arg);
++}
++
+ /*
+  *  Our "interrupt" function
+  *
+@@ -2430,13 +2464,45 @@
+ #endif
+ 	unsigned char *fr_ptr, fr_buf[LDL_MAX_HDR_LEN];
+ 	int fr_len;
++	struct free_rtn mblk_rtn;
+ 
+ 	ASSERT(dev->type == ARPHRD_ETHER || dev->type == ARPHRD_LOOPBACK
+ 	       || dev->type == ARPHRD_IEEE802 || IS_ARPHRD_IEEE802_TR(dev)
+ 	       || dev->type == ARPHRD_HDLC);
+ 		/*	ARPHRD_FDDI	*/
+ 
++	if (skb_is_nonlinear(skb)) {
++		struct sk_buff *b;
++		/* FIXME untested code */
++		printk("ldl: non linear skb");
++		b = skb_clone(skb, GFP_ATOMIC);
++		kfree_skb(skb);
++		if(b == NULL)
++			return 0;
++		if(skb_linearize(b, GFP_ATOMIC)) {
++			kfree_skb(b);
++			return 0;
++		}
++		skb = b;
++	}
++
++#if 1
++	mblk_rtn.free_func = mblk_destructor;
++	mblk_rtn.free_arg = (char*) skb;
+ 	fr_len = skb->tail - skb->mac.raw;
++	if((dp = esballoc( skb->mac.raw-2, fr_len+2,
++			   BPRI_LO, &mblk_rtn )) != NULL) {
++		dp->b_rptr = dp->b_wptr += 2;
++		fr_ptr = dp->b_rptr;
++		dp->b_wptr += fr_len;
++		skb_get(skb);
++	} else { /* We still need the frame type for correct drop stats */
++		fr_ptr = &fr_buf[0];
++		fr_len = lis_min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
++		ASSERT(fr_len > 0);
++		memcpy(fr_buf, skb->mac.raw, fr_len);
++	}
++#else
+ 	if ((dp = allocb(2 + fr_len, BPRI_LO)) != NULL) {
+ 		/*
+ 		 *  Prepare the data block.
+@@ -2456,7 +2522,7 @@
+ 		ASSERT(fr_len > 0);
+ 		memcpy(fr_buf, skb->mac.raw, fr_len);
+ 	}
+-
++#endif
+ 
+ 	if (ldl_debug_mask & LDL_DEBUG_RCV_FUNC)
+ 	    ldl_skbuff_dump("ldl_rcv_func: skb", skb, 

@@ -120,6 +120,7 @@ void decr_spin_lock_count(lis_spin_lock_t *lock)
 * This is the printf fuction.  Return is always zero.			*
 *									*
 ************************************************************************/
+__attribute__ ((format(printf, 1, 2)))
 int	port_printf(char *fmt, ...)
 {
     va_list args;

@@ -1,0 +1,1 @@
+.so man9/freeb.9.man

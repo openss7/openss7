@@ -1,0 +1,186 @@
+#
+# DejaGnu testsuite for LiS
+# test cases running strtst
+# single and multithreaded
+#
+
+# list of strtst tests
+set test_list [list open ioctl rdopt write timer putmsg poll mux clone \
+		   bufcall sad fifo passfd band flush autopush mt_open]
+# list of strtst tests that can run multithreaded (MT) (remove band for now on)
+set MT_test_list [list open putmsg poll bufcall fifo passfd flush]
+# regexp matching strtst error reports
+set fail_matcher {([\r\n][^\r\n]*BEGIN FAILURE.+TEST FAILED[^\r\n]*[\r\n])}
+# regexp matching wrapper statistics report
+set wrapper_matcher {wrapper: test finished successfully; max latency ([0-9]+) max load ([0-9]+\.[0-9]+)}
+
+#
+# helper: spawn wrapper and strtst with args
+#
+proc spawn_strtst { args } {
+    global WRAPPER_EXEC STRTST_EXEC spawn_id
+    set cmd [concat spawn $WRAPPER_EXEC $STRTST_EXEC -m0 $args]
+    #print $cmd
+    eval $cmd
+}
+
+#
+# do_* helpers: most common actions in expect
+#
+proc do_eof { test } {
+    print "$test: EOF!"
+    fail $test
+}
+proc do_timeout { test } {
+    print "$test: timeout!"
+    fail $test
+    exec kill -TERM [exp_pid]
+}
+proc do_fail { test } {
+    global expect_out
+    print "$expect_out(1,string)"
+    fail $test
+}
+proc do_wrapper { test max_latency max_load } {
+    global expect_out
+    set latency $expect_out(1,string)
+    set load $expect_out(2,string)
+#    print "$test: latency $latency load $load"
+    if { $latency > $max_latency } {
+	print "$test: latency $latency is above max_latency $max_latency!"
+	fail $test
+	return
+    }
+    if { $load > $max_load } {
+	print "$test: load $load is above max_load $max_load!"
+	fail $test
+	return
+    }
+    pass $test
+}
+
+#
+# check correct installation of programs
+#
+set timeout 3
+spawn_strtst -h
+expect {
+    -gl "^Usage:" { }
+    default { error "Cannot run strtst! Bad install, aborting testsuite" }
+}
+close ; wait
+
+#
+# run each strtst test once
+#
+proc strtst_one { } {
+    global fail_matcher wrapper_matcher test_list expect_out
+
+    set timeout 120
+
+    foreach t $test_list {
+	set test "strtst_$t"
+	print "$test: run strtst single threaded, one test: $t"
+	spawn_strtst $t
+	expect {
+	    -re "$wrapper_matcher" { do_wrapper $test 2 2.0 }
+	    -re "$fail_matcher" { do_fail $test }
+	    eof { do_eof $test }
+	    timeout { do_timeout $test }
+	}
+	close ; wait
+    }
+}
+
+#
+# run all strtst tests
+#
+proc strtst_all { } {
+    global fail_matcher wrapper_matcher expect_out
+
+    set timeout 120
+
+    set test "strtst_all"
+    print "$test: run strtst single threaded, all tests"
+    spawn_strtst -m0
+    expect {
+	-re "$wrapper_matcher" { do_wrapper $test 2 2.0 }
+	-re "$fail_matcher" { do_fail $test }
+	eof { do_eof $test }
+	timeout { do_timeout $test }
+    }
+    close ; wait
+}
+
+#
+# run each strtst test with $nthreads concurrent threads
+#
+proc strtst_mt_one { nthreads } {
+    global MT_test_list test_list fail_matcher wrapper_matcher expect_out
+
+    set timeout [expr 120 * $nthreads]
+
+    foreach t $test_list {
+	set test [string map {" " "_"} "strtst mt$nthreads $t"]
+	print "$test: run strtst multithreaded, $nthreads threads, one test: $t"
+	spawn_strtst -n $nthreads $t
+	expect {
+	    -re "$wrapper_matcher" {
+		if { [lsearch $MT_test_list $t] >= 0} {
+		    do_wrapper $test 2 [expr 2.0 * $nthreads ]
+		} else {
+		    # non MT tests are not expected to pass!
+		    xpass $test
+		}
+	    }
+	    -re "$fail_matcher" { do_fail $test }
+	    -gl "^Usage:" {
+		if { [lsearch $MT_test_list $t] >= 0} {
+		    fail $test
+		} else {
+		    # non MT tests are expected to fail this way
+		    xfail $test
+		}
+	    }
+	    eof { do_eof $test }
+	    timeout { do_timeout $test }
+	}
+	close ; wait
+    }
+}
+
+#
+# run all strtst tests with $nthreads concurrent threads
+#
+proc strtst_mt_all { nthreads } {
+    global fail_matcher wrapper_matcher expect_out
+
+    set timeout [expr 120 * $nthreads]
+
+    set test [string map {" " "_"} "strtst mt$nthreads all"]
+    print "$test: run strtst multithreaded, $nthreads threads, all MT tests"
+    spawn_strtst -n $nthreads
+    expect {
+	-re "$wrapper_matcher" { do_wrapper $test 2 [expr 2.0 * $nthreads] }
+	-re "$fail_matcher" { do_fail $test }
+	eof { do_eof $test }
+	timeout { do_timeout $test }
+    }
+    close ; wait
+}
+
+#
+# now, run all these tests!
+#
+
+strtst_one
+
+strtst_all
+
+foreach n $num_threads {
+    strtst_mt_one $n
+}
+
+foreach n $num_threads {
+    strtst_mt_all $n
+}

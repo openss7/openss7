@@ -1,0 +1,1 @@
+.so man9/qprocson.9.man

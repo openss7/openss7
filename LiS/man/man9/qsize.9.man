@@ -1,0 +1,166 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: qsize.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH QSIZE 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B qsize, lis_qsize
+\- return the number of messages on a queue
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " size " = qsize(queue_t *" q );
+.SH DESCRIPTION
+.PP
+.BR qsize ()
+returns the number of messages in the queue pointed to by
+.IR q .
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR qsize ()
+returns the number of messages in the queue pointed to by
+.IR q .
+.PP
+Upon failure,
+.BR qsize ()
+returns zero (0).
+.SH ERRORS
+.PP
+When
+.BR qsize ()
+fails, it returns zero (0).
+.BR qsize ()
+fails when the passed in queue pointer
+.I q
+is
+.B NULL
+or
+.I q
+does not point to a valid queue structure;
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+does not maintain the number of messages in a queue in the queue's
+.B queue
+structure.  Therefore, this function must count the message in the queue each
+time that the function is called.  This is inefficient if many calls to
+.BR qsize ()
+are performed by a given
+.IR STREAMS (4)
+module or driver.
+.PP
+.B LiS
+.[
+LiS
+.]
+returns zero (0) on failure.  It should probably return -1 to indicate failure
+to distinguish this from the case where the queue is simply empty.
+.SH "SEE ALSO"
+.PP
+.BR strqget (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR qsize ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

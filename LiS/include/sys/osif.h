@@ -173,7 +173,7 @@
 
 #if LINUX_VERSION_CODE >= 0x020400	/* 2.4 kernel */
 
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
 #ifdef pci_alloc_consistent
 #undef pci_alloc_consistent
 #endif
@@ -323,6 +323,19 @@
 #undef release_region
 #endif
 #define	release_region			lis_release_region
+
+#ifdef check_mem_region
+#undef check_mem_region
+#endif
+#define	check_mem_region		lis_check_mem_region
+#ifdef request_mem_region
+#undef request_mem_region
+#endif
+#define	request_mem_region		lis_request_mem_region
+#ifdef release_mem_region
+#undef release_mem_region
+#endif
+#define	release_mem_region		lis_release_mem_region
 
 #ifdef add_timer
 #undef add_timer
@@ -525,8 +538,12 @@ extern int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)_RP;
 extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg)_RP;
 extern size_t lis_osif_sg_dma_len(struct scatterlist *sg)_RP;
 
+#if  BITS_PER_LONG == 64 
+typedef u64 dma64_addr_t;
+#endif
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
 extern void lis_osif_pci_unmap_page(struct pci_dev *hwdev,
 				dma_addr_t dma_address, size_t size,
 				int direction)_RP;
@@ -635,6 +652,12 @@ void lis_request_region(unsigned int from,
 			 const char  *name) _RP;
 void lis_release_region(unsigned int from, unsigned int extent) _RP;
 
+int  lis_check_mem_region(unsigned int from, unsigned int extent) ;
+void lis_request_mem_region(unsigned int from,
+			 unsigned int extent,
+			 const char  *name) ;
+void lis_release_mem_region(unsigned int from, unsigned int extent) ;
+
 
 /*
  * Memory allocator <linux/malloc.h>
@@ -660,10 +683,9 @@ unsigned long lis_jiffies(void) _RP;
 /*
  * Printing routines.
  */
-#define PRINTF_LIKE(a,b)	__attribute__ ((format (printf, a, b)))
-int lis_printk(const char *fmt, ...) PRINTF_LIKE(1,2) _RP;
-int lis_sprintf(char *bfr, const char *fmt, ...) PRINTF_LIKE(2,3) _RP;
-int lis_vsprintf(char *bfr, const char *fmt, va_list args) PRINTF_LIKE(2,0) _RP;
+int lis_printk(const char *fmt, ...) __attribute__ ((format (printf, 1, 2))) _RP;
+int lis_sprintf(char *bfr, const char *fmt, ...) __attribute__ ((format (printf, 2, 3))) _RP;
+int lis_vsprintf(char *bfr, const char *fmt, va_list args) __attribute__ ((format (printf, 2, 0))) _RP;
 
 /*
  * Timer routines.

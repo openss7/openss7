@@ -1,0 +1,15 @@
+
+# size of expect's match buffer (default is 2000, much slower and unnecessary)
+match_max 1000
+
+# path to executables (FIXME: set on runtest command line or config file)
+set WRAPPER_EXEC "./wrapper/wrapper"
+set STRTST_EXEC "/usr/bin/strtst"
+set NETPERF_EXEC "/opt/netperf/netperf"
+set NETSERVER_EXEC "/opt/netperf/netserver"
+
+# strtst MT tests are run with this many threads successively
+set num_threads {2 4 10}
+
+# netperf tests are run with this many concurrent processes
+set num_processes [concat 1 $num_threads]

@@ -260,7 +260,7 @@ typedef struct autopush_init {
  *  but we have a manual dependency in the makefile.
  */
 #ifndef DEP
-#include "modconf.inc"
+#include "head/modconf.inc"
 #endif
 
 /*
@@ -512,7 +512,7 @@ static int apush_validate(autopush_list_t *list)
 	for (i = 0; i < list->npush; ++i) {
 		modID_t mod = list->mod[i];
 
-		if (lis_fmod_sw[mod].f_state & LIS_MODSTATE_INITED)
+		if (lis_fmod_sw[mod].f_str != NULL)
 			continue; /* registered */
 		return -1; /* not registered or configured */
 	}
@@ -763,10 +763,9 @@ lis_register_module_qlock_option(modID_t id, int qlock_option)
 static int _RP unregister_module(fmodsw_t *slot)
 {
     modID_t id;
-    int	    err;
     char    name[LIS_NAMESZ + 1];
 
-    if (!(slot->f_state & LIS_MODSTATE_INITED))
+    if (slot->f_str == NULL)
 	return(0) ;			/* already done */
 
     if (slot->f_count)
@@ -881,9 +880,9 @@ lis_findmod(const char *name)
     /* Look for the module */
     for (id = lis_fmodcnt; id > 0; id--)
 	if (!strcmp(lis_fmod_sw[id].f_name, name))
-	    break ;
+	    return id; /* found it */
 
-    return (id > 0 ? id : LIS_NULL_MID);
+    return LIS_NULL_MID;
 } /* lis_findmod */
 
 /*  -------------------------------------------------------------------  */
@@ -1064,7 +1063,7 @@ lis_register_strdev(major_t major,
 	{
 	    printk("STREAMS driver \"%s\" major %u not registered: "
 		    "NULL strtab pointer\n",
-		    (name != NULL) ? name : "", major) ;
+		    (name != NULL) ? name : "", (unsigned int)major) ;
 	    return(-EINVAL) ;		/* invalid parameters */
 	}
 
@@ -1454,11 +1453,6 @@ void lis_init_mod(void)
 		 */
 		strncpy(lis_fmod_sw[modid].f_objname,
 			lis_module_config[i].cnf_objname, LIS_NAMESZ) ;
-		lis_fmod_sw[i].f_state &= ~LIS_MODSTATE_MASK ;
-		if (lis_fmod_sw[modid].f_objname[0])
-		    lis_fmod_sw[modid].f_state |= LIS_MODSTATE_UNLOADED ;
-		else
-		    lis_fmod_sw[modid].f_state |= LIS_MODSTATE_LINKED ;
 	}
 
 	for (i = 0; i < DRV_CONFIG_SIZE; ++i)

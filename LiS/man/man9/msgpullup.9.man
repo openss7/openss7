@@ -1,0 +1,178 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: msgpullup.9.man,v 1.1.4.1 2005/03/09 23:14:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:13 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MSGPULLUP 9 "$Date: 2005/03/09 23:14:13 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B msgpullup, lis_msgpullup
+\- pull up bytes in a \fISTREAMS\fR message
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "struct msgb *" msg " = msgpullup(struct msgb *" mp ", int " len );
+.SH DESCRIPTION
+.PP
+.BR msgpullup ()
+will copy
+.I len
+bytes from the message pointed to by
+.I mp
+into a new message returned as a pointer to by
+.IR msg ,
+if possible.
+If the passed in message pointed to by
+.I mp
+contains more bytes than specified by
+.IR len ,
+.BR msgpullup ()
+will copy the remaning bytes onto the end of the new message.
+If the passed in message pointed to by
+.I mp
+contains less than
+.I len
+bytes,
+.BR msgpullup ()
+fails and returns
+.BR NULL .
+If
+.I len
+is specified as -1,
+all the bytes of the passed in message pointed to by
+.I mp
+will be concatenated and copied into the new message.
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR msgpullup ()
+returns a pointer to the new message.
+.PP
+Upon failure,
+.BR msgpullup ()
+returns
+.BR NULL .
+.SH ERRORS
+.PP
+.BR msgpullup ()
+fails and returns
+.B NULL
+when the number of bytes in the passed in message pointed to by
+.I mp
+is less than
+.IR len ;
+and when allocation for the new message
+.I msg
+fails.
+.SH CAVEATS
+.PP
+The
+.B LiS
+.[
+LiS
+.]
+implementation of
+.BR msgpullup ()
+allocates blocks for the new message before it check to see whether the number
+of bytes in the passed in message is less than
+.IR len.
+This is inefficient if it is normally the case that the passed in message has
+less bytes than
+.IR len .
+.SH SEE ALSO
+.PP
+.BR pullupmsg (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,1 @@
+.so man9/bzero.9.man

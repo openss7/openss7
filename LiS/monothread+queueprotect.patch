@@ -1,0 +1,301 @@
+diff -rauN LiS-2.16.18+proposal/head/head.c LiS-2.16/head/head.c
+--- LiS-2.16.18+proposal/head/head.c	2004-06-03 15:58:16.000000000 +0200
++++ LiS-2.16/head/head.c	2004-06-03 15:59:07.000000000 +0200
+@@ -2589,7 +2589,7 @@
+ {
+     int		msgs_before = lis_qsize(q) ;
+     lis_flags_t	psw ;
+-    mblk_t     *xp ;
++    mblk_t     *xp, *tmp = NULL ;
+ 
+     if ( LIS_DEBUG_FLUSH )
+ 	printk("lis_head_flush: "
+@@ -2632,8 +2632,13 @@
+ 	     */
+ 	    while ((xp = lis_get_rput_q(shead)) != NULL)
+ 	    {
+-		msgs_before++ ;
+-		freemsg(xp) ;
++	        /*
++		 * All messages are temporary saved in a local list.
++		 * Correct action will be taken after flush is complete.
++		 * Unqueueing now will preserves q_count value.
++		 */
++		xp->b_next = tmp ;
++		tmp = xp ;
+ 	    }
+ 	}
+ 	/*
+@@ -2650,6 +2655,29 @@
+ 	    CLR_SD_FLAG(shead,STRPRI);	/* no PCPROTO at head */
+ 
+ 	*mp->b_rptr &= ~FLUSHR ;		/* turn off flush read bit */
++	    /*
++	     * Do not discard messages corresponding to
++	     * an in-progress ioctl (IOCWAIT flag).
++	     * Discarding them could let the ioctl sleeping for ever
++	     * (unless timeout is activated)
++	     * Re-queuing now (after flush) preserves q_count value.
++	     */
++	    LIS_QISRLOCK(q, &psw) ;
++	    while ( (xp = tmp) != NULL )
++	    {
++		tmp = xp->b_next ;
++		xp->b_next = NULL ;
++		if ( F_ISSET(shead->sd_flag, IOCWAIT) )
++		    lis_put_rput_q(shead, xp) ;
++		else
++		{
++		    msgs_before++ ;
++		    freemsg(xp) ;
++		}
++	    }
++	    LIS_QISRUNLOCK(q, &psw) ;
++
++
+ 	LisDownCounter(MSGQDSTRHD, msgs_before - lis_qsize(q)) ;
+     }
+ 
+@@ -3494,6 +3522,14 @@
+      * Use RTN to return below here.
+      */
+     iocb->ioc_id = hd->sd_iocseq =  lis_incr(&lis_iocseq);
++    /*
++     * Reset items that could be not clean after a previous failing ioctl
++     * (ioctl returning on signal or error)
++     * - semaphore > 0
++     * - sd_iocblk != NULL
++     */
++    lis_sem_init(&hd->sd_wiocing, 0) ;
++    hd->sd_iocblk = NULL ;
+ 
+   again:				/* wioc lock is always held when here */
+     if (err < 0)
+@@ -3613,7 +3649,7 @@
+ 	       )
+ 	    {
+ 		if (err < 0)
+-		    cr->cp_rval=(caddr_t)(-err);
++		    cr->cp_rval=(caddr_t)(long)(-err);
+ 		else
+ 		    cr->cp_rval=(caddr_t)ENOMEM;
+ 		if (dat != NULL)
+@@ -3641,7 +3677,7 @@
+ 	    if ((err=lis_check_umem(f,VERIFY_WRITE,ubuf,len)) >= 0){
+ 		dat=lis_unlinkb(mioc);
+ 		if ((err = copyout_blks(f,ubuf,len,dat)) < 0)
+-		    cr->cp_rval=(caddr_t)(-err);
++		    cr->cp_rval=(caddr_t)(long)(-err);
+ 		else
+ 		    cr->cp_rval=0;
+ 	    } 
+@@ -7902,5 +7938,6 @@
+ /*----------------------------------------------------------------------
+ # Local Variables:      ***
+ # change-log-default-name: "~/src/prj/streams/src/NOTES" ***
++# c-basic-offset: 4 ***
+ # End: ***
+   ----------------------------------------------------------------------*/
+diff -rauN LiS-2.16.18+proposal/head/linux-mdep.c LiS-2.16/head/linux-mdep.c
+--- LiS-2.16.18+proposal/head/linux-mdep.c	2004-06-03 15:58:16.000000000 +0200
++++ LiS-2.16/head/linux-mdep.c	2004-06-03 15:59:07.000000000 +0200
+@@ -146,6 +146,14 @@
+  */
+ int lis_panic_when_killed = 1;
+ 
++/* 
++ * For running a given number of STREAMS threads on SMP
++ * machine. default is zero (use every available CPUs)
++ *
++ * FIXME: current implementation works only with lis_nthreads=1
++ */
++int lis_nthreads = 0;
++
+ /************************************************************************
+ *                      System Call Support                              *
+ *************************************************************************
+@@ -157,7 +165,7 @@
+ 
+ static int	lis_errnos[LIS_NR_CPUS] ;
+ #ifdef KERNEL_2_3
+-#define	errno	lis_errnos[smp_processor_id()]
++#define	errno	lis_errnos[(lis_nthreads? 0 : smp_processor_id())] 
+ #else
+ #define	errno	lis_errnos[0]
+ #endif
+@@ -3737,6 +3745,13 @@
+ 	"==================================================================\n"
+ 	"Linux STREAMS Subsystem loading...\n");
+ 
++    /*
++     * FIXME: single threading only support 0 & 1 value at this time.
++     * Any non-1 value is trimmed down to 0, to trigger the usual LiS
++     * behavior
++     */
++    lis_nthreads = (lis_nthreads == 1);
++
+     current->fs->umask = 0 ;		/* can set any permissions */
+ 
+     lis_mem_init() ;			/* in lismem.c */
+@@ -3816,10 +3831,10 @@
+ 	"Copyright (c) 1997-2003 David Grothe, et al, http://www.gcom.com\n"
+ 	"Major device number %d.\n"
+ 	"Version %s %s. Compiled for kernel version %s.\n"
+-	"Using %s %s\n"
++	"Using %s %s nthreads=%d\n"
+ 	"==================================================================\n",
+ 	lis_major, lis_version, lis_date, lis_kernel_version,
+-	lis_poll_file, lis_stropts_file );
++	lis_poll_file, lis_stropts_file, lis_nthreads );
+ 
+     return(0);
+ }
+@@ -4158,13 +4173,19 @@
+     sigaddset(&MY_BLKS, SIGTERM) ;	/* inhibit SIGTERM */
+ #if defined(KERNEL_2_5)
+ # if defined(__SMP__)
++    if (!lis_nthreads)
+     set_cpus_allowed(current, 1 << cpu_id) ;
++    else
++        set_cpus_allowed(current, 1) ;
+ # else
+     /* of course this symbol is not defined unless the kernel was built w/SMP */
+ # endif
+ #elif defined(KERNEL_2_3)
+ # if !defined(_PPC_LIS_)
++    if (!lis_nthreads)
+     current->cpus_allowed = (1 << cpu_id) ;	/* bind to a CPU */
++    else
++        current->cpus_allowed = 1 ;	/* bind to CPU 0 */
+ # endif
+ #endif
+ 
+@@ -4207,7 +4228,7 @@
+ 
+ 	lis_runq_wakeups[cpu_id]++ ;
+ #ifdef KERNEL_2_3
+-	if (cpu_id != smp_processor_id())
++	if (!lis_nthreads && cpu_id != smp_processor_id())
+ 	{
+ 	    static int	msg_cnt ;
+ 
+@@ -4250,7 +4271,7 @@
+     int		ncpus ;
+     char	name[16] ;
+ 
+-    ncpus = NUM_CPUS ;
++    ncpus = lis_nthreads? 1:NUM_CPUS ;
+     lis_num_cpus = ncpus ;
+     for (cpu = 0; cpu < ncpus; cpu++)
+     {
+@@ -4290,7 +4311,7 @@
+     int		req_cnt ;
+     int		in_intr = in_interrupt() ;
+ #ifdef KERNEL_2_3
+-    int		my_cpu = smp_processor_id() ;
++    int		my_cpu = lis_nthreads ? 0 : smp_processor_id() ;
+ #else
+     int		my_cpu = 0 ;
+ #endif
+@@ -4779,6 +4800,8 @@
+ #if defined(MODULE_DESCRIPTION)
+ MODULE_DESCRIPTION("SVR4 STREAMS for Linux (LGPL Code)");
+ #endif
++MODULE_PARM(lis_nthreads, "i");
++MODULE_PARM_DESC(lis_nthreads, "Number of STREAMS threads started.  0 (default) to run on every available CPUs");
+ MODULE_PARM(lis_panic_when_killed, "i");
+ MODULE_PARM_DESC(lis_panic_when_killed, "Flag for failed assertions: set to 1 (default) to call panic(), set to 0 to call BUG()");
+ 
+diff -rauN LiS-2.16.18+proposal/head/osif.c LiS-2.16/head/osif.c
+--- LiS-2.16.18+proposal/head/osif.c	2003-09-24 21:50:25.000000000 +0200
++++ LiS-2.16/head/osif.c	2004-06-03 15:59:07.000000000 +0200
+@@ -31,7 +31,16 @@
+ #ident "@(#) LiS osif.c 1.44 9/24/03"
+ 
+ #include <sys/stream.h>
+-#include <linux/autoconf.h>		/* Linux config defines */
++//#include <linux/autoconf.h>		/* Linux config defines */
++
++#ifdef MODVERSIONS
++# ifdef LISMODVERS
++#  include <sys/modversions.h>      /* /usr/src/LiS/include/sys */
++# else
++#  include <linux/modversions.h>
++# endif
++#endif
++
+ 
+ #ifdef STR
+ #undef STR				/* collides with irq.h */
+@@ -765,5 +774,8 @@
+  */
+ unsigned lis_usectohz(unsigned usec)
+ {
++    if ( ((1000 / HZ) * HZ) == 1000 ) /* ie: HZ == 100 */
+     return( usec / (1000000/HZ) ) ;
++    else			/* ie: HZ == 1024 */
++	return( (usec * HZ) / 1000000 ) ; /* 32bits overflow ??? */
+ }
+diff -rauN LiS-2.16.18+proposal/head/stream.c LiS-2.16/head/stream.c
+--- LiS-2.16.18+proposal/head/stream.c	2004-06-03 15:58:16.000000000 +0200
++++ LiS-2.16/head/stream.c	2004-06-03 15:59:07.000000000 +0200
+@@ -318,6 +318,7 @@
+ 
+ }/*queuerun*/
+ 
++extern int lis_nthreads;	/* module parameter from linux-mdep.c */
+ 
+ /*  -------------------------------------------------------------------  */
+ /*			Exported functions & macros                      */
+@@ -340,7 +341,12 @@
+ #if !defined(__SMP__)			/* only for single-threaded */
+ 	if (lis_atomic_read(&lis_queues_running)) /* recursion protection */
+ 	    return;
+-#endif
++#else  /* __SMP__ */
++        /* recursion protection ('&&' does not break atomic_t) */
++	if (lis_nthreads && lis_atomic_read(&lis_queues_running))
++	    return;
++#endif /* __SMP__ */
++
+ 	lis_atomic_inc(&lis_queues_running);
+ 	lis_atomic_inc(&lis_runq_active_flags[cpu]) ;
+ 	queuerun(cpu);			/* really run the queues */
+diff -rauN LiS-2.16.18+proposal/include/sys/ldl.h LiS-2.16/include/sys/ldl.h
+--- LiS-2.16.18+proposal/include/sys/ldl.h	2000-12-19 22:08:37.000000000 +0100
++++ LiS-2.16/include/sys/ldl.h	2004-06-03 15:59:07.000000000 +0200
+@@ -5,7 +5,7 @@
+ #if 0 /* Now defined in the LiS configuration */
+ #define LDL_MAJOR	58 /* Driver major device number	*/
+ #endif
+-#define LDL_N_MINOR	16 /* Number of minors			*/
++#define LDL_N_MINOR	256 /* Number of minors			*/
+ 
+ #ident "@(#) LiS ldl.h 2.9 12/19/00 21:08:37 "
+ 
+diff -rauN LiS-2.16.18+proposal/include/sys/osif.h LiS-2.16/include/sys/osif.h
+--- LiS-2.16.18+proposal/include/sys/osif.h	2003-11-23 19:04:48.000000000 +0100
++++ LiS-2.16/include/sys/osif.h	2004-06-03 15:59:07.000000000 +0200
+@@ -507,6 +507,10 @@
+ extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg);
+ extern size_t lis_osif_sg_dma_len(struct scatterlist *sg);
+ 
++#if  BITS_PER_LONG == 64 
++typedef u64 dma64_addr_t;
++#endif
++
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
+ #if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+ extern void lis_osif_pci_unmap_page(struct pci_dev *hwdev,
+diff -rauN LiS-2.16.18+proposal/Makefile LiS-2.16/Makefile
+--- LiS-2.16.18+proposal/Makefile	2003-12-31 16:16:38.000000000 +0100
++++ LiS-2.16/Makefile	2004-06-03 15:59:07.000000000 +0200
+@@ -193,7 +193,7 @@
+ endif
+ 	install -d $(LIS_ROOT)/usr/lib/LiS/include/sys/LiS
+ 	install -d $(LIS_ROOT)/usr/sbin
+-	find include -type f -name "*.h" -print -exec install {} $(LIS_ROOT)/usr/lib/LiS/{} \;
++	find include -type f -name "*.h" -print -exec install -m 644 {} $(LIS_ROOT)/usr/lib/LiS/{} \;
+ 	install -m 555 strms_down strms_status strms_up $(LIS_ROOT)/usr/sbin
+ 
+ 

@@ -31,7 +31,6 @@
 #ident "@(#) LiS osif.c 1.53 10/11/04"
 
 #include <sys/stream.h>
-#include <linux/autoconf.h>		/* Linux config defines */
 
 #ifdef STR
 #undef STR				/* collides with irq.h */
@@ -335,7 +334,7 @@ void  _RP lis_osif_pci_unregister_driver( struct pci_driver *p )
 #endif
 
 #if LINUX_VERSION_CODE >= 0x020400		/* 2.4 kernel */
-#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
 
 	 /***************************************
 	 *        PCI DMA Mapping Fcns		*
@@ -755,6 +754,23 @@ void  _RP lis_release_region(unsigned int from, unsigned int extent)
     release_region(from, extent) ;
 }
 
+int lis_check_mem_region(unsigned int from, unsigned int extent)
+{
+    return(check_mem_region(from, extent)) ;
+}
+
+void lis_request_mem_region(unsigned int from,
+			 unsigned int extent,
+			 const char  *name)
+{
+    request_mem_region(from, extent, name) ;
+}
+
+void lis_release_mem_region(unsigned int from, unsigned int extent)
+{
+    release_mem_region(from, extent) ;
+}
+
 /************************************************************************
 *                    Memory Allocation Routines                         *
 ************************************************************************/
@@ -843,6 +859,7 @@ void  _RP lis_osif_do_settimeofday( struct timeval *tp )
 /************************************************************************
 *                         Printing Routines                             *
 ************************************************************************/
+__attribute__ ((format(printf, 1, 2)))
 int  _RP lis_printk(const char *fmt, ...)
 {
     extern char	    lis_cmn_err_buf[];
@@ -857,6 +874,7 @@ int  _RP lis_printk(const char *fmt, ...)
     return(ret) ;
 }
 
+__attribute__ ((format(printf, 2, 3)))
 int  _RP lis_sprintf(char *bfr, const char *fmt, ...)
 {
     va_list	    args;
@@ -937,7 +955,10 @@ lis_del_timer(struct timer_list * timer)
  */
 unsigned _RP lis_usectohz(unsigned usec)
 {
+    if ( ((1000 / HZ) * HZ) == 1000 ) /* ie: HZ == 100 */
     return( usec / (1000000/HZ) ) ;
+    else			/* ie: HZ == 1024 */
+	return( (usec * HZ) / 1000000 ) ; /* 32bits overflow ??? */
 }
 
 /************************************************************************

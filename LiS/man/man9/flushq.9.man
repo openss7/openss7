@@ -1,0 +1,265 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: flushq.9.man,v 1.1.4.1 2005/03/09 23:14:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:00 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH FLUSHQ 9 "$Date: 2005/03/09 23:14:00 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B flushq
+\- flushes messages from a \fISTREAMS\fR message queue
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "flushq(queue_t *" q ", int " flag );
+.SH DESCRIPTION
+.PP
+.BR flushq ()
+is used to flush messages from a
+.IR STREAMS (4)
+message queue.  It is typically
+called in a
+.B M_FLUSH
+handling routine to flush the requested messages from a queue.
+.PP
+The arguments to
+.B flushq
+are interpreted as follows:
+.TP 8
+.I q
+The queue to flush.
+.TP 8
+.I flag
+How to flush the queue.
+.I flag
+can be one of the following:
+.RS
+.TP 12
+.B FLUSHDATA
+Flush only data messages; do not flush the control messages from the queue.
+.TP 12
+.B FLUSHALL
+Flush all the messages from queue: both data messages and control messages.
+.RE
+.SH EXAMPLES
+.PP
+.BR flushq ()
+is normally used within the
+.B M_FLUSH
+handling procedures for a
+.IR STREAMS (4)
+module or driver as follows:
+.sp
+.in +4
+.nf
+\fC\s-2\
+int x_w_flush(queue_t *q, mblk_t *mp)
+{
+    if (*mp->b_rptr & FLUSHW) {
+        if (*mp->b_rptr & FLUSHBAND)
+            flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+        else
+            flushq(WR(q), FLUSHALL);
+        if (q->q_next) {
+            putnext(q, mp);
+            return (0);
+        }
+        *mp->b_rptr &= ~FLUSHW;
+    }
+    if (*mp->b_rptr & FLUSHR) {
+        if (*mp->b_rptr & FLUSHBAND)
+            flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+        else
+            flushq(RD(q), FLUSHALL);
+        if (!q->q_next) {
+            qreply(q, mp);
+            return (0);
+        }
+        *mp->b_rptr &= ~FLUSHR;
+    }
+    freemsg(mp);
+    return (0);
+}
+int x_r_flush(queue_t *q, mblk_t *mp)
+{
+    if (*mp->b_rptr & FLUSHR) {
+        if (*mp->b_rptr & FLUSHBAND)
+            flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+        else
+            flushq(RD(q), FLUSHALL);
+        if (q->q_next) {
+            putnext(q, mp);
+            return (0);
+        }
+        *mp->b_rptr &= ~FLUSHR;
+    }
+    if (*mp->b_rptr & FLUSHW) {
+        if (*mp->b_rptr & FLUSHBAND)
+            flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+        else
+            flushq(WR(q), FLUSHALL);
+        if (!q->q_next) {
+            qreply(q, mp);
+            return (0);
+        }
+        *mp->b_rptr &= ~FLUSHW;
+    }
+    freemsg(mp);
+    return (0);
+}
+\s+2\fR
+.fi
+.PP
+In addition,
+.BR flushq ()
+is often used when closing or
+.BR I_UNLINK ing
+a stream as follows:
+.sp
+.in +4
+.nf
+\fC\s-2\
+void x_free_priv(queue_t *q)
+{
+    priv_t *p = (priv_t *) q->q_ptr;
+    flushq(RD(q), FLUSHALL);
+    flushq(WR(q), FLUSHALL);
+    /* free some more stuff */
+    free(p);
+    RD(q)->q_ptr = WR(q)->q_ptr = NULL;
+    return;
+}
+\s+2\fR
+.fi
+.SH "RETURN VALUES"
+.PP
+.BR flushq ()
+returns
+.BR void .
+.SH ERRORS
+.PP
+If the
+.I q
+passed to
+.BR flushq ()
+is
+.BR NULL ,
+or the
+.I q
+does not point to a valid queue structure, then
+.BR flushq ()
+will silently fail.
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+implements the call to
+.BR flushq (9)
+.BI flushq( q ", " band )
+as a call to
+.BI flushband( q ", " 0 ", " flag ).
+.SH "SEE ALSO"
+.PP
+.BR flushband (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR flushq ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

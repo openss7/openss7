@@ -551,6 +551,7 @@ object_info_t	*find_object(char *name)
 * Print an error message.						*
 *									*
 ************************************************************************/
+__attribute__ ((format(printf, 1, 2)))
 void	err(char *fmt, ...)
 {
     va_list args;

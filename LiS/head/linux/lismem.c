@@ -364,6 +364,8 @@ void	 _RP lis_free_all_pages(void)
 typedef struct
 {
     kmem_cache_t	*slab_ptr ;
+    unsigned char	__pad[SMP_CACHE_BYTES
+			      - (sizeof(kmem_cache_t *) % SMP_CACHE_BYTES)];
 
 } mem_hdr_t ;
 

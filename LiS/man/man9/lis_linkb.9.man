@@ -1,0 +1,1 @@
+.so man9/linkb.9.man

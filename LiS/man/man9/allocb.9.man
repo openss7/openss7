@@ -1,0 +1,239 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: allocb.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ALLOCB 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B allocb
+\- allocate a \fISTREAMS\fR message and data block
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "mblk_t *" mp " = allocb(int " size ", unsigned int " priority );
+.SH DESCRIPTION
+.PP
+.BR allocb ()
+allocates a message block and a data block of the requested
+.IR size " and " priority .
+.PP
+If the requested
+.I size
+is less than the
+.IR STREAMS (4)
+constant
+.B FASTBUF
+then a data block of size
+.B FASTBUF
+will be created.
+If the requested
+.I size
+is larger than the
+.IR STREAMS (4)
+constant
+.B FASTBUF
+then a data block of size
+.I size
+will be created.
+.PP
+The
+.I priority
+can be one of the following values:
+.RS
+.TP 12
+.B BPRI_LO
+The caller requests a low priority message buffer.
+.TP 12
+.B BPRI_MED
+The caller requests a medium priority message buffer.
+.TP 12
+.B BPRI_HI
+The caller requests a high priority message buffer.
+.RE
+.PP
+The allocated mesage block will have a data block type of
+.BR M_DATA .
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR allocb ()
+will
+return a pointer,
+.IR mp ,
+to the allocated message block.
+.PP
+Upon failure,
+.BR allocb ()
+will
+return a
+.B NULL
+message pointer,
+.IR mp .
+.SH ERRORS
+.PP
+When an error occurs,
+.BR allocb ()
+will return a
+.B NULL
+message pointer
+.IR mp .
+.PP
+.BR allocb ()
+will only fail if there is insufficient memory to allocate the necessary
+datastructures for the message block, data block or data buffer.
+.PP
+Failure to allocate a message block is typically followed by a call to
+.BR bufcall "(9) or " esbbcall (9).
+.SH CAVEATS
+.PP
+As with other post-SVR 4.2
+.[
+svr42
+.]
+.[
+svr42
+.]
+compliant
+.IR STREAMS (4)
+implementations, LiS
+.[
+LiS
+.]
+ignores the
+.I priority
+argument to
+.BR allocb ().
+The message block
+.I priority
+was an SVR 3
+.[
+svr3
+.]
+concept which was found not to be useful, primarily due to
+priority inversion.
+For a history of the
+.I priority
+mechanism and a discussion as to why the mechanism was abandonned in
+SVR 4.2,
+.[
+svr42
+.]
+see \*(lqThe Magic Garden.\*(rq
+.[
+magic
+.]
+.SH "SEE ALSO"
+.PP
+.BR freeb (9),
+.BR freemsg (9),
+.BR bufcall "(9), and "
+.BR esbbcall (9).
+.SH HISTORY
+.PP
+.BR allocb ()
+first appeared in SVR 3 STREAMS
+.[
+svr3
+.]
+and continued in SVR 4.2 STREAMS.
+.[
+svr42
+.]
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

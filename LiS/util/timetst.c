@@ -1,3 +1,59 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2003/12/15 23:35:47 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2003/12/15 23:35:47 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2003/12/15 23:35:47 $"
+
+static char const ident[] =
+    "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2003/12/15 23:35:47 $";
+
 /*
  * Copyright 1997 David Grothe, Gcom, Inc <dave@gcom.com>
  *
@@ -20,7 +76,7 @@
 
 #ident "@(#) LiS timetst.c 2.5 09/02/04 14:46:08 "
 
-#define	inline				/* make disappear */
+#define	inline			/* make disappear */
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -37,7 +93,10 @@
 #include <ioctl.h>
 #endif
 
-#include <sys/stream.h>
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
 #include <sys/stropts.h>
 
 #if	defined(LINUX)
@@ -48,7 +107,7 @@
 #include <sys/LiS/usrio.h>
 #endif
 
-#include <sys/LiS/loop.h>		/* an odd place for this file */
+#include <sys/LiS/loop.h>	/* an odd place for this file */
 
 /************************************************************************
 *                      File Names                                       *
@@ -91,7 +150,9 @@ struct strbuf	wr_dta = {0, 0, buf} ;
 struct strbuf	rd_ctl = {0, 0, rdctlbuf} ;
 struct strbuf	rd_dta = {0, 0, rdbuf} ;
 
-extern void make_nodes(void) ;
+int             output = 1;
+
+extern void     make_nodes(void);
 
 /************************************************************************
 *                        Histogram Maintenance                          *
@@ -215,11 +276,13 @@ void print_hist(histogram_bucket_t *h, int minimum)
     for (p = h; p->micro_secs != 0; p++)
     {
 	if (p->counter >= minimum)
-	    printf("%8d %12u\n", p->micro_secs, p->counter) ;
+	    if (output)
+		printf("%8d %12u\n", p->micro_secs, p->counter) ;
     }
 
     if (p->counter != 0)
-	printf("%8s %12u\n", "Larger", p->counter) ;
+	if (output)
+	    printf("%8s %12u\n", "Larger", p->counter) ;
 
 }
 
@@ -231,14 +294,13 @@ void print_hist(histogram_bucket_t *h, int minimum)
 * streams.								*
 *									*
 ************************************************************************/
-void	register_drivers(void)
+void register_drivers(void)
 {
 #if	!defined(LINUX) && !defined(QNX)
-    port_init() ;			/* stream head init routine */
+    port_init();		/* stream head init routine */
 #endif
 
-} /* register_drivers */
-
+}				/* register_drivers */
 
 /************************************************************************
 *                           timing_test                                 *
@@ -247,7 +309,7 @@ void	register_drivers(void)
 * Time reading and writing messages through streams.			*
 *									*
 ************************************************************************/
-void	timing_test(void)
+void timing_test(void)
 {
     time_t		time_on ;
     time_t		et ;
@@ -267,32 +329,36 @@ void	timing_test(void)
     int			interval ;
     struct timeval	x ;
 
-    printf("\nBegin timing test\n") ;
+    if (output)
+	printf("\nBegin timing test\n");
 
-    fd1 = user_open(LOOP_1, O_RDWR, 0) ;
+    fd1 = user_open(LOOP_1, O_RDWR, 0);
     if (fd1 < 0)
     {
-	printf("loop.1: %s\n", strerror(-fd1)) ;
-	return ;
+	if (output)
+	    printf("loop.1: %s\n", strerror(-fd1));
+	return;
     }
 
-    fd2 = user_open(LOOP_2, O_RDWR, 0) ;
+    fd2 = user_open(LOOP_2, O_RDWR, 0);
     if (fd2 < 0)
     {
-	printf("loop.2: %s\n", strerror(-fd2)) ;
-	return ;
+	if (output)
+	    printf("loop.2: %s\n", strerror(-fd2));
+	return;
     }
 
-    ioc.ic_cmd 	  = LOOP_SET ;
-    ioc.ic_timout = 10 ;
-    ioc.ic_len	  = sizeof(int) ;
-    ioc.ic_dp	  = (char *) &arg ;
+    ioc.ic_cmd = LOOP_SET;
+    ioc.ic_timout = 10;
+    ioc.ic_len = sizeof(int);
+    ioc.ic_dp = (char *) &arg;
 
-    arg = 2 ;
-    rslt = user_ioctl(fd1, I_STR, &ioc) ;
+    arg = 2;
+    rslt = user_ioctl(fd1, I_STR, &ioc);
     if (rslt < 0)
     {
-	printf("loop.1: ioctl LOOP_SET: %s\n", strerror(-rslt)) ;
+	if (output)
+	    printf("loop.1: ioctl LOOP_SET: %s\n", strerror(-rslt));
     }
 
     if (latency_opt)
@@ -309,9 +375,10 @@ void	timing_test(void)
     }
 
 
-    printf("Time test:  write %d bytes, read/write and service queue: ",
-    		lgth) ;
-    fflush(stdout) ;
+    if (output) {
+	printf("Time test:  write %d bytes, read/write and service queue: ", lgth) ;
+	fflush(stdout) ;
+    }
 
     sync() ;				/* do file sync now rather than
     					 * in the middle of the test.
@@ -328,23 +395,27 @@ void	timing_test(void)
 
 	if (rslt != lgth)
 	{
-	    if (rslt < 0)
-		printf("loop.1: write: %s\n", strerror(-rslt)) ;
-	    else
-		printf("loop.1:  write returned %d, expected %d\n", rslt, lgth) ;
-
-	    break ;
+	    if (output)
+	    {
+		if (rslt < 0)
+		    printf("loop.1: write: %s\n", strerror(-rslt));
+		else
+		    printf("loop.1:  write returned %d, expected %d\n", rslt, lgth);
+	    }
+	    break;
 	}
 
 	rslt = user_read(fd2, rdbuf, lgth);
-
 	if (rslt != lgth)
 	{
-	    if (rslt < 0)
-		printf("loop.2: read: %s\n", strerror(-rslt)) ;
-	    else
-		printf("loop.2:  read returned %d, expected %d\n", rslt, lgth) ;
-	    break ;
+	    if (output)
+	    {
+		if (rslt < 0)
+		    printf("loop.2: read: %s\n", strerror(-rslt));
+		else
+		    printf("loop.2:  read returned %d, expected %d\n", rslt, lgth);
+	    }
+	    break;
 	}
 
 	if (latency_opt)
@@ -359,27 +430,32 @@ void	timing_test(void)
 #endif
     et = (time(NULL) - time_on) * 1000000 ;	/* time in usecs */
 
-    printf("%ld micro-secs\n", et/iter_cnt) ;
+    if (output)
+	printf("%ld micro-secs\n", et/iter_cnt) ;
     if (latency_opt)
 	print_hist(hist, 1000) ;
-    printf("\n") ;
+    if (output)
+	printf("\n") ;
 
+    if (output)
+	printf("%ld micro-secs\n", et / iter_cnt);
 
-
-    ioc.ic_cmd 	  = LOOP_PUTNXT ;		/* use putnxt rather then svcq */
-    ioc.ic_len	  = 0 ;
-    rslt = user_ioctl(fd1, I_STR, &ioc) ;
+    ioc.ic_cmd = LOOP_PUTNXT;	/* use putnxt rather then svcq */
+    ioc.ic_len = 0;
+    rslt = user_ioctl(fd1, I_STR, &ioc);
     if (rslt < 0)
     {
-	printf("loop.1: ioctl LOOP_PUTNXT: %s\n", strerror(-rslt)) ;
+	if (output)
+	    printf("loop.1: ioctl LOOP_PUTNXT: %s\n", strerror(-rslt));
     }
 
-    printf("Time test:  write %d bytes, read/write w/o service queue: ",
-    		lgth) ;
-    fflush(stdout) ;
+    if (output)
+	printf("Time test:  write %d bytes, read/write w/o service queue: ", lgth);
+    if (output)
+	fflush(stdout);
     init_hist(hist) ;
-    sync() ;
-    time_on = time(NULL) ;
+    sync();
+    time_on = time(NULL);
 
     for (i = 0; i < iter_cnt; i++)
     {
@@ -390,23 +466,27 @@ void	timing_test(void)
 
 	if (rslt != lgth)
 	{
-	    if (rslt < 0)
-		printf("loop.1: write: %s\n", strerror(-rslt)) ;
-	    else
-		printf("loop.1:  write returned %d, expected %d\n", rslt, lgth) ;
-
-	    break ;
+	    if (output)
+	    {
+		if (rslt < 0)
+		    printf("loop.1: write: %s\n", strerror(-rslt));
+		else
+		    printf("loop.1:  write returned %d, expected %d\n", rslt, lgth);
+	    }
+	    break;
 	}
 
 	rslt = user_read(fd2, rdbuf, lgth);
-
 	if (rslt != lgth)
 	{
-	    if (rslt < 0)
-		printf("loop.2: read: %s\n", strerror(-rslt)) ;
-	    else
-		printf("loop.2:  read returned %d, expected %d\n", rslt, lgth) ;
-	    break ;
+	    if (output)
+	    {
+		if (rslt < 0)
+		    printf("loop.2: read: %s\n", strerror(-rslt));
+		else
+		    printf("loop.2:  read returned %d, expected %d\n", rslt, lgth);
+	    }
+	    break;
 	}
 
 	if (latency_opt)
@@ -419,25 +499,26 @@ void	timing_test(void)
 	}
     }
 
-    et = (time(NULL) - time_on) * 1000000 ;	/* time in usecs */
+    et = (time(NULL) - time_on) * 1000000;	/* time in usecs */
 
-    printf("%ld micro-secs\n", et/iter_cnt) ;
+    if (output)
+	printf("%ld micro-secs\n", et/iter_cnt) ;
     if (latency_opt)
 	print_hist(hist, 1000) ;
-    printf("\n") ;
+    if (output)
+	printf("\n") ;
 
-
-
-    ioc.ic_cmd 	  = LOOP_PUTNXT ;	/* use putnxt rather then svcq */
-    ioc.ic_len	  = 0 ;
-    rslt = user_ioctl(fd1, I_STR, &ioc) ;
+    ioc.ic_cmd = LOOP_PUTNXT;	/* use putnxt rather then svcq */
+    ioc.ic_len = 0;
+    rslt = user_ioctl(fd1, I_STR, &ioc);
     if (rslt < 0)
     {
-	printf("loop.1: ioctl LOOP_PUTNXT: %s\n", strerror(-rslt)) ;
+	if (output)
+	    printf("loop.1: ioctl LOOP_PUTNXT: %s\n", strerror(-rslt));
     }
 
-    printf("Time test:  write %d bytes, getmsg/putmsg w/o service queue: ",
-    		lgth) ;
+    if (output)
+	printf("Time test:  write %d bytes, getmsg/putmsg w/o service queue: ", lgth) ;
     fflush(stdout) ;
     init_hist(hist) ;
     sync() ;
@@ -456,26 +537,30 @@ void	timing_test(void)
 
 	if (rslt < 0)
 	{
-	    printf("loop.1: putmsg: %s\n", strerror(-rslt)) ;
-	    break ;
+	    if (output)
+		printf("loop.1: putmsg: %s\n", strerror(-rslt));
+	    break;
 	}
 
-	rd_ctl.len	= -1 ;
-	rd_dta.len	= -1 ;
-	flags		= MSG_ANY ;
+	rd_ctl.len = -1;
+	rd_dta.len = -1;
+	flags = MSG_ANY;
 
-	rslt = user_getpmsg(fd2, &rd_ctl, &rd_dta, &rband, &flags) ;
+	rslt = user_getpmsg(fd2, &rd_ctl, &rd_dta, &rband, &flags);
 
 	if (rslt < 0)
 	{
-	    printf("loop.2: getmsg: %s\n", strerror(-rslt)) ;
-	    break ;
+	    if (output)
+		printf("loop.2: getmsg: %s\n", strerror(-rslt));
+	    break;
 	}
-	else
-	if (rd_dta.len != lgth || rd_ctl.len > 0)
+	else if (rd_dta.len != lgth || rd_ctl.len > 0)
 	{
-	    printf("expected rd_ctl.len = %d, got %d\n", -1, rd_ctl.len) ;
-	    printf("expected rd_dta.len = %d, got %d\n", lgth, rd_dta.len) ;
+	    if (output)
+	    {
+		printf("expected rd_ctl.len = %d, got %d\n", -1, rd_ctl.len);
+		printf("expected rd_dta.len = %d, got %d\n", lgth, rd_dta.len);
+	    }
 	}
 
 	if (latency_opt)
@@ -490,16 +575,20 @@ void	timing_test(void)
 
     et = (time(NULL) - time_on) * 1000000 ;	/* time in usecs */
 
-    printf("%ld micro-secs\n", et/iter_cnt) ;
+    if (output)
+	printf("%ld micro-secs\n", et/iter_cnt) ;
     if (latency_opt)
 	print_hist(hist, 1000) ;
-    printf("\n") ;
+    if (output)
+	printf("\n") ;
 
+    if (output)
+	printf("%ld micro-secs\n", et / iter_cnt);
 
-    user_close(fd1) ;
-    user_close(fd2) ;
+    user_close(fd1);
+    user_close(fd2);
 
-} /* timing_test */
+}				/* timing_test */
 
 /************************************************************************
 *                          set_debug_mask                               *
@@ -518,85 +607,219 @@ void	set_debug_mask(unsigned long long msk)
     fd = user_open(LOOP_1, O_RDWR, 0) ;
     if (fd < 0)
     {
-	printf("loop.1: %s\n", strerror(ENO(fd))) ;
+	if (output)
+	    printf("loop.1: %s\n", strerror(ENO(fd))) ;
 	exit(1) ;
     }
 
     rslt = user_ioctl(fd, I_LIS_SDBGMSK, mask1) ;
     if (rslt < 0)
     {
-	printf("loop.1: I_LIS_SDBGMSK: %s\n", strerror(ENO(rslt))) ;
+	if (output)
+	    printf("loop.1: I_LIS_SDBGMSK: %s\n", strerror(ENO(rslt))) ;
 	exit(1) ;
     }
 
     rslt = user_ioctl(fd, I_LIS_SDBGMSK2, mask2) ;
-    printf("\nSTREAMS debug mask set to 0x%08lx%08lx\n", mask2, mask1) ;
+    if (output)
+	printf("\nSTREAMS debug mask set to 0x%08lx%08lx\n", mask2, mask1) ;
 
-    user_close(fd) ;
+    user_close(fd);
 
-} /* set_debug_mask */
-
-/************************************************************************
-*                             print_options                             *
-************************************************************************/
-void print_options(void)
-{
-    printf("strtst [<options>]\n");
-    printf("  -d<mask>     Set debug mask (long long argument)\n");
-    printf("  -i<cnt>      Set iteration count, %ld default\n", iter_cnt);
-    printf("  -l           Compute round trip message latency histogram\n");
-    printf("  -h           Print this message\n");
-}
-
-/************************************************************************
-*                            get_options                                *
-************************************************************************/
-void get_options(int argc, char **argv)
-{
-    int		opt ;
-
-    while ((opt = getopt(argc, argv, "d:i:hl")) > 0)
-    {
-	switch (opt)
-	{
-	case 'd':
-	    debug_mask = strtoull(optarg, NULL, 0);
-	    break ;
-	case 'i':
-	    iter_cnt = strtol(optarg, NULL, 0) ;
-	    break ;
-	case 'l':
-	    latency_opt = 1 ;
-	    break ;
-	case 'h':
-	    print_options() ;
-	    exit(0) ;
-	default:
-	    print_options() ;
-	    exit(1) ;
-	}
-    }
-}
-
+}				/* set_debug_mask */
 
 /************************************************************************
 *                              main                                     *
 ************************************************************************/
-int main(int argc, char **argv)
+
+void copying(int argc, char *argv[])
 {
-    get_options(argc, argv) ;
+    fprintf(stdout, "\
+\n\
+%1$s %2$s:\n\
+\n\
+Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997       David Grothe, Gcom, Inc <dave@gcom.com>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+This program is free software;  you can  redistribute  it and/or modify it under\n\
+the terms of the GNU General  Public License as  published by the  Free Software\n\
+Foundation; either  version 2 of  the  License, or  (at  your option) any  later\n\
+version.\n\
+\n\
+This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
+WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received  a copy of the GNU  General  Public License along with\n\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
+Cambridge, MA 02139, USA.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+", argv[0], ident);
+}
+void version(int argc, char *argv[])
+{
+    fprintf(stdout, "\
+\n\
+%1$s %2$s:\n\
+    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997       David Grothe, Gcom, Inc <dave@gcom.com>\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2, included\n\
+    here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permissions.\n\
+\n\
+", argv[0], ident);
+}
+
+void usage(int argc, char *argv[])
+{
+    fprintf(stderr, "\
+Usage:\n\
+    %1$s [options] [{-c,--count}] count\n\
+    %1$s {-h,--help}\n\
+    %1$s {-V,--version}\n\
+    %1$s {-C,--copying}\n\
+", argv[0]);
+}
+
+void help(int argc, char *argv[])
+{
+    fprintf(stdout, "\
+\n\
+Usage:\n\
+    %1$s [options] [{-c,--count}] count\n\
+    %1$s {-h,--help}\n\
+    %1$s {-V,--version}\n\
+    %1$s {-C,--copying}\n\
+Options:\n\
+    [-c, --count] COUNT\n\
+        sets the iteration count to COUNT [default: %2$ld]\n\
+    -q, --quiet\n\
+        suppresses normal output\n\
+    -h, --help\n\
+        print this usage information and exit\n\
+    -V, --version\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permission and exit\n\
+\n\
+", argv[0], iter_cnt);
+}
+
+int main(int argc, char *argv[])
+{
+    /*
+     *  Automake distcheck (reasonably) does not permit installed binaries
+     *  that do not accept --help and --version options.
+     */
+    while (1)
+    {
+	int             c;
+#ifdef _GNU_SOURCE
+	int             option_index = 0;
+	/* *INDENT-OFF* */
+	static struct option long_options[] = {
+	    { "count",	 required_argument, NULL, 'c' },
+	    { "quiet",	 no_argument,	    NULL, 'q' },
+	    { "help",	 no_argument,	    NULL, 'h' },
+	    { "version", no_argument,	    NULL, 'V' },
+	    { "copying", no_argument,	    NULL, 'C' },
+	    { 0, }
+	};
+	/* *INDENT-ON* */
+	c = getopt_long_only(argc, argv, "c:qhVC", long_options, &option_index);
+#else				/* _GNU_SOURCE */
+	c = getopt(argc, argv, "c:qhVC");
+#endif				/* _GNU_SOURCE */
+
+	if (c == -1)
+	    break;
+	switch (c)
+	{
+	case 0:
+	    usage(argc, argv);
+	    exit(2);
+	case 'q':
+	    output = 0;
+	    break;
+	case 'h':
+	    help(argc, argv);
+	    exit(0);
+	case 'V':
+	    version(argc, argv);
+	    exit(0);
+	case 'C':
+	    copying(argc, argv);
+	    exit(0);
+	case 'c':
+	    if (sscanf(optarg, "%li", &iter_cnt) != 1)
+		goto bad_option;
+	    break;
+	case '?':
+	default:
+	  bad_option:
+	    optind--;
+	  bad_nonoption:
+	    if (optind < argc && output)
+	    {
+		fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+		for (; optind < argc; optind++)
+		    fprintf(stderr, "%s ", argv[optind]);
+		fprintf(stderr, "\n");
+	    }
+	    usage(argc, argv);
+	    exit(2);
+	}
+    }
+    /*
+     * mimic old behavior of taking iteration count as non-option argument 
+     */
+    if (optind < argc)
+    {
+	if (sscanf(optarg, "%li", &iter_cnt) != 1)
+	    goto bad_nonoption;
+	optind++;
+    }
+    /*
+     * don't ignore additional (permuted) non-option arguments 
+     */
+    if (optind < argc)
+	goto bad_nonoption;
 
 #if	!defined(LINUX) && !defined(QNX)
-    register_drivers() ;
-    make_nodes() ;
+    register_drivers();
+    make_nodes();
 #endif
 
-    printf("Timing test version %s\n\n", "2.5 09/02/04");
-    printf("Using safe constructs and message tracing\n") ;
+    version(argc, argv);
+    copying(argc, argv);
+
+    if (output) {
+	printf("Timing test version %s\n\n", "2.5 09/02/04");
+	printf("Using safe constructs and message tracing\n") ;
+    }
     set_debug_mask(debug_mask | 0x30000L) ;
     timing_test() ;
 
-    printf("\n\nNot using safe constructs or message tracing\n") ;
+    if (output)
+	printf("\n\nNot using safe constructs or message tracing\n") ;
     set_debug_mask(debug_mask & ~0x30000L) ;
     timing_test() ;
 

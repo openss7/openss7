@@ -1,0 +1,201 @@
+% -*- texinfo -*- vim: ft=texinfo
+% =========================================================================
+%
+% @(#) $Id: LiS.texi,v 1.1.6.1 2005/03/09 23:13:43 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2005/03/09 23:13:43 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename LiS.info
+@settitle Linux STREAMS (LiS)
+@setchapternewpage off
+
+@dircategory Kernel
+@direntry
+* Linux STREAMS: (lis).                 STREAMS for Linux
+@end direntry
+
+@set xref-automatic-section-title
+
+@set UPDATED 13 December 2003
+@set UPDATED-MONTH December 2003
+@set VERSION 2.16.16
+@set EDITION 2.16.16
+
+@defindex op
+
+@ifinfo
+This file documents Linux STREAMS (LiS) @value{VERSION}
+
+Copyright 2003-2004  OpenSS7 Corporation
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph.
+
+@end ignore
+Permission is granted to copy and distributed modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions, except
+that this permission notice must be stated in a translation approved by the
+Free Software Foundation.
+@end ifinfo
+
+@iftex
+@shorttitlepage The Linux STREAMS (LiS) Reference Manual
+@end iftex
+@titlepage
+@title Linux STREAMS (LiS)
+@subtitle For verion @value{VERSION}, @value{UPDATED}
+@author Brian Bidulock  @cite{@email{bidulock@@openss7.org}}
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+All Rights Reserved. @*
+
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+This is the first edition of the Linux STREAMS documentation, and is
+consistent with Linux STREAMS (LiS) @value{VERSION}.  This manual was
+developed under the OpenSS7 Project @url{http://www.openss7.org} and was
+funded in part by HOB International.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission is granted to copy and distributed modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions, except
+that this permission notice must be stated in a translation approved by the
+Free Software Foundation.
+@end titlepage
+@page
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+@c Define an index of configure variables.
+@c @defcodeindex cv
+@c Define an index of options.
+@c @defcodeindex op
+@c Define an index of targets.
+@c @defcodeindex tr
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@node Top, Copying, (dir), (dir)
+@top Linux STREAMS (LiS)
+@comment  node-name,  next,  previous,  up
+This file documents the Linux STREAMS (LiS) package.  Linux STREAMS is a
+System V Release 4.2 compatible STREAMS subsystem for Linux.  This edition
+documents version @value{VERSION}.
+
+@ifnottex
+
+@menu
+* Copying::			Lesser GNU Public License
+* License::			GNU Free Documentation License
+
+* Introduction::		STREAMS for Linux?
+@end menu
+
+@end ifnottex
+
+@node Copying, License, Top, Top
+@c @include info/lesser.texi
+
+@node License, Introduction, Copying, Top
+@c @include info/fdl.texi
+
+@node Introduction, (dir), License, Top
+@chapter Introduction
+
+STREAMS for Linux?
+
+@page
+@shortcontents
+@page
+@contents
+@bye

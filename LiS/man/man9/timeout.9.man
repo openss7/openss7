@@ -1,0 +1,192 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: timeout.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TIMEOUT 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B timeout, lis_timeout
+\- start a timer
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/dki.h>
+.HP 8
+.BI "toid_t " tid " = timeout(timo_fcn_t *" timo_fcn ", caddr_t " arg ", long " ticks );
+.SH DESCRIPTION
+.PP
+.BR timeout ()
+starts a timer with duration
+.I ticks
+number of system clock ticks, that, upon expiry, will invoke the supplied
+timeout function callback
+.I timo_fcn
+(if the
+.I timo_fcn
+function pointer is
+.BR "" non- NULL )
+with the supplied argument
+.IR arg .
+The timeout callback function
+.I timo_fcn
+is a function returning
+.B void
+and taking a single
+.B caddr_t
+argument as follows:
+.sp
+.nf
+typedef void timo_fcn_t(caddr_t arg);
+.fi
+.SH "RETURN VALUES"
+.PP
+.BR timeout ()
+returns a
+.B timo_t
+defined as follows:
+.sp
+.nf
+typedef int toid_t;
+typedef int timeout_id_t;
+.fi
+.PP
+Upon success,
+.BR timeout ()
+returns a non-zero timeout id.
+.PP
+Upon failure,
+.BR timeout ()
+returns a zero (0) timeout id.
+.SH ERRORS
+.PP
+When
+.BR timeout ()
+fails, it returns a zero (0) timeout id.
+.BR timeout ()
+fails when it cannot allocate the internal structures for the timeout.
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+provides a wrapper to Linux Kernel timer functions to implement
+.BR timeout ().
+.BR LiS 's
+implementation
+.[
+LiS
+.]
+creates a Linux timer structure, assigns it a sequential
+integer timer identifier, and places it in a timer list.
+Whenever
+.B LiS
+.[
+LiS
+.]
+starts a timer it checks the list to see if the integer timer identifier is
+unique.  This is an exhaustive linear search.  This is inefficient.
+.IR STREAMS (4)
+modules or drivers that set timers often will experience poorer performance
+than if the Linux kernel timer facility was used directly.
+.SH "SEE ALSO"
+.PP
+.BR untimeout (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR timeout ()
+first appeared in SVR 2.
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

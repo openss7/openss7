@@ -1,0 +1,405 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: fifo.4s.man,v 1.1.4.1 2005/03/09 23:13:57 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:57 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH FIFO 4S "$Date: 2005/03/09 23:13:57 $" "$Name:  $" "Linux STREAMS"
+.\"
+.\"
+.SH NAME
+.PP
+.B fifo
+\- pseudo-driver for \fISTREAMS\fR \fBfifos\fR
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B fifo
+pseudo-driver
+(which is internal to
+.B LiS\c
+)
+.[
+LiS
+.]
+provides
+.I STREAMS
+.I fifos
+as single character special files, and
+.I STREAMS
+.I pipes
+as pairs of character special files which are interconnected (see
+.BR pipe "(3)).  "
+.sp
+.I STREAMS
+.I fifos
+differ from typical
+.I STREAMS
+character special files in that there are not separate
+.I "stream head"
+and
+.I driver
+queue pair within the
+.I STREAMS
+file.  Instead, a
+.I fifo
+is created with only a single queue pair for the
+.IR "stream head" .
+Moreover, in a typical
+.I driver
+queue pair, the write queue is not connected to a next queue.
+In a
+.IR fifo ,
+the write queue is directed to the read queue of the pair.
+A
+.I pipe
+comprises a pair of
+.IR fifos ", "
+with the write queue of each pair directed to the read queue of the other.
+The two
+.B fifos
+comprising a
+.B pipe
+are referred to as
+.IR peers ", "
+and each somewhat represents a
+.I driver
+to the other.
+As a degenerate case, a
+.B fifo
+is its own peer.
+.sp
+.I STREAMS
+.I modules
+may be pushed onto
+.B fifos
+and
+.BR pipes ", "
+but should not expect a
+.I driver
+below them; instead, the
+.BR SAMESTR "()"
+function should be used from the write queue of a pair to determine if
+the module is the lowest in the
+.I STREAMS
+file (this is called the
+.IR midpoint "). "
+The structure of a
+.B fifo
+or
+.B pipe
+is preserved when modules are pushed (and popped); i.e., the write
+queue at the
+.I midpoint
+will always be directed at the read queue of the
+.IR peer "."
+.sp
+Input and output are handled at a
+.B fifo
+stream head as they would normally be handled
+at a stream head.  In
+LiS,
+.[
+LiS
+.]
+an
+.BR "fifo open" "() "
+entry point exists to assign minor device numbers to new opens under the
+.B fifo
+major device number, and a
+.BR close "() "
+entry point is used correspondingly to release them.  These functions
+are kept in a
+.I streamtab
+data structure (as they would normally be for any
+.I STREAMS
+driver or module) which is private to the
+LiS
+.[
+LiS
+.]
+implementation.
+.\"
+.\"
+.SH "APPLICATION USAGE"
+.PP
+In the current Linux kernels, character special major numbers are limited
+to 16 bits, and major and minor device numbers to 8 bis each.  This limits
+a system to 256 total major device numbers and 256 total minor devices
+per major device number.  This is a rather severe limitation where
+mechanisms like
+.B fifos
+and
+.B pipes
+are concerned.
+.sp
+However, a driver may handle more than one major device number.  The
+.B fifo
+pseudo-driver uses this to overcome this limitation, by supporting the
+automatic allocation and use of multiple major device numbers for
+.B fifos
+and
+.BR pipes .
+Specifying more than 256 minor devices is done in the usual manner, i.e.,
+by specifying the number of "units" in the appropriate
+.B Config
+file.  Enough major device numbers will be allocated to cover the
+requested number of minor devices (if available, else an error will
+occur in 
+.BR strconf "(8)). "
+The number allocated will include one minor device per major number
+to be used as a
+.BR fifo "\-specific"
+.I clone
+minor device (specifically, minor number 0), which exhibits special behavior.
+.sp
+Normally, when cloning is done via the
+.B clone
+pseudo-driver, the
+.B clone
+major device number is used, along with the desired actual major number
+as the minor device number.  When an
+.BR open "() "
+is performed on such a device, the
+.BR "clone open" "() "
+routine in turn calls the appropriate driver's
+.BR open "(), "
+with the
+.I sflag
+parameter set to
+.BR CLONEOPEN .
+The driver's
+.BR open "() "
+is expected in this case to allocate an unused minor device number,
+and return it via an entirely new device number in the
+.I "devp" 
+parameter.  In this way, a driver can change the device number to be
+used for a
+.I STREAMS
+file.
+When minor device 0 for a specified for a
+.B fifo
+major device, the driver will also clone a new minor device number.
+However,
+LiS
+.[
+LiS
+.]
+opens
+.B fifo
+devices differently; specifically, when an already-opened
+.BR fifo "\-specific"
+clone minor device is reopened, the new and subsequent opens will use
+the already-opened clone.
+Thus, using minor device 0 for a
+.B fifo
+when creating a file system node will ensure that all concurrent
+opens of the associated path name will use the same
+.I STREAMS
+file; at the same time, opens of different file system nodes via
+different paths will open their respectively different
+.I STREAMS
+files.
+This is essentially how kernel
+.B fifos
+behave -applications and users of
+.I STREAMS
+.B fifos
+don't have to keep track of minor numbers to achieve this same behavior
+when it is desired.
+.sp
+It is in fact recommended that only two forms of file system nodes be used for
+.I STREAMS
+.BR fifos ": "
+the
+.B clone
+major number as major number with a
+.B fifo
+major number as minor number, to be used when
+.I every
+open of the associated path must clone a new
+.BR fifo ", "
+and a
+.B fifo
+major number as major number with 0 as the minor number, to be used
+when new opens are to clone a new
+.B fifo
+but subsequent concurrent opens are to use the already opened
+.BR fifo ". "
+These are represented by two device special file paths created when LiS
+.[
+LiS
+.]
+is installed:
+.RB "/" dev "/" fifo
+for the former, and
+.RB "/" dev "/" fifo.0
+for the latter.  It is recommended that these be used, possibly
+along with the equivalent of
+.BR stat "(2) "
+to determine appropriate major device numbers for the
+.B clone
+and
+.B fifo
+pseudo-drivers, which are also determined when LiS
+.[
+LiS
+.]
+is installed.
+It can be noted that
+.B pipes
+are actually created as instances of the former, after which the write
+queues are peer-connected.
+.sp
+The
+.B fifo
+pseudo-driver allocates minor devices in
+.I round-robin
+fashion; i.e., a list of available minor devices is kept, and once a
+minor number is finally closed, it is put at the end of this list.
+Thus, a
+.B fifo
+minor device which is opened and closed will not be immediately reused.
+.\"
+.\"
+.SH WARNINGS
+.PP
+Because
+.I STREAMS
+.B fifos
+and
+.B pipes
+are implemented as character special devices, they do not appear as
+.B pipe
+devices when examined with
+.BR stat "(2) "
+or the equivalent (e.g., 
+.BR ls "(1)); "
+i.e. the
+.B S_IFIFO
+indication is not set in the mode -
+.B S_IFCHR
+is set instead, and the actual device number is indicated in the
+.I st_rdev
+field of the
+.I stat
+data structure.
+.sp
+Because of the potential use of multiple major numbers, applications
+should not depend on a
+.B fifo
+or
+.B pipe
+having a specific major device number, nor should an application depend on
+all
+.B fifos
+and
+.B pipes
+having the same major device number.
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR clone "(4), "
+.BR connld "(4), "
+.BR fifo "(4), "
+.BR ls "(1), "
+.BR pipe "(3), "
+.BR pipemod "(4), "
+.BR STREAMS "(4), "
+.BR stat "(2), "
+.BR strconf "(8)"
+.\"
+.\"
+.SH HISTORY
+.PP
+UNIX\(rg\ System V Release 4 (SVR4)
+.[
+svr4
+.]
+.\"
+.\"
+.SH AUTHOR
+.PP
+John Boyd, protologos LLC.
+.[
+$LIST$
+.]
+.T3

@@ -4,7 +4,7 @@
  * Author          : Graham Wheeler
  * Created On      : Sat Oct  7 05:01:31 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: loop.c,v 1.5 1996/01/24 19:44:35 dave Exp $
+ * RCS Id          : $Id: loop.c,v 1.1.1.2 2003/10/23 21:23:58 brian Exp $
  * Purpose         : provide loopback streams driver
  * ----------------______________________________________________
  *

@@ -1,0 +1,265 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: insq.9.man,v 1.1.4.1 2005/03/09 23:14:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:00 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH INSQ 9 "$Date: 2005/03/09 23:14:00 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B insq
+\- inserts a message into a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " retval " = insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" mp );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR insq ()
+inserts the message pointed to by
+.I mp
+before the message pointed to by
+.I emp
+in the queue specified by
+.IR q .
+If the message pointer
+.I emp
+is
+.B NULL
+it indicates that the message pointed to by
+.I mp
+is to be inserted at the end of the queue.
+This means that
+\fB\)insq(\fI\)q\fB\), NULL, \fI\)mp\fB\))\fR
+is equivalent to
+\fB\)putq(\fI\)q\fB\), \fI\)mp\fB\))\fR.
+.PP
+Messages can be inserted before other messages only if the
+resulting insertion would not violate the proper ordering of priority and
+banded messages within the queue.  This means that high priority messages can
+be inserted before all messages.  Low priority messages can only be inserted
+before low priority messages of the same or lesser priority band.
+.\"
+.\"
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR insq ()
+returns true (1) and the message pointed to by
+.I mp
+has been inserted into the queue.
+.PP
+Upon failure,
+.BR insq ()
+returns false (0) and the message pointed to by
+.I mp
+remains unaltered.  (See
+.BR "\*(lqBUGS\*(rq" " below.)"
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR insq ()
+fails, it returns false (0).
+.BR insq ()
+can fail because the passed in message pointer
+.I mp
+is a
+.B NULL
+pointer;
+the passed in queue pointer
+.I q
+is a
+.B NULL
+pointer;
+the passed in queue pointer
+.I q
+does not point to a queue structure;
+the queue associated with the passed in queue pointer
+.I q
+has flags
+.BR QCLOSING " or " QPROCSOFF
+set indicating that the queue is closing or has
+had put and service routine
+processing turned off (e.g. with
+.BR qprocsoff (9)).
+.PP
+.BR insq ()
+also fails if the message passed in by
+.I mp
+cannot be inserted before the message passed in by
+.IR emp .
+.\"
+.\"
+.SH BUGS
+.PP
+For versions prior to OpenSS7 release
+.BR LiS-2.16.18-17 ,
+.B LiS
+.[
+lis
+.]
+incorrectly frees the message pointed to by
+.I mp
+when the call to
+.BR insq ()
+fails due to a
+.B NULL
+queue pointer
+.IR q ,
+or when the queue pointer
+.I q
+does not point to a valid queue structure,
+or when the queue pointer
+.I q
+points to a queue that is closing or has processing turned off.
+On the other hand,
+.B LiS
+.[
+LiS
+.]
+does not free the message pointer pointed to by
+.I mp
+when
+.BR insq ()
+fails because the insertion would mis-sequence the queue.
+Because of this bug, when
+.BR insq ()
+returns failure (0), it is difficult to determine whether the message
+pointed to by
+.I mp
+has been freed or not.
+This is inconsistent with SVR 4.2 MP and other implementations.
+.\"
+.\"
+.PP
+Beginning with OpenSS7 release version
+.BR LiS-2.16.18-17
+and for subsequent versions,
+the message is not freed upon failure and the caller retains ownership of the
+message subsequent to failure.
+This is consistent with SVR 4.2 MP and other implementations.
+.\"
+.PP
+However, for all releases,
+.BR insq ()
+still has bugs related to
+.BR qprocsoff (9)
+handling in that it fails while
+.BR qprocsoff (9)
+is in effect or if the stream is closing.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR rmvq (9),
+.BR putq (9),
+.BR putbq (9).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR insq ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

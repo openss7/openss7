@@ -1,0 +1,197 @@
+diff -rauN -U 8 LiS-2.16/drivers/str/linux/ldl.c LiS-2.16+ldl/drivers/str/linux/ldl.c
+--- LiS-2.16/drivers/str/linux/ldl.c	2003-12-31 16:16:37.000000000 +0100
++++ LiS-2.16+ldl/drivers/str/linux/ldl.c	2004-05-05 18:50:39.000000000 +0200
+@@ -667,17 +667,17 @@
+ 		/* No need to synchronize with rcv_func() */ 
+ 		sap->next_listen = pt->listen;
+ 		pt->listen = sap;
+ 		lis_rw_lock_init(&pt->lock, "LiS SAP listening list");
+ 		pt->magic = PT_MAGIC;
+ 		pt->pt.type = saptype;
+ 		pt->pt.dev = dl->ndev->dev;
+ 		pt->pt.func = rcv_func;
+-		pt->pt.data = NULL;
++		pt->pt.data = (void *)1; /* indicate "new style" packet handler */
+ 		pt->pt.next = NULL;
+ 		lis_spin_unlock(&first_pt_lock);
+ 		dev_add_pack(&pt->pt);
+ 	} else {
+ 		/* Re-use of packet_type */
+ 		ASSERT(pt->magic == PT_MAGIC);
+ 		ASSERT(pt->pt.type == saptype);
+ 		ASSERT(pt->pt.func == rcv_func);
+@@ -1175,48 +1175,73 @@
+ #endif
+ 
+ 	ndev = (struct ndev *)skb->sk;
+ 	skb->sk = NULL;
+ 	ASSERT(ndev != NULL);
+ 	ASSERT(ndev->magic == NDEV_MAGIC);
+ 
+ 	ASSERT(atomic_read(&ndev->wr_cur) >= skb->truesize);
++	atomic_sub(skb->truesize, &ndev->wr_cur);
+ 
+ 	if (ndev->dev != NULL) {
+ 		if (atomic_read(&ndev->wr_cur) <= ndev->wr_min) {
+ 			if (ndev->sleeping)
+ 				ndev_wr_wakeup(ndev);
+-			atomic_sub(skb->truesize, &ndev->wr_cur);
+ 		}
+ 	} else {
+ 		ASSERT(ndev->endpoints == NULL);
+ 
+-		atomic_sub(skb->truesize, &ndev->wr_cur);
+ 		if (atomic_read(&ndev->wr_cur) == 0)
+ 			ndev_free(ndev);
+ 	}
+ }
+ 
+ #if defined(KERNEL_2_1)
+ 
+ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+ {
++	int psw;
++	int ret;
++
+ 	ASSERT(skb != NULL);
+ 	ASSERT(ndev != NULL);
+ 	ASSERT(ndev->magic == NDEV_MAGIC);
+ 	ASSERT(ndev->dev != NULL);
+ 
+ 	skb->mac.raw = skb->data;
+ 	skb->dev = ndev->dev;
+ 	atomic_add(skb->truesize, &ndev->wr_cur);
+ 	(struct ndev *)skb->sk = ndev;
+ 	skb->destructor = ndev_skb_destruct;
+-	dev_queue_xmit(skb);
+-	return DONE;
++
++	if (atomic_read(&ndev->wr_cur) <= ndev->wr_max) {
++		switch (dev_queue_xmit(skb)) {
++		case NET_XMIT_SUCCESS:
++		default:
++			return DONE;
++
++		case NET_XMIT_DROP:
++			return RETRY;
++
++		case NET_XMIT_CN:
++		case NET_XMIT_POLICED:
++			ret = DONE;
++			break;
++		}
++	} else {
++		kfree_skb(skb);
++		ret = RETRY;
++	}
++
++	SPLSTR(psw);
++	if (!ndev->sleeping)
++		ndev_wr_sleep(ndev);
++	SPLX(psw);
++	return ret;
+ }
+ 
+ #elif defined(too_complicated_KERNEL_2_1)
+ 
+ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+ {
+ 	int psw;
+ 	struct ldldev *dev;
+@@ -2393,16 +2418,21 @@
+ 	} else {
+ 		freemsg(mp);
+ 		ginc(unitdata_drp_cnt) ;
+ 		++dl->lost_rcv;
+ 	}
+ #endif
+ }
+ 
++void mblk_destructor(char *arg)
++{
++	kfree_skb((struct sk_buff*)arg);
++}
++
+ /*
+  *  Our "interrupt" function
+  *
+  *  This is called from the Linux networking code whenever
+  *  a packet comes in from the device.
+  *
+  *  It is not a real interrupt function as the driver has
+  *  returned from the hardware interrupt when this is called.
+@@ -2425,23 +2455,55 @@
+ 	mblk_t *dp;
+ 	struct dl *dl, *last = NULL;
+ 	struct sap *sap;
+ #if 0
+ 	struct ethhdr *hdr = (struct ethhdr *)skb->mac.raw;
+ #endif
+ 	unsigned char *fr_ptr, fr_buf[LDL_MAX_HDR_LEN];
+ 	int fr_len;
++	struct free_rtn mblk_rtn;
+ 
+ 	ASSERT(dev->type == ARPHRD_ETHER || dev->type == ARPHRD_LOOPBACK
+ 	       || dev->type == ARPHRD_IEEE802 || IS_ARPHRD_IEEE802_TR(dev)
+ 	       || dev->type == ARPHRD_HDLC);
+ 		/*	ARPHRD_FDDI	*/
+ 
++	if (skb_is_nonlinear(skb)) {
++		struct sk_buff *b;
++		/* FIXME untested code */
++		printk("ldl: non linear skb");
++		b = skb_clone(skb, GFP_ATOMIC);
++		kfree_skb(skb);
++		if(b == NULL)
++			return 0;
++		if(skb_linearize(b, GFP_ATOMIC)) {
++			kfree_skb(b);
++			return 0;
++		}
++		skb = b;
++	}
++
++#if 1
++	mblk_rtn.free_func = mblk_destructor;
++	mblk_rtn.free_arg = (char*) skb;
+ 	fr_len = skb->tail - skb->mac.raw;
++	if((dp = esballoc( skb->mac.raw-2, fr_len+2,
++			   BPRI_LO, &mblk_rtn )) != NULL) {
++		dp->b_rptr = dp->b_wptr += 2;
++		fr_ptr = dp->b_rptr;
++		dp->b_wptr += fr_len;
++		skb_get(skb);
++	} else { /* We still need the frame type for correct drop stats */
++		fr_ptr = &fr_buf[0];
++		fr_len = lis_min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
++		ASSERT(fr_len > 0);
++		memcpy(fr_buf, skb->mac.raw, fr_len);
++	}
++#else
+ 	if ((dp = allocb(2 + fr_len, BPRI_LO)) != NULL) {
+ 		/*
+ 		 *  Prepare the data block.
+ 		 *  The header is removed later for those that do no want it.
+ 		 *  The two extra unused bytes makes the data more processor
+ 		 *  cache-efficient in the higher level protocols (at least for
+ 		 *  ethernet).
+ 		 */
+@@ -2451,17 +2513,17 @@
+ 		fr_ptr = dp->b_rptr;
+ 		dp->b_wptr += fr_len;
+ 	} else { /* We still need the frame type for correct drop stats */
+ 		fr_ptr = &fr_buf[0];
+ 		fr_len = lis_min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
+ 		ASSERT(fr_len > 0);
+ 		memcpy(fr_buf, skb->mac.raw, fr_len);
+ 	}
+-
++#endif
+ 
+ 	if (ldl_debug_mask & LDL_DEBUG_RCV_FUNC)
+ 	    ldl_skbuff_dump("ldl_rcv_func: skb", skb, 
+ 			     ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+ #ifdef KERNEL_2_1
+ 	dev_kfree_skb(skb);
+ #else
+ 	dev_kfree_skb(skb, FREE_WRITE);

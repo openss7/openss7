@@ -1,0 +1,234 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: configure.texi,v 1.1.4.1 2005/03/09 23:14:15 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any success
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2005/03/09 23:14:15 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@c This file is include from install.texi and contains the descriptions for
+@c package-specific enable/disable and with/without options
+
+In addition, the following @command{configure} options, specific to the
+@value{PACKAGE_TITLE} package are available:
+
+@ignore
+@table @command
+@item --enable-sctp-slow-verification
+@opindex sctp-slow-verification
+Enable slow verification of addresses and tags.
+
+When a message comes from an SCTP enpoint with the correct verification tag, it is not necessary to check whether it is
+from a correct source address to identify the SCTP association to which it belongs.  When you disable this feature
+(@command{--disable-sctp-slow-verification}), source addresses are not checked and it is up to firewall implementations
+to thwart attackers of the verification tag.  When you enable this feature (@command{--enablesctp-slow-verification}),
+you get RFC 2960 compliant operation, but at great cost to SCTP performance.
+
+This option defaults to disabled.
+
+@item --enable-sctp-throttle-heartbeats
+@opindex sctp-throttle-heartbeats
+Enable heartbeat throttling.
+
+Special feature of @value{PACKAGE_TITLE} that is not mentioned in RFC 2960.  When you enable this feature
+(@command{--enable-sctp-throttle-heartbeats}), @value{PACKAGE_TITLE} will throttle the rate at which it responds to
+heartbeats to the system control @var{heartbeat_interval}.  This makes SCTP more resilient to implementations which
+flood heartbeat messages.  For RFC 2960 compliant operation, disable this feature (@command{--disable-sctp-throttle-heartbeats}).
+
+This option defaults to disabled.
+
+@item --enable-sctp-discard-ootb
+@opindex sctp-discard-ootb
+Enable discard of out-of-the-blue packets.
+
+RFC 2960 requires the implementation to send @code{ABORT} to some OOTB packets (packets for which no SCTP association
+exists).  Sending @code{ABORT} chunks to unverified source addresses with the T bit set opens SCTP to blind masquerade
+attacks.  Not sending them may lead to delays at the peer endpoint aborting associations where our @code{ABORT} has been
+lost and the socket is already closed or if we have restarted and the peer still has open associations to us.  If you
+enable this feature (@command{--enable-sctp-discard-ootb}), SCTP will discard all OOTB packets.  This is necessary if
+another SCTP stack is being run on the same machine.  Therefore, if the @value{PACKAGE_TITLE} package is included on an
+OpenSS7 SCTP kernel, this feature is automagically enabled.  For RFC 2960 compliant operation, disable this feature
+(@command{--disable-sctp-discard-ootb}).
+
+This option defaults to disabled for non-OpenSS7 SCTP kernels, and enable for OpenSS7 SCTP kernels.
+
+@item --enable-sctp-extended-ip-support
+@opindex sctp-extended-ip-support
+Enable extended IP support for SCTP.
+
+This provides extended IP support for SCTP for things like IP Transparent Proxy and IP Masquerading.  This is
+experimental stuff.  If in doubt, disable this feature (@command{--disable-sctp-expended-ip-support}).
+
+This option defaults to disabled.
+
+@item --disable-sctp-hmac-sha1
+@opindex sctp-hmac-sha1
+Disable SHA-1 HMAC.
+
+This provides the ability to use the FIPS 180-1 (SHA-1) message authentication code in SCTP cookies.  If you enable this
+feature (@command{--enable-sctp-hmac-sha1}), when the appropriate sysctl is set, SCTP will use the SHA-1 HMAC when signing
+cookies in the @code{INIT-ACK} chunk.  If disable this feature (@command{--disable-sctp-hmac-sha1}), the SHA-1 HMAC will
+be unavailable for use with SCTP.
+
+This option defaults to enabled.
+
+@item --disable-sctp-hmac-md5
+@opindex sctp-hmac-md5
+Disable MD5 HMAC.
+
+This provides the ability to use the MD5 (RFC 1321) message authentication code in SCTP cookies.  If you enable this
+feature (@command{--enable-sctp-hmac-md5}), when the appropriate sysctl is set, SCTP will use the MD5 HMAC when signing
+cookies in the INIT ACK chunk.  If you disable this feature (@command{--disable-sctp-hmac-md5}), the MD5 HMAC will be
+unavailable for use with SCTP.
+
+This option defaults to enabled.
+
+@item --enable-sctp-adler32
+@opindex sctp-adler32
+Enable Adler32 checksum.
+
+This provides the ability to use the older RFC 2960 Adler32 checksum.  If CONFIG_SCTP_CRC_32 below is not selected, the
+Adler32 checksum is always provided.
+
+This option defaults to disabled.
+
+@item --disable-sctp-crc32c
+@opindex sctp-crc32c
+Disable CRC-32C checksum.
+
+This provides the ability to use the newer CRC-32c checksum as described in RFC 3309.  When this is selected and
+CONFIG_SCTP_ADLER_32 is not selected above, then the only checksum that will be used is the CRC-32c checksum.
+
+This option defaults to enabled.
+
+@item --enable-sctp-throttle-passiveopens
+@opindex sctp-throttle-passiveopens
+Enable throttling of passive opens.
+
+Special feature of Linux SCTP not mentioned in RFC 2960.  When secure algorithms are used for signing cookies, the
+implementation becomes vulnerable to INIT and @code{COOKIE-ECHO} flooding.  If you enable this feature
+(@command{--enable-sctp-throttle-passiveopens}), SCTP will only allow one INIT and one @code{COOKIE-ECHO} to be
+processed in each interval corresponding to the sysctl sctp_throttle_itvl.  Setting sctp_throttle_itvl to 0 defeats this
+function.  If you disable this feature (@command{--disable-sctp-throttle-passiveopens}), each INIT and
+@code{COOKIE-ECHO} will be processed.
+
+This option defaults to disabled.
+
+@item --enable-sctp-ecn
+@opindex sctp-ecn
+Enable explicit congestion notification.
+
+This enables support for Explicit Congestion Notification (ECN) chunks in SCTP messages as defined in RFC 2960 and RFC
+3168.  It also adds syctl (/proc/net/ipv4/sctp_ecn) which allows ECN for SCTP to be disabled at runtime.
+
+This option defaults to disabled.
+
+@item --enable-sctp-lifetimes
+@opindex sctp-lifetimes
+Enable SCTP message lifetimes.
+
+This enables support for message lifetimes as described in RFC 2960.  When enabled, message lifetimes can be set on
+messages.  See sctp(7).  This feature is always enabled when Partial Reliability Support is set.
+
+This option defaults to disabled.
+
+@item --enable-sctp-add-ip
+@opindex sctp-add-ip
+Enable ADD-IP.
+
+This enables support for ADD-IP as described in draft-ietf-tsvwg-addip-sctp-07.txt.  This allows the addition and
+removal of IP addresses from existing connections.  This is experimental stuff.
+
+This option defaults to disabled.
+
+@item --enable-sctp-adaptation-layer-info
+@opindex sctp-adaptation-layer-info
+Enable ALI.
+
+This enables support for the Adaptation Layer Information parameter described in draft-ietf-tsvwg-addip-sctp-07.txt for
+communicating application layer information bits at initialization.  This is experimental stuff.
+
+This option defaults to disabled.
+
+@item --enable-sctp-partial-reliability
+@opindex sctp-partial-reliability
+Enable SCTP Partial Reliability (PR-SCTP).
+
+This enables support for PR-SCTP as described in draft-stewart-tsvwg-prsctp-03.txt.  This allows for partial reliability
+of message delivery on a "timed reliability" basis.  This is experimental stuff.
+
+This option defaults to disabled.
+
+@item --disable-sctp-error-generator
+@opindex sctp-error-generator
+Disable the SCTP error generator.
+
+This provides an internal error generator that can be accessed with socket options for testing SCTP operation under
+packet loss.  You will need this option to run some of the test programs distributed with the SCTP module.
+
+This option defaults to enabled.
+
+@item --with-sctp
+@opindex sctp
+Enable the version 1 driver in the build.
+This option defaults to disabled.
+
+@item --with-sctp2
+@opindex sctp2
+Enable the version 2 driver in the build.
+This option defaults to enabled.
+@end ignore
+
+@end table
+

@@ -1,0 +1,274 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: bufcall.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH BUFCALL 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B bufcall
+\- install a \fISTREAMS\fR buffer callback
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " retval " = bufcall(unsigned " size ", int " priority ", void (*" function ")(long), long " arg );
+.SH DESCRIPTION
+.PP
+When allocation of a buffer fails as a result of a failed call to
+.BR allocb (9),
+the service routine should
+place the
+.IR STREAMS (4)
+message that invoked the
+.BR allocb (9)
+call back on the queue with
+.BR putbq (9)
+and call the
+.BR bufcall ()
+function with the queue's service routine as the
+.I function
+argument and a pointer to the queue as the
+.I arg
+argument to the call.
+The
+.I size
+and
+.I priority
+arguments should be the same as the
+.I size
+and
+.I priority
+arguments that were issued to
+.BR allocb (9).
+.PP
+In this way, the queue service routine will be recalled once there is
+sufficient memory to allocate the requested buffer and message blocks.
+.PP
+The arguments to
+.BR bufcall ()
+are interpreted as follows:
+.TP 12
+.I size
+The size of the requested data buffer.
+.TP 12
+.I priority
+The priority of the requested message.  The priority can be one of the
+following values:
+.RS
+.TP 12
+.B BPRI_LO
+The buffer needed is a high priority buffer.
+.TP 12
+.B BPRI_MED
+The buffer needed is a medium priority buffer.
+.TP 12
+.B BPRI_HI
+The buffer needed is a low priority buffer.
+.PP
+The
+.I priority
+argument is ignored by post-SVR 4.2 STREAMS
+.[
+svr42
+.]
+implementations.
+.RE
+.TP 12
+.I function
+The callback function to call when a buffer of the requested size and message of the
+requested priority becomes available.
+.TP 12
+.I arg
+The argument to pass to the callback function.
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR bufcall ()
+returns true (1) and the specified
+.I function
+will be called with the sepcified
+.I arg
+at a later time when buffers of the necessary size become available.
+.PP
+Upon failure,
+.BR bufcall ()
+returns false (0) and no call will be generated to the specified
+.IR function .
+.SH ERRORS
+.PP
+When
+.BR bufcall ()
+encounters an error, it returns false (0).
+.PP
+.BR bufcall ()
+returns false (0) when the function pointer to the callback function,
+.I function
+is
+.BR NULL ,
+or cannot allocate the necessary internal structures.
+.SH CAVEATS
+.PP
+The
+.B LiS
+.[
+LiS
+.]
+implementation of
+.BR bufcall ()
+does not actually generate a callback function once a buffer of the
+appropriate size becomes available.  Instead
+.B LiS
+.[
+LiS
+.]
+starts a timer.  When the timer expires, the ability to allocate the necessary
+buffers is checked and the callback function invoked if it is now possible to
+allocate the necessary structures and buffers.
+This is not entirely consistent with SVR 4.2
+.[
+svr42
+.]
+operation.
+.PP
+.B LiS
+.[
+LiS
+.]
+builds a linked list of buffer call structures and assigns an integer id to
+each structure.  Searches for unique buffer ids when ids are assigned and
+searches for buffer ids when
+.BR unbufcall (9)
+is called are linear searches that are slow and inefficient.
+In fact, \*(lqThe Magic Garden\*(rq explains that in SVR 4.2
+.[
+svr42
+.]
+a
+.BR bufcall ()
+results in the creation of a
+.B strevent
+structure which is linked to the
+.I strbcalls
+system variable
+and sets the
+.I strbcwait
+flag which is then causes
+.BR kmem_free ()
+to set the
+.IR qrunflag .
+At no point in this process is an integer id assigned to the
+.B strevent
+structure.  This means that
+.B LiS
+.[
+LiS
+.]
+meaninglessly assigns an integer id to the buffer call structure and the
+inefficiencies of linear searches are pointless.
+.SH "SEE ALSO"
+.PP
+.BR qbufcall (9),
+.BR putbq (9),
+.BR allocb "(9) and "
+.BR unbufcall (9).
+.SH HISTORY
+.PP
+.BR bufcall ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

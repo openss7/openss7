@@ -33,14 +33,18 @@
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
+#ifdef LINUX
+#include <linux/errno.h>
+#else
 #include <sys/errno.h>
+#endif
 #include <sys/cmn_err.h>
 #include <sys/osif.h>
 
 /*
  *  Some configuration sanity checks
  */
-#ifndef PIPEMOD_
+#ifndef PIPEMOD__MOD
 #error Not configured
 #endif
 

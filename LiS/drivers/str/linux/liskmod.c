@@ -31,11 +31,10 @@
 
 #ident "@(#) LiS liskmod.c 1.11 06/06/04 16:05:25 "
 
+#include <linux/config.h>
 #include <linux/version.h>
-
-#ifndef KERNEL_VERSION
-#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-#endif
+#include <linux/module.h>
+#include <linux/init.h>
 
 #if   LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
 #define KERNEL_2_0
@@ -45,19 +44,7 @@
 #define	KERNEL_2_4
 #endif
 
-#ifdef MODVERSIONS
-# ifdef LISMODVERS
-#  include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-# else
-#  include <linux/modversions.h>	/* BEFORE module.h, kernel.h, ... */
-# endif
-#endif
-
-#ifdef MODULE
-#include <linux/module.h>
-#endif
-
-#include <linux/kernel.h>		/* for printk */
+#include <linux/kernel.h>			/* for printk */
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,3,0)
 #include <linux/sched.h>

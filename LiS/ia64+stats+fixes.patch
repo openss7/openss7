@@ -1,0 +1,630 @@
+diff -rauN -U 8 LiS-2.16+ldl/drivers/str/linux/ldl.c LiS-2.16+fixes+stats/drivers/str/linux/ldl.c
+--- LiS-2.16+ldl/drivers/str/linux/ldl.c	2004-05-05 18:50:39.000000000 +0200
++++ LiS-2.16+fixes+stats/drivers/str/linux/ldl.c	2004-05-05 18:54:41.000000000 +0200
+@@ -401,36 +401,40 @@
+ 	0x7253,		/* Module ID number		*/
+ 	"ldl",		/* Module name: Linux DataLink	*/
+ 	4,		/* Min packet size accepted	*/
+ 	INFPSZ,		/* Max packet size accepted	*/
+ 	0x10000,	/* Hi water mark: 64 Kb		*/
+ 	0x04000		/* Low water mark: 16 Kb	*/
+ };
+ 
++STATIC struct module_stat dl_rdmstat = { }; /* all counters == 0 */
++
++STATIC struct module_stat dl_wrmstat = { }; /* all counters == 0 */
++
+ STATIC struct qinit dl_rinit = 
+ {
+ 	NULL,		/* No read put		*/
+ 	dl_rsrv,	/* Read service		*/
+ 	dl_open,	/* Each open		*/
+ 	dl_close,	/* Last close		*/
+ 	NULL,		/* Reserved		*/
+ 	&dl_minfo,	/* Information		*/
+-	NULL		/* No statistics	*/
++	&dl_rdmstat	/* Statistics		*/
+ };
+ 
+ STATIC struct qinit dl_winit = 
+ {
+ 	dl_wput,	/* Write put		*/
+ 	dl_wsrv,	/* Write service	*/
+ 	NULL,		/* Ignored		*/
+ 	NULL,		/* Ignored		*/
+ 	NULL,		/* Reserved		*/
+ 	&dl_minfo,	/* Information		*/
+-	NULL		/* No statistics	*/
++	&dl_wrmstat	/* Statistics		*/
+ };
+ 
+ #ifdef MODULE
+ STATIC
+ #endif
+ struct streamtab ldl_info = 
+ {
+ 	&dl_rinit,	/* Read queue		*/
+diff -rauN -U 8 LiS-2.16+ldl/head/head.c LiS-2.16+fixes+stats/head/head.c
+--- LiS-2.16+ldl/head/head.c	2003-12-31 16:16:38.000000000 +0100
++++ LiS-2.16+fixes+stats/head/head.c	2004-05-05 18:59:36.000000000 +0200
+@@ -567,34 +567,38 @@
+ 		{0			/* mi_idnum */
+ 		,"str_wput"		/* mi_idname */
+ 		,LIS_MINPSZ		/* mi_minpsz */
+ 		,LIS_MAXPSZ		/* mi_maxpsz */
+ 		,0xFFFF			/* mi_hiwat */
+ 		,0xF000			/* mi_lowat */
+ 		} ;
+ 
++struct module_stat	strmhd_rdmstat = { }; /* all counters == 0 */
++
++struct module_stat	strmhd_wrmstat = { }; /* all counters == 0 */
++
+ struct qinit	strmhd_rdinit =
+ 		{lis_strrput		/* qi_putp */
+ 		,lis_strrsrv		/* qi_srvp */
+ 		,NULL			/* qi_qopen */
+ 		,NULL			/* qi_qclose */
+ 		,NULL			/* qi_qadmin */
+ 		,&strmhd_rdminfo	/* qi_minfo */
+-		,NULL			/* qi_mstat */
++		,&strmhd_rdmstat	/* qi_mstat */
+ 		} ;
+ 
+ struct qinit	strmhd_wrinit =
+ 		{NULL			/* qi_putp */
+ 		,&lis_strwsrv		/* qi_srvp */
+ 		,NULL			/* qi_qopen */
+ 		,NULL			/* qi_qclose */
+ 		,NULL			/* qi_qadmin */
+ 		,&strmhd_wrminfo	/* qi_minfo */
+-		,NULL			/* qi_mstat */
++		,&strmhd_wrmstat	/* qi_mstat */
+ 		} ;
+ 
+ struct streamtab strmhd_info = {
+     &strmhd_rdinit,         /* read queue init */
+     &strmhd_wrinit,         /* write queue init */
+     NULL,
+     NULL
+ };
+@@ -1990,16 +1994,20 @@
+ 	    printk("lis_qdetach(q@0x%p,?%d,...) \"%s\" >> calling close(...)\n",
+ 		   rq, do_close, name);
+ 
+ 	CP(rq,0) ;
+ 	CLOCKADD() ;		/* user routine might sleep */
+ 	/* call w/queue locked and marked as closing */
+ 	lis_atomic_dec(&lis_in_syscall) ;	/* "done" with a system call */
+ 	lis_runqueues() ;
++#ifdef LIS_ATOMIC_STATS
++	    if(q->q_qinfo->qi_mstat != NULL)
++		lis_atomic_inc(&q->q_qinfo->qi_mstat->ms_ccnt);
++#endif
+ 	(*rq->q_qinfo->qi_qclose)(rq, (rq->q_next ? 0 : flag), creds);
+ 	lis_atomic_inc(&lis_in_syscall) ;	/* processing a system call */
+ 	CLOCKON() ;
+     }
+ 
+     /*
+      * Now that the qprocs have been turned off and the close routine called
+      * we need to ensure that the queues are not scheduled -- that is,
+@@ -2163,16 +2171,20 @@
+     if (LIS_DEBUG_OPEN)  name = lis_queue_name(q);
+     if (name && LIS_DEBUG_OPEN)
+ 	printk("lis_qopen(q@0x%p,...) "
+ 	       "calling %s \"%s\" open @0x%p (dev=%x,flag=%x,sflag=%x)\n",
+ 	       q, (sflag==MODOPEN?"module":"driver"), name,
+ 	       rq->q_qinfo->qi_qopen,
+ 	       *devp, flag, sflag);
+     
++#ifdef LIS_ATOMIC_STATS
++    if(rq->q_qinfo->qi_mstat != NULL)
++	    lis_atomic_inc(&rq->q_qinfo->qi_mstat->ms_ocnt);
++#endif
+     if ((err = (*(rq->q_qinfo->qi_qopen)) ( rq, devp,
+ 					    flag, sflag, credp )) != 0)  {
+ 	if (LIS_DEBUG_OPEN)
+ 	    printk("lis_qopen(q@0x%p,...) \"%s\" >> error %d\n",
+ 		   q, lis_queue_name(q), err);
+ 	return (err < 0 ? err : -err);
+     } else
+ 	return (0);
+diff -rauN -U 8 LiS-2.16+ldl/head/linux-mdep.c LiS-2.16+fixes+stats/head/linux-mdep.c
+--- LiS-2.16+ldl/head/linux-mdep.c	2004-01-12 17:50:27.000000000 +0100
++++ LiS-2.16+fixes+stats/head/linux-mdep.c	2004-05-05 19:05:03.000000000 +0200
+@@ -72,16 +72,17 @@
+ #include <sys/poll.h>
+ #include <sys/types.h>
+ #include <linux/mm.h>
+ #include <linux/file.h>
+ #include <linux/fs.h>		/* linux file sys externs */
+ #include <linux/pipe_fs_i.h>
+ #ifdef KERNEL_2_3
+ #include <linux/mount.h>
++#include <linux/proc_fs.h>	/* for stats in /proc/LiS */
+ #if defined(FATTACH_VIA_MOUNT)
+ #include <linux/capability.h>
+ #endif
+ #endif
+ #include <linux/time.h>
+ 
+ #if defined(MODULE) && !defined(KERNEL_2_3)		/* pre-2.4 kernel */
+ #define THIS_MODULE	(&__this_module)
+@@ -134,16 +135,22 @@
+                 "<usr/include/sys/stropts.h>"
+ #elif defined(_BITS_STROPTS_H)
+ 		"<usr/include/bits/stropts.h>"
+ #else
+ 		"<unknown/stropts.h>"
+ #endif
+ ;
+ 
++/*
++ * Load STREAMS module with panic_when_killed=1 (default) to call panic()
++ * when assertions fail; otherwise, failed assertions call BUG().
++ */
++int lis_panic_when_killed = 1;
++
+ /************************************************************************
+ *                      System Call Support                              *
+ *************************************************************************
+ *									*
+ * LiS provides wrappers for a selected few system calls.  The functions	*
+ * return 0 upon success and a negative errno on failure.		*
+ *									*
+ ************************************************************************/
+@@ -166,31 +173,58 @@
+ 
+ static inline _syscall3(long,syscall_mknod,const char *,file,int,mode,int,dev)
+ static inline _syscall1(long,syscall_unlink,const char *,file)
+ static inline _syscall5(long,syscall_mount,char *,dev,char *,dir,
+ 			char *,type,unsigned long,flg,void *,data)
+ static inline _syscall2(long,syscall_umount2,char *,file,int,flags)
+ 
+ /************************************************************************
++*                            lis_bug                                    *
++*************************************************************************
++*									*
++* This is called to report bugs in the STREAMS subsystem.               *
++*									*
++* It sends a warning message to the kernel logger, then calls either	*
++* BUG() or panic(), depending on lis_dont_panic                         *
++*									*
++************************************************************************/
++void lis_bug(const char *file, unsigned int line, const char *fmt, ...)
++{
++	static char buf[256];
++	va_list args;
++
++	va_start(args, fmt);
++	vsnprintf(buf, sizeof(buf), fmt, args);
++	va_end(args);
++	if(lis_panic_when_killed) {
++		panic("STREAMS file %s line %d: %s\n",
++		      file, line, buf);
++	} else {
++		printk(KERN_EMERG "STREAMS file %s line %d: %s\n",
++		       file, line, buf);
++		BUG();
++	}
++}
++
++/************************************************************************
+ *                            lis_assert_fail                            *
+ *************************************************************************
+ *									*
+ * This is called when the ASSERT() macro fails.                         *
+ *									*
+-* It sends a warning message to the kernel logger, but does nothing     *
+-* else.                                                        		*
++* It sends a warning message to the kernel logger and kills the STREAMS *
++* subsystem with lis_bug						*
+ *									*
+ ************************************************************************/
+ void lis_assert_fail(const char *expr, const char *objname,
+ 		     const char *file, unsigned int line)
+ {
+-        printk(KERN_CRIT "%s: assert(%s) failed in file %s, line %u\n",
+-	       objname, expr, file, line);
+-        /* We cannot just abort() the kernel here :-( */
++	lis_bug(file, line, "assert(%s) failed in module %s",
++		expr, objname);
+ }
+ 
+ /************************************************************************
+ *                            Prototypes                                 *
+ ************************************************************************/
+ extern void do_gettimeofday(struct timeval *tv) ;	/* kernel fcn */
+ extern void lis_print_trace_func(char *msg) ;	/* forward decl */
+ extern void lis_spl_init(void);			/* lislocks.c */
+@@ -673,46 +707,55 @@
+ *									*
+ * The return is negative if the target time is in the past, zero	*
+ * if it is the same as the current target time, and positive if		*
+ * target time is in the future.						*
+ *									*
+ ************************************************************************/
+ long	lis_time_till(long target_time)
+ {
+-    return( target_time - jiffies*(1000/HZ) ) ;
++	if ( ((1000 / HZ) * HZ) == 1000 ) /* ie: HZ == 100 */
++		return target_time - jiffies * (1000 / HZ) ;
++	else						/* ie: HZ == 1024 */
++		return (((target_time * HZ) / 1000 - jiffies) * 1000) / HZ ;
+ 
+ } /* lis_time_till */
+ 
+ /************************************************************************
+ *                           lis_target_time                             *
+ *************************************************************************
+ *									*
+ * Convert the milli_sec interval to an absolute target time expressed	*
+ * in milli-seconds.  We compute this relative to the Linux software	*
+ * clock, jiffies, converted to milliseconds.				*
+ *									*
+ ************************************************************************/
+ long	lis_target_time(long milli_sec)
+ {
+-    return( jiffies*(1000/HZ) + milli_sec ) ;
++	if ( ((1000 / HZ) * HZ) == 1000 ) /* ie: HZ == 100 */
++		return jiffies * (1000 / HZ) + milli_sec ;
++	else						/* ie: HZ == 1024 */
++		return ((jiffies + (milli_sec * HZ) / 1000) * 1000) / HZ ;
+ 
+ } /* lis_target_time */
+ 
+ /************************************************************************
+ *                           lis_milli_to_ticks                          *
+ *************************************************************************
+ *									*
+ * Convert milli-seconds to native ticks suitable for use with system	*
+ * timeout routines.							*
+ *									*
+ ************************************************************************/
+ long	lis_milli_to_ticks(long milli_sec)
+ {
+-    return(milli_sec/(1000/HZ)) ;
++	if ( ((1000/HZ)*HZ) == 1000 ) /* ie: HZ == 100 */
++		return milli_sec / (1000/HZ) ;
++	else						/* ie: HZ == 1024 */
++    return (milli_sec*HZ) / 1000 ;
+ }
+ 
+ 
+ /*  -------------------------------------------------------------------  */
+ 
+ /* find the head for a file descriptor.
+  * STATUS: complete, untested
+  */
+@@ -3015,17 +3058,20 @@
+ int
+ lis_ioc_fdetach( char *path )
+ {
+     char *tmp = getname(path);
+     int error = PTR_ERR(tmp);
+ 
+     if (tmp && !IS_ERR(tmp)) {
+ 	if (strcmp( tmp, "*" ) == 0)
+-	    lis_fdetach_all();
++	   {
++	     lis_fdetach_all();
++	     error = -errno;
++	   }
+ 	else
+ 	    error = lis_fdetach(path);  /* arg must be in user space */
+ 	putname(tmp);
+     }
+ 
+     return error;
+ }
+ 
+@@ -3617,16 +3663,75 @@
+ {
+     if (THIS_MODULE == NULL)
+ 	return(0) ;			/* can unload */
+ 
+     return(atomic_read(&(THIS_MODULE->uc.usecount)) <= lis_initial_use_cnt) ;
+ }
+ #endif
+ 
++#ifdef LIS_ATOMIC_STATS
++static struct proc_dir_entry *lis_proc_file = NULL;
++
++static int lis_write_qstats(char *buf, struct module_stat *ms)
++{
++	return sprintf(buf,
++		       "% 8d% 8d% 8d% 8d% 8d\n",
++		       lis_atomic_read(&ms->ms_pcnt),
++		       lis_atomic_read(&ms->ms_scnt),
++		       lis_atomic_read(&ms->ms_ocnt),
++		       lis_atomic_read(&ms->ms_ccnt),
++		       lis_atomic_read(&ms->ms_acnt));
++}
++
++static int lis_write_mstats(char *buf, struct streamtab *st, int rq)
++{
++	struct qinit *qi = (rq ? st->st_rdinit : st->st_wrinit);
++
++	if(!qi || !qi->qi_mstat)
++		return sprintf(buf, "\n");
++	else
++		return lis_write_qstats(buf, qi->qi_mstat);
++}
++
++static int lis_proc_read(char *page, char **start, off_t off, int count,
++			 int *eof, void *data)
++{
++	extern struct streamtab strmhd_info;
++
++	int len = 0, i;
++
++	len += sprintf(page+len, "%18s:% 8s% 8s% 8s% 8s% 8s\n",
++		       "driver/module", "#put", "#srvc", "#open", "#close", "#admin");
++	len += sprintf(page+len, "%15s.rq:", "HEAD");
++	len += lis_write_mstats(page+len, &strmhd_info, 1);
++	len += sprintf(page+len, "%15s.wq:", "HEAD");
++	len += lis_write_mstats(page+len, &strmhd_info, 0);
++	for(i = 0; i < MAX_STRDEV; i++) {
++		struct streamtab *st = lis_fstr_sw[i].f_str;
++		if(st == NULL)
++			continue;
++		len += sprintf(page+len, "(d)%12s.rq:", lis_fstr_sw[i].f_name);
++		len += lis_write_mstats(page+len, st, 1);
++		len += sprintf(page+len, "(d)%12s.wq:", lis_fstr_sw[i].f_name);
++		len += lis_write_mstats(page+len, st, 0);
++	}
++	for(i = 0; i < MAX_STRMOD; i++) {
++		struct streamtab *st = lis_fmod_sw[i].f_str;
++		if(st == NULL)
++			continue;
++		len += sprintf(page+len, "(m)%12s.rq:", lis_fmod_sw[i].f_name);
++		len += lis_write_mstats(page+len, st, 1);
++		len += sprintf(page+len, "(m)%12s.wq:", lis_fmod_sw[i].f_name);
++		len += lis_write_mstats(page+len, st, 0);
++	}
++	return len;
++}
++
++#endif /* LIS_ATOMIC_STATS */
+ 
+ int lis_init_module( void )
+ {
+     extern char	*lis_poll_file ;
+     extern void  lis_mem_init(void) ;
+ 
+     printk(
+ 	"==================================================================\n"
+@@ -3694,16 +3799,21 @@
+ 	{
+ 	    printk(
+ 	     "Linux Streams Subsystem failed to register its file system (%d).\n",
+ 	     err) ;
+ 	    return(err) ;
+ 	}
+     }
+ #endif
++#ifdef LIS_ATOMIC_STATS
++    lis_proc_file = create_proc_read_entry("LiS", 0444, NULL,
++					   lis_proc_read, NULL);
++
++#endif
+ 
+     lis_start_qsched() ;		/* ensure q running process going */
+     printk(
+ 	"Linux STREAMS Subsystem ready.\n"
+ 	"Copyright (c) 1997-2003 David Grothe, et al, http://www.gcom.com\n"
+ 	"Major device number %d.\n"
+ 	"Version %s %s. Compiled for kernel version %s.\n"
+ 	"Using %s %s\n"
+@@ -3745,16 +3855,21 @@
+     *  reason not to allow STREAMS to unload, but the fattach list
+     *  may not be empty, and may reflect busy dentries, inodes, memory,
+     *  and such.  So we try here to finish cleaning up after partially
+     *  undone fattaches...
+     */
+    lis_fdetach_all();
+ #endif
+ 
++#ifdef LIS_ATOMIC_STATS
++   if(lis_proc_file != NULL)
++	   remove_proc_entry("LiS", NULL);
++#endif
++
+    /*
+     * Make sure no streams modules are running,
+     * and de-register devices unregister_netdev (dev);
+     */
+ 
+     lis_kill_qsched() ;			/* drivers/str/runq.c */
+     lis_terminate_head();
+ 
+@@ -4142,17 +4257,18 @@
+ 	if (lis_runq_pids[cpu] > 0)		/* already running */
+ 	    continue ;
+ 
+ 	lis_sem_init(&lis_runq_sems[cpu], 0) ;	/* initialize semaphore */
+ 	lis_sem_init(&lis_runq_kill_sems[cpu], 0) ;/* initialize semaphore */
+ 
+ 	sprintf(name, "LiS-%s:%u", lis_version, cpu) ;
+ 	lis_runq_pids[cpu] = lis_thread_start(lis_thread_runqueues,
+-							  (void *)cpu, name) ;
++					      (void *)(long)cpu, /* __LP64__ */
++					      name) ;
+ 	if (lis_runq_pids[cpu] < 0)		/* failed to fork */
+ 	{
+ 	    printk("lis_start_qsched: %s: lis_thread_start error %d\n",
+ 		    name, lis_runq_pids[cpu]);
+ 	    lis_sem_destroy(&lis_runq_sems[cpu]) ;
+ 	    lis_sem_destroy(&lis_runq_kill_sems[cpu]) ;
+ 	    continue ;
+ 	}
+@@ -4658,16 +4774,18 @@
+ MODULE_LICENSE("GPL and additional rights");
+ #endif
+ #if defined(MODULE_AUTHOR)
+ MODULE_AUTHOR("David Grothe");
+ #endif
+ #if defined(MODULE_DESCRIPTION)
+ MODULE_DESCRIPTION("SVR4 STREAMS for Linux (LGPL Code)");
+ #endif
++MODULE_PARM(lis_panic_when_killed, "i");
++MODULE_PARM_DESC(lis_panic_when_killed, "Flag for failed assertions: set to 1 (default) to call panic(), set to 0 to call BUG()");
+ 
+ /************************************************************************
+ *                 Linux Kernel Cache Memory Routines                    *
+ *                 for allocating and freeing mdbblocks                  *
+ *             as a LiS performance improvement under Linux              *
+ ************************************************************************/
+ 
+ #if defined(USE_LINUX_KMEM_CACHE) 
+diff -rauN -U 8 LiS-2.16+ldl/head/msgutl.c LiS-2.16+fixes+stats/head/msgutl.c
+--- LiS-2.16+ldl/head/msgutl.c	2003-09-24 18:59:57.000000000 +0200
++++ LiS-2.16+fixes+stats/head/msgutl.c	2004-05-05 18:54:13.000000000 +0200
+@@ -116,23 +116,27 @@
+ /*  -------------------------------------------------------------------  */
+ /*			Exported functions & macros                      */
+ 
+ /* lis_msgsize - count sizes of blocks of message
+  */
+ int
+ lis_msgsize(mblk_t *mp)
+ {
++#if 0
+     int rtn = 0;
+     while (mp)
+     {
+ 	rtn += mp->b_datap->db_lim - mp->b_datap->db_base;
+ 	mp = mp->b_cont;
+     }
+     return rtn;
++#else
++    return lis_msgdsize(mp);
++#endif
+ }/*lis_msgsize*/
+ /*  -------------------------------------------------------------------  */
+ /* lis_msgdsize - return number of data bytes in M_DATA blocks in message
+  */
+ int
+ lis_msgdsize(mblk_t *mp)
+ {
+     int rtn = 0;
+diff -rauN -U 8 LiS-2.16+ldl/head/safe.c LiS-2.16+fixes+stats/head/safe.c
+--- LiS-2.16+ldl/head/safe.c	2003-12-27 22:34:34.000000000 +0100
++++ LiS-2.16+fixes+stats/head/safe.c	2004-05-05 18:54:41.000000000 +0200
+@@ -160,17 +160,23 @@
+     if (q->q_flag & QPROCSOFF)
+     {
+ 	if ( LIS_DEBUG_CLOSE )
+ 	    printk("lis_safe_putmsg: message on closing stream: %s #%d\n",
+ 		    f, l);
+ 	freemsg(mp) ;
+     }
+     else
++    {
++#ifdef LIS_ATOMIC_STATS
++	if(q->q_qinfo->qi_mstat != NULL)
++		lis_atomic_inc(&q->q_qinfo->qi_mstat->ms_pcnt);
++#endif
+ 	(*(q->q_qinfo->qi_putp))(q, mp);
++    }
+ 
+     lis_unlockqf(q, f,l) ;
+ }
+ 
+ void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
+ {
+     queue_t    *qnxt = NULL ;
+ 
+diff -rauN -U 8 LiS-2.16+ldl/head/stream.c LiS-2.16+fixes+stats/head/stream.c
+--- LiS-2.16+ldl/head/stream.c	2003-12-27 22:12:51.000000000 +0100
++++ LiS-2.16+fixes+stats/head/stream.c	2004-05-05 18:54:41.000000000 +0200
+@@ -254,16 +254,20 @@
+ 	lis_runq_cnts[cpu_id]++ ;		/* count qrun for this cpu */
+ 	if (   !procsoff
+ 	    && q->q_qinfo != NULL
+ 	    && q->q_qinfo->qi_srvp		/* has svc proc */
+ 	   )
+ 	{
+ 	    lis_cpfl(strmhd, (long)q, __FUNCTION__, __FILE__, __LINE__) ;
+ 	    lis_creds_to_task(&strmhd->sd_kcreds) ;
++#ifdef LIS_ATOMIC_STATS
++	    if(q->q_qinfo->qi_mstat != NULL)
++		    lis_atomic_inc(&q->q_qinfo->qi_mstat->ms_scnt);
++#endif
+ 	    (*q->q_qinfo->qi_srvp)(q);		/* enter svc proc w/q locked */
+ 	    lis_creds_to_task(&mycreds) ;
+ 
+ 	    if (lis_own_spl())			/* driver did not do splx */
+ 	    {
+ 		printk("queuerun: STREAMS driver %s returned from service "
+ 			"procedure with splstr locked\n",
+ 			lis_queue_name(q)) ;
+diff -rauN -U 8 LiS-2.16+ldl/include/sys/LiS/linux-mdep.h LiS-2.16+fixes+stats/include/sys/LiS/linux-mdep.h
+--- LiS-2.16+ldl/include/sys/LiS/linux-mdep.h	2004-01-12 17:50:27.000000000 +0100
++++ LiS-2.16+fixes+stats/include/sys/LiS/linux-mdep.h	2004-05-05 18:54:41.000000000 +0200
+@@ -261,16 +261,21 @@
+ 					      ___ASSERT_XSTR(LIS_OBJNAME), \
+ 					     __FILE__, __LINE__)))
+ #else
+ #define ASSERT(expr)							   \
+ 	((void)((expr) ? 0 : lis_assert_fail(#expr, "streams",		   \
+ 					     __FILE__, __LINE__)))
+ #endif
+ 
++/*
++ * The LIS_BUG macro
++ */
++extern void lis_bug(const char *file, unsigned int line, const char *fmt, ...);
++#define LIS_BUG(...) lis_bug(__FILE__,__LINE__, __VA_ARGS__)
+ 
+ /* disable/enable interrupts
+  */
+ #define SPLSTR(x)	x = lis_splstr()
+ #define SPLX(x)		lis_splx(x)
+ 
+ 
+ /*
+diff -rauN -U 8 LiS-2.16+ldl/include/sys/LiS/mod.h LiS-2.16+fixes+stats/include/sys/LiS/mod.h
+--- LiS-2.16+ldl/include/sys/LiS/mod.h	2003-11-23 00:02:25.000000000 +0100
++++ LiS-2.16+fixes+stats/include/sys/LiS/mod.h	2004-05-05 18:54:41.000000000 +0200
+@@ -129,27 +129,39 @@
+  *  but this is hidden by including this file.
+  */
+ #define module_info   lis_module_info
+ #define module_info_t lis_module_info_t
+ 
+ /*
+  *  Per-Module statistic record
+  */
++
++/* use non-standard but MP-safe statistics */
++#define LIS_ATOMIC_STATS
++
+ typedef struct module_stat {
+   SHARE
+     char *ms_xptr;              /* pointer to private statistics */
+     short ms_xsize;             /* length of private statistics buffer */
+     uint ms_flags;              /* bool stats -- for future use */
+   EXPORT
++#ifndef LIS_ATOMIC_STATS
+     long ms_pcnt;               /* count of calls to put proc */
+     long ms_scnt;               /* count of calls to service proc */
+     long ms_ocnt;               /* count of calls to open proc */
+     long ms_ccnt;               /* count of calls to close proc */
+     long ms_acnt;               /* count of calls to admin proc */
++#else
++    lis_atomic_t ms_pcnt;               /* count of calls to put proc */
++    lis_atomic_t ms_scnt;               /* count of calls to service proc */
++    lis_atomic_t ms_ocnt;               /* count of calls to open proc */
++    lis_atomic_t ms_ccnt;               /* count of calls to close proc */
++    lis_atomic_t ms_acnt;               /* count of calls to admin proc */
++#endif
+ } module_stat_t;
+ 
+ typedef struct fmodsw {
+         struct streamtab  *f_str;
+ 	ushort             f_count;	/* open count */
+         short              f_flags;     /* module/driver flags */
+         char               f_name[LIS_NAMESZ+1];
+         char               f_objname[LIS_NAMESZ+1];

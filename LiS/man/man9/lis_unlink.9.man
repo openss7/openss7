@@ -1,0 +1,187 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: lis_unlink.9.man,v 1.1.4.1 2005/03/09 23:14:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UNLINK 9 "$Date: 2005/03/09 23:14:12 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+\fBunlink\fR, \fBlis_unlink\fR - remove a file
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/dki.h>
+.HP 8
+.BI "int " retval " = lis_unlink(char *" pathname );
+.SH DESCRIPTION
+.PP
+.BR unlink ()
+is an
+.B LiS
+.[
+LiS
+.]
+wrapper function to the system call
+.BR unlink (2)
+that can be called from the kernel.
+.PP
+The purpose of this function being called from the kernel is to permit
+.IR STREAMS (4)
+kernel modules to create their own character special devices in the
+.B /dev
+directory and dynamically allocate device major numbers to those devices.
+.PP
+Normally, a character special device would be created by a
+.IR STREAMS (4)
+module or driver when the
+.B Linux
+kernel module loads (i.e. within the
+.BR init_module ()
+function).
+Normally,
+.BR unlink ()
+would be called within the kernel module
+.BR cleanup_module ()
+function to remove the character special devices that were created during
+module intialization.
+.PP
+The arguments to
+.BR unlink ()
+are the same as for
+.BR unlink (2).
+.PP
+.I pathname
+is the path to the file to remove.
+.PP
+For additional information, see
+.BR unlink (2).
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR unlink ()
+returns zero (0).
+Upon failure,
+.BR unlink ()
+returns a negative error number.
+.SH ERRORS
+.PP
+When
+.BR unlink ()
+fails, it returns a negative error number that can contain any of the errors
+listed under
+.BR unlink (2).
+.SH CAVEATS
+.PP
+.BR unlink ()
+is implemented by changing the data segment to the kernel data segment and
+calling
+.BR mount (2).
+This means that the
+.BR uid " and " euid
+of the caller is not changed.
+This makes this function rather useless if the process invoking it is not the
+kernel module loading daemon, or other process running with real root
+permission.
+.SH "SEE ALSO"
+.PP
+.BR unlink (2),
+.BR lis_mount (9),
+.BR lis_umount2 (9),
+.BR lis_mknod (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR unlink ()
+appeared in SVR 2.
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,339 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: strconf_config.5.man,v 1.1.4.1 2005/03/09 23:13:57 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:13:57 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRCONF_CONFIG 5 "22 May 2003" "LiS 2.16.8" "Linux STREAMS"
+.\"
+.\"
+.SH NAME
+.B strconf.config
+\- LiS STREAMS strconf configuration file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+
+
+.SS "Driver Specification"
+.PP
+.PP
+The Driver Specification is used for specifying STREAMS character special file
+drivers to
+.BR strconf (8).
+The format of the Driver Specification is as follows:
+.HP 12
+.BI "driver " driver-name " " prefix " " major " " minors
+.PP
+The components of the specification are interpreted as follows:
+.TP 12
+.B driver
+The keyword
+.B driver
+introduces this entry.
+.TP 12
+.I driver-name
+is the name of the STREAMS driver (not pushable module), for example
+.IR loop-around .
+It is any string of characters not including white-space characters.
+.TP 12
+.I prefix
+is alphanumeric plus underscore, and will be prefixed to any table entries
+referencing variables within this driver.  For example, the prefix
+.I loop_
+will be used to derive the reference to the
+.B streamtab
+entry
+.IR loop_info .
+The driver must have a variable declared within it by the name
+.IB prefix info
+of type
+.B streamtab
+structure.
+.TP 12
+.I major
+specifies the major device number that will be assigned to the device.  The
+character
+.I \(lq*\(rq
+means that the config program will choose the
+.I major
+number.
+A numeric value is used as it is given.
+.TP 12
+.I minors
+is the number of minors the device has.  If this field is omitted, the number
+1 will be used.  The value of this field isnot used for anything except to
+generate a
+.B #define
+in the
+.B config.h
+output file.
+.TP 4
+Example:
+
+.nf
+driver loop-around loop_ *
+.fi
+
+This declares a driver which has the name
+.I loop-around
+for reference purposes within the
+.BR strconf (8)
+program.  Its prefix is
+.IR loop_ ,
+and the
+.BR strconf (8)
+program is to assign its major device number.
+
+.SS "Module Specification"
+.PP
+.PP
+The Module Specification is used for specifying pushable STREAMS modules to
+.BR strconf (8).
+The format of the Module Specification is as follows:
+.HP 12
+.BI "module " name " " prefix
+.PP
+The components of the specification are interpreted as follows:
+.TP 12
+.B module
+The keyword
+.B module
+introduces this entry.
+.TP 12
+.I name
+is the name of the module, for example
+.IR relay-mod .
+It is any string of characters not including white-space characters.
+.TP 12
+.I prefix
+is alphanumeric plus underscore, and will be prefixed to any table entries
+referencing variables wihtin this module.  For example, the prefix
+.I relay_
+will be used to derive the reference to the
+.B streamtab
+entry
+.IR relay_info .
+The module must have a variable declared within it by the name
+.IB prefix info
+of type
+.B streamtab
+structure.
+.TP 4
+Example:
+
+.nf
+module relay-mod relay_
+.fi
+
+This example declares a pushable module to be referred to internally as
+.IR relay-mod .
+Its prefix is
+.IR relay_ .
+
+
+.SS "Node Specificaton"
+.PP
+.PP
+The Node Specification is used for specifying which STREAMS character special
+files must be created to
+.BR strconf (8).
+The format of the Node Specification is as follows:
+.HP 12
+.BI "node " dev-name " " type " " perm " " major " " minor
+.PP
+The components of the specification are interpreted as follows:
+.TP 12
+.B node
+The keyword
+.B node
+introduces this entry.
+.TP 12
+.I dev-name
+.TP 12
+.I type
+.TP 12
+.I perm
+.TP 12
+.I major
+.TP 12
+.I minor
+
+.SS "Device Specifications"
+.PP
+.PP
+The Device Specification specifies charactersitics about device drivers to
+.BR strconf (8).
+The format of the Device Specification is as follows:
+.HP 12
+.BI "device " driver-name " " unit " " port " " nports " " irq-share " " irq " " mem " " mem-size " " dma1 " " dma2
+.PP
+The components of the specification are interpreted as follows:
+.TP 12
+.B device
+The keyword
+.B device
+introduces this entry.
+.TP 12
+.I driver-name
+.TP 12
+.I unit
+.TP 12
+.I port
+.TP 12
+.I nports
+.TP 12
+.I irq-share
+.TP 12
+.I irq
+.TP 12
+.I mem
+.TP 12
+.I mem-size
+.TP 12
+.I dma1
+.TP 12
+.I dma2
+
+.SS "Driver Initialization Specification"
+.PP
+.TP 12
+.B initialize
+.TP 12
+.I driver-name
+
+.SS "Driver Termination Specification"
+.PP
+.TP 12
+.B terminate
+.TP 12
+.I driver-name
+
+.SS "Driver Interrupt Specification"
+.PP
+.TP 12
+.B interrupt
+.TP 12
+.I driver-name
+
+.SS "Object Name Specification"
+.PP
+.TP 12
+.B objname
+.TP 12
+.I type
+.TP 12
+.I name
+.TP 12
+.I object-name
+
+.SS "Loadable Specification"
+.PP
+.TP 12
+.B loadable
+.TP 12
+.I object-name
+
+.SS "Autopush Specification"
+.PP
+.TP 12
+.B autopush
+.TP 12
+.I driver-name
+.TP
+.I minor
+.TP
+.I last-minor
+.TP
+.I module-list
+
+.SS "Tunable Parameter Specification"
+.PP
+.TP 12
+.B define
+.TP 12
+.I name
+.TP 12
+.I value
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,199 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: putnextctl.9.man,v 1.1.4.1 2005/03/09 23:14:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:13 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH PUTNEXTCTL 9 "$Date: 2005/03/09 23:14:13 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B putnextctl, lis_putnextctl
+\- puts a control message on the downstream \fISTREAMS\fR message queue
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " retval " = putnextctl(queue_t *" q ", int " type );
+.SH DESCRIPTION
+.PP
+.BR putnextctl ()
+creates a zero-length control message of type
+.I type
+and invokes the put procedure of the queue next to the queue pointed to
+by
+.I q
+to place the message on the subsequent queue.
+If
+.I type
+is a data message type and not a control message type,
+.BR putnextctl ()
+will fail.
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR putnextctl ()
+returns true (1).
+.PP
+Upon failure,
+.BR putnextctl ()
+returns false (0).
+.SH ERRORS
+.PP
+.BR putnextctl ()
+failes and returns false (0) if the specified
+.I type
+is not a control message type, or if the passed in queue pointer
+.I q
+is
+.BR NULL ,
+or has a
+.I q_next
+pointer of
+.BR NULL ,
+or if allocation of the necessary message block fails.
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+implements
+.BR putnextctl ()
+as a call to
+.BR putctl (9)
+with a queue pointer of
+.IR q->q_next .
+.SH BUGS
+.PP
+.B LiS
+.[
+LiS
+.]
+.BR putnextctl ()
+will return success even if the operation fails because of the following
+conditions:
+.IR q " and " q->q_next
+are not
+.BR NULL ,
+but
+.I q->q_next
+points to something other than a queue structure;
+the queue pointed to by
+.I q->q_next
+has a
+.I q_info
+pointer of
+.BR NULL ;
+the queue pointed to by
+.I q->q_next
+is closing, or the queue has had put and service routine processing turned off
+(e.g. with
+.BR qprocsoff (9)).
+.B LiS
+.[
+LiS
+.]
+should return failure when the operation fails.
+.SH "SEE ALSO"
+.PP
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putnextctl1 (9).
+.SH VERSIONS
+.PP
+This manpage is for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR putnextctl ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

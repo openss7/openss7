@@ -93,6 +93,7 @@ void	lis_cmn_err_init(void)
     lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock") ;
 }
 
+__attribute__ ((format(printf, 2, 3)))
 void	_RP lis_cmn_err(int err_lvl, char *fmt, ...)
 {
     va_list	 args;

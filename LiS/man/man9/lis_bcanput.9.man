@@ -1,0 +1,1 @@
+.so man9/bcanput.9.man

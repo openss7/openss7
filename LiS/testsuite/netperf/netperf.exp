@@ -1,0 +1,142 @@
+#
+# DejaGnu testsuite for LiS
+# test cases running netperf
+# one and several processes
+# local and remote
+#
+
+# regexp matching strtst error reports
+set fail_matcher {wrapper: child process [0-9]+ exited abnormally}
+# regexp matching wrapper statistics report
+set wrapper_matcher {wrapper: test finished successfully; max latency ([0-9]+) max load ([0-9]+\.[0-9]+)}
+# number of parallel jobs
+set num_progs 1
+
+#
+# helper: spawn wrapper and netperf with args
+#
+proc spawn_netperf { args } {
+    global WRAPPER_EXEC NETPERF_EXEC spawn_id num_progs
+    set cmd [concat spawn $WRAPPER_EXEC -n $num_progs $NETPERF_EXEC $args]
+    #print $cmd
+    eval $cmd
+}
+
+#
+# do_* helpers: most common actions in expect
+#
+proc do_eof { test } {
+    print "$test: EOF!"
+    fail $test
+}
+proc do_timeout { test } {
+    print "$test: timeout!"
+    fail $test
+    exec kill -TERM [exp_pid]
+}
+proc do_fail { test } {
+    global expect_out
+    print "$expect_out(1,string)"
+    fail $test
+}
+proc do_wrapper { test max_latency max_load } {
+    global expect_out
+    set latency $expect_out(1,string)
+    set load $expect_out(2,string)
+#    print "$test: latency $latency load $load"
+    if { $latency > $max_latency } {
+	print "$test: latency $latency is above max_latency $max_latency!"
+	fail $test
+	return
+    }
+    if { $load > $max_load } {
+	print "$test: load $load is above max_load $max_load!"
+	fail $test
+	return
+    }
+    pass $test
+}
+
+#
+# check correct installation of programs
+#
+set timeout 3
+spawn_netperf -h
+expect {
+    -gl "Usage:" { }
+    default { error "Cannot run netperf! Bad install, aborting testsuite" }
+}
+close ; wait
+
+#
+# run DLPI STREAM test
+#
+proc netperf_stream { duration host ppa msize } {
+    global fail_matcher wrapper_matcher expect_out spawn_id num_progs
+
+    set timeout [expr ($duration * 1.2) + 5]
+
+    set test [string map {" " "_"} "netperf stream $host $num_progs"]
+    print "$test: run $num_progs x netperf DLCL_STREAM for $duration seconds against $host (msg size $msize bytes)"
+    spawn_netperf -l $duration -H $host -t DLCL_STREAM -- -D /dev/ldl -p $ppa -s16%02d -m $msize
+    set i1 0
+    set i2 0
+    set t_sender 0
+    set t_receiver 0
+    expect {
+	-re "$fail_matcher" { do_fail $test }
+ 	-re {\s+-1\s+\d+\s+\d+\.\d+\s+(\d+)\s+\d+\s+(\d+\.\d+)\s+[\r\n]} {
+	    set sender($i1) $expect_out(2,string)
+# 	    print "$test: sender bitrate $sender($i1)"
+	    set t_sender [expr $t_sender + $sender($i1)]
+	    incr i1
+ 	    exp_continue
+ 	}
+ 	-re {\s+-1\s+\d+\.\d+\s+(\d+)\s+(\d+\.\d+)\s+[\r\n]} {
+            set receiver($i2) $expect_out(2,string)
+ #	    print "$test: receiver bitrate $receiver($i2)"
+            set t_receiver [expr $t_receiver + $receiver($i2)]
+            incr i2
+ 	    exp_continue
+ 	}
+	-re "$wrapper_matcher" { 
+	    if { [expr $t_receiver / $t_sender] < 0.90 } {
+		print "$test: total sender bitrate $t_sender"
+		print "$test: total receiver bitrate $t_receiver"
+		print "$test: more than 10% packet lost!"
+		fail $test
+	    } else {
+		do_wrapper $test 2 2.0
+	    }
+	}
+	eof { do_eof $test }
+	timeout { do_timeout $test }
+    }
+    close ; wait
+}
+
+#
+# first, start netserver
+#
+spawn sh -c "trap '' 1 ; exec $NETSERVER_EXEC"
+set timeout 3
+expect {
+    -re {^Starting netserver at port.*already in use[\r\n]+$} {
+	notice netserver already running
+    }
+    -re {^Starting netserver at port \d+[\r\n]+$} { }
+    default { error "Cannot run netserver! Bad install, aborting testsuite" }
+}
+close ; wait
+
+#
+# now, run all these tests!
+#
+
+foreach num_progs $num_processes {
+    foreach time {10 100} {
+	foreach size {100 1450} {
+	    netperf_stream $time localhost 0 $size
+	}
+    }
+}

@@ -1,0 +1,172 @@
+#
+# Configuration file for STREAMS device drivers
+#
+# The built-in STREAMS drivers are configured in this file.  External
+# binary packages are configured in /usr/src/linux/drivers/streams/pkg
+# (see the Makefile in that directory and the one above it).
+#
+# Driver specifications
+#
+# multiple major numbers for a driver may be allocated two ways:
+# . by explicitly requesting n-majors (see below)
+# . by requesting an n-minors value large enough to require more than
+#   one major number.
+#
+# strconf now supports allocating multiple major numbers, but
+# not all drivers do.  It is only known to work for 'fifo' at this time.
+#
+#	name		prefix	major	n-minors  n-majors
+driver	clone-drvr	clone_	*
+driver	fifo		fifo_	*	512
+driver	loop-around	sloop_	*
+driver	mini-mux	mux_	*
+driver	printk		printk_	*
+#driver	link-drvr	ldl_	*
+driver	sad		sad_	*
+#driver	ip_to_dlpi	ip2xinet	*
+driver	mtdrv		mtdrv_	*
+#
+# this must be 30 for iBCS compatibility
+#
+#driver	inet		ss_	30
+#
+# Pushable module specifications
+#
+# Names must be a max of 8 chars for Solaris/UnixWare compatibility
+#
+#	name		prefix
+module	pipemod		pipemod_
+module	connld		connld_
+module	relay		relay_
+module	relay2		relay2_
+#module	ip_strms	ip_to_streams_
+#module	timod		timod_
+#module	tirdwr		tirdwr_
+
+#
+# Object name specifications
+#
+#	type	name		object name
+objname driver	clone-drvr	clone
+objname driver	fifo		fifo
+objname driver	loop-around	loop
+objname driver	mini-mux	minimux
+objname driver	printk		printk
+#objname driver	link-drvr	ldl
+objname driver	sad		sad
+#objname driver	ip_to_dlpi	ip_to_dlpi
+objname driver	mtdrv		mtdrv
+#objname driver	inet		inet
+objname module	pipemod		pipemod
+objname module	connld		connld
+objname module	relay2		relay
+#objname module	ip_strms	ip_strm_mod
+#objname module	timod		timod
+#objname module	tirdwr		tirdwr
+
+#
+# Autopush specifications
+#
+# These are just stupid examples
+#
+#         driver          minor lastminor  modules
+#autopush clone-drvr          1         0  relay
+#autopush clone-drvr          2         5  relay2
+#autopush link-drvr          -1         0  relay relay2
+ autopush loop-around	      9		0  relay
+
+#
+# Loadable specifications
+#
+# Warning: ldl is GPL, don't change if linking with non-free code
+#
+# If you do not have a system with support for demand-loading modules
+# into the kernel, you will have to load these modules by hand or in
+# the startup scripts.
+# If you do not use the loadable keyword at all, everything is linked
+# into streams.o.
+#
+loadable pipemod
+loadable connld
+#loadable timod
+#loadable tirdwr
+#loadable ldl
+loadable sad
+#loadable ip_to_dlpi
+loadable mtdrv
+#loadable inet
+
+#
+# Initialization specifications
+#
+initialize clone-drvr
+initialize fifo
+#initialize link-drvr
+initialize loop-around
+
+#
+# Termination specifications
+#
+terminate fifo
+terminate loop-around
+
+#
+# Node specifications
+#
+# Loop driver now makes its own nodes in its init routine as an 
+# example of how to use lis_mknod.
+#
+#	name	          type	perm	major		minor
+#node	/dev/loop.1	     c	0644	loop-around	1
+#node	/dev/loop.2	     c	*	loop-around	2
+#node	/dev/loop_clone	     c	*	clone-drvr	loop-around
+node	/dev/mux_clone	     c	*	clone-drvr	mini-mux
+node	/dev/minimux.1	     c	*	mini-mux	1
+node	/dev/minimux.2	     c	*	mini-mux	2
+node	/dev/clone_drvr	     c	*	clone-drvr	0
+#node	/dev/ldl	     c	*	clone-drvr	link-drvr
+node	/dev/printk	     c	*	printk		0
+node	/dev/sad	     c	*	clone-drvr	sad
+node	/dev/fifo	     c  0666    clone-drvr	fifo
+node	/dev/fifo.0          c  0666    fifo            0
+#
+# These are iBCS devices that should already be installed on a
+# system that supports the iBCS.  The /dev entries are supposed
+# to by symbolic links to the /dev/inet entries.  arp and rip
+# are supposed to be symbolic links to udp
+#
+#node	/dev/ip		     c	0666	inet		32
+#node	/dev/icmp	     c	0666	inet		33
+#node	/dev/ggp	     c	0666	inet		34
+#node	/dev/ipip	     c	0666	inet		35
+#node	/dev/tcp	     c	0666	inet		36
+#node	/dev/egp	     c	0666	inet		37
+#node	/dev/pup	     c	0666	inet		38
+#node	/dev/udp	     c	0666	inet		39
+#node	/dev/idp	     c	0666	inet		40
+#node	/dev/rawip	     c	0666	inet		41
+#node	/dev/arp	     c	0666	inet		39
+#node	/dev/rip	     c	0666	inet		39
+#node	/dev/inet/ip	     c	0666	inet		32
+#node	/dev/inet/icmp	     c	0666	inet		33
+#node	/dev/inet/ggp	     c	0666	inet		34
+#node	/dev/inet/ipip	     c	0666	inet		35
+#node	/dev/inet/tcp	     c	0666	inet		36
+#node	/dev/inet/egp	     c	0666	inet		37
+#node	/dev/inet/pup	     c	0666	inet		38
+#node	/dev/inet/udp	     c	0666	inet		39
+#node	/dev/inet/idp	     c	0666	inet		40
+#node	/dev/inet/rawip	     c	0666	inet		41
+#node	/dev/inet/arp	     c	0666	inet		39
+#node	/dev/inet/rip	     c	0666	inet		39
+#node	/dev/ticots_ord	     c	0666	inet		42
+#node	/dev/ticots	     c	0666	inet		43
+#node	/dev/ticlts	     c	0666	inet		44
+
+#
+# Device specifications
+#
+#	drvr-name	unit  port nports share	IRQ     mem M-size DMA1 DMA2
+#device	cdip		   0 0x310     16     S  10 0xD0000 0x4000
+#device	cdip		   1     0      0     S  10       0      0
+

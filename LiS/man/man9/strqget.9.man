@@ -1,0 +1,440 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: strqget.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STRQGET 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B strqget, lis_strqget
+\- gets information about a \fISTREAMS\fR message queue
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP 8
+.BI "int " retval " = strqget(queue_t *" q ", qfields_t " what ", unsigned char " band ", long *" val );
+.SH DESCRIPTION
+.PP
+.BR strqget ()
+returns the value or pointer requested by
+.I what
+for the queue pointed to by
+.I q
+and band specified by
+.I band
+into the memory area pointed to by
+.IR val .
+The attribute retrieved can be either a scalar or a pointer.
+.PP
+When
+.I band
+is zero,
+.BR strqget ()
+will retrieve the attribute specified by
+.I what
+for the queue.
+When
+.I band
+is non-zero (between 1 and 255),
+.BR strqget ()
+will retrieve the attribute specified by
+.I what
+for the queue band specified by
+.IR band .
+.PP
+The argument
+.I what
+specifies which queue (or queue band if
+.I band
+is non-zero) attribute is to be retrieved.
+.I what
+can be one of the following values:
+.TP 12
+.B QHIWAT
+Gets the high water mark associated with the
+.I q
+or queue
+.IR band .
+.TP 12
+.B QLOWAT
+Gets the low water mark associated with the
+.I q
+or queue
+.IR band .
+.TP 12
+.B QCOUNT
+Gets the count of bytes associated with the
+.I q
+or queue
+.IR band .
+.TP 12
+.B QFIRST
+Gets the first message pointer associated with the
+.I q
+or queue
+.IR band .
+.TP 12
+.B QLAST
+Gets the last message pointer associated with the
+.I q
+or queue
+.IR band .
+.TP 12
+.B QFLAG
+Gets the flags associated with the
+.I q
+or queue
+.IR band .
+.TP 12
+.B QMAXPSZ
+Gets the maximum packet size associated with the
+.IR q .
+For this operation
+.I band
+must be zero (0).
+.TP 12
+.B QMINPSZ
+Gets the minimum packet size associated with the
+.IR q .
+For this operation
+.I band
+must be zero (0).
+.PP
+.BR strqget ()
+provides a mechanism whereby a
+.IR STREAMS (4)
+module or driver can access information
+about a queue or queue band without directly accessing the
+.B queue
+or
+.B qband
+structures.
+Values retrieved by
+.BR strqget ()
+are equivalent to directly accessing the
+.B queue
+or
+.B qband
+structure members described below.
+.PP
+The
+.B queue
+structure contains at least the following members:
+.HP
+.BI "ulong " q_hiwat
+\- the high water mark for the queue.
+.HP
+.BI "ulong " q_lowat
+\- the low water mark for the queue.
+.HP
+.BI "ulong " q_count
+\- the count of the number of bytes in the queue.
+.HP
+.BI "struct msgb *" q_first
+\- the first message in the queue.
+.HP
+.BI "struct msgb *" q_last
+\- the last message in the queue.
+.HP
+.BI "ulong " q_flag
+\- the flags associated with the queue, see
+.BR "\*(lqQueue Flags\*(rq" ,
+above.
+.HP
+.BI "long " q_maxpsz
+\- the maximum message size accepted by the queue.
+.HP
+.BI "long " q_minpsz
+\- the minimum message size accepted by the queue.
+.PP
+The
+.B qband
+structure contains at least the following members:
+.HP
+.BI "ulong " qb_hiwat
+\- the high water mark for the band.
+.HP
+.BI "ulong " qb_lowat
+\- the low water mark for the band.
+.HP
+.BI "ulong " qb_count;
+\- the count of the number of bytes in the band.
+.HP
+.BI "struct msgb *" qb_first
+\- the first message in the band.
+.HP
+.BI "struct msgb *" qb_last
+\- the last message in the band.
+.HP
+.BI "ulong " qb_flag
+\- the flags associated with the band, see
+.BR "\*(lqQueue Band Flags\*(rq" ,
+above.
+.\"
+.\"
+.\"
+.SS "Queue Flags"
+.PP
+When
+.BR strqget ()
+is called with
+.I what
+set to
+.B QFLAG
+and
+.I band
+is set to zero (0),
+.BR strqget ()
+returns the queue flags in the area pointed to by
+.IR val .
+The queue flags in the area pointed to by
+.I val
+can contain the following flags:
+.TP 12
+.B QENAB
+set when the queue is enabled.
+.TP 12
+.B QWANTR
+set when the previous queue wants to read.
+.TP 12
+.B QWANTW
+set when the previous queue wants to write.
+.TP 12
+.B QFULL
+set when the queue is full.  The queue is full when the count of
+bytes in the queue is greater than the high water mark for the
+queue.
+.TP 12
+.B QREADR
+set when the queue is the reader.
+.TP 12
+.B QUSE
+set when the queue is not free.
+.TP 12
+.B QNOENB
+set when the queue is not to be enabled.
+.TP 12
+.B QBACK
+set when the queue is a back-enabled queue.
+.TP 12
+.B QRETRY
+set when the retry timer is set for the queue.
+.TP 12
+.B QSCAN
+set when the queue is in the scan list.
+.TP 12
+.B QCLOSING
+set when the stream head wants to close this queue.
+.TP 12
+.B QWASFULL
+set when the queue was previously full (QFULL was set) but the
+queue count has not yet dropped to the low water mark.
+.TP 12
+.B QCLOSEWT
+set when the stream head is waiting for the queue to drain.
+.TP 12
+.B QPROCSOFF
+set when the put and service procedures for the queue are turned off.
+.TP 12
+.B QRUNNING
+set while the queue's service procedure is running.
+.TP 12
+.B QWAITING
+set when qdetach is waiting on the queue for a wakeup.
+.\"
+.\"
+.\"
+.SS "Queue Band Flags"
+.PP
+When
+.BR strqget ()
+is called with
+.I what
+set to
+.B QFLAG
+and
+.I band
+is set between 1 and 255,
+.BR strqget ()
+returns the queue band flags associated with
+.I band
+in the area pointed to by
+.IR val .
+The queue band flags in the area pointed to by
+.I val
+can contain the following flags:
+.TP 12
+.B QB_FULL
+set when the queue band is full.  The queue band is full when the count of the
+bytes in the queue band is greater than the high water mark for the queue
+band.
+.TP 12
+.B QB_WANTW
+set when the previous queue wants to write to this queue band.
+.TP 12
+.B QB_BACK
+set when the queue band is back-enabled.
+.TP 12
+.B QB_WASFULL
+set when the queue band was previously full (QB_FULL was set) but the queue
+band count has not yet dropped to the low water mark for the queue band.
+.SH "RETURN VALUES"
+.PP
+Upon success,
+.BR strqget ()
+returns zero (0) and places the appropriate value in the
+memory area pointed to by
+.IR val .
+.PP
+Upon failure,
+.BR strqget ()
+returns a non-zero error number.
+The memory area pointed to by
+.I val
+remains unchanged.
+.SH ERRORS
+.PP
+When
+.BR strqget ()
+fails,
+it returns one of the following errors:
+.TP 12
+.RB [ EINVAL ]
+The value pointer
+.I val
+is
+.BR NULL ;
+the queue pointer
+.I q
+is
+.BR NULL;
+.I q
+does not point to a valid queue structure;
+the queue band specified in
+.I band
+does not exist;
+.BR QMAXPSZ " or " QMINPSZ
+was specified for
+.I what
+and
+.I band
+was non-zero;
+.I what
+is not a valid queue or queue band attribute.
+.SH CAVEATS
+.PP
+.B LiS
+.[
+LiS
+.]
+defines a number of queue flags that are not elsewhere defined, yet returns
+those flags from a call to
+.BR strqget ().
+.B LiS
+.[
+LiS
+.]
+should mask off its private flags when returning flags from a call to
+.BR strqget ().
+.SH "SEE ALSO"
+.PP
+.BR strqset (9).
+.SH VERSIONS
+.PP
+This manpage was written for
+.B LiS\c
+.
+.[
+LiS
+.]
+.PP
+.BR strqget ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
