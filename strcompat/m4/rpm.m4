@@ -454,6 +454,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # =========================================================================
 # _RPM_SPEC_SETUP_OPTIONS
 # -------------------------------------------------------------------------
+# Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+# --with and --without rpmpopt syntax, so convert to the equivalent --define
+# syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
+# properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     PACKAGE_OPTIONS=
     arg=
@@ -462,20 +466,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
             if test -n "$arg" ; then
                 eval "arg=$arg"
                 AC_MSG_CHECKING([for rpm argument '$arg'])
-                if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-                    if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-#                       arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
-                        # Older rpms (particularly those used by SuSE) rpms are too stupid to handle
-                        # --with and --without rpmpopt syntax, so convert to the equivalent --define syntax
-                        val="`echo $arg | sed -e 's|--enable|--with|;s|--disable|--without|'`"
-                        arg="`echo $val | sed -e 's|-|_|g;s|^__|_|'`"
-                        arg="--define \"$arg $val\""
-                        PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
-                        AC_MSG_RESULT([$arg])
-                    else
-                        :
-                        AC_MSG_RESULT([no])
-                    fi
+                if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+                    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+                    arg="--define '${nam} ${arg}'"
+                    PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+                    AC_MSG_RESULT([yes])
                 else
                     :
                     AC_MSG_RESULT([no])
@@ -489,20 +484,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     if test -n "$arg" ; then
         eval "arg=$arg"
         AC_MSG_CHECKING([for rpm argument '$arg'])
-        if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-            if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-#               arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
-                # Older rpms (particularly those used by SuSE) rpms are too stupid to handle --with
-                # and --without rpmpopt syntax, so convert to the equivalent --define syntax
-                val="`echo $arg | sed -e 's|--enable|--with|;s|--disable|--without|'`"
-                arg="`echo $val | sed -e 's|-|_|g;s|^__|_|'`"
-                arg="--define \"$arg $val\""
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
-                AC_MSG_RESULT([$arg])
-            else
-                :
-                AC_MSG_RESULT([no])
-            fi
+        if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+            nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+            arg="--define '${nam} ${arg}'"
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+            AC_MSG_RESULT([yes])
         else
             :
             AC_MSG_RESULT([no])
