@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/12 23:20:21 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/20 20:34:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/20 20:34:07 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -308,8 +308,7 @@ static __inline__ qband_t *bget(qband_t *qb)
 		if (atomic_read(&qbi->qbi_refs) < 1)
 			swerr();
 		atomic_inc(&qbi->qbi_refs);
-	} else
-		swerr();
+	}
 	return (qb);
 }
 static __inline__ void bput(qband_t **bp)
@@ -322,8 +321,7 @@ static __inline__ void bput(qband_t **bp)
 				freeqb(qb);
 		} else
 			swerr();
-	} else
-		swerr();
+	}
 }
 
 /* queue gets and puts */
@@ -338,8 +336,7 @@ static __inline__ queue_t *qget(queue_t *q)
 		atomic_inc(&qu->qu_refs);
 		printd(("%s: queue %p count is now %d\n", __FUNCTION__, qu,
 			atomic_read(&qu->qu_refs)));
-	} else
-		swerr();
+	}
 	return (q);
 }
 static __inline__ void qput(queue_t **qp)
@@ -359,8 +356,7 @@ static __inline__ void qput(queue_t **qp)
 					atomic_read(&qu->qu_refs)));
 		} else
 			swerr();
-	} else
-		swerr();
+	}
 }
 
 /* 

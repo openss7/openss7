@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/06/08 20:46:43 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/20 20:16:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/08 20:46:43 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 20:16:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -509,6 +509,8 @@ dnl AC_MSG_CHECKING([for kernel system map])
     fi
     AC_MSG_CHECKING([for kernel system map])
     AC_MSG_RESULT([${linux_cv_k_sysmap:-no}])
+    ksysmap="$linux_cv_k_sysmap"
+    AC_SUBST([ksysmap])dnl
 ])# _LINUX_CHECK_KERNEL_SYSMAP
 # =========================================================================
 
@@ -611,6 +613,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
                 *bigmem)
                     linux_cv_rh_boot_kernel=bigmem
                     ;;
+                *hugemem)
+                    linux_cv_rh_boot_kernel=hugemem
+                    ;;
                 *debug)
                     linux_cv_rh_boot_kernel=debug
                     ;;
@@ -631,6 +636,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
                 ;;
             bigmem)
                 AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for Red Hat BIGMEM kernel.])
+                ;;
+            hugemem)
+                AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for Red Hat HUGEMEM kernel.])
                 ;;
             debug)
                 AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for Red Hat DEBUG kernel.])

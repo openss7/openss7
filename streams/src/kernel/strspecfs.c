@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/20 20:34:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/20 20:34:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/20 20:34:07 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/20 20:34:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/20 20:34:07 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1260,7 +1260,7 @@ STATIC void spec_put_inode(struct inode *inode)
 		inode, inode->i_ino, inode->u.generic_ip, atomic_read(&inode->i_count),
 		inode->i_nlink));
 	if (inode->i_nlink != 0) {
-		swerr();
+		pswerr(("%s: number of links non-zero: i_nlink = %d, force deleting\n", __FUNCTION__, inode->i_nlink));
 		force_delete(inode);
 	}
 }

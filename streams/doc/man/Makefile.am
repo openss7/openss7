@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/23 07:24:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/20 20:32:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:21 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 20:32:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,11 +59,11 @@ lfs_man_MANS = \
 	man2/fattach.2 \
 	man2/fcntl.2s \
 	man2/getmsg.2 \
-	man2/getpmsg.2 \
+	man2/getpmsg.2s \
 	man2/pipe.2s \
 	man2/poll.2s \
 	man2/putmsg.2 \
-	man2/putpmsg.2 \
+	man2/putpmsg.2s \
 	man2/read.2s \
 	man2/readv.2s \
 	man2/soon.2 \
@@ -812,11 +812,11 @@ lfs_dist_noinst_MANS = \
 	man2/fattach.2.man \
 	man2/fcntl.2s.man \
 	man2/getmsg.2.man \
-	man2/getpmsg.2.man \
+	man2/getpmsg.2s.man \
 	man2/pipe.2s.man \
 	man2/poll.2s.man \
 	man2/putmsg.2.man \
-	man2/putpmsg.2.man \
+	man2/putpmsg.2s.man \
 	man2/read.2s.man \
 	man2/readv.2s.man \
 	man2/soon.2.man \

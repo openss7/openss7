@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/05/25 06:52:50 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/20 20:22:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/25 06:52:50 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 20:22:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -618,8 +618,8 @@ fi
 
 Summary:        Linux Fast STREAMS headers, libs and docs.
 Group:          Development/System
-Requires:       %{name}-lib = %{version}-%{base_release}
-Requires:       %{name}-doc = %{version}-%{base_release}
+#Requires:      %{name}-lib = %{version}-%{base_release}
+#Requires:      %{name}-doc = %{version}-%{base_release}
 Conflicts:      LiS
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
@@ -716,7 +716,7 @@ necessary to create and distribute this rpm.
 
 Summary:        Linux Fast STREAMS admin utilities.
 Group:          System Environment/Base
-Requires:       %{name}-lib = %{version}-%{base_release}
+#Requires:      %{name}-lib = %{version}-%{base_release}
 Conflicts:      LiS
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
@@ -796,8 +796,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.23  2004/05/25 06:52:50  brian
-# - Removed double listing on source directory.
+# Revision 0.9.2.24  2004/06/20 20:22:19  brian
+# - FC1 rpm 4.2.1 can't handle internal Requires.
+#
+# Revision 1.24  2004/06/20 20:22:19  brian
+# - FC1 rpm 4.2.1 can't handle internal Requires.
 #
 # Revision 1.23  2004/05/25 06:52:50  brian
 # - Removed double listing on source directory.

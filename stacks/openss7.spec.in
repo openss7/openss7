@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/25 06:52:50 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/20 20:22:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/25 06:52:50 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 20:22:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -625,8 +625,8 @@ fi
 
 Summary:        OpenSS7 headers, lib and doc.
 Group:          Development/System
-Requires:       %{name}-lib = %{version}-%{base_release}
-Requires:       %{name}-doc = %{version}-%{base_release}
+#Requires:      %{name}-lib = %{version}-%{base_release}
+#Requires:      %{name}-doc = %{version}-%{base_release}
 %if %{BUILD_lfs}
 Requires:       streams-devel >= 0.7a
 %endif
@@ -730,7 +730,7 @@ necessary to create and distribute this rpm.
 
 Summary:        OpenSS7 admin utilities.
 Group:          System Environment/Base
-Requires:       %{name}-lib = %{version}-%{base_release}
+#Requires:      %{name}-lib = %{version}-%{base_release}
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
@@ -777,6 +777,9 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 0.9.2.22  2004/06/20 20:22:24  brian
+# - FC1 rpm 4.2.1 can't handle internal Requires.
+#
 # Revision 0.9.2.21  2004/05/25 06:52:50  brian
 # - Removed double listing on source directory.
 #

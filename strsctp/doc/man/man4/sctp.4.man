@@ -1,0 +1,334 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: sctp.4.man,v 0.9 2004/06/20 20:35:26 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/06/20 20:35:26 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strsctp.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsctp.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SCTP 4 "$Date: 2004/06/20 20:35:26 $" "$Name:  $" "OpenSS7 INET Devices"
+.SH NAME
+.B sctp
+\- Stream Control Transmission Protocol (SCTP)
+.SH SYNOPSIS
+.PP
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/sctp.h>
+.br
+.B #include <sys/npi_sctp.h>
+.br
+.B #include <sys/tpi_sctp.h>
+.br
+.B #include <sys/xti_sctp.h>
+.HP
+.BI "int " sctp_stream " = open(" sctp_device ", " flags );
+.HP
+.BI "int " sctp_xtistr " = t_open(" sctp_device ", " flags );
+.HP
+.BI "int " sctp_socket " = socket(" PF_INET ", " socket_type ", " \fRIPPROTO_SCTP\fR );
+.SH DESCRIPTION
+.PP
+.B SCTP
+is an implementation of the Stream Control Transmission Protocol
+.RB ( SCTP )
+define in RFC 2960
+.[
+RFC 2960
+.]
+and RFC 3309.
+.[
+RFC 3309
+.]
+.B SCTP
+provides reliable deliver of ordered or unordered packets over a full duplex
+connection between two streams on top of
+.BR ip (4).
+.B SCTP
+can guarantee that the data arrives in order on a stream, if requested, and
+retransmits lost packets.  It generates and checks a per-packet checksum to
+catch transmission errors.
+.B SCTP
+uses the services of the Internet Protocol,
+.BR ip (4),
+to transfer packets.
+.PP
+.B SCTP
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver.
+.BR ip (4)
+streams are lined under the
+.BR SCTP
+multiplexing driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide network services to
+.BR SCTP .
+Once linked, the streams must be configured using
+.BR sctp_ioctl (4).
+.PP
+.B SCTP
+provides two stream types.  To select one of the stream types,
+.I sctp_device
+can be one of the following:
+.TP
+.I /dev/sctp_n
+This device provides the
+.B SCTP
+protocol services using the N-primitives of the
+Network Provider Interface,
+.BR npi (7),
+used for the Stream Control Transmission Protocol as described in
+.BR npi_sctp (7).
+The
+.BR npi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR sockets (3)
+library and provides the
+.B SCTP
+interface using sockets as described in
+.BR sctp (7).
+This stream provides connection-oriented NPI services.
+.TP
+.I /dev/sctp_t
+This device provides the
+.B SCTP
+protocol service interface using the T-primitives of the Transport Provider
+Interface,
+.BR tpi (7),
+used of the Stream Control Transmission Protocol, as described in
+.BR tpi_sctp (7).
+The
+.BR tpi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR xnet "(3) or " xti (3)
+library and provides the
+.B SCTP
+interface using XTI as described in
+.BR xti_sctp (3).
+.PP
+.B SCTP
+provides three socket types for use by the
+.BR sockets (3)
+library
+.BR socket (7)
+calls.
+.B SCTP
+provides sockets in the protocol family
+.B PF_INET
+using the protocol number
+.BR IPPROTO_SCTP .
+The
+.I socket_type
+argument can be one of the following:
+.TP
+.B SOCK_SEQPACKET
+A standard
+.I SOCK_SEQPACKET
+socket that preserves message boundaries, Nagles at the association level, and
+provides ordered and unordered reliable and partial reliable, acknnowledged
+and unacknowledged delivery on multiple streams.
+This socket uses the underlying
+.I /dev/sctp_t
+transport service provider.
+.TP
+.B SOCK_STREAM
+A
+.BR tcp (7)
+compatible
+.I SOCK_STREAM
+socket that does not preserve message boundaries, Nagles at the stream level,
+and provides ordered and out-of-band unacknowledged deliver on a single
+stream.  This is an optional capability of
+.BR SCTP
+that provides for maximum compatability with applications written for
+.BR tcp (4).
+This socket uses the underlying
+.I /dev/sctp_t
+transport service provider.
+.TP
+.B SOCK_RDM
+A
+.BR udp (7)
+compatible
+.I SOCK_RDM
+socket that preserves message boundaries, does not Nagle, and provides only
+unordered but reliable or partially reliable delivery on multiple streams.
+This is an optional capability of
+.B SCTP
+that provides for maximum compatibility with applications written for
+.BR rudp (7).
+This socket uses the underlying
+.I /dev/sctp_t
+transport service provider.
+.PP
+The following entries in /etc/protosw provides the information necessary for
+.BR socksys (4)
+to use these devices:
+.PP
+.TS
+tab(:);
+llllll.
+\fCPF_INET:\fCSOCK_SEQPACKET:\fCIPPROTO_SCTP:\fC/dev/sctp_t:\fCtpi:\fCcots
+\fCPF_INET:\fCSOCK_STREAM:\fCIPPROTO_SCTP:\fC/dev/sctp_t:\fCtpi:\fCcots
+\fCPF_INET:\fCSOCK_RDM:\fCIPPROTO_SCTP:\fC/dev/sctp_t:\fCtpi:\fCcots
+.TE
+\fR
+.PP
+For additional information, see
+.BR socksys (4)
+and
+.BR protosw (5).
+.SH IOCTLS
+.PP
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+and
+.BR streamio (7)
+.I I_STR
+system calls on the
+.IR sctp_stream ", " sctp_xtistr " or " sctp_socket .
+These management controls are described in
+.SH NOTICES
+.PP
+.PP
+.B SCTP
+has several implementations.  This manpage is for the
+.IR STREAMS (4)
+implementation.  There is also an
+.BR INET (4)
+implementation which provides
+.BR tpi (7)
+access to the Linux NET4 version of
+.BR SCTP .
+For more information on this version, see
+.BR sctp (7).
+.SH FILES
+.PP
+.BR <sys/socket.h> ,
+.BR <netint/sctp.h> ,
+.BR <sys/npi_ip.h> ,
+.BR <sys/npi_sctp.h> ,
+.BR <sys/tpi_ip.h> ,
+.BR <sys/tpi_sctp.h> ,
+.BR <sys/xti_ip.h> ,
+.BR <sys/xti_sctp.h> .
+.SH DEVICES
+.PP
+.IR /dev/sctp_n ,
+.IR /dev/sctp_t .
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2),
+.BR ip (4),
+.BR npi (7),
+.BR npi_sctp (7),
+.BR protosw (5),
+.BR rudp (7),
+.BR sctp (7),
+.BR sctp (8),
+.BR sctp_ioctl (4),
+.BR sctp_ioctl (4).
+.BR socket (7),
+.BR sockets (3),
+.BR socksys (4),
+.BR streamio (7),
+.BR STREAMS (4),
+.BR tcp (7),
+.BR tpi (7),
+.BR tpi_sctp (7),
+.BR udp (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_sctp (3).
+.\"
+.\"
+.XX
+.[
+sctp-mib
+.]
+.[
+prsctp
+.]
+.[
+addip
+.]
+.[
+sctpig
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

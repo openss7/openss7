@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.7 2004/06/12 23:19:09 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.8 2004/06/20 20:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/06/12 23:19:09 $ by $Author: brian $
+.\" Last Modified $Date: 2004/06/20 20:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMIO 7 "$Date: 2004/06/12 23:19:09 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH STREAMIO 7 "$Date: 2004/06/20 20:32:52 $" "$Name:  $" "Linux Fast-STREAMS"
 .\"
 .\"
 .SH NAME
@@ -181,7 +181,7 @@ is set to one of the following errors numbers:
 is outside the range 0 to 255 and does not represent a valid priority band.
 .PP
 Any of the errors returned by
-.BR putpmsg (2)
+.BR putpmsg (2s)
 may be returned in
 .IR errno .
 Any error received in an
@@ -220,7 +220,7 @@ contains a priority band outside the range 0 - 255.
 .\"
 .PP
 Any of the errors returned by
-.BR getpmsg (2)
+.BR getpmsg (2s)
 may be returned in
 .IR errno .
 Any error received in an
@@ -345,7 +345,7 @@ is invalid.
 .\"
 .PP
 Any of the errors returned by
-.BR putpmsg (2)
+.BR putpmsg (2s)
 may be returned in
 .IR errno .
 Any error received in an
@@ -511,7 +511,7 @@ there is no message on the stream head read queue.
 .\"
 .PP
 Any of the errors returned by
-.BR getpmsg (2)
+.BR getpmsg (2s)
 may be returned in
 .IR errno .
 Any error received in an

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timod.4.man,v 0.9.2.4 2004/05/14 07:59:53 brian Exp $
+.\" @(#) $Id: timod.4.man,v 0.9.2.5 2004/06/20 20:32:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/14 07:59:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/06/20 20:32:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIMOD 4 "$Date: 2004/05/14 07:59:53 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH TIMOD 4 "$Date: 2004/06/20 20:32:50 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -108,9 +108,9 @@ commands into TLI primitives.  These
 commands are intended to be used by the XTI/TLI library.
 .B timod
 does not alter any messages passed with
-.BR putmsg "(2) or " putpmsg (2),
+.BR putmsg "(2) or " putpmsg (2s),
 or received with
-.BR getmsg "(2) or " getpmsg (2).
+.BR getmsg "(2) or " getpmsg (2s).
 .B timod
 simply intercepts responses to its own primitives sent downstream as a result
 of an

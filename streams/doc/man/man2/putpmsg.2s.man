@@ -1,0 +1,636 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: putpmsg.2s.man,v 0.9.2.1 2004/06/20 20:32:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/06/20 20:32:44 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH PUTPMSG 2 "$Date: 2004/06/20 20:32:44 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.\"
+.\"
+.SH NAME
+.B putpmsg
+\- put a band message to a STREAMS character device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.HP 8
+.BI "int putpmsg(int " fd ", const struct strbuf *" ctlptr ", const struct strbuf *" dataptr ", int " band ", int " flags );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the file descriptor to which to put a message.
+.TP
+.I ctlptr
+a pointer to a
+.B strbuf
+structure holding the control part of the message.
+.TP
+.I dataptr
+structure holding the data part of the message.
+.TP
+.I flags
+putmsg flags.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR putpmsg ()
+generates a STREAMS message from the buffer supplied in the specified
+.IR ctlptr " and " datapr
+for the queue band
+.I band
+and with options specified by
+.I flags
+and delivers the message to the stream head associated with the STREAMS
+character special file
+.IR fd .
+.PP
+The resulting STREAMS message can contain a control part as specified by
+.IR ctlptr ,
+a data part as specified by
+.IR datptr ,
+or both.
+The control part, when present, will generate
+.BR M_PROTO " or " M_PCPROTO
+message blocks.
+The data part, when present, will generate
+.B M_DATTA
+message blocks.
+When both control and data parts are present, an
+.BR M_PROTO " or " M_PCPROTO
+message block followed by one or more
+.B M_DATA
+message blocks will be generated.
+.PP
+.I fd
+is an open file descriptor for the STREAMS character special file to which the
+STREAMS message is to be written.
+.PP
+.IR ctlptr " and " datptr
+point to a
+.B strbuf
+structure, which contains the following members:
+.sp
+.nf
+\fC\s-2\
+struct strbuf {
+    int maxlen;         /* Maximum buffer length.  */
+    int len;            /* Length of data.  */
+    char *buf;          /* Pointer to buffer.  */
+};
+\s+2\fR
+.fi
+.TP
+.I maxlen
+Not used by
+.BR putpmsg ().
+.TP
+.I len
+The length of the information pointed to by
+.IR buf .
+.TP
+.I buf
+A pointer to the buffer that contains
+.I len
+bytes of information.
+.PP
+.I ctlptr
+points to a
+.B strbuf
+structure describing the control part to be included in the message, or
+.B NULL
+if there is no control part.
+The
+.I buf
+member
+of the
+.B strbuf
+structure pointed to by
+.I ctlptr
+indiates the start of the information to sent in the control part, and
+the
+.I len
+member indicates the length of the information for the control part.
+.PP
+.I datptr
+points to a
+.B strbuf
+structure decribing the data part to be included in the message, or
+.B NULL
+is there is no data part.
+The
+.I buf
+member
+of the
+.B strbuf
+structure pointed to by
+.I ctlptr
+indiates the start of the information to sent in the data part, and
+the
+.I len
+member indicates the length of the information for the data part.
+.I len
+can be zero (0) to send zero-length data.
+.PP
+.I band
+specifies the queue band to which to write data when
+.I flags
+is set to
+.BR MSG_BAND .
+When flags is set to other than
+.BR MSG_BAND ,
+.I band
+must be set to zero (0).
+.PP
+.I flags
+specifies whether to send a high priority message or a band message.
+.I flags
+can be one of the following values:
+.TP
+.B MSG_HIPRI
+Specifies that a high priority message is to be sent if the request contains a
+control part
+.IR "" ( ctlptr " is not"
+.BR "" NULL ).
+This results in an
+.B M_PCPROTO
+message being placed on the stream head.
+.TP
+.B MSG_BAND
+Specifies that a normal priority queue band message is to be sent for the
+specified
+.IR band .
+This results in an
+.B M_PROTO
+message being placed on the stream head when there is a control part.
+When there is only a data part, an
+.B M_DATA
+message for the specified
+.I band
+is placed on the stream head.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR putpmsg ()
+returns zero (0).
+.PP
+Upon failure,
+.BR putpmsg ()
+returns -1 and sets
+.I errno
+to an appropritate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR putpmsg ()
+fails, it returns -1 and sets
+.I errno
+to one of the following:
+.TP
+.\".RB [ EACCES ]
+.\".I fd
+.\"is a dynamic device, and write permission on the device is denied.
+.\"
+.\"
+.TP
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation and
+.BR putpmsg ()
+would block: that is, the message is being sent with
+.I flags
+set to
+.B MSG_BAND
+and the corresponding
+.I band
+is flow controlled.
+.\"
+.\"
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid file descriptor, or
+refers to a stream that is not open for writing.
+.\"
+.\"
+.TP
+.RB [ ENOSTR ]
+.i fd
+does not refer to a stream.
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.i fd
+refers to a stream that is currently linked underneath a STREAMS multiplexing driver.  All read or write systems calls will fail with error number
+.RB [ EINVAL ]
+for such a stream.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.TP
+.RB [ EFAULT ]
+.IR ctlptr ", " datptr ", " ctlptr->buf " or " datptr->buf
+point outside the caller's address space.
+.\"
+.\"
+.TP
+.RB [ ERESTARTSYS ]
+A signal arrived before the operation could begin.
+.\"
+.\"
+.TP
+.RB [ EINTR ]
+A signal arrived before the operation could complete.
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+The values of
+.IR band " or " flags ,
+or the combination of
+.IR ctlptr ", " datptr ", and the values of " band " and " flags
+were invalid,
+such as when
+.I flags
+is specified as
+.B MSG_HIPRI
+and
+.I band
+is non-zero.
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a stream that is linked under a STREAMS multiplexing driver.
+.\"
+.\"
+.TP
+.RB [ EIO ]
+I/O error, or,
+.I fd
+refers to a stream that is open but is in the process of closing.
+.\"
+.\"
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a pipe and the other end of the pipe is closed.
+.\"
+.\"
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a STREAMS based pipe and there are no readers at the other end of
+the pipe.
+.\"
+.\"
+.TP
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
+.\"
+.\"
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.BR putpmsg ()
+system call.
+.\"
+.\"
+.TP
+.RB [ ENOSR ]
+STREAMS resources were insufficient to complete the operation.
+.\"
+.\"
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.\"
+.\"
+.TP
+.RB [ ENXIO ]
+A
+.B M_HANGUP
+message arrived at the stream head for the specified
+.IR fd .
+.\"
+.\"
+.TP
+.RB [ ERANGE ]
+The
+.I len
+of the data part of the message is outside the range
+.I q_minpsz
+to
+.I q_maxpsz
+inclusive for the topmost STREAMS module or driver under the stream head, or,
+the
+.I len
+of the control or data part is larger than the maximum sized control or data
+message for the STREAMS subsystem.
+.\"
+.\"
+.TP
+.RB [ ENOSYS ]
+The
+.BR putpmsg ()
+system call is not supported on your system.  The occurs when STREAMS is not
+loaded or you have linked the wrong library.
+.PP
+Other errors may be returned by
+.BR putpmsg ().
+If the protocol module sends an
+.B M_ERROR
+message to the stream head, the error returned on all subsequent write
+operations, including
+.BR putpmsg (),
+is specified in the
+.B M_ERROR
+message by the protocol module.  Which errors are returned under what
+conditions form part of the necessary documentation of the protocol module.
+.\"
+.\"
+.SH NOTICES
+.PP
+.SS "Multi-Threading"
+.PP
+.BR putpmsg ()
+is thread-safe; however, multiple threads performing concurrent partial writes
+on the same stream will interfere with each other.  POSIX mandatory file
+locks, (see
+.BR lockf (3)),
+can be used to avoid interference.
+.SS "Asynchronous I/O"
+.PP
+If the file is set for blocking operation (see
+.BR fcntl (2)),
+then
+.BR putpmsg ()
+will block waiting for the band specified in
+.I band
+(with
+.B MSG_BAND
+set in
+.IR flags )
+to permit sending messages under band flow control.
+.RB ( putpmsg ()
+will not wait for a message block to formulate the
+.I STREAMS
+message, but will return
+.RB [ ENOSR ]
+if it cannot allocate the necessary message block).
+When the file is set for non-blocking operation,
+.BR putpmsg ()
+will not block, but will return the appropriate error number
+.RB ([ ENOSTR "], [" EAGAIN "], [" EWOULDBLOCK ])
+if the STREAMS
+message could not be formulated and sent immediately.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR intro (2),
+.BR poll (2),
+.BR putmsg (2),
+.BR write (2),
+.BR streamio (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR putpmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR putpmsg ()
+is compatible with SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX,
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42cr
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg.
+.PP
+.BR putpmsg ()
+is compatible with LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.B LiS
+.[
+LiS
+.]
+incorrectly returns
+.RB [ EINVAL ]
+instead of
+.RB [ EIO ]
+when the internal head queue pointer points to a structure that is not a queue
+structure, or is mangled.
+.IP \(em
+.B LiS
+does not return
+.RB [ EIO ]
+when
+.I fd
+refers to a closing stream.
+.IP \(em
+.B LiS
+incorrectly returns
+.RB [ EIO ]
+when
+.I fd
+refers to a broken pipe.
+.IP \(em
+.B LiS
+incorrectly returns
+.RB [ EAGAIN ]
+instead of
+.RB [ EINTR ]
+when an
+.B M_SIG
+message causes a signal that interrupts the call to
+.BR putpmsg ()
+before any data is written.
+.IP \(em
+.B LiS
+incorrectly returns
+.RB [ ENODEV ]
+instead of
+.RB [ ENOSTR ]
+when there is no stream associated with
+.IR fd .
+.IP \(em
+.B LiS
+incorrectly returns
+.RB [ EINVAL ]
+instead of
+.RB [ ENODEV ]
+when
+.I fd
+refers to a device that does not support the
+.BR putpmsg ()
+system call.
+.PP
+.B Linux Fast-STREAMS
+provides system calls for
+.IR __NR_getpmsg " and " __NR_putpmsg
+that are used to implement this system call.
+(glibc has prototypes for this system call.)
+In addition,
+.B Linux Fast-STREAMS
+recognizes the \*(lqinvalid\*(rq buffer length to
+.BR write (2)
+used by LiS to emulate the
+.I __NR_getpmsg
+system call, permitting LiS libaries to be used with
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR putpmsg ()
+first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

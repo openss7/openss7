@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/24 12:48:50 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:17:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:50 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 20:17:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ post-modules:
 			rm -f $$conf_new ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
+			sysmap='$(DESTDIR)$(ksysmap)' ; \
 			if test -r $$sysmap ; then \
 				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
 				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
@@ -157,8 +157,9 @@ post-modules:
 		if test -d "$(DESTDIR)$(krootdir)/usr/src" ; then \
 			echo "rm -fr \"$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_NAME)\"" ; \
 			rm -fr "$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_NAME)" ; \
-			echo "$(LN_S) $(srcdir) \"$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_NAME)\"" ; \
-			$(LN_S) $(srcdir) "$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_NAME)" ; \
+			d=`(cd $(srcdir); pwd)` ; \
+			echo "$(LN_S) -f \"$$d\" \"$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_NAME)\"" ; \
+			$(LN_S) -f "$$d" "$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_NAME)" ; \
 		fi ; \
 	fi
 
@@ -215,7 +216,7 @@ postun-modules:
 			rm -f $$conf_new ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
+			sysmap='$(DESTDIR)$(ksysmap)' ; \
 			if test -r $$sysmap ; then \
 				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
 				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \

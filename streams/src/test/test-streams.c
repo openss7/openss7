@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/12 23:20:34 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:34:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:34 $ by $Author: brian $
+ Last Modified $Date: 2004/06/20 20:34:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: test-streams.c,v $
- Revision 0.9.2.4  2004/06/12 23:20:34  brian
- - Ioctl debugging.
+ Revision 0.9.2.5  2004/06/20 20:34:09  brian
+ - Further debugging.
+
+ Revision 1.5  2004/06/20 20:34:09  brian
+ - Further debugging.
 
  Revision 1.4  2004/06/12 23:20:34  brian
  - Ioctl debugging.
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/12 23:20:34 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:34:09 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/12 23:20:34 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/20 20:34:09 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -1169,8 +1172,8 @@ struct test_stream test_case_1_2 = { NULL, &test_1_2, NULL };
  */
 #define name_case_2_1_1 "Perform streamio I_NREAD."
 #define desc_case_2_1_1 "\
-Checks that I_NREAD can be performed on a stream.  Because this test is \
-peformed on a freshly opened stream, it should return zero (0) as a return \
+Checks that I_NREAD can be performed on a stream.  Because this test is \n\
+peformed on a freshly opened stream, it should return zero (0) as a return \n\
 value and return zero (0) in the integer pointed to by arg."
 int test_2_1_1(int child)
 {
@@ -1193,7 +1196,7 @@ struct test_stream test_case_2_1_1 = { &preamble_0, &test_2_1_1, &postamble_0 };
 
 #define name_case_2_1_2 "Perform streamio I_NREAD - EFAULT."
 #define desc_case_2_1_2 "\
-Checks that EFAULT is returned when arg points outside the caller's address\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
 int test_2_1_2(int child)
 {
@@ -1218,7 +1221,7 @@ struct test_stream test_case_2_1_2 = { &preamble_0, &test_2_1_2, &postamble_0 };
 Checks that I_PUSH can be performed on a stream."
 int test_2_2(int child)
 {
-	if (test_ioctl(child, I_PUSH, "nomodule") == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nomodule") == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
@@ -1742,6 +1745,7 @@ struct test_stream test_case_2_32 = { &preamble_0, &test_2_32, &postamble_0 };
 #define test_case_2_32_stream_1 (NULL)
 #define test_case_2_32_stream_2 (NULL)
 
+#if 0
 /*
  *  Perform IOCTL on one stream - I_S_RECVFD	(UnixWare)
  */
@@ -1789,6 +1793,7 @@ struct test_stream test_case_2_35 = { &preamble_0, &test_2_35, &postamble_0 };
 #define test_case_2_35_stream_0 (&test_case_2_35)
 #define test_case_2_35_stream_1 (NULL)
 #define test_case_2_35_stream_2 (NULL)
+#endif
 
 /*
  *  Perform IOCTL on one stream - I_GETTP	(UnixWare)
@@ -2254,6 +2259,7 @@ struct test_case {
 		"2.32", name_case_2_32, desc_case_2_32, {
 	test_case_2_32_stream_0, test_case_2_32_stream_1, test_case_2_32_stream_2}, 0, 0}
 	, {
+#if 0
 		"2.33", name_case_2_33, desc_case_2_33, {
 	test_case_2_33_stream_0, test_case_2_33_stream_1, test_case_2_33_stream_2}, 0, 0}
 	, {
@@ -2263,6 +2269,7 @@ struct test_case {
 		"2.35", name_case_2_35, desc_case_2_35, {
 	test_case_2_35_stream_0, test_case_2_35_stream_1, test_case_2_35_stream_2}, 0, 0}
 	, {
+#endif
 		"2.36", name_case_2_36, desc_case_2_36, {
 	test_case_2_36_stream_0, test_case_2_36_stream_1, test_case_2_36_stream_2}, 0, 0}
 	, {

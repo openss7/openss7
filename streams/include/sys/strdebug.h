@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.5 2004/06/12 23:19:15 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.6 2004/06/20 20:34:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:19:15 $ by $Author: brian $
+ Last Modified $Date: 2004/06/20 20:34:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/12 23:19:15 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/20 20:34:04 $"
 
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -178,7 +178,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    todo(__pks)		__todo(__pks)
 #define  printd(__pks)		do { } while(0)
 #define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
+#define  pswerr(__pks)		__swerr()
 
 #else
 
@@ -203,7 +203,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    todo(__pks)		do { } while(0)
 #define  printd(__pks)		do { } while(0)
 #define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
+#define  pswerr(__pks)		__swerr()
 
 #endif
 

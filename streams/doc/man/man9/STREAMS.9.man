@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.6 2004/06/20 20:32:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
+.\" Last Modified $Date: 2004/06/20 20:32:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STREAMS 9 "$Date: 2004/06/20 20:32:55 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -181,11 +181,11 @@ an existing pipe end
 .HP
 .BR getmsg "(2)\ \-\ get next message from a STREAMS character device
 .HP
-.BR getpmsg "(2)\ \-\ get next message from a STREAMS character device
+.BR getpmsg "(2s)\ \-\ get next message from a STREAMS character device
 .HP
 .BR putmsg "(2)\ \-\ put a message to a STREAMS character device
 .HP
-.BR putpmsg "(2)\ \-\ put a message to a STREAMS character device
+.BR putpmsg "(2s)\ \-\ put a message to a STREAMS character device
 .HP
 .BR poll "(2)\ \-\ wait for some event on a STREAMS character device
 .HP
@@ -1265,7 +1265,7 @@ The default value is 2^12.
 This is the system wide maximum.  Existing allocations are unaffected by
 lowering this value.
 Changing this value can have an impact on users of
-.BR putpmsg (2).
+.BR putpmsg (2s).
 .TP
 .B sys.streams.strmsgsz
 Defines the maximum STREAMS message size.
@@ -1277,7 +1277,7 @@ Changing this value can have an impact on users of
 .BR write (2),
 .BR writev (2),
 and
-.BR putpmsg (2).
+.BR putpmsg (2s).
 .TP
 .B sys.streams.strthresh
 Defines the maximum amount of memory that will be allocated for use by the
