@@ -1,0 +1,482 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: SV_WAIT.9.man,v 0.9.2.2 2004/03/14 08:56:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SV_WAIT 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B SV_WAIT, SV_WAIT_SIG
+\- wait on a sychronization variable or signal
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/ksynch.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+void \fBSV_WAIT\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
+.HP
+int \fBSV_WAIT_SIG\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I svp
+A pointer to the sychrnonization variable upon which to wait.
+.TP
+.I priority
+A hint to scheduler concerning the priority with which the caller will run
+after waking.  The priority values are:
+.RS
+.TP \w'\ pridisk\ 'u
+.B pridisk
+A priority for a disk driver.
+.PD 0
+.TP
+.B prinet
+A priority for a network driver.
+.TP
+.B pritty
+A priority for a terminal driver (including
+.IR STREAMS ).
+.TP
+.B pritape
+A priority for a tape driver.
+.TP
+.B prihi
+A high priority.
+.TP
+.B primed
+A medium priority.
+.TP
+.B prilo
+A lo priority.
+.PD
+.RE
+.TP
+.I lkp
+A locked basic lock that will be released before blocking.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+wait on the sycnhronization variable referenced by the
+.I svp
+argument.
+The calling process will sleep inside
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+until signalled by
+.BR SV_BROADCAST (9)
+or
+.BR SV_SIGNAL (9)
+for the synchronization varilable referenced by
+.I svp
+by another thread of execution.
+.BR SV_WAIT_SIG ()
+will also wake when the calling process receives a signal.
+.PP
+A priority may be specified with the
+.I priority
+argument that is a hint to the scheduler at which priority level the process
+will run after exiting from the
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+call.  This priority level is not set by
+.BR SV_WAIT (),
+or
+.BR SV_WAIT_SG (),
+but is merely a hint to the scheduler as to what priority to assign to the
+task relative to other processes.
+.PP
+The basic lock indicated by the
+.I lkp
+argument must be held by the caller when calling
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ().
+This lock will be released internally and interrupt prioirty set to
+.B plbase
+after the process is placed on the wait queue, but before the context
+switching to another process.  Upon return from
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG (),
+the lock is not held and the interrupt priority is set to
+.BR plbase .
+This procedure ensures that signals and wakeups on the sychronization variable
+are not lost.
+.PP
+The process will not be interrupted by signals while sleeping inside
+.BR SV_WAIT ().
+The process will be interrupted by signals while sleeping inside
+.BR SV_WAIT_SIG ().
+.\"
+.\"
+.SH USAGE
+.PP
+Within the scope of
+.IR STREAMS ,
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+is typically used within a
+.BR qopen (9)
+procedure to wait on some condition before continuing
+.I STREAMS
+module initialization actions.  One typicall usage is to call
+.BR qprocson (9)
+to enable
+.BR put (9)
+and
+.BR srv (9)
+procedures, send a message downstream and await a response.  Either the
+.BR put (9)
+or
+.BR srv (9)
+procedure would include a call to
+.BR SV_SIGNAL (9)
+to wait the process to continue the
+.BR qopen (9)
+procedure.
+See
+.RI \(lq EXAMPLES \(rq,
+below.
+.PP
+An alternative to using
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+are the
+.IR Solaris \(rg
+DDI
+.[
+solspg
+.]
+.BR qwait (9)
+or
+.BR qwait_sig (9)
+functions.
+.PP
+The primary difference between
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+is that
+.BR SV_WAIT ()
+cannot be interrupted by signals and
+.BR SV_WAIT_SIG ()
+can.
+If it cannot be guaranteed that the condition will ever occur and there
+remains a possibility that the process will sleep forever, then
+.BR SV_WAIT_SIG ()
+is a better choice than
+.BR SV_WAIT ().
+When
+.BR SV_WAIT_SIG ()
+is interrupted by a signal in the
+.I STREAMS
+module
+.BR qopen (9)
+procedure, the caller should exit the procedure with the error
+.RB [ EINTR ].
+.\"
+.\"
+.SH RETURN
+.PP
+.BR SV_WAIT ()
+returns void.
+.BR SV_WAIT_SIG ()
+returns false (zero) if the call was not interrupted by a signal and
+true (one) if the call was interrupted by a signal.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are always successful.  If incorrect arguments are supplied, the result will
+be indeterminate.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+can be called from user context.  For
+.I STREAMS
+this means from withing a kernel module
+.BR init_module (9)
+or
+.BR term_module (9)
+routine, or from within a
+.I STREAMS
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are MP-safe.  However, is the caller's responsibility to ensure that the
+appropriate basic lock is supplied to the call.
+.\"
+.\"
+.SH NOTICES
+.PP
+Calls to
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+should be written so as to be able to tolerate false wakeups.  The condition
+that initiated the sleep on the synchronization varilable should be rechecked
+on exit to ensure that the condition has been cleared.
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are
+.IR "SVR 4.2" -specific
+functions:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+defined.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SV_BROADCAST (9),
+.BR SV_SIGNAL (9),
+.BR qopen (9),
+.BR qprocson (9),
+.BR put (9),
+.BR srv (9),
+.BR qwait (9),
+.BR init_module (9),
+.BR term_module (9),
+.BR qclose (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4.2 MP" ,
+with the following portablity considerations:
+.IP \(em \w'\ \(em\ 'u
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+documents its implementation of
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+somewhat differently than that of
+.IR "SVR 4.2" .
+See
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdoc
+.]
+for more information.
+.IP \(em \w'\ \(em\ 'u
+.I LiS
+does not provide these functions.
+.IP \(em
+.IR Solaris \(rg
+provides the related functions
+.BR qwait (9)
+and
+.BR qwait_sig (9).
+.IP \(em
+Under
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+the
+.I priority
+argument, which is a scheduler hint, is ignored.
+.B Linux
+does not schedule in the same manner as
+.IR "SVR 4.2 MP" .
+.IP \(em
+Under
+.B Linux
+a interrupt priority of
+.B plbase
+corresponds to interrupts enabled.
+.IP \(em
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.IR Linux \(rg.
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2"
+DDI documentation.
+.[
+uw7doc
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+first appeared in
+.IR "SVR 4.2"
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

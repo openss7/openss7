@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: qsize.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: qsize.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QSIZE 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QSIZE 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -161,7 +161,7 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .B Linux Fast-STREAMS
 maintains a count of the messages on a given queue or queue band in the
 .BR queue_t (9)
@@ -177,10 +177,10 @@ on the queue for each invocation.  LiS is inefficient if many calls to
 are performed by a given
 .I STREAMS
 module or driver.
-.IP \(bu
+.IP \(em
 .BR qsize ()
 always succeeds.  LiS returns zero (0) on failure.
-.IP \(bu
+.IP \(em
 .BR qsize ()
 called with an invalid
 .I q
@@ -190,13 +190,13 @@ Under LiS,
 called with an invalid
 .I q
 pointer will return zero (0).
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]

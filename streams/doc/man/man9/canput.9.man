@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: canput.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: canput.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CANPUT 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH CANPUT 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH "NAME"
@@ -235,7 +235,7 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR canput ()
 called with a
 .B NULL
@@ -252,7 +252,7 @@ or points to a structure other than a
 .B queue_t 
 structure,
 it will return false (0).
-.IP \(bu
+.IP \(em
 Although a call to
 .BI bcanput( q ", " 0 )
 is functionally equivalent to
@@ -268,13 +268,13 @@ and
 .BI bcanputnext( q ", " band )
 with macros that call
 .BI bcanput( q ", " band ).
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]

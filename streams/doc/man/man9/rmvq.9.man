@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: rmvq.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: rmvq.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH RMVQ 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH RMVQ 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -173,7 +173,7 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR rmvq ()
 is always successful.
 .IP "" 4
@@ -200,7 +200,7 @@ the message pointed to by
 .I mp
 does not exist on the queue
 .IR q .
-.IP \(bu
+.IP \(em
 .B Linux Fast-STREAMS
 mainatins a queue pointer within the
 .BR msgb (9)
@@ -225,13 +225,13 @@ using a linear search.  This is inefficient if
 is called often by a
 .IR STREAMS (4)
 module or driver.
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]

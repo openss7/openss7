@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTBQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PUTBQ 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -220,7 +220,7 @@ LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 If
 .BR putbq ()
 is passed an invalid
@@ -241,7 +241,7 @@ is closing or for which
 put and service routine processing has been
 turned off (e.g. with
 .BR qprocsoff (9)).
-.IP \(bu
+.IP \(em
 .BR putbq ()
 only fails if
 .I mp->b_band
@@ -269,13 +269,13 @@ This is inconsistent with SVR 4.2 DDI/DKI and
 .IR Solaris \(rg
 documentation.
 This is an LiS bug.
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: physreq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: physreq.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PHSYREQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH PHSYREQ 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -201,15 +201,15 @@ structure largely ignore the members of the structure.
 The
 .BR physreq _t
 structure is compatible with
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 and
-.BR LiS ,
+.IR LiS ,
 with the following considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 The
 .BR physreq _t
 structure is specific to
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 and is only provided
 when
 .B _UW7_SOURCE
@@ -218,25 +218,25 @@ with compatibility flag:
 .B CONFIG_STREAMS_COMPAT_UW7
 or
 .BR CONFIG_STREAMS_COMPAT_LIS .
-.IP \(bu
-.B LiS
+.IP \(em
+.I LiS
 ignores this argument and provides a
 .B void 
 pointer in the
 .BR lis_allocb_physreq (9)
 function prototype.
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 documentation;
 .[
 uw7doc
 .]
-.B LiS
+.I LiS
 source code.
 .[
 LiS
@@ -249,7 +249,7 @@ LiS
 The
 .B phsyreq
 structure first appeared in
-.BR UnixWare \(rg.
+.IR UnixWare \(rg.
 .\"
 .\"
 .[

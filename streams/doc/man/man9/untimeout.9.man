@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: untimeout.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: untimeout.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNTIMEOUT 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNTIMEOUT 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -168,9 +168,9 @@ or interrupt service routines.
 .\"
 .SH "MP-STREAMS"
 .PP
-.B untimeout ()
+.BR untimeout ()
 is MP-safe; however, the caller of
-.B untimeout ()
+.BR untimeout ()
 must ensure that the callback function has not returned running before
 calling
 .\"
@@ -180,22 +180,22 @@ calling
 .BR untimeout ()
 can be called with a
 .I toid
-return by
-.BR timeout(9),
+returned by
+.BR timeout (9),
 or
 .BR qtimeout (9).
 .PP
 .BR untimeout ()
-must be called for all outstaning timeout calls from the
+must be called for all outstanding timeout calls from the
 .BR qclose (9)
-procedure fo the modules before existing and unloading.
+procedure of the modules before exiting and unloading.
 .PP
-Becuase
+Because
 .B Linux Fast-STREAMS
 .[
 lfs
 .]
-uses an outdating pointer for the creturned
+uses an outdating pointer for the returned
 .BR toid_t ,
 .BR untimeout ()
 must be called promptly for outstanding buffer calls.
@@ -228,41 +228,41 @@ and systems based on
 .[
 svr4spg
 .]
-with the folllowing portability considerations:
-.IP \(bu
+with the following portability considerations:
+.IP \(em \w'\ \(em\ 'u
 The
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 function prototype returns
 .BR void .
-.IP \(bu
+.IP \(em
 Under
-.BR LiS ,
+.IR LiS ,
 .[
 lis
 .]
 .BR timeout (9)
 creates a Linux timer structure, assigns it a sequential integer timer
 identifier, and places it in a timer list.  Whenever
-.B LiS
+.I LiS
 stops a timer, it
 checks the list for the integer timer identifier with interrupts disabled.
 This is an exhaustive linear search.  This is inefficient.
 .I STREAMS
 modules or drivers that stop timers often will experience poorer performance
 than if the Linux kernel timer facility was used directly.
-.IP \(bu
+.IP \(em
 Symbol
 .BR lis_untimeout ()
 is provided for compatibility with
-.BR LiS .
+.IR LiS .
 See
 .BR lisbcm (9).
 .BR lis_untimeout ()
 calls
 .BR untimeout ()
 directly.
-.IP \(bu
-.BR AIX \(rg
+.IP \(em
+.IR AIX \(rg
 .[
 aixdoc
 .]
@@ -285,8 +285,8 @@ svr3spg
 based systems maintaining the
 .B int
 prototype.
-.IP \(bu
-.BR Solaris \(rg
+.IP \(em
+.IR Solaris \(rg
 .[
 soldoc
 .]
@@ -298,17 +298,17 @@ describes this function as having the following prototype:
 .sp
 The
 .B clock_t
-return value is decribed as being -1 when the
+return value is described as being -1 when the
 .I toid
 is not found and zero or positive otherwise.
-.IP \(bu
+.IP \(em
 Both
-.BR AIX \(rg
+.IR AIX \(rg
 .[
 aixdoc
 .]
 and
-.BR OSF \(rg
+.IR OSF \(rg
 .[
 osfdoc
 .]
@@ -333,8 +333,8 @@ definitions which use an
 .B int
 for the
 .BR toid_t .
-.IP \(bu
-Binary compatiblity is not guaranteed.
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

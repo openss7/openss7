@@ -1,0 +1,283 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: umount2.9.man,v 0.9.2.2 2004/03/14 08:56:36 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UMOUNT2 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B umount2
+\- unmount a filesystem
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _LIS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/dki.h>
+.HP
+int \fBumount2\fR(char *\fIpathname\fR, int \fIflags\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I pathname
+is the path to the directory to which the file system is attached.
+.TP
+.I flags
+can be one of the following:
+.RS
+.TP
+.B MTP_FORCE
+force unmount the filesystem
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR umount2 ()
+is an
+.IR LiS -specific
+.[
+lis
+.]
+wrapper function to the system call
+.BR umount2 (2)
+that can be called from within the kernel.
+.PP
+The purpose of this function beinf called from within the kernel is to permit
+.IR STREAMS (4)
+kernel modules to mount their own filesystems.
+.PP
+Normally, a filesystem would be mounted by a
+.IR STREAMS (4)
+module or driver when the
+.B Linux
+kernel module loads (i.e. within the
+.BR init_module (9)
+function).  Normally,
+.BR umount2 ()
+would be called within the kernel module
+.BR cleanup_module (9)
+function to unmount the filesystems that were mounted during module
+initialization.
+.PP
+For additional information, see
+.BR umount (2).
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR umount2 ()
+succeeds, it returns zero (0);
+when it fails, it returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR umount2 ()
+fails under the same conditions and with the same (negative) error numbers as
+.BR umount (2).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR umount2 ()
+can be called from user context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR umount2 ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR umount2 ()
+is implemented by changing the data segment to the kernel data segment and
+calling
+.BR umount (2).
+This means that the
+.BR uid " and " euid
+of the caller is not changed.  This makes this function rather useless if the
+process invoking it is not the kernel module loading daemon, or other process
+running with real root permission.
+.PP
+.BR umount2 ()
+is a
+.IR LiS -specific
+function:
+.B _LIS_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_LIS
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR umount (2),
+.BR mount (9),
+.BR mknod (9),
+.BR unlink (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR umount2 ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR umount2 ()
+is compatible with
+.I LiS
+with the following portablity considerations:
+.IP \(em \w'\ \(em\ 'u
+.BR umount2 ()
+is not bug-for-bug compatible with
+.IR LiS .
+.[
+lis
+.]
+.I LiS
+synthesizes system calls from inside the kernel that is incompatible with
+architectures that do not support in-kernel system calls.
+.BR umount2 ()
+peforms a direct function call to
+.BR sys_umount (9)
+within the kernel and does not suffer from this deficiency.
+.IP \(em
+The symbol
+.B lis_umount2
+is provided for source compatibility.
+.BR lis_umount2 ()
+simply calls
+.BR umount2 ().
+.IP \(em
+.BR umount2 ()
+is provided for source level compatibility with
+.I LiS
+for the purpose of porting
+.I LiS
+drivers to
+.IR Linux \(rg.
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR LiS ,
+binaries are incompatible.
+.IP \(em
+.BR umount2 ()
+only provides functionality comparable to
+.I LiS
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR umount2 ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I LiS
+documentation.
+.[
+lis
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR umount2 ()
+first appeared in
+.IR "SVR 2" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

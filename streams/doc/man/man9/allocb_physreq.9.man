@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: allocb_physreq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: allocb_physreq.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ALLOCB_PHYSREQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH ALLOCB_PHYSREQ 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -232,7 +232,7 @@ is MP-safe.  The caller has exclusive acces to the returned message.
 .PP
 .BR allocb_physreq ()
 is provided for source level compatibility with
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 and, despite the description above, ignores the
 .I physrp
 argument.
@@ -270,11 +270,11 @@ to allocate the message block.
 .PP
 .BR allocb_physreq ()
 is source level compatible with
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 and
-.BR LiS ,
+.IR LiS ,
 with the following considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 Despite the description above,
 .BR allocb_physreq ()
 is not specially implemented and results in a simple call to
@@ -282,9 +282,9 @@ is not specially implemented and results in a simple call to
 with the argument
 .I physrp
 being largely ignored.
-.BR LiS
+.IR LiS
 has the same behavior.
-.IP \(bu
+.IP \(em
 .I STREAMS
 modules relying on
 .BR allocb_physreq ()
@@ -294,7 +294,7 @@ memory allocation: (1) allocations are always aligned to the next largest
 power of 2 boundary greater than the requested size; (2) allocations of
 greater than a page size result in continguous memory allocations; (3)
 allocations of greater than a page size are alligned to a page boundary.
-.IP \(bu
+.IP \(em
 Symbol
 .BR lis_allocb_physreq ()
 is provided for binary compatibility with LiS.  See
@@ -303,7 +303,7 @@ is provided for binary compatibility with LiS.  See
 simply calls
 .BR allocb_physreq ()
 directly.
-.BR \(bu
+.BR \(em
 This function is not provided by
 .BR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -312,13 +312,13 @@ usldk
 nor any other
 .B SVR 4
 based implementation with the exception of
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 and
-.BR LiS ,
+.IR LiS ,
 .RB ( LiS
 largely for compatibility with
-.BR UnixWare \(rg).
-.IP \(bu
+.IR UnixWare \(rg).
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -328,13 +328,13 @@ for more compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 documentation;
 .[
 uw7doc
 .]
 and
-.B LiS
+.I LiS
 source code.
 .[
 LiS
@@ -345,7 +345,7 @@ LiS
 .PP
 .BR allocb_physreq ()
 first appeared in
-.BR UnixWare \(rg.
+.IR UnixWare \(rg.
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QENABLE 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QENABLE 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -208,19 +208,19 @@ has no known bugs.
 .PP
 .BR qenable ()
 is source-level compatible with
-.BR "SVR 4.2 MP DDI/DKI" ,
-.BR AIX \(rg,
-.BR HP-UX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR LiS ,
+.IR LiS ,
 with the following considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR qenable ()
 only schedules the queue for later service.
-.IP \(bu
+.IP \(em
 .BR qenable ()
 schedules a queue regardless of whether the
 .B QNOENB
@@ -228,9 +228,9 @@ flag is set, or whether
 .BR noenable (9)
 has been called for the queue,
 .IR q .
-.IP \(bu
+.IP \(em
 Under
-.BR LiS,
+.IR LiS,
 .[
 LiS
 .]
@@ -240,9 +240,9 @@ will not enable a queue previously disabled with
 or
 .BR qprocsoff ().
 This is an
-.B LiS
+.I LiS
 bug.
-.IP \(bu
+.IP \(em
 .BR qenable ()
 functions properly on a stream frozen with
 .BR freezestr (9).
@@ -251,15 +251,15 @@ does not block the setting of flags unless some other
 .I STREAMS
 sychronization mechanism is in place (such as perimeters).
 Under
-.BR UnixWare \(rg,
+.IR UnixWare \(rg,
 .BR qenable ()
 called on a frozen stream will have indeterminate results.
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]
@@ -267,10 +267,10 @@ do not permit
 .BR qenable ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.IP \(bu
+.IP \(em
 .BR qenable ()
 enables the queue regardless of the settings of other flags.
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 documentation
 .[
 uw7doc
@@ -280,11 +280,11 @@ explicitly states that
 schedules the queue regardless of whether
 .BR noenable (9)
 was invoked on the queue previously.
-.BR AIX
-.BR HP-UX \(rg,
-.BR OSF \(rg
+.IR AIX
+.IR HP-UX \(rg,
+.IR OSF \(rg
 and
-.BR Solaris \(rg
+.IR Solaris \(rg
 documentation
 .[
 aixdoc
@@ -300,7 +300,7 @@ do not say that
 defeats
 .BR qenable ()
 either.
-.BR LiS
+.IR LiS
 source code,
 .[
 LiS
@@ -309,19 +309,19 @@ on the other hand shows that no queue will be enabled while the
 .BR QNOENB ", "  QPROCSOFF " or " QCLOSING
 flags are set.
 This is an
-.B LiS
+.I LiS
 bug.
-.IP \(bu
+.IP \(em
 .BR qenable ()
 is not bug-for-bug compatible with
-.BR LiS .
-.B LiS
+.IR LiS .
+.I LiS
 has a nasty bug in
 .BR qenable ()
 requiring the non-standard
 .BR canenable (9)
 function.
-.IP \(bu
+.IP \(em
 Symbol
 .BR lis_qenable ()
 is provided for binary compatibility with LiS.  See
@@ -329,7 +329,7 @@ is provided for binary compatibility with LiS.  See
 .BR lis_qenable ()
 simply calls
 .BR qenable ().
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -344,12 +344,12 @@ for additional compatibility considerations.
 .[
 usldk
 .]
-.BR AIX \(rg,
-.BR HP-UX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF \(rg,
+.IR Solaris \(rg
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 documentation;
 .[
 aixdoc
@@ -367,7 +367,7 @@ soldoc
 uw7doc
 .]
 and
-.BR LiS 
+.IR LiS 
 source code
 .[
 LiS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BCANPUT 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH BCANPUT 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH "NAME"
@@ -227,8 +227,8 @@ usldk
 and systems based on
 .BR "SVR 4" ,
 with the following portability considerations:
-.IP \(bu
-.BR AIX \(rg
+.IP \(em \w'\ \(em\ 'u
+.IR AIX \(rg
 .[
 aixdoc
 .]
@@ -239,8 +239,8 @@ structure does not exist for
 that
 .BR bcanput ()
 returns true (1).
-.IP \(bu
-.BR HP-UX \(rg
+.IP \(em
+.IR HP-UX \(rg
 .[
 hpuxspg
 .]
@@ -248,18 +248,18 @@ lists
 .BR bcanput ()
 as a function that can only be passed a queue pointer in the queue pair within
 a queue's procedure.
-.IP \(bu
-.BR SUPER-UX \(rg
+.IP \(em
+.IR SUPER-UX \(rg
 .[
 suxdoc
 .]
 indicates that the stream cannot be frozen when calling
 .BR bcanput (9)
 and that private locks cannot be held across the call.
-.IP \(bu
+.IP \(em
 .BR bcanput ()
 always succeeds.  Under
-.BR LiS ,
+.IR LiS ,
 .BR bcabput ()
 will return zero (0 - flow controlled) if an internal error occurs, without
 setting the
@@ -267,11 +267,11 @@ setting the
 flag for the queue or band.  This means that, although flow controlled, no
 backenable procedure will be run.  This can lead to indefinite postponement of
 a queue service procedure under
-.BR LiS .
+.IR LiS .
 .B Linux Fast-STREAMS
 .BR bcanput ()
 does not have this problem.
-.IP \(bu
+.IP \(em
 The declaration for
 .BR bcanput ()
 provides that
@@ -288,13 +288,13 @@ and other systems based on
 .I band
 is
 .BR "unsigned char" .
-.IP \(bu
+.IP \(em
 Symbol
 .BR lis_bcanput ()
 and
 .BR lis_bcanput_anyband ()
 are provided for compatibility with
-.BR LiS .
+.IR LiS .
 See
 .BR lisbcm (9).
 .BR lis_bcanput ()
@@ -303,12 +303,12 @@ and
 simply call
 .BR bcanput ()
 directly.
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]
@@ -316,7 +316,7 @@ do not permit
 .BR bcanput ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

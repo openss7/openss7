@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MP-STREAMS 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MP-STREAMS 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -117,7 +117,7 @@ svr4
 .B Linux Fast-STREAMS
 also provide a sycnrhonization framework based on perimeters for compatibility
 with the
-.BR Solaris \(rg
+.IR Solaris \(rg
 implementation of
 .IR STREAMS .
 .[
@@ -213,7 +213,7 @@ or
 .BR qclose (9)
 procedures of a module use data structures that are global to the module.
 This is a
-.BR Solaris \(rg
+.IR Solaris \(rg
 specific concept.
 .[
 solspg
@@ -227,7 +227,7 @@ structures are protected.  For example:
 .BR streams_open (9),
 .BR streams_close (9),
 or even
-.BR Solaris \(rg's
+.IR Solaris \(rg's
 own
 .BR ddi_get_soft_state (9)
 mechanism.
@@ -362,12 +362,12 @@ Asynchronous callback functions are not normally synchronized.
 .PP
 .B Linux Fast-STREAMS
 provides the following assurances with regard to asynchronous callbacks:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 The callback function will be invoked on the processor that initiated the
 callback.  This ensures that the callback function will not execute until
 after the function that invoked the callback returns or encounters a
 pre-emption point.
-.IP \(bu
+.IP \(em
 If the
 .B STR_QSAFETY
 flag is set during configuration, asynchronous callback function invoked from
@@ -378,7 +378,7 @@ executive (within a
 queue procedure, callout or callback function),
 will be synchronized with the queue for which the callback is associated.  In
 addition, local interrupts will be supressed on the servicing processor.
-.IP \(bu
+.IP \(em
 Asynchronous callbacks invoked from outside the
 .I STREAMS
 executive (at user context outside the
@@ -390,10 +390,10 @@ interrupt service routines)
 will never be synchronized with the
 .I STREAMS
 framework.
-.IP \(bu
-.IP \(bu
-.IP \(bu
-.IP \(bu
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
 .PP
 .SS "Asynchronous Callback Cancellation"
 .PP

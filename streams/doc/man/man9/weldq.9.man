@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: weldq.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: weldq.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WELDQ 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WELDQ 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -87,11 +87,13 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .PP
-.B typedef void *weld_arg_t;
+typedef void *\fBweld_arg_t\fR;
 .br
-.B typedef void (*weld_fcn_t) (weld_arg_t);
+typedef void (*\fBweld_fcn_t\fR)(\fBweld_arg_t\fR);
 .HP
-.BI "int weldq(queue_t *" q1 ", queue_t *" q2 ", queue_t *" q3 ", queue_t *" q4 ", weld_fcn_t " func ", weld_arg_t " arg ", queue_t *" protect_q );
+int \fBweldq\fR(queue_t *\fIq1\fR, queue_t *\fIq2\fR, queue_t *\fIq3\fR,
+queue_t *\fIq4\fR, weld_fcn_t \fIfunc\fR, weld_arg_t \fIarg\fR, queue_t
+*\fIprotect_q\fR);
 .\"
 .\"
 .SH ARGUMENTS
@@ -118,10 +120,53 @@ an optional callback function to execute on completion.
 an argument for the optional callback function.
 .TP
 .I protect_q
-an optional queue to use for synchronization.
+an optional queue to use for synchronization to protect the callback function.
 .\"
 .\"
 .SH DESCRIPTION
+.\".PP
+.\"The
+.\".I STREAMS
+.\"synchronization-queueing mechanism allows only one queue to be accessed at any
+.\"one time.  In some cases, however, it is necessary for a thread to establish
+.\"queue connections between modules that are not in the same stream.  These
+.\"queue connections (welding mechanism) are especially useful for
+.\".I STREAMS
+.\"multiplexing and for echo-like
+.\".I STREAMS
+.\"drivers.
+.\".PP
+.\".I STREAMS
+.\"uses a special synchronization queue for welding queues.  As for individual
+.\"queue synchronization, the welding and unwelding requests are queued.  The
+.\"actual operation id sone safely by
+.\".IR STREAMS ,
+.\"without any risk of deadlocks.
+.\".PP
+.\"The
+.\".BR weldq ()
+.\"and
+.\".BR unweldq (9)
+.\"utilities, respectively, establish and remove connections between one or two
+.\"pairs of module or driver queues.  Because the actual operation is done
+.\"asynchronously, the utilities specify a callback function and its argument.
+.\"The callback function is typically the
+.\".BR qenable (9)
+.\"function or the
+.\".BR wakeup (9)
+.\"kernel service.
+.\".PP
+.\"During the welding and unwelding operation, both pairs of queues are acquired.
+.\"However, it may be necessary to prevent another queue, queue pair, module or
+.\"group of modules from being accessed during the operation.  Therefore, an
+.\"additional queue can be specified when calling the
+.\".BR weldq ()
+.\"or
+.\".BR unweldq (9)
+.\"utility; this queue will also be acquired during the operation.  Depending on
+.\"the synchronization level of the module to which this queue belongs, the
+.\"queue, queue pair, the module instance, all module instances, or an arbitrary
+.\"group of mdoules will be acquired.
 .PP
 .BR weldq ()
 forms a pipe-like connection between the queue pairs specified by
@@ -159,14 +204,11 @@ should be set to
 If syncrhonization of the callback function with a queue is necessary (and is
 recommended), the argument
 .I protect_q
-specifies a queue to be used for synchronization.
-If synchronization with a queue is not required,
+specifies a queue to be used for synchronization.  If synchronization of the
+callback function with a queue is not required,
 .I protect_q
 should be set to
 .BR NULL .
-.PP
-Queues that have been successfully welded can be unwelded with
-.BR unweldq (9).
 .\"
 .\"
 .SH USAGE
@@ -186,7 +228,7 @@ or loopback connection.
 For example, to weld two streams,
 .IR rq1 " and " rq2
 together in a pipe-like connection, the following can be performed:
-.BI "weld(WR(" rq1 "), RD(" rq2 "), WR(" rq2 "), RD(" rq1 "), " NULL ", " 0 ", " NULL ).
+.BI "weld(WR(" rq1 "), " rq2 ", WR(" rq2 "), " rq1 ", " NULL ", " 0 ", " NULL ).
 .\"
 .\"
 .SH RETURN
@@ -304,14 +346,27 @@ and the callback is invoked.
 .\"
 .SH NOTICES
 .PP
-Under
-.BR "Linux 2.4" ,
-without kernel pre-emption,
+Queues that have been successfully welded with
 .BR weldq ()
-simply obtains the necessary locks in the calling thread, performs the
-function and then calls the callback function (if any).    Under
-.BR "Linux 2.6" ,
-with kernel pre-emption, the call may be rescheduled.
+can be unwelded with
+.BR unweldq (9).
+.PP
+If one end of a pipe-like streams created by
+.BR weldq ()
+is closed,
+.I STREAMS
+will automatically unweld the two modules.  In this case,
+.BR unweldq (9)
+does not need to be called.
+.\".PP
+.\"Under
+.\".BR "Linux 2.4" ,
+.\"without kernel pre-emption,
+.\".BR weldq ()
+.\"simply obtains the necessary locks in the calling thread, performs the
+.\"function and then calls the callback function (if any).    Under
+.\".BR "Linux 2.6" ,
+.\"with kernel pre-emption, the call may be rescheduled.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -340,48 +395,48 @@ has no known bugs.
 .PP
 .BR weldq ()
 is compatible with
-.BR AIX \(rg,
+.IR AIX \(rg,
 .[
 aixspg
 .]
-.BR HP-UX \(rg,
+.IR HP-UX \(rg,
 .[
 hpuxspg
 .]
-.BR OSF \(rg,
+.IR OSF \(rg,
 .[
 osfspg
 .]
 with the following portability considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR weldq ()
 is not an
 .B "SVR 4.2 MP DDI/DKI"
 function.
-.IP \(bu
-.BR Solaris \(rg,
+.IP \(em
+.IR Solaris \(rg,
 .[
 solspg
 .]
-.BR SUPER-UX \(rg,
+.IR SUPER-UX \(rg,
 .[
 suxspg
 .]
-.BR UnixWare \(rg,
+.IR UnixWare \(rg,
 .[
 uw7spg
 .]
-.BR UXP/V \(rg,
+.IR UXP/V \(rg,
 .[
 uxpspg
 .]
 and
-.B LiS
+.I LiS
 .[
 lis
 .]
-do not provide this function.
-.IP \(bu
+do not document this function.
+.IP \(em
 Binary compatibility is not guaranteed.
 .\"
 .\"
@@ -402,11 +457,11 @@ conforms to
 .[
 aixspg
 .]
-.BR HP-UX \(rg,
+.IR HP-UX \(rg,
 .[
 hpuxspg
 .]
-.BR OSF \(rg,
+.IR OSF \(rg,
 .[
 osfspg
 .]

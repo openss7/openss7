@@ -1,0 +1,275 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: streams_close_comm.9.man,v 0.9.2.2 2004/03/14 08:56:36 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STREAMS_CLOSE_COMM 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B streams_close_comm
+\- \fISTREAMS\fR common minor device close utility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _OSF_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+int \fBstreams_close_comm\fR(queue_t *\fIq\fR, int \fIoflag\fR, cred_t
+*\fIcrp\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+The read queue of the queue pair as directly obtained from the
+.BR qclose (9)
+call.
+.TP
+.I oflag
+The open flags as directly obtained from the
+.BR qclose (9)
+call.
+.TP
+.I crp
+The pointer to the credentials structure as directly obtained from the
+.BR qclose (9)
+call.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR streams_close_comm ()
+is a convenience or housekeeping function used within a module or driver's
+.BR qclose (9)
+procedure to deallocate the private data structure and free the minor device
+number, if required.
+.PP
+.BR streams_close_comm ()
+must only be used to close streams that used either the
+.BR streams_open_comm (9)
+or
+.BR streams_open_ocomm (9)
+convenience function in the module's
+.BR qopen (9)
+procedure.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR streams_close_comm ()
+always returns zero (0).  The return value should be ignored by the caller.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR streams_close_comm ()
+fails it fails silently.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR streams_close_comm ()
+can be called from any context, however, it is only normally called from the
+module's
+.BR qclose (9)
+proecedure at user context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR streams_close_comm ()
+is mp-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR streams_close_comm ()
+is a
+.IR OSF \(rg-specific
+function:
+.B _OSF_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_OSF
+defined.
+.PP
+.BR streams_close_comm ()
+is closely related to the
+.IR AIX \(rg
+.BR mi_close_comm (9)
+convenience function.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of the use of the
+.BR streams_close_comm ()
+convenience function in a module's
+.BR qclose (9)
+procedure:
+.PP
+.nf
+\fC\s-1
+int
+xxx_close(queue_t *q, dev_t *devp, cred_t *crp)
+{
+    return streams_close_comm(q, devp, crp);
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR streams_open_comm (9),
+.BR streams_open_ocomm (9),
+.BR mi_open_comm (9),
+.BR mi_next_ptr (9),
+.BR mi_close_comm (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR streams_close_comm ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR streams_close_comm ()
+is compatible with
+.IR OSF \(rg
+with the following portablity considerations:
+.IP \(em \w'\ \(em\ 'u
+.IP \(em
+.IP \(em
+.IP \(em
+.BR streams_close_comm ()
+is provided for source level compatibility with
+.IR OSF \(rg
+for the purpose of porting
+.IR OSF \(rg
+drivers to
+.IR Linux \(rg.
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR OSF \(rg,
+binaries are incompatible.
+.IP \(em
+.BR streams_close_comm ()
+only provides functionality comparable to
+.IR OSF \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR streams_close_comm ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR OSF \(rg
+DDI documentation.
+.[
+osfdoc
+.]
+.[
+osfspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR streams_close_comm ()
+first appeared in
+.IR OSF \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

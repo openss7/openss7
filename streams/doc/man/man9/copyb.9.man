@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: copyb.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: copyb.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH COPYB 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH COPYB 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -163,7 +163,7 @@ message block.
 .SH NOTICES
 .PP
 The
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -208,9 +208,9 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
-.IP \(bu
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
+.IP \(em
+.IP \(em
 .PP
 Symbol
 .BR lis_copyb ()

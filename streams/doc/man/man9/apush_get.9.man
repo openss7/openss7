@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: apush_get.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: apush_get.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH APUSH_GET 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH APUSH_GET 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -198,7 +198,7 @@ successfully loaded.
 .PP
 .BR apush_get ()
 is an
-.BR LiS -specific
+.IR LiS -specific
 function.
 The macro definition
 .B _LIS_SOURCE
@@ -272,12 +272,12 @@ list.
 .PP
 .BR apush_get ()
 is compatible with
-.BR LiS ,
+.IR LiS ,
 .[
 LiS
 .]
 with the following portability considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 Symbol
 .BR lis_apush_get ()
 is provided for compatibility with LiS.  See
@@ -286,7 +286,7 @@ is provided for compatibility with LiS.  See
 simply calls
 .BR apush_get ()
 directly.
-.IP \(bu
+.IP \(em
 .B SVR 4.2 MP DDI/DKI
 .[
 usldk
@@ -295,7 +295,7 @@ and
 systems based on
 .B SVR 4
 do not export this function.
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -313,7 +313,7 @@ SAD (STREAMS Administrative Driver).  See
 .BR sad (4).
 .BR apush_get ()
 is provided only for compatibility with
-.BR LiS .
+.IR LiS .
 For the
 .B Linux Fast-STREAMS
 specific function, see

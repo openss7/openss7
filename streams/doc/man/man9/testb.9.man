@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: testb.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: testb.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TESTB 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH TESTB 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -172,7 +172,7 @@ As with other post SVR 3 STREAMS
 svr3
 .]
 implementations,
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -236,51 +236,53 @@ and systems based on
 svr4spg
 .]
 with the following portability considerations:
-.IP \(bu
-.BR AIX \(rg
+.IP \(em \w'\ \(em\ 'u
+.IR AIX \(rg
 .[
 aixdoc
 .]
 defines the first argument as
 .BR "register int" .
-.IP \(bu
-.BR AIX \(rg
+.IP \(em
+.IR AIX \(rg
 and
-.BR Solaris \(rg
+.IR Solaris \(rg
 .[
 soldoc
 .]
 ignore the
 .I priority
 argument.
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7doc
 .]
-.BR HP-UX \(rg
+.IR HP-UX \(rg
 .[
 hpuxdoc
 .]
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxdoc
 .]
-.BR OSF \(rg
+.IR OSF \(rg
 .[
 osfdoc
 .]
 do not.
-.BR OSF \(rg
+.IP \(em
+.IR OSF \(rg
 adds the
 .B BPRI_WAITOK
 priority.
-.BR UXP/V \(rg
+.IP \(em
+.IR UXP/V \(rg
 .[
 uxpdoc
 .]
 does not document this function.
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

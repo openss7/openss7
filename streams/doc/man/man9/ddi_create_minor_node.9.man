@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.1 2004/03/10 08:45:54 brian Exp $
+.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/10 08:45:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -262,7 +262,7 @@ drivers to
 Because the
 .B dev_info
 structure for
-.B Lnux Fast-STREAMS
+.B Linux Fast-STREAMS
 .[
 lfs
 .]
@@ -274,7 +274,7 @@ binaries are incompatible.
 is compatible with
 .IR Solaris \(rg
 with the following portability considerations:
-.IP \(em
+.IP \(em \w'\ \(em\ 'u
 .BR ddi_create_minor_node ()
 does not recognize any flags other than
 .B CLONE_DEV

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QPROCSOFF 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH QPROCSOFF 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -240,7 +240,7 @@ usldk
 and systems based on
 .BR "SVR 4" ,
 with the following portability considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR qprocson ()
 can be called with private queue pairs allocated with
 .BR allocq (9).
@@ -250,7 +250,7 @@ This is a non-portable
 lfs
 .]
 extension.
-.IP \(bu
+.IP \(em
 .BR qprocsoff ()
 clears the
 .I QHLIST
@@ -261,12 +261,12 @@ structure for both queues in the queue pair.
 can be called repeatedly for the same queue pair and only the first call will
 have an effect.  This can crash or lock processors on other systems (with the
 exception of
-.BR HP-UX \(rg
+.IR HP-UX \(rg
 .[
 hpuxspg
 .]
 as noted below.)
-.IP \(bu
+.IP \(em
 .BR qprocsoff ()
 waits for all other threads to exit
 .BR qopen (9),
@@ -280,17 +280,17 @@ procedures before returning.  This is consistent with
 usldk
 .]
 and documentation for
-.BR Solaris \(rg
+.IR Solaris \(rg
 .[
 soldoc
 .]
 but inconsistent with
-.BR LiS .
+.IR LiS .
 .[
 lis
 .]
 Under
-.BR LiS ,
+.IR LiS ,
 .BR qprocsoff ()
 does not wait for
 .BR qopen (9),
@@ -300,7 +300,7 @@ or
 .BR srv (9)
 procedures on other threads to exit before returning, but simply
 sets a flag.
-.IP \(bu
+.IP \(em
 The module or driver can neglect to call
 .BR qprocsoff ()
 before returning from the module's
@@ -310,61 +310,61 @@ procedure and the
 scheduler will perform an implicit
 .BR qprocsoff ().
 This is consitent with
-.B LiS
+.I LiS
 behavior but different from
 .BR "SVR 4.2 MP DDI/DKI" ,
-.BR UnixWare \(rg,
-.BR OSF1 \(rg,
+.IR UnixWare \(rg,
+.IR OSF1 \(rg,
 and
-.BR Solaris \(rg.
+.IR Solaris \(rg.
 Because
 .BR "SVR 4.2 MP DDI/DKI" ,
-.BR UnixWare \(rg,
-.BR OSF1 \(rg,
+.IR UnixWare \(rg,
+.IR OSF1 \(rg,
 and 
-.BR Solaris \(rg
+.IR Solaris \(rg
 should never return from
 .BR qclose (9)
 without calling
 .BR qprocsoff (),
 there should be no compatibility issues.
-.IP \(bu
-.BR AIX \(rg
+.IP \(em
+.IR AIX \(rg
 and
-.BR HP-UX \(rg
+.IR HP-UX \(rg
 do not support a
 .BR qprocson (9)
 or
 .BR qprocsoff (9)
 function.   On
-.BR HP-UX \(rg
+.IR HP-UX \(rg
 they are
 a null operation.
-.IP \(bu
+.IP \(em
 .BR qprocsoff ()
 can be called twice without danger.
 This is not true for
 .BR "SVR 4.2 MP DDI/DKI"
 or
-.BR Solaris \(rg
+.IR Solaris \(rg
 but is consistent with
-.BR HP-UX \(rg
+.IR HP-UX \(rg
 and
-.BR LiS .
-.IP \(bu
+.IR LiS .
+.IP \(em
 .BR qprocsoff ()
 blocks other threads attempting to enter the
 .BR put (9)
 procedure until it returns.
 Under
-.BR LiS ,
+.IR LiS ,
 attempts to enter the
 .BR put (9)
 procedure will result in the message being dropped or freed.
 See
 .BR put (9)
 for more information.
-.IP \(bu
+.IP \(em
 Symbol
 .BR lis_qprocsoff ()
 is provided for compatibility with LiS.  See
@@ -372,13 +372,13 @@ is provided for compatibility with LiS.  See
 .BR lis_qprocsoff ()
 simply calls
 .BR qprocsoff ().
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]
@@ -386,7 +386,7 @@ do not permit
 .BR qprocsoff ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -400,23 +400,23 @@ for additional compatibility information.
 .[
 usldk
 .]
-.BR AIX \(rg,
+.IR AIX \(rg,
 .[
 aixdoc
 .]
-.BR UnixWare \(rg,
+.IR UnixWare \(rg,
 .[
 uw7doc
 .]
-.BR HP-UX \(rg,
+.IR HP-UX \(rg,
 .[
 hpuxdoc
 .]
-.BR OSF \(rg,
+.IR OSF \(rg,
 .[
 osfdoc
 .]
-.BR Solaris \(rg,
+.IR Solaris \(rg,
 .[
 soldoc
 .]

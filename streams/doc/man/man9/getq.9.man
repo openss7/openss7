@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: getq.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: getq.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETQ 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETQ 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -209,7 +209,7 @@ and LiS
 LiS
 .]
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR getq ()
 passed a
 .B NULL
@@ -228,7 +228,7 @@ As most service procedures pass
 .BR getq ()
 the queue pointer passed to the service procedure, these corner cases should
 rarely be encountered.
-.IP \(bu
+.IP \(em
 .BR getq ()
 will retrieve messages from a queue that has had
 .BR qprocsoff (9)
@@ -250,13 +250,13 @@ may need to exchange messages with lower level queue pairs and making
 return
 .B NULL
 during close is an LiS bug.
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]

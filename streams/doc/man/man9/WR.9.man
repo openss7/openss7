@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: WR.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: WR.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WR 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WR 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -189,16 +189,16 @@ usldk
 and systems based on
 .BR "SVR 4" ,
 with the following portability considerations:
-.IP \(bu 3
-.BR SUPER-UX \(rg,
+.IP \(em 3
+.IR SUPER-UX \(rg,
 .[
 suxspg
 .]
-.BR UnixWare \(rg,
+.IR UnixWare \(rg,
 .[
 uw7spg
 .]
-.BR LiS ,
+.IR LiS ,
 .[
 lis
 .]
@@ -210,20 +210,20 @@ argument to
 If a write queue pointer is passed to
 .BR WR (),
 then the passed in write queue pointer is returned.
-.IP \(bu
-.BR AIX \(rg,
+.IP \(em \w'\ \(em\ 'u
+.IR AIX \(rg,
 .[
 aixspg
 .]
-.BR OSF \(rg,
+.IR OSF \(rg,
 .[
 osfspg
 .]
-.BR Solaris \(rg,
+.IR Solaris \(rg,
 .[
 solspg
 .]
-.BR UXP/V \(rg,
+.IR UXP/V \(rg,
 .[
 uxpspg
 .]
@@ -243,7 +243,7 @@ is often defined as:
 #define WR(__q) ((__q)+1)
 \s+2\fP
 .fi
-.IP \(bu
+.IP \(em
 .BR WR ()
 is implemented on
 .B Linux Fast-STREAMS
@@ -269,7 +269,7 @@ is a valid altenative implementation if the
 programmer wishes the more restrictive
 .BR WR ()
 behavior.
-.IP \(bu
+.IP \(em
 Portable
 .I STREAMS
 drivers and modules should not
@@ -280,7 +280,7 @@ nor
 rely upon
 .BR WR ()
 being defined as a macro or a function.
-.IP \(bu
+.IP \(em
 Binary compatiblity is not guaranteed.
 .PP
 See

@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: unweldq.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: unweldq.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,11 +71,11 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNWELDQ 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNWELDQ 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B weldq
+.B unweldq
 \- unweld two queues
 .\"
 .\"
@@ -87,73 +87,402 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .PP
-.B typedef void *weld_arg_t;
+typedef void *\fBweld_arg_t\fR;
 .br
-.B typedef void (*weld_fcn_t) (weld_arg_t);
+typedef void (*\fBweld_fcn_t\fR)(\fBweld_arg_t\fR);
 .HP
-.BI "int unweldq(queue_t *" q1 ", queue_t *" q2 ", queue_t *" q3 ", queue_t *" q4 ", weld_fcn_t " func ", weld_arg_t " arg ", queue_t *" protect_q );
+int \fBunweldq\fR(queue_t *\fIq1\fR, queue_t *\fIq2\fR, queue_t *\fIq3\fR,
+queue_t *\fIq4\fR, \fBweld_fcn_t\fR \fIfunc\fR, \fBweld_arg_t\fR \fIarg\fR,
+queue_t *\fIprotect_q\fR);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q1
+the first queue to unweld.
 .TP
 .I q2
+the queue to unweld from
+.IR q1 .
 .TP
 .I q3
+the second queue to weld.
 .TP
 .I q4
+the queue to unweld from
+.IR q3 .
 .TP
 .I func
+an optional callback function to execute on completion.
 .TP
 .I arg
+an argument for the optional callback function.
 .TP
 .I protect_q
+an optional queue to use for synchronization.
 .\"
 .\"
 .SH DESCRIPTION
+.\".PP
+.\"The
+.\".I STREAMS
+.\"synchronization-queueing mechanism allows only one queue to be accessed at any
+.\"one time.  In some cases, however, it is necessary for a thread to establish
+.\"queue connections between modules that are not in the same stream.  These
+.\"queue connections (welding mechanism) are especially useful for
+.\".I STREAMS
+.\"multiplexing and for echo-like
+.\".I STREAMS
+.\"drivers.
+.\".PP
+.\".I STREAMS
+.\"uses a special synchronization queue for welding queues.  As for individual
+.\"queue synchronization, the welding and unwelding requests are queued.  The
+.\"actual operation id sone safely by
+.\".IR STREAMS ,
+.\"without any risk of deadlocks.
+.\".PP
+.\"The
+.\".BR weldq (9)
+.\"and
+.\".BR unweldq ()
+.\"utilities, respectively, establish and remove connections between one or two
+.\"pairs of module or driver queues.  Because the actual operation is done
+.\"asynchronously, the utilities specify a callback function and its argument.
+.\"The callback function is typically the
+.\".BR qenable (9)
+.\"function or the
+.\".BR wakeup (9)
+.\"kernel service.
+.\".PP
+.\"During the welding and unwelding operation, both pairs of queues are acquired.
+.\"However, it may be necessary to prevent another queue, queue pair, module or
+.\"group of modules from being accessed during the operation.  Therefore, an
+.\"additional queue can be specified when calling the
+.\".BR weldq (9)
+.\"or
+.\".BR unweldq ()
+.\"utility; this queue will also be acquired during the operation.  Depending on
+.\"the synchronization level of the module to which this queue belongs, the
+.\"queue, queue pair, the module instance, all module instances, or an arbitrary
+.\"group of mdoules will be acquired.
 .PP
+.BR unweldq ()
+severs a pipe-like connection between the queue pairs specified by
+.RI ( q1 ", " q4 )
+and
+.RI ( q3 ", " q2 ).
+The
+.I q->q_next
+pointer
+.RB (see queue (9))
+of
+.I q1
+is disconnected from
+.I q2
+and the
+.I q->q_next
+pointer of
+.I q3
+is disconnected from
+.IR q4 .
+If only one pair of queues need to be severed,
+.I q3
+and
+.I q4
+can be set to
+.BR NULL .
+.PP
+The actual disconnection of the queues may be performed asynchronously and the
+caller can provide a callback function,
+.IR func ,
+and argument
+.IR arg ,
+to be called once the disconnection is complete.  If a callback function is
+not required,
+.IR func " and " arg
+should be set to
+.BR NULL .
+.PP
+If synchronization of the callback function with a queue is necessary (and
+recommended), the argument
+.I protect_q
+specifies a queue to be used for synchronization.  If synchronization of the
+callback function with a queue is not required,
+.I protect_q
+should be set to
+.BR NULL .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR unweldq ()
+is used by the
+.BR ticlts (4),
+.BR ticots (4),
+.BR ticotsord (4),
+and
+.BR spx (4)
+drivers to disconnect two streams previously connected with
+.BR weldq (9)
+to tear down a
+.BR pipe (2)
+or loopback connection.
+.PP
+For example, to unweld two streams,
+.IR rq1 " and " rq2
+from each other that were previously connected in a pipe-like connection, the
+following can be performed:
+.BI "unweld(WR(" rq1 "), " rq2 ", WR(" rq2 "), " rq1 ", " NULL ", " 0 ", " NULL ).
 .\"
 .\"
 .SH RETURN
 .PP
+Upon success,
+.BR unweldq ()
+issues a welding request and returns zero (0).
+Upon failure,
+.BR unweldq ()
+does not affect a change to any queue, and the function returns a
+.I positive
+error number.
 .\"
 .\"
 .SH ERRORS
 .PP
+.PP
+When
+.BR unweldq ()
+encounters and error, it returns an appropriate error number as follows:
+.TP
+.RB [ EAGAIN ]
+The request could not be completed.  The caller may try again.  This occurs
+from a failure to allocate the
+.I STREAMS
+resources necessary to complete the request.
+.TP
+.RB [ EINVAL ]
+A parameter was in error:
+.IR q1 " or " q3
+are not connected; or
+.IR q2 " or " q4
+are supplied without the corresponding
+.IR q1 " or " q3 .
+.TP
+.RB [ ENXIO ]
+The
+.BR unweldq ()
+utility is not provided.
+(This error code is never returned by
+.BR "Linux  Fast-STREAMS" .)
+.PP
+Note that
+.BR unweldq ()
+returns a
+.I positive
+error number, whereas most other
+.B Linux Fast-STREAMS
+functions, in the
+.B Linux
+tradition, return a
+.I negative
+error number.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR unweldq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR unweldq ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR unweldq ()
+callback function can execute at the same time as any non-exclusive
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+or
+.BR srv (9)
+procedure, non-exclusive
+.BR weldq (9),
+.BR unweldq (),
+.BR qbufcall (9),
+or
+.BR qtimeout (9)
+callback or interrupt service routine.
+.PP
+However, the
+.BR unweldq ()
+action and callback function will be serviced by the same CPU as the CPU from
+which the
+.BR unweldq ()
+request was issued.  Therefore, the callback function will not execute until
+after
+.BR unweldq ()
+returns.
+Because the servicing thread and the current thread are the same, the
+.BR unweldq ()
+callback will not be invoked until after the function that called
+.BR unweldq ()
+returns and encounters a preemption point.
+This means that it is safe to hold locks across the call to
+.BR unweldq ()
+and the caller can 
+perform other actions exclusive to the callback function subsequent to the
+call, such as
+.BR SV_WAIT (9)
+on a condition variable that is signalled using
+.BR SV_SIGNAL (9)
+or
+.BR SV_BROADCAST (9)
+from the callback function.
+.PP
+If a protection queue,
+.I protect_q
+is specified, the normal sychronization as is appropriate for a callback
+procedure on the specified queue will be taken before the action is performed
+and the callback is invoked.
 .\"
 .\"
 .SH NOTICES
 .PP
+Only queues that have been successfully welded with
+.BR weldq (9)
+can be unwelded with
+.BR unweldq ().
+.PP
+If one end of a pipe-like streams created by
+.BR weldq (9)
+is closed,
+.I STREAMS
+will automatically unweld the two modules.  In this case,
+.BR unweldq ()
+does not need to be called.
+.\".PP
+.\"Under
+.\".BR "Linux 2.4" ,
+.\"without kernel pre-emption,
+.\".BR unweldq ()
+.\"simply obtains the necessary locks in the calling thread, performs the
+.\"function and then calls the callback function (if any).    Under
+.\".BR "Linux 2.6" ,
+.\"with kernel pre-emption, the call may be rescheduled.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR weldq (9),
+.BR ticlts (4),
+.BR ticots (4),
+.BR ticotsord (4),
+.BR spx (4),
+.BR pipe (2),
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9),
+.BR srv (9),
+.BR qbufcall (9),
+.BR qtimeout (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR unweldq ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR unweldq ()
+is compatible with
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF \(rg,
+.[
+osfspg
+.]
+with the following portability considerations:
+.IP \(em \w'\ \(em\ 'u
+.BR unweldq ()
+is not an
+.B "SVR 4.2 MP DDI/DKI"
+function.
+.IP \(em
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+and
+.I LiS
+.[
+lis
+.]
+do not document this function.
+.IP \(em
+Binary compatibility is not guaranteed.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR unweldq ()
+is not an
+.BR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.I STREAMS
+utility function; however, it appeared in a number of implementations.
+.PP
+.BR unweldq ()
+conforms to
+.BR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF \(rg,
+.[
+osfspg
+.]
+documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR unweldq ()
+first appeared in a number of implementations of
+.BR "SVR 4 MP" .
+.[
+svr4
+.]
 .\"
 .\"
 .TI

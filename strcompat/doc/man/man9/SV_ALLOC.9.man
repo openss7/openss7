@@ -1,0 +1,312 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: SV_ALLOC.9.man,v 0.9 2004/03/14 07:18:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/03/14 07:18:42 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SV_ALLOC 9 "$Date: 2004/03/14 07:18:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B SV_ALLOC
+\- allocate an initialized synchronization variable
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/kmem.h>
+.br
+.B #include <sys/ksynch.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+sv_t *\fBSV_ALLOC\fR(int \fIflag\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I flag
+flag indicates whether the caller can sleep awaiting allocation or not.  It
+can be one of the following flags (see
+.BR kmem_alloc (9)):
+.RS
+.TP
+.B KM_SLEEP
+The caller can sleep awaiting allocation of the synchronization variable.
+.TP
+.B KM_NOSLEEP
+The caller cannot sleep awaiting allocation of the synchronization variable.
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR SV_ALLOC ()
+allocates and initializes a syncrhonization variable.  A synchronization
+variable is a kernel condition variable.  Allocation can sleep awaiting
+availability of sufficient memory with the
+.B KM_SLEEP
+flag, or can fail and return
+.B NULL
+in the event of insufficient memory with the
+.B KM_NOSLEEP
+flag.
+See
+.BR kmem_alloc (9)
+for more information on the
+.I flag
+argument.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR SV_ALLOC ()
+is used in relation to
+.I STREAMS
+to allocate a synchronization variable to be used from within a user context.
+The synchronization variable could be used within the kernle module's
+.BR init_module (9)
+or
+.BR term_module (9)
+routines, or within the
+.BR qopen (9)
+or
+.BR qclose (9)
+procedures.
+.PP
+An alternative to using a syncrhonization variable within the
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures is to use the
+.IR Solaris \(rg
+.BR qwait (9)
+or
+.BR qwait_sig (9)
+DDI functions.
+.[
+solspg
+.]
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR SV_ALLOC ()
+succeeds, it returns a pointer to the allocated synchronization variable;
+when it fails, it returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR SV_ALLOC ()
+fails when
+.I flags
+is set to
+.BR KM_NOSLEEP
+and suffient memory for the sycnrhonization variable cannot be allocated.
+When
+.BR SV_ALLOC ()
+fails, it returns
+.BR NULL .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR SV_ALLOC ()
+can be called from any context with the
+.BR KM_NOSLEEP
+flag.  With the
+.BR KM_SLEEP
+flag, it many only be called from user context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR SV_ALLOC ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR SV_ALLOC ()
+is a
+.IR "SVR 4.2" -specific
+function:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SV_ALLOC (9),
+.BR SV_DEALLOC (9),
+.BR SV_BROADCAST (9),
+.BR SV_SIGNAL (9),
+.BR SV_WAIT (9),
+.BR SV_WAIT_SIG (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR SV_ALLOC ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR SV_ALLOC ()
+is compatible with
+.B SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and systems based on
+.BR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+documents this function as available for use with
+.IR STREAMS .
+.IP \(em
+.I LiS
+.[
+lis
+.]
+does not support this function.
+.IP \(em
+.BR SV_ALLOC ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.IR Linux \(rg.
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR SV_ALLOC ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR SV_ALLOC ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI.
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+A version of
+.BR SV_ALLOC ()
+first appeared in
+.BR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

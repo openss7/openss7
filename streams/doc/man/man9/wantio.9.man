@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: wantio.9.man,v 0.9.2.1 2004/03/01 02:44:11 brian Exp $
+.\" @(#) $Id: wantio.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WANTIO 9 "$Date: 2004/03/01 02:44:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WANTIO 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -268,30 +268,30 @@ has no known bugs.
 .PP
 .BR wantio ()
 is an
-.BR AIX \(rg-specific
+.IR AIX \(rg-specific
 .I STREAMS
 utility function.
 .BR wantio ()
 is source-level compatible with
-.BR AIX \(rg
+.IR AIX \(rg
 with the following exceptions:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 The
 .BR wantio
 structure bears no resemblance to that of
-.BR AIX \(rg.
+.IR AIX \(rg.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 .BR wantio ()
 is an
-.BR AIX \(rg-specific
+.IR AIX \(rg-specific
 .I STREAMS
 utility function.
 .BR wantio ()
 is compliant with
-.BR AIX \(rg
+.IR AIX \(rg
 documentation.
 .[
 aixdoc
@@ -302,12 +302,12 @@ aixdoc
 .PP
 .BR wantio ()
 is an
-.BR AIX \(rg-specific
+.IR AIX \(rg-specific
 .I STREAMS
 utility function.
 .BR wantio ()
 first appeared in
-.BR AIX \(rg.
+.IR AIX \(rg.
 .\"
 .\"
 .[

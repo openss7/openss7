@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: RD.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: RD.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -72,7 +72,7 @@ no-label-in-text
 .R2
 .\"
 .\"
-.TH RD 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH RD 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -193,16 +193,16 @@ usldk
 and systems based on
 .BR "SVR 4" ,
 with the following portability considerations:
-.IP \(bu 3
-.BR SUPER-UX \(rg,
+.IP \(em 3
+.IR SUPER-UX \(rg,
 .[
 suxspg
 .]
-.BR UnixWare \(rg,
+.IR UnixWare \(rg,
 .[
 uw7spg
 .]
-.BR LiS ,
+.IR LiS ,
 .[
 lis
 .]
@@ -214,20 +214,20 @@ argument to
 If a read queue pointer is passed to
 .BR RD (),
 then the passed in read queue pointer is returned.
-.IP \(bu
-.BR AIX \(rg,
+.IP \(em \w'\ \(em\ 'u
+.IR AIX \(rg,
 .[
 aixspg
 .]
-.BR OSF \(rg,
+.IR OSF \(rg,
 .[
 osfspg
 .]
-.BR Solaris \(rg,
+.IR Solaris \(rg,
 .[
 solspg
 .]
-.BR UXP/V \(rg,
+.IR UXP/V \(rg,
 .[
 uxpspg
 .]
@@ -247,7 +247,7 @@ is often defined as:
 #define RD(__q) ((__q)-1)
 \s+2\fP
 .fi
-.IP \(bu
+.IP \(em
 .BR RD ()
 is implemented on
 .B Linux Fast-STREAMS
@@ -273,7 +273,7 @@ is a valid altenative implementation if the
 programmer wishes the more restrictive
 .BR RD ()
 behavior.
-.IP \(bu
+.IP \(em
 Portable
 .I STREAMS
 drivers and modules should not
@@ -284,7 +284,7 @@ nor
 rely upon
 .BR RD ()
 being defined as a macro or a function.
-.IP \(bu
+.IP \(em
 Binary compatiblity is not guaranteed.
 .PP
 See

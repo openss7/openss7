@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: enableok.9.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: enableok.9.man,v 0.9.2.3 2004/03/14 08:56:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ENABLEOK 9 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH ENABLEOK 9 "$Date: 2004/03/14 08:56:36 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -237,16 +237,16 @@ has no known bugs.
 .PP
 .BR enableok ()
 is source-level compatible with
-.BR "SVR 4.2 MP DDI/DKI" ,
-.BR AIX \(rg,
-.BR HP-UX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR LiS ,
+.IR LiS ,
 with the following considerations:
-.IP \(bu
+.IP \(em \w'\ \(em\ 'u
 .BR enableok ()
 uses atomic bit operations and does not take the queue write lock.
 This makes
@@ -257,7 +257,7 @@ with
 Under LiS,
 .BR enableok ()
 takes the queue spin lock and uses normal bit operations to set the flag.
-.IP \(bu
+.IP \(em
 .BR enableok ()
 called with an invalid
 .I q
@@ -270,7 +270,7 @@ the result is undefined in the same situations due to an LiS coding error.
 Repaired versions of LiS will make
 .BR enableok ()
 fail silently in these situations.
-.IP \(bu
+.IP \(em
 Symbol
 .BR lis_safe_enableok ()
 is provided for binary compatibility with LiS.  See
@@ -279,13 +279,13 @@ is provided for binary compatibility with LiS.  See
 calls
 .BR enableok ()
 directly.
-.IP \(bu
-.BR UnixWare \(rg
+.IP \(em
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
 and
-.BR SUPER-UX \(rg
+.IR SUPER-UX \(rg
 .[
 suxspg
 .]
@@ -293,7 +293,7 @@ do not permit
 .BR enableok ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.IP \(bu
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -308,11 +308,11 @@ for additional compatibility considerations.
 usldk
 .]
 .BR AIX \(rg,
-.BR HP-UX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg
+.IR HP-UX \(rg,
+.IR OSF \(rg,
+.IR Solaris \(rg
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 documentation;
 .[
 aixdoc
@@ -330,7 +330,7 @@ soldoc
 uw7doc
 .]
 and
-.BR LiS 
+.IR LiS 
 source code.
 .[
 LiS

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: _fini.9.man,v 0.9.2.1 2004/03/10 08:45:54 brian Exp $
+.\" @(#) $Id: _fini.9.man,v 0.9.2.3 2004/03/14 08:56:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/10 08:45:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/14 08:56:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH _FINI 9 "$Date: 2004/03/10 08:45:54 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH _FINI 9 "$Date: 2004/03/14 08:56:35 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -155,7 +155,7 @@ has no known bugs.
 is compatible with
 .IR Solaris \(rg
 with the following portablity considerations:
-.IP \(em
+.IP \(em \w'\ \(em\ 'u
 .IP \(em
 .IP \(em
 .IP \(em
@@ -167,7 +167,7 @@ for the purpose of porting
 drivers to
 .IR Linux \(rg.
 Because internal structures and definitions for
-.B Lnux Fast-STREAMS
+.B Linux Fast-STREAMS
 .[
 lfs
 .]
