@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmid.9.man,v 0.9.2.5 2004/04/19 12:03:42 brian Exp $
+.\" @(#) $Id: getmid.9.man,v 0.9.2.6 2004/04/29 00:08:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 12:03:42 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/29 00:08:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETMID 9 "$Date: 2004/04/19 12:03:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETMID 9 "$Date: 2004/04/29 00:08:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -123,6 +123,16 @@ does not correspond to a module.
 .PP
 .BR getmid ()
 can be called from any context.
+When called from a blocking context,
+.BR getmid ()
+has the side-effect that the named module may be loaded by module name.  The
+kernel module demand loaded will have the module name or alias
+.RB \*(lq streams-\fI%s\fP \*(rq,
+where
+.RI \*(lq %s \*(rq
+is the name of the
+.I STREAMS
+module.
 .\"
 .\"
 .SH MP-STREAMS
@@ -157,7 +167,7 @@ structure pointed to by the
 of the
 .B qinit (9)
 structure, which is usually hard coded for each driver or module.  The module
-name should be a unique.
+name should be unique across drivers and modules.
 .\"
 .\"
 .SH "SEE ALSO"

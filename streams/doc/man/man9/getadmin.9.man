@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getadmin.9.man,v 0.9.2.5 2004/04/19 12:03:42 brian Exp $
+.\" @(#) $Id: getadmin.9.man,v 0.9.2.6 2004/04/29 00:08:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 12:03:42 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/29 00:08:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH GETADMIN 9 "$Date: 2004/04/19 12:03:42 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH GETADMIN 9 "$Date: 2004/04/29 00:08:40 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -126,6 +126,17 @@ fails when there is no module or driver for the given module Id.
 .PP
 .BR getadmin ()
 can be called from any context.
+When called from a blocking context,
+.BR getadmin ()
+has the side-effect that the identified module may be loaded by module
+identifier.  The kernel module demand loaded will have the module name or
+alias
+.RB \*(lq streams-modid-\fI%u\fP \*(rq,
+where
+.RI \*(lq %u \*(rq
+is the identifier of the
+.I STREAMS
+module.
 .\"
 .\"
 .SH MP-STREAMS
