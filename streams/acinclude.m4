@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.12 2004/04/17 08:17:50 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.13 2004/04/22 12:08:30 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/17 08:17:50 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/22 12:08:30 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -61,11 +61,13 @@ m4_include([m4/kernel.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
+m4_include([m4/libraries.m4])
 
 # =========================================================================
 # AC_LFS
 # -------------------------------------------------------------------------
 AC_DEFUN([AC_LFS], [
+    ac_default_prefix='/usr'
     _LFS_OPTIONS
     AC_MAN_CONVERSION
     AC_PUBLIC_RELEASE
@@ -92,6 +94,7 @@ dnl Acutally generating output files is last.  We don't want to generate a thing
 dnl until we have performed all the checks and balances.
 dnl 
     AC_RPM_SPEC
+    AC_LDCONFIG
     _LFS_OUTPUT_CONFIG_MASTER
     _LFS_OUTPUT_CONFIG
 ])# AC_LFS
@@ -319,9 +322,9 @@ dnl     it once here.
 # =============================================================================
 
 # =============================================================================
-# _LFS_OUTPUT_CONFIG
+# _LFS_OUTPUT_CONFIG_COMMANDS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_OUTPUT_CONFIG], [
+AC_DEFUN([_LFS_OUTPUT_CONFIG_COMMANDS], [
           if test :"${LFS_SC_CONFIG:+set}" = :set; then
               AC_MSG_NOTICE([creating $LFS_SC_CONFIG from $lfs_configs])
               eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --hconfig=$LFS_SC_CONFIG $lfs_configs"
@@ -354,6 +357,26 @@ AC_DEFUN([_LFS_OUTPUT_CONFIG], [
 #             AC_MSG_NOTICE([creating $LFS_SC_STRLOAD from $lfs_configs])
 #             eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strload=$LFS_SC_STRLOAD $lfs_configs"
 #         fi
+])# _LFS_OUTPUT_CONFIG_COMMANDS
+# =============================================================================
+
+# =============================================================================
+# _LFS_OUTPUT_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_OUTPUT_CONFIG], [
+    AC_CONFIG_COMMANDS([strconf],
+        [_LFS_OUTPUT_CONFIG_COMMANDS],
+        [ac_aux_dir="$ac_aux_dir" \
+        lfs_configs="$lfs_configs" \
+        LFS_SC_MAJBASE="$LFS_SC_MAJBASE" \
+        LFS_SC_CONFIG="$LFS_SC_CONFIG" \
+        LFS_SC_MODCONF="$LFS_SC_MODCONF" \
+        LFS_SC_MKNODES="$LFS_SC_MKNODES" \
+        LFS_SC_DRVCONF="$LFS_SC_DRVCONF" \
+        LFS_SC_CONFMOD="$LFS_SC_CONFMOD" \
+        LFS_SC_MAKEDEV="$LFS_SC_MAKEDEV" \
+        LFS_SC_STSETUP="$LFS_SC_STSETUP" \
+        LFS_SC_STRLOAD="$LFS_SC_STRLOAD"])
 ])# _LFS_OUTPUT_CONFIG
 # =============================================================================
 

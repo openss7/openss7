@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/19 20:25:48 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/19 20:25:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/19 20:25:48 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:34 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/19 20:25:48 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:34 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #include <asm/atomic.h>		/* for atomic operations */
 #include <asm/bitops.h>		/* for atomic bit operations */
 #include <linux/compiler.h>	/* for expected/unexpected */
@@ -70,6 +68,10 @@ static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.
 #include <linux/wait.h>		/* for wait queues */
 #include <linux/types.h>	/* for various types */
 #include <linux/interrupt.h>	/* for in_interrupt() */
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/cmn_err.h>	/* for CE_ constants */
 #include <sys/strlog.h>		/* for SL_ constants */

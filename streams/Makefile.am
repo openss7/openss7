@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/04/18 21:37:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/04/22 12:08:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/18 21:37:39 $ by $Author: brian $
+# Last Modified $Date: 2004/04/22 12:08:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -159,7 +159,7 @@ libLfSdrivers_a_CPPFLAGS	= \
 				-I./src/kernel -I@srcdir@/src/kernel \
 				-I./src/drivers -I@srcdir@/src/drivers \
 				-I./src/modules -I@srcdir@/src/modules \
-				@LFS_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@
+				@LFS_INCLUDES@ @KERNEL_CPPFLAGS@ @KERNEL_MODFLAGS@ -DEXPORT_SYMTAB
 libLfSdrivers_a_CFLAGS		= @KERNEL_CFLAGS@
 
 libLfSmodules_a_SOURCES		= \
@@ -2579,64 +2579,66 @@ noinst_man_MANS = \
 
 include am/man.am
 
+EXPORT_SRCFILES = \
+	src/compat/aix/aixcompat.c \
+	src/compat/hpux/hpuxcompat.c \
+	src/compat/lis/liscompat.c \
+	src/compat/osf/osfcompat.c \
+	src/compat/sun/suncompat.c \
+	src/compat/svr4/svr4compat.c \
+	src/compat/uw7/uw7compat.c \
+	src/drivers/strpipe.c \
+	src/kernel/strsyms.c
+
+EXPORT_VERFILES = \
+	include/sys/versions/aixcompat.ver \
+	include/sys/versions/hpuxcompat.ver \
+	include/sys/versions/liscompat.ver \
+	include/sys/versions/osfcompat.ver \
+	include/sys/versions/suncompat.ver \
+	include/sys/versions/svr4compat.ver \
+	include/sys/versions/uw7compat.ver \
+	include/sys/versions/strpipe.ver \
+	include/sys/versions/strsyms.ver
+
+PKGINCL = include/sys
+
+GENKSYMS_CPPFLAGS = \
+	-I./src/compat -I@srcdir@/src/compat \
+	-I./src/kernel -I@srcdir@/src/kernel \
+	-I./src/drivers -I@srcdir@/src/drivers \
+	-I./src/modules -I@srcdir@/src/modules \
+	$(LFS_INCLUDES) $(KERNEL_CPPFLAGS)
+
+include am/genksyms.am
+
 nobase_pkginclude_HEADERS = include/stropts.h include/tihdr.h include/timod.h \
 	include/sys/aixddi.h include/sys/cmn_err.h include/sys/ddi.h include/sys/debug.h include/sys/dki.h \
 	include/sys/hpuxddi.h include/sys/kmem.h include/sys/lisddi.h include/sys/osfddi.h include/sys/sad.h \
 	include/sys/sc.h \
 	include/sys/sockmod.h include/sys/spec_fs_i.h include/sys/strconf.h include/sys/strdebug.h \
 	include/sys/stream.h include/sys/strlog.h include/sys/stropts.h include/sys/strsubr.h include/sys/sunddi.h \
-	include/sys/svr4ddi.h include/sys/tihdr.h include/sys/timod.h include/sys/uw7ddi.h
-
-#
-#   Need to override the following two automake rules to strip the first path
-#   component from the header file path name.
-#
-install-nobase_pkgincludeHEADERS: $(nobase_pkginclude_HEADERS)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(pkgincludedir)
-	@list='$(nobase_pkginclude_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^[^/]*/||'`"; \
-	  echo "$(nobase_pkgincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(pkgincludedir)/$$f"; \
-	  $(nobase_pkgincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(pkgincludedir)/$$f; \
-	done
-
-uninstall-nobase_pkgincludeHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(nobase_pkginclude_HEADERS)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^[^/]*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(pkgincludedir)/$$f"; \
-	  rm -f $(DESTDIR)$(pkgincludedir)/$$f; \
-	done
+	include/sys/svr4ddi.h include/sys/tihdr.h include/sys/timod.h include/sys/uw7ddi.h \
+	include/sys/modversions.h \
+	include/sys/versions/aixcompat.ver \
+	include/sys/versions/hpuxcompat.ver \
+	include/sys/versions/liscompat.ver \
+	include/sys/versions/osfcompat.ver \
+	include/sys/versions/suncompat.ver \
+	include/sys/versions/svr4compat.ver \
+	include/sys/versions/uw7compat.ver \
+	include/sys/versions/strpipe.ver \
+	include/sys/versions/strsyms.ver
 
 nobase_include_HEADERS = include/xti.h include/xti_inet.h \
 	include/xti/config.h include/xti/tihdr.h include/xti/timod.h include/xti/xti_atm.h include/xti/xti.h \
 	include/xti/xti_inet.h include/xti/xti_ip.h include/xti/xti_local.h include/xti/xti_mosi.h \
 	include/xti/xti_osi.h include/xti/xti_sctp.h include/xti/xti_tcp.h include/xti/xti_udp.h
 
+include am/headers.am
+
 noinst_SCRIPTS = \
 	$(STRCONF_SCRIPT)
-#
-#   Need to override the following two automake rules to strip the first path
-#   component from the header file path name.
-#
-install-nobase_includeHEADERS: $(nobase_include_HEADERS)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(includedir)
-	@list='$(nobase_include_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^[^/]*/||'`"; \
-          echo "$(nobase_includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f"; \
-          $(nobase_includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f; \
-	done
-
-uninstall-nobase_includeHEADERS:
-	@$(NORMAL_INSTALL)
-	@list='$(nobase_include_HEADERS)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^[^/]*/||'`"; \
-	  echo "rm -f $(DESTDIR)$(includedir)/$$f"; \
-	  rm -f $(DESTDIR)$(includedir)/$$f; \
-	done
 
 install-devices: $(STRMAKENODES) $(INET_MKDEV)
 	$(STRMAKENODES)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/16 17:14:54 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/22 12:08:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/16 17:14:54 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/22 12:08:32 $"
 
-static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/16 17:14:54 $";
+static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/22 12:08:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/stropts.h>
 #include <sys/stream.h>
@@ -74,7 +76,7 @@ static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/16 17:14:54 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/22 12:08:32 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

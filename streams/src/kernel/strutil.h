@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/19 20:25:48 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/19 20:25:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -56,10 +56,10 @@
 /* common inlines */
 
 /* queue structure read/write locks */
-static __inline__ void qrlock(queue_t *q, ulong *flagp)
+static __inline__ void qrlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
-		local_irq_save(flagp);
+		local_irq_save(flagsp);
 	if (q->q_owner != current)
 		read_lock(&q->q_rwlock);
 	else {
@@ -68,7 +68,7 @@ static __inline__ void qrlock(queue_t *q, ulong *flagp)
 	}
 	return;
 }
-static __inline__ void qrunlock(queue_t *q, ulong *flagp)
+static __inline__ void qrunlock(queue_t *q, ulong *flagsp)
 {
 	if (q->q_owner != current)
 		read_unlock(&q->q_rwlock);
@@ -77,13 +77,13 @@ static __inline__ void qrunlock(queue_t *q, ulong *flagp)
 		q->q_nest--;
 	}
 	if (flagsp)
-		local_irq_restore(flagp);
+		local_irq_restore(flagsp);
 	return;
 }
-static __inline__ void qwlock(queue_t *q, ulong *flagp)
+static __inline__ void qwlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
-		local_irq_save(flagp);
+		local_irq_save(flagsp);
 	if (q->q_owner != current) {
 		write_lock(&q->q_rwlock);
 		q->q_owner = current;
@@ -94,7 +94,7 @@ static __inline__ void qwlock(queue_t *q, ulong *flagp)
 	}
 	return;
 }
-static __inline__ void qwunlock(queue_t *q, ulong *flagp)
+static __inline__ void qwunlock(queue_t *q, ulong *flagsp)
 {
 	if (q->q_owner == current) {
 		if (q->q_nest <= 0) {
@@ -106,7 +106,7 @@ static __inline__ void qwunlock(queue_t *q, ulong *flagp)
 			q->q_nest--;
 		}
 		if (flagsp)
-			local_irq_restore(flagp);
+			local_irq_restore(flagsp);
 		return;
 	}
 	swerr();

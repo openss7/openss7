@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,23 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $";
+static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #include <linux/proc_fs.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/strsubr.h>
 
@@ -82,7 +84,7 @@ extern struct proc_dir_entry *proc_str;
  *  -------------------------------------------------------------------------
  */
 
-#undef  snprintf
+#undef snprintf
 #define snprintf safe_snprintf
 
 static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
@@ -110,7 +112,7 @@ static int get_streams_drivers_list(char *page, char **start, off_t offset, int 
 	struct list_head *cur;
 	if (offset < maxlen) {
 		get_streams_driver_hdr(buffer, maxlen - 1);
-		len = snprintf(page + len, "%-*s\n", maxlen - 1, buffer);
+		len = sprintf(page + len, "%-*s\n", maxlen - 1, buffer);
 	}
 	pos = maxlen;
 	read_lock(&cdevsw_lock);
@@ -1087,7 +1089,6 @@ static int get_streams_strevent(char *page, ssize_t maxlen, int type, struct str
 		len += snprintf(page + len, maxlen - len, ", %p", se->x.t.arg);
 		len += snprintf(page + len, maxlen - len, ", %d", se->x.t.cpu);
 		len += snprintf(page + len, maxlen - len, ", %lu }", se->x.t.timer.expires);
-	default:
 	}
 	len += snprintf(page + len, maxlen - len, ", %d", se->se_id);
 	len += snprintf(page + len, maxlen - len, ", %d", se->se_seq);

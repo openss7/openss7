@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
+#endif
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
 #endif
 
 #include <sys/stropts.h>
@@ -79,7 +81,7 @@ static char const ident[] = "$RCSfile: strnsdev.c,v $ $Name:  $($Revision: 0.9.2
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

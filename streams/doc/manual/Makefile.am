@@ -7,7 +7,7 @@ all-local: ps pdf
 
 docdir = @datadir@/doc/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 
-install-data-local: all-local
+install-data-local: # all-local
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(docdir)
 	$(INSTALL_DATA) SPG.pdf $(DESTDIR)$(docdir)

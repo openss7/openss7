@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #ifdef CONFIG_PROC_FS
 #include <linux/proc_fs.h>
 #endif
 #include <linux/sysctl.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/stropts.h>
 #include <sys/stream.h>

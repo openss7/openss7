@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/09 22:56:47 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $";
+static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $";
 
 #define __NO_VERSION__
 
@@ -63,6 +63,7 @@ static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
 #endif
@@ -71,6 +72,10 @@ static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.7
 #include <linux/file.h>		/* for fput */
 #include <linux/poll.h>
 #include <linux/fs.h>
+
+#ifndef __GENKSYMS__ 
+#include <sys/modversions.h>
+#endif
 
 #include <sys/kmem.h>		/* for kmem_ */
 #include <sys/stropts.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $"
 
-static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $";
 
 /* 
  *  This is TIRDWR an TLI read/write module for TPI Version 2 transport
@@ -64,10 +64,12 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/kmem.h>
 #include <sys/stropts.h>
@@ -83,7 +85,7 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.5
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
+#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

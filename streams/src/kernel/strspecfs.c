@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/16 17:14:54 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
 
 #define __NO_VERSION__
 
@@ -62,6 +62,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #include <linux/compiler.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
@@ -79,6 +80,10 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.
 #endif
 #include <linux/major.h>
 #include <asm/atomic.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/strsubr.h>
 #include <sys/strconf.h>

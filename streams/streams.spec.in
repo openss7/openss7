@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/17 08:17:50 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/22 12:08:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/17 08:17:50 $ by $Author: brian $
+# Last Modified $Date: 2004/04/22 12:08:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -234,8 +234,9 @@ preferred_cflags="-freorder-blocks"
     %{?_with_compat_lis:        --enable-compat-lis} \
     %{?_without_compat_lis:     --disable-compat-lis}
 
+make dep
 make
-#make pdf
+make pdf
 
 %install
 # ---------------------------------------------------------------------------
@@ -782,8 +783,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.8  2004/04/17 08:17:50  brian
-# - Working up alpha relesae package.
+# Revision 0.9.2.9  2004/04/22 12:08:30  brian
+# - Added kernel symbol versions.
+#
+# Revision 1.9  2004/04/22 12:08:30  brian
+# - Added kernel symbol versions.
 #
 # Revision 1.8  2004/04/17 08:17:50  brian
 # - Working up alpha relesae package.

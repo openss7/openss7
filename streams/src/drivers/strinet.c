@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:32 $"
 
-static char const ident[] = "$RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:32 $";
 
 /* 
  *  This driver provides the functionality of IP (Internet Protocol) over a
@@ -62,10 +62,8 @@ static char const ident[] = "$RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #include <linux/net.h>
 #include <linux/in.h>
@@ -73,6 +71,10 @@ static char const ident[] = "$RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.
 
 #include <net/sock.h>
 #include <net/tcp.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/cmn_err.h>
 #include <sys/stropts.h>
@@ -90,7 +92,7 @@ static char const ident[] = "$RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define	INET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define INET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define INET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#define INET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:32 $"
 #define INET_DEVICE	"SVR 4.2 XTIOS (XTI Over Sockets) for NET4"
 #define INET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define INET_LICENSE	"GPL"

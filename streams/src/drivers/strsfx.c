@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $
+ @(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
+#ident "@(#) $RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $";
+static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/stropts.h>
 #include <sys/stream.h>
@@ -78,7 +80,7 @@ static char const ident[] = "$RCSfile: strsfx.c,v $ $Name:  $($Revision: 0.9.2.7
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/16 17:14:54 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"

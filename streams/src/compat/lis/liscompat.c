@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:31 $"
 
-static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:31 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
+#include <linux/modversions.h>
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -101,6 +99,10 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
+
 #define _LIS_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stropts.h>
@@ -115,7 +117,7 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/07 23:39:10 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:31 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"

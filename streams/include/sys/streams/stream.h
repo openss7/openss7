@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.5 2004/03/08 12:17:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.6 2004/04/22 12:08:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:31 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 12:17:48 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:31 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,12 +63,18 @@
 #endif				/* HAVE_LINUX_FAST_STREAMS */
 
 #include <linux/config.h>
+#include <linux/module.h>
+#include <linux/modversions.h>
 #include <linux/types.h>	/* for various types */
 typedef unsigned char uchar;		/* idiots! */
 #include <asm/system.h>		/* for xchg */
 #include <asm/bitops.h>		/* for set_bit */
 #include <asm/fcntl.h>		/* for O_NONBLOCK, etc */
 #include <linux/sched.h>	/* for sleep_on and interruptible_sleep_on */
+
+#ifndef __GENKSYMS__
+#include "sys/modversions.h"
+#endif
 
 #include <sys/dki.h>		/* for cred_t */
 /* caller should have already included this, but make sure */

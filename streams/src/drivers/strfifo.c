@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $
+ @(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 12:17:48 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#ident "@(#) $RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
 
-static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $";
+static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #include <asm/semaphore.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/stropts.h>
 #include <sys/stream.h>
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: strfifo.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 12:17:48 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:32 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"

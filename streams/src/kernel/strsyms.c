@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,23 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/09 22:56:47 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 22:56:47 $";
+static char const ident[] = "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $";
 
 #define __NO_VERSION__
 #define EXPORT_SYMTAB
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -120,123 +122,123 @@ static char const ident[] = "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.
 #include "strfifo.h"
 #include "strattach.h"
 
-EXPORT_SYMBOL_NOVERS(adjmsg);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(allocb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(backq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(bcanputnext);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(bcanput);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(bcopy);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(bufcall);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(bzero);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(canenable);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(canputnext);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(canput);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(cmn_err);		/* cmn_err.h */
-EXPORT_SYMBOL_NOVERS(copyb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(copyin);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(copymsg);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(copyout);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(datamsg);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(delay);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_getparm);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_hztomsec);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_hztousec);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_msectohz);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_priv);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_usectohz);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(drv_usecwait);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(dupb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(dupmsg);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(enableok);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(enableq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(esballoc);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(flushband);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(flushq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(freeb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(freemsg);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(freezestr);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(getadmin);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(getmajor);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(getmid);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(getminor);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(getq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(insq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(kmem_alloc);	/* kmem.h */
-EXPORT_SYMBOL_NOVERS(kmem_free);	/* kmem.h */
-EXPORT_SYMBOL_NOVERS(linkb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(makedevice);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(max);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(min);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(msgdsize);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(msgpullup);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(noenable);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(OTHERQ);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(pcmsg);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(pullupmsg);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(putbq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(putctl1);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(putctl);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(putnextctl1);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(putnextctl);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(putnext);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(putq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(put);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(qenable);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(qprocsoff);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(qprocson);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(qreply);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(qsize);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(RD);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(rmvb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(rmvq);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(SAMESTR);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(strlog);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(strqget);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(strqset);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(testb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(timeout);		/* ddi.h */
-EXPORT_SYMBOL_NOVERS(unbufcall);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(unfreezestr);	/* stream.h */
-EXPORT_SYMBOL_NOVERS(unlinkb);		/* stream.h */
-EXPORT_SYMBOL_NOVERS(untimeout);	/* ddi.h */
-EXPORT_SYMBOL_NOVERS(WR);		/* stream.h */
+EXPORT_SYMBOL(adjmsg);		/* stream.h */
+EXPORT_SYMBOL(allocb);		/* stream.h */
+EXPORT_SYMBOL(backq);		/* stream.h */
+EXPORT_SYMBOL(bcanputnext);	/* stream.h */
+EXPORT_SYMBOL(bcanput);		/* stream.h */
+EXPORT_SYMBOL(bcopy);		/* ddi.h */
+EXPORT_SYMBOL(bufcall);		/* stream.h */
+EXPORT_SYMBOL(bzero);		/* ddi.h */
+EXPORT_SYMBOL(canenable);	/* stream.h */
+EXPORT_SYMBOL(canputnext);	/* stream.h */
+EXPORT_SYMBOL(canput);		/* stream.h */
+EXPORT_SYMBOL(cmn_err);		/* cmn_err.h */
+EXPORT_SYMBOL(copyb);		/* stream.h */
+EXPORT_SYMBOL(copyin);		/* ddi.h */
+EXPORT_SYMBOL(copymsg);		/* stream.h */
+EXPORT_SYMBOL(copyout);		/* ddi.h */
+EXPORT_SYMBOL(datamsg);		/* stream.h */
+EXPORT_SYMBOL(delay);		/* ddi.h */
+EXPORT_SYMBOL(drv_getparm);	/* ddi.h */
+EXPORT_SYMBOL(drv_hztomsec);	/* ddi.h */
+EXPORT_SYMBOL(drv_hztousec);	/* ddi.h */
+EXPORT_SYMBOL(drv_msectohz);	/* ddi.h */
+EXPORT_SYMBOL(drv_priv);		/* ddi.h */
+EXPORT_SYMBOL(drv_usectohz);	/* ddi.h */
+EXPORT_SYMBOL(drv_usecwait);	/* ddi.h */
+EXPORT_SYMBOL(dupb);		/* stream.h */
+EXPORT_SYMBOL(dupmsg);		/* stream.h */
+EXPORT_SYMBOL(enableok);		/* stream.h */
+EXPORT_SYMBOL(enableq);		/* stream.h */
+EXPORT_SYMBOL(esballoc);		/* stream.h */
+EXPORT_SYMBOL(flushband);	/* stream.h */
+EXPORT_SYMBOL(flushq);		/* stream.h */
+EXPORT_SYMBOL(freeb);		/* stream.h */
+EXPORT_SYMBOL(freemsg);		/* stream.h */
+EXPORT_SYMBOL(freezestr);	/* stream.h */
+EXPORT_SYMBOL(getadmin);		/* stream.h */
+EXPORT_SYMBOL(getmajor);		/* ddi.h */
+EXPORT_SYMBOL(getmid);		/* stream.h */
+EXPORT_SYMBOL(getminor);		/* ddi.h */
+EXPORT_SYMBOL(getq);		/* stream.h */
+EXPORT_SYMBOL(insq);		/* stream.h */
+EXPORT_SYMBOL(kmem_alloc);	/* kmem.h */
+EXPORT_SYMBOL(kmem_free);	/* kmem.h */
+EXPORT_SYMBOL(linkb);		/* stream.h */
+EXPORT_SYMBOL(makedevice);	/* ddi.h */
+//EXPORT_SYMBOL(max);		/* ddi.h */
+//EXPORT_SYMBOL(min);		/* ddi.h */
+EXPORT_SYMBOL(msgdsize);		/* stream.h */
+EXPORT_SYMBOL(msgpullup);	/* stream.h */
+EXPORT_SYMBOL(noenable);		/* stream.h */
+EXPORT_SYMBOL(OTHERQ);		/* stream.h */
+EXPORT_SYMBOL(pcmsg);		/* stream.h */
+EXPORT_SYMBOL(pullupmsg);	/* stream.h */
+EXPORT_SYMBOL(putbq);		/* stream.h */
+EXPORT_SYMBOL(putctl1);		/* stream.h */
+EXPORT_SYMBOL(putctl);		/* stream.h */
+EXPORT_SYMBOL(putnextctl1);	/* stream.h */
+EXPORT_SYMBOL(putnextctl);	/* stream.h */
+EXPORT_SYMBOL(putnext);		/* stream.h */
+EXPORT_SYMBOL(putq);		/* stream.h */
+EXPORT_SYMBOL(put);		/* stream.h */
+EXPORT_SYMBOL(qenable);		/* stream.h */
+EXPORT_SYMBOL(qprocsoff);	/* stream.h */
+EXPORT_SYMBOL(qprocson);		/* stream.h */
+EXPORT_SYMBOL(qreply);		/* stream.h */
+EXPORT_SYMBOL(qsize);		/* stream.h */
+EXPORT_SYMBOL(RD);		/* stream.h */
+EXPORT_SYMBOL(rmvb);		/* stream.h */
+EXPORT_SYMBOL(rmvq);		/* stream.h */
+EXPORT_SYMBOL(SAMESTR);		/* stream.h */
+EXPORT_SYMBOL(strlog);		/* stream.h */
+EXPORT_SYMBOL(strqget);		/* stream.h */
+EXPORT_SYMBOL(strqset);		/* stream.h */
+EXPORT_SYMBOL(testb);		/* stream.h */
+EXPORT_SYMBOL(timeout);		/* ddi.h */
+EXPORT_SYMBOL(unbufcall);	/* stream.h */
+EXPORT_SYMBOL(unfreezestr);	/* stream.h */
+EXPORT_SYMBOL(unlinkb);		/* stream.h */
+EXPORT_SYMBOL(untimeout);	/* ddi.h */
+EXPORT_SYMBOL(WR);		/* stream.h */
 
-EXPORT_SYMBOL_NOVERS(linkmsg);		/* stream.h LfS */
-EXPORT_SYMBOL_NOVERS(putctl2);		/* stream.h D3str+ */
-EXPORT_SYMBOL_NOVERS(putnextctl2);	/* stream.h D3str+ */
-EXPORT_SYMBOL_NOVERS(unweldq);		/* stream.h D3str+ */
-EXPORT_SYMBOL_NOVERS(weldq);		/* stream.h D3str+ */
+EXPORT_SYMBOL(linkmsg);		/* stream.h LfS */
+EXPORT_SYMBOL(putctl2);		/* stream.h D3str+ */
+EXPORT_SYMBOL(putnextctl2);	/* stream.h D3str+ */
+EXPORT_SYMBOL(unweldq);		/* stream.h D3str+ */
+EXPORT_SYMBOL(weldq);		/* stream.h D3str+ */
 
-EXPORT_SYMBOL_NOVERS(allocq);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(bcanget);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(canget);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(freeq);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(qattach);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(qclose);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(qdetach);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(qopen);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(setq);		/* stream.h LfS (internal) */
-EXPORT_SYMBOL_NOVERS(setqsched);	/* stream.h LfS (internal) */
+EXPORT_SYMBOL(allocq);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(bcanget);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(canget);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(freeq);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(qattach);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(qclose);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(qdetach);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(qopen);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(setq);		/* stream.h LfS (internal) */
+EXPORT_SYMBOL(setqsched);	/* stream.h LfS (internal) */
 
-EXPORT_SYMBOL_NOVERS(appq);		/* stream.h LiS */
-EXPORT_SYMBOL_NOVERS(esbbcall);		/* stream.h LiS */
-EXPORT_SYMBOL_NOVERS(isdatablk);	/* stream.h LiS */
-EXPORT_SYMBOL_NOVERS(isdatamsg);	/* stream.h LiS */
-EXPORT_SYMBOL_NOVERS(kmem_zalloc);	/* kmem.h */
-EXPORT_SYMBOL_NOVERS(kmem_zalloc_node);	/* kmem.h */
-EXPORT_SYMBOL_NOVERS(msgsize);		/* stream.h LiS */
-EXPORT_SYMBOL_NOVERS(qcountstrm);	/* stream.h LiS */
-EXPORT_SYMBOL_NOVERS(xmsgsize);		/* stream.h LiS */
+EXPORT_SYMBOL(appq);		/* stream.h LiS */
+EXPORT_SYMBOL(esbbcall);		/* stream.h LiS */
+EXPORT_SYMBOL(isdatablk);	/* stream.h LiS */
+EXPORT_SYMBOL(isdatamsg);	/* stream.h LiS */
+EXPORT_SYMBOL(kmem_zalloc);	/* kmem.h */
+EXPORT_SYMBOL(kmem_zalloc_node);	/* kmem.h */
+EXPORT_SYMBOL(msgsize);		/* stream.h LiS */
+EXPORT_SYMBOL(qcountstrm);	/* stream.h LiS */
+EXPORT_SYMBOL(xmsgsize);		/* stream.h LiS */
 
 #ifdef _AIX_STREAMS_SOURCE
-EXPORT_SYMBOL_NOVERS(mi_bufcall);	/* aixddi.h */
+EXPORT_SYMBOL(mi_bufcall);	/* aixddi.h */
 #endif
 
 #ifdef _SUN_SOURCE
-EXPORT_SYMBOL_NOVERS(qbufcall);		/* sunddi.h */
-EXPORT_SYMBOL_NOVERS(qunbufcall);	/* sunddi.h */
-EXPORT_SYMBOL_NOVERS(qtimeout);		/* sunddi.h */
-EXPORT_SYMBOL_NOVERS(quntimeout);	/* sunddi.h */
+EXPORT_SYMBOL(qbufcall);		/* sunddi.h */
+EXPORT_SYMBOL(qunbufcall);	/* sunddi.h */
+EXPORT_SYMBOL(qtimeout);		/* sunddi.h */
+EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
 #endif
 
 EXPORT_SYMBOL_GPL(register_inode);		/* strconf.h */
@@ -266,55 +268,55 @@ EXPORT_SYMBOL_GPL(specfs_mnt);		/* strspecfs.h */
 	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
 	defined(CONFIG_STREAMS_SC_MODULE) || \
 	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-EXPORT_SYMBOL_NOVERS(fmodsw);		/* strreg.h */
-EXPORT_SYMBOL_NOVERS(cdevsw);		/* strreg.h */
-EXPORT_SYMBOL_NOVERS(strm_open);	/* strreg.h */
-EXPORT_SYMBOL_NOVERS(sdev_open);	/* strreg.h */
-EXPORT_SYMBOL_NOVERS(fmodsw_list);	/* strreg.h */
-EXPORT_SYMBOL_NOVERS(cdevsw_list);	/* strreg.h */
-EXPORT_SYMBOL_NOVERS(fmod_count);	/* strreg.h */
-EXPORT_SYMBOL_NOVERS(cdev_count);	/* strreg.h */
+EXPORT_SYMBOL(fmodsw);		/* strreg.h */
+EXPORT_SYMBOL(cdevsw);		/* strreg.h */
+EXPORT_SYMBOL(strm_open);	/* strreg.h */
+EXPORT_SYMBOL(sdev_open);	/* strreg.h */
+EXPORT_SYMBOL(fmodsw_list);	/* strreg.h */
+EXPORT_SYMBOL(cdevsw_list);	/* strreg.h */
+EXPORT_SYMBOL(fmod_count);	/* strreg.h */
+EXPORT_SYMBOL(cdev_count);	/* strreg.h */
 #endif
 
 #if	defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-EXPORT_SYMBOL_NOVERS(strthreads);	/* strsched.h */
+EXPORT_SYMBOL(strthreads);	/* strsched.h */
 #endif
 
 #if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) || \
 	defined(CONFIG_STREAMS_FIFO_MODULE) || \
 	defined(CONFIG_STREAMS_PIPE_MODULE)
-EXPORT_SYMBOL_NOVERS(allocsd);		/* strsched.h */
-EXPORT_SYMBOL_NOVERS(autopush);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(freesd);		/* strsched.h */
-EXPORT_SYMBOL_NOVERS(sd_get);		/* strsched.h */
-EXPORT_SYMBOL_NOVERS(sd_put);		/* strsched.h */
-EXPORT_SYMBOL_NOVERS(strclose);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strfasync);	/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strflush);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strgetpmsg);	/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strioctl);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strllseek);	/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strmmap);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(stropen);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strpoll);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strputpmsg);	/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strread);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strreadv);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strsendpage);	/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strwrite);		/* strhead.h */
-EXPORT_SYMBOL_NOVERS(strwritev);	/* strhead.h */
+EXPORT_SYMBOL(allocsd);		/* strsched.h */
+EXPORT_SYMBOL(autopush);		/* strhead.h */
+EXPORT_SYMBOL(freesd);		/* strsched.h */
+EXPORT_SYMBOL(sd_get);		/* strsched.h */
+EXPORT_SYMBOL(sd_put);		/* strsched.h */
+EXPORT_SYMBOL(strclose);		/* strhead.h */
+EXPORT_SYMBOL(strfasync);	/* strhead.h */
+EXPORT_SYMBOL(strflush);		/* strhead.h */
+EXPORT_SYMBOL(strgetpmsg);	/* strhead.h */
+EXPORT_SYMBOL(strioctl);		/* strhead.h */
+EXPORT_SYMBOL(strllseek);	/* strhead.h */
+EXPORT_SYMBOL(strmmap);		/* strhead.h */
+EXPORT_SYMBOL(stropen);		/* strhead.h */
+EXPORT_SYMBOL(strpoll);		/* strhead.h */
+EXPORT_SYMBOL(strputpmsg);	/* strhead.h */
+EXPORT_SYMBOL(strread);		/* strhead.h */
+EXPORT_SYMBOL(strreadv);		/* strhead.h */
+EXPORT_SYMBOL(strsendpage);	/* strhead.h */
+EXPORT_SYMBOL(strwrite);		/* strhead.h */
+EXPORT_SYMBOL(strwritev);	/* strhead.h */
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_NOVERS(apush_get);	/* strconf.h */
-EXPORT_SYMBOL_NOVERS(apush_set);	/* strconf.h */
-EXPORT_SYMBOL_NOVERS(apush_vml);	/* strconf.h */
-EXPORT_SYMBOL_NOVERS(sdev_get);		/* strsubr.h */
-EXPORT_SYMBOL_NOVERS(sdev_put);		/* strsubr.h */
-EXPORT_SYMBOL_NOVERS(smod_get);		/* strsubr.h */
-EXPORT_SYMBOL_NOVERS(smod_put);		/* strsubr.h */
-EXPORT_SYMBOL_NOVERS(vcmn_err);		/* cmn_err.h */
+EXPORT_SYMBOL(apush_get);	/* strconf.h */
+EXPORT_SYMBOL(apush_set);	/* strconf.h */
+EXPORT_SYMBOL(apush_vml);	/* strconf.h */
+EXPORT_SYMBOL(sdev_get);		/* strsubr.h */
+EXPORT_SYMBOL(sdev_put);		/* strsubr.h */
+EXPORT_SYMBOL(smod_get);		/* strsubr.h */
+EXPORT_SYMBOL(smod_put);		/* strsubr.h */
+EXPORT_SYMBOL(vcmn_err);		/* cmn_err.h */
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
-EXPORT_SYMBOL_NOVERS(do_fattach);	/* strattach.h */
-EXPORT_SYMBOL_NOVERS(do_fdetach);	/* strattach.h */
+EXPORT_SYMBOL(do_fattach);	/* strattach.h */
+EXPORT_SYMBOL(do_fdetach);	/* strattach.h */
 #endif
 #endif
 #endif

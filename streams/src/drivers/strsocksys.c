@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#ident "@(#) $RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
 
-static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
+static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
-#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 #include <linux/smp_lock.h>
 #include <linux/slab.h>
+
+#ifndef __GENKSYMS__
+#include <sys/modversions.h>
+#endif
 
 #include <sys/stropts.h>
 #include <sys/stream.h>
@@ -77,7 +79,7 @@ static char const ident[] = "$RCSfile: strsocksys.c,v $ $Name:  $($Revision: 0.9
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
