@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:29 $
+# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/17 02:45:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/16 00:47:29 $ by $Author: brian $
+# Last Modified $Date: 2004/08/17 02:45:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,19 @@ reexec="$SHELL $0"
 PROGRAM=strconf.sh
 PACKAGE=LiS
 VERSION='0.9.2'
-TIMESTAMP='(Sat Aug 14 23:18:17 MDT 2004)'
+TIMESTAMP='(Mon Aug 16 19:50:05 MDT 2004)'
+
+if test "$PACKAGE" = LfS ; then
+    ucstreams='LFS'
+    lcstreams='lfs'
+    mcstreams='LfS'
+fi
+
+if test "$PACKAGE" = LiS ; then
+    ucstreams='LIS'
+    lcstreams='lis'
+    mcstreams='LiS'
+fi
 
 help="Try \`$progname --help' for more information."
 mkdir="mkdir"
@@ -141,6 +153,7 @@ default_makenodes='makenodes.c'
 default_driverconf='drvrconf.mk'
 default_confmodules='conf.modules'
 default_strmknods='makedev.lst'
+default_strsetup='strsetup.conf'
 
 basemajor=$default_basemajor
 permission=$default_permission
@@ -152,6 +165,7 @@ makenodes=
 driverconf=
 confmodules=
 strmknods=
+strsetup=
 
 
 # Parse our command line options once, thoroughly.
@@ -171,11 +185,11 @@ do
         --*=*)
             optarg=`$echo "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'`
             ;;
-        -b | -h | -o | -m | -H | -p | -r | -l | -L)
+        -b | -h | -o | -m | -H | -p | -r | -l | -L | -s | -S)
             optarg=
             ;;
-        -b* | -h* | -o* | -m* | -H* | -p* | -r* | -l* | -L*)
-            optarg=`$echo "X$arg" | $Xsed -e 's/-[bhomHprlL]//'`
+        -b* | -h* | -o* | -m* | -H* | -p* | -r* | -l* | -L* | -s* | -S*)
+            optarg=`$echo "X$arg" | $Xsed -e 's/-[bhomHprlLsS]//'`
             ;;
         *)
             optarg=
@@ -188,7 +202,7 @@ do
             -*)
                 case $prev in
                     # these have optional arguments
-                    hconfig | modconf | makenodes | strmknods | driverconf | confmodules)
+                    hconfig | modconf | makenodes | strmknods | strsetup | driverconf | confmodules)
                         eval "$prev=\"\$default_$prev\""
                         reexec="$reexec $prevopt"
                         ;;
@@ -266,6 +280,14 @@ do
             makenodes="$optarg"
             reexec="$reexec --makenodes=\"$optarg\""
             ;;
+        --strsetup | --strsetu | --strset | --strse | --strs | --setup | -S)
+            prevopt="$arg"
+            prev=strsetup
+            ;;
+        --strsetup=* | --strsetu=* | --strset=* | --strse=* | --strs=* | --setup=* | -S*)
+            strsetup="$optarg"
+            reexec="$reexec --strsetup=\"$optarg\""
+            ;;
         --strmknods | --strmknod | --strmkno | --strmkn | --strmk | --strm | --str | --st | --smknod | -s)
             prevopt="$arg"
             prev=strmknods
@@ -328,7 +350,7 @@ if test -n "$prev"; then
             -*)
                 case $prev in
                     # these have optional arguments
-                    hconfig | modconf | makenodes | strmknods| driverconf | confmodules)
+                    hconfig | modconf | makenodes | strmknods | strsetup | driverconf | confmodules)
                         eval "$prev=\"\$default_$prev\""
                         reexec="$reexec $prevopt"
                         ;;
@@ -361,10 +383,10 @@ Usage:
 
 Options:
     -b|--basmajor=MAJOR
-        major number to act as base for LiS drivers and devices
+        major number to act as base for STREAMS drivers and devices
         [default: $default_basemajor]
     -h|--hconfig=[HCONFIG]
-        full path and filename of the LiS configuration header file
+        full path and filename of the STREAMS configuration header file
         [default: $default_hconfig]
     -o|--modconf=[MODCONFINC]
         full path and filename of the module configuration include file
@@ -387,13 +409,16 @@ Options:
     -s|--strmknods=[MAKEDEVICES]
         full path and filename of the makedevices script
         [default: $default_strmknods]
+    -S|--strsetup=[STRSETUP]
+        full path and filename of the strsetup configuration file
+        [default: $default_strsetup]
 EOF
     exit 0
 fi
 
 if test "x$nonopt" != "x"; then
     infile="$nonopt ${1+$@}"
-    rexec="$rexec $infile"
+    reexec="$reexec $infile"
 else
     # reading standard input
     infile=
@@ -401,7 +426,7 @@ fi
 
 # create all our directories
 
-for file in $hconfig $modconf $makenodes $strmknods $driverconf $confmodules $functionname
+for file in $hconfig $modconf $makenodes $strmknods $strsetup $driverconf $confmodules $functionname
 do
     # strip filename
     comps=`$echo ":$file" | $SED -ne 's/^:\//#/;s/^://;s/\// /g;s/^#/\//;p'`
@@ -415,7 +440,7 @@ do
         eval "pathcomp=\"$pathcomp\${components[$count]}\""
         ((count++))
         case $pathcomp in
-            -*) pathcom=./$pathcomp ;;
+            -*) pathcomp=./$pathcomp ;;
         esac
         if test ! -d "$pathcomp"; then
             mkdir "$pathcomp" || lasterr=$?
@@ -743,8 +768,8 @@ cat >$hconfig <<EOF
 
  *****************************************************************************/
 
-#ifndef __SYS_LIS_CONFIG_H__
-#define __SYS_LIS_CONFIG_H__
+#ifndef __SYS_${ucstreams}_CONFIG_H__
+#define __SYS_${ucstreams}_CONFIG_H__
 
 /*
  * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
@@ -764,20 +789,45 @@ do
     eval "major=\"\$strconf_major_$name\""
     eval "nmajors=\"\$strconf_nmajors_$name\""
     eval "nminors=\"\$strconf_nminors_$name\""
-    $echo "#define ${Prefix}		1" >>$hconfig
-    $echo "#define ${Prefix}_ID		$Idnum" >>$hconfig
-    $echo "#define ${Prefix}_DRV_NAME	\"$realname\"" >>$hconfig
-    $echo "#define ${Prefix}_DRV	1" >>$hconfig
-    $echo "#define ${Prefix}_DRV_ID	$Idnum" >>$hconfig
-    $echo "#define ${Prefix}_CNTLS	0" >>$hconfig
-    $echo "#define ${Prefix}_UNITS	$nminors" >>$hconfig
-    $echo "#define ${Prefix}_CMAJORS	$nmajors" >>$hconfig
+    if test "$PACKAGE" = "LiS" ; then
+        $echo "#define ${Prefix}            1" >>$hconfig
+        $echo "#define ${Prefix}_ID         $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_DRV_NAME   \"$realname\"" >>$hconfig
+        $echo "#define ${Prefix}_DRV        1" >>$hconfig
+        $echo "#define ${Prefix}_DRV_ID     $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_CNTLS      0" >>$hconfig
+        $echo "#define ${Prefix}_UNITS      $nminors" >>$hconfig
+        $echo "#define ${Prefix}_CMAJORS    $nmajors" >>$hconfig
+    fi
+    if test "$PACKAGE" = "LfS" ; then
+        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_NMINORS  $nminors" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_NMAJORS  $nmajors" >>$hconfig
+    fi
     count=0
-    while test $count -lt $nmajors
-    do
-        $echo "#define ${Prefix}_CMAJOR_${count}	$((major+count++))" >>$hconfig
-    done
-    $echo "#define ${Prefix}_TYPE	-1" >>$hconfig
+    if test "$PACKAGE" = "LiS" ; then
+        while test $count -lt $nmajors
+        do
+            $echo "#define ${Prefix}_CMAJOR_${count}   $((major+count++))" >>$hconfig
+        done
+        $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
+    fi
+    if test "$PACKAGE" = "LfS" ; then
+        while test $count -lt $nmajors
+        do
+            if test ${count} -eq 0 ; then
+                $echo "#define CONFIG_STREAMS_${Prefix}_MAJOR    $((major+count++))" >>$hconfig
+            else
+                $echo "#define CONFIG_STREAMS_${Prefix}_MAJOR_${count}  $((major+count++))" >>$hconfig
+            fi
+        done
+        eval "objname=\"\$strconf_objname_$name\""
+        eval "loadable=\"\$strconf_loadable_$objname\""
+        if test x"$loadable" = xyes; then
+            $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
+        fi
+    fi
     $echo "" >>$hconfig
 done
 for name in $strconf_module_names
@@ -787,19 +837,30 @@ do
     Prefix=`$echo $prefix | $strconf_uppercase`
     eval "realname=\"\$strconf_realname_$name\""
     eval "Idnum=\"\$strconf_id_$name\""
-    $echo "#define ${Prefix}		1" >>$hconfig
-    $echo "#define ${Prefix}_ID		$Idnum" >>$hconfig
-    $echo "#define ${Prefix}_MOD_NAME	\"$realname\"" >>$hconfig
-    $echo "#define ${Prefix}_MOD	1" >>$hconfig
-    $echo "#define ${Prefix}_MOD_ID	$Idnum" >>$hconfig
-    $echo "#define ${Prefix}_UNITS	0" >>$hconfig
-    $echo "#define ${Prefix}_TYPE	-1" >>$hconfig
+    if test "$PACKAGE" = "LiS" ; then
+        $echo "#define ${Prefix}            1" >>$hconfig
+        $echo "#define ${Prefix}_ID         $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_MOD_NAME   \"$realname\"" >>$hconfig
+        $echo "#define ${Prefix}_MOD        1" >>$hconfig
+        $echo "#define ${Prefix}_MOD_ID     $Idnum" >>$hconfig
+        $echo "#define ${Prefix}_UNITS      0" >>$hconfig
+        $echo "#define ${Prefix}_TYPE       -1" >>$hconfig
+    fi
+    if test "$PACKAGE" = "LfS" ; then
+        $echo "#define CONFIG_STREAMS_${Prefix}_NAME     \"$realname\"" >>$hconfig
+        $echo "#define CONFIG_STREAMS_${Prefix}_MODID    $Idnum" >>$hconfig
+        eval "objname=\"\$strconf_objname_$name\""
+        eval "loadable=\"\$strconf_loadable_$objname\""
+        if test x"$loadable" = xyes; then
+            $echo "#define CONFIG_STREAMS_${Prefix}_MODULE   1" >>$hconfig
+        fi
+    fi
     $echo "" >>$hconfig
 done
 cat >>$hconfig <<EOF
 /* -------------------------------------------------- */
 
-#endif  /* __SYS_LIS_CONFIG_H__ */
+#endif  /* __SYS_${ucstreams}_CONFIG_H__ */
 
 /*
  * vim: ft=c
@@ -857,8 +918,8 @@ cat >$modconf <<EOF
 
  *****************************************************************************/
 
-#ifndef __SYS_LIS_MODCONF_INC__
-#define __SYS_LIS_MODCONF_INC__
+#ifndef __SYS_${ucstreams}_MODCONF_INC__
+#define __SYS_${ucstreams}_MODCONF_INC__
 
 /*
  * GENERATED BY $progname (`date`) FROM ${infile:-(stdin)}
@@ -907,7 +968,7 @@ do
 #    fi
 done
 $echo "" >>$modconf
-$echo "driver_config_t lis_driver_config[] =" >>$modconf
+$echo "driver_config_t ${lcstreams}_driver_config[] =" >>$modconf
 $echo "{" >>$modconf
 for name in $strconf_driver_names
 do
@@ -935,7 +996,7 @@ do
 done
 $echo "};" >>$modconf
 $echo "" >>$modconf
-$echo "device_config_t lis_device_config[] =" >>$modconf
+$echo "device_config_t ${lcstreams}_device_config[] =" >>$modconf
 $echo "{" >>$modconf
 $echo "};" >>$modconf
 $echo "" >>$modconf
@@ -949,7 +1010,7 @@ do
     fi
 done
 $echo "" >>$modconf
-$echo "module_config_t lis_module_config[] =" >>$modconf
+$echo "module_config_t ${lcstreams}_module_config[] =" >>$modconf
 $echo "{" >>$modconf
 $echo "	{\"\", NULL, \"\"},	/* empty 0th entry */" >>$modconf
 for name in $strconf_module_names
@@ -966,9 +1027,9 @@ do
 done
 $echo "};" >>$modconf
 $echo "" >>$modconf
-$echo "#ifdef LIS_LOADABLE_SUPPORT" >>$modconf
+$echo "#ifdef ${ucstreams}_LOADABLE_SUPPORT" >>$modconf
 $echo "" >>$modconf
-$echo "driver_obj_name_t lis_drv_objnames[] =" >>$modconf
+$echo "driver_obj_name_t ${lcstreams}_drv_objnames[] =" >>$modconf
 $echo "{" >>$modconf
 for name in $strconf_driver_names
 do
@@ -988,9 +1049,9 @@ do
 done
 $echo "};" >>$modconf
 $echo "" >>$modconf
-$echo "#endif			/* LIS_LOADABLE_SUPPORT */" >>$modconf
+$echo "#endif			/* ${ucstreams}_LOADABLE_SUPPORT */" >>$modconf
 $echo "" >>$modconf
-$echo "autopush_init_t lis_apush_init[] =" >>$modconf
+$echo "autopush_init_t ${lcstreams}_apush_init[] =" >>$modconf
 $echo "{" >>$modconf
 for name in $strconf_driver_names
 do
@@ -1016,7 +1077,7 @@ cat >>$modconf <<EOF
 
 /* -------------------------------------------------- */
 
-#endif  /* __SYS_LIS_MODCONF_INC__ */
+#endif  /* __SYS_${ucstreams}_MODCONF_INC__ */
 
 /*
  * vim: ft=c
@@ -1347,8 +1408,107 @@ do
     if test x"$minnumb" = x; then
         continue
     fi
-    echo "%attr(${devperm}, root, root) %dev(c, ${majnumb} ${minnumb}) ${devname}" >> $strmknods
+    echo "%attr(${devperm}, root, root) %dev(c, ${majnumb}, ${minnumb}) ${devname}" >> $strmknods
 done
+fi
+
+#
+#   Make strsetup configuration file
+#
+if test x"$strsetup" != x
+then
+cat >$strsetup <<EOF
+# vim: ft=conf
+# =============================================================================
+# 
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# =============================================================================
+
+#
+# Generated by $progname (`date`) from ${infile:-(stdin)}
+# Edits to this file will be lost: edit $progname instead.
+#
+# --------------------------------
+
+#
+#   strsetup configuration file
+#
+
+EOF
+for node in $strconf_node_names
+do
+    eval "devname=\"\$strconf_devname_$node\""
+    eval "devtype=\"\$strconf_devtype_$node\""
+    eval "devperm=\"\$strconf_devperm_$node\""
+    eval "majname=\"\$strconf_majname_$node\""
+    case "$majname" in
+        [_a-zA-Z]*) eval "majnumb=\"\$strconf_major_$majname\"" ;;
+        [0-9]*) majnumb="$majname" ;;
+        *) continue ;;
+    esac
+    if test x"$majnumb" = x; then
+        continue
+    fi
+    eval "minname=\"\$strconf_minname_$node\""
+    case "$minname" in
+        [_a-zA-Z]*) eval "minnumb=\"\$strconf_major_$minname\"" ;;
+        [0-9]*) minnumb="$minname" ;;
+        *) continue ;;
+    esac
+    if test x"$minnumb" = x; then
+        continue
+    fi
+    minor="$minnumb"
+    if test ":$majname" = ":clone" -a ":$minnumb" != ":0" ; then
+        majname="$minname"
+        minor="clone"
+    fi
+    echo -e "$majname\t$devname\t$devperm\t$minor\t# major $majnumb\tminor $minnumb" >> $strsetup
+done
+cat >>$strsetup <<EOF
+
+# --------------------------------
+# vim: ft=conf
+EOF
 fi
 
 #

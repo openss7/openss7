@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.8 2004/05/28 21:35:17 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.9 2004/08/17 02:45:14 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/28 21:35:17 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/17 02:45:14 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -197,10 +197,10 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
             AC_MSG_NOTICE([creating $STRCONF_MAKEDEV from $STRCONF_INPUT])
             eval "$STRCONF -b${STRCONF_MAJBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT"
         fi
-dnl     if test :"${STRCONF_STSETUP:+set}" = :set; then
-dnl         AC_MSG_NOTICE([creating $STRCONF_STSETUP from $STRCONF_INPUT])
-dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT"
-dnl     fi
+        if test :"${STRCONF_STSETUP:+set}" = :set; then
+            AC_MSG_NOTICE([creating $STRCONF_STSETUP from $STRCONF_INPUT])
+            eval "$STRCONF -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT"
+        fi
 dnl     if test :"${STRCONF_STRLOAD:+set}" = :set; then
 dnl         AC_MSG_NOTICE([creating $STRCONF_STRLOAD from $STRCONF_INPUT])
 dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT"
