@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 12:48:47 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 11:19:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,35 +46,35 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:47 $ by $Author: brian $
+# Last Modified $Date: 2004/08/22 11:19:19 $ by $Author: brian $
 #
 # =============================================================================
 
 if RPM_BUILD_KERNEL
 
 $(STRCONF_CONFIG): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --hconfig=$(STRCONF_CONFIG) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --hconfig=$(STRCONF_CONFIG) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_MODCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --modconf=$(STRCONF_MODCONF) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --modconf=$(STRCONF_MODCONF) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_MKNODES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --makenodes=$(STRCONF_MKNODES) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --makenodes=$(STRCONF_MKNODES) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_DRVCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --driverconf=$(STRCONF_DRVCONF) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --driverconf=$(STRCONF_DRVCONF) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_CONFMOD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --confmodules=$(STRCONF_CONFMOD) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --confmodules=$(STRCONF_CONFMOD) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_MAKEDEV): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --strmknods=$(STRCONF_MAKEDEV) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --strmknods=$(STRCONF_MAKEDEV) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_STSETUP): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(STRCONF) --strsetup=$(STRCONF_STSETUP) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+	$(STRCONF) --strsetup=$(STRCONF_STSETUP) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 #$(STRCONF_STRLOAD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-#	$(STRCONF) --strload=$(STRCONF_STRLOAD) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+#	$(STRCONF) --strload=$(STRCONF_STRLOAD) --package=$(STRCONF_PACKAGE) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
 $(STRCONF_INPUT): $(CONFIG_CLEAN_FILES) $(STRCONF_CONFIGS)
 	$(SHELL) ./config.status strconf
