@@ -1,6 +1,4 @@
-LIS_HOME = ../..
-SRC=..
-include $(LIS_HOME)/config.mk
+include .config_mk
 
 OPT	= -DQNX
 BINDIR	= /usr/local/bin
@@ -9,7 +7,9 @@ XLIBS	= -L$(Groot)/rsys/lib/qnx -lstrmio.a
 all:	streams
 
 streams:	streams.o
-	$(CC) -o streams streams.o $(XLIBS)
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -o $@ $^ $(XLIBS)
 
 streams.o:	../streams.c
-	$(CC) -I../../include $(OPT) -c streams.o  ../streams.c
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -I$(SRCDIR)/include $(OPT) -o $@ -c $^

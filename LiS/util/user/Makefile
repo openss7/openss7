@@ -1,5 +1,4 @@
-LIS_HOME = ../..
-include $(LIS_HOME)/config.mk
+include .config_mk
 
 OPT	= -DUSER -DDIRECT_USER 
 BINDIR	= /usr/sbin

@@ -1,7 +1,6 @@
-LIS_HOME = ../..
-include $(LIS_HOME)/config.mk
+include .config_mk
 
 OPT	= 
 BINDIR	= /usr/local/bin
 
-include $(SRC)/mk.bdy
+include $(UTILDIR)/mk.bdy

@@ -7,15 +7,10 @@ LIBOBJS = $(PRELDOBJS) pipe.o
 
 CP_OPTS	= -f
 XOPTS  += -D__KERNEL_SYSCALLS__
+XOPTS  += -DBLD32OVER64 -m31
+LDOPTS = -melf_s390
 
-ifeq ($(ARCH), s390x)
-#
-# For 64-bit zSeries, specify use of position independent code
-XOPTS  += -fPIC
-endif
-
-
-include $(LIBDIR)/mk.bdy
+include $(LIBDIR32OVER64)/mk.bdy
 
 
 #
@@ -26,5 +21,4 @@ include $(LIBDIR)/mk.bdy
 
 dep:
 	$(Q_ECHO) $(qtag_DEP)$(relpwd)
-	$(Q)$(CC) -M -DDEP $(LIBOBJS:%.o=$(LIBDIR)/%.c) >.depend
-
+	$(CC) -M -DDEP $(LIBOBJS:%.o=$(LIBDIR)/%.c) >.depend

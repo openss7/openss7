@@ -1,8 +1,4 @@
-#
-# LiS configuration
-#
-LIS_HOME = ../..
-include $(LIS_HOME)/config.mk
+include .config_mk
 
 #
 # Environment of LINUX means the intent is to link the code into the
@@ -30,11 +26,14 @@ endif
 # Are we compiling LiS as a loadable kernel module?
 ifeq ($(CONFIG_STREAMS),m)
   OPT += -DMODULE
+  ifeq ($(KBUILD_NEEDS_MODNAME),y)
+    OPT += -DKBUILD_MODNAME=streams
+  endif
 endif 
 
-ifeq ($(DBG_OPT),y)
-  OPT += -DDEBUG
-endif
+#ifeq ($(DBG_OPT),y)
+#  OPT += -DDEBUG
+#endif
 
 XOBJS = poll.o
 
@@ -68,8 +67,10 @@ XOBJS += lislocks.o
 #
 XOBJS += exports.o
 
-include ../mk.bdy
+include $(HEADDIR)/mk.bdy
+
+modules: streamshead.o
 
 dep: common-dep
-	$(CC) -M -DDEP $(HEADDIR)/poll.c >>.depend
-
+	$(Q_ECHO) $(qtag_DEP)$(relpwd)
+	$(Q)$(CC) -M -DDEP $(HEADDIR)/poll.c >>.depend

@@ -1,5 +1,4 @@
-LIS_HOME = ../..
-include $(LIS_HOME)/config.mk
+include .config_mk
 
 OPT	= -DLINUX
 XUTILS  = ldltest ldlconfig test test2 fattach fdetach \
@@ -11,6 +10,9 @@ ULOPTS += -lpthread
 
 include $(UTILDIR)/mk.bdy
 
+default:
+	$(nothing)
+
 #thrtst:	thrtst.c
 #	$(CC) -o $@ $^ $(ULOPTS) -lpthread
 	
@@ -18,8 +20,9 @@ include $(UTILDIR)/mk.bdy
 #	$(CC) -o $@ $^ $(ULOPTS) -lpthread
 	
 install_xutils:	ldltest ldlconfig fattach fdetach
-	install -d $(INST_SBIN)
-	install $^ $(INST_SBIN)
+	$(Q)install -d $(DESTDIR)$(sbindir)
+	$(Q)install $^ $(DESTDIR)$(sbindir)
 
 uninstall_xutils:
-	-(cd $(INST_SBIN); rm -f ldltest ldlconfig fattach fdetach)
+	-$(Q)(cd $(DESTDIR)$(sbindir) && \
+		rm -f ldltest ldlconfig fattach fdetach)

@@ -1,11 +1,10 @@
-LIS_HOME = ../..
-include $(LIS_HOME)/config.mk
+include .config_mk
 
 XOPTS += -DUSER
-LIBOBJS = makenodes.o $(LIS_HOME)/streams.o
+LIBOBJS = makenodes.o $(SRCDIR)/streams.o
 
 
-include ../mk.bdy
+include $(LIBDIR)/mk.bdy
 
 
 #
@@ -17,12 +16,13 @@ include ../mk.bdy
 ifneq ($(strip $(wildcard makenodes.c)),)
 
 dep:
-	$(CC) -M -DDEP makenodes.c >.depend
+	$(Q_ECHO) $(qtag_DEP)$(relpwd)
+	$(Q)$(CC) -M -DDEP makenodes.c >.depend
 
 else
 
 dep:
-	>.depend
+	$(Q_ECHO) $(qtag_DEP)$(relpwd)
+	$(Q)>.depend
 
 endif
-
