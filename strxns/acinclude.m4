@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/24 02:11:11 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/27 12:27:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:11 $ by $Author: brian $
+# Last Modified $Date: 2005/03/27 12:27:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,10 +79,24 @@ AC_DEFUN([AC_XNS], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    AC_CONFIG_FILES([debian/strxns-core.preinst
-		     debian/strxns-core.postinst
-		     debian/strxns-core.prerm
+    AC_CONFIG_FILES([debian/strxns-core.postinst
 		     debian/strxns-core.postrm
+		     debian/strxns-core.preinst
+		     debian/strxns-core.prerm
+		     debian/strxns-devel.preinst
+		     debian/strxns-dev.postinst
+		     debian/strxns-dev.preinst
+		     debian/strxns-dev.prerm
+		     debian/strxns-doc.postinst
+		     debian/strxns-doc.preinst
+		     debian/strxns-doc.prerm
+		     debian/strxns-init.postinst
+		     debian/strxns-init.postrm
+		     debian/strxns-init.preinst
+		     debian/strxns-init.prerm
+		     debian/strxns-lib.preinst
+		     debian/strxns-source.preinst
+		     debian/strxns-util.preinst
 		     src/util/modutils/strxns])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"

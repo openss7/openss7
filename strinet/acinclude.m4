@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/24 02:11:05 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/27 12:27:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:05 $ by $Author: brian $
+# Last Modified $Date: 2005/03/27 12:27:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,10 +80,24 @@ AC_DEFUN([AC_INET], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    AC_CONFIG_FILES([debian/strinet-core.preinst
-		     debian/strinet-core.postinst
-		     debian/strinet-core.prerm
+    AC_CONFIG_FILES([debian/strinet-core.postinst
 		     debian/strinet-core.postrm
+		     debian/strinet-core.preinst
+		     debian/strinet-core.prerm
+		     debian/strinet-devel.preinst
+		     debian/strinet-dev.postinst
+		     debian/strinet-dev.preinst
+		     debian/strinet-dev.prerm
+		     debian/strinet-doc.postinst
+		     debian/strinet-doc.preinst
+		     debian/strinet-doc.prerm
+		     debian/strinet-init.postinst
+		     debian/strinet-init.postrm
+		     debian/strinet-init.preinst
+		     debian/strinet-init.prerm
+		     debian/strinet-lib.preinst
+		     debian/strinet-source.preinst
+		     debian/strinet-util.preinst
 		     src/util/modutils/strinet])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"

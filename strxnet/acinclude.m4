@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/24 02:11:09 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/27 12:27:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:09 $ by $Author: brian $
+# Last Modified $Date: 2005/03/27 12:27:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,11 +79,24 @@ AC_DEFUN([AC_XNET], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    AC_CONFIG_FILES([debian/strxnet-core.preinst
-		     debian/strxnet-core.postinst
-		     debian/strxnet-core.prerm
+    AC_CONFIG_FILES([debian/strxnet-core.postinst
 		     debian/strxnet-core.postrm
+		     debian/strxnet-core.preinst
+		     debian/strxnet-core.prerm
+		     debian/strxnet-devel.preinst
+		     debian/strxnet-dev.postinst
+		     debian/strxnet-dev.preinst
+		     debian/strxnet-dev.prerm
+		     debian/strxnet-doc.postinst
+		     debian/strxnet-doc.preinst
+		     debian/strxnet-doc.prerm
+		     debian/strxnet-init.postinst
+		     debian/strxnet-init.postrm
+		     debian/strxnet-init.preinst
+		     debian/strxnet-init.prerm
 		     debian/strxnet-lib.preinst
+		     debian/strxnet-source.preinst
+		     debian/strxnet-util.preinst
 		     src/util/modutils/strxnet])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"

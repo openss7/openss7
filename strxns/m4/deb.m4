@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/26 02:54:25 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/27 10:57:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 02:54:25 $ by $Author: brian $
+# Last Modified $Date: 2005/03/27 10:57:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -182,6 +182,13 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     ])
     PACKAGE_DEBTOPDIR="$deb_cv_topdir"
     AC_SUBST([PACKAGE_DEBTOPDIR])dnl
+    AC_CACHE_CHECK([for deb BUILD directory], [deb_cv_builddir], [dnl
+	# debbuilddir needs to be absolute: always build in the top build
+	# directory on the local machine
+	deb_cv_builddir=`pwd`/debian
+    ])
+    debbuilddir="$deb_cv_builddir"
+    AC_SUBST([debbuilddir])dnl
 ])# _DEB_DPKG_SETUP_TOPDIR
 # =============================================================================
 

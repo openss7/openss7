@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/03/24 12:45:43 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/03/27 14:14:18 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/24 12:45:43 $ by $Author: brian $
+## Last Modified $Date: 2005/03/27 14:14:18 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -160,7 +160,7 @@ redhat_sig_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
 redhat_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
 redhat_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
 redhat_img_files	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
-redhat_source_files	= $(redhat_spec_file) $(redhat_img_files) $(redhat_src_file) $(redhat_tar_file) $(redhat_sig_file)
+redhat_source_files	= $(redhat_spec_file) $(redhat_img_files) $(redhat_tar_file)
 redhat_binary_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 redhat_binary_files	= $(rpmdir)/*/$(redhat_binary_file)
 redhat_cache_files	= $(rpmbuilddir)/*config.cache \
@@ -255,7 +255,7 @@ all-lis-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-lfs-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 
-sign srpm-sign: $(srpm)
+sign srpm-sign: $(redhat_src_file)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
@@ -342,17 +342,13 @@ release-clean-rpm: distclean-rpm
 
 RELEASE_CLEAN_LOCAL	+= release-clean-rpm
 
-RELEASECLEANFILES	+= $(redhat_source_files) \
-			   $(redhat_cache_files) \
+RELEASECLEANFILES	+= $(redhat_cache_files) \
 			   $(redhat_dir_stamp) \
+			   $(redhat_source_files) \
+			   $(redhat_src_file) \
+			   $(redhat_sig_file) \
 			   $(redhat_binary_files) \
 			   $(redhat_hdist_files)
-
-EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
-			   $(PACKAGE_TARNAME).gif \
-			   $(PACKAGE_TARNAME).xpm \
-			   .rpmrelease \
-			   .rpmepoch
 
 MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign
 ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-sign all-rebuild all-resign
@@ -362,5 +358,11 @@ endif
 
 endif
 ## MAINTAINER_MODE
+
+EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
+			   $(PACKAGE_TARNAME).gif \
+			   $(PACKAGE_TARNAME).xpm \
+			   .rpmrelease \
+			   .rpmepoch
 
 ## vim: ft=automake

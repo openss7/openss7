@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2005/03/26 04:06:23 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2005/03/27 12:23:57 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 04:06:23 $ by $Author: brian $
+## Last Modified $Date: 2005/03/27 12:23:57 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -236,46 +236,9 @@ install: build
 
 build-lis: build-lis-stamp
 build-lis-stamp:
-	dh_testdir
 	rm -f build-lfs-stamp build-stamp
-	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
-	./configure \
-		CC='$(CC)' \
-		CFLAGS='$(CFLAGS)' \
-		LDFLAGS='$(LDFLAGS)' \
-		CPPFLAGS='$(CPPFLAGS)' \
-		CPP='$(CPP)' \
-		CXX='$(CXX)' \
-		CXXFLAGS='$(CXXFLAGS)' \
-		CXXCPP='$(CXXCPP)' \
-		CONFIG_SITE="$(csite_file)" \
-		MODPOST_CACHE="$(mpost_file)" \
-		--cache-file="$(cache_file)" \
-		--host="$(DEB_HOST_GNU_ARCH)" \
-		--prefix=$(prefix) \
-		--exec_prefix=$(exec_prefix) \
-		--bindir=$(bindir) \
-		--sbindir=$(sbindir) \
-		--sysconfdir=$(sysconfdir) \
-		--datadir=$(datadir) \
-		--includedir=$(includedir) \
-		--libdir=$(libdir) \
-		--libexecdir=$(libexecdir) \
-		--localstatedir=$(localstatedir) \
-		--sharedstatedir=$(sharedstatedir) \
-		--mandir=$(mandir) \
-		--infodir=$(infodir) \
-		--disable-maintainer-mode \
-		--disable-dependency-tracking \
-		--with-gnu-ld \
-		$(PACKAGE_DEBOPTIONS) \
-		$(BUILD_CFGOPTIONS) \
-		--with-lis \
-		--without-lfs \
-		|| { rm -f $(cache_file) ; exit 1 ; }
-	$(MAKE) -f Makefile
-	$(MAKE) -f Makefile check
-	chmod +x debian/rules
+	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
+	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='--with-lis --without-lfs' build
 	touch build-lis-stamp
 
 install-lis: DH_OPTIONS =
@@ -290,46 +253,9 @@ install-lis: build-lis
 
 build-lfs: build-lfs-stamp
 build-lfs-stamp:
-	dh_testdir
 	rm -f build-lis-stamp build-stamp
-	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
-	./configure \
-		CC='$(CC)' \
-		CFLAGS='$(CFLAGS)' \
-		LDFLAGS='$(LDFLAGS)' \
-		CPPFLAGS='$(CPPFLAGS)' \
-		CPP='$(CPP)' \
-		CXX='$(CXX)' \
-		CXXFLAGS='$(CXXFLAGS)' \
-		CXXCPP='$(CXXCPP)' \
-		CONFIG_SITE="$(csite_file)" \
-		MODPOST_CACHE="$(mpost_file)" \
-		--cache-file="$(cache_file)" \
-		--host="$(DEB_HOST_GNU_ARCH)" \
-		--prefix=$(prefix) \
-		--exec_prefix=$(exec_prefix) \
-		--bindir=$(bindir) \
-		--sbindir=$(sbindir) \
-		--sysconfdir=$(sysconfdir) \
-		--datadir=$(datadir) \
-		--includedir=$(includedir) \
-		--libdir=$(libdir) \
-		--libexecdir=$(libexecdir) \
-		--localstatedir=$(localstatedir) \
-		--sharedstatedir=$(sharedstatedir) \
-		--mandir=$(mandir) \
-		--infodir=$(infodir) \
-		--disable-maintainer-mode \
-		--disable-dependency-tracking \
-		--with-gnu-ld \
-		$(PACKAGE_DEBOPTIONS) \
-		$(BUILD_CFGOPTIONS) \
-		--with-lfs \
-		--without-lis \
-		|| { rm -f $(cache_file) ; exit 1 ; }
-	$(MAKE) -f Makefile
-	$(MAKE) -f Makefile check
-	chmod +x debian/rules
+	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
+	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='--with-lfs --without-lis' build
 	touch build-lfs-stamp
 
 install-lfs: DH_OPTIONS =
@@ -390,6 +316,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.9  2005/03/27 12:23:57  brian
+# - slimmer build of lis and lfs components
+#
 # Revision 1.1.2.8  2005/03/26 04:06:23  brian
 # - corrections to multiple targets
 #

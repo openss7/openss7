@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/03/24 02:11:00 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/27 12:27:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:00 $ by $Author: brian $
+# Last Modified $Date: 2005/03/27 12:27:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,10 +79,24 @@ AC_DEFUN([AC_SS7], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    AC_CONFIG_FILES([debian/strss7-core.preinst
-		     debian/strss7-core.postinst
-		     debian/strss7-core.prerm
+    AC_CONFIG_FILES([debian/strss7-core.postinst
 		     debian/strss7-core.postrm
+		     debian/strss7-core.preinst
+		     debian/strss7-core.prerm
+		     debian/strss7-devel.preinst
+		     debian/strss7-dev.postinst
+		     debian/strss7-dev.preinst
+		     debian/strss7-dev.prerm
+		     debian/strss7-doc.postinst
+		     debian/strss7-doc.preinst
+		     debian/strss7-doc.prerm
+		     debian/strss7-init.postinst
+		     debian/strss7-init.postrm
+		     debian/strss7-init.preinst
+		     debian/strss7-init.prerm
+		     debian/strss7-lib.preinst
+		     debian/strss7-source.preinst
+		     debian/strss7-util.preinst
 		     src/util/modutils/strss7])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"

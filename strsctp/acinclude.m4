@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/24 02:11:06 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/27 12:27:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:06 $ by $Author: brian $
+# Last Modified $Date: 2005/03/27 12:27:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,10 +80,24 @@ AC_DEFUN([AC_SCTP], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-    AC_CONFIG_FILES([debian/strsctp-core.preinst
-		     debian/strsctp-core.postinst
-		     debian/strsctp-core.prerm
+    AC_CONFIG_FILES([debian/strsctp-core.postinst
 		     debian/strsctp-core.postrm
+		     debian/strsctp-core.preinst
+		     debian/strsctp-core.prerm
+		     debian/strsctp-devel.preinst
+		     debian/strsctp-dev.postinst
+		     debian/strsctp-dev.preinst
+		     debian/strsctp-dev.prerm
+		     debian/strsctp-doc.postinst
+		     debian/strsctp-doc.preinst
+		     debian/strsctp-doc.prerm
+		     debian/strsctp-init.postinst
+		     debian/strsctp-init.postrm
+		     debian/strsctp-init.preinst
+		     debian/strsctp-init.prerm
+		     debian/strsctp-lib.preinst
+		     debian/strsctp-source.preinst
+		     debian/strsctp-util.preinst
 		     src/util/modutils/strsctp])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"

@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/26 04:06:23 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/27 12:24:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 04:06:23 $ by $Author: brian $
+## Last Modified $Date: 2005/03/27 12:24:02 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -100,8 +100,6 @@ kernel_release=$(shell echo $(kversion) | sed -e s',-,.,g')
 core_name = core-$(kversion)-$(krelease)
 info_name = info-$(kversion)-$(krelease)
 epoch = @PACKAGE_RPMEPOCH@
-majbase = @STRCONF_MAJBASE@
-makedev = @STRCONF_MAKEDEV@
 base = @PACKAGE_LCNAME@
 title = @PACKAGE_TITLE@
 stitle = @PACKAGE_SHORTTITLE@
@@ -270,7 +268,6 @@ build-stamp:
 		--with-gnu-ld \
 		--with-k-release=$(kversion) \
 		--with-k-modules=$(kmoduledir) \
-		--with-base-major=$(majbase) \
 		$(PACKAGE_DEBOPTIONS) \
 		$(BUILD_CFGOPTIONS) \
 		|| { rm -f $(cache_file) ; exit 1 ; }
@@ -347,8 +344,11 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
-# Revision 0.9.2.8  2005/03/26 04:06:23  brian
-# - corrections to multiple targets
+# Revision 0.9.2.9  2005/03/27 12:24:02  brian
+# - slimmer build of lis and lfs components
+#
+# Revision 1.9  2005/03/27 12:24:02  brian
+# - slimmer build of lis and lfs components
 #
 # Revision 1.8  2005/03/26 04:06:23  brian
 # - corrections to multiple targets
