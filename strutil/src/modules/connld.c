@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -62,8 +62,11 @@ static char const ident[] =
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -79,7 +82,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
+#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"

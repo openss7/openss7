@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:22 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $";
 
 #define __NO_VERSION__
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #ifdef CONFIG_PROC_FS
 #include <linux/proc_fs.h>
 #endif
@@ -99,6 +103,11 @@ int sysctl_str_max_strdev = MAX_STRDEV;	/* max no streams devices */
 int sysctl_str_max_strmod = MAX_STRMOD;	/* max no streams modules */
 int sysctl_str_max_mblk = 10;		/* max no of headers on free list */
 int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
+
+EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
+#if defined CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);
+#endif
 
 static struct ctl_table_header *streams_sysctl_handle;
 

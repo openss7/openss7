@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.7 2004/05/04 21:36:57 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.8 2004/05/07 03:33:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/04 21:36:57 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:01 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -515,7 +515,8 @@ extern void cdev_put(struct cdevsw *cdev);
 extern struct cdevsw *cdrv_get(modID_t modid);
 extern void cdrv_put(struct cdevsw *cdev);
 extern struct cdevsw *cdev_find(const char *name);
-extern struct fmodsw *fmod_get(modID_t modid);
+extern struct cdevsw *cdev_match(const char *name);
+//extern struct fmodsw *fmod_get(modID_t modid);
 extern void fmod_put(struct fmodsw *smod);
 extern struct fmodsw *fmod_find(const char *name);
 extern struct devnode *node_find(const struct cdevsw *cdev, const char *name);

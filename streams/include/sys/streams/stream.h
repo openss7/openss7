@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.10 2004/05/04 21:36:56 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.11 2004/05/07 03:33:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:56 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/04 21:36:56 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:01 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,8 +63,12 @@
 #endif				/* HAVE_LINUX_FAST_STREAMS */
 
 #include <linux/config.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #include <linux/types.h>	/* for various types */
 typedef unsigned char uchar;		/* idiots! */
 #include <asm/system.h>		/* for xchg */

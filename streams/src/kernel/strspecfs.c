@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/06 08:44:22 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 03:33:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/06 08:44:22 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 03:33:05 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/06 08:44:22 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 03:33:05 $";
 
 #define __NO_VERSION__
 
@@ -303,10 +303,11 @@ STATIC struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, in
 }
 
 /**
- *  strm_open: - open a stream from an external character special device, fifo, or socket.
- *  @ext_inode:	external filesystem inode
- *  @ext_file:	external filesystem file pointer (user file pointer)
- *  @args:	arguments to qopen
+ *  strm_open:	- open a stream from an external character special device,
+ *		fifo, or socket.  This is also used for nesting clone calls.
+ *  @ext_inode:	external (or chaining) filesystem inode
+ *  @ext_file:	external (or chaining) filesystem file pointer (user file pointer)
+ *  @argp:	arguments to qopen
  */
 int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *argp)
 {
@@ -386,64 +387,9 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
       exit:
 	return (err);
 }
-#if defined CONFIG_STREAMS_STH_MODULE || CONFIG_STREAMS_NSDEV_MODULE
+#if defined CONFIG_STREAMS_STH_MODULE || CONFIG_STREAMS_CLONE_MODULE || CONFIG_STREAMS_NSDEV_MODULE
 EXPORT_SYMBOL_GPL(strm_open);
 #endif
-
-/**
- *  spec_open: - open a stream from an external character special device, fifo, or socket.
- *  @inode: external filesystem inode
- *  @file:  external filesystem file pointer (user file pointer)
- */
-int spec_open(struct inode *inode, struct file *file)
-{
-	struct cdevsw *cdev;
-	major_t major;
-	minor_t minor;
-	struct str_args args = {
-		.inode = inode,
-		.file = file,
-		.oflag = make_oflag(file),
-		.sflag = DRVOPEN,
-		.crp = current_creds,
-	};
-	int err;
-	switch (inode->i_mode & ~S_IFMT) {
-	case S_IFCHR:
-		if (!(cdev = cdev_get(MAJOR(kdev_t_to_nr(inode->i_rdev)))))
-			return (-ENXIO);
-		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
-		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
-		break;
-	case S_IFIFO:
-		if (!(cdev = cdev_find("fifo")))
-			return (-ENXIO);
-		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
-		minor = 0;
-		break;
-	case S_IFSOCK:
-		if (!(cdev = cdev_find("sock")))
-			return (-ENXIO);
-		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
-		minor = 0;
-		break;
-	default:
-		return (-ENODEV);
-	}
-	args.dev = makedevice(major, minor);
-	args.name.name = args.buf;
-	args.name.len = snprintf(args.buf, sizeof(args.buf), "%u", args.dev);
-	args.name.hash = args.dev;
-	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
-	err = strm_open(inode, file, &args);
-	cdev_put(cdev);
-	return (err);
-}
-
-struct file_operations spec_f_ops = {
-	owner:THIS_MODULE,
-	open:&spec_open,
-};
 
 /**
  *  spec_dev_open: - open a stream from an internal character special device, fifo or socket
@@ -482,48 +428,6 @@ STATIC struct file_operations spec_dev_f_ops = {
 	owner:THIS_MODULE,
 	open:&spec_dev_open,
 };
-
-#if 0
-/**
- *  nest_open: - nest an open within the shadow special filesystem
- *  @old_inode:	old shadow special filesystem inode
- *  @old_file:	old shadow special filesystem file pointer
- *  @args:	arguments to qopen
- */
-int nest_open(struct inode *old_inode, struct file *old_file, struct str_args *argp)
-{
-	struct dentry *dentry;
-	struct inode *inode;		/* next shadow special filesystem inode to use */
-	struct file *file;		/* next shadow special filesystem file pointer to use */
-	struct cdevsw *cdevsw;
-	int err;
-	err = -ENXIO;
-	if (!(cdevsw = cdrv_get(getmajor(argp->dev))))
-		goto exit;
-	argp->name.len = 0;
-	argp->name.hash = argp->dev;
-	dentry = lookup_hash(&argp->name, specfs_mnt->mnt_root);
-	cdrv_put(cdev);
-	if ((err = PTR_ERR(dentry)) < 0)
-		goto exit;
-	err = -ENOMEM;		/* we only fail to get an inode when memory allocation fails */
-	if (!(inode = dentry->d_inode))
-		goto exit;
-	err = -ENODEV;		/* we only get a bad inode when there is no device entry */
-	if (is_bad_inode(inode))
-		goto dput_exit;
-	dentry->d_fsdata = argp;	/* this is how we pass qopen() arguments */
-	file = dentry_open(dentry, specfs_mnt, old_file->f_flags);
-	if ((err = PTR_ERR(file)) < 0)
-		goto dput_exit;
-	file_swap_put(old_file, file);
-	err = 0;
-      dput_exit:
-	dput(dentry);
-      exit:
-	return (err);
-}
-#endif
 
 /* 
  *  =========================================================================
@@ -1125,10 +1029,10 @@ static void spec_read_inode(struct inode *inode)
 	modID_t modid;
 	struct cdevsw *cdev;
 	dev_t dev;
-	if ((modid = (inode->i_ino >> 16) & 0x0000ffff)) {
+	if ((modid = getmajor(inode->i_ino))) {
 		/* For device nodes, the upper 16 bits of the inode number is the module id; the
 		   lower 16 bits of the inode number is the device instance. */
-		if ((cdev = (struct cdevsw *) fmod_get(modid))) {
+		if ((cdev = cdrv_get(modid))) {
 			struct spec_sb_info *sbi;
 			dev = MKDEV(getmajor(inode->i_ino) + MAJOR(getminor(inode->i_ino)),
 				    MINOR(getminor(inode->i_ino)));
@@ -1145,29 +1049,27 @@ static void spec_read_inode(struct inode *inode)
 			insert_inode_hash(inode);
 			return;
 		}
-	} else {
+	} else if ((modid = getminor(inode->i_ino))) {
 		/* For module nodes, the upper 16 bits of the inode number is zero indicating that
 		   this is a module node; the lower 16 bits is the module id. */
-		if ((modid = inode->i_ino & 0x0000ffff)) {
-			dev = NODEV;
-			if ((cdev = (struct cdevsw *) fmod_get(modid))) {
-				/* initialize specfs specific fields */
-				struct spec_sb_info *sbi;
-				sbi = inode->i_sb->u.generic_sbp;
-				inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
-				inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
-				inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
-				inode->u.generic_ip = cdev;
-				inode->i_mode = S_IFDIR | sbi->sbi_mode;
-				inode->i_op = &spec_dir_i_ops;
-				inode->i_fop = fops_get(&spec_dir_f_ops);
-				inode->i_rdev = to_kdev_t(NODEV);
-				inode->i_cdev = NULL;
-				insert_inode_hash(inode);
-				return;
-			}
-			/* No module with that id. */
+		dev = NODEV;
+		if ((cdev = cdrv_get(modid))) {
+			/* initialize specfs specific fields */
+			struct spec_sb_info *sbi;
+			sbi = inode->i_sb->u.generic_sbp;
+			inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
+			inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
+			inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
+			inode->u.generic_ip = cdev;
+			inode->i_mode = S_IFDIR | sbi->sbi_mode;
+			inode->i_op = &spec_dir_i_ops;
+			inode->i_fop = fops_get(&spec_dir_f_ops);
+			inode->i_rdev = to_kdev_t(NODEV);
+			inode->i_cdev = NULL;
+			insert_inode_hash(inode);
+			return;
 		}
+		/* No module with that id. */
 	}
 	make_bad_inode(inode);
 	insert_inode_hash(inode);

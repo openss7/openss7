@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $";
 
 /* 
  *  This driver provides the functionality of IP (Internet Protocol) over a
@@ -63,8 +63,11 @@ static char const ident[] =
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #include <linux/net.h>
 #include <linux/in.h>
@@ -94,7 +97,7 @@ static char const ident[] =
 
 #define	INET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define INET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define INET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#define INET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $"
 #define INET_DEVICE	"SVR 4.2 XTIOS (XTI Over Sockets) for NET4"
 #define INET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define INET_LICENSE	"GPL"

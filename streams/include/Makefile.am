@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/05 23:10:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/07 07:18:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/05 23:10:08 $ by $Author: brian $
+# Last Modified $Date: 2004/05/07 07:18:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -93,6 +93,8 @@ nobase_nodist_pkginclude_HEADERS = \
 	sys/versions/strsad.ver \
 	sys/versions/strsched.ver \
 	sys/versions/strspecfs.ver \
+	sys/versions/strsysctl.ver \
+	sys/versions/strutil.ver \
 	sys/versions/strsyms.ver \
 	sys/versions/sth.ver
 

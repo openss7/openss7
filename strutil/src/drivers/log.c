@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:04 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:04 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -78,7 +81,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/06 08:44:21 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/07 03:33:04 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 07:18:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:14 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/06 08:44:22 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/07 07:18:14 $";
 
 #define __NO_VERSION__
 
@@ -123,8 +123,6 @@ static char const ident[] =
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "strsched.h"		/* for in_stream */
 #include "strutil.h"		/* for q locking and puts and gets */
-#undef  __SCHED_EXTERN_INLINE
-#define __SCHED_EXTERN_INLINE extern
 #include "strsched.h"		/* verification of externs */
 
 struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
@@ -723,6 +721,7 @@ void flushq(queue_t *q, int flag)
 	   and we don't block interrupts too long */
 	freechain(mp, mpp);
 }
+EXPORT_SYMBOL(flushq);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -778,6 +777,7 @@ queue_t *allocq(void)
 	}
 	return (rq);
 }
+EXPORT_SYMBOL_GPL(allocq);
 
 /*
  *  __freeq:	- free a queue pair
@@ -828,6 +828,7 @@ void freeq(queue_t *rq)
 	__freeq(rq);
 	freechain(mp, mpp);
 }
+EXPORT_SYMBOL_GPL(freeq);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1100,6 +1101,7 @@ bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
 	return __bufcall(NULL, size, priority, function, arg);
 }
+EXPORT_SYMBOL(bufcall);
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /**
@@ -1116,6 +1118,7 @@ bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (v
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
 }
+EXPORT_SYMBOL(qbufcall);
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
@@ -1132,6 +1135,7 @@ void mi_bufcall(queue_t *q, int size, int priority)
 	__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q);
 	return;
 }
+EXPORT_SYMBOL(mi_bufcall);
 #endif
 
 /**
@@ -1141,6 +1145,7 @@ void mi_bufcall(queue_t *q, int size, int priority)
  *  @arg:	a client argument to pass to the callback function
  */
 __EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
+//EXPORT_SYMBOL_GPL(esbbcall);
 
 /**
  *  unbufcall:	- cancel a buffer callout
@@ -1153,6 +1158,7 @@ void unbufcall(bcid_t bcid)
 	if ((se = find_event(bcid)))
 		xchg(&se->x.b.func, NULL);
 }
+EXPORT_SYMBOL(unbufcall);
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /**
@@ -1165,16 +1171,9 @@ void qunbufcall(queue_t *q, bufcall_id_t bcid)
 {
 	unbufcall(bcid);
 }
+EXPORT_SYMBOL(qunbufcall);
 #endif
 
-/**
- *  timeout:	- issue a timeout callback
- *  @arg:	client data
- *
- *  Notices:	Note that, for MP safety, timeouts are always raised against the same processor that
- *  invoked the timeout.  This means that the callback function will not execute until after the
- *  caller hits a pre-emption point.
- */
 static void timeout_function(unsigned long arg)
 {
 	struct strevent *se = (struct strevent *) arg;
@@ -1205,10 +1204,20 @@ static toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long tick
 	}
 	return (toid);
 }
+
+/**
+ *  timeout:	- issue a timeout callback
+ *  @arg:	client data
+ *
+ *  Notices:	Note that, for MP safety, timeouts are always raised against the same processor that
+ *  invoked the timeout.  This means that the callback function will not execute until after the
+ *  caller hits a pre-emption point.
+ */
 toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 {
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
+EXPORT_SYMBOL(timeout);
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks)
@@ -1217,6 +1226,7 @@ timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long tic
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
 	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());
 }
+EXPORT_SYMBOL(qtimeout);
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
@@ -1249,12 +1259,14 @@ clock_t untimeout(toid_t toid)
 	}
 	return (rem);
 }
+EXPORT_SYMBOL(untimeout);
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 clock_t quntimeout(queue_t *q, timeout_id_t toid)
 {
 	return untimeout(toid);
 }
+EXPORT_SYMBOL(quntimeout);
 #endif
 
 /*
@@ -1325,6 +1337,7 @@ int weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, w
 		set_bit(QWELDED_BIT, &q3->q_flag);
 	return __weldq(q1, q2, q3, q4, func, arg, protq, SE_WELDQ);
 }
+EXPORT_SYMBOL(weldq);
 
 /**
  *  unweldq:	- unweld two queue pairs from each other
@@ -1361,6 +1374,7 @@ int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		clear_bit(QWELDED_BIT, &q3->q_flag);
 	return __weldq(q1, NULL, q3, NULL, func, arg, protq, SE_UNWELDQ);
 }
+EXPORT_SYMBOL(unweldq);
 
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) || defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /*
@@ -1709,6 +1723,7 @@ static void sq_putp(struct strevent *se)
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
+//EXPORT_SYMBOL(kmem_alloc);
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -1716,6 +1731,7 @@ __EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
+//EXPORT_SYMBOL(kmem_zalloc);
 
 /**
  *  kmem_free:	- free memory
@@ -1733,6 +1749,25 @@ void kmem_free(void *addr, size_t size)
 			raise_softirq(STREAMS_SOFTIRQ);
 	}
 }
+EXPORT_SYMBOL(kmem_free);
+
+/**
+ *  kmem_alloc_node: - allocate memory
+ *  @size:	amount of memory to allocate in bytes
+ *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
+ *  @node:
+ */
+__EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
+//EXPORT_SYMBOL(kmem_alloc_node);
+
+/**
+ *  kmem_zalloc: - allocate and zero memory
+ *  @size:	amount of memory to allocate in bytes
+ *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
+ *  @node:
+ */
+__EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
+//EXPORT_SYMBOL(kmem_zalloc_node);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -2009,6 +2044,7 @@ void inline setqsched(void)
 	if (test_and_set_bit(qrunflag, &t->flags))
 		raise_softirq(STREAMS_SOFTIRQ);
 }
+EXPORT_SYMBOL_GPL(setqsched);
 
 /**
  *  qschedule:	- schedule a queue for service
@@ -2059,6 +2095,7 @@ int enableq(queue_t *q)
 	}
 	return (0);
 }
+EXPORT_SYMBOL(enableq);
 
 /**
  *  qenable:	- schedule a queue for execution
@@ -2070,18 +2107,21 @@ void qenable(queue_t *q)
 {
 	(void) qschedule(q);
 }
+EXPORT_SYMBOL(qenable);
 
 /**
  *  enableok:	- permit scheduling of a queue service procedure
  *  @q:		queue to permit service procedure scheduling
  */
 __EXTERN_INLINE void enableok(queue_t *q);
+//EXPORT_SYMBOL(enableok);
 
 /**
  *  noenable:	- defer scheduling of a queue service procedure
  *  @q:		queue to defer service procedure scheduling
  */
 __EXTERN_INLINE void noenable(queue_t *q);
+//EXPORT_SYMBOL(noenable);
 
 /*
  *  freechains:	- free chains of message blocks

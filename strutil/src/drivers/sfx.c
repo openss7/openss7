@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/07 03:33:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/07 03:33:04 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/07 03:33:04 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
-#ifdef MODVERIONS
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
 #endif
 #include <linux/module.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strspecfs.h"		/* for strm_open() */
+#include "strspecfs.h"		/* for str_args */
 #include "strsched.h"		/* for sd_get/sd_put */
 #include "strsad.h"		/* for autopush */
 #include "sth.h"
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/06 08:44:21 $"
+#define SFX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/07 03:33:04 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"

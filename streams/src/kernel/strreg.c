@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/06 08:44:22 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/07 03:33:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/06 08:44:22 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/07 03:33:04 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/06 08:44:22 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/07 03:33:04 $";
 
 #define __NO_VERSION__
 
@@ -119,8 +119,7 @@ struct list_head cdevsw_list = LIST_HEAD_INIT(cdevsw_list);	/* Devices go here *
 struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here */
 struct list_head minors_list = LIST_HEAD_INIT(minors_list);	/* Minors go here */
 
-#if	defined CONFIG_STREAMS_NSDEV_MODULE || \
-	defined CONFIG_STREAMS_SC_MODULE
+#if	defined CONFIG_STREAMS_SC_MODULE
 EXPORT_SYMBOL_GPL(cdevsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE
@@ -674,6 +673,9 @@ struct fmodsw *fmod_str(const struct streamtab *str)
 	read_unlock(&fmodsw_lock);
 	return (fmod);
 }
+#if defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_SYMBOL_GPL(fmod_str);
+#endif
 #endif
 
 /* 
@@ -739,6 +741,7 @@ void cdrv_put(struct cdevsw *cdev)
 EXPORT_SYMBOL_GPL(cdrv_put);
 #endif
 
+#if 0
 /**
  *  fmod_get: - get a reference to a STREAMS module
  *  @modid: module id number of the STREAMS module
@@ -750,6 +753,7 @@ struct fmodsw *fmod_get(modID_t modid)
 {
 	return fmod_lookup(modid, !in_interrupt());
 }
+#endif
 
 /**
  *  fmod_put: - put a reference to a STREAMS module
@@ -761,6 +765,9 @@ void fmod_put(struct fmodsw *smod)
 	if (smod)
 		__MOD_DEC_USE_COUNT(smod->f_kmod);
 }
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(fmod_put);
+#endif
 
 /**
  *  node_get: - get a reference to a minor device node (devnode)
@@ -774,7 +781,7 @@ struct devnode *node_get(const struct cdevsw *cdev, minor_t minor)
 
 /**
  *  cdev_find: - find a STREAMS device by its name
- *  @name: the name to find
+ *  @name:	the name to find
  *
  *  Attempt to find a STREAMS device by name.  If the device cannot be found by name, attempt to
  *  load the kernel module streams-%s where %s is the name requested and check again.
@@ -793,6 +800,33 @@ EXPORT_SYMBOL_GPL(cdev_find);
 #endif
 
 /**
+ *  cdev_match: - find a STREAMS device by extended name
+ *  @name:	the name to find
+ *
+ *  Attempt to find a STREAMS device by extended name.  If the device cannot be found by extended
+ *  name, attempt to load the kernel module streams-%s where %s is the name requested and check
+ *  again.
+ *
+ *  Return Value: A pointer to the STREAMS device, with use count incremented, or %NULL if not found
+ *  and could not be loaded.
+ *
+ *  Context: When the calling context can block, an attempt will be made to load the driver by name.
+ */
+struct cdevsw *cdev_match(const char *name)
+{
+	int i;
+	char root[FMNAMESZ + 1];
+	snprintf(root, sizeof(root), "%s", name);
+	for (i = 0; i < FMNAMESZ && root[i] != '.'; i++) ;
+	root[i] = '\0';
+	return cdev_find(root);
+}
+
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
+EXPORT_SYMBOL_GPL(cdev_match);
+#endif
+
+/**
  *  fmod_find: - get a reference to a STREAMS module
  *  @name: name of the module
  *
@@ -808,6 +842,9 @@ struct fmodsw *fmod_find(const char *name)
 {
 	return fmod_search(name, !in_interrupt());
 }
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(fmod_find);
+#endif
 
 struct devnode *node_find(const struct cdevsw *cdev, const char *name)
 {
@@ -1009,6 +1046,7 @@ int register_strmod(struct fmodsw *fmod)
 	write_unlock(&fmodsw_lock);
 	return (err);
 }
+EXPORT_SYMBOL_GPL(register_strmod);
 
 /**
  *  unregister_strmod:
@@ -1022,6 +1060,7 @@ int unregister_strmod(struct fmodsw *fmod)
 	write_unlock(&fmodsw_lock);
 	return (err);
 }
+EXPORT_SYMBOL_GPL(unregister_strmod);
 
 /**
  *  register_strdrv: - register STREAMS driver
@@ -1035,6 +1074,7 @@ int register_strdrv(struct cdevsw *cdev)
 	write_unlock(&cdevsw_lock);
 	return (err);
 }
+EXPORT_SYMBOL_GPL(register_strdrv);
 
 /**
  *  unregister_strdrv:
@@ -1048,6 +1088,7 @@ int unregister_strdrv(struct cdevsw *cdev)
 	write_unlock(&cdevsw_lock);
 	return (err);
 }
+EXPORT_SYMBOL_GPL(unregister_strdrv);
 
 /**
  *  register_cmajor: - register a character device inode
@@ -1076,6 +1117,7 @@ int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *
 	write_unlock(&cdevsw_lock);
 	return (ret);
 }
+EXPORT_SYMBOL_GPL(register_cmajor);
 
 /**
  *  unregister_cmajor: - unregister a special device inode
@@ -1102,6 +1144,7 @@ int unregister_cmajor(struct cdevsw *cdev, major_t major)
 	write_unlock(&cdevsw_lock);
 	return (ret);
 }
+EXPORT_SYMBOL_GPL(unregister_cmajor);
 
 /**
  *  getmid: - get the module identifier associated with a module name
@@ -1130,6 +1173,7 @@ modID_t getmid(const char *name)
 	}
 	return (modid);
 }
+EXPORT_SYMBOL(getmid);
 
 /**
  *  getadmin: - get the administrative function associated with a module identifier
@@ -1158,6 +1202,7 @@ qi_qadmin_t getadmin(modID_t modid)
 	}
 	return (qadmin);
 }
+EXPORT_SYMBOL(getadmin);
 
 /**
  *  strreg_init: - initialize the registeration module

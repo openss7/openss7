@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #ifdef CONFIG_KMOD
 #include <linux/kmod.h>
 #endif
@@ -75,13 +79,13 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strspecfs.h"
+#include "strspecfs.h"	    /* for strm_open() and str_args */
 #include "strreg.h"
 #include "sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -141,62 +145,40 @@ static struct streamtab nsdev_info = {
 	st_wrinit:&nsdev_winit,
 };
 
-/* 
- *  NSDEVOPEN
- *  -------------------------------------------------------------------------
- *  This is rather simple.  We are going to do a redirected open on the a new
- *  device with the major device number mapped according to name.  We do this
- *  by nesting another strm_open() inside the first one with an adjusted
- *  device number. It helps that the orginal file and dentry pointer is stored
- *  with the args passed as fsdata attached to the dentry.  We use this to
- *  find the original file pointer and dentry and get the name of the opened
- *  file.
+/**
+ *  nsdevopen:	- open the named streams device
+ *  @inode:	shadow special filesystem inode to open
+ *  @file:	shadow special filesystem file pointer to open
  *
- *  If we don't find a reasonable match and kmod is equipped, we try to load
- *  the module with 'streams-' prefixed to the name and run through the list
- *  again.
+ *  This is rather simple.  We are going to do a redirected open on the a new device with the major
+ *  device number mapped according to name.  We do this by nesting another strm_open() inside the
+ *  first one with an adjusted device number. It helps that the orginal file pointer is stored with
+ *  the args passed as private_data attached to the current file pointer.  We use this to find the
+ *  original file pointer and dentry and get the name of the opened file.
+ *
+ *  If we don't find a reasonable match and kmod is equipped, we try to load the module with
+ *  'streams-' prefixed to the name and run through the list again.  We could also generate the
+ *  request from the path to the original dentry.
  */
 static int nsdevopen(struct inode *inode, struct file *file)
 {
-	struct str_args *argp = file->f_dentry->d_fsdata;
-	struct dentry *dentry = argp->file->f_dentry;	/* original file dentry */
-	struct qstr *name = &dentry->d_name;
-	int retry = 0;
-	do {
-		int i, len_max = 0;
-		const struct cdevsw *cdev, *cdev_max = NULL;
-		struct list_head *pos;
-		read_lock(&cdevsw_lock);
-		/* do a name search looking for the device */
-		list_for_each(pos, &cdevsw_list) {
-			cdev = list_entry(pos, struct cdevsw, d_list);
-			for (i = 0; i < name->len && i < FMNAMESZ + 1; i++)
-				if (cdev->d_name[i] != name->name[i])
-					break;
-			if (i > len_max) {
-				len_max = i;
-				cdev_max = cdev;
-			}
-		}
-		read_unlock(&cdevsw_lock);
-		/* aww come on ... at least 3 char match */
-		if (cdev_max && (len_max == name->len || len_max > 2)) {
-			argp->dev = makedevice(cdev_max->d_str->st_rdinit->qi_minfo->mi_idnum,
-					       getminor(argp->dev));
-			argp->sflag = DRVOPEN;	/* this is a directed open */
-			return strm_open(inode, file, xchg(&file->f_dentry->d_fsdata, NULL));
-		}
-#ifdef CONFIG_KMOD
-		{
-			char buf[FMNAMESZ + 10];
-			snprintf(buf, FMNAMESZ + 10, "streams-%s", name->name);
-			request_module(buf);
-			continue;
-		}
-#endif
-		break;
-	} while (!retry++);
-	return (-ENOENT);	/* sounds good */
+	struct str_args *argp;
+	struct cdevsw *cdev;
+	if (!(argp = file->private_data))
+		return (-EIO);
+	if (!(cdev = cdev_match(argp->file->f_dentry->d_name.name)))
+		return (-ENOENT);
+	// argp->inode = argp->inode;
+	// argp->file = argp->file;
+	argp->dev = makedevice(cdev->d_str->st_rdinit->qi_minfo->mi_idnum, getminor(argp->dev));
+	argp->name.name = file->f_dentry->d_name.name;
+	argp->name.len = file->f_dentry->d_name.len;
+	argp->name.hash = file->f_dentry->d_name.hash;
+	// argp->oflag = argp->oflag;
+	// argp->sflag = argp->sflag;
+	// argp->crp = argp->crp;
+	cdev_put(cdev);
+	return strm_open(inode, file, argp);
 }
 
 struct file_operations nsdev_f_ops ____cacheline_aligned = {
@@ -212,29 +194,11 @@ struct file_operations nsdev_f_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-static int open_nsdev(struct inode *inode, struct file *file)
-{
-	struct str_args args = {
-		file:file,
-		oflag:make_oflag(file),
-		crp:current_creds,
-		name:{args.buf, 0, 0},
-	};
-	args.dev = makedevice(major, 0);
-	args.sflag = CLONEOPEN;
-	file->f_op = &nsdev_f_ops;
-	return strm_open(inode, file, &args);
-}
-
-static struct file_operations nsdev_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:open_nsdev,
-};
-
 static struct cdevsw nsdev_cdev = {
 	d_name:CONFIG_STREAMS_NSDEV_NAME,
 	d_str:&nsdev_info,
-	d_fop:&nsdev_ops,
+	d_flag:0,
+	d_fop:&nsdev_f_ops,
 	d_mode:S_IFCHR,
 	d_kmod:THIS_MODULE,
 };
@@ -247,20 +211,15 @@ static int __init nsdev_init(void)
 #else
 	printk(KERN_INFO NSDEV_SPLASH);
 #endif
-	if ((err = register_strdrv(&nsdev_cdev)) < 0)
+	if ((err = register_strdev(&nsdev_cdev, major)) < 0)
 		return (err);
-	if ((err = register_cmajor(&nsdev_cdev, major, &nsdev_ops)) < 0) {
-		unregister_strdrv(&nsdev_cdev);
-		return (err);
-	}
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 };
 static void __exit nsdev_exit(void)
 {
-	unregister_cmajor(&nsdev_cdev, 0);
-	unregister_strdrv(&nsdev_cdev);
+	unregister_strdev(&nsdev_cdev, 0);
 };
 
 #ifdef CONFIG_STREAMS_NSDEV_MODULE

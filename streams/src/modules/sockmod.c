@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -79,7 +82,7 @@ static char const ident[] =
 
 #define SOCKMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/06 08:44:23 $"
+#define SOCKMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/07 03:33:05 $"
 #define SOCKMOD_DEVICE		"SVR 4.2 Socket Library Module for TLI Devices"
 #define SOCKMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKMOD_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/07 03:33:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:23 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/07 03:33:05 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/07 03:33:05 $";
 
 //#define __NO_VERSION__
 
@@ -92,11 +92,11 @@ static char const ident[] =
 #include "strsad.h"		/* for autopush */
 #include "strutil.h"		/* for q locking and puts and gets */
 #include "strattach.h"		/* for do_fattach/do_fdetach/do_spipe */
-#include "strspecfs.h"		/* for strm_open() */
+#include "strspecfs.h"		/* for strm_open() and str_args */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/06 08:44:23 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/07 03:33:05 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3395,27 +3395,6 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
-
-#if 0
-static int open_strm(struct inode *inode, struct file *file)
-{
-	struct str_args args = {
-		file:file,
-		dev:kdev_t_to_nr(inode->i_rdev),
-		oflag:make_oflag(file),
-		sflag:DRVOPEN,
-		crp:current_creds,
-		name:{args.buf, 0, 0},
-	};
-	file->f_op = &strm_f_ops;	/* fops_get already done */
-	return strm_open(inode, file, &args);
-}
-
-static struct file_operations strm_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
-	open:open_strm,
-};
-#endif
 
 /* 
  *  -------------------------------------------------------------------------

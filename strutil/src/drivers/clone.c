@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
 
 #ifndef __GENKSYMS__
 #include <sys/modversions.h>
@@ -72,12 +75,12 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strspecfs.h"		/* for strm_open() and str_args */
+#include "strspecfs.h"		/* for str_args */
 #include "sth.h"		/* for make_oflags */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:03 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -150,32 +153,23 @@ static struct streamtab clone_info = {
  */
 static int cloneopen(struct inode *inode, struct file *file)
 {
+	struct str_args *argp;
 	struct cdevsw *cdev;
-	// major_t major = (inode->i_ino >> sizeof(minor_t) * 8);
-	minor_t minor = (inode->i_ino & ((1 << sizeof(minor_t) * 8) - 1));
-	struct str_args args = {
-		file:file,
-		dev:inode->i_ino,
-		oflag:make_oflag(file),
-		sflag:CLONEOPEN,
-		crp:current_creds,
-		name:{args.buf, 0, 0},
-	};
-	int err;
-	void *fsdata;
-	err = -ENXIO;
-	if (!(cdev = (struct cdevsw *) fmod_get(minor)))	/* FIXME */
-		goto error;
-	err = -EIO;
-	if (!cdev->d_fop || !cdev->d_fop->open)
-		goto put_error;
-	fsdata = xchg(&file->f_dentry->d_fsdata, &args);
-	err = (*cdev->d_fop->open) (inode, file);
-	file->f_dentry->d_fsdata = fsdata;
-      put_error:
+	if (!(argp = file->private_data))
+		return (-EIO);
+	if (!(cdev = cdev_get(getminor(inode->i_ino))))
+		return (-ENOENT);
+	// argp->inode = argp->inode;
+	// argp->file = argp->file;
+	argp->dev = makedevice(cdev->d_str->st_rdinit->qi_minfo->mi_idnum, 0);
+	argp->name.name = file->f_dentry->d_name.name;
+	argp->name.len = file->f_dentry->d_name.len;
+	argp->name.hash = file->f_dentry->d_name.hash;
+	// argp->oflag = argp->oflag;
+	argp->sflag = CLONEOPEN;
+	// argp->crp = argp->crp;
 	cdev_put(cdev);
-      error:
-	return (err);
+	return strm_open(inode, file, argp);
 }
 
 struct file_operations clone_f_ops ____cacheline_aligned = {

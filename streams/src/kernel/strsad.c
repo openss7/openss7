@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:22 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:22 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:22 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/06 08:44:22 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/07 03:33:04 $";
 
 #define __NO_VERSION__
 
@@ -239,6 +239,7 @@ int autopush_vml(struct str_mlist *smp, int nmods)
 EXPORT_SYMBOL_GPL(autopush_vml);
 #endif
 
+#if defined CONFIG_STREAMS_COMPAT_LIS || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 int apush_set(struct strapush *sap)
 {
 	if (sap != NULL) {
@@ -253,7 +254,12 @@ int apush_set(struct strapush *sap)
 	}
 	return (-EINVAL);
 }
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(apush_set);
+#endif
+#endif
 
+#if defined CONFIG_STREAMS_COMPAT_LIS || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 int apush_get(struct strapush *sap)
 {
 	struct strapush *ap;
@@ -276,11 +282,20 @@ int apush_get(struct strapush *sap)
       enodev:
 	return (-ENODEV);
 }
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(apush_get);	/* strconf.h  LiS specific */
+#endif
+#endif
 
+#if defined CONFIG_STREAMS_COMPAT_LIS || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 int apush_vml(struct str_list *slp)
 {
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
 }
+#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SYMBOL_GPL(apush_vml);
+#endif
+#endif
 
 /**
  *  autopush: - perform autopush operations on a newly opened stream

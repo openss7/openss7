@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/06 08:44:21 $ by $Author: brian $
+ Last Modified $Date: 2004/05/07 03:33:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
+#ifdef MODVERSIONS
 #include <linux/modversions.h>
+#endif
 #include <linux/module.h>
+#include <linux/modversions.h>
+
 #include <linux/smp_lock.h>
 #include <linux/slab.h>
 
@@ -81,7 +85,7 @@ static char const ident[] =
 
 #define XNET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XNET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/06 08:44:21 $"
+#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/07 03:33:04 $"
 #define XNET_DEVICE	"SVR 4.2 Sockets Library NET4 Support"
 #define XNET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XNET_LICENSE	"GPL"

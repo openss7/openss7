@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/05/05 23:10:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2004/05/07 07:18:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/05 23:10:08 $ by $Author: brian $
+# Last Modified $Date: 2004/05/07 07:18:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,9 +104,9 @@ libLfSkernel_a_SOURCES		= \
 				src/kernel/strsched.h \
 				src/kernel/strspecfs.c \
 				src/kernel/strspecfs.h \
-				src/kernel/strsyms.c \
 				src/kernel/strsysctl.c \
 				src/kernel/strsysctl.h \
+				src/kernel/strsyms.c \
 				src/kernel/strutil.c \
 				src/kernel/strutil.h \
 				src/kernel/strreg.c \
@@ -412,6 +412,8 @@ EXPORT_SRCFILES = \
 	src/kernel/strsad.c \
 	src/kernel/strsched.c \
 	src/kernel/strspecfs.c \
+	src/kernel/strsysctl.c \
+	src/kernel/strutil.c \
 	src/kernel/strsyms.c \
 	src/modules/sth.c
 
@@ -428,6 +430,8 @@ EXPORT_VERFILES = \
 	include/sys/versions/strsad.ver \
 	include/sys/versions/strsched.ver \
 	include/sys/versions/strspecfs.ver \
+	include/sys/versions/strsysctl.ver \
+	include/sys/versions/strutil.ver \
 	include/sys/versions/strsyms.ver \
 	include/sys/versions/sth.ver
 
