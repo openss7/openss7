@@ -31,7 +31,7 @@
 #ifndef _USER_CMN_H
 #define	_USER_CMN_H		1
 
-#ident "@(#) LiS user-cmn.h 2.10 11/19/02 21:18:18 "
+#ident "@(#) LiS user-cmn.h 2.11 09/02/04 14:11:57 "
 
 #include <string.h>
 #ifndef SYS_LISLOCKS_H
@@ -70,6 +70,7 @@ typedef struct u_file
     struct u_file	*f_link ;		/* in case of linked list */
     char		*f_name ;		/* file name */
     int			 f_flags ;		/* file open flags */
+    int			 f_mode ;		/* file rd/wr mode */
     int			 f_count ;		/* reference count */
     int			 f_fdnr ;		/* file number */
     struct inode	*f_inode ;		/* inode of file */

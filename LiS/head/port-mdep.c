@@ -31,7 +31,7 @@
  * 
  */
 
-#ident "@(#) LiS port-mdep.c 2.16 11/23/03 19:58:44 "
+#ident "@(#) LiS port-mdep.c 2.20 09/02/04 14:11:17 "
 
 #include <sys/stream.h>
 #include <sys/LiS/errmsg.h>
@@ -45,6 +45,7 @@ extern file_t	*user_file_of_fd(int fd) ;
 extern int  user_sendfd(struct stdata *, unsigned int, struct file *);
 extern int  user_recvfd(struct stdata *, struct strrecvfd *,struct file *);
 extern void user_free_passfp(mblk_t *);
+extern void user_new_stream_name(struct stdata *hd, struct file *f);
 
 #define _return(e) return ((e)<0?-(errno=-(e)):(e))
 
@@ -324,6 +325,36 @@ lis_untmout(struct timer_list *tl)
     port_del_timer(tl);
 }
 
+/*
+ * Initialization and allocation of timers
+ */
+
+int lis_timer_size ;
+
+void lis_init_timers(int size)
+{
+    lis_timer_size = size ;
+}
+
+void lis_terminate_timers(void)
+{
+}
+
+void *lis_alloc_timer(char *file, int line)
+{
+    void        *t ;
+
+    t = LISALLOC(lis_timer_size,file, line) ;
+    return(t) ;
+}
+
+void *lis_free_timer(void *timerp)
+{
+    FREE(timerp) ;
+    return(NULL) ;
+}
+
+
 /************************************************************************
 *                            port_time_till                             *
 *************************************************************************
@@ -398,6 +429,14 @@ void port_put_inode( struct inode *i )
 	i->i_str = NULL;
 	lis_mark_mem(i, "unused inode: ", major(i->i_dev));
     }
+}
+
+/*
+ * port_is_stream_inode
+ */
+int port_is_stream_inode(struct inode *i)
+{
+    return(1) ;
 }
 
 /*
@@ -522,6 +561,7 @@ void port_cleanup_file_closing(struct file *f, stdata_t *head)
 
 void port_new_stream_name(struct stdata *hd, struct file *f)
 {
+    user_new_stream_name(hd, f) ;
 }
 
 void
@@ -605,4 +645,5 @@ void	lis_creds_to_task(lis_kcreds_t *cp)
 {
     (void) cp ;
 }
+
 

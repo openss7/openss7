@@ -30,7 +30,10 @@
  * 
  */
 
-#ident "@(#) LiS user-mdep.c 2.7 5/30/03 21:40:40 "
+#ident "@(#) LiS user-mdep.c 2.12 09/02/04 14:10:52 "
+
+void lis_modget_dbg(const char *file, int line, const char *fn) ;
+void lis_modput_dbg(const char *file, int line, const char *fn) ;
 
 #include "port-mdep.c"
 
@@ -112,6 +115,10 @@ int user_get_pipe( struct file **f0, struct file **f1 )
     hd1 = FILE_STR(*f1);  wq1 = hd1->sd_wq;
     hd0->sd_peer = hd1;
     hd1->sd_peer = hd0;
+    lis_head_get(hd0) ;			/* balanced in lis_qdetach */
+    lis_head_get(hd1) ;
+    if (LIS_DEBUG_OPEN)
+	printk("lis_get_pipe: hd0:%s hd1:%s\n", hd0->sd_name, hd1->sd_name) ;
 
     /*
      *  twist the write queues to point to the peers' read queues
@@ -144,6 +151,8 @@ int user_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
     if (!sendhd ||
 	!(sendhd->magic == STDATA_MAGIC) ||
 	!(recvhd = sendhd->sd_peer) ||
+	!(recvhd->magic == STDATA_MAGIC) ||
+	recvhd == sendhd ||
 	F_ISSET(sendhd->sd_flag, STRHUP))
 	goto not_fifo;
 
@@ -263,7 +272,7 @@ int user_recvfd( stdata_t *recvhd, strrecvfd_t *recv, struct file *fp )
  *  handle failures
  */
 not_passfp:
-    putbq( recvhd->sd_rq, mp );   /* put the message back */
+    putbqf( recvhd->sd_rq, mp );   /* put the message back */
 no_msg:
 not_stream:
     return error;
@@ -294,4 +303,45 @@ void user_free_passfp( mblk_t *mp )
 
 not_passfp:
     lis_freemsg(mp);
+}
+
+void user_new_stream_name(struct stdata *hd, struct file *f)
+{
+    if (f->f_name)
+	strncpy(hd->sd_name, f->f_name, sizeof(hd->sd_name)) ;
+}
+
+/************************************************************************
+*                        Module Counters                                *
+*************************************************************************
+*									*
+* This is just a simulation of module use counters.			*
+*									*
+************************************************************************/
+
+static long	lis_mod_cnt ;
+
+void lis_modget_dbg(const char *file, int line, const char *fn)
+{
+    if (LIS_DEBUG_REFCNTS)
+	printk("lis_modget() <\"%s\"/%ld>++ {%s@%d,%s()}\n",
+	       "LiS", lis_mod_cnt, file, line, fn) ;
+
+    lis_mod_cnt++ ;
+}
+
+void lis_modput_dbg(const char *file, int line, const char *fn)
+{
+    if (LIS_DEBUG_REFCNTS)
+	printk("lis_modput() --<\"%s\"/%ld> {%s@%d,%s()}\n",
+	       "LiS", lis_mod_cnt, file, line, fn) ;
+
+    if (lis_mod_cnt <= 0)
+    {
+	printk("lis_modput() >> error -- count=%ld {%s@%d,%s()}\n",
+	       lis_mod_cnt, file, line, fn) ;
+	return ;
+    }
+
+    lis_mod_cnt-- ;
 }

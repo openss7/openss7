@@ -55,7 +55,7 @@
 #ifndef _PORT_MDEP_H
 #define _PORT_MDEP_H 1
 
-#ident "@(#) LiS port-mdep.h 2.21 12/15/02 18:10:28 "
+#ident "@(#) LiS port-mdep.h 2.25 09/02/04 14:12:22 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -154,7 +154,7 @@ struct stdata		 *port_fd_to_str(int fd) ;
 
 /* should well-define this...
  */
-#define ASSERT(e)		assert(e)
+#define LISASSERT(e)		assert(e)
 
 /* disable/enable interrupts
  */
@@ -169,9 +169,9 @@ void	port_print_spl_track(void) ;
 #define	lis_hitime()	0	/* no such routine here */
 #endif
 
-void	port_splstr(int *save_state) ;
-void	port_splx(int *saved_state) ;
-void	port_spl0(int *save_state) ;
+void	port_splstr(lis_flags_t *save_state) ;
+void	port_splx(lis_flags_t *saved_state) ;
+void	port_spl0(lis_flags_t *save_state) ;
 
 
 /* lock inodes...
@@ -185,6 +185,7 @@ void	port_spl0(int *save_state) ;
 #define lis_grab_inode          port_grab_inode
 #define lis_put_inode           port_put_inode
 #define	lis_new_inode	        port_new_inode
+#define	lis_is_stream_inode	port_is_stream_inode
 #define lis_old_inode           port_old_inode
 #define lis_show_inode_aliases  port_show_inode_aliases
 #define lis_set_up_inode        port_set_up_inode
@@ -195,6 +196,7 @@ void	port_spl0(int *save_state) ;
 
 extern struct inode *port_grab_inode(struct inode *);
 extern void 	     port_put_inode(struct inode *);
+extern int 	     port_is_stream_inode(struct inode *);
 extern struct inode *port_new_inode(struct file *, dev_t);
 extern struct inode *port_old_inode(struct file *,struct inode *);
 extern void 	     port_show_inode_aliases(struct inode *);
@@ -408,8 +410,10 @@ extern void port_select_wakeup(struct stdata *hd) ;
 /*
  * Dummies for module count manipulations.  Used only in Linux kernel.
  */
+#if 0				/* replaced by MODGET/PUT */
 #define lis_inc_mod_cnt() 	/* nothing at all */
 #define lis_dec_mod_cnt() 	/* nothing at all */
+#endif
 
 /*  -------------------------------------------------------------------  */
 
