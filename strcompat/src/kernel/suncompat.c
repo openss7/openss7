@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/25 13:11:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
+ Last Modified $Date: 2005/02/25 13:11:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/25 13:11:39 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/25 13:11:39 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -125,7 +125,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/25 13:11:39 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -479,13 +479,13 @@ extern int ddi_unmap_regs(void);
 struct mod_ops mod_strmops = { MODREV_1, 0, };
 EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
-__SUN_EXTERN_INLINE int nodev();
+__SUN_EXTERN_INLINE int nodev(void);
 EXPORT_SYMBOL(nodev);		/* strconf.h */
-__SUN_EXTERN_INLINE int nulldev();
+__SUN_EXTERN_INLINE int nulldev(void);
 EXPORT_SYMBOL(nulldev);		/* strconf.h */
-__SUN_EXTERN_INLINE int nochpoll();
+__SUN_EXTERN_INLINE int nochpoll(void);
 EXPORT_SYMBOL(nochpoll);	/* strconf.h */
-__SUN_EXTERN_INLINE int ddi_prop_op();
+__SUN_EXTERN_INLINE int ddi_prop_op(void);
 EXPORT_SYMBOL(ddi_prop_op);
 
 int mod_install(struct modlinkage *ml)

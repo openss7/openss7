@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.2 2005/02/25 13:11:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/02/25 13:11:38 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/25 13:11:38 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -214,24 +214,24 @@ struct cb_ops {
 };
 #else
 struct cb_ops {
-	int (*cb_open) ();
-	int (*cb_close) ();
-	int (*cb_strategy) ();
-	int (*cb_print) ();
-	int (*cb_dump) ();
-	int (*cb_read) ();
-	int (*cb_write) ();
-	int (*cb_ioctl) ();
-	int (*cb_devmap) ();
-	int (*cb_mmap) ();
-	int (*cb_segmap) ();
-	int (*cb_chpoll) ();
-	int (*cb_prop_op) ();
+	int (*cb_open) (void);
+	int (*cb_close) (void);
+	int (*cb_strategy) (void);
+	int (*cb_print) (void);
+	int (*cb_dump) (void);
+	int (*cb_read) (void);
+	int (*cb_write) (void);
+	int (*cb_ioctl) (void);
+	int (*cb_devmap) (void);
+	int (*cb_mmap) (void);
+	int (*cb_segmap) (void);
+	int (*cb_chpoll) (void);
+	int (*cb_prop_op) (void);
 	struct streamtab *cb_str;	/* streams information */
 	int cb_flag;
 	int cb_rev;
-	int (*cb_aread) ();
-	int (*cb_awrite) ();
+	int (*cb_aread) (void);
+	int (*cb_awrite) (void);
 };
 #endif
 
@@ -286,19 +286,19 @@ struct dev_ops {
 	int (*devo_power) (dev_info_t * dip, int component, int level);
 };
 
-__SUN_EXTERN_INLINE int nodev()
+__SUN_EXTERN_INLINE int nodev(void)
 {
 	return (ENXIO);
 }
-__SUN_EXTERN_INLINE int nulldev()
+__SUN_EXTERN_INLINE int nulldev(void)
 {
 	return (0);
 }
-__SUN_EXTERN_INLINE int nochpoll()
+__SUN_EXTERN_INLINE int nochpoll(void)
 {
 	return (ENXIO);
 }
-__SUN_EXTERN_INLINE int ddi_prop_op()
+__SUN_EXTERN_INLINE int ddi_prop_op(void)
 {
 	return (0);
 }
