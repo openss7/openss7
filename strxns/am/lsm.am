@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/23 01:56:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -58,6 +58,7 @@ EXTRA_DIST		+= $(PACKAGE)-$(VERSION).lsm
 ALL_LOCAL		+= $(PACKAGE)-$(VERSION).lsm
 CLEANFILES		+= $(PACKAGE)-$(VERSION).lsm
 DISTCLEANFILES		+= $(PACKAGE_TARNAME).lsm
+RELEASECLEANFILES	+= $(PACKAGE)-$(VERSION).lsm
 MAINTAINERCLEANFILES	+= \
 			$(srcdir)/$(PACKAGE)-$(VERSION).lsm \
 			$(srcdir)/$(PACKAGE_TARNAME).lsm

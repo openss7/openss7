@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/20 14:09:25 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/23 01:57:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 14:09:25 $ by $Author: brian $
+# Last Modified $Date: 2005/02/23 01:57:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -276,6 +276,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist build vendor], [dist_cv_build_vendor], [dnl
 	dist_cv_build_vendor=$(dist_get_vendor "${dist_cv_build_flavor:-unknown}")
+	if test -z "$dist_cv_build_vendor" ; then dist_cv_build_vendor=$build_vendor ; fi
     ])
     AC_CACHE_CHECK([for dist build release], [dist_cv_build_release], [dnl
 	if test ":${dist_cv_build_rel_file:-no}" != :no ; then
@@ -344,8 +345,9 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    dist_cv_build_cpu=$(dist_get_cpu "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	# cannot get the cpu from the compiler
+	if test -z "$dist_cv_build_cpu" ; then dist_cv_build_cpu=$build_cpu ; fi
     ])
-    AC_CACHE_CHECK([for dist target lsb release file], [dist_cv_target_lsb_file], [dnl
+    AC_CACHE_CHECK([for dist host lsb release file], [dist_cv_host_lsb_file], [dnl
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/lsb-release\""
 	dist_search_path=$(echo "$dist_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g')
@@ -353,15 +355,15 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	do
 	    if test -f "$dist_file"
 	    then
-		dist_cv_target_lsb_file="$dist_file"
+		dist_cv_host_lsb_file="$dist_file"
 		break
 	    fi
 	done
-	if test -z "$dist_cv_target_lsb_file" ; then
-	    dist_cv_target_lsb_file='no'
+	if test -z "$dist_cv_host_lsb_file" ; then
+	    dist_cv_host_lsb_file='no'
 	fi
     ])
-    AC_CACHE_CHECK([for dist target release file], [dist_cv_target_rel_file], [dnl
+    AC_CACHE_CHECK([for dist host release file], [dist_cv_host_rel_file], [dnl
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/whitebox-release
 	    ${DESTDIR}${sysconfdir}/fedora-release
@@ -374,15 +376,15 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	do
 	    if test -f "$dist_file"
 	    then
-		dist_cv_target_rel_file="$dist_file"
+		dist_cv_host_rel_file="$dist_file"
 		break
 	    fi
 	done
-	if test -z "$dist_cv_target_rel_file" ; then
-	    dist_cv_target_rel_file='no'
+	if test -z "$dist_cv_host_rel_file" ; then
+	    dist_cv_host_rel_file='no'
 	fi
     ])
-    AC_CACHE_CHECK([for dist target issue file], [dist_cv_target_issue_file], [dnl
+    AC_CACHE_CHECK([for dist host issue file], [dist_cv_host_issue_file], [dnl
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/issue
 	    ${DESTDIR}${sysconfdir}/issue.net\""
@@ -391,28 +393,28 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	do
 	    if test -f "$dist_file"
 	    then
-		dist_cv_target_issue_file="$dist_file"
+		dist_cv_host_issue_file="$dist_file"
 		break
 	    fi
 	done
-	if test -z "$dist_cv_target_issue_file" ; then
-	    dist_cv_target_issue_file='no'
+	if test -z "$dist_cv_host_issue_file" ; then
+	    dist_cv_host_issue_file='no'
 	fi
     ])
     AC_REQUIRE([_DISTRO_FUNCTIONS])
-    AC_CACHE_CHECK([for dist target flavor], [dist_cv_target_flavor], [dnl
-	if test ":${dist_cv_target_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_target_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
-		dist_cv_target_flavor='debian'
+    AC_CACHE_CHECK([for dist host flavor], [dist_cv_host_flavor], [dnl
+	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
+		dist_cv_host_flavor='debian'
 	    else
-		dist_cv_target_flavor=$(dist_get_flavor "$(cat $dist_cv_target_rel_file)")
+		dist_cv_host_flavor=$(dist_get_flavor "$(cat $dist_cv_host_rel_file)")
 	    fi
 	fi
-	if test -z "$dist_cv_target_flavor" -a ":${dist_cv_target_lsb_file:-no}" != :no ; then
-	    . "$dist_cv_target_lsb_file"
-	    dist_cv_target_flavor=$(dist_get_flavor "${DISTRIB_DESCRIPTION:-unknown}")
-	    if test -z "$dist_cv_target_flavor" ; then
-		dist_cv_target_flavor=$(echo "$DISTRIB_ID" | tr [[:upper:]] [[:lower:]] | sed -e 's|[[[:space:]]]*||g;s|linux||g')
+	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
+	    . "$dist_cv_host_lsb_file"
+	    dist_cv_host_flavor=$(dist_get_flavor "${DISTRIB_DESCRIPTION:-unknown}")
+	    if test -z "$dist_cv_host_flavor" ; then
+		dist_cv_host_flavor=$(echo "$DISTRIB_ID" | tr [[:upper:]] [[:lower:]] | sed -e 's|[[[:space:]]]*||g;s|linux||g')
 	    fi
 	    unset LSB_RELEASE
 	    unset DISTRIB_ID
@@ -421,21 +423,21 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
-	if test -z "$dist_cv_target_flavor" -a ":${dist_cv_target_issue_file:-no}" != :no ; then
-	    dist_cv_target_flavor=$(dist_get_flavor "$(cat $dist_cv_target_issue_file | grep 'Linux\|Fedora' | head -1)")
+	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
+	    dist_cv_host_flavor=$(dist_get_flavor "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
-	# cannot get target flavor using build system compiler
+	# cannot get host flavor using build system compiler
     ])
-    AC_CACHE_CHECK([for dist target vendor], [dist_cv_target_vendor], [dnl
-	dist_cv_target_vendor=$(dist_get_vendor "${dist_cv_target_flavor:-unknown}")
+    AC_CACHE_CHECK([for dist host vendor], [dist_cv_host_vendor], [dnl
+	dist_cv_host_vendor=$(dist_get_vendor "${dist_cv_host_flavor:-unknown}")
     ])
-    AC_CACHE_CHECK([for dist target release], [dist_cv_target_release], [dnl
-	if test ":${dist_cv_target_rel_file:-no}" != :no ; then
-	    dist_cv_target_release=$(dist_get_release "$(cat $dist_cv_target_rel_file)")
+    AC_CACHE_CHECK([for dist host release], [dist_cv_host_release], [dnl
+	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_rel_file)")
 	fi
-	if test -z "$dist_cv_target_release" -a ":${dist_cv_target_lsb_file:-no}" != :no ; then
-	    . "$dist_cv_target_lsb_file"
-	    dist_cv_target_release=$(dist_get_release "$DISTRIB_RELEASE")
+	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
+	    . "$dist_cv_host_lsb_file"
+	    dist_cv_host_release=$(dist_get_release "$DISTRIB_RELEASE")
 	    unset LSB_RELEASE
 	    unset DISTRIB_ID
 	    unset DISTRIB_VENDOR
@@ -443,26 +445,27 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
-	if test -z "$dist_cv_target_release" -a ":${dist_cv_target_issue_file:-no}" != :no ; then
-	    dist_cv_target_release=$(dist_get_release "$(cat $dist_cv_target_issue_file | grep 'Linux\|Fedora' | head -1)")
+	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
+	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
-	# cannot get target release using build system compiler
+	# cannot get host release using build system compiler
+	if test -z "$dist_cv_host_vendor" ; then dist_cv_host_vendor=$host_vendor ; fi
     ])
-    AC_CACHE_CHECK([for dist target distrib], [dist_cv_target_distrib], [dnl
-	dist_cv_target_distrib=$(dist_get_distrib "$dist_cv_target_flavor")
+    AC_CACHE_CHECK([for dist host distrib], [dist_cv_host_distrib], [dnl
+	dist_cv_host_distrib=$(dist_get_distrib "$dist_cv_host_flavor")
     ])
-    AC_CACHE_CHECK([for dist target codename], [dist_cv_target_codename], [dnl
-	if test ":${dist_cv_target_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_target_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
-		dist_cv_target_codename=$(dist_get_codename "$(cat $dist_cv_target_rel_file)")
+    AC_CACHE_CHECK([for dist host codename], [dist_cv_host_codename], [dnl
+	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
+		dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_rel_file)")
 	    else
 		# for now ...
-		dist_cv_target_codename='Woody'
+		dist_cv_host_codename='Woody'
 	    fi
 	fi
-	if test -z "$dist_cv_target_codename" -a ":${dist_cv_target_lsb_file:-no}" != :no ; then
-	    . "$dist_cv_target_lsb_file"
-	    dist_cv_target_codename=$(dist_get_codename "(${DISTRIB_CODENAME})")
+	if test -z "$dist_cv_host_codename" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
+	    . "$dist_cv_host_lsb_file"
+	    dist_cv_host_codename=$(dist_get_codename "(${DISTRIB_CODENAME})")
 	    unset LSB_RELEASE
 	    unset DISTRIB_ID
 	    unset DISTRIB_VENDOR
@@ -470,31 +473,32 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
-	if test -z "$dist_cv_target_codename" -a ":${dist_cv_target_issue_file:-no}" != :no ; then
-	    dist_cv_target_codename=$(dist_get_codename "$(cat $dist_cv_target_issue_file | grep 'Linux\|Fedora' | head -1)")
+	if test -z "$dist_cv_host_codename" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
+	    dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	# cannot get the codename from the compiler
     ])
-    AC_CACHE_CHECK([for dist target cpu], [dist_cv_target_cpu], [dnl
-	if test ":${dist_cv_target_rel_file:-no}" != :no ; then
-	    if test `echo "$dist_cv_target_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
-		dist_cv_target_cpu=$(dist_get_cpu "$(cat $dist_cv_target_rel_file)")
+    AC_CACHE_CHECK([for dist host cpu], [dist_cv_host_cpu], [dnl
+	if test ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
+		dist_cv_host_cpu=$(dist_get_cpu "$(cat $dist_cv_host_rel_file)")
 	    else
 		if test :${DEB_HOST_ARCH+set} = :set ; then
-		    dist_cv_target_cpu="$DEB_HOST_ARCH"
+		    dist_cv_host_cpu="$DEB_HOST_ARCH"
 		elif test -x /usr/bin/dpkg-architecture ; then
-		    dist_tmp=`echo "$target_os" | sed -e 's|-gnu||'`
-		    eval "`/usr/bin/dpkg-architecture -a${target_cpu} -t${target_cpu}-${dist_tmp} -f`"
-		    dist_cv_target_cpu="$DEB_HOST_ARCH"
+		    dist_tmp=`echo "$host_os" | sed -e 's|-gnu||'`
+		    eval "`/usr/bin/dpkg-architecture -a${host_cpu} -t${host_cpu}-${dist_tmp} -f`"
+		    dist_cv_host_cpu="$DEB_HOST_ARCH"
 		    eval "`/usr/bin/dpkg-architecture -u`"
 		fi
 	    fi
 	fi
 	# cannot get the cpu from lsb
-	if test -z "$dist_cv_target_cpu" -a ":${dist_cv_target_issue_file:-no}" != :no ; then
-	    dist_cv_target_cpu=$(dist_get_cpu "$(cat $dist_cv_target_issue_file | grep 'Linux\|Fedora' | head -1)")
+	if test -z "$dist_cv_host_cpu" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
+	    dist_cv_host_cpu=$(dist_get_cpu "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	# cannot get the cpu from the compiler
+	if test -z "$dist_cv_host_cpu" ; then dist_cv_host_cpu=$host_cpu ; fi
     ])
 ])# _DISTRO_SETUP
 # =============================================================================
@@ -505,110 +509,49 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 AC_DEFUN([_DISTRO_OUTPUT], [dnl
 # now we adjust the cannonical names
     AC_MSG_CHECKING([build system type])
-    case "$dist_cv_build_vendor" in
-	(whitebox)
-	    build_vendor='whitebox'
-	    build_os='linux'
-	    build_alias="${build_cpu}-${build_vendor}-${build_os}"
-	    ac_cv_build_alias="$build_alias"
-	    ;;
-	(redhat)
-	    build_vendor='redhat'
-	    build_os='linux'
-	    build_alias="${build_cpu}-${build_vendor}-${build_os}"
-	    ac_cv_build_alias="$build_alias"
-	    ;;
-	(mandrake)
-	    build_vendor='mandrake'
-	    build_os='linux-gnu'
-	    build_alias="${build_cpu}-${build_vendor}-${build_os}"
-	    ac_cv_build_alias="$build_alias"
-	    ;;
-	(suse)
-	    build_vendor='suse'
-	    build_os='linux'
-	    build_alias="${build_cpu}-${build_vendor}-${build_os}"
-	    ac_cv_build_alias="$build_alias"
-	    ;;
-	(debian)
-	    test :${dist_cv_build_cpu:-no} = :no || build_cpu="$dist_cv_build_cpu"
-	    build_vendor='debian'
-	    build_os='linux'
-	    build_alias="${build_cpu}-${build_os}"
-	    ac_cv_build_alias="$build_alias"
-	    ;;
-    esac
-    AC_MSG_RESULT([$build_alias])
+    if test -z "$build_alias" ; then
+	build_vendor="$dist_cv_build_vendor"
+	case "$build_vendor" in
+	    (whitebox|redhat|suse|debian)  
+		case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
+	    (mandrake)  
+		case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
+	esac
+    fi
+    build="${build_cpu}-${build_vendor}-${build_os}"
+    AC_MSG_RESULT([$build])
     AC_MSG_CHECKING([host system type])
-    case "$dist_cv_target_vendor" in
-	(whitebox)
-	    host_vendor='whitebox'
-	    host_os='linux'
-	    host_alias="${host_cpu}-${host_vendor}-${host_os}"
-	    ac_cv_host_alias="$host_alias"
-	    ;;
-	(redhat)
-	    host_vendor='redhat'
-	    host_os='linux'
-	    host_alias="${host_cpu}-${host_vendor}-${host_os}"
-	    ac_cv_host_alias="$host_alias"
-	    ;;
-	(mandrake)
-	    host_vendor='mandrake'
-	    host_os='linux-gnu'
-	    host_alias="${host_cpu}-${host_vendor}-${host_os}"
-	    ac_cv_host_alias="$host_alias"
-	    ;;
-	(suse)
-	    host_vendor='suse'
-	    host_os='linux'
-	    host_alias="${host_cpu}-${host_vendor}-${host_os}"
-	    ac_cv_host_alias="$host_alias"
-	    ;;
-	(debian)
-	    test :${dist_cv_target_cpu:-no} = :no || host_cpu="$dist_cv_target_cpu"
-	    host_vendor='debian'
-	    host_os='linux'
-	    host_alias="${host_cpu}-${host_os}"
-	    ac_cv_host_alias="$host_alias"
-	    ;;
-    esac
-    AC_MSG_RESULT([$host_alias])
+    if test -z "$host_alias" ; then
+	host_cpu="$build_cpu"
+	host_vendor="$build_vendor"
+	host_os="$build_os"
+    else
+	host_vendor="$dist_cv_host_vendor"
+	case "$host_vendor" in
+	    (whitebox|redhat|suse|debian)  
+		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
+	    (mandrake)  
+		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
+	esac
+    fi
+    host="${host_cpu}-${host_vendor}-${host_os}"
+    AC_MSG_RESULT([$host])
     AC_MSG_CHECKING([target system type])
-    case "$dist_cv_target_vendor" in
-	(whitebox)
-	    target_vendor='whitebox'
-	    target_os='linux'
-	    target_alias="${target_cpu}-${target_vendor}-${target_os}"
-	    ac_cv_target_alias="$target_alias"
-	    ;;
-	(redhat)
-	    target_vendor='redhat'
-	    target_os='linux'
-	    target_alias="${target_cpu}-${target_vendor}-${target_os}"
-	    ac_cv_target_alias="$target_alias"
-	    ;;
-	(mandrake)
-	    target_vendor='mandrake'
-	    target_os='linux-gnu'
-	    target_alias="${target_cpu}-${target_vendor}-${target_os}"
-	    ac_cv_target_alias="$target_alias"
-	    ;;
-	(suse)
-	    target_vendor='suse'
-	    target_os='linux'
-	    target_alias="${target_cpu}-${target_vendor}-${target_os}"
-	    ac_cv_target_alias="$target_alias"
-	    ;;
-	(debian)
-	    test :${dist_cv_target_cpu:-no} = :no || target_cpu="$dist_cv_target_cpu"
-	    target_vendor='debian'
-	    target_os='linux'
-	    target_alias="${target_cpu}-${target_os}"
-	    ac_cv_target_alias="$target_alias"
-	    ;;
-    esac
-    AC_MSG_RESULT([$target_alias])
+    if test -z "$target_alias" ; then
+	target_cpu="$host_cpu"
+	target_vendor="$host_vendor"
+	target_os="$host_os"
+    else
+	target_vendor="$dist_cv_host_vendor"
+	case "$target_vendor" in
+	    (whitebox|redhat|suse|debian)  
+		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
+	    (mandrake)  
+		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
+	esac
+    fi
+    target="${target_cpu}-${target_vendor}-${target_os}"
+    AC_MSG_RESULT([$target])
 ])# _DISTRO_OUTPUT
 # =============================================================================
 

@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/02/22 08:31:31 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/02/23 01:56:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/22 08:31:31 $ by $Author: brian $
+## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -112,12 +112,7 @@ rpm_directories	= \
 ##
 # These are the same directories as rpm_directories with common archive directories stripped out.
 ##
-RELEASE_DIRECTORIES += \
-		$(topdir)/SOURCES \
-		$(topdir)/BUILD \
-		$(topdir)/RPMS \
-		$(topdir)/SRPMS \
-		$(topdir)/SPECS
+RELEASE_DIRECTORIES += $(rpm_directories)
 
 ##
 # Options for building source rpms.  We have separate fig and xpm macros from the binary rpms to

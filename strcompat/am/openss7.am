@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/02/23 01:56:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -117,13 +117,14 @@ $(FORCED_TARGETS): forced-% : %
 
 MY_PHONY		+= $(FORCED_TARGETS)
 
-$(RELEASE_DIRECTORIES):
-	@test -d $@ || { echo " $(mkinstalldirs) $@" ; $(mkinstalldirs) $@ ; }
+$(RELEASE_DIRECTORIES)::
+	@test -d $@ || { echo " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
 	
 release: $(RELEASE_DIRECTORIES) $(RELEASE)
 
 release-clean-local:
-	targets="$(RELEASE_CLEAN)" ; for target in $$targets ; do \
+	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
+		echo "$(MAKE) $(AM_MAKEFLAGS) $$target" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $$target ; \
 	done
 
@@ -134,7 +135,7 @@ release-clean: release-clean-local
 	fi
 
 MY_PHONY	+= release $(RELEASE)
-MY_PHONY	+= release-clean $(RELEASE_CLEAN)
+MY_PHONY	+= release-clean $(RELEASE_CLEAN_LOCAL)
 FORCED_TARGETS	+= forced-release
 
 if MAINTAINER_MODE

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/02/23 01:57:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/02/23 01:57:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -583,8 +583,8 @@ AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
     AC_REQUIRE([_DISTRO])
     AC_MSG_ERROR([
 *** 
-*** Build is for $dist_cv_target_distrib $linux_cv_boot_kernel kernel but the machine architecture is
-*** $linux_cv_march.  $dist_cv_target_distrib $linux_cv_boot_kernel kernels cannot be compiled for $linux_cv_march machine
+*** Build is for $dist_cv_host_distrib $linux_cv_boot_kernel kernel but the machine architecture is
+*** $linux_cv_march.  $dist_cv_host_distrib $linux_cv_boot_kernel kernels cannot be compiled for $linux_cv_march machine
 *** architecture.  If you are automatically building with the rebuild make
 *** target this error is to be expected on a couple of kernel permutations.
 *** ])
@@ -596,7 +596,7 @@ AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
     AC_REQUIRE([_DISTRO])
-    AC_CACHE_CHECK([for kernel $dist_cv_target_distrib boot], [linux_cv_boot_kernel], [dnl
+    AC_CACHE_CHECK([for kernel $dist_cv_host_distrib boot], [linux_cv_boot_kernel], [dnl
 	linux_cv_boot_kernel=no
 	if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
 	then

@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/21 23:25:57 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/02/23 01:56:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+## Last Modified $Date: 2005/02/23 01:56:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -82,21 +82,22 @@ if BUILD_DPKG
 # dpkg-source.
 ##
 debianpkg		= $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)_0
-debian_dir		= $(PACKAGE_DISTDIR)/$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
-debian_dir_stamp	= $(PACKAGE_DISTDIR)/stamp-$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
-debian_dsc_file		= $(PACKAGE_DISTDIR)/$(debianpkg).dsc
-debian_tar_file		= $(PACKAGE_DISTDIR)/$(debianpkg).tar.gz
-debain_source_files	= $(debian_dsc_file) $(debian_tar_file)
+debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
+debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
+debian_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
+debian_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
+debian_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
+debian_source_files	= $(debian_dsc_file) $(debian_tar_file) $(debian_sig_file)
 
 RELEASE_DIRECTORIES	+= $(PACKAGE_DEBTOPDIR)
 
-$(debian_dir): $(debian_dir_stamp)
-$(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
-	(cd "$(PACKAGE_DISTDIR)" \
-	 && $(am__remove_distdir) \
-	 && tar -xzvf $(PACKAGE)-$(VERSION).tar.gz | grep '/$$' \
-	 && mv -f $(PACKAGE)-$(VERSION) $(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0 \
-	 && touch $(debian_dir_stamp))
+$(debian_dir):: $(debian_dir_stamp)
+$(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(PACKAGE_DEBTOPDIR)
+	rm -rf $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION) $(debian_dir)
+	$(mkdir_p) $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION)
+	gzip -dc $< | tar xf - -C $(PACKAGE_DEBTOPDIR)
+	mv -f $(PACKAGE_DEBTOPDIR)/${PACKAGE}-$(VERSION) $(debian_dir)
+	touch $(debian_dir_stamp)
 
 ##
 # Approach to signing dsc files taken from dpkg-buildpackage:  A signed .dsc file is merely a signed
@@ -106,41 +107,39 @@ $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
 # builds that including signing.  If you don't like the security issues that raises, dont use it and
 # you will be prompted for a passphrase with each signature.
 ##
-$(debian_source_files): $(debain_dir_stamp) $(PACKAGE_DEBTOPDIR)
-	@there="`(cd "$(PACKAGE_DISTDIR)"; pwd)`" ; \
-	echo "(cd "$(PACKAGE_DEBTOPDIR)" ; $(DPKG_SOURCE) -b -sn $$there/$(debain_dir))" ; \
-	(cd "$(PACKAGE_DEBTOPDIR)" ; $(DPKG_SOURCE) -b -sn $$there/$(debain_dir)) ; \
+$(debian_dsc_file) $(debian_tar_file): $(debian_dir_stamp) $(PACKAGE_DEBTOPDIR)
+	(cd "$(PACKAGE_DEBTOPDIR)" ; $(DPKG_SOURCE) -b -sn $(debian_dir))
+
+$(debian_sig_file): $(debian_dsc_file)
+	@\
 	user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 	home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
-	pass="${GNUPGPASS}" ; pass="$${pass:+ --passphrase-fd 0 }" ; \
+	pass="${GNUPGPASS}" ; pass="$${pass:+ --batch --passphrase-fd 0 }" ; \
 	pipe="${GNUPGPASS}" ; pipe="$${pipe:+ echo "$$pipe" |}" ; \
-	echo "rm -f $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.asc" ; \
-	rm -f $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.asc ; \
-	echo "$(GPG) --clearsign --batch -a$$user$$home -- $(debian_dsc_file) > $(debian_dsc_file).sig" ; \
-	eval "$$pipe $(GPG) --clearsign --batch -a$$user$$home$$pass -- $(debian_dsc_file) > $(debian_dsc_file).sig" \
-		|| { rm -f $(debain_dsc_file) $(debian_dsc_file).sig ; exit 1 } ; \
-	echo "mv -f $(debian_dsc_file).sig $(debian_dsc_file)" ; \
-	mv -f $(debian_dsc_file).sig $(debian_dsc_file)
-
+	echo "rm -f $(debian_sig_file)" ; \
+	rm -f $(debian_sig_file) ; \
+	echo "$(GPG) --clearsign -a$$user$$home$$pass -o- -- $< > $@" ; \
+	eval "$$pipe $(GPG) --clearsign -a$$user$$home$$pass -o- -- $< > $@" || { rm -f $< $@ ; exit 1 ; }
+	cp -fp $(debian_sig_file) $(debian_dsc_file)
+	touch $(debian_sig_file)
 
 dsc: $(debian_source_files)
 
 # still have to do this yet
 debs:
 
-MY_PHONY		+= dsc debs
-ALL_RECURSIVE_TARGETS	+= all-dsc all-debs
-
 release-deb: dsc debs
 
 RELEASE			+= release-deb
-RELEASECLEANFILES	+= $(debian_source_files)
+RELEASECLEANFILES	+= $(debian_source_files) $(debian_dir_stamp)
+RELEASE_DIRECTORIES	+= $(debian_dir)
 
 distclean-deb:
-	@test -d $(PACKAGE_DISTDIR) && (cd $(PACKAGE_DISTDIR) ; $(am__remove_distdir))
-	rm -rf $(PACKAGE_DISTDIR)/$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0 $(PACKAGE_DISTDIR)/stamp-$(PACKAGE)-$(PACKAGE_VERSION).$(PACKAGE_RELEASE)-0
+	rm -rf $(debian_dir)
 
 DISTCLEAN_LOCAL		+= distclean-deb
+
+RELEASE_CLEAN_LOCAL	+= distclean-deb
 
 EXTRA_DIST		+= \
 			debian/changelog \
@@ -149,6 +148,7 @@ EXTRA_DIST		+= \
 			.pkgrelease \
 			.pkgepoch
 
+MY_PHONY		+= dsc debs
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs
 
 endif

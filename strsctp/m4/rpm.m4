@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/02/22 08:31:31 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/02/23 01:57:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/22 08:31:31 $ by $Author: brian $
+# Last Modified $Date: 2005/02/23 01:57:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -105,22 +105,22 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_extra=
 		;;
 	    :auto)
-		case "$dist_cv_target_flavor" in
+		case "$dist_cv_host_flavor" in
 		    (whitebox)
-			case $dist_cv_target_release in
+			case $dist_cv_host_release in
 			    (3.0)	rpm_cv_dist_extra=".WB3" ;;
 			    (4.0)	rpm_cv_dist_extra=".WB4" ;;
 			esac
 			;;
 		    (fedora)
-			case $dist_cv_target_release in
+			case $dist_cv_host_release in
 			    (1)		rpm_cv_dist_extra=".FC1" ;;
 			    (2)		rpm_cv_dist_extra=".FC2" ;;
 			    (3)		rpm_cv_dist_extra=".FC3" ;;
 			esac
 			;;
 		    (redhat)
-			case $dist_cv_target_release in
+			case $dist_cv_host_release in
 			    (7.[[0-3]])	rpm_cv_dist_extra=".7.x" ;;
 			    (8.0)	rpm_cv_dist_extra=".8" ;;
 			    (9)		rpm_cv_dist_extra=".9" ;;
@@ -130,14 +130,14 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			esac
 			;;
 		    (mandrake)
-			rpm_tmp=`echo "$dist_cv_target_release" | sed -e 's|\.||g'`
+			rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\.||g'`
 			rpm_cv_dist_extra=".${rpm_tmp}mdk"
 			;;
 		    (suse)
-			rpm_cv_dist_extra=".${dist_cv_target_release:-SuSE}"
+			rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}"
 			;;
 		    (debian)
-			rpm_cv_dist_extra=".deb${dist_cv_target_release}"
+			rpm_cv_dist_extra=".deb${dist_cv_host_release}"
 			;;
 		esac
 		;;
@@ -147,7 +147,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	esac
     ])
     AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
-	case "$dist_cv_target_flavor" in
+	case "$dist_cv_host_flavor" in
 	    (whitebox)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
 	    (fedora)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
 	    (mandrake)	rpm_cv_dist_topdir='/usr/src/RPM'    ;;
@@ -157,7 +157,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	    (*)		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
 	esac
     ])
-    PACKAGE_RPMDIST="${dist_cv_target_distrib:-Unknown Linux} ${dist_cv_target_release:-Unknown}"
+    PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}"
     AC_SUBST([PACKAGE_RPMDIST])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
 	defaults to automatic detection.])
