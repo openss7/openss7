@@ -1,3 +1,56 @@
+'\" rtp
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: fattach.8,v 1.1.1.1.4.1 2003/12/11 11:27:27 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2003/12/11 11:27:27 $ by $Author: brian $
+.\"
+.\" =========================================================================
 .\"
 .\" Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
 .\"
@@ -16,12 +69,25 @@
 .\" Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
 .\" MA 02139, USA.
 .\"
-.TH FATTACH 8 "24 Apr 2000" "LiS 2.9" "Linux STREAMS"
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH FATTACH 8 "$Date: 2003/12/11 11:27:27 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B fattach
-\- attach a
-.BR STREAMS "\-based"
-file to a path name in the file system
+\- attach a \fISTREAMS\fR file to a path name in the file system
 .SH SYNOPSIS
 .BI "fattach [-v] [-m|-u|-M" "<mode>" "] [-p|-c|" "<STREAMS path>" "] " "<path> ..."
 .br
@@ -37,7 +103,7 @@ If the
 and/or the
 .B "\-c"
 option is specified, a
-.BR STREAMS "\-based
+.I STREAMS
 .I pipe
 is created and its two ends are alternately attached to the path names
 given.  In this mode of usage, at least two path names are required,
@@ -50,7 +116,7 @@ and
 .B "\-c"
 options are not specified, the first path name given must identify
 a
-.BR STREAMS "\-based"
+.I STREAMS
 file.  That file will be opened, and it will be attached
 to each of the path names subsequently specified (of which there must
 be at least one).
@@ -58,7 +124,7 @@ be at least one).
 .TP
 .B "\-p"
 Create a
-.BR STREAMS "\-based"
+.I STREAMS
 pipe, to which to attach the subsequently specified path names.
 The first path will be attached to the first pipe end, the second to the
 second pipe end, the third to the first pipe end, etc., until the list
@@ -84,7 +150,7 @@ and below).
 .TP
 .B "\-m"
 Apply the mode of the last-specified path(s) to the attached
-.BR STREAMS "\-based"
+.I STREAMS
 file(s) after attaching.  (See
 .BR fattach "(3)."
 .TP
@@ -94,7 +160,7 @@ Apply the
 (see
 .BR umask "(2)) "
 the
-.BR STREAMS "\-based"
+.I STREAMS
 file after attaching. (See
 .BR fattach "(3))."
 This is done by default when a pipe is created via
@@ -102,7 +168,7 @@ This is done by default when a pipe is created via
 .TP
 .BI "\-M" " <mode>"
 Apply the given mode to the
-.BR STREAMS "\-based"
+.I STREAMS
 file(s) after attaching.  (See
 .BR fattach "(3))."
 .TP
@@ -176,10 +242,17 @@ must be performed).
 An
 .B fdetach
 function has been provided for various
-.B STREAMS
+.I STREAMS
 implementations based on SVR4
-.BR STREAMS .
+.[
+svr4
+.]
+.IR STREAMS .
 Not all of these have provided a corresponding utility program of this
 sort.
 .SH AUTHOR
 John Boyd, protologos LLC.
+.[
+$LIST$
+.]
+.TA

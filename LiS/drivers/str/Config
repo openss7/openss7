@@ -17,7 +17,7 @@
 #
 #	name		prefix	major	n-minors  n-majors
 driver	clone-drvr	clone_	*
-driver	fifo            fifo_   *       512
+driver	fifo		fifo_	*	512
 driver	loop-around	sloop_	*
 driver	mini-mux	mux_	*
 driver	printk		printk_	*
@@ -26,13 +26,17 @@ driver	sad		sad_	*
 driver	ip_to_dlpi	ip2xinet	*
 driver	mtdrv		mtdrv_	*
 #
+# this must be 30 for iBCS compatibility
+#
+driver	inet		ss_	30
+#
 # Pushable module specifications
 #
 # Names must be a max of 8 chars for Solaris/UnixWare compatibility
 #
 #	name		prefix
-module	pipemod         pipemod_
-module	connld          connld_
+module	pipemod		pipemod_
+module	connld		connld_
 module	relay		relay_
 module	relay2		relay2_
 module	ip_strms	ip_to_streams_
@@ -42,22 +46,23 @@ module	tirdwr		tirdwr_
 #
 # Object name specifications
 #
-#       type   name            object name
-objname driver clone-drvr      clone
-objname driver fifo            fifo
-objname driver loop-around     loop
-objname driver mini-mux        minimux
-objname driver printk          printk
-objname driver link-drvr       ldl
-objname driver sad             sad
-objname driver ip_to_dlpi      ip_to_dlpi
-objname driver mtdrv	       mtdrv
-objname module pipemod         pipemod
-objname module connld          connld
-objname module relay2          relay
-objname module ip_strms        ip_strm_mod
-objname module timod           timod
-objname module tirdwr          tirdwr
+#	type	name		object name
+objname driver	clone-drvr	clone
+objname driver	fifo		fifo
+objname driver	loop-around	loop
+objname driver	mini-mux	minimux
+objname driver	printk		printk
+objname driver	link-drvr	ldl
+objname driver	sad		sad
+objname driver	ip_to_dlpi	ip_to_dlpi
+objname driver	mtdrv		mtdrv
+objname driver	inet		inet
+objname module	pipemod		pipemod
+objname module	connld		connld
+objname module	relay2		relay
+objname module	ip_strms	ip_strm_mod
+objname module	timod		timod
+objname module	tirdwr		tirdwr
 
 #
 # Autopush specifications
@@ -89,6 +94,7 @@ loadable ldl
 loadable sad
 loadable ip_to_dlpi
 loadable mtdrv
+loadable inet
 
 #
 # Initialization specifications
@@ -123,6 +129,36 @@ node	/dev/printk	     c	*	printk		0
 node	/dev/sad	     c	*	clone-drvr	sad
 node	/dev/fifo	     c  0666    clone-drvr	fifo
 node	/dev/fifo.0          c  0666    fifo            0
+#
+# These are iBCS devices that should already be installed on a
+# system that supports the iBCS.  The /dev entries are supposed
+# to by symbolic links to the /dev/inet entries.  arp and rip
+# are supposed to be symbolic links to udp
+#
+#node	/dev/ip		     c	0666	inet		32
+#node	/dev/icmp	     c	0666	inet		33
+#node	/dev/ggp	     c	0666	inet		34
+#node	/dev/ipip	     c	0666	inet		35
+#node	/dev/tcp	     c	0666	inet		36
+#node	/dev/egp	     c	0666	inet		37
+#node	/dev/pup	     c	0666	inet		38
+#node	/dev/udp	     c	0666	inet		39
+#node	/dev/idp	     c	0666	inet		40
+#node	/dev/rawip	     c	0666	inet		41
+#node	/dev/arp	     c	0666	inet		39
+#node	/dev/rip	     c	0666	inet		39
+#node	/dev/inet/ip	     c	0666	inet		32
+#node	/dev/inet/icmp	     c	0666	inet		33
+#node	/dev/inet/ggp	     c	0666	inet		34
+#node	/dev/inet/ipip	     c	0666	inet		35
+#node	/dev/inet/tcp	     c	0666	inet		36
+#node	/dev/inet/egp	     c	0666	inet		37
+#node	/dev/inet/pup	     c	0666	inet		38
+#node	/dev/inet/udp	     c	0666	inet		39
+#node	/dev/inet/idp	     c	0666	inet		40
+#node	/dev/inet/rawip	     c	0666	inet		41
+#node	/dev/inet/arp	     c	0666	inet		39
+#node	/dev/inet/rip	     c	0666	inet		39
 
 #
 # Device specifications

@@ -186,6 +186,18 @@ struct ldl_flags_ioctl {
 	unsigned long mask;
 };
 
+/* 
+ *  This is absurd... A kernel data structure exposed into user space with
+ *  user header files.  One so architecture depedenent as lis_atomic_t yet.
+ *  Not to mention that lis_atomic_t can be different sizes dependeing on
+ *  kernel and user space sizes.  LDL is unusable on anything othen than
+ *  32-bit architectures. --bb
+ */
+#ifndef lis_atomic_t
+typedef long lis_atomic_t;		/* no not volatile as in the kernel */
+#define lis_atomic_t lis_atomic_t
+#endif
+
 typedef struct ldl_gstats_ioctl			/* global statistics */
 {						/* for entire driver */
     lis_atomic_t	attach_req_cnt ;
