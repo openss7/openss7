@@ -1,4 +1,4 @@
-Source: @PACKAGE@-@PACKAGE_VERSION@.@PACKAGE_RELEASE@
+Source: @PACKAGE@-@VERSION@
 Section: devel
 Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>

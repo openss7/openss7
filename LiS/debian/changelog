@@ -1,3 +1,9 @@
+LiS-2.18.1 (0) experimental; urgency=low
+
+  * Changed version numbering.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Wed, 16 Mar 2005 16:37:11 -0700
+
 LiS-2.16.18.22 (0) experimental; urgency=low
 
   * Initial stab at debian build system.

@@ -1,3 +1,9 @@
+sctp-0.2.21 (0) experimental; urgency=low
+
+  * Changed version numbering.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Wed, 16 Mar 2005 16:37:11 -0700
+
 sctp-0.2.20.1 (0) experimental; urgency=low
 
   * Initial stab at debian build system.
