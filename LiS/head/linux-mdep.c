@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.105 5/30/03 21:40:40 "
+#ident "@(#) LiS linux-mdep.c 2.106 6/6/03 16:28:15 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -3511,7 +3511,6 @@ void lis_gettimeofday(struct timeval *tv)
 /*				    Module                               */
 #ifdef LINUX
 
-#ifdef LIS_LOADABLE_SUPPORT
 
 /*
  *  lis_loadable_load - load a loadable module.
@@ -3522,10 +3521,16 @@ void lis_gettimeofday(struct timeval *tv)
  */
 int lis_loadable_load(const char *name)
 {
+#ifdef LIS_LOADABLE_SUPPORT
 	return request_module(name);
+#else
+	printk("lis_loadable_load: %s: "
+		"kernel not compiled for dynamic module loading\n",
+		name) ;
+	return(-ENOSYS) ;
+#endif
 }
 
-#endif /* ifdef LIS_LOADABLE_SUPPORT */
 
 /*
  * The lis_can_unload module tells rmmod when it is OK to unload us.

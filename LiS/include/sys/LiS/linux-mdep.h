@@ -37,7 +37,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) LiS linux-mdep.h 2.53 4/15/03 18:15:20 "
+#ident "@(#) LiS linux-mdep.h 2.54 6/6/03 16:27:56 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -433,12 +433,12 @@ extern int lis_ioc_fdetach(char *);
 #define LIS_LOADABLE_SUPPORT 1
 #endif
 
-#ifdef LIS_LOADABLE_SUPPORT
-
-/* lis_loadable_load - load a loadable module. */
+/* lis_loadable_load - load a loadable module.
+ *
+ * Routine is always present but returns error if the kernel is not
+ * built for dynamic loading of modules from within the kernel.
+ */
 int lis_loadable_load(const char *name);
-
-#endif /* ifdef LIS_LOADABLE_SUPPORT */
 
 /*
  * Process kill
