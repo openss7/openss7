@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.15 2004/04/25 08:47:39 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.16 2004/04/26 20:01:41 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/25 08:47:39 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/26 20:01:41 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -71,28 +71,32 @@ m4_include([m4/strconf.m4])
 AC_DEFUN([AC_LFS], [
     ac_default_prefix='/usr'
     _LFS_OPTIONS
-    AC_MAN_CONVERSION
-    AC_PUBLIC_RELEASE
-    AC_RPM_SPEC
-    AC_LDCONFIG
-    AC_STRCONF
+    _MAN_CONVERSION
+    _PUBLIC_RELEASE
+    _RPM_SPEC
+    _LDCONFIG
     _LFS_SETUP_COMPAT
     LFS_INCLUDES="-D_LFS_SOURCE=1 -I- -imacros ./config.h -I./include -I${srcdir}/include"
+    AC_SUBST([LFS_INCLUDES])
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
+    USER_LDFLAGS="$LDFLAGS"
+    AC_SUBST([USER_LDFLAGS])
     AC_SUBST([USER_CPPFLAGS])
     AC_SUBST([USER_CFLAGS])
-    AC_SUBST([LFS_INCLUDES])
     AC_MSG_NOTICE([final user CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user LDFLAGS   = $USER_LDFLAGS])
     AC_MSG_NOTICE([final user INCLUDES  = $LFS_INCLUDES])
     _LFS_SETUP
     AC_MSG_NOTICE([final kern MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kern NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kern CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final kern LDFLAGS   = $KERNEL_LDFLAGS])
     CPPFLAGS=
     CFLAGS=
+    _LFS_STRCONF
 ])# AC_LFS
 # =========================================================================
 
@@ -164,7 +168,7 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [
 # _LFS_SETUP_COMPAT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_COMPAT], [
-    AC_CACHE_CHECK([for UNIX(R) SVR 4.2 compatibility], [lfs_cv_svr4], [dnl
+    AC_CACHE_CHECK([for UNIX(R) SVR 4.2 compatibility], [lfs_cv_svr4], [
         if test :"$enable_compat_svr4" != :no ; then lfs_cv_svr4=yes ; else lfs_cv_svr4=no ; fi
         if test :"$enable_compat_sol8" != :no ; then lfs_cv_svr4=yes ; fi
         if test :"$enable_compat_uw7"  != :no ; then lfs_cv_svr4=yes ; fi
@@ -172,22 +176,22 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [
         if test :"$enable_compat_aix"  != :no ; then lfs_cv_svr4=yes ; fi
         if test :"$enable_compat_hpux" != :no ; then lfs_cv_svr4=yes ; fi
     ])
-    AC_CACHE_CHECK([for Solaris(R) 8 compatibility], [lfs_cv_sol8], [dnl
+    AC_CACHE_CHECK([for Solaris(R) 8 compatibility], [lfs_cv_sol8], [
         if test :"$enable_compat_sol8" != :no ; then lfs_cv_sol8=yes ; else lfs_cv_sol8=no ; fi
     ])
-    AC_CACHE_CHECK([for UnixWare(R) 7 compatibility], [lfs_cv_uw7], [dnl
+    AC_CACHE_CHECK([for UnixWare(R) 7 compatibility], [lfs_cv_uw7], [
         if test :"$enable_compat_uw7" != :no  ; then lfs_cv_uw7=yes  ; else lfs_cv_uw7=no  ; fi
     ])
-    AC_CACHE_CHECK([for OSF/1.2 compatibility], [lfs_cv_osf], [dnl
+    AC_CACHE_CHECK([for OSF/1.2 compatibility], [lfs_cv_osf], [
         if test :"$enable_compat_osf" != :no  ; then lfs_cv_osf=yes  ; else lfs_cv_osf=no  ; fi
     ])
-    AC_CACHE_CHECK([for AIX(R) 4 compatibility], [lfs_cv_aix], [dnl
+    AC_CACHE_CHECK([for AIX(R) 4 compatibility], [lfs_cv_aix], [
         if test :"$enable_compat_aix" != :no  ; then lfs_cv_aix=yes  ; else lfs_cv_aix=no  ; fi
     ])
-    AC_CACHE_CHECK([for HPUX(R) compatibility], [lfs_cv_hpux], [dnl
+    AC_CACHE_CHECK([for HPUX(R) compatibility], [lfs_cv_hpux], [
         if test :"$enable_compat_hpux" != :no ; then lfs_cv_hpux=yes ; else lfs_cv_hpux=no ; fi
     ])
-    AC_CACHE_CHECK([for LiS compatibility], [lfs_cv_lis], [dnl
+    AC_CACHE_CHECK([for LiS compatibility], [lfs_cv_lis], [
         if test :"$enable_compat_lis" != :no  ; then lfs_cv_lis=yes  ; else lfs_cv_lis=no  ; fi
     ])
     if test :"$lfs_cv_svr4" = :yes ; then
@@ -261,8 +265,8 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [
 # _LFS_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP], [
-    AC_LINUX_KERNEL
-    AC_GENKSYMS
+    _LINUX_KERNEL
+    _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _LFS_CHECK_KERNEL
@@ -285,10 +289,9 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [
 # _LFS_CONFIG_INET
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_INET], [
-    AC_CACHE_CHECK([for tcp_openreq_cachep support], [lfs_cv_tcp_openreq_cachep], [dnl
-        tmp_cppflags="$CPPFLAGS"
-        CPPFLAGS="$KERNEL_CPPFLAGS"
-        AC_EGREP_CPP([\<yes_we_have_the_required_support\>], [
+    AC_CACHE_CHECK([for tcp_openreq_cachep support], [lfs_cv_tcp_openreq_cachep], [
+        _LINUX_KERNEL_ENV([
+            AC_EGREP_CPP([\<yes_we_have_the_required_support\>], [
 #include <linux/config.h>
 #include <linux/version.h>
 #ifdef CONFIG_MODVERSIONS
@@ -299,8 +302,8 @@ AC_DEFUN([_LFS_CONFIG_INET], [
 #ifdef CONFIG_IPV6_MODULE
     yes_we_have_the_required_support
 #endif
-        ], [lfs_cv_tcp_openreq_cachep=yes], [lfs_cv_tcp_openreq_cachep=no])
-        CPPFLAGS="$tmp_cppflags"
+            ], [lfs_cv_tcp_openreq_cachep=yes], [lfs_cv_tcp_openreq_cachep=no])
+        ])
     ])
     if test :"$lfs_cv_tcp_openreq_cachep" = :no ; then
         AC_MSG_CHECKING([usable tcp_openreq_cachep address])
@@ -353,7 +356,7 @@ AC_DEFUN([_LFS_CONFIG_INET], [
 # 
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_FATTACH], [
-    AC_CACHE_CHECK([for usable mount_sem address], [lfs_cv_mount_sem_addr], [dnl
+    AC_CACHE_CHECK([for usable mount_sem address], [lfs_cv_mount_sem_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_mount_sem_addr=`($EGREP '\<mount_sem' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -371,7 +374,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         structure rather than using the static global mount_sem semaphore.
         Define this if you have a modified kernel.])
     fi
-    AC_CACHE_CHECK([for usable clone_mnt address], [lfs_cv_clone_mnt_addr], [dnl
+    AC_CACHE_CHECK([for usable clone_mnt address], [lfs_cv_clone_mnt_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_clone_mnt_addr=`($EGREP '\<clone_mnt' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -384,7 +387,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         the address of clone_mnt in the kernel system map so that
         fattach/fdetach can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable check_mnt address], [lfs_cv_check_mnt_addr], [dnl
+    AC_CACHE_CHECK([for usable check_mnt address], [lfs_cv_check_mnt_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_check_mnt_addr=`($EGREP '\<check_mnt' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -397,7 +400,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         the address of check_mnt in the kernel system map so that
         fattach/fdetach can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable graft_tree address], [lfs_cv_graft_tree_addr], [dnl
+    AC_CACHE_CHECK([for usable graft_tree address], [lfs_cv_graft_tree_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_graft_tree_addr=`($EGREP '\<graft_tree' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -410,7 +413,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         the address of graft_tree in the kernel system map so that
         fattach/fdetach can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable do_umount address], [lfs_cv_do_umount_addr], [dnl
+    AC_CACHE_CHECK([for usable do_umount address], [lfs_cv_do_umount_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_do_umount_addr=`($EGREP '\<do_umount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -423,7 +426,7 @@ AC_DEFUN([_LFS_CONFIG_FATTACH], [
         the address of do_umount in the kernel system map so that
         fattach/fdetach can be properly supported.])
     fi
-    AC_CACHE_CHECK([for ability to support fattach/fdetach], [lfs_cv_fattach], [dnl
+    AC_CACHE_CHECK([for ability to support fattach/fdetach], [lfs_cv_fattach], [
         case "$lfs_cv_clone_mnt_addr:$lfs_cv_check_mnt_addr:$lfs_cv_graft_tree_addr:$lfs_cv_do_umount_addr" in
             no:*:*:* | *:no:*:* | *:*:no:* | *:*:*:no)
                 lfs_cv_fattach=no
@@ -452,8 +455,8 @@ _LFS_CONFIG_LIS
 # sys_mount             <-- extern, not declared
 # pcibios_init          <-- extern, declared in <linux/pci.h>
 # -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_LIS], [dnl
-    AC_CACHE_CHECK([for usable sys_unlink address], [lfs_cv_sys_unlink_addr], [dnl
+AC_DEFUN([_LFS_CONFIG_LIS], [
+    AC_CACHE_CHECK([for usable sys_unlink address], [lfs_cv_sys_unlink_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_sys_unlink_addr=`($EGREP '\<sys_unlink' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -466,7 +469,7 @@ AC_DEFUN([_LFS_CONFIG_LIS], [dnl
         to the address of sys_unlink in the kernel system map so that LiS
         compatibility can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable sys_mknod address], [lfs_cv_sys_mknod_addr], [dnl
+    AC_CACHE_CHECK([for usable sys_mknod address], [lfs_cv_sys_mknod_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_sys_mknod_addr=`($EGREP '\<sys_mknod' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -479,7 +482,7 @@ AC_DEFUN([_LFS_CONFIG_LIS], [dnl
         the address of sys_mknod in the kernel system map so that LiS
         compatibility can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable sys_umount address], [lfs_cv_sys_umount_addr], [dnl
+    AC_CACHE_CHECK([for usable sys_umount address], [lfs_cv_sys_umount_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_sys_umount_addr=`($EGREP '\<sys_umount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -492,7 +495,7 @@ AC_DEFUN([_LFS_CONFIG_LIS], [dnl
         to the address of sys_umount in the kernel system map so that LiS
         compatibility can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable sys_mount address], [lfs_cv_sys_mount_addr], [dnl
+    AC_CACHE_CHECK([for usable sys_mount address], [lfs_cv_sys_mount_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_sys_mount_addr=`($EGREP '\<sys_mount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -505,7 +508,7 @@ AC_DEFUN([_LFS_CONFIG_LIS], [dnl
         the address of sys_mount in the kernel system map so that LiS
         compatibility can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable pcibios_init address], [lfs_cv_pcibios_init_addr], [dnl
+    AC_CACHE_CHECK([for usable pcibios_init address], [lfs_cv_pcibios_init_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_pcibios_init_addr=`($EGREP '\<pcibios_init' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -522,7 +525,7 @@ AC_DEFUN([_LFS_CONFIG_LIS], [dnl
 # =========================================================================
 
 # =========================================================================
-_LFS_CONFIG_LFS
+# _LFS_CONFIG_LFS
 # -------------------------------------------------------------------------
 # symbols to rip for Linux Fast STREAMS
 # -------------------------------------------------------------------------
@@ -530,8 +533,8 @@ _LFS_CONFIG_LFS
 # open_softirq          <-- extern, declared in <linux/interrupt.h>
 # sock_readv_writev     <-- extern, declared in <linux/net.h>
 # -------------------------------------------------------------------------
-AC_DEFUN([_LFS_CONFIG_LFS], [dnl
-    AC_CACHE_CHECK([for usable file_move address], [lfs_cv_file_move_addr], [dnl
+AC_DEFUN([_LFS_CONFIG_LFS], [
+    AC_CACHE_CHECK([for usable file_move address], [lfs_cv_file_move_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_file_move_addr=`($EGREP '\<file_move' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -544,7 +547,7 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
         the address of file_move in the kernel system map so that Linux
         Fast-STREAMS can be properly supported.])
     fi
-    AC_CACHE_CHECK([for usable open_softirq address], [lfs_cv_open_softirq_addr], [dnl
+    AC_CACHE_CHECK([for usable open_softirq address], [lfs_cv_open_softirq_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_open_softirq_addr=`($EGREP '\<open_softirq' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -569,7 +572,7 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
 *** 
         ])
     fi
-    AC_CACHE_CHECK([for usable sock_readv_writev address], [lfs_cv_sock_readv_writev_addr], [dnl
+    AC_CACHE_CHECK([for usable sock_readv_writev address], [lfs_cv_sock_readv_writev_addr], [
         if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
             lfs_cv_sock_readv_writev_addr=`($EGREP '\<sock_readv_writev' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
         fi
@@ -583,6 +586,25 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
         Fast-STREAMS can be properly supported.])
     fi
 ])# _LFS_CONFIG_LFS
+# =========================================================================
+
+# =========================================================================
+# _LFS_STRCONF
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_STRCONF], [
+    strconf_cv_stem='Config'
+dnl strconf_cv_input='Config.master'
+dnl strconf_cv_majbase=230
+    strconf_cv_config='include/sys/config.h'
+    strconf_cv_modconf='modconf.h'
+dnl strconf_cv_drvconf='drvconf.mk'
+dnl strconf_cv_confmod='conf.modules'
+dnl strconf_cv_makedev='devices.lst'
+    strconf_cv_mknodes='src/util/strmakenodes.c'
+dnl strconf_cv_stsetup='strsetup.conf'
+dnl strconf_cv_strload='strload.conf'
+    _STRCONF
+])# _LFS_STRCONF
 # =========================================================================
 
 dnl =========================================================================
