@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/11 22:19:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/14 12:29:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 12:29:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -90,13 +90,20 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
     AC_PATH_TOOL([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GENKSYMS:-no}" = :no ; then
-	AC_MSG_WARN([Could not find genksyms program in PATH.])
+	if test :"$linux_cv_k_ko_modules" != :yes
+	then
+	    AC_MSG_WARN([Could not find genksyms program in PATH.])
+	fi
 	GENKSYMS=/sbin/genksyms
     fi
     AC_ARG_VAR([KGENKSYMS], [Generate kernel symbols command])
-    AC_PATH_TOOL([KGENKSYMS], [genksyms], [], [${kbuilddir}/scripts/genksyms])
+    eval "ksyms_dir=\"$kbuilddir/scripts/genksyms\""
+    AC_PATH_TOOL([KGENKSYMS], [genksyms], [], [$ksyms_dir])
     if test :"${KGENKSYMS:-no}" = :no ; then
-	AC_MSG_WARN([Could not find executable kernel genksyms program in $kbuilddir/scripts/genksyms.])
+	if test :"$linux_cv_k_ko_modules" = :yes
+	then
+	    AC_MSG_WARN([Could not find executable kernel genksyms program in $kbuilddir/scripts/genksyms.])
+	fi
 	KGENKSYMS='${kbuilddir}/scripts/genksyms/genksyms'
     fi
 dnl AC_ARG_VAR([MODPOST], [Kernel module post processing command])
