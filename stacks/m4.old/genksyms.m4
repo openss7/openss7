@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 12:48:50 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/08 20:46:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:50 $ by $Author: brian $
+# Last Modified $Date: 2004/06/08 20:46:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,8 +89,17 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
         ], [ksyms_cv_smp=yes], [ksyms_cv_smp=no]) ])
     if test :"${ksyms_cv_smp:-no}" = :yes ; then
         GENKSYMS_SMP_PREFIX='-p smp_'
-    else
-        GENKSYMS_SMP_PREFIX=''
+    fi
+    AC_CACHE_CHECK([for genksyms SuSE production kernel], [ksyms_cv_regparm], [dnl
+        AC_EGREP_CPP([\<yes_we_have_a_regparm_kernel\>], [
+#include <linux/version.h>
+#include <linux/config.h>
+#ifdef CONFIG_REGPARM
+    yes_we_have_a_regparm_kernel
+#endif
+        ], [ksyms_cv_regparm=yes], [ksyms_cv_regparm=no]) ])
+    if test :"${ksyms_cv_regparm:-no}" = :yes ; then
+        GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
     AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
     AC_PATH_TOOL([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/07 17:45:43 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/08 20:46:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/07 17:45:43 $ by $Author: brian $
+# Last Modified $Date: 2004/06/08 20:46:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -141,6 +141,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_MACHDIR
     _LINUX_SETUP_KERNEL_CFLAGS
     _LINUX_SETUP_KERNEL_DEBUG
+    _LINUX_CHECK_KERNEL_REGPARM
     _LINUX_CHECK_KERNEL_VERSIONS
     _LINUX_CHECK_KERNEL_MODVERSIONS
     PACKAGE_KNUMBER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
@@ -978,6 +979,25 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
     esac
     AC_MSG_RESULT([${linux_cv_debug:-no}])
 ])# _LINUX_SETUP_KERNEL_DEBUG
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_REGPARM
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_REGPARM], [dnl
+    AC_CACHE_CHECK([for kernel SuSE production kernel], [linux_cv_k_regparm], [dnl
+        AC_EGREP_CPP([\<yes_we_have_kernel_regparm\>], [
+#include <linux/version.h>
+#include <linux/config.h>
+#ifdef CONFIG_REGPARM
+    yes_we_have_kernel_regparm
+#endif
+        ], [linux_cv_k_regparm=yes], [linux_cv_k_regparm=no]) ])
+    if test :"${linux_cv_k_regparm:-no}" = :yes
+    then
+        CFLAGS="${CFLAGS}${CFLAGS:+ }-mregparm=3"
+    fi
+])# _LINUX_CHECK_KERNEL_REGPARM
 # =========================================================================
 
 # =========================================================================
