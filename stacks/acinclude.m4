@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/03/08 19:29:42 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/09 10:34:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 19:29:42 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 10:34:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,10 +127,54 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_SETUP], [dnl
     _LINUX_KERNEL
+    _SS7_CONFIG_KERNEL
     _GENKSYMS
     _LINUX_STREAMS
     _XOPEN
 ])# _SS7_SETUP
+# =============================================================================
+
+# =============================================================================
+# _SS7_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h linux/slab.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+])
+    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#if HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#if HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#if HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#include <linux/time.h>		/* for struct timespec */
+])
+])# _SS7_CONFIG_KERNEL
 # =============================================================================
 
 # =============================================================================

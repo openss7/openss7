@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:20 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/09 10:33:35 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:20 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 10:33:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:20 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/09 10:33:35 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:20 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/09 10:33:35 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:31:20 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/09 10:33:35 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3065,7 +3065,7 @@ xp_overflow(struct cd *cd)
  *  E400P-SS7 Interrupt Service Routine
  *  -----------------------------------
  */
-STATIC void
+STATIC irqreturn_t
 xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
@@ -3177,14 +3177,14 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA | E1DIV);
 	}
-	return;
+	return (irqreturn_t)(IRQ_HANDLED);
 }
 
 /*
  *  T400P-SS7 Interrupt Service Routine
  *  -----------------------------------
  */
-STATIC void
+STATIC irqreturn_t
 xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
@@ -3317,7 +3317,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA);
 	}
-	return;
+	return (irqreturn_t)(IRQ_HANDLED);
 }
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:44 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/09 10:33:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:44 $ by $Author: brian $
+ Last Modified $Date: 2005/03/09 10:33:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:44 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/09 10:33:34 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:44 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/09 10:33:34 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -61,6 +61,8 @@ static char const ident[] =
  *  Signalling Data Terminal.
  */
 #include "os7/compat.h"
+
+#include <linux/socket.h>
 
 #include <tihdr.h>
 // #include <xti.h>
