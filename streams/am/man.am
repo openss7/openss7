@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/27 06:36:37 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/30 13:30:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/27 06:36:37 $ by $Author: brian $
+## Last Modified $Date: 2005/03/30 13:30:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -67,52 +67,52 @@ if COOKED_MANPAGES
 $(man_MANS):: %: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man1_MANS):: %.1: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.1/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man2_MANS):: %.2: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.2/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man3_MANS):: %.3: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.3/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man4_MANS):: %.4: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.4/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man5_MANS):: %.5: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.5/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man6_MANS):: %.6: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.6/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man7_MANS):: %.7: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.7/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man8_MANS):: %.8: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man9_MANS):: %.9: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.9/' > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.9/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 all-manmacros:
 
@@ -131,52 +131,52 @@ else
 $(man_MANS): %: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man//' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man//;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man1_MANS): %.1: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.1/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man2_MANS): %.2: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.2/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man3_MANS): %.3: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.3/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man4_MANS): %.4: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.4/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man5_MANS): %.5: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.5/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man6_MANS): %.6: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.6/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man7_MANS): %.7: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.7/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man8_MANS): %.8: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.8/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 $(man9_MANS): %.9: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO) "converting manpage $< to $@" ; \
-	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.9/' > $@ ;
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.9/;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g' > $@ ;
 
 ##
 # When manpages are uncooked, we need macro files in the build directory for

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/27 12:27:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/30 11:35:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/27 12:27:15 $ by $Author: brian $
+# Last Modified $Date: 2005/03/30 11:35:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -332,23 +332,26 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 		version of ip_route_output.])
 	fi
     ])
-    _LINUX_CHECK_HEADERS([net/xfrm.h net/dst.h], [], [], [
+    _LINUX_CHECK_HEADERS([linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h], [], [], [
+#include <linux/compiler.h>
 #include <linux/config.h>
-#include <linux/sysctl.h>
-#include <linux/types.h>
-#include <linux/fcntl.h>
-#include <linux/random.h>
+#include <linux/version.h>
+#include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
 #include <linux/socket.h>
 #include <net/sock.h>
-#include <linux/ipsec.h>
-#include <linux/poll.h>
-#include <linux/slab.h>
-#include <linux/mm.h>
-#include <linux/module.h>
-#include <linux/proc_fs.h>
 #include <net/protocol.h>
 #include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
     ])
     _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
 #include <linux/config.h>
@@ -361,8 +364,51 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
     ])
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output ip_dst_output], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
+    _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#if HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#if HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+    ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
 			  struct inet_protocol.no_policy,
+			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
 			  struct sk_buff.h.sh,
 			  struct sock.protinfo.af_inet.ttl,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_compat.h,v 0.9.2.1 2005/03/14 08:26:00 brian Exp $
+ @(#) $Id: sctp_compat.h,v 0.9.2.2 2005/03/30 11:35:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/14 08:26:00 $ by $Author: brian $
+ Last Modified $Date: 2005/03/30 11:35:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_SCTP_COMPAT_H__
 #define __LOCAL_SCTP_COMPAT_H__
 
-#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include "os7/compat.h"
 
@@ -84,6 +84,9 @@
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
 #endif
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
+#if HAVE_KINC_LINUX_RCUPDATE_H
+#include <linux/rcupdate.h>
+#endif
 #endif				/* LINUX */
 
 #define sctp_addr	        sctp_addr__
@@ -92,7 +95,9 @@
 #define sctp_strm		sctp_strm__
 #define sctp_dup		sctp_dup__
 #define sctp_bind_bucket	sctp_bind_bucket__
+#if defined HAVE_OPENSS7_SCTP
 #define sctp_mib		sctp_mib__
+#endif
 #define sctphdr			sctphdr__
 #define sctp_cookie		sctp_cookie__
 #define sctp_chunk		sctp_chunk__
@@ -111,6 +116,7 @@
 #include <net/icmp.h>
 #include <net/route.h>
 #include <net/inet_ecn.h>
+#include <net/snmp.h>
 
 #undef sctp_addr
 #undef sctp_daddr
@@ -118,7 +124,9 @@
 #undef sctp_strm
 #undef sctp_dup
 #undef sctp_bind_bucket
+#if defined HAVE_OPENSS7_SCTP
 #undef sctp_mib
+#endif
 #undef sctphdr
 #undef sctp_cookie
 #undef sctp_chunk
