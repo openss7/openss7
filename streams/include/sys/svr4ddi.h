@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: svr4ddi.h,v 0.9.2.6 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: svr4ddi.h,v 0.9.2.7 2004/11/08 19:56:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2004/11/08 19:56:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/11/08 19:56:36 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -181,8 +181,17 @@ __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp)
 {
 	kmem_free(svp, sizeof(*svp));
 }
+#ifndef HAVE___WAKE_UP_SYNC_ADDR
+#undef	__wake_up_sync
+#define __wake_up_sync __wake_up
+#endif
 __SVR4_EXTERN_INLINE void SV_SIGNAL(sv_t * svp)
 {
+#ifdef HAVE___WAKE_UP_SYNC_ADDR
+#undef	__wake_up_sync
+	typeof(&__wake_up_sync) ___wake_up_sync = (typeof(___wake_up_sync)) HAVE___WAKE_UP_SYNC_ADDR;
+#define	__wake_up_sync ___wake_up_sync
+#endif
 	svp->sv_condv = 1;
 	wake_up_interruptible_sync(&svp->sv_waitq);
 }
