@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/19 07:38:49 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/20 00:52:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/19 07:38:49 $ by $Author: brian $
+# Last Modified $Date: 2005/01/20 00:52:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -308,7 +308,7 @@ cd %{mybuilddir}
     --mandir=%{_mandir} \
     --infodir=%{_infodir} \
     --disable-maintainer-mode \
-    --enable-dependency-tracking \
+    --disable-dependency-tracking \
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
@@ -340,6 +340,7 @@ cd %{mybuilddir}
     %{?_with_lfs:                %_with_lfs} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
+make
 make check
 
 %install
@@ -926,6 +927,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.32  2005/01/20 00:52:06  brian
+# - Go back to quick no dependencies compile.
+#
 # Revision 0.9.2.31  2005/01/19 07:38:49  brian
 # - Added checks and autotest options to configure.
 #
