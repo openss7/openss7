@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: weldq.9.man,v 0.9.2.5 2004/03/18 09:13:44 brian Exp $
+.\" @(#) $Id: weldq.9.man,v 0.9.2.6 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WELDQ 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WELDQ 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -403,7 +403,7 @@ aixspg
 .[
 hpuxspg
 .]
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .[
 osfspg
 .]
@@ -444,7 +444,7 @@ Binary compatibility is not guaranteed.
 .PP
 .BR weldq ()
 is not an
-.BR "SVR 4.2 MP DDI/DKI"
+.IR "SVR 4.2 MP DDI/DKI"
 .[
 usldk
 .]
@@ -453,7 +453,7 @@ utility function; however, it appeared in a number of implementations.
 .PP
 .BR weldq ()
 conforms to
-.BR AIX \(rg,
+.IR AIX \(rg,
 .[
 aixspg
 .]
@@ -461,7 +461,7 @@ aixspg
 .[
 hpuxspg
 .]
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .[
 osfspg
 .]
@@ -472,7 +472,7 @@ documentation.
 .PP
 .BR weldq ()
 first appeared in a number of implementations of
-.BR "SVR 4 MP" .
+.IR "SVR 4 MP" .
 .[
 svr4
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: echo.4.man,v 0.9.2.4 2004/04/16 17:14:54 brian Exp $
+.\" @(#) $Id: echo.4.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ECHO 4 "$Date: 2004/04/16 17:14:54 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH ECHO 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -154,7 +154,7 @@ provides this device in support of
 and for compatibility with
 .IR HP-UX \(rg
 and
-.IR OSF \(rg.
+.IR OSF/1 \(rg.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -195,7 +195,7 @@ has no known bugs.
 This is an
 .IR HP-UX \(rg-
 and
-.IR OSF \(rg-specific
+.IR OSF/1 \(rg-specific
 device.
 .[
 hpuxspg
@@ -209,12 +209,12 @@ is provided in
 for compatibility with
 .IR HP-UX \(rg
 and
-.IR OSF \(rg
+.IR OSF/1 \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR HP-UX \(rg
 and
-.IR OSF \(rg
+.IR OSF/1 \(rg
 do not document all behavior.
 .IP \(em
 Use for purposes other than
@@ -233,7 +233,7 @@ equivalent, see
 .PP
 .IR HP-UX \(rg
 and
-.IR OSF \(rg
+.IR OSF/1 \(rg
 documentation.
 .[
 hpuxdoc
@@ -249,7 +249,7 @@ osfdoc
 first appeared in
 .IR HP-UX \(rg
 and
-.IR OSF \(rg?
+.IR OSF/1 \(rg?
 .\"
 .\"
 .[

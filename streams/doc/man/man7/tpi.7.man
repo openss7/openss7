@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: tpi.7.man,v 0.9.2.1 2004/03/01 02:44:10 brian Exp $
+.\" @(#) $Id: tpi.7.man,v 0.9.2.2 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI 7 "$Date: 2004/03/01 02:44:10 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH TPI 7 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS"
 .SH NAME
 .B tpi
 \- Transport Provider Interface
@@ -94,14 +94,14 @@ sort-adjacent-labels
 .\"
 .PP
 To support a framework for providing networking products in the
-.BR UNIX \(rg
+.IR UNIX \(rg
 system, an effort is underway to define service interfaces that map to
 strategic levels of the Open Systems Interconnection (OSI) Reference Model.
 These service interfaces hide implementation details of a particular service
 from the consumer of the service.  This enables system programmers to develop
 software independent of the particular protocol that provides a specific
 service.  The interfaces being specified for
-.BR UNIX \(rg
+.IR UNIX \(rg
 System V are defined within the
 .IR STREAMS (4)
 environment.  This document specifies a kernel-level interface that supports

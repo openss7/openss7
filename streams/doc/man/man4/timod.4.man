@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: timod.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: timod.4.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIMOD 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH TIMOD 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -438,8 +438,8 @@ has no known bugs.
 .PP
 .B timod
 is compatible with
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
 .BR LiS ,
 .[
@@ -450,8 +450,8 @@ with the following exceptions:
 .B timod
 supports the IOCTLs
 .BR TI_GETMYNAME ", " TI_GETPEERNAME ", " TI_SETMYNAME " and " TI_SETPEERNAME .
-.BR Solaris \(rg ,
-.BR UnixWare \(rg
+.IR Solaris \(rg ,
+.IR UnixWare \(rg
 and
 .B LiS
 do not.

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putpmsg.2.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: putpmsg.2.man,v 0.9.2.5 2004/04/17 23:14:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTPMSG 2 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
+.TH PUTPMSG 2 "$Date: 2004/04/17 23:14:55 $" "$Name:  $" "Linux Fast-STREAMS System Calls"
 .\"
 .\"
 .SH NAME
@@ -88,18 +88,18 @@ sort-adjacent-labels
 .\"
 .SH ARGUMENTS
 .PP
-.TP 12
+.TP
 .I fd
 the file descriptor to which to put a message.
-.TP 12
+.TP
 .I ctlptr
 a pointer to a
 .B strbuf
 structure holding the control part of the message.
-.TP 12
+.TP
 .I dataptr
 structure holding the data part of the message.
-.TP 12
+.TP
 .I flags
 putmsg flags.
 .\"
@@ -152,15 +152,15 @@ struct strbuf {
 };
 \s+2\fR
 .fi
-.TP 12
+.TP
 .I maxlen
 Not used by
 .BR putpmsg ().
-.TP 12
+.TP
 .I len
 The length of the information pointed to by
 .IR buf .
-.TP 12
+.TP
 .I buf
 A pointer to the buffer that contains
 .I len
@@ -218,7 +218,7 @@ must be set to zero (0).
 specifies whether to send a high priority message or a band message.
 .I flags
 can be one of the following values:
-.TP 12
+.TP
 .B MSG_HIPRI
 Specifies that a high priority message is to be sent if the request contains a
 control part
@@ -227,7 +227,7 @@ control part
 This results in an
 .B M_PCPROTO
 message being placed on the stream head.
-.TP 12
+.TP
 .B MSG_BAND
 Specifies that a normal priority queue band message is to be sent for the
 specified
@@ -262,13 +262,13 @@ When
 fails, it returns -1 and sets
 .I errno
 to one of the following:
-.TP 12
+.TP
 .\".RB [ EACCES ]
 .\".I fd
 .\"is a dynamic device, and write permission on the device is denied.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EAGAIN ]
 The stream head is set for non-blocking operation and
 .BR putpmsg ()
@@ -281,20 +281,20 @@ and the corresponding
 is flow controlled.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EBADF ]
 .I fd
 is not a valid file descriptor, or
 refers to a stream that is not open for writing.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ENOSTR ]
 .i fd
 does not refer to a stream.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EINVAL ]
 .i fd
 refers to a stream that is currently linked underneath a STREAMS multiplexing driver.  All read or write systems calls will fail with error number
@@ -308,23 +308,23 @@ for such a stream.
 .\"
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EFAULT ]
 .IR ctlptr ", " datptr ", " ctlptr->buf " or " datptr->buf
 point outside the caller's address space.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ERESTARTSYS ]
 A signal arrived before the operation could begin.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EINTR ]
 A signal arrived before the operation could complete.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EINVAL ]
 The values of
 .IR band " or " flags ,
@@ -340,39 +340,39 @@ and
 is non-zero.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EINVAL ]
 .I fd
 refers to a stream that is linked under a STREAMS multiplexing driver.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EIO ]
 I/O error, or,
 .I fd
 refers to a stream that is open but is in the process of closing.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EPIPE ]
 .I fd
 refers to a pipe and the other end of the pipe is closed.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ESTRPIPE ]
 .I fd
 refers to a STREAMS based pipe and there are no readers at the other end of
 the pipe.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ EISDIR ]
 .I fd
 refers to a directory.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ENODEV ]
 .I fd
 refers to a device that does not support the
@@ -380,18 +380,18 @@ refers to a device that does not support the
 system call.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ENOSR ]
 STREAMS resources were insufficient to complete the operation.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ENOSTR ]
 .I fd
 refers to a device that has no stream associated with it.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ENXIO ]
 A
 .B M_HANGUP
@@ -399,7 +399,7 @@ message arrived at the stream head for the specified
 .IR fd .
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ERANGE ]
 The
 .I len
@@ -414,7 +414,7 @@ of the control or data part is larger than the maximum sized control or data
 message for the STREAMS subsystem.
 .\"
 .\"
-.TP 12
+.TP
 .RB [ ENOSYS ]
 The
 .BR putpmsg ()
@@ -439,8 +439,11 @@ conditions form part of the necessary documentation of the protocol module.
 .SS "Multi-Threading"
 .PP
 .BR putpmsg ()
-is not yet fully MT-safe.  Multiple threads peforming concurrent partial
-writes on the same stream will interfere with each other.
+is thread-safe; however, multiple threads performing concurrent partial writes
+on the same stream will interfere with each other.  POSIX mandatory file
+locks, (see
+.BR lockf (3)),
+can be used to avoid interference.
 .SS "Asynchronous I/O"
 .PP
 If the file is set for blocking operation (see
@@ -503,9 +506,20 @@ SUSv3,
 susv3
 .]
 POSIX,
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42cr
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
-and
-.IR UnixWare \(rg.
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg.
 .PP
 .BR putpmsg ()
 is compatible with LiS

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strvf.8.man,v 0.9.2.5 2004/03/09 22:55:53 brian Exp $
+.\" @(#) $Id: strvf.8.man,v 0.9.2.7 2004/04/17 23:14:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/09 22:55:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRVF 8 "$Date: 2004/03/09 22:55:53 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRVF 8 "$Date: 2004/04/17 23:14:57 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -258,9 +258,9 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-.BR HPUX \(rg.
+.IR HP-UX \(rg.
 This is an
-.BR HPUX \(rg-specific
+.IR HP-UX \(rg-specific
 command.
 .[
 hpuxspg
@@ -269,13 +269,13 @@ hpuxspg
 is provided in
 .B Linux Fast-STREAMS
 for compatibility with
-.BR HPUX \(rg
+.IR HP-UX \(rg
 with the following portability considerations:
 .IP \(em
-.BR HPUX \(rg
+.IR HP-UX \(rg
 does not document any long options.
 .IP \(em
-.BR HPUX \(rg
+.IR HP-UX \(rg
 does not document the
 .BR -d ", " -q ", " -v ", " -h ", " -V " or " -C options.
 .IP \(em
@@ -286,12 +286,12 @@ are provided for compatibility with GNU coding standards.
 The format of the output from the
 .B strvf
 command may be different from that of
-.BR HPUX \(rg.
+.IR HP-UX \(rg.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.BR HPUX \(rg
+.IR HP-UX \(rg
 documentation.
 .[
 hpuxdoc
@@ -302,7 +302,7 @@ hpuxdoc
 .PP
 .B strvf
 first appeared in
-.BR HPUX \(rg.
+.IR HP-UX \(rg.
 .\"
 .\"
 .[

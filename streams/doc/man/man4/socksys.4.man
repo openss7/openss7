@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: socksys.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: socksys.4.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SOCKSYS 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH SOCKSYS 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -519,7 +519,7 @@ IO control.
 The
 .BR tpi (7)
 driver must be written to always return a
-.BR UNIX \(rg
+.IR UNIX \(rg
 system error in the
 .I UNIX_error
 field of the
@@ -548,7 +548,7 @@ error numbers returned in the
 field of the
 .BR T_ERROR_ACK (7)
 primitive, will return the following
-.BR UNIX \(rg
+.IR UNIX \(rg
 errors when the
 .I UNIX_error
 field is zero:
@@ -604,8 +604,8 @@ has no known bugs.
 .PP
 .B /dev/socksys
 is compatible with
-.BR UnixWare \(rg,
-.BR Solaris \(rg
+.IR UnixWare \(rg,
+.IR Solaris \(rg
 and
 .B LiS
 .[

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insf.8.man,v 0.9.2.3 2004/03/07 22:49:11 brian Exp $
+.\" @(#) $Id: insf.8.man,v 0.9.2.5 2004/04/17 23:14:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH INSF 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH INSF 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -133,13 +133,13 @@ command.
 .SH COMPATIBILITY
 .PP
 This is for compatibility with the
-.BR HPUX \(rg
+.IR HP-UX \(rg
 command.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.BR HPUX \(rg
+.IR HP-UX \(rg
 documentation.
 .\"
 .\"

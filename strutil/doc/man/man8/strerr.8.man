@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strerr.8.man,v 0.9.2.2 2004/03/07 22:49:11 brian Exp $
+.\" @(#) $Id: strerr.8.man,v 0.9.2.4 2004/04/17 23:14:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRERR 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRERR 8 "$Date: 2004/04/17 23:14:57 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -351,17 +351,17 @@ has no known bugs.
 .PP
 .B strerr
 is compatible with
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 and systems based on
 .B "SVR 4.2"
 such as
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR UX/P \(rg
+.IR UXP/V \(rg
 with the following compatibility considerations:
 .IP \(em
 Options
@@ -384,17 +384,17 @@ Options
 .BR --help " and " --version
 are provided for compatibility with GNU coding standards.
 .IP \(em
-.BR AIX \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR AIX \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR UX/P \(rg
+.IR UXP/V \(rg
 do not document the
 .BR -a " or " -d
 options;
-.BR HPUX \(rg
+.IR HP-UX \(rg
 and
-.BR OSF \(rg
+.IR OSF/1 \(rg
 do.
 .IP \(em
 All other implementations document the log file directory as
@@ -417,12 +417,12 @@ if necessary, unless a directory is specified with the
 option.
 .IP \(em
 Under
-.BR "SVR 4.2"
+.IR "SVR 4.2"
 .[
 svr42cr
 .]
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 .[
 uw7doc
 .]
@@ -433,7 +433,7 @@ error logger is called
 rather than
 .BR /dev/strlog .
 Under
-.BR OSF \(rg
+.IR OSF/1 \(rg
 .[
 osfdoc
 .]
@@ -461,17 +461,17 @@ option.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ;
+.IR "SVR 4.2" ;
 .[
 svr42cr
 .]
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR UX/P \(rg
+.IR UXP/V \(rg
 documentation.
 .[
 aixdoc
@@ -497,7 +497,7 @@ uxpdoc
 .PP
 .B strerr
 first appear in
-.BR "SVR 4" .
+.IR "SVR 4" .
 .[
 svr4
 .]

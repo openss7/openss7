@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strlog.9.man,v 0.9.2.4 2004/03/18 09:13:44 brian Exp $
+.\" @(#) $Id: strlog.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRLOG 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRLOG 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -254,7 +254,7 @@ is the
 argument.
 .PP
 As
-.BR Linux \(rg
+.IR Linux \(rg
 does not have a
 .I STREAMS
 logger, the BSD
@@ -296,11 +296,11 @@ usldk
 .]
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg
 and
-.BR UX/P \(rg
+.IR UXP/V \(rg
 with the portability considerations:
 .IP \(em \w'\ \(em\ 'u
 .IR AIX \(rg
@@ -310,7 +310,7 @@ argument.
 .IP \(em
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg
 and
 .IR UXP/V \(rg
@@ -326,7 +326,7 @@ source compatibility.
 .BR strlog ()
 ignores this flag.
 .IP \(em
-.IR OSF \(rg
+.IR OSF/1 \(rg
 does not document the
 .BR SL_FATAL ", " SL_WARN ", " SL_NOTE ", " SL_NOTIFY " or " SL_NOPUTBUF
 flags.
@@ -334,13 +334,13 @@ flags.
 The
 .B SL_NOTIFY
 flags is supposed to send a copy of the log to the system administrator.  As
-.BR Linux \(rg
+.IR Linux \(rg
 does not actually have a STREAMS based logger (although it does use
 .IR \*(lq/dev/log\*(rq )
 the
 .BR syslogd (8)
 facilities under
-.BR Linux \(rg
+.IR Linux \(rg
 should be used instead.
 Therefore,
 .BR strlog ()
@@ -353,7 +353,7 @@ does the same.
 Under
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg
 and
@@ -375,7 +375,7 @@ Binary compatibility with
 SVR 4.2 MP,
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg
 and
@@ -391,7 +391,7 @@ usldk
 .]
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR OSF \(rg,
+.IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg,
 and

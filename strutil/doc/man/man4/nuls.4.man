@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: nuls.4.man,v 0.9.2.4 2004/04/16 17:14:54 brian Exp $
+.\" @(#) $Id: nuls.4.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/16 17:14:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NULS 4 "$Date: 2004/04/16 17:14:54 $" "$Name:  $" "Linux Fast-STREAMS Modules"
+.TH NULS 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS Modules"
 .\"
 .\"
 .SH NAME
@@ -203,7 +203,7 @@ module as on
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 and
-.IR OSF \(rg
+.IR OSF/1 \(rg
 systems in support of the
 .BR autopush (8),
 .BR scls (8),
@@ -270,7 +270,7 @@ device is compatible with
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 and
-.IR OSF \(rg
+.IR OSF/1 \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .B /dev/nuls
@@ -291,7 +291,7 @@ and
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 and
-.IR OSF \(rg
+.IR OSF/1 \(rg
 documentation.
 .[
 aixdoc
@@ -317,7 +317,7 @@ implementations for
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 and
-.IR OSF \(rg.
+.IR OSF/1 \(rg.
 
 .\"
 .\"

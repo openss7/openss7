@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff nocindent
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strace.8.man,v 0.9.2.2 2004/03/07 22:49:11 brian Exp $
+.\" @(#) $Id: strace.8.man,v 0.9.2.4 2004/04/17 23:14:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRACE 8 "$Date: 2004/03/07 22:49:11 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRACE 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -370,16 +370,16 @@ has no known bugs.
 .PP
 .B strace
 is compatible with systems based on
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 .[
 svr42cr
 .]
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg,
-.BR UX/P \(rg,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg,
 with the following compatibility considerations:
 .IP \(em
 Options
@@ -419,12 +419,12 @@ The first process to register for the given trace id filter will receive those
 trace messages and no other trace process will receive them.
 .IP \(em
 Under
-.BR "SVR 4.2"
+.IR "SVR 4.2"
 .[
 svr42cr
 .]
 and
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 the
 .I STREAMS
 trace logger is called
@@ -438,7 +438,7 @@ based log mechanism (BSD-style) logging device named
 .BR /dev/log .
 .IP \(em
 Under
-.BR OSF \(rg
+.IR OSF/1 \(rg
 the
 .I STREAMS
 trace logger is called
@@ -460,16 +460,16 @@ log device in this search sequence.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ;
+.IR "SVR 4.2" ;
 .[
 svr42cr
 .]
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg,
-.BR UX/P \(rg,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg,
 documentation.
 .[
 aixdoc
@@ -495,7 +495,7 @@ uxpdoc
 .PP
 .B strace
 first appeared in
-.BR "SVR 4" .
+.IR "SVR 4" .
 .[
 svr42cr
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: minor.9.man,v 0.9.2.3 2004/03/18 09:13:44 brian Exp $
+.\" @(#) $Id: minor.9.man,v 0.9.2.4 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/18 09:13:44 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MAJOR 9 "$Date: 2004/03/18 09:13:44 $" "$Name:  $" "Linux Fast-STREAMS SVR3 DDI/DKI"
+.TH MAJOR 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS SVR3 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -234,7 +234,7 @@ is compatible with
 svr3
 .]
 and systems based on
-.BR "SVR 3" ,
+.IR "SVR 3" ,
 with the following portability considerations:
 .IP \(em \w'\ \(em\ 'u
 .BR minor ()

@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff nocindent
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fdetach.8.man,v 0.9.2.5 2004/03/09 22:55:53 brian Exp $
+.\" @(#) $Id: fdetach.8.man,v 0.9.2.7 2004/04/17 23:14:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/09 22:55:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FDETACH 8 "$Date: 2004/03/09 22:55:53 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH FDETACH 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -213,15 +213,15 @@ has no known bugs.
 .PP
 .B fdetach
 is compatible with
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 .[
 svr42cr
 .]
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg,
-.BR UXP/V \(rg
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+.IR UXP/V \(rg
 and
 .BR LiS ,
 .[
@@ -229,7 +229,7 @@ LiS
 .]
 with the following considerations:
 .IP \(em 4
-.BR AIX \(rg
+.IR AIX \(rg
 does not
 document
 .[
@@ -241,7 +241,7 @@ command.  However,
 .BR umount (1)
 may be used in its stead.
 For compatibility with
-.BR AIX \(rg,
+.IR AIX \(rg,
 .B Linux Fast-STREAMS
 supports the use of the
 .BR umount (8)
@@ -264,28 +264,28 @@ options.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ;
+.IR "SVR 4.2" ;
 .[
 svr42cr
 .]
-.BR HPUX \(rg,
+.IR HP-UX \(rg,
 .[
 hpuxspg
 .]
-.BR OSF \(rg,
+.IR OSF/1 \(rg,
 .[
 osfspg
 .]
-.BR Solaris \(rg,
+.IR Solaris \(rg,
 .[
 solspg
 .]
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 .[
 uw7doc
 .]
 and
-.BR UXP/V \(rg
+.IR UXP/V \(rg
 .[
 uxpdoc
 .]
@@ -296,7 +296,7 @@ documentation.
 .PP
 .BR fdetach
 first appeared in
-.BR "SVR 4" .
+.IR "SVR 4" .
 .[
 svr4
 .]

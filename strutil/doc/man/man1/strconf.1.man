@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: strconf.1.man,v 0.9.2.2 2004/03/07 22:49:04 brian Exp $
+.\" @(#) $Id: strconf.1.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:04 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCONF 1 "$Date: 2004/03/07 22:49:04 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
+.TH STRCONF 1 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS User Commands"
 .\"
 .\"
 .SH NAME
@@ -166,12 +166,12 @@ stream and is not the superuser, the
 command will fail.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH FILES
@@ -191,40 +191,48 @@ command.
 .\"
 .SH BUGS
 .PP
+.B strconf
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR "SVR 4.2" ,
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR SuperUX \(rg,
-.BR UnixWare \(rg
+.IR "SVR 4.2" ,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
 and
-.BR UX/P \(rg.
+.IR UXP/V \(rg.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ;
+.IR "SVR 4.2" ;
 .[
 svr42cr
 .]
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR SuperUX \(rg,
-.BR UnixWare \(rg,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
 and
-.BR UX/P \(rg
+.IR UXP/V \(rg
 documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
+.B strconf
+first appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
 .\"
 .\"
 .[

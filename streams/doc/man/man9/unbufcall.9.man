@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unbufcall.9.man,v 0.9.2.4 2004/03/16 08:01:18 brian Exp $
+.\" @(#) $Id: unbufcall.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:18 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNBUFCALL 9 "$Date: 2004/03/16 08:01:18 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNBUFCALL 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -207,7 +207,7 @@ has no known bugs.
 .PP
 .BR unbufcall ()
 is compatible with
-.BR "SVR 4.2 MP DDI/DKI" ,
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
@@ -245,7 +245,7 @@ instead of an
 .B int
 .I bcid
 as was the case for
-.BR "SVR 3" .
+.IR "SVR 3" .
 .[
 svr3spg
 .]
@@ -269,7 +269,7 @@ use
 .B register int
 for
 .IR bcid .
-.IR OSF \(rg
+.IR OSF/1 \(rg
 .[
 osfdoc
 .]
@@ -307,7 +307,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2 MP DDI/DKI" ,
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
@@ -317,7 +317,7 @@ usldk
 .PP
 .BR unbufcall ()
 first appeared in
-.BR "SVR 3" .
+.IR "SVR 3" .
 .[
 svr3spg
 .]

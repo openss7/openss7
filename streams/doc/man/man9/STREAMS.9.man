@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.4 2004/03/16 11:39:32 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 11:39:32 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS 9 "$Date: 2004/03/16 11:39:32 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STREAMS 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -495,7 +495,7 @@ an existing pipe end
 .PP
 .B Linux Fast-STREAMS
 provides the following more common extensions to
-.BR "SVR 4.2 MP DDI/DKI" :
+.IR "SVR 4.2 MP DDI/DKI" :
 .[
 usldk
 .]
@@ -517,7 +517,7 @@ usldk
 .PP
 .B Linux Fast-STREAMS
 provides access to the
-.BR "SVR 4"
+.IR "SVR 4"
 .[
 svr4
 .]
@@ -678,7 +678,7 @@ internal functions listed below:
 .BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
 .PD
 .PP
-.SS "OSF1.2/Digial UNIX\(rg Compatibility Functions"
+.SS "OSF/1 1.2\(emDigial UNIX\(rg Compatibility Functions"
 .PP
 .PD 0
 .HP

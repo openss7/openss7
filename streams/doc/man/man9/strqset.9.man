@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqset.9.man,v 0.9.2.5 2004/03/16 08:01:18 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 0.9.2.6 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 08:01:18 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRQSET 9 "$Date: 2004/03/16 08:01:18 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH STRQSET 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -295,12 +295,12 @@ has not known bugs.
 .PP
 .BR strqset (9)
 is source-level compatible with
-.BR "SVR 4.2 MP DDI/DKI" ,
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
 and systems based on
-.BR "SVR 4" ,
+.IR "SVR 4" ,
 .[
 svr4spg
 .]
@@ -337,7 +337,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2 MP DDI/DKI" .
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]

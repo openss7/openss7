@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: ip.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: ip.4.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH IP 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Under Construction"
+.TH IP 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Under Construction"
 .\"
 .\"
 .SH NAME
@@ -191,7 +191,7 @@ A standard
 socket that preserves message boundaries, does not Nagle, and provides only
 best effort unreliable delivery in a connectionless association.  This socket
 uses the underlying
-.BR Linux \(rg
+.IR Linux \(rg
 .B IP
 socket implementation,
 .BR ip (7),
@@ -247,11 +247,11 @@ has several implementation.  THis manpage is for
 implementation that provides
 .BR tpi (7)
 access to the
-.BR Linux \(rg
+.IR Linux \(rg
 NET4 version of
 .BR IP .
 For more information on the
-.BR Linux \(rg
+.IR Linux \(rg
 NET4 version, see
 .BR ip (7).
 .\"

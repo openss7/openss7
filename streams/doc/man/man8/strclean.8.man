@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strclean.8.man,v 0.9.2.3 2004/03/09 22:55:53 brian Exp $
+.\" @(#) $Id: strclean.8.man,v 0.9.2.5 2004/04/17 23:14:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/09 22:55:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRCLEAN 8 "$Date: 2004/03/09 22:55:53 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRCLEAN 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -246,17 +246,17 @@ has no known bugs.
 .PP
 .B strclean
 is compatible with
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 and systems based on
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 such as
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR UXP/V \(rg,
+.IR UXP/V \(rg,
 with the following compatibility considerations:
 .IP \(em
 No other implementation documents the
@@ -284,17 +284,17 @@ for more information on trace log files.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ;
+.IR "SVR 4.2" ;
 .[
 svr42cr
 .]
-.BR AIX \(rg,
-.BR HPUX \(rg,
-.BR OSF \(rg,
-.BR Solaris \(rg,
-.BR UnixWare \(rg
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
 and
-.BR UXP/V \(rg
+.IR UXP/V \(rg
 documentation.
 .[
 aixdoc
@@ -321,7 +321,7 @@ uxpdoc
 .PP
 .B strclean
 first appear in
-.BR "SVR 4" .
+.IR "SVR 4" .
 .[
 svr4
 .]

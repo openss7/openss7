@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: ticotsord.4.man,v 0.9.2.2 2004/03/07 22:49:10 brian Exp $
+.\" @(#) $Id: ticotsord.4.man,v 0.9.2.3 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/07 22:49:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TICOTSORD 4 "$Date: 2004/03/07 22:49:10 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH TICOTSORD 4 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .SH NAME
 .B ticotsord, tlcotsod
 \- connection oriented orderly release loopback provider
@@ -168,14 +168,14 @@ has no known bugs.
 .PP
 .B /dev/ticotsord
 is compatible with
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 and
-.BR Solaris\(rg.
+.IR Solaris\(rg.
 .B /dev/tlcotsod
 is compatible with
-.BR HPUX \(rg;
+.IR HP-UX \(rg;
 except that
-.BR HPUX \(rg
+.IR HP-UX \(rg
 has a separate
 .B /dev/unix_cots
 device.

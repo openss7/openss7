@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlink.9.man,v 0.9.2.4 2004/03/16 11:37:11 brian Exp $
+.\" @(#) $Id: unlink.9.man,v 0.9.2.5 2004/04/17 18:52:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/16 11:37:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 18:52:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNLINK 9 "$Date: 2004/03/16 11:37:11 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNLINK 9 "$Date: 2004/04/17 18:52:13 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -268,7 +268,7 @@ lis
 .PP
 .BR unlink ()
 first appeared in
-.BR "SVR 2" .
+.IR "SVR 2" .
 .\"
 .\"
 .[

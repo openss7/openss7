@@ -1,7 +1,7 @@
-'\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.5 2004/03/09 22:55:53 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.7 2004/04/17 23:14:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/09 22:55:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/17 23:14:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH 8 "$Date: 2004/03/09 22:55:53 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH AUTOPUSH 8 "$Date: 2004/04/17 23:14:56 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -628,17 +628,17 @@ LfS
 .]
 .B autopush
 is compatible with
-.BR "SVR 4.2" ,
+.IR "SVR 4.2" ,
 .[
 svr42
 .]
-.BR Solaris \(rg,
-.BR UnixWare \(rg,
-.BR HPUX \(rg,
-.BR AIX \(rg,
-.BR OSF \(rg
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+.IR HP-UX \(rg,
+.IR AIX \(rg,
+.IR OSF/1 \(rg
 and
-.BR LiS ,
+.IR LiS ,
 .[
 LiS
 .]
@@ -648,8 +648,8 @@ with the following caveats:
 options
 .BR -f ", " -g ", " -r ", " -M ", " -m " and " -N
 are compatible with
-.BR UnixWare \(rg.
-.BR UnixWare \(rg
+.IR UnixWare \(rg.
+.IR UnixWare \(rg
 does not document long options formats, nor the
 .BR -s ", " -c ", " -V ", " -h " or " -v
 flags.
@@ -658,8 +658,8 @@ flags.
 options
 .BR -f ", " -g ", " -r ", " -M " and " -m
 are compatible with
-.BR Solaris "\(rg and " OSF \(rg.
-.BR Solaris "\(rg and " OSF \(rg
+.IR Solaris "\(rg and " OSF/1 \(rg.
+.IR Solaris "\(rg and " OSF/1 \(rg
 do not document long options formats, nor the
 .BR -s ", " -c ", " -V ", " -h ", " -v " or " -N
 flags.
@@ -668,14 +668,14 @@ flags.
 options
 .BR -f ", " -g ", " -r ", " -M " and " -m
 are compatible with
-.BR AIX "\(rg and " HPUX \(rg.
-.BR AIX "\(rg and " HPUX \(rg
+.IR AIX "\(rg and " HP-UX \(rg.
+.IR AIX "\(rg and " HP-UX \(rg
 provide that the argument to the
 .B -M
 option can be either a major number or a name.
 .B autopush
 supports this as well.
-.BR AIX "\(rg and " HPUX \(rg
+.IR AIX "\(rg and " HP-UX \(rg
 do not document long options formats, nor the
 .BR -s ", " -c ", " -V ", " -h ", " -v " or " -N
 flags.
@@ -683,20 +683,20 @@ flags.
 .B autopush
 .BR -f " filename"
 file formats are compatible with both
-.BR Solaris \(rg,
-.BR UnixWare \(rg,
-.BR HPUX \(rg,
-.BR AIX \(rg
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+.IR HP-UX \(rg,
+.IR AIX \(rg
 and
-.BR OSF \(rg,
+.IR OSF/1 \(rg,
 including the
-.BR UnixWare \(rg
+.IR UnixWare \(rg
 use of -1 in the
 .I lastminor
 position to specify that the specified minor device is a
 .BR clone (4)
 device or redirected open channel, and the
-.BR Solaris \(rg
+.IR Solaris \(rg
 use of the special module name
 .RI \*(lq [anchor] \*(rq.
 .IP \(em 4
@@ -704,7 +704,7 @@ use of the special module name
 directly implements the driver name function in the
 .BR sad (4)
 driver.
-.BR AIX "\(rg and " HPUX \(rg
+.IR AIX "\(rg and " HP-UX \(rg
 mention using the
 .BR sc (4)
 module to enhance the
@@ -758,16 +758,16 @@ should be avoided.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4.2" ;
+.IR "SVR 4.2" ;
 .[
 svr42cr
 .]
-.BR UnixWare \(rg,
-.BR Solaris \(rg,
-.BR HPUX \(rg,
-.BR AIX \(rg
+.IR UnixWare \(rg,
+.IR Solaris \(rg,
+.IR HP-UX \(rg,
+.IR AIX \(rg
 and
-.BR OSF \(rg
+.IR OSF/1 \(rg
 documentation.
 .\"
 .\"
@@ -775,7 +775,7 @@ documentation.
 .PP
 .B autopush
 first appeared in
-.BR "SVR 4" .
+.IR "SVR 4" .
 .[
 svr4
 .]
