@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/04 03:05:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/04 05:58:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/04 03:05:04 $ by $Author: brian $
+# Last Modified $Date: 2004/08/04 05:58:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -203,7 +203,7 @@ endif
 endif
 
 EXTRA_DIST			= $(mods_source_FILES) $(drvs_source_FILES)
-dist_noinst_SCRIPTS		=
+dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)

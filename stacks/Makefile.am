@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/28 10:10:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/08/04 06:03:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/28 10:10:55 $ by $Author: brian $
+# Last Modified $Date: 2004/08/04 06:03:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -829,10 +829,9 @@ EXTRA_DOCS = \
 	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
 	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
 
-EXTRA_DIST = $(ss7_source_FILES) $(EXTRA_DOCS)
-
-dist_noinst_SCRIPTS =
-EXTRA_SCRIPTS =
+EXTRA_DIST			= $(ss7_source_FILES) $(EXTRA_DOCS)
+dist_noinst_SCRIPTS		= configure.nexusware
+EXTRA_SCRIPTS			=
 
 KERNEL_MODCONF			= conf.modules
 KERNEL_SUBDIR			= openss7
