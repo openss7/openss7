@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/03/18 11:40:32 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/03/21 08:32:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/18 11:40:32 $ by $Author: brian $
+# Last Modified $Date: 2005/03/21 08:32:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -979,9 +979,7 @@ dnl		configuration file is the .config file in the kernel-headers package.  For 
 dnl		the kbuilddir is /usr/src/linux but we want /usr/src/kernel-headers for the correct
 dnl		.config file.  So, we do the search.
 dnl
-		linux_cv_k_config_spec='
-		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
-		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config'
+		linux_cv_k_config_spec='${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config'
 		;;
 	    (*)
 		# try to figure out if we have a redhat or mandrake variant
