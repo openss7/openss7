@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.11 2004/08/22 11:19:20 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.13 2004/08/23 10:30:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/22 11:19:20 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/23 10:30:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -409,7 +409,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
 	    ;;
 	*)			: ;;
     esac
-    STREAMS_CPPFLAGS="-D_LIS_SOURCE${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD='-lLiS'
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =========================================================================
@@ -418,8 +418,10 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
 # _LINUX_STREAMS_LFS_DEFINES
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [
-    STREAMS_CPPFLAGS="-D_LFS_SOURCE${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD='-lstreams'
+    AC_DEFINE_UNQUOTED([HAVE_BCID_T], [], [Linux Fast-STREAMS has this type.])
+    AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [], [Linux Fast-STREAMS has this type.])
 ])# _LINUX_STREAMS_LFS_DEFINES
 # =========================================================================
 

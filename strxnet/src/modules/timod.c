@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/27 02:17:18 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 02:17:18 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 11:45:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/27 02:17:18 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/27 02:17:18 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -67,6 +67,10 @@ static char const ident[] =
  */
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
 #endif
 
 #if !defined _LIS_SOURCE && !defined _LFS_SOURCE
@@ -103,11 +107,13 @@ static char const ident[] =
 
 #include <sys/stream.h>
 
-#ifdef _LFS_SOURCE
+#ifdef LFS
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
 #endif
+#include <sys/ddi.h>
 
 /*
    These are for TPI definitions 
@@ -125,7 +131,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/27 02:17:18 $"
+#define TIMOD_REVISION	"LfS $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 11:45:57 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -322,14 +328,14 @@ static int
 timod_rput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
-#if defined _LIS_SOURCE
+#if defined LIS
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			TIMOD_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 		union T_primitives *p;
 		struct iocblk *ioc;
@@ -575,14 +581,14 @@ static int
 timod_wput(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
-#if defined _LIS_SOURCE
+#if defined LIS
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			TIMOD_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 		union T_primitives *p;
 		struct iocblk *ioc;
@@ -1007,7 +1013,7 @@ timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
       quit:
 	MOD_DEC_USE_COUNT;
-	return (ENXIO);
+	return (err);
 }
 
 static int
@@ -1015,7 +1021,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
-#if defined _LIS_SOURCE
+#if defined LIS
 	/*
 	   protect against LiS bugs 
 	 */
@@ -1029,7 +1035,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 			TIMOD_MOD_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	timod_pop(q);
 	goto skip_pop;
       skip_pop:
@@ -1048,7 +1054,7 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  *
  *  -------------------------------------------------------------------------
  */
-#if defined _LFS_SOURCE
+#if defined LFS
 static struct fmodsw timod_fmod = {
 	f_name:TIMOD_MOD_NAME,
 	f_str:&timod_info,
@@ -1072,7 +1078,7 @@ timod_unregister_module(void)
 	return (void) unregister_strmod(&timod_fmod);
 }
 
-#elif defined _LIS_SOURCE
+#elif defined LIS
 
 static int
 timod_register_module(void)

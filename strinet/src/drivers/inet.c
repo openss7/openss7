@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:46:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/15 19:57:43 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 11:46:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:46:08 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:46:08 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -61,6 +61,10 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
 #endif
 
 #if !defined _LIS_SOURCE && !defined _LFS_SOURCE
@@ -232,11 +236,14 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #include <sys/stream.h>
 
-#ifdef _LFS_SOURCE
+#ifdef LFS
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
 #endif
+
+#include <sys/ddi.h>
 
 #if defined HAVE_TIHDR_H
 #   include <tihdr.h>
@@ -252,12 +259,14 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define LINUX_2_4 1
 
+#ifndef LFS
 #include "debug.h"
+#endif
 #include "bufq.h"
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:46:08 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"
@@ -13748,6 +13757,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (-err);
 	}
+	qprocson(q);
 	return (0);
 }
 
@@ -13755,22 +13765,40 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC int
-ss_close(queue_t *q, int flag, cred_t *crp)
+STATIC int ss_close(queue_t *q, int flag, cred_t *crp)
 {
 	ss_t *ss = PRIV(q);
 	(void) flag;
 	(void) crp;
 	(void) ss;
 	printd(("%s: closing character device %d:%d\n", SS_MOD_NAME, ss->cmajor, ss->cminor));
+#if defined LIS
+	/* 
+	   protect against LiS bugs */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", SS_MOD_NAME,
+			__FUNCTION__);
+		goto quit;
+	}
+	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			SS_MOD_NAME, __FUNCTION__);
+		goto skip_pop;
+	}
+#endif				/* defined LIS */
+	goto skip_pop;
+      skip_pop:
+	qprocsoff(q);
 	spin_lock_bh(&ss_lock);
 	ss_free_priv(q);
 	spin_unlock_bh(&ss_lock);
 	MOD_DEC_USE_COUNT;
+	goto quit;
+      quit:
 	return (0);
 }
 
-#ifdef _LFS_SOURCE
+#if defined LFS
 /*
  *  =========================================================================
  *
@@ -13817,7 +13845,7 @@ module_exit(ss_exit);
 #endif
 
 
-#else
+#elif defined LIS
 /*
  *  =========================================================================
  *

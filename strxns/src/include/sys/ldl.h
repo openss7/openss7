@@ -188,38 +188,40 @@ struct ldl_flags_ioctl {
 
 /* 
  *  This is absurd... A kernel data structure exposed into user space with
- *  user header files.  One so architecture depedenent as lis_atomic_t yet.
- *  Not to mention that lis_atomic_t can be different sizes dependeing on
+ *  user header files.  One so architecture depedenent as atomic_t yet.
+ *  Not to mention that atomic_t can be different sizes dependeing on
  *  kernel and user space sizes.  LDL is unusable on anything othen than
  *  32-bit architectures. --bb
  */
-#ifndef lis_atomic_t
-typedef long lis_atomic_t;		/* no not volatile as in the kernel */
-#define lis_atomic_t lis_atomic_t
+#ifndef __KERNEL__
+#ifndef atomic_t
+typedef long atomic_t;		/* no not volatile as in the kernel */
+#define atomic_t atomic_t
+#endif
 #endif
 
 typedef struct ldl_gstats_ioctl			/* global statistics */
 {						/* for entire driver */
-    lis_atomic_t	attach_req_cnt ;
-    lis_atomic_t	detach_req_cnt ;
-    lis_atomic_t	bind_req_cnt ;
-    lis_atomic_t	unbind_req_cnt ;
-    lis_atomic_t	subs_bind_req_cnt ;
-    lis_atomic_t	subs_unbind_req_cnt ;
-    lis_atomic_t	udqos_req_cnt ;
-    lis_atomic_t	ok_ack_cnt ;
-    lis_atomic_t	error_ack_cnt ;
-    lis_atomic_t	unitdata_req_cnt ;	/* including M_DATA */
-    lis_atomic_t	unitdata_req_q_cnt ;	/* including M_DATA */
-    lis_atomic_t	unitdata_ind_cnt ;	/* including M_DATA */
-    lis_atomic_t	unitdata_q_cnt ;	/* including M_DATA */
-    lis_atomic_t	unitdata_drp_cnt ;	/* including M_DATA */
-    lis_atomic_t	uderror_ind_cnt ;
-    lis_atomic_t	ioctl_cnt ;
-    lis_atomic_t	net_rx_cnt ;		/* # pkts from below */
-    lis_atomic_t	net_rx_drp_cnt ;	/* usually mem-alloc fail */
-    lis_atomic_t	net_tx_cnt ;		/* # pkts xmitted */
-    lis_atomic_t	net_tx_fail_cnt ;
+    atomic_t	attach_req_cnt ;
+    atomic_t	detach_req_cnt ;
+    atomic_t	bind_req_cnt ;
+    atomic_t	unbind_req_cnt ;
+    atomic_t	subs_bind_req_cnt ;
+    atomic_t	subs_unbind_req_cnt ;
+    atomic_t	udqos_req_cnt ;
+    atomic_t	ok_ack_cnt ;
+    atomic_t	error_ack_cnt ;
+    atomic_t	unitdata_req_cnt ;	/* including M_DATA */
+    atomic_t	unitdata_req_q_cnt ;	/* including M_DATA */
+    atomic_t	unitdata_ind_cnt ;	/* including M_DATA */
+    atomic_t	unitdata_q_cnt ;	/* including M_DATA */
+    atomic_t	unitdata_drp_cnt ;	/* including M_DATA */
+    atomic_t	uderror_ind_cnt ;
+    atomic_t	ioctl_cnt ;
+    atomic_t	net_rx_cnt ;		/* # pkts from below */
+    atomic_t	net_rx_drp_cnt ;	/* usually mem-alloc fail */
+    atomic_t	net_tx_cnt ;		/* # pkts xmitted */
+    atomic_t	net_tx_fail_cnt ;
 
 } ldl_gstats_ioctl_t ;
 

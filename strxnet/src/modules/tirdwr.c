@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 02:17:18 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:45:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/27 02:17:18 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 11:45:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 02:17:18 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:45:57 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 02:17:18 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:45:57 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
 #endif
 
 #if !defined _LIS_SOURCE && !defined _LFS_SOURCE
@@ -93,11 +97,13 @@ static char const ident[] =
 
 #include <sys/stream.h>
 
-#ifdef _LFS_SOURCE
+#ifdef LFS
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
 #endif
+#include <sys/ddi.h>
 
 /*
    These are for TPI definitions 
@@ -113,7 +119,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 02:17:18 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/23 11:45:57 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -428,14 +434,14 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *bp = NULL;
-#if defined _LIS_SOURCE
+#if defined LIS
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		/*
@@ -578,14 +584,14 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
-#if defined _LIS_SOURCE
+#if defined LIS
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		if (!(priv->flags & (TIRDWR_EPROTO | TIRDWR_HANGUP))) {
@@ -691,7 +697,7 @@ tirdwr_push(queue_t *q)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
-#ifdef _LIS_SOURCE
+#ifdef LIS
 		lis_flags_t psw;
 		/*
 		   Under LiS we can't freeze the stream but we can lock the queue.  This is not a
@@ -714,7 +720,7 @@ tirdwr_push(queue_t *q)
 			case M_PCPROTO:
 				err = EPROTO;
 			}
-#ifdef _LIS_SOURCE
+#ifdef LIS
 		LIS_QISRUNLOCK(hq, &psw);
 #else
 		unfreezestr(q, psw);
@@ -810,7 +816,7 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	return (0);
       quit:
 	MOD_DEC_USE_COUNT;
-	return (ENXIO);
+	return (err);
 }
 
 static int
@@ -818,7 +824,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
-#if defined _LIS_SOURCE
+#if defined LIS
 	/*
 	   protect against some LiS bugs 
 	 */
@@ -832,7 +838,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	tirdwr_pop(q);
 	goto skip_pop;
       skip_pop:
@@ -852,7 +858,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  *  =========================================================================
  */
 
-#if defined _LFS_SOURCE
+#if defined LFS
 
 static struct fmodsw tirdwr_fmod = {
 	f_name:TIRDWR_MOD_NAME,
@@ -877,7 +883,7 @@ tirdwr_unregister_module(void)
 	return (void) unregister_strmod(&tirdwr_fmod);
 }
 
-#elif defined _LIS_SOURCE
+#elif defined LIS
 
 static int
 tirdwr_register_module(void)

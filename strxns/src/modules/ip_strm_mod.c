@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/15 19:54:29 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,159 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/15 19:54:29 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 13:22:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/15 19:54:29 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $"
 
-static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/15 19:54:29 $";
+static char const ident[] =
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $";
+
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the ip_strm_mod module.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	ifdef MODVERSIONS
+#	    include <linux/modversions.h>
+#	endif
+#	include <linux/module.h>
+#	include <linux/modversions.h>
+#	ifndef __GENKSYMS__
+#	    if defined HAVE_SYS_LIS_MOVERSIONS_H
+#		include <sys/LiS/modversions.h>
+#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#		include <sys/streams/modversions.h>
+#	    endif
+#	endif
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#include <linux/slab.h>
+
+#include <linux/bitops.h>
+#include <linux/net.h>
+#include <linux/in.h>
+
+#include <linux/netdevice.h>
+#include <linux/etherdevice.h>
+#include <linux/skbuff.h>
+#include <linux/ethtool.h>
+#include <linux/delay.h>
+#include <linux/types.h>
+#include <linux/if_arp.h>
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
+
+#include <sys/stream.h>
+
+#ifdef LFS
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+
+#include <sys/ddi.h>
+
+#include <sys/dlpi.h>
+
+#ifndef LFS
+#include "debug.h"
+#endif
+
+#define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
+#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2004/08/23 13:22:48 $"
+#define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
+#define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define IP_TO_STREAMS_LICENSE		"GPL"
+#define IP_TO_STREAMS_BANNER		IP_TO_STREAMS_DESCRIP		"\n" \
+					IP_TO_STREAMS_COPYRIGHT	"\n" \
+					IP_TO_STREAMS_REVISION	"\n" \
+					IP_TO_STREAMS_DEVICE		"\n" \
+					IP_TO_STREAMS_CONTACT		"\n"
+#define IP_TO_STREAMS_SPLASH		IP_TO_STREAMS_DEVICE		" - " \
+					IP_TO_STREAMS_REVISION	"\n"
+
+MODULE_AUTHOR(IP_TO_STREAMS_CONTACT);
+MODULE_DESCRIPTION(IP_TO_STREAMS_DESCRIP);
+MODULE_SUPPORTED_DEVICE(IP_TO_STREAMS_DEVICE);
+MODULE_LICENSE(IP_TO_STREAMS_LICENSE);
+
+#ifndef IP_TO_STREAMS_MOD_NAME
+#   ifdef CONFIG_STREAMS_IP_TO_STREAMS_NAME
+#	define IP_TO_STREAMS_MOD_NAME CONFIG_STREAMS_IP_TO_STREAMS_NAME
+#   else
+#	define IP_TO_STREAMS_MOD_NAME "ip_strms"
+#   endif
+#endif
+
+#ifndef IP_TO_STREAMS_MOD_ID
+#   ifdef CONFIG_STREAMS_IP_TO_STREAMS_MODID
+#	define IP_TO_STREAMS_MOD_ID CONFIG_STREAMS_IP_TO_STREAMS_MODID
+#   else
+#	define IP_TO_STREAMS_MOD_ID 0
+#   endif
+#endif
+
+modID_t modid = IP_TO_STREAMS_MOD_ID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
+
+STATIC struct module_info ip_to_streams_minfo = {
+	.mi_idnum = IP_TO_STREAMS_MOD_ID,	/* Module ID number */
+	.mi_idname = IP_TO_STREAMS_MOD_NAME,	/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 20000,		/* Hi water mark */
+	.mi_lowat = 2000,		/* Lo water mark */
+};
+
+STATIC int ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int ip_to_streams_close(queue_t *, int, cred_t *);
+
+STATIC int ip_to_streams_rput(queue_t *, mblk_t *);
+STATIC int ip_to_streams_rsrv(queue_t *);
+STATIC int ip_to_streams_wput(queue_t *, mblk_t *);
+STATIC int ip_to_streams_wsrv(queue_t *);
+
+STATIC struct qinit ip_to_streams_rinit = {
+	.qi_putp = ip_to_streams_rput,	/* Read put (message from below) */
+	.qi_srvp = ip_to_streams_rsrv,	/* Read service */
+	.qi_qopen = ip_to_streams_open,	/* Each open */
+	.qi_qclose = ip_to_streams_close,	/* Last close */
+	.qi_minfo = &ip_to_streams_minfo,	/* Information */
+};
+
+STATIC struct qinit ip_to_streams_winit = {
+	.qi_putp = ip_to_streams_wput,	/* Read put (message from below) */
+	.qi_srvp = ip_to_streams_wsrv,	/* Read service */
+	.qi_minfo = &ip_to_streams_minfo,	/* Information */
+};
+
+STATIC struct streamtab ip_to_streams_info = {
+	.st_rdinit = &ip_to_streams_rinit,	/* Upper read queue */
+	.st_wrinit = &ip_to_streams_winit,	/* Upper write queue */
+};
 
 /************************************************************************
 *									*
@@ -108,65 +254,18 @@ static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.
  * tear down the whole thing by closing the streams file.
  */
 
+#ifdef LFS
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
+#define	KERNEL_2_0
+#else
+#define	KERNEL_2_1
+# if LINUX_VERSION_CODE > KERNEL_VERSION(2,3,0)
+# define KERNEL_2_3
+# endif
+#endif
+#endif
 
-/************************************************************************
-*                              SCCS ID                                  *
-*************************************************************************
-*									*
-* The following strings identify this module as to version info.	*
-*									*
-************************************************************************/
-
-#ident "@(#) LiS ip_strm_mod.c 2.21 10/09/02 22:08:57 "
-
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/modversions.h>
-#include <linux/module.h>
-
-#include <linux/kernel.h>
-#include <linux/string.h>
-#include <linux/errno.h>
-#include <linux/ioport.h>
-#include <linux/slab.h>
-#include <linux/interrupt.h>
-#include <linux/timer.h>
-#include <linux/pci.h>
-#include <linux/spinlock.h>
-#include <linux/init.h>
-#include <linux/delay.h>
-#include <linux/ioctl.h>
-
-#include <asm/bitops.h>
-#include <asm/io.h>
-#include <asm/uaccess.h>
-
-#include <linux/net.h>
-#include <linux/in.h>
-
-#include <linux/netdevice.h>
-#include <linux/etherdevice.h>
-#include <linux/skbuff.h>
-#include <linux/ethtool.h>
-#include <linux/delay.h>
-#include <linux/types.h>
-
-#include <linux/if_arp.h>
-
-/*
- * UNIX includes
- */
-#include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/dlpi.h>
-
-#include <sys/mkdev.h>
-#include <sys/ddi.h>
-#include <sys/cred.h>
-
-#include <sys/LiS/mod.h>
 #include "ip_strm_mod.h"
-#include <sys/osif.h>
 
 /************************************************************************
 *                        Function Prototypes                            *
@@ -175,84 +274,24 @@ static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.
 /*
  * Functions in this file
  */
-extern int	ip_strm_init(struct ism_dev *dev) ;
+extern int ip_strm_init(struct ism_dev *dev);
 
-
-/************************************************************************
-*                    Streams Entry Point Routines                       *
-*************************************************************************
-*									*
-* The following section of code contains the entry point routines for	*
-* the streams driver.  These are the open, close, put and service	*
-* routines pointed to by the qinit structures above.			*
-*									*
-************************************************************************/
-
-extern  int		ip_to_streams_open(queue_t *,dev_t *,int ,int, cred_t *);
-
-extern  int		ip_to_streams_close(queue_t *, int, cred_t *);
-extern  int		ip_to_streams_wput(queue_t *,mblk_t *);
-extern  int		ip_to_streams_wsrv(queue_t *);
-extern  int		ip_to_streams_rput(queue_t *,mblk_t *);
-extern  int	        ip_to_streams_rsrv(queue_t *);
-extern  int		ip_to_streams_conn_req(ip_to_streams_minor_t *minor_ptr,
-				      mblk_t *mp, int retry) ;
-extern int		ip_to_streams_proto(ip_to_streams_minor_t *, mblk_t *,
-					int );
+extern int ip_to_streams_conn_req(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry);
+extern int ip_to_streams_proto(ip_to_streams_minor_t *, mblk_t *, int);
 
 #ifdef GCOM
-extern  void		netman_hex_mp (mblk_t *, char *);
-extern  void    	Rsys_print_traced_token (char *bufp) ;
-extern	void		Rsys_hex_print(char *, unsigned char *, int);
+extern void netman_hex_mp(mblk_t *, char *);
+extern void Rsys_print_traced_token(char *bufp);
+extern void Rsys_hex_print(char *, unsigned char *, int);
 #endif
 
-/************************************************************************
-*                    Linkage to Streams System                          *
-************************************************************************/
-
-struct module_info ip_to_streams_minfo =
-	{ 0		/* mi_idnum  */
-	, "ip_to_streams"	/* mi_idname */
-	, 0		/* mi_minpsz */
-	, INFPSZ	/* mi_maxpsz */
-	, 20000		/* mi_hiwat  */
-	, 2000		/* mi_lowat  */
-	};
-struct qinit ip_to_streams_rinit =
-	{ ip_to_streams_rput
-	, ip_to_streams_rsrv	/* qi_srvp  */
-	, ip_to_streams_open	/* qi_open  */
-	, ip_to_streams_close	/* qi_close */
-	, NULL			/* qi_admin */
-	, &ip_to_streams_minfo	/* qi_minfo */
-	, NULL		/* qi_mstat */
-	};
-struct qinit ip_to_streams_winit =
-	{ ip_to_streams_wput	/* qi_putp  */
-	, ip_to_streams_wsrv	/* qi_srvp  */
-	, NULL		/* qi_open  */
-	, NULL		/* qi_close */
-	, NULL		/* qi_admin */
-	, &ip_to_streams_minfo	/* qi_minfo */
-	, NULL		/* qi_mstat */
-	};
-
-struct streamtab ip_to_streams_info =
-	{ &ip_to_streams_rinit	   /* read queue definition */
-	, &ip_to_streams_winit	   /* write queue definition */
-	, NULL			   /* mux read queue  */
-	, NULL			   /* mux write queue */
-	};
-
-int	ip_to_streamsdevflag = 0;
+int ip_to_streamsdevflag = 0;
 
 /************************************************************************
 *                       Storage Declarations                            *
 ************************************************************************/
 
-unsigned long		 ip_to_streams_debug_mask = 0;
-
-
+unsigned long ip_to_streams_debug_mask = 0;
 
 #define IP_STRM_MTU (1500)
 
@@ -263,48 +302,70 @@ unsigned long		 ip_to_streams_debug_mask = 0;
 * The streams open routine. Called when this is pushed on to the stack	*
 *									*
 ************************************************************************/
-int
-ip_to_streams_open( queue_t *rdq,
-	   dev_t   *devp,
-	   int      flag,
-	   int      sflag,
-	   cred_t  *credp)
+/**
+ *  @internal
+ *  @brief STREAMS open routine
+ *  @param q the read queue pointer of the newly created queue pair
+ *  @param devp a pointer to the dev_t (ignored for modules)
+ *  @param oflag open flags
+ *  @param sflag streams flag, should always be MODOPEN
+ *  @param credp pointer to a cred_t credential structure of the pushing
+ *  process
+ *
+ *  This is the STREAMS open entry point to the IP_STRM module.  This entry
+ *  point is called when the IP_STRM module is first pushed onto the stack as
+ *  well as each time that a module is pushed above it.
+ */
+STATIC int ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 {
-    ip_to_streams_minor_t	*minor_ptr ;
+	int err;
+	ip_to_streams_minor_t *minor_ptr;
+	MOD_INC_USE_COUNT;	/* keep module from unloading */
 
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	cmn_err(CE_CONT, "\nip_to_streams_open: q=%x sflag=%d", sflag) ;
+	if (ip_to_streams_debug_mask & (DBG_OPEN))
+		cmn_err(CE_NOTE, "ip_to_streams_open: q=%p sflag=%d", q, sflag);
 
-    minor_ptr = (ip_to_streams_minor_p) ALLOC(sizeof(ip_to_streams_minor_t)) ;
-    if (minor_ptr == NULL)
-	return(-ENOMEM) ;
+	err = 0;
+	if (q->q_ptr != NULL)
+		goto quit;	/* already open */
+	err = ENXIO;
+	if (sflag != MODOPEN || WR(q)->q_next == NULL)
+		goto quit;
+	err = ENOMEM;
+	if ((minor_ptr = (ip_to_streams_minor_p)
+	     kmem_alloc(sizeof(ip_to_streams_minor_t), KM_NOSLEEP)) == NULL)
+		goto quit;
 
-    memset(minor_ptr, 0, sizeof(*minor_ptr)) ;	/* clear to zero */
+	memset(minor_ptr, 0, sizeof(*minor_ptr));	/* clear to zero */
 
-    minor_ptr->dl_magic = DL_MAGIC ;
-    rdq->q_ptr = (caddr_t) minor_ptr ;
-    WR(rdq)->q_ptr = (caddr_t) minor_ptr ;
+	minor_ptr->dl_magic = DL_MAGIC;
+	q->q_ptr = (caddr_t) minor_ptr;
+	WR(q)->q_ptr = (caddr_t) minor_ptr;
 
-    minor_ptr->dl_rdq = rdq ;
-    minor_ptr->dl_wrq = WR(rdq) ;
-    minor_ptr->dl_q   = rdq;
-    minor_ptr->dl_err_prim = -1 ;		/* ensure no retry */
+	minor_ptr->dl_rdq = q;
+	minor_ptr->dl_wrq = WR(q);
+	minor_ptr->dl_q = q;
+	minor_ptr->dl_err_prim = -1;	/* ensure no retry */
 
-    strcpy(minor_ptr->myname, "is") ;		/* initial name Ip/Streams */
+	strcpy(minor_ptr->myname, "is");	/* initial name Ip/Streams */
 #if defined(KERNEL_2_3)
-    strcpy(minor_ptr->mydev.name, "is") ;	/* initial name Ip/Streams */
+	strcpy(minor_ptr->mydev.name, "is");	/* initial name Ip/Streams */
 #else
-    minor_ptr->mydev.name = minor_ptr->myname ;
+	minor_ptr->mydev.name = minor_ptr->myname;
 #endif
-    minor_ptr->mydev.init = ip_strm_init ;
-    minor_ptr->mydev.priv = minor_ptr ;
+	minor_ptr->mydev.init = ip_strm_init;
+	minor_ptr->mydev.priv = minor_ptr;
 
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	cmn_err(CE_CONT, "\nip_to_streams_open succeeded") ;
+	if (ip_to_streams_debug_mask & (DBG_OPEN))
+		cmn_err(CE_CONT, "\nip_to_streams_open succeeded");
 
-    return (0);			/* success */
+	qprocson(q);
+	return (0);		/* success */
+      quit:
+	MOD_DEC_USE_COUNT;
+	return (err);
 
-} /* ip_to_streams_open */
+}				/* ip_to_streams_open */
 
 /************************************************************************
 *                          ip_to_streams_close                          *
@@ -313,41 +374,58 @@ ip_to_streams_open( queue_t *rdq,
 * Called when closing the stream					*
 *									*
 ************************************************************************/
-
-int ip_to_streams_close(queue_t *q, int dummy, cred_t *credp)
+/**
+ *  @internal
+ *  @brief STREAMS close routine
+ *  @param q pointer to the read queue of the queue pair
+ *  @param oflag open flags
+ *  @param credp pointer to a credentials structure
+ *
+ *  
+ */
+STATIC int ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 {
-    ip_to_streams_minor_t	*minor_ptr ;
-
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	cmn_err(CE_CONT, "\nip_to_streams_close: q=%x ", q) ;
-
-    minor_ptr = (ip_to_streams_minor_t *) q->q_ptr ;
-
-    if (   minor_ptr != (ip_to_streams_minor_t *) NULL
-	&& minor_ptr->dl_magic == DL_MAGIC
-       )
-    {
-	if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	    cmn_err(CE_CONT, "ip_to_streams_close: %s\n", minor_ptr->myname) ;
-
-	if (minor_ptr->dev_registered != 0)	/* still open to IP */
-	    unregister_netdev(&minor_ptr->mydev) ;
-
-	minor_ptr->dl_magic = ~DL_MAGIC ;
-	FREE(minor_ptr) ;
-    }
-    else
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	cmn_err(CE_CONT, "ip_to_streams_close: invalid minor ptr q_ptr=%x\n",
-			q->q_ptr) ;
-
-    q->q_ptr = NULL ;				/* zot the q ptrs */
-    WR(q)->q_ptr = NULL ;			/* zot the q ptrs */
-
-    return(0) ;
-
-} /* ip_to_streams_close */
-
+	ip_to_streams_minor_t *minor_ptr;
+	(void) oflag;
+	(void) credp;
+	if (ip_to_streams_debug_mask & (DBG_OPEN))
+		cmn_err(CE_NOTE, "%s: q=%p ", __FUNCTION__, q);
+#if defined LIS
+	/* protect against LiS bugs */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.",
+			IP_TO_STREAMS_MOD_NAME, __FUNCTION__);
+		goto quit;
+	}
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			IP_TO_STREAMS_MOD_NAME, __FUNCTION__);
+		goto skip_pop;
+	}
+#endif
+	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
+	if (minor_ptr != NULL && minor_ptr->dl_magic == DL_MAGIC) {
+		if (ip_to_streams_debug_mask & (DBG_OPEN))
+			cmn_err(CE_NOTE, "%s: %s", __FUNCTION__, minor_ptr->myname);
+		if (minor_ptr->dev_registered != 0)	/* still open to IP */
+			unregister_netdev(&minor_ptr->mydev);
+		minor_ptr->dl_magic = ~DL_MAGIC;
+	} else {
+		if (ip_to_streams_debug_mask & (DBG_OPEN))
+			cmn_err(CE_NOTE, "%s: invalid minor ptr q_ptr=%p", __FUNCTION__, q->q_ptr);
+		goto quit;
+	}
+	goto skip_pop;
+      skip_pop:
+	qprocsoff(q);
+	kmem_free(q->q_ptr, sizeof(*minor_ptr));
+	q->q_ptr = NULL;	/* zot the q ptrs */
+	WR(q)->q_ptr = NULL;	/* zot the q ptrs */
+	MOD_DEC_USE_COUNT;
+	goto quit;
+      quit:
+	return (0);
+}
 
 /************************************************************************
 *                          ip_to_streams_ioctl                          *
@@ -357,93 +435,85 @@ int ip_to_streams_close(queue_t *q, int dummy, cred_t *credp)
 * ioctl is to be forwarded downstream.  Return 0 if we handled it here.	*
 *									*
 ************************************************************************/
-int ip_to_streams_ioctl(queue_t *q, mblk_t  *mp)
+int ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 {
-    struct iocblk		*iocp;
-    ip_to_streams_minor_t	*minor_ptr ;
-    mblk_t			*xmp = mp->b_cont ;
-    int				 result = 0 ;
+	struct iocblk *iocp;
+	ip_to_streams_minor_t *minor_ptr;
+	mblk_t *xmp = mp->b_cont;
+	int result = 0;
 
-    iocp = (struct iocblk *) mp -> b_rptr;      /* the request header */
-    if ((mp -> b_wptr - mp -> b_rptr) < sizeof (struct iocblk *))   /* small */
-	return(1) ;			/* let driver deal with it */
+	iocp = (struct iocblk *) mp->b_rptr;	/* the request header */
+	if ((mp->b_wptr - mp->b_rptr) < sizeof(struct iocblk *))	/* small */
+		return (1);	/* let driver deal with it */
 
-    minor_ptr = (ip_to_streams_minor_t *) q->q_ptr ;
-    switch (iocp -> ioc_cmd)
-    {
-    case SIOCSIFNAME:		/* set interface name */
-        /*
-         * This ioctl is sent by the streams user.  It is the last step
-         * in making this stream available to IP.  Once we know the
-         * name we register the device with IP as an interface.
-         *
-         * As an added feature, the streams user can set the name
-         * to the empty string and we will unregister from IP.  When
-         * we unregister we leave the streams side alone so that a
-         * simple "set if-name" ioctl will make the interface appear
-         * under IP again.
-         */
-	if (xmp != NULL && *xmp->b_rptr != 0)		/* name specified */
-	{
-	    strncpy(minor_ptr->myname, xmp->b_rptr, sizeof(minor_ptr->myname)) ;
+	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
+	switch (iocp->ioc_cmd) {
+	case SIOCSIFNAME:	/* set interface name */
+		/* 
+		 * This ioctl is sent by the streams user.  It is the last step
+		 * in making this stream available to IP.  Once we know the
+		 * name we register the device with IP as an interface.
+		 *
+		 * As an added feature, the streams user can set the name
+		 * to the empty string and we will unregister from IP.  When
+		 * we unregister we leave the streams side alone so that a
+		 * simple "set if-name" ioctl will make the interface appear
+		 * under IP again.
+		 */
+		if (xmp != NULL && *xmp->b_rptr != 0) {	/* name specified */
+			strncpy(minor_ptr->myname, xmp->b_rptr, sizeof(minor_ptr->myname));
 #if defined(KERNEL_2_3)
-	    strcpy(minor_ptr->mydev.name, minor_ptr->myname) ;
+			strcpy(minor_ptr->mydev.name, minor_ptr->myname);
 #else
-	    minor_ptr->mydev.name = minor_ptr->myname ;
+			minor_ptr->mydev.name = minor_ptr->myname;
 #endif
-	    if ((result = register_netdev(&minor_ptr->mydev)) != 0)
-		printk("ip_to_streams_ioctl: "
-		       "register_netdev(%s) failed: %d\n",
-		       minor_ptr->myname, result);
-	    else
-		printk("ip_to_streams_ioctl: SIOCSIFNAME: %s\n",
-			minor_ptr->myname) ;
+			if ((result = register_netdev(&minor_ptr->mydev)) != 0)
+				printk("ip_to_streams_ioctl: " "register_netdev(%s) failed: %d\n",
+				       minor_ptr->myname, result);
+			else
+				printk("ip_to_streams_ioctl: SIOCSIFNAME: %s\n", minor_ptr->myname);
 
-	    minor_ptr->dev_registered = result == 0 ;
+			minor_ptr->dev_registered = result == 0;
+		} else {	/* nullify name, unregister */
+
+			unregister_netdev(&minor_ptr->mydev);
+			strcpy(minor_ptr->myname, "is");
+			minor_ptr->contype = 0;	/* not connected */
+			minor_ptr->ip_open = 0;	/* not open to IP now */
+		}
+
+		if (xmp != NULL) {
+			freemsg(xmp);	/* don't return any data */
+			mp->b_cont = NULL;
+		}
+		break;
+	default:
+		printk("ip_to_streams_ioctl: undefined ioctl: 0x%x\n", iocp->ioc_cmd);
+		result = -EINVAL;
+		break;
 	}
-	else				/* nullify name, unregister */
-	{
-	    unregister_netdev(&minor_ptr->mydev) ;
-	    strcpy(minor_ptr->myname, "is") ;
-	    minor_ptr->contype = 0;	/* not connected */
-	    minor_ptr->ip_open = 0 ;	/* not open to IP now */
+
+	/* 
+	 * If you exit the switch then we are going to reply to the
+	 * ioctl and not forward it downstream.
+	 */
+	if (result) {		/* error */
+		mp->b_datap->db_type = M_IOCNAK;
+		iocp->ioc_count = 0;	/* no data */
+	} else {		/* success */
+
+		mp->b_datap->db_type = M_IOCACK;
+		if ((xmp = mp->b_cont) == NULL)	/* no chained buf */
+			iocp->ioc_count = 0;	/* no data */
+		else		/* a response */
+			iocp->ioc_count = xmp->b_wptr - xmp->b_rptr;
 	}
 
-	if (xmp != NULL)
-	{
-	    freemsg(xmp) ;		/* don't return any data */
-	    mp->b_cont = NULL ;
-	}
-	break ;
-    default:
-	printk("ip_to_streams_ioctl: undefined ioctl: 0x%x\n", iocp->ioc_cmd) ;
-	result = -EINVAL ;
-	break ;
-    }
+	iocp->ioc_error = result;
+	qreply(q, mp);
+	return (0);		/* do not forward */
 
-    /*
-     * If you exit the switch then we are going to reply to the
-     * ioctl and not forward it downstream.
-     */
-    if (result)						/* error */
-    {
-	mp -> b_datap -> db_type = M_IOCNAK;
-	iocp -> ioc_count = 0;                          /* no data */
-    }
-    else                                                /* success */
-    {
-	mp -> b_datap -> db_type = M_IOCACK;
-	if ((xmp = mp -> b_cont) == NULL)               /* no chained buf */
-	    iocp -> ioc_count = 0;                      /* no data */
-	else                                            /* a response */
-	    iocp -> ioc_count = xmp -> b_wptr - xmp -> b_rptr;
-    }
-
-    iocp -> ioc_error = result;
-    qreply(q, mp);
-    return(0) ;				/* do not forward */
-
-} /* ip_to_streams_ioctl */
+}				/* ip_to_streams_ioctl */
 
 /************************************************************************
 *                           ip_to_streams_wput                          *
@@ -453,154 +523,143 @@ int ip_to_streams_ioctl(queue_t *q, mblk_t  *mp)
 *									*
 ************************************************************************/
 
-int ip_to_streams_wput(queue_t *q, mblk_t  *mp)
+STATIC int ip_to_streams_wput(queue_t *q, mblk_t *mp)
 {
-    ip_to_streams_minor_t	*minor_ptr ;
+	ip_to_streams_minor_t *minor_ptr;
 
-    if ( ip_to_streams_debug_mask & DBG_PUT )
-	cmn_err(CE_CONT, "\nip_to_streams_wput: q=%x mp=%x\n", q, mp) ;
+	if (ip_to_streams_debug_mask & DBG_PUT)
+		cmn_err(CE_CONT, "\nip_to_streams_wput: q=%p mp=%p\n", q, mp);
 
-    minor_ptr = (ip_to_streams_minor_t *) q->q_ptr ;
+	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 
-    /* make sure the data structure is valid */
-    if (   minor_ptr == (ip_to_streams_minor_t *) NULL
-	|| minor_ptr->dl_magic != DL_MAGIC
-       )
-    {
-	if (ip_to_streams_debug_mask & DBG_SQUAWK)
-	    cmn_err(CE_NOTE, "ip_to_streams_wput: bad minor") ;
+	/* make sure the data structure is valid */
+	if (minor_ptr == (ip_to_streams_minor_t *) NULL || minor_ptr->dl_magic != DL_MAGIC) {
+		if (ip_to_streams_debug_mask & DBG_SQUAWK)
+			cmn_err(CE_NOTE, "ip_to_streams_wput: bad minor");
 
-	freemsg(mp) ;
-	return(0) ;
-    }
-
-    switch(mp->b_datap->db_type)
-    {
-    case M_DATA:
-	if ( canputnext(q) )		/* data uses flow control */
-	    putnext(q, mp);
-	else
-	    if (!putq(q, mp))
-		    freemsg(mp);
-	break;
-
-    case M_PROTO:
-    case M_PCPROTO:
-    {
-	int err;
-	union DL_primitives *dlp;
-
-	err = 0;
-	dlp = (union DL_primitives *)mp->b_rptr;
-
-	switch(dlp->dl_primitive)
-	{
-	    case DL_UNITDATA_REQ:
-	    {
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("ip_to_streams_wput: DL_UNITDATA_REQ:\n");
-
-		if ( canputnext(q) )		/* data uses flow control */
-		    putnext(q, mp);
-		else
-		    if (!putq(q, mp))
-			    freemsg(mp);
-		return(0) ;
-	    }
-
-	    case DL_INFO_REQ:
-	    {
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("ip_to_streams_wput: DL_INFO_REQ:\n");
-
-		putnext(q, mp);
-		break;
-	    }
-
-	    case DL_BIND_REQ:
-	    {
-		dl_bind_req_t	     *dlp;
-
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("ip_to_streams_wput:DL_BIND_REQ:\n");
-
-		minor_ptr->dlstate = DL_BIND_PENDING;
-
-		dlp = (dl_bind_req_t *) mp->b_rptr ;
-		minor_ptr->dl_sap = dlp->dl_sap ;	/* save SAP */
-
-		putnext(q, mp);
-		break;
-	    }
-
-	    case DL_UNBIND_REQ:
-	    {
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("DL_UNBIND_REQ:\n");
-		minor_ptr->dlstate = DL_UNBIND_PENDING;
-		minor_ptr->dl_sap = 0 ;
-
-		putnext(q, mp);
-		break;
-	    }
-
-	    case DL_ATTACH_REQ:
-	    {
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("DL_ATTACH_REQ:\n");
-
-		minor_ptr->dlstate = DL_ATTACH_PENDING;
-		putnext(q, mp);
-
-		break;
-	    }
-
-	    case DL_DETACH_REQ:
-	    {
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("DL_DETACH_REQ:\n");
-
-		minor_ptr->dlstate = DL_DETACH_PENDING ;
-		putnext(q, mp);
-		break;
-	    }
-	    break;
-	}
-	break;
-    }
-
-    case M_IOCTL:
-	if (ip_to_streams_ioctl(q, mp))		/* forward */
-	    putnext(q, mp);
-	break;
-
-    case M_FLUSH:
-	if (*mp->b_rptr & FLUSHW)
-	{
-	    flushq(q, FLUSHDATA);
+		freemsg(mp);
+		return (0);
 	}
 
-	if (*mp->b_rptr & FLUSHR)
+	switch (mp->b_datap->db_type) {
+	case M_DATA:
+		if (canputnext(q))	/* data uses flow control */
+			putnext(q, mp);
+		else if (!putq(q, mp))
+			freemsg(mp);
+		break;
+
+	case M_PROTO:
+	case M_PCPROTO:
 	{
-	    flushq(RD(q), FLUSHDATA);
-	    *mp->b_rptr &= ~FLUSHW;
-	    qreply(q, mp);
+		int err;
+		union DL_primitives *dlp;
+
+		err = 0;
+		dlp = (union DL_primitives *) mp->b_rptr;
+
+		switch (dlp->dl_primitive) {
+		case DL_UNITDATA_REQ:
+		{
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("ip_to_streams_wput: DL_UNITDATA_REQ:\n");
+
+			if (canputnext(q))	/* data uses flow control */
+				putnext(q, mp);
+			else if (!putq(q, mp))
+				freemsg(mp);
+			return (0);
+		}
+
+		case DL_INFO_REQ:
+		{
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("ip_to_streams_wput: DL_INFO_REQ:\n");
+
+			putnext(q, mp);
+			break;
+		}
+
+		case DL_BIND_REQ:
+		{
+			dl_bind_req_t *dlp;
+
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("ip_to_streams_wput:DL_BIND_REQ:\n");
+
+			minor_ptr->dlstate = DL_BIND_PENDING;
+
+			dlp = (dl_bind_req_t *) mp->b_rptr;
+			minor_ptr->dl_sap = dlp->dl_sap;	/* save SAP */
+
+			putnext(q, mp);
+			break;
+		}
+
+		case DL_UNBIND_REQ:
+		{
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("DL_UNBIND_REQ:\n");
+			minor_ptr->dlstate = DL_UNBIND_PENDING;
+			minor_ptr->dl_sap = 0;
+
+			putnext(q, mp);
+			break;
+		}
+
+		case DL_ATTACH_REQ:
+		{
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("DL_ATTACH_REQ:\n");
+
+			minor_ptr->dlstate = DL_ATTACH_PENDING;
+			putnext(q, mp);
+
+			break;
+		}
+
+		case DL_DETACH_REQ:
+		{
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("DL_DETACH_REQ:\n");
+
+			minor_ptr->dlstate = DL_DETACH_PENDING;
+			putnext(q, mp);
+			break;
+		}
+			break;
+		}
+		break;
 	}
-	else
-	    freemsg(mp);
 
-	break;
+	case M_IOCTL:
+		if (ip_to_streams_ioctl(q, mp))	/* forward */
+			putnext(q, mp);
+		break;
 
-    default:
-	freemsg(mp) ;
-	break;
+	case M_FLUSH:
+		if (*mp->b_rptr & FLUSHW) {
+			flushq(q, FLUSHDATA);
+		}
 
-    } /* switch */
+		if (*mp->b_rptr & FLUSHR) {
+			flushq(RD(q), FLUSHDATA);
+			*mp->b_rptr &= ~FLUSHW;
+			qreply(q, mp);
+		} else
+			freemsg(mp);
 
-    return(0) ;
+		break;
 
-} /* ip_to_streams_wput */
+	default:
+		freemsg(mp);
+		break;
 
+	}			/* switch */
+
+	return (0);
+
+}				/* ip_to_streams_wput */
 
 /************************************************************************
 *                        ip_to_streams_allocb                           *
@@ -626,29 +685,23 @@ int ip_to_streams_wput(queue_t *q, mblk_t  *mp)
 *		and the 'mp' has been placed into the 'q'.		*
 *									*
 ************************************************************************/
-mblk_t *ip_to_streams_allocb(queue_t		*q,
-		    mblk_t		*mp,
-		    int   		 type,
-		    int    		 size,
-		    int     		 priority,
-		    int	    		 head,
-		    int			*bufcall_id)
+mblk_t *ip_to_streams_allocb(queue_t *q, mblk_t *mp, int type, int size, int priority, int head,
+			     int *bufcall_id)
 {
-    mblk_t	*msg ;
+	mblk_t *msg;
 
-    if ( ip_to_streams_debug_mask & DBG_ALLOCB )
-	cmn_err(CE_CONT, "\nip_to_streams_allocb: called\n");
+	if (ip_to_streams_debug_mask & DBG_ALLOCB)
+		cmn_err(CE_CONT, "\nip_to_streams_allocb: called\n");
 
-    msg = allocb(size, priority) ;
+	msg = allocb(size, priority);
 
-    if (msg != (mblk_t *) NULL)
-    {						/* buffer allocated */
-	msg->b_datap->db_type = type ;
-	return(msg) ;
-    }
-    return((mblk_t *) NULL) ;
+	if (msg != (mblk_t *) NULL) {	/* buffer allocated */
+		msg->b_datap->db_type = type;
+		return (msg);
+	}
+	return ((mblk_t *) NULL);
 
-} /* ip_to_streams_allocb */
+}				/* ip_to_streams_allocb */
 
 /************************************************************************
 *                          ip_to_streams_merror                         *
@@ -659,62 +712,51 @@ mblk_t *ip_to_streams_allocb(queue_t		*q,
 * We will use the mp given to us if we can.				*
 *									*
 ************************************************************************/
-int
-ip_to_streams_m_error(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int errno, int retry)
+int ip_to_streams_m_error(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int errno, int retry)
 {
-    if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	cmn_err(CE_CONT, "\nip_to_streams_m_error: called\n");
-
-    if (   minor_ptr == (ip_to_streams_minor_t *) NULL)
-    {
 	if (ip_to_streams_debug_mask & DBG_SQUAWK)
-	    cmn_err(CE_NOTE, "ip_to_streams_m_error: bad or detached minor %x",
-		    minor_ptr) ;
+		cmn_err(CE_CONT, "\nip_to_streams_m_error: called\n");
 
-	if (mp != (mblk_t *) NULL) freemsg(mp) ;
-	return(1) ;				/* message "sent" */
-    }
+	if (minor_ptr == (ip_to_streams_minor_t *) NULL) {
+		if (ip_to_streams_debug_mask & DBG_SQUAWK)
+			cmn_err(CE_NOTE, "ip_to_streams_m_error: bad or detached minor %p",
+				minor_ptr);
 
-    flushq(minor_ptr->dl_rdq, FLUSHALL);	/* ensure queue empty */
-    minor_ptr->dl_retry_proto = 0 ;		/* TLI proto to retry */
-    minor_ptr->dl_err_prim = -1 ;		/* for error ack retry */
-    minor_ptr->dlstate = 0 ;			/* go to null state */
+		if (mp != (mblk_t *) NULL)
+			freemsg(mp);
+		return (1);	/* message "sent" */
+	}
 
-    if (mp == (mblk_t *) NULL)
-    {
-	mp = ip_to_streams_allocb(minor_ptr->dl_wrq,
-			 mp,
-			 M_ERROR,
-			 1,
-			 BPRI_HI,
-			 retry,
-			 &minor_ptr->dl_bufcall_id) ;
+	flushq(minor_ptr->dl_rdq, FLUSHALL);	/* ensure queue empty */
+	minor_ptr->dl_retry_proto = 0;	/* TLI proto to retry */
+	minor_ptr->dl_err_prim = -1;	/* for error ack retry */
+	minor_ptr->dlstate = 0;	/* go to null state */
 
-	minor_ptr->dl_m_error  = errno | 0x100 ;	/* set retry flag */
-	if (mp == (mblk_t *) NULL) return(0) ;		/* deferred */
-    }
-    else
-    {
-	mp->b_datap->db_type = M_ERROR ;
-	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base ;
-    }
+	if (mp == (mblk_t *) NULL) {
+		mp = ip_to_streams_allocb(minor_ptr->dl_wrq, mp, M_ERROR, 1, BPRI_HI, retry,
+					  &minor_ptr->dl_bufcall_id);
 
-    *mp->b_wptr++ = errno ;			/* plant error code */
+		minor_ptr->dl_m_error = errno | 0x100;	/* set retry flag */
+		if (mp == (mblk_t *) NULL)
+			return (0);	/* deferred */
+	} else {
+		mp->b_datap->db_type = M_ERROR;
+		mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	}
 
-    minor_ptr->dl_m_error  = 0 ;		/* unset retry flag */
+	*mp->b_wptr++ = errno;	/* plant error code */
+
+	minor_ptr->dl_m_error = 0;	/* unset retry flag */
 
 #ifdef GCOM
-    if ( ip_to_streams_debug_mask & (DBG_UPR_PROTOS | DBG_MERROR) )
-	rsys_decode_msg(rsys_nextq_name(minor_ptr->dl_rdq),
-			"ip_to_streams_m_error: To",
-			mp,
-			0) ;
+	if (ip_to_streams_debug_mask & (DBG_UPR_PROTOS | DBG_MERROR))
+		rsys_decode_msg(rsys_nextq_name(minor_ptr->dl_rdq), "ip_to_streams_m_error: To", mp,
+				0);
 #endif
 
-    putnext(minor_ptr->dl_rdq, mp);
-    return(0);
-} /* ip_to_streams_merror */
-
+	putnext(minor_ptr->dl_rdq, mp);
+	return (0);
+}				/* ip_to_streams_merror */
 
 /************************************************************************
 *                          ip_to_streams_error_ack                      *
@@ -725,65 +767,51 @@ ip_to_streams_m_error(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int errno, i
 * Return 1 if succeed, 0 if deferred.					*
 *									*
 ************************************************************************/
-int
-ip_to_streams_error_ack(ip_to_streams_minor_t *minor_ptr,
-	       mblk_t       *mp,
-	       long	     err_prim,
-	       long          tli_error,
-	       long          unix_error,
-	       int	     retry)
+int ip_to_streams_error_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long err_prim,
+			    long tli_error, long unix_error, int retry)
 {
-    dl_error_ack_t		*p ;
+	dl_error_ack_t *p;
 
-    if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	cmn_err(CE_CONT, "\nip_to_streams_error_ack: called\n");
+	if (ip_to_streams_debug_mask & DBG_SQUAWK)
+		cmn_err(CE_CONT, "\nip_to_streams_error_ack: called\n");
 
-    if (   mp == (mblk_t *) NULL
-	|| mp->b_datap->db_lim - mp->b_datap->db_base < sizeof(*p)
-	|| (!retry && (ip_to_streams_debug_mask & DBG_ALLOCB))
-       )
-    {					/* must allocate a buffer */
-	if (mp != (mblk_t *) NULL) freemsg(mp) ;
-	mp = ip_to_streams_allocb(minor_ptr->dl_rdq,
-			 (mblk_t *) NULL,
-			 M_PCPROTO,
-			 sizeof(*p),
-			 BPRI_MED,
-			 retry,
-			 &minor_ptr->dl_bufcall_id) ;
-	if (mp == (mblk_t *) NULL)
-	{
-	    minor_ptr->dl_err_prim = err_prim ;
-	    minor_ptr->dl_tli_err  = tli_error ;
-	    minor_ptr->dl_unix_err = unix_error ;
-	    return(0) ;				/* deferred */
+	if (mp == (mblk_t *) NULL || mp->b_datap->db_lim - mp->b_datap->db_base < sizeof(*p)
+	    || (!retry && (ip_to_streams_debug_mask & DBG_ALLOCB))
+	    ) {			/* must allocate a buffer */
+		if (mp != (mblk_t *) NULL)
+			freemsg(mp);
+		mp = ip_to_streams_allocb(minor_ptr->dl_rdq, (mblk_t *) NULL, M_PCPROTO, sizeof(*p),
+					  BPRI_MED, retry, &minor_ptr->dl_bufcall_id);
+		if (mp == (mblk_t *) NULL) {
+			minor_ptr->dl_err_prim = err_prim;
+			minor_ptr->dl_tli_err = tli_error;
+			minor_ptr->dl_unix_err = unix_error;
+			return (0);	/* deferred */
+		}
+	} else {
+		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
 	}
-    }
-    else
-    {
-	mp->b_datap->db_type = M_PCPROTO ;
-	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base ;
-    }
 
-    minor_ptr->dl_err_prim = -1 ;		/* ensure no retry */
+	minor_ptr->dl_err_prim = -1;	/* ensure no retry */
 
-    /*
-     * Have a buffer, build error_ack and send it
-     */
-    mp->b_rptr = mp->b_datap->db_base ;
-    mp->b_wptr = mp->b_datap->db_base ;
+	/* 
+	 * Have a buffer, build error_ack and send it
+	 */
+	mp->b_rptr = mp->b_datap->db_base;
+	mp->b_wptr = mp->b_datap->db_base;
 
-    p             = (dl_error_ack_t *) mp->b_wptr ;
-    p->dl_primitive       = DL_ERROR_ACK ;
-    p->dl_error_primitive = err_prim ;
-    p->dl_errno           = tli_error ;
-    p->dl_unix_errno      = unix_error ;
-    mp->b_wptr   += sizeof(*p) ;
+	p = (dl_error_ack_t *) mp->b_wptr;
+	p->dl_primitive = DL_ERROR_ACK;
+	p->dl_error_primitive = err_prim;
+	p->dl_errno = tli_error;
+	p->dl_unix_errno = unix_error;
+	mp->b_wptr += sizeof(*p);
 
-    putnext(minor_ptr->dl_rdq, mp);
-    return(1) ;					/* succeed */
+	putnext(minor_ptr->dl_rdq, mp);
+	return (1);		/* succeed */
 
-} /* ip_to_streams_error_ack */
+}				/* ip_to_streams_error_ack */
 
 /************************************************************************
 *                         ip_to_streams_ok_ack	                        *
@@ -794,72 +822,57 @@ ip_to_streams_error_ack(ip_to_streams_minor_t *minor_ptr,
 * Return 1 if succeed, 0 if deferred.					*
 *									*
 ************************************************************************/
-int
-ip_to_streams_ok_ack(ip_to_streams_minor_t *minor_ptr,
-	       mblk_t    *mp,
-	       long	  ok_prim,
-	       int	  retry)
+int ip_to_streams_ok_ack(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, long ok_prim, int retry)
 {
-    dl_ok_ack_t		*p ;
+	dl_ok_ack_t *p;
 
-    if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	cmn_err(CE_CONT, "\nip_to_streams_ok_ack: called\n");
-
-    if (   minor_ptr == (ip_to_streams_minor_t *) NULL
-	|| minor_ptr->dl_magic != DL_MAGIC
-       )
-    {
 	if (ip_to_streams_debug_mask & DBG_SQUAWK)
-	    cmn_err(CE_NOTE, "ip_to_streams_ok_ack: bad minor") ;
+		cmn_err(CE_CONT, "\nip_to_streams_ok_ack: called\n");
 
-	if (mp != (mblk_t *) NULL) freemsg(mp) ;
-	return(1) ;
-    }
+	if (minor_ptr == (ip_to_streams_minor_t *) NULL || minor_ptr->dl_magic != DL_MAGIC) {
+		if (ip_to_streams_debug_mask & DBG_SQUAWK)
+			cmn_err(CE_NOTE, "ip_to_streams_ok_ack: bad minor");
 
-    if (   mp == (mblk_t *) NULL
-	|| mp->b_datap->db_lim - mp->b_datap->db_base < sizeof(*p)
-	|| (!retry && (ip_to_streams_debug_mask & DBG_ALLOCB))
-       )
-    {					/* must allocate a buffer */
-	if (mp != (mblk_t *) NULL) freemsg(mp) ;
-	mp = ip_to_streams_allocb(minor_ptr->dl_rdq,
-			 (mblk_t *) NULL,
-			 M_PCPROTO,
-			 sizeof(*p),
-			 BPRI_MED,
-			 retry,
-			 &minor_ptr->dl_bufcall_id) ;
-	if (mp == (mblk_t *) NULL)
-	{
-	    minor_ptr->dl_err_prim = ok_prim ;
-	    minor_ptr->dl_tli_err  = 0 ;
-	    minor_ptr->dl_unix_err = 0 ;
-	    return(0) ;				/* deferred */
+		if (mp != (mblk_t *) NULL)
+			freemsg(mp);
+		return (1);
 	}
-    }
-    else
-    {
-	mp->b_datap->db_type = M_PCPROTO ;
-	mp->b_rptr = mp->b_wptr = mp->b_datap->db_base ;
-    }
 
-    minor_ptr->dl_err_prim = -1 ;		/* ensure no retry */
+	if (mp == (mblk_t *) NULL || mp->b_datap->db_lim - mp->b_datap->db_base < sizeof(*p)
+	    || (!retry && (ip_to_streams_debug_mask & DBG_ALLOCB))
+	    ) {			/* must allocate a buffer */
+		if (mp != (mblk_t *) NULL)
+			freemsg(mp);
+		mp = ip_to_streams_allocb(minor_ptr->dl_rdq, (mblk_t *) NULL, M_PCPROTO, sizeof(*p),
+					  BPRI_MED, retry, &minor_ptr->dl_bufcall_id);
+		if (mp == (mblk_t *) NULL) {
+			minor_ptr->dl_err_prim = ok_prim;
+			minor_ptr->dl_tli_err = 0;
+			minor_ptr->dl_unix_err = 0;
+			return (0);	/* deferred */
+		}
+	} else {
+		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+	}
 
-    /*
-     * Have a buffer, build ok_ack and send it
-     */
-    mp->b_rptr = mp->b_datap->db_base ;
-    mp->b_wptr = mp->b_datap->db_base ;
+	minor_ptr->dl_err_prim = -1;	/* ensure no retry */
 
-    p               = (dl_ok_ack_t *) mp->b_wptr ;
-    p->dl_primitive  = DL_OK_ACK ;
-    p->dl_correct_primitive = ok_prim ;
-    mp->b_wptr     += sizeof(*p) ;
+	/* 
+	 * Have a buffer, build ok_ack and send it
+	 */
+	mp->b_rptr = mp->b_datap->db_base;
+	mp->b_wptr = mp->b_datap->db_base;
 
-    putnext(minor_ptr->dl_rdq, mp);
-    return(1) ;					/* succeed */
+	p = (dl_ok_ack_t *) mp->b_wptr;
+	p->dl_primitive = DL_OK_ACK;
+	p->dl_correct_primitive = ok_prim;
+	mp->b_wptr += sizeof(*p);
 
-} /* ip_to_streams_ok_ack */
+	putnext(minor_ptr->dl_rdq, mp);
+	return (1);		/* succeed */
+
+}				/* ip_to_streams_ok_ack */
 
 /************************************************************************
 *                          ip_to_streams_rsrv                           *
@@ -871,60 +884,52 @@ ip_to_streams_ok_ack(ip_to_streams_minor_t *minor_ptr,
 *									*
 ************************************************************************/
 
-int ip_to_streams_rsrv(queue_t *q)
+STATIC int ip_to_streams_rsrv(queue_t *q)
 {
-    ip_to_streams_minor_t	*minor_ptr ;
-    int			 done ;
+	ip_to_streams_minor_t *minor_ptr;
+	int done;
 
-    if ( ip_to_streams_debug_mask & DBG_SVC )
-	cmn_err(CE_CONT, "\nip_to_streams_rsrv: q=%x\n", q) ;
+	if (ip_to_streams_debug_mask & DBG_SVC)
+		cmn_err(CE_CONT, "\nip_to_streams_rsrv: q=%p\n", q);
 
-    minor_ptr = (ip_to_streams_minor_t *) q->q_ptr ;
+	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 
-    if (   minor_ptr == (ip_to_streams_minor_t *) NULL
-	|| minor_ptr->dl_magic != DL_MAGIC
-	|| minor_ptr->dl_rdq != q
-       )
-    {
-	return(0) ;
-    }
-
-    done = 1 ;
-    if (minor_ptr->dl_m_error > 0)
-    {
-	flushq(q, FLUSHALL);			/* ensure queue empty */
-	ip_to_streams_m_error(minor_ptr, (mblk_t *) NULL, minor_ptr->dl_m_error, 1) ;
-	return(0) ;
-    }
-
-    if (minor_ptr->dl_err_prim >= 0)
-    {
-	flushq(q, FLUSHALL);			/* ensure queue empty */
-	if (minor_ptr->dl_tli_err == 0)
-	{
-	    done = ip_to_streams_ok_ack(minor_ptr,
-			       (mblk_t *) NULL,
-			       minor_ptr->dl_err_prim, 1) ;
+	if (minor_ptr == (ip_to_streams_minor_t *) NULL || minor_ptr->dl_magic != DL_MAGIC
+	    || minor_ptr->dl_rdq != q) {
+		return (0);
 	}
-	else
-	{
-	    done = ip_to_streams_error_ack(minor_ptr,
-				  (mblk_t *) NULL,
-				  minor_ptr->dl_err_prim,
-				  minor_ptr->dl_tli_err,
-				  minor_ptr->dl_unix_err, 1) ;
+
+	done = 1;
+	if (minor_ptr->dl_m_error > 0) {
+		flushq(q, FLUSHALL);	/* ensure queue empty */
+		ip_to_streams_m_error(minor_ptr, (mblk_t *) NULL, minor_ptr->dl_m_error, 1);
+		return (0);
 	}
-    }
 
-    if (!done) return(0) ;		/* still retrying error/ok acks */
+	if (minor_ptr->dl_err_prim >= 0) {
+		flushq(q, FLUSHALL);	/* ensure queue empty */
+		if (minor_ptr->dl_tli_err == 0) {
+			done =
+			    ip_to_streams_ok_ack(minor_ptr, (mblk_t *) NULL, minor_ptr->dl_err_prim,
+						 1);
+		} else {
+			done =
+			    ip_to_streams_error_ack(minor_ptr, (mblk_t *) NULL,
+						    minor_ptr->dl_err_prim, minor_ptr->dl_tli_err,
+						    minor_ptr->dl_unix_err, 1);
+		}
+	}
 
-    /*
-     * Try other protos
-     */
+	if (!done)
+		return (0);	/* still retrying error/ok acks */
 
-    return(0) ;
+	/* 
+	 * Try other protos
+	 */
 
-} /* ip_to_streams_rsrv */
+	return (0);
+
+}				/* ip_to_streams_rsrv */
 
 /************************************************************************
 *                             ip_to_streams_wsrv                        *
@@ -934,81 +939,66 @@ int ip_to_streams_rsrv(queue_t *q)
 *									*
 ************************************************************************/
 
-int ip_to_streams_wsrv(queue_t *q)
+STATIC int ip_to_streams_wsrv(queue_t *q)
 {
-    ip_to_streams_minor_t	*minor_ptr ;
-    mblk_t			*mp ;
-    struct ism_dev		*dev ;
-    int				 wakeup = 0 ;
+	ip_to_streams_minor_t *minor_ptr;
+	mblk_t *mp;
+	struct ism_dev *dev;
+	int wakeup = 0;
 
-    if ( ip_to_streams_debug_mask & DBG_SVC )
-	cmn_err(CE_CONT, "\nip_to_streams_wsrv: q=%x\n", q) ;
+	if (ip_to_streams_debug_mask & DBG_SVC)
+		cmn_err(CE_CONT, "\nip_to_streams_wsrv: q=%p\n", q);
 
-    minor_ptr = (ip_to_streams_minor_t *) q->q_ptr ;
+	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 
-    if (   minor_ptr == (ip_to_streams_minor_t *) NULL
-	|| minor_ptr->dl_magic != DL_MAGIC
-       )
-    {
-	return(0) ;			/* bad minor */
-    }
-
-    dev = &minor_ptr->mydev;
-    for (;;)
-    {
-	if ((mp = getq (minor_ptr -> dl_wrq)) == NULL)
-	{
-	    if (netif_queue_stopped(dev))
-	    {
-		netif_start_queue(dev) ;
-		wakeup = 1 ;
-	    }
-	    break;			/* done */
+	if (minor_ptr == (ip_to_streams_minor_t *) NULL || minor_ptr->dl_magic != DL_MAGIC) {
+		return (0);	/* bad minor */
 	}
 
-	if (mp -> b_datap -> db_type == M_DATA)
-	{
-	    if ( canputnext(q) )
-	    {
-		putnext(q, mp);		/* send downstream */
-		if (netif_queue_stopped(dev))
-		{
-		    netif_start_queue(dev) ;
-		    wakeup = 1 ;
+	dev = &minor_ptr->mydev;
+	for (;;) {
+		if ((mp = getq(minor_ptr->dl_wrq)) == NULL) {
+			if (netif_queue_stopped(dev)) {
+				netif_start_queue(dev);
+				wakeup = 1;
+			}
+			break;	/* done */
 		}
-	    }
-	    else
-	    {
-		netif_stop_queue(dev) ;
-		if (!putbq(q, mp))
-			freemsg(mp);	/* FIXME */
-		return(0);			/* quit */
-	    }
-	    minor_ptr->stats.tx_packets++;
+
+		if (mp->b_datap->db_type == M_DATA) {
+			if (canputnext(q)) {
+				putnext(q, mp);	/* send downstream */
+				if (netif_queue_stopped(dev)) {
+					netif_start_queue(dev);
+					wakeup = 1;
+				}
+			} else {
+				netif_stop_queue(dev);
+				if (!putbq(q, mp))
+					freemsg(mp);	/* FIXME */
+				return (0);	/* quit */
+			}
+			minor_ptr->stats.tx_packets++;
+		} else {
+			if (ip_to_streams_proto(minor_ptr, mp, 1) == 0) {	/* deferred, queued 
+										 */
+				netif_stop_queue(dev);	/* stop output from above */
+				return (0);	/* quit */
+			}
+
+			if (netif_queue_stopped(dev)) {
+				netif_start_queue(dev);
+				wakeup = 1;
+			}
+		}
 	}
-	else
-	{
-	    if (ip_to_streams_proto(minor_ptr, mp, 1) == 0)
-	    {				/* deferred, queued */
-		netif_stop_queue(dev) ;	/* stop output from above */
-		return(0) ;		/* quit */
-	    }
 
-	    if (netif_queue_stopped(dev))
-	    {
-		netif_start_queue(dev) ;
-		wakeup = 1 ;
-	    }
-	}
-    }
+	if (wakeup)
+		netif_wake_queue(dev);	/* have netif look at our queue */
 
-    if (wakeup)
-	netif_wake_queue(dev) ;		/* have netif look at our queue */
+	return (0);
 
-    return(0) ;
-
-} /* ip_to_streams_wsrv */
-
+}				/* ip_to_streams_wsrv */
 
 /************************************************************************
 *                           ip_to_streams_proto                         *
@@ -1019,46 +1009,42 @@ int ip_to_streams_wsrv(queue_t *q)
 * Return 1 if succeed in handling msg, 0 if deferred.			*
 *									*
 ************************************************************************/
-int
-ip_to_streams_proto(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int retry)
+int ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 {
-    queue_t *q = minor_ptr->dl_wrq ;
-    long	*lp ;
+	queue_t *q = minor_ptr->dl_wrq;
+	long *lp;
 
-    if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	cmn_err(CE_CONT, "\nip_to_streams_proto: called\n");
+	if (ip_to_streams_debug_mask & DBG_SQUAWK)
+		cmn_err(CE_CONT, "\nip_to_streams_proto: called\n");
 
-    lp = (long *) mp->b_rptr ;
+	lp = (long *) mp->b_rptr;
 
-    switch (*lp)
-    {
-    case DL_UNITDATA_REQ:
-	if ( canputnext(q) )
-	{
-	    putnext(q, mp);
-	    return(1) ;
+	switch (*lp) {
+	case DL_UNITDATA_REQ:
+		if (canputnext(q)) {
+			putnext(q, mp);
+			return (1);
+		}
+
+		if (!putq(q, mp))
+			freemsg(mp);
+
+		break;
+
+	default:
+		if (canputnext(q)) {
+			putnext(q, mp);
+			return (1);
+		}
+
+		if (!putq(q, mp))
+			freemsg(mp);
+		break;
 	}
 
-	if (!putq(q, mp))
-		freemsg(mp);
+	return (0);		/* deferred */
 
-	break ;
-
-    default:
-	if ( canputnext(q) )
-	{
-	    putnext(q, mp);
-	    return(1) ;
-	}
-
-	if (!putq(q, mp))
-		freemsg(mp);
-	break ;
-    }
-
-    return(0);				/* deferred */
-
-} /* ip_to_streams_proto */
+}				/* ip_to_streams_proto */
 
 /************************************************************************
 *                           ip_to_streams_rput                          *
@@ -1067,161 +1053,143 @@ ip_to_streams_proto(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int retry)
 * Handle a message from below.						*
 *									*
 ************************************************************************/
-int ip_to_streams_rput(queue_t *q, mblk_t  *mp)
+STATIC int ip_to_streams_rput(queue_t *q, mblk_t *mp)
 {
-    ip_to_streams_minor_t      *minor_ptr = q->q_ptr;
-    struct ism_dev *dev ;
-    int convert_to_skbuf(ip_to_streams_minor_t *, mblk_t *);
+	ip_to_streams_minor_t *minor_ptr = q->q_ptr;
+	struct ism_dev *dev;
+	int convert_to_skbuf(ip_to_streams_minor_t *, mblk_t *);
 
-    if (minor_ptr == NULL)
-    {
-	cmn_err(CE_WARN, "ip_to_streams_rput: q->q_ptr NULL") ;
-	freemsg(mp) ;
-	return(0) ;
-    }
+	if (minor_ptr == NULL) {
+		cmn_err(CE_WARN, "ip_to_streams_rput: q->q_ptr NULL");
+		freemsg(mp);
+		return (0);
+	}
 
-    dev = &minor_ptr->mydev;
-    if ( ip_to_streams_debug_mask & DBG_PUT )
-	cmn_err(CE_CONT,
-	    "\nip_to_streams_rput: q=%x mp=%x minor:0x%x, dev:0x%x\n",
-		 q, mp, minor_ptr, dev) ;
+	dev = &minor_ptr->mydev;
+	if (ip_to_streams_debug_mask & DBG_PUT)
+		cmn_err(CE_CONT, "\nip_to_streams_rput: q=%p mp=%p minor:0x%p, dev:0x%p\n", q, mp,
+			minor_ptr, dev);
 
-    /* checking, checking, checking... */
-    if (   minor_ptr == (ip_to_streams_minor_t *) NULL )
-    {
-	if (ip_to_streams_debug_mask & DBG_SQUAWK)
-	    cmn_err(CE_NOTE, "ip_to_streams_rput: bad stream") ;
+	/* checking, checking, checking... */
+	if (minor_ptr == (ip_to_streams_minor_t *) NULL) {
+		if (ip_to_streams_debug_mask & DBG_SQUAWK)
+			cmn_err(CE_NOTE, "ip_to_streams_rput: bad stream");
 
-	if (mp != (mblk_t *) NULL) freemsg(mp) ;
+		if (mp != (mblk_t *) NULL)
+			freemsg(mp);
 
-	/* mark an error, so the world can see it */
-	minor_ptr->stats.rx_errors++;
-	return(0) ;
-    }
+		/* mark an error, so the world can see it */
+		minor_ptr->stats.rx_errors++;
+		return (0);
+	}
 
-    /*
-     * the way this is structured, you can convert the buffer to a linux skbuf
-     * and also send it upstairs to the process what has the stream open.
-     * Or you could pass this over to another 'device driver' that looks
-     * like a device that tcp_dump can look at.
-     * This way you could have a hook for tcp_dump into this area.
-     */
-    switch(mp->b_datap->db_type)
-    {
+	/* 
+	 * the way this is structured, you can convert the buffer to a linux skbuf
+	 * and also send it upstairs to the process what has the stream open.
+	 * Or you could pass this over to another 'device driver' that looks
+	 * like a device that tcp_dump can look at.
+	 * This way you could have a hook for tcp_dump into this area.
+	 */
+	switch (mp->b_datap->db_type) {
 	case M_DATA:
 	{
-	    if ( minor_ptr->contype == IP )
-	    {
-		/* if we are putting up to IP, convert to sk buff */
-		if ( convert_to_skbuf(minor_ptr, mp) != 0 )
-		{
-		    minor_ptr->stats.rx_errors++;
-		    break;
+		if (minor_ptr->contype == IP) {
+			/* if we are putting up to IP, convert to sk buff */
+			if (convert_to_skbuf(minor_ptr, mp) != 0) {
+				minor_ptr->stats.rx_errors++;
+				break;
+			}
+			minor_ptr->stats.rx_packets++;
+		} else {
+			/* It will go here if we are not putting to IP */
+			if (canputnext(q))
+				putnext(q, mp);
+			else if (!putq(q, mp))
+				freemsg(mp);
 		}
-		minor_ptr->stats.rx_packets++;
-	    }
-	    else
-	    {
-		/* It will go here if we are not putting to IP */
-		if ( canputnext(q) )
-		    putnext(q, mp);
-		else
-		    if (!putq(q, mp))
-			    freemsg(mp);
-	    }
-	    break;
+		break;
 	}
 
 	case M_PROTO:
 	case M_PCPROTO:
 	{
-	    int err;
-	    union DL_primitives *dlp;
+		int err;
+		union DL_primitives *dlp;
 
-	    err = 0;
-	    dlp = (union DL_primitives *)mp->b_rptr;
+		err = 0;
+		dlp = (union DL_primitives *) mp->b_rptr;
 
-	    switch(dlp->dl_primitive)
-	    {
-	    case DL_BIND_ACK:
-		if ( ip_to_streams_debug_mask & DBG_WPUT)
-		    printk("ip_to_streams_rput: DL_BIND_ACK:\n");
+		switch (dlp->dl_primitive) {
+		case DL_BIND_ACK:
+			if (ip_to_streams_debug_mask & DBG_WPUT)
+				printk("ip_to_streams_rput: DL_BIND_ACK:\n");
 
-		minor_ptr->dlstate = DL_DATAXFER;
-		putnext(q, mp);
-		break;
-
-	    case DL_UNITDATA_IND:
-		/*
-		 * When we get the unitdata indication, we need to determine
-		 * where to put it.  If an ip stream is connected here, we need
-		 * to convert the msg buf to a linux sk buf and send it up
-		 * to IP.
-		 * 
-		 * If ip is not connected, then we just need to do a putnext.
-		 */
-		if ( minor_ptr->contype == IP )
-		{
-		    if (convert_to_skbuf(minor_ptr, mp) != 0 )
-		    {
-			minor_ptr->stats.rx_errors++;
-			break;
-		    }
-		    minor_ptr->stats.rx_packets++;
-		}
-		else
-		{
-		    if ( canputnext(q) )
+			minor_ptr->dlstate = DL_DATAXFER;
 			putnext(q, mp);
-		    else
-			if (!putq(q, mp))
+			break;
+
+		case DL_UNITDATA_IND:
+			/* 
+			 * When we get the unitdata indication, we need to determine
+			 * where to put it.  If an ip stream is connected here, we need
+			 * to convert the msg buf to a linux sk buf and send it up
+			 * to IP.
+			 * 
+			 * If ip is not connected, then we just need to do a putnext.
+			 */
+			if (minor_ptr->contype == IP) {
+				if (convert_to_skbuf(minor_ptr, mp) != 0) {
+					minor_ptr->stats.rx_errors++;
+					break;
+				}
+				minor_ptr->stats.rx_packets++;
+			} else {
+				if (canputnext(q))
+					putnext(q, mp);
+				else if (!putq(q, mp))
+					freemsg(mp);
+			}
+			break;
+
+		default:	/* everything else just goes upstream */
+			if (canputnext(q))
+				putnext(q, mp);
+			else if (!putq(q, mp))
 				freemsg(mp);
+			break;
+
 		}
 		break;
-
-	    default:		/* everything else just goes upstream */
-		if ( canputnext(q) )
-		    putnext(q, mp);
-		else
-		    if (!putq(q, mp))
-			    freemsg(mp);
-		break;
-
-	    }
-	    break;
 	}
 
 	case M_FLUSH:
 	{
-	    if (*mp->b_rptr & FLUSHR)
-	    {
-		flushq(q, FLUSHDATA);
-	    }
+		if (*mp->b_rptr & FLUSHR) {
+			flushq(q, FLUSHDATA);
+		}
 
-	    if (*mp->b_rptr & FLUSHW)
-	    {
-		flushq(WR(q), FLUSHDATA);
-		*mp->b_rptr &= ~FLUSHR;
+		if (*mp->b_rptr & FLUSHW) {
+			flushq(WR(q), FLUSHDATA);
+			*mp->b_rptr &= ~FLUSHR;
 
-		qreply(q, mp);
-	    }
-	    else
-		freemsg(mp);
+			qreply(q, mp);
+		} else
+			freemsg(mp);
 
-	    break;
+		break;
 	}
 
 	default:		/* send upstream */
 	{
-	    putnext(q, mp);
-	    break;
+		putnext(q, mp);
+		break;
 	}
 
-    } /* switch */
+	}			/* switch */
 
-    return(0) ;
+	return (0);
 
-} /* ip_to_streams_rput */
+}				/* ip_to_streams_rput */
 
 /************************************************************************
 *                           convert_to_skbuf                          	*
@@ -1230,70 +1198,68 @@ int ip_to_streams_rput(queue_t *q, mblk_t  *mp)
 * Convert from a streams msg buffer to a Linux skbuf			*
 *									*
 ************************************************************************/
-int 
-convert_to_skbuf( ip_to_streams_minor_t *minor_ptr, mblk_t *mp)
+int convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 {
-    struct sk_buff *skb;
-    int		    len;
-    mblk_t 	   *tmp = mp;
-    char	   *ctmp ;
+	struct sk_buff *skb;
+	int len;
+	mblk_t *tmp = mp;
+	char *ctmp;
 
-    if ( ( mp->b_datap->db_type == M_PROTO)
-        || ( mp->b_datap->db_type == M_PCPROTO)
-       )
-	tmp = mp->b_cont;
+	if ((mp->b_datap->db_type == M_PROTO)
+	    || (mp->b_datap->db_type == M_PCPROTO)
+	    )
+		tmp = mp->b_cont;
 
-    len = msgdsize(tmp);
+	len = msgdsize(tmp);
 
-    if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	cmn_err(CE_CONT, "\nconvert_to_skbuf: minor_ptr 0x%x, mp 0x%x, len %d\n", minor_ptr, mp, len);
+	if (ip_to_streams_debug_mask & DBG_SQUAWK)
+		cmn_err(CE_CONT, "\nconvert_to_skbuf: minor_ptr 0x%p, mp 0x%p, len %d\n", minor_ptr,
+			mp, len);
 
-    skb = dev_alloc_skb(len+4);
+	skb = dev_alloc_skb(len + 4);
 
-    if ( skb == NULL )
-    {
-	if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	    cmn_err(CE_CONT, "\nconvert_to_skbuf: could not allocate %d bytes\n", len);
-       return(-1);
-    }
+	if (skb == NULL) {
+		if (ip_to_streams_debug_mask & DBG_SQUAWK)
+			cmn_err(CE_CONT, "\nconvert_to_skbuf: could not allocate %d bytes\n", len);
+		return (-1);
+	}
 
-    /* set up the skb data structure */
-    skb->dev = &minor_ptr->mydev;
-    skb_reserve(skb,2);
-    skb->protocol = htons(ETH_P_IP);
-    skb->pkt_type = PACKET_HOST;
-    skb->h.raw = skb->data ;
-    skb->mac.raw = skb->data ;
+	/* set up the skb data structure */
+	skb->dev = &minor_ptr->mydev;
+	skb_reserve(skb, 2);
+	skb->protocol = htons(ETH_P_IP);
+	skb->pkt_type = PACKET_HOST;
+	skb->h.raw = skb->data;
+	skb->mac.raw = skb->data;
 #if defined(KERNEL_2_1)
-    skb->nh.raw = skb->data ;
+	skb->nh.raw = skb->data;
 #endif
-    skb->ip_summed = CHECKSUM_NONE ;
+	skb->ip_summed = CHECKSUM_NONE;
 
-    ctmp = skb->data;
+	ctmp = skb->data;
 
-    /*
-     * skip over proto stuff, and copy the data over.
-     */
+	/* 
+	 * skip over proto stuff, and copy the data over.
+	 */
 
-    while(tmp)
-    {
-	len = (tmp->b_wptr - tmp->b_rptr);
-	ctmp = skb_put(skb, len);
-        memcpy(ctmp, tmp->b_rptr, len);
+	while (tmp) {
+		len = (tmp->b_wptr - tmp->b_rptr);
+		ctmp = skb_put(skb, len);
+		memcpy(ctmp, tmp->b_rptr, len);
 #ifdef GCOM
-	if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	    Rsys_hex_print("convert_to_skbuf:", ctmp, len);
+		if (ip_to_streams_debug_mask & DBG_SQUAWK)
+			Rsys_hex_print("convert_to_skbuf:", ctmp, len);
 #endif
-        tmp = tmp->b_cont;
-    }
+		tmp = tmp->b_cont;
+	}
 
-    /* make sure we don't lose any buffers */
-    freemsg(mp);
+	/* make sure we don't lose any buffers */
+	freemsg(mp);
 
-    /* inform system that an IP packet is ready to go */
-    netif_rx(skb);
+	/* inform system that an IP packet is ready to go */
+	netif_rx(skb);
 
-    return(0);
+	return (0);
 }
 
 /*
@@ -1321,120 +1287,112 @@ convert_to_skbuf( ip_to_streams_minor_t *minor_ptr, mblk_t *mp)
 
 static int ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 {
-    ip_to_streams_minor_t  *ipptr    = (ip_to_streams_minor_t *)dev->priv ;
-    dl_unitdata_req_t	   *dl;
-    mblk_t *mp, *mpt;
-  
-    if ( ip_to_streams_debug_mask & DBG_PUT )
-	cmn_err(CE_CONT, "\nip_strm_xmit: skb 0x%lx dev 0x%lx\n", skb, dev) ;
+	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
+	dl_unitdata_req_t *dl;
+	mblk_t *mp, *mpt;
 
-    /* make sure everything is ok */
-    if (skb == NULL || dev == NULL) 
-    {
-	if ( ip_to_streams_debug_mask & DBG_PUT )
-	    cmn_err(CE_CONT, "\nip_strm_xmit: skb NULL or dev NULL\n") ;
-	return(0);
-    }
+	if (ip_to_streams_debug_mask & DBG_PUT)
+		cmn_err(CE_CONT, "\nip_strm_xmit: skb 0x%p dev 0x%p\n", skb, dev);
 
-    /* is someone trying to confuse us? */
-    if ( ipptr == NULL )
-    {
-	if ( ip_to_streams_debug_mask & DBG_PUT )
-	    cmn_err(CE_CONT, "\nip_strm_xmit: ipptr NULL\n") ;
-	ipptr->stats.tx_errors++;
-	SKB_FREE(skb);				/* don't want a rexmit */
-	return(0);
-    }
+	/* make sure everything is ok */
+	if (skb == NULL || dev == NULL) {
+		if (ip_to_streams_debug_mask & DBG_PUT)
+			cmn_err(CE_CONT, "\nip_strm_xmit: skb NULL or dev NULL\n");
+		return (0);
+	}
 
-    if (ipptr->dl_magic != DL_MAGIC)		/* not already open */
-    {
-	if ( ip_to_streams_debug_mask & DBG_PUT )
-	    cmn_err(CE_CONT, "\nip_strm_xmit: ipptr->dl_magic\n") ;
-	ipptr->stats.tx_errors++;
-	SKB_FREE(skb);				/* don't want a rexmit */
-        return(0);
-    }
+	/* is someone trying to confuse us? */
+	if (ipptr == NULL) {
+		if (ip_to_streams_debug_mask & DBG_PUT)
+			cmn_err(CE_CONT, "\nip_strm_xmit: ipptr NULL\n");
+		ipptr->stats.tx_errors++;
+		SKB_FREE(skb);	/* don't want a rexmit */
+		return (0);
+	}
 
-    if ( ipptr->dlstate != DL_DATAXFER )	/* BIND not complete? */
-    {
-	if ( ip_to_streams_debug_mask & DBG_PUT )
-	    cmn_err(CE_CONT, "\nip_strm_xmit: state != DL_DATAXFER\n") ;
-	ipptr->stats.tx_errors++;
-	SKB_FREE(skb);				/* don't want a rexmit */
-        return(0);
-    }
+	if (ipptr->dl_magic != DL_MAGIC) {	/* not already open */
+		if (ip_to_streams_debug_mask & DBG_PUT)
+			cmn_err(CE_CONT, "\nip_strm_xmit: ipptr->dl_magic\n");
+		ipptr->stats.tx_errors++;
+		SKB_FREE(skb);	/* don't want a rexmit */
+		return (0);
+	}
 
-    /* convert to a streams message */
-    /* put a proto message in front of the data */
+	if (ipptr->dlstate != DL_DATAXFER) {	/* BIND not complete? */
+		if (ip_to_streams_debug_mask & DBG_PUT)
+			cmn_err(CE_CONT, "\nip_strm_xmit: state != DL_DATAXFER\n");
+		ipptr->stats.tx_errors++;
+		SKB_FREE(skb);	/* don't want a rexmit */
+		return (0);
+	}
 
-    mpt = allocb(sizeof(dl_unitdata_req_t), BPRI_MED);
+	/* convert to a streams message */
+	/* put a proto message in front of the data */
 
-    if ( mpt == NULL )
-    {
-	if ( ip_to_streams_debug_mask & DBG_PUT )
-	    cmn_err(CE_CONT, "\nip_strm_xmit: mpt NULL\n") ;
-	ipptr->stats.tx_errors++;
-	SKB_FREE(skb);				/* don't want a rexmit */
-	return(0);
-    }
+	mpt = allocb(sizeof(dl_unitdata_req_t), BPRI_MED);
 
-    mpt->b_datap->db_type = M_PROTO;
+	if (mpt == NULL) {
+		if (ip_to_streams_debug_mask & DBG_PUT)
+			cmn_err(CE_CONT, "\nip_strm_xmit: mpt NULL\n");
+		ipptr->stats.tx_errors++;
+		SKB_FREE(skb);	/* don't want a rexmit */
+		return (0);
+	}
 
-    mp = allocb(skb->len, BPRI_MED);
+	mpt->b_datap->db_type = M_PROTO;
 
-    if ( mp == NULL )
-    {
-	if ( ip_to_streams_debug_mask & DBG_PUT )
-	    cmn_err(CE_CONT, "\nip_strm_xmit: mp NULL\n") ;
-	ipptr->stats.tx_errors++;
-	SKB_FREE(skb);				/* don't want a rexmit */
-	freemsg(mpt);
-	return(0);
-    }
+	mp = allocb(skb->len, BPRI_MED);
 
-    mpt->b_cont = mp;	/* hook the message off the proto */
+	if (mp == NULL) {
+		if (ip_to_streams_debug_mask & DBG_PUT)
+			cmn_err(CE_CONT, "\nip_strm_xmit: mp NULL\n");
+		ipptr->stats.tx_errors++;
+		SKB_FREE(skb);	/* don't want a rexmit */
+		freemsg(mpt);
+		return (0);
+	}
 
-    mpt->b_wptr += sizeof(dl_unitdata_req_t);
+	mpt->b_cont = mp;	/* hook the message off the proto */
 
-    dl = (dl_unitdata_req_t *)mpt->b_rptr;
+	mpt->b_wptr += sizeof(dl_unitdata_req_t);
 
-    dl->dl_primitive        = DL_UNITDATA_REQ;
-    dl->dl_dest_addr_length = 0;
-    dl->dl_dest_addr_offset = 0;
+	dl = (dl_unitdata_req_t *) mpt->b_rptr;
 
-    /* copy data over to the streams buffer */
-    memcpy(mp->b_rptr, skb->data, skb->len);
+	dl->dl_primitive = DL_UNITDATA_REQ;
+	dl->dl_dest_addr_length = 0;
+	dl->dl_dest_addr_offset = 0;
+
+	/* copy data over to the streams buffer */
+	memcpy(mp->b_rptr, skb->data, skb->len);
 
 #ifdef GCOM
-    if ( ip_to_streams_debug_mask & DBG_SQUAWK )
-	Rsys_hex_print("ip_strm_xmit:", mp->b_rptr, skb->len);
+	if (ip_to_streams_debug_mask & DBG_SQUAWK)
+		Rsys_hex_print("ip_strm_xmit:", mp->b_rptr, skb->len);
 #endif
 
-    /* set write pointer to correct place */
-    mp->b_wptr += skb->len;
+	/* set write pointer to correct place */
+	mp->b_wptr += skb->len;
 
-    /* free the skb buffer */
-    SKB_FREE(skb);
+	/* free the skb buffer */
+	SKB_FREE(skb);
 
-    /* send it down to the streams modules */
+	/* send it down to the streams modules */
 
-    if ( canputnext(ipptr->dl_wrq) )
-    {
-        putnext(ipptr->dl_wrq, mpt);
-        ipptr->stats.tx_packets++;
-    }
-    else
-    {
-	netif_stop_queue(dev) ;
-        if (!putq(ipptr->dl_wrq, mpt))
-		freemsg(mpt);
-    }
+	if (canputnext(ipptr->dl_wrq)) {
+		putnext(ipptr->dl_wrq, mpt);
+		ipptr->stats.tx_packets++;
+	} else {
+		netif_stop_queue(dev);
+		if (!putq(ipptr->dl_wrq, mpt))
+			freemsg(mpt);
+	}
 
-    if ( ip_to_streams_debug_mask & DBG_PUT )
-	cmn_err(CE_CONT, "\nip_strm_xmit: putnext complete\n") ;
+	if (ip_to_streams_debug_mask & DBG_PUT)
+		cmn_err(CE_CONT, "\nip_strm_xmit: putnext complete\n");
 
-    return(0);
+	return (0);
 }
+
 #undef SKB_FREE
 
 /************************************************************************
@@ -1445,9 +1403,9 @@ static int ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 ************************************************************************/
 int ip_strm_ioctl(struct ism_dev *dev, struct ifreq *ifr, int cmd)
 {
-    return(-EINVAL) ;
+	return (-EINVAL);
 
-} /* ip_strm_ioctl */
+}				/* ip_strm_ioctl */
 
 /************************************************************************
 *                           enet_statistics                          	*
@@ -1458,12 +1416,12 @@ int ip_strm_ioctl(struct ism_dev *dev, struct ifreq *ifr, int cmd)
 ************************************************************************/
 static struct enet_statistics *get_stats(struct ism_dev *dev)
 {
-    ip_to_streams_minor_t  *ipptr    = (ip_to_streams_minor_t *)dev->priv ;
+	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
-    if (ipptr == NULL)
-	return(NULL) ;
+	if (ipptr == NULL)
+		return (NULL);
 
-    return (&ipptr->stats);
+	return (&ipptr->stats);
 }
 
 /************************************************************************
@@ -1485,45 +1443,39 @@ static struct enet_statistics *get_stats(struct ism_dev *dev)
 
 int ip_strm_open(struct ism_dev *dev)
 {
-    ip_to_streams_minor_t	*ipptr = (ip_to_streams_minor_t *) dev->priv;
+	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	cmn_err(CE_CONT, "ip_strm_open: dev 0x%x\n", dev);
+	if (ip_to_streams_debug_mask & (DBG_OPEN))
+		cmn_err(CE_CONT, "ip_strm_open: dev 0x%p\n", dev);
 
-    /* if the stream has not been opened, fail */
-    if (ipptr == NULL)
-	return(EIO);
+	/* if the stream has not been opened, fail */
+	if (ipptr == NULL)
+		return (EIO);
 
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	printk("ip_strm_open: %s: ipptr = 0x%px\n", ipptr->myname, ipptr);
+	if (ip_to_streams_debug_mask & (DBG_OPEN))
+		printk("ip_strm_open: %s: ipptr = 0x%px\n", ipptr->myname, ipptr);
 
-    dev->flags |= IFF_POINTOPOINT ;
+	dev->flags |= IFF_POINTOPOINT;
 
-    if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-    {
-	printk("ip_strm_open: ipptr: 0x%lx, dl_wrq: 0x%lx\n",
-			 (unsigned long)ipptr,
-			 (unsigned long)ipptr->dl_wrq);
-    }
-
-    if ( ipptr->dl_wrq == NULL)
-    {
-	if ( ip_to_streams_debug_mask & (DBG_OPEN) )
-	{
-	    printk("ip_strm_open: dl_wrq not setup correctly\n");
+	if (ip_to_streams_debug_mask & (DBG_OPEN)) {
+		printk("ip_strm_open: ipptr: 0x%lx, dl_wrq: 0x%lx\n", (unsigned long) ipptr,
+		       (unsigned long) ipptr->dl_wrq);
 	}
-	return(EIO);
-    }
 
-    /* this flag is used to control where we send the reads from the
-     * streams modules.  If it is IP, then we will convert to a LINUX
-     * sk_buf and send it up to ip, otherwise we send it to the process
-     * that has opened the stream.
-     */
-    ipptr->contype = IP;
-    ipptr->ip_open = 1 ;
+	if (ipptr->dl_wrq == NULL) {
+		if (ip_to_streams_debug_mask & (DBG_OPEN)) {
+			printk("ip_strm_open: dl_wrq not setup correctly\n");
+		}
+		return (EIO);
+	}
 
-    return 0;
+	/* this flag is used to control where we send the reads from the streams modules.  If it is 
+	   IP, then we will convert to a LINUX sk_buf and send it up to ip, otherwise we send it to 
+	   the process that has opened the stream. */
+	ipptr->contype = IP;
+	ipptr->ip_open = 1;
+
+	return 0;
 }
 
 /************************************************************************
@@ -1543,14 +1495,14 @@ int ip_strm_open(struct ism_dev *dev)
 ************************************************************************/
 int ip_strm_close(struct ism_dev *dev)
 {
-    ip_to_streams_minor_t    *ipptr = (ip_to_streams_minor_t *) dev->priv ;
+	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
-    netif_stop_queue(dev) ;
-    ipptr->contype = 0 ;
-    ipptr->ip_open = 0 ;
-    return(0) ;
+	netif_stop_queue(dev);
+	ipptr->contype = 0;
+	ipptr->ip_open = 0;
+	return (0);
 
-} /* ip_strm_close */
+}				/* ip_strm_close */
 
 /************************************************************************
 *                           ip_strm_init                          	*
@@ -1562,38 +1514,104 @@ int ip_strm_close(struct ism_dev *dev)
 int ip_strm_init(struct ism_dev *dev)
 {
 #ifndef KERNEL_2_1
-    int i;
+	int i;
 #endif
 
-    dev->mtu		   = IP_STRM_MTU;
-    dev->hard_start_xmit   = ip_strm_xmit;
-    dev->do_ioctl	   = ip_strm_ioctl;
-    dev->hard_header	   = 0;
-    dev->hard_header_len   = 0;
-    dev->addr_len	   = 0;
-    dev->tx_queue_len	   = 100;
-    dev->type		   = ARPHRD_DLCI;	/* 0x0001		*/
-    dev->rebuild_header	   = 0;
-    dev->open		   = ip_strm_open;
-    dev->flags		  |= IFF_POINTOPOINT;
+	dev->mtu = IP_STRM_MTU;
+	dev->hard_start_xmit = ip_strm_xmit;
+	dev->do_ioctl = ip_strm_ioctl;
+	dev->hard_header = 0;
+	dev->hard_header_len = 0;
+	dev->addr_len = 0;
+	dev->tx_queue_len = 100;
+	dev->type = ARPHRD_DLCI;	/* 0x0001 */
+	dev->rebuild_header = 0;
+	dev->open = ip_strm_open;
+	dev->flags |= IFF_POINTOPOINT;
 #ifdef KERNEL_2_1
-    dev->addr_len	   = 4;
+	dev->addr_len = 4;
 #else
-    dev->family		   = AF_INET;
-    dev->pa_addr	   = 0;
-    dev->pa_brdaddr	   = 0;
-    dev->pa_mask	   = 0;
-    dev->pa_alen	   = 4;
+	dev->family = AF_INET;
+	dev->pa_addr = 0;
+	dev->pa_brdaddr = 0;
+	dev->pa_mask = 0;
+	dev->pa_alen = 4;
 #endif
-    dev->irq		   = 0;
-    memset(dev->dev_addr, 0, MAX_ADDR_LEN);
-    dev->get_stats = get_stats;
-    netif_start_queue(dev) ;
+	dev->irq = 0;
+	memset(dev->dev_addr, 0, MAX_ADDR_LEN);
+	dev->get_stats = get_stats;
+	netif_start_queue(dev);
 
 #if !defined(KERNEL_2_1)
-    for (i = 0; i < DEV_NUMBUFFS; i++)
-	    skb_queue_head_init(&dev->buffs[i]);
+	for (i = 0; i < DEV_NUMBUFFS; i++)
+		skb_queue_head_init(&dev->buffs[i]);
 #endif
 
-    return(0);
+	return (0);
 }
+
+#if defined LFS
+STATIC struct fmodsw ip_to_streams_fmod = {
+	.f_name = IP_TO_STREAMS_MOD_NAME,
+	.f_str = &ip_to_streams_info,
+	.f_flag = 0,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC int ip_to_streams_register_module(void)
+{
+	int err;
+	if ((err = register_strmod(&ip_to_streams_fmod)) < 0)
+		return (err);
+	if (modid == 0 && err > 0)
+		modid = err;
+	return (0);
+};
+STATIC void ip_to_streams_unregister_module(void)
+{
+	return (void) unregister_strmod(&ip_to_streams_fmod);
+}
+#elif defined LIS
+STATIC int ip_to_streams_register_module(void)
+{
+	int ret;
+	if ((ret =
+	     lis_register_strmod(&ip_to_streams_info, IP_TO_STREAMS_MOD_NAME)) != LIS_NULL_MID) {
+		if (modid == 0)
+			modid = ret;
+		return (0);
+	}
+	/* LiS is not too good on giving informative errors here. */
+	return (EIO);
+}
+STATIC void ip_to_streams_unregister_module(void)
+{
+	/* LiS provides detailed error here when they are discarded. */
+	return (void) lis_unregister_strmod(&ip_to_streams_info);
+}
+#endif
+
+STATIC int __init ip_to_streams_init(void)
+{
+	int err;
+#ifdef MODULE
+	cmn_err(CE_NOTE, IP_TO_STREAMS_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, IP_TO_STREAMS_SPLASH);	/* console splash */
+#endif
+	if ((err = ip_to_streams_register_module())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", IP_TO_STREAMS_MOD_NAME,
+			-err);
+		return (err);
+	}
+	return (0);
+};
+
+STATIC void __exit ip_to_streams_exit(void)
+{
+	ip_to_streams_unregister_module();
+	return;
+}
+
+module_init(ip_to_streams_init);
+module_exit(ip_to_streams_exit);

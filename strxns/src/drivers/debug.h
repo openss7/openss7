@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 03:05:25 $
+ @(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/23 10:12:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/04 03:05:25 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 10:12:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 03:05:25 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/23 10:12:33 $"
+
+#ifdef LFS
+#include <sys/strdebug.h>
+#else				/* LFS */
 
 #if 1
 #define DDTRACE          do { printk("%s [%s %d] trace\n",__FUNCTION__,__FILE__, __LINE__); } while(0)
@@ -70,22 +74,22 @@
 #endif
 #endif
 
-#undef __never
-#undef __rare
-#undef __seldom
-#undef __usual
-#undef __normal
-#undef __assert
-#undef __assure
-#undef __ensure
-#undef __trace
-#undef __ptrace
-#undef __fixme
-#undef __todo
-#undef __ctrace
-#undef __printd
-#undef __swerr
-#undef __pswerr
+#undef  __never
+#undef  __rare
+#undef  __seldom
+#undef  __usual
+#undef  __normal
+#undef  __assert
+#undef  __assure
+#undef  __ensure
+#undef  __trace
+#undef  __ptrace
+#undef  __fixme
+#undef  __todo
+#undef  __ctrace
+#undef  __printd
+#undef  __swerr
+#undef  __pswerr
 
 #define __never() \
 do { printk(KERN_EMERG "%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); *(int *)0 = 0; } while(0)
@@ -135,28 +139,28 @@ do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LI
 #define __pswerr(__pkspec) \
 do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
-#undef   never
-#undef    rare
-#undef  seldom
-#undef   usual
-#undef unusual
-#undef  normal
-#undef abnormal
-#undef  assert
-#undef  assure
-#undef  ensure
-#undef  unless
-#undef   trace
-#undef  ptrace
-#undef  ctrace
-#undef   fixme
-#undef    todo
-#undef  printd
-#undef   swerr
-#undef  pswerr
+#undef     never
+#undef     rare
+#undef   seldom
+#undef    usual
+#undef  unusual
+#undef   normal
+#undef  abnormal
+#undef   assert
+#undef   assure
+#undef   ensure
+#undef   unless
+#undef    trace
+#undef   ptrace
+#undef   ctrace
+#undef    fixme
+#undef     todo
+#undef   printd
+#undef    swerr
+#undef   pswerr
 
-#undef STATIC
-#undef INLINE
+#undef  STATIC
+#undef  INLINE
 
 #ifdef _DEBUG
 
@@ -183,7 +187,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STATIC
 #define INLINE
 
-#else
+#else				/* _DEBUG */
 #ifdef _SAFE
 
 #define   never()		do { *(int *)0 = 0; } while(0)
@@ -209,7 +213,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STATIC static
 #define INLINE inline
 
-#else
+#else				/* _SAFE */
 
 #define   never()		do { } while(0)
 #define	   rare()		do { } while(0)
@@ -234,8 +238,10 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define STATIC static
 #define INLINE inline
 
-#endif
+#endif				/* _SAFE */
 
-#endif
+#endif				/* _DEBUG */
+
+#endif				/* LFS */
 
 #endif				/* __DEBUG_H__ */
