@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2004/08/20 20:55:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2004/10/13 09:47:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/20 20:55:57 $ by $Author: brian $
+# Last Modified $Date: 2004/10/13 09:47:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -115,7 +115,6 @@ netserver_SOURCES		= netserver.c
 netserver_LDFLAGS		= libnetperf.la $(NETPERF_LDADD)
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
-EXTRA_DIST			= ACKNWLDGMNTS COPYRIGHT netperf.ps README.ovms Release_Notes
 dist_noinst_SCRIPTS		= configure.nexusware
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS)
@@ -178,22 +177,24 @@ dist_noinst_MANS		= \
 
 MANMACRO_PFX			= netperf
 
+info_TEXINFOS			= netperf.texi
+EXTRA_info_TEXINFOS		= \
+				  scripts/texi/gpl.texi \
+				  scripts/texi/fdl.texi \
+				  scripts/texi/lesser.texi \
+				  scripts/texi/install.texi
+
+EXTRA_DIST			= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes
+
+include am/info.am
+
 include am/man.am
-
-info_TEXINFOS		= netperf.texi
-
-AM_MAKEINFOFLAGS	= --force --footnote-style=separate
-AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
-
-EXTRA_DIST		+= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
-
-all-local: info ps pdf html
 
 #
 #   Rules for making rpms
 #
-AM_RPMFLAGS				=
-AM_SRPMFLAGS				=
+AM_RPMFLAGS			=
+AM_SRPMFLAGS			=
 
 include am/rpm.am
 
