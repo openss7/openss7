@@ -64,10 +64,11 @@ objname module tirdwr          tirdwr
 #
 # These are just stupid examples
 #
-#        driver          minor lastminor  modules
+#         driver          minor lastminor  modules
 #autopush clone-drvr          1         0  relay
 #autopush clone-drvr          2         5  relay2
 #autopush link-drvr          -1         0  relay relay2
+ autopush loop-around	      9		0  relay
 
 #
 # Loadable specifications

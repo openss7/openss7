@@ -34,6 +34,7 @@ initialize	fifo
 #	name		type	perm	major		minor
 node	loop.1		c	0644	loop-around	1
 node	loop.2		c	*	loop-around	2
+node	loop.9		c	*	loop-around	9
 node	loop.255	c	*	loop-around	255
 node	loop_clone	c	*	clone-drvr	loop-around
 node	mux_clone	c	*	clone-drvr	mini-mux
@@ -53,3 +54,8 @@ node	putst		c	0666	putst		0
 #device	loop-around	   1 0x310     16     S	 10 0xD0000 0x4000
 #device	loop-around	   2 0	        0     S	 10 	  0	 0
 
+#
+# Autopush specifications for testing
+#
+#        driver          minor lastminor  modules
+autopush loop-around         9         0  relay

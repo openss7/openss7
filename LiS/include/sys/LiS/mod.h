@@ -34,7 +34,7 @@
 #ifndef _MOD_H
 #define _MOD_H 1
 
-#ident "@(#) LiS mod.h 2.4 12/15/02 18:00:05 "
+#ident "@(#) LiS mod.h 2.5 10/23/03 21:24:57 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -152,11 +152,25 @@ typedef struct fmodsw {
 	ushort             f_count;	/* open count */
         short              f_flags;     /* module/driver flags */
         char               f_name[LIS_NAMESZ+1];
+        char               f_objname[LIS_NAMESZ+1];
+        int		   f_state;	/* state of module */
+	lis_semaphore_t	   f_sem;	/* to synchronize loading */
 } fmodsw_t;
 
 #define LIS_MODFLG_CLONE   0x0001       /* module is 'clone' */
 #define LIS_MODFLG_FIFO    0x0002       /* module is 'fifo'  */
 #define LIS_MODFLG_REOPEN  0x0004       /* cloned minors can reopen */
+
+/*
+ * States
+ */
+#define LIS_MODSTATE_MASK	0x0FF	/* isolates state variable */
+#define	LIS_MODSTATE_LINKED	0	/* linked in with LiS */
+#define	LIS_MODSTATE_UNLOADED	1	/* not loaded */
+#define	LIS_MODSTATE_LOADING	2	/* loading */
+#define	LIS_MODSTATE_LOADED	3	/* loaded */
+
+#define LIS_MODSTATE_INITED	0x100	/* initialized */
 
 #endif /* __KERNEL__ */
 

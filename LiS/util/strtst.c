@@ -18,7 +18,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS strtst.c 2.30 10/4/03 17:51:31 "
+#ident "@(#) LiS strtst.c 2.31 10/23/03 21:25:28 "
 
 #define	inline			/* make disappear */
 
@@ -76,6 +76,7 @@
 #ifdef LINUX
 #define	LOOP_1		"/dev/loop.1"
 #define	LOOP_2		"/dev/loop.2"
+#define	LOOP_9		"/dev/loop.9"
 #define	LOOP_255	"/dev/loop.255"
 #define LOOP_CLONE	"/dev/loop_clone"
 #define MUX_CLONE	"/dev/mux_clone"
@@ -89,6 +90,7 @@
 #else
 #define	LOOP_1		"loop.1"
 #define	LOOP_2		"loop.2"
+#define	LOOP_9		"loop.9"
 #define	LOOP_255	"loop.255"
 #define LOOP_CLONE	"loop_clone"
 #define MUX_CLONE	"mux_clone"
@@ -4630,6 +4632,42 @@ int sad_vml_test(int fd, struct str_list *list)
 }
 
 /************************************************************************
+*                             autopush_test                             *
+************************************************************************/
+void autopush_test(void)
+{
+	int	fd ;
+	int	rslt ;
+
+	print("\nSTREAMS Auto-Push test\n");
+
+	print("autopush_test: open loop.9 w/autopush relay module\n");
+	fd = user_open(LOOP_9, O_RDWR, 0);
+	if (fd < 0) {
+		print("autopush_test: loop.9 open: %s\n", strerror(-fd));
+		xit();
+	}
+
+	rslt = user_ioctl(fd, I_FIND, "relay") ;
+	if (rslt < 0)
+	{
+	    print("loop.9: I_FIND: %s\n", strerror(-rslt)) ;
+	    xit() ;
+	}
+
+	if (rslt > 0)
+	    print("Module \"relay\" is present in the stream\n");
+	else
+	{
+      	    print("Error: module \"relay\" is not present in the stream\n");
+	    xit() ;
+	}
+
+	print("autopush_test: closing files\n");
+	user_close(fd) ;
+}
+
+/************************************************************************
 *                             sad_test                                  *
 ************************************************************************/
 void sad_test(void)
@@ -5974,6 +6012,9 @@ void test(void)
     bufcall_test() ;
     print("Memory allocated = %ld\n", lis_mem_alloced) ;
     wait_for_logfile("bufcall test") ;
+
+    autopush_test() ;
+    wait_for_logfile("sad driver test") ;
 
     sad_test() ;
     print("Memory allocated = %ld\n", lis_mem_alloced) ;

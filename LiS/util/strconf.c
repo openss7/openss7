@@ -34,7 +34,7 @@
  * 
  */
 
-#ident "@(#) LiS strconf.c 2.10 11/5/02"
+#ident "@(#) LiS strconf.c 2.11 10/23/03"
 
 #include <limits.h>
 #include <stdio.h>
@@ -1406,7 +1406,6 @@ void	process_line(void)
 	        free(ap) ;
 	        return ;
 	    }
-
 	}
 
 	/*
@@ -1721,33 +1720,25 @@ void	build_modconf(void)
 
     p0("module_config_t		lis_module_config[] =\n") ;
     p0("{\n") ;
+    p0("	{\"\",NULL,\"\"}, /* empty 0th entry */") ;
     for (mp = module_head; mp != NULL; mp = mp->link)
     {
-	if (mp->obj->loadable)
-	    continue ;
-
 	p1("	{\"%s\",", mp->name) ;
-	p1(" &%sinfo},\n", mp->prefix) ;
+	if (mp->obj->loadable)
+	{				/* no streamtab, incl obj name */
+	    p1(" NULL, \"%s\"},\n", mp->obj->name) ;
+	}
+	else
+	{				/* streamtab, no obj name */
+	    p1(" &%sinfo,", mp->prefix) ;
+	    p0(" \"\"},\n") ;
+	}
     }
-    p0("\n") ;
     p0("} ;\n") ;
     p0("\n") ;
 
     p0("\n") ;
     p0("#ifdef LIS_LOADABLE_SUPPORT\n") ;
-    p0("\n") ;
-
-    p0("module_obj_name_t		lis_mod_objnames[] =\n") ;
-    p0("{\n") ;
-    for (mp = module_head; mp != NULL; mp = mp->link)
-    {
-	if (!mp->obj->loadable)
-	    continue ;
-
-	p1("	{\"%s\",", mp->name) ;
-	p1(" \"%s\"},\n", mp->obj->name) ;
-    }
-    p0("} ;\n") ;
     p0("\n") ;
 
     p0("driver_obj_name_t		lis_drv_objnames[] =\n") ;
@@ -1785,15 +1776,12 @@ void	build_modconf(void)
 	    p1("	{%3d,", dp->major[0]) ;
 	    p1("%3d,", ap->minor) ;
 	    p1("%3d,", ap->lastminor) ;
-	    p1(" {%2d, {", ap->npush) ;
-	    for (i = 0; i < MAXAPUSH; ++i)
+	    p1("%2d, {", ap->npush) ;
+	    for (i = 0; i < ap->npush; ++i)
 	    {
-		if (i < ap->npush)
-	    	    p1("%3d, ", ap->mods[i]->id) ;
-		else
-	    	    p0("  0,") ;
+		p1("\"%s\", ", ap->mods[i]->name) ;
 	    }
-	    p0("} } },\n") ;
+	    p0("} },\n") ;
 	}
     }
     p0("} ;\n") ;

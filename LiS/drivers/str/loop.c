@@ -32,7 +32,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ident "@(#) LiS loop.c 2.22 2/8/03 16:14:55 "
+#ident "@(#) LiS loop.c 2.23 10/23/03 21:23:58 "
 
 /*  -------------------------------------------------------------------  */
 
@@ -183,6 +183,7 @@ void sloop_init(void)
     make_node("/dev/loop_clone", CLONE__CMAJOR_0, SLOOP__CMAJOR_0);
     make_node("/dev/loop.1", SLOOP__CMAJOR_0, 1);
     make_node("/dev/loop.2", SLOOP__CMAJOR_0, 2);
+    make_node("/dev/loop.9", SLOOP__CMAJOR_0, 9);
     make_node("/dev/loop.255", SLOOP__CMAJOR_0, 255);
 
 }				/* loop_init */
@@ -192,6 +193,7 @@ void sloop_term(void)
     make_node("/dev/loop_clone", 0,0);
     make_node("/dev/loop.1", 0,0);
     make_node("/dev/loop.2", 0,0);
+    make_node("/dev/loop.9", 0,0);
     make_node("/dev/loop.255", 0,0);
 
 }				/* loop_term */
