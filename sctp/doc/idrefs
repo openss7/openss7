@@ -1,0 +1,22 @@
+%K rfc2960
+%A R. Stewart, et al
+%D February 2000
+%I IETF
+%L RFC2960
+%R RFC 2960
+%T Stream Control Transmission Protocol (SCTP)
+
+%K tpi
+%L TPI92
+%A Unix International
+%D December 10, 1992
+%R Revision 1.5
+%T Transport Provider Interface Specification
+%O (defunct)
+
+%A X Programmer's Group
+%L XTI
+%K xti
+%D unknown
+%T XOpen Transport Interface
+%R Revision 1.0

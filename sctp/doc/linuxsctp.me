@@ -1,0 +1,280 @@
+.R1
+# abbreviate A
+# label L
+no-default-database
+no-accumulate
+database idrefs
+annotate X pp
+move-punctuation
+discard YZ
+.R2
+.de $0
+.(x 0
+\\$2 \\$1
+.)x
+..
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 11.0i
+.po 4
+.ll 7.2i
+.lt 7.2i
+.nr LL 7.2i
+.nr LT 7.2i
+.fo 'Bidulock'Version 0.0'FORMFEED[Page %]'
+.he 'Internet Draft'Informational'March 2001'
+.hy 6
+.ad b
+.ta 3
+\".na
+.ba 0
+.nr so -3n
+.nr ii 3n
+.nr pi 3n
+.nf
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       The OpenSS7 Project
+.fi
+.sp  2
+Expires in six months                                         March 2001
+.sp  2
+.ce 3
+
+Stream Control Transmission Protocol (SCTP)
+Implementation for Linux NET4
+<draft-bidulock-sigtran-linuxsctp-00.txt>
+.sp 2
+.fi
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet Draft provides informational notes concerning the OpenSS7 Linux
+NET4 package implementation of the Stream Control Transmission Protocol
+(SCTP).
+.[
+rfc2960
+.]
+
+.sh 1 "Introduction"
+
+.sh 1 "Implementation Notes"
+
+.sh 2 "Socket Library"
+
+Linux SCTP implements the socket library interface for Stream Control
+Transmission Protocol with some minor modifications which are compatible with
+the BSD and POSIX interfaces.
+
+.sh 3 "socket()"
+
+.(b
+.nf
+\fB#include <sys/socket.h>\fR
+\fB#include <netinet/in.h>\fR
+
+\fBint socket(int \fIdomain\fB, int \fItype\fB, int \fIprotocol\fB);\fR
+
+\fBsctp_socket = socket(PF_INET, SOCK_SEQPACKET, 0);\fR
+.fi
+.)b I F
+
+LinuxSCTP uses the \fISOCK_SEQPACKET\fR type within the \fIPF_INET\fR and
+\fIPF_INET6\fR domains for Stream Control Transmission Protocol.  Aside from
+using \fISOCK_SEQPACKET\fR instead of \fISOCK_STREAM\fR, there is no
+difference between SCTP and TCP or UDP with respect to socket opening.
+
+.sh 3 "bind()"
+
+.(b
+.nf
+\fB#include <sys/types.h>\fR
+\fB#include <sys/socket.h>\fR
+
+\fBint bind(int \fIsockfd\fB,\fR
+		\fBstruct sockaddr *\fImy_addr\fB,\fR \fBsocklen_t \fIaddrlen\fB);\fR
+.fi
+.)b I F
+
+The socket library \fBbind\fR(2) call has the same semantics as for TCP or
+UDP.  The differences in the use of the \fBbind\fR(2) call for SCTP are as
+follows:
+.np
+\fImy_addr\fR can point to an array of socket addresses rather than a single
+socket address.
+.np
+\fIaddrlen\fR is the length of the entire address array.
+.lp
+All other normal semantics of \fBbind\fR(2) apply.
+
+.sh 3 "listen()"
+
+The socket library \fBlisten\fR(2) call has the same operation as for TCP or
+UDP.
+
+.(b
+.nf
+\fB#include <sys/socket.h>\fR
+
+\fBint listen(int \fIs\fB, int \fIbacklog\fB);\fR
+.fi
+.)b I F
+
+.sh 3 "accept()"
+
+.(b
+\fB#include <sys/types.h>\fR
+\fB#include <sys/socket.h>\fR
+
+\fBint accept(int \fIs\fB,\fR
+		\fBstruct sockaddr *\fIaddr\fB,\fR \fBsocklen_t *\fIaddrlen\fB);\fR
+.)b I F
+
+.sh 3 "connect()"
+
+.(b
+\fB#include <sys/types.h>\fR
+\fB#include <sys/socket.h>\fR
+
+\fBint connect(int \fIsockfd\fB,\fR
+		\fBconst struct sockaddr *\fIserv_addr\fB,\fR \fBsocklen_t \fIaddrlen\fB);\fR
+.)b I F
+
+.sh 3 "shutdown()"
+
+.(b
+\fB#include <sys/socket.h>\fR
+
+\fBint shutdown(int \fIs\fB, int \fIhow\fB);\fR
+.)b I F
+
+.sh 3 "close()"
+
+.(b
+\fB#include <unistd.h>\fR
+
+\fBint close(int \fIfd\fB);\fR
+.)b I F
+
+.sh 2 "Kernel Implementation"
+
+Linux SCTP implements the SCTP protocl in the Linux kernel alongside the TCP
+and UDP implementations in the NET4 package.  Much of the same approaches
+which were taked to TCP implementation have been echoed in the SCTP
+implementation.
+
+This section discusses some of the implementation decisions and approaches.
+
+.sh 3 "Socket Hashes"
+
+TCP in the NET4 package hashs established sockets on single source and
+destination addresses and port numbers.  This is because a TCP connection is
+uniquely described by a source and destination address and port number.  The
+multi-homing features of SCTP extends this notion to include a list of source
+and destination addresses coupled with a single source and destination port
+number.
+
+For implementation, this difference in SCTP makes cache miss and hash lookups
+costly for multi-homed hosts with a resonable number of source and destination
+addresses.  Wherease TCP has no other invariant in a message which could
+uniquely identify the connection, SCTP has the Verification Tag in each
+message which is invariant over the connection in a given direction.
+Therefore, the Linux SCTP implementation uses the Verification Tag in the
+message as the hash key for established sockets.
+
+This has some ramifications on the selection of Verification Tags.  Selection
+of Verification Tags should follow the following basic rules:
+.np
+
+
+.sh 3 "Path MTU Discovery"
+.lp
+Although RFC 2960
+.[
+rfc2960
+.]
+makes reference to the procedure to be used during Path MTU Discovery when
+it is discovered (as a result if ICMP error) that the IP packet has become
+fragemented and was not transmitted because the DF bit was set in the IP
+packet for Path MTU discovery.
+RFC 2960
+says that the IP packet SHOULD be retransmitted with the DF bit clear;
+however, it is certain that there will be no possible way to determine which
+IP packet requires retransmission.
+.[
+rfc2960
+.]
+
+.lp
+This is because ICMP errors only return the first 8 bytes
+.(f
+The first 8 bytes of the SCTP message contain only the port numbers (source
+and destination) and the verification tag.  For TCP, this carries the sequence
+number, which is sufficient to identify the IP frame for retransmission.
+.)f
+of the IP payload in
+the ICMP fragmentation message.  Therefore, it will be impossible
+.(f
+Impossible is another word for "can't do it!"
+.)f
+to determine the IP message which caused the fragmentation error.
+
+.uh "Security Considerations"
+.uh Acknowledgements
+.nr ii 5
+.de ]<
+.uh References
+.rm (f )f
+..
+.pa
+.(b L F
+.[
+$LIST$
+.]
+.)b
+.nr ii 3
+
+.uh "Author's  Addresses"
+.(d
+.nf
+Brian F. G. Bidulock                                Tel: +1-972-839-4489
+The OpenSS7 Project                          EMail: bidulock@openss7.org
+4701 Preston Park Boulevard, Suite 424
+Plano, TX 75093
+USA
+.fi
+.)d
+.pd
+.sp 2
+.lp
+This Internet Draft expires September 2001.
+.pa
+.(b C F
+TABLE OF CONTENTS
+
+.xp 0
+.)b

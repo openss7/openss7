@@ -1,0 +1,1886 @@
+Network Working Group                                    R. R. Stewart
+INTERNET-DRAFT                                                   Cisco
+                                                                Q. Xie
+                                                             L Yarroll
+                                                              Motorola
+                                                               J. Wood
+                                                               K. Poon 
+                                                      Sun Microsystems
+
+expires in six months                                 October 31, 2000
+
+
+
+                       SCTP Sockets Mapping
+             <draft-stewart-sctpsocket-sigtran-01.txt>
+
+Status of This Memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of [RFC2026].  Internet-Drafts are working
+documents of the Internet Engineering Task Force (IETF), its areas,
+and its working groups.  Note that other groups may also distribute
+working documents as Internet-Drafts.
+
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html.
+
+
+Abstract
+
+This document describes a mapping of the Stream Control Transmission
+Protocol [SCTP] into a sockets API. The benefits of this mapping
+include compatibility for TCP applications, access to new SCTP
+features and a consolidate error and event notification scheme.
+
+
+Table of Contents
+
+1. Introduction
+2. Conventions
+  2.1 Data Types
+3. UDP-style Interface
+  3.1 Basic Operation
+    3.1.1 socket() - UDP Style Syntax
+    3.1.2 bind() - UDP Style Syntax
+    3.1.3 sendmsg() and recvmsg() - UDP Style Syntax
+    3.1.4 close() - UDP Style Syntax
+  3.2 Implicit Association Setup
+  3.3 Examples
+4. TCP-style Interface
+  4.1 Basic Operation
+    4.1.1 socket() - TCP Style Syntax
+    4.1.2 bind() - TCP Style Syntax
+    4.1.3 listen() - TCP Style Syntax
+    4.1.4 accept() - TCP Style Syntax
+    4.1.5 connect() - TCP Style Syntax
+    4.1.6 close() - TCP Style Syntax
+    4.1.7 shutdown() - TCP Style Syntax
+    4.1.8 sendmsg() and recvmsg() - TCP Style Syntax
+  4.2 Examples
+5. Data Structures
+  5.1 The msghdr and cmsghdr Structures
+  5.2 SCTP msg_control Structures
+    5.2.1 SCTP Initiation Structure
+    5.2.2 SCTP SNDRCV Structure
+  5.3 SCTP Events and Notifications
+    5.3.1 SCTP Notification and Event types
+      5.3.1.1 Communication notifications
+      5.3.1.2 Interface details
+      5.3.1.3 SCTP Communication error.
+6. Common Operations for Both Styles
+  6.1 send(), recv(), sendto(), recvfrom()
+  6.2 setsockopt(), getsockopt()
+  6.3 read() and write()
+7. Socket Options
+  7.1 Read / Write Options
+    7.1.1 Retransmission Timeout Parameters (SCTP_RTOINFO)
+    7.1.2 Association Retransmission Parameter (SCTP_ASSOCRTXINFO)
+    7.1.3 Path Parameters (SCTP_PATHPARAMS)
+    7.1.4 Initialization Parameters (SCTP_INITMSG)
+    7.1.5 Change of Addresses (SCTP_ADD_ADDR/SCTP_DEL_ADDR)
+    7.1.6 SO_LINGER
+  7.2 Read-Only Options
+    7.2.1 Path Information (SCTP_PATHINFO)
+    7.2.2 Peer Endpoint's Set of Addresses (SCTP_PATHCOUNT,
+          SCTP_ALLPATHS) 
+    7.2.3 Association Status (SCTP_STATUS)
+  7.3.  Ancillary Data Interest Options
+8. New Interface
+  8.1 sctp_bindx()
+  8.2 Branched-off Association, sctp_peeloff()
+9. Security Considerations
+10.  Authors' Addresses
+11.  References
+
+
+
+1. Introduction
+
+The sockets API has provided a standard mapping of the Internet
+Protocol suite to many operating systems. Both TCP [TCP] and UDP [UDP]
+have benefited from this standard representation and access method
+across many diverse platforms. SCTP is a new protocol that provides
+many of the characteristics of TCP but also incorporates semantics
+more akin to UDP. This document defines a method to map the existing
+sockets API for use with SCTP, providing both a base for access to new
+features and compatibility so that most existing TCP applications can
+be migrated to SCTP with few (if any) changes.
+
+There are three basic design objectives:
+
+ 1) Maintain consistency with existing sockets APIs: 
+
+    We define a sockets mapping for SCTP that is consistent with other
+    sockets API protocol mappings (for instance, UDP, TCP, IPv4,
+    and IPv6).
+
+ 2) Support a UDP-style interface
+
+    This set of semantics is similar to that defined for conntionless
+    protocols, such as UDP. It is more efficient than a TCP-like
+    connection-oriented interface in terms of exploring the new
+    features of SCTP. 
+
+    Note that SCTP is connection-oriented in nature, and it does not
+    support broadcast or multicast communications, as UDP does.
+
+ 3) Support a TCP-style interface
+
+    This interface supports the same basic semantics as sockets for 
+    connection-oriented protocols, such as TCP. 
+
+    The purpose of defining this interface is to allow existing
+    applications built on connnection-oriented protocols be ported to
+    use SCTP with very little effort, and developers familiar with
+    that semantics can easily adapt to SCTP.
+
+    Extensions will be added to this mapping to provide mechanisms to
+    exploit new features of SCTP. 
+
+Goals 2 and 3 are not compatible, so in this document we define two
+modes of mapping, namely the UDP-style mapping and the TCP-style
+mapping. These two modes share some common data structures and
+operations, but will require the use of two different programming
+models.
+
+A mechanism is defined to convert a UDP-style SCTP socket into a
+TCP-style socket.
+
+Some of the SCTP mechanisms cannot be adequately mapped to existing socket
+interface.  In some cases, it is more desirable to have new interface
+instead of using exisitng socket calls.  This document also describes
+those new interface.
+
+2. Conventions
+
+2.1 Data Types
+
+Whenever possible, data types from Draft 6.6 (March 1997) of POSIX
+1003.1g are used: uintN_t means an unsigned integer of exactly N bits
+(e.g., uint16_t).  We also assume the argument data types from 1003.1g
+when possible (e.g., the final argument to setsockopt() is a size_t
+value).  Whenever buffer sizes are specified, the POSIX 1003.1 size_t
+data type is used.
+
+3. UDP-style Interface
+ 
+The UDP-style interface has the following characteristics:
+
+  A) Outbound association setup is implicit.
+
+  B) Messages are delivered in complete messages (with one notable
+     exception). 
+
+  C) New inbound associations are accepted automatically.
+
+
+3.1 Basic Operation
+
+A typical server in this model uses the following socket calls in
+sequence to prepare an endpoint for servicing requests:
+
+  1. socket()
+  2. bind()
+  3. setsocketopt()
+  4. recvmsg()
+  5. sendmsg()
+  6. close()
+
+A typical client  uses the following calls in sequence to setup an
+association with a server to request services:
+
+  1. socket()
+  2. sendmsg()
+  3. recvmsg()
+  4. close()
+
+In this model, by default, all the associations connected to the endpoint
+are represented with a single socket.
+
+If the server or client wishes to branch an existing association off to a
+separate socket, it is required to call sctp_peeloff() and in the parameter
+specifies one of the transport addresses of the association. The
+sctp_peeloff() call will return a new socket which can then be used with
+recv() and send() functions for message passing. See Section 8.2 for more on
+branched-off associations.
+
+Once an association is branched off to a separate socket, it becomes
+completely separated from the original socket.  All subsequent control
+and data operations to that association must be done through the new
+socket. For example, the close operation on the original socket will
+not terminated any association that have been branched off to a
+different socket.
+
+We will discuss the UDP-style socket calls in more details in the
+following subsections.
+
+
+3.1.1 socket() - UDP Style Syntax
+
+Applications use socket() to create a socket descriptor to represent
+an SCTP endpoint.
+
+The syntax is,
+
+  sd = socket(PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP);
+
+or,
+
+  sd = socket(PF_INET6, SOCK_SEQPACKET, IPPROTO_SCTP);
+
+Here, SOCK_SEQPACKET indicates the creation of a UDP-style socket. 
+
+The first form creates an endpoint which can use only IPv4 addresses,
+while, the second form creates an endpoint which can use both IPv6 and
+IPv4 mapped addresses. 
+
+
+3.1.2 bind() - UDP Style Syntax
+
+Applications use bind() to specify which local address the SCTP
+endpoint should associate itself with as the primary address.
+
+An SCTP endpoint can be associated with multiple addresses.  To do this,
+sctp_bindx() is introduced in section 8.1 to help applications do the job
+of associating multiple addresses.  Instead of calling bind(), an
+application can use sctp_bindx() to associate an SCTP endpoint with
+multiple addresses.
+
+These addresses associated with a socket are the eligible transport
+addresses for the endpoint to send and receive data. The endpoint will
+also present these addresses to its peers during the association
+initialization process, see [SCTP].
+
+After calling bind() or sctp_bindx(), if the endpoint wishes to accept
+new assocations on the socket, it must enable the SCTP_ASSOC_CHANGE
+socket option (see section 5.2.3.1).  Then the SCTP endpoint will accept
+all SCTP INIT requests passing the COMMUNICATION_UP notification to
+the endpoint upon reception of a valid associaition (i.e. the receipt
+of a valid COOKIE ECHO).
+
+The syntax of bind() is,
+
+  ret = bind(int sd, struct sockaddr *addr, int addrlen);
+
+  sd      - the socket descriptor returned by socket().
+  addr    - the address structure (struct sockaddr_in or struct
+            sockaddr_in6 [RFC 2553]), 
+  addrlen - the size of the address structure.
+
+If sd is an IPv4 socket, the address passed must be an IPv4 address.
+If the sd is an IPv6 socket, the address passed can either be an IPv4
+or an IPv6 address.
+
+Applications cannot call bind() multiple times to associate multiple
+addresses to an endpoint.  After the first call to bind(), all
+subsequent call will return an error.
+
+If addr is specified as INADDR_ANY for an IPv4 or IPv6 socket, or as
+IN6ADDR_ANY for an IPv6 socket (normally used by server applications),
+the operating system will associates the endpoint with all the
+available local interfaces.
+
+If a bind() or sctp_bindx() is not called prior to the connect() call,
+the system picks an ephemeral port and will choose an address set
+equivalant to binding with INADDR_ANY and IN6ADDR_ANY for IPv4 and
+IPv6 socket respectively. One of those addresses will be the primary
+address for the association.  This automatically enables the
+multihoming capability of SCTP.
+
+3.1.3 sendmsg() and recvmsg() - UDP Style Syntax
+
+An application uses sendmsg() and recvmsg() call to transmit data to
+and receive data from its peer. 
+
+  ssize_t sendmsg(int socket, const struct msghdr *message,
+                  int flags);
+
+  ssize_t recvmsg(int socket, struct msghdr *message,
+                  int flags);
+
+  socket  - the socket descriptor of the endpoint.
+  message - pointer to the msghdr structure which contains a single
+            user message and possibly some ancillary data.
+
+            See Section 5 for complete description of the data
+            structures. 
+
+  flags   - flags sent or received with the user message, see Section
+            5 for complete description of the flags. 
+
+As we will see in Section 5, along with the user data, the ancillary
+data field is used to carry the sctp_sndrcvinfo and/or the
+sctp_initmsg structures to perform various SCTP functions including
+specifying options for sending each user message.  Those options,
+depending on whether sending or receiving, include stream number,
+stream sequence number, TOS, various flags, context and payload
+protocol Id, etc.
+
+When sending user data with sendmsg(), the msg_name field in msghdr
+structure will be filled with one of the addresses of the intended
+receiver. If there is no association existing between the sender and
+the intended receiver, the sender's SCTP stack will set up a new
+association and then send the user data (see Section 3.2 for more on
+implicit association setup).
+
+When receiving a user message with recvmsg(), the msg_name field in
+msghdr structure will be populated with the source IP address of the
+user data. The caller of recvmsg() can use this address information to
+determine to which association the received user message belongs.
+
+Note, if the socket is a branched-off socket that only represents one
+association (see Section 3.1), the msg_name field is not used when
+sending data (i.e., ignored by the SCTP stack).
+
+
+3.1.4 close() - UDP Style Syntax
+
+Applications use close() to perform graceful shutdown (as described in
+Section 10.1 of [SCTP]) on ALL the associations currently represented
+by a UDP-style socket. 
+
+The syntax is
+
+  ret = close(int sd);
+
+  sd      - the socket descriptor of the associations to be closed.
+
+To gracefully shutdown a specific association represented by the
+UDP-style socket, an application should use the sendmsg() call,
+passing no user data, but including the appropriate flag in the
+ancillary data (see Section 5.2.2).
+
+If sd in the close() call is a branched-off socket representing only
+one association, the shutdown is performed on that association only.
+
+
+3.2 Implicit Association Setup
+
+Once all bind() calls are complete on a UDP-style socket, the
+application can begin sending and receiving data using the
+sendmsg()/recvmsg() or sendto()/recvfrom() calls, without going
+through any explicit association setup procedures (i.e., no connect()
+calls required).
+
+Whenever sendmsg() or sendto() is called and the SCTP stack at the
+sender finds that there is no association existing between the sender
+and the intended receiver (identified by the address passed either in
+the msg_name field of msghdr structure in the sendmsg() call or the
+dest_addr field in the sendto() call), the SCTP stack will
+automatically setup an association to the intended receiver.
+
+Upon the successful association setup a COMMUNICATION_UP notification
+will be dispatched to the socket at both the sender and receiver
+side. This notification can be read by the recvmsg() system call (see
+Section 3.1.3).
+
+Note, if the SCTP stack at the sender side supports bundling, the
+first user message may be bundled with the COOKIE ECHO message [SCTP].
+
+When the SCTP stack sets up a new association implicitly, it first
+consults the sctp_initmsg structure, which is passed along within the
+ancillary data in the sendmsg() call (see Section 5.2.1 for details of
+the data structures), for any special options to be used on the new
+association. 
+
+If this information is not present in the sendmsg() call, or if the
+implicit association setup is triggered by a sendto() call, the
+default association initialization parameters will be used. These
+default association parameters may be set with respective setsockopt()
+calls or be left to the system defaults.
+
+Implicit association setup cannot be initiated by send()/recv()
+calls.
+
+
+3.3 Examples
+
+  [ To be filled in later ]
+
+
+4. TCP-style Interface
+
+The goal of this model is to follow as closely as possible the current
+practice of using the sockets interface for a connection oriented
+protocol, such as TCP. This model enables existing applications using
+connection oriented protocols to be ported to SCTP with very little
+effort.
+
+Note that some new SCTP features and some new SCTP socket options can
+only be utilized through the use of sendmsg() and recvmsg() calls,
+see Section 4.1.8.
+
+4.1 Basic Operation
+
+A typical server in TCP-style model uses the following system call
+sequence to prepare an SCTP endpoint for servicing requests: 
+
+  1. socket()
+  2. bind()
+  3. listen()
+  4. accept()
+
+The accept() call blocks until a new assocation is set up. It
+returns with a new socket descriptor. The server then uses the new
+socket descriptor to communicate with the client, using recv() and
+send() calls to get requests and send back responses.
+
+Then it calls 
+
+  5. close()
+
+to terminate the association.
+
+A typical client uses the following system call sequence to setup an
+association with a server to request services:
+
+  1. socket()
+  2. connect()
+
+After returning from connect(), the client uses send() and recv()
+calls to send out requests and receive responses from the server.
+
+The client calls 
+
+  3. close()
+
+to terminate this association when done.
+
+
+4.1.1 socket() - TCP Style Syntax
+
+ [Editor's Note: [Should we include return code of these calls in the
+ draft or should it be in a man page of different OSes? We may want to
+ map special error code for SCTP.  EMSGSIZE is used below.  And if an
+ app chooses not to receive event, we need to map some of those events
+ to an error. We need to figure out the mapping.]
+    
+Applications calls socket() to create a socket descriptor to represent
+an SCTP endpoint.
+
+The syntax is:
+
+  sd = socket(PF_INET, SOCK_STREAM, IPPROTO_SCTP);
+
+or,
+
+  sd = socket(PF_INET6, SOCK_STREAM, IPPROTO_SCTP);
+
+Here, SOCK_STREAM indicates the creation of a TCP-style socket.
+
+The first form creates an endpoint which can use only IPv4 addresses,
+while the second form creates an endpoint which can use both IPv6 and
+mapped IPv4 addresses.
+
+
+4.1.2 bind() - TCP Style Syntax
+
+Applications use bind() to pass the primary address assoicated with an SCTP
+endpoint to the system.  An SCTP endpoint can be associated with multiple
+addresses.  To do this, sctp_bindx() is introduced in section 8.1 to help
+applications do the job of associating multiple addresses.  Instead of
+calling bind(), an application can use sctp_bindx() to associae a SCTP
+endpoint with multiple addresses.
+
+These addresses associated with a socket are the eligible transport
+addresses for the endpoint to send and receive data. The endpoint will
+also present these addresses to its peers during the association
+initialization process, see [SCTP].
+
+The syntax is:
+
+  ret = bind(int sd, struct sockaddr *addr, int addrlen);
+
+  sd      - the socket descriptor returned by socket() call.
+  addr    - the address structure (either struct sockaddr_in or struct
+            sockaddr_in6 defined in [RFC 2553]). 
+  addrlen - the size of the address structure.
+
+If sd is an IPv4 socket, the address passed must be an IPv4 address.
+Otherwise, i.e., the sd is an IPv6 socket, the address passed can
+either be an IPv4 or an IPv6 address.
+
+Applications cannot call bind() multiple times to associate multiple
+addresses to the endpoint.  After the first call to bind(), all
+subsequent calls will return an error.
+
+If addr is specified as INADDR_ANY for an IPv4 or IPv6 socket, or as
+IN6ADDR_ANY for an IPv6 socket (normally used by server applications),
+the operating system will associate the endpoint with an optimal 
+address set of the available interfaces.
+
+The completion of this bind() process does not ready the SCTP endpoint 
+to accept inbound SCTP association requests.  Until a listen() system
+call, described below, is performed on the socket, the SCTP endpoint
+will promptly reject an inbound SCTP INIT request with an SCTP ABORT
+and discard data received.
+
+
+4.1.3 listen() - TCP Style Syntax
+
+Applications use listen() to ready the SCTP endpoint for accepting
+inbound associations.
+
+The syntax is:
+
+  ret = listen(int sd, int backlog);
+
+  sd      - the socket descriptor of the SCTP endpoint.
+  backlog - this specifies the max number of outstanding associations
+            allowed in the socket's accept queue.  These are the
+            associations that have finished the four-way initiation
+            handshake (see Section 5 of [SCTP]) and are in the
+            ESTABLISHED state. 
+
+
+4.1.4 accept() - TCP Style Syntax
+
+Applications use accept() call to remove an established SCTP assocation
+from the accept queue of the endpoint.  A new socket descriptor will be
+returned from accept() to represent the newly formed association.
+
+The syntax is: 
+
+  new_sd = accept(int sd, struct sockaddr *addr, socklen_t *addrlen);
+
+  new_sd  - the socket descriptor for the newly formed association.
+  sd      - the listening socket descriptor.
+  addr    - on return, will contain the primary address of the peer
+            endpoint. 
+  addrlen - on return, will contains the size of addr.
+
+
+4.1.5 connect() - TCP Style Syntax
+
+Applications use connect() to initiate an association to a peer.
+
+The syntax is
+
+  ret = connect(int sd, const struct sockaddr *addr, int addrlen);
+
+  sd      - the socket descriptor of the endpoint.
+  addr    - the peer's address.
+  addrlen - the size of the address.
+
+This operation corresponds to the ASSOCIATE primitive described in
+section 10.1 of [SCTP]. 
+
+By default, the new association created will have only one outbound
+stream. The SCTP_INITMSG option described in Section 7.1.4 should be
+used to change the number of outbound streams.
+
+If a bind() or sctp_bindx() is not called prior to the connect() call,
+the system picks an ephemeral port and will choose an address set
+equivalant to binding with INADDR_ANY and IN6ADDR_ANY for IPv4 and
+IPv6 socket respectively. One of those addresses will be the primary
+address for the association.  This automatically enables the
+multihoming capability of SCTP.
+
+Note that SCTP allows data exchange, similar to T/TCP [RFC1644], during
+the association set up phase.  If an application wants to do this, it
+cannot use connect() call.  Instead, it should use sendto() or
+sendmsg() to initiate an assocation.  If it uses sendto() and it wants
+to change initialization behavior, it needs to use the SCTP_INITMSG
+socket option before calling sendto().  Or it can use SCTP_INIT type
+sendmsg() to initiate an association without doing the setsockopt().
+
+SCTP does not support half close semantics.  This means that unlike
+T/TCP, MSG_EOF should not be set in the flags parameter when calling
+sendto() or sendmsg() when the call is used to initiate a connection.
+MSG_EOF is not an acceptable flag with SCTP socket.
+
+[ Editor's note: MSG_EOF can be used to replace the SHUTDOWN flag in
+  the SCTP_SNDRCV message. ]
+
+4.1.6 close() - TCP Style Syntax
+
+Applications use close() to gracefully close down an association.
+
+The syntax is:
+
+  ret = close(int sd);
+
+  sd      - the socket descriptor of the association to be closed.
+
+This operation corresponds to the SHUTDOWN primitive described in
+[SCTP] section 10.1.
+
+
+4.1.7 shutdown() - TCP Style Syntax
+
+The socket call shutdown() does not have any meaning with an SCTP
+socket because SCTP does not have a half closed semantics.  Calling
+shutdown() on an SCTP socket will return an error.
+
+To perform the ABORT operation described in [SCTP] section 10.1, an
+application can use the socket option SO_LINGER.  It is described
+in section 7.1.6.
+
+4.1.8 sendmsg() and recvmsg() - TCP Style Syntax
+
+With a TCP-style socket, the application can also use sendmsg() and
+recvmsg() to transmit data to and receive data from its peer. The
+semantics is similar to those used in the UDP-style model 
+(section 3.1.3), with the following differences:
+
+  1) When sending, the msg_name field in the msghdr is not used to
+     specify the intended receiver, rather it is used to indicate a 
+     different peer address if the sender does not want to send the
+     message over the primary address of the receiver. 
+
+     When receiving, if a message is not received from the primary
+     address, the SCTP stack will fill in the msg_name field on return
+     so that the application can retrieve the source address
+     information of the received message. 
+
+  2) An application must use close() to gracefully shutdown an
+     assocication, or use SO_LINGER option with close() to abort an
+     asssociation.  It must not use the ABORT or SHUTDOWN flag in
+     sendmsg().  The system returns an error if an application tries
+     to do so. 
+
+
+4.2 Examples
+
+    [To be filled in... ]
+
+
+5. Data Structures
+
+We discuss in this section important data structures which are specifc
+to SCTP and are used with sendmsg() and recvmsg() calls to control
+SCTP endpoint operations and to access ancillary information.
+
+
+5.1 The msghdr and cmsghdr Structures
+
+The msghdr structure used in the sendmsg() and recvmsg() calls, as
+well as the ancillary data carried in the structure, is the key for
+the application to set and get various control information from the
+SCTP endpoint.
+
+The msghdr and the related cmsghdr structures are defined and
+discussed in details in [RFC2292]. Here we will cite their definitions
+from [RFC2292].
+
+The msghdr structure:
+
+    struct msghdr {
+      void      *msg_name;        /* ptr to socket address structure */
+      socklen_t  msg_namelen;     /* size of socket address structure */
+      struct iovec  *msg_iov;     /* scatter/gather array */
+      size_t     msg_iovlen;      /* # elements in msg_iov */
+      void      *msg_control;     /* ancillary data */
+      socklen_t  msg_controllen;  /* ancillary data buffer length */
+      int        msg_flags;       /* flags on received message */
+    };
+
+The cmsghdr structure:
+
+    struct cmsghdr {
+      socklen_t  cmsg_len;   /* #bytes, including this header */
+      int        cmsg_level; /* originating protocol */
+      int        cmsg_type;  /* protocol-specific type */
+                 /* followed by unsigned char cmsg_data[]; */
+    };
+
+In the msghdr structure, the usage of msg_name has been discussed in
+previous sections (see Sections 3.1.3 and 4.1.8).
+
+The scatter/gather buffers, or I/O vectors (pointed to by the msg_iov
+field) are treated as a single SCTP data chunk, rather than multiple
+chunks, for both sendmsg() and recvmsg().
+
+The msg_flags are not used when sending a message with sendmsg().
+
+On return from a recvmsg() call, the msg_flags may contain the
+following:
+
+MSG_IS_DATA - (see Section 5.2.2)
+
+MSG_IS_EVENT - (see Section 5.2.3).
+
+
+5.2 SCTP Ancillary Data
+
+A key element of all SCTP-specific socket extensions is the use of
+ancillary data to specify and access SCTP-specific ancillary data via
+the struct msghdr's msg_control member used in sendmsg() and
+recvmsg(). Fine-grained control over initialization and sending
+parameters and all event notifications are handled with ancillary
+data. This specification follows the convention that only data may
+appear in a msghdr's msg_iov member, and all other protocol
+information is transmitted as ancillary data via the msg_control
+member.
+
+Each ancillary data item is preceeded by a struct cmsghdr (see Section
+5.1), which defines the function and purpose of the data contained in
+in the cmsg_data[] member.
+
+In the following subsections we describe the allowable cmsg_data[]
+structures that may be passed in a cmsghdr to/from the SCTP protocol
+stack, and define the cmsg_type's for each data type. All SCTP
+ancillary data items use the cmsg_level IPPROTO_SCTP. The following
+cmsg_types are detailed below:
+
+    SCTP_INIT           (Section 5.2.1)
+    SCTP_SNDRCV         (Section 5.2.2)
+    SCTP_ASSOC_CHANGE   (Section 5.2.3.1)
+    SCTP_INTF_CHANGE    (Section 5.2.3.2)
+    SCTP_REMOTE_ERROR   (Section 5.2.3.3)
+    SCTP_SEND_FAILED    (Section XXX)
+
+[Editors note: We need to seperate the assoc_change, intf_change
+ remote_error and send_failed into the seperate socket that we
+ discussed at the bake-off. This will then make it easier to
+ read up the variable data especially the send_failed which
+ we have not documented here ... Randall
+]
+
+By default, on TCP-style socket, SCTP will pass up no ancillary data;
+on a UDP-style socket, SCTP will only pass up SCTP_SNDRCV
+information. Specific ancillary data items can be enabled with socket
+options defined for SCTP; see section 7.3. Note in particular that for
+UDP-style sockets, new associations will not be accepted by
+default. See section 5.2.1 for more information.
+
+Note that all types are fixed length; see section 5.4 for further
+discussion on this. Whenever addresses must be embedded in these
+types, a struct sockaddr_storage (defined in [RFC2253]) is used as a
+portable, fixed-length address format.
+
+Other protocols may also use ancillary data to provide the socket
+layer consumer with advanced access to the protocol. These ancillary
+data items from other protocols may be intermingled with SCTP
+items. For example, the IPv6 socket API definitions ([RFC2292 and
+RFC2553]) define a number of ancillary data items. If a socket API
+consumer enables delivery of both SCTP and IPv6 ancillary data, they
+both may appear in the same msg_control buffer in any order.
+
+Note, the following SCTP specific ancillary data structures are
+additional to other ancillary data structures, such as those defined
+in [RFC2292] and [RFC2553]. In other words, an application should be
+prepared to handle other types of ancillary data besides that passed
+by SCTP.
+
+The sockets application must provide a buffer large enough to
+accomodate all ancillary data provided via recvmsg(). If the buffer is
+not large enough, the ancillary data will be truncated and the
+msghdr's msg_flags will include MSG_CTRUNC. [ Ed. note: defined by
+Posix - jw ]
+
+5.2.1 SCTP_INIT
+
+This is the SCTP-specific cmsghdr structure used for assocation
+initiation purpose. It is normally passed in a sendmsg() call when
+implicitly starting a new association.
+
+
+    cmsg_level    cmsg_type      cmsg_data[]           
+    ------------  ------------   ----------------------
+    IPPROTO_SCTP  SCTP_INIT      sctp_initmsg structure 
+
+
+Here, the sctp_initmsg structure is defined as follows:
+
+  struct sctp_initmsg {
+     uint16_t sinit_num_ostreams;
+     uint16_t sinit_max_instreams;
+     uint16_t sinit_max_attempts;
+     uint16_t sinit_max_init_timeo;
+  };
+
+  sinit_num_ostreams: 16 bits (unsigned integer)
+
+  This is an integer number representing the number of streams that
+  the application wishes to be able to send to.  This number is
+  confirmed in the COMMUNICATION_UP notification and must be
+  verified since it is a negotiated number with the remote endpoint.
+  The default value of 0 indicates to use the endpoint default
+  value. 
+
+  sinit_max_instreams: 16 bits (unsigned integer)
+
+  This value represents the maximum number of inbound streams the
+  application is prepared to support. This value is bounded by the
+  actual implementation.  In other words the user MAY be able to
+  support more streams than the Operating System.  In such a case,
+  the Operating System limit overrides the value requested by the
+  user. The default value of 0 indicates to use the endpoint's
+  default value. 
+
+  sinit_max_attempts: 16 bits (unsigned integer)
+
+  This integer specifies how many attempts the SCTP endpoint should
+  make at resending the INIT.  This value overrides the system SCTP
+  'Max.Init.Retransmits' value.  The default value of 0 indicates to
+  use the endpoint's default value.  This is normally set to the
+  system's default 'Max.Init.Retransmit' value.
+  
+  sinit_max_init_timeo: 16 bits (unsigned integer)
+
+  This value represents the largest Time-Out or RTO value to use in
+  attempting a INIT.  Normally the 'RTO.Max' is used to limit the
+  doubling of the RTO upon timeout.  For the INIT message this value
+  MAY override 'RTO.Max'.  This value MUST NOT influence 'RTO.Max'
+  during data transmission and is only used to bound the initial setup
+  time.  A default value of 0 indicates to use the endpoint's default
+  value.  This is normally set to the system's 'RTO.Max' value (60
+  seconds).
+
+
+5.2.2 SCTP_SNDRCV
+
+This is the SCTP-specific cmsghdr structure used for specifying send
+options when calling sendmsg() or getting ancillary information on a
+received message when calling recvmsg().
+
+    cmsg_level    cmsg_type      cmsg_data[]           
+    ------------  ------------   ----------------------
+    IPPROTO_SCTP  SCTP_SNDRCV    sctp_sndrcvinfo structure 
+
+
+Here, the sctp_sndrcvinfo structure is defined as follows:
+
+  struct sctp_sndrcvinfo {
+     uint32_t sinfo_tsn;
+     uint16_t sinfo_stream;
+     uint16_t sinfo_ssn;
+     uint16_t sinfo_delivery_num;
+     uint16_t sinfo_flags;
+     uint32_t sinfo_ppid;
+     uint32_t sinfo_context;
+     uint8_t sinfo_tos;
+  };
+
+  sinfo_tsn:32 bits (unsigned integer)
+  
+  For recvmsg() this value contains the TSN number that the remote
+  endpoint placed in the DATA chunk.  For fragmented messages it is
+  implementation dependent.  The sendmsg() call ignores this
+  parameter.
+                                      
+  sinfo_stream: 16 bits (unsigned integer)
+  
+  For recvmsg() this value contains the message's stream number. For
+  sendmsg() this value holds the stream number that the application
+  wishes to send this message to.  If a sender specifies an invalid
+  stream number an error indication is returned and the call fails.
+  
+  sinfo_ssn: 16 bits (unsigned integer)
+  
+  For recvmsg() this value contains the stream sequence number that
+  the remote endpoint placed in the DATA chunk.  For fragmented
+  messages this is the same number for all deliveries of the message
+  (if more than one recvmsg() is needed to read the message).  The
+  sendmsg() call will ignore this parameter.
+  
+  sinfo_delivery_num: 16 bits (unsigned integer)
+  
+  This value holds the delivery number used by the partial delivery
+  mechanism.  In some cases the SCTP endpoint needs to deliver a large
+  message in pieces.  When this occurs, the delivery number increments
+  with each subsequent delivery.  The delivery number is set to 0 on
+  the first delivery.  The sendmsg() call ignores this field.
+  
+  sinfo_ppid:32 bits (unsigned integer)
+  
+  This value in sendmsg() is an opaque unsigned value that is passed
+  to the remote end in each user message.  In recvmsg() this value is
+  the same information that was passed by the upper layer in the peer
+  application.  Please note that byte order issues are NOT accounted for
+  and this information is passed opaquely by the SCTP stack from one end
+  to the other.
+  
+  sinfo_context:32 bits (unsigned integer)
+  
+  This value is an opaque 32 bit context datum that is used in the
+  sendmsg() function.  This value is passed back to the upper layer if
+  a error occurs on the send of a message and is retrieved with each
+  unsent message (Note: if a endpoint has done multple sends, all of
+  which fail, multiple different sinfo_context values will be returned.
+  One with each user data message).
+  
+  sinfo_flags: 16 bits (unsigned integer)
+  
+  This field may contain any of the following flags and is
+  composed of a bitwise OR of these values.
+  
+    recvmsg() flags:
+  
+      MSG_MORE_DATA - This flag is present if a subsequent delivery
+                      follows.  Subsequent recvmsg() calls retrieve
+                      further piece(s) of the message. 
+      
+      MSG_EOR       - This flag is present in the last piece of a message. 
+      
+      MSG_UNORDERED - This flag is present when the message was sent
+                      non-ordered.
+      
+    sendmsg() flags:
+      
+      MSG_UNORDERED - This flag requests the un-ordered delivery of the
+                      message.  If this flag is clear the datagram is
+                      considered an ordered send.
+                
+      MSG_ABORT     - Setting this flag causes the specified association
+                      to abort by sending an ABORT message to the peer.
+                
+      MSG_SHUTDOWN  - Setting this flag invokes the SCTP graceful shutdown
+                      procedures which assure that all data enqueued by
+                      both endpoints are successfully transmitted before
+                      closing the association.
+
+  sinfo_tos: 8 bits (unsigned integer)
+    
+  This field is available to change the TOS value in the outbound IP
+  packet. The default value of this field is 0. Note only 6 bits of 
+  this byte are used, the upper 2 bits are not part of the TOS field.
+  Any setting within these upper 2 bits is ignored.
+
+  A sctp_sndrcvinfo item always corresponds to the data in msg_iov.
+
+
+5.2.3 SCTP Events and Notifications
+
+[ Editors Note: This section needs to be investigated, we need to
+  expand on how to get off the "notification" socket for
+  reading these notifies and errors 
+]
+    
+An SCTP application needs to be able to understand and process events
+and errors that happen on the SCTP stack. These events include
+networks status changes, association startups, and undeliverable
+datagrams.  All of these are essential for the application to process.
+
+When an SCTP application layer does a recvmsg() most often the message
+read is a Data message from a peer endpoint. However, when the SCTP
+stack wishes to communicate an event notification to the application,
+it sets msg_flags in the msghdr to MSG_IS_EVENT, and overwrite the
+msg_control structure with a cmsghdr structure that defines the type
+of event (see Section 5.3.1). The data portion of the msghdr, i.e. the
+msg_iov, will contain the information communicated with the event or
+error.
+
+ [Editor's Note: can we include the event/error info in the
+  cmsg_data[] as well? This may make the notifications more consistent
+  with other SCTP control infomation passing. I.e., do not use
+  msg_iov - Qiaobing, I thought ALL info was passed in the
+  cmsg_data area and in fact you could get both cmsg_data notify
+  AND a data message on the same read... -Randall
+  right -- I changed the error cause definition for this reason -jw 
+  I think we will re-write most of this section when we make
+  it into a error-socket... so lets not miss with it until
+  the -02 version of the spec :) ... Randall
+]
+
+
+The following table illustrates the SCTP notification and event
+types.
+
+ [ Ed. note -- We don't need the value definition column, since each
+   one is a seperate cmsg item. This goes for other definitions below
+   too, since those are implementation-specific and will be #define'd
+   in each implemenations' appropriate header file. -jw 
+   But we will need something like this to seperate it out when
+   reading from the "error/notification" socket. - rrs
+ ]
+
+Name                        Description
+---------            ---------------------------
+
+SCTP_SNDRCV          This indicates a normal User
+                     Data message is being sent
+                     and or received.  Special
+                     options and directions are
+                     also included in the 
+                     SCTP_msgcontrol structure as 
+                     defined in 5.2.2.
+
+SCTP_ASSOC_CHANGE    This flag indicates that an
+                     association has either been
+                     opened or closed.  The data
+                     found in the control msg is detailed
+                     in 5.2.3.1.
+               
+SCTP_INTF_CHANGE     This flag indicates that an
+                     address that is part of an existing
+                     association has experienced a
+                     change of state (e.g. a failure
+                     or return to service of the 
+                     reachability of a endpoint
+                     via a specific transport 
+                     address).  Please see 5.2.3.2
+                     for data structure details.
+
+SCTP_SEND_FAILED     The attached datagram
+                     could not
+                     be sent to the remote endpoint.
+                     This structure includes the
+                     original SCTP_SNDRCVINFO
+                     that was used in sending this
+                     message i.e. this structure
+                     uses the sctp_sndrecvinfo per
+                     section 5.2.2.
+                     
+SCTP_REMOTE_ERROR    The attached error message
+                     is an Operational
+                     Error received from the remote
+                     peer.  It includes the complete TLV
+                     sent by the remote endpoint.
+                     See section 5.2.3.3 for the
+                     detailed format.
+
+
+5.2.3.1 SCTP_ASSOC_CHANGE
+
+    cmsg_level    cmsg_type          cmsg_data[]           
+    ------------  ------------       ----------------------
+    IPPROTO_SCTP  SCTP_ASSOC_CHANGE  sctp_assoc_change structure 
+
+Communication notifications inform the ULP that an SCTP association
+has either begun or ended.  The notification information has the
+following format:
+
+  struct sctp_assoc_change {
+     struct sockaddr_storage sac_paddr;
+     int sac_state;
+     int sac_error;
+  };
+
+sac_paddr: sizeof (struct sockaddr_storage)
+
+The primary address field, sac_paddr, holds one of the remote peers
+addresses.  If the peer is NOT multi-homed the sac_paddr holds the
+only address of the peer.  The sockaddr_storage structure is found in
+[RFC2553].
+
+[Editors note: Do we need to add a bunch of things in the
+ comm-up for say number of streams that peer opened/you opened
+ etc.. -- Randall
+ Actually, can we just combine this and SCTP_INIT? -jw
+ We should -kp Not if we make it go up the notification
+ socket... but we could re-use the INIT structure on
+ that socket... R]
+
+sac_state:  32 bits (signed integer)
+
+This field holds one of a number of values that communicate
+the event that happened to the association.  They include:
+
+Event Name           Description
+----------------     ---------------
+COMMUNICATION_UP     A new association is now ready
+                     and data may be exchanged with this
+                     peer.
+
+COMMUNICATION_LOST   The association identified by the 
+                     address has failed.  The association
+                     is now in the closed state.
+
+SHUTDOWN_COMPLETE    The association has gracefully closed.
+
+CANT_START_ASSOC     The association failed to setup.
+                               
+sac_error:  32 bits (signed integer)
+
+If the state was reached due to a error condition (i.e.
+COMMUNCIATION_LOST) any relevant error information is available in
+this field. This corresponds to the protocol error codes defined in
+[SCTP].
+
+An application must enable this ancillary data item with setsockopt
+(see section 7.3) before any new associations will be accepted on the
+socket. This is the mechanism by which a server (or peer application
+that wishes to accept new associations) informs the SCTP stack to
+accept new associations on a socket. Clients (i.e. applications on
+which only active opens are made) can leave this ancillary data item
+off; they will then be assured that the only associations on the
+socket will be ones they actively initiated. Server or peer to peer
+sockets, on the other hand, will always accept new associations, so a
+well-written application using server UDP-style sockets must be
+prepared to handle new associations from unwanted peers.
+
+
+5.2.3.2 SCTP_INTF_CHANGE
+
+    cmsg_level    cmsg_type          cmsg_data[]           
+    ------------  ------------       ----------------------
+    IPPROTO_SCTP  SCTP_INTF_CHANGE   sctp_assoc_change structure 
+
+When a destination address on a multi-homed peer encounters a change
+in reachability an interface details event is sent.  The information
+has the following structure:
+
+struct sctp_intf_change{
+     struct sockaddr_storage sic_paddr;
+     struct sockaddr_storage sic_aaddr;
+     int sic_state;
+     int sic_error;
+}
+
+sic_paddr: sizeof (struct sockaddr_storage)
+
+The primary address field, sic_paddr, holds the remote endpoint's
+address that was announced in the COMMUNICATION_UP notification.
+
+sic_aaddr: sizeof (struct sockaddr_storage)
+
+The affected address field, sic_aaddr, holds the remote peer's addresses of the
+association that is encountering the change of state.
+
+state:  32 bits (signed integer)
+
+This field holds one of a number of values that communicate
+the event that happened to the association.  They include:
+
+
+Event Name           Description
+----------------     ---------------
+ADDRESS_AVAILABLE    This address is now reachable.
+                                  
+
+ADDRESS_UNREACHABLE  The address specified can no
+                     longer be reached.  Any data sent
+                     to this address is rerouted to an
+                     alternate until this address becomes
+                     reachable.
+
+error:  32 bits (signed integer)
+
+If the state was reached due to any error condition (e.g.
+ADDRESS_UNREACHABLE) any relevant error information is available in
+this field.
+
+
+5.2.3.3 SCTP_REMOTE_ERROR
+
+    cmsg_level    cmsg_type          cmsg_data[]           
+    ------------  ------------       ----------------------
+    IPPROTO_SCTP  SCTP_REMOTE_ERROR  sctp_assoc_change structure 
+
+A remote peer may send an Operational Error message to its peer.  This message
+indicates a variety of error conditions on an association.  The cmsg_data[]
+portion of this event consists of as much of the complete SCTP error TLV as
+will fit.  Please refer to the SCTP specification [SCTP] section 3.3.10 for a
+complete list of possible error formats.  SCTP error TLVs have the format:
+
+#define SCTP_MAX_ERRCAUSE_LEN
+
+struct sctp_remote_error {
+    uint16_t sre_error;
+    uint16_t sre_len;
+    char     sre_info[SCTP_MAX_ERRCAUSE_LEN];
+};
+
+sre_error: 16 bits (unsigned integer)
+
+This value represents one of the Operational Error causes defined in
+the SCTP specification, in network byte order.
+
+sre_len: 16 bits (unsigned integer)
+
+This value represents the length including sre_error, sre_len
+and any additional information carried in sre_info, in network byte
+order.
+
+sre_info: up to SCTP_MAX_ERRCAUSE_LEN
+
+This represents the detailed error information sent by the remote
+endpoint. SCTP_MAX_ERRCAUSE_LEN is implementation-dependant.
+
+
+5.4 Ancillary Data Considerations and Semantics
+
+Programming with ancillary socket data contains some subtleties and
+pitfalls, which are discussed below.
+
+
+5.4.1 Multiple Items and Ordering
+
+Multiple ancillary data items may be included in any call to sendmsg()
+or recvmsg(); these may include multiple SCTP or non-SCTP items, or
+both.
+
+The ordering of ancillary data items (either by SCTP or another
+protocol) is not significant and is implementation-dependant, so
+applications must not depend on any ordering. The one exception to
+this is that SCTP_ASSOC_CHANGE events announcing new associations must
+always preceed any other ancillary data items pertaining to the new
+assocition.
+
+SCTP_SNDRCV items must always correspond to the data in the msghdr's
+msg_iov member. An implementation may choose to bundle together
+multiple SCTP ancillary data items (for instance, a SCTP_ASSOC_CHANGE
+for a new association, followed by a SCTP_SNDRCV info corresponding to
+data bundled with the association initialization), or the
+implemantation can choose to deliver these events across multiple
+calls to recvmsg().
+
+There can be only a single SCTP_SNDRCV info for each sendmsg() or
+recvmsg() call. Multiple instances of other events may appear in a
+single call.
+
+[ ed. note: should we restrict it to only one SCTP_INIT too? Hmm
+  well one could imagine getting multiple associations at
+  once but if we goe with the "event socket" then I think
+  each recv() should be a single notification ...
+ ]
+
+
+5.4.2 Accessing and Manipulating Ancillary Data
+
+Applications can infer the presence of data or ancillary data by
+examining the msg_iovlen and msg_controllen msghdr members,
+respectively.
+
+Implementations may have different padding requirements for ancillary
+data, so portable applications should make use of the macros
+CMSG_FIRSTHDR, CMSG_NXTHDR, CMSG_DATA, CMSG_SPACE, and CMSG_LEN. See
+[RFC2292] and your SCTP implementation's documentation for more
+information. Following is an example, from [RFC2292], demonstrating
+the use of these macros to access ancillary data:
+
+       struct msghdr   msg;
+       struct cmsghdr  *cmsgptr;
+
+       /* fill in msg */
+
+       /* call recvmsg() */
+
+       for (cmsgptr = CMSG_FIRSTHDR(&msg); cmsgptr != NULL;
+            cmsgptr = CMSG_NXTHDR(&msg, cmsgptr)) {
+           if (cmsgptr->cmsg_level == ... && cmsgptr->cmsg_type == ... ) {
+               u_char  *ptr;
+
+               ptr = CMSG_DATA(cmsgptr);
+               /* process data pointed to by ptr */
+           }
+       }
+
+
+5.4.3 Control Message Buffer Sizing
+
+The information conveyed via SCTP_SNDRCV and SCTP_ASSOC_CHANGE events
+will often be fundamental to the correct and sane operation of the
+sockets application. This is particularly true of the UDP semantics,
+but also of the TCP semantics. For example, if an application needs to
+send and receive data on different SCTP streams, SCTP_SNDRCV events
+are indispensable. Similarly, the only way an application written to
+the UDP semantics can detect the addition of an assocation is via the
+SCTP_ASSOC_CHANGE event.
+
+Given that some ancillary data is critical, and that multiple
+ancillary data items may appear in any order, applications should be
+carefully written to always provide a large enough buffer to contain
+all possible ancillary data that can be presented by recvmsg(). If the
+buffer is too small, and crucial data is truncated, it may pose a
+fatal error condition.
+
+Thus it is essential that applications be able to deterministically
+calculate the maximum required buffer size to pass to recvmsg(). One
+constraint imposed on this specification that makes this possible is
+that all ancillary data definitions are of a fixed length. One way to
+calculate the maximum required buffer size might be to take the sum
+the sizes of all enabled ancillary data item structures, as calculated
+by CMSG_SPACE. For example, if we enabled SCTP_INIT, SCTP_SNDRCV_INFO,
+SCTP_ASSOC_CHANGE, and IPV6_RECVPKTINFO [RFC2292], we would calculate
+and allocate the buffer size as follows:
+
+    size_t total;
+    void *buf;
+
+    total = CMSG_SPACE(sizeof (struct sctp_initmsg)) +
+            CMSG_SPACE(sizeof (struct sctp_sndrcvinfo)) +
+            CMSG_SPACE(sizeof (struct sctp_assoc_change)) +
+            CMSG_SPACE(sizeof (struct in6_pktinfo));
+
+    buf = malloc(total);
+
+We could then use this buffer for msg_control on each call to
+recvmsg() and be assured that we would not lose any ancillary data to
+truncation.
+
+6. Common Operations for Both Styles
+
+6.1 send(), recv(), sendto(), recvfrom()
+
+Applications can use send() and sendto() to transmit data to the peer 
+of an SCTP endpoint. recv() and recvfrom() can be used to receive data
+from the peer. 
+
+The syntax is:
+
+  size = send(int sd, connst void *msg, size_t len, int flags);
+  size = sendto(int sd, const void *msg, size_t len, int flags,
+                const struct sockaddr *to, int tolen);
+  size = recv(int sd, void *buf, size_t len, int flags);
+  size = recvfrom(int sd, void *buf, size_t len, int flags,
+                  struct sockaddr *from, int *fromlen);
+
+  sd      - the socket descriptor of an SCTP endpoint.
+  msg     - the message to be sent.
+  len     - the size of the message or the size of buffer.
+  to      - one of the peer addresses of the association to be
+            used to send the message.
+  tolen   - the size of the address.
+  buf     - the buffer to store a received message.
+  from    - the buffer to store the peer address used to send the 
+            received message.
+  fromlen - the size of the receive buffer.
+  flags   - (described below).
+
+SCTP has the concept of multiple streams in one association.  The
+above calls do not allow the caller to specify which stream a
+message should send to or received from.  The system uses stream 0 as
+the default stream for the above calls.  In all calls listed above
+the socket descriptor passed to these calls must represent a single 
+association.
+
+SCTP is message based.  The msg buffer above in send() and sendto() is
+considered to be a single message.  This means that if the caller
+wants to send a message which is composed by several buffers, the
+caller needs to combine them before calling send() or sendto().  Or
+the caller can use sendmsg() to do that without combining them.
+
+In receiving, if the buffer supplied is not large enough to hold a
+complete messaage, the receive call returns a EMSGSIZE error.
+Refer to recvmsg() for a method to receive partial message.
+
+The flags parameter is formed by OR'ing one or more of the following: 
+
+MSG_UNORDERED
+
+SCTP has a concept of unordered delivery.  When sending, caller can
+use this flag to tell the system that this message can be delivered
+unordered.  The caller must set this flag in all calls to transmit
+unorderd messages.
+
+Note, the send and recv calls, when used in the UDP-style model, 
+may only be used with high bandwidth socket descriptors (see Section 3.3).
+
+
+6.2 setsockopt(), getsockopt()
+
+Applications use setsockopt() and getsockopt() to set or retrieve
+socket options.  Socket options are used to change the default
+behavior of sockets calls.  They are described in Section 7.
+
+The syntax is:
+
+  ret = getsockopt(int sd, int level, int optname, void *optval,
+                   size_t *optlen); 
+  ret = setsockopt(int sd, int level, int optname, const void *optval,
+                   size_t optlen);
+
+  sd      - the socket descript.
+  level   - set to IPPROTO_SCTP for all SCTP options.
+  optname - the option name.
+  optval  - the buffer to store the value of the option.
+  optlen  - the size of the buffer.
+
+
+6.3 read() and write()
+
+Applications can use read() and write() to send and receive data to
+and from peer.  They have the same semantics as send() and recv()
+except that the flags parameter cannot be used.
+
+Note, these calls, when used in the UDP-style model, may only be 
+used with high bandwidth socket descriptors (see Section 3.3).
+
+
+7. Socket Options
+
+The following sub-section describes various SCTP level socket options
+that are common to both models.  SCTP associations can be mutlihomed,
+so options need to be applicable to specific peer address in an
+association.  Therefore, all option parameters include a
+sockaddr_storage structure to select which peer address the option
+should be applied to.
+
+For the datagram model this is also used to identify the association instance
+that the operation affects, so it must be set when using this model.
+
+For the connnection oriented model and high bandwidth datagram sockets
+(see section 3.3) this peer address parameter can be ignored for those
+options that affect all peer addresses.  In the cases noted below
+where the parameter is ignored, an application can pass to the system
+a corresponding option structure similar to those described below but
+without the peer address parameter, which should be the last field of
+the option structure.  This can make the option setting/getting
+operation more efficient.  If an application does this, it should also
+specify an appropriate optlen value (i.e. sizeof (option parameter) -
+sizeof (struct sockaddr_storage)).
+
+Note that socket or IP level options is set or retrieved per socket.  This
+means that for datagram model, those options will be applied to all
+associations belonging to the socket.  And for connection oriented model,
+those options will be applied to all peer addresses of the association
+controlled by the socket.  Applications should be very careful in setting
+those options.
+
+7.1 Read / Write Options
+
+7.1.1 Retransmission Timeout Parameters (SCTP_RTOINFO)
+
+The protocol parameters used to initialize and bound retransmission
+timeout (RTO) are tunable.  See [SCTP] for more information on how
+these parameters are used in RTO calculation.  The peer address 
+parameter is ignored for TCP style socket.
+
+The following structure is used to access and modify these parameters:
+
+struct sctp_rtoinfo {
+        uint32_t              srto_initial;
+        uint32_t              srto_max;
+        uint32_t              srto_min;
+        struct socket_storage srto_address;
+};
+
+  srto_initial    - This contains the initial RTO value.
+  srto_max and srto_min - These contain the maximum and minumum bounds
+                    for all RTOs.
+  srto_address    - (UDP style socket) This is the identifying address as
+                    described in 7.
+
+All parameters are time values, in milliseconds.  A  value of 0, when
+modifying the parameters, indicates that the current value should
+not be changed.
+
+To access or modify these  parameters, the application should call
+getsockopt or setsockopt() respectively with the option name
+SCTP_RTOINFO.
+
+
+7.1.2 Association Retransmission Parameter (SCTP_ASSOCRTXINFO)
+
+The protocol parameter used to set the number of retransmissions sent before
+an association is considered unreachable is tunable.  See [SCTP] for more
+information on how this parameter is used.  The peer address parameter is
+ignored for TCP style socket.
+
+The following structure is used to access and modify this parameters:
+
+struct sctp_assocparams {
+        uint16_t sasoc_asocmaxrxt; 
+        struct sockaddr_storage sasoc_address;
+};
+
+sasoc_asocmaxrxt - This contains the maximum retransmission attempts
+                   to make for the association.
+sasoc_address   - (UDP style socket) This is the identifying address as
+                  described in 7.
+
+To access or modify these parameters, the application should call
+gesockopt or setsockopt() respectively with the option name
+SCTP_ASSOCRTXINFO.
+
+The maximum number of retransmissions before an address is considered
+unreachable is also tunable, but is address-specific, so it is covered in
+a seperate option.  If an application attempts to set the value of the
+association maximum retransmission parameter to less than the sum of
+all  maximum retransmission parameters, setsockopt() shall return
+an error.  The reason for this, from [SCTP] section 8.2:
+
+  Note: When configuring the SCTP endpoint, the user should avoid
+  having the value of 'Association.Max.Retrans' larger than the
+  summation of the 'Path.Max.Retrans' of all the destination addresses
+  for the remote endpoint.  Otherwise, all the destination addresses may
+  become inactive while the endpoint still considers the peer endpoint
+  reachable.
+
+
+7.1.3 Path Parameters (SCTP_PATHPARAMS)
+
+Applications can enable or disable heartbeats for any peer address of an
+association, modify an address's heartbeat interval, and adjust the address's
+maximum number of retransmissions sent before an address is considered
+unreachable.  The following structure is used to access and modify an
+address's parameters:
+
+struct sctp_pathparams {
+        struct sockaddr_storage spp_address;
+        uint32_t spp_interval;
+        uint16_t spp_pathmaxrxt; 
+};
+
+spp_address     - This specifies which address is of interest (for the
+                  datagram model this also infers the association in
+                  question).
+spp_interval    - This contains the value of the heartbeat interval,
+                  in milliseconds.  A value of 0, when modifying the
+                  parameter, specifies that the heartbeat on this
+                  address should be disabled. 
+spp_pathmaxrxt  - This contains the maximum number of
+                  retransmissions before this address shall be
+                  considered unreachable.  
+
+To access or modify these parameters, the application should call
+gesockopt or setsockopt() respectively with the option name
+SCTP_PATHPARAMS.
+
+7.1.4 Initialization Parameters (SCTP_INITMSG)
+
+Applications can specify protocol parameters for the default 
+association intialization.  The structure used to access and modify these
+parameters is defined in section 3.1.1.  The option name argument to
+setsockopt() and getsockopt() is SCTP_INITMSG.
+
+Setting initialization parameters is effective only on an
+unconnected socket (for the datagram model only future associations
+are effected by the change).
+
+
+7.1.6 SO_LINGER
+
+An application using the TCP-style socket can use this option to perform
+the SCTP ABORT primitive.  The linger option structure is:
+
+struct  linger {
+        int     l_onoff;                /* option on/off */
+        int     l_linger;               /* linger time */
+};
+
+To enable the option, set l_onoff to 1.  If the l_linger value is set
+to 0, calling close() is the same as the ABORT primitive.  If the value
+is set to a negative value, the setsockopt() call will return an error.
+If the value is set to a positive value linger_time, the close() can be
+blocked for at most linger_time ms.  If the graceful shutdown phase
+does not finish during this period, close() will return but the graceful
+shutdown phase continues in the system.
+
+7.2 Read-Only Options
+
+7.2.1 Path Information (SCTP_PATHINFO)
+
+Applications can retrieve information about a specific peer address of an
+association, including its reachability state, congestion window, and
+retransmission timer values.  This information is read-only, so only
+getsockopt() operates on this option.  Calls to setsockopt() on this option
+returns an error.  The following structure is used to access this information:
+
+struct sctp_pathinfo {
+        struct sockaddr_storage spath_address;
+        int32_t         spath_state;
+        uint32_t        spath_cwnd;
+        uint32_t        spath_srtt;
+        uint32_t        spath_rto;
+};
+
+spath_address   - This is filled in the application, and contains
+                  the peer address of interest (for the datagram model this
+                  also infers the association in question).
+On return from getsockopt():
+spath_state     - This contains the path's state (either SCTP_ACTIVE
+                  or SCTP_INACTIVE).
+spath_cwnd      - This contains the path's current congestion
+                  window.
+spath_srtt      - This contains the path's current smoothed
+                  round-trip time calculation in milliseconds.
+spath_rto       - This contains the path's current retransmission
+                  timeout value in milliseconds.
+
+To retrieve this information, use getsockopt() with the option name
+set to SCTP_PATHINFO.
+
+
+7.2.2 Peer Endpoint's Set of Addresses (SCTP_PATHCOUNT, SCTP_ALLPATHS)
+
+Applications can retrieve the set of addresses that correspond to a
+peer endpoint.  Since this set is variable length, two options are
+needed to retrieve the information: the first, SCTP_PATHCOUNT, takes
+the following structure as its argument to getsockopt():  
+
+struct sctp_pathcnt{
+        uint32_t                spthc_numaddrs;
+        struct sockaddr_storage spthc_address;
+};
+
+spthc_numaddrs  - If filled in upon return from this call this
+                  indicates the number of addresses associated with
+                  the peer.  The application can then allocate a
+                  buffer large enough to hold all the peer's
+                  addresses, and call getsockopt() with SCTP_ALLPATHS.
+spthc_address    - (UDP style socket) This is the identifying address as
+                  described in 7.
+
+For the datagram model, the first address in the call to SCTP_ALLPATHS MUST be
+filled in with a valid address that identifies the association.  The peer
+address parameter is ignored for TCP style socket.
+
+On return of getsockopt(SCTP_ALLPATHS), each address is represented as a
+struct sockaddr_storage.  So if n is the number of peer addresses, the caller
+must allocate a buffer of size n * sizeof(struct sockaddr_storage).  The
+application can retrieve information on each address by iterating through the
+returned list of addresses and calling getsockopt() with the SCTP_PATHINFO
+option name.  This information is read-only.
+
+7.2.3 Association Status (SCTP_STATUS)
+
+Applications can retrieve current status information about an
+association, including association state, peer receiver window size,
+number of unacked data chunks, and number of data chunks pending
+receipt.  This information is read-only.  The following structure is
+used to access this information:
+
+struct sctp_status {
+        int32_t         sstat_state;
+        uint32_t        sstat_rwnd;
+        uint16_t        sstat_unackdata;
+        uint16_t        sstat_penddata;
+        struct sctp_pathinfo sstat_primary;
+        struct sockaddr_storage sstat_address;
+};
+
+sstat_state    - This contains  the association's current  state (states TBD).
+sstat_rwnd     - This contains the association  peer's current
+                  receiver window size.
+sstat_unackdata - This is the number of unacked data chunks.
+sstat_penddata  - This is the number of data chunks pending receipt.
+sstat_primary   - This is information on the current primary path.
+sstat_address  - (UDP style socket) This is the identifying address as
+                 described in 7.
+
+To access this status values, the application calls getsockopt()
+with the option name SCTP_STATUS.  The peer address parameter is ignored
+for TCP style socket.
+
+
+7.3.  Ancillary Data Interest Options
+
+Applications can receive notifications of certain SCTP events and
+per-message information as ancillary data with recvmsg().
+
+The following optional information is available to the application:
+
+  1.  SCTP_RECVDATAIOEVNT: Per-message information (i.e. stream number,
+      TSN, SSN, etc. described in section 3.2.2)
+  2.  SCTP_RECVASSOCEVNT: (described in section 3.2.2)
+  3.  SCTP_RECVPATHEVNT: (described in section 3.2.2)
+  4.  SCTP_RECVSENDFAILEVNT: (described in section 3.2.2)
+  5.  SCTP_RECVPEERERR: (described in section 3.2.2)
+
+To receive any ancillary data, first the application registers it's
+interest by calling setsockopt() to turn on the corresponding flag:
+
+    int on = 1;
+
+    setsockopt(fd, IPPROTO_SCTP, SCTP_RECVDATAIOEVNT,   &on, sizeof(on));
+
+    setsockopt(fd, IPPROTO_SCTP, SCTP_RECVPATHEVNT,     &on, sizeof(on));
+    setsockopt(fd, IPPROTO_SCTP, SCTP_RECVSENDFAILEVNT, &on, sizeof(on));
+    setsockopt(fd, IPPROTO_SCTP, SCTP_RECVPEERERR,      &on, sizeof(on));
+
+Note that for connectionless mode SCTP sockets, the caller of
+recvmsg() receives ancillary data for ALL associations bound to the
+file descriptor.  For connection-oriented SCTP sockets, the caller
+receives ancillary data for only the single association bound to the
+file descriptor.
+
+By default the connection oriented socket has all options off.
+
+By default the datagram oriented socket has SCTP_REVCVDATAIOEVENT
+on and all other options off.
+
+The format of the data structures for each ancillary data item is
+given in section 5.2.
+
+
+8. New Interfaces
+
+Depending on the system, the following interface can be implemented
+as system calls or library funtions.
+
+8.1 sctp_bindx()
+
+The syntax of sctp_bindx() is,
+
+  ret = sctp_bindx(int sd,
+              struct sockaddr_storage *addrs,
+              int addrcnt,
+              int flags);
+
+If sd is an IPv4 socket, the addresses passed must be IPv4 addresses.
+If the sd is an IPv6 socket, the addresses passed can either be IPv4
+or IPv6 addresses.
+
+A single address may be specified as INADDR_ANY or IN6ADDR_ANY, see
+section 3.1.2 for this usage.
+
+addrs is a pointer to an array of one or more socket addresses.  Each
+address is contained in a struct sockaddr_storage, so each address is
+fixed length. The caller specifies the number of addresses in the
+array with addrcnt.
+
+On success, sctp_bindx() returns 0. On failure, sctp_bindx() returns -1,
+and sets errno to the appropriate error code. [ Editor's note: need
+to fill in all error code? ]
+
+For SCTP, the port given in each socket address must be the same, or
+sctp_bindx() will fail, setting errno to EINVAL .
+
+The flags parameter is formed from the bitwise OR of zero or
+more of the following currently defined flags:
+
+    SCTP_BINDX_ADD_ADDR
+    SCTP_BINDX_REM_ADDR
+
+SCTP_BIND_ADD_ADDR directs SCTP to add the given addresses to the
+association, and SCTP_BIND_REM_ADDR directs SCTP to remove the given
+addresses from the association. The two flags are mutually exclusive;
+if both are given, sctp_bindx() will fail with EINVAL.  A caller may not
+remove all addresses from an association; sctp_bindx() will reject such
+an attempt with EINVAL.
+
+An application can use sctp_bindx(SCTP_BINDX_ADD_ADDR) to associate
+additional addresses with an endpoint after calling bind().  Or use
+sctp_bindx(SCTP_BINDX_REM_ADDR) to remove some addresses a listening
+socket is associated with so that no new association accepted will be
+associated with those addresses.
+
+SCTP_BIND_ADD_ADDR is defined as 0, so that it becomes the default
+behavior for sctp_bindx() when no flags are given.
+
+Adding and removing addresses from a connected association is optional
+functionality. Implementations that do not support this functionality
+should return EOPNOTSUPP.
+
+[ Editor's note: This does not work well with UDP-style socket because
+  it does not allow changes of address on individual association controlled
+  by a socket. No but I would claim that if you were grouping all
+  the associations in a single fd, then you want a add_address to
+  apply to all associations.. so I don't see it as a issue - R
+]
+
+8.2 Branched-off Association 
+
+After an association is established on a UDP-style socket, the
+application may wish to branch off the association into a separate
+socket/file descriptor.
+
+This is particularly desirable when, for instance, the application
+wishes to have a number of sporadic message senders/receivers remain
+under the original UDP-style socket but branch off those associations
+carrying high volume data traffic into their own separate socket
+descriptors.
+
+The application uses sctp_peeloff() call to branch off an association
+into a separate socket (Note the semantics are somewhat changed from
+the traditional TCP-style accept() call).
+
+The syntax is:
+
+  new_sd = sctp_peeloff(int sd, struct sockaddr *addr, int *addrlen)
+
+  new_sd  - the new socket descriptor representing the branched-off
+            association. 
+
+  sd      - the original UDP-style socket descriptor returned from the
+            socket() system call (see Section 3.1.1).
+
+  addr    - the specified address of the association that is to be
+            branched off to a separate file descriptor (Note, in a
+            traditional TCP-style accept() call, this would be an out 
+            parameter, but for the UDP-style call, this is an in
+            parameter).
+
+  addrlen - an integer pointer to the size of the sockaddr structure
+            addr (in a traditional TCP-style call, this would be a out
+            parameter, but for the UDP-style call this is an in
+            parameter). 
+
+
+9. Security Considerations
+
+Many TCP and UDP implementations reserve port numbers below 1024 for
+privileged users.  If the target platform supports privileged users, 
+the SCTP implementation SHOULD restrict the ability to call bind() or
+sctp_bindx() on these port numbers to privileged users.
+
+Similarly unprivelged users should not be able to set protocol
+parameters which could result in the congestion control algorithm
+being more agressive than permitted on the public Internet.  These
+paramaters are:
+
+   struct sctp_rtoinfo
+   [There must be more.  I'm digging through the Applicability
+   Statement.] 
+
+If an unprivileged user inherits a datagram model socket with open
+associations on a privileged port, it MAY be permitted to accept new
+associations, but it SHOULD NOT be permitted to open new
+associations.  This could be relevant for the r* family of
+protocols.
+
+[Have we enabled any DoS attacks by making certain parameters
+visible to upper layers?  I need to do a careful analysis on this
+one... Yes but we will fix it by implementing the agreement
+that J, K and I reached in San Jose.. i.e. no association automatically
+until you ask for COMM-UP NOTIFY events, we also need a
+way to specify backlog if I remember right :)]
+
+[Are there other security issues?]
+
+
+10.  Authors' Addresses
+
+Randall R. Stewart                      Tel: +1-815-479-8536
+Cisco Systems, Inc.                     EMail: rrs@cisco.com
+Crystal Lake, IL 60012
+USA
+
+Qiaobing Xie                            Tel: +1-847-632-3028
+Motorola, Inc.                          EMail: qxie1@email.mot.com
+1501 W. Shure Drive, Room 2309         
+Arlington Heights, IL 60004         
+USA                                 
+
+La Monte H.P. Yarroll                   NIC Handle: LY
+Motorola, Inc.                          EMail: piggy@acm.org
+1501 W.  Shure Drive, IL27-2315         
+Arlington Heights, IL 60004         
+USA                                 
+
+Jonathan Wood
+Sun Microsystems, Inc.                  Email: jonathan.wood@eng.sun.com
+901 San Antonio Road
+Palo Alto, CA 94303
+USA
+
+
+Kacheong Poon           
+Sun Microsystems, Inc.                  Email: kacheong.poon@eng.sun.com
+901 San Antonio Road
+Palo Alto, CA 94303
+USA
+
+
+11.  References
+
+[RFC1644] Braden, R., "T/TCP -- TCP Extensions for Transactions
+          Functional Specification," RFC 1644, July 1994.
+
+[RFC2026] Bradner, S., "The Internet Standards Process -- Revision 3", 
+          RFC 2026, October 1996.
+
+[RFC2292] W.R. Stevens, M. Thomas, "Advanced Sockets API for IPv6",
+          RFC 2292, February 1998.
+
+[RFC2553] R. Gilligan, S. Thomson, J. Bound, W. Stevens. "Basic Socket
+          Interface Extensions for IPv6," RFC 2553, March 1999.
+
+[SCTP]    R.R. Stewart, Q. Xie, K. Morneault, C. Sharp, H.J. Schwarzbauer,
+          T. Taylor, I.  Rytina, M.  Kalla, L.  Zhang, and, V.  Paxson, "Stream
+          Control Transmission Protocol," <draft-ietf-sigtran-sctp-11.txt>,
+          July 2000  work in progress.
+
+[STEVENS] W.R. Stevens,  M. Thomas, E. Nordmark, "Advanced Sockets API for
+          IPv6," <draft-ietf-ipngwg-rfc2292bis-01.txt>, December 1999
+          (Work in progress)
+
+

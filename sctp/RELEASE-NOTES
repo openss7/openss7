@@ -1,0 +1,70 @@
+# *****************************************************************************
+# 
+# $Id: RELEASE-NOTES,v 0.9.2.2 2001/05/15 19:33:19 brian Exp $
+# 
+# *****************************************************************************
+# 
+# Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+# 
+# All Rights Reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+# 
+# *****************************************************************************
+# 
+# Last Modified $Date: 2001/05/15 19:33:19 $ by $Author: brian $
+# 
+# *****************************************************************************
+
+Release linux-sctp-0.1:  (Prerelease1)
+
+    This version was tested at the 3rd SCTP Bakeoff at ETSI in Sophia Antipolis.
+    The test programs which were executed and some of the Ethereal dumps are
+    provided under the linux-sctp-0.1/test/ directory.
+
+    Here's what works well:
+
+        The code handles socket semantics and the orderly establishment and
+        teardown of associations correctly.
+
+        All of the socket sematics tested by the test programs work correctly.
+
+        Multihoming works correctly.
+
+    Here's what doesn't work so well:
+
+        Don't set CONFIG_SCTP_EXTENDED_IP_SUPPORT.  This is just a place-saver
+        around some code which will eventually support IP proxying and firewalls
+        and stuff.  It is guaranteed not to work just yet.
+
+        In some situations, the padding of parameters on send or receive may
+        be incorrect and cause the CHUNK to be rejected.
+
+    Here's what needs to be done yet:
+
+        Get CONFIG_SCTP_EXTENDED_IP_SUPPORT working for firewalls and proxies.
+
+        Test SHA-1 and HMD5 cookie signing.  (Currently the cookie HMAC is just
+        set to all 1's regardless of configuration settings).
+
+        Clean up some of the sctp_abort processing (closing sockets under
+        interrupt).
+
+        Clean up some of the GAP and SACK handling on both the sending and
+        receive side.
+
+        Get CONFIG_SCTP_TCP_COMPATIBLE tested and working.
+
+        Clean out a few bugs.
