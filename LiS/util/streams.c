@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS streams.c 2.18 12/27/03 15:13:10 "
+#ident "@(#) LiS streams.c 2.23 07/30/04 10:52:59 "
 #include <sys/types.h>
 #undef GCOM_OPEN
 #include <sys/stropts.h>
@@ -28,6 +28,7 @@
 #define	LOOP_CLONE	"/dev/loop_clone"
 #endif
 #include <sys/ioctl.h>
+#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -38,6 +39,7 @@
  * Storage Declarations
  */
 unsigned long strstats[STRMAXSTAT][4]; /* the stats */
+char	      buf[100000] ;		/* large buffer */
 
 char		*prog_name ;
 
@@ -46,9 +48,11 @@ int		Cflag = 0;
 int		mflag = 0;
 int		dflag = 0;
 int		Dflag = 0;
+int		Lflag = 0;
 int		sflag = 0;
 int		Sflag = 0;
 int		tflag = 0;
+int		Tflag = 0;
 int		pflag = 0;
 int		qflag = 0;
 int		Hflag = 0;
@@ -57,6 +61,13 @@ long		memK = 0 ;
 long		msgmemK = 0 ;
 
 lis_qrun_stats_t	qrun_stats ;
+
+typedef struct
+{
+    int		micro_secs ;
+    unsigned	counter ;
+
+} histogram_bucket_t ;
 
 /*
  * Names of stat slots
@@ -79,6 +90,8 @@ itemname_t lis_itemnames[] =
     {CANPUTS,		CANPUTSSTR},
     {QUEUES,		QUEUESSTR},
     {QSCHEDS,		QSCHEDSSTR},
+    {WRITECNT,		WRITESTR},
+    {READCNT,		READSTR},
     {OPENTIME,		OPENTIMESTR},
     {CLOSETIME,		CLOSETIMESTR},
     {READTIME,		READTIMESTR},
@@ -173,6 +186,19 @@ void print_qrun_stats(void)
     }
 }
 
+void print_sem_time_hist(char *buf, int nbytes)
+{
+    histogram_bucket_t	*p = (histogram_bucket_t *)buf ;
+
+    for (; p->micro_secs != 0; p++)
+    {
+	if (p->counter != 0)
+	    printf("%8d %12u\n", p->micro_secs, p->counter) ;
+    }
+
+    if (p->counter != 0)
+	printf("%8s %12u\n", "Larger", p->counter) ;
+}
 
 void print_debug_bits(void)
 {
@@ -212,6 +238,9 @@ void print_debug_bits(void)
     printf("DEBUG_SNDFD         0x00000001\n");
     printf("DEBUG_CP (code path)0x00000002\n");
     printf("DEBUG_CACHE         0x00000004\n");
+    printf("DEBUG_LOCK_CONTENTION 0x00000008\n");
+    printf("DEBUG_REFCNTS       0x00000010\n");
+    printf("DEBUG_SEMTIME       0x00000020\n");
 
 } /* print_debug_bits */
 
@@ -224,10 +253,12 @@ void print_options(void)
     printf("  -D<msk>  second debug mask (in hex)\n");
     printf("  -s       print streams memory stats\n");
     printf("  -S       print streams queue run stats\n");
+    printf("  -L       print lock contention talbe\n");
     printf("  -m       print memory allocation to log file (from kernel)\n");
     printf("  -p       print SPL trace buffer to log file (from kernel)\n");
     printf("  -q       print all queues to log file (from kernel)\n");
     printf("  -t       print streams timing stats\n");
+    printf("  -T       print semaphore timing histogram\n");
     printf("  start    starts the streams subsystem\n");
     printf("  stop     stops the streams subsystem\n");
     printf("  status   reports status of streams subsystem\n");
@@ -270,7 +301,7 @@ int main( int argc, char *argv[])
 	}
     }
     
-    while(( c = getopt(argc, argv, "pqsStmhHd:D:c::C::")) != -1)
+    while(( c = getopt(argc, argv, "LpqsStTmhHd:D:c::C::")) != -1)
     {
 	switch (c)
 	{
@@ -316,6 +347,10 @@ int main( int argc, char *argv[])
 	        }
 		break;
 
+	    case 'L':
+		Lflag = 1;
+		break ;
+
 	    case 's':
 	        sflag = 1;
 	        break;
@@ -326,6 +361,10 @@ int main( int argc, char *argv[])
 
 	    case 't':
 	        tflag = 1;
+	        break;
+
+	    case 'T':
+	        Tflag = 1;
 	        break;
 
 	    case 'm':
@@ -351,7 +390,7 @@ int main( int argc, char *argv[])
     }
 
     if (   !mflag && !dflag && !sflag && !tflag && !pflag && !qflag
-	&& !cflag && !Cflag && !Sflag && !Dflag)
+	&& !cflag && !Cflag && !Sflag && !Dflag && !Lflag && !Tflag)
     {
 	print_options() ;
 	exit(1);
@@ -360,7 +399,7 @@ int main( int argc, char *argv[])
     fd = open(LOOP_CLONE, 0, 0) ;
     if (fd < 0)
     {
-	printf(LOOP_CLONE ": %s\n", strerror(-fd)) ;
+	printf(LOOP_CLONE ": %s\n", strerror(errno)) ;
 	exit(1) ;
     }
 
@@ -369,7 +408,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_SDBGMSK, debug_mask) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_SDBGMSK: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_SDBGMSK: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
     }
@@ -379,7 +418,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_SDBGMSK2, debug_mask2) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_SDBGMSK2: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_SDBGMSK2: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
     }
@@ -390,7 +429,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_GETSTATS, strstats) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_GETSTATS: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_GETSTATS: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
 	LisShowStrStats();
@@ -401,7 +440,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_QRUN_STATS, &qrun_stats) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_QRUN_STATS: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_QRUN_STATS: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
 	print_qrun_stats() ;
@@ -412,7 +451,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_PRNTMEM, 0) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_PRNTMEM: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_PRNTMEM: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
 #ifdef QNX
@@ -425,7 +464,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_PRNTSPL, 0) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_PRNTSPL: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_PRNTSPL: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
     }
@@ -435,7 +474,7 @@ int main( int argc, char *argv[])
 	rslt = ioctl(fd, I_LIS_PRNTQUEUES, 0) ;
 	if (rslt < 0)
 	{
-	    printf(LOOP_CLONE ": I_LIS_PRNTQUEUES: %s\n", strerror(-rslt)) ;
+	    printf(LOOP_CLONE ": I_LIS_PRNTQUEUES: %s\n", strerror(errno)) ;
 	    exit(1) ;
 	}
     }
@@ -496,6 +535,29 @@ int main( int argc, char *argv[])
 	    memK /= 1024 ;
 	    printf("Maximum total memory to use: %ldK\n", memK) ;
 	}
+    }
+
+    if ( Lflag )
+    {
+	rslt = ioctl(fd, I_LIS_LOCKS, &buf) ;
+	if (rslt < 0)
+	{
+	    perror("ioctl I_LIS_LOCKS") ;
+	    exit(1) ;
+	}
+	printf("%s", buf) ;
+    }
+
+    if (Tflag)
+    {
+	rslt = ioctl(fd, I_LIS_SEMTIME, &buf) ;
+	if (rslt < 0)
+	{
+	    perror("ioctl I_LIS_SEMTIME") ;
+	    exit(1) ;
+	}
+	printf("Semaphore wakeup latency histogram:\n") ;
+	print_sem_time_hist(buf, rslt) ;
     }
 
     close(fd) ;

@@ -59,7 +59,7 @@ extern "C" {
 #define	LIS_STROPTS_H_SOLARIS_UW_COMPATIBLE	1
 #endif
 
-#ident "@(#) LiS stropts.h 2.16 4/24/03 16:54:55 "
+#ident "@(#) LiS stropts.h 2.19 07/30/04 10:52:59 "
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -320,6 +320,8 @@ extern int gcom_open( const char *__path, int __oflag, ... );
 /*
  * The following ioctls are specific to this STREAMS implementation.
  */
+#define I_LIS_SEMTIME 		(__SID |239)	/* sem wakeup histogram */
+#define I_LIS_LOCKS 		(__SID |240)	/* lock contention */
 #define I_LIS_SDBGMSK2 		(__SID |241)	/* 2nd debug mask */
 #define	I_LIS_QRUN_STATS	(__SID |242)	/* see qrun_stats_t */
 #define I_LIS_PIPE              (__SID |243)    /* pipe() */
@@ -465,7 +467,7 @@ typedef struct
  * interpreted as one of these structures.
  */
 
-#define LIS_GETMSG_PUTMSG_ULEN 	(-0x12345678)
+#define LIS_GETMSG_PUTMSG_ULEN 	(0x12345678)
 
 typedef struct getpmsg_args
 {
