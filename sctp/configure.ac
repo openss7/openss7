@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/12/20 20:18:29 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/12/21 12:24:16 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,27 +51,16 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/20 20:18:29 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/21 12:24:16 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.3 2004/12/20 20:18:29 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.5 2004/12/21 12:24:16 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7 Linux Native SCTP], [0.2.20], [bugs@openss7.org], [sctp])
-
-if test "$cache_file" = /dev/null -o -z "$cache_file" ; then cache_file='config.cache' ; fi
-if test -w "$cache_file"; then :; else touch "$cache_file" ; fi
-if test -z "$CONFIG_SITE" ; then CONFIG_SITE='config.site' ; fi
-
-AC_CONFIG_COMMANDS([siteconfig], [dnl
-    if test -n "$CONFIG_SITE" -a -n "$cache_file" ; then
-	if test -w "$CONFIG_SITE" -o ! -e "$CONFIG_SITE" ; then
-	    cat "$cache_file" | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|sctp_cv_)' > "$CONFIG_SITE"
-	fi
-    fi], [cache_file="$cache_file" ; CONFIG_SITE="$CONFIG_SITE"])
 
 # Need to adjust directories if default
 ac_default_prefix='/usr'

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/12/21 00:14:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/12/21 12:23:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 00:14:50 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 12:23:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,7 @@ sctp_source_FILES		= $(nodist_EXTRA_libSCTPmodl_a_SOURCES)
 
 nodist_libSCTPmodl_a_SOURCES	= $(sctp_source_FILES)
 
-libSCTPmodl_a_DEPENDENCIES	= config.h include/linux/hooks.h
+libSCTPmodl_a_DEPENDENCIES	= $(CONFIG_HEADER)
 libSCTPmodl_a_CPPFLAGS		= \
 				  -I./src \
 				  -I$(srcdir)/src \
@@ -107,15 +107,9 @@ EXTRA_DIST			= $(sctp_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			=
 
-KERNEL_MODCONF			= 
-KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
-KMODCONF_EXT			= $(PACKAGE_TARNAME)
+KERNEL_SUBDIR			= kernel/net
 
-include am/kernel.am
-
-install-devices:
-
-uninstall-devices:
+include am/sctp.am
 
 if RPM_BUILD_USER
 
