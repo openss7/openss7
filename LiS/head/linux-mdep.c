@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.116 11/23/03 19:58:44 "
+#ident "@(#) LiS linux-mdep.c 2.119 01/12/04 10:50:27 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -222,6 +222,22 @@ typedef struct lis_free_passfp_tg
 
 static lis_free_passfp_t free_passfp;
 
+#if defined(USE_LINUX_KMEM_CACHE)
+static kmem_cache_t *lis_msgb_cachep = NULL;
+static kmem_cache_t *lis_queue_cachep = NULL;
+static kmem_cache_t *lis_qband_cachep = NULL;
+#endif
+
+#if defined(USE_LINUX_KMEM_TIMER) 
+static kmem_cache_t *lis_timer_cachep = NULL;
+struct lis_timer {
+      struct timer_list    lt;
+      timo_fcn_t 	  *func;
+      caddr_t		   arg;
+      volatile toid_t	   handle;
+};
+#endif
+
 #if defined(FATTACH_VIA_MOUNT)
 /*
  * fattach instance data
@@ -390,9 +406,19 @@ int			 lis_initial_use_cnt ;
 
 #if defined(KERNEL_2_3)
 
+#if defined(CONFIG_DEV)
 static
 void lis_mnt_cnt_sync(const char *file, int line, const char *fn)
+#else
+static
+void lis_mnt_cnt_sync(void)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file = "head/linux-mdep.c" ;
+    static int   line = 0 ;
+    static char *fn   = "lis_mnt_cnt_sync";
+#endif
     if (lis_mnt)
 	lis_atomic_set(&lis_mnt_cnt,MNT_COUNT(lis_mnt));
 #if 1
@@ -402,12 +428,25 @@ void lis_mnt_cnt_sync(const char *file, int line, const char *fn)
 #endif
 }
 
+#if defined(CONFIG_DEV)
 struct vfsmount *lis_mntget(struct vfsmount *m, 
 			    const char *file, int line, const char *fn)
+#else
+struct vfsmount *lis_mntget(struct vfsmount *m)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file = "head/linux-mdep.c" ;
+    static int   line = 0 ;
+    static char *fn   = "lis_mntget";
+#endif
     struct vfsmount *mm = (m ? mntget(m) : NULL) ;
 
+#if defined(CONFIG_DEV)
     lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__);
+#else
+    lis_mnt_cnt_sync();
+#endif
 
     if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
     {
@@ -423,9 +462,18 @@ struct vfsmount *lis_mntget(struct vfsmount *m,
     return(mm) ;
 }
 
+#if defined(CONFIG_DEV)
 void lis_mntput(struct vfsmount *m, 
 		const char *file, int line, const char *fn)
+#else
+void lis_mntput(struct vfsmount *m)
+#endif
 {
+#if !defined(CONFIG_DEV)
+    static char *file = "head/linux-mdep.c" ;
+    static int   line = 0 ;
+    static char *fn   = "lis_mntput";
+#endif
     if (m == NULL)
     {
 	if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
@@ -443,12 +491,22 @@ void lis_mntput(struct vfsmount *m,
     if (MNT_COUNT(m) > 0)
 	mntput(m) ;
 
+#if defined(CONFIG_DEV)
     lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__);
+#else
+    lis_mnt_cnt_sync();
+#endif
 }
 
+#if defined(CONFIG_DEV)
 #define MNTSYNC()       lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__)
 #define	MNTGET(m)	lis_mntget((m),__LIS_FILE__,__LINE__,__FUNCTION__)
 #define	MNTPUT(m)	lis_mntput((m),__LIS_FILE__,__LINE__,__FUNCTION__)
+#else
+#define MNTSYNC()       lis_mnt_cnt_sync()
+#define MNTGET(m)       lis_mntget((m))
+#define MNTPUT(m)       lis_mntput((m))
+#endif  /* CONFIG_DEV  */
 #else
 #define MNTSYNC()       do {} while (0)
 #define	MNTGET(m)	0
@@ -4568,7 +4626,6 @@ int	lis_umount2(char *path, int flags)
 
     old_fs = get_fs();
     set_fs(KERNEL_DS);
-
 #if defined(FATTACH_VIA_MOUNT)
     if (!(ret = mount_permission(path))) {
 
@@ -4606,3 +4663,211 @@ MODULE_AUTHOR("David Grothe");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("SVR4 STREAMS for Linux (LGPL Code)");
 #endif
+
+/************************************************************************
+*                 Linux Kernel Cache Memory Routines                    *
+*                 for allocating and freeing mdbblocks                  *
+*             as a LiS performance improvement under Linux              *
+************************************************************************/
+
+#if defined(USE_LINUX_KMEM_CACHE) 
+void lis_init_msg(void)
+{
+        lis_msgb_cachep =
+            kmem_cache_create("lis_msgb_cachep", sizeof(struct mdbblock),
+                                0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+        if (!lis_msgb_cachep) 
+                printk("lis_init_msg: lis_msgb_cachep is NULL. "
+			"kmem_cache_create failed\n");
+}
+
+void lis_msgb_cache_freehdr(void *bp)
+{
+      if (lis_msgb_cachep) {
+              LisDownCount(HEADERS);
+              kmem_cache_free(lis_msgb_cachep, (struct mdbblock *) bp);
+	      if (LIS_DEBUG_CACHE)
+		printk("lis_msgb_cache_freehdr: freed %p\n", bp);
+      }
+}/*lis_msgb_cachep_free*/
+
+
+struct mdbblock *lis_kmem_cache_allochdr(void)
+{
+extern lis_atomic_t  lis_strcount ;     /* # bytes allocated to msgs   */
+extern long          lis_max_msg_mem ;  /* maximum to allocate */
+
+      struct mdbblock *md;
+      if (!lis_max_msg_mem || lis_atomic_read(&lis_strcount) < lis_max_msg_mem)       {
+              md = kmem_cache_alloc(lis_msgb_cachep, GFP_ATOMIC);
+              LisUpCount(HEADERS);
+	      if (LIS_DEBUG_CACHE)
+		  printk("lis_kmem_cache_allochdr: allocated %p\n", md);
+              md->msgblk.m_mblock.b_next = NULL;
+              return (md);
+      } else {
+	      printk("lis_kmem_cache_allochdr: msgb allocation failed\n");
+              LisUpFailCount(HEADERS);
+              return (NULL);
+      }
+}
+
+/************************************************************************
+*                 Linux Kernel Cache Memory Routines                    *
+*             for allocating and freeing queues and qbands              *
+*             as a LiS performance improvement under Linux              *
+************************************************************************/
+
+void lis_init_queues(void)
+{
+      lis_queue_cachep =
+          kmem_cache_create("lis_queue_cachep", sizeof(queue_t)*2, 0,
+                            SLAB_HWCACHE_ALIGN, NULL, NULL);
+      lis_qband_cachep =
+          kmem_cache_create("lis_qband_cachep", sizeof(qband_t), 0,
+                            SLAB_HWCACHE_ALIGN, NULL, NULL);
+}
+
+void lis_terminate_queues(void)
+{
+      kmem_cache_destroy(lis_qband_cachep);
+      kmem_cache_destroy(lis_queue_cachep);
+}
+#endif
+
+#if defined(USE_LINUX_KMEM_TIMER) 
+/************************************************************************
+*            LINUX kernel cache based SVR4 Compatible timeout           *
+*************************************************************************
+*                                                                       *
+* This implementation of SVR4 compatible timeout functions uses the     *
+* Linux timeout mechanism as the internals and LINUX cache memory for   *
+* the timer_list entries.						*
+*                                                                       *
+* The use of LINUX kernel cache memory for the individual timer_list    *
+* entries greatly simplifies the complexity of managing (allocating     *
+* and freeing) a linked list of individual timer_list elements.         *
+*                                                                       *
+* The 2.6 kernel is fussy about calling kernel routines that might	*
+* sleep while holding spin locks.  The cache alloc routines can be	*
+* called while holding a spin lock as long as the flags argument does	*
+* not say GFP_WAIT.  Since we use GFP_ALLOC we hold our lock until after*
+* the cache allocation calls are complete.				*
+*                                                                       *
+* It is OK to hold spin locks when calling the kernel timer functions	*
+* such as init_timer, add_timer and del_timer.				*
+*                                                                       *
+* I think there is a race in this code between lis_timeout,		*
+* lis_untimeout and lt_timeout.  The worrysome case is when these	*
+* routines are called in the order: lt_timeout, lis_timeout,		*
+* lis_untimeout.  Because the kernel cache allocators use a LIFO	*
+* discipline lt_timeout can free the timer entry, lis_timeout can	*
+* allocate the same entry as a new one and then lis_untimeout can	*
+* free this same entry again, because it appears valid when		*
+* lis_untimeout is called.						*
+*                                                                       *
+* We hold a global spin lock during all timer operations to eliminate	*
+* the simple race between lt_timeout and lis_untimeout.			*
+*                                                                       *
+************************************************************************/
+
+extern lis_spin_lock_t	  lis_tlist_lock ; /* dki.c */
+
+void lis_init_dki(void)
+{
+      lis_timer_cachep =
+          kmem_cache_create("lis_timer_cachep", 
+                             sizeof(struct lis_timer), 
+                             0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+        if (!lis_timer_cachep) 
+                printk("lis_init_dki: lis_timer_cachep is NULL. "
+			"kmem_cache_create failed\n");
+}
+
+static void lt_timeout(unsigned long data)
+{
+      struct lis_timer *t = (typeof(t)) data;
+      lis_flags_t  	psw;
+      timo_fcn_t       *fcn ;
+      caddr_t		uarg ;
+
+      if(!t) return;
+
+      /*
+       * The kernel code has delete the timer from the timer list
+       * prior to calling this routine.
+       */
+      lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+      if (t->handle == (toid_t) t && t->func != NULL)
+      {
+	  fcn        = t->func ;	/* save local copy */
+	  uarg       = t->arg ;
+	  t->func    = NULL ;
+	  t->handle  = NULL ;
+	  kmem_cache_free(lis_timer_cachep, t);
+	  lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+	  fcn(uarg) ;			/* call fcn while not holding lock */
+      }
+      else				/* stale timer, or lost race */
+	  lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+}
+
+toid_t lis_untimeout(toid_t id)
+{
+      struct lis_timer *t = (typeof(t)) id;
+      lis_flags_t       psw;
+
+      if (t)
+      {
+        lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+	if (t->handle == (toid_t) t)
+	{
+	    t->handle = NULL ;
+	    t->func = NULL ;
+	    del_timer(&t->lt);
+	    kmem_cache_free(lis_timer_cachep, t);
+	}			/* else lost the race */
+        lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+      }
+      return (0);
+}
+
+toid_t  lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+                    char *file_name, int line_nr)
+{
+      struct lis_timer *t;
+      lis_flags_t  	psw;
+
+      if (timo_fcn)
+      {
+	  if ((t = kmem_cache_alloc(lis_timer_cachep, GFP_ATOMIC)))
+	  {
+	      /*
+	       * If this routine is called just after lt_timeout and
+	       * just before lis_untimeout for the same timer then we
+	       * could have just allocated the same timer that lt_timeout
+	       * just freed.  That will make it look nice and valid for
+	       * lis_untimeout, which will free it even though we think
+	       * we have it running.  A later call on lis_untimeout will
+	       * likely come to no good.
+	       */
+	      lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+              bzero(t, sizeof(*t));
+              t->func = timo_fcn;
+              t->arg  = arg;
+	      t->handle = (toid_t) t ;
+              init_timer(&t->lt);
+              t->lt.function = &lt_timeout;
+              t->lt.data     = (unsigned long) t;
+              t->lt.expires  = jiffies + ticks;
+              add_timer(&t->lt);
+	      lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+	  }
+	  return (toid_t) t;
+      }
+   return (toid_t) NULL;
+}
+
+#endif
+
+/*  -------------------------------------------------------------------  */

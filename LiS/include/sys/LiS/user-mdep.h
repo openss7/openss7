@@ -35,7 +35,7 @@
 #ifndef _USER_MDEP_H
 #define _USER_MDEP_H
 
-#ident "@(#) LiS user-mdep.h 2.9 10/24/02 21:11:35 "
+#ident "@(#) LiS user-mdep.h 2.10 01/12/04 11:06:59 "
 
 #include <sys/errno.h>	      /* for errno */
 #ifndef _MEMORY_H
@@ -173,6 +173,10 @@ typedef struct lis_select_struct
 } lis_select_t ;
 
 
+#define	LIS_QBAND_FREE		FREE
+#define	LIS_QUEUE_FREE		FREE
+#define	LIS_QUEUE_ALLOC(nb,s)	ALLOCF_CACHE(nb,s)
+#define LIS_QBAND_ALLOC(nb,s)	ALLOCF(nb,s)
 
 #ifndef PORTABLE
 #define	PORTABLE	1

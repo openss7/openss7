@@ -37,7 +37,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) LiS linux-mdep.h 2.55 8/18/03 14:07:57 "
+#ident "@(#) LiS linux-mdep.h 2.57 01/12/04 10:50:27 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -616,6 +616,18 @@ typedef unsigned long	minor_t ;	/* mimics SVR4 */
 #define FREE(p)			lis_free(p,__FILE__,__LINE__)
 #define MEMCPY(dest, src, len)	memcpy(dest, src, len)
 #define PANIC(msg)		panic(msg)
+
+#if (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+#define	LIS_QBAND_FREE(p)	kmem_cache_free(lis_qband_cachep, (p));
+#define	LIS_QUEUE_FREE(p)	kmem_cache_free(lis_queue_cachep, (p));
+#define	LIS_QUEUE_ALLOC(nb,s)	kmem_cache_alloc(lis_queue_cachep,GFP_ATOMIC);
+#define LIS_QBAND_ALLOC(nb,s)	kmem_cache_alloc(lis_qband_cachep,GFP_ATOMIC);
+#else
+#define	LIS_QBAND_FREE		FREE
+#define	LIS_QUEUE_FREE		FREE
+#define	LIS_QUEUE_ALLOC(nb,s)	ALLOCF_CACHE(nb,s)
+#define LIS_QBAND_ALLOC(nb,s)	ALLOCF(nb,s)
+#endif
 /*
  * These are used only internally
  */
@@ -664,6 +676,7 @@ int	lis_check_umem(struct file *fp, int rd_wr_fcn,
 
 
 #endif				/* __KERNEL__ */
+
 
 /*  -------------------------------------------------------------------  */
 
@@ -794,6 +807,35 @@ extern struct inode *igrab(struct inode *inode) ;
  */
 #if defined(KERNEL_2_4_7)
 #define FATTACH_VIA_MOUNT 1
+#endif
+
+
+#endif				/* __KERNEL__ */
+
+#ifdef __KERNEL__
+
+#if defined(USE_LINUX_KMEM_CACHE)
+
+#if defined(CONFIG_DEV)
+#define allochdr(a,b) lis_kmem_cache_allochdr()
+#else
+#define allochdr() lis_kmem_cache_allochdr()
+#endif
+
+#define lis_terminate_msg() kmem_cache_destroy(lis_msgb_cachep);
+#define freehdr(a) lis_msgb_cache_freehdr((a))
+extern kmem_cache_t *lis_msgb_cachep;
+extern kmem_cache_t *lis_queue_cachep;
+extern kmem_cache_t *lis_qband_cachep;
+extern struct mdbblock *lis_kmem_cache_allochdr(void);
+extern void lis_msgb_cache_freehdr(void *);
+extern void lis_init_queues(void);
+extern void lis_terminate_queues(void);
+#endif
+
+#if defined(USE_LINUX_KMEM_TIMER)
+#define lis_terminate_dki() kmem_cache_destroy(lis_timer_cachep)
+extern kmem_cache_t *lis_timer_cachep;
 #endif
 
 #endif				/* __KERNEL__ */

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.78 11/23/03"
+Configure_version="2.82 01/12/04"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -59,6 +59,8 @@ OPTIONS
        -c|--intcpuflags  "int or unsigned long" type for CPU [y|n] 
 
        -i|--forcenewinode Force new_inode usage (only when not detected) [y|n]
+
+       -p|--productioncode Performance enhanced production code [y|n]
        
 EXAMPLE 
 
@@ -67,6 +69,7 @@ EXAMPLE
  --versionlinux=2.4.22-1-686-smp    --loadmodules=n 
  --moduleslocation=/lib/modules/2.4.22-1-686-smp/ --backcompat=n 
  --solaris=n --sourcedebug=y --sharedlibs=y --intcpuflags=n --forcenewinode=y 
+ --productioncode=y
 
 EOF
 }
@@ -79,8 +82,8 @@ if getopt -u -V >/dev/null 2>&1; then
 fi
 OPT=`getopt $UOP -l"onmachine:,levelrun:,nativecompiler:,onrunning:,ksourcedir:\
 ,versionlinux:,loadmodules:,moduleslocation:,backcompat:,solaris:,sourcedebug:,sharedlibs:\
-,intcpuflags:,forcenewinode:,help" \
-       "m:l:n:r:s:v:M:b:S:g:R:c:i:h"  "$@" `
+,intcpuflags:,forcenewinode:,productioncode:,help" \
+       "m:l:n:r:s:v:M:b:S:g:R:c:i:p:h"  "$@" `
 
 if [ $? != 0 ] ;then 
 echo "run $0 -h for details"
@@ -97,7 +100,7 @@ eval set -- "$OPT"
 unset OPT_ONMACHINE OPT_LEVELRUN OPT_NATIVECOMPILER OPT_ONRUNNINGLNX \
       OPT_KSOURCEDIR OPT_VERSIONLINUX OPT_LOADMODULES OPT_MODULESLOCATION \
       OPT_BACKCOMPAT OPT_SOLARISSTYLE OPT_SRCDBG OPT_SHAREDLIBS \
-      OPT_INTCPUFLAGS OPT_FORCENEWINODE CONFIG\
+      OPT_INTCPUFLAGS OPT_FORCENEWINODE OPT_PRODUCTIONCODE CONFIG\
 
 ## PARSE OPTIONS AND SET VARIABLES USED in script
 while [ ! -z "$1" ]
@@ -117,6 +120,7 @@ case "$1" in
      -R|--sharedlibs)OPT_SHAREDLIBS=$2; shift ;;
      -c|--intcpuflags) OPT_INTCPUFLAGS=$2; shift ;;
      -i|--forcenewinode) OPT_FORCENEWINODE=$2; shift ;;
+     -p|--productioncode) OPT_PRODUCTIONCODE=$2; shift ;;
      -h|--help) usage ; exit 0;;
       *) shift ; break;;
     esac
@@ -212,9 +216,9 @@ do_read_dir()
          #interact with user..
          do_readstring
          else
-         RESULT=${ARGVVALUE}
+	     RESULT=${ARGVVALUE}
              # to avoid loops
-        unset  ARGVVALUE 
+	     unset  ARGVVALUE 
          fi
 	if [ -d $RESULT ]; then
 	    return 0
@@ -1041,6 +1045,9 @@ else
     MACHINE=`uname -m`
     INT_PSW=y
 fi
+CONFIG_DEV=n
+USE_KMEM_CACHE=y
+USE_LINUX_KMEM_TIMER=y
 
 if [ "$MACHINE" = "s390" -o "$MACHINE" = "s390x" ]; then
   SMP_GREP_ID='smp_num_cpus'
@@ -1556,6 +1563,46 @@ do_read_choice
 INT_PSW=$RESULT
 
 #
+# CONFIG_DEV    -  Compile LiS for development or production.
+#		   We ask the user the question with the opposite sense
+#                  and then invert the answer for our internal flag.
+#
+# USE_KMEM_CACHE - Use level 2 cache memory for LiS queue and mblk structs
+#                  for performance.
+#
+if [ "$CONFIG_DEV..." = "..." ]; then
+    CONFIG_DEV=n
+fi
+PROMPT="\
+When you make STREAMS, do you want LiS to be compiled in production mode?\n\
+In this mode LiS will not audit queue, msg pointer, and internal LiS\n\
+queue structure sanity for every STREAMs function call.  It will also\n\
+use faster kernel allocations for messages.\n\
+Responding 'y' is more appropriate for production environments\n\
+Responding 'n' is more appropriate for development environments\n\
+with verified modules/drivers.\n\
+    y = No audit of structures, faster memory handling\n\
+    n = Do audit STREAMs and LiS structures and pointers\n\
+Please enter y or n"
+RESPONSE="y n"
+if [ "$CONFIG_DEV..." = "y..." ]; then
+    DEFAULT=n
+else
+    DEFAULT=y
+fi
+ARGVVALUE="${OPT_PRODUCTIONCODE}"
+do_read_choice
+if [ "$RESULT..." = "y..." ]; then
+    CONFIG_DEV=n
+    USE_KMEM_CACHE=y
+    USE_LINUX_KMEM_TIMER=y
+else
+    CONFIG_DEV=y
+    USE_KMEM_CACHE=n
+    USE_LINUX_KMEM_TIMER=n
+fi
+
+#
 # Some systems don't have a /usr/local/sbin directory.  Make one
 # if necessary.  We keep some LiS utilities in that directory.
 #
@@ -1670,7 +1717,7 @@ if   [ "$TARGET" = "l"  ]; then
     if $CC_NAME -mpreferred-stack-boundary=2 -S -o /dev/null -xc /dev/null \
 	>/dev/null 2>&1
     then
-	CC_OPTIMIZE="$CC_OPTIMIZE -mpreferred-stack-boundary=2"
+	CC_OPT2=-mpreferred-stack-boundary=2
     fi
 else
     echo
@@ -1690,7 +1737,7 @@ if [ "$CC_VERS..." = "3.0.2..." ]; then
     do_confirm
 fi
 
-echo "Using \"$CC_NAME $CC_OPTIMIZE\" $CC_VERS as the C compiler"
+echo "Using \"$CC_NAME $CC_OPTIMIZE $CC_OPT2\" $CC_VERS as the C compiler"
 
 #
 # Figure out which routine name to use for "get_empty_inode".
@@ -1768,10 +1815,14 @@ if [ "$TARGET" = "l" ]; then
     cfg_out CC_NAME $CC_NAME
     cfg_out CC_VERS $CC_VERS
     cfg_out CC_OPTIMIZE "$CC_OPTIMIZE"
+    cfg_out CC_OPT2 "$CC_OPT2"
     cfg_out MACHINE_INCL $MACHINE_INCL
     cfg_out_str GET_EMPTY_INODE $GET_EMPTY_INODE
     #cfg_out REGISTER_SYSCALLS $REGISTER_SYSCALLS
     cfg_out INT_PSW $INT_PSW
+    cfg_out CONFIG_DEV $CONFIG_DEV
+    cfg_out USE_KMEM_CACHE $USE_KMEM_CACHE
+    cfg_out USE_LINUX_KMEM_TIMER $USE_LINUX_KMEM_TIMER
 fi
 cfg_out LIS_OLD_CONSTS $LIS_OLD_CONSTS
 cfg_out SOLARIS_STYLE_CMN_ERR $SOLARIS_STYLE_CMN_ERR

@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS strdbg.c 2.24 5/30/03 21:40:40 "
+#ident "@(#) LiS strdbg.c 2.26 01/12/04 10:50:27 "
 
 #include <sys/stream.h>
 #include <sys/poll.h>
@@ -73,9 +73,12 @@ mem_link_t	 lis_mem_head = {&lis_mem_head, &lis_mem_head} ;
 				        - sizeof(void *) \
 				)
 
-
+#if defined(CONFIG_DEV)
 #ifndef DEBUG_MASK
 #define	DEBUG_MASK	LIS_DEBUG_SAFE_BIT
+#endif
+#else
+#define	DEBUG_MASK	0
 #endif
 #ifndef DEBUG_MASK2
 #define	DEBUG_MASK2	0
@@ -173,7 +176,7 @@ void	lis_flush_print_buffer(void)
 static void put_file_name(mem_link_t *p, const char *name)
 {
     int		len = strlen(name) ;
-    int		index = 0 ;;
+    int		index = 0 ;
 
     if (len > sizeof(p->file_name) - 1)
 	index = len - (sizeof(p->file_name) - 1) ;
@@ -330,11 +333,13 @@ void	lis_free(void *ptr, char *file_name, int line_nr)
     LisUpCount(MEMFREES) ;			/* stats array */
     if (LIS_DEBUG_MONITOR_MEM)
 	rslt = lis_check_mem() ;		/* check all mem areas */
+#if defined(CONFIG_DEV)
     else
 	rslt = lis_check_guard(ptr, file_name) ;/* check the guard word */
 
     if (rslt == 0)
 	LisUpFailCount(MEMFREES) ;		/* stats array */
+#endif
 
     p = (mem_link_t *) ptr ;
     p-- ;					/* go back to link structure */
@@ -432,6 +437,7 @@ int	lis_check_mem(void)
 
 } /* lis_check_mem */
 
+#if defined(CONFIG_DEV)
 /************************************************************************
 *                          lis_mark_mem                                 *
 *************************************************************************
@@ -452,6 +458,11 @@ void	lis_mark_mem(void *ptr, const char *file_name, int line_nr)
     p->line_nr	  = line_nr;			/* line number called from */
 
 } /* lis_mark_mem */
+#else	/* production case - no memory marking */
+/*
+ *	lis_mark_mem() is a null #define in include/sys/LiS
+ */
+#endif
 
 /************************************************************************
 *                           lis_print_block                             *
@@ -646,9 +657,7 @@ const char	*lis_queue_name(queue_t *q)
 {
     const char	*name ;
 
-    if (   q == NULL
-	|| q->q_magic != Q_MAGIC
-       )
+    if (!LIS_CHECK_Q_MAGIC(q))
 	return("(bad)") ;
 
     if (   q->q_qinfo != NULL

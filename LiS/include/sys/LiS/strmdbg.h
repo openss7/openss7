@@ -40,7 +40,7 @@
 #ifndef	_STRMDBG_H
 #define	_STRMDBG_H		1
 
-#ident "@(#) LiS strmdbg.h 2.15 7/15/03 20:23:22 "
+#ident "@(#) LiS strmdbg.h 2.17 01/12/04 10:50:27 "
 
 #ifndef _HEAD_H
 #include <sys/LiS/head.h>
@@ -102,6 +102,7 @@ extern unsigned long	lis_debug_mask2 ;
  */
 #define LIS_DEBUG_SNDFD_BIT		0x00000001L
 #define LIS_DEBUG_CP_BIT		0x00000002L	/* print code path */
+#define LIS_DEBUG_CACHE_BIT		0x00000004L	/* cache allocs */
 
 /*
  * Shorthand macros
@@ -149,6 +150,7 @@ extern unsigned long	lis_debug_mask2 ;
 
 #define LIS_DEBUG_SNDFD		(lis_debug_mask2 & LIS_DEBUG_SNDFD_BIT)
 #define LIS_DEBUG_CP		(lis_debug_mask2 & LIS_DEBUG_CP_BIT)
+#define LIS_DEBUG_CACHE		(lis_debug_mask2 & LIS_DEBUG_CACHE_BIT)
 
 
 /*
@@ -188,7 +190,11 @@ void	*lis_malloc(int nbytes, int class, int use_cache,
 			char *file_name, int line_nr) ;
 void	*lis_zmalloc(int nbytes, int class, char *file_name, int line_nr) ;
 void	 lis_free(void *ptr, char *file_name, int line_nr) ;
+#if defined(CONFIG_DEV)
 void	 lis_mark_mem(void *ptr, const char *file_name, int line_nr) ;
+#else
+#define	lis_mark_mem(a, b, c)
+#endif
 int      lis_check_guard(void *ptr, char *msg) ;
 int      lis_check_mem(void) ;
 void     lis_terminate_mem(void) ;

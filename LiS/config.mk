@@ -139,7 +139,7 @@ XOPTS+= -fno-strict-aliasing -Wno-sign-compare -fno-common
 ifeq ($(DBG_OPT),y)
 XOPTS += -DINLINE="" -DSTATIC="" -ggdb -O -DLIS_SRC=\"$(LIS_HOME)\"
 else
-XOPTS += $(CC_OPTIMIZE) -DINLINE=inline -DSTATIC=static -fomit-frame-pointer
+XOPTS += $(CC_OPTIMIZE) $(CC_OPT2) -DINLINE=inline -DSTATIC=static -fomit-frame-pointer
 endif
 
 #
@@ -282,6 +282,30 @@ ifeq ($(LIS_TARG),user)
 LIBBASE = LiSuser
 else
 LIBBASE = LiS
+endif
+
+#
+# If the user wants LiS built for development purposes (lots of internal
+# LiS debugging mechanisms - code path tracing, lock and semaphore use
+# tracing, carry __FILE__ and __LINE__ on stack throughout all function
+# calls.
+#
+ifeq ($(CONFIG_DEV),y)
+XOPTS += -DCONFIG_DEV
+endif
+
+#
+# Use Linux Kernel memory caches for performance
+#
+ifeq ($(USE_KMEM_CACHE),y)
+XOPTS += -DUSE_LINUX_KMEM_CACHE
+endif
+
+#
+# Use Linux Kernel memory cache and native timer management routines
+#
+ifeq ($(USE_LINUX_KMEM_TIMER),y)
+XOPTS += -DUSE_LINUX_KMEM_TIMER
 endif
 
 #

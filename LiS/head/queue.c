@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS queue.c 2.32 9/30/03 20:39:53 "
+#ident "@(#) LiS queue.c 2.34 01/12/04 10:50:27 "
 
 
 
@@ -56,8 +56,12 @@
 extern lis_atomic_t	 lis_runq_req_cnt ;
 extern lis_spin_lock_t	 lis_qhead_lock ;
 extern void lis_safe_putmsg(queue_t *, mblk_t *, char *, int); /* safe.c */
-extern void lis_cpfl(void *p, long a, const char *fcn, const char *f, int l);
 
+#if defined(CONFIG_DEV)
+extern void lis_cpfl(void *p, long a, const char *fcn, const char *f, int l);
+#else
+#define lis_cpfl(a,b,c,d,e)
+#endif
 
 /*  -------------------------------------------------------------------  */
 /* find_qband
@@ -101,7 +105,7 @@ find_qband(queue_t *q, int msg_class)
 
     if (qp == NULL)			/* no such band */
     {					/* and no unused structures */
-	qp = (qband_t*) ALLOCF(sizeof(struct qband),"qband ");
+	qp = (qband_t*) LIS_QBAND_ALLOC(sizeof(struct qband),"qband ");
 	if (qp == NULL) return(NULL) ;	/* could not allocate */
 
 	qp->qb_next = q->q_bandp;
@@ -472,28 +476,28 @@ rmv_msg(queue_t *q, mblk_t *mp)
 /*
  * lis_check_q_magic
  *
- * Return 1 if magic number in queue is OK.  Return 0 if not.
+ * lis_check_q_magic is only called by LiS when q == NULL or
+ * q->q_magic != Q_MAGIC. If q != NULL then it is an automatic
+ * conclusion that q->q_magic != Q_MAGIC.
+ *
+ * log errors when q == NULL or q->q_magic != Q_MAGIC
+ * Return 0 always
  */
 int	lis_check_q_magic(queue_t *q, char *file, int line)
 {
-    if (q == NULL)
-    {
+    if (!q) 
+	{
 	printk("%s #%u: Queue pointer is NULL\n", file, line) ;
-	return(0) ;
-    }
-
-    if (q->q_magic != Q_MAGIC)
-    {
+	}
+    else
+       	{
 	printk("%s #%u: Queue magic number is 0x%lx, should be 0x%lx\n",
-		file, line, q->q_magic, Q_MAGIC) ;
-
-	return(0) ;
-    }
-
-    return(1) ;
-
+       		file, line, q->q_magic, Q_MAGIC) ;
+       	}
+    return(0) ;
+  
 } /* lis_check_q_magic */
-
+  
 /* backq - Return the queue which feeds this one.
  *
  * If q is a read queue then return the ptr to the downstream queue.
@@ -505,7 +509,7 @@ lis_backq_fcn(queue_t *q, char *f, int l)
     queue_t	*oq ;
     queue_t	*nq ;
 
-    if (   !lis_check_q_magic(q,f,l)
+    if (   !LIS_QMAGIC(q,f,l)
 	|| !(oq = OTHER(q))
 	|| !(nq = oq->q_next)
        )
@@ -869,7 +873,7 @@ lis_qenable(queue_t *q)
     if (!LIS_CHECK_Q_MAGIC(q)) return ;
 
     /* is there a service procedure? if not, just return */
-    if (q == NULL || q->q_qinfo == NULL || q->q_qinfo->qi_srvp == NULL)
+    if (q->q_qinfo == NULL || q->q_qinfo->qi_srvp == NULL)
 	return ;
 
     lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
@@ -1008,8 +1012,6 @@ flush_worker(queue_t *q, int band, int flush_all)
     int		  q_flag;
     lis_flags_t   psw;
     int		  mtype ;
-
-    if (q == NULL) return;
 
     if (!LIS_CHECK_Q_MAGIC(q)) return ;
 
@@ -1230,8 +1232,6 @@ lis_qsize(queue_t *q)
     mblk_t *mp;
     int rtn = 0;
     lis_flags_t psw;
-    if (q == NULL) return 0;
-
     if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
 
     LIS_QISRLOCK(q, &psw) ;
@@ -1253,9 +1253,7 @@ lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
     struct qband *qp ;
     lis_flags_t   psw;
 
-    if (q == NULL || val == NULL) return(EINVAL) ;
-
-    if (!LIS_CHECK_Q_MAGIC(q)) return(EINVAL) ;
+    if ( val == NULL || !LIS_CHECK_Q_MAGIC(q)) return(EINVAL) ;
 
     LIS_QISRLOCK(q, &psw) ;
     if (band > 0)
@@ -1346,8 +1344,6 @@ lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
     struct qband *qp ;
     lis_flags_t   psw;
 
-    if (q == NULL) return(EINVAL) ;
-
     if (!LIS_CHECK_Q_MAGIC(q)) return(EINVAL) ;
 
     LIS_QISRLOCK(q, &psw) ;
@@ -1423,7 +1419,7 @@ lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 queue_t *
 lis_allocq( const char *name )
 {
-  queue_t *q = (queue_t*)ALLOCF_CACHE(sizeof(queue_t)*2,"Queue");
+  queue_t *q = (queue_t*)LIS_QUEUE_ALLOC(sizeof(queue_t)*2,"Queue");
 
   if (q == NULL) return(NULL) ;		/* memset does not null-check */
 
@@ -1463,18 +1459,18 @@ lis_freeq( queue_t *q )
     wq = LIS_WR(q) ;
     for (i = 1; i <= 2; i++, q = wq)
     {
-	if (!q || !LIS_CHECK_Q_MAGIC(q)) continue ;
+	if (!LIS_CHECK_Q_MAGIC(q)) continue ;
 
 	q->q_magic = Q_MAGIC ^ 1;
 	for (qp = q->q_bandp; qp != NULL; )
 	{
 	    qpx = qp->qb_next ;
-	    FREE(qp) ;
+	    LIS_QBAND_FREE(qp);
 	    qp = qpx ;
 	}
     }
 
-    FREE(rq);
+    LIS_QUEUE_FREE(rq);
     LisDownCount(QUEUES) ;			/* one fewer queue */
 
 }/*lis_freeq*/
@@ -1487,7 +1483,7 @@ lis_freeq( queue_t *q )
 void
 lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 {
-    if (mp1 == NULL || mp2 == NULL || q == NULL)
+    if (mp1 == NULL || mp2 == NULL )
       return;
 
     if (!LIS_CHECK_Q_MAGIC(q))
@@ -1515,8 +1511,6 @@ lis_bcanput(queue_t *q, unsigned char band)
     lis_flags_t	  opsw, psw;
     struct qband *qp ;
     queue_t	 *oq = q;
-
-    if (q == NULL) return 0; /* sanity check */
 
     if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
 
@@ -1578,7 +1572,8 @@ return_failure:
 int 
 lis_bcanputnext(queue_t *q, unsigned char band)
 {
-    if (!q || !q->q_next || !LIS_CHECK_Q_MAGIC(q))  return(0);
+    if (!LIS_CHECK_Q_MAGIC(q) || 
+	!LIS_CHECK_Q_MAGIC(q->q_next)) return(0);
 
     return(lis_bcanput(q->q_next, band)) ; /* check the next queue */
 
@@ -1601,8 +1596,7 @@ lis_bcanputnext_anyband(queue_t *q)
     struct qband *qp ;
     queue_t	 *oq ;			/* original (next) queue */
 
-    if (   q == NULL
-	|| !LIS_CHECK_Q_MAGIC(q)
+    if (   !LIS_CHECK_Q_MAGIC(q)
 	|| (q = q->q_next) == NULL
 	|| !LIS_CHECK_Q_MAGIC(q)
        )
@@ -1650,7 +1644,7 @@ int	lis_qcountstrm(queue_t *q)
     int		 nbytes = 0 ;
     queue_t	*oq = q ;
 
-    if (q == NULL || !LIS_CHECK_Q_MAGIC(q)) return(0) ;
+    if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
 
     LIS_QISRLOCK(oq, &psw) ;
 
