@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/12/28 03:48:26 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2004/12/29 08:54:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/28 03:48:26 $ by $Author: brian $
+# Last Modified $Date: 2004/12/29 08:54:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,7 @@ if BUILD_RPMS
 #
 
 RPMFLAGS  = -vv
-SRPMFLAGS = $(RPMFLAGS)
+SRPMFLAGS = $(RPMFLAGS) --nodeps
 
 RPMICONS = \
 	--define "_gif_icon $(PACKAGE_TARNAME).gif" \
@@ -132,13 +132,15 @@ srpm:
 #   AM_RPMTARGETS
 #
 rpms: srpm
-	@for t in $(RPMTARGET) $(AM_RPMTARGETS) ; do \
+	@targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
+	for t in $$targets ; do \
 		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t --" SRPMS/$(tardir).src.rpm; \
 		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(tardir).src.rpm; \
 	done
 
 sign:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		if test ! -f $$f ; then \
 			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 			break ; \
@@ -147,7 +149,7 @@ sign:
 	if test ! -f SRPMS/$(tardir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
-	for f in $(RPM_ARCHIVES) ; do \
+	for f in $$archives ; do \
 		if test -f $$f ; then \
 			rm -f $$f.asc ; \
 			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
@@ -205,13 +207,14 @@ srpm:
 rpms: srpm
 
 sign:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		if test ! -f $$f ; then \
 			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 			break ; \
 		fi ; \
 	done ; \
-	@for f in $(RPM_ARCHIVES) ; do \
+	for f in $$archives ; do \
 		if test -f $$f ; then \
 			rm -f $$f.asc ; \
 			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
@@ -222,7 +225,8 @@ sign:
 	done
 
 rebuild:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		if test ! -f $$f ; then \
 			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 			break ; \
@@ -249,13 +253,15 @@ distclean-rpms:
 	rm -f $(PACKAGE_TARNAME).gif
 	rm -f $(PACKAGE_TARNAME).xpm
 	rm -fr BUILD RPMS SOURCES SPECS SRPMS
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		echo "rm -f $$f" ; \
 		rm -f $$f ; \
 	done
 
 distclean-sign:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		echo "rm -f $$f.asc" ; \
 		rm -f $$f.asc ; \
 	done
