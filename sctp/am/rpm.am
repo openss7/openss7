@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/01/29 11:22:15 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/01/31 21:49:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/29 11:22:15 $ by $Author: brian $
+# Last Modified $Date: 2005/01/31 21:49:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -112,7 +112,6 @@ RPMSOPTS = \
 	--define "_gpg_name $(GNUPGUSER)" \
 	--define "_gpgbin $(GPG)" \
 	$(RPMOPTS)
-
 
 RPMTARGET = $(target)
 
@@ -181,7 +180,7 @@ all-rpms: \
 			$(mkinstalldirs) $(PACKAGE_RPMTOPDIR)/$$d ; \
 		fi ; \
 	done
-	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
+	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
 lis-rpms:
 	$(MAKE) $(AM_MAKEFLAGS) AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
