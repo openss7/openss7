@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:57:08 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/01/21 23:25:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/01/19 22:57:08 $ by $Author: brian $
+# Last Modified $Date: 2004/01/21 23:25:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -538,13 +538,23 @@ development of OpenSS7 applications, modules and drivers.
 %post doc
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
-    /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    # older rpm versions do not compress info files
+    if test -f %{_infodir}/%{name}.info ; then
+        /sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir
+    elif test -f %{_infodir}/%{name}.info.gz ; then
+        /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    fi
 fi
 
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
-    /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    # older rpm versions do not compress info files
+    if test -f %{_infodir}/%{name}.info ; then
+        /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir
+    elif test -f %{_infodir}/%{name}.info.gz ; then
+        /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
+    fi
 fi
 
 %postun doc
@@ -711,15 +721,24 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.1  2004/01/19 22:57:08  brian
-# - Corrected info install.
+# Revision 0.9.2.3  2004/01/21 23:25:47  brian
+# - Corrected info install for older RPM versions.
 #
-# Revision 0.9  2004/01/17 07:50:03  brian
-# - Added files for 0.9 baseline autoconf release.
+# Revision 0.9.2.2  2004/01/21 21:24:50  brian
+# - Updated and tested M2PA to Draft10.
 #
-# Revision 1.1  2004/01/17 02:15:32  brian
-# Added spec file.
-#
+* Mon Jan 19 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2004/01/19 22:57:08  brian
+- Corrected info install.
+
+* Sat Jan 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9  2004/01/17 07:50:03  brian
+- Added files for 0.9 baseline autoconf release.
+
+* Sat Jan 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1  2004/01/17 02:15:32  brian
+- Added spec file.
+
 * Sun Jan 11 2004 Brian Bidulock <bidulock@openss7.org>
 - Began this RPM build for OpenSS7.
 - Borrowed heavily from the OpenSS7 LiS build.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:18 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/19 22:59:18 $ by $Author: brian $
+ Last Modified $Date: 2004/01/21 21:24:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:18 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:18 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -87,7 +87,7 @@ static char const ident[] =
 #include "timer.h"
 
 #define M2PA_DESCRIP	"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:18 $"
+#define M2PA_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:51 $"
 #define M2PA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2PA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -116,7 +116,9 @@ MODULE_LICENSE(M2PA_LICENSE);
 STATIC struct module_info sl_minfo = {
       mi_idnum:M2PA_SL_MOD_ID,	/* Module ID number */
       mi_idname:M2PA_SL_MOD_NAME,
-				/* Module name */
+	/*
+	   Module name 
+	 */
       mi_minpsz:1,		/* Min packet size accepted */
       mi_maxpsz:INFPSZ,	/* Max packet size accepted */
       mi_hiwat:1 << 15,	/* Hi water mark */
@@ -887,6 +889,7 @@ n_exdata_req(queue_t *q, struct sl *sl, void *qos_ptr, size_t qos_len, mblk_t *d
 #define MF_CONTINUE		0x00008000
 #define MF_CLEAR_RTB		0x00010000
 #define MF_NEED_FLUSH		0x00020000
+#define MF_WAIT_SYNC		0x00040000
 
 #define MS_POWER_OFF		0
 #define MS_OUT_OF_SERVICE	1
@@ -1152,11 +1155,18 @@ sl_send_status(queue_t *q, struct sl *sl, uint32_t status)
 				qos.sid = M2PA_DATA_STREAM;
 				break;
 			case M2PA_STATUS_IN_SERVICE:
-				/*
-				   Should only really be sent on data stream when used for
-				   processor outage resynchronization. 
-				 */
-				qos.sid = M2PA_DATA_STREAM;
+				switch (sl_get_state(sl)) {
+				case MS_PROCESSOR_OUTAGE:
+					/*
+					   Should only really be sent on data stream when used for
+					   processor outage resynchronization. 
+					 */
+					qos.sid = M2PA_DATA_STREAM;
+					break;
+				default:
+					qos.sid = M2PA_STATUS_STREAM;
+					break;
+				}
 				break;
 			default:
 				qos.sid = M2PA_STATUS_STREAM;
@@ -1779,6 +1789,7 @@ sl_aerm_stop(queue_t *q, struct sl *sl)
 STATIC int
 sl_t9_timeout(struct sl *sl)
 {
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 	if (sl_get_state(sl) == MS_PROVING) {
 		int err;
 		queue_t *q = sl->iq;
@@ -1788,13 +1799,15 @@ sl_t9_timeout(struct sl *sl)
 		   bandwidth of the proving messages, adjust the t9 timer or the size of the
 		   filler. 
 		 */
-		if (sl->flags & MF_LOC_EMERG)
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
-		else
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
-		if (err)
-			return (err);
-		sl_timer_start(sl, t9);
+		if (proving) {
+			if (sl->flags & MF_LOC_EMERG)
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+			else
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+			if (err)
+				return (err);
+			sl_timer_start(sl, t9);
+		}
 		return (0);
 	}
 	ptrace(("%s: %p: Received timeout t9 in uexpected state %lu\n", M2PA_SL_MOD_NAME, sl,
@@ -2004,26 +2017,89 @@ sl_t2_timeout(struct sl *sl)
 		sl_get_state(sl)));
 	return (-EPROTO);
 }
+
+STATIC int
+sl_ready(struct sl *sl)
+{
+	int err;
+	sl->flags &= ~MF_LOC_EMERG;
+	sl->flags &= ~MF_REM_EMERG;
+	sl_suerm_start(NULL, sl);
+	sl->flags |= MF_LOC_INS;
+	if (sl->flags & MF_LPO) {
+		if ((err = sl_send_status(NULL, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
+			return (err);
+		if (sl->flags & MF_REM_INS) {
+			if ((err = sl_in_service_ind(NULL, sl)) < 0)
+				return (err);
+			sl->flags &= ~MF_SEND_MSU;
+			sl->flags &= ~MF_RECV_MSU;
+			sl_oos_stats(NULL, sl);
+			sl_set_state(sl, MS_PROCESSOR_OUTAGE);
+		} else {
+			sl_timer_start(sl, t1);
+			sl_set_state(sl, MS_ALIGNED_NOT_READY);
+		}
+	} else {
+		mblk_t *mp;
+		if ((mp = sl->tb.q_head)) {
+			if ((err = sl_send_data(NULL, sl, mp)) < 0)
+				return (err);
+			sl->tmsu++;
+			sl->fsnt++;
+			bufq_queue(&sl->rtb, bufq_dequeue(&sl->tb));
+			sl->tmsu--;
+			sl->tack++;
+			sl->sl.stats.sl_tran_msus++;
+			sl->sl.stats.sl_tran_sio_sif_octets += mp->b_wptr - mp->b_rptr - 1;
+			if (sl->rtb.q_msgs >= sl->sl.config.N1
+			    || sl->rtb.q_count >= sl->sl.config.N2
+			    || sl->tmsu + sl->tack > 0x7ffffff)
+				sl->flags |= MF_RTB_FULL;
+		} else {
+			if ((err = sl_send_status(NULL, sl, M2PA_STATUS_IN_SERVICE)) < 0)
+				return (err);
+		}
+		if (sl->flags & MF_REM_INS) {
+			if ((err = sl_in_service_ind(NULL, sl)) < 0)
+				return (err);
+			sl->flags |= MF_SEND_MSU;
+			sl->flags |= MF_RECV_MSU;
+			sl_is_stats(NULL, sl);
+			sl_set_state(sl, MS_IN_SERVICE);
+		} else {
+			sl_timer_start(sl, t1);
+			sl_set_state(sl, MS_ALIGNED_READY);
+		}
+	}
+	return (0);
+}
+
 STATIC INLINE int
 sl_lsc_status_alignment(queue_t *q, struct sl *sl)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 	switch (sl_get_state(sl)) {
 	case MS_OUT_OF_SERVICE:
 		return (QR_DONE);
 	case MS_NOT_ALIGNED:
-		if (sl->flags & MF_LOC_EMERG)
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
-		else
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
-		if (err)
-			return (err);
 		sl_timer_stop(sl, t2);
-		sl_timer_start(sl, t3);
-		sl_set_state(sl, MS_ALIGNED);
-		return (QR_DONE);
+		if (proving) {
+			if (sl->flags & MF_LOC_EMERG)
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+			else
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+			if (err)
+				return (err);
+			sl_timer_start(sl, t3);
+			sl_set_state(sl, MS_ALIGNED);
+			return (QR_DONE);
+		}
 	case MS_ALIGNED:
-		return (QR_DONE);
+		if (proving)
+			return (QR_DONE);
+		return sl_ready(sl);
 	case MS_PROVING:
 		sl_aerm_stop(q, sl);
 		sl_timer_stop(sl, t4);
@@ -2045,29 +2121,33 @@ STATIC INLINE int
 sl_lsc_emergency(queue_t *q, struct sl *sl)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 	sl->flags |= MF_LOC_EMERG;
-	switch (sl_get_state(sl)) {
-	case MS_PROVING:
-		/*
-		   For a normal Q.703 link, when we received an emergency signal in the proving
-		   state, we would stop sending normal proving messages and being sending emergency 
-		   proving messages.  The problem is if we have already primed the SCTP transmit
-		   queue with normal messages the change would be difficult.  MTP2 normally paces
-		   output of SIN so that the switch to SIE can be made at any time.  The only way
-		   that we can change mid-burst is to send proving messages in smaller chunks or on 
-		   some sort of timed basis. 
-		 */
-		if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
-			return (err);
-		sl_timer_stop(sl, t4);
-		sl_aerm_stop(q, sl);
-		sl_timer_start(sl, t4);
-		sl_aerm_start(q, sl);
-		return (0);
-	case MS_ALIGNED:
-		if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
-			return (err);
-		return (0);
+	if (proving) {
+		switch (sl_get_state(sl)) {
+		case MS_PROVING:
+			/*
+			   For a normal Q.703 link, when we received an emergency signal in the
+			   proving state, we would stop sending normal proving messages and being
+			   sending emergency proving messages.  The problem is if we have already
+			   primed the SCTP transmit queue with normal messages the change would be
+			   difficult.  MTP2 normally paces output of SIN so that the switch to SIE
+			   can be made at any time.  The only way that we can change mid-burst is
+			   to send proving messages in smaller chunks or on some sort of timed
+			   basis. 
+			 */
+			if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
+				return (err);
+			sl_timer_stop(sl, t4);
+			sl_aerm_stop(q, sl);
+			sl_timer_start(sl, t4);
+			sl_aerm_start(q, sl);
+			return (0);
+		case MS_ALIGNED:
+			if ((err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY)) < 0)
+				return (err);
+			return (0);
+		}
 	}
 	ptrace(("%s: %p: Received primitive SL_EMERGENCY_REQ in unexpected state %lu\n",
 		M2PA_SL_MOD_NAME, sl, sl_get_state(sl)));
@@ -2085,28 +2165,34 @@ STATIC INLINE int
 sl_lsc_status_proving_normal(queue_t *q, struct sl *sl)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 	switch (sl_get_state(sl)) {
 	case MS_NOT_ALIGNED:
-		if (sl->flags & MF_LOC_EMERG)
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
-		else
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
-		if (err)
-			return (err);
 		sl_timer_stop(sl, t2);
-		sl_timer_start(sl, t3);
-		sl_set_state(sl, MS_ALIGNED);
+		if (proving) {
+			if (sl->flags & MF_LOC_EMERG)
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+			else
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+			if (err)
+				return (err);
+			sl_timer_start(sl, t3);
+			sl_set_state(sl, MS_ALIGNED);
+		}
 		/*
 		   fall thru 
 		 */
 	case MS_ALIGNED:
 		sl->flags &= ~MF_REM_EMERG;
-		sl_timer_stop(sl, t3);
-		sl_aerm_start(q, sl);
-		sl_timer_start(sl, t4);
-		sl->sl.statem.Cp = 0;
-		sl_set_state(sl, MS_PROVING);
-		return (QR_DONE);
+		if (proving) {
+			sl_timer_stop(sl, t3);
+			sl_aerm_start(q, sl);
+			sl_timer_start(sl, t4);
+			sl->sl.statem.Cp = 0;
+			sl_set_state(sl, MS_PROVING);
+			return (QR_DONE);
+		}
+		return sl_ready(sl);
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIN)
@@ -2126,28 +2212,34 @@ STATIC INLINE int
 sl_lsc_status_proving_emergency(queue_t *q, struct sl *sl)
 {
 	int err;
+	int proving = !(sl->option.popt & SS7_POPT_NOPR);
 	switch (sl_get_state(sl)) {
 	case MS_NOT_ALIGNED:
 		sl_timer_stop(sl, t2);
-		if (sl->flags & MF_LOC_EMERG)
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
-		else
-			err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
-		if (err)
-			return (err);
-		sl_timer_start(sl, t3);
-		sl_set_state(sl, MS_ALIGNED);
+		if (proving) {
+			if (sl->flags & MF_LOC_EMERG)
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_EMERGENCY);
+			else
+				err = sl_send_proving(q, sl, M2PA_STATUS_PROVING_NORMAL);
+			if (err)
+				return (err);
+			sl_timer_start(sl, t3);
+			sl_set_state(sl, MS_ALIGNED);
+		}
 		/*
 		   fall thru 
 		 */
 	case MS_ALIGNED:
-		sl->flags |= MF_REM_EMERG;
-		sl_timer_stop(sl, t3);
-		sl_aerm_start(q, sl);
-		sl_timer_start(sl, t4);
-		sl->sl.statem.Cp = 0;
-		sl_set_state(sl, MS_PROVING);
-		return (QR_DONE);
+		if (proving) {
+			sl->flags |= MF_REM_EMERG;
+			sl_timer_stop(sl, t3);
+			sl_aerm_start(q, sl);
+			sl_timer_start(sl, t4);
+			sl->sl.statem.Cp = 0;
+			sl_set_state(sl, MS_PROVING);
+			return (QR_DONE);
+		}
+		return sl_ready(sl);
 	case MS_PROVING:
 		if (sl->flags & MF_REM_EMERG)
 			return (QR_DONE);
@@ -2216,56 +2308,8 @@ sl_t4_timeout(struct sl *sl)
 	int err;
 	if (sl_get_state(sl) == MS_PROVING) {
 		sl_aerm_stop(NULL, sl);
-		sl->flags &= ~MF_LOC_EMERG;
-		sl->flags &= ~MF_REM_EMERG;
-		sl_suerm_start(NULL, sl);
-		sl->flags |= MF_LOC_INS;
-		if (sl->flags & MF_LPO) {
-			if ((err = sl_send_status(NULL, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
-				return (err);
-			if (sl->flags & MF_REM_INS) {
-				if ((err = sl_in_service_ind(NULL, sl)) < 0)
-					return (err);
-				sl->flags &= ~MF_SEND_MSU;
-				sl->flags &= ~MF_RECV_MSU;
-				sl_oos_stats(NULL, sl);
-				sl_set_state(sl, MS_PROCESSOR_OUTAGE);
-			} else {
-				sl_timer_start(sl, t1);
-				sl_set_state(sl, MS_ALIGNED_NOT_READY);
-			}
-		} else {
-			mblk_t *mp;
-			if ((mp = sl->tb.q_head)) {
-				if ((err = sl_send_data(NULL, sl, mp)) < 0)
-					return (err);
-				sl->tmsu++;
-				sl->fsnt++;
-				bufq_queue(&sl->rtb, bufq_dequeue(&sl->tb));
-				sl->tmsu--;
-				sl->tack++;
-				sl->sl.stats.sl_tran_msus++;
-				sl->sl.stats.sl_tran_sio_sif_octets += mp->b_wptr - mp->b_rptr - 1;
-				if (sl->rtb.q_msgs >= sl->sl.config.N1
-				    || sl->rtb.q_count >= sl->sl.config.N2
-				    || sl->tmsu + sl->tack > 0x7ffffff)
-					sl->flags |= MF_RTB_FULL;
-			} else {
-				if ((err = sl_send_status(NULL, sl, M2PA_STATUS_IN_SERVICE)) < 0)
-					return (err);
-			}
-			if (sl->flags & MF_REM_INS) {
-				if ((err = sl_in_service_ind(NULL, sl)) < 0)
-					return (err);
-				sl->flags |= MF_SEND_MSU;
-				sl->flags |= MF_RECV_MSU;
-				sl_is_stats(NULL, sl);
-				sl_set_state(sl, MS_IN_SERVICE);
-			} else {
-				sl_timer_start(sl, t1);
-				sl_set_state(sl, MS_ALIGNED_READY);
-			}
-		}
+		if ((err = sl_ready(sl)))
+			return (err);
 		return (0);
 	}
 	ptrace(("%s: %p: Received timeout t4 in unexpected state %lu\n", M2PA_SL_MOD_NAME, sl,
@@ -2274,7 +2318,7 @@ sl_t4_timeout(struct sl *sl)
 }
 
 STATIC INLINE int
-sl_lsc_status_in_service(queue_t *q, struct sl *sl)
+sl_lsc_status_in_service(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	int err;
 	switch (sl_get_state(sl)) {
@@ -2302,6 +2346,18 @@ sl_lsc_status_in_service(queue_t *q, struct sl *sl)
 		return (QR_DONE);
 	case MS_IN_SERVICE:
 	case MS_PROCESSOR_OUTAGE:
+		if (sl->i_version >= M2PA_VERSION_DRAFT10) {
+			/*
+			   In the final, when we receive a READY in the in service or processor
+			   outage states, we use the BSN in the message to synchronize when
+			   synchronization was required. 
+			 */
+			if (sl->flags & MF_WAIT_SYNC) {
+				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr));
+				sl->flags &= ~MF_WAIT_SYNC;
+				sl->flags |= MF_SEND_MSU;
+			}
+		}
 	case MS_OUT_OF_SERVICE:
 		ptrace(("%s: %p: Received status IN_SERVICE in unusual state %lu\n",
 			M2PA_SL_MOD_NAME, sl, sl_get_state(sl)));
@@ -2446,9 +2502,72 @@ sl_rc_sn_check(queue_t *q, struct sl *sl, mblk_t *mp)
 	case M2PA_VERSION_DRAFT6:
 	case M2PA_VERSION_DRAFT6_1:
 	case M2PA_VERSION_DRAFT6_9:
+	{
+		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
+		if (mlen >= 2 * sizeof(uint32_t)) {
+			int msu;
+			uint bsnr = ntohl(*((uint32_t *) mp->b_rptr)++);
+			uint fsnr = ntohl(*((uint32_t *) mp->b_rptr)++);
+			mlen -= 2 * sizeof(uint32_t);
+			msu = (mlen > sizeof(uint32_t)) ? 0 : 1;
+			if ((uint32_t) fsnr != (uint32_t) (sl->fsnx - msu)) {
+				if (sl->bfsn) {
+					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_FIBR)
+						if ((err =
+						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_FIBR,
+								   0, NULL, 0)) < 0)
+							return (err);
+					if ((err =
+					     sl_lsc_out_of_service(q, sl,
+								   SL_FAIL_ABNORMAL_FIBR)) < 0)
+						return (err);
+					printd(("%s: %p: Link failed: Abnormal FIBR\n",
+						M2PA_SL_MOD_NAME, sl));
+					return (-EPROTO);
+				}
+				printd(("%s: %p: Received bad fsn = %u, expecting %u\n",
+					M2PA_SL_MOD_NAME, sl, fsnr, (sl->fsnx - msu)));
+				sl->bfsn++;
+				return (-EPROTO);
+			} else
+				sl->bfsn = 0;
+			if (!between32(bsnr, sl->bsnr, sl->fsnt)) {
+				if (sl->bbsn) {
+					if (sl->sl.notify.events & SL_EVT_FAIL_ABNORMAL_BSNR)
+						if ((err =
+						     lmi_event_ind(q, sl, SL_EVT_FAIL_ABNORMAL_BSNR,
+								   0, NULL, 0)) < 0)
+							return (err);
+					if ((err =
+					     sl_lsc_out_of_service(q, sl,
+								   SL_FAIL_ABNORMAL_BSNR)) < 0)
+						return (err);
+					printd(("%s: %p: Link failed: Abnormal BSNR\n",
+						M2PA_SL_MOD_NAME, sl));
+					return (-EPROTO);
+				}
+				printd(("%s: %p: Received bad bsn = %u, expecting %u\n",
+					M2PA_SL_MOD_NAME, sl, bsnr, sl->fsnt));
+				sl->bbsn++;
+			} else {
+				if ((err = sl_txc_datack(q, sl, diff32(sl->bsnr, bsnr))) < 0)
+					return (err);
+				sl->bsnr = bsnr;
+				sl->bbsn = 0;
+			}
+			break;
+		}
+		rare();
+		return (-EMSGSIZE);
+	}
 	default:
 	case M2PA_VERSION_DRAFT10:
 	{
+		/*
+		   In the final, when we are waiting for synchronization (we have sent
+		   PROCESSOR_RECOVERED but have not yet received IN_SERVICE, DATA or DATA-ACK) we
+		   do not check the sequence number, but resynchornize to the provided number. 
+		 */
 		size_t mlen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
 		if (mlen >= 2 * sizeof(uint32_t)) {
 			int msu;
@@ -2850,11 +2969,13 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 		/*
 		   just remember for later 
 		 */
+		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
 		return (0);
 	case MS_ALIGNED_READY:
 		if ((err = sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 			return (err);
+		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
 		sl_timer_stop(sl, t7);
 		sl_timer_stop(sl, t6);
@@ -2864,6 +2985,7 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 	case MS_IN_SERVICE:
 		if ((err = sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 			return (err);
+		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
 		sl_timer_stop(sl, t7);
 		sl_timer_stop(sl, t6);
@@ -2890,6 +3012,7 @@ sl_lsc_local_processor_outage(queue_t *q, struct sl *sl)
 		if (!(sl->flags & MF_LPO))
 			if ((err = sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE)) < 0)
 				return (err);
+		sl->flags &= ~MF_WAIT_SYNC;
 		sl->flags |= MF_LPO;
 		sl_timer_stop(sl, t7);	/* ??? */
 		sl_timer_stop(sl, t6);	/* ??? */
@@ -3034,7 +3157,8 @@ sl_lsc_no_processor_outage(queue_t *q, struct sl *sl)
 			sl->flags &= ~MF_LPO;
 			sl->flags |= MF_NEED_FLUSH;
 			sl->flags |= MF_RECV_MSU;
-			sl->flags |= MF_SEND_MSU;
+			if (!(sl->flags & MF_WAIT_SYNC))
+				sl->flags |= MF_SEND_MSU;
 			if (sl->rtb.q_count) {
 				if (sl->flags & MF_REM_BUSY)
 					sl_timer_start(sl, t6);
@@ -3079,12 +3203,22 @@ sl_lsc_continue(queue_t *q, struct sl *sl, mblk_t *mp)
 #endif
 
 STATIC INLINE int
-sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl)
+sl_lsc_status_processor_outage_ended(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	int err;
 	switch (sl_get_state(sl)) {
 	case MS_PROCESSOR_OUTAGE:
 		if (sl->flags & MF_RPO) {
+			if (sl->i_version >= M2PA_VERSION_DRAFT10) {
+				/*
+				   In the final, when we receive PROCESSOR_RECOVERED, we need to
+				   send READY, and also use the BSN from the received message to
+				   synchronize FSN. 
+				 */
+				sl->fsnt = ntohl(*((uint32_t *) mp->b_rptr));
+				if ((err = sl_send_status(q, sl, M2PA_STATUS_IN_SERVICE)))
+					return (err);
+			}
 			if (sl->sl.notify.events & SL_EVT_RPO_END)
 				if ((err = lmi_event_ind(q, sl, SL_EVT_RPO_END, 0, NULL, 0)) < 0)
 					return (err);
@@ -3166,6 +3300,8 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 				if ((err =
 				     sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
 					return (err);
+				if (sl->i_version >= M2PA_VERSION_DRAFT10)
+					sl->flags |= MF_WAIT_SYNC;
 				sl->flags &= ~MF_LPO;
 			}
 			if (!(sl->flags & MF_RPO))
@@ -3189,6 +3325,8 @@ sl_lsc_resume(queue_t *q, struct sl *sl)
 				if ((err =
 				     sl_send_status(q, sl, M2PA_STATUS_PROCESSOR_OUTAGE_ENDED)) < 0)
 					return (err);
+				if (sl->i_version >= M2PA_VERSION_DRAFT10)
+					sl->flags |= MF_WAIT_SYNC;
 				sl->flags &= ~MF_LPO;
 			}
 			sl->flags |= MF_RECV_MSU;
@@ -3670,9 +3808,9 @@ sl_recv_status(queue_t *q, struct sl *sl, mblk_t *mp)
 		case M2PA_STATUS_BUSY_ENDED:
 			return sl_lsc_status_busy_ended(q, sl);
 		case M2PA_STATUS_IN_SERVICE:
-			return sl_lsc_status_in_service(q, sl);
+			return sl_lsc_status_in_service(q, sl, mp);
 		case M2PA_STATUS_PROCESSOR_OUTAGE_ENDED:
-			return sl_lsc_status_processor_outage_ended(q, sl);
+			return sl_lsc_status_processor_outage_ended(q, sl, mp);
 		case M2PA_STATUS_OUT_OF_SERVICE:
 			return sl_lsc_status_out_of_service(q, sl);
 		case M2PA_STATUS_PROCESSOR_OUTAGE:

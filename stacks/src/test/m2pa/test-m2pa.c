@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:53:23 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:53 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/19 22:53:23 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/01/21 21:24:53 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:53:23 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:53 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:53:23 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/01/21 21:24:53 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -131,9 +131,10 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 // #define M2PA_VERSION_DRAFT5
 // #define M2PA_VERSION_DRAFT5_1
 // #define M2PA_VERSION_DRAFT6
-#define M2PA_VERSION_DRAFT6_1
+// #define M2PA_VERSION_DRAFT6_1
 // #define M2PA_VERSION_DRAFT6_9
 // #define M2PA_VERSION_DRAFT7
+#define M2PA_VERSION_DRAFT10
 
 typedef struct addr {
 	uint16_t port __attribute__ ((packed));
@@ -575,6 +576,7 @@ stop_tt(void)
 #define BUSY			8
 #define BUSY_ENDED		9
 #define INVALID_STATUS		10
+#define SEQUENCE_SYNC		11
 
 #define DATA			20	/* Protocol Tester (PT) signals and events */
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
@@ -628,6 +630,7 @@ stop_tt(void)
 #define CONG_D			210
 #define NO_CONG			211
 #define CLEARB			212
+#define SYNC			213
 
 #define CONN_REQ		300	/* MGMT controls */
 #define CONN_IND		301
@@ -748,9 +751,19 @@ union primitives {
  *  -------------------------------------------------------------------------
  */
 static void
+pt_printf_sn(char *l, char *r)
+{
+#if defined(M2PA_VERSION_DRAFT10)
+	printf("%23.23s  ---[%04x, %04x]-->  %-23.23s\n", l, pt_fsn, pt_bsn, r);
+#else
+	printf("%23.23s  ----------------->  %-23.23s\n", l, r);
+	FFLUSH(stdout);
+#endif
+}
+static void
 pt_printf(char *l, char *r)
 {
-#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT10)
 	if (pt_fsn || pt_bsn)
 		printf("%23.23s  ---[%04x, %04x]-->  %-23.23s\n", l, pt_fsn, pt_bsn, r);
 	else
@@ -784,50 +797,81 @@ send(int msg)
 		if (!cntmsg)
 			pt_printf("ALIGNMENT", "");
 		status = M2PA_STATUS_ALIGNMENT;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	case PROVING_NORMAL:
 		if (!cntmsg)
 			pt_printf("PROVING-NORMAL", "");
 		status = M2PA_STATUS_PROVING_NORMAL;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	case PROVING_EMERG:
 		if (!cntmsg)
 			pt_printf("PROVING-EMERGENCY", "");
 		status = M2PA_STATUS_PROVING_EMERGENCY;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	case OUT_OF_SERVICE:
 		if (!cntmsg)
 			pt_printf("OUT-OF-SERVICE", "");
 		status = M2PA_STATUS_OUT_OF_SERVICE;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	case IN_SERVICE:
 		if (!cntmsg)
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			pt_printf("IN-SERVICE", "");
 #else
-			pt_printf("READY", "");
+			pt_printf_sn("READY", "");
 #endif
 		status = M2PA_STATUS_IN_SERVICE;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
+	case SEQUENCE_SYNC:
+#if defined M2PA_VERSION_DRAFT10
+		if (!cntmsg)
+			pt_printf_sn("READY", "");
+		status = M2PA_STATUS_IN_SERVICE;
+		ptconf.qos_data.sid = 1;
+		goto pt_status_putmsg;
+#else
+		return SUCCESS;
+#endif
 	case PROCESSOR_OUTAGE:
 		if (!cntmsg)
 			pt_printf("PROCESSOR-OUTAGE", "");
 		status = M2PA_STATUS_PROCESSOR_OUTAGE;
+#if defined M2PA_VERSION_DRAFT10
+		ptconf.qos_data.sid = 1;
+#else
+		ptconf.qos_data.sid = 0;
+#endif
 		goto pt_status_putmsg;
 	case PROCESSOR_ENDED:
 		if (!cntmsg)
+#if defined M2PA_VERSION_DRAFT10
+			pt_printf_sn("PROCESSOR-RECOVERED", "");
+#else
 			pt_printf("PROCESSOR-OUTAGE-ENDED", "");
+#endif
 		status = M2PA_STATUS_PROCESSOR_OUTAGE_ENDED;
+#if defined M2PA_VERSION_DRAFT10
+		ptconf.qos_data.sid = 1;
+#else
+		ptconf.qos_data.sid = 0;
+#endif
 		goto pt_status_putmsg;
 	case BUSY_ENDED:
 		if (!cntmsg)
 			pt_printf("BUSY-ENDED", "");
 		status = M2PA_STATUS_BUSY_ENDED;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	case BUSY:
 		if (!cntmsg)
 			pt_printf("BUSY", "");
 		status = M2PA_STATUS_BUSY;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	case COUNT:
 		printf("           Ct = %5d    ----------------->                         \n", count);
@@ -846,6 +890,7 @@ send(int msg)
 		if (!cntmsg)
 			pt_printf("[INVALID-STATUS]", "");
 		status = M2PA_STATUS_INVALID;
+		ptconf.qos_data.sid = 0;
 		goto pt_status_putmsg;
 	      pt_status_putmsg:
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
@@ -882,7 +927,7 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)
 		data.len = 5 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -926,6 +971,7 @@ send(int msg)
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
 	      send_data:
+		ptconf.qos_data.sid = 1;
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 		if (!cntmsg) {
 			printf("   [%3d bytes]     DATA  ----------------->                         \n", msu_len);
@@ -975,7 +1021,7 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)
 		pt_fsn++;
 		if (!cntmsg) {
 			printf("   [%3d bytes]     DATA  ---[%04x, %04x]-->                         \n", msu_len, pt_fsn, pt_bsn);
@@ -1012,6 +1058,7 @@ send(int msg)
 	case ACK:
 #if defined(M2PA_VERSION_DRAFT3_1)
 		pt_printf("ACK", "");
+		ptconf.qos_data.sid = 1;
 		data.len = 3 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_ACK_MESSAGE;
@@ -1029,6 +1076,7 @@ send(int msg)
 #elif defined(M2PA_VERSION_DRAFT4_1)
 	      pt_ack_putmsg:
 		pt_printf("IN-SERVICE", "");
+		ptconf.qos_data.sid = 0;
 		data.len = 4 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -1048,6 +1096,7 @@ send(int msg)
 #elif defined(M2PA_VERSION_DRAFT4_9)
 	      pt_ack_putmsg:
 		pt_printf("IN-SERVICE", "");
+		ptconf.qos_data.sid = 0;
 		data.len = 5 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -1067,6 +1116,7 @@ send(int msg)
 #elif defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
 	      pt_ack_putmsg:
 		pt_printf("IN-SERVICE", "");
+		ptconf.qos_data.sid = 0;
 		data.len = 5 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.exdata_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_STATUS_MESSAGE;
@@ -1083,10 +1133,11 @@ send(int msg)
 			return FAILURE;
 		}
 		return SUCCESS;
-#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 	      pt_ack_putmsg:
 		printf("               DATA-ACK  ---[%04x, %04x]-->                         \n", pt_fsn, pt_bsn);
 		FFLUSH(stdout);
+		ptconf.qos_data.sid = 1;
 		data.len = 4 * sizeof(uint32_t);
 		ctrl.len = sizeof(p->npi.data_req) + sizeof(ptconf.qos_data);
 		((uint32_t *) pt_buf)[0] = M2PA_DATA_MESSAGE;
@@ -1158,7 +1209,6 @@ send(int msg)
 		goto pt_control_putmsg;
 	case TX_MAKE:
 		return SUCCESS;
-
 	case ENABLE_REQ:
 		if (verbose > 1) {
 			printf("                :enable                                             \n");
@@ -1552,9 +1602,19 @@ static int show_fisus = 1;
  *  -------------------------------------------------------------------------
  */
 static void
+iut_printf_sn(char *l, char *r)
+{
+#if defined(M2PA_VERSION_DRAFT10)
+	printf("%23.23s  <--[%04x, %04x]---  %-23.23s\n", l, iut_bsn, iut_fsn, r);
+#else
+	printf("%23.23s  <-----------------  %-23.23s\n", l, r);
+#endif
+	FFLUSH(stdout);
+}
+static void
 iut_printf(char *l, char *r)
 {
-#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)
+#if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT10)
 	if (iut_fsn || iut_bsn)
 		printf("%23.23s  <--[%04x, %04x]---  %-23.23s\n", l, iut_bsn, iut_fsn, r);
 	else
@@ -1578,7 +1638,7 @@ pt_decode_data(void)
 		uint mystatus = ((uint32_t *) pt_buf)[2];
 #elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 		uint mystatus = ((uint32_t *) pt_buf)[3];
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)
 		uint mystatus = ((uint32_t *) pt_buf)[4];
 #else
 #error "Draft poorly defined."
@@ -1642,7 +1702,7 @@ pt_decode_data(void)
 		break;
 #endif
 	case M2PA_DATA_MESSAGE:
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 		if (ntohl(((uint32_t *) pt_buf)[1]) == 4 * sizeof(uint32_t)) {
 			ret = ACK;
 			break;
@@ -1674,7 +1734,8 @@ pt_decode_data(void)
 	if (show_fisus || ret != FISU || verbose > 1) {
 		if (ret != oldret || oldisb != (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn))) {
 			// if ( oldisb == (((iut_bib|iut_bsn)<<8)|(iut_fib|iut_fsn)) &&
-			// ( ( ret == FISU && oldret == DATA ) || ( ret == DATA && oldret == FISU ) ) )
+			// ( ( ret == FISU && oldret == DATA ) || ( ret == DATA && oldret == FISU ) 
+			// ) )
 			// {
 			// if ( ret == DATA && !expand )
 			// cntmsg++;
@@ -1707,7 +1768,7 @@ pt_decode_data(void)
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			iut_printf("", "IN-SERVICE");
 #else
-			iut_printf("", "READY");
+			iut_printf_sn("", "READY");
 #endif
 			return ret;
 		case ALIGNMENT:
@@ -1733,7 +1794,7 @@ pt_decode_data(void)
 			printf("                         <-----------------  [INVALID STATUS %5u] \n", ntohl(((uint32_t *) pt_buf)[2]));
 #elif defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)
 			printf("                         <--[%04x, %04x]---  [INVALID STATUS %5u] \n", iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[3]));
-#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)
+#elif defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)||defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT10)
 			printf("                         <--[%04x, %04x]---  [INVALID STATUS %5u] \n", iut_bsn, iut_fsn, ntohl(((uint32_t *) pt_buf)[4]));
 #else
 #error "Poorly defined version."
@@ -1741,21 +1802,25 @@ pt_decode_data(void)
 			FFLUSH(stdout);
 			return ret;
 		case PROCESSOR_ENDED:
+#if defined(M2PA_VERSION_DRAFT10)
+			iut_printf_sn("", "PROCESSOR-RECOVERED");
+#else
 			iut_printf("", "PROCESSOR-OUTAGE-ENDED");
+#endif
 			return ret;
 		case BUSY_ENDED:
 			iut_printf("", "BUSY-ENDED");
 			return ret;
 #if defined(M2PA_VERSION_DRAFT4)||defined(M2PA_VERSION_DRAFT4_1)||defined(M2PA_VERSION_DRAFT4_9)||defined(M2PA_VERSION_DRAFT5)||defined(M2PA_VERSION_DRAFT5_1)
 		case ACK:
-			iut_printf("", "IN-SERVICE");
+			iut_printf_sn("", "IN-SERVICE");
 			return ret;
 #elif defined(M2PA_VERSION_DRAFT3_1)
 		case ACK:
 			printf("                         <-----------------  ACK [%5u msgs]       \n", ntohl(((uint32_t *) pt_buf)[2]));
 			FFLUSH(stdout);
 			return ret;
-#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)
+#elif defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT7)||defined(M2PA_VERSION_DRAFT10)
 		case ACK:
 			printf("                         <--[%04x, %04x]---  DATA-ACK               \n", iut_bsn, iut_fsn);
 			FFLUSH(stdout);
@@ -2731,10 +2796,11 @@ test_case_1_4(void)
 
 #define desc_case_1_5a "\
 Link State Control - Expected signal units/orders\n\
-Normal alignment procedure\
+Normal alignment procedure\n\
+Forward direction\
 "
 static int
-test_case_1_5a(void)
+test_case_1_5a(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -2765,9 +2831,13 @@ test_case_1_5a(void)
 		case 2:
 			switch ((event = get_event())) {
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				expand = 1;
+				return FAILURE;
 			case IN_SERVICE:
 				expand = 1;
 				send(IN_SERVICE);
@@ -2797,10 +2867,11 @@ test_case_1_5a(void)
 
 #define desc_case_1_5b "\
 Link State Control - Expected signal units/orders\n\
-Normal alignment procedure\
+Normal alignment procedure\n\
+Reverse direction\
 "
 static int
-test_case_1_5b(void)
+test_case_1_5b(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -2831,9 +2902,13 @@ test_case_1_5b(void)
 		case 2:
 			switch ((event = get_event())) {
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				expand = 1;
+				return FAILURE;
 			case IN_SERVICE:
 				expand = 1;
 				send(IN_SERVICE);
@@ -2861,12 +2936,60 @@ test_case_1_5b(void)
 	}
 }
 
+#define desc_case_1_5a_p "\
+Link State Control = Expected signal units/orders\n\
+Normal alignment procedure\n\
+Forward direction\n\
+With proving\
+"
+static int
+test_case_1_5a_p(void)
+{
+	return test_case_1_5a(1);
+}
+
+#define desc_case_1_5b_p "\
+Link State Control = Expected signal units/orders\n\
+Normal alignment procedure\n\
+Reverse direction\n\
+With proving\
+"
+static int
+test_case_1_5b_p(void)
+{
+	return test_case_1_5b(1);
+}
+
+#define desc_case_1_5a_np "\
+Link State Control = Expected signal units/orders\n\
+Normal alignment procedure\n\
+Forward direction\n\
+Without proving\
+"
+static int
+test_case_1_5a_np(void)
+{
+	return test_case_1_5a(0);
+}
+
+#define desc_case_1_5b_np "\
+Link State Control = Expected signal units/orders\n\
+Normal alignment procedure\n\
+Reverse direction\n\
+With outproving\
+"
+static int
+test_case_1_5b_np(void)
+{
+	return test_case_1_5b(0);
+}
+
 #define desc_case_1_6 "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment procedure - correct procedure (MSU)\
 "
 static int
-test_case_1_6(void)
+test_case_1_6(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -2888,7 +3011,10 @@ test_case_1_6(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -2909,12 +3035,18 @@ test_case_1_6(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				break;
+				if (proving) {
+					send(PROVING);
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					break;
+				}
+				return FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -2943,6 +3075,28 @@ test_case_1_6(void)
 			return SCRIPTERROR;
 		}
 	}
+}
+
+#define desc_case_1_6_p "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment procedure = correct procedure (MSU)\n\
+With proving\
+"
+static int
+test_case_1_6_p(void)
+{
+	return test_case_1_6(1);
+}
+
+#define desc_case_1_6_np "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment procedure = correct procedure (MSU)\n\
+Without proving\
+"
+static int
+test_case_1_6_np(void)
+{
+	return test_case_1_6(0);
 }
 
 #define desc_case_1_7 "\
@@ -3044,10 +3198,11 @@ test_case_1_7(void)
 
 #define desc_case_1_8a "\
 Link State Control - Expected signal units/orders\n\
-Normal alignment with PO set (FISU)\
+Normal alignment with PO set (FISU)\n\
+Forward direction\
 "
 static int
-test_case_1_8a(void)
+test_case_1_8a(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3070,7 +3225,10 @@ test_case_1_8a(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3094,14 +3252,20 @@ test_case_1_8a(void)
 				break;
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -3133,10 +3297,11 @@ test_case_1_8a(void)
 
 #define desc_case_1_8b "\
 Link State Control - Expected signal units/orders\n\
-Normal alignment with PO set (FISU)\
+Normal alignment with PO set (FISU)\n\
+Reverse direction\
 "
 static int
-test_case_1_8b(void)
+test_case_1_8b(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3159,7 +3324,10 @@ test_case_1_8b(void)
 			case ALIGNMENT:
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3180,14 +3348,20 @@ test_case_1_8b(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -3216,12 +3390,61 @@ test_case_1_8b(void)
 	}
 }
 
-#define desc_case_1_9a "\
+#define desc_case_1_8a_p "\
 Link State Control - Expected signal units/orders\n\
-Normal alignment with PO set (MSU)\
+Normal alignment with PO set (FISU)\n\
+Forward direction\n\
+With proving\
 "
 static int
-test_case_1_9a(void)
+test_case_1_8a_p(void)
+{
+	return test_case_1_8a(1);
+}
+
+#define desc_case_1_8b_p "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (FISU)\n\
+Reverse direction\n\
+With proving\
+"
+static int
+test_case_1_8b_p(void)
+{
+	return test_case_1_8b(1);
+}
+
+#define desc_case_1_8a_np "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (FISU)\n\
+Forward direction\n\
+Without proving\
+"
+static int
+test_case_1_8a_np(void)
+{
+	return test_case_1_8a(0);
+}
+
+#define desc_case_1_8b_np "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (FISU)\n\
+Reverse direction\n\
+Without proving\
+"
+static int
+test_case_1_8b_np(void)
+{
+	return test_case_1_8b(0);
+}
+
+#define desc_case_1_9a "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (MSU)\n\
+Forward direction\
+"
+static int
+test_case_1_9a(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3243,7 +3466,10 @@ test_case_1_9a(void)
 			case ALIGNMENT:
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3264,14 +3490,20 @@ test_case_1_9a(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -3303,10 +3535,11 @@ test_case_1_9a(void)
 
 #define desc_case_1_9b "\
 Link State Control - Expected signal units/orders\n\
-Normal alignment with PO set (MSU)\
+Normal alignment with PO set (MSU)\n\
+Reverse direction\
 "
 static int
-test_case_1_9b(void)
+test_case_1_9b(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3329,7 +3562,10 @@ test_case_1_9b(void)
 			case ALIGNMENT:
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 10);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3353,9 +3589,12 @@ test_case_1_9b(void)
 				expand = 1;
 				break;
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 			case TIMEOUT:
 			case IN_SERVICE:
 			case DATA:
@@ -3388,12 +3627,60 @@ test_case_1_9b(void)
 	}
 }
 
+#define desc_case_1_9a_p "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (MSU)\n\
+Forward direction\n\
+With proving\
+"
+static int
+test_case_1_9a_p(void)
+{
+	return test_case_1_9a(1);
+}
+
+#define desc_case_1_9b_p "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (MSU)\n\
+Reverse direction\n\
+With proving\
+"
+static int
+test_case_1_9b_p(void)
+{
+	return test_case_1_9b(1);
+}
+
+#define desc_case_1_9a_np "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (MSU)\n\
+Forward direction\n\
+Without proving\
+"
+static int
+test_case_1_9a_np(void)
+{
+	return test_case_1_9a(0);
+}
+
+#define desc_case_1_9b_np "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set (MSU)\n\
+Reverse direction\n\
+Without proving\
+"
+static int
+test_case_1_9b_np(void)
+{
+	return test_case_1_9b(0);
+}
+
 #define desc_case_1_10 "\
 Link State Control - Expected signal units/orders\n\
 Normal alignment with PO set and cleared\
 "
 static int
-test_case_1_10(void)
+test_case_1_10(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3417,7 +3704,10 @@ test_case_1_10(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3437,14 +3727,20 @@ test_case_1_10(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -3473,12 +3769,34 @@ test_case_1_10(void)
 	}
 }
 
+#define desc_case_1_10_p "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set and cleared\n\
+With proving\
+"
+static int
+test_case_1_10_p(void)
+{
+	return test_case_1_10(1);
+}
+
+#define desc_case_1_10_np "\
+Link State Control - Expected signal units/orders\n\
+Normal alignment with PO set and cleared\n\
+Without proving\
+"
+static int
+test_case_1_10_np(void)
+{
+	return test_case_1_10(0);
+}
+
 #define desc_case_1_11 "\
 Link State Control - Expected signal units/orders\n\
 Set RPO when \"Aligned not ready\"\
 "
 static int
-test_case_1_11(void)
+test_case_1_11(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3502,7 +3820,10 @@ test_case_1_11(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3522,9 +3843,12 @@ test_case_1_11(void)
 		case 3:
 			switch ((event = get_event())) {
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 			case PROCESSOR_OUTAGE:
 				expand = 1;
 				send(PROCESSOR_OUTAGE);
@@ -3552,12 +3876,35 @@ test_case_1_11(void)
 	}
 }
 
-#define desc_case_1_12a "\
+#define desc_case_1_11_p "\
 Link State Control - Expected signal units/orders\n\
-SIOS received when \"Aligned not ready\"\
+Set RPO when \"Aligned not ready\"\n\
+With proving\
 "
 static int
-test_case_1_12a(void)
+test_case_1_11_p(void)
+{
+	return test_case_1_11(1);
+}
+
+#define desc_case_1_11_np "\
+Link State Control - Expected signal units/orders\n\
+Set RPO when \"Aligned not ready\"\n\
+Without proving\
+"
+static int
+test_case_1_11_np(void)
+{
+	return test_case_1_11(0);
+}
+
+#define desc_case_1_12a "\
+Link State Control - Expected signal units/orders\n\
+SIOS received when \"Aligned not ready\"\n\
+Forward direction\
+"
+static int
+test_case_1_12a(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3580,7 +3927,10 @@ test_case_1_12a(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3601,14 +3951,20 @@ test_case_1_12a(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -3640,12 +3996,37 @@ test_case_1_12a(void)
 	}
 }
 
-#define desc_case_1_12b "\
+#define desc_case_1_12a_p "\
 Link State Control - Expected signal units/orders\n\
-SIOS received when \"Aligned not ready\"\
+SIOS received when \"Aligned not ready\"\n\
+Forward direction\n\
+With proving\
 "
 static int
-test_case_1_12b(void)
+test_case_1_12a_p(void)
+{
+	return test_case_1_12a(1);
+}
+
+#define desc_case_1_12a_np "\
+Link State Control - Expected signal units/orders\n\
+SIOS received when \"Aligned not ready\"\n\
+Forward direction\n\
+Without proving\
+"
+static int
+test_case_1_12a_np(void)
+{
+	return test_case_1_12a(0);
+}
+
+#define desc_case_1_12b "\
+Link State Control - Expected signal units/orders\n\
+SIOS received when \"Aligned not ready\"\n\
+Reverse direction\
+"
+static int
+test_case_1_12b(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3669,7 +4050,10 @@ test_case_1_12b(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3690,14 +4074,20 @@ test_case_1_12b(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -3730,12 +4120,36 @@ test_case_1_12b(void)
 	}
 }
 
+#define desc_case_1_12b_p "\
+Link State Control - Expected signal units/orders\n\
+SIOS received when \"Aligned not ready\"\n\
+Reverse direction\n\
+With proving\
+"
+static int
+test_case_1_12b_p(void)
+{
+	return test_case_1_12b(1);
+}
+
+#define desc_case_1_12b_np "\
+Link State Control - Expected signal units/orders\n\
+SIOS received when \"Aligned not ready\"\n\
+Reverse direction\n\
+Without proving\
+"
+static int
+test_case_1_12b_np(void)
+{
+	return test_case_1_12b(0);
+}
+
 #define desc_case_1_13 "\
 Link State Control - Expected signal units/orders\n\
 SIO received when \"Aligned not ready\"\
 "
 static int
-test_case_1_13(void)
+test_case_1_13(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3758,7 +4172,10 @@ test_case_1_13(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3779,14 +4196,20 @@ test_case_1_13(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -3819,6 +4242,28 @@ test_case_1_13(void)
 			return SCRIPTERROR;
 		}
 	}
+}
+
+#define desc_case_1_13_p "\
+Link State Control - Expected signal units/orders\n\
+SIO received when \"Aligned not ready\"\n\
+With proving\
+"
+static int
+test_case_1_13_p(void)
+{
+	return test_case_1_13(1);
+}
+
+#define desc_case_1_13_np "\
+Link State Control - Expected signal units/orders\n\
+SIO received when \"Aligned not ready\"\n\
+Without proving\
+"
+static int
+test_case_1_13_np(void)
+{
+	return test_case_1_13(0);
 }
 
 #define desc_case_1_14 "\
@@ -3929,7 +4374,7 @@ Link State Control - Expected signal units/orders\n\
 Set and clear LPO when \"Aligned ready\"\
 "
 static int
-test_case_1_15(void)
+test_case_1_15(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -3951,7 +4396,10 @@ test_case_1_15(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -3972,14 +4420,20 @@ test_case_1_15(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case IN_SERVICE:
 				expand = 1;
@@ -4023,6 +4477,7 @@ test_case_1_15(void)
 		case 6:
 			switch ((event = get_event())) {
 			case PROCESSOR_ENDED:
+				send(SEQUENCE_SYNC);
 				return SUCCESS;
 			default:
 				return FAILURE;
@@ -4034,12 +4489,34 @@ test_case_1_15(void)
 	}
 }
 
+#define desc_case_1_15_p "\
+Link State Control - Expected signal units/orders\n\
+Set and clear LPO when \"Aligned ready\"\n\
+With proving\
+"
+static int
+test_case_1_15_p(void)
+{
+	return test_case_1_15(1);
+}
+
+#define desc_case_1_15_np "\
+Link State Control - Expected signal units/orders\n\
+Set and clear LPO when \"Aligned ready\"\n\
+Without proving\
+"
+static int
+test_case_1_15_np(void)
+{
+	return test_case_1_15(0);
+}
+
 #define desc_case_1_16 "\
 Link State Control - Expected signal units/orders\n\
 Timer T1 in \"Aligned not ready\" state\
 "
 static int
-test_case_1_16(void)
+test_case_1_16(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -4062,7 +4539,10 @@ test_case_1_16(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -4083,14 +4563,20 @@ test_case_1_16(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -4119,6 +4605,28 @@ test_case_1_16(void)
 			return SCRIPTERROR;
 		}
 	}
+}
+
+#define desc_case_1_16_p "\
+Link State Control - Expected signal units/orders\n\
+Timer T1 in \"Aligned not ready\" state\n\
+With proving\
+"
+static int
+test_case_1_16_p(void)
+{
+	return test_case_1_16(1);
+}
+
+#define desc_case_1_16_np "\
+Link State Control - Expected signal units/orders\n\
+Timer T1 in \"Aligned not ready\" state\n\
+Without proving\
+"
+static int
+test_case_1_16_np(void)
+{
+	return test_case_1_16(0);
 }
 
 #define desc_case_1_17 "\
@@ -4878,7 +5386,7 @@ Link State Control - Expected signal units/orders\n\
 Deactivation during aligned not ready\
 "
 static int
-test_case_1_27(void)
+test_case_1_27(int proving)
 {
 	for (;;) {
 		switch (state) {
@@ -4901,7 +5409,10 @@ test_case_1_27(void)
 				send(START);
 				send(ALIGNMENT);
 				start_tt(iutconf.sl.t4n * 20);
-				state = 2;
+				if (proving)
+					state = 2;
+				else
+					state = 3;
 				break;
 			default:
 				return FAILURE;
@@ -4922,14 +5433,20 @@ test_case_1_27(void)
 			switch ((event = get_event())) {
 #if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
 			case PROVING:
-				send(PROVING);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #else
 			case PROVING_NORMAL:
-				send(PROVING_NORMAL);
-				expand = 0;
-				break;
+				if (proving) {
+					send(PROVING_NORMAL);
+					expand = 0;
+					break;
+				}
+				return FAILURE;
 #endif
 			case PROCESSOR_OUTAGE:
 				expand = 1;
@@ -4953,6 +5470,28 @@ test_case_1_27(void)
 			return SCRIPTERROR;
 		}
 	}
+}
+
+#define desc_case_1_27_p "\
+Link State Control - Expected signal units/orders\n\
+Deactivation during aligned not ready\n\
+With proving\
+"
+static int
+test_case_1_27_p(void)
+{
+	return test_case_1_27(1);
+}
+
+#define desc_case_1_27_np "\
+Link State Control - Expected signal units/orders\n\
+Deactivation during aligned not ready\n\
+Without proving\
+"
+static int
+test_case_1_27_np(void)
+{
+	return test_case_1_27(0);
 }
 
 #define desc_case_1_28 "\
@@ -4986,7 +5525,8 @@ test_case_1_28(void)
 
 #define desc_case_1_29a "\
 Link State Control - Expected signal units/orders\n\
-SIO received during link in service\
+SIO received during link in service\n\
+Forward direction\
 "
 static int
 test_case_1_29a(void)
@@ -5016,7 +5556,8 @@ test_case_1_29a(void)
 
 #define desc_case_1_29b "\
 Link State Control - Expected signal units/orders\n\
-SIO received during link in service\
+SIO received during link in service\n\
+Reverse direction\
 "
 static int
 test_case_1_29b(void)
@@ -5044,7 +5585,8 @@ test_case_1_29b(void)
 
 #define desc_case_1_30a "\
 Link State Control - Expected signal units/orders\n\
-Deactivation during LPO\
+Deactivation during LPO\n\
+Forward direction\
 "
 static int
 test_case_1_30a(void)
@@ -5085,7 +5627,8 @@ test_case_1_30a(void)
 
 #define desc_case_1_30b "\
 Link State Control - Expected signal units/orders\n\
-Deactivation during LPO\
+Deactivation during LPO\n\
+Reverse direction\
 "
 static int
 test_case_1_30b(void)
@@ -5128,7 +5671,8 @@ test_case_1_30b(void)
 
 #define desc_case_1_31a "\
 Link State Control - Expected signal units/orders\n\
-Deactivation during RPO\
+Deactivation during RPO\n\
+Forward direction\
 "
 static int
 test_case_1_31a(void)
@@ -5158,7 +5702,8 @@ test_case_1_31a(void)
 
 #define desc_case_1_31b "\
 Link State Control - Expected signal units/orders\n\
-Deactivation during RPO\
+Deactivation during RPO\n\
+Reverse direction\
 "
 static int
 test_case_1_31b(void)
@@ -5191,7 +5736,8 @@ test_case_1_31b(void)
 
 #define desc_case_1_32a "\
 Link State Control - Expected signal units/orders\n\
-Deactivation during the proving period\
+Deactivation during the proving period\n\
+Forward direction\
 "
 static int
 test_case_1_32a(void)
@@ -5269,7 +5815,6 @@ test_case_1_32a(void)
 				expand = 0;
 				send(OUT_OF_SERVICE);
 				break;
-
 			case OUT_OF_SERVICE:
 				expand = 1;
 				break;
@@ -5289,7 +5834,8 @@ test_case_1_32a(void)
 
 #define desc_case_1_32b "\
 Link State Control - Expected signal units/orders\n\
-Deactivation during the proving period\
+Deactivation during the proving period\n\
+Reverse direction\
 "
 static int
 test_case_1_32b(void)
@@ -5654,7 +6200,7 @@ test_case_2_1(void)
 				send(PROCESSOR_ENDED);
 				send(IN_SERVICE);
 				send(BUSY_ENDED);
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				send(ACK);
 #endif
 				send(DATA);
@@ -5758,7 +6304,7 @@ test_case_2_2(void)
 				send(BUSY);
 				send(INVALID_STATUS);
 				send(IN_SERVICE);
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				send(ACK);
 #endif
 				send(DATA);
@@ -5867,7 +6413,7 @@ test_case_2_3(void)
 				send(IN_SERVICE);
 				send(PROCESSOR_ENDED);
 				send(BUSY_ENDED);
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				send(ACK);
 #endif
 				send(DATA);
@@ -5963,7 +6509,7 @@ test_case_2_4(void)
 				send(BUSY);
 				send(INVALID_STATUS);
 				send(IN_SERVICE);
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				send(ACK);
 #endif
 				send(DATA);
@@ -6771,12 +7317,13 @@ test_case_3_8(void)
 	}
 }
 
-#define desc_case_4_1 "\
+#define desc_case_4_1a "\
 Processor Outage Control\n\
-Set and clear LPO while link in service\
+Set and clear LPO while link in service\n\
+Forward direction\
 "
 static int
-test_case_4_1(void)
+test_case_4_1a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6797,7 +7344,7 @@ test_case_4_1(void)
 					state = 2;
 					break;
 				}
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				pt_bsn = iut_fsn;
 #endif
 				send(ACK);
@@ -6841,7 +7388,7 @@ test_case_4_1(void)
 			case IUT_RPR:
 				break;
 			case DATA:
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				pt_bsn = iut_fsn;
 #endif
 				send(ACK);
@@ -6854,6 +7401,106 @@ test_case_4_1(void)
 		case 5:
 			switch ((event = get_event())) {
 			case PROCESSOR_ENDED:
+				send(SEQUENCE_SYNC);
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+
+#define desc_case_4_1b "\
+Processor Outage Control\n\
+Set and clear LPO while link in service\n\
+Reverse direction\
+"
+static int
+test_case_4_1b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case IUT_IN_SERVICE:
+				break;
+			case DATA:
+				if (++count == 2) {
+					signal(LPO);
+					send(DATA);
+					start_tt(iutconf.sl.t7 * 10 / 2);
+					state = 2;
+					break;
+				}
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				break;
+			case ACK:
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;	/* stupid ITU-T SDLs */
+			case ACK:
+				break;
+			case PROCESSOR_OUTAGE:
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;
+			case TIMEOUT:
+				signal(CLEARB);
+				signal(SEND_MSU);
+				start_tt(1000);
+				signal(LPR);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_RPR:
+				break;
+			case DATA:
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
+				pt_bsn = iut_fsn;
+#endif
+				send(ACK);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case PROCESSOR_ENDED:
+				send(SEQUENCE_SYNC);
 			case IUT_RPR:
 				break;	/* stupid ITU-T SDLs */
 			case TIMEOUT:
@@ -6899,6 +7546,7 @@ test_case_4_2(void)
 			case IUT_RPR:
 			case IUT_RPO:
 				break;
+			case IN_SERVICE:
 			case NO_MSG:
 				send(LPR);
 				send(PROCESSOR_ENDED);
@@ -6910,6 +7558,7 @@ test_case_4_2(void)
 			break;
 		case 3:
 			switch ((event = get_event())) {
+			case IN_SERVICE:
 			case IUT_RPO:
 				break;
 			case IUT_RPR:
@@ -6967,6 +7616,8 @@ test_case_4_3(void)
 			break;
 		case 3:
 			switch ((event = get_event())) {
+			case IN_SERVICE:
+				break;
 			case IUT_RPR:
 				return SUCCESS;
 			default:
@@ -7089,7 +7740,8 @@ test_case_5_3(void)
 
 #define desc_case_5_4a "\
 SU delimitation, alignment, error detection and correction\n\
-Reception of single and multiple flags between FISUs\
+Reception of single and multiple flags between FISUs\n\
+Forward direction\
 "
 static int
 test_case_5_4a(void)
@@ -7123,7 +7775,8 @@ test_case_5_4a(void)
 
 #define desc_case_5_4b "\
 SU delimitation, alignment, error detection and correction\n\
-Reception of single and multiple flags between FISUs\
+Reception of single and multiple flags between FISUs\n\
+Reverse direction\
 "
 static int
 test_case_5_4b(void)
@@ -7157,7 +7810,8 @@ test_case_5_4b(void)
 
 #define desc_case_5_5a "\
 SU delimitation, alignment, error detection and correction\n\
-Reception of single and multiple flags between MSUs\
+Reception of single and multiple flags between MSUs\n\
+Forward direction\
 "
 static int
 test_case_5_5a(void)
@@ -7191,7 +7845,8 @@ test_case_5_5a(void)
 
 #define desc_case_5_5b "\
 SU delimitation, alignment, error detection and correction\n\
-Reception of single and multiple flags between MSUs\
+Reception of single and multiple flags between MSUs\n\
+Reverse direction\
 "
 static int
 test_case_5_5b(void)
@@ -7906,7 +8561,7 @@ test_case_8_1(void)
 			case ACK:
 				break;
 			case DATA:
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				pt_bsn = iut_fsn;
 #endif
 				send(ACK);
@@ -8051,7 +8706,7 @@ test_case_8_3(void)
 					nacks = n;
 					signal(ETC);
 					signal(COUNT);
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 					pt_bsn += nacks;
 #endif
 					send(ACK);
@@ -8068,7 +8723,7 @@ test_case_8_3(void)
 				signal(ETC);
 				signal(COUNT);
 				nacks = count;
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				pt_bsn += nacks;
 #endif
 				send(ACK);
@@ -8096,7 +8751,7 @@ test_case_8_3(void)
 					nacks = n;
 					signal(ETC);
 					signal(COUNT);
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 					pt_bsn += nacks;
 #endif
 					send(ACK);
@@ -8137,7 +8792,7 @@ test_case_8_4(void)
 		case 1:
 			switch ((event = get_event())) {
 			case DATA:
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				pt_bsn = iut_fsn;
 #endif
 				send(ACK);
@@ -8472,12 +9127,13 @@ test_case_8_8(void)
 #endif
 }
 
-#define desc_case_8_9 "\
+#define desc_case_8_9a "\
 Transmission and reception control (Basic)\n\
-Single FISU prior to RPO being set\
+Single FISU prior to RPO being set\n\
+Forward direction\
 "
 static int
-test_case_8_9(void)
+test_case_8_9a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -8521,11 +9177,90 @@ test_case_8_9(void)
 			break;
 		case 5:
 			switch ((event = get_event())) {
+			case IN_SERVICE:
+				break;
 			case IUT_RPR:
 				break;
 			case ACK:
 				break;
 			case IUT_DATA:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+
+#define desc_case_8_9b "\
+Transmission and reception control (Basic)\n\
+Single FISU prior to RPO being set\n\
+Reverse direction\
+"
+static int
+test_case_8_9b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				pt_bsn = iut_fsn;
+				signal(LPO);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case PROCESSOR_OUTAGE:
+				pt_bsn = iut_fsn;
+				send(ACK);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			signal(LPR);
+			state = 4;
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case PROCESSOR_ENDED:
+				send(SEQUENCE_SYNC);
+				signal(SEND_MSU);
+				state = 5;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 5:
+			switch ((event = get_event())) {
+			case DATA:
+				pt_bsn = iut_fsn;
+				send(ACK);
+				start_tt(1000);
+				state = 6;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 6:
+			switch ((event = get_event())) {
+			case TIMEOUT:
 				return SUCCESS;
 			default:
 				return FAILURE;
@@ -8650,12 +9385,54 @@ test_case_8_11(void)
 #endif
 }
 
-#define desc_case_8_12 "\
+#define desc_case_8_12a "\
 Transmission and reception control (Basic)\n\
-Excessive delay of acknowledgement\
+Excessive delay of acknowledgement\n\
+Single data\
 "
 static int
-test_case_8_12(void)
+test_case_8_12a(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				beg_time = milliseconds(t7);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+
+#define desc_case_8_12b "\
+Transmission and reception control (Basic)\n\
+Excessive delay of acknowledgement\n\
+Multiple data\
+"
+static int
+test_case_8_12b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -8722,6 +9499,68 @@ test_case_8_13(void)
 			return SCRIPTERROR;
 		}
 	}
+}
+
+#define desc_case_8_14 "\
+Transmission and reception control (Basic)\n\
+Abnormal FSN\
+"
+static int
+test_case_8_14(void)
+{
+#if defined(M2PA_VERSION_DRAFT3)||defined(M2PA_VERSION_DRAFT3_1)
+	return NOTAPPLICABLE;	/* can't do this */
+#else
+	int nind = 0;
+	for (;;) {
+		switch (state) {
+		case 0:
+			pt_bsn = 0x3fff;
+			send(DATA);
+			state = 3;
+		case 3:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				if (nind < 1)
+					nind++;
+				else
+					return FAILURE;
+				break;
+			case ACK:
+				if (iut_fsn != 0)
+					return FAILURE;
+				if (iut_bsn != 0)
+					if (iut_bsn != 1)
+						return FAILURE;
+				pt_bsn = 1;
+				send(DATA);
+				state = 4;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case IUT_DATA:
+				if (nind < 1)
+					nind++;
+				else
+					return FAILURE;
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+#endif
 }
 
 #define desc_case_9_1 "\
@@ -9659,12 +10498,13 @@ test_case_10_1(void)
 	}
 }
 
-#define desc_case_10_2 "\
+#define desc_case_10_2a "\
 Congestion Control\n\
-Timer T7\
+Timer T7\n\
+During receive congestion\
 "
 static int
-test_case_10_2(void)
+test_case_10_2a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -9697,9 +10537,10 @@ test_case_10_2(void)
 		case 3:
 			switch ((event = get_event())) {
 			case TIMEOUT:
-#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)
+#if defined(M2PA_VERSION_DRAFT6)||defined(M2PA_VERSION_DRAFT6_1)||defined(M2PA_VERSION_DRAFT6_9)||defined(M2PA_VERSION_DRAFT10)
 				pt_bsn = iut_fsn;
 #endif
+				send(BUSY_ENDED);
 				send(ACK);
 				state = 4;
 				start_tt(1000);
@@ -9716,6 +10557,138 @@ test_case_10_2(void)
 				return FAILURE;
 			}
 			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+
+#define desc_case_10_2b "\
+Congestion Control\n\
+Timer T7\n\
+After receive congestion\
+"
+static int
+test_case_10_2b(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				send(BUSY);
+				start_tt(iutconf.sl.t6 * 10 - 300);
+				beg_time = milliseconds(t6);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				start_tt(iutconf.sl.t7 * 10 + 200);
+				beg_time = milliseconds(t7);
+				send(BUSY_ENDED);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				state = 4;
+				start_tt(1000);
+				break;
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
+			default:
+				return FAILURE;
+			}
+		case 4:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				return FAILURE;
+			case OUT_OF_SERVICE:
+				break;
+			case IUT_OUT_OF_SERVICE:
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi);
+			default:
+				return FAILURE;
+			}
+			break;
+		default:
+			return SCRIPTERROR;
+		}
+	}
+}
+
+#define desc_case_10_2c "\
+Congestion Control\n\
+Timer T7\n\
+After receive congestion\
+"
+static int
+test_case_10_2c(void)
+{
+	for (;;) {
+		switch (state) {
+		case 0:
+			signal(SEND_MSU);
+			state = 1;
+			break;
+		case 1:
+			switch ((event = get_event())) {
+			case DATA:
+				send(BUSY);
+				start_tt(iutconf.sl.t6 * 10 - 300);
+				beg_time = milliseconds(t6);
+				state = 2;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 2:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				start_tt(iutconf.sl.t7 * 10 - 300);
+				beg_time = milliseconds(t7);
+				send(BUSY_ENDED);
+				state = 3;
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 3:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				pt_bsn = iut_fsn;
+				send(ACK);
+				state = 4;
+				start_tt(1000);
+				break;
+			default:
+				return FAILURE;
+			}
+			break;
+		case 4:
+			switch ((event = get_event())) {
+			case TIMEOUT:
+				return SUCCESS;
+			default:
+				return FAILURE;
+			}
 		default:
 			return SCRIPTERROR;
 		}
@@ -10178,12 +11151,12 @@ iut_power_off(void)
 static int
 link_power_off(void)
 {
+	iut_options = 0;
 	show_msus = 1;
 	show_fisus = 1;
 	show_timeout = 0;
 	pt_bib = pt_fib = iut_bib = iut_fib = 0x0;
 	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
-	iut_options = 0;
 	if (mgm_open() != SUCCESS)
 		return INCONCLUSIVE;
 	if (pt_open() != SUCCESS)
@@ -10202,6 +11175,33 @@ link_power_off(void)
 static int
 link_out_of_service(void)
 {
+	iut_options = 0;
+	show_msus = 1;
+	show_fisus = 1;
+	show_timeout = 0;
+	pt_bib = pt_fib = iut_bib = iut_fib = 0x0;
+	pt_bsn = pt_fsn = iut_bsn = iut_fsn = 0x0;
+	if (mgm_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (pt_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_open() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_connect() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_m2pa_push() != SUCCESS)
+		return INCONCLUSIVE;
+	if (iut_enable() != SUCCESS)
+		return INCONCLUSIVE;
+	if (signal(POWER_ON) != SUCCESS)
+		return INCONCLUSIVE;
+	start_tt(MAXIMUM_WAIT);
+	return SUCCESS;
+}
+static int
+link_out_of_service_np(void)
+{
+	iut_options = SS7_POPT_NOPR;
 	show_msus = 1;
 	show_fisus = 1;
 	show_timeout = 0;
@@ -10333,22 +11333,36 @@ struct test_case {
 	"1.2", desc_case_1_2, test_case_1_2, link_out_of_service, iut_power_off, 0, 0}, {
 	"1.3", desc_case_1_3, test_case_1_3, link_out_of_service, iut_power_off, 0, 0}, {
 	"1.4", desc_case_1_4, test_case_1_4, link_out_of_service, iut_power_off, 0, 0}, {
-	"1.5(a)", desc_case_1_5a, test_case_1_5a, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.5(b)", desc_case_1_5b, test_case_1_5b, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.6", desc_case_1_6, test_case_1_6, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.5(a)", desc_case_1_5a_p, test_case_1_5a_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.5(b)", desc_case_1_5b_p, test_case_1_5b_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.5(a)np", desc_case_1_5a_np, test_case_1_5a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.5(b)np", desc_case_1_5b_np, test_case_1_5b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.6", desc_case_1_6_p, test_case_1_6_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.6np", desc_case_1_6_np, test_case_1_6_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
 	"1.7", desc_case_1_7, test_case_1_7, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.8(a)", desc_case_1_8a, test_case_1_8a, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.8(b)", desc_case_1_8b, test_case_1_8b, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.9(a)", desc_case_1_9a, test_case_1_9a, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.9(b)", desc_case_1_9b, test_case_1_9b, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.10", desc_case_1_10, test_case_1_10, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.11", desc_case_1_11, test_case_1_11, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.12(a)", desc_case_1_12a, test_case_1_12a, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.12(b)", desc_case_1_12b, test_case_1_12b, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.13", desc_case_1_13, test_case_1_13, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.8(a)", desc_case_1_8a_p, test_case_1_8a_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.8(b)", desc_case_1_8b_p, test_case_1_8b_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.8(a)np", desc_case_1_8a_np, test_case_1_8a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.8(b)np", desc_case_1_8b_np, test_case_1_8b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.9(a)", desc_case_1_9a_p, test_case_1_9a_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.9(b)", desc_case_1_9b_p, test_case_1_9b_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.9(a)np", desc_case_1_9a_np, test_case_1_9a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.9(b)np", desc_case_1_9b_np, test_case_1_9b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.10", desc_case_1_10_p, test_case_1_10_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.10np", desc_case_1_10_np, test_case_1_10_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.11", desc_case_1_11_p, test_case_1_11_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.11np", desc_case_1_11_np, test_case_1_11_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.12(a)", desc_case_1_12a_p, test_case_1_12a_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.12(b)", desc_case_1_12b_p, test_case_1_12b_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.12(a)np", desc_case_1_12a_np, test_case_1_12a_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.12(b)np", desc_case_1_12b_np, test_case_1_12b_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.13", desc_case_1_13_p, test_case_1_13_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.13np", desc_case_1_13_np, test_case_1_13_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
 	"1.14", desc_case_1_14, test_case_1_14, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.15", desc_case_1_15, test_case_1_15, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.16", desc_case_1_16, test_case_1_16, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.15", desc_case_1_15_p, test_case_1_15_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.15np", desc_case_1_15_np, test_case_1_15_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
+	"1.16", desc_case_1_16_p, test_case_1_16_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.16np", desc_case_1_16_np, test_case_1_16_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
 	"1.17", desc_case_1_17, test_case_1_17, link_out_of_service, iut_power_off, 0, 0,}, {
 	"1.18", desc_case_1_18, test_case_1_18, link_out_of_service, iut_power_off, 0, 0,}, {
 	"1.19", desc_case_1_19, test_case_1_19, link_out_of_service, iut_power_off, 0, 0,}, {
@@ -10359,7 +11373,8 @@ struct test_case {
 	"1.24", desc_case_1_24, test_case_1_24, link_out_of_service, iut_power_off, 0, 0,}, {
 	"1.25", desc_case_1_25, test_case_1_25, link_out_of_service, iut_power_off, 0, 0,}, {
 	"1.26", desc_case_1_26, test_case_1_26, link_out_of_service, iut_power_off, 0, 0,}, {
-	"1.27", desc_case_1_27, test_case_1_27, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.27", desc_case_1_27_p, test_case_1_27_p, link_out_of_service, iut_power_off, 0, 0,}, {
+	"1.27np", desc_case_1_27_np, test_case_1_27_np, link_out_of_service_np, iut_power_off, 0, 0,}, {
 	"1.28", desc_case_1_28, test_case_1_28, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"1.29(a)", desc_case_1_29a, test_case_1_29a, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"1.29(b)", desc_case_1_29b, test_case_1_29b, link_in_service_basic, iut_power_off, 0, 0,}, {
@@ -10388,7 +11403,8 @@ struct test_case {
 	"3.6", desc_case_3_6, test_case_3_6, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"3.7", desc_case_3_7, test_case_3_7, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"3.8", desc_case_3_8, test_case_3_8, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"4.1", desc_case_4_1, test_case_4_1, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"4.1(a)", desc_case_4_1a, test_case_4_1a, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"4.1(b)", desc_case_4_1b, test_case_4_1b, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"4.2", desc_case_4_2, test_case_4_2, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"4.3", desc_case_4_3, test_case_4_3, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"5.1", desc_case_5_1, test_case_5_1, link_in_service_basic, iut_power_off, 0, 0,}, {
@@ -10414,11 +11430,14 @@ struct test_case {
 	"8.6", desc_case_8_6, test_case_8_6, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"8.7", desc_case_8_7, test_case_8_7, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"8.8", desc_case_8_8, test_case_8_8, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.9", desc_case_8_9, test_case_8_9, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"8.9(a)", desc_case_8_9a, test_case_8_9a, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"8.9(b)", desc_case_8_9b, test_case_8_9b, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"8.10", desc_case_8_10, test_case_8_10, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"8.11", desc_case_8_11, test_case_8_11, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"8.12", desc_case_8_12, test_case_8_12, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"8.12(a)", desc_case_8_12a, test_case_8_12a, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"8.12(b)", desc_case_8_12b, test_case_8_12b, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"8.13", desc_case_8_13, test_case_8_13, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"8.14", desc_case_8_14, test_case_8_14, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"9.1", desc_case_9_1, test_case_9_1, link_in_service_pcr, iut_power_off, 0, 0,}, {
 	"9.2", desc_case_9_2, test_case_9_2, link_in_service_pcr, iut_power_off, 0, 0,}, {
 	"9.3", desc_case_9_3, test_case_9_3, link_in_service_pcr, iut_power_off, 0, 0,}, {
@@ -10433,7 +11452,9 @@ struct test_case {
 	"9.12", desc_case_9_12, test_case_9_12, link_in_service_pcr, iut_power_off, 0, 0,}, {
 	"9.13", desc_case_9_13, test_case_9_13, link_in_service_pcr, iut_power_off, 0, 0,}, {
 	"10.1", desc_case_10_1, test_case_10_1, link_in_service_basic, iut_power_off, 0, 0,}, {
-	"10.2", desc_case_10_2, test_case_10_2, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"10.2(a)", desc_case_10_2a, test_case_10_2a, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"10.2(b)", desc_case_10_2b, test_case_10_2b, link_in_service_basic, iut_power_off, 0, 0,}, {
+	"10.2(c)", desc_case_10_2c, test_case_10_2c, link_in_service_basic, iut_power_off, 0, 0,}, {
 	"10.3", desc_case_10_3, test_case_10_3, link_in_service_basic, iut_power_off, 0, 0,}, {
 	NULL,}
 };
@@ -10621,7 +11642,7 @@ do_tests(void)
 		fprintf(stdout, "\n\n");
 		for (i = 0; i < (sizeof(test_suite) / sizeof(struct test_case)) && test_suite[i].numb; i++) {
 			if (test_suite[i].run) {
-				fprintf(stdout, "Test Case SCTP NPI:%-10s  ", test_suite[i].numb);
+				fprintf(stdout, "Test Case M2PA:%-10s  ", test_suite[i].numb);
 				switch (test_suite[i].result) {
 				case SUCCESS:
 					fprintf(stdout, "SUCCESS\n");

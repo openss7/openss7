@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi_ioctl.h,v 0.9 2004/01/17 08:08:12 brian Exp $
+ @(#) $Id: lmi_ioctl.h,v 0.9.2.1 2004/01/21 21:24:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:08:12 $ by $Author: brian $
+ Last Modified $Date: 2004/01/21 21:24:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LMI_IOCTL_H__
 #define __LMI_IOCTL_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  This file is rather Linux specific for now.  Linux encodes direction and
@@ -123,7 +123,8 @@ enum {
 	SS7_POPT_PCR = 0x00000002,	/* preventative cyclic retranlmission */
 	SS7_POPT_HSL = 0x00000004,	/* high speed links */
 	SS7_POPT_XSN = 0x00000008,	/* extended sequence numbers */
-	SS7_POPT_ALL = 0x0000000f	/* all options */
+	SS7_POPT_NOPR = 0x00000010,	/* no proving */
+	SS7_POPT_ALL = 0x0000001f	/* all options */
 };
 
 /*
