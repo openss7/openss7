@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/02 03:22:42 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/04 18:50:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 03:22:42 $ by $Author: brian $
+## Last Modified $Date: 2005/04/04 18:50:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -56,11 +56,11 @@
 #   for systems (such as debian) that will not do not do grefer on man pages.
 ##
 
-man_MACROS = $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
+man_MACROS		= $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
 
-EXTRA_DIST += \
-	$(man_MACROS) \
-	$(dist_noinst_MANS)
+EXTRA_DIST		+= \
+			   $(man_MACROS) \
+			   $(dist_noinst_MANS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -292,17 +292,17 @@ distclean-manpages:
 
 maintainer-clean-manpages:
 
-ALL_LOCAL += all-manmacros all-manpages
+ALL_LOCAL		+= all-manmacros all-manpages
 
-INSTALL_DATA_LOCAL += install-manmacros install-manpages
+INSTALL_DATA_LOCAL	+= install-manmacros install-manpages
 
-UNINSTALL_LOCAL += uninstall-manmacros uninstall-manpages
+UNINSTALL_LOCAL		+= uninstall-manmacros uninstall-manpages
 
-CLEAN_LOCAL += clean-manmacros clean-manpages
+CLEAN_LOCAL		+= clean-manmacros clean-manpages
 
-DISTCLEAN_LOCAL += distclean-manmacros distclean-manpages
+DISTCLEAN_LOCAL		+= distclean-manmacros distclean-manpages
 
-MAINTAINER_CLEAN_LOCAL += maintainer-clean-manmacros maintainer-clean-manpages
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-manmacros maintainer-clean-manpages
 
 if COMPRESS_MANPAGES
 ## COMPRESS_MANPAGES
@@ -517,7 +517,7 @@ endif
 # manpages are installed in a temporary, unconfigured directory.)  This is for alien systems and
 # embedded targets that cannot build from packages.
 ##
-INSTALL_DATA_HOOK += post-manpages
+POST_INSTALL_AM		+= post-manpages
 
 ##
 # The uninstall-hook target is run after the files have been removed.  It is essentially equivalent
@@ -526,7 +526,7 @@ INSTALL_DATA_HOOK += post-manpages
 # installed in a temporary, unconfigured directory.)  This is for alien systems and embedded targets
 # that cannot build from packages.
 ##
-UNINSTALL_HOOK += postun-manpages
+POST_UNINSTALL_AM	+= postun-manpages
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -542,6 +542,6 @@ endif
 
 .PHONY: all-manpages install-manpages uninstall-manpages clean-manpages distclean-manpages \
 	maintainer-clean-manpages all-manmacros install-manmacros uninstall-manmacros \
-	clean-manmacros distclean-manmacros maintainer-clean-manmacros post-manpages postun-manpages
+	clean-manmacros distclean-manmacros maintainer-clean-manmacros
 
 ## vim: ft=automake

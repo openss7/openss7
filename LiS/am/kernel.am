@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/04/02 03:22:42 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/04/04 18:50:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 03:22:42 $ by $Author: brian $
+## Last Modified $Date: 2005/04/04 18:50:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -91,7 +91,7 @@ stamp-modpost: stamp-verobjs $(KERNEL_MODULES)
 	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list ; \
 	touch stamp-modpost
 
-CLEANFILES += System.symvers Module.symvers
+CLEANFILES		+= System.symvers Module.symvers
 
 if am__fastdepCC
 ## am__fastdepCC
@@ -263,9 +263,11 @@ install-modconf:
 # least on Mandrakelinux we need to place them in /etc/modprobe.preload for the same effect.
 ##
 if WITH_KO_MODULES
-INSTALL_EXEC_LOCAL += pre-modules install-modules
+PRE_INSTALL_AM		+= pre-modules
+INSTALL			+= install-modules
 else
-INSTALL_EXEC_LOCAL += pre-modules install-modules install-preloads pre-modconf install-modconf
+PRE_INSTALL_AM		+= pre-modules pre-modconf
+INSTALL_EXEC_LOCAL	+= install-modules install-preloads install-modconf
 endif
 
 ##
@@ -273,14 +275,51 @@ endif
 # kernel modules, so they could be anywhere.  This pre-installation scriptlet searches for any
 # kernel modules by the same name as ours and simply removes them.
 ##
+# A better and more thourough approach if a current modules.dep file exists is to walk through the
+# dependency graph from each module and remove all modules that depend on that module as well.
+##
 pre-modules:
 	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; \
 	for dir in $(DESTDIR)$(kmoduledir)/ $(DESTDIR)$(kmoduledir)/../preferred $(DESTDIR)$(kmoduledir)/../default $(DESTDIR)$(kmoduledir)/../boot ; do \
 		test -d $$dir || continue ; \
 		for m in `find $$dir \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do \
 			b=`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'` ; \
-			case " $$list " in (*" $$b "*) $(ECHO) "rm -f -- $$m" ; rm -f -- $$m ;; esac ; \
+			case " $$list " in (*" $$b "*) $(ECHO) "rm -f -- $$m" ; rm -f -- $$m ;; (*) continue ;; esac ; \
 		done ; \
+		if test -f $$dir/modules.dep ; then \
+			dep= ; while read line ; do \
+				case $$line in \
+					(*\)	line="`echo $$line | sed -e 's|\\$$||'`" ; \
+						dep="$${dep:+$$dep }$$line" ; continue ;; \
+					(*)	dep="$${dep:+$$dep }$$line" ;; \
+				esac ; \
+				set dummy $$dep ; \
+				if test "$${2+set}" = "set" ; then \
+					t=$$1 ; \
+					target=target_`echo $$t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
+					shift ; \
+					for p in $$* ; do \
+						prereq=prereq_`echo $$p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
+						eval "$$prereq=\"\$${$$prereq:+\$$$$prereq }$$t" ; \
+						eval "$$target=\"\$${$$target:+\$$$$target }$$p" ; \
+					done ; \
+				fi ; \
+			done < $$dir/modules.dep ; \
+		fi ; \
+	done ; \
+	expanded=0 ; \
+	while test $$expanded != 0 ; do \
+		for m in $$list ; do \
+			for p in eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`" ; do \
+				case " $$list " in \
+					(*" $$p "*) continue ;; \
+					(*) list="$$list $$p" ; expanded=1 ;; \
+				esac ; \
+			done ; \
+		done ; \
+	done ; \
+	for m in $$list ; do \
+		rm -f -- `find $(DESTDIR)$(kmoduledir)/.. \( -name $m.o -o -name $m.ko -o -name $m.o.gz -o -name $m.ko.gz \) 2>/dev/null` ; \
 	done
 
 pre-modconf:
@@ -445,12 +484,12 @@ post-deprecated:
 ## completed.
 ##
 if WITH_KO_MODULES
-INSTALL_EXEC_HOOK += post-depmod post-source
+POST_INSTALL_AM		+= post-depmod post-source
 else
-INSTALL_EXEC_HOOK += post-modconf post-preload post-depmod post-source
+POST_INSTALL_AM		+= post-modconf post-preload post-depmod post-source
 endif
 
-#INSTALL_EXEC_HOOK += post-deprecated
+#POST_INSTALL_AM	+= post-deprecated
 
 ##
 # There is no rpm equivalent for this target.  This simply removes kernel modules.  It is not
@@ -474,48 +513,50 @@ uninstall-modconf:
 	rm -f -- "$(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)"
 
 if WITH_KO_MODULES
-UNINSTALL_LOCAL += uninstall-modules
+UNINSTALL_LOCAL		+= uninstall-modules
 else
-UNINSTALL_LOCAL += uninstall-preload uninstall-modules uninstall-modconf
+UNINSTALL_LOCAL		+= uninstall-preload uninstall-modules uninstall-modconf
 endif
 
 ##
 # The postun-modconf target checks for a fully configured uninstall directory by checking for the
-# existence of the /etc/modules.conf file in the target uninstall directory $(DESTDIR).
-# It it exists, then we are doing a non-rpm (autoconf) uninstall and need to unconfigure
-# modules.conf in the target directory.
+# existence of the /etc/modules.conf file in the target uninstall directory $(DESTDIR).  It it
+# exists, then we are doing a non-rpm (autoconf) uninstall and need to unconfigure modules.conf in
+# the target directory.
 ##
 # First which check if there are any remaning modules.ext files that belong to other kernel
 # releases.  If there are, we do not remove the patch from modules.conf because it is still needed
-# by the other kernels.  If there are not, the prune and include patch is removed from the
-# modules.conf file.
-##
-# If we have a usable system map file and an executable depmod, we perform the depmod.
+# by the other kernels.  If there are not, the include patch is removed from the modules.conf file.
 ##
 # It is not possible to restore any modules or associated modules.conf entries for non-rpm or older
 # rpm LiS or LfS releases.  You need to reinstall those packages (if desired) to restore the removed
 # modules and entries.  Use current versions of the openss7 autoconf/rpm LiS or LfS instead, please.
 ##
 postun-modconf:
-	@test -f $(DESTDIR)$(sysconfdir)/modules.conf || exit 0 ; \
-	conf_fil="$(DESTDIR)$(sysconfdir)/modules.conf" ; \
-	for f in $(DESTDIR)$(rootdir)/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
-		test -f $$f || exit 0 ; \
+	@conf_fil=$(DESTDIR)$(sysconfdir)/modules.conf ; \
+	test -f $$conf_fil || exit 0 ; \
+	for f in $(DESTDIR)$(kmoduledir)/../*/modules.$(KMODCONF_EXT) ; do \
+		test -f $$f || exit 0 ; break ; \
 	done ; \
-	conf_new="$$conf_fil.new.$$$$" ; \
-	sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_fil > $$conf_new ; \
+	conf_tmp="$${TMPDIR-/var/tmp}/modules.conf.tmp.$$$$" ; \
+	conf_new="$${TMPDIR-/var/tmp}/modules.conf.new.$$$$" ; \
+	cp -f -- $$conf_fil $$conf_new ; \
+	sed -e '\|^include[[:space:]].*$(modutildir)/$(KMODCONF_EXT)|d' $$conf_new > $$conf_tmp ; \
+	mv -f -- $$conf_tmp $$conf_new ; \
+	echo "include $(modutildir)/$(KMODCONF_EXT)" >> $$conf_new ; \
 	chmod --reference=$$conf_fil $$conf_new ; \
-	cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
-	rm -f -- $$conf_new ; \
-	prel_fil="$(DESTDIR)$(sysconfdir)/modules"
+	cp -f -b --suffix=.$(KMODCONF_EXT).bak -- $$conf_new $$conf_fil ; \
+	rm -f -- $$conf_new
 
 ##
 # If we have preload modules defined, we are the last uninstall, and we have the appropriate preload
-# file, then we remove our module names from that file.
+# file, then we remove our module names from that file.  Determining the uninstall is a little more
+# complicated because .ko modules do not have modconf files, so we need to look in the modules.dep
+# file for a dependency including one of our modules.
 ##
 postun-preload:
 	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
-	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
+	mods=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$mods ; do \
 		test `grep -l "/$$p:" $(DESTDIR)$(rootdir)/lib/modules/*/modules.dep | wc -l` -eq 0 || exit 0 ; \
 	done ; \
 	if test "$(kext)" = ".ko" ; \
@@ -523,21 +564,24 @@ postun-preload:
 	else prel_fil=$(DESTDIR)$(sysconfdir)/modules ; \
 	fi ; \
 	test -f $$prel_fil || exit 0 ; \
-	cp -f $$prel_fil $$prel_fil.new.$$$$ ; \
-	list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
-		f=`$(ECHO) $$p | sed -e 's|\.o$$||'` ; \
-		sed -e "/^$$f\>/d" $$prel_fil.new.$$$$ > $$prel_fil.tmp.$$$$ ; \
-		mv -f $$prel_fil.tmp.$$$$ $$prel_fil.new.$$$$ ; \
-		$(ECHO) $$f >> $$prel_fil.new.$$$$ ; \
+	prel_tmp="${TMPDIR-/var/tmp}/modules.tmp.$$$$" ; \
+	prel_new="${TMPDIR-/var/tmp}/modules.new.$$$$" ; \
+	cp -f -- $$prel_fil $$prel_new ; \
+	mods='$(KERNEL_PRELOADS)' ; for p in $$mods ; do \
+		m=`$(ECHO) $$p | sed -e 's|\.o$$||'` ; \
+		sed -e '\|^[[:space:]]*'"$$m"'[[:space:]]*$$|d' $$prel_new > $$prel_tmp ; \
+		mv -f -- $$prel_tmp $$prel_new ; \
 	done ; \
-	chmod --reference=$$prel_fil $$prel_fil.new.$$$$ ; \
-	cp -fb --suffix=$$ext.bak $$prel_fil.new.$$$$ $$prel_fil ; \
-	rm -f -- "$$prel_fil.new.$$$$"
+	chmod --reference=$$prel_fil -- $$prel_new ; \
+	cp -fb --suffix=$(KMODCONF_EXT).bak -- $$prel_new $$prel_fil ; \
+	rm -f -- $$prel_new
 
 ##
+# If we have a usable system map file and an executable depmod, we perform the depmod.
+##
 # We run depmod -Ae instead of -ae on autoconf install because installed files have current
-# timestamps.  For rpm intalls, installed binary files have original timestamps and -Ae will
-# not result in updated files.
+# timestamps.  For rpm intalls, installed binary files have original timestamps and -Ae will not
+# result in updated files.
 ##
 postun-depmod:
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
@@ -564,12 +608,12 @@ postun-deprecated:
 # runs after uninstall has completed.
 ##
 if WITH_KO_MODULES
-UNINSTALL_HOOK += postun-depmod postun-source
+POST_UNINSTALL_AM	+= postun-depmod postun-source
 else
-UNINSTALL_HOOK += postun-modconf postun-preload postun-depmod postun-source
+POST_UNINSTALL_AM	+= postun-modconf postun-preload postun-depmod postun-source
 endif
 
-#UNINSTALL_HOOK += postun-deprecated
+#POST_UNINSTALL_AM	+= postun-deprecated
 
 ##
 # Checking for undefined symbols is rather pointless on .ko objects.  The reason is that these must

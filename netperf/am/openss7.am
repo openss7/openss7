@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/31 11:20:03 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/04/05 00:45:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/31 11:20:03 $ by $Author: brian $
+## Last Modified $Date: 2005/04/05 00:45:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -76,6 +76,11 @@ CHECK_LOCAL		=
 INSTALLCHECK_LOCAL	=
 DISTCHECK_HOOK		=
 RELEASE_CLEAN_LOCAL	=
+
+PRE_INSTALL_AM		=
+POST_INSTALL_AM		=
+PRE_UNINSTALL_AM	=
+POST_UNINSTALL_AM	=
 
 ##
 # In case we only need the files version:
@@ -156,6 +161,7 @@ $(MY_RECURSIVE_TARGETS):
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
 	target=`$(ECHO) $@ | sed s/-recursive//` ; \
 	list='$(SUBDIRS)' ; for subdir in $$list ; do \
+		case " m4 intl po " in *" $$subdir "*) continue ;; esac ; \
 		$(ECHO) "Making $$target in $$subdir" ; \
 		if test "$$subdir" = "." ; then \
 			dot_seen=yes ; \
@@ -240,7 +246,7 @@ TESTS			=
 TESTS_ENVIRONMENT	= 
 endif
 
-MY_RECURSIVE_TARGETS += txt-recursive sgml-recursive
+MY_RECURSIVE_TARGETS	+= txt-recursive sgml-recursive
 
 txt: txt-recursive
 
@@ -266,7 +272,7 @@ libtool: $(LIBTOOL_DEPS)
 CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SYMBOL,EXPORT_SYMBOL_NOVERS,EXPORT_SYMBOL_GPL
 
 # if MAINTAINER_MODE
-# ALL_LOCAL += TAGS CTAGS
+# ALL_LOCAL		+= TAGS CTAGS
 # endif
 
 ##
@@ -277,25 +283,55 @@ ifnames:
 
 MY_PHONY	+= ifnames
 
-CLEANFILES += check_commands.log
+CLEANFILES		+= check_commands.log
 
-DISTCLEANFILES += *.log config.site *.err *.out
+DISTCLEANFILES		+= *.log config.site *.err *.out
 
-MAINTAINERCLEANFILES += $(srcdir)/Makefile.in
+MAINTAINERCLEANFILES	+= $(srcdir)/Makefile.in
 
 all-local: $(ALL_LOCAL)
+
+pre-install: pre-install-recursive
+
+pre-install-am: $(PRE_INSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= pre-install-recursive
+MY_PHONY		+= pre-install pre-install-am
+
+install-exec-local: pre-install-am $(INSTALL_EXEC_LOCAL)
+
+install-exec-hook: $(INSTALL_EXEC_HOOK)
 
 install-data-local: $(INSTALL_DATA_LOCAL)
 
 install-data-hook: $(INSTALL_DATA_HOOK)
+	$(MAKE) $(AM_MAKEFLAGS) post-install-am
 
-install-exec-local: $(INSTALL_EXEC_LOCAL)
+post-install: post-install-recursive
 
-install-exec-hook: $(INSTALL_EXEC_HOOK)
+post-install-am: $(POST_INSTALL_AM)
 
-uninstall-local: $(UNINSTALL_LOCAL)
+MY_RECURSIVE_TARGETS	+= post-install-recursive
+MY_PHONY		+= post-install post-install-am
+
+pre-uninstall: pre-uninstall-recursive
+
+pre-uninstall-am: $(PRE_UNINSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= pre-uninstall-recursive
+MY_PHONY		+= pre-uninstall pre-uninstall-am
+
+uninstall-local: pre-uninstall-am $(UNINSTALL_LOCAL)
 
 uninstall-hook: $(UNINSTALL_HOOK)
+	$(MAKE) $(AM_MAKEFLAGS) post-uninstall-am
+
+post-uninstall: post-uninstall-am
+
+post-uninstall-am: $(POST_UNINSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= post-uninstall-recursive
+MY_PHONY		+= post-uninstall post-uninstall-am
 
 mostlyclean-local: $(MOSTLYCLEAN_LOCAL)
 

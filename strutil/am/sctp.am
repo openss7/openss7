@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/02 03:22:42 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/04/04 18:50:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 03:22:42 $ by $Author: brian $
+## Last Modified $Date: 2005/04/04 18:50:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -71,11 +71,11 @@ if RPM_BUILD_KERNEL
 Modules.map: $(KERNEL_MODULES)
 	$(NM) -s $(KERNEL_MODULES) > $@
 
-CLEANFILES += Modules.map
+CLEANFILES		+= Modules.map
 
 all-kernel: $(KERNEL_MODULES) Modules.map
 
-ALL_LOCAL += all-kernel
+ALL_LOCAL		+= all-kernel
 
 STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 
@@ -126,7 +126,7 @@ install-modules: $(KERNEL_MODULES)
 		$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT) ; \
 	fi
 
-INSTALL_EXEC_LOCAL += install-modules
+INSTALL_EXEC_LOCAL	+= install-modules
 
 ##
 # This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
@@ -200,7 +200,7 @@ post-source:
 # unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
 # target with install-exec-hook that runs after install-exec has completed.
 ##
-INSTALL_EXEC_HOOK += post-modules post-source
+POST_INSTALL_AM		+= post-modules post-source
 
 ##
 # There is no rpm equivalent for this target.  This simply removes kernel modules.  It is not
@@ -227,7 +227,7 @@ uninstall-modules:
 	$(ECHO) "rm -f -- $$k/modules.$(KMODCONF_EXT)" ; \
 	rm -f -- "$$k/modules.$(KMODCONF_EXT)"
 
-UNINSTALL_LOCAL += uninstall-modules
+UNINSTALL_LOCAL		+= uninstall-modules
 
 ##
 # This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when
@@ -293,7 +293,7 @@ postun-source:
 # wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
 # runs after uninstall has completed.
 ##
-UNINSTALL_HOOK += postun-modules postun-source
+POST_UNINSTALL_AM	+= postun-modules postun-source
 
 if PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules

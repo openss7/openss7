@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/02 03:22:42 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/04 18:50:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 03:22:42 $ by $Author: brian $
+## Last Modified $Date: 2005/04/04 18:50:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -56,18 +56,16 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 ##
-# Although we use libtool for building shared libraries, libtool "finish"
-# commands are not smart enough to perform ld configuration in a cross-build
-# situation.  To support cross-building for embedded targets, we perform the
-# finish and unfinish actions ourselves.  This is equivalent to the rpm %post
-# and %postun scripts, however, these are never run for an rpm build becuase
-# the environment is an rpm sandbox rather that the complete environment.
+# Although we use libtool for building shared libraries, libtool "finish" commands are not smart
+# enough to perform ld configuration in a cross-build situation.  To support cross-building for
+# embedded targets, we perform the finish and unfinish actions ourselves.  This is equivalent to the
+# rpm %post and %postun scripts, however, these are never run for an rpm build becuase the
+# environment is an rpm sandbox rather that the complete environment.
 ##
 
 ##
-# Unfortunately, libtool is not smart enough to perform ld configuration for a
-# foreign environment in a cross-build situation, therefore, we perform the
-# "finish" action ourselves.
+# Unfortunately, libtool is not smart enough to perform ld configuration for a foreign environment
+# in a cross-build situation, therefore, we perform the "finish" action ourselves.
 ##
 post-libraries:
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
@@ -76,19 +74,17 @@ post-libraries:
 	fi
 
 ##
-# The install-exec-hook target is run after the files have been installed.  It
-# is essentially equivalent to the rpm %post, but it is only exectued when the
-# install directory is fully configured for shared libraries.  (That is, this
-# does not run when building an rpm, because the binaries are installed in a
-# temporary, unconfigured directory.)  This is for alien systems and embedded
-# targets that cannot build from packages.
+# The install-exec-hook target is run after the files have been installed.  It is essentially
+# equivalent to the rpm %post, but it is only exectued when the install directory is fully
+# configured for shared libraries.  (That is, this does not run when building an rpm, because the
+# binaries are installed in a temporary, unconfigured directory.)  This is for alien systems and
+# embedded targets that cannot build from packages.
 ##
-INSTALL_EXEC_HOOK += post-libraries
+POST_INSTALL_AM		+= post-libraries
 
 ##
-# Unfortunately, libtool is not smart enough to perform ld configuration for a
-# foreign environment in a cross-build situation, therefore, we perform the
-# "unfinish" action ourselves.
+# Unfortunately, libtool is not smart enough to perform ld configuration for a foreign environment
+# in a cross-build situation, therefore, we perform the "unfinish" action ourselves.
 ##
 postun-libraries:
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
@@ -97,14 +93,13 @@ postun-libraries:
 	fi
 
 ##
-# The uninstall-hook target is run after the files have been removed.  It is
-# essentially equivalent to the rpm %postun, but it is only executed when the
-# uninstall directory is fully configured for shared libraries.  (That is,
-# this does not run when building an rpm, because the binaries are installed
-# in a temporary, unconfigured directory.)  This is for alien systems and
-# embedded targets that cannot build from packages.
+# The uninstall-hook target is run after the files have been removed.  It is essentially equivalent
+# to the rpm %postun, but it is only executed when the uninstall directory is fully configured for
+# shared libraries.  (That is, this does not run when building an rpm, because the binaries are
+# installed in a temporary, unconfigured directory.)  This is for alien systems and embedded targets
+# that cannot build from packages.
 ##
-UNINSTALL_HOOK += postun-libraries
+POST_UNINSTALL_AM	+= postun-libraries
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -119,7 +114,5 @@ endif
 endif
 ## PKG_BUILD_ARCH
 endif
-
-.PHONY: post-libraries postun-libraries
 
 ## vim: ft=automake
