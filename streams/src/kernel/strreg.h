@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/30 19:43:13 $
+ @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/05 20:46:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/30 19:43:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/05 20:46:41 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -61,6 +61,10 @@ extern int fmod_count;
 
 extern struct list_head cdevsw_list;
 extern struct list_head fmodsw_list;
+
+#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+extern struct fmodsw *fmod_str(const struct streamtab *str);
+#endif
 
 /* initialization for main */
 extern int strreg_init(void);
