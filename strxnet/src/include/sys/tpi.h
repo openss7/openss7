@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9 2004/04/05 12:37:53 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.1 2004/04/06 12:33:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,32 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:37:53 $ by $Author: brian $
+ Last Modified $Date: 2004/04/06 12:33:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #if !defined _XTI_H && !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
 #error ****
-#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
-#error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <timod.h>
-#error **** INSTEAD OF <sys/timod.h>.
+#error **** Do not include system header files directly in user-space
+#error **** programs.  Likely you should have included <timod.h>
+#error **** instead of <sys/timod.h>.
 #error ****
 #endif
 
-/*
+/* 
  *  This file contains definitions that are common to XTI, TLI and TPI.  It is
- *  included by <xti.h> and <tiuser.h> as well as <tihdr.h>.  TLI specifics
- *  can be found in <sys/tli.h>.
+ *  included by <xti.h> and <tiuser.h> as well as <tihdr.h>.
  */
 
 /* 
- *  Transport service error numbers
- *  (error codes used by TLI transport providers)
+ *  Transport service error numbers (error codes used by TLI transport
+ *  providers) The following are the error codes needed by both the kernel level
+ *  transport providers and the user level library.
  */
 #define TBADADDR	 1	/* Bad address format */
 #define TBADOPT		 2	/* Bad options format */
@@ -94,7 +94,7 @@
 /* 
  *  The following are XPG3 and up.
  */
-#if defined _XPG3 || defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
+#if defined _XPG3 || defined _XOPEN_SOURCE || defined __KERNEL__
 #define TNOSTRUCTYPE	20	/* Structure type not supported			*/	/* not TPI */
 #define TBADNAME	21	/* Bad transport provider name			*/	/* not TPI */
 #define TBADQLEN	22	/* Listener queue length limit is zero		*/	/* not TPI */
@@ -103,7 +103,7 @@
 /* 
  *  The following are _XOPEN_SOURCE (XPG4 and up).
  */
-#if defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
+#if defined _XOPEN_SOURCE || defined __KERNEL__
 #define TINDOUT		24	/* Outstanding connect indications		*/	/* not TPI */
 #define TPROVMISMATCH	25	/* Not same transport provider			*/	/* not TPI */
 #define TRESQLEN	26	/* Connection acceptor has qlen > 0		*/	/* not TPI */
@@ -112,7 +112,121 @@
 #define TPROTO		29	/* Protocol error				*/	/* not TPI */
 #endif
 
+/*
+ *  Transport service types
+ */
+#define T_COTS		1	/* Connection oriented transport service */
+#define T_COTS_ORD	2	/* COTS with orderly release */
+#define T_CLTS		3	/* Connectionless transport service */
 
+/* 
+ *  Transport provider flags
+ */
+#define T_SNDZERO	0x001	/* Must match <sys/strops.h>: SNDZERO */
+#define T_SENDZERO	0x001	/* supports 0-length TSDUs */
+#define T_ORDRELDATA	0x002	/* supports orderly release data */
+#define XPG4_1		0x100	/* This indicates that the transport provider conforms to XTI in
+				   XPG4 and supports the new primitives T_ADDR_REQ and T_ADDR_ACK */
+#define T_XPG4_1	0x100	/* XPG4 and higher */
 
-#endif  _SYS_TPI_H
+/* 
+ *  Flags used from user level library routines.
+ */
+#define T_MORE		0x001	/* more data */
+#define T_EXPEDITED	0x002	/* expedited data */
+#define T_PUSH		0x004	/* send data immediately */
+#define T_NEGOTIATE	0x0004	/* set options */
+#define T_CHECK		0x0008	/* check options */
+#define T_DEFAULT	0x0010	/* get default options */
+#define T_SUCCESS	0x0020	/* success */
+#define T_FAILURE	0x0040	/* failure */
+/* 
+ *  The following are _XOPEN_SOURCE (XPG4 and up).
+ */
+#if _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
+#define T_CURRENT	0x0080	/* get current options */
+#define T_PARTSUCCESS	0x0100	/* partial success */
+#define T_READONLY	0x0200	/* option is read only */
+#define T_NOTSUPPORT	0x0400	/* option is not supported */
+#endif
 
+#define T_ALLOPT	0	/* All options at a level */
+
+/* 
+ *  General purpose constants
+ */
+#define T_UNSPEC	(~0-2)	/* Unspecified value */
+#define T_INVALID	(-2)	/* No sense */
+#define T_INFINITE	(-1)	/* No limit */
+#define T_NO		0	/* No/off/false */
+#define T_YES		1	/* Yes/on/true */
+#define T_GARBAGE	2
+#define T_UNUSED	(-1)
+#define	T_NULL		0
+#define T_ABSREQ	0x8000	/* Can be used to determine whether an option name is an absolute
+				   requirement */
+
+#if !(defined _XPG4_2 || defined _XOPEN_SOURCE) || defined __KERNEL__
+/* 
+ *  Older TLI options format and support macros.
+ */
+struct opthdr {
+	t_uscalar_t level;		/* Option level */
+	t_uscalar_t name;		/* Option name */
+	t_uscalar_t len;		/* Length of option value */
+	char value[0];			/* and onwards...  */
+};
+
+#define OPTLEN(len)								\
+	((((len) + sizeof(t_uscalar_t) - 1) sizeof(t_uscalar_t)) * sizeof(t_uscalar_t))
+
+#define OPTVAL(opt)								\
+	((char *)((struct opthdr *)opt + 1))
+#endif
+
+#if defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
+/* 
+ *  Newer XOPEN options format and support macros.
+ */
+struct t_opthdr {
+	t_uscalar_t len;		/* Option length, incl. header */
+	t_uscalar_t level;		/* Option level */
+	t_uscalar_t name;		/* Option name */
+	t_uscalar_t status;		/* Negotiation result */
+	char value[0];			/* and onwards...  */
+};
+
+#define _T_ALIGN_SIZE sizeof(t_uscalar_t)
+
+#define _T_ALIGN_OFS(p, o)							\
+	((char *)(((t_uscalar_t)(p) - (o) + _T_ALIGN_SIZE - 1)			\
+		    & ~(_T_ALIGN_SIZE - 1)) + (o))
+
+#define _T_ALIGN_OFFSET(p)							\
+	((t_uscalar_t)(p) & (_T_ALIGN_SIZE - 1))
+
+#define _T_ALIGN_OFS_OFS(p, l, o) _T_ALIGN_OFS((char *)(p) + l, (o))
+
+#define _T_OPT_FIRSTHDR_OFS(b, l, o)						\
+	((struct t_opthdr *)(							\
+	  (_T_ALIGN_OFS((b), (o)) + sizeof(struct t_opthdr)			\
+	   <= (char *)(b) + (l)) ?						\
+	   _T_ALIGN_OFS((b), (o)) : NULL))
+
+#define _T_OPT_NEXTHDR_OFS(b, l, p, o)						\
+	((struct t_opthdr *)(							\
+	  (_T_ALIGN_OFS_OFS((p), (p)->len + sizeof(struct t_opthdr), (o))	\
+	   <= ((char *)(b) + (l))) ?						\
+	  _T_ALIGN_OFS_OFS((p), (p)->len, (o)) : NULL				\
+	))
+
+#define _T_OPT_DATA_OFS(p, o)							\
+	((unsigned char *)(_T_ALIGN_OFS((struct t_opthdr *)(p)+1, (o))))
+
+#define T_OPT_FIRSTHDR(b)	_T_OPT_FIRSTHDR_OFS((b)->buf, (b)->len, 0)
+#define T_OPT_NEXTHDR(b, p)	_T_OPT_NEXTHDR_OFS((b)->buf, (b)->len, p, 0)
+#define T_OPT_DATA(p)		_T_OPT_DATA_OFS((p), 0)
+
+#endif
+
+#endif				/* _SYS_TPI_H */

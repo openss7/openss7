@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: xti_inet.h,v 0.9.2.1 2004/04/06 12:33:12 brian Exp $
+ @(#) $Id: xti_xti.h,v 0.9 2004/04/06 12:27:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2004 OpenSS7 Corporation.  All Rights Reserved.
+     Copyright (C) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.
 
                                   PUBLIC LICENSE
 
@@ -41,34 +41,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/06 12:33:12 $ by $Author: brian $
+ Last Modified $Date: 2004/04/06 12:27:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _XTI_INET_H
-#define _XTI_INET_H
+#ifndef _SYS_XTI_XTI_H
+#define _SYS_XTI_XTI_H
 
-#ident "@(#) $RCSfile: xti_inet.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_xti.h,v $ $Name:  $($Revision: 0.9 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-#ifdef __KERNEL__
-#error **** 
-#error **** This is a user-space header file.  It should never be included by
-#error **** kernel modules.  You should include <sys/xti_inet.h> instead.
-#error **** 
+#ifndef t_scalar_t
+typedef int32_t t_scalar_t;
+#define t_scalar_t t_scalar_t
 #endif
 
-#ifdef __BEGIN_DECLS
-/* *INDENT-OFF* */
-__BEGIN_DECLS
-/* *INDENT-ON* */
-#endif
+/* OPTIONS ON XTI LEVEL */
 
-#include <sys/xti_inet.h>
+/* 
+ *  XTI Level
+ */
+#define XTI_GENERIC	0xffff
 
-#ifdef __END_DECLS
-/* *INDENT-OFF* */
-__END_DECLS
-/* *INDENT-ON* */
-#endif
+/* 
+ *  XTI-level Options
+ */
+#define XTI_DEBUG	0x0001	/* enable debugging */
+#define XTI_LINGER	0x0080	/* linger on close if data present */
+#define XTI_RCVBUF	0x1002	/* receive buffer size */
+#define XTI_RCVLOWAT	0x1004	/* receive low-water mark */
+#define XTI_SNDBUF	0x1001	/* send buffer size */
+#define XTI_SNDLOWAT	0x1003	/* send low-water mark */
 
-#endif				/* _XTI_INET_H */
+/* 
+ * Structure used with linger option.
+ */
+struct t_linger {
+	t_scalar_t l_onoff;		/* option on/off */
+	t_scalar_t l_linger;		/* linger time */
+};
+
+#endif				/* _SYS_XTI_XTI_H */

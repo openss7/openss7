@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $
+ @(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/06 12:33:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
+ Last Modified $Date: 2004/04/06 12:33:12 $ by $Author: brian $
 
  $Log: xti.h,v $
+ Revision 0.9.2.2  2004/04/06 12:33:12  brian
+ - Working up header files.
+
  Revision 0.9.2.1  2004/04/05 12:39:05  brian
  - Working up XNET release.
 
@@ -75,7 +78,14 @@
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/05 12:39:05 $"
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/06 12:33:12 $"
+
+#ifdef __KERNEL__
+#error **** 
+#error **** This is a user-space header file.  It should never be included by
+#error **** kernel modules.  You should include <sys/xti.h> instead.
+#error **** 
+#endif
 
 #include <unistd.h>
 #include <features.h>
@@ -86,7 +96,7 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <xti/xti.h>
+#include <sys/xti.h>
 
 /* 
  * extern int t_errno;
@@ -149,6 +159,7 @@ struct netbuf {
 	char *buf;
 };
 
+#if 0
 #undef t_opthdr
 /* 
  * t_opthdr structure
@@ -161,6 +172,7 @@ struct t_opthdr {
 	t_uscalar_t status;		/* status value */
 	/* followed by option value(s) */
 };
+#endif
 
 /* 
  *  Format of the address and options arguments of bind.
@@ -223,6 +235,75 @@ struct t_leaf_status {
 	int status;			/* status: T_CONNECT or T_DISCONNECT */
 	int reason;			/* disconnect reason */
 };
+
+/* 
+ * The following are structure types used when dynamically allocating the
+ * above structures via t_alloc().
+ */
+#if defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__
+#define T_BIND		1	/* allocate t_bind structure */
+#define T_OPTMGMT	2	/* allocate t_optmgmt structure */
+#define T_CALL		3	/* allocate t_call structure */
+#define T_DIS		4	/* allocate t_discon structure */
+#define T_UNITDATA	5	/* allocate t_unitdata structure */
+#define T_UDERROR	6	/* allocate t_uderr structure */
+#define T_INFO		7	/* allocate t_info structure */
+#else				/* defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__ */
+#define T_BIND_STR	1	/* allocate t_bind structure */
+#define T_OPTMGMT_STR	2	/* allocate t_optmgmt structure */
+#define T_CALL_STR	3	/* allocate t_call structure */
+#define T_DIS_STR	4	/* allocate t_discon structure */
+#define T_UNITDATA_STR	5	/* allocate t_unitdata structure */
+#define T_UDERROR_STR	6	/* allocate t_uderr structure */
+#define T_INFO_STR	7	/* allocate t_info structure */
+#endif				/* defined _XPG4_2 || defined _XOPEN_SOURCE || defined __KERNEL__ */
+
+/* 
+ * The following bits specify which fields of the above structures should be
+ * allocated by t_alloc().
+ */
+#define T_ADDR		0x0001	/* address */
+#define T_OPT		0x0002	/* options */
+#define T_UDATA		0x0004	/* user data */
+#define T_ALL		0xffff	/* all the above fields supported */
+
+/* 
+ * The following are the states for the user.
+ */
+#define T_UNINIT	0	/* unitialized state */
+#define T_UNBND		1	/* unbound */
+#define T_IDLE		2	/* idle */
+#define T_OUTCON	3	/* outgoing connection pending */
+#define T_INCON		4	/* incoming connection pending */
+#define T_DATAXFER	5	/* data transfer */
+#define T_OUTREL	6	/* outgoing release pending */
+#define T_INREL		7	/* incoming release pending */
+#define T_FAKE		8
+#define T_HACK		12
+
+/* 
+ * The following are the events returned from t_look().
+ */
+#define T_LISTEN	0x0001	/* connection indication received */
+#define T_CONNECT	0x0002	/* connection confirmation received */
+#define T_DATA		0x0004	/* normal data received */
+#define T_EXDATA	0x0008	/* expedited data received */
+#define T_DISCONNECT	0x0010	/* disconnection received */
+#define T_UDERR		0x0040	/* datagram error indication */
+#define T_ORDREL	0x0080	/* orderly release indication */
+#define T_GODATA	0x0100	/* sending normal data is again possible */
+#define T_GOEXDATA	0x0200	/* sending expedited data is again possible */
+#define T_LEAFCHANGE	0x0400	/* status of a leaf has changed */
+#define T_EVENTS	0x0800
+#define T_ERROR		(~0)
+
+#ifndef __P
+#ifdef __STDC__
+#define __P(x)	x
+#else
+#define __P(x)	()
+#endif
+#endif
 
 /* 
  *  XTI LIBRARY FUNCTIONS

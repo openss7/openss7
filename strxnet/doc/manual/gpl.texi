@@ -1,7 +1,6 @@
-@ifnottex
 @setfilename gpl.info
 @heading GNU GENERAL PUBLIC LICENSE
-@end ifnottex
+@cindex GPL, General Public License
 @center Version 2, June 1991
 
 @display

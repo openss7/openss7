@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: udp.4.man,v 0.9 2004/04/05 19:52:53 brian Exp $
+.\" @(#) $Id: udp.4.man,v 0.9.2.1 2004/04/06 12:33:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -48,7 +48,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/04/05 19:52:53 $ by $Author: brian $
+.\" Modified $Date: 2004/04/06 12:33:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -66,7 +66,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UDP 4 "$Date: 2004/04/05 19:52:53 $" "$Name:  $" "OpenSS7 INET Devices"
+.TH UDP 4 "$Date: 2004/04/06 12:33:59 $" "$Name:  $" "OpenSS7 INET Devices"
 .SH NAME
 .B udp
 \- User Datagram Protocol
@@ -104,15 +104,20 @@ is implemented as a
 .IR STREAMS (4)
 pseudo-driver using the
 .BR INET (4)
-.B strinet
-packet for
+.B strxnet
+package for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+and
 .B LiS\c
 .
 .[
-LiS
+lis
 .]
 The
-.B strinet
+.B strxnet
 package translate Linux native
 .BR udp (7)
 sockets into TPI
@@ -251,7 +256,7 @@ For more information on the Linux NET4 version, see
 .BR INET (4),
 .BR ioctl (2),
 .BR ip (7),
-.BR LiS (9),
+.BR STREAMS (9),
 .BR protosw (5),
 .BR socket (7),
 .BR sockets (3),
