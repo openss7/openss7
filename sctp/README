@@ -1,10 +1,10 @@
 # *****************************************************************************
 # 
-# $Id: README,v 0.9.2.7 2003/05/08 21:44:35 brian Exp $
+# $Id: README,v 0.9.2.8 2004/01/26 13:56:10 brian Exp $
 # 
 # *****************************************************************************
 # 
-# Copyright (C) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 # 
 # All Rights Reserved.
 # 
@@ -24,17 +24,34 @@
 # 
 # *****************************************************************************
 # 
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+# 
+# *****************************************************************************
+# 
 # Commercial licensing and support of this software is available from OpenSS7
 # Corporation at a fee.  See http://www.openss7.com/
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2003/05/08 21:44:35 $ by $Author: brian $
+# Last Modified $Date: 2004/01/26 13:56:10 $ by $Author: brian $
 # 
 # *****************************************************************************
 
-This is the linux-sctp-0.2.16 prerelease.  It can be obtained from the
-download area of http://www.openss7.org as linux-sctp-0.2.16.tgz.
+
+This is the linux-sctp-0.2.18 prerelease.  It can be obtained from the
+download area of http://www.openss7.org as linux-sctp-0.2.18.tgz.
 
 Please see the INSTALL file for installation instructions.
 
@@ -44,15 +61,15 @@ this licensing arrangement.  If you are interested in different licensing
 arrangements on the loadable module, please contact the copyright holder
 (OpenSS7 Corporation) or bidulock@openss7.org
 
-linux-sctp-0.2.16 is the Prerelease2-16 version of a Linux Kernel native
+linux-sctp-0.2.18 is the Prerelease2-18 version of a Linux Kernel native
 implementation of RFC 2960 Stream Control Transmission Protocol.  For
 information on using the implementation see the man/sctp.7 Linux manual
-page and look at the test programs in linux-sctp-0.2.16/test/.
+page and look at the test programs in linux-sctp-0.2.18/test/.
 
 Please see RELEASE-NOTES for the release notes for the current version.
 
 WARNING:
-    This is prerelease code.  It is Beta but somewhat unstable.  It is
-    possible it will crash or lock your machine in some situations.  Please
-    remember that there is NO WARRANTY with this code and take appropriate
-    precautions when attempting to run it.
+    This is prerelease code.  It is Beta but rather stable.  Nevertheless,
+    it is possible it will crash or lock your machine in some situations.
+    Please remember that there is NO WARRANTY with this code and take
+    appropriate precautions when attempting to run it.
