@@ -1,25 +1,25 @@
-Source: @PACKAGE@-@VERSION@
+Source: @PACKAGE_LCNAME@-@VERSION@
 Section: devel
 Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE@-openss7-@VERSION@
+Package: @PACKAGE_LCNAME@-openss7-@VERSION@
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE@-openss7, @PACKAGE@-openss7-@VERSION@
+Provides: @PACKAGE_LCNAME@-openss7, @PACKAGE_LCNAME@-openss7-@VERSION@
 Suggests: sctp-0.2.20-2
-Description: This package includes @PACKAGE@ test programs optioned and compiled for use with
- OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 STREAMS socket library and socket
- drivers.  The purpose of this package is to be able to perform comparison tests against TCP and
- SCTP.  This distribution is currently only applicable to Linux release and was targetted at ix86
- and ppc architectures, but should build and install for other architectures as well.
+Description: @PACKAGE_SHORTTITLE@ for OpenSS7 SCTP.
+ Test programs optioned and compiled for use with OpenSS7 Linux Native SCTP
+ sockets interface.  The purpose of this package is to be able to perform
+ comparison tests against TCP and SCTP.
 
-Package: @PACKAGE@-doc-@VERSION@
+Package: @PACKAGE_LCNAME@-doc-@VERSION@
 Architecture: all
 Section: doc
 Priority: optional
-Provides: @PACKAGE@-doc
-Description: This package contains html documentation for the development of @PACKAGE@ applications,
- modules and drivers.
+Provides: @PACKAGE_LCNAME@-doc
+Description: Documentation and man pages for @PACKAGE_TITLE@
+ Pdf and html documentation for installation and the development of
+ @PACKAGE_TITLE@ applications, modules and drivers.

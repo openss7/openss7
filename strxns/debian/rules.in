@@ -1,99 +1,315 @@
 #!/usr/bin/make -f
-# =============================================================================
-# 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/09 08:00:26 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2005/03/09 08:00:26 $ by $Author: brian $
-#
-# =============================================================================
+## =============================================================================
+## 
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/21 11:50:36 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/03/21 11:50:36 $ by $Author: brian $
+##
+## =============================================================================
 
 PACKAGE = @PACKAGE@
+PACKAGE_LCNAME = @PACKAGE_LCNAME@
 VERSION = @VERSION@
+PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
+PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
+mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
 
-export DH_VERBOSE=1
-export DH_OPTIONS
+rootdir = @rootdir@
+kversion = @kversion@
+kmoduledir = @kmoduledir@
 
-build: OS7_ARCH_OPTION = --enable-indep --enable-arch
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+sbindir = @sbindir@
+sysconfdir = @sysconfdir@
+datadir = @datadir@
+includedir = @includedir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localstatedir = @localstatedir@
+sharedstatedir = @sharedstatedir@
+mandir = @mandir@
+infodir = @infodir@
+oldincludedir = @oldincludedir@
+
+configdir = @configdir@
+initrddir = @initrddir@
+
+pkgdatadir = $(datadir)/$(PACKAGE)
+pkglibdir = $(libdir)/$(PACKAGE)
+pkgincludedir = $(includedir)/$(PACKAGE)
+
+export DH_VERBOSE = 1
+export DH_OPTIONS =
+
+name = $(PACKAGE)
+
+kernel_version=@kversion@
+kernel_number=$(shell echo $(kversion) | sed -e s'|-.*$||')
+kernel_release=$(shell echo $(kversion) | sed -e s'|-|.|g')
+core_name = core-$(kversion)
+info_name = info-$(kversion)
+epoch = @PACKAGE_RPMEPOCH@
+majbase = @STRCONF_MAJBASE@
+makedev = @STRCONF_MAKEDEV@
+base = @PACKAGE_LCNAME@
+title = @PACKAGE_TITLE@
+stitle = @PACKAGE_SHORTTITLE@
+
+modules = streams-ip_strm_mod streams-ip_to_dlpi streams-ldl
+preloads =
+libraries =
+tools = strxns_mknod ldlconfig ldltest
+infofiles = $(name)
+initfiles = 
+
+@WITH_KO_MODULES_TRUE@with_ko_modules = 1
+@WITH_KO_MODULES_FALSE@with_ko_modules = 0
+
+have_init_files = 0
+have_libraries = 0
+have_preloads = 0
+
+pkg_control_files =
+
+@WITH_LFS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-streams-core-$(kversion)-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-streams-core-$(kversion)-$(VERSION).install:
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+@WITH_LIS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-lis-core-$(kversion)-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-lis-core-$(kversion)-$(VERSION).install:
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install:
+	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs:
+	( echo "AUTHORS" ; \
+	  echo "ChangeLog" ; \
+	  echo "COPYING" ; \
+	  echo "INSTALL" ; \
+	  echo "NEWS" ; \
+	  echo "README" ; \
+	  echo "THANKS" ; \
+	  echo "doc/manual" ; \
+	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages:
+	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
+
+@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install:
+	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
+	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info
+
+debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info:
+	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
+
+pkg_control_files += debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install:
+	( echo '$(mytmpdir)$(pkgincludedir)/*.h' ; \
+	  echo '$(mytmpdir)$(pkgincludedir)/sys/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+#pkg_control_files += debian/$(PACKAGE_LCNAME)-source-$(VERSION).install
+
+#debian/$(PACKAGE_LCNAME)-source-$(VERSION).install:
+#	( echo '$(mytmpdir)/usr/src/*' ) \
+#	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+
+@WITH_LFS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-streams-util-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-streams-util-$(VERSION).install:
+	( echo '$(mytmpdir)$(bindir)/*' ; \
+	  echo '$(mytmpdir)$(sbindir)/*' ; \
+	  echo '$(mytmpdir)$(libexecdir)/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+@INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
+@INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
+
+@WITH_LIS_TRUE@pkg_control_files += debian/$(PACKAGE_LCNAME)-lis-util-$(VERSION).install
+
+debian/$(PACKAGE_LCNAME)-lis-util-$(VERSION).install:
+	( echo '$(mytmpdir)$(bindir)/*' ; \
+	  echo '$(mytmpdir)$(sbindir)/*' ; \
+	  echo '$(mytmpdir)$(libexecdir)/*' ) \
+	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
+@INSTALL_INITSCRIPTS_TRUE@	( echo '$(mytmpdir)$(sysconfdir)/*' ) \
+@INSTALL_INITSCRIPTS_TRUE@	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' >> $@
+
+cache_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
+csite_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-config.site
+mpost_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
+
 build: build-stamp
 build-stamp:
 	dh_testdir
-	./configure $(OS7_ARCH_OPTION) $(PACKAGE_DEBOPTIONS)
-	$(MAKE)
+	./configure \
+		CC='$(CC)' \
+		CFLAGS='$(CFLAGS)' \
+		LDFLAGS='$(LDFLAGS)' \
+		CPPFLAGS='$(CPPFLAGS)' \
+		CPP='$(CPP)' \
+		CXX='$(CXX)' \
+		CXXFLAGS='$(CXXFLAGS)' \
+		CXXCPP='$(CXXCPP)' \
+		CONFIG_SITE="$(csite_file)" \
+		MODPOST_CACHE="$(mpost_file)" \
+		--cache-file="$(cache_file)" \
+		--host="$(DEB_HOST_GNU_ARCH)" \
+		--prefix=$(prefix) \
+		--exec_prefix=$(exec_prefix) \
+		--bindir=$(bindir) \
+		--sbindir=$(sbindir) \
+		--sysconfdir=$(sysconfdir) \
+		--datadir=$(datadir) \
+		--includedir=$(includedir) \
+		--libdir=$(libdir) \
+		--libexecdir=$(libexecdir) \
+		--localstatedir=$(localstatedir) \
+		--sharedstatedir=$(sharedstatedir) \
+		--mandir=$(mandir) \
+		--infodir=$(infodir) \
+		--disable-maintainer-mode \
+		--disable-dependency-tracking \
+		--with-gnu-ld \
+		--with-k-release=$(kversion) \
+		--with-k-modules=$(kmoduledir) \
+		--with-base-major=$(majbase) \
+		$(PACKAGE_DEBOPTIONS) \
+		$(BUILD_CFGOPTIONS) \
+		--disable-initscripts \
+		|| { rm -f $(cache_file) ; exit 1 ; }
+	$(MAKE) -f Makefile
+	$(MAKE) -f Makefile check
+	chmod +x debian/rules
 	touch build-stamp
 
-build-arch: OS7_ARCH_OPTION = --disable-indep --enable-arch
-build-arch: build-stamp
-
-build-indep: OS7_ARCH_OPTION = --enable-indep --disable-arch
-build-indep: build-stamp
-
 clean:
-	dh_testdir
-	dh_testroot
+	dh_testdir -v
+	dh_testroot -v
+	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
+	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
+	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
+	rm -fr $(mytmpdir)
 	rm -f build-stamp
-	$(MAKE) clean
-	$(MAKE) distclean
-	dh_clean
+	rm -f $(pkg_control_files)
+	dh_clean -v
 
-install: DH_OPTIONS=
+install: DH_OPTIONS =
 install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-	$(MAKE) DESTDIR=`pwd`/debian/tmp install
-	dh_install
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_control_files)
+	dh_install -v
 
-binary: build
+binary-common:
+	dh_testdir -v
+	dh_testroot -v
+	dh_installchangelogs -v
+	dh_installdocs -v
+	dh_installdebconf -v
+	dh_installinit -v
+	dh_installinfo -v
+	dh_installman -v
+	dh_strip -v
+	dh_link -v
+	dh_compress -v
+	dh_fixperms -v
+	dh_makeshlibs -v
+	dh_installdeb -v
+	dh_shlibdeps -v
+	dh_gencontrol -v
+	dh_md5sums -v
+	dh_builddeb -v
 
-binary-arch: build-arch
+# Build architecture-independent files here.
+binary-indep: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
-binary-indep: build-indep
+# Build architecture-dependent files here.
+binary-arch: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+binary: binary-indep binary-arch
+
+binary-%: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
 
 get-orig-source:
 	wget http://www.openss7.org/$(PACKAGE)-$(VERSION).tar.bz
 
+.PHONY: build clean binary-indep binary-arch binary install
+
+# =============================================================================
+# $Log: rules.in,v $
+# Revision 0.9.2.3  2005/03/21 11:50:36  brian
+# - updating debian packaging
+#
+# =============================================================================
+# vim: ft=make

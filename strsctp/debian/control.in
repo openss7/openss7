@@ -4,12 +4,12 @@ Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE_LCNAME@-LiS-core-@kversion@-@VERSION@
+Package: @PACKAGE_LCNAME@-lis-core-@kversion@-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-LiS-core @PACKAGE_LCNAME@-LiS-core-@kversion@ @PACKAGE_LCNAME@-LiS-core-@kversion@-@VERSION@
-Conflicts: streams-core @PACKAGE_LCNAME@-streams-core
+Provides: @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@, @PACKAGE_LCNAME@-lis-core-@kversion@-@VERSION@
+Conflicts: streams-core, @PACKAGE_LCNAME@-streams-core
 Description: Core LiS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for LiS.
  Includes assorted LiS drivers and modules for @PACKAGE_TITLE@.
@@ -21,8 +21,8 @@ Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-streams-core @PACKAGE_LCNAME@-streams-core-@kversion@ @PACKAGE_LCNAME@-streams-core-@kversion@-@VERSION@
-Conflicts: LiS-core @PACKAGE_LCNAME@-LiS-core
+Provides: @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@, @PACKAGE_LCNAME@-streams-core-@kversion@-@VERSION@
+Conflicts: LiS-core, @PACKAGE_LCNAME@-lis-core
 Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
  Includes assorted STREAMS drivers and modules for @PACKAGE_TITLE@.
@@ -30,11 +30,11 @@ Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  applies to kernel version @kversion@ and requires an STREAMS package
  compiled for the same kernel.
 
-Package: @PACKAGE_LCNAME@-LiS-lib-@VERSION@
+Package: @PACKAGE_LCNAME@-lis-lib-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lib @PACKAGE_LCNAME@-LiS-lib
+Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-lis-lib
 Description: Shared libraries for @PACKAGE_TITLE@ for LiS
  Run-time shared libraries necessary to run applications programs and utilities
  developed for @PACKAGE_SHORTTITLE@ for LiS.
@@ -43,16 +43,16 @@ Package: @PACKAGE_LCNAME@-streams-lib-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lib @PACKAGE_LCNAME@-streams-lib
+Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-streams-lib
 Description: Shared libraries for @PACKAGE_TITLE@ for STREAMS
  Run-time shared libraries necessary to run applications programs and utilities
  developed for @PACKAGE_SHORTTITLE@ for STREAMS.
 
-Package: @PACKAGE_LCNAME@-LiS-util-@VERSION@
+Package: @PACKAGE_LCNAME@-lis-util-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util @PACKAGE_LCNAME@-LiS-util
+Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-lis-util
 Conflicts: @PACKAGE_LCNAME@-streams-util
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and LiS
  Adminstration and configuration test utilities and commands for
@@ -62,8 +62,8 @@ Package: @PACKAGE_LCNAME@-streams-util-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util @PACKAGE_LCNAME@-streams-util
-Conflicts: @PACKAGE_LCNAME@-LiS-util
+Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-streams-util
+Conflicts: @PACKAGE_LCNAME@-lis-util
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
  Adminstration and configuration test utilities and commands for
  @PACKAGE_TITLE@ for STREAMS; also init scripts and configuration files.

@@ -1,50 +1,56 @@
-Source: @PACKAGE@-@VERSION@
+Source: @PACKAGE_LCNAME@-@VERSION@
 Section: devel
 Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE@-core-@VERSION@
+Package: @PACKAGE_LCNAME@-core-@kversion@-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE@-core, @PACKAGE@-core-@VERSION@
-Description: This package contains the kernel modules that provide the Linux kernel @PACKAGE_STITLE@
- Linux/BSD NET4 protocol modules.  This package is heavily tied to the kernel for which it was
- compiled.  This package applies to kernel version @PACKAGE_KVERSION@.
+Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@, @PACKAGE_LCNAME@-core-@kversion@-@VERSION@
+Description: Core kernel modules for @PACKAGE_TITLE@
+ Kernel modules that provide the Linux kernel @PACKAGE_TITLE@ Linux/BSD NET4
+ protocol modules.
+ These binaries are heavily tied to the kernel for which they were compiled:
+ applies to kernel version @kversion@.
 
-Package: @PACKAGE@-util-@VERSION@
+Package: @PACKAGE_LCNAME@-util-@VERSION@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE@-util
-Description: This package provides adminstrative and configuration test utilities and commands
- associated with the @PACKAGE_TITLE@ package.  It also includes necessary init scripts and
- configuration files.
+Provides: @PACKAGE_LCNAME@-util
+Description: Utitlity and test programs for @PACKAGE_TITLE@
+ Adminstration and configuration test utilities and commands for
+ @PACKAGE_TITLE@; also init scripts and configuration files.
 
-Package: @PACKAGE@-devel-@VERSION@
+Package: @PACKAGE_LCNAME@-devel-@VERSION@
 Architecture: any
 Section: devel
 Priority: optional
-Provides: @PACKAGE@-devel
-Description: This package contains library archives for static compilation, and headers files to
- develop @PACKAGE_TITLE@ applications.  This also includes the header files and static libraries
- required to compile @PACKAGE_TITLE@ applications programs.  In addition it contains all of the
- manual pages necessary for developing @PACKAGE_TITLE@ application programs.
+Provides: @PACKAGE_LCNAME@-devel
+Description: C headers and static libraries for @PACKAGE_TITLE@
+ Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
+ drivers; user-space headers and static libraries required to compile
+ @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
+ info files for both kernel and user-space functions.
 
-Package: @PACKAGE@-doc-@VERSION@
+Package: @PACKAGE_LCNAME@-doc-@VERSION@
 Architecture: all
 Section: doc
 Priority: optional
-Provides: @PACKAGE@-doc
-Description: This package contains html documentation for the development of @PACKAGE@ applications,
- modules and drivers.
+Provides: @PACKAGE_LCNAME@-doc
+Description: Documentation and man pages for @PACKAGE_TITLE@
+ Pdf and html documentation for installation and the development of
+ @PACKAGE_TITLE@ applications, modules and drivers.
 
-Package: @PACKAGE@-source-@VERSION@
+Package: @PACKAGE_LCNAME@-source-@VERSION@
 Architecture: all
 Section: devel
 Priority: optional
-Provides: @PACKAGE@-source
-Description: This package contains the source code necessary for building the @PACKAGE@ release.  It
- includes the autoconf configuration utilities necessary to create and distribute this dpkg.
+Provides: @PACKAGE_LCNAME@-source
+Description: Source code for @PACKAGE_TITLE@
+ Source code for building the @PACKAGE_TITLE@ release: autoconf configuration
+ utilities necessary to create and distribute this dpkg -- required for
+ recompiling against recompiled kernel.
 
