@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/01/14 06:38:47 $
+dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/01/15 19:34:37 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/15 19:34:37 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -977,6 +977,32 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
     #
     # CFLAGS="-Wall -Wstrict-prototypes -Wno-trigraphs -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common"
     CFLAGS="-Wall -Wno-trigraphs"
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+    then
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-system-headers"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wundef"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-endif-labels"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wbad-function-cast"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-qual"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-align"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wwrite-strings"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wconversion"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wsign-compare"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Waggregate-return"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wstrict-prototypes"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-prototypes"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-declarations"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-noreturn"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-format-attribute"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpacked"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpadded"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wredundant-decls"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wnested-externs"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wunreachable-code"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Winline"
+        #CFLAGS="${CFLAGS}${CFLAGS:+ }-Wdisabled-optimization"
+        CFLAGS="${CFLAGS}${CFLAGS:+ }-Werror"
+    fi
     AC_ARG_ENABLE([k-inline],
         AS_HELP_STRING([--enable-k-inline],
             [enable kernel inline functions.  @<:@default=no@:>@]),
@@ -984,7 +1010,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
         [enable_k_inline='no'])
     if test :"${enable_k_inline:-no}" != :no 
     then
-        CFLAGS="$CFLAGS${CFLAGS:+ }-Winline"
+        CFLAGS="$CFLAGS${CFLAGS:+ }-Winline -finline-functions"
     fi
     AC_ARG_WITH([k-optimize],
         AS_HELP_STRING([--with-k-optimize=HOW],
@@ -1010,13 +1036,15 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
             CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=`echo $linux_cv_march | sed -e 's|^alpha||'` -Wa,-mev6"
             ;;
         arm*)
+            CFLAGS=`echo "$CFLAGS" | sed -e'| -fno-common||'`
+            CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
             CFLAGS="${CFLAGS}${CFLAGS:+ }-fno-common -pipe -fomit-frame-pointer"
             CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$linux_cv_march"
             AC_MSG_WARN([*** you need to set -mapcs and -mtune yourself in CFLAGS= ***])
             ;;
         cris*)
             CFLAGS="${CFLAGS}${CFLAGS:+ }-mlinux -pipe"
-            CFLAGS=`echo "$CFLAGS" | sed -e'|-fomit-frame-pointer||'`
+            CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
             ;;
         i?86*)
             CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe"
@@ -1062,7 +1090,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
         m68*)
             CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -ffixed-a2"
             CFLAGS="${CFLAGS}${CFLAGS:+ }-m${linux_cv_march}"
-            CFLAGS=`echo "$CFLAGS" | sed -e'|-fomit-frame-pointer||'`
+            CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
             ;;
         mips64*)
             CFLAGS="${CFLAGS}${CFLAGS:+ }-mabi=64 -G 0 -mno-abicalls -fno-pic -Wa,--trap --pipe"

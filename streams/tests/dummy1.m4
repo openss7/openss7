@@ -1,7 +1,7 @@
 dnl vim: ft=config
 dnl =========================================================================
 dnl
-dnl @(#) $Id: dummy1.m4,v 0.9 2004/06/07 17:34:33 brian Exp $
+dnl @(#) $Id: dummy1.m4,v 0.9.2.1 2005/01/15 19:35:01 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,11 +52,12 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/07 17:34:33 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/15 19:35:01 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 AT_SETUP([dummy test])
+AT_TESTED([../autopush])
 AT_KEYWORDS([dummy])
 AT_CHECK([exit 0], [], [ignore])
 AT_XFAIL_IF(false)

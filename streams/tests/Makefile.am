@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/15 19:35:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/22 06:17:56 $ by $Author: brian $
+# Last Modified $Date: 2005/01/15 19:35:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@
 # pre-install checks.
 #
 
-TESTSUITE		= testsuite
+TESTSUITE		= $(srcdir)/testsuite
 
 $(srcdir)/package.m4: $(top_srcdir)/configure
 	@( \
@@ -85,8 +85,17 @@ $(TESTSUITE): $(TESTSUITE_DEPS)
 atconfig: $(top_builddir)/config.status
 	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
-EXTRA_DIST		= testsuite.at testsuite package.m4 \
-			  dummy1.m4 dummy2.m4 dummy3.m4 dummy4.m4
+# automake does this one for us
+#
+#atlocal: $(srcdir)/atlocal.in $(top_builddir)/config.status
+#	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
+
+EXTRA_DIST		= testsuite testsuite.at \
+			  dummy1.m4 \
+			  dummy2.m4 \
+			  dummy3.m4 \
+			  dummy4.m4 \
+			  package.m4
 dist_noinst_SCRIPTS	= testsuite
 
 if PERFORM_TESTING
@@ -104,7 +113,7 @@ installcheck-tirdwr:
 installcheck-inet:
 
 installcheck-test:
-#	$(SHELL) $(TESTSUITE) -x -v -d
+	$(SHELL) $(TESTSUITE) -x -v
 
 installcheck-hook: installcheck-specfs
 
@@ -120,11 +129,11 @@ installcheck-hook: installcheck-inet
 
 installcheck-hook: installcheck-test
 
-installcheck-hook: atconfig atlocal
+installcheck-hook: atconfig atlocal $(TESTSUITE)
 
 else
 
-installcheck-hook: atconfig atlocal
+installcheck-hook: atconfig atlocal $(TESTSUITE)
 
 endif
 

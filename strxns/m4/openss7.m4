@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/14 06:38:47 $
+dnl @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/15 22:39:18 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,10 +48,16 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/15 22:39:18 $ by $Author: brian $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl $Log: openss7.m4,v $
+dnl Revision 0.9.2.8  2005/01/15 22:39:18  brian
+dnl - Export necessary variables to check scripts.
+dnl
+dnl Revision 0.9.2.7  2005/01/15 19:34:37  brian
+dnl - Working up check and installcheck testing.
+dnl
 dnl Revision 0.9.2.6  2005/01/14 06:38:47  brian
 dnl - Updated copyright headers and comments.
 dnl
@@ -79,6 +85,7 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     AC_SUBST([PACKAGE_SHORTTITLE])dnl
     _OPENSS7_CACHE
     _OPENSS7_DEBUG
+    AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
 # =============================================================================
 
@@ -124,8 +131,9 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
     then
         CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wall||;s|  | |g'`
         CFLAGS=`echo "$CFLAGS" | sed -e 's|-Werror||;s|  | |g'`
+        CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wundef||;s|  | |g'`
         CFLAGS=`echo "$CFLAGS" | sed -e 's|^  *||;s|  *$||;s|    | |g;s|   | |g;s|  | |g'`
-        CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Werror"
+        CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Werror"
     fi
 ])# _OPENSS7_DEBUG
 # =============================================================================

@@ -1,0 +1,158 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_modules,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/15 22:39:18 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/01/15 22:39:18 $ by $Author: brian $
+#
+# =============================================================================
+
+script=`basename $0`
+testname="check: $script"
+
+KERNEL_SYSMAP="$DESTDIR$ksysmap"
+
+echo "$testname: I: ---------------------------------------------"
+echo "$testname: I: Testing undefined symbols in kernel modules."
+echo "$testname: I: ---------------------------------------------"
+if test -z "$KERNEL_SYSMAP"
+then
+	echo "$testname: E: KERNEL_SYSMAP is empty, skipping test."
+	echo "$testname: I: ---------------------------------------------"
+	exit 77
+fi
+if test -z "$KERNEL_MODULES"
+then
+	echo "$testname: E: KERNEL_MODULES is empty, skipping test."
+	echo "$testname: I: ---------------------------------------------"
+	exit 77
+fi
+echo "$testname: I: Using system map $KERNEL_SYSMAP."
+echo -n "$testname: I: Generating module symbol map.. "
+rm -f Modules.map
+for module in $KERNEL_MODULES
+do
+	nm -s $module | grep '\<B\>\|\<D\>\|\<T\>' >> Modules.map
+done
+echo " ..done."
+echo "$testname: I: ---------------------------------------------"
+for module in $KERNEL_MODULES
+do
+	thismodule=
+	if test -f ./$module
+	then
+		echo "$testname: D: Checking kernel module $module."
+		echo "$testname: I: ---------------------------------------------"
+#		symbollist=`objdump -t $module | grep '\*UND\*' | sed -e 's|^.* ||'`
+#		for symbol in $symbollist
+		nm -s $module | grep '\<U\>' | sed -e 's|^.* ||' > Modules.und
+		while read symbol
+		do
+			if test "$symbol" = "__this_module"
+			then
+				thismodule=found
+				continue
+			fi
+			echo -n "$testname: D: Checking symbol $symbol."
+			# we need to find the module name in the symbol table
+			# echo it for now
+			if ( grep "\<$symbol\>" Modules.map 2>&1 >/dev/null)
+			then
+				echo " ..found. (Modules.map)"
+			else
+				if ( grep "\<$symbol\>" $KERNEL_SYSMAP 2>&1 >/dev/null)
+				then
+					echo " ..found. (System.map)"
+				else
+					symbol=`echo $symbol | sed -r -e 's|_R(smp_)?[[:xdigit:]]{8}$||'`
+					if ( grep "\<$symbol\>" $KERNEL_SYSMAP 2>&1 >/dev/null)
+					then
+						echo " ..found. (System.map)[unversioned]"
+					else
+						echo " ..not found. ($symbol)"
+						symbols="${symbols}${symbols:+ }${module}:${symbol}"
+					fi
+				fi
+			fi
+		done <Modules.und
+		echo "$testname: I: ---------------------------------------------"
+	else
+		echo "$testname: E: Kernel module $module does not exist." >&2
+		echo "$testname: I: ---------------------------------------------"
+		modules="${modules}${modules:+ }$module"
+	fi
+done
+
+if test -z "$modules"
+then
+	echo "$testname: I: All modules found."
+else
+	echo "$testname: E: The following modules were not found:"
+	for module in $modules
+	do
+		echo "$testname: E: $module"
+	done
+	echo "$testname: I: ---------------------------------------------"
+fi
+if test -z "$symbols"
+then
+	echo "$testname: I: All symbols in all modules found."
+else
+	echo "$testname: E: The following symbols were not found:"
+	for symbol in $symbols
+	do
+		echo "$testname: E: $symbol"
+	done
+	echo "$testname: I: ---------------------------------------------"
+fi
+rm -f Modules.map Modules.und
+if test -n "$symbols" -o -n "$modules"
+then
+	exit 1
+fi
+exit 0
+

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/01/15 19:34:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/08/22 06:17:55 $"
+ #ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/08/22 06:17:55 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.30 $) $Date: 2004/08/22 06:17:55 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1102,7 +1102,7 @@ STATIC INLINE int spec_parse_options(char *options, struct spec_sb_info *sbi)
 	sbi->sbi_uid = uid;
 	sbi->sbi_gid = gid;
 	sbi->sbi_mode = mode & ~S_IFMT;
-	return (0);
+	return (err);
       einval:
 	err = -EINVAL;
 	goto done_options;
@@ -1371,6 +1371,7 @@ STATIC void spec_put_super(struct super_block *sb)
  */
 STATIC int spec_statfs(struct super_block *sb, struct statfs *buf)
 {
+	(void) sb;
 	ptrace(("%s: stat filesystem superblock %p\n", __FUNCTION__, sb));
 	buf->f_type = SPECFS_MAGIC;
 	buf->f_bsize = 1024;
@@ -1389,6 +1390,7 @@ STATIC int spec_statfs(struct super_block *sb, struct statfs *buf)
 STATIC int spec_remount_fs(struct super_block *sb, int *flags, char *data)
 {
 	struct spec_sb_info *sbi = sb->u.generic_sbp;
+	(void) flags;
 	ptrace(("%s: remouting superblock %p\n", __FUNCTION__, sb));
 	return spec_parse_options(data, sbi);
 }
@@ -1417,6 +1419,7 @@ STATIC void spec_clear_inode(struct inode *inode)
 STATIC void spec_umount_begin(struct super_block *sb)
 {
 	ptrace(("%s: unmounting with force, superblock %p\n", __FUNCTION__, sb));
+	(void) sb;
 	return;
 }
 

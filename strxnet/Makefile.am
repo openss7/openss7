@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/11/06 09:54:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/15 20:18:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/06 09:54:37 $ by $Author: brian $
+# Last Modified $Date: 2005/01/15 20:18:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -318,5 +318,10 @@ AM_RPMFLAGS = --define "_kversion $(PACKAGE_KVERSION)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
+
+dist_check_SCRIPTS	= $(srcdir)/scripts/check_modules
+
+TESTS			= $(srcdir)/scripts/check_modules
+TESTS_ENVIRONMENT	= KERNEL_MODULES='$(KERNEL_MODULES)' KERNEL_SYSMAP='$(DESTDIR)$(ksysmap)' $(SHELL)
 
 # vim: ft=automake

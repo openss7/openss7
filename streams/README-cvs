@@ -1,0 +1,132 @@
+# *****************************************************************************
+# 
+# $Id: README-cvs,v 0.9.2.1 2005/01/15 19:33:12 brian Exp $
+# 
+# *****************************************************************************
+# 
+# Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# 
+# All Rights Reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+# 
+# *****************************************************************************
+# 
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+# 
+# *****************************************************************************
+# 
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+# 
+# *****************************************************************************
+# 
+# Last Modified $Date: 2005/01/15 19:33:12 $ by $Author: brian $
+# 
+# *****************************************************************************
+
+The following is an extract from the manual to assist CVS developers:
+
+6.1.4 Downloading from CVS
+--------------------------
+
+If you are a subscriber or sponsor of The OpenSS7 Project
+(http://www.openss7.org/) with CVS archive access privileges then you can
+download release or mid-release versions of the 'streams' package from the
+project CVS archive.
+
+The Linux Fast-STREAMS package is located in the 'streams' subdirectory of
+'/var/cvs'.  For release tag information, see *Note Releases::.
+
+To access the archive from the project CVS pserver, use the following commands
+to check out a version from the archive:
+
+     % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
+     % cvs login
+     Password: *********
+     % cvs co -r streams_0.7a streams
+     % cvs logout
+
+It is, of course, possible to check out by date or by other criteria.  For more
+information, see *Note cvs(1): (*manpages*)cvs(1).
+
+Preparing the CVS Working Directory
+...................................
+
+Although public releases of the 'streams' package do not require
+reconfiguration, creating a configurable directory from the CVS archive
+requires tools not normally distributed with the other releases.
+
+The build host requires the following GNU tools:
+
+   * 'autoconf 2.59'
+
+   * 'automake 1.9.3'
+
+   * 'libtool 1.5.10'
+
+   * 'gettext 0.14.1'
+
+   * 'texinfo 4.0'
+
+It should be stressed that, in particular, the 'autoconf' and 'automake' must
+be at version releases '2.59' and '1.9'.  _The versions normally distributed in
+mainstream GNU/Linux distributions are, in fact, much older than these
+versions._  GNU version of these packages configured and installed to default
+directories will install in '/usr/local/' allowing them to coexist with
+distribution installed versions.
+
+In addition, the build host requires a complete tool chain for compiling for
+the target host, including kernel tools such as 'genksyms' and others.
+
+To generate a configuration script and the necessary scriptlets required by the
+GNU autoconf system, execute the following commands on the working directory:
+
+     % autoreconf -fisv streams
+
+where, 'streams' is the name of the directory to where the working copy was
+checked out under the previous step.  This command generates the 'configure'
+script and other missing pieces that are normally distributed with the release
+Tar Balls or RPMs.  The package can now be configured and built using the same
+instructions as are used for the Tar Ball, see *Note Configuring the Tar
+Ball::, and *Note Building from the Tar Ball::.
+
+Make sure that 'autoreconf --version' returns '2.59'.  Otherwise, you may need
+to perform something like the following:
+
+     % PATH="/usr/local/bin:$PATH"
+     % autoreconf -fisv streams
+
+When configuring the package in a working directory and while working an
+change-compile-test cycle that involves configuration macros or documentation,
+I find it of great advantage to invoke the GNU 'configure' options
+'--enable-maintainer-mode' and '--enable-dependency-tracking'.  The first of
+these two options will add maintainer-specific targets to any generated
+'Makefile', and the later will invoke automatic dependency tracking within the
+'Makefile' so rebuilds after changes to macro, source or documentation files
+will be automatically rebuilt.
+
