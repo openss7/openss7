@@ -1,0 +1,633 @@
+<html>
+
+
+
+<head>
+
+<title>Kernel Compatibility Issues</title>
+<meta name="title" content="LiS Kernel Compatibility Issues">
+<meta name="keywords" content="Linux, streams, kernel, compatibility, LiS">
+<meta name="description" content="Issues concerning kernel compatibility and LiS">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>Kernel Compatibility Issues Concerning LiS </h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+    <td width="600" height="100%" align="left" valign="top"> 
+      <h2><font color="#000000" size="+0">LiS-2.15 Kernel and Driver Compatibility</font></h2>
+      <p>LiS-2.15 continues to insulate STREAMS drivers from the Linux kernel. 
+        It works with 2.2, 2.4, and 2.5 versions of the kernel. Support for 2.0 
+        kernels has been dropped.</p>
+      <p>Driver writers will need to recompile their drivers against LiS-2.15 
+        include files. You will see the following major changes.</p>
+      <ul>
+        <li>LiS spin locks and semaphores have been rearranged so that the kernel 
+          memory is at the end of the structure instead of the beginning.</li>
+        <li>The former change allows for there to be dynamic allocation routines 
+          for <a href="dki.html#dynamicspinlocks">spin locks</a> and <a href="dki.html#dynamicsemaphores">semaphores</a>.</li>
+        <li>LiS now provides an abstraction for <a href="dki.html#LiSReadWriteLocks">read/write 
+          locks</a>, with dynamic allocation.</li>
+        <li>Those experimenting with 2.5 kernels will notice that the &quot;sleep 
+          while holding spin lock&quot; problems have been fixed.</li>
+        <li>Porting to 2.5 has necessitated some changes to the <a href="dki.html#majorminordev_t">major/minor 
+          device</a> structure handling.</li>
+        <li>The fattach related functions are functional on kernels version 2.4.7 
+          and later.</li>
+        <li>STREAMS pipes and FIFOs are now functional.</li>
+        <li>OS interface code has been added for the kernel's DMA mapping functions.</li>
+      </ul>
+      <p>There is one known bug in LiS-2.15 relative to 2.5 kernels. It has to 
+        do with a memory leak involving timer structures, and may prove to be 
+        a kernel bug rather than an LiS bug. Since the 2.5 kernel is not suitable 
+        for general use I am saving the investigation of this bug for later.</p>
+      <h2><font color="#000000" size="+0">LiS-2.14 Kernel and Driver Compatibility</font></h2>
+      <p>LiS-2.13 was a series of beta releases. LiS-2.14 represents the culmination 
+        of this series. There should be enough distribution and kernel compatibility 
+        that LiS-2.14 will hold up for some time.</p>
+      <p>The known fattach and FIFO bugs have still not been fixed. The author 
+        of those subsystems has not found the time to put in the fixes, nor have 
+        I. </p>
+      <h2><font color="#000000" size="+0">LiS-2.13 Kernel and Driver Compatibility</font></h2>
+      <p>This version of LiS has been tested with 2.4 kernels up to 2.4.16. LiS 
+        does not yet support the fattach/fdetach functions on kernel versions 
+        2.4.7 and beyond. There are also known bugs in the LiS pipe/FIFO code. 
+        All of these problems are scheduled to be fixed in early 2002.</p>
+      <p>LiS-2.13 adds the ability for drivers to make their own &quot;/dev&quot; 
+        nodes via the <a href="dki.html#syscalls">lis_mknod</a> function. Also 
+        provided is an <a href="dki.html#syscalls">lis_unlink</a> function that 
+        allows drivers to remove their device files.</p>
+      <p>There is almost no new functionality added by LiS-2.13. The differences 
+        between LiS-2.13 and LiS-2.12 are almost entirely kernel compatibility 
+        issues and bug fixes.</p>
+      <h2><font color="#000000" size="+0">LiS-2.12 Kernel and Driver Compatibility</font></h2>
+      <p>This version of LiS is compatible with all 2.2.x versions of the kernel 
+        and with early versions of the 2.4.x kernel, at least up to 2.4.2 and 
+        perhaps later versions as well.</p>
+      <p>If you have drivers that have worked with LiS-2.10 or LiS-2.11 (or earlier) 
+        please recompile them using the header files from LiS-2.12. This may be 
+        the last recompile in quite some time that you will need for your driver 
+        code.</p>
+      <p>LiS-2.12 contains a sufficient <a href="dki.html">Driver/Kernel Interface 
+        (DKI)</a> that it is straightforward to write a STREAMS driver that can 
+        be compiled against LiS-2.12 and the resulting object modules used either 
+        on a 2.2 or 2.4 kernel, with only LiS needing recompilation on the target 
+        machine.</p>
+      <p>When run on 2.4 kernels, LiS makes <a href="smp.html">full use of multiple 
+        CPUs</a>. It forks a queue runner task for each CPU and locks each task 
+        onto its CPU. Queue runner tasks are awakened to assist with service procedure 
+        processing as the number of scheduled queues increases.</p>
+      <p>Because of this aggressive use of processors, you may find that your 
+        drivers do not function properly when run with LiS-2.12 in a multi-CPU 
+        SMP environment. You should expect that drivers that worked in single-CPU 
+        environments will continue to work as before.</p>
+      <p>Making your drivers MP safe involves the use of spin locks. The <a href="dki.html">DKI</a> 
+        documentation contains advice on the use of these locks.</p>
+      <p>This version of LiS also contains a rewrite of the flushing code and 
+        tests added to strtst for flushing. In particular the details of <a href="dki.html#flush_band">the 
+        rules for flushing queue bands</a> are now adhered to. Be advised, however, 
+        that Solaris STREAMS does not adhere strictly to these rules so there 
+        may be some subtle differences in behavior between LiS and Solaris when 
+        flushing queue bands.</p>
+      <p>Speaking of queue bands, the queue band handling code has been debugged 
+        a bit more and a test added to <font face="Courier New, Courier, mono">strtst</font> 
+        to illustrate its correct behavior.</p>
+      <h2><font size="+0">Differences between LiS-2.12.2 and LiS-2.12.1</font></h2>
+      <ul>
+        <li>LiS installation will attempt a kernel &quot;make dep&quot; if modversions.h 
+          is needed but absent</li>
+      </ul>
+      <h2><font size="+0">Differences between LiS-2.12.1 and LiS-2.12</font></h2>
+      <ul>
+        <li>Added an <a href="config.html#major-base">environment variable</a> 
+          to control the base of the LiS major device numbers.</li>
+        <li>LDL needed ifdef for ETH_P_ECHO for 2.4.4 (de-implemented symbol).</li>
+        <li>Queue runner threads change to root directory at startup time.</li>
+        <li>Fixed a lock ordering problem with lis_backenable.</li>
+        <li>Stopped acquiring the inode i_sem; not needed and led to lock ordering 
+          problems. </li>
+      </ul>
+      <h2><font size="+0">Differences between LiS-2.12 and LiS-2.11</font></h2>
+      <p>The following is a list of differences between LiS-2.11 and LiS-2.12. 
+        The list may not be complete.</p>
+      <ul>
+        <li>The <a href="smp.html">aggressive use of multiple CPUs</a> on 2.4 
+          kernels is the biggest difference.</li>
+        <li><a href="dki.html#Debugging_Spin_Locks">Debugging support for spin 
+          locks</a> and semaphores.</li>
+        <li>Rewrite of flushing code to adhere to <a href="dki.html#flush_band">AT&amp;T 
+          semantics</a> for flushing queue bands.</li>
+        <li>Improve queue band handling code.</li>
+        <li>Fix some problems with orphan inode structures with pipes, fifos and 
+          fattach.</li>
+        <li>Put and service procedure prototypes changed to return int rather 
+          than void (AT&amp;T compatibility).</li>
+        <li>Propogate task credentials (user id and capabilities) of stream opener 
+          to service procedures.</li>
+        <li>Ensure that opener's user id is associated with the opened stream.</li>
+        <li>Use defined type toid_t for return from timeout function.</li>
+        <li>M_SIG causes signal as soon as it reaches front of queue without having 
+          to be read.</li>
+        <li>Fix problem with flushing stream head queue with M_PCPROTO at front.</li>
+        <li>Getpmsg did not always update the strbuf len field correctly for empty 
+          messages. </li>
+        <li>Cross compile patches for PPC from Wolfgang Denk.</li>
+        <li>Change in <a href="#major_devices">LiS major device numbers</a>.</li>
+        <li>Support for 2.0 kernels no longer maintained. If you are using an 
+          older kernel you must use an older LiS version as well (try LiS-2.8).</li>
+        <li>No longer use /etc/ld.so.preload. Instead just copy LiS libs to /lib 
+          and run ldconfig.</li>
+        <li>Make very-clean now removes LiS libs as well as other stuff.</li>
+      </ul>
+      <h2><font color="#000000" size="+0">LiS-2.10 Kernel and Driver Compatibility</font></h2>
+      <p>This version of LiS is compatible with all 2.2.x versions of the Linux 
+        kernel. It <i>may</i> work with 2.4.x kernels, but you should probably 
+        wait for LiS-2.11 for that.</p>
+      <p>If you have drivers that worked with LiS-2.8 or earlier, you must recompile 
+        your drivers in the context of the LiS-2.10 header files. The <font face="Courier New, Courier, mono">queue_t</font> 
+        structure has changed in size since LiS-2.8 which means that the old RD 
+        and WR macros will not compute the correct addresses.</p>
+      <p>LiS-2.10 contains features that are intended to greately reduce the necessity 
+        of recompiling STREAMS driver code in future versions of LiS or future 
+        versions of the kernel. The goal is to be able to compile STREAMS drivers 
+        against LiS-2.10 header files and use the resulting object code on both 
+        2.2.x kernels and 2.4.x kernels.</p>
+      <p>For more details about the interface between STREAMS drivers and the 
+        kernel, see the <a href="dki.html">Driver/Kernel Interface</a> documentation.</p>
+      <h2><font size="+0">New Features in LiS-2.11</font></h2>
+      <p>LiS-2.11 only differs from LiS-2.10 in that LiS-2.11 runs on kernel version 
+        2.4.0 in addition to the 2.2 series of kernels.</p>
+      <p>NOTE: When running with a 2.4 kernel, make sure that you are using <i>modutils</i> 
+        at least as recent as 2.3.21. The alignment of the text segment in loadable 
+        modules changed in the 2.4 kernel and the old <i>modutils</i> do not understand 
+        the new alignment. The <font face="Courier New, Courier, mono">strtst</font> 
+        program will not run correctly unless LiS is loaded using the newer <i>modutils</i>. 
+        You can find the source for the new <i>modutils</i> at <font size="-1"><a href="http://www.kernel.org/pub/linux/utils/kernel/modutils/v2.3">http://www.kernel.org/pub/linux/utils/kernel/modutils/v2.3</a></font>.</p>
+      <h2><font size="+0">New Features in LiS-2.10</font></h2>
+      <p>LiS-2.10 contains a number of new features since LiS-2.8. LiS-2.9 was 
+        largely a beta release that tested these features.</p>
+      <ul>
+        <li>fattach/fdetach - These SVR4 functions have finally been implemented.</li>
+        <li>STREAMS pipes - The default LiS library contains a &quot;pipe&quot; 
+          routine that uses STREAMS to implement inter-process pipes.</li>
+        <li>STREAMS fifos - You can now write pipe server processes to which clients 
+          can attach simply by opening a named file.</li>
+        <li>SMP Safety - LiS will now run on multi-CPU systems.</li>
+        <li>Driver insulation - LiS now provides a rich set of interface routines 
+          that insulate a STREAMS driver from the kernel version on which it is 
+          running.</li>
+        <li>Improved Configuration - The installation script recognizes more versions 
+          and distributions of the kernel.</li>
+        <li>libc Compatibility - LiS and glibc are getting more compatible all 
+          the time. The LiS and glibc stropts.h files are now completely compatible.</li>
+        <li>Improved Documentation - There is at least some documentation for 
+          all of the new features.</li>
+        <li>Searchable Documentation - Gcom has published a new web site at <a href="http://www.gcom.com">http://www.gcom.com</a> 
+          with search capabilities. This includes the ability to search LiS documentation 
+          from the web.</li>
+      </ul>
+      <h2> <font size=+0>Kernel Version 2.3.x</font></h2>
+      <p>For LiS version 2.7 and later and for kernel version 2.3.x there are 
+        some significant compatibility issues.&nbsp; Click <a href="#kernel_2_3">here</a> 
+        for more on this topic. </p>
+      <h2> <font size=+0>Kernel Version 2.2.x</font></h2>
+      <p>For LiS version 2.5 and later and for kernel version 2.2.x there are 
+        no compatibility issues; there are no kernel patches whatsoever required 
+        to install LiS. You will need LiS-2.4 at minimum to run in a 2.2.x kernel. 
+      </p>
+      <h2> <font size=+0>Kernel Version 2.0.36</font></h2>
+      <p>The latest version of LiS has not been tested on 2.0 kernels. Therefore, 
+        do not be surprised if it does not install or execute correctly in these 
+        kernels. If you are using an old kernel, you must also use an older version 
+        of LiS, perhaps LiS-2.5.</p>
+      <p>For LiS version 2.5 and later and for kernel version 2.0.36 there are 
+        no kernel patches required to run LiS as a "bottom half" process. A one-line 
+        patch is required to run LiS as a kernel daemon process. The installation 
+        default is to run as a bottom half process in 2.0.36. LiS-1.25 or later 
+        should install properly with 2.0.36. The more recent the version of LiS, 
+        the less kernel patching is required. </p>
+      <h2> <font size=+0>Extracting Old LiS Kernel Patches&nbsp;(obsolete)</font></h2>
+      <p>Previous versions of LiS installed inside the kernel source tree and 
+        included patches to the kernel in order to install LiS into the kernel. 
+        There was no provision made for removing these patches from the kernel.&nbsp; 
+      </p>
+      <p>Beginning with LiS-1.25 any patches made to kernels whose version number 
+        is 2.0.35 or later can be removed from the kernel just by doing a "make 
+        realclean" in the LiS installation directory. If you have installed the 
+        older version of LiS in your kernel then you need to take steps to remove 
+        it prior to installing this version of LiS.&nbsp; 
+      <p>There are two methods of doing this. Both are manual procedures.&nbsp; 
+      <ol>
+        <li> Change the name of your kernel source directory, as in</li>
+        <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mv /usr/src/linux /usr/src/linux.old</pre>
+        and then untar a fresh kernel source as /usr/src/linux. This method works 
+        fine if LiS was the only patch to your kernel. Once the new kernel works, 
+        remove the linux.old directory.&nbsp; 
+        <li> In your kernel tree, do the following:</li>
+      </ol>
+      <dir> 
+        <dir> 
+          <pre>&nbsp;&nbsp;&nbsp;&nbsp; cd /usr/src/linux/drivers
+
+&nbsp;&nbsp;&nbsp;&nbsp; rm -r streams</pre>
+          That deletes almost all of the files that came with the old version 
+          of LiS.&nbsp; 
+          <p>Next, you must restore the patched kernel files to their original 
+            state. From the directory /usr/src/linux, look for the following files:&nbsp; 
+          <p>LiS:&nbsp; 
+        </dir>
+        <ul>
+          <ul>
+            <li> arch/i386/kernel/entry.S.orig&nbsp;</li>
+            <li> fs/read_write.c.orig&nbsp;</li>
+            <li> fs/select.c.orig&nbsp;</li>
+            <li> kernel/ksyms.c.orig&nbsp;</li>
+            <li> init/main.c.orig&nbsp;</li>
+            <li> include/asm-i386/unistd.h.orig&nbsp;</li>
+            <li> drivers/Makefile.orig</li>
+          </ul>
+        </ul>
+        <dir> 
+          <li> Semaphores:&nbsp;</li>
+        </dir>
+        <ul>
+          <ul>
+            <li> arch/i386/lib/semaphore.S.orig&nbsp;</li>
+            <li> kernel/sched.c.orig&nbsp;</li>
+            <li> include/asm/semaphore.h.orig</li>
+          </ul>
+        </ul>
+        <dir> 
+          <li> If you do not have any other patches applied to these files, then 
+            change their names back to the original file names (these names minus 
+            the .orig suffix). Not all of these files will be present on every 
+            version of the kernel. Kernels later than 2.0.30 would not have had 
+            the semaphore patch, for example.&nbsp;</li>
+          <br>
+          &nbsp; 
+          <p>&nbsp; 
+          <p>If you have other patches in these files then you will need to consult 
+            one of the following files from the newly installed /usr/src/LiS directory:&nbsp; 
+        </dir>
+        <ul>
+          <ul>
+            <li> patches.kernel.24-27&nbsp;</li>
+            <li> patches.kernel.28-34</li>
+          </ul>
+        </ul>
+        <dir> 
+          <li> There is really no recourse at this point other than to examine 
+            the patches and manually extract the LiS patches from the affected 
+            files.&nbsp;</li>
+        </dir>
+      </dir>
+      <dir> 
+        <h2><font size=+0>Open Flags&nbsp;(obsolete)</font></h2>
+        <p>The open flags MODOPEN and CLONEOPEN have been changed since the previous 
+          version. You must recompile your STREAMS drivers using the new header 
+          files in order to incorporate this change. The change brings the bit 
+          assignments into conformance with SVR4.&nbsp; </p>
+        <p>STREAMS drivers compiled against the old header files <i>should not</i> 
+          be linked into LiS without recompiling. The old open routines will misinterpret 
+          their flags argument.&nbsp; 
+        <h3> <font size=+0>System Calls&nbsp;(obsolete)</font></h3>
+        <p>This change affects all application level programs that use the STREAMS 
+          constructs getpmsg, putpmsg or poll.&nbsp;</P>
+        <p>For kernel versions prior to 2.0.36, LiS did not have official system 
+          call numbers assigned for getpmsg, putpmsg and poll. Beginning with 
+          kernel version 2.0.36, and all 2.2 kernels, LiS has official system 
+          call numbers assigned for getpmsg and putpmsg. The 2.2 kernels have 
+          a built-in poll system call. Therefore, there is no LiS poll system 
+          call in 2.2 kernels.&nbsp; 
+        <p>The system call slots that LiS used for getpmsg and putpmsg in earlier 
+          kernels were, of course, taken up by other functions by the time the 
+          official system call slots got assigned for the 2.2 (and 2.1) kernel. 
+          That means that older STREAMS applications compiled for use with earlier 
+          versions of LiS, when run on newer kernels, will be issuing incorrect 
+          system calls for getpmsg and putpmsg. These applications need to be 
+          recompiled and relinked using the new LiS.&nbsp; 
+        <p>The new version of LiS, even when run on kernels prior to 2.0.36, will 
+          always plug the system call table slots for the new "official" STREAMS 
+          system calls in addition to the older ad hoc slots. This means that 
+          you can use applications that utilize putpmsg and getpmsg with the new 
+          system calls on older kernels by using the new version of LiS.&nbsp; 
+        <p>However, the poll system call is not so easy. If your application uses 
+          poll then you must maintain a version of it that is compatible with 
+          kernel versions prior to 2.0.36 and another version that is compatible 
+          with kernel versions 2.0.36 and beyond, including 2.2 kernels. The reason 
+          for this is that prior to 2.0.36, LiS contained the only implementation 
+          of the poll system call. However, starting with 2.0.36, the kernel contains 
+          its own implementation of poll and the LiS implementation must yield 
+          to the kernel's implementation. The system call slot used by LiS for 
+          poll and the one used by the Linux kernel are different. So there is 
+          really no way around maintaining two versions of such applications.&nbsp; 
+        <p>The following table summarizes the system call number assignments for 
+          different kernel versions. Numbers in plain text are the ad hoc numbers 
+          used by earlier versions of LiS. Numbers in <i>italics</i> are official 
+          kernel assigned numbers. The problem with the poll system call is that 
+          the number 169, used by earlier version of LiS, is used for a different 
+          system call in kernel version 2.0.36 and beyond. Thus, it is not possible 
+          for LiS to plug that system call slot with a pointer to its poll routine 
+          for backward compatibility.&nbsp; <br>
+          &nbsp; 
+        <table BORDER cellpadding=7 >
+          <tr> 
+            <td valign=TOP width="43%" height="9">Version</td>
+            <td align=CENTER valign=TOP width="19%" height="9">Getpmsg</td>
+            <td align=CENTER valign=TOP width="19%" height="9">Putpmsg</td>
+            <td align=CENTER valign=TOP width="19%" height="9">Poll</td>
+          </tr>
+          <tr> 
+            <td valign=TOP width="43%" height="9">LiS for kernel versions &lt; 
+              2.0.36</td>
+            <td align=CENTER valign=TOP width="19%" height="9">168</td>
+            <td align=CENTER valign=TOP width="19%" height="9">167</td>
+            <td align=CENTER valign=TOP width="19%" height="9">169</td>
+          </tr>
+          <tr> 
+            <td valign=TOP width="43%" height="9">LiS for kernel version 2.0.36</td>
+            <td align=CENTER valign=TOP width="19%" height="9"><i>188</i></td>
+            <td align=CENTER valign=TOP width="19%" height="9"><i>189</i></td>
+            <td align=CENTER valign=TOP width="19%" height="9"><i>168</i></td>
+          </tr>
+          <tr> 
+            <td valign=TOP width="43%" height="9">LiS for kernel versions >= 2.2.0</td>
+            <td align=CENTER valign=TOP width="19%" height="9"><i>188</i></td>
+            <td align=CENTER valign=TOP width="19%" height="9"><i>189</i></td>
+            <td align=CENTER valign=TOP width="19%" height="9"><i>168</i></td>
+          </tr>
+        </table>
+        <p>In kernel versions 2.0.36 and earlier, LiS provides the implementation 
+          of the poll system call. In 2.2 kernels, the kernel provides the implementation 
+          of poll and LiS hooks into it on behalf of its STREAMS drivers.&nbsp; 
+        <h2> <font size=+1>Libraries</font>&nbsp;</h2>
+        <p>The older version of LiS had direct inline code for STREAMS system 
+          calls defined in <font face="Courier New, Courier, mono">stropts.h</font>. 
+          The new version contains function prototypes in <font face="Courier New, Courier, mono">stropts.h</font> 
+          with the actual system call code contained in a library that you link 
+          with your application program.&nbsp;</p>
+        <p>The library resides in the directory <font face="Courier New, Courier, mono">/lib</font> 
+          and is named <font face="Courier New, Courier, mono">libLiS.a</font>. 
+          Thus, you need to include the directive "<font face="Courier New, Courier, mono">-lLiS</font>" 
+          with the link of your STREAMS applications. For more about LiS libraries 
+          <a href="libc.html">click here</a>.&nbsp; 
+        <h3> <b><font size=+0>Interactions with Other Packages</font></b>&nbsp;</h3>
+        <p>In kernel versions around 2.2.14 there were some compile time clashes 
+          with the irda driver. These have been resolved and/or worked around 
+          in LiS-2.10.</p>
+        <p>On kernel version prior to 2.0.36 there can be problems with LiS interacting 
+          with other packages such as JDK and, perhaps, iBSC. In particular, JDK 
+          looks to see if system call number 168 has been assigned. If it has, 
+          it assumes that the operating system implements the poll system call 
+          in that slot. As you can see from the chart above, older versions of 
+          LiS did plug system call 168, but with the getpmsg routine, not with 
+          poll. Although we do not know for sure there is a possibility that iBSC 
+          would have the same problem.&nbsp; </p>
+        <p>The solution is to upgrade to a kernel at least as new as 2.0.36 or 
+          a 2.2 series kernel.&nbsp; 
+        <h2> <a name="kernel_2_3"></a><font size=+0>Compatibility with Kernel 
+          Version 2.3.x</font></h2>
+        <p>Version 2.3 of the Linux kernel brings with it some compatibility issues 
+          that need to be addressed by the LiS user.&nbsp; The two most important 
+          ones concern the file &lt;sys/stropts.h> and the major device numbers 
+          used by LiS. </p>
+        <h4>stropts.h Compatibility</h4>
+        <p>There are no more compatibility problems with &lt;sys/stropts.h&gt; 
+          with glibc-2.1 and LiS-2.10. The following is more for historical purposes 
+          than practical necessity.</p>
+        <p>Beginning at least with egcs-2.91.66 (egcs-1.1.2 release), which comes 
+          with Red Hat 6.0, there is a file in the standard include directory 
+          named &lt;sys/stropts.h>.&nbsp; This file has constant definitions that 
+          are incompatible with those used in&nbsp; LiS/include/sys/stropts.h.&nbsp; 
+          If you compile an application against the glibc version of stropts.h, 
+          and compile LiS using its own version then certain ioctls may not work 
+          correctly.&nbsp; You should be aware of this problem and be sure to 
+          include "-I/usr/src/LiS/include" in the compiler options that you use 
+          in compiling your STREAMS based applications. 
+        <p>In this version of LiS, some of the constants in stropts.h have been 
+          changed to conform to the values used by UnixWare and Solaris.&nbsp; 
+          These are different values than previously used in LiS.&nbsp; When you 
+          install LiS the installation procedure will ask you whether you want 
+          LiS compiled with the backward-compatible LiS constants, or the UnixWare/Solaris 
+          compatible constants.&nbsp; Logically speaking, it does not matter which 
+          set you use as long as LiS and your application code are both compiled 
+          with the same values. 
+        <p>I highly recommend that you use the UnixWare/Solaris compatible version, 
+          however.&nbsp; A future release of egcs, utilizing glibc 2.2, will contain 
+          an updated version of its stropts.h which has constants that are compatible 
+          with UnixWare, Solaris and LiS.&nbsp; So by selecting the UnixWare/Solaris 
+          compatible version at this time you can ensure that your applications 
+          will be fully compatible with these values in the future. 
+        <p>With any luck, these constants will never have to change again. </p>
+        <h4><a name="major_devices"></a>Major Device Number Compatibility</h4>
+        <p>The second major compatibility issue concerns the major device numbers 
+          that LiS assigns to STREAMS devices.&nbsp; In the past LiS based these 
+          device numbers at 50, since the Linux kernel did not pre-define many 
+          major device numbers.&nbsp; As of kernel version 2.3.x there are major 
+          device numbers defined up to 220 and beyone!&nbsp; So starting with 
+          LiS-2.12, we have used the major number of 240 as the base for STREAMS 
+          device files. This range is supposed to be reserved for &quot;experimental 
+          drivers&quot; which should make it safe to use. 
+        <p>What this means is that you must be sure to run the <font face="Courier New, Courier, mono">strmakenodes</font> 
+          program before running any STREAMS applications after installing LiS-2.12.&nbsp; 
+          This need not concern you overly, since doing a "<font face="Courier New, Courier, mono">make 
+          install</font>" in the <font face="Courier New, Courier, mono">/usr/src/LiS</font> 
+          directory causes <font face="Courier New, Courier, mono">strmakenodes</font> 
+          to be run anyway.&nbsp; This is more a concern if you are compiling 
+          LiS on one machine and then loading it onto another for execution.&nbsp; 
+          In such cases you may need to load the new <font face="Courier New, Courier, mono">strmakenodes</font> 
+          program and run it. </p>
+        <p>I am hoping that the kernel developers will expand the major and minor 
+          device number spaces for 2.6. If they do that then LiS should be able 
+          to get a block of majors allocated to it.</p>
+      </dir>
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
