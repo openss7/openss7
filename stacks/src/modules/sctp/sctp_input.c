@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $
+ @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:59 $ by $Author: brian $
+ Last Modified $Date: 2004/06/21 09:26:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $"
+#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $"
 
-static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $";
+static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $";
 
 #define __NO_VERSION__
 
@@ -314,6 +314,7 @@ sctp_rcv(struct sk_buff *skb)
 #define IPPROTO_SCTP 132
 #endif
 
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 STATIC struct inet_protocol sctp_protocol = {
 	sctp_rcv,			/* SCTP data handler */
 	sctp_err,			/* SCTP error control */
@@ -335,3 +336,23 @@ sctp_term_proto(void)
 {
 	inet_del_protocol(&sctp_protocol);
 }
+#endif
+
+#ifdef HAVE_NEW_STYLE_INET_PROTOCOL
+STATIC struct inet_protocol sctp_protocol = {
+	sctp_rcv,			/* SCTP data handler */
+	sctp_err,			/* SCTP error control */
+};
+
+void
+sctp_init_proto(void)
+{
+	inet_add_protocol(&sctp_protocol, IPPROTO_SCTP);
+}
+
+void
+sctp_term_proto(void)
+{
+	inet_del_protocol(&sctp_protocol, IPPROTO_SCTP);
+}
+#endif

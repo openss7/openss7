@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:59 $ by $Author: brian $
+ Last Modified $Date: 2004/06/21 09:26:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $"
 
-static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $";
+static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $";
 
 #define __NO_VERSION__
 
@@ -111,6 +111,7 @@ static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.
  *  -------------------------------------------------------------------------
  *  We need this broken out so that we can use the netfilter hooks.
  */
+#if defined HAVE_OLD_STYLE_INET_PROTOCOL
 static inline int
 sctp_queue_xmit(struct sk_buff *skb)
 {
@@ -125,6 +126,9 @@ sctp_queue_xmit(struct sk_buff *skb)
 		return skb->dst->output(skb);
 	}
 }
+#else
+#define sctp_queue_xmit ip_queue_xmit
+#endif
 
 /*
  *  XMIT OOTB (Disconnect Send with no Listening STREAM).
@@ -133,6 +137,23 @@ sctp_queue_xmit(struct sk_buff *skb)
  *  destination address and a message block.  The only time that we use this
  *  is for responding to OOTB packets with ABORT or SHUTDOWN COMPLETE.
  */
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+#ifndef HAVE_IP_ROUTE_OUTPUT
+static inline int
+ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+	struct flowi fl = {.oif = oif,
+		.nl_u = {.ip4_u = {.daddr = daddr,
+				   .saddr = saddr,
+				   .tos = tos}},
+		.proto = IPPROTO_SCTP,
+		.uli_u = {.ports = {.sport = 0,.dport = 0}}
+	};
+	return ip_route_output_key(rp, &fl);
+}
+#endif
 void
 sctp_xmit_ootb(daddr, saddr, mp)
 	uint32_t daddr;

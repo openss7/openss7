@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:17 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:26:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:17 $ by $Author: brian $
+ Last Modified $Date: 2004/06/21 09:26:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:17 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:26:23 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:17 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:26:23 $";
 
 #define __NO_VERSION__
 
@@ -5098,6 +5098,17 @@ sctp_recv_msg(sp, mp)
  *  RECV SCTP ICMP ERROR
  *  -------------------------------------------------------------------------
  */
+#ifndef ip_rt_update_pmtu
+#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
+void
+ip_rt_update_pmtu(struct dst_entry *dst, u32 mtu)
+{
+	void (*func) (struct dst_entry *, u32) = (typeof(func)) HAVE_IP_RT_UPDATE_PMTU_ADDR;
+	return func(dst, mtu);
+}
+#endif
+#endif
+
 int
 sctp_recv_err(sp, mp)
 	sctp_t *sp;
@@ -5130,23 +5141,8 @@ sctp_recv_err(sp, mp)
 			if (sd->dst_cache) {
 				if (code == ICMP_FRAG_NEEDED) {
 					size_t mtu = ntohs(icmph->un.frag.mtu);
-
 					rare();
-#ifdef ip_rt_update_pmtu
 					ip_rt_update_pmtu(sd->dst_cache, mtu);
-#else
-					/*
-					   not an exported symbol 
-					 */
-#ifndef ip_rt_mtu_expires
-#define ip_rt_mtu_expires 10*60*HZ
-#endif
-					if (sd->dst_cache->pmtu > mtu && mtu && mtu >= 68
-					    && !(sd->dst_cache->mxlock & (1 << RTAX_MTU))) {
-						sd->dst_cache->pmtu = mtu;
-						dst_set_expires(sd->dst_cache, ip_rt_mtu_expires);
-					}
-#endif
 				} else
 					dst_release(xchg(&sd->dst_cache, NULL));
 			} else

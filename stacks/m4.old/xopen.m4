@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/24 12:48:51 $
+# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/21 09:02:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:51 $ by $Author: brian $
+# Last Modified $Date: 2004/06/21 09:02:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -223,6 +223,85 @@ AC_DEFUN([_XOPEN_SETUP_SCTP], [dnl
     fi
     if test :"${with_sctp2:-no}" = :yes ; then
         with_sctp='no'
+    fi
+    if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
+        _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu], [with_sctp='no'; with_sctp2='no'])
+    fi
+    if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
+        _LINUX_KERNEL_ENV([dnl
+            AC_CHECK_MEMBER([struct inet_protocol.protocol],
+                [xopen_cv_inet_protocol_style='old'],
+                [:], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/protocol.h>
+                ])
+            AC_CHECK_MEMBER([struct inet_protocol.no_policy],
+                [xopen_cv_inet_protocol_style='new'],
+                [:], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/protocol.h>
+                ])
+            AC_CHECK_MEMBER([struct dst_entry.path],
+                [xopen_cv_dst_entry_path='yes'],
+                [xopen_cv_dst_netry_path='no'], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+#include <net/dst.h>
+                ])
+            ])
+    fi
+    if test :"${xopen_cv_inet_protocol_style:+set}" = :set ; then
+        case "$xopen_cv_inet_protocol_style" in
+            old)
+                AC_DEFINE_UNQUOTED([HAVE_OLD_STYLE_INET_PROTOCOL], [], [Most
+                2.4 kernels have the old style struct inet_protocol and the
+                old prototype for inet_add_protocol() and inet_del_protocol()
+                defined in <net/protocol.h>.  Some more recent RH kernels
+                (such as EL3) use the 2.6 style of structure and prototypes.
+                Define this macro if your kernel has the old style structure
+                and prototypes.])
+                ;;
+            new)
+                AC_DEFINE_UNQUOTED([HAVE_NEW_STYLE_INET_PROTOCOL], [], [Most
+                2.4 kernels have the old style struct inet_protocol and the
+                old prototype for inet_add_protocol() and inet_del_protocol()
+                defined in <net/protocol.h>.  Some more recent RH kernels
+                (such as EL3) use the 2.6 style of structure and prototypes.
+                Define this macro if your kernel has the new style structure
+                and prototypes.])
+                ;;
+        esac
+    else
+        with_sctp='no'
+        with_sctp2='no'
+    fi
+    if test :"${xopen_cv_dst_entry_path:-no}" = :yes ; then
+        AC_DEFINE_UNQUOTED([HAVE_STRUCT_DST_ENTRY_PATH], [], [Newer RHEL3
+        kernels change the destination entry structure.  Define this macro to
+        use the newer structure.])
     fi
 ])# _XOPEN_SETUP_SCTP
 # =============================================================================

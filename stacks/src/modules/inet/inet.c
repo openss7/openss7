@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:03:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/14 10:33:06 $ by $Author: brian $
+ Last Modified $Date: 2004/06/21 09:03:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:03:03 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:03:03 $";
 
 /*
  *  This driver provides the functionality of IP (Internet Protocol) over a
@@ -72,6 +72,11 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $
 
 #include <net/sock.h>
 #include <net/tcp.h>
+
+#ifdef USING_AF_INET_TTL_MEMBER_NAME
+#undef ttl
+#define ttl USING_AF_INET_TTL_MEMBER_NAME
+#endif
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -96,7 +101,7 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $
 
 #define	SS_DESCRIP	"SOCKSYS STREAMS (TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/14 10:33:06 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/21 09:03:03 $"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SS_DEVICE	"Supports OpenSS7 INET Drivers."
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

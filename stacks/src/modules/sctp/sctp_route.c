@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:59 $ by $Author: brian $
+ Last Modified $Date: 2004/06/21 09:26:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $"
 
-static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $";
+static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/21 09:26:23 $";
 
 #define __NO_VERSION__
 
@@ -220,6 +220,16 @@ sctp_choose_best(sp, not)
 #else
 extern int sysctl_ip_dynaddr;
 #endif
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+#ifndef HAVE_STRUCT_DST_ENTRY_PATH
+static inline u32
+dst_pmtu(struct dst_entry *dst)
+{
+	return (dst->pmtu);
+}
+#endif
 /*
  *  sysctl_ip_dynaddr: this symbol is normally not exported, but we exported
  *  for the Linux Native version of SCTP, so we may have to treat it as extern
@@ -263,6 +273,7 @@ sctp_update_routes(sp, force_reselect)
 		if (!rt) {
 			if (sd->dif)
 				sd->saddr = 0;
+#if defined HAVE_OLD_STYLE_INET_PROTOCOL
 			if ((err =
 			     ip_route_connect(&rt, sd->daddr, sd->saddr,
 					      RT_TOS(sp->ip_tos) | RTO_CONN | sp->ip_dontroute,
@@ -270,6 +281,18 @@ sctp_update_routes(sp, force_reselect)
 				rare();
 				continue;
 			}
+#elif defined HAVE_NEW_STYLE_INET_PROTOCOL
+			if ((err =
+			     ip_route_connect(&rt, sd->daddr, sd->saddr,
+					      RT_TOS(sp->ip_tos) | RTO_CONN | sp->ip_dontroute,
+					      sd->dif, IPPROTO_SCTP, sp->sport, sp->dport,
+					      NULL)) < 0) {
+				rare();
+				continue;
+			}
+#else
+#error One of HAVE_OLD_STYLE_INET_PROTOCOL or HAVE_NEW_STYLE_INET_PROTOCOL must be defined.
+#endif
 			if (rt->rt_flags & (RTCF_MULTICAST | RTCF_BROADCAST) && !sp->ip_broadcast) {
 				rare();
 				ip_rt_put(rt);
@@ -294,9 +317,9 @@ sctp_update_routes(sp, force_reselect)
 			sd->rto = sp->rto_ini;
 			sd->rttvar = 0;
 			sd->srtt = 0;
-			sd->mtu = rt->u.dst.pmtu;
-			sd->ssthresh = 2 * rt->u.dst.pmtu;
-			sd->cwnd = rt->u.dst.pmtu;
+			sd->mtu = dst_pmtu(&rt->u.dst);
+			sd->ssthresh = 2 * sd->mtu;
+			sd->cwnd = sd->mtu;
 			sd->dst_cache = &rt->u.dst;
 
 			route_changed = 1;
@@ -309,8 +332,17 @@ sctp_update_routes(sp, force_reselect)
 			   see if route changed on primary as result of INIT that was discarded 
 			 */
 			struct rtable *rt2 = NULL;
+#if defined HAVE_OLD_STYLE_INET_PROTOCOL
 			if (!ip_route_connect
-			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif)) {
+			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif))
+#elif defined HAVE_NEW_STYLE_INET_PROTOCOL
+			if (!ip_route_connect
+			    (&rt2, rt->rt_dst, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, sd->dif,
+			     IPPROTO_SCTP, sp->sport, sp->dport, NULL))
+#else
+#error One of HAVE_OLD_STYLE_INET_PROTOCOL or HAVE_NEW_STYLE_INET_PROTOCOL must be defined.
+#endif
+			{
 				if (rt2->rt_src != rt->rt_src) {
 					rare();
 					rt2 = xchg(&rt, rt2);
@@ -318,9 +350,9 @@ sctp_update_routes(sp, force_reselect)
 					sd->rto = sp->rto_ini;
 					sd->rttvar = 0;
 					sd->srtt = 0;
-					sd->mtu = rt->u.dst.pmtu;
-					sd->ssthresh = 2 * rt->u.dst.pmtu;
-					sd->cwnd = rt->u.dst.pmtu;
+					sd->mtu = dst_pmtu(&rt->u.dst);
+					sd->ssthresh = 2 * sd->mtu;
+					sd->cwnd = sd->mtu;
 					sd->dst_cache = &rt->u.dst;
 
 					route_changed = 1;
@@ -334,8 +366,8 @@ sctp_update_routes(sp, force_reselect)
 		   always update MTU if we have a viable route 
 		 */
 
-		if (sd->mtu != rt->u.dst.pmtu) {
-			sd->mtu = rt->u.dst.pmtu;
+		if (sd->mtu != dst_pmtu(&rt->u.dst)) {
+			sd->mtu = dst_pmtu(&rt->u.dst);
 			mtu_changed = 1;
 			rare();
 		}
