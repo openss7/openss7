@@ -1,0 +1,38 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+l|l|l.
+TR Sub-Layer Primitive:TC Sub-Layer Primitive:TPI Primitive
+=
+TR-UNI Request:TC-UNI Request:T_UNITDATA_REQ 
+TR-UNI Indication:TC-UNI Indication:T_UNITDATA_IND 
+TR-BEGIN Request:TC-BEGIN Request:T_CONN_REQ 
+TR-BEGIN Indication:TC-BEGIN Indication:T_CONN_IND 
+TR-CONTINUE Request:TC-CONTINUE Request:T_CONN_RES 
+TR-CONTINUE Indication:TC-CONTINUE Indication:T_CONN_CON 
+TR-CONTINUE Request:TC-CONTINUE Request:T_OPTDATA_REQ 
+TR-CONTINUE Indication:TC-CONTINUE Indication:T_OPTDATA_IND 
+TR-END Request:TC-END Request:T_ORDREL_REQ 
+TR-END Indication:TC-END Indication:T_ORDREL_IND 
+TR-U-ABORT Request:TC-U-ABORT Request:T_DISCON_REQ 
+TR-U-ABORT Indication:TC-U-ABORT Indication:T_DISCON_IND 
+TR-P-ABORT Indication::T_DISCON_IND 
+TR-NOTICE Indication:TC-NOTICE Indication:T_UDERROR_IND 
+.TE

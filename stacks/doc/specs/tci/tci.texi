@@ -1,23 +1,133 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% =========================================================================
+%
+% @(#) $Id: tci.texi,v 0.9.2.2 2004/10/19 10:03:47 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any success
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2004/10/19 10:03:47 $ by $Author: brian $
+%
+% =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
 @setfilename tci.info
 @settitle Transaction Component Interface
 @c %**end of header
-@titlepage
-@title Transaction Component Interface
-@subtitle Application Program Interface
-@subtitle Version:
-@subtitle October 9, 2001
-@author @uref{mailto:bidulock@@openss7.org,Brian F. G. Bidulock}
 
-@page
-@vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com/} @*
+@dircategory OpenSS7
+@direntry
+* TCI: (tci).                   Transaction Component Interface.
+@end direntry
+
+@include texi/args.texi
+
+@ifinfo
+This file documents the Transaction Component Interface.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATA}, for
+@value{PACKAGE_TITLE} version @value{PACKAVE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
 All Rights Reserved. @*
 
 @noindent
-Published by OpenSS7 Corporation @*
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copyring, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical to
+this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@ignore
+@shorttitlepage Transaction Component Interface --- Application Program Interface
+@end ignore
+@titlepage
+@titlefont{Transaction Component Interface}
+@sp 0.5
+@title Application Program Interface
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+All Rights Reserved. @*
+
+@noindent
+Published by @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
 1469 Jefferys Crescent @*
 Edmonton, Alberta  T6L 6T1 @*
 Canada @*
@@ -26,31 +136,51 @@ Canada @*
 Unauthorized distribution or duplication is prohibited.
 
 @noindent
-This software and related documentation is protected by copyright and distributed under licenses restricting its use,
-copying, distribution and decompilation.  No part of this software or related documentation may be reproduced in any
-form by any means without the prior written authorization of the copyright holder, and licensors, if any.
+This software and related documentation is protected by copyright and
+distributed under licenses restricting its use, copying, distribution and
+decompilation.  No part of this software or related documentation may be
+reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the recipient will protect this information and
-keep it confidential, and will not disclose the information contained in this document without the written permission of
-its owner.
+The recipient of this document, by its retention and use, warrants that the
+recipient will protect this information and keep it confidential, and will not
+disclose the information contained in this document without the written
+permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} reserves the right to revise
+this software and documentation for any reason, including but not limited to,
+conformity with standards promulgated by various agencies, utilization of
+advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to
+herein.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
+obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @emph{Released under GFDL} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @emph{Released under GFDL} @| @| @thispage
+@end iftex
 @page
 
 @c Define an index of primitives
-@c @defindex pr
+@defindex pr
 @c Define an index of primitive values
 @defindex pv
 @c Define an index of protocol states
 @defindex st
+
+@c @syncodeindex pr cp
+@c @syncodeindex pv cp
+@c @syncodeindex tp cp
+@c @syncodeindex vr cp
 
 @ifnottex
 @ifinfo
@@ -63,879 +193,1371 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @end ifnotinfo
 @end ifnottex
 
-@iftex
-@headings off
-@everyheading @thistitle @| @| @thischaptername
-@c @oddheading @thistitle @| @| @thischaptername
-@c @evenheading @thischaptername @| @| @thistitle
-@everyfooting DRAFT Version 0.9.3 @| @emph{This document is subject to NDA} @| @thispage
-@c @oddfooting DRAFT Version 0.9.3 @| @emph{This document is subject to NDA} @| @thispage
-@c @evenfooting @thispage @| @emph{This document is subject to NDA} @| DRAFT Version 0.9.3
-@end iftex
-
-@noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
-implied warranty.
-
-@noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this documentation including
-all implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that the
-contents of the document are suitable for any purpose, or that the implementation of such contents will not infringe on
-any third party patents, copyrights, trademarks or other rights.  In no event shall OpenSS7 corporation be liable for
-any direct, indirect, special or consequential damages or any damages whatsoever resulting from loss of use, data or
-profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with any
-use of this document or the performance or implementation of the contents thereof.
+@menu
+* Preface::
+* Introduction::
+* The Transaction Component Sub-Layer::
+* TCI Services Definition::
+* TCI Primitives::
+* TCAP Header File::
+* Glossary::
+* Acronyms::
+* References::
+* Indices::
+@end menu
 
 @node Preface
 @unnumbered Preface
 
-@node Abstract
+@section Security Warning
+
+@noindent
+Permission to use, copy and distribute this documentation without modification,
+for any purpose and without fee or royalty is hereby granted, provided that both
+the above copyright notice and this permission notice appears in all copies and
+that the name of @uref{http://www.openss7.com/,OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or
+its contents without specific, written prior permission.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} makes no representation about
+the suitability of this documentation for any purpose.  It is provided ``as is''
+without express or implied warranty.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with
+regard to this documentation including all implied warranties of
+merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the
+implementation of such contents will not infringe on any third party patents,
+copyrights, trademarks or other rights..  In no event shall
+@uref{http://www.openss7.com/,OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting
+from loss of use, data or profits, whether in an action of contract, negligence
+or other tortious action, arising out of or in connection with any use of this
+document or the performance or implementation of the contents thereof.
+
 @section Abstract
 
-This document is a Application Program Interface containing technical details concerning the implementation of the
-Transaction Component Interface (TCI) for OpenSS7.  It contains recommendations on software architecture as well as
+This document is a Application Program Interface containing technical details
+concerning the implementation of the Transaction Component Interface (TCI) for
+OpenSS7.  It contains recommendations on software architecture as well as
 platform and system applicability of the Transaction Component Interface (TCI).
 
-@node Purpose
 @section Purpose
 
-The purpose of this document is to provide technical documentation of the Transaction Component Interface (TCI).  This
-document is intended to be included with the OpenSS7 STREAMS software package released by OpenSS7 Corporation.  It is
-intended to assist software developers, maintainers and users of the Transaction Component Interface (TCI) with
-understanding the software architecture and technical interfaces which are made available in the software package.
+The purpose of this document is to provide technical documentation of the
+Transaction Component Interface (TCI).  This document is intended to be included
+with the OpenSS7 STREAMS software package released by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.  It is intended to assist
+software developers, maintainers and users of the Transaction Component
+Interface (TCI) with understanding the software architecture and technical
+interfaces which are made available in the software package.
 
-@node Intent
 @section Intent
 
-It is the intent of this document that it act as the primary source of information concerning the Transaction Component
-Interface (TCI).
+It is the intent of this document that it act as the primary source of
+information concerning the Transaction Component Interface (TCI).
 
-@node Audience
 @section Audience
 
-The audience for this document is software developers, maintainers and users and integrators of the Transaction
-Component Interface (TCI).
+The audience for this document is software developers, maintainers and users and
+integrators of the Transaction Component Interface (TCI).
 
-@node Revision History
 @section Revision History
 
-Take care that you are working with a current version of this documentation: you will not be notified of updates.  To
-ensure that you are working with a current version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for
-a current version.
+Take care that you are working with a current version of this documentation: you
+will not be notified of updates.  To ensure that you are working with a current
+version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for a
+current version.
 
 A printed (or postscript) version of this document is an UNCONTROLLED version.
-
-@c @strong{List of Tables}
-@c Table 1.  Service Primitives for Protocol
-@c Classes 1, 2 and 3&#9; 4
-@c Table 2.  Service Primitives for Protocol Class
-@c 4&#9; 4
-@c Table 3.  Ordering Relationships Between Queue
-@c Model Objects&#9; 6
-@c Table 4.  Transaction Initiation Transaction
-@c Service Primitives&#9; 9
-@c Table 5.  Transaction Continuation Transaction
-@c Service Primitives&#9; 9
-@c Table 6.  Transaction Termination Transaction
-@c Service Primitives&#9; 9
-@c Table 7.  SCCP QOS Option Values&#9; 12
-@c Table 8.  Primitive Mapping&#9; 17
-@c Table 9.  T-UNI Request Mapping&#9; 17
-@c Table 10.  T-UNI Indication Mapping&#9; 17
-@c Table 11.  T-Begin Request Mapping&#9; 17
-@c Table 12.  T-Begin Indication Mapping&#9; 18
-@c Table 13.  T-Continue Request Mapping&#9; 18
-@c Table 14.  T-Continue Indication Mapping&#9; 18
-@c Table 15.  T-Continue Request Mapping&#9; 18
-@c Table 16.  T-Continue Indication Mapping&#9; 18
-@c Table 17.  T-END Request Mapping&#9; 19
-@c Table 18.  T-END Indication Mapping&#9; 19
-@c Table 19.  T-U-ABORT Request Mapping&#9; 19
-@c Table 20.  T-U-ABORT Indication Mapping&#9; 19
-@c Table 21.  T-P-ABORT Indication Mapping&#9; 20
-@c Table 22.  T-NOTICE Indication Mapping&#9; 20
-@c @strong{List of Figures}
-@c 
 
 @node Introduction
 @chapter Introduction
 
-This document specifies a STREAMS-based kernel-level instantiation of the ITU-T Transaction Capabilities Application
-Part (TCAP) Component (TC) Sub-Layer.  The Transaction Component Interface (TCI) enables the user of a component
-sub-layer service to access and use any of a variety of conforming transaction providers wtihout specific knowledge of
-the provider's protocol.  Ther service interface is designed to support any transaction protocol but is intented for the
-ITU-T Recommendation Q.771 Transaction Capabilities Application Part (TCAP) Component (TC) Sub-Layer.  This interface
-only specifies acess to transaction component sub-layer services providers, and does not address issues concerning
-transaction or component sub-layer management, protocol performance, and performance analysis tools.
+This document specifies a STREAMS-based kernel-level instantiation of the ITU-T
+Transaction Capabilities Application Part (TCAP) Component (TC) Sub-Layer.  The
+Transaction Component Interface (TCI) enables the user of a component sub-layer
+service to access and use any of a variety of conforming transaction providers
+without specific knowledge of the provider's protocol.  The service interface is
+designed to support any transaction protocol but is intended for the ITU-T
+Recommendation Q.771 Transaction Capabilities Application Part (TCAP) Component
+(TC) Sub-Layer.  This interface only specifies access to transaction component
+sub-layer services providers, and does not address issues concerning transaction
+or component sub-layer management, protocol performance, and performance
+analysis tools.
 
-The specification assumes that the reader is familiar with the ISO reference model terminology, ISO/ITU-T transaction
-service definitions (ROSE, ACSE, TCAP), and STREAMS.
+The specification assumes that the reader is familiar with the ISO reference
+model terminology, ISO/ITU-T transaction service definitions (ROSE, ACSE, TCAP),
+and STREAMS.
 
-@node Related Documentation
 @section Related Documentation
 
 @itemize
-@item 1993 ITU-T X.219 Recommendation
-@item 1993 ITU-T X.217 Recommendation
-@item 1993 ITU-T Q.771 Recommendation
+
+@item ITU-T Recommendation X.200 (White Book) --- ISO/IEC 7498-1:1994
+
+@item ITU-T Recommendation X.219 (White Book) --- ISO/IEC
+
+@item ITU-T Recommendation X.229 (White Book) --- ISO/IEC
+
+@item ITU-T Recommendation X.217 (White Book) --- ISO/IEC 8649 : 1996
+
+@item ITU-T Recommendation X.227 (White Book) --- ISO/IEC 8650-1 : 1995
+
+@item ITU-T Recommendation X.237 (White Book) --- ISO/IEC 10035-1 : 1995
+
+@item ITU-T Recommendation Q.771 (White Book)
+
 @item System V Interface Definition, Issue 2 - Volume 3
+
 @end itemize
 
-@node Role
 @subsection Role
 
-This document specifies an interface that supports the Transaction Component (TC) Sub-Layer services provided by the
-Transaction Capabilities Application Part (TCAP) as specified in ITU-T Recommendation Q.771.  It may also be capable of
-supporting the transaction component capabilities of the Remote Operations Service Execution (ROSE) for Open Systems
-Interconnect for CCITT Applications as specified in ITU-T Recommendation X.219 and ISO ????.  These specifications are
-targetted for use by developers and testers of protocol modules that require transaction component sub-layer
-service.@footnote{An example of a protocol module that requires transaction component sub-layer services is the 3GPP TS
+This document specifies an interface that supports the Transaction Component
+(TC) Sub-Layer services provided by the Transaction Capabilities Application
+Part (TCAP) as specified in ITU-T Recommendation Q.771.  It may also be capable
+of supporting the transaction component capabilities of the Remote Operations
+Service Execution (ROSE) for Open Systems Interconnect for CCITT Applications as
+specified in ITU-T Recommendation X.219 and ISO ????.  These specifications are
+targeted for use by developers and testers of protocol modules that require
+transaction component sub-layer service.@footnote{An example of a protocol
+module that requires transaction component sub-layer services is the 3GPP TS
 29.002 Mobile Application Part (MAP).}
 
-@node Definitions, Acronyms, and Abbreviations
 @section Definitions, Acronyms, and Abbreviations
 
 @table @emph
+
 @item Originating TC User
+
 A TC-User that initiates a transaction.
-@item Desintation TC User
-A TC-User with whom an originating TC user wishes to establish a transaction association.
+
+@item Destination TC User
+
+A TC-User with whom an originating TC user wishes to establish a transaction
+dialogue.
+
 @item ISO
+
 International Organization for Standardization
+
 @item TC User
+
 Kernel level protocol or user level application that is accessing the services of the transaction component sub-layer.
+
 @item TC Provider
-Transaction sub-layer entity/entitites that provide/s the services of the transaction component interace.
+
+Transaction sub-layer entity/entities that provide/s the services of the transaction component interface.
+
 @item TCI
+
 Transaction Component Interface
+
 @item TIDU
+
 Transaction Interface Data Unit
+
 @item TSDU
+
 Transaction Service Data Unit
+
 @item OSI
+
 Open Systems Interconnection
+
 @item QOS
+
 Quality of Service
+
 @item STREAMS
+
 A communication services development facility first available with UNIX System V Release 3
+
 @end table
 
 @node The Transaction Component Sub-Layer
 @chapter The Transaction Component Sub-Layer
 
-The Transaction Component Sub-Layer provides the means to manage the association of TC-Users into transaction components
-and dialogues.  It is responsible for the routing and management of transaction component exchange within dialogues
+The Transaction Component Sub-Layer provides the means to manage the dialogue
+of TC-Users into transaction components and dialogues.  It is responsible for
+the routing and management of transaction component exchange within dialogues
 between TC-user entities.
+
+@menu
+* Model of the TCI::
+* TCI Services::
+@end menu
 
 @node Model of the TCI
 @section Model of the TCI
 
-The TCI defines the services provided by the transaction component sub-layer to the transaction component-user at the
-boundary between the Transaction Capabilities Application Part (TCAP) user and the Transaction Component (TC) Sub-Layer
-in the model presented in ITU-T Recommendation Q.771.  The interface consists of a set of primitives defined as STREAMS
-messages that provide access to the component sub-layer services, and are transferred between the TC user entity and the
-TC provider.  These primitives are of two types: ones that originate from the TC user, and others that originate from
-the TC provider, or respond to an event of the TC provider.  The primitives that originate from the TC provider are
-either confirmations of a request or are indications to the TC user that the event has occured.  @emph{Figure 1} shows
-the model of the TCI.
+The TCI defines the services provided by the transaction component sub-layer to
+the transaction component-user at the boundary between the Transaction
+Capabilities Application Part (TCAP) user and the Transaction Component (TC)
+Sub-Layer in the model presented in ITU-T Recommendation Q.771.  The interface
+consists of a set of primitives defined as STREAMS messages that provide access
+to the component sub-layer services, and are transferred between the TC user
+entity and the TC provider.  These primitives are of two types: ones that
+originate from the TC user, and others that originate from the TC provider, or
+respond to an event of the TC provider.  The primitives that originate from the
+TC provider are either confirmations of a request or are indications to the TC
+user that the event has occurred.  @emph{Figure 1} shows the model of the TCI.
 
 @cartouche
-@center Figure 1@strong{@emph{.  Model of the TRI}}
+@center Figure 1@strong{@emph{.  Model of the TCI}}
 @image{tci_fig,3.5in}
 @end cartouche
 
-The TCI allows the TC provider to be configured with any component sub-layer user (such as the Transaction Component
-(TC) Sub-Layer) that also conforms to the TCI.  A transction component sub-layer user can also be a user program that
-conforms to the TCI and accesses the TC provider via @strong{putmsg}(2) and @strong{getmsg}(2) system calls.
+The TCI allows the TC provider to be configured with any component sub-layer
+user (such as the Mobile Application Part whose upper layer interface is
+described in @ref{Top, About This Manual, , mapi, Mobile Application Part
+Interface}), that also conforms to the TCI.  A transaction component sub-layer
+user can also be a user program that conforms to the TCI and accesses the TC
+provider via @strong{putmsg}(2) and @strong{getmsg}(2) system calls.
+
+@dfn{STREAMS} messages that are used to communicate transaction component
+service primitives between the transaction component user and the transaction
+component provider may have one of the following formats:
+
+@enumerate
+@item
+
+A @var{M_PROTO}
+@prindex M_PROTO
+message block followed by zero or more @var{M_DATA}
+@prindex M_DATA
+message blocks.  The @var{M_PROTO} message block contains the type of service
+primitive and all relevant arguments associated with the primitive.  The
+@var{M_DATA} blocks contain user data associated with the service primitive.
+
+@item
+
+One @var{M_PCPROTO}
+@prindex M_PCPROTO
+message block containing the type of service primitive and all the relevant
+arguments associated with the primitive.
+
+@item
+
+One or more @var{M_DATA}
+@prindex M_DATA
+message blocks containing user data.
+@end enumerate
+
+The following sections describe the service primitives which define all
+operation classes of service.
+
+For all operation classes of service, two types of primitives exist: primitives
+that originate from the service user and primitives that originate from the
+service provider.  The primitives that originate from the service user make
+requests to the service provider or response to an event of the service
+provider.  The primitive that originate from the service provider are either
+confirmations of a request or are indications to the service user that an event
+has occurred.  The primitive types along with the mapping of those primitives to
+the @dfn{STREAMS} message types and the service primitives of the ISO/IEC xxxxx
+and service definitions are listed in @ref{TCI Primitives}.  The format of these
+primitives and the rules governing the use of them are described in
+@ref{Management Primitives}, @ref{Operation Class 1 through 3 Primitives}, and
+@ref{Operation Class 4 Primitives}.
 
 @node TCI Services
 @section TCI Services
 
-The features of the TCI are defined in terms of the services provided by the TC provider, and the individual primitives
-that may flow between the TC user and the TC provider.  The services supported by the TCI are based on five distinct
-classes of transaction, protocol classes 1, 2, 3 and 4.  In addition, the TRI supports services for local management.
-Table 1 and Table 2 summarizes the TCI service primitives by their state and service.
+The features of the TCI are defined in terms of the services provided by the TC
+provider, and the individual primitives that may flow between the TC user and
+the TC provider.
 
-@node Protocol Class 1
-@subsection Protocol Class 1
-@cindex Protocol Classes
-@cindex Protocol Class 1
+The services supported by the TCI are based on four distinct classes of
+transaction, operation classes 1, 2, 3 and 4.  In addition, the TCI supports
+services for local management.
 
-The main features of protocol class 1 transactions are:
+@subsection Operation Class 1
 
-@itemize
-@end itemize
+The main features of operation class 1 transactions are:
 
-There are three phases to each transaction: Transaction Initiation, Transaction Continuation, and Transaction
-Termination.  Transaction components arrive at their destination in the same order as they departed their source and the
-data is protected against duplication or loss of data units within some specified quality of service.
+@itemize 
 
-@node Protocol Class 2
-@subsection Protocol Class 2
-@cindex Protocol Classes
-@cindex Protocol Class 2
+@item Operation success is reported.
 
-The main features of protocol class 2 transactions are:
+@item Operation failure is reported.
 
-@itemize
-@end itemize
+@end itemize 
 
-There are three phases to each transaction: Transaction Initiation, Transaction Continuation, and Transaction
-Termination.  Transaction components arrive at their destination in the same order as they departed their source and the
-data is protected against duplication or loss of data units within some specified quality of service.
+There are three phases to each transaction: Transaction Initiation, Transaction
+Data Transfer, and Transaction Termination.@footnote{All three phases in
+operation class 1 can be combined into a single exchange of primitives.}
+Transaction components arrive at their destination in the same order as they
+departed their source and the data is protected against duplication or loss of
+data units within some specified quality of service.
 
-@node Protocol Class 3
-@subsection Protocol Class 3
-@cindex Protocol Classes
-@cindex Protocol Class 3
+@subsection Operation Class 2
 
-The main features of protocol class 3 transactions are:
+The main features of operation class 2 transactions are:
 
-@itemize
-@end itemize
+@itemize 
 
-There are three phases to each transaction: Transaction Initiation, Transaction Continuation, and Transaction
-Termination.  Transaction components arrive at their destination in the same order as they departed their source and the
-data is protected against duplication or loss of data units within some specified quality of service.
+@item Operation success is @emph{not} reported.
 
-@node Protocol Class 4
-@subsection Protocol Class 4
-@cindex Protocol Classes
-@cindex Protocol Class 4
+@item Operation failure is reported.
 
-The main features of protocol class 4 transactions are:
+@end itemize 
 
-@itemize
-@end itemize
+There are three phases to each transaction: Transaction Initiation, Transaction
+Data Transfer, and Transaction Termination.@footnote{All three phases in
+operation class 2 can be combined into a single exchange of primitives.}
+Transaction components arrive at their destination in the same order as they
+departed their source and the data is protected against duplication or loss of
+data units within some specified quality of service.
 
-Protocol class 4 has no structure to the transaction and has no separate phases.  Each transaction component is
-transmitted from source to destination independently, appropriate addressing information is included with each component
-sequence.  As the components are transmitted independently from source to destination, there are, in general, no
-guarantees of proper sequence and completeness of the data transmission.
+@subsection Operation Class 3
 
-@node Local Management
+The main features of operation class 3 transactions are:
+
+@itemize 
+
+@item Operation success is reported.
+
+@item Operation failure is @emph{not} reported.
+
+@end itemize 
+
+There are three phases to each transaction: Transaction Initiation, Transaction
+Data Transfer, and Transaction Termination.@footnote{All three phases in
+operation class 3 can be combined into a single exchange of primitives.}
+Transaction components arrive at their destination in the same order as they
+departed their source and the data is protected against duplication or loss of
+data units within some specified quality of service.
+
+@subsection Operation Class 4
+
+The main features of operation class 4 transactions are:
+
+@itemize 
+
+@item Operation success is @emph{not} reported.
+
+@item Operation failure is @emph{not} reported.
+
+@end itemize 
+
+Operation class 4 has no structure to the transaction and has no separate
+phases.  Each transaction component is transmitted from source to destination
+independently, appropriate addressing information is included with each
+component sequence.  As the components are transmitted independently from source
+to destination, there are, in general, no guarantees of proper sequence and
+completeness of the data transmission.
+
+@subsection Component Handling
+
+@multitable @columnfractions .6 .1 .1 .1 .1
+
+@item TC-Invoke @tab 1 @tab 2  @tab 3  @tab 4
+
+@item TC-Result @tab 1 @tab -- @tab 3  @tab --
+
+@item TC-Error  @tab 1 @tab 2  @tab -- @tab --
+
+@item TC-Cancel @tab 1 @tab 2  @tab 3  @tab --
+
+@item TC-Reject @tab 1 @tab 2  @tab -- @tab 4
+
+@end multitable
+
 @subsection Local Management
 
-The TCI specifications also define a set of local management functions that apply to all protocol classes.  These
-services have local significance only.
+The TCI specifications also define a set of local management functions that
+apply to all operation classes.  These services have local significance only.
 
-@c Table 1@strong{@emph{.  Service Primitives for Protocol Classes 1, 2 and 3}}
+Table 1 and Table 2 summarize the TCI service primitives by their state and
+service.
 
-@multitable @columnfractions .33 .33 .33
-@item @b{STATE} @tab @b{SERVICE} @tab @b{PRIMITIVES}
-@item Local Management @tab Information Reporting @tab @code{TR_INFO_REQ, TR_INFO_ACK, TR_ERROR_ACK}
-@tpindex TR_INFO_REQ
-@tpindex TR_INFO_ACK
-@tpindex TR_ERROR_ACK
-@item @tab Bind @tab @code{TR_BIND_REQ, TR_BIND_ACK, TR_UNBIND_REQ, TR_OK_ACK, TR_ERROR_ACK}
-@tpindex TR_BIND_REQ
-@tpindex TR_BIND_ACK
-@tpindex TR_UNBIND_REQ
-@tpindex TR_OK_ACK
-@tpindex TR_ERROR_ACK
-@item @tab Options Management @tab @code{TR_OPTMGMT_REQ, TR_OK_ACK, TR_ERROR_ACK}
-@tpindex TR_OPTMGMT_REQ
-@tpindex TR_OK_ACK
-@tpindex TR_ERROR_ACK
-@item Transaction Initiation @tab Transaction Initiation @tab @code{TR_BEGIN_REQ, TR_BEGIN_IND, TR_CONT_REQ, TR_CONT_IND, TR_TOKEN_REQ, TR_TOKEN_ACK, TR_OK_ACK, TR_ERROR_ACK}
-@tpindex TR_BEGIN_REQ
-@tpindex TR_BEGIN_IND
-@tpindex TR_CONT_REQ
-@tpindex TR_CONT_IND
-@tpindex TR_TOKEN_REQ
-@tpindex TR_TOKEN_ACK
-@tpindex TR_OK_ACK
-@tpindex TR_ERROR_ACK
-@item Transaction Continuation @tab Component Transfer @tab @code{TR_CONT_REQ, TR_CONT_IND}
-@tpindex TR_CONT_REQ
-@tpindex TR_CONT_IND
-@item Transaction Termination @tab Transaction End @tab @code{TR_END_REQ, TR_END_IND}
-@tpindex TR_END_REQ
-@tpindex TR_END_IND
-@item @tab Transaction Abort @tab @code{TR_ABORT_REQ, TR_ABORT_IND}
-@tpindex TR_ABORT_REQ
-@tpindex TR_ABORT_IND
+@sp 1
+@center Table 1@strong{@emph{.  Service Primitives for Operation Classes 1, 2 and 3}}
+
+@multitable @columnfractions .20 .20 .60
+
+@item @b{STATE}
+@tab @b{SERVICE}
+@tab @b{PRIMITIVES}
+
+@item Local@*Management
+@tab Information@*Reporting
+@tab TC_INFO_REQ, TC_INFO_ACK,@*TC_ERROR_ACK
+
+@item
+@tab Bind
+@tab TC_BIND_REQ, TC_BIND_ACK,@*TC_UNBIND_REQ, TC_OK_ACK,@*TC_ERROR_ACK
+
+@item
+@tab Options@*Management
+@tab TC_OPTMGMT_REQ, TC_OK_ACK,@*TC_ERROR_ACK
+
+@item Transaction@*Initiation
+@tab Transaction@*Begin
+@tab TC_BEGIN_REQ, TC_BEGIN_IND,@*TC_BEGIN_RES, TC_BEGIN_CON,@*TC_TOKEN_REQ,
+TC_TOKEN_ACK,@*TC_OK_ACK, TC_ERROR_ACK
+
+@item Transaction@*Data Transfer
+@tab Transaction@*Continue
+@tab TC_CONT_REQ, TC_CONT_IND
+
+@item Transaction@*Release
+@tab Transaction@*End
+@tab TC_END_REQ, TC_END_IND
+
+@item
+@tab Transaction@*Abort
+@tab TC_ABORT_REQ, TC_ABORT_IND
+
 @end multitable
 
-@c Table 2@strong{@emph{.  Service Primitives for Protocol Class 4}}
+@sp 1
+@center Table 2@strong{@emph{.  Service Primitives for Operation Class 4}}
 
-@multitable @columnfractions .33 .33 .33
-@item @b{STATE} @tab @b{SERVICE} @tab @b{PRIMITIVES}
-@item Local Management @tab Information Reporting @tab @code{TR_INFO_REQ, TR_INFO_ACK, TR_ERROR_ACK}
-@tpindex TR_INFO_REQ
-@tpindex TR_INFO_ACK
-@tpindex TR_ERROR_ACK
-@item @tab Bind @tab @code{TR_BIND_REQ, TR_BIND_ACK, TR_UNBIND_REQ, TR_OK_ACK, TR_ERROR_ACK}
-@tpindex TR_BIND_REQ
-@tpindex TR_BIND_ACK
-@tpindex TR_UNBIND_REQ
-@tpindex TR_OK_ACK
-@tpindex TR_ERROR_ACK
-@item @tab Options Management @tab @code{TR_OPTMGMT_REQ, TR_OK_ACK, TR_ERROR_ACK}
-@tpindex TR_OPTMGMT_REQ
-@tpindex TR_OK_ACK
-@tpindex TR_ERROR_ACK
-@item Transaction @tab Component Transfer @tab @code{TR_UNI_REQ, TR_UNI_IND}
-@tpindex TR_UNI_REQ
-@tpindex TR_UNI_IND
+@multitable @columnfractions .20 .20 .60
+
+@item @b{STATE}
+@tab @b{SERVICE}
+@tab @b{PRIMITIVES}
+
+@item Local@*Management
+@tab Information@*Reporting
+@tab TC_INFO_REQ, TC_INFO_ACK,@*TC_ERROR_ACK
+
+@item
+@tab Bind
+@tab TC_BIND_REQ, TC_BIND_ACK,@*TC_UNBIND_REQ, TC_OK_ACK,@*TC_ERROR_ACK
+
+@item
+@tab Options@*Management
+@tab TC_OPTMGMT_REQ, TC_OK_ACK,@*TC_ERROR_ACK
+
+@item Transaction@*Unitdata
+@tab Transaction@*Unidirectional
+@tab TC_UNI_REQ, TC_UNI_IND
+
 @end multitable
 
-@node TRI Services Definition
-@chapter TRI Services Definition
+@node TCI Services Definition
+@chapter TCI Services Definition
 
-This section describes the services of the TRI primitives.  Time-sequence diagrams that illustrate the sequence of
-primitives are used.  (Conventions for the time-sequence diagrams are defined in ITU-T X.210.) The format of the
-primitives will be defined later in this document.
+This section describes the services of the TCI primitives.  Time-sequence
+diagrams @footnote{Conventions for the time-sequence diagrams are defined in
+ITU-T X.210, ISO/IEC 10731:1994.} that illustrate the sequence of primitives are
+used.  The format of the primitives will be defined later in this document.
+
+@menu
+* Local Management Services Definition::
+* Operation Class 1 through 3 Transaction Services Definition::
+* Operation Class 4 Transaction Services Definition::
+* Component Handling Services Definition::
+@end menu
 
 @node Local Management Services Definition
 @section Local Management Services Definition
 
-The services defined in this section are outside the scope of the international standards.  These services apply to all
-protocol classes.  They are involved for the initialization/de-initialization of a stream connected to the TR provider.
-They are also used to manage options supported by the TR provider and to report information on the supported parameter
-values.
+The services defined in this section are outside the scope of the international
+standards.  These services apply to all operation classes.  They are involved
+for the initialization/de-initialization of a stream connected to the TC
+provider.  They are also used to manage options supported by the TC provider and
+to report information on the supported parameter values.
 
-@node Transaction Information Reporting Service
+@menu
+* Transaction Information Reporting Service Definition::
+* TC User Bind Service Definition::
+* TC User Unbind Service Definition::
+* Receipt Acknowledgement Service Definition::
+* Options Mangement Service Definition::
+* Error Acknowledgement Service Definition::
+@end menu
+
+@node Transaction Information Reporting Service Definition
 @subsection Transaction Information Reporting Service
-
-This service provides information on the options supported by the TR provider.
+This service provides information on the options supported by the TC provider.
 
 @itemize
-@item TR_INFO_REQ:
-@tpindex TR_INFO_REQ
-This primitive request that the TR provider returns the values of all the supported protocol
-parameters.  This request may be invoked during any phase.
-@item TR_INFO_ACK:
-@tpindex TR_INFO_ACK
-This primitive is in response to the @code{TR_INFO_REQ} primitive and returns the values of the supported
-@tpindex TR_INFO_REQ
-protocol parameters to the TR user.
+
+@item @code{TC_INFO_REQ}:
+
+@prindex TC_INFO_REQ
+This primitive request that the TC provider returns the values of all the
+supported protocol parameters.  This request may be invoked during any phase.
+
+@item @code{TC_INFO_ACK}:
+
+@prindex TC_INFO_ACK
+This primitive is in response to the @dfn{TC_INFO_REQ} primitive and returns
+the values of the supported protocol parameters to the TC user.
 @end itemize
 
-The sequence of primitives for transaction information mangement is shown in @emph{Figure 2}.
+The sequence of primitives for transaction information management is shown in
+@emph{Figure 2}.
 
 @cartouche
-@center Figure 2@strong{@emph{.  Sequence of Primitives Transaction Information Reporting Service}}
+@center Figure 2@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{Transaction Information Reporting Service}}
 @image{tci_fig1,3.5in}
 @end cartouche
 
-@node TR User Bind Service
-@subsection TR User Bind Service
+@node TC User Bind Service Definition
+@subsection TC User Bind Service
 
-This service allows an originating address to be associated with a stream.  It allows the TR user to negotiate the
-number of transaction indications that can remain unacknowledged for that TR user (a transaction indication is
-considered unacknowledged while it is awaiting a corresponding transaction response or abort request from the TR user).
-This service also defines a mechanism that allows a stream (bound to the address of the TR user) to be reserved to
-handle incoming transactions only.  This stream is referred to as the listener stream.
+This service allows an originating address to be associated with a stream.  It
+allows the TC user to negotiate the number of transaction begin indications that
+can remain unacknowledged for that TC user (a transaction begin indication is
+considered unacknowledged while it is awaiting a corresponding transaction
+response or abort request from the TC user).  This service also defines a
+mechanism that allows a stream (bound to the address of the TC user) to be
+reserved to handle incoming transactions only.  This stream is referred to as
+the listener stream.
 
 @itemize 
-@item @code{TR_BIND_REQ}:
-@tpindex TR_BIND_REQ
-This primitive request that the TR user be bound to a particular originating address, and negotiate the number of
-allowable outstanding transaction indications for that address.
-@item @code{TR_BIND_ACK}:
-@tpindex TR_BIND_ACK
-This primtiive is in response to the @code{TR_BIND_REQ} primitive and indicates to the user that the specified TR user
-has been bound to an originating address.
+
+@item @code{TC_BIND_REQ}:
+
+@prindex TC_BIND_REQ
+This primitive request that the TC user be bound to a particular originating
+address, and negotiate the number of allowable outstanding transaction
+indications for that address.
+
+@item @code{TC_BIND_ACK}:
+
+@prindex TC_BIND_ACK
+This primitive is in response to the @dfn{TC_BIND_REQ} primitive and indicates
+to the user that the specified TC user has been bound to an originating address.
 @end itemize
 
-The sequence of primives for the TR user bind service is shown in @emph{Figure 3}.
+The sequence of primitives for the TC user bind service is shown in @emph{Figure
+3}.
 
 @cartouche
-@center Figure 3@strong{@emph{.  Sequence of Primitives TR User Bind Service}}
+@center Figure 3@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{TC User Bind Service}}
 @image{tci_fig2,3.5in}
 @end cartouche
 
-@node TR User Unbind Service
-@subsection TR User Unbind Service
+@node TC User Unbind Service Definition
+@subsection TC User Unbind Service
 
-This service allows the TR user to be unbound from a network address.
+This service allows the TC user to be unbound from a network address.
 
 @itemize
-@item @code{TR_UNBIND_REQ}:
-@tpindex TR_UNBIND_REQ
-This primitive requests that the TR user be unbound from the network address it had previously been bound to.
+
+@item @code{TC_UNBIND_REQ}:
+
+@prindex TC_UNBIND_REQ
+This primitive requests that the TC user be unbound from the network address it
+had previously been bound to.
 @end itemize
 
-The sequence of primives for the TR user unbind service is shown in @emph{Figure 4}.
+The sequence of primitives for the TC user unbind service is shown in
+@emph{Figure 4}.
 
 @cartouche
-@center Figure 4@strong{@emph{.  Sequence of Primitives TR User Unbind &amp; Receipt Acknowledgement Services}}
+@center Figure 4@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{TC User Unbind &amp; Receipt Acknowledgement Services}}
 @image{tci_fig3,3.5in}
 @end cartouche
 
-@node Receipt Acknowledgement Service
+@node Receipt Acknowledgement Service Definition
 @subsection Receipt Acknowledgement Service
 
 @itemize 
-@item @code{TR_OK_ACK}:
-@tpindex TR_OK_ACK
-This primitive indicates to the TR user that the previous TR user originated primitive was received successfully by the
-TR provider.
+
+@item @code{TC_OK_ACK}:
+
+@prindex TC_OK_ACK
+This primitive indicates to the TC user that the previous TC user originated
+primitive was received successfully by the TC provider.
 @end itemize
 
-An example showing the sequence of primitives for successful receive acknowledgement is depicted in
-@emph{Figure 4}.
+An example showing the sequence of primitives for successful receive
+acknowledgement is depicted in @emph{Figure 4}.
 
-@node Options Mangement Service
+@node Options Mangement Service Definition
 @subsection Options Mangement Service
 
-This service allows the TR user to manage the QOS parameter values associated with the TR provider.
+This service allows the TC user to manage the QOS parameter values associated
+with the TC provider.
 
 @itemize 
-@item @code{TR_OPTMGMT_REQ}:
-@tpindex TR_OPTMGMT_REQ
-This primitive allows the TR user to select default values for QOS parameters within the range supported by the TR
-provider, and to indicate the default seelction of return option.
+
+@item @code{TC_OPTMGMT_REQ}:
+
+@prindex TC_OPTMGMT_REQ
+This primitive allows the TC user to select default values for QOS parameters
+within the range supported by the TC provider, and to indicate the default
+selection of return option.
+
+@item @code{TC_OPTMGMT_ACK}:
+
+@prindex TC_OPTMGMT_ACK
 @end itemize
 
-@emph{Figure 5} shows the sequence of primitives for transaction options management.
+@emph{Figure 5} shows the sequence of primitives for transaction options
+management.
 
 @cartouche
-@center Figure 5@strong{@emph{.  Sequence of Primitives Options Management Service}}
+@center Figure 5@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{Options Management Service}}
 @image{tci_fig4,3.5in}
 @end cartouche
 
-@node Error Acknowledgement Service
+@node Error Acknowledgement Service Definition
 @subsection Error Acknowledgement Service
 
 @itemize 
-@item @code{TR_ERROR_ACK}:
-@tpindex TR_ERROR_ACK
-This primitive indicates to the TR user that a non-fatal error has occured in the last TR user originated request or
-response primitive (listed in ?) on the stream.
+
+@item @code{TC_ERROR_ACK}:
+
+@prindex TC_ERROR_ACK
+This primitive indicates to the TC user that a non-fatal error has occurred in
+the last TC user originated request or response primitive (listed in
+@cite{Figure 6}) on the stream.
 @end itemize
 
 @emph{Figure 6} shows the sequence of primitives for the error management primitive.
 
 @cartouche
-@center Figure 6@strong{@emph{.  Sequence of Primitives Error Acknowledgement Service}}
+@center Figure 6@strong{@emph{.  Sequence of Primitives}}
+@center @strong{@emph{Error Acknowledgement Service}}
 @image{tci_fig5,3.5in}
 @end cartouche
 
-@node Protocol Class 1, 2 and 3 Transaction Services Definition
-@section Protocol Class 1, 2 and 3 Transaction Services Definition
-@cindex Protocol Class 1
-@cindex Protocol Class 2
-@cindex Protocol Class 3
+@node Operation Class 1 through 3 Transaction Services Definition
+@section Operation Class 1, 2 and 3 Transaction Services Definition
+@cindex Operation Class 1
+@cindex Operation Class 2
+@cindex Operation Class 3
 
-This section describes the required transaction service primitives that define the protocol class 1, 2 and 3, structured
-transaction interface.  The queue model for protocol classes 1, 2 and 3 are discussed in more detail in ITU-T X.219 and
-ITU-T Q.771.  The queue model represents the operation of a transaction association in the abstract by a pair of queues
-linking two transaction users.  There is one queue for each direction of component flow.  Each queue represents a flow
-control function in one direction of transfer.  The ability of a user to add objects to a queue will be determined by
-the behavior of the user removing objects from that queue, and the state of the queue.  The pair of queues is considered
-to be available for each potential transaction association.  Objects that are entered or removed from the queue are
-either as a result of interactions at the two transaction addresses, or as the result of TR provider intiatives.
+This section describes the required transaction service primitives that define
+the operation class 1, 2 and 3, structured transaction interface.
+
+@menu
+* Transaction Initiation::
+* Transaction Component Transfer::
+* Transaction Termination::
+@end menu
+
+The queue model for operation classes 1, 2 and 3 are discussed in more detail in
+ITU-T X.219 and ITU-T Q.771.
+
+The queue model represents the operation of a transaction dialogue in the
+abstract by a pair of queues linking two transaction users.  There is one queue
+for each direction of component flow.  Each queue represents a flow control
+function in one direction of transfer.  The ability of a user to add objects to
+a queue will be determined by the behaviour of the user removing objects from
+that queue, and the state of the queue.  The pair of queues is considered to be
+available for each potential transaction dialogue.  Objects that are entered
+or removed from the queue are either as a result of interactions at the two
+transaction addresses, or as the result of TC provider initiatives.
 
 @itemize 
-@item A queue is empty until a transaction object has been entered and can be returned to this state, with loss of its
-contents, by the TR provider.
-@item Objects may be entered into a queue as a result of the actions of the source TR user, subject to control by the TR
-provider.
-@item Objects may also be enetered into a queue by the TR provider.
-@item Objects are removed from the queue under the control of the TR user in the same order as they were entered except:
+
+@item A queue is empty until a transaction object has been entered and can be
+returned to this state, with loss of its contents, by the TC provider.
+
+@item Objects may be entered into a queue as a result of the actions of the
+source TC user, subject to control by the TC provider.
+
+@item Objects may also be entered into a queue by the TC provider.
+
+@item Objects are removed from the queue under the control of the TC user in the
+same order as they were entered except:
+
 @end itemize
 
 @enumerate
-@item If the object is of type defined to be able to advance ahead of the preceding object (however, no object is
-defined to be able to advance ahead of another object of the same type), or
-@item If the following object is defined to be destructive with respect to the preceding object on the queue.  If
-necessary, the last object on the queue will be deleted to allow a destructive object to be entered - they will
-therefore always be added to the queue.  For example, &quot;abort&quot; objects are defined to be destructive with
-resepect to all other objects.
+
+@item If the object is of type defined to be able to advance ahead of the
+preceding object (however, no object is defined to be able to advance ahead of
+another object of the same type), or
+
+@item If the following object is defined to be destructive with respect to the
+preceding object on the queue.  If necessary, the last object on the queue will
+be deleted to allow a destructive object to be entered - they will therefore
+always be added to the queue.  For example, ``abort'' objects are defined to be
+destructive with respect to all other objects.
+
 @end enumerate
 
 @emph{Table 3} shows the ordering relationships among the queue model objects.
 
-@c Table 3@strong{@emph{.  Ordering Relationships Between Queue Model Objects}}
+@sp 1
+@center Table 3@strong{@emph{.  Ordering Relationships Between Queue Model Objects}}
 
 @multitable @columnfractions .20 .20 .20 .20 .20
+
 @item @strong{Object X} @tab @strong{BEGIN} @tab @strong{CONT} @tab @strong{END} @tab @strong{ABORT}
+
 @item @strong{Object Y}
+
 @item BEGIN @tab N/A @tab - @tab - @tab DES
+
 @item CONT @tab N/A @tab - @tab - @tab DES
-@item DISC @tab N/A @tab N/A @tab - @tab -
+
+@item END @tab N/A @tab N/A @tab - @tab -
+
 @end multitable
 
 @multitable @columnfractions .09 .91
+
 @item AA @tab Indicates that Object X is defined to be able to advance ahead of preceding Object Y
+
 @item DES @tab Indicates that Object X is defined to be destructive with respect to the preceding Object Y.
+
 @item - @tab Indicates that Object X is neither destructive with respect to Object Y, nor able to advance ahead of Object Y
+
 @item N/A @tab Indicates that Object X will not occur in a position succeeding Object Y in a valid state of a queue.
+
 @end multitable
 
-@node Transaction Initiation Phase
-@subsection Transaction Initiation Phase
+@node Transaction Initiation
+@subsection Transaction Initiation
 
-A pair of queues is associated with a transaction association between two transaction users when the TR provider
-receives a @code{TR_BEGIN_REQ} primitive at one of the TR users resulting in a begin object being entered into the
-queue.  The queues will remain associated with the transaction until a @code{TR_END_REQ} or @code{TR_ABORT_REQ}
-primitive (resulting in an end or abort object) is either entered or removed from a queue.  Similarly, in the queue from
-the destination TR user, objects can be entered into the queue only after the begin object associated with the
-@code{TR_BEGIN_RES} has been entered into the queue.  Alternatively, the destination TR user can enter an end or abort
-object into the queue instead of the begin object to terminate the transaction.  The transaction establishment procedure
-will fail if the TR provider is unable to establish a transaction association, or if the destination TR user is unable
-to accept the @code{TR_BEGIN_IND} (see Transaction Termination primitive definition).
-@tpindex TR_BEGIN_REQ
-@tpindex TR_END_REQ
-@tpindex TR_ABORT_REQ
-@tpindex TR_BEGIN_RES
-@tpindex TR_BEGIN_IND
+A pair of queues is associated with a transaction dialogue between two
+transaction users when the TC provider receives a @code{TC_BEGIN_REQ}
+@prindex TC_BEGIN_REQ
+primitive at one of the TC users resulting in a begin object being entered into
+the queue.  The queues will remain associated with the transaction until a
+@code{TC_END_REQ}
+@prindex TC_END_REQ
+or @code{TC_ABORT_REQ}
+@prindex TC_ABORT_REQ
+primitive (resulting in an end or abort object) is either entered or removed
+from a queue.  Similarly, in the queue from the destination TC user, objects can
+be entered into the queue only after the begin object associated with the
+@code{TC_BEGIN_RES}
+@prindex TC_BEGIN_RES
+has been entered into the queue.  Alternatively, the destination TC user can
+enter an end or abort object into the queue instead of the begin object to
+terminate the transaction.
 
-@node User Primitives for Successful Transaction Establishment
+The transaction establishment procedure will fail if the TC provider is unable
+to establish a transaction dialogue, or if the destination TC user is unable
+to accept the @code{TC_BEGIN_IND}
+@prindex TC_BEGIN_IND
+(see Transaction Termination primitive definition in @ref{TC_END_IND}).
+
 @subsubsection User Primitives for Successful Transaction Establishment
+The following user primitves support Operation Class 1, 2, or 3 Phase I
+(Transaction Establishment) services:
 
 @itemize 
-@item @code{TR_BEGIN_REQ}:
-@tpindex TR_BEGIN_REQ
-This primitive requests that the TR provider form a transaction association with the specified destination TR user.
-@item @code{TR_BEGIN_RES}:
-@tpindex TR_BEGIN_RES
-This primitive requests that the TR provider accept a previous transaction indication.
+
+@item @code{TC_BEGIN_REQ}:
+
+@prindex TC_BEGIN_REQ
+This primitive requests that the TC provider form a transaction dialogue with
+the specified destination TC user.
+
+@item @code{TC_BEGIN_RES}:
+
+@prindex TC_BEGIN_RES
+This primitive requests that the TC provider accept a previous transaction
+indication.
+
 @end itemize
 
-@node Provider Primitives for Successful Transaction Establishment
 @subsubsection Provider Primitives for Successful Transaction Establishment
+The following provider primitives support Operation Class 1, 2, or 3 Phase I
+(Transaction Establishment) services:
 
 @itemize 
-@item @code{TR_BEGIN_IND}:
-@tpindex TR_BEGIN_IND
-This primitive indicates to the TR user that a transaction association request has been made by a user at the specified
-source address.
-@item @code{TR_BEGIN_CON}:
-@tpindex TR_BEGIN_CON
-This primitive indicates to the TR user that a transaction initiation request has been confirmed on the specified
-responding address.
+
+@item @code{TC_BEGIN_IND}:
+
+@prindex TC_BEGIN_IND
+This primitive indicates to the TC user that a transaction dialogue request
+has been made by a user at the specified source address.
+
+@item @code{TC_BEGIN_CON}:
+
+@prindex TC_BEGIN_CON
+This primitive indicates to the TC user that a transaction initiation request
+has been confirmed on the specified responding address.
+
 @end itemize
 
-The sequence of primitives in a successful transaction initiation is defined by the time sequence diagrams as shown in
-@emph{Figure 7}.
+The sequence of primitives in a successful transaction initiation is defined by
+the time sequence diagrams as shown in @emph{Figure 7}.
 
 @cartouche
-@center Figure 7@strong{@emph{.  Sequence of Primitives: Successful Transaction Initiation}}
+@center Figure 7@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Successful Transaction Initiation}}
 @image{tci_fig6,3.5in}
 @end cartouche
 
-The sequence of primitives for the transaction intiation response token value determination is shown in @emph{Figure 8}
-(procedures for transaction initiation response token value determination are discussed in sections 4.1.3 and 4.1.4).
+The sequence of primitives for the transaction initiation response token value
+determination is shown in @emph{Figure 8} (procedures for transaction initiation
+response token value determination are discussed in @ref{TC_BIND_REQ}, and
+@ref{TC_BIND_ACK}).
 
 @cartouche
-@center Figure 8@strong{@emph{.  Sequence of Primitives: Transaction Response Token Value Determination}}
+@center Figure 8@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Transaction Response Token Value Determination}}
 @image{tci_fig7,3.5in}
 @end cartouche
 
 @node Transaction Component Transfer
 @subsection Transaction Component Transfer
 
-Flow control on the transaction association is done by management of the queue capacity, and by allowing objects of
-certain types to be inserted to the queues, as shown in @emph{Table 4}.
+Flow control on the transaction dialogue is done by management of the queue
+capacity, and by allowing objects of certain types to be inserted to the queues,
+as shown in @emph{Table 4}.
 
-@node Primitives for Component Transfer
 @subsubsection Primitives for Component Transfer
 
+The following primitives support Operation Class 1, 2, or 3 Phase II
+(Transaction Component Transfer) services:
+
 @itemize 
-@item @code{TR_CONT_REQ}:
-@tpindex TR_CONT_REQ
-This primitive requests that the TR provider transfer the specified componets.
-@item @code{TR_CONT_IND}:
-@tpindex TR_CONT_IND
-This primitive indicates to the TR user that this message contains components.
+
+@item @code{TC_CONT_REQ}:
+
+@prindex TC_CONT_REQ
+This primitive requests that the TC provider transfer the specified components.
+
+@item @code{TC_CONT_IND}:
+
+@prindex TC_CONT_IND
+This primitive indicates to the TC user that this message contains components.
+
 @end itemize
 
-@emph{Figure 9} shows the sequence of primitives for successful component transfer.  The sequence of primitives may
-remain incomplete if a TR_END or TR_ABORT primitive occurs.
+@emph{Figure 9} shows the sequence of primitives for successful component
+transfer.  The sequence of primitives may remain incomplete if a
+@samp{TC_END_REQ},
+@prindex TC_END_REQ
+@samp{TC_ABORT_REQ},
+@prindex TC_ABORT_REQ
+or @samp{TC_ABORT_IND}
+@prindex TC_ABORT_IND
+primitive occurs.
 
 @cartouche
-@center Figure 9@strong{@emph{.  Sequence of Primitives: Component Transfer}}
+@center Figure 9@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Component Transfer}}
 @image{tci_fig8,3.5in}
 @end cartouche
 
-@node Transaction Termination Phase
-@subsection Transaction Termination Phase
+@node Transaction Termination
+@subsection Transaction Termination
 
-The transaction association procedure is initialized by insertion of an end or abort object (associated with a
-@code{TR_END_REQ} or @code{TR_ABORT_REQ}) into the queue.  As shown in Table?, the termination procedure is destructive
-with respect to other objects in the queue, and eventually results in the emptying of queues and termination of the
-transaction association.  The sequence of primitives depends on the origin of the termination action.  The sequence may
-be:
-@tpindex TR_END_REQ
-@tpindex TR_ABORT_REQ
+The transaction dialogue procedure is initialized by insertion of an end or
+abort object (associated with a @code{TC_END_REQ}
+@prindex TC_END_REQ
+or @code{TC_ABORT_REQ})
+@prindex TC_ABORT_REQ
+into the queue.  As shown in Table?, the termination procedure is destructive
+with respect to other objects in the queue, and eventually results in the
+emptying of queues and termination of the transaction dialogue.
+
+The sequence of primitives depends on the origin of the termination action.  The
+sequence may be:
 
 @enumerate
-@item invoked by on TR user, with a request from that TR user leading to an indication to the other;
-@item invoked by both TR users, with a request from each of the TR users;
-@item invoked by the TR provider, with an indication to each of the NS users;
-@item invoked independently by one TR user and the TR provider, with a request from the originating TR user and an
-indication to the other.
+
+@item invoked by on TC user, with a request from that TC user leading to an
+indication to the other;
+
+@item invoked by both TC users, with a request from each of the TC users;
+
+@item invoked by the TC provider, with an indication to each of the TC users;
+
+@item invoked independently by one TC user and the TC provider, with a request
+from the originating TC user and an indication to the other.
+
 @end enumerate
 
-@node Primitives for Transaction Termination
 @subsubsection Primitives for Transaction Termination
 
+The following primitives support Operation Class 1, 2, or 3 Phase III
+(Transaction Termination) services:
+
 @itemize 
-@item @code{TR_END_REQ}:
-@tpindex TR_END_REQ
-This primitive requests that the TR provider deny an outstanding request for a transaction association or normal
-termination of an existing transaction.
-@item @code{TR_ABORT_REQ}:
-@tpindex TR_ABORT_REQ
-This primitive requests that the TR povider deny an outstanding request for a transaction association or abonormal
-termination of an existing transaction.
-@item @code{TR_END_IND}:
-@tpindex TR_END_IND
-This primitive indicates to the TR user that either a request for transaction initiation has been denied or an existing
-transaction has been terminated normally.
-@item @code{TR_ABORT_IND}:
-@tpindex TR_ABORT_IND
-This primitive indicates to the TR user that either a request for transaction initiation has been denied or an existing
-transaction has been terminated abnormally.
+
+@item @code{TC_END_REQ}:
+
+@prindex TC_END_REQ
+This primitive requests that the TC provider deny an outstanding request for a
+transaction dialogue or normal termination of an existing transaction.
+
+@item @code{TC_ABORT_REQ}:
+
+@prindex TC_ABORT_REQ
+This primitive requests that the TC provider deny an outstanding request for a
+transaction dialogue or abnormal termination of an existing transaction.
+
+@item @code{TC_END_IND}:
+
+@prindex TC_END_IND
+This primitive indicates to the TC user that either a request for transaction
+initiation has been denied or an existing transaction has been terminated
+normally.
+
+@item @code{TC_ABORT_IND}:
+
+@prindex TC_ABORT_IND
+This primitive indicates to the TC user that either a request for transaction
+initiation has been denied or an existing transaction has been terminated
+abnormally.
+
 @end itemize
 
-The sequence of primitives are shown in the time sequence diagrams in the figures that follow:
+The sequence of primitives are shown in the time sequence diagrams in the
+figures that follow:
 
 @cartouche
-@center Figure 10@strong{@emph{.  Sequence of Primitives: TR User Invoked Termination}}
+@center Figure 10@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TC User Invoked Termination}}
 @image{tci_fig9,3.5in}
 @end cartouche
 
 @cartouche
-@center Figure 11@strong{@emph{.  Sequence of Primitives: Simultaneous TR User Invoked Termination}}
+@center Figure 11@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Simultaneous TC User Invoked Termination}}
 @image{tci_fi10,3.5in}
 @end cartouche
 
 @cartouche
-@center Figure 12@strong{@emph{.  Sequence of Primitives: TR Provider Invoked Termination}}
+@center Figure 12@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TC Provider Invoked Termination}}
 @image{tci_fi11,3.5in}
 @end cartouche
 
 @cartouche
-@center Figure 13@strong{@emph{.  Sequence of Primitives: Simultaneous TR User and TR Provider Invoked Termination}}
+@center Figure 13@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Simultaneous TC User and TC Provider Invoked Termination}}
 @image{tci_fi12,3.5in}
 @end cartouche
 
-A TR user may reject a transaction initiation attemp by issuing a @code{TR_ABORT_REQ}.  The originator parameter in the
-@code{TR_ABORT_REQ} will indicate TR user invoked termination.  The sequence of primitives is shown in @emph{Figure 14}.
-@tpindex TR_ABORT_REQ
+A TC user may reject a transaction initiation attempt by issuing a
+@samp{TC_ABORT_REQ}.
+@prindex TC_ABORT_REQ
+The originator parameter in the @samp{TC_ABORT_REQ}
+@prindex TC_ABORT_REQ
+will indicate TC user invoked termination.  The sequence of primitives is shown
+in @emph{Figure 14}.
 
 @cartouche
-@center Figure 14@strong{@emph{.  Sequence of Primitives: TR User Rejection of a Transaction Initiation Attempt}}
+@center Figure 14@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TC User Rejection of a Transaction Initiation Attempt}}
 @image{tci_fi13,3.5in}
 @end cartouche
 
-If the TR provider is unable to establish a transaction, it indicates this to the requester by an N_ABORT_IND.  The
-originator of the primitive indicates a TR provider invoked release.  This is shown in @emph{Figure 15}.
+If the TC provider is unable to establish a transaction, it indicates this to
+the requester by an @samp{TC_ABORT_IND}.
+@prindex TC_ABORT_IND
+The originator of the primitive indicates a TC provider invoked release.  This
+is shown in @emph{Figure 15}.
 
 @cartouche
-@center Figure 15@strong{@emph{.  Sequence of Primitives: TR Provider Rejection of a Transaction Initiation Attempt}}
+@center Figure 15@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{TC Provider Rejection of a Transaction Initiation Attempt}}
 @image{tci_fi14,3.5in}
 @end cartouche
 
-@node Protocol Class 4 Transaction Services Definition
-@section Protocol Class 4 Transaction Services Definition
+@node Operation Class 4 Transaction Services Definition
+@section Operation Class 4 Transaction Services Definition
 
-The protocol class 4 service allows for the transfer of transaction components in one and both directions simultaneously
-wtihout establishing a transaction dialogue.  A set of primitives are defined that carry transaction components and
-control information between the TR user and the TR provider entities.  The primitives are modeled as requests initiated
-by the TR user and indications initiated by the TR provider.  Indications may be initiated by the TR provider
-independently from requests by the TR user.  The protocol class 4 transaction service consists of one phase.
+The operation class 4 service allows for the transfer of transaction components
+in one and both directions simultaneously without establishing a transaction
+dialogue.  A set of primitives are defined that carry transaction components and
+control information between the TC user and the TC provider entities.  The
+primitives are modelled as requests initiated by the TC user and indications
+initiated by the TC provider.  Indications may be initiated by the TC provider
+independently from requests by the TC user.  The operation class 4 transaction
+service consists of one phase.
+
+@menu
+* Request and Response Primitives::
+@end menu
 
 @node Request and Response Primitives
 @subsection Request and Response Primitives
 
 @itemize 
-@item @code{TR_UNI_REQ}:
-@tpindex TR_UNI_REQ
-This primitive requests that the TR provider send the transaction components to the specified destination.
-@item @code{TR_UNI_IND}:
-@tpindex TR_UNI_IND
-This primitive indicates to the TR user that a component sequence has been received from the specified originating
-address.
+
+@item @code{TC_UNI_REQ}:
+
+@prindex TC_UNI_REQ
+This primitive requests that the TC provider send the transaction components to
+the specified destination.
+
+@item @code{TC_UNI_IND}:
+
+@prindex TC_UNI_IND
+This primitive indicates to the TC user that a component sequence has been
+received from the specified originating address.
+
 @end itemize
 
-@emph{Figure 16} shows the sequence of primitives for the protocol class 4 mode of transfer.
+@emph{Figure 16} shows the sequence of primitives for the operation class 4 mode
+of transfer.
 
 @cartouche
-@center Figure 16@strong{@emph{.  Sequence of Primitives: Protocol Class 4 Component Transfer}}
+@center Figure 16@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Operation Class 4 Component Transfer}}
 @image{tci_fi15,3.5in}
 @end cartouche
 
 @itemize 
-@item TR_NOTICE_IND:
-This primitive indicates to the TR user that the components with the specified desintation address and QOS parameters
-produced an error.  This primitive is specific to protocol class 4.
+
+@item @code{TC_NOTICE_IND}:
+
+This primitive indicates to the TC user that the components with the specified
+destination address and QOS parameters produced an error.  This primitive is
+specific to operation class 4.
+
 @end itemize
 
-@emph{Figure 17} shows the sequence of primitives for the protocol class 4 error management primitive.
+@emph{Figure 17} shows the sequence of primitives for the operation class 4
+error management primitive.
 
 @cartouche
-@center Figure 17@strong{@emph{.  Sequence of Primitives: Protocol Class 4 Error Indication Service}}
+@center Figure 17@strong{@emph{.  Sequence of Primitives:}}
+@center @strong{@emph{Operation Class 4 Error Indication Service}}
 @image{tci_fi16,3.5in}
 @end cartouche
 
-@node TRI Primitives
-@chapter TRI Primitives
+@node Component Handling Services Definition
+@section Component Handling Services Definition
 
-This section describes the format and parameters of the TRI primitives (Appendix A shows the mapping of TRI primitives
-to the primitives defined in ITU-T Q.771).  In addition, it discusses the states in which the primitive is valid, the
-resulting state, and the acknowledgement that the primitive expects.  (The state/event tables for these primitives are
-shown in Appendix B.  The precedence tables for the TRI primitives are shown in Appendix C.) Rules for SS7 conformance
-are described in Addendum 1 to this document.  The following tables provide a summary of the TR primitives and their
-parameters.
+@menu
+* Component Invoke Service::
+* Component Return Result Service::
+* Component Error Service::
+* Component Cancel Service::
+* Component Reject Service::
+@end menu
 
-@c Table 4@strong{@emph{.  Transaction Initiation Transaction Service Primitives}}
+@node Component Invoke Service
+@subsection Component Invoke Service
+
+@itemize
+
+@item @code{TC_INVOKE_REQ}:
+
+@item @code{TC_INVOKE_IND}:
+
+@end itemize
+
+@node Component Return Result Service
+@subsection Component Return Result Service
+
+@itemize
+
+@item @code{TC_RESULT_REQ}:
+
+@item @code{TC_RESULT_IND}:
+
+@end itemize
+
+@node Component Error Service
+@subsection Component Error Service
+
+@itemize
+
+@item @code{TC_ERROR_REQ}:
+
+@item @code{TC_ERROR_IND}:
+
+@end itemize
+
+@node Component Cancel Service
+@subsection Component Cancel Service
+
+@itemize
+
+@item @code{TC_CANCEL_REQ}:
+
+@item @code{TC_CANCEL_IND}:
+
+@end itemize
+
+@node Component Reject Service
+@subsection Component Reject Service
+
+@itemize
+
+@item @code{TC_REJECT_REQ}:
+
+@item @code{TC_REJECT_IND}:
+
+@end itemize
+
+@node TCI Primitives
+@chapter TCI Primitives
+
+@menu
+* Management Primitives::
+* Operation Class 1 through 3 Primitives::
+* Operation Class 4 Primitives::
+* Component Handling Primitives::
+@end menu
+
+This section describes the format and parameters of the TCI primitives (Appendix
+A shows the mapping of TCI primitives to the primitives defined in ITU-T Q.771).
+In addition, it discusses the states in which the primitive is valid, the
+resulting state, and the acknowledgement that the primitive expects.  (The
+state/event tables for these primitives are shown in Appendix B.  The precedence
+tables for the TCI primitives are shown in Appendix C.) Rules for SS7
+conformance are described in Addendum 1 to this document.  The following tables
+provide a summary of the TC primitives and their parameters.
+
+@sp 1
+@center Table 4@strong{@emph{.  Transaction Initiation Transaction Service Primitives}}
 
 @multitable @columnfractions .23 .27 .50
+
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS}
-@item TR Initiation @tab @code{TR_BEGIN_REQ} @tab ()
-@tpindex TR_BEGIN_REQ
-@item @tab @code{TR_BEGIN_IND} @tab ()
-@tpindex TR_BEGIN_IND
-@item @tab @code{TR_BEGIN_RES} @tab ()
-@tpindex TR_BEGIN_RES
-@item @tab @code{TR_BEGIN_CON} @tab ()
-@tpindex TR_BEGIN_CON
+
+@item TC Initiation @tab @code{TC_BEGIN_REQ} @tab ()
+@prindex TC_BEGIN_REQ
+
+@item @tab @code{TC_BEGIN_IND} @tab ()
+@prindex TC_BEGIN_IND
+
+@item @tab @code{TC_BEGIN_RES} @tab ()
+@prindex TC_BEGIN_RES
+
+@item @tab @code{TC_BEGIN_CON} @tab ()
+@prindex TC_BEGIN_CON
+
 @end multitable
 
-@c Table 5@strong{@emph{.  Transaction Continuation Transaction Service Primitives}}
+@sp 1
+@center Table 5@strong{@emph{.  Transaction Continuation Transaction Service Primitives}}
 
 @multitable @columnfractions .23 .27 .50
+
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS}
-@item TR Initiation @tab @code{TR_CONT_REQ} @tab ()
-@tpindex TR_CONT_REQ
-@item @tab @code{TR_CONT_IND} @tab ()
-@tpindex TR_CONT_IND
+
+@item TC Initiation @tab @code{TC_CONT_REQ} @tab ()
+@prindex TC_CONT_REQ
+
+@item @tab @code{TC_CONT_IND} @tab ()
+@prindex TC_CONT_IND
+
 @end multitable
 
-@c Table 6@strong{@emph{.  Transaction Termination Transaction Service Primitives}}
+@sp 1
+@center Table 6@strong{@emph{.  Transaction Termination Transaction Service Primitives}}
 
 @multitable @columnfractions .23 .27 .50
+
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS}
-@item TR Initiation @tab @code{TR_END_REQ} @tab ()
-@tpindex TR_END_REQ
-@item @tab @code{TR_END_IND} @tab ()
-@tpindex TR_END_IND
-@item @tab @code{TR_ABORT_REQ} @tab ()
-@tpindex TR_ABORT_REQ
-@item @tab @code{TR_ABORT_IND} @tab ()
-@tpindex TR_ABORT_IND
+
+@item TC Initiation @tab @code{TC_END_REQ} @tab ()
+@prindex TC_END_REQ
+
+@item @tab @code{TC_END_IND} @tab ()
+@prindex TC_END_IND
+
+@item @tab @code{TC_ABORT_REQ} @tab ()
+@prindex TC_ABORT_REQ
+
+@item @tab @code{TC_ABORT_IND} @tab ()
+@prindex TC_ABORT_IND
+
 @end multitable
 
+@page
 @node Management Primitives
 @section Management Primitives
 
-These primitives apply to all protocol classes.
+These primitives apply to all operation classes.
 
-@node Transaction Information Request
-@subsection Transaction Information Request
-@unnumberedsubsubsec TR_INFO_REQ
-@tpindex TR_INFO_REQ
+@menu
+* Transaction Information::
+* Transaction Protocol Address Management::
+* Transaction Options Management::
+* Transaction Error Management::
+@end menu
 
-This primitive request the TR provider to return the values of all supported protocol parameters (@pxref{TR_INFO_ACK}),
-and also the current state of the TR provider (as defined in Appendix B).  This primitive does not affect the state of
-the TR provider and does not appear in the state tables.
+@ignore
+@menu
+---- detailed node listing ----
 
-@unnumberedsubsubsec Format
+Transaction Information
 
-The format of the message is one M_PCPROTO message block and its structure is as follows:
+* TC_INFO_REQ::
+* TC_INFO_ACK::
+
+Transaction Protocol Address Management
+
+* TC_BIND_REQ::
+* TC_BIND_ACK::
+* TC_UNBIND_REQ::
+* TC_ADDR_REQ::
+* TC_ADDR_ACK::
+
+Transaction Options Management
+
+* TC_OPTMGMT_REQ::
+* TC_OPTMGMT_ACK::
+
+Transaction Error Management
+
+* TC_OK_ACK::
+* TC_ERROR_ACK::
+@end menu
+@end ignore
+
+@node Transaction Information
+@subsection Transaction Information
+
+@menu
+* TC_INFO_REQ::
+* TC_INFO_ACK::
+@end menu
+
+@node TC_INFO_REQ
+@subsubsection Transaction Information Request
+
+@subsubheading TC_INFO_REQ
+@prindex TC_INFO_REQ
+
+This primitive request the TC provider to return the values of all supported
+protocol parameters (@pxref{TC_INFO_ACK}), and also the current state of the TC
+provider (as defined in @ref{State/Event Tables}).  This primitive does not
+affect the state of the TC provider and does not appear in the state tables.
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PCPROTO}
+@prindex M_PCPROTO
+message block and its structure is as follows:
 
 @smallexample
-typedef struct
-@{
-    ulong PRIM_type;  /* always TR_INFO_REQ */
-@tpindex TR_INFO_REQ
-@} TR_info_req_t;
+typedef struct TC_info_req @{
+        ulong PRIM_type;                /* Always TC_INFO_REQ */
+@} TC_info_req_t;
+@tpindex TC_info_req_t
 @end smallexample
 
-@unnumberedsubsubsec Parameters
+@subsubheading Parameters
 
-@table @emph
-@item PRIM_type:
-Indicates the primitive type.
-@end table
+The primitive has the following arguments:
 
-@unnumberedsubsubsec Valid States
+@vtable @var
 
-This primitive is valid in any state where a local acknowledgement is not pending.
+@item PRIM_type
 
-@unnumberedsubsubsec New State
+Indicates the primitive type.  Always @samp{TC_INFO_REQ}.
+
+@end vtable
+
+@subsubheading Valid States
+
+This primitive is valid in any state where a local acknowledgement is not
+pending.
+
+@subsubheading New State
 
 The new state remains unchanged.
 
-@unnumberedsubsubsec Acknowledgements
+@subsubheading Rules
 
-This primitive requires the TR provider to generate one of the following acknowledgements upon receipt of the primitive:
+For the rules governing the requests made by this primitive, see the
+@samp{TC_INFO_ACK} primitive described in @ref{TC_INFO_ACK}.
 
-@itemize 
-@item @emph{Successful:} Acknowledgement of the primitive via the @code{TR_INFO_ACK} primitive.
-@tpindex TR_INFO_ACK
-@item @emph{Non-fatal Errors}: There are no errors associated with the issuance of this primitive.
+@subsubheading Acknowledgements
+
+This primitive requires the TC provider to generate one of the following
+acknowledgements upon receipt of the primitive:
+
+@itemize ---
+
+@item @emph{Successful:}
+
+Acknowledgement of the primitive is indicatd with the @code{TC_INFO_ACK}
+primitive described in @ref{TC_INFO_ACK}.
+
+@item @emph{Non-fatal Errors:}
+
+These errors will be indicated with the @code{TC_ERROR_ACK} primitive described
+in @ref{TC_ERROR_ACK}.  The allowable errors are as follows:
+
+There are no errors associated with the issuance of this primitive.
+
 @end itemize
 
-@node Transaction Information Acknowledgement
-@subsection Transaction Information Acknowledgement
+@page
+@node TC_INFO_ACK
+@subsubsection Transaction Information Acknowledgement
 
-@node TR_INFO_ACK
-@unnumberedsubsubsec TR_INFO_ACK
-@tpindex TR_INFO_ACK
+@subsubheading TC_INFO_ACK
+@prindex TC_INFO_ACK
 
-This primitive indicates to the TR user any relevant protocol-dependent parameters.@footnote{}  It should be initiated
-in response to the @code{TR_INFO_REQ} primitive described above.
-@tpindex TR_INFO_REQ
+This primitive indicates to the TC user any relevant protocol-dependent
+parameters.@footnote{}  It should be initiated in response to the
+@code{TC_INFO_REQ} primitive described above under @ref{TC_INFO_REQ}.
 
-@unnumberedsubsubsec Format
+@subsubheading Format
+
+The format of the message is one @samp{M_PCPROTO}
+@prindex M_PCPROTO
+message block and its structure is as follows:
 
 @smallexample
-typedef struct @{
-    ulong PRIM_type;      /* always TR_INFO_ACK*/
-    ulong TSDU_size;      /* maximum TSDU size */
-    ulong ETSDU_size;     /* maximum ETSDU size*/
-    ulong CDATA_size;     /* connect data size  */
-    ulong DDATA_size;     /* disconnect data size */
-    ulong ADDR_size;      /* address size */
-    ulong ADDR_length;    /* address length */
-    ulong ADDR_offset;    /* address offset */
-    ulong QOS_length;     /* default QOS values length */
-    ulong QOS_offset;     /* default QOS values offset */
-    ulong QOS_range_length;  /* QOS range length */
-    ulong QOS_range_offset;  /* QOS range offset */
-    ulong OPTIONS_flags;  /* bit masking for options */
-    ulong TIDU_size;      /* transaction interface data size */
-    long  SERV_type;      /* service type */
-    ulong CURRENT_state;   /* current state */
-    ulong PROVIDER_type;   /* type of provider */
-    ulong NODU_size;       /* optimal TSDU size */
-    ulong PROTOID_length;  /* length of bound protocol ids */
-    ulong PROTOID_offset;  /* offset of bound protocol ids */
-    ulong TRI_version;     /* supported TRI version number */
-@} TR_info_ack_t;
+typedef struct TC_info_ack @{
+        long PRIM_type;                 /* always TC_INFO_ACK */
+        long TSDU_size;                 /* maximum TSDU size */
+        long ETSDU_size;                /* maximum ETSDU size */
+        long CDATA_size;                /* connect data size */
+        long DDATA_size;                /* disconnect data size */
+        long ADDR_size;                 /* maximum address size */
+        long OPT_size;                  /* maximum options size */
+        long TIDU_size;                 /* transaction interface data size */
+        long SERV_type;                 /* service type */
+        long CURRENT_state;             /* current state */
+        long PROVIDER_flag;             /* provider flags */
+        long TCI_version;               /* TCI version */
+@} TC_info_ack_t;
+@tpindex TC_info_ack_t
 @end smallexample
 
-@unnumberedsubsubsec Parameters
+@subsubheading Parameters
+
+The primitive has the following arguments:
 
 @table @emph
+
 @item PRIM_type
-Indicates the primitive type.
+
+Indicates the primitive type.  Always @samp{TC_INFO_ACK}.
+
 @item TSDU_size
+
 Specifies the maximum size (in octets) of Transaction Service User Data supported by the TR provider.
+
 @item ETSDU_size
+
 Specifies the maximum size (in octets) of Expedited Transaction Service User Data supported by the TR provider.
+
 @item CDATA_size
+
 Specifies the maximum number of octets of data that may be associated with a transaction initiation primitive.
+
 @item DDATA_size
+
 Specifies the maximum number of octets of data that may be associated with a transaction termination primitive.
+
 @item ADDR_size
+
 Specifies the maximum size (in decimal digits) of a network address.
+
 @item ADDR_length, ADDR_offset
+
 Specifies the length in bytes and offset from the beginning of the M_PCPROTO message block of the network address bound
-on the stream on which the @code{TR_INFO_REQ} was issued (a network address is bound
-@tpindex TR_INFO_REQ
-to a stream via a @code{TR_BIND_REQ}).
-@tpindex TR_BIND_REQ
+on the stream on which the @code{TC_INFO_REQ} was issued (a network address is bound
+@prindex TC_INFO_REQ
+to a stream via a @code{TC_BIND_REQ}).
+@prindex TC_BIND_REQ
+
 @item QOS_length, QOS_offset
 
 @item QOS_range_length, QOS_range_offset
@@ -954,789 +1576,2541 @@ to a stream via a @code{TR_BIND_REQ}).
 
 @item PROTOID_length, PROTOID_offset
 
-@item TRI_version
-@end table
-
-@node TCAP Transport Provider TPI Addendum
-@chapter TCAP Transport Provider TPI Addendum
-
-The Transaction Interface (TRI) is written as an addendum to the XTI/TPI (X/Open Tranport Interface/Transport Provider
-Interface).  No new primitive or semantics have been added to the interface, merely a definition of the
-protocol-specific and provider-specific aspects of TCAP Transport.  TCAP Transport is very close to the XTI mOSI
-transport specification.  The major difference is that SCCP Network Layer Addresses and options are used instead of ISO
-Presentation Layer addresses and options.  Aside from that, TCAP Transport resembles X.219 OSI Transport.
-
-@node Addressing
-@section Addressing
-
-TCAP uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
-
-@node Address Format
-@subsection Address Format
-
-The address format for a TCAP address is as follows:
-
-@node Options
-@section Options
-
-@node TCAP Level Options
-@subsection TCAP Level Options
-
-Application Context Name
-
-User Information
-
-@node SCCP Level Options
-@subsection SCCP Level Options
-
-@unnumberedsubsubsec SCCP Quality of Service Options
-
-The TCAP interface uses protocol level T_SS7_SCCP for options at the SCCP level.  SCCP QOS parameters are communicated
-to the underlying transport using the option name T_SCCP_QOS.  There are three QOS structures which can be used in this
-fashion are listed in @emph{Table 7} as follows:
-
-@c Table 7@strong{@emph{.  SCCP QOS Option Values}}
-
-@multitable @columnfractions .25 .34 .15 .26
-@item @strong{Option Name} @tab @strong{Type of Option Value} @tab @strong{Legal Option Value} @tab @strong{Meaning}
-@item T_SCCP_QOS @tab N_qos_sel_sccp_t @tab see text @tab For use with T_UNITDATA_REQ, T_OPTDATA_REQ
-@item T_SCCP_QOS @tab N_qos_opt_sel_sccp_t @tab see text @tab For use with T_CONN_REQ, T_CONN_RES
-@item T_SCCP_QOS @tab N_qos_range_sccp_t @tab see text @tab For use with T_INFO_ACK
-@end multitable
-
-Quality of service structure @code{qos_sel_sccp_t} has the following fields:
-
-@table @emph
-
-@item n_qos_type
-This is the NPI Quality of Service structure type and is always set to @code{N_QOS_SEL_SCCP},
-@code{N_QOS_OPT_SEL_SCCP}, or @code{N_QOS_RANGE_SCCP}.
-
-@item protocol_class
-This is the protocol class.  The @emph{protocol_class} field can be one of the following: @code{N_QOS_PCLASS_0} (SCCP
-connectionless protocol class 0), @code{N_QOS_PCLASS_1} (for SCCP connectionless protocol class 1),
-@code{N_QOS_PCLASS_2} (for SCCP connection-oriented protocol class 2), @code{N_QOS_PCLASS_3} (for SCCP
-connection-oriented protocol class 3) or @code{QOS_UNKNOWN}.  @code{N_QOS_PCLASS_2} and @code{N_QOS_PCLASS_3} are not
-applicable to TCAP.
-@cindex Protocol Classes
-@cindex Protocol Class 1
-@cindex Protocol Class 2
-@cindex Protocol Class 3
-@cindex Protocol Class 4
-
-@item option_flags
-If the @emph{options_flags} field has bit @code{N_QOS_OPT_RETERR} set then the SCCP will return the PDU on error.
-
-@item importance
-This is the importance of the message for consideration for SCCP flow control.  This value is not normally set by the
-user.  It can be any integer number from 0 to 7, or @code{QOS_UNKNOWN}.
-
-@item sequence_selection
-This affects the SLS (Signalling Link Selection) value that will be used for protocol classes @code{N_QOS_PCLASS_0} and
-@code{N_QOS_PCLASS_1}.  This value is not normally set by the user and can be an integer value or @code{QOS_UNKNOWN}.
-
-@item message_priority
-This affects the MP (Message Priority) value that will be used for specific messages in all protocol classes.  This
-value is not normally set by the use and can be any integer value from 0 to 3 or the value @code{QOS_UNKNOWN}.
+@item TCI_version
 
 @end table
 
-@node T_INFO_ACK Values
-@section T_INFO_ACK Values
-
-The following discusses the values which may be returned in the T_INFO_ACK primitive in response to
-a T_INFO_REQ primitive.
+@page
+@node Transaction Protocol Address Management
+@subsection Transaction Protocol Address Management
 
-@table @emph
+@menu
+* TC_BIND_REQ::
+* TC_BIND_ACK::
+* TC_UNBIND_REQ::
+* TC_ADDR_REQ::
+* TC_ADDR_ACK::
+@end menu
 
-@item TSDU_size
-TCAP has effectively no limit to the amount of data which can be sent in a particular invoke or result component.  TCAP
-includes a ``more'' bit concept in that an Invoke Not Last and Return Result Not Last can be used to indicated that the
-next Invoke or Return Result are part of the same component sequence.  ITU-T does not include the Not Last concept for
-Invokes.  As a result, for ANSI and other TCAPs supporting the Invoke Not Last components, TSDU_size will be set to
-T_INFINITE (-1).  For other TCAPs not supporting Invoke Not Last, the TSDU_size will be set to the maximum size of a
-single component sequence derived from the maximum size of the underlying SCCP transport.  This may still be T_INFINITE
-(-1) as the underlying SCCP connectionless transport may support unlimited size NSDUs.
+@node TC_BIND_REQ
+@subsubsection Transaction Bind Request
 
-@item ETSDU_size
-TCAP has no expedited data service and the value of ETSDU_size is set to T_UNKNOWN (-2).
+@subsubheading TC_BIND_REQ
+@prindex TC_BIND_REQ
 
-@item CDATA_size
-TCAP can send connection data (components) with the initial Begin(Query) or first Continue(Conversation) package and can
-also send Application Context and User Information in either package.  These messages correspond to TR-BEGIN and the
-first TR-CONTINUE after receiving a TR-BEGIN and these correspond to T_CONN_REQ and T_CONN_RES.  Because the underlying
-SCCP connectionless transport may support unlimited size NSDUs, this value may be set to T_INFINITE (-1) or may be set
-to the maximum amount of connection data (including Application Context, User Information and Components) which can be
-sent or received in either package.  This informs the user as to wht size to make data buffers associated with
-connection indications and confirmations (T_CONN_IND, T_CONN_CON) and how much data can be sent with connection requests
-and responses (T_CONN_REQ, T_CONN_RES).
+@subsubheading Format
 
-@item DDATA_size
-TCAP can send disconnect data (components) with the final End(Response) package.  These messages correspond to the
-TR-END primitive and the T_DISCON_REQ or T_DISCON_IND.  Again, becuase the underlying SCCP connectionless transport may
-support unlimited size NSDUs, this value may be set to T_INFINITE(-1) or may be set to the maximum amount of
-disconnection data which can be sent or received in the End(Response) package.  This informs the user as to what size to
-make data buffers associated with disconnection indications (T_DISCON_IND) and how much data can be sent with
-disconnection requests (T_DISCON_REQ).
+@smallexample
+typedef struct TC_bind_req @{
+        ulong PRIM_type;
+        ulong ADDR_length;              /* address length */
+        ulong ADDR_offset;              /* address offset */
+        ulong XACT_number;              /* maximum outstanding transaction reqs. */
+        ulong BIND_flags;               /* bind flags */
+@} TC_bind_req_t;
+@tpindex TC_bind_req_t
 
-@item ADDR_size
-This is the maximum TCAP address size which can be communicated across the interface.  This address size is the maximum
-size of the defined SCCP address structure (@code{sizeof(sccp_addr_t)}) which also will include and address digits up to
-a maximum of @code{SCCP_MAX_ADDR_LENGTH} octets of digits.  This informs the user as to what size it should reserve for
-control buffers so as to receive control information without buffer truncation.
+typedef struct TC_subs_bind_req @{
+        ulong PRIM_type;
+@} TC_subs_bind_req_t;
+@tpindex TC_subs_bind_req_t
+@end smallexample
 
-@item OPT_size
-This is the maximum size of the options field used in any TPI message and is the sum of the maximum option sizes of one
-of each of the options that can occur together.  This informs the user as to what size is should reserve for control
-buffers to ensure that received control messages which include options can be contained within the buffer without
-truncation.
+@subsubheading Parameters
 
-@item TIDU_size
-Even though a TCAP provider can support unlimited TSDU size, it cannot normally support unlimited TIDU size.  This is
-because the underlying SCCP NSDU may be limited in size.  The TCAP provider is not responsible for segmenting component
-sequences offered to the provider from the user in as M_DATA.  This is the maximum size of the TIDU which corresponds to
-the maximum size of the underlying NSDU.  Because the underlying SCCP provider may have no limit on the NSDU size (i.e.,
-it supports segmentation of connectionless NSDUs) this may be more in the manner of a optimal recommendation to the user
-rather than an absolute maximum.  Because of this, a given TCAP provider might not reject TIDUs which are larger than
-this value.
+The primitive has the following arguments:
 
-@item SERV_type
-There are two service type supported by a TCAP provider: T_COTS and T_CLTS.  T_CLTS (TCAP class 4) is a connectionless
-unidirection unstructured transaction service with no error notification.  T_COTS (TCAP classes 1, 2 and 3) are
-connection-oriented structured transaction services with or without error notification.  The value reflected here is
-dependent on the setting of option T_TCAP_PCLASS.
+@vtable @var
 
-@item CURRENT_state
-Provides the current state of the Transport Provider.  TCAP providers use the same states as other TPI providers.
+@item PRIM_type
 
-@item PROVIDER_flag
-TPI provider flags which are set are SENDZERO (because TCAP supports the sending of packages without components) and
-XPG4_1 (to indicate that the transport provider supports the latest TPI semantics).
+Indicates the primitive type.  Always @samp{TC_BIND_REQ}.
 
-@end table
+@item ADDR_length
 
-@node Supported Services
-@section Supported Services
+@item ADDR_offset
 
-@node Common Transport Services
-@subsection Common Transport Services
+@item XACT_number
 
-@node Information Service
-@subsubsection Information Service
+@item BIND_flags
 
-@unnumberedsubsubsec T_INFO_REQ
+@end vtable
 
-@unnumberedsubsubsec T_INFO_ACK
+@subsubheading Flags
 
-@unnumberedsubsubsec T_ADDR_REQ
+@subsubheading Valid State
 
-@unnumberedsubsubsec T_ADDR_ACK
+@subsubheading New State
 
-@node Bind Service
-@subsubsection Bind Service
+@subsubheading Rules
 
-@unnumberedsubsubsec T_BIND_REQ
+@subsubheading Acknowledgement
 
-@unnumberedsubsubsec T_BIND_ACK
 
-@node Options Management Service
-@subsubsection Options Management Service
+@page
+@node TC_BIND_ACK
+@subsubsection Transaction Bind Acknowledgement
 
-@unnumberedsubsubsec T_OPTMGMT_REQ
+@subsubheading TC_BIND_ACK
+@prindex TC_BIND_ACK
 
-@unnumberedsubsubsec T_OPTMGMT_ACK
+@subsubheading Format
 
-@node Connection-Mode Services
-@subsection Connection-Mode Services
+@smallexample
+typedef struct TC_bind_ack @{
+        ulong PRIM_type;
+        ulong ADDR_length;
+        ulong ADDR_offset;
+        ulong XACT_number;
+        ulong TOKEN_value;
+@} TC_bind_ack_t;
+@tpindex TC_bind_ack_t
 
-@node Connection Establishment
-@subsubsection Connection Establishment
+typedef struct TC_subs_bind_ack @{
+        ulong PRIM_type;
+@} TC_subs_bind_ack_t;
+@tpindex TC_subs_bind_ack_t
+@end smallexample
 
-@unnumberedsubsubsec T_CONN_REQ
+@subsubheading Parameters
 
-@unnumberedsubsubsec T_CONN_IND
+The primitive has the following arguments:
 
-@unnumberedsubsubsec T_CONN_RES
+@vtable @var
 
-@unnumberedsubsubsec T_CONN_CON
+@item PRIM_type
 
-@node Data Transfer
-@subsubsection Data Transfer
+Indicates the primitive type.  Always @samp{TC_BIND_ACK}.
 
-@unnumberedsubsubsec T_DATA_REQ
+@item ADDR_length
 
-@unnumberedsubsubsec T_DATA_IND
+@item ADDR_offset
 
-@unnumberedsubsubsec T_EXDATA_REQ
+@item XACT_number
 
-@unnumberedsubsubsec T_EXDATA_IND
+@item TOKEN_value
 
-@unnumberedsubsubsec T_OPTDATA_REQ
+@end vtable
 
-@unnumberedsubsubsec T_OPTDATA_IND
+@subsubheading Flags
 
-@node Connection Release
-@subsubsection Connection Release
+@subsubheading Valid State
 
-@unnumberedsubsubsec T_DISCON_REQ
+@subsubheading New State
 
-@unnumberedsubsubsec T_DISCON_IND
+@subsubheading Rules
 
-@unnumberedsubsubsec T_ORDREL_REQ
+@subsubheading Acknowledgement
 
-@unnumberedsubsubsec T_ORDREL_IND
 
-@node Connection-Less Mode Services
-@subsubsection Connection-Less Mode Services
+@page
+@node TC_UNBIND_REQ
+@subsubsection Transaction Unbind Request
 
-@unnumberedsubsubsec T_UNITDATA_REQ
+@subsubheading TC_UNBIND_REQ
+@prindex TC_UNBIND_REQ
 
-@unnumberedsubsubsec T_UNITDATA_IND
+@subsubheading Format
 
-@unnumberedsubsubsec T_UDERROR_IND
+@smallexample
+typedef struct TC_unbind_req @{
+        ulong PRIM_type;                /* Always TC_UNBIND_REQ */
+@} TC_unbind_req_t;
+@tpindex TC_unbind_req_t
+@end smallexample
 
-@node Component Services
-@subsubsection Component Services
+@subsubheading Parameters
 
-@unnumberedsubsubsec T_INVOKE_REQ
+The primitive has the following arguments:
 
-@unnumberedsubsubsec T_INVOKE_IND
+@vtable @var
 
-@unnumberedsubsubsec T_RESULT_REQ
+@item PRIM_type
 
-@unnumberedsubsubsec T_RESULT_IND
+Indicates the primitive type.  Always @samp{TC_UNBIND_REQ}.
 
-@unnumberedsubsubsec T_ERROR_REQ
+@end vtable
 
-@unnumberedsubsubsec T_ERROR_IND
+@subsubheading Flags
 
-@unnumberedsubsubsec T_CANCEL_REQ
+@subsubheading Valid State
 
-@unnumberedsubsubsec T_CANCEL_IND
+@subsubheading New State
 
-@unnumberedsubsubsec T_REJECT_REQ
+@subsubheading Rules
 
-@unnumberedsubsubsec T_REJECT_IND
+@subsubheading Acknowledgement
 
-@node Mapping of TCAP to TPI
-@chapter Mapping of TCAP to TPI
 
-@node State Mapping
-@section State Mapping
+@page
+@node TC_ADDR_REQ
+@subsubsection Transaction Protocol Address Request
 
-@cartouche
-@center Figure 18@strong{@emph{.  TR Sub-Layer State Machine}}
-@image{tci_fi17,4in}
-@end cartouche
+@subsubheading TC_ADDR_REQ
+@prindex TC_ADDR_REQ
 
-@cartouche
-@center Figure 19@strong{@emph{.  TR Sub-Layer State Machine}}
-@image{tci_fi18,4in}
-@end cartouche
+@subsubheading Format
 
-@node Primitive Mapping
-@section Primitive Mapping
+@smallexample
+@tpindex TC_addr_req_t
+@end smallexample
 
-@c Table 8@strong{@emph{.  Primitive Mapping}}
+@subsubheading Parameters
 
-@multitable @columnfractions .34 .35 .31
-@item @strong{TR Sub-Layer Primitive} @tab @strong{TC Sub-Layer Primitive} @tab @strong{TPI Primitive}
-@item TR-UNI Request @tab TC-UNI Request @tab T_UNITDATA_REQ
-@item TR-UNI Indication @tab TC-UNI Indication @tab T_UNITDATA_IND
-@item TR-BEGIN Request @tab TC-BEGIN Request @tab T_CONN_REQ
-@item TR-BEGIN Indication @tab TC-BEGIN Indication @tab T_CONN_IND
-@item TR-CONTINUE Request @tab TC-CONTINUE Request @tab T_CONN_RES
-@item TR-CONTINUE Indication @tab TC-CONTINUE Indication @tab T_CONN_CON
-@item TR-CONTINUE Request @tab TC-CONTINUE Request @tab T_OPTDATA_REQ
-@item TR-CONTINUE Indication @tab TC-CONTINUE Indication @tab T_OPTDATA_IND
-@item TR-END Request @tab TC-END Request @tab T_ORDREL_REQ
-@item TR-END Indication @tab TC-END Indication @tab T_ORDREL_IND
-@item TR-U-ABORT Request @tab TC-U-ABORT Request @tab T_DISCON_REQ
-@item TR-U-ABORT Indication @tab TC-U-ABORT Indication @tab T_DISCON_IND
-@item TR-P-ABORT Indication @tab @tab T_DISCON_IND
-@item TR-NOTICE Indication @tab TC-NOTICE Indication @tab T_UDERROR_IND 
-@end multitable
+The primitive has the following arguments:
 
-@node T-UNI
-@subsection T-UNI
+@vtable @var
 
-@node Request
-@subsubsection Request
+@end vtable
 
-The Q.771 TR-UNI and TC-UNI Requests map onto the TPI T_UNITDATA_REQ primitive as shown in Table 9.
+@subsubheading Flags
 
-@c Table 9@strong{@emph{.  T-UNI Request Mapping}}
+@subsubheading Valid State
 
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-UNI Request @tab T_UNITDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Originating Address @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
+@subsubheading New State
 
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-UNI Request @tab T_UNITDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Dialogue ID @tab implicit (see note 2)
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks 
-@end multitable
+@subsubheading Rules
 
-Notes:
-@enumerate
-@item The @emph{Originating Address} parameter is implicit to the stream and is taken from the address which is bound to
-the stream in a previous T_BIND_REQ operation and which is returned as the LOCADDR in a T_ADDR_ACK.
-@item The @emph{Dialogue ID} is implicit to the stream.  Each stream supports only one dialog at a time.
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_ADDR_ACK
+@subsubsection Transaction Protocol Address Acknowledgement
+
+@subsubheading TC_ADDR_ACK
+@prindex TC_ADDR_ACK
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PCPROTO}
+@prindex M_PCPROTO
+message block structured as follows:
+
+@smallexample
+@tpindex TC_addr_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Transaction Options Management
+@subsection Transaction Options Management
+
+@menu
+* TC_OPTMGMT_REQ::
+* TC_OPTMGMT_ACK::
+@end menu
+
+@node TC_OPTMGMT_REQ
+@subsubsection Transaction Options Management Request
+
+@subsubheading TC_OPTMGMT_REQ
+@prindex TC_OPTMGMT_REQ
+
+@subsubheading Format
+
+@smallexample
+typedef struct TC_optmgmt_req @{
+        ulong PRIM_type;
+        ulong OPT_length;
+        ulong OPT_offset;
+        ulong MGMT_flags;
+@} TC_optmgmt_req_t;
+@tpindex TC_optmgmt_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_OPTMGMT_REQ}.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item MGMT_flags
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_OPTMGMT_ACK
+@subsubsection Transaction Options Management Acknowledgement
+
+@subsubheading TC_OPTMGMT_ACK
+@prindex TC_OPTMGMT_ACK
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PCPROTO}
+@prindex M_PCPROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_optmgmt_ack @{
+        ulong PRIM_type;
+        ulong OPT_length;
+        ulong OPT_offset;
+        ulong MGMT_flags;
+@} TC_optmgmt_ack_t;
+@tpindex TC_optmgmt_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_OPTMGMT_ACK}.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item MGMT_flags
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Transaction Error Management
+@subsection Transaction Error Management
+
+@menu
+* TC_OK_ACK::
+* TC_ERROR_ACK::
+@end menu
+
+@node TC_OK_ACK
+@subsubsection Transaction Successful Receipt Acknowledgement
+
+@subsubheading TC_OK_ACK
+@prindex TC_OK_ACK
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PCPROTO}
+@prindex M_PCPROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_ok_ack @{
+        ulong PRIM_type;
+        ulong CORRECT_prim;
+@} TC_ok_ack_t;
+@tpindex TC_ok_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_OK_ACK}.
+
+@item CORRECT_prim
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_ERROR_ACK
+@subsubsection Transaction Error Acknowledgement
+
+@subsubheading TC_ERROR_ACK
+@prindex TC_ERROR_ACK
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PCPROTO}
+@prindex M_PCPROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_error_ack @{
+        ulong PRIM_type;
+        ulong ERROR_prim;
+        ulong TRPI_error;
+        ulong UNIX_error;
+        ulong DIALOG_id;
+        ulong INVOKE_id;
+@} TC_error_ack_t;
+@tpindex TC_error_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_ERROR_ACK}.
+
+@item ERROR_prim
+
+@item TRPI_error
+
+@item UNIX_error
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Operation Class 1 through 3 Primitives
+@section Operation Class 1, 2 and 3 Primitives
+
+This section describes the operation class 1, 2, and 3 dialogue handling primitives.  Primitives are grouped into phases:
+
+@enumerate 1
+
+@item Transaction Establishment Phase
+
+@ifnotinfo
+@xref{Transaction Establishment Phase}.
+@end ifnotinfo
+
+@item Transaction Data Transfer Phase
+
+@ifnotinfo
+@xref{Transaction Data Transfer Phase}.
+@end ifnotinfo
+
+@item Transaction Termination Phase
+
+@ifnotinfo
+@xref{Transaction Termination Phase}.
+@end ifnotinfo
+
 @end enumerate
 
-@node Indication
-@subsubsection Indication
-
-The Q.771 TR-UNI and TC-UNI Indications map onto the T_UNITDATA_IND primitive as shown in Table 10.
-
-@c Table 10@strong{@emph{.  T-UNI Indication Mapping}}
-
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-UNI Indication @tab T_UNITDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Originating Address @tab SRC_offset, SRC_length
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-UNI Indication @tab T_UNITDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see npte 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab SRC_offset, SRC_length
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable
-
-Notes:
-@enumerate
-@item The @emph{Destination Address} parameter is implicit to the stream and is taken to be the address which is bound
-to the stream.
-@end enumerate
-
-@node TR-BEGIN
-@subsection TR-BEGIN
-
-@node Request
-@subsubsection Request
-
-The Q.771 TR-BEGIN and TC-BEGIN Requests map onto the T_CONN_REQ primitive as shown in Table 11.
-
-@c Table 11@strong{@emph{.  T-Begin Request Mapping}}
-
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Originating Address @tab implicit (see note 1)
-@item Transaction ID @tab implicit (see note 2)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab DEST_offset, DEST_length
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Dialogue ID @tab implicit (see note 2)
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable
-
-Notes:
-@enumerate
-@item The @emph{Originating Address} parameter is implicit to the stream and is taken from the address which is bound to
-the stream in a previous T_BIND_REQ operation and which is returned as the LOCADDR in a T_ADDR_ACK.
-@item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the stream.  Each stream only supports one dialog
-at a time.
-@end enumerate
-
-@node Indication
-@subsubsection Indication
-
-The Q.771 TR-BEGIN and TC-BEGIN Indications map onto the T_CONN_IND primitive as shown in Table 12.
-
-@c Table 12@strong{@emph{.  T-Begin Indication Mapping}}
-
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-BEGIN Request @tab T_CONN_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Originating Address @tab SRC_offset, SRC_length
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-BEGIN Indication @tab T_CONN_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Destination Address @tab implicit (see note 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Originating Address @tab SRC_offset, SRC_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable
-Notes:
-@enumerate
-@item The @emph{Destination Address} parameter is implicit to the stream and is the address to which the stream was
-bound with the previous T_BIND_REQ operation and which is returned as as the LOCADDR in a T_ADDR_ACK.
-@end enumerate
-
-@node T-CONTINUE
-@subsection T-CONTINUE
-
-@node Confirming Request
-@subsubsection Confirming Request
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Requests confirming a transaction map onto the T_CONN_RES primitive as shown in
-Table 13.
-
-@c Table 13@strong{@emph{.  T-Continue Request Mapping}}
-
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Request @tab T_CONN_RES
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Request @tab T_CONN_RES
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab implicit (see note 1)
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable
-
-Notes:
-@enumerate
-@item The @emph{Originating Address} parameter is implicit to the stream and is taken from the address which is bound to
-the stream in a previous T_BIND_REQ operation and which is returned as the LOCADDR in a T_ADDR_ACK.
-@end enumerate
-
-@node Confirming Indication
-@subsubsection Confirming Indication
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Indications confirming a transaction map onto the T_CONN_CON primitive as shown in
-Table 14.
-
-@c Table 14@strong{@emph{.  T-Continue Indication Mapping}}
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Indication @tab T_CONN_CON
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab RES_length, RES_offset
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Indication @tab T_CONN_CON
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Originating Address @tab RES_length, RES_offset
-@item Application Context Name @tab OPT_offset, OPT_length
-@item Dialogue ID @tab SEQ_number
-@item User Information @tab OPT_offset, OPT_length
-@item Components Present @tab M_DATA blocks
-@end multitable
-Notes:
-@enumerate
-@item The @emph{Responding Address} parameter is delivered in the primitive but may be ignored by
-the TR-User.
-@end enumerate
-
-@node Subsequent Request
-@subsubsection Subsequent Request
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Requests continuing a transaction map onto the T_OPTDATA_REQ primitive as shown in
-Table 15.
-
-@c Table 15@strong{@emph{.  T-Continue Request Mapping}}
-
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Request @tab T_OPTDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Transaction ID @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Request @tab T_OPTDATA_REQ
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Dialogue ID @tab implicit (see note 1)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab OPT_offset, OPT_length
-@end multitable
-Notes:
-@enumerate
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are implicit to the stream.  Each stream
-supports only one dialog at a time.
-@end enumerate
-
-@node Subsequent Indication
-@subsubsection Subsequent Indication
-
-The Q.771 TR-CONTINUE and TC-CONTINUE Indications continuing a transaction map onto the T_OPTDATA_IND primitive as shown
-in Table 16.
-
-@c Table 16@strong{@emph{.  T-Continue Indication Mapping}}
-
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-CONTINUE Indication @tab T_OPTDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Transaction ID @tab implicit (see note 1)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-CONTINUE Indication @tab T_OPTDATA_IND
-@item Quality of Service @tab OPT_offset, OPT_length
-@item Dialogue ID @tab implicit (see note 1)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab OPT_offset, OPT_length
-@end multitable
-Notes:
-@enumerate
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are implicit to the stream.  Each stream
-supports only one dialog at a time.
-@end enumerate
-
-@node T-END
-@subsection T-END
-
-@node Request
-@subsubsection Request
-
-The Q.771 TR-END and TC-END Requests map onto the T_ORDREL_REQ primitive as shown in Table 17.
-
-@c Table 17@strong{@emph{.  T-END Request Mapping}}
-@multitable @columnfractions .50 .50
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-END Request @tab T_ORDREL_REQ
-@item Quality of Service @tab implicit (see notes)
-@item Transaction ID @tab implicit (see notes)
-@item Termination @tab implied (see notes)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-END Request @tab T_ORDREL_REQ
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@item Termination @tab implied (see notes)
-@end multitable
-Notes:
-@enumerate
-@item Pre-arranged or basic terminations are distinguished by protocol class and options parameters.
-@item User data in M_DATA blocks can be associated wtih the primitive.
-@end enumerate
-
-@node Indication
-@subsubsection Indication
-
-
-The Q.771 TR-END and TC-END Indications map onto the T_ORDREL_IND primitive as shown in Table 18.
-
-@c Table 18@strong{@emph{.  T-END Indication Mapping}}
-@multitable @columnfractions .5 .5
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-END Indication @tab T_ORDREL_IND
-@item Quality of Service @tab implicit (see notes)
-@item Transaction ID @tab implicit (see notes)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-END Indication @tab T_ORDREL_IND
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@end multitable
-Notes:
-@enumerate
-@end enumerate
-
-@node T-U-ABORT
-@subsection T-U-ABORT
-
-@node Request
-@subsubsection Request
-
-The Q.771 TR-U-ABORT and TC-U-ABORT Requests map onto the T_DISCON_REQ primitive as shown in Table 19.
-
-@c Table 19@strong{@emph{.  T-U-ABORT Request Mapping}}
-@multitable @columnfractions .45 .45 .1
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive} @tab @strong{Notes}
-@item TR-U-ABORT Request @tab T_DISCON_REQ
-@item Quality of Service @tab implicit (see notes) @tab (1)
-@item Transaction ID @tab SEQ_number @tab (2)
-@item User Data @tab M_DATA blocks
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TC-U-ABORT Request @tab T_DISCON_REQ
-@item Quality of Service @tab implicit (see notes) @tab (1)
-@item Dialogue ID @tab SEQ_number @tab (2)
-@item Abort reason @tab (implied by presence or absence of Application Context Name) @tab (3)
-@item Application Context Name @tab implicit (see notes) @tab (3)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes) @tab (3)
-@end multitable
-Notes:
-@enumerate
-@item The @emph{Quality of Service} parameter is implicit to the stream.  Each Protocol Class 1, 2 or 3 stream
-(structured dialog) either has a sequence control value associated with the stream or a new sequence control is selected
-for each package in a transaction.  Thus, this parameter does not need to be specified by the T-User.  If the T-User
-wants to change the return option or sequence control associated with a T-U-ABORT, this can be performed with the
-T_OPTMGMT_REQ primitive before the T_DISCON_REQ primitive is issued.
-@item The @emph{Transaction ID} and @emph{Dialogue ID} are implicit to the stream when the transaction association is
-fully formed.  When the transaction association has not been confirmed and an T-U-ABORT is issued, the SEQ_number
-parameter identifies the transaction or dialogue in question.
-@end enumerate
-
-@node Indication
-@subsubsection Indication
-
-The TR-U-ABORT Indication primitive of Q.771 maps onto the T_DISCON_IND primitive.
-
-@c Table 20@strong{@emph{.  T-U-ABORT Indication Mapping}}
-@multitable @columnfractions .5 .5
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-U-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab (not provided)
-@item Transaction ID @tab SEQ_number
-@item User Data @tab M_DATA blocks
-@item TC-U-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab implicit (see notes)
-@item Dialogue ID @tab implicit (see notes)
-@item Abort reason @tab DISCON_reason
-@item Application Context Name @tab implicit (see notes)
-@item Components Present @tab M_DATA blocks
-@item User Information @tab implicit (see notes)
-@end multitable
-Notes:
-@enumerate
-@item The T_DISCON_IND reason distinguishes between TR-U-ABORT and TR-P-ABORT.
-@item QOS parameters are not provided to the TR-User even when available at the transport provider.
-@item User Data may be provided with the disconnect in M_DATA message blocks associated with the M_PROTO message block
-for the T_DISCON_IND.
-@end enumerate
-
-@node T-P-ABORT
-@subsection T-P-ABORT
-
-@node Indication
-@subsubsection Indication
-
-The TR-P-ABORT Indication primitive of Q.771 maps onto the T_DISCON_IND primitive.
-
-@c Table 21@strong{@emph{.  T-P-ABORT Indication Mapping}}
-@multitable @columnfractions .5 .5
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-P-ABORT Indication @tab T_DISCON_IND
-@item Quality of Service @tab (not provided)
-@item Transaction ID @tab SEQ_number
-@item P-Abort @tab DISCON_reason
-@end multitable
-Notes:
-@enumerate
-@item The T_DISCON_IND reason distinguishes between TR-U-ABORT and TR-P-ABORT.
-@item QOS parameters are not provided to the user on abort even when available at the transport provider.
-@end enumerate
-
-@node T-NOTICE
-@subsection T-NOTICE
-
-@node Indication
-@subsubsection Indication
-
-The TR-NOTICE Indication primitive of Q.771 maps onto the T_UDERROR_IND and T_DISCON_IND primitives.
-
-@c Table 22@strong{@emph{.  T-NOTICE Indication Mapping}}
-@multitable @columnfractions .5 .5
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-NOTICE Indication @tab T_UDERROR_IND
-@item Transaction ID @tab implicit (see note 1)
-@item Report Cause @tab ERROR_type
-
-@item @strong{Q.771 Primitive} @tab @strong{TPI Primitive}
-@item TR-NOTICE Indication @tab T_UDERROR_IND
-@item Transaction ID @tab implicit (see note1)
-@item Report Cause @tab ERROR_type
-@end multitable
-Notes:
-@enumerate
-@item The @emph{Transaction} @emph{ID} and @emph{Dialogue ID} parameters are implicit to the stream.  Each stream
-supports only one dialog at a time.
-@end enumerate
-
-@node Parameter Mapping
-@section Parameter Mapping
-
-@node TR Sub-Layer Parameters
-@subsection TR Sub-Layer Parameters
-
-@node Quality of Service
-@subsubsection Quality of Service
-
-The @emph{Quality of Service} parameters map to the @code{N_QOS_SEL_SCCP} quality of service parameter set which can be
-placed in the @emph{OPT_length} and @emph{OPT_offset} fields of the appropriate messages.  The @code{N_qos_sel_sccp_t}
-structure has the Return Option and Sequence Control parameters refererenced in the Q.771 recommendations.
-
-@node Destination Address
-@subsubsection Destination Address
-
-The @emph{Destination Address} is an SCCP Called Party Address in the format specified for the
-@uref{http://www.openss7.org/spi_idx.html,SCCP Network Provider Interface}.  This parameter is contained in the
-@emph{DEST_length} and @emph{DEST_offset} fields of the appropriate TPI primitives.  It is also contained in the
-@emph{REMADDR_length} and @emph{REMADDR_offset} fields of the T_ADDR_ACK management primitive.
-
-@node Originating Address
-@subsubsection Originating Address
-
-The @emph{Originating Address} is an SCCP Calling Party Address in the format specified for the
-@uref{http://www.openss7.org/spi_idx.html,SCCP Network Provider Interface}.  This parameter is contained in the
-@emph{SRC_length} and @emph{SRC_offset} or @emph{RES_length} and @emph{RES_offset} fields of the appropriate TPI
-primitives.  It is also contained in the @emph{LOCADDR_length} and @emph{LOCADDR_offset} fields in the T_ADDR_ACK
-management primitive.
-
-@node P-Abort
-@subsubsection P-Abort
-
-@node Transaction ID
-@subsubsection Transaction ID
-
-The @emph{Transaction ID} parameter is normally implicit to the stream for a fully associated transaction.  Each stream
-supports only one fully associated transactions.  For unaccepted or unconfirmed transactions, the @emph{SEQ_number}
-field of the appropriate TPI primitive is use to identify the transaction.  The @emph{Transaction ID} is, therefore,
-implicit to the connection or connection indication.
-
-@node Termination
-@subsubsection Termination
-
-Whether the termination is pre-arranged or basic is a characteristic of the stream.
-
-@node User Data
-@subsubsection User Data
-
-@node Report Cause
-@subsubsection Report Cause
+@menu
+* Transaction Establishment Phase::
+* Transaction Data Transfer Phase::
+* Transaction Termination Phase::
+@end menu
+
+@ignore
+@menu
+---- detailed node listing ----
+
+Transaction Establishment Phase
+
+* TC_BEGIN_REQ::
+* TC_BEGIN_IND::
+* TC_BEGIN_RES::
+* TC_BEGIN_CON::
+
+Transaction Data Transfer Phase
+
+* TC_CONT_REQ::
+* TC_CONT_IND::
+
+Transaction Termination Phase
+
+* TC_END_REQ::
+* TC_END_IND::
+* TC_ABORT_REQ::
+* TC_ABORT_IND::
+@end menu
+@end ignore
+
+@node Transaction Establishment Phase
+@subsection Transaction Establishment Phase
+
+@menu
+* TC_BEGIN_REQ::
+* TC_BEGIN_IND::
+* TC_BEGIN_RES::
+* TC_BEGIN_CON::
+@end menu
+
+The transaction begin service provides means to start a transaction dialogue
+between two TC-users.  This may be accompanied by the transfer of components
+previously accumulated using the component handling primitives described in
+@ref{Component Handling Primitives}.
+
+@page
+@node TC_BEGIN_REQ
+@subsubsection Transaction Begin Request
+
+@subsubheading TC_BEGIN_REQ
+@prindex TC_BEGIN_REQ
+
+This primitive requests that the transaction component provider form a
+transaction dialogue to the specified destination protocol address, from the
+specified source protocol address, using the specified options.  Any components
+that have been accumulated using the component handling primitives
+(@pxref{Component Handling Primitives}), will accompany the primitive.
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block followed by zero or more @samp{M_DATA} message blocks containing
+raw transaction user information.
+The @samp{M_PROTO} message block is structured as follows:
+
+@smallexample
+typedef struct TC_begin_req @{
+        ulong PRIM_type;                /* Always TC_BEGIN_REQ */
+        ulong SRC_length;               /* Source address length */
+        ulong SRC_offset;               /* Source address offset */
+        ulong DEST_length;              /* Destination address length */
+        ulong DEST_offset;              /* Destination address offset */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* For use with ANSI QWP/QWOP */
+@} TC_begin_req_t;
+@tpindex TC_begin_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_BEGIN_REQ}.
+
+@item SRC_length
+
+Specifies the length of the source protocol address associated with the
+primitive.
+
+@item SRC_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the source protocol address begins.
+Proper alignment of the protocol address in the @samp{M_PROTO} message block is
+not guaranteed.
+
+@item DEST_length
+
+Specifies the length of the destination protocol address associated with the
+primitive.
+
+@item DEST_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the destination protocol address begins.
+Proper alignment of the protocol address in the @samp{M_PROTO} message block is
+not guaranteed.
+
+@item OPT_length
+
+Specifies the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Specifies additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+The @var{COMP_flags} field can contain any of the following flags:
+
+@vtable @var
+
+@item COMPONENTS_PRESENT
+
+Specifies, when set, that components previously accumulated with the component
+handling primitives (@pxref{Component Handling Primitives}) are to be associated
+with the primitive.
+
+@item NO_PERMISSION
+
+Specifies, when set, that the the peer is not granted permission to end the
+transaction upon the receipt of the corresponding @samp{TC_BEGIN_IND} primitive.
+
+@end vtable
+
+@subsubheading Valid State
+
+This primitive is valid in transaction state @var{TC_IDLE}.
+
+@subsubheading New State
+
+The new state for the transaction is @var{TC_WACK_CREQ}.
+
+@subsubheading Rules
+
+The following rules apply to the specification of parameters to this primitive:
+
+@itemize ---
+
+@item When the source address is not specified, @var{SRC_length} and
+@var{SRC_offset} must be specified as zero (0).
+
+@item When the @var{SRC_length} and @var{SRC_offset} are zero (0), the source
+protocol address is the local address that is implicitly associated with the
+access point from the local bind service (@pxref{TC_BIND_REQ}).
+
+@item The destination protocol address must be specified and the TC provider
+will return error @samp{TCNOADDR} if the @var{DEST_length} and @var{DEST_offset}
+are zero (0).
+
+@end itemize
+
+@subsubheading Acknowledgement
+
+This primitive requires the transaction provider to generate one of the
+following acknowledgements upon receipt of the primitive:
+
+@itemize ---
+
+@item @emph{Successful Dialogue Establishment:}
+This is indicated with the @samp{TC_BEGIN_CON} primitive described in
+@ref{TC_BEGIN_REQ}.  This results in the @var{TC_DATA_XFER} state for the
+transaction.  Successful establishment and tear down can also be indicated with
+the @samp{TC_END_IND} primitive described in @ref{TC_END_IND}.  This results in
+the @var{TC_IDLE} state for the transaction.
+
+@item @emph{Unsuccessful Dialogue Establishment:}
+This is indicated with the @samp{TC_ABORT_IND} primitive described in
+@ref{TC_ABORT_IND}.  For example, an dialogue may be rejected because either
+the called transaction user cannot be reached, or the transaction provider or
+the called transaction user did not agree on the specified options.  This
+results in the @var{TC_IDLE} state for the transaction.
+
+@item @emph{Successful:}
+Correct acknowledgement of the primitive is indicated with the @samp{TC_OK_ACK}
+primitive described in @ref{TC_OK_ACK}.
+
+@item @emph{Non-fatal errors:}
+These are indicated with the @samp{TC_ERROR_ACK} primitive.  The applicable
+non-fatal errors are defined as follows:
+
+@vtable @var
+
+@item TCACCES
+
+This indicates that the user did not have proper permissions for the use of the
+requested protocol address or protocol options.
+
+@item TCBADADDR
+
+This indicates that the protocol address was in an incorrect format or the
+address contained illegal information.  It is not intended to indicate protocol
+connection errors, such as an unreachable destination.  Those types of errors
+are indicated with the @samp{TC_ABORT_IND} primitive described in
+@ref{TC_ABORT_IND}.
+
+@item TCBADOPT
+
+This indicates that the options were in an incorrect format or they contained
+illegal information.
+
+@item TCOUTSTATE
+
+The primitive would place the transaction interface out of state.
+
+@item TCBADDATA
+
+The amount of user data specified was illegal (@pxref{TC_INFO_ACK}).
+
+@item TCBADFLAG
+
+The flags specified were incorrect, not supported by the provider, or contained
+illegal information.
+
+@item TCBADSEQ
+
+The specified dialogue identifier @var{DIALOG_id} was incorrect, or contained
+illegal information.  This error would normally occur if the TC user selected a
+dialogue identifier reserved for the provider (high bit set to 0).
+
+@item TCSYSERR
+
+A system error has occured and the UNIX System error is indicated in the
+primitive.
+
+@end vtable
+
+@end itemize
+
+
+@page
+@node TC_BEGIN_IND
+@subsubsection Transaction Begin Indication
+
+@subsubheading TC_BEGIN_IND
+@prindex TC_BEGIN_IND
+
+The transaction indication service primitive indicates that a peer TC user has
+initiated a transaction dialogue, the source protocol address associated with
+the peer TC user, the destination address to which the transaction dialogue
+is initiated, the options for the dialogue.
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_begin_ind @{
+        ulong PRIM_type;                /* Always TC_BEGIN_IND */
+        ulong SRC_length;               /* Source address length */
+        ulong SRC_offset;               /* Source address offset */
+        ulong DEST_length;              /* Destination address length */
+        ulong DEST_offset;              /* Destination address offset */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* For use with ANSI QWP/QWOP */
+@} TC_begin_ind_t;
+@tpindex TC_begin_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_BEGIN_IND}.
+
+@item SRC_length
+
+Indicates the length of the source protocol address associated with the
+primitive.
+
+@item SRC_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the source protocol address begins.
+
+@item DEST_length
+
+Indicates the length of the destination protocol address associated with the
+primitive.
+
+@item DEST_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the destination protocol address begins.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Indicates additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+The @var{COMP_flags} field can contain any of the following flags:
+
+@vtable @var
+
+@item TC_COMPONENTS_PRESENT
+
+Indicates, when set, that component handling primitives representing the
+components associated with the begin indication follow this primitive.
+
+@item TC_NO_PERMISSION
+
+Indicates, when set, that the TC user is not permitted to end the dialogue upon
+receipt of this primitive, nor when issuing a response.
+
+@end vtable
+
+@subsubheading Valid State
+
+This primitive is valid in transaction state @var{TC_IDLE}.
+
+@subsubheading New State
+
+The new state of the transaction is @var{TC_WRES_CIND}.
+
+@subsubheading Rules
+
+The following rules apply to the issuance of this primitive by the transaction
+provider:
+
+@itemize ---
+
+@item The dialogue identifier provided by the transaction provider uniquely
+identifies this transaction begin indication within the stream upon which the
+primitive is issued.  This must be a positive, non-zero value.  The high bit of
+the transaction identifier is reserved for exclusive use by the transaction user
+in generating correlation identifiers.
+
+@item It is not necessary to indicate a destination address in
+@var{DEST_length}, and @var{DEST_offset} when the protocol address to which the
+begin indication corresponds is the same as the local protocol address to which
+the listening stream is bound.  In the case that the destination protocol
+address is not provided, @var{DEST_length} and @var{DEST_offset} must both be
+set to zero (0).  When the local protocol address to which the begin indication
+corresponds is not the same as the bound address for the stream, the transaction
+provider must indicate the destination protocol address using @var{DEST_length}
+and @var{DEST_offset}.
+
+@item The source protocol address is a mandatory field.  The transaction
+provider must indicate the source protocol address corresponding to the begin
+indication using the @var{SRC_length} and @var{SRC_offset} fields.
+
+@item Any indicated options are included in the @var{OPT_length} and
+@var{OPT_offset} fields.
+
+@item When the @samp{TC_NO_PERMISSION} flag is set, the TC user must not issue a
+@samp{TC_END_REQ} primitive in response to this indication.
+
+@end itemize
+
+
+@page
+@node TC_BEGIN_RES
+@subsubsection Transaction Begin Response
+
+@subsubheading TC_BEGIN_RES
+@prindex TC_BEGIN_RES
+
+This primitive allows the destination TC user to request that the TC provider
+accept a previous transaction dialogue begin indication, either on the current
+@dfn{stream} or on a specified acceptor @dfn{stream}.
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_begin_res @{
+        ulong PRIM_type;                /* Always TC_CONT_REQ */
+        ulong SRC_length;               /* Source address length */
+        ulong SRC_offset;               /* Source address offset */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* For use with ANSI CWP/CWOP */
+@} TC_begin_res_t;
+@tpindex TC_begin_res_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_BEGIN_RES}.
+
+@item SRC_length
+
+Specifies the length of the source protocol address associated with the
+primitive.
+
+@item SRC_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the source protocol address begins.
+Proper alignment of the protocol address in the @samp{M_PROTO} message block is
+not guaranteed.
+
+@item OPT_length
+
+Specifies the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Specifies additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+The @var{COMP_flags} field can contain any of the following flags:
+
+@vtable @var
+
+@item TC_COMPONENTS_PRESENT
+
+Specifies, when set, that component handling primitives representing the
+components associated with the begin indication precede this primitive.
+
+@item TC_NO_PERMISSION
+
+Specifies, when set, that the TC user peer is not permitted to end the dialogue
+upon receipt of this primitive, nor when issuing a response.
+
+@end vtable
+
+@subsubheading Valid State
+
+This primitive is valid in transaction state @var{TC_WRES_CIND}.
+
+@subsubheading New State
+
+The new state of the transaction is @var{TC_DATA_XFER}.
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+This primitive requires the TC provider to generate one of the following
+acknowledgements upon receipt of the primitive:
+
+@itemize ---
+
+@item @emph{Successful:}
+Correct acknowledgement of the primitive is indicated with the @code{TC_OK_ACK}
+primitive described in @ref{TC_OK_ACK}.
+
+@item @emph{Unsuccessful (Non-fatal errors):}
+These errors will be indicated with the @code{TC_ERROR_ACK} primitive described
+in @ref{TC_ERROR_ACK}.  The allowable errors are as follows:
+
+@vtable @code
+
+@item TCBADF
+
+The token specified is not associated with an open stream.
+
+@item TCBADOPT
+
+The options were in an incorrect format, or they contained illegal information.
+
+@item TCACCES
+
+The user did not have proper permissions for the use of the responding protocol
+address or protocol options.
+
+@item TCOUTSTATE
+
+The primitive would place the transaction interface out of state for the
+indicated transaction.
+
+@item TCBADDATA
+
+The amount of user data specified was outside the range supported by the
+transaction provider.
+
+@item TCBADFLAG
+
+The flags specified were incorrect, not supported by the provider, or contained
+illegal information.
+
+@item TCBADSEQ
+
+The specified dialogue identifier @var{DIALOG_id} was incorrect, or contained
+illegal information.  This error would normally occur if the TC user selected a
+dialogue identifier reserved for the provider (high bit set to 0).
+
+@item TCSYSERR
+
+A system error occurred and the UNIX System error is indicated in the primitive.
+
+@item TCRESADDR
+
+The transaction provider requires that the responding @dfn{stream} is bound to
+the same address as the @dfn{stream} on which the transaction dialogue begin
+indication was received.
+
+@item TCBADADDR
+
+This indicates that the protocol address was in an incorrect format or the
+protocol address contained illegal information.
+
+@end vtable
+
+@end itemize
+
+@page
+@node TC_BEGIN_CON
+@subsubsection Transaction Begin Confirm
+
+@subsubheading TC_BEGIN_CON
+@prindex TC_BEGIN_CON
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_begin_con @{
+        ulong PRIM_type;                /* Always TC_CONT_IND */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* For use with ANSI CWP/CWOP */
+@} TC_begin_con_t;
+@tpindex TC_begin_con_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_BEGIN_CON}.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Indicates additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Transaction Data Transfer Phase
+@subsection Transaction Data Transfer Phase
+
+@menu
+* TC_CONT_REQ::
+* TC_CONT_IND::
+@end menu
+
+The component transfer service primtiives provide for an exchange of component
+user data known as TSDUs, in either direction or in both directions
+simultaneously on a transaction dialogue.  The transaction service preserves
+both the sequence and the boundaries of the TSDUs.
+
+@node TC_CONT_REQ
+@subsubsection Transaction Continue Request
+
+@subsubheading TC_CONT_REQ
+@prindex TC_CONT_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_cont_req @{
+        ulong PRIM_type;                /* Always TC_CONT_REQ */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* For use with ANSI CWP/CWOP */
+@} TC_cont_req_t;
+@tpindex TC_cont_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_CONT_REQ}.
+
+@item OPT_length
+
+Specifies the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Specifies additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node TC_CONT_IND
+@subsubsection Transaction Continue Indication
+
+@subsubheading TC_CONT_IND
+@prindex TC_CONT_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_cont_ind @{
+        ulong PRIM_type;                /* Always TC_CONT_IND */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* For use with ANSI CWP/CWOP */
+@} TC_cont_ind_t;
+@tpindex TC_cont_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_CONT_IND}.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Indicates additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Transaction Termination Phase
+@subsection Transaction Termination Phase
+
+@menu
+* TC_END_REQ::
+* TC_END_IND::
+* TC_ABORT_REQ::
+* TC_ABORT_IND::
+@end menu
+
+@node TC_END_REQ
+@subsubsection Transaction End Request
+
+@subsubheading TC_END_REQ
+@prindex TC_END_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_end_req @{
+        ulong PRIM_type;                /* Always TC_END_REQ */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong TERM_scenario;            /* Reason for termination */
+@} TC_end_req_t;
+@tpindex TC_end_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_END_REQ}.
+
+@item OPT_length
+
+Specifies the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item TERM_scenario
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node TC_END_IND
+@subsubsection Transaction End Indication
+
+@subsubheading TC_END_IND
+@prindex TC_END_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_end_ind @{
+        ulong PRIM_type;                /* Always TC_END_IND */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* Components present flag */
+@} TC_end_ind_t;
+@tpindex TC_end_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_END_IND}.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Indicates additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node TC_ABORT_REQ
+@subsubsection Transaction Abort Request
+
+@subsubheading TC_ABORT_REQ
+@prindex TC_ABORT_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_abort_req @{
+        ulong PRIM_type;                /* Always TC_ABORT_REQ */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong ABORT_reason;             /* Abort reason */
+@} TC_abort_req_t;
+@tpindex TC_abort_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_ABORT_REQ}.
+
+@item OPT_length
+
+Specifies the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item ABORT_reason
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node TC_ABORT_IND
+@subsubsection Transaction Abort Indication
+
+@subsubheading TC_ABORT_IND
+@prindex TC_ABORT_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block structured as follows:
+
+@smallexample
+typedef struct TC_abort_ind @{
+        ulong PRIM_type;                /* Always TC_ABORT_IND */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong ABORT_reason;             /* Abort reason */
+        ulong ORIGINATOR;               /* Either User or Provider originated */
+@} TC_abort_ind_t;
+@tpindex TC_abort_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_ABORT_IND}.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item ABORT_reason
+
+
+@item ORIGINATOR
+
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Operation Class 4 Primitives
+@section Operation Class 4 Primitives
+
+@menu
+* Transaction Phase::
+@end menu
+
+@page
+@node Transaction Phase
+@subsection Transaction Phase
+
+@menu
+* TC_UNI_REQ::
+* TC_UNI_IND::
+* TC_NOTICE_IND::
+@end menu
+
+@node TC_UNI_REQ
+@subsubsection Transaction Unidirectional Request
+
+@subsubheading TC_UNI_REQ
+@prindex TC_UNI_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_uni_req @{
+        ulong PRIM_type;                /* Always TC_UNI_REQ */
+        ulong SRC_length;               /* Source address length */
+        ulong SRC_offset;               /* Source address offset */
+        ulong DEST_length;              /* Destination address length */
+        ulong DEST_offset;              /* Destination address offset */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+@} TC_uni_req_t;
+@tpindex TC_uni_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_UNI_REQ}.
+
+@item SRC_length
+
+Specifies the length of the source protocol address associated with the
+primitive.
+
+@item SRC_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the source protocol address begins.
+
+@item DEST_length
+
+Specifies the length of the destination protocol address associated with the
+primitive.
+
+@item DEST_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the destination protocol address begins.
+
+@item OPT_length
+
+Specifies the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Specifies the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_UNI_IND
+@subsubsection Transaction Unidirectional Indication
+
+@subsubheading TC_UNI_IND
+@prindex TC_UNI_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_uni_ind @{
+        ulong PRIM_type;                /* Always TC_UNI_IND */
+        ulong SRC_length;               /* Source address length */
+        ulong SRC_offset;               /* Source address offset */
+        ulong DEST_length;              /* Destination address length */
+        ulong DEST_offset;              /* Destination address offset */
+        ulong OPT_length;               /* Options associated with the primitive */
+        ulong OPT_offset;               /* Options associated with the primitive */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong COMP_flags;               /* Components preset flag */
+@} TC_uni_ind_t;
+@tpindex TC_uni_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_UNI_IND}.
+
+@item SRC_length
+
+Indicates the length of the source protocol address associated with the
+primitive.
+
+@item SRC_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the source protocol address begins.
+
+@item DEST_length
+
+Indicates the length of the destination protocol address associated with the
+primitive.
+
+@item DEST_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the destination protocol address begins.
+
+@item OPT_length
+
+Indicates the length of the protocol options associated with the primitive.
+
+@item OPT_offset
+
+Indicates the offset from the beginning of the @samp{M_PROTO} message block
+where the protocol options begin.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item COMP_flags
+
+Indicates additional information about the components.  See ``Flags'' below.
+Component flags may be provider specific.
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node TC_NOTICE_IND
+@subsubsection Transaction Notice Indication
+
+@subsubheading TC_NOTICE_IND
+@prindex TC_NOTICE_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_notice_ind @{
+        ulong PRIM_type;                /* Always TC_NOTICE_IND */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong REPORT_cause;             /* Report cause */
+@} TC_notice_ind_t;
+@tpindex TC_notice_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_NOTICE_IND}.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item REPORT_cause
+
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+
+@page
+@node Component Handling Primitives
+@section Component Handling Primitives
+
+@menu
+* Invocation of an Operation::
+* Result of a Successful Operation::
+* Error Reply to an Invoked Operation::
+* Termination of an Operation Invocation::
+* Rejection of a Component::
+@end menu
+
+@ignore
+@menu
+---- detailed node listing ----
+
+Invocation of an Operation
+
+* TC_INVOKE_REQ::
+* TC_INVOKE_IND::
+
+Result of a Successful Operation
+
+* TC_RESULT_REQ::
+* TC_RESULT_IND::
+
+Error Reply to an Invoked Operation
+
+* TC_ERROR_REQ::
+* TC_ERROR_IND::
+
+Termination of an Operation Invocation
+
+* TC_CANCEL_REQ::
+* TC_CANCEL_IND::
+
+Rejection of a Component
+
+* TC_REJECT_REQ::
+* TC_REJECT_IND::
+@end menu
+@end ignore
+
+@node Invocation of an Operation
+@subsection Invocation of an Operation
+
+@menu
+* TC_INVOKE_REQ::
+* TC_INVOKE_IND::
+@end menu
+
+@node TC_INVOKE_REQ
+@subsubsection Invoke Request
+
+@subsubheading TC_INVOKE_REQ
+@prindex TC_INVOKE_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_invoke_req @{
+        ulong PRIM_type;                /* Always TC_INVOKE_REQ */
+        ulong DIALOG_id;                /* Dialog identifier */
+        ulong PROTOCOL_class;           /* Application protocol class */
+        ulong INVOKE_id;                /* Invoke Identifier */
+        ulong LINKED_id;                /* Linked Invoke Identifier */
+        ulong OPERATION;                /* Requested operation to invoke */
+        ulong MORE_flag;                /* Not last */
+        ulong TIMEOUT;                  /* Timeout */
+@} TC_invoke_req_t;
+@tpindex TC_invoke_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_INVOKE_REQ}.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item PROTOCOL_class
+
+@item INVOKE_id
+
+@item LINKED_id
+
+@item OPERATION
+
+@item MORE_flag
+
+@item TIMEOUT
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node TC_INVOKE_IND
+@subsubsection Invoke Indication
+
+@subsubheading TC_INVOKE_IND
+@prindex TC_INVOKE_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_invoke_ind @{
+        ulong PRIM_type;                /* Always TC_INVOKE_IND */
+        ulong DIALOG_id;                /* Dialog identifier */
+        ulong OP_class;                 /* Application operation class */
+        ulong INVOKE_id;                /* Invoke Identifier */
+        ulong LINKED_id;                /* Linked Invoke Identifier */
+        ulong OPERATION;                /* Requested operation to invoke */
+        ulong MORE_flag;                /* Not last */
+@} TC_invoke_ind_t;
+@tpindex TC_invoke_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_INVOKE_IND}.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item OP_class
+
+@item INVOKE_id
+
+@item LINKED_id
+
+@item OPERATION
+
+@item MORE_flag
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Result of a Successful Operation
+@subsection Result of a Successful Operation
+
+@menu
+* TC_RESULT_REQ::
+* TC_RESULT_IND::
+@end menu
+
+@node TC_RESULT_REQ
+@subsubsection Return Result Request
+
+@subsubheading TC_RESULT_REQ
+@prindex TC_RESULT_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_result_req @{
+        ulong PRIM_type;                /* Always TC_RESULT_REQ */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke Identifier */
+        ulong OPERATION;                /* Requested operation result */
+        ulong MORE_flag;                /* Not last */
+@} TC_result_req_t;
+@tpindex TC_result_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_RESULT_REQ}.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@item OPERATION
+
+@item MORE_flag
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_RESULT_IND
+@subsubsection Return Result Indication
+
+@subsubheading TC_RESULT_IND
+@prindex TC_RESULT_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_result_ind @{
+        ulong PRIM_type;                /* Always TC_RESULT_IND */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke Identifier */
+        ulong OPERATION;                /* Requested operation result */
+        ulong MORE_flag;                /* Not last */
+@} TC_result_ind_t;
+@tpindex TC_result_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_RESULT_IND}.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@item OPERATION
+
+@item MORE_flag
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Error Reply to an Invoked Operation
+@subsection Error Reply to an Invoked Operation
+
+@menu
+* TC_ERROR_REQ::
+* TC_ERROR_IND::
+@end menu
+
+@node TC_ERROR_REQ
+@subsubsection Return Error Request
+
+@subsubheading TC_ERROR_REQ
+@prindex TC_ERROR_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_error_req @{
+        ulong PRIM_type;                /* Always TC_ERROR_REQ */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke Identifier */
+        ulong ERROR_code;               /* Error code */
+        ulong MORE_flag;                /* Not last */
+@} TC_error_req_t;
+@tpindex TC_error_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_RESULT_REQ}.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@item ERROR_code
+
+@item MORE_flag
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_ERROR_IND
+@subsubsection Return Error Indication
+
+@subsubheading TC_ERROR_IND
+@prindex TC_ERROR_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_error_ind @{
+        ulong PRIM_type;                /* Always TC_ERROR_IND */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke Identifier */
+        ulong ERROR_code;               /* Error code */
+@} TC_error_ind_t;
+@tpindex TC_error_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_ERROR_IND}.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@item ERROR_code
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+@page
+@node Termination of an Operation Invocation
+@subsection Termination of an Operation Invocation
+
+@menu
+* TC_CANCEL_REQ::
+* TC_CANCEL_IND::
+@end menu
+
+@node TC_CANCEL_REQ
+@subsubsection Cancel Request
+
+@subsubheading TC_CANCEL_REQ
+@prindex TC_CANCEL_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_cancel_req @{
+        ulong PRIM_type;                /* Always TC_CANCEL_REQ */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke identifier */
+@} TC_cancel_req_t;
+@tpindex TC_cancel_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Specifies the primitive type.  Always @samp{TC_CANCEL_REQ}.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_CANCEL_IND
+@subsubsection Cancel Indication
+
+@subsubheading TC_CANCEL_IND
+@prindex TC_CANCEL_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_cancel_ind @{
+        ulong PRIM_type;                /* Always TC_CANCEL_IND */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke identifier */
+@} TC_cancel_ind_t;
+@tpindex TC_cancel_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+Indicates the primitive type.  Always @samp{TC_CANCEL_IND}.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node Rejection of a Component
+@subsection Rejection of a Component
+
+@menu
+* TC_REJECT_REQ::
+* TC_REJECT_IND::
+@end menu
+
+@node TC_REJECT_REQ
+@subsubsection Reject Request
+
+@subsubheading TC_REJECT_REQ
+@prindex TC_REJECT_REQ
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_reject_req @{
+        ulong PRIM_type;                /* Always TC_REJECT_REQ */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke identifier */
+        ulong PROBLEM_code;             /* Problem code */
+@} TC_reject_req_t;
+@tpindex TC_reject_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+Specifies the primitive type.  Always @samp{TC_REJECT_REQ}.
+
+@item DIALOG_id
+
+Specifies the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@item PROBLEM_code
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
+
+@page
+@node TC_REJECT_IND
+@subsubsection Reject Indication
+
+@subsubheading TC_REJECT_IND
+@prindex TC_REJECT_IND
+
+@subsubheading Format
+
+The format of the message is one @samp{M_PROTO}
+@prindex M_PROTO
+message block, followed by zero or more @samp{M_DATA}
+@prindex M_DATA
+message blocks if any components are specified by the TC user.  The
+format of the @samp{M_PROTO} message block is as follows:
+
+@smallexample
+typedef struct TC_reject_ind @{
+        ulong PRIM_type;                /* Always TC_REJECT_IND */
+        ulong DIALOG_id;                /* Dialog Identifier */
+        ulong INVOKE_id;                /* Invoke identifier */
+        ulong ORIGINATOR;               /* Either User, Local or Remote */
+        ulong PROBLEM_code;             /* Problem code */
+@} TC_reject_ind_t;
+@tpindex TC_reject_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+The primitive has the following arguments:
+
+@vtable @var
+
+@item PRIM_type
+
+Indicates the primitive type.  Always @samp{TC_REJECT_IND}.
+
+@item DIALOG_id
+
+Indicates the dialogue identifier which uniquely identifies this transaction
+dialogue within the stream.  Dialogue identifiers assigned by the component
+user must have the high bit set to one (1); those assigned by the component
+provider have the high bit set to zero (0).
+
+@item INVOKE_id
+
+@item ORIGINATOR
+
+@item PROBLEM_code
+
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Valid State
+
+@subsubheading New State
+
+@subsubheading Rules
+
+@subsubheading Acknowledgement
+
 
 
 @node TCAP Header File
@@ -1746,23 +4120,37 @@ Whether the termination is pre-arranged or basic is a characteristic of the stre
 @unnumbered Glossary
 
 @table @emph
+
 @item Signalling Data Link Service Data Unit
+
 A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link connection to the
 other.
+
 @item Data transfer
+
 The phase in connection and connectionless modes that supports the transfer of data between to signalling data link
 users.
+
 @item SDL provider
+
 The signalling data link layer protocol that provides the services of the signalling data link interface.
+
 @item SDL user
+
 The user-level application or user-level or kernel-level protocol that accesses the services of the signalling data link
 layer.
+
 @item Local management
+
 The phase in connection and connectionless modes in which a SDL user initializes a stream and attaches a PPA address to
 the stream.  Primitives in this phase generate local operations only.
+
 @item PPA
+
 The point at which a system attaches itself to a physical communications medium.
+
 @item PPA identifier
+
 An identifier of a particular physical medium over which communication transpires.
 @end table
 
@@ -1770,24 +4158,38 @@ An identifier of a particular physical medium over which communication transpire
 @unnumbered Acronyms
 
 @multitable {SDL SDU}{International Telecommunication Union - Telecom Sector}
+
 @item SDLI @tab Signalling Data Link Interface
+
 @item SDL @tab Signalling Data Link
+
 @item SDL SDU @tab Signalling Data Link Service Data Unit
+
 @item ITU-T @tab International Telecommunications Union - Telecom Sector
+
 @item PPA @tab Physical Point of Attachment
+
 @end multitable
 
 @node References
 @unnumbered References
 
 @multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
+
 @item [1] @tab ITU-T Recommendation Q.700
+
 @item [2] @tab ITU-T Recommendation Q.701
+
 @item [3] @tab ITU-T Recommendation Q.702
+
 @item [4] @tab ITU-T Recommendation Q.703
+
 @item [5] @tab ITU-T Recommendation Q.704
+
 @item [6] @tab Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
+
 @item [7] @tab ITU-T Recommendation Q.771
+
 @end multitable
 
 @node Indices
@@ -1806,44 +4208,64 @@ An identifier of a particular physical medium over which communication transpire
 * Protocol State Index::
 @end menu
 
+@page
 @node Concept Index
 @section Concept Index
+
 @printindex cp
 
+@page
 @node Type Index
 @section Type Index
+
 @printindex tp
 
+@page
 @node Function Index
 @section Function Index
+
 @printindex fn
 
+@page
 @node Variable Index
 @section Variable Index
+
 @printindex vr
 
+@page
 @node File Index
 @section File Index
+
 @printindex pg
 
+@c @page
 @c @node Option Index
 @c @section Option Index
+
 @c @printindex op
 
+@c @page
 @c @node Author Index
 @c @section Author Index
+
 @c @printindex au
 
-@c @node Primitive Index
-@c @section Primitive Index
-@c @printindex pr
+@page
+@node Primitive Index
+@section Primitive Index
 
+@printindex pr
+
+@page
 @node Primitive Value Index
 @section Primitive Value Index
+
 @printindex pv
 
+@page
 @node Protocol State Index
 @section Protocol State Index
+
 @printindex st
 
 @bye

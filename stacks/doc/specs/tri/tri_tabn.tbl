@@ -1,0 +1,42 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|cs
+l|l|ls.
+Option Name:Option Type:Meaning
+=
+T_SCCP_QOS:N_qos_sel_sccp_t:T{
+.hy 0
+.ad l
+For use with TR_UNI_REQ, TR_BEGIN_REQ, TR_BEGIN_RES, TR_CONT_REQ, TR_END_REQ,
+TR_ABORT_REQ.
+T}
+_
+T_SCCP_QOS:N_qos_opt_sel_sccp_t:T{
+.hy 0
+.ad l
+For use with TR_BEGIN_REQ, TR_BEGIN_RES.
+T}
+_
+T_SCCP_QOS:N_qos_range_sccp_t:T{
+.hy 0
+.ad l
+For use with TR_INFO_ACK.
+T}
+.TE

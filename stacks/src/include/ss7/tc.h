@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.3 2004/10/12 05:54:09 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.4 2004/10/19 10:03:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/10/12 05:54:09 $ by $Author: brian $
+ Last Modified $Date: 2004/10/19 10:03:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  Primitive definitions for TC-Users and TC-Providers.
@@ -157,25 +157,25 @@ typedef struct {
  *  TC_INFO_REQ
  */
 typedef struct TC_info_req {
-	ulong PRIM_type;
+	ulong PRIM_type;		/* Always TC_INFO_REQ */
 } TC_info_req_t;
 
 /*
  *  TC_INFO_ACK
  */
 typedef struct TC_info_ack {
-	long PRIM_type;
-	long TSDU_size;
-	long ETSDU_size;
-	long CDATA_size;
-	long DDATA_size;
-	long ADDR_size;
-	long OPT_size;
-	long TIDU_size;
-	long SERV_type;
-	long CURRENT_state;
-	long PROVIDER_flag;
-	long TRPI_version;
+	long PRIM_type;			/* always TC_INFO_ACK */
+	long TSDU_size;			/* maximum TSDU size */
+	long ETSDU_size;		/* maximum ETSDU size */
+	long CDATA_size;		/* connect data size */
+	long DDATA_size;		/* disconnect data size */
+	long ADDR_size;			/* maximum address size */
+	long OPT_size;			/* maximum options size */
+	long TIDU_size;			/* transaction interface data size */
+	long SERV_type;			/* service type */
+	long CURRENT_state;		/* current state */
+	long PROVIDER_flag;		/* provider flags */
+	long TCI_version;		/* TCI version */
 } TC_info_ack_t;
 
 /*
@@ -213,6 +213,13 @@ typedef struct TC_subs_bind_req {
 typedef struct TC_subs_bind_ack {
 	ulong PRIM_type;
 } TC_subs_bind_ack_t;
+
+/*
+ *  TC_UNBIND_REQ
+ */
+typedef struct TC_unbind_req {
+	ulong PRIM_type;		/* Always TC_UNBIND_REQ */
+} TC_unbind_req_t;
 
 /*
  *  TC_OK_ACK

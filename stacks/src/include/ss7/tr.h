@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tr.h,v 0.9.2.2 2004/08/30 06:19:39 brian Exp $
+ @(#) $Id: tr.h,v 0.9.2.3 2004/10/19 10:03:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 06:19:39 $ by $Author: brian $
+ Last Modified $Date: 2004/10/19 10:03:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TR_H__
 #define __SS7_TR_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #define TR_INFO_REQ		 0	/* Information request */
 #define TR_BIND_REQ		 1	/* Bind to network address */
@@ -261,6 +261,7 @@ typedef struct TR_uni_ind {
 typedef struct TR_begin_req {
 	ulong PRIM_type;		/* Always TR_BEGIN_REQ */
 	ulong CORR_id;			/* Correlation id */
+	ulong ASSOC_flags;		/* Association flags */
 	ulong DEST_length;		/* Destination address length */
 	ulong DEST_offset;		/* Destination address offset */
 	ulong ORIG_length;		/* Originating address length */
@@ -275,6 +276,7 @@ typedef struct TR_begin_req {
 typedef struct TR_begin_ind {
 	ulong PRIM_type;		/* Always TR_BEGIN_IND */
 	ulong TRANS_id;			/* Transaction id */
+	ulong ASSOC_flags;		/* Association flags */
 	ulong DEST_length;		/* Destination address length */
 	ulong DEST_offset;		/* Destination address offset */
 	ulong ORIG_length;		/* Originating address length */
@@ -292,6 +294,7 @@ typedef struct TR_begin_ind {
 typedef struct TR_begin_res {
 	ulong PRIM_type;		/* Always TR_BEGIN_RES */
 	ulong TRANS_id;			/* Transaction id */
+	ulong ASSOC_flags;		/* Association flags */
 	ulong ORIG_length;		/* Originating address length */
 	ulong ORIG_offset;		/* Originating address offset */
 	ulong OPT_length;		/* Options structure length */
@@ -307,6 +310,7 @@ typedef struct TR_begin_res {
 typedef struct TR_begin_con {
 	ulong PRIM_type;		/* Always TR_BEGIN_CON */
 	ulong CORR_id;			/* Correlation Id */
+	ulong ASSOC_flags;		/* Association flags */
 	ulong TRANS_id;			/* Transaction id */
 	ulong ORIG_length;		/* Originating address length */
 	ulong ORIG_offset;		/* Originating address offset */
@@ -320,6 +324,7 @@ typedef struct TR_begin_con {
 typedef struct TR_cont_req {
 	ulong PRIM_type;		/* Always TR_CONT_REQ */
 	ulong TRANS_id;			/* Transaction id */
+	ulong ASSOC_flags;		/* Association flags */
 	ulong OPT_length;		/* Options structure length */
 	ulong OPT_offset;		/* Options structure offset */
 } TR_cont_req_t;
@@ -330,6 +335,7 @@ typedef struct TR_cont_req {
 typedef struct TR_cont_ind {
 	ulong PRIM_type;		/* Always TR_CONT_IND */
 	ulong TRANS_id;			/* Transaction id */
+	ulong ASSOC_flags;		/* Association flags */
 	ulong OPT_length;		/* Options structure length */
 	ulong OPT_offset;		/* Options structure offset */
 } TR_cont_ind_t;

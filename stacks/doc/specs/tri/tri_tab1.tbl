@@ -1,0 +1,109 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|cs
+l|l|ls.
+STATE:SERVICE:PRIMITIVES
+=
+T{
+.hy 0
+.ad l
+Local Management
+T}:T{
+.hy 0
+.ad l
+Information Reporting
+T}:T{
+.hy 0
+.ad l
+TR_INFO_REQ, TR_INFO_ACK, TR_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Bind
+T}:T{
+.hy 0
+.ad l
+TR_BIND_REQ, TR_BIND_ACK, TR_UNBIND_ACK, TR_OK_ACK, TR_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Options Management
+T}:T{
+.hy 0
+.ad l
+TR_OPTMGMT_REQ, TR_OK_ACK, TR_ERROR_ACK
+T}
+_
+T{
+.hy 0
+.ad l
+Transaction Establishment
+T}:T{
+.hy 0
+.ad l
+Transaction Begin
+T}:T{
+.hy 0
+.ad l
+TR_BEGIN_REQ, TR_BEGIN_IND, TR_BEGIN_RES, TR_BEGIN_CON, TR_TOKEN_REQ, TR_TOKEN_ACK, TR_OK_ACK, TR_ERROR_ACK
+T}
+_
+T{
+.hy 0
+.ad l
+Transaction Data Transfer
+T}:T{
+.hy 0
+.ad l
+Transaction Continue
+T}:T{
+.hy 0
+.ad l
+TR_CONT_REQ, TR_CONT_IND
+T}
+_
+T{
+.hy 0
+.ad l
+Transaction Release
+T}:T{
+.hy 0
+.ad l
+Transaction End
+T}:T{
+.hy 0
+.ad l
+TR_END_REQ, TR_END_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Transaction Abort
+T}:T{
+.hy 0
+.ad l
+TR_ABORT_REQ, TR_ABORT_IND
+T}
+.TE

@@ -1,1 +1,1 @@
-SUBDIRS = tri tci mapi
+SUBDIRS = tri tci mapi npi tpi

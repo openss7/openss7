@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/10/13 09:47:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/10/19 10:03:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 09:47:10 $ by $Author: brian $
+# Last Modified $Date: 2004/10/19 10:03:45 $ by $Author: brian $
 #
 # =============================================================================
 
 info_TEXINFOS		= mapi.texi
 
-EXTRA_info_TEXINFOS	= 
+EXTRA_info_TEXINFOS	= \
+			texi/args.texi \
+			$(top_srcdir)/scripts/texi/fdl.texi
 
 FIG_FIGS		= \
 			mapi_fig.fig

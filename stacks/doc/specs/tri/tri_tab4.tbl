@@ -1,0 +1,51 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|css
+l|l|lss.
+SERVICE:PRIMITIVE:PARAMETERS
+=
+T{
+.hy 0
+.ad l
+TR Initiation
+T}:TR_BEGIN_REQ:T{
+.hy 0
+.ad l
+()
+T}
+:_:_
+:TR_BEGIN_IND:T{
+.hy 0
+.ad l
+()
+T}
+:_:_
+:TR_BEGIN_RES:T{
+.hy 0
+.ad l
+()
+T}
+:_:_
+:TR_BEGIN_CON:T{
+.hy 0
+.ad l
+()
+T}
+.TE
