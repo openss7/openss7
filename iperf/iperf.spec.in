@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.24 $) $Date: 2005/03/15 10:41:49 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.26 $) $Date: 2005/03/16 11:58:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/15 10:41:49 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:58:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,17 +75,10 @@
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%global BUILD_tools   1}}
 
-%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
-
 %if %{BUILD_tools}
 %global BUILD_libs    0
-%global BUILD_devs    %newrpm
-%global MAKE_devs     %oldrpm
 %else
 %global BUILD_libs    0
-%global BUILD_devs    0
-%global MAKE_devs     0
 %endif
 
 
@@ -117,7 +110,7 @@ Icon:           %{_gif_icon}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
-Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      iperf
@@ -577,9 +570,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.24  2005/03/15 10:41:49  brian
-# - Updated changelog and a few inconsistencies.
+# Revision 1.1.2.26  2005/03/16 11:58:18  brian
+# - enhance devfs support
 #
+
+* Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.25  2005/03/16 10:48:34  brian
+- straighten out devfs and get source urls correct
+
+* Tue Mar 15 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.24  2005/03/15 10:41:49  brian
+- Updated changelog and a few inconsistencies.
 
 * Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.23  2005/03/09 08:00:23  brian
