@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2004/12/19 15:11:51 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2004/12/21 22:22:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/19 15:11:51 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 22:22:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -226,6 +226,7 @@ fi
     CXX="${CXX:-$CC}" \
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
     CXXCPP="${CXXCPP:-$CPP}" \
+    CONFIG_SITE="%{csite_file}" \
     --cache-file=%{cache_file} \
     --build=%{_build} \
     --host=%{_target_platform} \
@@ -873,8 +874,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.46  2004/12/19 15:11:51  brian
-# - Working up better spec files.
+# Revision 0.9.2.47  2004/12/21 22:22:20  brian
+# - Added automatic site configuration to rpm build.
+#
+# Revision 0.9.2.15  2004/12/21 22:22:20  brian
+# - Added automatic site configuration to rpm build.
 #
 # Revision 0.9.2.14  2004/12/19 15:11:51  brian
 # - Working up better spec files.

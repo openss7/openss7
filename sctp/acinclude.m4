@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.9 2004/12/21 00:40:58 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.10 2004/12/21 22:20:50 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/21 00:40:58 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/21 22:20:50 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -188,7 +188,8 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
             AC_DEFINE_UNQUOTED([HAVE_IP_ROUTE_OUTPUT_EXPLICIT], [], [Define if you have the explicit
                 version of ip_route_output.])
         fi
-        AC_CHECK_HEADERS([net/xfrm.h], [], [], [
+        ])
+    _LINUX_CHECK_HEADERS([net/xfrm.h], [], [], [
 #include <linux/config.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
@@ -205,8 +206,24 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/proc_fs.h>
 #include <net/protocol.h>
 #include <net/inet_common.h>
-            ])
-        AC_CHECK_MEMBERS([struct inet_protocol.protocol, struct inet_protocol.no_policy], [], [], [
+        ])
+    _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+        ])
+    _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
+                          struct inet_protocol.no_policy,
+                          struct dst_entry.path,
+                          struct sock.protinfo.af_inet.ttl,
+                          struct sock.protoinfo.af_inet.uc_ttl,
+                          struct sock.tp_pinfo.af_sctp], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -217,42 +234,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
 #include <net/protocol.h>
-            ])
-        AC_CHECK_MEMBERS([struct dst_entry.path], [], [], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
 #include <net/dst.h>
-            ])
-        AC_CHECK_MEMBERS([
-                struct sock.protinfo.af_inet.ttl,
-                struct sock.protoinfo.af_inet.uc_ttl,
-                struct sock.tp_pinfo.af_sctp], [], [], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-            ])
-        AC_CHECK_TYPES([struct sockaddr_storage], [], [], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-            ])
         ])
     _LINUX_KERNEL_SYMBOL_EXPORT([icmp_err_convert])
     _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/12/21 10:11:55 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/12/21 22:20:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 10:11:55 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 22:20:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1131,6 +1131,214 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
     AC_MSG_RESULT([${linux_cv_debug:-no}])
 ])# _LINUX_SETUP_KERNEL_DEBUG
 # =========================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MEMBER_internal(AGGREGATE.MEMBER, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent to AC_CHECK_MEMBER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MEMBER_internal],
+    [AS_LITERAL_IF([$1], [],
+                   [AC_FATAL([$0: requires literal arguments])])dnl
+    m4_bmatch([$1], [\.], ,
+             [m4_fatal([$0: Did not see any dot in '$1'])])dnl
+    AS_VAR_PUSHDEF([linux_Member], [linux_cv_member_$1])dnl
+    dnl Extract the aggregate name, and the member name
+    AC_CACHE_CHECK([for kernel $1], linux_Member,
+    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])],
+    [dnl AGGREGATE linux_aggr;
+    static m4_bpatsubst([$1], [\..*]) linux_aggr;
+    dnl linux_aggr.MEMBER;
+    if (linux_aggr.m4_bpatsubst([$1], [^[^.]*\.]))
+    return 0;])],
+                    [AS_VAR_SET(linux_Member, yes)],
+    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])],
+    [dnl AGGREGATE linux_aggr;
+    static m4_bpatsubst([$1], [\..*]) linux_aggr;
+    dnl sizeof linux_aggr.MEMBER;
+    if (sizeof linux_aggr.m4_bpatsubst([$1], [^[^.]*\.]))
+    return 0;])],
+                    [AS_VAR_SET(linux_Member, yes)],
+                    [AS_VAR_SET(linux_Member, no)])])])
+    AS_IF([test AS_VAR_GET(linux_Member) = yes], [$2], [$3])dnl
+    AS_VAR_POPDEF([linux_Member])dnl
+])# _LINUX_CHECK_MEMBER_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MEMBERS_internal(AGGREGATE.MEMBER, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_MEMBERS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MEMBERS_internal],
+    [m4_foreach([LK_Member], [$1],
+        [_LINUX_CHECK_MEMBER_internal(LK_Member,
+            [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_[]LK_Member), 1,
+                [Define to 1 if `]m4_bpatsubst(LK_Member, [^[^.]*\.])[' is member of
+                 `]m4_bpatsubst(LK_Member, [\..*])['.])
+$2],
+                [$3],
+                [$4])])
+])# _LINUX_CHECK_MEMBERS_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MEMBER(AGGREGATE.MEMBER, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent to AC_CHECK_MEMBER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MEMBER], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_MEMBER_internal([$1], [$2], [$3], [$4])])
+])# _LINUX_CHECK_MEMBER
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_MEMBERS(AGGREGATE.MEMBER, [ACTION-IF-FOUND], [ACTION-IF-NOT_FOUND], [INCLUDES])
+# -----------------------------------------------------------------------------
+# Kernel environment equivalent of AC_CHECK_MEMBERS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_MEMBERS], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_MEMBERS_internal([$1], [$2], [$3], [$4])])
+])# _LINUX_CHECK_MEMBERS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_TYPE_internal
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_TYPE_internal], [dnl
+    AS_VAR_PUSHDEF([linux_Type], [linux_cv_type_$1])dnl
+    AC_CACHE_CHECK([for kernel $1], linux_Type,
+        [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])],
+[if (($1 *) 0)
+    return 0;
+if (sizeof ($1))
+    return 0;])],
+        [AS_VAR_SET(linux_Type, yes)],
+        [AS_VAR_SET(linux_Type, no)])])
+    AS_IF([test AS_VAR_GET(linux_Type) = yes], [$2], [$3])[]dnl
+    AS_VAR_POPDEF([linux_Type])dnl
+])# _LINUX_CHECK_TYPE_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_TYPES_internal(TYPES,
+#       [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#       [INCLUDES = DEFAULT-INCLUDES])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_TYPES_internal], [dnl
+    m4_foreach([LK_Type], [$1],
+        [_LINUX_CHECK_TYPE_internal(LK_Type,
+            [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_[]LK_Type), 1,
+                [Define to 1 if the system has the type ']LK_Type['.])
+$2],
+            [$3],
+            [$4])])
+])# _LINUX_CHECK_TYPES_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_TYPE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_TYPE], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_TYPE_internal([$1], [$2], [$3], [$4])
+        ])
+])# _LINUX_CHECK_TYPE
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_TYPES
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_TYPES], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_TYPES_internal([$1], [$2], [$3], [$4])
+        ])
+])# _LINUX_CHECK_TYPES
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_HEADER_internal
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_HEADER_internal], [dnl
+    AS_VAR_PUSHDEF([linux_Header], [linux_cv_header_$1])dnl
+    AC_CACHE_CHECK([for kernel $1], linux_Header,
+        [AC_COMPILE_IFELSE([AC_LANG_SOURCE([AC_INCLUDES_DEFAULT([$4])
+@%:@include <$1>])],
+        [AS_VAR_SET(linux_Header, yes)],
+        [AS_VAR_SET(linux_Header, no)])])
+    AS_IF([test AS_VAR_GET(linux_Header) = yes], [$2], [$3])[]dnl
+    AS_VAR_POPDEF([linux_Header])dnl
+])# _LINUX_CHECK_HEADER_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_HEADERS_internal
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_HEADERS_internal], [dnl
+    AC_FOREACH([LK_Header], [$1],
+        [AH_TEMPLATE(AS_TR_CPP(HAVE_[]LK_Header),
+            [Define to 1 if you have the <]LK_Header[> header file.])])
+    for lk_header in $1
+    do
+    _LINUX_CHECK_HEADER_internal($lk_header,
+        [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$lk_header)) $2],
+        [$3],
+        [$4])dnl
+    done
+])# _LINUX_CHECK_HEADERS_internal
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_HEADER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_HEADER], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_HEADER_internal([$1], [$2], [$3], [$4])
+        ])
+])# _LINUX_CHECK_HEADER
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_HEADERS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_HEADERS], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        _LINUX_CHECK_HEADERS_internal([$1], [$2], [$3], [$4])
+        ])
+])# _LINUX_CHECK_HEADERS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_], [dnl
+])# _LINUX_KERNEL_
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    _LINUX_KERNEL_ENV([dnl
+        CPPFLAGS="$KERNEL_MODFLAGS $CPPFLAGS"
+        ])
+])# _LINUX_KERNEL_
+# =============================================================================
 
 # =============================================================================
 # _LINUX_CHECK_KERNEL_CONFIG_internal([CHECKING-LABEL], CONFIG-NAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])

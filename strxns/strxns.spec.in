@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/12/19 15:12:08 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/12/21 22:22:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/19 15:12:08 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 22:22:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -270,6 +270,7 @@ fi
     CXX="${CXX:-$CC}" \
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
     CXXCPP="${CXXCPP:-$CPP}" \
+    CONFIG_SITE="%{csite_file}" \
     --cache-file=%{cache_file} \
     --build=%{_build} \
     --host=%{_target_platform} \
@@ -887,6 +888,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.19  2004/12/21 22:22:31  brian
+# - Added automatic site configuration to rpm build.
+#
 # Revision 0.9.2.18  2004/12/19 15:12:08  brian
 # - Working up better spec files.
 #

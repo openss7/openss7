@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/12/19 15:11:54 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/12/21 22:22:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/19 15:11:54 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 22:22:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -272,6 +272,7 @@ fi
     CXX="${CXX:-$CC}" \
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
     CXXCPP="${CXXCPP:-$CPP}" \
+    CONFIG_SITE="%{csite_file}" \
     --cache-file=%{cache_file} \
     --build=%{_build} \
     --host=%{_target_platform} \
@@ -895,6 +896,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.24  2004/12/21 22:22:23  brian
+# - Added automatic site configuration to rpm build.
+#
 # Revision 0.9.2.23  2004/12/19 15:11:54  brian
 # - Working up better spec files.
 #
