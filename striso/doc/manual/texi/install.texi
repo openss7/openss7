@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.2 2005/02/02 21:44:47 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.4 2005/02/17 11:34:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/02/02 21:44:47 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 11:34:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -78,7 +78,7 @@ The @value{PACKAGE_TITLE} package releases can be downloaded from the downloads
 page of @uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The
 package is available as a binary RPM (for popular architectures) a source RPM,
 or as a tar ball.  If you are using a browsable viewer, you can obtain the
-OpenSS7 release of @command{@value{PACKAGE}} from the links in the sections that
+OpenSS7 release of @command{@value{PACKAGE_NAME}} from the links in the sections that
 follow.
 
 By far the easiest form for installing and using
@@ -355,7 +355,7 @@ To configure and install the tar ball, @xref{Configuring the Tar Ball}.
 
 If you are a subscriber or sponsor of @uref{http://www.openss7.org/, The OpenSS7
 Project} with CVS archive access privileges then you can download release or
-mid-release versions of the @file{@value{PACKAGE}} package from the project CVS
+mid-release versions of the @file{@value{PACKAGE_NAME}} package from the project CVS
 archive.
 
 The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE_TARNAME}}
@@ -370,7 +370,7 @@ to check out a version from the archive:
 % export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
 % cvs login
 Password: *********
-% cvs co -r @value{PACKAGE}_@value{PACKAGE_VERSION} @value{PACKAGE_TARNAME}
+% cvs co -r @value{PACKAGE_TARNAME}_@value{PACKAGE_VERSION} @value{PACKAGE_TARNAME}
 % cvs logout
 @end cartouche
 @end example
@@ -380,7 +380,7 @@ information, see @ref{cvs(1), cvs(1), cvs(1), *manpages*, The Manual Pages}.
 
 @subsubheading Preparing the CVS Working Directory
 
-Although public releases of the @file{@value{PACKAGE}} package do not require
+Although public releases of the @file{@value{PACKAGE_NAME}} package do not require
 reconfiguration, creating a configurable directory from the CVS archive requires
 tools not normally distributed with the other releases.
 
@@ -470,7 +470,7 @@ binary RPM are as follows:
 @item @value{PACKAGE_TARNAME}-LiS-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @cindex @value{PACKAGE_TARNAME}-LiS-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}/lib/modules/@value{_kversion}}
+@item @file{@value{_rootdir}/lib/modules/@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
 @value{PACKAGE_TARNAME} STREAMS drivers and modules.
 @end table
@@ -486,9 +486,9 @@ This relocatable directory contains the kernel modules that provide the
 @cindex @value{PACKAGE_TARNAME}-LiS-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @cindex @value{PACKAGE_TARNAME}-streams-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_libdir}}
-@item @file{@value{_krootdir}@value{_includedir}}
-@item @file{@value{_krootdir}@value{_mandir}}
+@item @file{@value{_rootdir}@value{_libdir}}
+@item @file{@value{_rootdir}@value{_includedir}}
+@item @file{@value{_rootdir}@value{_mandir}}
 @end table
 
 @item @value{PACKAGE_TARNAME}-LiS-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
@@ -496,8 +496,8 @@ This relocatable directory contains the kernel modules that provide the
 @cindex @value{PACKAGE_TARNAME}-LiS-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @cindex @value{PACKAGE_TARNAME}-streams-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_datadir}/doc}
-@item @file{@value{_krootdir}@value{_infodir}}
+@item @file{@value{_rootdir}@value{_datadir}/doc}
+@item @file{@value{_rootdir}@value{_infodir}}
 @end table
 
 @ignore
@@ -506,11 +506,11 @@ This relocatable directory contains the kernel modules that provide the
 @cindex @value{PACKAGE_TARNAME}-LiS-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @cindex @value{PACKAGE_TARNAME}-streams-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_libdir}}
+@item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains
 the run-time shared libraries necessary to run applications programs and utilities
 developed for @value{PACKAGE_TITLE}.
-@item @file{@value{_krootdir}@value{_datadir}/locale}
+@item @file{@value{_rootdir}@value{_datadir}/locale}
 This relocatable directory contains the locale information for shared library files.
 @end table
 @end ignore
@@ -518,7 +518,7 @@ This relocatable directory contains the locale information for shared library fi
 @item @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @cindex @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_prefix}/src}
+@item @file{@value{_rootdir}@value{_prefix}/src}
 This relocatable directory contains
 the source code.
 @end table
@@ -528,16 +528,16 @@ the source code.
 @cindex @value{PACKAGE_TARNAME}-LiS-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @cindex @value{PACKAGE_TARNAME}-streams-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_bindir}}
+@item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains
 binary programs and utilities.
-@item @file{@value{_krootdir}@value{_sbindir}}
+@item @file{@value{_rootdir}@value{_sbindir}}
 This relocatable directory contains
 system binary programs and utilities.
-@item @file{@value{_krootdir}@value{_mandir}}
+@item @file{@value{_rootdir}@value{_mandir}}
 This relocatable directory contains
 manual pages.
-@item @file{@value{_krootdir}@value{_libexecdir}}
+@item @file{@value{_rootdir}@value{_libexecdir}}
 This relocatable directory contains
 test programs.
 @end table
@@ -685,7 +685,7 @@ manpages uncooked: they are actually smaller that way.
 @opindex public
 
 Release public packages or private packages.  This option has no effect on the
-@file{@value{PACKAGE}} package.  The default is to release public packages.
+@file{@value{PACKAGE_NAME}} package.  The default is to release public packages.
 
 @item --with k-debug
 @itemx --without k-debug
@@ -812,8 +812,8 @@ compression.
 @item --disable-public
 @opindex public
 
-Disable public release.  Has no effect on the @file{@value{PACKAGE}} release.
-No private components exist in @file{@value{PACKAGE}} releases.
+Disable public release.  Has no effect on the @file{@value{PACKAGE_NAME}} release.
+No private components exist in @file{@value{PACKAGE_NAME}} releases.
 
 @item --enable-tools
 @opindex tools
@@ -883,9 +883,9 @@ This option has no effect if there are no kernel modules in the package.
 @itemx --disable-k-modversions
 @opindex k-modversions
 
-Disable module versions on @command{@value{PACKAGE}} symbols.  Specifies whether
+Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies whether
 kernel symbol versioning is to be used on symbols exported from built
-@command{@value{PACKAGE}} modules.  The default is to provide kernel symbol
+@command{@value{PACKAGE_NAME}} modules.  The default is to provide kernel symbol
 versioning on all exported symbols.
 
 This option has no effect if there are no kernel modules in the package.
@@ -1431,7 +1431,7 @@ option to @samp{./configure.nexusware}.
 In addition, because @cite{NexusWare} does not include an
 @file{/etc/modules.conf} file by default, it will be necessary to add one or
 edit your @file{rc.4} file to @command{insmod} the necessary
-@file{@value{PACKAGE}} modules at boot time.
+@file{@value{PACKAGE_NAME}} modules at boot time.
 
 Once you have completed the necessary @file{.spec} and @file{rc.4} file entries,
 you need to rebuild the @samp{generic} kernel flash image once more for these
@@ -1439,7 +1439,7 @@ objects to be included in the flash file system.  It is important that this
 second build of the kernel image be the same as the first.
 
 When modifying and rebuilding a @cite{NexusWare} kernel, it will be necessary to
-rebuild and install @file{@value{PACKAGE}}.  Simply perform the last @samp{make
+rebuild and install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make
 install-strip} stage or start again with @samp{./configure.nexusware}.  You can
 place the unpacked tarball in
 @file{@var{$NEXUSWARE_PREFIX}/usr/src/@value{PACKAGE_TARNAME}}, and add the following to

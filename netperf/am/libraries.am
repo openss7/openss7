@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/26 20:10:30 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/17 08:04:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 20:10:30 $ by $Author: brian $
+# Last Modified $Date: 2005/02/17 08:04:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,8 +68,8 @@ if RPM_BUILD_USER
 #
 post-libraries:
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
-		echo "$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
-		$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
+		echo "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 
 #
@@ -89,8 +89,8 @@ INSTALL_EXEC_HOOK += post-libraries
 #
 postun-libraries:
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
-		echo "$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
-		$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
+		echo "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 
 #

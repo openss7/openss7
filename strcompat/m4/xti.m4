@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.18 2005/02/02 10:02:29 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.20 2005/02/17 09:03:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/02 10:02:29 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 09:03:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -135,44 +135,44 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
                     # streams includes line.  This check can be dropped when the older RPM releases
                     # of LiS fall out of favor.
                     eval "xti_search_path=\"
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/strxnet/src/include
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/LiS/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/LiS/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/LiS/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/LiS/include/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include
-                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/xti
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/xti\""
+                        ${DESTDIR}${includedir}/strxnet
+                        ${DESTDIR}${rootdir}${oldincludedir}/strxnet
+                        ${DESTDIR}${rootdir}/usr/include/strxnet
+                        ${DESTDIR}${rootdir}/usr/local/include/strxnet
+                        ${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+                        ${DESTDIR}${includedir}/LiS/xti
+                        ${DESTDIR}${rootdir}${oldincludedir}/LiS/xti
+                        ${DESTDIR}${rootdir}/usr/include/LiS/xti
+                        ${DESTDIR}${rootdir}/usr/local/include/LiS/xti
+                        ${DESTDIR}${rootdir}/usr/src/LiS/include/xti
+                        ${DESTDIR}${includedir}/xti
+                        ${DESTDIR}${rootdir}${oldincludedir}/xti
+                        ${DESTDIR}${rootdir}/usr/include/xti
+                        ${DESTDIR}${rootdir}/usr/local/include/xti
+                        ${DESTDIR}${oldincludedir}/strxnet
+                        ${DESTDIR}/usr/include/strxnet
+                        ${DESTDIR}/usr/local/include/strxnet
+                        ${DESTDIR}/usr/src/strxnet/src/include
+                        ${DESTDIR}${oldincludedir}/LiS/xti
+                        ${DESTDIR}/usr/include/LiS/xti
+                        ${DESTDIR}/usr/local/include/LiS/xti
+                        ${DESTDIR}/usr/src/LiS/include/xti
+                        ${DESTDIR}${oldincludedir}/xti
+                        ${DESTDIR}/usr/include/xti
+                        ${DESTDIR}/usr/local/include/xti\""
                     ;;
                 LfS)
                     # LfS has always been separate.
                     eval "xti_search_path=\"
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/strxnet/src/include
-                        ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
-                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include\""
+                        ${DESTDIR}${includedir}/strxnet
+                        ${DESTDIR}${rootdir}${oldincludedir}/strxnet
+                        ${DESTDIR}${rootdir}/usr/include/strxnet
+                        ${DESTDIR}${rootdir}/usr/local/include/strxnet
+                        ${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+                        ${DESTDIR}${oldincludedir}/strxnet
+                        ${DESTDIR}/usr/include/strxnet
+                        ${DESTDIR}/usr/local/include/strxnet
+                        ${DESTDIR}/usr/src/strxnet/src/include\""
                     ;;
             esac
             xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`

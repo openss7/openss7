@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/02/10 22:40:23 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/17 08:04:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/10 22:40:23 $ by $Author: brian $
+# Last Modified $Date: 2005/02/17 08:04:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +80,7 @@ STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 #
 install-modules: $(KERNEL_MODULES)
 	@$(NORMAL_INSTALL)
-	@r='$(DESTDIR)$(krootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -n "$(KERNEL_PRELOADS)" ; then \
 		echo "$(mkinstalldirs) $$d/boot" ; \
@@ -129,7 +129,7 @@ INSTALL_EXEC_LOCAL += install-modules
 # target with install-exec-hook that runs after install-exec has completed.
 #
 # The post-modules target checks for a fully configured install directory by checking for
-# modules.dep in the kernel modules directory $(DESTDIR)$(krootdir)$(kmoduledir).
+# modules.dep in the kernel modules directory $(DESTDIR)$(rootdir)$(kmoduledir).
 #
 # If modules.dep does not exist, we simply exit.
 #
@@ -145,7 +145,7 @@ INSTALL_EXEC_LOCAL += install-modules
 # installing the source package under rpm.
 #
 post-modules:
-	@r='$(DESTDIR)$(krootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
+	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -f "$$conf_fil" ; then \
 		if test -e "$$k/net/sctp/sctp.o$$kext" ; then \
@@ -176,7 +176,7 @@ post-modules:
 	fi
 
 post-source:
-	@u='$(DESTDIR)$(krootdir)/usr/src' ; \
+	@u='$(DESTDIR)$(rootdir)/usr/src' ; \
 	if test -d $$u ; then \
 		p="$$u/$(PACKAGE_TARNAME)" ; \
 		d=`(cd $(srcdir); pwd)` ; \
@@ -202,7 +202,7 @@ INSTALL_EXEC_HOOK += post-modules post-source
 #
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
-	@r='$(DESTDIR)$(krootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
@@ -241,7 +241,7 @@ UNINSTALL_LOCAL += uninstall-modules
 # under rpm.
 #
 postun-modules:
-	@r='$(DESTDIR)$(krootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
+	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -f "$$conf_fil" ; then \
 		l=yes ; \
@@ -277,7 +277,7 @@ postun-modules:
 	fi
 
 postun-source:
-	rm -f -- "$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_TARNAME)"
+	rm -f -- "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)"
 
 #
 # This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when

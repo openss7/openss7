@@ -1,6 +1,6 @@
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/13 12:14:11 $
+dnl @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/02/17 11:47:26 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -46,31 +46,18 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/02/13 12:14:11 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 11:47:26 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.37 2005/02/13 12:14:11 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.39 2005/02/17 11:47:26 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
-dnl
-dnl Need to adjust directories if default
-dnl
-ac_default_prefix='/usr'
-if test :"$sysconfdir"    = :'${prefix}/etc'  ; then   sysconfdir='/etc'                 ; fi
-if test :"$localstatedir" = :'${prefix}/var'  ; then localstatdir='/var'                 ; fi
-if test :"$infodir"       = :'${prefix}/info' ; then      infodir='${prefix}/share/info' ; fi
-if test :"$mandir"        = :'${prefix}/man'  ; then       mandir='${prefix}/share/man'  ; fi
-dnl
-dnl Specify the real root of the install tree
-dnl
-if test :"$prefix" = :NONE ; then rootdir="$ac_default_prefix" ; else rootdir="$prefix" ; fi
-rootdir=`echo $rootdir | sed -e 's|/local$||;s|/usr$||'`
-AC_SUBST([rootdir])
+_OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([src/modules/sth.c])
 AC_CONFIG_HEADER([config.h include/sys/streams/config.h])
@@ -82,7 +69,7 @@ AC_CANONICAL_TARGET
 
 _DISTRO
 
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION-3)
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 dnl
 dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing

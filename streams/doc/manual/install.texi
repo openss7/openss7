@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.5 2004/11/06 10:22:31 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.7 2005/02/17 11:34:53 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2004/11/06 10:22:31 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 11:34:53 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -77,13 +77,13 @@
 The @value{PACKAGE_TITLE} package releases can be downloaded from the downloads page of
 @uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The package is available as a
 binary RPM (for popular architectures) a source RPM, or as a tar ball.  If you are using a browsable
-viewer, you can obtain the OpenSS7 release of @command{@value{PACKAGE}} from the links in the
+viewer, you can obtain the OpenSS7 release of @command{@value{PACKAGE_NAME}} from the links in the
 sections that follow.
 
-By far the easiest form for installing and using @command{@value{PACKAGE}-@value{PACKAGE_VERSION}}
+By far the easiest form for installing and using @command{@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}}
 is to download and install binary RPM. If a binary RPM is not available for your distribution,  but
 your distribution supports RPM, the next best method for installing and using
-@command{@value{PACKAGE}-@value{PACKAGE_VERSION}} is to download and rebuild the source RPM.  If
+@command{@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}} is to download and rebuild the source RPM.  If
 your architecture does not support RPM at all, or you have special needs (such as cross-compiling
 for embedded targets), the final resort method is to download, configure, build and install from the
 source tarball.
@@ -108,7 +108,7 @@ RPM from each of the three categories below.
 
 @subsubheading Independent RPM
 Independent RPM are not dependent on the Linux kernel version.  For example, the source package
-@samp{@value{PACKAGE}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}, is not
+@samp{@value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}, is not
 dependent on kernel.
 
 @noindent
@@ -117,31 +117,31 @@ is not on the list, you can build binary RPM from the source RPM (see @pxref{Bui
 Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-dev} package contains the device definitions necessary to run applications
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-dev} package contains the device definitions necessary to run applications
 programs developed for @value{PACKAGE_TITLE}.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-devel} package contains library archives for static compilation, header
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-devel} package contains library archives for static compilation, header
 files to develop @value{PACKAGE_TITLE} modules and drivers.  This also includes the header files and
 static libraries required to compile @value{PACKAGE_TITLE} applications programs.  It also contains
 all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} modules or drivers.
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-doc} package contains this manual in plaintext, postscript, PDF and HTML
-forms, along with the meta-information from the @file{@value{PACKAGE}} package.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-doc} package contains this manual in plaintext, postscript, PDF and HTML
+forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-lib} package contains the run-time shared libraries necessary to run
-application programs and utilities developed for the @file{@value{PACKAGE}} package.
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-lib} package contains the run-time shared libraries necessary to run
+application programs and utilities developed for the @file{@value{PACKAGE_NAME}} package.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-source} package contains the source code necessary for building the
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-source} package contains the source code necessary for building the
 @value{PACKAGE_TITLE} release.  It includes the @command{autoconf} configuration utilities necessary
 to create and distribute this rpm.
 
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-util} package provides administrative and configuration test utilities and
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-util} package provides administrative and configuration test utilities and
 commands associated with the @value{PACKAGE_TITLE} package.
 @end table
 
@@ -155,8 +155,8 @@ If your architecture or kernel version is not on the list, you can build binary 
 RPM (see @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
-The @file{@value{PACKAGE}-core} package contains the kernel modules that provide the
+@item @uref{http://www.openss7.org/rpms/rh7.2/RPMS/i686/@value{PACKAGE_TARNAME}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm, @value{PACKAGE_TARNAME}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm}
+The @file{@value{PACKAGE_TARNAME}-core} package contains the kernel modules that provide the
 @value{PACKAGE_TITLE} core, modules and drivers.  This package is heavily tied to the Kernel for
 which it was compiled.  This particular package applies to kernel version @var{@value{_kversion}}.
 @end table
@@ -175,7 +175,7 @@ If you cannot obtain a binary RPM for your architecture, or would like to roll
 you own binary RPM, download the following source RPM.
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm, @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm}
+@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm, @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
 any supported architecture and for any 2.4 kernel.
 @end table
@@ -194,8 +194,8 @@ For non-RPM architectures, such as @cite{NexusWare} embedded target, download th
 follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz, @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2, @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2}
+@item @uref{http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz, @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz}
+@itemx @uref{http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2, @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2}
 These are the @command{tar} balls for the release.  These @command{tar} balls contain the
 @command{autoconf} distribution which includes all the source necessary for building and installing
 the package.  These tarballs will even build Source RPM and Binary RPM on RPM architectures.
@@ -205,7 +205,7 @@ The tar ball may be downloaded easily with @command{wget} as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
 @end cartouche
 @end example
 
@@ -214,7 +214,7 @@ or
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
 @end cartouche
 @end example
 
@@ -224,8 +224,8 @@ After downloading one of the tar balls, unpack the archive using one of the foll
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
-% tar -xzvf @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
+% tar -xzvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
 @end cartouche
 @end example
 
@@ -234,15 +234,15 @@ or
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
 @end cartouche
 @end example
 
 @noindent
 Either will create a subdirectory name
-@file{@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}} containing all of the files
-and subdirectories for the @command{@value{PACKAGE}} package.
+@file{@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}} containing all of the files
+and subdirectories for the @command{@value{PACKAGE_NAME}} package.
 
 
 @subsubheading Configuration
@@ -257,9 +257,9 @@ To configure and install the tar ball, @xref{Configuring the Tar Ball}.
 
 If you are a subscriber or sponsor of @uref{http://www.openss7.org/, The OpenSS7 Project} with CVS
 archive access privileges then you can download release or mid-release versions of the
-@file{@value{PACKAGE}} package from the project CVS archive.
+@file{@value{PACKAGE_NAME}} package from the project CVS archive.
 
-The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE}} subdirectory of
+The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE_TARNAME}} subdirectory of
 @file{/var/cvs}.  For release tag information, see @ref{Releases}.
 
 To access the archive from the project CVS pserver, use the following commands to check out a
@@ -270,7 +270,7 @@ version from the archive:
 % export CVSROOT='-d:pserver:@var{username}@@cvs.openss7.com:2401/var/cvs'
 % cvs login
 Password: *********
-% cvs co -r @value{PACKAGE}_@value{PACKAGE_VERSION} @value{PACKAGE}
+% cvs co -r @value{PACKAGE_TARNAME}_@value{PACKAGE_VERSION} @value{PACKAGE_TARNAME}
 % cvs logout
 @end cartouche
 @end example
@@ -280,7 +280,7 @@ It is, of course, possible to check out by date or by other criteria.  For more 
 
 @subsubheading Preparing the CVS Working Directory
 
-Although public releases of the @file{@value{PACKAGE}} package do not require reconfiguration,
+Although public releases of the @file{@value{PACKAGE_NAME}} package do not require reconfiguration,
 creating a configurable directory from the CVS archive requires tools not normally distributed with
 the other releases.
 
@@ -308,12 +308,12 @@ execute the following commands on the working directory:
 
 @example
 @cartouche
-% autoreconf -fisv @value{PACKAGE}
+% autoreconf -fisv @value{PACKAGE_TARNAME}
 @end cartouche
 @end example
 
 @noindent
-where, @file{@value{PACKAGE}} is the name of the directory to where the working copy was checked out
+where, @file{@value{PACKAGE_TARNAME}} is the name of the directory to where the working copy was checked out
 under the previous step.  This command generates the @command{configure} script and other missing
 pieces that are normally distributed with the release Tar Balls or RPMs.  The package can now be
 configured and built using the same instructions as are used for the Tar Ball, see @ref{Configuring
@@ -325,7 +325,7 @@ something like the following:
 @example
 @cartouche
 % PATH="/usr/local/bin:$PATH"
-% autoreconf -fisv @value{PACKAGE}
+% autoreconf -fisv @value{PACKAGE_TARNAME}
 @end cartouche
 @end example
 
@@ -362,60 +362,60 @@ possible to relocate some of the installation directories.  This allows some deg
 customization.  Relocations that are available on the binary RPM are as follows:
 
 @table @file
-@item @value{PACKAGE}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-core-@value{_kversion}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}/lib/modules/@value{_kversion}}
-This relocatable directory contains the kernel modules that provide the @value{PACKAGE} core,
+@item @file{@value{_rootdir}/lib/modules/@value{_kversion}}
+This relocatable directory contains the kernel modules that provide the @value{PACKAGE_NAME} core,
 drivers and modules.
 @end table
 
-@item @value{PACKAGE}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-dev-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 (not relocatable)
 
-@item @value{PACKAGE}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-devel-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_libdir}}
-@item @file{@value{_krootdir}@value{_includedir}}
-@item @file{@value{_krootdir}@value{_mandir}}
+@item @file{@value{_rootdir}@value{_libdir}}
+@item @file{@value{_rootdir}@value{_includedir}}
+@item @file{@value{_rootdir}@value{_mandir}}
 @end table
 
-@item @value{PACKAGE}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_datadir}/doc}
-@item @file{@value{_krootdir}@value{_infodir}}
+@item @file{@value{_rootdir}@value{_datadir}/doc}
+@item @file{@value{_rootdir}@value{_infodir}}
 @end table
 
-@item @value{PACKAGE}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-lib-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_libdir}}
+@item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains the run-time shared libraries necessary to run applications
 programs and utilities developed for @value{PACKAGE_TITLE}.
-@item @file{@value{_krootdir}@value{_datadir}/locale}
+@item @file{@value{_rootdir}@value{_datadir}/locale}
 This relocatable directory contains the locale information for shared library files.
 @end table
 
-@item @value{PACKAGE}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-source-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_prefix}/src}
+@item @file{@value{_rootdir}@value{_prefix}/src}
 This relocatable directory contains the source code.
 @end table
 
-@item @value{PACKAGE}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
-@cindex @value{PACKAGE}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@item @value{PACKAGE_TARNAME}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+@cindex @value{PACKAGE_TARNAME}-util-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @table @asis
-@item @file{@value{_krootdir}@value{_bindir}}
+@item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains binary programs and utilities.
-@item @file{@value{_krootdir}@value{_sbindir}}
+@item @file{@value{_rootdir}@value{_sbindir}}
 This relocatable directory contains system binary programs and utilities.
-@item @file{@value{_krootdir}@value{_mandir}}
+@item @file{@value{_rootdir}@value{_mandir}}
 This relocatable directory contains manual pages.
-@item @file{@value{_krootdir}@value{_libexecdir}}
+@item @file{@value{_rootdir}@value{_libexecdir}}
 This relocatable directory contains test programs.
 @end table
 
@@ -526,7 +526,7 @@ smaller that way.
 @opindex public
 
 Release public packages or private packages.  This option has no effect on the
-@file{@value{PACKAGE}} package.  The default is to release public packages.
+@file{@value{PACKAGE_NAME}} package.  The default is to release public packages.
 
 @item --with k-debug
 @itemx --without k-debug
@@ -645,8 +645,8 @@ default is to not perform kernel debugging.
 @itemx --disable-k-modversions
 @opindex k-modversions
 
-Disable module versions on @command{@value{PACKAGE}} symbols.  Specifies whether kernel symbol
-versioning is to be used on symbols exported from built @command{@value{PACKAGE}} modules.  The
+Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies whether kernel symbol
+versioning is to be used on symbols exported from built @command{@value{PACKAGE_NAME}} modules.  The
 default is to provide kernel symbol versioning on all exported symbols.
 
 @item --disable-compress-manpages
@@ -671,8 +671,8 @@ way).
 @item --disable-public
 @opindex public
 
-Disable public release.  Has no effect on the @file{@value{PACKAGE}} release.  No private components
-exist in @file{@value{PACKAGE}} releases.
+Disable public release.  Has no effect on the @file{@value{PACKAGE_NAME}} release.  No private components
+exist in @file{@value{PACKAGE_NAME}} releases.
 
 @item --enable-tools
 @opindex tools
@@ -953,8 +953,8 @@ The source RPM is rebuilt to binary RPMs as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
-% rpmbuild @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
+% wget http://www.openss7.org/rpms/SRPMS/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
+% rpmbuild @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
 @end cartouche
 @end example
 
@@ -967,7 +967,7 @@ are provided on the @command{rpm} command line.  For example:
 @cartouche
 % rpmbuild -vv --target athlon-redhat-linux \ 
   --define "_kversion @value{_kversion}" \ 
-  -- @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
+  -- @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.src.rpm
 @end cartouche
 @end example
 
@@ -995,9 +995,9 @@ Folowing is an example of a native build against the running kernel:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% pushd @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% pushd @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
 % ./configure
 % make
 % popd
@@ -1020,9 +1020,9 @@ in the release package for an example.
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% pushd @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% pushd @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
 % ./configure DESTDIR="/some/other/root" \ 
 	--with-k-release=2.4.18 --host sparc-linux
 % make
@@ -1085,9 +1085,9 @@ tree is rooted at @file{/u5/NexusWare}.)
 % source SETUP.sh
 % make
 % popd
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% pushd @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% tar -xjvf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% pushd @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
 % ./configure.nexusware --with-k-optimize=size
 % make
 % make install-strip
@@ -1101,7 +1101,7 @@ the @cite{NexusWare} root file system.  If you are cross-building for
 @cite{NexusWare} you should already know what that means.  Objects that you
 might be interested in copying to the root file system are kernel modules that
 were installed in
-@file{@var{$NEXUSWARE_PREFIX}/lib/modules/2.4.18/@value{PACKAGE}}, libraries
+@file{@var{$NEXUSWARE_PREFIX}/lib/modules/2.4.18/@value{PACKAGE_LCNAME}}, libraries
 installed in @file{@var{$NEXUSWARE_PREFIX}/usr/lib} and utility functions
 installed in @file{@var{$NEXUSWARE_PREFIX}/usr/bin} and
 @file{@var{$NEXUSWARE_PREFIX}/usr/sbin} and test programs in
@@ -1115,7 +1115,7 @@ option to @samp{./configure.nexusware}.
 In addition, because @cite{NexusWare} does not include an
 @file{/etc/modules.conf} file by default, it will be necessary to add one or
 edit your @file{rc.4} file to @command{insmod} the necessary
-@file{@value{PACKAGE}} modules at boot time.
+@file{@value{PACKAGE_NAME}} modules at boot time.
 
 Once you have completed the necessary @file{.spec} and @file{rc.4} file entries,
 you need to rebuild the @samp{generic} kernel flash image once more for these
@@ -1123,10 +1123,10 @@ objects to be included in the flash file system.  It is important that this
 second build of the kernel image be the same as the first.
 
 When modifying and rebuilding a @cite{NexusWare} kernel, it will be necessary to
-rebuild and install @file{@value{PACKAGE}}.  Simply perform the last @samp{make
+rebuild and install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make
 install-strip} stage or start again with @samp{./configure.nexusware}.  You can
 place the unpacked tarball in
-@file{@var{$NEXUSWARE_PREFIX}/usr/src/@value{PACKAGE}}, and add the following to
+@file{@var{$NEXUSWARE_PREFIX}/usr/src/@value{PACKAGE_TARNAME}}, and add the following to
 the top-level @cite{NexusWare} @file{Makefile} to make the build process a
 single step process instead of dual pass:
 
@@ -1141,8 +1141,8 @@ all:
         (cd usr/src/pti; $(MAKE))
         (cd drivers; $(MAKE))
         (cd utility; $(MAKE))
-#       uncomment for @value{PACKAGE} build
-#       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
+#       uncomment for @value{PACKAGE_TARNAME} build
+#       (cd usr/src/@value{PACKAGE_TARNAME}; ./configure.nexusware; $(MAKE) install-strip)
         (cd build/generic; $(MAKE))
 ...
 @end cartouche
@@ -1155,12 +1155,12 @@ build the @cite{NexusWare} flash image as normal:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% wget http://www.openss7.org/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
 % pushd /u5/NexusWare24
 % source SETUP.sh
 % pushd usr/src
-% tar -xjvf $@{DIRSTACK[2]@}/@value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
-% ln -sf @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE} @value{PACKAGE}
+% tar -xjvf $@{DIRSTACK[2]@}/@value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% ln -sf @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE} @value{PACKAGE_TARNAME}
 % popd
 % make
 % popd
@@ -1195,7 +1195,7 @@ rpm(8), *manpages*, The Manual Pages}.
 @example
 @cartouche
 % pushd RPMS/i686
-% rpm -ihv @value{PACKAGE}-*-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+% rpm -ihv @value{PACKAGE_TARNAME}-*-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @end cartouche
 @end example
 
@@ -1214,12 +1214,12 @@ will relocate the documentation and info directories:
 % rpm -ihv \ 
         --relocate '/usr/share/doc=/usr/local/share/doc' \ 
         --relocate '/usr/share/info=/usr/local/share/info' \ 
-        -- @value{PACKAGE}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
+        -- @value{PACKAGE_TARNAME}-doc-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.i686.rpm
 @end cartouche
 @end example
 
 @noindent
-The previous example will install the @file{@value{PACKAGE}-doc} package by will
+The previous example will install the @file{@value{PACKAGE_TARNAME}-doc} package by will
 relocate the documentation an info directory contents to the @file{/usr/local}
 version.
 
@@ -1271,7 +1271,7 @@ following command:
 
 @example
 @cartouche
-% rpm -evv `rpm -qa | grep '^@value{PACKAGE}-'`
+% rpm -evv `rpm -qa | grep '^@value{PACKAGE_TARNAME}-'`
 @end cartouche
 @end example
 
@@ -1291,12 +1291,12 @@ files and source RPM file.  A command such as:
 
 @example
 @cartouche
-% find / -name '@value{PACKAGE}-*.rpm' -type f -print0 | xargs --null rm -f
+% find / -name '@value{PACKAGE_TARNAME}-*.rpm' -type f -print0 | xargs --null rm -f
 @end cartouche
 @end example
 
 @noindent
-should remove all @file{@value{PACKAGE}} RPMs from your system.
+should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.
 
 @c ----------------------------------------------------------------------------
 
@@ -1311,12 +1311,12 @@ follows:
 
 @example
 @cartouche
-% cd /usr/src/@value{PACKAGE}
+% cd /usr/src/@value{PACKAGE_TARNAME}
 % make uninstall
 % cd ..
-% rm -fr @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
-% rm -f @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
-% rm -f @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
+% rm -fr @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+% rm -f @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.gz
+% rm -f @value{PACKAGE_TARNAME}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}.tar.bz2
 @end cartouche
 @end example
 
@@ -1334,7 +1334,7 @@ the Tar Ball}) except the final installation and then perform the steps above.
 
 @subsection Normal Module Loading
 
-When @file{@value{PACKAGE}} installs, modules and drivers are normally
+When @file{@value{PACKAGE_NAME}} installs, modules and drivers are normally
 configured for demand loading.  The @samp{install} and @samp{install-strip}
 @command{make}
 @fnindex make
@@ -1342,16 +1342,16 @@ configured for demand loading.  The @samp{install} and @samp{install-strip}
 @fnindex make install-strip
 targets will make the necessary changes to the @file{/etc/modules.conf} file and
 place the modules in an appropriate place in
-@file{/lib/modules/@var{@value{_kversion}}/@value{PACKAGE}}.  The @samp{make install}
+@file{/lib/modules/@var{@value{_kversion}}/@value{PACKAGE_LCNAME}}.  The @samp{make install}
 process should have copied the kernel module files @file{streams-*.o} to the
-directory @file{@var{DESTDIR}/lib/modules/@value{_kversion}/@value{PACKAGE}}.
+directory @file{@var{DESTDIR}/lib/modules/@value{_kversion}/@value{PACKAGE_LCNAME}}.
 This means that to load any of these modules, you can simply execute, for
 example, @samp{modprobe stream-@var{somedriver}}.
 
 @subsubsection Linux STREAMS Module Loading
 
 If your kernel has been built using the @file{kerneld} daemon, then
-@file{@value{PACKAGE}} kernel modules will automatically load as soon as the
+@file{@value{PACKAGE_NAME}} kernel modules will automatically load as soon as the
 STREAMS module is pushed or the driver is opened.  The @samp{make install}
 process makes the necessary changes to the @file{@var{DESTDIR}/etc/modules.conf}
 file.  After the install, you will see lines like the following added to your
@@ -1359,9 +1359,9 @@ file.  After the install, you will see lines like the following added to your
 
 @example
 @cartouche
-prune modules.@value{PACKAGE}
-if -f /lib/modules/`uname -r`/modules.@value{PACKAGE}
-include /lib/modules/`uname -r`/modules.@value{PACKAGE}
+prune modules.@value{PACKAGE_LCNAME}
+if -f /lib/modules/`uname -r`/modules.@value{PACKAGE_LCNAME}
+include /lib/modules/`uname -r`/modules.@value{PACKAGE_LCNAME}
 endif
 @end cartouche
 @end example
@@ -1369,7 +1369,7 @@ endif
 @noindent
 which will provide for demand loading of the modules if they have been built and
 installed for the running kernel.  The @file{/lib/modules/@command{`uname
--r`}/modules.@value{PACKAGE}} file looks like this:
+-r`}/modules.@value{PACKAGE_LCNAME}} file looks like this:
 
 @smallexample
 @cartouche

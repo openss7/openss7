@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/02/15 10:35:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/02/17 11:40:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/15 10:35:22 $ by $Author: brian $
+# Last Modified $Date: 2005/02/17 11:40:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -346,8 +346,8 @@ EXTRA_SCRIPTS			+=
 export KERNEL_MODULES		= specfs.o streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 export KERNEL_PRELOADS		=
 export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
-export KERNEL_SUBDIR		= $(PACKAGE_TARNAME)
-export KMODCONF_EXT		= $(PACKAGE_TARNAME)
+export KERNEL_SUBDIR		= $(PACKAGE_LCNAME)
+export KMODCONF_EXT		= $(PACKAGE_LCNAME)
 export KERNEL_MODMAPS		=
 
 include am/kernel.am
@@ -617,11 +617,23 @@ endif
 
 if INSTALL_INITSCRIPTS
 
+if WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		= \
+				src/util/init/specfs.sh \
+				src/util/init/strace.sh \
+				src/util/init/streams.sh \
+				src/util/init/strerr.sh
+
+else
+
 dist_initrd_SCRIPTS		= \
 				src/util/init/specfs \
 				src/util/init/strace \
 				src/util/init/streams \
 				src/util/init/strerr
+
+endif
 
 dist_config_DATA		= \
 				src/util/sysconfig/specfs \

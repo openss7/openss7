@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: dist.m4,v 0.9.2.5 2005/02/13 12:15:29 brian Exp $
+dnl @(#) $Id: dist.m4,v 0.9.2.6 2005/02/17 08:05:49 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/13 12:15:29 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 08:05:49 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -336,7 +336,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist target lsb release file], [dist_cv_target_lsb_file], [dnl
         eval "dist_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/lsb-release\""
+            ${DESTDIR}${sysconfdir}/lsb-release\""
         dist_search_path=$(echo "$dist_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g')
         for dist_file in $dist_search_path
         do
@@ -352,12 +352,12 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist target release file], [dist_cv_target_rel_file], [dnl
         eval "dist_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/whitebox-release
-            ${rootdir:-$DESTDIR}${sysconfdir}/fedora-release
-            ${rootdir:-$DESTDIR}${sysconfdir}/mandrake-release
-            ${rootdir:-$DESTDIR}${sysconfdir}/redhat-release
-            ${rootdir:-$DESTDIR}${sysconfdir}/SuSE-release
-            ${rootdir:-$DESTDIR}${sysconfdir}/debian_version\""
+            ${DESTDIR}${sysconfdir}/whitebox-release
+            ${DESTDIR}${sysconfdir}/fedora-release
+            ${DESTDIR}${sysconfdir}/mandrake-release
+            ${DESTDIR}${sysconfdir}/redhat-release
+            ${DESTDIR}${sysconfdir}/SuSE-release
+            ${DESTDIR}${sysconfdir}/debian_version\""
         dist_search_path=$(echo "$dist_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g')
         for dist_file in $dist_search_path
         do
@@ -373,8 +373,8 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist target issue file], [dist_cv_target_issue_file], [dnl
         eval "dist_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/issue
-            ${rootdir:-$DESTDIR}${sysconfdir}/issue.net\""
+            ${DESTDIR}${sysconfdir}/issue
+            ${DESTDIR}${sysconfdir}/issue.net\""
         dist_search_path=$(echo "$dist_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g')
         for dist_file in $dist_search_path
         do
@@ -585,7 +585,8 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
-    if test ":$build_os" != ":$host_os" -o ":$build_os" != ":$target_os" ; then
+    if test :"`echo $build_os | sed -e s'|-gnu$||'`" != :"`echo $host_os | sed -e s'|-gnu$||'`" -o \
+        :"`echo $build_os | sed -e s'|-gnu$||'`" != :"`echo $target_os | sed -e s'|-gnu$||'`" ; then
         AC_MSG_WARN([
 **** 
 **** The build operating system ($build_os) is not the same
@@ -596,7 +597,9 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 **** later, build on the same operating system as the host and
 **** target.
 **** ])
-    elif test ":$build_vendor" != ":$host_vendor" -o ":$build_vendor" != ":$target_vendor" ; then
+    fi
+    if test :$build_vendor != :pc -a :$host_vendor != :pc -a :$target_vendor != :pc ; then
+    if test ":$build_vendor" != ":$host_vendor" -o ":$build_vendor" != ":$target_vendor" ; then
         AC_MSG_WARN([
 **** 
 **** The build distribution ($build_vendor) is not the same
@@ -607,6 +610,7 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 **** later, build on the same distribution as the host and
 **** target.
 **** ])
+    fi
     fi
 ])# _DISTRO_CHECK_VENDOR
 # ===========================================================================

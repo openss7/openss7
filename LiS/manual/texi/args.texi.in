@@ -1,6 +1,6 @@
 @comment vim: ft=texinfo
 @set PACKAGE @PACKAGE@
-@set PACKAGE_BUGREPORT @PACKAGE_BUGREPORT@
+@c @set PACKAGE_BUGREPORT @PACKAGE_BUGREPORT@
 @set PACKAGE_DATE @PACKAGE_DATE@
 @set PACKAGE_EPOCH @PACKAGE_EPOCH@
 @set PACKAGE_NAME @PACKAGE_NAME@
@@ -10,6 +10,8 @@
 @set PACKAGE_TITLE @PACKAGE_TITLE@
 @set PACKAGE_VERSION @PACKAGE_VERSION@
 @set PACKAGE_SHORTTITLE @PACKAGE_SHORTTITLE@
+@set PACKAGE_UCNAME @PACKAGE_UCNAME@
+@set PACKAGE_LCNAME @PACKAGE_LCNAME@
 
 @set _bindir @prefix@/bin
 @set _datadir @prefix@/share
@@ -17,7 +19,7 @@
 @set _includedir @prefix@/include
 @set _infodir @prefix@/share/info
 @set _kmoduledir @kmoduledir@
-@set _krootdir @krootdir@
+@set _rootdir @rootdir@
 @set _ksysmap @ksysmap@
 @set _kversion @kversion@
 @set _libdir @prefix@/lib

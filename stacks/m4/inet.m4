@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: inet.m4,v 0.9.2.10 2005/02/02 10:02:29 brian Exp $
+dnl @(#) $Id: inet.m4,v 0.9.2.12 2005/02/17 09:03:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/02 10:02:29 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 09:03:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -121,42 +121,42 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
         fi
         if test ":${inet_cv_includes:-no}" = :no ; then
             eval "inet_search_path=\"
-                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strinet/src/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strinet
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strinet/src/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strxnet/src/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/streams/src/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/LiS/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
+                ${DESTDIR}${includedir}/strinet
+                ${DESTDIR}${rootdir}${oldincludedir}/strinet
+                ${DESTDIR}${rootdir}/usr/include/strinet
+                ${DESTDIR}${rootdir}/usr/local/include/strinet
+                ${DESTDIR}${rootdir}/usr/src/strinet/src/include
+                ${DESTDIR}${oldincludedir}/strinet
+                ${DESTDIR}/usr/include/strinet
+                ${DESTDIR}/usr/local/include/strinet
+                ${DESTDIR}/usr/src/strinet/src/include
+                ${DESTDIR}${includedir}/strxnet
+                ${DESTDIR}${rootdir}${oldincludedir}/strxnet
+                ${DESTDIR}${rootdir}/usr/include/strxnet
+                ${DESTDIR}${rootdir}/usr/local/include/strxnet
+                ${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+                ${DESTDIR}${oldincludedir}/strxnet
+                ${DESTDIR}/usr/include/strxnet
+                ${DESTDIR}/usr/local/include/strxnet
+                ${DESTDIR}/usr/src/strxnet/src/include
+                ${DESTDIR}${includedir}/streams
+                ${DESTDIR}${rootdir}${oldincludedir}/streams
+                ${DESTDIR}${rootdir}/usr/include/streams
+                ${DESTDIR}${rootdir}/usr/local/include/streams
+                ${DESTDIR}${rootdir}/usr/src/streams/src/include
+                ${DESTDIR}${oldincludedir}/streams
+                ${DESTDIR}/usr/include/streams
+                ${DESTDIR}/usr/local/include/streams
+                ${DESTDIR}/usr/src/streams/include
+                ${DESTDIR}${includedir}/LiS
+                ${DESTDIR}${rootdir}${oldincludedir}/LiS
+                ${DESTDIR}${rootdir}/usr/include/LiS
+                ${DESTDIR}${rootdir}/usr/local/include/LiS
+                ${DESTDIR}${rootdir}/usr/src/LiS/include
+                ${DESTDIR}${oldincludedir}/LiS
+                ${DESTDIR}/usr/include/LiS
+                ${DESTDIR}/usr/local/include/LiS
+                ${DESTDIR}/usr/src/LiS/include\""
             inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             inet_cv_includes=
             for inet_dir in $inet_search_path ; do

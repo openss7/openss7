@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: args.texi.in,v 0.9.2.2 2005/01/14 06:40:13 brian Exp $
+@c @(#) $Id: args.texi.in,v 0.9.2.4 2005/02/17 11:34:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,12 +54,12 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/01/14 06:40:13 $ by $Author: brian $
+@c Last Modified $Date: 2005/02/17 11:34:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @set PACKAGE @PACKAGE@
-@set PACKAGE_BUGREPORT @PACKAGE_BUGREPORT@
+@c @set PACKAGE_BUGREPORT @PACKAGE_BUGREPORT@
 @set PACKAGE_DATE @PACKAGE_DATE@
 @set PACKAGE_EPOCH @PACKAGE_EPOCH@
 @set PACKAGE_NAME @PACKAGE_NAME@
@@ -69,6 +69,8 @@
 @set PACKAGE_TITLE @PACKAGE_TITLE@
 @set PACKAGE_VERSION @PACKAGE_VERSION@
 @set PACKAGE_SHORTTITLE @PACKAGE_SHORTTITLE@
+@set PACKAGE_UCNAME @PACKAGE_UCNAME@
+@set PACKAGE_LCNAME @PACKAGE_LCNAME@
 
 @set _bindir @prefix@/bin
 @set _datadir @prefix@/share
@@ -76,7 +78,7 @@
 @set _includedir @prefix@/include
 @set _infodir @prefix@/share/info
 @set _kmoduledir @kmoduledir@
-@set _krootdir @krootdir@
+@set _rootdir @rootdir@
 @set _ksysmap @ksysmap@
 @set _kversion @kversion@
 @set _libdir @prefix@/lib

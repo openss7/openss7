@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/04 23:03:27 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/17 08:04:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/04 23:03:27 $ by $Author: brian $
+# Last Modified $Date: 2005/02/17 08:04:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,7 +102,7 @@ EXTRA_SCRIPTS += scripts/strconf-sh
 # Invoke creation of any installed devices if the installation directory is configured.
 
 install-devices: $(STRMAKENODES)
-	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
 		echo './$(STRMAKENODES)' ; \
 		./$(STRMAKENODES) ; \
 	fi
@@ -110,7 +110,7 @@ install-devices: $(STRMAKENODES)
 # Invoke removal of any installed devices if the installation directory is configured.
 
 uninstall-devices: $(STRMAKENODES)
-	@if test -r $(DESTDIR)$(krootdir)/etc/modules.conf ; then \
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
 		echo './$(STRMAKENODES) --remove' ; \
 		./$(STRMAKENODES) --remove ; \
 	fi

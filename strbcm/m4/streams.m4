@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.35 2005/02/02 10:02:29 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.37 2005/02/17 09:03:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/02 10:02:29 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 09:03:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -249,16 +249,15 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
             # note if linux kernel macros have not run this reduces
             streams_cv_lis_includes=
             eval "streams_search_path=\"
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/LiS/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
+                ${DESTDIR}${includedir}/LiS
+                ${DESTDIR}${rootdir}${oldincludedir}/LiS
+                ${DESTDIR}${rootdir}/usr/include/LiS
+                ${DESTDIR}${rootdir}/usr/local/include/LiS
+                ${DESTDIR}${rootdir}/usr/src/LiS/include
+                ${DESTDIR}${oldincludedir}/LiS
+                ${DESTDIR}/usr/include/LiS
+                ${DESTDIR}/usr/local/include/LiS
+                ${DESTDIR}/usr/src/LiS/include\""
             streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for streams_dir in $streams_search_path 
             do
@@ -362,16 +361,15 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
             # note if linux kernel macros have not run this reduces
             streams_cv_lfs_includes=
             eval "streams_search_path=\"
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/streams/include
-                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
-                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include\""
+                ${DESTDIR}${includedir}/streams
+                ${DESTDIR}${rootdir}${oldincludedir}/streams
+                ${DESTDIR}${rootdir}/usr/include/streams
+                ${DESTDIR}${rootdir}/usr/local/include/streams
+                ${DESTDIR}${rootdir}/usr/src/streams/include
+                ${DESTDIR}${oldincludedir}/streams
+                ${DESTDIR}/usr/include/streams
+                ${DESTDIR}/usr/local/include/streams
+                ${DESTDIR}/usr/src/streams/include\""
             streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for streams_dir in $streams_search_path 
             do

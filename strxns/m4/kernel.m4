@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/02/07 09:55:53 $
+dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/17 11:38:02 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/02/07 09:55:53 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 11:38:02 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -129,8 +129,8 @@ dnl     [enable_k_install='yes'])
 AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_RELEASE
     _LINUX_CHECK_KERNEL_LINKAGE
-    _LINUX_CHECK_KERNEL_PREFIX
-    _LINUX_CHECK_KERNEL_ROOTDIR
+dnl _LINUX_CHECK_KERNEL_PREFIX
+dnl _LINUX_CHECK_KERNEL_ROOTDIR
     _LINUX_CHECK_KERNEL_TOOLS
     _LINUX_CHECK_KERNEL_MODULES
     _LINUX_CHECK_KERNEL_BUILD
@@ -151,7 +151,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     AC_SUBST([PACKAGE_KNUMBER])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_KNUMBER], ["$PACKAGE_KNUMBER"], [The Linux
         kernel version without EXTRAVERSION.])
-    PACKAGE_KVERSION="$linux_cv_k_release"
+    PACKAGE_KVERSION="${kversion}"
     AC_SUBST([PACKAGE_KVERSION])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_KVERSION], ["$PACKAGE_KVERSION"], [The Linux
         kernel version for which the package was configured.])
@@ -372,13 +372,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     then
         linux_cv_k_modules="$with_k_modules"
     else
-        linux_cv_k_modules="$linux_cv_k_prefix/lib/modules/${linux_cv_k_release}"
+        linux_cv_k_modules='${rootdir}/lib/modules/${kversion}'
     fi
-    AC_MSG_RESULT([${linux_cv_k_modules:-no}])
+    eval "linux_tmp=\"$linux_cv_k_modules\""
+    AC_MSG_RESULT([${linux_tmp:-no}])
     AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
-        if test -r $linux_cv_k_modules/modules.dep
+        if test -r $linux_tmp/modules.dep
         then
-            if ( grep -q '\.o\.gz:' $linux_cv_k_modules/modules.dep )
+            if ( grep -q '\.o\.gz:' $linux_tmp/modules.dep )
             then
                 linux_cv_k_compress='yes'
             else
@@ -399,8 +400,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
             COMPRESS_KERNEL_MODULES=
             AC_MSG_WARN([
 **** 
-**** Strange, the modules directory is $linux_cv_k_modules
-**** but the file $linux_cv_k_modules/modules.dep does
+**** Strange, the modules directory is $linux_tmp
+**** but the file $linux_tmp/modules.dep does
 **** not exist.  This could cause some problems later.
 **** ])
             ;;
@@ -429,16 +430,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
         linux_cv_k_build="$with_k_build"
     else
         eval "k_build_search_path=\"
-            ${linux_cv_k_modules:+$linux_cv_k_rootdir$linux_cv_k_prefix$linux_cv_k_modules/build}
-            $linux_cv_k_rootdir$linux_cv_k_prefix/lib/modules/$linux_cv_k_release/build
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux-$linux_cv_k_release
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux-2.4
-            $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux
-            ${linux_cv_k_modules:+$linux_cv_k_rootdir$linux_cv_k_modules/build}
-            $linux_cv_k_rootdir/lib/modules/$linux_cv_k_release/build
-            $linux_cv_k_rootdir/usr/src/linux-$linux_cv_k_release
-            $linux_cv_k_rootdir/usr/src/linux-2.4
-            $linux_cv_k_rootdir/usr/src/linux\""
+            ${kmoduledir:+${DESTDIR}${kmoduledir}/build}
+            ${DESTDIR}${rootdir}/lib/modules/${kversion}/build
+            ${DESTDIR}${rootdir}/usr/src/linux-${kversion}
+            ${DESTDIR}${rootdir}/usr/src/linux-2.4
+            ${DESTDIR}${rootdir}/usr/src/linux
+            ${DESTDIR}/lib/modules/${kversion}/build
+            ${DESTDIR}/usr/src/linux-${kversion}
+            ${DESTDIR}/usr/src/linux-2.4
+            ${DESTDIR}/usr/src/linux\""
         k_build_search_path=`echo "$k_build_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         linux_cv_k_build=
         for linux_dir in $k_build_search_path ; do
@@ -462,24 +462,24 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 ***
 *** This package does not support headless kernel build.  Install the
 *** appropriate built kernel source package for the target kernel
-*** "$linux_cv_k_release" and then configure again.
+*** "${kversion}" and then configure again.
 *** 
 *** The following directories do no exist in the build environment:
-***     $linux_cv_k_rootdir$linux_cv_k_prefix$linux_cv_k_modules/build
-***     $linux_cv_k_rootdir$linux_cv_k_prefix/lib/modules/$linux_cv_k_release/build
-***     $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux-$linux_cv_k_release
-***     $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux-2.4
-***     $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/linux
-***     $linux_cv_k_rootdir$linux_cv_k_modules/build
-***     $linux_cv_k_rootdir/lib/modules/$linux_cv_k_release/build
-***     $linux_cv_k_rootdir/usr/src/linux-$linux_cv_k_release
-***     $linux_cv_k_rootdir/usr/src/linux-2.4
-***     $linux_cv_k_rootdir/usr/src/linux
+***     ${DESTDIR}${kmoduledir}/build
+***     ${DESTDIR}${rootdir}/lib/modules/${kversion}/build
+***     ${DESTDIR}${rootdir}/usr/src/linux-${kversion}
+***     ${DESTDIR}${rootdir}/usr/src/linux-2.4
+***     ${DESTDIR}${rootdir}/usr/src/linux
+***     ${DESTDIR}${kmoduledir}/build
+***     ${DESTDIR}/lib/modules/${kversion}/build
+***     ${DESTDIR}/usr/src/linux-${kversion}
+***     ${DESTDIR}/usr/src/linux-2.4
+***     ${DESTDIR}/usr/src/linux
 *** 
 *** Check the settings of the following options before repeating:
-***     --with-k-release ${linux_cv_k_release:-no}
-***     --with-k-modules ${linux_cv_k_modules:-no}
-***     --with-k-build   ${linux_cv_k_release:-no}
+***     --with-k-release ${kversion:-no}
+***     --with-k-modules ${kmoduledir:-no}
+***     --with-k-build   ${kversion:-no}
 *** ])
         else
             if ! -d "$linux_cv_k_build" 
@@ -488,15 +488,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 ***
 *** This package does not support headless kernel build.  Install the
 *** appropriate built kernel source package for the target kernel
-*** "$linux_cv_k_release" and then configure again.
+*** "${kversion}" and then configure again.
 *** 
 *** The following directories do not exist in the build environment:
 ***     ${linux_cv_k_build}
 *** 
 *** Check the settings of the following options before repeating:
-***     --with-k-release ${linux_cv_k_release:-no}
-***     --with-k-modules ${linux_cv_k_modules:-no}
-***     --with-k-build   ${linux_cv_k_release:-no}
+***     --with-k-release ${kversion:-no}
+***     --with-k-modules ${kmoduledir:-no}
+***     --with-k-build   ${kversion:-no}
 *** ])
             fi
         fi
@@ -523,12 +523,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [dnl
         linux_cv_k_sysmap="$with_k_sysmap"
     else
         eval "k_sysmap_search_path=\"
-            $linux_cv_k_build/System.map-$linux_cv_k_release
+            $linux_cv_k_build/System.map-${kversion}
             $linux_cv_k_build/System.map
-            $linux_cv_k_rootdir$linux_cv_k_prefix/boot/System.map-$linux_cv_k_release
-            $linux_cv_k_rootdir$linux_cv_k_prefix/boot/System.map
-            $linux_cv_k_rootdir/boot/System.map-$linux_cv_k_release
-            $linux_cv_k_rootdir/boot/System.map\""
+            ${DESTDIR}${rootdir}/boot/System.map-${kversion}
+            ${DESTDIR}${rootdir}/boot/System.map
+            ${DESTDIR}/boot/System.map-${kversion}
+            ${DESTDIR}/boot/System.map\""
         k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         linux_cv_k_sysmap=
         for linux_file in $k_sysmap_search_path ; do
@@ -652,7 +652,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FLAVOR], [dnl
                 linux_cv_k_flavor=kernel.org
                 if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
                 then
-                    case "$linux_cv_k_release" in
+                    case "${kversion}" in
                         *mdk*)
                             linux_cv_k_flavor=Mandrake
                             ;;
@@ -730,7 +730,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
         linux_cv_rh_boot_kernel=no
         if test -r "${linux_cv_k_includes}/linux/rhconfig.h"
         then
-            case "$linux_cv_k_release" in
+            case "${kversion}" in
                 *BOOT)
                     linux_cv_rh_boot_kernel=BOOT
                     ;;

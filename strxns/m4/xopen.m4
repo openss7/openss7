@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/04 08:47:26 $
+dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/02/17 08:05:49 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/02/04 08:47:26 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 08:05:49 $ by $Author: brian $
 dnl
 dnl =============================================================================
 

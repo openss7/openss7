@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/02/03 12:36:22 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/02/17 12:57:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,28 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/03 12:36:22 $ by $Author: brian $
+# Last Modified $Date: 2005/02/17 12:57:23 $ by $Author: brian $
 #
 # =============================================================================
 
-if PUBLIC_RELEASE
-
-rpmdistdir = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
-
-$(rpmdistdir).lsm: $(PACKAGE_TARNAME).lsm
+$(distdir).lsm: $(PACKAGE_TARNAME).lsm
 	cat $< > $@
 
-LSM = $(rpmdistdir).lsm $(PACKAGE_TARNAME).lsm
-
-else
-
-rpmdistdir = $(PACKAGE_TARNAME)-bin-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)
-
-LSM =
-
-endif
-
-distdir = $(rpmdistdir)
+LSM = $(distdir).lsm $(PACKAGE_TARNAME).lsm
 
 EXTRA_DIST += $(LSM)
 

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: init.m4,v 0.9.2.2 2005/02/13 12:15:59 brian Exp $
+dnl @(#) $Id: init.m4,v 0.9.2.3 2005/02/17 08:05:49 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/13 12:15:59 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 08:05:49 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -92,8 +92,7 @@ dnl
     AC_CACHE_CHECK([for init SysV inittab], [init_cv_inittab], [dnl
         init_cv_inittab='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/inittab
-            ${rootdir:-$DESTDIR}/etc/inittab\""
+            ${DESTDIR}${sysconfdir}/inittab\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -f $init_tmp ; then
@@ -102,17 +101,6 @@ dnl
             fi
         done
     ])
-    if test ":${init_cv_inittab:-no}" = :no ; then
-        AC_MSG_WARN([
-**** 
-**** Configure cannot find the inittab.  The location searched was:
-**** 
-****    ${rootdir:-$DESTDIR}${sysconfdir}/inittab
-****    ${rootdir:-$DESTDIR}/etc/inittab
-**** 
-**** This is going to cause problems later.
-**** ])
-    fi
 dnl 
 dnl next check for the initial init script from inittab
 dnl 
@@ -120,7 +108,7 @@ dnl
         init_cv_script='no'
         if test ":$init_cv_inittab" != :no ; then
             init_tmp="$(< $init_cv_inittab | grep -c1 '^si::sysinit:' | sed -e 's|^si::sysinit:||;s|[[[:space:]]].*||')"
-            init_tmp=`echo "${rootdir:-$DESTDIR}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+            init_tmp=`echo "${DESTDIR}${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             if test -f "$init_tmp" ; then
                 init_cv_script="$init_tmp"
             fi
@@ -130,10 +118,8 @@ dnl     fallback is to go looking for it in the usual places
 dnl
         if test ":${init_cv_script:-no}" = :no ; then
             eval "init_search_path=\"
-                ${rootdir:-$DESTDIR}${sysconfdir}/init.d/rcS
-                ${rootdir:-$DESTDIR}/etc/init.d/rcS
-                ${rootdir:-$DESTDIR}${sysconfdir}/rc.d/rc.sysinit
-                ${rootdir:-$DESTDIR}/etc/rc.d/rc.sysinit\""
+                ${DESTDIR}${sysconfdir}/init.d/rcS
+                ${DESTDIR}${sysconfdir}/rc.d/rc.sysinit\""
             init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for init_tmp in $init_search_path ; do
                 if test -f $init_tmp ; then
@@ -146,8 +132,9 @@ dnl
     AC_CACHE_CHECK([for init SysV rcS.d directory], [init_cv_rcs_dir], [dnl
         init_cv_rcs_dir='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/rcS.d
-            ${rootdir:-$DESTDIR}/etc/rcS.d\""
+            ${DESTDIR}${sysconfdir}/rcS.d
+            ${sysconfdir}/rcS.d
+            /etc/rcS.d\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -d $init_tmp ; then
@@ -159,8 +146,7 @@ dnl
     AC_CACHE_CHECK([for init SysV rc.d directory], [init_cv_rc_dir], [dnl
         init_cv_rc_dir='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/rc.d
-            ${rootdir:-$DESTDIR}/etc/rc.d\""
+            ${DESTDIR}${sysconfdir}/rc.d\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -d $init_tmp ; then
@@ -175,8 +161,7 @@ dnl
     AC_CACHE_CHECK([for init SysV rc.modules script], [init_cv_rc_modules], [dnl
         init_cv_rc_modules='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/rc.d/rc.modules
-            ${rootdir:-$DESTDIR}/etc/rc.d/rc.modules\""
+            ${DESTDIR}${sysconfdir}/rc.d/rc.modules\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -f $init_tmp ; then
@@ -191,8 +176,7 @@ dnl
     AC_CACHE_CHECK([for init SysV modules file], [init_cv_modules], [dnl
         init_cv_modules='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/modules
-            ${rootdir:-$DESTDIR}/etc/modules\""
+            ${DESTDIR}${sysconfdir}/modules\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -f $init_tmp ; then
@@ -208,10 +192,8 @@ dnl
     AC_CACHE_CHECK([for init SysV rcX.d directory], [init_cv_rcx_dir], [dnl
         init_cv_rcx_dir='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/rc.d/rc[[S0-6]].d
-            ${rootdir:-$DESTDIR}/etc/rc.d/rc[[S0-6]]3.d
-            ${rootdir:-$DESTDIR}${sysconfdir}/rc[[S0-6]]3.d
-            ${rootdir:-$DESTDIR}/etc/rc[[S0-6]]3.d\""
+            ${DESTDIR}${sysconfdir}/rc.d/rc[[S0-6]].d
+            ${DESTDIR}${sysconfdir}/rc[[S0-6]].d\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -d $init_tmp ; then
@@ -228,10 +210,8 @@ dnl
     AC_CACHE_CHECK([for init SysV init.d directory], [init_cv_initrddir], [dnl
         init_cv_initrddir='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/rc.d/init.d
-            ${rootdir:-$DESTDIR}/etc/rc.d/init.d
-            ${rootdir:-$DESTDIR}${sysconfdir}/init.d
-            ${rootdir:-$DESTDIR}/etc/init.d\""
+            ${DESTDIR}${sysconfdir}/rc.d/init.d
+            ${DESTDIR}${sysconfdir}/init.d\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -d $init_tmp -a ! -L $init_tmp ; then
@@ -246,10 +226,8 @@ dnl
     AC_CACHE_CHECK([for init SysV config directory], [init_cv_configdir], [dnl
         init_cv_configdir='no'
         eval "init_search_path=\"
-            ${rootdir:-$DESTDIR}${sysconfdir}/sysconfig
-            ${rootdir:-$DESTDIR}/etc/sysconfig
-            ${rootdir:-$DESTDIR}${sysconfdir}/default
-            ${rootdir:-$DESTDIR}/etc/default\""
+            ${DESTDIR}${sysconfdir}/sysconfig
+            ${DESTDIR}${sysconfdir}/default\""
         init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         for init_tmp in $init_search_path ; do
             if test -d $init_tmp ; then
@@ -257,14 +235,19 @@ dnl
                 break
             fi
         done
+        if test :${init_cv_configdir:-no} = :no ; then
+            if test :${init_cv_rcs_dir:-no} = :no ; then
+dnl             redhat style
+                init_cv_configdir="${DESTDIR}/${sysconfdir}/sysconfig"
+            else
+dnl             debian style
+                init_cv_configdir="${DESTDIR}/${sysconfdir}/default"
+            fi
+        fi
     ])
     AC_CACHE_CHECK([for init SysV installation], [init_cv_install], [dnl
         init_cv_install='yes'
         test ":${enable_initscripts:-yes}" = :no && init_cv_install='no'
-        test :"${init_cv_initrddir:-no}" = :no && init_cv_install='no'
-        test :"${init_cv_configdir:-no}" = :no && init_cv_install='no'
-dnl     for now
-        test :"${CHKCONFIG:-no}" = :no && init_cv_install='no'
     ])
 ])# _INIT_SCRIPTS_SETUP
 # ===========================================================================
@@ -275,24 +258,37 @@ dnl     for now
 # ---------------------------------------------------------------------------
 AC_DEFUN([_INIT_SCRIPTS_OUTPUT], [dnl
     AM_CONDITIONAL([INSTALL_INITSCRIPTS], [test :"${init_cv_install:-yes}" = :yes])dnl
+    AM_CONDITIONAL([WITH_RCSD_DIRECTORY], [test :${init_cv_rcs_dir:-no} != :no])dnl
 dnl
 dnl initrddir is where we are going to put init scripts
 dnl
     if test :"${init_cv_initrddir:-no}" != :no ; then
-        init_tmp=`echo "${rootdir:-$DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+        init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         initrddir="${init_cv_initrddir#$init_tmp}"
     else
-        initrddir="${sysconfdir}/rc.d/init.d"
+        if test :${init_cv_rcs_dir:-no} = :no ; then
+dnl         redhat style
+            initrddir="${sysconfdir}/rc.d/init.d"
+        else
+dnl         debian style
+            initrddir="${sysconfdir}/init.d"
+        fi
     fi
     AC_SUBST([initrddir])
 dnl
 dnl configdir is where we are going to put init script default files
 dnl
     if test :"$init_cv_configdir:-no}" != :no ; then
-        init_tmp=`echo "${rootdir:-$DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+        init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
         configdir="${init_cv_configdir#$init_dir}"
     else
-        configdir="${sysconfdir}/sysconfig"
+        if test :${init_cv_rcs_dir:-no} = :no ; then
+dnl         redhat style
+            configdir="${sysconfdir}/sysconfig"
+        else
+dnl         debian style
+            configdir="${sysconfdir}/default"
+        fi
     fi
     AC_SUBST([configdir])
 ])# _INIT_SCRIPTS_OUTPUT
