@@ -1,18 +1,70 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/23 08:56:14 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/01/23 08:56:14 $ by $Author: brian $
+#
+# =============================================================================
+
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.2 2004/12/18 10:97:02 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.3 2005/01/23 08:56:14 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7], [0.9.2], [bugs@openss7.org])
 
 # Need to adjust directories if default
 ac_default_prefix='/usr'
-if test :"$sysconfdir" = :'${prefix}/etc' ; then sysconfdir='/etc' ; fi
-if test :"$localstatedir" = :'${prefix}/var' ; then localstatedir='/var' ; fi
-if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; fi
-if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
+if test :"$sysconfdir"    = :'${prefix}/etc'  ; then   sysconfdir='/etc'                 ; fi
+if test :"$localstatedir" = :'${prefix}/var'  ; then localstatdir='/var'                 ; fi
+if test :"$infodir"       = :'${prefix}/info' ; then      infodir='${prefix}/share/info' ; fi
+if test :"$mandir"        = :'${prefix}/man'  ; then       mandir='${prefix}/share/man'  ; fi
 
-AC_CONFIG_SRCDIR([strxns/config.h.in])
+AC_CONFIG_SRCDIR([sctp/config.h.in])
 AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
@@ -23,9 +75,21 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 
+dnl
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
+dnl
+if test :"${USE_MAINTAINER_MODE:-yes}" = :yes 
+then 
+	enable_dependency_tracking='yes'
+fi
+
 AC_GNU_SOURCE
 
-# Checks for programs.
+dnl
+dnl Checks for programs.
+dnl
+AM_PROG_AS
+AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
@@ -39,24 +103,32 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION(0.14.1)
+#AM_GNU_GETTEXT_VERSION(0.14.1)
 
-#
-# Checks for libraries.
-#
-pgk_save_LIBS="$LIBS"
+dnl
+dnl Checks for libraries.
+dnl
+pkg_save_LIBS
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([LiS], [fattach])
+AC_CHECK_LIB([streams], [fattach])
+AC_CHECK_LIB([xnet], [t_open])
+AC_CHECK_LIB([socket], [socket])
 LIBS="$pkg_save_LIBS"
 
-# Checks for header files.
+dnl
+dnl Checks for header files.
+dnl
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h termios.h unistd.h values.h wchar.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
 AC_HEADER_STAT
 AC_HEADER_STDBOOL
 AC_C_CONST
@@ -74,29 +146,29 @@ AC_STRUCT_TM
 AC_C_VOLATILE
 AC_CHECK_TYPES([ptrdiff_t])
 
-#
-# Checks for library functions.
-#
+dnl
+dnl Checks for library functions.
+dnl
+#AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
-AC_FUNC_LSTAT
-AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_FUNC_SELECT_ARGTYPES
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_SETPGRP fi
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
+AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero getcwd gethostbyname gethrtime gettimeofday inet_ntoa localtime_r mempcpy memset munmap nl_langinfo pstat_getdynamic select setlocale socket sqrt stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul uname])
 
-AC_OPENSS7
+AC_OS7
 
-AC_CONFIG_SUBDIRS(LiS strxns strxnet strinet strsctp)
+AC_CONFIG_SUBDIRS([sctp iperf LiS streams strxns strxnet strsctp netperf])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -1,11 +1,10 @@
-# vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/12/17 21:52:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/23 08:56:14 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -36,7 +35,7 @@
 # users).  If the Software is supplied to any unit or agency of the Government
 # other than DoD, it is classified as "Restricted Computer Software" and the
 # Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 # the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 # (or any successor regulations).
 #
@@ -47,74 +46,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/17 21:52:43 $ by $Author: brian $
+# Last Modified $Date: 2005/01/23 08:56:14 $ by $Author: brian $
 #
 # =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.8 dist-bzip2 std-options -Wall
+include am/openss7.am
 
-ACLOCAL_AMFLAGS = -I m4
+RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
+	html-recursive info-recursive install-data-recursive \
+	install-exec-recursive install-info-recursive \
+	install-recursive installcheck-recursive installdirs-recursive \
+	pdf-recursive ps-recursive uninstall-info-recursive \
+	uninstall-recursive
 
-#
-# Accumulate these 'till the end
-#
-INSTALL_EXEC_LOCAL	=
-INSTALL_DATA_LOCAL	=
-UNINSTALL_LOCAL		=
-INSTALL_EXEC_HOOK	=
-INSTALL_DATA_HOOK	=
-UNINSTALL_HOOK		=
-ALL_LOCAL		=
-CLEAN_LOCAL		=
-DISTCLEAN_LOCAL		=
+RECURSIVE_TARGETS += rpms-recursive srpm-recursive sign-recursive resign-recursive rebuild-recursive
 
-#
-# Have the makefile regenerate libtool if necessary
-#
-$(OBJECTS): libtool
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status --recheck
-
-#
-# I use vim, not emacs.  The following triggers Automake 1.8 to include
-# targets for making vim tags files along with emacs TAGS files.
-#
-CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SYMBOL,EXPORT_SYMBOL_NOVERS,EXPORT_SYMBOL_GPL
-
-#
-# A rule to generate an ifnames.log file
-#
-ifnames:
-	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
-
-distclean-logs:
-	rm -f *.log
-
-DISTCLEAN_LOCAL += distclean-logs
-
-install-exec-local: $(INSTALL_EXEC_LOCAL)
-
-install-data-local: $(INSTALL_DATA_LOCAL)
-
-uninstall-local: $(UNINSTALL_LOCAL)
-
-install-exec-hook: $(INSTALL_EXEC_HOOK)
-
-install-data-hook: $(INSTALL_DATA_HOOK)
-
-uninstall-hook: $(UNINSTALL_HOOK)
-
-all-local: $(ALL_LOCAL)
-
-clean-local: $(CLEAN_LOCAL)
-
-distclean-local: $(DISTCLEAN_LOCAL)
-
-SUBDIRS = @subdirs@
-
-#
-# Collected phonys from other automake fragments.
-#
-.PHONY: ifnames distclean-logs
-
-# vim: ft=automake
+SUBDIRS	= @subdirs@
