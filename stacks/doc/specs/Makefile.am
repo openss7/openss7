@@ -1,0 +1,1 @@
+SUBDIRS = tri tci mapi

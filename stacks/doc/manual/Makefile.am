@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/10/12 09:49:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/10/13 01:39:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/12 09:49:06 $ by $Author: brian $
+# Last Modified $Date: 2004/10/13 01:39:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,12 +55,7 @@ info_TEXINFOS		= openss7.texi libxnet.texi
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
 			  releases.texi \
-			  rpm.texi \
-			  texi/args.texi \
-			  texi/fdl.texi \
-			  texi/gpl.texi \
-			  texi/install.texi \
-			  texi/lesser.texi
+			  rpm.texi
 
 include ../../am/info.am
 

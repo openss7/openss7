@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2004/08/31 04:49:04 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2004/10/13 01:49:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/31 04:49:04 $ by $Author: brian $
+# Last Modified $Date: 2004/10/13 01:49:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -854,12 +854,16 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.35  2004/08/31 04:49:04  brian
-# - Avoid empty macro body error on extrainfo.
+# Revision 0.9.2.36  2004/10/13 01:49:05  brian
+# - Updates spec changelogs.
 #
-# Revision 0.9.2.3  2004/08/31 04:49:04  brian
-# - Avoid empty macro body error on extrainfo.
+# Revision 0.9.2.4  2004/10/13 01:49:05  brian
+# - Updates spec changelogs.
 #
+
+* Tue Aug 31 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.3  2004/08/31 04:49:04  brian
+- Avoid empty macro body error on extrainfo.
 
 * Sun Aug 22 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.2  2004/08/22 07:28:53  brian

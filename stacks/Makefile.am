@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/31 09:17:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/10/13 01:39:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/31 09:17:39 $ by $Author: brian $
+# Last Modified $Date: 2004/10/13 01:39:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -835,7 +835,16 @@ EXTRA_DOCS = \
 	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
 	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
 
-EXTRA_DIST			= $(ss7_source_FILES) $(EXTRA_DOCS)
+EXTRA_TEX = \
+	scripts/texinfo.cnf \
+	scripts/texi/args.texi.in \
+	scripts/texi/fdl.texi \
+	scripts/texi/gpl.texi \
+	scripts/texi/install.texi \
+	scripts/texi/lesser.texi
+
+
+EXTRA_DIST			= $(ss7_source_FILES) $(EXTRA_DOCS) $(EXTRA_TEX)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			=
 
