@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/03/17 14:28:55 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/03/23 12:34:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/17 14:28:55 $ by $Author: brian $
+# Last Modified $Date: 2005/03/23 12:34:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -335,8 +335,16 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 # syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
 # properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
-    arg=
-    args=`echo " $ac_configure_args " | sed -r -e 's| (.)?--enable-maintainer-mode(.)? | |g;s| (.)?--enable-dependency-tracking(.)? | |g'`
+    args="$ac_configure_args"
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-maintainer-mode(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-dependency-tracking(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-modules(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-tools(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-arch(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-indep(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--with(out)?-lis(=[[^[:space:]]]*)?(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--with(out)?-lfs(=[[^[:space:]]]*)?(.)? , ,g;s,^ *,,;s, *$,,'`
+    args=`echo " $args " | sed -r -e 's, (.)?--with(out)?-k-release(=[[^[:space:]]]*)?(.)? , ,g;s,^ *,,;s, *$,,'`
     for arg_part in $args ; do
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
 	    if test -n "$arg" ; then
