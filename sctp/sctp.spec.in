@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/03/09 12:14:21 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/15 10:41:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 12:14:21 $ by $Author: brian $
+# Last Modified $Date: 2005/03/15 10:41:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,7 +85,7 @@
 %global infofiles   %{name}
 #global initfiles
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56].*$|0|;s|^2\.4.*$|1|')
+%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
 %global have_initfiles %{?initfiles:1}%{!?initfiles:0}
 %global have_libraries %{?libraries:1}%{!?libraries:0}
 %global have_preloads %{?preloads:1}%{!?preloads:0}
@@ -892,30 +892,40 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.35  2005/03/09 12:14:21  brian
-# - Corrected problematic conditionals.
+# Revision 0.9.2.36  2005/03/15 10:41:50  brian
+# - Updated changelog and a few inconsistencies.
 #
-# Revision 1.35  2005/03/09 12:14:21  brian
-# - Corrected problematic conditionals.
+# Revision 1.36  2005/03/15 10:41:50  brian
+# - Updated changelog and a few inconsistencies.
 #
-# Revision 1.34  2005/03/09 08:00:23  brian
-# - Updated revision numbering.
-#
-# Revision 1.33  2005/03/09 03:40:47  brian
-# - Major revision number changes.
-#
-# Revision 1.32  2005/03/08 10:52:58  brian
-# - Correction to modules and tools in spec files.
-#
-# Revision 1.31  2005/03/07 06:09:26  brian
-# - More spec changes for 2.6.
-#
-# Revision 1.30  2005/02/25 10:56:40  brian
-# - Don't specify build architecture.
-#
-# Revision 1.29  2005/02/22 08:32:03  brian
-# - spec changes for updated makefile fragments
-#
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.35  2005/03/09 12:14:21  brian
+- Corrected problematic conditionals.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.34  2005/03/09 08:00:23  brian
+- Updated revision numbering.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.33  2005/03/09 03:40:47  brian
+- Major revision number changes.
+
+* Tue Mar  8 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.32  2005/03/08 10:52:58  brian
+- Correction to modules and tools in spec files.
+
+* Mon Mar  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.31  2005/03/07 06:09:26  brian
+- More spec changes for 2.6.
+
+* Fri Feb 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.30  2005/02/25 10:56:40  brian
+- Don't specify build architecture.
+
+* Tue Feb 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.29  2005/02/22 08:32:03  brian
+- spec changes for updated makefile fragments
 
 * Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.28  2005/02/19 12:06:51  brian

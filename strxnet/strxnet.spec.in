@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/03/09 12:14:24 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/03/15 10:41:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 12:14:24 $ by $Author: brian $
+# Last Modified $Date: 2005/03/15 10:41:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,7 +89,7 @@
 %global infofiles   %{name} libxnet
 #global initfiles
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56].*$|0|;s|^2\.4.*$|1|')
+%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
 %global have_initfiles %{?initfiles:1}%{!?initfiles:0}
 %global have_libraries %{?libraries:1}%{!?libraries:0}
 %global have_preloads %{?preloads:1}%{!?preloads:0}
@@ -138,7 +138,7 @@
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
-%global _strvers 2:2.16.18
+%global _strvers 0:2.18.1
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
@@ -1015,27 +1015,37 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.71  2005/03/09 12:14:24  brian
-# - Corrected problematic conditionals.
+# Revision 0.9.2.72  2005/03/15 10:41:51  brian
+# - Updated changelog and a few inconsistencies.
 #
-# Revision 0.9.2.70  2005/03/09 08:00:24  brian
-# - Updated revision numbering.
-#
-# Revision 0.9.2.69  2005/03/09 03:40:48  brian
-# - Major revision number changes.
-#
-# Revision 0.9.2.68  2005/03/08 10:52:59  brian
-# - Correction to modules and tools in spec files.
-#
-# Revision 0.9.2.67  2005/03/07 06:09:27  brian
-# - More spec changes for 2.6.
-#
-# Revision 0.9.2.66  2005/02/25 10:56:41  brian
-# - Don't specify build architecture.
-#
-# Revision 0.9.2.65  2005/02/22 08:32:04  brian
-# - spec changes for updated makefile fragments
-#
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.71  2005/03/09 12:14:24  brian
+- Corrected problematic conditionals.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.70  2005/03/09 08:00:24  brian
+- Updated revision numbering.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.69  2005/03/09 03:40:48  brian
+- Major revision number changes.
+
+* Tue Mar  8 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.68  2005/03/08 10:52:59  brian
+- Correction to modules and tools in spec files.
+
+* Mon Mar  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.67  2005/03/07 06:09:27  brian
+- More spec changes for 2.6.
+
+* Fri Feb 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.66  2005/02/25 10:56:41  brian
+- Don't specify build architecture.
+
+* Tue Feb 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.65  2005/02/22 08:32:04  brian
+- spec changes for updated makefile fragments
 
 * Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.64  2005/02/19 12:06:52  brian

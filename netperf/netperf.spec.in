@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2005/03/09 08:00:23 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2005/03/15 10:41:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 08:00:23 $ by $Author: brian $
+# Last Modified $Date: 2005/03/15 10:41:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -101,7 +101,7 @@
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
-%global _strvers 2:2.16.18
+%global _strvers 0:2.18.1
 %global _conflict streams
 %endif
 
@@ -366,18 +366,25 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.13  2005/03/09 08:00:23  brian
-# - Updated revision numbering.
+# Revision 1.1.2.14  2005/03/15 10:41:49  brian
+# - Updated changelog and a few inconsistencies.
 #
-# Revision 1.1.2.12  2005/03/09 03:40:47  brian
-# - Major revision number changes.
-#
-# Revision 1.1.2.11  2005/02/25 10:56:40  brian
-# - Don't specify build architecture.
-#
-# Revision 1.1.2.10  2005/02/22 08:32:03  brian
-# - spec changes for updated makefile fragments
-#
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.13  2005/03/09 08:00:23  brian
+- Updated revision numbering.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.12  2005/03/09 03:40:47  brian
+- Major revision number changes.
+
+* Fri Feb 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.11  2005/02/25 10:56:40  brian
+- Don't specify build architecture.
+
+* Tue Feb 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.10  2005/02/22 08:32:03  brian
+- spec changes for updated makefile fragments
 
 * Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.9  2005/02/19 12:06:51  brian

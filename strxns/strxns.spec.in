@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/09 12:14:25 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/03/15 10:41:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 12:14:25 $ by $Author: brian $
+# Last Modified $Date: 2005/03/15 10:41:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -138,7 +138,7 @@
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
-%global _strvers 2:2.16.18
+%global _strvers 0:2.18.1
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
@@ -1013,30 +1013,41 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.51  2005/03/09 12:14:25  brian
-# - Corrected problematic conditionals.
+# Revision 0.9.2.52  2005/03/15 10:41:51  brian
+# - Updated changelog and a few inconsistencies.
 #
-# Revision 0.9.2.50  2005/03/09 08:00:25  brian
-# - Updated revision numbering.
-#
-# Revision 0.9.2.49  2005/03/09 03:40:48  brian
-# - Major revision number changes.
-#
-# Revision 0.9.2.48  2005/03/08 19:32:13  brian
-# - Changes for new build compile.
-#
-# Revision 0.9.2.47  2005/03/08 10:52:59  brian
-# - Correction to modules and tools in spec files.
-#
-# Revision 0.9.2.46  2005/03/07 06:09:27  brian
-# - More spec changes for 2.6.
-#
-# Revision 0.9.2.45  2005/02/25 10:56:41  brian
-# - Don't specify build architecture.
-#
-# Revision 0.9.2.44  2005/02/22 08:32:04  brian
-# - spec changes for updated makefile fragments
-#
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.51  2005/03/09 12:14:25  brian
+- Corrected problematic conditionals.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.50  2005/03/09 08:00:25  brian
+- Updated revision numbering.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.49  2005/03/09 03:40:48  brian
+- Major revision number changes.
+
+* Tue Mar  8 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.48  2005/03/08 19:32:13  brian
+- Changes for new build compile.
+
+* Tue Mar  8 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.47  2005/03/08 10:52:59  brian
+- Correction to modules and tools in spec files.
+
+* Mon Mar  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.46  2005/03/07 06:09:27  brian
+- More spec changes for 2.6.
+
+* Fri Feb 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.45  2005/02/25 10:56:41  brian
+- Don't specify build architecture.
+
+* Tue Feb 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.44  2005/02/22 08:32:04  brian
+- spec changes for updated makefile fragments
 
 * Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.43  2005/02/19 12:06:53  brian

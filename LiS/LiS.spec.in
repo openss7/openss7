@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/14 01:22:12 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/03/15 10:41:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 01:22:12 $ by $Author: brian $
+# Last Modified $Date: 2005/03/15 10:41:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,9 +85,9 @@
 %global libraries   LiS
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
 %global infofiles   %{name}
-%global initfiles   strace streams strerr
+%global initfiles   streams
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56].*$|0|;s|^2\.4.*$|1|')
+%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
 %global have_initfiles %{?initfiles:1}%{!?initfiles:0}
 %global have_libraries %{?libraries:1}%{!?libraries:0}
 %global have_preloads %{?preloads:1}%{!?preloads:0}
@@ -147,7 +147,7 @@ ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm
 ExclusiveOs:    Linux
 #Source:         ftp://ftp.gcom.com/pub/linux/src/%{name}/%{name}-%{version}.tgz
 #Source:         %{name}-%{version}.tar.bz2
-Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 %if %{?buildroot: 0}%{!?buildroot: 1}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
 %endif
@@ -748,8 +748,7 @@ Release:        %{fullrelease}
 # ---------------------------------------------------------------------------
 %description lib
 The %{name}-lib package contains the run-time shared libraries necessary to
-run applications programs developed for %{title}.  In addition, it
-contains a user-space implementation of the STREAMS subsystem.
+run applications programs developed for %{title}.
 
 %if %{have_libraries}
 %pre lib
@@ -1040,33 +1039,46 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.2  2005/03/14 01:22:12  brian
-# - Added init scripts.
+# Revision 1.1.6.3  2005/03/15 10:41:49  brian
+# - Updated changelog and a few inconsistencies.
 #
-# Revision 1.1.6.1  2005/03/09 23:13:43  brian
-# - First stab at autoconf'ed 2.18.0.  Results of merge.
-#
-# Revision 1.1.4.81  2005/03/09 12:14:21  brian
-# - Corrected problematic conditionals.
-#
-# Revision 1.1.4.80  2005/03/09 08:00:22  brian
-# - Updated revision numbering.
-#
-# Revision 1.1.4.79  2005/03/09 03:40:46  brian
-# - Major revision number changes.
-#
-# Revision 1.1.4.78  2005/03/08 10:52:57  brian
-# - Correction to modules and tools in spec files.
-#
-# Revision 1.1.4.77  2005/03/07 06:09:26  brian
-# - More spec changes for 2.6.
-#
-# Revision 1.1.4.76  2005/02/25 10:56:39  brian
-# - Don't specify build architecture.
-#
-# Revision 1.1.4.75  2005/02/22 08:32:02  brian
-# - spec changes for updated makefile fragments
-#
+
+* Mon Mar 14 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.2  2005/03/14 01:22:12  brian
+- Added init scripts.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.1  2005/03/09 23:13:43  brian
+- First stab at autoconf'ed 2.18.0.  Results of merge.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.81  2005/03/09 12:14:21  brian
+- Corrected problematic conditionals.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.80  2005/03/09 08:00:22  brian
+- Updated revision numbering.
+
+* Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.79  2005/03/09 03:40:46  brian
+- Major revision number changes.
+
+* Tue Mar  8 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.78  2005/03/08 10:52:57  brian
+- Correction to modules and tools in spec files.
+
+* Mon Mar  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.77  2005/03/07 06:09:26  brian
+- More spec changes for 2.6.
+
+* Fri Feb 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.76  2005/02/25 10:56:39  brian
+- Don't specify build architecture.
+
+* Tue Feb 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.4.75  2005/02/22 08:32:02  brian
+- spec changes for updated makefile fragments
+
 
 * Sat Feb 19 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.4.74  2005/02/19 12:06:51  brian
