@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 20:15:33 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:28 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:28 $";
 
 //#define __NO_VERSION__
 
@@ -84,7 +84,6 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "strsched.h"		/* for allocsd */
 #include "strreg.h"		/* for spec_open() */
 #include "strlookup.h"		/* for cmin_get() */
@@ -98,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/10 20:15:33 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:28 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -188,10 +187,8 @@ struct streamtab str_info = {
  */
 static int check_stream_io(struct file *file, struct stdata *sd)
 {
-	if (unlikely(file == NULL))
-		return (-EBADF);
-	if (unlikely(sd == NULL))
-		return (-ENOSTR);
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -210,10 +207,10 @@ static int check_stream_io(struct file *file, struct stdata *sd)
  */
 static int check_stream_rd(struct file *file, struct stdata *sd)
 {
-	if (unlikely(file == NULL || !(file->f_mode & FREAD)))
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
+	if (!(file->f_mode & FREAD))
 		return (-EBADF);
-	if (unlikely(sd == NULL))
-		return (-ENOSTR);
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -245,10 +242,10 @@ static int check_stream_rd(struct file *file, struct stdata *sd)
  */
 static int check_stream_wr(struct file *file, struct stdata *sd)
 {
-	if (unlikely(file == NULL || !(file->f_mode & FWRITE)))
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
+	if (!(file->f_mode & FWRITE))
 		return (-EBADF);
-	if (unlikely(sd == NULL))
-		return (-ENOSTR);
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -290,10 +287,8 @@ static int check_stream_wr(struct file *file, struct stdata *sd)
  */
 static int check_stream_oc(struct file *file, struct stdata *sd)
 {
-	if (unlikely(file == NULL))
-		return (-EBADF);
-	if (unlikely(sd == NULL))
-		return (-ENOSTR);
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -328,6 +323,8 @@ static int check_stream_oc(struct file *file, struct stdata *sd)
  */
 static int check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
 {
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -356,6 +353,8 @@ static int check_wakeup_io(struct file *file, struct stdata *sd, long *timeo)
  */
 static int check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
 {
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -391,6 +390,8 @@ static int check_wakeup_rd(struct file *file, struct stdata *sd, long *timeo)
  */
 static int check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
 {
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -434,6 +435,8 @@ static int check_wakeup_wr(struct file *file, struct stdata *sd, long *timeo)
  */
 static int check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
 {
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (unlikely(sd->sd_flag & (STPLEX | STRCLOSE | STRHUP | STRDERR | STWRERR))) {
 		if (unlikely(test_bit(STPLEX_BIT, &sd->sd_flag)))
 			return (-EINVAL);
@@ -475,6 +478,8 @@ static int check_wakeup_oc(struct file *file, struct stdata *sd, long *timeo)
 static int strwaitband(struct file *file, struct stdata *sd, int band, long *timeo)
 {
 	int err = 0;
+	ensure(file, return(-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if (!bcanputnext(sd->sd_wq, band)) {
 		/* wait for band to become available */
 		DECLARE_WAITQUEUE(wait, current);
@@ -502,6 +507,7 @@ static int strwaitband(struct file *file, struct stdata *sd, int band, long *tim
  */
 static mblk_t *strgetq(struct stdata *sd, int flags, int band)
 {
+	ensure(sd, return (NULL));
 	if (flags == MSG_HIPRI) {
 		/* M_PCPROTO is the only high priority messsage on the queue and there can only be
 		   one of them. (And we do not expect another...) */
@@ -553,6 +559,8 @@ static mblk_t *strgetq(struct stdata *sd, int flags, int band)
 static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int band)
 {
 	mblk_t *mp;
+	ensure(file, return (NULL));
+	ensure(sd, return (NULL));
 	/* maybe we'll get lucky... */
 	/* also we must make an attempt before returning ENXIO, EPIPE or rderror */
 	if ((mp = strgetq(sd, flags, band)))
@@ -584,6 +592,8 @@ static mblk_t *strwaitgmsg(struct file *file, struct stdata *sd, int flags, int 
  */
 static void strwakeopen(struct file *file, struct stdata *sd)
 {
+	ensure(file, return);
+	ensure(sd, return);
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	/* wake up anybody waiting on open bit */
@@ -600,6 +610,8 @@ static int strwaitopen(struct file *file, struct stdata *sd)
 {
 	int err = 0;
 	int locked, frozen;
+	ensure(file, return (-EBADF));
+	ensure(sd, return (-ENOSTR));
 	if ((err = check_stream_oc(file, sd)) == 0 &&
 	    ((locked = test_and_set_bit(STWOPEN_BIT, &sd->sd_flag)) ||
 	     (frozen = test_bit(STFROZEN_BIT, &sd->sd_flag)))) {
@@ -742,7 +754,7 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 				if (!(dp = allocb(len, BPRI_HI)))
 					goto ioc_error;
 				dp->b_datap->db_type = M_DATA;
-				bcopy(ptr, dp->b_wptr, len);
+				__copy_from_user(dp->b_wptr, ptr, len);
 				dp->b_wptr += len;
 			} else {
 				if ((err = verify_area(VERIFY_WRITE, ptr, len)))
@@ -753,7 +765,7 @@ static int strsendioctl(struct file *file, int cmd, cred_t *crp, mblk_t *dp, siz
 				err = -EMSGSIZE;
 				if (dp->b_wptr < dp->b_rptr + len)
 					goto ioc_error;
-				bcopy(dp->b_rptr, ptr, len);
+				__copy_to_user(ptr, dp->b_rptr, len);
 			}
 			ioc->copyresp.cp_rval = (caddr_t) 0;
 			continue;
@@ -801,6 +813,7 @@ static int str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, 
 	unsigned long flags;
 	int err = 0;
 	queue_t *q = sd->sd_rq;
+	trace();
 	qrlock(q, &flags);
 	switch (arg) {
 	case ANYMARK:
@@ -832,6 +845,7 @@ static int str_i_atmark(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err = -EINVAL;
+	trace();
 	if (arg < 256 || arg == ANYBAND)
 		if (!(err = check_stream_wr(file, sd)))
 			return (bcanput(sd->sd_wq, arg) ? 1 : 0);
@@ -848,8 +862,9 @@ static int str_i_canput(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_ckband(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err = -EINVAL;
+	trace();
 	if (arg < 256 || arg == ANYBAND)
-		if (!(err = check_stream_rd(file, sd)) || (err == -ENXIO) || (err = -EPIPE))
+		if (!(err = check_stream_io(file, sd)))
 			return (bcanget(sd->sd_rq, arg) ? 1 : 0);
 	return (err);
 }
@@ -865,57 +880,59 @@ static int str_i_fdinsert(struct file *file, struct stdata *sd, unsigned int cmd
 {
 	int err = 0;
 	mblk_t *mp;
-	struct strfdinsert *fdi = (typeof(fdi)) arg;
+	struct strfdinsert fdi, *valp = (typeof(valp)) arg;
 	struct stdata *sd2;
 	struct file *f2;
-	if ((err = verify_area(VERIFY_READ, fdi, sizeof(*fdi))) < 0)
+	trace();
+	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))) < 0)
 		goto exit;
+	__copy_from_user(&fdi, valp, sizeof(fdi));
 	if ((err = check_stream_wr(file, sd)) < 0)
 		goto exit;
-	if (fdi->offset < 0 || fdi->ctlbuf.len < fdi->offset + sizeof(queue_t *) ||
-	    (fdi->flags != 0 && fdi->flags != RS_HIPRI))
+	if (fdi.offset < 0 || fdi.ctlbuf.len < fdi.offset + sizeof(queue_t *) ||
+	    (fdi.flags != 0 && fdi.flags != RS_HIPRI))
 		goto einval;
-	if ((err = verify_area(VERIFY_READ, fdi->ctlbuf.buf, fdi->ctlbuf.len)) < 0)
+	if ((err = verify_area(VERIFY_READ, fdi.ctlbuf.buf, fdi.ctlbuf.len)) < 0)
 		goto einval;
-	if (fdi->databuf.len <= 0)
+	if (fdi.databuf.len <= 0)
 		goto no_databuf;
-	if ((err = verify_area(VERIFY_READ, fdi->databuf.buf, fdi->databuf.len)) < 0)
+	if ((err = verify_area(VERIFY_READ, fdi.databuf.buf, fdi.databuf.len)) < 0)
 		goto einval;
       no_databuf:
-	if (fdi->ctlbuf.len > sysctl_str_strctlsz)
+	if (fdi.ctlbuf.len > sysctl_str_strctlsz)
 		goto erange;
 	{
 		long timeo;
-		if (fdi->databuf.len >= 0) {
+		if (fdi.databuf.len >= 0) {
 			queue_t *wq;
-			if (fdi->databuf.len > sysctl_str_strmsgsz)
+			if (fdi.databuf.len > sysctl_str_strmsgsz)
 				goto erange;
 			wq = sd->sd_wq->q_next;
-			if (wq->q_minpsz > fdi->databuf.len || fdi->databuf.len > wq->q_maxpsz)
+			if (wq->q_minpsz > fdi.databuf.len || fdi.databuf.len > wq->q_maxpsz)
 				goto erange;
 		}
-		if (!(f2 = fget(fdi->fildes)))
+		if (!(f2 = fget(fdi.fildes)))
 			goto einval;
 		if (!(sd2 = stri_lookup(f2)))
 			goto put_einval;
 		timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 		if ((err = strwaitband(file, stri_lookup(file), 0, &timeo)) < 0)
 			goto put_exit;
-		if (!(mp = allocb(fdi->ctlbuf.len, BPRI_MED)))
+		if (!(mp = allocb(fdi.ctlbuf.len, BPRI_MED)))
 			goto enosr;
-		mp->b_datap->db_type = (fdi->flags == RS_HIPRI) ? M_PCPROTO : M_PROTO;
-		if (fdi->databuf.len >= 0) {
+		mp->b_datap->db_type = (fdi.flags == RS_HIPRI) ? M_PCPROTO : M_PROTO;
+		if (fdi.databuf.len >= 0) {
 			mblk_t *dp;
-			if (!(dp = allocb(fdi->databuf.len, BPRI_MED)))
+			if (!(dp = allocb(fdi.databuf.len, BPRI_MED)))
 				goto free_enosr;
 			dp->b_datap->db_type = M_DATA;
-			bcopy(fdi->databuf.buf, dp->b_wptr, fdi->databuf.len);
-			dp->b_wptr += fdi->databuf.len;
+			__copy_from_user(dp->b_wptr, fdi.databuf.buf, fdi.databuf.len);
+			dp->b_wptr += fdi.databuf.len;
 			linkb(mp, dp);
 		}
-		bcopy(fdi->ctlbuf.buf, mp->b_wptr, fdi->ctlbuf.len);
-		mp->b_wptr += fdi->ctlbuf.len;
-		bcopy(&sd2->sd_rq, mp->b_rptr + fdi->offset, sizeof(sd2->sd_rq));
+		__copy_from_user(mp->b_wptr, fdi.ctlbuf.buf, fdi.ctlbuf.len);
+		mp->b_wptr += fdi.ctlbuf.len;
+		bcopy(&sd2->sd_rq, mp->b_rptr + fdi.offset, sizeof(sd2->sd_rq));
 		putnext(sd->sd_wq, mp);
 	}
       put_exit:
@@ -950,6 +967,7 @@ static int str_i_find(struct file *file, struct stdata *sd, unsigned int cmd, un
 	const char *name = (typeof(name)) arg;
 	queue_t *wq;
 	int err;
+	trace();
 	err = -EFAULT;
 	if (strnlen_user(name, FMNAMESZ + 1)) {
 		err = 0;
@@ -976,18 +994,20 @@ static int str_i_flushband(struct file *file, struct stdata *sd, unsigned int cm
 {
 	int err;
 	mblk_t *mp;
-	struct bandinfo *bi = (struct bandinfo *) arg;
-	if ((err = verify_area(VERIFY_READ, bi, sizeof(*bi))))
+	struct bandinfo bi, *valp = (struct bandinfo *) arg;
+	trace();
+	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		return (err);
-	if (bi->bi_flag & ~(FLUSHR | FLUSHW | FLUSHRW))
+	__copy_from_user(&bi, valp, sizeof(bi));
+	if (bi.bi_flag & ~(FLUSHR | FLUSHW | FLUSHRW))
 		return (-EINVAL);
 	if ((err = check_stream_io(file, sd)))
 		return (err);
 	if (!(mp = allocb(2, BPRI_MED)))
 		return (-ENOSR);
 	mp->b_datap->db_type = M_FLUSH;
-	*mp->b_wptr++ = bi->bi_flag | FLUSHBAND;
-	*mp->b_wptr++ = bi->bi_pri;
+	*mp->b_wptr++ = bi.bi_flag | FLUSHBAND;
+	*mp->b_wptr++ = bi.bi_pri;
 	mp->b_flag |= MSGNOLOOP;
 	putnext(sd->sd_wq, mp);
 	return (0);
@@ -1004,6 +1024,7 @@ static int str_i_flush(struct file *file, struct stdata *sd, unsigned int cmd, u
 {
 	int err;
 	mblk_t *mp;
+	trace();
 	if (arg & ~(FLUSHR | FLUSHW | FLUSHRW))
 		return (-EINVAL);
 	if ((err = check_stream_io(file, sd)))
@@ -1029,9 +1050,10 @@ static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd,
 	unsigned long flags;
 	int err;
 	int *valp = (int *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
-	if ((err = check_stream_rd(file, sd)) && (err != -ENXIO) && (err != -EPIPE))
+	if ((err = check_stream_io(file, sd)))
 		return (err);
 	qrlock(sd->sd_rq, &flags);
 	do {
@@ -1043,7 +1065,7 @@ static int str_i_getband(struct file *file, struct stdata *sd, unsigned int cmd,
 	qrunlock(sd->sd_rq, &flags);
 	if (err == -ENODATA)
 		return (err);
-	bcopy(&err, valp, sizeof(*valp));
+	__copy_to_user(valp, &err, sizeof(*valp));
 	return (0);
 }
 
@@ -1059,12 +1081,13 @@ static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cm
 {
 	int err;
 	long closetime, *valp = (long *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
 	if ((err = check_stream_wr(file, sd)))
 		return (err);
 	closetime = sd->sd_closetime;
-	bcopy(&closetime, valp, sizeof(*valp));
+	__copy_to_user(valp, &closetime, sizeof(*valp));
 	return (0);
 }
 
@@ -1080,11 +1103,12 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
 {
 	int err;
 	long closetime, *valp = (long *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		return (err);
 	if ((err = check_stream_io(file, sd)))
 		return (err);
-	bcopy(valp, &closetime, sizeof(*valp));
+	__copy_from_user(&closetime, valp, sizeof(*valp));
 	sd->sd_closetime = closetime;
 	return (0);
 }
@@ -1099,12 +1123,13 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
 static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, flags, *valp = (int *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
 	if ((err = check_stream_io(file, sd)))
 		return (err);
 	flags = sd->sd_sigflags;
-	bcopy(&flags, valp, sizeof(*valp));
+	__copy_to_user(valp, &flags, sizeof(*valp));
 	return (0);
 }
 
@@ -1118,6 +1143,7 @@ static int str_i_getsig(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+	trace();
 	if ((err = check_stream_io(file, sd)))
 		return (err);
 	sd->sd_sigflags = arg;
@@ -1134,12 +1160,13 @@ static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, rdopt, *valp = (int *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
-	if ((err = check_stream_rd(file, sd)) && (err != -ENXIO) && (err != -EPIPE))
+	if ((err = check_stream_io(file, sd)))
 		return (err);
 	rdopt = sd->sd_rdopt & RPROTMASK;
-	bcopy(&rdopt, valp, sizeof(*valp));
+	__copy_to_user(valp, &rdopt, sizeof(*valp));
 	return (0);
 }
 
@@ -1153,12 +1180,13 @@ static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, mode, prot;
+	trace();
 	mode = arg & (RNORM | RMSGD | RMSGN);
 	prot = arg & (RPROTNORM | RPROTDAT | RPROTDIS);
 	if ((arg & ~(RPROTMASK)) || (mode != RNORM && mode != RMSGD && mode != RMSGN)
 	    || (prot != RPROTNORM && prot != RPROTDAT && prot != RPROTDIS))
 		return (-EINVAL);
-	if ((err = check_stream_rd(file, sd)) && (err != -ENXIO) && (err != -EPIPE))
+	if ((err = check_stream_io(file, sd)))
 		return (err);
 	sd->sd_rdopt = arg;
 	return (0);
@@ -1174,12 +1202,13 @@ static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, wropt, *valp = (int *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
 	if ((err = check_stream_wr(file, sd)) < 0)
 		return (err);
 	wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD);
-	bcopy(&wropt, valp, sizeof(*valp));
+	__copy_to_user(valp, &wropt, sizeof(*valp));
 	return (0);
 }
 
@@ -1193,6 +1222,7 @@ static int str_i_gwropt(struct file *file, struct stdata *sd, unsigned int cmd, 
 static int str_i_swropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+	trace();
 	if ((arg & ~(SNDZERO | SNDPIPE | SNDHOLD)))
 		return (-EINVAL);
 	if ((err = check_stream_wr(file, sd)) < 0)
@@ -1220,6 +1250,7 @@ static int str_send_link_ioctl(struct file *file, int cmd, cred_t *crp, queue_t 
 	int err, rval;
 	struct linkblk *lbp;
 	mblk_t *mp;
+	trace();
 	err = -ENOSR;
 	if (!(mp = allocb(sizeof(*lbp), BPRI_MED)))
 		goto error;
@@ -1254,6 +1285,7 @@ static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, u
 	struct linkblk *l;
 	queue_t *qtop, *qbot;
 	int index;
+	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
 	err = -EINVAL;
@@ -1324,6 +1356,7 @@ static int str_i_link(struct file *file, struct stdata *sd, unsigned int cmd, un
  */
 static int str_i_plink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
+	trace();
 	return str_i_xlink(file, sd, cmd, arg);
 }
 
@@ -1339,6 +1372,7 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
 	struct stdata **sdp;
 	int err;
 	long index = arg;
+	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
 	sdp = (cmd == I_UNLINK) ? &sd->sd_links : &sd->sd_cdevsw->d_plinks;
@@ -1393,6 +1427,7 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int str_i_unlink(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
+	trace();
 	return str_i_xunlink(file, sd, cmd, arg);
 }
 
@@ -1418,22 +1453,27 @@ static int str_i_punlink(struct file *file, struct stdata *sd, unsigned int cmd,
 static int str_i_list(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, nmods, i;
-	struct str_list *sl = (struct str_list *) arg;
+	struct str_list sl, *valp = (struct str_list *) arg;
 	struct str_mlist *sm;
 	struct queue **qp;
+	char fmname[FMNAMESZ + 1];
+	trace();
 	nmods = sd->sd_pushcnt + 1;
-	if (sl == NULL)
+	if (valp == NULL)
 		/* return number of modules and drivers */
 		return (nmods);
-	if ((err = verify_area(VERIFY_WRITE, sl, sizeof(*sl))) < 0)
+	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
-	nmods = sl->sl_nmods < nmods ? sl->sl_nmods : nmods;
-	if (nmods < 0 || (sm = sl->sl_modlist) == NULL)
+	__copy_from_user(&sl, valp, sizeof(sl));
+	nmods = sl.sl_nmods < nmods ? sl.sl_nmods : nmods;
+	if (nmods < 0 || (sm = sl.sl_modlist) == NULL)
 		return (-EINVAL);
 	if ((err = verify_area(VERIFY_WRITE, sm, sizeof(*sm) * nmods)) < 0)
 		return (err);
-	for (qp = &sd->sd_wq->q_next, i = 0; *qp && i < nmods; qp = &(*qp)->q_next, i++, sm++)
-		snprintf(sm->l_name, FMNAMESZ + 1, (*qp)->q_qinfo->qi_minfo->mi_idname);
+	for (qp = &sd->sd_wq->q_next, i = 0; *qp && i < nmods; qp = &(*qp)->q_next, i++, sm++) {
+		snprintf(fmname, FMNAMESZ + 1, (*qp)->q_qinfo->qi_minfo->mi_idname);
+		__copy_to_user(sm->l_name, fmname, FMNAMESZ + 1);
+	}
 	return (0);
 }
 
@@ -1448,14 +1488,16 @@ static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, un
 {
 	int err = 0;
 	queue_t *q;
-	char *name = (char *) arg;
-	if ((err = verify_area(VERIFY_WRITE, (void *) arg, FMNAMESZ + 1)))
+	char fmname[FMNAMESZ + 1], *valp = (char *) arg;
+	trace();
+	if ((err = verify_area(VERIFY_WRITE, valp, FMNAMESZ + 1)))
 		goto exit;
 	srlock(sd);
 	err = -EINVAL;
 	if (!(q = sd->sd_wq->q_next) || !SAMESTR(sd->sd_wq))
 		goto unlock_exit;
-	snprintf(name, FMNAMESZ + 1, q->q_qinfo->qi_minfo->mi_idname);
+	snprintf(fmname, FMNAMESZ + 1, q->q_qinfo->qi_minfo->mi_idname);
+	__copy_to_user(valp, fmname, FMNAMESZ + 1);
 	return (err);
       unlock_exit:
 	srunlock(sd);
@@ -1474,15 +1516,16 @@ static int str_i_nread(struct file *file, struct stdata *sd, unsigned int cmd, u
 {
 	unsigned long flags;
 	int err, bytes, *valp = (int *) arg;
-	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0 ||
-	    ((err = check_stream_rd(file, sd)) && err != ENXIO && err != -EPIPE))
+	trace();
+	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
+		goto exit;
+	if ((err = check_stream_io(file, sd)))
 		goto exit;
 	qrlock(sd->sd_rq, &flags);
 	err = qsize(sd->sd_rq);
-	if (sd->sd_rq->q_first)
-		bytes = msgdsize(sd->sd_rq->q_first);
+	bytes = msgdsize(sd->sd_rq->q_first);
 	qrunlock(sd->sd_rq, &flags);
-	bcopy(&bytes, valp, sizeof(*valp));
+	__copy_to_user(valp, &bytes, sizeof(bytes));
       exit:
 	return (err);
 }
@@ -1498,33 +1541,32 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 {
 	unsigned long flags;
 	int err, rtn = 0;
-	struct strpeek *sp;
-	int cmax, dmax;
+	struct strpeek sp, *valp = (struct strpeek *) arg;
 	queue_t *q = sd->sd_rq;
-	caddr_t cbuf, dbuf;
-	if (!(sp = (struct strpeek *) arg))
+	trace();
+	if (!valp)
 		return (-EINVAL);
-	if ((err = verify_area(VERIFY_WRITE, sp, sizeof(*sp))) < 0)
+	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
-	cmax = sp->ctlbuf.maxlen;
-	dmax = sp->databuf.maxlen;
-	cbuf = sp->ctlbuf.buf;
-	dbuf = sp->databuf.buf;
-	if (cmax < 0 || dmax < 0 || (cmax && !cbuf) || (dmax && !dbuf))
+	__copy_from_user(&sp, valp, sizeof(sp));
+	if (sp.ctlbuf.maxlen < 0 || sp.databuf.maxlen < 0 || (sp.ctlbuf.maxlen && !sp.ctlbuf.buf)
+	    || (sp.databuf.maxlen && !sp.databuf.buf))
 		return (-EINVAL);
-	if (cmax && (err = verify_area(VERIFY_WRITE, cbuf, cmax)) < 0)
+	if (sp.ctlbuf.maxlen
+	    && (err = verify_area(VERIFY_WRITE, sp.ctlbuf.buf, sp.ctlbuf.maxlen)) < 0)
 		return (err);
-	if (dmax && (err = verify_area(VERIFY_WRITE, dbuf, dmax)) < 0)
+	if (sp.databuf.maxlen
+	    && (err = verify_area(VERIFY_WRITE, sp.databuf.buf, sp.databuf.maxlen)) < 0)
 		return (err);
 	/* all areas verified, check readable */
-	if ((err = check_stream_rd(file, sd)) && err != -ENXIO && err != -EPIPE)
+	if ((err = check_stream_io(file, sd)))
 		return (err);
 	qrlock(q, &flags);
 	do {
 		mblk_t *mp, *dp;
 		ssize_t blen;
-		ssize_t clen = sp->ctlbuf.maxlen;
-		ssize_t dlen = sp->databuf.maxlen;
+		ssize_t clen = sp.ctlbuf.maxlen;
+		ssize_t dlen = sp.databuf.maxlen;
 		ssize_t davail, cavail;
 		if (!(mp = q->q_first)) {
 			err = 0;
@@ -1533,9 +1575,9 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 		}
 		davail = msgdsize(mp);	/* M_DATA blocks */
 		cavail = msgsize(mp) - davail;	/* isddatablks - M_DATA blocks */
-		sp->flags = mp->b_datap->db_type > QPCTL ? RS_HIPRI : 0;
-		sp->ctlbuf.len = 0;
-		sp->databuf.len = 0;
+		sp.flags = mp->b_datap->db_type > QPCTL ? RS_HIPRI : 0;
+		sp.ctlbuf.len = 0;
+		sp.databuf.len = 0;
 		for (dp = mp; dp; dp = dp->b_cont) {
 			if ((blen = dp->b_wptr - dp->b_rptr) <= 0)
 				continue;
@@ -1544,26 +1586,26 @@ static int str_i_peek(struct file *file, struct stdata *sd, unsigned int cmd, un
 				if (dlen == -1)
 					break;
 				if (blen > dlen) {
-					bcopy(dp->b_rptr, sp->databuf.buf + sp->databuf.len, dlen);
-					sp->databuf.len += dlen;
+					__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr, dlen);
+					sp.databuf.len += dlen;
 					dlen = 0;
 					break;
 				}
-				bcopy(dp->b_rptr, sp->databuf.buf + sp->databuf.len, blen);
-				sp->databuf.len += blen;
+				__copy_to_user(sp.databuf.buf + sp.databuf.len, dp->b_rptr, blen);
+				sp.databuf.len += blen;
 				dlen -= blen;
 			} else {
 				/* goes in ctrl part */
 				if (clen == -1)
 					break;
 				if (blen > clen) {
-					bcopy(dp->b_rptr, sp->ctlbuf.buf + sp->ctlbuf.len, clen);
-					sp->ctlbuf.len += clen;
+					__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr, clen);
+					sp.ctlbuf.len += clen;
 					clen = 0;
 					break;
 				}
-				bcopy(dp->b_rptr, sp->ctlbuf.buf + sp->ctlbuf.len, blen);
-				sp->ctlbuf.len += blen;
+				__copy_to_user(sp.ctlbuf.buf + sp.ctlbuf.len, dp->b_rptr, blen);
+				sp.ctlbuf.len += blen;
 				clen -= blen;
 			}
 		}
@@ -1586,12 +1628,12 @@ static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, un
 {
 	int err;
 	char name[FMNAMESZ + 1];
-	dev_t dev;
+	dev_t dev = sd->sd_dev;
+	trace();
 	if ((err = strncpy_from_user(name, (const char *) arg, FMNAMESZ + 1)) < 0)
 		goto error;
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
-	dev = sd->sd_file->f_dentry->d_inode->i_ino;	/* FIXME: must be a better way */
 	if ((err = qpush(sd, name, &dev, make_oflag(file), current_creds)) < 0)
 		goto error;
       error:
@@ -1608,10 +1650,9 @@ static int str_i_push(struct file *file, struct stdata *sd, unsigned int cmd, un
 static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
-	dev_t dev;
+	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
-	dev = sd->sd_file->f_dentry->d_inode->i_ino;	/* FIXME: must be a better way */
 	if ((err = qpop(sd, make_oflag(file), current_creds)) < 0)
 		goto error;
       error:
@@ -1625,6 +1666,7 @@ static int str_i_pop(struct file *file, struct stdata *sd, unsigned int cmd, uns
 static void freefd_func(caddr_t arg)
 {
 	struct file *file = (struct file *) arg;
+	trace();
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
 	fput(file);
@@ -1644,6 +1686,7 @@ static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, 
 	struct file *f2;
 	mblk_t *mp;
 	queue_t *rq;
+	trace();
 	if (!(f2 = fget(arg)))
 		goto ebadf;
 	srlock(sd);
@@ -1684,13 +1727,14 @@ static int str_i_sendfd(struct file *file, struct stdata *sd, unsigned int cmd, 
  */
 static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
-	struct strrecvfd *sr;
+	struct strrecvfd sr, *valp = (struct strrecvfd *) arg;
 	mblk_t *mp;
 	int fd, err;
 	struct file *f2;
-	if ((sr = (struct strrecvfd *) arg) == NULL)
+	trace();
+	if (!valp)
 		goto einval;
-	if ((err = verify_area(VERIFY_WRITE, sr, sizeof(*sr))) < 0)
+	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		goto error;
 	/* yes, we return ENXIO on hangup */
 	if ((err = check_stream_io(file, sd)) < 0)
@@ -1708,9 +1752,10 @@ static int str_i_recvfd(struct file *file, struct stdata *sd, unsigned int cmd, 
 	/* we need to do another get because an fput will be done when the mblk is freed */
 	get_file(f2);
 	fd_install(fd, f2);
-	sr->fd = fd;
-	sr->uid = f2->f_uid;
-	sr->gid = f2->f_gid;
+	sr.fd = fd;
+	sr.uid = f2->f_uid;
+	sr.gid = f2->f_gid;
+	__copy_to_user(valp, &sr, sizeof(sr));
 	freemsg(mp);
 	return (0);
       ebadmsg:
@@ -1744,22 +1789,24 @@ static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, uns
 {
 	int err, rval = 0;
 	mblk_t *mp;
-	struct strioctl *ic = (typeof(ic)) arg;
+	struct strioctl ic, *valp = (typeof(valp)) arg;
+	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
-	if ((err = verify_area(VERIFY_READ, ic, sizeof(*ic))) < 0)
+	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))) < 0)
 		goto error;
-	if ((err = verify_area(VERIFY_READ, ic->ic_dp, ic->ic_len)) < 0)
+	__copy_from_user(&ic, valp, sizeof(*valp));
+	if ((err = verify_area(VERIFY_READ, ic.ic_dp, ic.ic_len)) < 0)
 		goto error;
 	err = -ENOSR;
-	if (!(mp = allocb(ic->ic_len, BPRI_MED)))
+	if (!(mp = allocb(ic.ic_len, BPRI_MED)))
 		goto error;
-	bcopy(ic->ic_dp, mp->b_wptr, ic->ic_len);
-	mp->b_wptr += ic->ic_len;
+	__copy_from_user(mp->b_wptr, ic.ic_dp, ic.ic_len);
+	mp->b_wptr += ic.ic_len;
 	{
 		long timeo = (file->f_flags & (O_NONBLOCK | O_NDELAY)) ? 0 : MAX_SCHEDULE_TIMEOUT;
-		timeo = ic->ic_timout == -1 ? timeo : drv_msectohz(ic->ic_timout);
-		err = strsendioctl(file, I_STR, current_creds, mp, ic->ic_len, &timeo, &rval);
+		timeo = ic.ic_timout == -1 ? timeo : drv_msectohz(ic.ic_timout);
+		err = strsendioctl(file, I_STR, current_creds, mp, ic.ic_len, &timeo, &rval);
 	}
 	if (err < 0)
 		goto error;
@@ -1778,12 +1825,13 @@ static int str_i_str(struct file *file, struct stdata *sd, unsigned int cmd, uns
 static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err, eropt, *valp = (int *) arg;
+	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 		return (err);
 	if ((err = check_stream_io(file, sd)) < 0)
 		return (err);
 	eropt = sd->sd_eropt & (RERRNONPERSIST | WERRNONPERSIST);
-	bcopy(&eropt, valp, sizeof(*valp));
+	__copy_to_user(valp, &eropt, sizeof(*valp));
 	return (0);
 }
 
@@ -1797,6 +1845,7 @@ static int str_i_gerropt(struct file *file, struct stdata *sd, unsigned int cmd,
 static int str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+	trace();
 	if ((arg & ~(RERRNONPERSIST | WERRNONPERSIST)))
 		return (-EINVAL);
 	if ((err = check_stream_io(file, sd)) < 0)
@@ -1815,6 +1864,7 @@ static int str_i_serropt(struct file *file, struct stdata *sd, unsigned int cmd,
 static int str_i_anchor(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
+	trace();
 	if ((err = check_stream_io(file, sd)) < 0)
 		return (err);
 	sd->sd_nanchor = sd->sd_pushcnt;
@@ -1833,6 +1883,7 @@ static int str_i_transparent(struct file *file, struct stdata *sd, unsigned int 
 {
 	int err, rval;
 	mblk_t *mp;
+	trace();
 	err = -ENOSR;
 	if (!(mp = allocb(sizeof(arg), BPRI_MED)))
 		goto error;
@@ -1957,7 +2008,7 @@ int stropen(struct inode *inode, struct file *file)
 			freeq(q);
 			return (-ENOSR);
 		}
-		printd(("%s: initializing stream head for %s\n", __FUNCTION__, cdev->d_name));
+		printd(("%s: initializing stream head %p for %s\n", __FUNCTION__, sd, cdev->d_name));
 		/* initialization of the stream head */
 		sd->sd_dev = dev;
 		sd->sd_flag = STWOPEN;	/* hold open bit */
@@ -1996,22 +2047,26 @@ int stropen(struct inode *inode, struct file *file)
 		printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 		cdrv_put(cdev);
 	} else {
+		printd(("%s: waiting on open of stream head %p\n", __FUNCTION__, sd));
 		if ((err = strwaitopen(file, sd)))
 			goto sdput_exit;
+		printd(("%s: holding existing stream head %p\n", __FUNCTION__, sd));
 	}
 	/* here we hold the STWOPEN bit - stream head open must clear */
-	printd(("%s: calling qopen for stream head\n", __FUNCTION__));
+	printd(("%s: calling qopen for stream head %p\n", __FUNCTION__, sd));
 	dev = sd->sd_dev;
 	if ((err = qopen(sd->sd_rq, &sd->sd_dev, make_oflag(file), sflag, current_creds)))
 		goto wakeup_exit;
-	printd(("%s: qopen call for stream head successful\n", __FUNCTION__));
+	printd(("%s: qopen call for stream head %p successful\n", __FUNCTION__, sd));
 	sd->sd_opens++;
 	sd->sd_readers += (file->f_mode & FREAD) ? 1 : 0;
 	sd->sd_writers += (file->f_mode & FWRITE) ? 1 : 0;
 	if (!file->private_data && dev != sd->sd_dev) {
+		printd(("%s: changing inode\n", __FUNCTION__));
 		/* inode needs to change - select a new one */
 		inode = iget(file->f_vfsmnt->mnt_sb, sd->sd_dev);
 	} else {
+		printd(("%s: using current inode\n", __FUNCTION__));
 		/* current inode is ok - hold it while stream head attached */
 		igrab(inode);
 	}
@@ -2127,7 +2182,7 @@ int strclose(struct inode *inode, struct file *file)
 			}
 		}
 	      put_exit:
-		printd(("%s: putting stream head%p\n", __FUNCTION__, sd));
+		printd(("%s: putting stream head %p\n", __FUNCTION__, sd));
 		sd_put(sd);	/* could be final put */
 		return (err);
 	}
@@ -2315,16 +2370,17 @@ ssize_t strread(struct file *file, char *buf, size_t len, loff_t *ppos)
 	   32-bit kernel because the pointers cannot be properly converted. */
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		int err;
-		struct strpmsg *sg = (typeof(sg)) buf;
-		if ((err = verify_area(VERIFY_WRITE, buf, sizeof(*sg))) < 0)
+		struct strpmsg sg, *valp = (struct strpmsg *) buf;
+		if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))) < 0)
 			goto error;
-		if (sg->ctlbuf.maxlen > 0
-		    && (err = verify_area(VERIFY_WRITE, sg->ctlbuf.buf, sg->ctlbuf.maxlen)) < 0)
+		__copy_from_user(&sg, valp, sizeof(sg));
+		if (sg.ctlbuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg.ctlbuf.buf, sg.ctlbuf.maxlen)) < 0)
 			goto error;
-		if (sg->databuf.maxlen > 0
-		    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
+		if (sg.databuf.maxlen > 0
+		    && (err = verify_area(VERIFY_WRITE, sg.databuf.buf, sg.databuf.maxlen)) < 0)
 			goto error;
-		return strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
+		return strgetpmsg(file, &sg.ctlbuf, &sg.databuf, &sg.band, &sg.flags);
 	      error:
 		return (err);
 	}
@@ -2427,16 +2483,17 @@ ssize_t strwrite(struct file *file, const char *buf, size_t len, loff_t *ppos)
 	   32-bit kernel because the pointers cannot be properly converted. */
 	if (len == LFS_GETMSG_PUTMSG_ULEN) {
 		int err;
-		struct strpmsg *sp = (typeof(sp)) buf;
-		if ((err = verify_area(VERIFY_READ, buf, sizeof(*sp))))
+		struct strpmsg sp, *valp = (struct strpmsg *) buf;
+		if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 			goto error;
-		if (sp->ctlbuf.len > 0
-		    && (err = verify_area(VERIFY_READ, sp->ctlbuf.buf, sp->ctlbuf.len)) < 0)
+		__copy_from_user(&sp, valp, sizeof(sp));
+		if (sp.ctlbuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp.ctlbuf.buf, sp.ctlbuf.len)) < 0)
 			goto error;
-		if (sp->databuf.len > 0
-		    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
+		if (sp.databuf.len > 0
+		    && (err = verify_area(VERIFY_READ, sp.databuf.buf, sp.databuf.len)) < 0)
 			goto error;
-		return strputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
+		return strputpmsg(file, &sp.ctlbuf, &sp.databuf, sp.band, sp.flags);
 	      error:
 		return (err);
 	}
@@ -2804,17 +2861,18 @@ EXPORT_SYMBOL_GPL(strgetpmsg);
 static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
-	struct strpmsg *sp = (typeof(sp)) arg;
+	struct strpmsg sp, *valp = (struct strpmsg *) arg;
 	/* verify all areas */
-	if ((err = verify_area(VERIFY_READ, sp, sizeof(*sp))))
+	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		goto error;
-	if (sp->ctlbuf.len > 0
-	    && (err = verify_area(VERIFY_READ, sp->ctlbuf.buf, sp->ctlbuf.len)) < 0)
+	__copy_from_user(&sp, valp, sizeof(sp));
+	if (sp.ctlbuf.len > 0
+	    && (err = verify_area(VERIFY_READ, sp.ctlbuf.buf, sp.ctlbuf.len)) < 0)
 		goto error;
-	if (sp->databuf.len > 0
-	    && (err = verify_area(VERIFY_READ, sp->databuf.buf, sp->databuf.len)) < 0)
+	if (sp.databuf.len > 0
+	    && (err = verify_area(VERIFY_READ, sp.databuf.buf, sp.databuf.len)) < 0)
 		goto error;
-	return strputpmsg(file, &sp->ctlbuf, &sp->databuf, sp->band, sp->flags);
+	return strputpmsg(file, &sp.ctlbuf, &sp.databuf, sp.band, sp.flags);
       error:
 	return (err);
 }
@@ -2829,17 +2887,18 @@ static int str_i_putpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
 static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
 	int err;
-	struct strpmsg *sg = (typeof(sg)) arg;
+	struct strpmsg sg, *valp = (struct strpmsg *) arg;
 	/* verify all areas */
-	if ((err = verify_area(VERIFY_WRITE, sg, sizeof(*sg))))
+	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		goto error;
-	if (sg->ctlbuf.maxlen > 0
-	    && (err = verify_area(VERIFY_WRITE, sg->ctlbuf.buf, sg->ctlbuf.maxlen)) < 0)
+	__copy_from_user(&sg, valp, sizeof(sg));
+	if (sg.ctlbuf.maxlen > 0
+	    && (err = verify_area(VERIFY_WRITE, sg.ctlbuf.buf, sg.ctlbuf.maxlen)) < 0)
 		goto error;
-	if (sg->databuf.maxlen > 0
-	    && (err = verify_area(VERIFY_WRITE, sg->databuf.buf, sg->databuf.maxlen)) < 0)
+	if (sg.databuf.maxlen > 0
+	    && (err = verify_area(VERIFY_WRITE, sg.databuf.buf, sg.databuf.maxlen)) < 0)
 		goto error;
-	return strgetpmsg(file, &sg->ctlbuf, &sg->databuf, &sg->band, &sg->flags);
+	return strgetpmsg(file, &sg.ctlbuf, &sg.databuf, &sg.band, &sg.flags);
       error:
 	return (err);
 }
@@ -2939,6 +2998,7 @@ int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned 
 	struct stdata *sd = stri_lookup(file);
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	(void) size;
+	trace();
 	switch (cmd) {
 	case FIOGETOWN:
 	case FIOSETOWN:

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/06/10 20:15:30 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/06/12 23:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/06/10 20:15:30 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/06/12 23:20:20 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2004/06/10 20:15:30 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2004/06/12 23:20:20 $";
 
 #define __NO_VERSION__
 
@@ -88,7 +88,6 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "sth.h"		/* for stream operations */
 #include "strlookup.h"		/* cdevsw_list, etc. */
 #include "strspecfs.h"		/* for specfs_get and specfs_put */

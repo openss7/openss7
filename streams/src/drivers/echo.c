@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:33 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/12 23:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:33 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:33 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/12 23:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:33 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/12 23:20:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/06/01 12:04:33 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/12 23:20:09 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -127,6 +127,7 @@ static struct module_info echo_minfo = {
 static int echo_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
+	trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -191,22 +192,33 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct echo *p, **pp = &echo_list;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
-	if (q->q_ptr != NULL)
+	ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor, sflag));
+	if (q->q_ptr != NULL) {
+		printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
-	if (sflag == MODOPEN || WR(q)->q_next)
+	}
+	if (sflag == MODOPEN || WR(q)->q_next) {
+		printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
-	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
+	}
+	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	{ /* we could sleep */
+		printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
+	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
+		printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
-		if (cminor < 1)
+		printd(("%s: driver open\n", __FUNCTION__));
+		if (cminor < 1) {
+			printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
+		}
 		spin_lock(&echo_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
 		for (; *pp && dmajor == getmajor((*pp)->dev) &&
@@ -217,12 +229,14 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			if (cminor == dminor && sflag != CLONEOPEN) {
 				spin_unlock(&echo_lock);
 				kmem_free(p, sizeof(*p));
+				pswerr(("%s: stream already open!\n", __FUNCTION__));
 				return (EIO);	/* bad error */
 			}
 		}
 		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&echo_lock);
 			kmem_free(p, sizeof(*p));
+			printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -232,16 +246,21 @@ static int echo_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		*pp = p;
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&echo_lock);
+		printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
+	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
 static int echo_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct echo *p;
-	if ((p = q->q_ptr) == NULL)
+	trace();
+	if ((p = q->q_ptr) == NULL) {
+		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
+	}
 	spin_lock(&echo_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
@@ -249,6 +268,7 @@ static int echo_close(queue_t *q, int oflag, cred_t *crp)
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
 	spin_unlock(&echo_lock);
+	printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 

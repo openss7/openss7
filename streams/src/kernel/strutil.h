@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/12 23:20:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -270,18 +270,24 @@ static __inline__ void slockinit(struct stdata *sd)
 }
 static __inline__ void hrlock(queue_t *rq)
 {
+	trace();
+	ensure(rq, return);
 	srlock(((struct queinfo *) rq)->qu_str);
 }
 static __inline__ void hrunlock(queue_t *rq)
 {
+	trace();
+	ensure(rq, return);
 	srunlock(((struct queinfo *) rq)->qu_str);
 }
 static __inline__ void hwlock(queue_t *rq, unsigned long *flagsp)
 {
+	trace();
 	swlock(((struct queinfo *) rq)->qu_str, flagsp);
 }
 static __inline__ void hwunlock(queue_t *rq, unsigned long *flagsp)
 {
+	trace();
 	swunlock(((struct queinfo *) rq)->qu_str, flagsp);
 }
 static __inline__ void __hwlock(queue_t *rq)
@@ -296,12 +302,14 @@ static __inline__ void __hwunlock(queue_t *rq)
 /* queue band gets and puts */
 static __inline__ qband_t *bget(qband_t *qb)
 {
+	struct qbinfo *qbi;
 	if (qb) {
-		struct qbinfo *qbi = (typeof(qbi)) qb;
+		qbi = (typeof(qbi)) qb;
 		if (atomic_read(&qbi->qbi_refs) < 1)
 			swerr();
 		atomic_inc(&qbi->qbi_refs);
-	}
+	} else
+		swerr();
 	return (qb);
 }
 static __inline__ void bput(qband_t **bp)
@@ -309,31 +317,50 @@ static __inline__ void bput(qband_t **bp)
 	qband_t *qb;
 	if ((qb = xchg(bp, NULL))) {
 		struct qbinfo *qbi = (typeof(qbi)) qb;
-		if (atomic_dec_and_test(&qbi->qbi_refs))
-			freeqb(qb);
-	}
+		if (atomic_read(&qbi->qbi_refs) >= 1) {
+			if (atomic_dec_and_test(&qbi->qbi_refs))
+				freeqb(qb);
+		} else
+			swerr();
+	} else
+		swerr();
 }
 
 /* queue gets and puts */
 static __inline__ queue_t *qget(queue_t *q)
 {
+	struct queinfo *qu;
+	ptrace(("%s: getting queue %p\n", __FUNCTION__, q));
 	if (q) {
-		struct queinfo *qu = (typeof(qu)) RD(q);
+		qu = (typeof(qu)) RD(q);
 		if (atomic_read(&qu->qu_refs) < 1)
 			swerr();
 		atomic_inc(&qu->qu_refs);
-	}
+		printd(("%s: queue %p count is now %d\n", __FUNCTION__, qu,
+			atomic_read(&qu->qu_refs)));
+	} else
+		swerr();
 	return (q);
 }
 static __inline__ void qput(queue_t **qp)
 {
 	queue_t *q;
+	ptrace(("%s: putting queue %p\n", __FUNCTION__, *qp));
+	ensure(qp, return);
 	if ((q = xchg(qp, NULL))) {
 		queue_t *rq = RD(q);
 		struct queinfo *qu = (typeof(qu)) rq;
-		if (atomic_dec_and_test(&qu->qu_refs))
-			freeq(rq);
-	}
+		if (atomic_read(&qu->qu_refs) >= 1) {
+			if (atomic_dec_and_test(&qu->qu_refs)) {
+				printd(("%s: queue %p is being freed\n", __FUNCTION__, qu));
+				freeq(rq);
+			} else
+				printd(("%s: queue %p count is now %d\n", __FUNCTION__, qu,
+					atomic_read(&qu->qu_refs)));
+		} else
+			swerr();
+	} else
+		swerr();
 }
 
 /* 

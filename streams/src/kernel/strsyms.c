@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/06 09:47:53 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/12 23:20:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/06 09:47:53 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/06 09:47:53 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/12 23:20:21 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/06 09:47:53 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/12 23:20:21 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -118,7 +118,6 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "strsched.h"
 #include "strreg.h"
 #include "sth.h"		/* for str_minfo */

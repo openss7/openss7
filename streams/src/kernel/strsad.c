@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/12 23:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/10 01:10:21 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/12 23:20:20 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/06/10 01:10:21 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/12 23:20:20 $";
 
 #define __NO_VERSION__
 
@@ -77,7 +77,6 @@ static char const ident[] =
 #include <sys/sad.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "strsched.h"		/* for ap_alloc/ap_put */
 #include "strsad.h"		/* extern verification */
 

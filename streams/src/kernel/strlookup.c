@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/12 23:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/10 01:10:21 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/12 23:20:20 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/10 01:10:21 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/12 23:20:20 $";
 
 #define __NO_VERSION__
 
@@ -87,7 +87,6 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "sth.h"		/* for stream operations */
 #include "strspecfs.h"		/* for specfs_get and specfs_put */
 #include "strlookup.h"		/* extern verification */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/09 08:43:44 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:43:44 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/09 08:43:44 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:20 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/09 08:43:44 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:20:20 $";
 
 #define __NO_VERSION__
 
@@ -75,7 +75,6 @@ static char const ident[] =
 #include <sys/strsubr.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "strlookup.h"
 #include "strsched.h"
 #include "strprocfs.h"		/* extern verification */
@@ -565,7 +564,7 @@ static int get_streams_strinfo_list(char *page, char **start, off_t offset, int 
 	}
 }
 
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 static int get_streams_stdata_hdr(char *page, ssize_t maxlen)
 {
 	int len = 0;
@@ -1392,7 +1391,7 @@ int strprocfs_init(void)
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
 #endif
 	create_proc_info_entry("strinfo", 0444, proc_str, get_streams_strinfo_list);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 #if 0
 	create_proc_info_entry("cdevsw", 0444, proc_str, get_streams_cdevsw_list);
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
@@ -1421,7 +1420,7 @@ void strprocfs_exit(void)
 	remove_proc_entry("fmodsw", proc_str);
 #endif
 	remove_proc_entry("strinfo", proc_str);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 #if 0
 	remove_proc_entry("cdevsw", proc_str);
 	remove_proc_entry("fmodsw", proc_str);

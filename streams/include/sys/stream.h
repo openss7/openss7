@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.21 2004/06/09 08:43:41 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.22 2004/06/12 23:19:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/09 08:43:41 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:19:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/09 08:43:41 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/12 23:19:15 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -101,6 +101,8 @@ typedef unsigned long __streams_dev_t;
 #ifndef __GENKSYMS__
 #include "sys/streams/modversions.h"
 #endif
+
+#include <sys/strdebug.h>	/* for debugging assertions */
 
 #include <sys/dki.h>		/* for cred_t */
 /* caller should have already included this, but make sure */
@@ -1122,6 +1124,7 @@ __EXTERN_INLINE queue_t *WR(queue_t *q)
 __EXTERN_INLINE queue_t *backq(queue_t *q)
 {
 	struct queue *bq;
+	ensure(q, return (NULL));
 	return ((bq = OTHERQ(q)->q_next) ? OTHERQ(bq) : NULL);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.4 2004/05/29 08:28:06 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.5 2004/06/12 23:19:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:06 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:19:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/29 08:28:06 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/12 23:19:15 $"
 
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
@@ -127,6 +127,31 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define   fixme(__pks)		__fixme(__pks)
 #define    todo(__pks)		__todo(__pks)
 #define  printd(__pks)		__printd(__pks)
+#define   swerr()		__swerr()
+#define  pswerr(__pks)		__pswerr(__pks)
+
+#elif defined(CONFIG_STREAMS_TEST)
+
+#define STATIC static
+#define INLINE inline
+
+#define   never()		__never()
+#define    rare()		__rare()
+#define  seldom()		__seldom()
+#define   usual(__exp)		__usual(__exp)
+#define unusual(__exp)		__usual(!(__exp))
+#define  normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__noemal(!(__exp))
+#define  assert(__exp)		__assert(__exp)
+#define  assure(__exp)		__assure(__exp)
+#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define  unless(__exp,__sta)	__unless(__exp,__sta)
+#define   trace()		do { } while(0)
+#define  ptrace(__pks)		do { } while(0)
+#define  ctrace(__fnc)		(__fnc)
+#define   fixme(__pks)		__fixme(__pks)
+#define    todo(__pks)		__todo(__pks)
+#define  printd(__pks)		do { } while(0)
 #define   swerr()		__swerr()
 #define  pswerr(__pks)		__pswerr(__pks)
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -88,11 +88,10 @@ static char const ident[] =
 #endif
 
 #include "sys/config.h"
-#include "strdebug.h"
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/10 20:15:30 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/12 23:20:21 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1498,7 +1497,7 @@ STATIC struct super_block *specfs_read_super(struct super_block *sb, void *data,
 	return (NULL);
 }
 
-STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
+STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE | FS_LITTER);
 
 STATIC struct vfsmount *specfs_mnt = NULL;
 STATIC spinlock_t specfs_lock = SPIN_LOCK_UNLOCKED;

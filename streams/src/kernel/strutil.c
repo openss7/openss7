@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/12 23:20:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:21 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/12 23:20:21 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/10 01:10:21 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/12 23:20:21 $";
 
 #define __NO_VERSION__
 
@@ -89,7 +89,6 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "strsched.h"		/* for current_context() */
@@ -718,12 +717,21 @@ __EXTERN_INLINE queue_t *backq(queue_t *q);
  */
 void qbackenable(queue_t *q)
 {
+	queue_t *qp;
+	ptrace(("%s; back-enabling queue %p\n", __FUNCTION__, q));
+	ensure(q, return);
+	ptrace(("%s; locking queue %p\n", __FUNCTION__, q));
 	hrlock(q);		/* read lock queue chain */
-	for (q = backq(q); q; q = backq(q))
-		if (q->q_qinfo->qi_srvp) {
-			enableq(q);	/* normal enable */
+	for (qp = backq(q); qp; qp = backq(qp)) {
+		ensure(qp->q_qinfo, continue);
+		ptrace(("%s; checking queue %p for service procedure\n", __FUNCTION__, qp));
+		if (qp->q_qinfo->qi_srvp) {
+			ptrace(("%s; found queue to enable %p\n", __FUNCTION__, qp));
+			enableq(qp);	/* normal enable */
 			break;
 		}
+	}
+	ptrace(("%s; unlocking queue %p\n", __FUNCTION__, q));
 	hrunlock(q);
 	return;
 }
@@ -923,7 +931,7 @@ int canget(queue_t *q)
 	result = __canget(q);
 	qrunlock(q, &flags);
 	if (result & 2)
-		qbackenable(q);
+		ctrace(qbackenable(q));
 	return (result & 1);
 }
 
@@ -1106,7 +1114,7 @@ void flushband(queue_t *q, int band, int flag)
 	backenable = __flushband(q, flag, band, &mpp);
 	qwunlock(q, &flags);
 	if (backenable)
-		qbackenable(q);
+		ctrace(qbackenable(q));
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	mb();
@@ -1222,11 +1230,12 @@ mblk_t *getq(queue_t *q)
 	mblk_t *mp;
 	unsigned long flags;
 	int backenable = 0;
+	ensure(q, return (NULL));
 	qwlock(q, &flags);
 	mp = __getq(q, &backenable);
 	qwunlock(q, &flags);
 	if (backenable)
-		qbackenable(q);
+		ctrace(qbackenable(q));
 	return (mp);
 }
 
@@ -1295,7 +1304,7 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		nmp->b_prev->b_next = nmp;
 	nmp->b_next = emp;
 	emp->b_prev = nmp;
-	nmp->b_queue = qget(q);
+	nmp->b_queue = ctrace(qget(q));
 	/* some adding to do */
 	q->q_msgs++;
 	if (!qb) {
@@ -1479,7 +1488,7 @@ static int __putbq(queue_t *q, mblk_t *mp)
 			if (!q->q_pctl)
 				q->q_pctl = mp;
 		}
-		mp->b_queue = qget(q);
+		mp->b_queue = ctrace(qget(q));
 		/* pull queue head */
 		if (q->q_first == fmp) {
 			q->q_first = mp;
@@ -1500,7 +1509,7 @@ static int __putbq(queue_t *q, mblk_t *mp)
 		if ((mp->b_next = q->q_first))
 			mp->b_next->b_prev = mp;
 		mp->b_prev = NULL;
-		mp->b_queue = qget(q);
+		mp->b_queue = ctrace(qget(q));
 		mp->b_bandp = NULL;
 		mp->b_band = 0;
 		q->q_first = mp;
@@ -1640,7 +1649,7 @@ int __putq(queue_t *q, mblk_t *mp)
 		if ((mp->b_next = q->q_first))
 			mp->b_next->b_prev = mp;
 		mp->b_prev = NULL;
-		mp->b_queue = qget(q);
+		mp->b_queue = ctrace(qget(q));
 		mp->b_bandp = NULL;
 		mp->b_band = 0;
 		q->q_first = mp;
@@ -1675,7 +1684,7 @@ int __putq(queue_t *q, mblk_t *mp)
 			if (q->q_pctl == lmp)
 				q->q_pctl = mp;
 		}
-		mp->b_queue = qget(q);
+		mp->b_queue = ctrace(qget(q));
 		/* push queue tail */
 		if (q->q_last == lmp) {
 			q->q_last = mp;
@@ -1822,7 +1831,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 	qprocsoff(q);		/* doesn't alter anything if procs still turned off */
 	qdelete(q);		/* remove half insert */
       freeq_error:
-	qput(&q);
+	ctrace(qput(&q));
       error:
 	return (err);
 }
@@ -1872,10 +1881,11 @@ void qdelete(queue_t *q)
 	ptrace(("%s: deleting queue from stream\n", __FUNCTION__));
 	wq = rq + 1;
 	swlock(sd, &flags);
-	qput(&rq->q_next);
-	qput(&wq->q_next);
+	ctrace(qput(&rq->q_next));
+	ctrace(qput(&wq->q_next));
 	qu->qu_str = NULL;
 	swunlock(sd, &flags);
+	ctrace(qput(&q));
 	sd_put(sd);
 }
 
@@ -1934,11 +1944,11 @@ void qinsert(queue_t *brq, queue_t *irq)
 	ptrace(("%s: half insert of queue pair under stream head\n", __FUNCTION__));
 	hwlock(brq, &flags);
 	iqu->qu_str = sd_get(bqu->qu_str);
-	irq->q_next = qget(brq);
+	irq->q_next = ctrace(qget(brq));
 	if (bwq->q_next != brq) {	/* not a fifo */
-		iwq->q_next = qget(bwq->q_next);
+		iwq->q_next = ctrace(qget(bwq->q_next));
 	} else {		/* is a fifo */
-		iwq->q_next = qget(irq);
+		iwq->q_next = ctrace(qget(irq));
 	}
 	hwunlock(brq, &flags);
 }
@@ -1993,13 +2003,13 @@ void qprocsoff(queue_t *q)
 		/* bypass this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
-			bq->q_next = qget(rq->q_next);
-			qput(&qn);
+			bq->q_next = ctrace(qget(rq->q_next));
+			ctrace(qput(&qn));
 		}
 		if ((bq = backq(wq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
-			bq->q_next = qget(wq->q_next);
-			qput(&qn);
+			bq->q_next = ctrace(qget(wq->q_next));
+			ctrace(qput(&qn));
 		}
 		hwunlock(rq, &flags);
 		/* put procs must check QHLIST bit after acquiring hrlock */
@@ -2041,13 +2051,13 @@ void qprocson(queue_t *q)
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
-			bq->q_next = qget(rq);
-			qput(&qn);
+			bq->q_next = ctrace(qget(rq));
+			ctrace(qput(&qn));
 		}
 		if ((bq = backq(wq))) {
 			queue_t *qn = xchg(&bq->q_next, NULL);
-			bq->q_next = qget(wq);
-			qput(&qn);
+			bq->q_next = ctrace(qget(wq));
+			ctrace(qput(&qn));
 		}
 		hwunlock(rq, &flags);
 	} else
@@ -2190,7 +2200,7 @@ static int __rmvq(queue_t *q, mblk_t *mp)
 			backenable = 1;
 	}
 	q->q_msgs--;
-	qput(&mp->b_queue);
+	ctrace(qput(&mp->b_queue));
 	bput(&mp->b_bandp);
 	mp->b_next = mp->b_prev = NULL;
 	return (backenable);
@@ -2206,13 +2216,14 @@ void rmvq(queue_t *q, mblk_t *mp)
 	unsigned long flags;
 	int backenable;
 	q = mp->b_queue;
+	ensure(q, return);
 	/* We ignore the queue pointer provided by the user because we know which queue the message 
 	   belongs to (if any). */
 	qwlock(q, &flags);
 	backenable = __rmvq(q, mp);
 	qwunlock(q, &flags);
 	if (backenable)
-		qbackenable(q);
+		ctrace(qbackenable(q));
 }
 
 EXPORT_SYMBOL(rmvq);

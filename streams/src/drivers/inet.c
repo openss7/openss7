@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/12 23:20:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:33 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/12 23:20:10 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/12 23:20:10 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -222,12 +222,11 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define LINUX_2_4 1
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "bufq.h"
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:33 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/12 23:20:10 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/10 20:15:30 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/12 23:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 20:15:30 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/10 20:15:30 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/12 23:20:20 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/10 20:15:30 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/12 23:20:20 $";
 
 #define __NO_VERSION__
 
@@ -96,7 +96,6 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "strsched.h"		/* for in_stream */
@@ -106,7 +105,7 @@ static char const ident[] =
 struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 EXPORT_SYMBOL(strthreads);
 #endif
 
@@ -124,14 +123,14 @@ static void mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct mdbblock *md = obj;
 		bzero(md, sizeof(*md));
 		atomic_set(&md->datablk.d_dblock.db_users, 0);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &md->msgblk.m_next);
 		INIT_LIST_HEAD((struct list_head *) &md->datablk.db_next);
 #endif
 	}
 }
 
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 /* use the current queue being processed by the thread as a guess as to which queue the thing
    (message block, bufcall callback, timout callback) belongs to, but, if we are at irq, then we
    will only used the supplied value, even if null. */
@@ -140,7 +139,7 @@ static queue_t *queue_guess(queue_t *q)
 	queue_t *guess;
 	if ((guess = q) == NULL && current_context() == CTX_STREAMS)
 		guess = this_thread->currentq;
-	return (qget(guess));
+	return (ctrace(qget(guess)));
 }
 #endif
 
@@ -197,7 +196,7 @@ mblk_t *mdbblock_alloc(uint priority, void *func)
 		break;
 	}
 	if ((mp = kmem_cache_alloc(sdi->si_cache, slab_flags))) {
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
 		md->msgblk.m_func = func;
@@ -274,7 +273,7 @@ static void freeblocks(struct strthread *t)
 		local_irq_restore(flags);
 		while ((mp = mp_next)) {
 			struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 			unsigned long flags;
 			struct mdbblock *md = (struct mdbblock *) mp;
@@ -306,7 +305,7 @@ static void qbinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct qbinfo *qbi = obj;
 		bzero(qbi, sizeof(*qbi));
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &qbi->qbi_next);
 #endif
 	}
@@ -318,7 +317,7 @@ struct qband *allocqb(void)
 	if ((qb = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 		struct qbinfo *qbi = (struct qbinfo *) qb;
 		atomic_set(&qbi->qbi_refs, 1);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		{
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
@@ -335,7 +334,7 @@ struct qband *allocqb(void)
 void freeqb(struct qband *qb)
 {
 	struct strinfo *si = &Strinfo[DYN_QBAND];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct qbinfo *qbi = (struct qbinfo *) qb;
 	write_lock_irqsave(&si->si_rwlock, flags);
@@ -372,7 +371,7 @@ static void apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct apinfo *api = obj;
 		bzero(api, sizeof(*api));
 		INIT_LIST_HEAD(&api->api_list);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &api->api_next);
 #endif
 	}
@@ -382,7 +381,7 @@ struct apinfo *ap_alloc(struct strapush *sap)
 	struct apinfo *api;
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
 	if ((api = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &api->api_next, &si->si_head);
@@ -410,7 +409,7 @@ void ap_put(struct apinfo *api)
 	if (api) {
 		if (atomic_dec_and_test(&api->api_refs)) {
 			struct strinfo *si = &Strinfo[DYN_STRAPUSH];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &api->api_next);
@@ -421,7 +420,7 @@ void ap_put(struct apinfo *api)
 			/* clean it up before putting it back in the cache */
 			bzero(api, sizeof(*api));
 			INIT_LIST_HEAD(&api->api_list);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &api->api_next);
 #endif
 			kmem_cache_free(si->si_cache, api);
@@ -445,7 +444,7 @@ static void devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		bzero(di, sizeof(*di));
 		INIT_LIST_HEAD(&di->di_list);
 		INIT_LIST_HEAD(&di->di_hash);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &di->di_next);
 #endif
 	}
@@ -455,7 +454,7 @@ struct devinfo *di_alloc(struct cdevsw *cdev)
 	struct devinfo *di;
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
 	if ((di = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &di->di_next, &si->si_head);
@@ -488,7 +487,7 @@ void di_put(struct devinfo *di)
 	if (di) {
 		if (atomic_dec_and_test(&di->di_refs)) {
 			struct strinfo *si = &Strinfo[DYN_DEVINFO];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &di->di_next);
@@ -501,7 +500,7 @@ void di_put(struct devinfo *di)
 			bzero(di, sizeof(*di));
 			INIT_LIST_HEAD(&di->di_list);
 			INIT_LIST_HEAD(&di->di_hash);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &di->di_next);
 #endif
 			kmem_cache_free(si->si_cache, di);
@@ -528,7 +527,7 @@ static void modinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		bzero(mi, sizeof(*mi));
 		INIT_LIST_HEAD(&mi->mi_list);
 		INIT_LIST_HEAD(&mi->mi_hash);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
 #endif
 	}
@@ -538,7 +537,7 @@ struct modinfo *mi_alloc(struct fmodsw *fmod)
 	struct modinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
 	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
 		list_add_tail((struct list_head *) &mi->mi_next, &si->si_head);
@@ -568,7 +567,7 @@ void mi_put(struct modinfo *mi)
 	if (mi) {
 		if (atomic_dec_and_test(&mi->mi_refs)) {
 			struct strinfo *si = &Strinfo[DYN_MODINFO];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
 			list_del_init((struct list_head *) &mi->mi_next);
@@ -581,7 +580,7 @@ void mi_put(struct modinfo *mi)
 			bzero(mi, sizeof(*mi));
 			INIT_LIST_HEAD(&mi->mi_list);
 			INIT_LIST_HEAD(&mi->mi_hash);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
 #endif
 			kmem_cache_free(si->si_cache, mi);
@@ -706,11 +705,12 @@ void flushq(queue_t *q, int flag)
 	int backenable;
 	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long flags;
+	ensure(q, return);
 	qwlock(q, &flags);
 	backenable = __flushq(q, flag, &mpp);
 	qwunlock(q, &flags);
 	if (backenable)
-		qbackenable(q);
+		ctrace(qbackenable(q));
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	freechain(mp, mpp);
@@ -736,7 +736,7 @@ static void queinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		qlockinit(&qu->wq);
 		qu->rq.q_flag = QREADR;
 		qu->wq.q_flag = 0;
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &qu->qu_next);
 #endif
 	}
@@ -757,7 +757,7 @@ queue_t *allocq(void)
 		atomic_set(&qu->qu_refs, 1);
 		rq->q_other = wq;
 		wq->q_other = rq;
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		{
 			unsigned long flags;
 			write_lock_irqsave(&si->si_rwlock, flags);
@@ -785,7 +785,7 @@ static void __freeq(queue_t *rq)
 {
 	queue_t *wq = rq + 1;
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct queinfo *qu = (struct queinfo *) rq;
 	write_lock_irqsave(&si->si_rwlock, flags);
@@ -843,7 +843,7 @@ static void linkinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct linkinfo *li = obj;
 		struct linkblk *l = &li->li_linkblk;
 		bzero(li, sizeof(*li));
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &li->li_next);
 #endif
 		spin_lock_irqsave(&link_index_lock, flags);
@@ -858,7 +858,7 @@ struct linkblk *alloclk(void)
 	struct linkblk *l;
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 	if ((l = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		unsigned long flags;
 		struct linkinfo *li = (struct linkinfo *) l;
 		write_lock_irqsave(&si->si_rwlock, flags);
@@ -878,7 +878,7 @@ void freelk(struct linkblk *l)
 {
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
 	struct linkinfo *li = (struct linkinfo *) l;
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 	{
 		unsigned long flags;
 		write_lock_irqsave(&si->si_rwlock, flags);
@@ -997,7 +997,7 @@ static void seinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct strevent *se = obj;
 		unsigned long flags;
 		bzero(s, sizeof(*s));
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &s->s_next);
 #endif
 		write_lock_irqsave(&event_hash_lock, flags);
@@ -1015,7 +1015,7 @@ static inline struct strevent *event_alloc(int type, queue_t *q)
 		if ((se = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 			struct seinfo *s = (struct seinfo *) se;
 			s->s_type = type;
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 			{
 				unsigned long flags;
 				s->s_queue = queue_guess(q);
@@ -1034,10 +1034,10 @@ static inline struct strevent *event_alloc(int type, queue_t *q)
 static inline void event_free(struct strevent *se)
 {
 	struct strinfo *si = &Strinfo[DYN_STREVENT];
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct seinfo *s = (struct seinfo *) se;
-	qput(&s->s_queue);
+	ctrace(qput(&s->s_queue));
 	write_lock_irqsave(&si->si_rwlock, flags);
 	list_del_init((struct list_head *) &s->s_next);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -1084,7 +1084,7 @@ bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long
 	struct strevent *se;
 	if ((se = event_alloc(SE_BUFCALL, q))) {
 		struct strthread *t = this_thread;
-		se->x.b.queue = qget(q);	/* hold a reference */
+		se->x.b.queue = ctrace(qget(q));	/* hold a reference */
 		se->x.b.func = function;
 		se->x.b.arg = arg;
 		se->x.b.size = size;
@@ -1155,7 +1155,7 @@ toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsi
 	struct strevent *se;
 	if ((se = event_alloc(SE_TIMEOUT, q))) {
 		init_timer(&se->x.t.timer);
-		se->x.t.queue = qget(q);	/* hold a reference */
+		se->x.t.queue = ctrace(qget(q));	/* hold a reference */
 		se->x.t.func = timo_fcn;
 		se->x.t.arg = arg;
 		se->x.t.cpu = cpu;
@@ -1197,7 +1197,7 @@ clock_t untimeout(toid_t toid)
 	clock_t rem = 0;
 	if ((se = find_event(toid))) {
 		xchg(&se->x.t.func, NULL);
-		qput(&se->x.t.queue);
+		ctrace(qput(&se->x.t.queue));
 		rem = se->x.t.timer.expires - jiffies;
 		if (rem < 0)
 			rem = 0;
@@ -1227,13 +1227,13 @@ static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_
 	struct strevent *se;
 	if ((se = event_alloc(type, protq))) {
 		struct strthread *t = this_thread;
-		se->x.w.queue = qget(protq);
+		se->x.w.queue = ctrace(qget(protq));
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		se->x.w.q1 = qget(q1);
-		se->x.w.q2 = qget(q2);
-		se->x.w.q3 = qget(q3);
-		se->x.w.q4 = qget(q4);
+		se->x.w.q1 = ctrace(qget(q1));
+		se->x.w.q2 = ctrace(qget(q2));
+		se->x.w.q3 = ctrace(qget(q3));
+		se->x.w.q4 = ctrace(qget(q4));
 		*xchg(&t->strevents_tail, &se->se_next) = se;
 		if (!test_and_set_bit(strevents, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
@@ -1334,7 +1334,7 @@ int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *ar
 	struct strevent *se;
 	if ((se = event_alloc(type, q))) {
 		struct strthread *t = this_thread;
-		se->x.p.queue = qget(q);
+		se->x.p.queue = ctrace(qget(q));
 		se->x.p.func = func;
 		se->x.p.arg = arg;
 		se->x.p.perim = perim;
@@ -1358,7 +1358,7 @@ void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
 	/* must be called with sq locked */
 	struct strevent *se;
 	if ((se = event_alloc(SE_STRPUT, q))) {
-		se->x.p.queue = qget(q);
+		se->x.p.queue = ctrace(qget(q));
 		se->x.p.func = (void *) put;
 		se->x.p.arg = q;
 		se->x.p.perim = PERIM_INNER | PERIM_OUTER;
@@ -1454,11 +1454,11 @@ static void sq_weldq(struct strevent *se)
 				__hwlock(se->x.w.q3);
 			if (se->x.w.q1) {
 				qn1 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q1->q_next = qget(se->x.w.q2);
+				se->x.w.q1->q_next = ctrace(qget(se->x.w.q2));
 			}
 			if (se->x.w.q3) {
 				qn3 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q3->q_next = qget(se->x.w.q4);
+				se->x.w.q3->q_next = ctrace(qget(se->x.w.q4));
 			}
 			if (se->x.w.q3)
 				__hwunlock(se->x.w.q3);
@@ -1466,13 +1466,13 @@ static void sq_weldq(struct strevent *se)
 				__hwunlock(se->x.w.q1);
 			local_irq_restore(flags);
 			leave_exclus(isq);
-			qput(&se->x.w.q1);
-			qput(&se->x.w.q2);
-			qput(&se->x.w.q3);
-			qput(&se->x.w.q4);
+			ctrace(qput(&se->x.w.q1));
+			ctrace(qput(&se->x.w.q2));
+			ctrace(qput(&se->x.w.q3));
+			ctrace(qput(&se->x.w.q4));
 			event_free(se);
-			qput(&qn1);
-			qput(&qn3);
+			ctrace(qput(&qn1));
+			ctrace(qput(&qn3));
 		} else
 			defer_event(isq, se, &flags);
 		leave_shared(osq);
@@ -1499,11 +1499,11 @@ static void sq_unweldq(struct strevent *se)
 				__hwlock(se->x.w.q3);
 			if (se->x.w.q1) {
 				qn1 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q1->q_next = qget(se->x.w.q2);
+				se->x.w.q1->q_next = ctrace(qget(se->x.w.q2));
 			}
 			if (se->x.w.q3) {
 				qn3 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q3->q_next = qget(se->x.w.q4);
+				se->x.w.q3->q_next = ctrace(qget(se->x.w.q4));
 			}
 			if (se->x.w.q3)
 				__hwunlock(se->x.w.q3);
@@ -1511,13 +1511,13 @@ static void sq_unweldq(struct strevent *se)
 				__hwunlock(se->x.w.q1);
 			local_irq_restore(flags);
 			leave_exclus(isq);
-			qput(&se->x.w.q1);
-			qput(&se->x.w.q2);
-			qput(&se->x.w.q3);
-			qput(&se->x.w.q4);
+			ctrace(qput(&se->x.w.q1));
+			ctrace(qput(&se->x.w.q2));
+			ctrace(qput(&se->x.w.q3));
+			ctrace(qput(&se->x.w.q4));
 			event_free(se);
-			qput(&qn1);
-			qput(&qn3);
+			ctrace(qput(&qn1));
+			ctrace(qput(&qn3));
 		} else
 			defer_event(isq, se, &flags);
 		leave_shared(osq);
@@ -1694,7 +1694,7 @@ static inline void timeouts(struct strthread *t)
 						qprunlock(q);
 						hrunlock(q);
 					}
-					qput(&se->x.t.queue);
+					ctrace(qput(&se->x.t.queue));
 				} else {
 					func(se->x.t.arg);
 				}
@@ -1738,16 +1738,16 @@ static inline void doevents(struct strthread *t)
 					hwlock(se->x.w.q1, &flags);
 					se->x.w.q1->q_next = se->x.w.q2;
 					hwunlock(se->x.w.q1, &flags);
-					qput(&se->x.w.q1);
-					qput(&se->x.w.q2);
+					ctrace(qput(&se->x.w.q1));
+					ctrace(qput(&se->x.w.q2));
 				}
 				if (se->x.w.q3) {
 					unsigned long flags;
 					hwlock(se->x.w.q3, &flags);
 					se->x.w.q3->q_next = se->x.w.q4;
 					hwunlock(se->x.w.q3, &flags);
-					qput(&se->x.w.q3);
-					qput(&se->x.w.q4);
+					ctrace(qput(&se->x.w.q3));
+					ctrace(qput(&se->x.w.q4));
 				}
 				if (se->x.w.func) {
 					t->currentq = q;
@@ -1756,7 +1756,7 @@ static inline void doevents(struct strthread *t)
 				}
 				if (q) {
 					hwunlock(q, &flags);
-					qput(&q);
+					ctrace(qput(&q));
 				}
 				event_free(se);
 				continue;;
@@ -1770,7 +1770,7 @@ static inline void doevents(struct strthread *t)
 					se->x.p.func(se->x.p.arg, se->x.p.mp);
 				qpwunlock(se->x.p.queue);
 				hwunlock(se->x.p.queue, &flags);
-				qput(&se->x.p.queue);
+				ctrace(qput(&se->x.p.queue));
 				event_free(se);
 				continue;;
 			}
@@ -1873,7 +1873,7 @@ static inline void bufcalls(struct strthread *t)
 						qprunlock(q);
 						hrunlock(q);
 					}
-					qput(&q);
+					ctrace(qput(&q));
 				} else {
 					func(se->x.b.arg);
 				}
@@ -1948,7 +1948,7 @@ static void qschedule(queue_t *q)
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		struct strthread *t = this_thread;
 		/* put ourselves on the run list */
-		*xchg(&t->qtail, &q->q_link) = qget(q);
+		*xchg(&t->qtail, &q->q_link) = ctrace(qget(q));
 		setqsched();
 	}
 }
@@ -2031,7 +2031,7 @@ static inline void freechains(struct strthread *t)
 		while ((mp = mp_next)) {
 			mp_next = xchg(&mp->b_next, NULL);
 			/* fake out freeb */
-			qput(&mp->b_queue);
+			ctrace(qput(&mp->b_queue));
 			bput(&mp->b_bandp);
 			mp->b_next = mp->b_prev = NULL;
 			freemsg(mp);
@@ -2102,7 +2102,7 @@ static void clear_shinfo(struct shinfo *sh)
 	struct stdata *sd = &sh->sh_stdata;
 	bzero(sh, sizeof(*sh));
 	atomic_set(&sh->sh_refs, 0);
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 	INIT_LIST_HEAD((struct list_head *) &sh->sh_next);
 #endif
 	sd->sd_rdopt = RNORM | RPROTNORM;
@@ -2241,7 +2241,7 @@ static void str_term_caches(void)
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
 		if (!si->si_cache)
 			continue;
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		/* if we are tracking the allocations we can kill things whether they refer to each 
 		   other or not. I hope we don't have any inodes kicking around... */
 #endif
@@ -2261,7 +2261,7 @@ static int str_init_caches(void)
 	struct strinfo *si = Strinfo;
 	struct cacheinfo *ci = Cacheinfo;
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
-#ifdef CONFIG_STREAMS_DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&si->si_head);
 #endif
 		rwlock_init(&si->si_rwlock);

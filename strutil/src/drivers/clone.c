@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/12 23:20:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 20:15:27 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/12 23:20:09 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/12 23:20:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,13 +74,12 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "strreg.h"		/* for spec_open() */
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/06/10 20:15:27 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/06/12 23:20:09 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.28 2004/06/07 17:34:19 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.29 2004/06/12 23:18:59 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/07 17:34:19 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/12 23:18:59 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -115,11 +115,28 @@ AC_DEFUN([_LFS_OPTIONS], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
     case "$linux_cv_debug" in
-        _DEBUG | _TEST)
+        _DEBUG)
             AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to perform
                     internal structure tracking within the STREAMS executive
                     as well as to provide additional /proc filesystem files
                     for examining internal structures.])
+            ;;
+        _TEST)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TEST], [], [Define to perform
+                    performance testing with debugging.  This mode does not
+                    dump massive amounts of information into system logs, but
+                    peforms all assertion checks.])
+            ;;
+        _SAFE)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAFE], [], [Define to perform
+                    fundamental assertion checks.  This is a safer mode of
+                    operation.])
+            ;;
+        _NONE | *)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NONE], [], [Define to perform
+                    no assertion checks but report software errors.  This is
+                    the smallest footprint, highest performance mode of
+                    operation.])
             ;;
     esac
 ])# _LFS_SETUP_DEBUG

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/12 23:20:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/12 23:20:10 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/12 23:20:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,12 +75,11 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 #include "strreg.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/01 12:04:34 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/12 23:20:10 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -230,7 +229,7 @@ static int spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (0);	/* already open */
 	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);	/* can't open as module */
-	if ((p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
+	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP)))	/* we could sleep */
 		return (ENOMEM);	/* no memory */
 	bzero(p, sizeof(*p));
 	switch (sflag) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/12 23:20:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/10 01:10:18 $ by $Author: brian $
+ Last Modified $Date: 2004/06/12 23:20:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/12 23:20:10 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/12 23:20:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -75,11 +75,10 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strdebug.h"
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/06/10 01:10:18 $"
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/06/12 23:20:10 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -128,6 +127,7 @@ static struct module_info nuls_minfo = {
 static int nuls_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
+	trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -158,9 +158,10 @@ static int nuls_put(queue_t *q, mblk_t *mp)
 		mp->b_datap->db_type = M_DATA;
 		qreply(q, mp);
 		return (0);
+	default:
+		freemsg(mp);
+		return (0);
 	}
-	freemsg(mp);
-	return (0);
       nak:
 	{
 		union ioctypes *ioc;
@@ -252,8 +253,11 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 static int nuls_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct nuls *p;
-	if ((p = q->q_ptr) == NULL)
+	trace();
+	if ((p = q->q_ptr) == NULL) {
+		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
+	}
 	spin_lock(&nuls_lock);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
@@ -261,6 +265,7 @@ static int nuls_close(queue_t *q, int oflag, cred_t *crp)
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
 	spin_unlock(&nuls_lock);
+	printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 
