@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/03/31 02:59:37 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/03/31 10:23:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 02:59:37 $ by $Author: brian $
+# Last Modified $Date: 2005/03/31 10:23:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -828,6 +828,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		fi
 		AC_MSG_RESULT([no])
 	    done
+	    if test -z "$linux_cv_k_source"
+	    then
+		linux_cv_k_source="$linux_cv_k_build"
+	    fi
 	fi
 	AC_MSG_CHECKING([for kernel source directory]) ])
     ksrcdir="$linux_cv_k_source"
@@ -1467,7 +1471,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     fi
     AC_SUBST([krelease])
     AC_MSG_CHECKING([for kernel file sanity])
-	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_includes $linux_cv_k_config\""
+	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
 	case "$target_vendor" in
 	    (mandrake)
 dnl
