@@ -1,0 +1,55 @@
+#
+# Configuration file for STREAMS device drivers
+#
+# Driver specifications
+#
+# The clone driver has a fixed major number.  Others can be allocated
+# automatically.
+#
+#	name		prefix	major	n-minors
+driver	clone-drvr	clone_	32
+driver	loop-around	sloop_	*
+driver	mini-mux	mux_	*
+driver	printk		printk_	*
+driver	sad		sad_	*
+driver	fifo		fifo_   *	512
+driver	putst		putst_	*
+
+#
+# Pushable module specifications
+#
+#	name		prefix
+module	relay		relay_
+module	relay2		relay2_
+module	timod		timod_
+module	pipemod		pipemod_
+
+#
+initialize 	clone-drvr
+initialize	fifo
+
+#
+# Node specifications
+#
+#	name		type	perm	major		minor
+node	loop.1		c	0644	loop-around	1
+node	loop.2		c	*	loop-around	2
+node	loop.255	c	*	loop-around	255
+node	loop_clone	c	*	clone-drvr	loop-around
+node	mux_clone	c	*	clone-drvr	mini-mux
+node	minimux.1	c	*	mini-mux	1
+node	minimux.2	c	*	mini-mux	2
+node	clone_drvr	c	*	clone-drvr	0
+node	printk		c	*	printk		0
+node	sad		c	*	clone-drvr	sad
+node	fifo		c	0666	clone-drvr	fifo
+node	fifo.0		c	0666	fifo		0
+node	putst		c	0666	putst		0
+
+#
+# Device specifications
+#
+#	drvr-name	unit  port nports share	IRQ     mem M-size DMA1 DMA2
+#device	loop-around	   1 0x310     16     S	 10 0xD0000 0x4000
+#device	loop-around	   2 0	        0     S	 10 	  0	 0
+
