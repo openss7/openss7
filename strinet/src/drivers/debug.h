@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $
+ @(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 12:44:17 $ by $Author: brian $
+ Last Modified $Date: 2004/06/27 10:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $"
 
 #if 1
 #define DDTRACE          do { printk("%s [%s %d] trace\n",__FUNCTION__,__FILE__, __LINE__); } while(0)

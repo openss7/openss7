@@ -79,5 +79,5 @@ loadable inet
 node	/dev/ticots_ord	     c	0666	inet		42
 node	/dev/ticots	     c	0666	inet		43
 node	/dev/ticlts	     c	0666	inet		44
-node	/dev/sctp	     c	0666	inet		45
+@WITH_OPENSS7_SCTP_TRUE@node	/dev/sctp	     c	0666	inet		45
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,25 +46,51 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/03 12:44:17 $ by $Author: brian $
+ Last Modified $Date: 2004/06/27 10:08:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
    provider (NPI).  It provides a STREAMS-based encapsulation of the Linux IP stack. 
  */
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef CONFIG_MODVERSIONS
-#include <linux/modversions.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
 #endif
-#include <linux/module.h>
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error ****  to compile the inet driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	ifdef MODVERSIONS
+#	    include <linux/modversions.h>
+#	endif
+#	include <linux/module.h>
+#	include <linux/modversions.h>
+#	ifndef __GENKSYMS__
+#	    if defined HAVE_SYS_LIS_MOVERSIONS_H
+#		include <sys/LiS/modversions.h>
+#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#		include <sys/streams/modversions.h>
+#	    endif
+#	endif
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
 
 #if defined HAVE_OPENSS7_SCTP
 #if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
@@ -97,18 +123,27 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $D
 #include <net/sctp.h>
 #endif
 
+#ifndef SK_WMEM_MAX
+#define SK_WMEM_MAX 65535
+#endif
+#ifndef SK_RMEM_MAX
+#define SK_RMEM_MAX 65535
+#endif
+
 #if !defined HAVE_OPENSS7_SCTP
 #undef sctp_addr
 #endif
 
+#ifndef tcp_openreq_cachep
 #ifdef HAVE_TCP_OPENREQ_CACHEP_ADDR
 #include <linux/slab.h>
 static kmem_cache_t **const _tcp_openreq_cachep_location =
     (typeof(_tcp_openreq_cachep_location)) (HAVE_TCP_OPENREQ_CACHEP_ADDR);
-#undef tcp_openreq_cachep
 #define tcp_openreq_cachep (*_tcp_openreq_cachep_location)
 #endif
+#endif
 
+#ifndef tcp_set_keepalive
 #ifdef HAVE_TCP_SET_KEEPALIVE_ADDR
 void
 tcp_set_keepalive(struct sock *sk, int val)
@@ -117,95 +152,112 @@ tcp_set_keepalive(struct sock *sk, int val)
 	return func(sk, val);
 }
 #endif
+#endif
+
+#ifndef tcp_sync_mss
+#ifdef HAVE_TCP_SYNC_MSS_ADDR
+int
+tcp_sync_mss(struct sock *sk, u32 pmtu)
+{
+	static int (*func)(struct sock *, u32) = (typeof(func)) HAVE_TCP_SYNC_MSS_ADDR;
+	return func(sk, pmtu);
+}
+#endif
+#endif
+
+#ifndef tcp_write_xmit
+#ifdef HAVE_TCP_WRITE_XMIT_ADDR
+int
+tcp_write_xmit(struct sock *sk, int nonagle)
+{
+	static int (*func)(struct sock *, int) = (typeof(func)) HAVE_TCP_WRITE_XMIT_ADDR;
+	return func(sk, nonagle);
+}
+#endif
+#endif
+
+#ifndef tcp_cwnd_application_limited
+#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
+void
+tcp_cwnd_application_limited(struct sock *sk)
+{
+	static void (*func)(struct sock *) = (typeof(func)) HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR;
+	return func(sk);
+}
+#endif
+#endif
 
 /*
    recreate this structure because it is used by an inline 
  */
 __u8 ip_tos2prio[16] = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
 
+#ifndef sysctl_rmem_default
 #ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
 static __u32 *const _sysctl_rmem_default_location =
     (typeof(_sysctl_rmem_default_location)) (HAVE_SYSCTL_RMEM_DEFAULT_ADDR);
-#undef sysctl_rmem_default
 #define sysctl_rmem_default (*_sysctl_rmem_default_location)
 #else
-#undef sysctl_rmem_default
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
+#endif
 
+#ifndef sysctl_wmem_default
 #ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
 static __u32 *const _sysctl_wmem_default_location =
     (typeof(_sysctl_wmem_default_location)) (HAVE_SYSCTL_WMEM_DEFAULT_ADDR);
-#undef sysctl_wmem_default
 #define sysctl_wmem_default (*_sysctl_wmem_default_location)
 #else
-#undef sysctl_wmem_default
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
+#endif
 
+#ifndef sysctl_tcp_fin_timeout
 #ifdef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
 static __u32 *const _sysctl_tcp_fin_timeout_location =
     (typeof(_sysctl_tcp_fin_timeout_location)) (HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR);
-#undef sysctl_tcp_fin_timeout
 #define sysctl_tcp_fin_timeout (*_sysctl_tcp_fin_timeout_location)
 #else
-#undef sysctl_tcp_fin_timeout
 #define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
 #endif
+#endif
+
+#ifdef USING_AF_INET_TTL_MEMBER_NAME
+#undef ttl
+#define ttl USING_AF_INET_TTL_MEMBER_NAME
+#endif
+
+#include <sys/kmem.h>
+#include <sys/cmn_err.h>
 
 #include <sys/stream.h>
-#include <sys/cmn_err.h>
-#include <sys/tihdr.h>
 
-#if 0
-#define T_UNSPEC  (~0 - 2)	/* applicable to u_long, t_scalar_t, char .. */
-#define T_ALIGN(p)	(((uintptr_t)(p) + sizeof(long)-1) & ~(sizeof(long)-1))
-
-/*
-   OPTIONS ON XTI LEVEL 
- */
-
-/*
- *  XTI Level
- */
-#define XTI_GENERIC 0xffff
-
-/*
- *  XTI-level Options
- */
-#define XTI_DEBUG	0x0001	/* enable debugging */
-#define XTI_LINGER	0x0080	/* linger on close if data present */
-#define XTI_RCVBUF	0x1002	/* receive buffer size */
-#define XTI_RCVLOWAT	0x1004	/* receive low-water mark */
-#define XTI_SNDBUF	0x1001	/* send buffer size */
-#define XTI_SNDLOWAT	0x1003	/* send low-water mark */
-
-/*
- * Structure used with linger option.
- */
-struct t_linger {
-	t_scalar_t l_onoff;		/* option on/off */
-	t_scalar_t l_linger;		/* linger time */
-};
-
-#else
-#include <xti.h>
+#ifdef _LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/ddi.h>
 #endif
-#include <xti_inet.h>
+
+#if defined HAVE_TIHDR_H
+#   include <tihdr.h>
+#else
+#   include <sys/tihdr.h>
+#endif
+
+#include <sys/xti.h>
+#include <sys/xti_inet.h>
+#include <sys/xti_sctp.h>
 
 #define T_ALLLEVELS -1UL
 
 #define LINUX_2_4 1
-
-// for testing only
-#define _DEBUG 1
 
 #include "debug.h"
 #include "bufq.h"
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/03 12:44:17 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:33 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"
@@ -238,8 +290,8 @@ MODULE_LICENSE(SS_LICENSE);
 #   endif
 #endif
 
-static unsigned short major = SS_CMAJOR;
-MODULE_PARM(major, "b");
+unsigned short major = SS_CMAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allocation).");
 
 #ifndef SS_CMAJOR
@@ -264,7 +316,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allo
 #define TICOTS_CMINOR	43
 #define TICLTS_CMINOR	44
 
+#if defined HAVE_OPENSS7_SCTP
+#define SCTP_CMINOR	45
+#define LAST_CMINOR	45
+#else				/* defined HAVE_OPENSS7_SCTP */
 #define LAST_CMINOR	44
+#endif				/* defined HAVE_OPENSS7_SCTP */
 
 #define FREE_CMINOR	50
 
@@ -282,12 +339,12 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allo
  */
 
 STATIC struct module_info ss_minfo = {
-      mi_idnum:SS_CMAJOR,	/* Module ID number */
-      mi_idname:SS_MOD_NAME,	/* Module name */
-      mi_minpsz:0,		/* Min packet size accepted */
-      mi_maxpsz:INFPSZ,	/* Max packet size accepted */
-      mi_hiwat:1 << 15,	/* Hi water mark */
-      mi_lowat:1 << 10,	/* Lo water mark */
+	mi_idnum:SS_CMAJOR,		/* Module ID number */
+	mi_idname:SS_MOD_NAME,		/* Module name */
+	mi_minpsz:0,			/* Min packet size accepted */
+	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
+	mi_hiwat:1 << 15,		/* Hi water mark */
+	mi_lowat:1 << 10,		/* Lo water mark */
 };
 
 STATIC int ss_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -297,25 +354,25 @@ STATIC int ss_rput(queue_t *, mblk_t *);
 STATIC int ss_rsrv(queue_t *);
 
 STATIC struct qinit ss_rinit = {
-      qi_putp:ss_rput,		/* Read put (msg from below) */
-      qi_srvp:ss_rsrv,		/* Read queue service */
-      qi_qopen:ss_open,	/* Each open */
-      qi_qclose:ss_close,	/* Last close */
-      qi_minfo:&ss_minfo,	/* Information */
+	qi_putp:ss_rput,		/* Read put (msg from below) */
+	qi_srvp:ss_rsrv,		/* Read queue service */
+	qi_qopen:ss_open,		/* Each open */
+	qi_qclose:ss_close,		/* Last close */
+	qi_minfo:&ss_minfo,		/* Information */
 };
 
 STATIC int ss_wput(queue_t *, mblk_t *);
 STATIC int ss_wsrv(queue_t *);
 
 STATIC struct qinit ss_winit = {
-      qi_putp:ss_wput,		/* Write put (msg from above) */
-      qi_srvp:ss_wsrv,		/* Write queue service */
-      qi_minfo:&ss_minfo,	/* Information */
+	qi_putp:ss_wput,		/* Write put (msg from above) */
+	qi_srvp:ss_wsrv,		/* Write queue service */
+	qi_minfo:&ss_minfo,		/* Information */
 };
 
 STATIC struct streamtab ss_info = {
-      st_rdinit:&ss_rinit,	/* Upper read queue */
-      st_wrinit:&ss_winit,	/* Lower read queue */
+	st_rdinit:&ss_rinit,		/* Upper read queue */
+	st_wrinit:&ss_winit,		/* Lower read queue */
 };
 
 /*
@@ -415,6 +472,7 @@ typedef struct ss_options {
 		unsigned int reuseaddr;	/* T_IP_REUSEADDR */
 		unsigned int dontroute;	/* T_IP_DONTROUTE */
 		unsigned int broadcast;	/* T_IP_BROADCAST */
+		uint32_t addr;		/* T_IP_ADDR */
 	} ip;
 	struct {
 		t_uscalar_t checksum;	/* T_UDP_CHECKSUM */
@@ -504,7 +562,7 @@ typedef struct ss_protocol {
 	struct ss_protocol *next;	/* list linkage */
 	struct ss_protocol **prev;	/* list linkage */
 	atomic_t refcnt;		/* reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	void (*put) (struct ss_protocol *);	/* release function */
 	struct ss_protocol *(*get) (struct ss_protocol *);	/* acquire function */
 	ulong type;			/* structure type */
@@ -524,13 +582,13 @@ typedef struct inet {
 	struct inet *next;		/* list of all IP-Users */
 	struct inet **prev;		/* list of all IP-Users */
 	size_t refcnt;			/* structure reference count */
-	lis_spin_lock_t lock;		/* structure lock */
+	spinlock_t lock;		/* structure lock */
 	ushort cmajor;			/* major device number */
 	ushort cminor;			/* minor device number */
 	queue_t *rq;			/* associated read queue */
 	queue_t *wq;			/* associated write queue */
 	cred_t cred;			/* credientials */
-	lis_spin_lock_t qlock;		/* queue lock */
+	spinlock_t qlock;		/* queue lock */
 	queue_t *rwait;			/* RD queue waiting on lock */
 	queue_t *wwait;			/* WR queue waiting on lock */
 	int users;			/* lock holders */
@@ -646,7 +704,7 @@ enum {
 	_T_BIT_IP_REUSEADDR,
 	_T_BIT_IP_DONTROUTE,
 	_T_BIT_IP_BROADCAST,
-	_T_BIT_IP_PKTINFO,
+	_T_BIT_IP_ADDR,
 	_T_BIT_IP_RETOPTS,
 	_T_BIT_TCP_NODELAY,
 	_T_BIT_TCP_MAXSEG,
@@ -701,7 +759,7 @@ enum {
 	_T_BIT_SCTP_LIFETIME,
 	_T_BIT_SCTP_DISPOSITION,
 	_T_BIT_SCTP_MAX_BURST,
-#endif				/* defined HAVE_OPENSS7_SCTP */
+#endif					/* defined HAVE_OPENSS7_SCTP */
 };
 
 typedef struct ss_event {
@@ -709,7 +767,7 @@ typedef struct ss_event {
 	int state;			/* state at time of event */
 } ss_event_t;
 
-STATIC lis_spin_lock_t ss_lock;		/* protects ss_opens lists */
+STATIC spinlock_t ss_lock;		/* protects ss_opens lists */
 STATIC ss_t *ss_opens = NULL;
 
 #if 0
@@ -814,27 +872,27 @@ ss_trylockq(queue_t *q)
 {
 	int res;
 	ss_t *ss = PRIV(q);
-	lis_spin_lock(&ss->qlock);
-	if ((res = !ss->users++)) {
+	spin_lock_bh(&ss->qlock);
+	if (!(res = !ss->users++)) {
 		if (q == ss->rq)
 			ss->rwait = q;
 		if (q == ss->wq)
 			ss->wwait = q;
 	}
-	lis_spin_unlock(&ss->qlock);
+	spin_unlock_bh(&ss->qlock);
 	return (res);
 }
 STATIC void
 ss_unlockq(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
-	lis_spin_lock(&ss->qlock);
+	spin_lock_bh(&ss->qlock);
 	if (ss->rwait)
 		qenable(xchg(&ss->rwait, NULL));
 	if (ss->wwait)
 		qenable(xchg(&ss->wwait, NULL));
 	ss->users = 0;
-	lis_spin_unlock(&ss->qlock);
+	spin_unlock_bh(&ss->qlock);
 }
 
 /*
@@ -854,16 +912,20 @@ ss_bufsrv(long data)
 	queue_t *q = (queue_t *) data;
 	if (q) {
 		ss_t *ss = PRIV(q);
-		if (q == ss->rq)
+		spin_lock_bh(&ss->lock);
+		if (q == ss->rq) {
 			if (ss->rbid) {
 				ss->rbid = 0;
 				ss->refcnt--;
 			}
-		if (q == ss->wq)
+		} else if (q == ss->wq) {
 			if (ss->wbid) {
 				ss->wbid = 0;
 				ss->refcnt--;
 			}
+		} else
+			swerr();
+		spin_unlock_bh(&ss->lock);
 		qenable(q);
 	}
 }
@@ -873,7 +935,7 @@ ss_bufsrv(long data)
  *  -------------------------------------------------------------------------
  */
 STATIC void
-ss_unbufcall(queue_t *q)
+__ss_unbufcall(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	if (ss->rbid) {
@@ -898,23 +960,22 @@ ss_allocb(queue_t *q, size_t size, int prior)
 		return (mp);
 	else {
 		ss_t *ss = PRIV(q);
+		spin_lock_bh(&ss->lock);
 		if (q == ss->rq) {
 			if (!ss->rbid) {
 				ss->rbid = bufcall(size, prior, &ss_bufsrv, (long) q);
 				ss->refcnt++;
 			}
-			return (NULL);
-		}
-		if (q == ss->wq) {
+		} else if (q == ss->wq) {
 			if (!ss->wbid) {
 				ss->wbid = bufcall(size, prior, &ss_bufsrv, (long) q);
 				ss->refcnt++;
 			}
-			return (NULL);
-		}
+		} else
+			swerr();
+		spin_unlock_bh(&ss->lock);
+		return (NULL);
 	}
-	swerr();
-	return (NULL);
 }
 
 #if 0
@@ -1098,6 +1159,8 @@ ss_size_conn_opts(ss_t * ss)
 			size += _T_SPACE_SIZEOF(ss->options.ip.dontroute);
 		if (ss_tst_bit(_T_BIT_IP_BROADCAST, ss->options.flags))
 			size += _T_SPACE_SIZEOF(ss->options.ip.broadcast);
+		if (ss_tst_bit(_T_BIT_IP_ADDR, ss->options.flags))
+			size += _T_SPACE_SIZEOF(ss->options.ip.addr);
 		switch (ss->p.prot.protocol) {
 		case T_INET_TCP:
 			if (ss_tst_bit(_T_BIT_TCP_NODELAY, ss->options.flags))
@@ -1378,6 +1441,14 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				ss->options.ip.broadcast = sk->broadcast ? T_YES : T_NO;
 			}
 			*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.broadcast;
+			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+		}
+		if (ss_tst_bit(_T_BIT_IP_ADDR, ss->options.flags)) {
+			oh->level = T_INET_IP;
+			oh->name = T_IP_ADDR;
+			oh->len = _T_LENGTH_SIZEOF(uint32_t);
+			oh->status = T_SUCCESS;
+			*((uint32_t *) T_OPT_DATA(oh)) = ss->options.ip.addr;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		switch (ss->p.prot.protocol) {
@@ -2048,6 +2119,10 @@ ss_set_options(ss_t * ss)
 			unsigned int *valp = &ss->options.ip.broadcast;
 			sk->broadcast = (*valp == T_YES) ? 1 : 0;
 		}
+		if (ss_tst_bit(_T_BIT_IP_ADDR, ss->options.flags)) {
+			uint32_t *valp = &ss->options.ip.addr;
+			sk->saddr = *valp;
+		}
 		switch (ss->p.prot.protocol) {
 		case T_INET_UDP:
 			if (ss_tst_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags)) {
@@ -2687,6 +2762,18 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					if (!request)
 						continue;
 					sk->broadcast = (*valp == T_YES) ? 1 : 0;
+					continue;
+				}
+				case T_IP_ADDR:
+				{
+					uint32_t *valp = (unsigned int *) T_OPT_DATA(ih);
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					ss->options.ip.addr = *valp;
+					ss_set_bit(_T_BIT_IP_ADDR, ss->options.flags);
+					if (!request)
+						continue;
+					sk->saddr = *valp;
 					continue;
 				}
 				}
@@ -3580,7 +3667,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
  *  options provided to T_OPTDATA_REQ or T_UNITDATA_REQ.
  */
 STATIC int
-ss_size_cmsg(ss_t * ss, unsigned char *ip, size_t ilen)
+ss_cmsg_size(ss_t * ss, unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
 	struct t_opthdr *ih;
@@ -3602,12 +3689,15 @@ ss_size_cmsg(ss_t * ss, unsigned char *ip, size_t ilen)
 					olen += CMSG_SPACE(40);
 					continue;
 				case T_IP_TOS:
-					olen += CMSG_SPACE(unsigned char);
+					olen += CMSG_SPACE(sizeof(unsigned char));
 					continue;
 				case T_IP_TTL:
-					olen += CMSG_SPACE(unsigned char);
+					olen += CMSG_SPACE(sizeof(unsigned char));
 					continue;
 				case T_IP_DONTROUTE:
+					continue;
+				case T_IP_ADDR:
+					olen += CMSG_SPACE(sizeof(struct in_pktinfo));
 					continue;
 				}
 			}
@@ -3636,7 +3726,7 @@ ss_size_cmsg(ss_t * ss, unsigned char *ip, size_t ilen)
 				case T_SCTP_LIFETIME:
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
-					olen += CMSG_SPACE(unsigned int);
+					olen += CMSG_SPACE(sizeof(unsigned int));
 					continue;
 				}
 			}
@@ -3659,7 +3749,7 @@ ss_size_cmsg(ss_t * ss, unsigned char *ip, size_t ilen)
  *  T_UNITDATA_REQ.
  */
 STATIC int
-ss_build_cmsg(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
+ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 {
 	struct cmsghdr *ch = CMSG_FIRSTHDR(msg);
 	struct t_opthdr *ih;
@@ -3739,6 +3829,16 @@ ss_build_cmsg(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 							    == T_NO ? 0 : MSG_DONTROUTE;
 					}
 					continue;
+				case T_IP_ADDR:
+					if (ih->len == sizeof(*ih) + sizeof(uint32_t)) {
+						ch->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
+						ch->cmsg_level = SOL_IP;
+						ch->cmsg_type = IP_PKTINFO;
+						*((struct in_pktinfo *) CMSG_DATA(ch)) = (struct in_pktinfo) {
+						0, { *((uint32_t *) T_OPT_DATA(ih)) }, { 0 }};
+						ch = CMSG_NXTHDR(msg, ch);
+					}
+					continue;
 				}
 			}
 			continue;
@@ -3803,6 +3903,17 @@ ss_build_cmsg(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 	return (-EPROTO);
 }
 
+STATIC int
+ss_errs_size(ss_t * ss, struct msghdr *msg)
+{
+	return (0);
+}
+STATIC int
+ss_errs_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
+{
+	return (-EFAULT);
+}
+
 /*
  *  Size cmsg Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3810,7 +3921,7 @@ ss_build_cmsg(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
  *  cmsg.  Only options with end to end significance are important.
  */
 STATIC int
-ss_size_opts(ss_t * ss, struct msghdr *msg)
+ss_opts_size(ss_t * ss, struct msghdr *msg)
 {
 	int size = 0;
 	struct cmsghdr *cmsg;
@@ -3823,14 +3934,17 @@ ss_size_opts(ss_t * ss, struct msghdr *msg)
 			if (ss->p.prot.family == PF_INET
 			    && (ss->p.prot.protocol == T_INET_UDP || ss->p.prot.protocol == T_INET_IP)) {
 				switch (cmsg->cmsg_type) {
-				case IP_RECVOPTS:
-				{
-					size_t len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
-					size += T_SPACE(len);
+				case IP_PKTINFO:
+					size += _T_SPACE_SIZEOF(uint32_t);
 					continue;
-				}
+				case IP_TTL:
+					size += _T_SPACE_SIZEOF(unsigned char);
+					continue;
 				case IP_TOS:
 					size += _T_SPACE_SIZEOF(unsigned char);
+					continue;
+				case IP_RECVOPTS:
+					size += T_SPACE((cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40));
 					continue;
 				}
 			}
@@ -3870,7 +3984,7 @@ ss_size_opts(ss_t * ss, struct msghdr *msg)
  *  Data indications only indicate options with end-to-end significance.
  */
 STATIC int
-ss_build_opts(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
+ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 {
 	struct cmsghdr *cmsg;
 	struct t_opthdr *oh;
@@ -3887,20 +4001,44 @@ ss_build_opts(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 				case IP_RECVOPTS:
 				{
 					size_t len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
+					printd(("%s: %p: processing option IP_RECVOPTS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: building option T_IP_OPTIONS\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
-					oh->len = T_SPACE(len);
+					oh->len = T_LENGTH(len);
 					oh->status = T_SUCCESS;
 					bcopy(CMSG_DATA(cmsg), T_OPT_DATA(oh), len);
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				}
 				case IP_TOS:
+					printd(("%s: %p: processing option IP_TOS\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: building option T_IP_TOS\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
 					oh->len = _T_LENGTH_SIZEOF(unsigned char);
 					oh->status = T_SUCCESS;
 					*((unsigned char *) T_OPT_DATA(oh)) = *((unsigned char *) CMSG_DATA(cmsg));
+					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+					continue;
+				case IP_TTL:
+					printd(("%s: %p: processing option IP_TTL\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: building option T_IP_TTL\n", SS_MOD_NAME, ss));
+					oh->level = T_INET_IP;
+					oh->name = T_IP_TTL;
+					oh->len = _T_LENGTH_SIZEOF(unsigned char);
+					oh->status = T_SUCCESS;
+					*((unsigned char *) T_OPT_DATA(oh)) = *((unsigned char *) CMSG_DATA(cmsg));
+					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
+					continue;
+				case IP_PKTINFO:
+					printd(("%s: %p: processing option IP_PKTINFO\n", SS_MOD_NAME, ss));
+					printd(("%s: %p: building option T_IP_ADDR\n", SS_MOD_NAME, ss));
+					oh->level = T_INET_IP;
+					oh->name = T_IP_ADDR;
+					oh->len = _T_LENGTH_SIZEOF(uint32_t);
+					*((uint32_t *) T_OPT_DATA(oh)) =
+					    ((struct in_pktinfo *) CMSG_DATA(cmsg))->ipi_addr.s_addr;
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				}
@@ -3922,6 +4060,8 @@ ss_build_opts(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 		case SOL_SCTP:
 			switch (cmsg->cmsg_type) {
 			case SCTP_PPI:
+				printd(("%s: %p: processing option SCTP_PPI\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: building option T_SCTP_PPI\n", SS_MOD_NAME, ss));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PPI;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
@@ -3930,6 +4070,8 @@ ss_build_opts(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 				continue;
 			case SCTP_DISPOSITION:
+				printd(("%s: %p: processing option SCTP_DISPOSITION\n", SS_MOD_NAME, ss));
+				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", SS_MOD_NAME, ss));
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DISPOSITION;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
@@ -3943,30 +4085,6 @@ ss_build_opts(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 		}
 	}
 	return ((unsigned char *) oh - op);
-}
-
-/*
- *  Size a particular option
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-STATIC size_t
-ss_size_opt(size_t isize, const size_t size, int flag)
-{
-	size_t osize = sizeof(struct t_opthdr);
-	switch (flag) {
-	case T_DEFAULT:
-	case T_CURRENT:
-		osize += T_ALIGN(size);
-		break;
-	case T_CHECK:
-		osize += T_ALIGN(isize);
-		break;
-	case T_NEGOTIATE:
-		osize += T_ALIGN((isize > size ? isize : size));
-		break;
-	}
-	ptrace(("%s: parameter size = %u\n", SS_MOD_NAME, osize));
-	return (osize);
 }
 
 /*
@@ -4066,6 +4184,10 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 						continue;
 				case T_IP_BROADCAST:
 					olen += _T_SPACE_SIZEOF(ss_defaults.ip.broadcast);
+					if (ih->name != T_ALLOPT)
+						continue;
+				case T_IP_ADDR:
+					olen += _T_SPACE_SIZEOF(ss_defaults.ip.addr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4440,6 +4562,10 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 						continue;
 				case T_IP_BROADCAST:
 					olen += _T_SPACE_SIZEOF(ss->options.ip.broadcast);
+					if (ih->name != T_ALLOPT)
+						continue;
+				case T_IP_ADDR:
+					olen += _T_SPACE_SIZEOF(ss->options.ip.addr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4834,6 +4960,12 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 						continue;
 				case T_IP_BROADCAST:
 					if (optlen && optlen != sizeof(ss->options.ip.broadcast))
+						goto einval;
+					olen += T_SPACE(optlen);
+					if (ih->name != T_ALLOPT)
+						continue;
+				case T_IP_ADDR:
+					if (optlen && optlen != sizeof(ss->options.ip.addr))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -5335,6 +5467,12 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.broadcast))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.broadcast);
+					if (ih->name != T_ALLOPT)
+						continue;
+				case T_IP_ADDR:
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.addr))
+						goto einval;
+					olen += _T_SPACE_SIZEOF(ss->options.ip.addr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -5950,10 +6088,21 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				case T_IP_BROADCAST:
 					printd(("%s: %p: processing option T_IP_BROADCAST\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_IP;
-					oh->name = T_IP_DONTROUTE;
+					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.broadcast);
 					oh->status = T_SUCCESS;
 					*((unsigned int *) T_OPT_DATA(oh)) = ss_defaults.ip.broadcast;
+					if (ih->name != T_ALLOPT)
+						continue;
+					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+						goto efault;
+				case T_IP_ADDR:
+					printd(("%s: %p: processing option T_IP_ADDR\n", SS_MOD_NAME, ss));
+					oh->level = T_INET_IP;
+					oh->name = T_IP_ADDR;
+					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.addr);
+					oh->status = T_SUCCESS;
+					*((uint32_t *) T_OPT_DATA(oh)) = ss_defaults.ip.addr;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -6668,11 +6817,23 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				case T_IP_BROADCAST:
 					printd(("%s: %p: processing option T_IP_BROADCAST\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_IP;
-					oh->name = T_IP_DONTROUTE;
+					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.broadcast);
 					oh->status = T_SUCCESS;
 					// refresh current value
 					*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.broadcast;
+					if (ih->name != T_ALLOPT)
+						continue;
+					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+						goto efault;
+				case T_IP_ADDR:
+					printd(("%s: %p: processing option T_IP_ADDR\n", SS_MOD_NAME, ss));
+					oh->level = T_INET_IP;
+					oh->name = T_IP_ADDR;
+					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.addr);
+					oh->status = T_SUCCESS;
+					// refresh current value
+					*((uint32_t *) T_OPT_DATA(oh)) = ss->options.ip.addr;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -7501,7 +7662,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				case T_IP_BROADCAST:
 					printd(("%s: %p: processing option T_IP_BROADCAST\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_IP;
-					oh->name = T_IP_DONTROUTE;
+					oh->name = T_IP_BROADCAST;
 					oh->len = ih->len;
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
@@ -7510,6 +7671,17 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						if (*valp != T_YES && *valp != T_NO)
 							goto einval;
 					}
+					if (ih->name != T_ALLOPT)
+						continue;
+					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+						goto efault;
+				case T_IP_ADDR:
+					printd(("%s: %p: processing option T_IP_ADDR\n", SS_MOD_NAME, ss));
+					oh->level = T_INET_IP;
+					oh->name = T_IP_ADDR;
+					oh->len = ih->len;
+					oh->status = T_SUCCESS;
+					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -8780,7 +8952,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_IP_BROADCAST\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_IP;
-					oh->name = T_IP_DONTROUTE;
+					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					if (!sk) {
 						oh->status = ss_overall_result(&overall, T_FAILURE);
@@ -8796,6 +8968,30 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					}
 					ss->options.ip.broadcast = *valp;
 					sk->broadcast = (*valp == T_YES) ? 1 : 0;
+					if (ih->name != T_ALLOPT)
+						continue;
+					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+						goto efault;
+				}
+				case T_IP_ADDR:
+				{
+					uint32_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_IP_ADDR\n", SS_MOD_NAME, ss));
+					oh->level = T_INET_IP;
+					oh->name = T_IP_ADDR;
+					oh->len = _T_LENGTH_SIZEOF(*valp);
+					if (!sk) {
+						oh->status = ss_overall_result(&overall, T_FAILURE);
+						break;
+					}
+					oh->status = T_SUCCESS;
+					if (ih->name == T_ALLOPT) {
+						*valp = ss_defaults.ip.addr;
+					} else {
+						*valp = *((typeof(valp)) T_OPT_DATA(ih));
+					}
+					ss->options.ip.addr = *valp;
+					sk->saddr = *valp;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -9269,8 +9465,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_MAXSEG:
 				{
-					printd(("%s: %p: processing option T_SCTP_MAXSEG\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_MAXSEG\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9294,8 +9490,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_CORK:
 				{
-					printd(("%s: %p: processing option T_SCTP_CORK\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_CORK\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9319,8 +9515,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_PPI:
 				{
-					printd(("%s: %p: processing option T_SCTP_PPI\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_PPI\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9344,8 +9540,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_SID:
 				{
-					printd(("%s: %p: processing option T_SCTP_SID\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_SID\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9369,8 +9565,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_SSN:
 				{
-					printd(("%s: %p: processing option T_SCTP_SSN\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_SSN\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9394,8 +9590,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_TSN:
 				{
-					printd(("%s: %p: processing option T_SCTP_TSN\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_TSN\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9419,8 +9615,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_RECVOPT:
 				{
-					printd(("%s: %p: processing option T_SCTP_RECVOPT\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_RECVOPT\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9444,8 +9640,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_COOKIE_LIFE:
 				{
-					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9469,8 +9665,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_SACK_DELAY:
 				{
-					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9494,9 +9690,9 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_PATH_MAX_RETRANS:
 				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", SS_MOD_NAME,
 						ss));
-					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9520,9 +9716,9 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_ASSOC_MAX_RETRANS:
 				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", SS_MOD_NAME,
 						ss));
-					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9546,9 +9742,9 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_MAX_INIT_RETRIES:
 				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", SS_MOD_NAME,
 						ss));
-					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9572,8 +9768,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_HEARTBEAT_ITVL:
 				{
-					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9597,8 +9793,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_RTO_INITIAL:
 				{
-					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9622,8 +9818,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_RTO_MIN:
 				{
-					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9647,8 +9843,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_RTO_MAX:
 				{
-					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9672,8 +9868,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_OSTREAMS:
 				{
-					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9697,8 +9893,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_ISTREAMS:
 				{
-					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9722,8 +9918,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_COOKIE_INC:
 				{
-					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9747,8 +9943,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_THROTTLE_ITVL:
 				{
-					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9772,8 +9968,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_MAC_TYPE:
 				{
-					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9797,8 +9993,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_HB:
 				{
-					printd(("%s: %p: processing option T_SCTP_HB\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_HB\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9822,8 +10018,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_RTO:
 				{
-					printd(("%s: %p: processing option T_SCTP_RTO\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_RTO\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9847,8 +10043,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_STATUS:
 				{
-					printd(("%s: %p: processing option T_SCTP_STATUS\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_STATUS\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -9872,8 +10068,8 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_DEBUG:
 				{
-					printd(("%s: %p: processing option T_SCTP_DEBUG\n", SS_MOD_NAME, ss));
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_DEBUG\n", SS_MOD_NAME, ss));
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
@@ -10090,6 +10286,8 @@ ss_socket(ss_t * ss)
 		ensure(ss->sock->sk, return (-EFAULT));
 		ss->sock->sk->allocation = GFP_ATOMIC;
 		ss_socket_get(ss->sock, ss);
+		if (ss->p.prot.family == PF_INET)
+			ss->sock->sk->protinfo.af_inet.cmsg_flags |= 0x0f;
 		return (0);
 	}
 	printd(("%s: %p: ERROR: from sock_create %d\n", SS_MOD_NAME, ss, err));
@@ -10140,6 +10338,7 @@ ss_bind(ss_t * ss, struct sockaddr *add, size_t add_len)
 			break;
 		case EADDRNOTAVAIL:
 		case EDESTADDRREQ:
+		case ESOCKTNOSUPPORT:
 			err = TNOADDR;
 			break;
 		case EAFNOSUPPORT:
@@ -10190,6 +10389,7 @@ ss_listen(ss_t * ss, uint cons)
 	printd(("%s: %p: ERROR: from sock->ops->listen %d\n", SS_MOD_NAME, ss, err));
 	switch (-err) {
 	case EDESTADDRREQ:
+	case ESOCKTNOSUPPORT:
 		err = TNOADDR;
 		break;
 	case EINVAL:
@@ -10442,6 +10642,25 @@ ss_getnames(ss_t * ss)
  *  =========================================================================
  */
 /*
+ *  M_FLUSH
+ *  ---------------------------------------------------------------
+ */
+STATIC int
+m_flush(queue_t *q, int how, int band)
+{
+	ss_t *ss = PRIV(q);
+	mblk_t *mp;
+	if ((mp = ss_allocb(q, 2, BPRI_HI))) {
+		mp->b_datap->db_type = M_FLUSH;
+		*mp->b_wptr++ = how;
+		*mp->b_wptr++ = band;
+		putnext(ss->rq, mp);
+		return (QR_DONE);
+	}
+	return (-ENOBUFS);
+}
+
+/*
  *  M_ERROR
  *  ---------------------------------------------------------------
  */
@@ -10599,11 +10818,11 @@ t_seq_find(ss_t * ss, mblk_t *rp)
 	mblk_t *mp;
 	if ((mp = rp)) {
 		struct sock *sk = ((ss_event_t *) rp->b_rptr)->sk;
-		lis_spin_lock(&ss->conq.q_lock);
+		spin_lock_bh(&ss->conq.q_lock);
 		{
 			for (mp = bufq_head(&ss->conq); mp && ((ss_event_t *) mp->b_rptr)->sk != sk; mp = mp->b_next) ;
 		}
-		lis_spin_unlock(&ss->conq.q_lock);
+		spin_unlock_bh(&ss->conq.q_lock);
 	}
 	return (mp);
 }
@@ -10627,6 +10846,18 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
 	struct T_discon_ind *p;
 	ulong seq = 0;
 	(void) res;
+	/*
+	   TPI spec says that if the interface is in the TS_DATA_XFER, TS_WIND_ORDREL or
+	   TS_WACK_ORDREL [sic] state, the stream must be flushed before sending up the
+	   T_DISCON_IND primitive. 
+	 */
+	switch (ss_get_state(ss)) {
+	case TS_DATA_XFER:
+	case TS_WIND_ORDREL:
+	case TS_WREQ_ORDREL:
+		if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
+			goto enobufs;
+	}
 	if (canputnext(ss->rq)) {
 		if ((mp = ss_allocb(q, sizeof(*p), BPRI_MED))) {
 			if (!cp || (seq = t_seq_delete(ss, cp))) {
@@ -10648,6 +10879,7 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
 			ptrace(("%s: ERROR: bad sequence number\n", SS_MOD_NAME));
 			return (-EFAULT);
 		}
+	      enobufs:
 		ptrace(("%s: ERROR: no buffers\n", SS_MOD_NAME));
 		return (-ENOBUFS);
 	}
@@ -10660,7 +10892,7 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
  *  ---------------------------------------------------------------
  */
 STATIC int
-t_data_ind(queue_t *q, uint flags, mblk_t *dp)
+t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -10669,7 +10901,7 @@ t_data_ind(queue_t *q, uint flags, mblk_t *dp)
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_DATA_IND;
-		p->MORE_flag = flags;
+		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
 		mp->b_cont = dp;
 		printd(("%s: %p: <- T_DATA_IND\n", SS_MOD_NAME, ss));
 		putnext(ss->rq, mp);
@@ -10684,7 +10916,7 @@ t_data_ind(queue_t *q, uint flags, mblk_t *dp)
  *  ---------------------------------------------------------------
  */
 STATIC int
-t_exdata_ind(queue_t *q, uint flags, mblk_t *dp)
+t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
@@ -10694,7 +10926,7 @@ t_exdata_ind(queue_t *q, uint flags, mblk_t *dp)
 		mp->b_band = 1;	/* expedite */
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_EXDATA_IND;
-		p->MORE_flag = flags;
+		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
 		mp->b_cont = dp;
 		printd(("%s: %p: <- T_EXDATA_IND\n", SS_MOD_NAME, ss));
 		putnext(ss->rq, mp);
@@ -10871,6 +11103,13 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 		case TS_WACK_UREQ:
 			if ((err = ss_unbind(ss)))
 				goto free_error;
+			/*
+			   TPI spec says that if the provider must flush both queues before
+			   responding with a T_OK_ACK primitive when responding to a T_UNBIND_REQ.
+			   This is to flush queued data for connectionless providers. 
+			 */
+			if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
+				goto enobufs;
 			ss_set_state(ss, TS_UNBND);
 			break;
 		case TS_WACK_CRES:
@@ -10895,8 +11134,11 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 			break;
 		case TS_WACK_DREQ7:
 			ensure(cp, goto free_error);
-			if (!(err = ss_accept(ss, &sock, cp)))
+			if (!(err = ss_accept(ss, &sock, cp))) {
+				if (!sock->sk->prot->disconnect(sock->sk, O_NONBLOCK))
+					sock->state = SS_UNCONNECTED;
 				sock_release(sock);
+			}
 			if (bufq_length(&ss->conq))
 				ss_set_state(ss, TS_WRES_CIND);
 			else {
@@ -10908,11 +11150,22 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 			}
 			break;
 		case TS_WACK_DREQ6:
+			if ((err = ss_disconnect(ss)))
+				goto free_error;
+			ss_set_state(ss, TS_IDLE);
+			break;
 		case TS_WACK_DREQ9:
 		case TS_WACK_DREQ10:
 		case TS_WACK_DREQ11:
 			if ((err = ss_disconnect(ss)))
 				goto free_error;
+			/*
+			   TPI spec says that if the interface is in the TS_DATA_XFER,
+			   TS_WIND_ORDREL or TS_WACK_ORDREL [sic] state, the stream must be flushed
+			   before responding with the T_OK_ACK primitive. 
+			 */
+			if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
+				goto enobufs;
 			ss_set_state(ss, TS_IDLE);
 			break;
 		default:
@@ -10927,6 +11180,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 		putnext(ss->rq, mp);
 		return (QR_DONE);
 	}
+      enobufs:
 	ptrace(("%s: ERROR: No buffers\n", SS_MOD_NAME));
 	return (-ENOBUFS);
       free_error:
@@ -10939,27 +11193,30 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-t_unitdata_ind(queue_t *q, struct sockaddr *src, struct msghdr *msg, mblk_t *dp)
+t_unitdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
-	size_t src_len = ss_addr_size(ss, src);
-	size_t opt_len = ss_size_opts(ss, msg);
-	if ((mp = ss_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
+	size_t opt_len = ss_opts_size(ss, msg);
+#if 0
+	fixme(("Option processing strapped out for debugging: size would be %u\n", opt_len));
+	opt_len = 0;
+#endif
+	if ((mp = ss_allocb(q, sizeof(*p) + msg->msg_namelen + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_UNITDATA_IND;
-		p->SRC_length = src_len;
-		p->SRC_offset = src_len ? sizeof(*p) : 0;
+		p->SRC_length = msg->msg_namelen;
+		p->SRC_offset = msg->msg_namelen ? sizeof(*p) : 0;
 		p->OPT_length = opt_len;
-		p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
-		if (src_len) {
-			bcopy(src, mp->b_wptr, src_len);
-			mp->b_wptr += src_len;
+		p->OPT_offset = opt_len ? sizeof(*p) + msg->msg_namelen : 0;
+		if (msg->msg_namelen) {
+			bcopy(msg->msg_name, mp->b_wptr, msg->msg_namelen);
+			mp->b_wptr += msg->msg_namelen;
 		}
 		if (opt_len) {
-			ss_build_opts(ss, msg, mp->b_wptr, opt_len);
+			ss_opts_build(ss, msg, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
@@ -10981,33 +11238,33 @@ t_unitdata_ind(queue_t *q, struct sockaddr *src, struct msghdr *msg, mblk_t *dp)
  *  errors or permission.
  */
 STATIC INLINE int
-t_uderror_ind(queue_t *q, struct sockaddr *src, struct sockaddr *dst, unsigned char *opt, size_t opt_len, mblk_t *dp,
-	      int etype)
+t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
 	struct T_uderror_ind *p;
-	size_t dst_len = ss_addr_size(ss, dst);
-	(void) src;
+	size_t opt_len = ss_errs_size(ss, msg);
+	int etype;
 	if (canputnext(ss->rq)) {
-		if ((mp = ss_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
+		if ((mp = ss_allocb(q, sizeof(*p) + msg->msg_namelen + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = 2;	/* XXX move ahead of data indications */
 			p = ((typeof(p)) mp->b_wptr)++;
 			p->PRIM_type = T_UDERROR_IND;
-			p->DEST_length = dst_len;
-			p->DEST_offset = dst_len ? sizeof(*p) : 0;
+			p->DEST_length = msg->msg_namelen;
+			p->DEST_offset = msg->msg_namelen ? sizeof(*p) : 0;
 			p->OPT_length = opt_len;
-			p->OPT_offset = opt_len ? sizeof(*p) + dst_len : 0;
-			p->ERROR_type = etype;
-			if (dst_len) {
-				bcopy(dst, mp->b_wptr, dst_len);
-				mp->b_wptr += dst_len;
+			p->OPT_offset = opt_len ? sizeof(*p) + msg->msg_namelen : 0;
+			if (msg->msg_namelen) {
+				bcopy(msg->msg_name, mp->b_wptr, msg->msg_namelen);
+				mp->b_wptr += msg->msg_namelen;
 			}
 			if (opt_len) {
-				bcopy(opt, mp->b_wptr, opt_len);
+				ss_errs_build(ss, msg, mp->b_wptr, opt_len, &etype);
 				mp->b_wptr += opt_len;
 			}
+			p->ERROR_type = etype;
+			mp->b_cont = dp;
 			printd(("%s: %p: <- T_UDERROR_IND\n", SS_MOD_NAME, ss));
 			putnext(ss->rq, mp);
 			return (0);
@@ -11096,22 +11353,27 @@ t_ordrel_ind(queue_t *q)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-t_optdata_ind(queue_t *q, uint flags, struct msghdr *msg, mblk_t *dp)
+t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
 	struct T_optdata_ind *p;
-	size_t opt_len = ss_size_opts(ss, msg);
+	size_t opt_len = ss_opts_size(ss, msg);
+#if 0
+	fixme(("Option processing strapped out for debugging: size would be %u\n", opt_len));
+	opt_len = 0;
+#endif
 	if ((mp = ss_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		mp->b_band = flags & T_ODF_EX ? 1 : 0;	/* expedite */
+		mp->b_band = msg->msg_flags & T_ODF_EX ? 1 : 0;	/* expedite */
 		p = ((typeof(p)) mp->b_wptr)++;
 		p->PRIM_type = T_OPTDATA_IND;
-		p->DATA_flag = flags & (T_ODF_MORE | T_ODF_EX);
+		p->DATA_flag =
+		    ((msg->msg_flags & MSG_EOR) ? 0 : T_ODF_MORE) | ((msg->msg_flags & MSG_OOB) ? T_ODF_EX : 0);
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) : 0;
 		if (opt_len) {
-			ss_build_opts(ss, msg, mp->b_wptr, opt_len);
+			ss_opts_build(ss, msg, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
 		}
 		mp->b_cont = dp;
@@ -11364,14 +11626,14 @@ ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
  *  -------------------------------------------------------------------------
  */
 STATIC int
-ss_sock_recvmsg(queue_t *q)
+ss_sock_recvmsg(queue_t *q, int flags)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
-	int err, more, expd, res, oldsize = 0x7fffffff, size = 0;
+	int err, res, oldsize = 0x7fffffff, size = 0;
 	struct msghdr msg = { NULL, };
-	unsigned char cbuf[128] = { 0, };
-	struct sockaddr src = { AF_INET, };
+	u_int32_t cbuf[32] = { 0xdeadbeef, };
+	struct sockaddr add = { AF_INET, };
 	struct sk_buff *skb;
 	while (canputnext(ss->rq)) {
 		switch (ss->p.prot.type) {
@@ -11397,8 +11659,8 @@ ss_sock_recvmsg(queue_t *q)
 			iov[0].iov_base = mp->b_rptr;
 			iov[0].iov_len = size;
 			if (ss->p.prot.type != SOCK_STREAM) {
-				msg.msg_name = &src;
-				msg.msg_namelen = ss_addr_size(ss, &src);
+				msg.msg_name = &add;
+				msg.msg_namelen = ss_addr_size(ss, &add);
 			} else {
 				msg.msg_name = NULL;
 				msg.msg_namelen = 0;
@@ -11407,7 +11669,7 @@ ss_sock_recvmsg(queue_t *q)
 			msg.msg_iovlen = sizeof(iov) / sizeof(struct iovec);
 			msg.msg_control = cbuf;
 			msg.msg_controllen = sizeof(cbuf);
-			msg.msg_flags = 0;
+			msg.msg_flags = flags;
 			if ((res = ss_recvmsg(ss, &msg, size)) < 0) {
 				freemsg(mp);
 				return (res);
@@ -11419,27 +11681,46 @@ ss_sock_recvmsg(queue_t *q)
 			mp->b_wptr = mp->b_rptr + res;
 			ptrace(("%s: %p: recvmsg with len = %d\n", SS_MOD_NAME, ss, res));
 		}
+		if (msg.msg_flags & MSG_CTRUNC) {
+			printd(("%s: %p: control message truncated\n", SS_MOD_NAME, ss));
+			msg.msg_control = NULL;
+			msg.msg_controllen = 0;
+		}
+		if (msg.msg_control != (void *) cbuf) {
+			printd(("%s: %p: control message pointer moved!\n", SS_MOD_NAME, ss));
+			printd(("%s: %p: initial control buffer %p\n", SS_MOD_NAME, ss, msg.msg_control));
+			printd(("%s: %p: initial control length %d\n", SS_MOD_NAME, ss, msg.msg_controllen));
+			msg.msg_control = cbuf;
+			msg.msg_controllen = sizeof(cbuf) - msg.msg_controllen;
+			printd(("%s: %p: final control buffer %p\n", SS_MOD_NAME, ss, msg.msg_control));
+			printd(("%s: %p: final control length %d\n", SS_MOD_NAME, ss, msg.msg_controllen));
+		} else if (msg.msg_controllen == sizeof(cbuf) && cbuf[0] == 0xdeadbeef) {
+			printd(("%s: %p: control message unchanged!\n", SS_MOD_NAME, ss));
+			msg.msg_control = NULL;
+			msg.msg_controllen = 0;
+		}
 #if 0
 		if (msg.msg_flags & MSG_TRUNC) {
 			freemsg(mp);
 			return (-EMSGSIZE);
 		}
 #endif
-		more = (msg.msg_flags & MSG_EOR) ? 0 : T_ODF_MORE;
-		expd = (msg.msg_flags & MSG_OOB) ? T_ODF_EX : 0;
 		if (ss->p.info.SERV_type == T_CLTS) {
-			if ((err = t_unitdata_ind(q, &src, &msg, mp)) != QR_ABSORBED)
+			if (flags & MSG_ERRQUEUE) {
+				if ((err = t_uderror_ind(q, &msg, mp)) != QR_ABSORBED)
+					return (err);
+			} else if ((err = t_unitdata_ind(q, &msg, mp)) != QR_ABSORBED)
 				return (err);
 		} else if (!msg.msg_controllen) {
 			if (msg.msg_flags & MSG_OOB) {
-				if ((err = t_exdata_ind(q, more, mp)) != QR_ABSORBED)
+				if ((err = t_exdata_ind(q, &msg, mp)) != QR_ABSORBED)
 					return (err);
 			} else {
-				if ((err = t_data_ind(q, more, mp)) != QR_ABSORBED)
+				if ((err = t_data_ind(q, &msg, mp)) != QR_ABSORBED)
 					return (err);
 			}
 		} else {
-			if ((err = t_optdata_ind(q, more | expd, &msg, mp)) != QR_ABSORBED)
+			if ((err = t_optdata_ind(q, &msg, mp)) != QR_ABSORBED)
 				return (err);
 		}
 	}
@@ -11463,7 +11744,6 @@ ss_sock_recvmsg(queue_t *q)
 STATIC void
 ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 {
-	__PSW_TYPE flags;
 	mblk_t *mp;
 	ss_event_t *p;
 	if ((mp = allocb(sizeof(*p), BPRI_HI))) {
@@ -11477,21 +11757,21 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 	/*
 	   set up bufcall so we don't lose events 
 	 */
-	lis_spin_lock_irqsave(&ss->lock, &flags); {
-		/*
-		 * make sure bufcalls don't happen now 
-		 */
-		if (q == ss->rq) {
-			if (ss->rbid)
-				unbufcall(xchg(&ss->rbid, 0));
-			ss->rbid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
-		} else if (q == ss->wq) {
-			if (ss->wbid)
-				unbufcall(xchg(&ss->wbid, 0));
-			ss->wbid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
-		}
-	}
-	lis_spin_unlock_irqrestore(&ss->lock, &flags);
+	spin_lock_bh(&ss->lock);
+	/*
+	 * make sure bufcalls don't happen now 
+	 */
+	if (q == ss->rq) {
+		if (ss->rbid)
+			unbufcall(xchg(&ss->rbid, 0));
+		ss->rbid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
+	} else if (q == ss->wq) {
+		if (ss->wbid)
+			unbufcall(xchg(&ss->wbid, 0));
+		ss->wbid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
+	} else
+		swerr();
+	spin_unlock_bh(&ss->lock);
 }
 
 /*
@@ -11566,8 +11846,11 @@ _ss_sock_error_report(long data)
 		if (sk->error_report == &ss_error_report) {
 			if ((ss = SOCK_PRIV(sk))) {
 				ss_putctl(ss, ss->rq, M_ERROR, &_ss_sock_error_report, sk);
-			} else
+			}
+#if 0
+			else
 				assure(ss);
+#endif
 		} else
 			assure(sk->error_report == &ss_error_report);
 		read_unlock(&sk->callback_lock);
@@ -11708,10 +11991,10 @@ STATIC mblk_t *
 t_seq_check(ss_t * ss, ulong seq)
 {
 	mblk_t *mp;
-	lis_spin_lock(&ss->conq.q_lock); {
+	spin_lock_bh(&ss->conq.q_lock); {
 		for (mp = bufq_head(&ss->conq); mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
 	}
-	lis_spin_unlock(&ss->conq.q_lock);
+	spin_unlock_bh(&ss->conq.q_lock);
 	usual(mp);
 	return (mp);
 }
@@ -12065,6 +12348,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	{
 		struct sockaddr_in *add_in;
 		if ((add_len = p->ADDR_length) == 0) {
+			if (ss->p.prot.type == SOCK_RAW)
+				goto noaddr;
 			bzero(add, sizeof(add));
 			add_len = sizeof(struct sockaddr_in);
 			add->sa_family = AF_INET;
@@ -12125,6 +12410,10 @@ t_bind_req(queue_t *q, mblk_t *mp)
       acces:
 	err = TACCES;
 	ptrace(("%s: ERROR: no permission for address\n", SS_MOD_NAME));
+	goto error;
+      noaddr:
+	err = TNOADDR;
+	ptrace(("%s: ERROR: address could not be assigned\n", SS_MOD_NAME));
 	goto error;
       badaddr:
 	err = TBADADDR;
@@ -12196,7 +12485,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		size_t opt_len = p->OPT_length;
 		size_t opt_off = p->OPT_offset;
 		unsigned char *opt = mp->b_rptr + opt_off;
-		if ((cmsg_len = ss_size_cmsg(ss, opt, opt_len)) >= 0) {
+		if ((cmsg_len = ss_cmsg_size(ss, opt, opt_len)) >= 0) {
 			struct msghdr msg;
 			unsigned char cmsg[cmsg_len];
 			struct sockaddr *dst = (typeof(dst)) (mp->b_rptr + p->DEST_offset);
@@ -12204,8 +12493,8 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 			msg.msg_namelen = ss_addr_size(ss, dst);
 			msg.msg_control = cmsg_len ? cmsg : NULL;
 			msg.msg_controllen = cmsg_len;
-			msg.msg_flags = 0;
-			if (ss_build_cmsg(ss, opt, opt_len, &msg) < 0)
+			msg.msg_flags = MSG_NOSIGNAL | MSG_DONTWAIT;
+			if (ss_cmsg_build(ss, opt, opt_len, &msg) < 0)
 				goto badopt;
 			return ss_sock_sendmsg(ss, mp, &msg);
 		}
@@ -12341,7 +12630,7 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
-	ss->sock->ops->shutdown(ss->sock, SEND_SHUTDOWN);
+	ss->sock->ops->shutdown(ss->sock, SEND_SHUTDOWN - 1);	/* XXX */
 	switch (ss_get_state(ss)) {
 	case TS_DATA_XFER:
 		ss_set_state(ss, TS_WIND_ORDREL);
@@ -12368,7 +12657,6 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_optdata_req(queue_t *q, mblk_t *mp)
 {
-	int err;
 	ss_t *ss = PRIV(q);
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 	if (ss->p.info.SERV_type == T_CLTS)
@@ -12384,15 +12672,15 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 		size_t opt_len = p->OPT_length;
 		size_t opt_off = p->OPT_offset;
 		unsigned char *opt = mp->b_rptr + opt_off;
-		if ((cmsg_len = ss_size_cmsg(ss, opt, opt_len)) >= 0) {
+		if ((cmsg_len = ss_cmsg_size(ss, opt, opt_len)) >= 0) {
 			struct msghdr msg;
 			unsigned char cmsg[cmsg_len];
 			msg.msg_name = NULL;
 			msg.msg_namelen = 0;
 			msg.msg_control = &cmsg;
 			msg.msg_controllen = cmsg_len;
-			msg.msg_flags = 0;
-			if (ss_build_cmsg(ss, opt, opt_len, &msg) < 0)
+			msg.msg_flags = MSG_NOSIGNAL | MSG_DONTWAIT;
+			if (ss_cmsg_build(ss, opt, opt_len, &msg) < 0)
 				goto badopt;
 			if ((p->DATA_flag & T_ODF_EX))
 				msg.msg_flags |= MSG_OOB;
@@ -12409,30 +12697,25 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 		goto badopt;
 	}
       badopt:
-	err = TBADOPT;
 	ptrace(("%s: ERROR: bad options\n", SS_MOD_NAME));
 	goto error;
       acces:
-	err = TACCES;
 	ptrace(("%s: ERROR: no permission to options\n", SS_MOD_NAME));
 	goto error;
       outstate:
-	err = TOUTSTATE;
 	ptrace(("%s: ERROR: would place i/f out of state\n", SS_MOD_NAME));
 	goto error;
       einval:
 	ptrace(("%s: ERROR: invalid primitive format\n", SS_MOD_NAME));
-	return m_error(q, EPROTO);
+	goto error;
       discard:
 	ptrace(("%s: ERROR: ignore in idle state\n", SS_MOD_NAME));
 	return (QR_DONE);
       notsupport:
-	err = TNOTSUPPORT;
 	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", SS_MOD_NAME));
 	goto error;
       error:
-	// FIXME: not right.  Need to do M_ERROR. 
-	return t_error_ack(q, T_OPTDATA_REQ, err);
+	return m_error(q, EPROTO);
 }
 
 #ifdef T_ADDR_REQ
@@ -12616,9 +12899,9 @@ ss_w_flush(queue_t *q, mblk_t *mp)
 	}
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHER(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
 		else
-			flushq(OTHER(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHALL);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
@@ -12652,7 +12935,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 	int oldstate = xchg(&ss->tcp_state, p->state);
 	if (!ss->sock)
 		goto discard;
-	assure(p->state != oldstate);
+	// assure(p->state != oldstate);
 	printd(("%s: %p: state_change [%s <- %s] %p\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(oldstate), p->sk));
 	switch (ss->p.prot.type) {
@@ -12814,7 +13097,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
 		case TS_WREQ_ORDREL:	/* TCP bug I believe */
-			return ss_sock_recvmsg(q);
+			return ss_sock_recvmsg(q, 0);
 		}
 		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
 			state_name(ss_get_state(ss))));
@@ -12824,7 +13107,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	case SOCK_RDM:
 		switch (ss_get_state(ss)) {
 		case TS_IDLE:
-			return ss_sock_recvmsg(q);
+			return ss_sock_recvmsg(q, 0);
 		}
 		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
 			state_name(ss_get_state(ss))));
@@ -12872,6 +13155,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
 		switch (ss_get_state(ss)) {
 		case TS_DATA_XFER:
 		case TS_WREQ_ORDREL:
+			qenable(ss->wq);
 			return (QR_DONE);
 		}
 		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
@@ -12882,6 +13166,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
 	case SOCK_RDM:
 		switch (ss_get_state(ss)) {
 		case TS_IDLE:
+			qenable(ss->wq);
 			return (QR_DONE);
 		}
 		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
@@ -12922,7 +13207,7 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	err = sock_error(p->sk);
 	if (!ss->sock)
 		goto discard;
-	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
+	// assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
 	printd(("%s: %p: error_report [%s <- %s] %p\n", SS_MOD_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
@@ -12930,7 +13215,7 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	case SOCK_SEQPACKET:
 		switch (ss_get_state(ss)) {
 		default:
-			fixme(("%s: %p: FIXME: save errors for later\n", SS_MOD_NAME, ss));
+			// fixme(("%s: %p: FIXME: save errors for later\n", SS_MOD_NAME, ss));
 			return (QR_DONE);
 		case TS_IDLE:
 			printd(("%s: %p: INFO: ignoring error event %d\n", SS_MOD_NAME, ss, err));
@@ -13021,7 +13306,7 @@ STATIC int
 ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0, locked;
-	if (mp->b_datap->db_type < QPCTL || q->q_count) {
+	if (mp->b_datap->db_type < QPCTL && q->q_count) {
 		putq(q, mp);
 		return (0);
 	}
@@ -13251,12 +13536,12 @@ ss_alloc_priv(queue_t *q, ss_t ** slp, ushort cmajor, ushort cminor, cred_t *crp
 		ss->refcnt++;
 		ss->cred = *crp;
 		ss->p = *prof;
-		lis_spin_lock_init(&ss->qlock, "ss-queue-lock");
+		spin_lock_init(&ss->qlock);
 		ss->rwait = NULL;
 		ss->wwait = NULL;
 		ss->users = 0;
 		ss_set_state(ss, TS_UNBND);
-		lis_spin_lock_init(&ss->lock, "ss-priv-lock");
+		spin_lock_init(&ss->lock);
 		bufq_init(&ss->conq);
 		if ((ss->next = *slp))
 			ss->next->prev = &ss->next;
@@ -13273,14 +13558,13 @@ STATIC void
 ss_free_priv(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
-	__PSW_TYPE flags = 0;
 	printd(("%s: unlinking private structure, reference count = %d\n", SS_MOD_NAME, ss->refcnt));
-	lis_spin_lock_irqsave(&ss->lock, &flags); {
+	spin_lock_bh(&ss->lock); {
 		bufq_purge(&ss->conq);
 		if (ss->sock)
 			ss_socket_put(xchg(&ss->sock, NULL));
 		printd(("%s: removed socket, reference count = %d\n", SS_MOD_NAME, ss->refcnt));
-		ss_unbufcall(q);
+		__ss_unbufcall(q);
 		printd(("%s: removed bufcalls, reference count = %d\n", SS_MOD_NAME, ss->refcnt));
 		if ((*ss->prev = ss->next))
 			ss->next->prev = ss->prev;
@@ -13293,7 +13577,7 @@ ss_free_priv(queue_t *q)
 		ss->wq->q_ptr = NULL;
 		ss->refcnt--;
 	}
-	lis_spin_unlock_irqrestore(&ss->lock, &flags);
+	spin_unlock_bh(&ss->lock);
 	if (ss->refcnt) {
 		assure(ss->refcnt);
 		printd(("%s: WARNING: ss->refcnt = %d\n", SS_MOD_NAME, ss->refcnt));
@@ -13317,57 +13601,74 @@ STATIC const ss_profile_t ss_profiles[] = {
 	{{PF_INET, SOCK_RAW, IPPROTO_ICMP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_RAW, IPPROTO_IGMP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_RAW, IPPROTO_IPIP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_STREAM, IPPROTO_TCP},
 	 {T_INFO_ACK, T_INVALID, 1, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_RAW, IPPROTO_EGP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_RAW, IPPROTO_PUP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_DGRAM, IPPROTO_UDP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_RAW, IPPROTO_IDP},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_INET, SOCK_RAW, IPPROTO_RAW},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
-	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_UNIX, SOCK_STREAM, 0},
 	 {T_INFO_ACK, T_INVALID, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
-	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_UNIX, SOCK_STREAM, 0},
 	 {T_INFO_ACK, T_INVALID, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
-	  T_INFINITE, 0xffff, T_COTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}},
+	  T_INFINITE, 0xffff, T_COTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+	,
 	{{PF_UNIX, SOCK_DGRAM, 0},
 	 {T_INFO_ACK, 0xffff, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_un),
 	  T_INFINITE, 0xffff, T_CLTS, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+#if defined HAVE_OPENSS7_SCTP
+	,
+	{{PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP},
+	 {T_INFO_ACK, T_INVALID, T_INVALID, 536, T_INVALID,
+	  8 * sizeof(struct sockaddr_in),
+	  T_INFINITE, 0xffff, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
+#endif				/* defined HAVE_OPENSS7_SCTP */
 };
 STATIC int ss_majors[SS_NMAJOR] = { SS_CMAJOR, };
 STATIC int
 ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	__PSW_TYPE flags;
 	int mindex = 0, err;
 	int cmajor = getmajor(*devp);
 	int cminor = getminor(*devp);
@@ -13389,7 +13690,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	prof = &ss_profiles[cminor - FIRST_CMINOR];
 	cminor = FREE_CMINOR;
-	lis_spin_lock_irqsave(&ss_lock, &flags);
+	spin_lock_bh(&ss_lock);
 	for (; *ipp; ipp = &(*ipp)->next) {
 		if (cmajor != (*ipp)->cmajor)
 			break;
@@ -13408,7 +13709,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	}
 	if (mindex >= SS_NMAJOR || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", SS_MOD_NAME));
-		lis_spin_unlock_irqrestore(&ss_lock, &flags);
+		spin_unlock_bh(&ss_lock);
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
@@ -13416,7 +13717,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
 		ptrace(("%s: ERROR: No memory\n", SS_MOD_NAME));
-		lis_spin_unlock_irqrestore(&ss_lock, &flags);
+		spin_unlock_bh(&ss_lock);
 		MOD_DEC_USE_COUNT;
 		return (ENOMEM);
 	}
@@ -13429,11 +13730,11 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if ((err = ss_sock_init(ss)) < 0) {
 		ptrace(("%s: ERROR: from ss_sock_init %d\n", SS_MOD_NAME, -err));
 		ss_free_priv(q);
-		lis_spin_unlock_irqrestore(&ss_lock, &flags);
+		spin_unlock_bh(&ss_lock);
 		MOD_DEC_USE_COUNT;
 		return (-err);
 	}
-	lis_spin_unlock_irqrestore(&ss_lock, &flags);
+	spin_unlock_bh(&ss_lock);
 	return (0);
 }
 
@@ -13445,18 +13746,65 @@ STATIC int
 ss_close(queue_t *q, int flag, cred_t *crp)
 {
 	ss_t *ss = PRIV(q);
-	__PSW_TYPE flags;
 	(void) flag;
 	(void) crp;
 	(void) ss;
 	printd(("%s: closing character device %d:%d\n", SS_MOD_NAME, ss->cmajor, ss->cminor));
-	lis_spin_lock_irqsave(&ss_lock, &flags);
+	spin_lock_bh(&ss_lock);
 	ss_free_priv(q);
-	lis_spin_unlock_irqrestore(&ss_lock, &flags);
+	spin_unlock_bh(&ss_lock);
 	MOD_DEC_USE_COUNT;
 	return (0);
 }
 
+#ifdef _LFS_SOURCE
+/*
+ *  =========================================================================
+ *
+ *  LfS Module Initialization
+ *
+ *  =========================================================================
+ */
+static struct cdevsw ss_cdev = {
+	d_name:SS_MOD_NAME,
+	d_str:&ss_info,
+	d_flag:0,
+	d_fop:NULL,
+	d_mode:S_IFCHR,
+	d_kmod:THIS_MODULE,
+};
+int __init ss_init(void)
+{
+	int err;
+#ifdef CONFIG_STREAMS_INET_MODULE
+	printk(KERN_INFO SS_BANNER);
+#else
+	printk(KERN_INFO SS_SPLASH);
+#endif
+	if ((err = ss_init_caches()))
+		return (err);
+	if ((err = register_strdev(&ss_cdev, major)) < 0) {
+		ss_term_caches();
+		return (err);
+	}
+	if (err > 0)
+		major = err;
+	return (0);
+}
+
+void __exit ss_exit(void)
+{
+	unregister_strdev(&ss_cdev, major);
+	ss_term_caches();
+}
+
+#ifdef CONFIG_STREAMS_INET_MODULE
+module_init(ss_init);
+module_exit(ss_exit);
+#endif
+
+
+#else
 /*
  *  =========================================================================
  *
@@ -13488,7 +13836,7 @@ ss_init(void)
 		} else if (mindex)
 			ss_majors[mindex] = err;
 	}
-	lis_spin_lock_init(&ss_lock, "ss-open-list-lock");
+	spin_lock_init(&ss_lock);
 	ss_initialized = 1;
 	return;
 }
@@ -13530,3 +13878,4 @@ cleanup_module(void)
 {
 	ss_terminate();
 }
+#endif
