@@ -60,39 +60,36 @@
 #include "Timestamp.hpp"
 #include "Mutex.hpp"
 #include "Extractor.hpp"
+#include "Notify.hpp"
+#include "Settings.hpp"
 
+
+class Notify;
 /* ------------------------------------------------------------------- */
 class PerfSocket : public Socket {
 public:
     // stores port, UDP/TCP mode, and UDP rate
-    PerfSocket( unsigned short inPort,  bool inUDP );
+    PerfSocket( ext_Settings *inSettings, Notify* toNotify = NULL );
 
     // destroy the iperf socket object
     virtual ~PerfSocket();
 
     iperf_sockaddr Accept_UDP( void );
 
-    // used to reference the 4 byte ID number we place in UDP datagrams
-    // use int32_t if possible, otherwise a 32 bit bitfield (e.g. on J90) 
-    struct UDP_datagram {
-#ifdef HAVE_INT32_T
-        int32_t id;
-        u_int32_t tv_sec;
-        u_int32_t tv_usec;
-#else
-        signed   int id      : 32;
-        unsigned int tv_sec  : 32;
-        unsigned int tv_usec : 32;
-#endif
-    };
+    // lock while doing reporting; printf often isn't thread safe.
+    static Mutex sReporting;
+    static int sReportCount;
+
 
 protected:
     // UDP, in PerfSocket_UDP.cpp
     void Send_UDP( void );
     void Recv_UDP( void );
 
-    void write_UDP_FIN(    int sock, void* buf, int len );
-    void write_UDP_AckFIN( int sock, void* buf, int len );
+    void write_UDP_FIN( );
+    void write_UDP_AckFIN( max_size_t mTotalLen, Timestamp mEndTime,
+                           Timestamp mStartTime, int errorCnt,
+                           int outofOrder, int32_t datagramID );
 
     // TCP, in PerfSocket_TCP.cpp
     void Send_TCP( void );
@@ -101,9 +98,9 @@ protected:
     // Used for automatic determining of Window size
     void Client_Recv_TCP(void);
     void Server_Send_TCP(void);
-    
+
     void Multicast_remove_client( iperf_sockaddr );
-    
+
     virtual void SetSocketOptions( void );
     virtual int set_tcp_windowsize( int, int ) = 0;
     virtual int get_tcp_windowsize( int ) = 0;
@@ -137,9 +134,11 @@ protected:
 
     static bool sInterupted;
 
+    // Extra Settings
+    ext_Settings *mSettings;
+
     // buffer to do reads/writes
     char *mBuf;
-    int mBufLen;
 
     // individual and cummulative bytes written
     max_size_t mTotalLen;
@@ -166,13 +165,8 @@ protected:
     int32_t mPLastDatagramID;
     max_size_t mPLastTotalLen;
 
-    // number of lines left before printing another header
-    static int sReportCount;
-
-    // lock while doing reporting; printf often isn't thread safe.
-    static Mutex sReporting;
-
     Extractor *extractor;
+    Notify    *ptr_parent;
 
 
 }; // end class PerfSocket
