@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/03/01 00:08:40 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/03/01 11:55:29 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,12 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/01 00:08:40 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/01 11:55:29 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
+AC_REVISION([$Id: configure.ac,v 0.9.2.4 2004/03/01 11:55:29 brian Exp $])
 AC_PREREQ(2.57)
 AC_INIT([streams],[0.9.2],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/timod.c])
@@ -68,34 +69,41 @@ auxdir="$ac_aux_dir"
 AC_SUBST(auxdir)
 
 AC_CANONICAL_TARGET
-
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 
 AC_GNU_SOURCE
 
 # Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-
 AM_PROG_AS
 AC_PROG_AWK
-AC_PROG_CC_C_O
-
+AC_PROG_CC
+AC_PROG_CPP
+AM_PROG_CC_C_O
+AM_PROG_CC_STDC
+AC_PROG_CXX
+AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
+AM_GNU_GETTEXT_VERSION(0.13.1)
+
 # Checks for libraries.
+# FIXME: Replace `main' with a function in `-lc':
+AC_CHECK_LIB([c], [main])
 
 # Checks for header files.
-AC_CHECK_HEADERS([unistd.h])
+AC_FUNC_ALLOCA
+AC_HEADER_STDC
+AC_CHECK_HEADERS([argz.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STAT
+AC_HEADER_STDBOOL
 AC_C_CONST
 AC_TYPE_UID_T
 AC_C_INLINE
@@ -103,22 +111,38 @@ AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
+AC_CHECK_MEMBERS([struct stat.st_blksize])
+AC_STRUCT_ST_BLOCKS
+AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
 AC_C_VOLATILE
+AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
-AC_HEADER_STDC
+AM_GNU_GETTEXT
 AC_PROG_GCC_TRADITIONAL
 AC_HEADER_MAJOR
+if test :"${cross_compiling-no}" != :yes ; then
+	:
+	AC_FUNC_MALLOC
+	AC_FUNC_SETPGRP
+fi
+AC_FUNC_FORK
 AC_FUNC_MEMCMP
+AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_MMAP
+AC_FUNC_REALLOC
+AC_TYPE_SIGNAL
+AC_FUNC_STAT
 AC_FUNC_STRNLEN
-AC_FUNC_STRNLEN
-AC_CHECK_FUNCS([bzero memset strchr])
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero gettimeofday getcwd inet_ntoa mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul])
 
 AC_LFS
 
-# AC_CONFIG_FILES([Makefile doc/Makefile doc/man/Makefile doc/manual/Makefile])
-AC_CONFIG_FILES([Makefile])
+dnl AC_CONFIG_FILES([Makefile doc/Makefile doc/man/Makefile doc/manual/Makefile])
+dnl AC_CONFIG_FILES([Makefile])
+
+AC_CONFIG_FILES([Makefile po/Makefile.in intl/Makefile m4/Makefile])
 
 AC_OUTPUT

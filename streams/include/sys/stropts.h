@@ -250,4 +250,6 @@ struct strpmsg {
 	long flags;
 };
 
+#define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678)
+
 #endif				/* __STROPTS_H__ */
