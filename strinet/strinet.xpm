@@ -1,5 +1,5 @@
 /* XPM */
-static char *openss7-logo-small[] = {
+static char *magick[] = {
 /* columns rows colors chars-per-pixel */
 "64 64 191 2",
 "   c #020202",

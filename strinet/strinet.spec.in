@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/12/21 22:22:23 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/12/29 07:23:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 22:22:23 $ by $Author: brian $
+# Last Modified $Date: 2004/12/29 07:23:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -259,6 +259,7 @@ fi
 %endif
 
 %define cache_file ../%{_target_platform}-%{kernel_version}-%{_streams}.cache
+%define csite_file ../config.site
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
@@ -896,6 +897,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.25  2004/12/29 07:23:10  brian
+# - Added missing config_site macro definition.
+#
 # Revision 0.9.2.24  2004/12/21 22:22:23  brian
 # - Added automatic site configuration to rpm build.
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/24 12:25:42 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/12/29 07:22:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/24 12:25:42 $ by $Author: brian $
+ Last Modified $Date: 2004/12/29 07:22:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/24 12:25:42 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/12/29 07:22:20 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/24 12:25:42 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/12/29 07:22:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -105,14 +105,14 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
 
-#include "include/linux/hooks.h"
-#include "include/linux/linux_sysctl.h"
-#include "include/net/net_sctp.h"
-#include "include/net/net_sock.h"
-#include "include/net/net_snmp.h"
-#include "include/os7_namespace.h"
+#include "linux/sysctl.h"
+#include "net/sctp.h"
+#include "net/sock.h"
+#include "net/snmp.h"
+#include "linux/hooks.h"
+#include "os7_namespace.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.11 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.12 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."

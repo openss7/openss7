@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 06:30:23 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:55:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/12 06:30:23 $ by $Author: brian $
+ Last Modified $Date: 2004/12/29 06:55:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 06:30:23 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:55:39 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 06:30:23 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:55:39 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
 #endif /* NEED_MAKEFILE_EDIT */
 #ifndef lint
 char	nettest_id[]="\
-@(#)nettest_bsd.c (c) Copyright 1993-2004 Hewlett-Packard Co. Version 2.3";
+@(#)nettest_bsd.c (c) Copyright 1993-2004 Hewlett-Packard Co. Version 2.3pl1";
 #else
 #define DIRTY
 #define HISTOGRAM
@@ -387,6 +387,9 @@ create_data_socket(int family, int type, int protocol, int address, unsigned sho
   SOCKET temp_socket;
   int one;
   int sock_opt_len;
+  struct sockaddr_in temp;
+  int    on  = 1;
+  
 
   /*set up the data socket                        */
   temp_socket = socket(family, 
@@ -532,35 +535,36 @@ create_data_socket(int family, int type, int protocol, int address, unsigned sho
       break;
   }
 
-  if ((address) || (port)) {
-    struct sockaddr_in temp;
-    int    on  = 1;
+  /* since some of the UDP tests do not do anything to cause an
+     implicit bind() call, we need to be rather explicit about our
+     bind() call here. even if the address and/or the port are zero
+     (INADDR_ANY etc). raj 2004-07-20 */
 
-    if (setsockopt(temp_socket,
-		   SOL_SOCKET,
-		   SO_REUSEADDR,
-		   &on,
-		   sizeof(on)) < 0) {
-      fprintf(where,
-	      "netperf: create_data_socket: SO_REUSEADDR failled %d\n",
-	      errno);
-      fflush(where);
-    }
-
-    bzero(&temp,sizeof(struct sockaddr));
-    temp.sin_port = htons(port);
-    temp.sin_family = AF_INET;
-    temp.sin_addr.s_addr = address;
-    if (bind(temp_socket,
-	     (struct sockaddr *)&temp,
-	     sizeof(struct sockaddr_in)) < 0) {
-      fprintf(where,
-	      "netperf: create_data_socket: data socket bind failed errno %d\n",
-	      errno);
-      fprintf(where," port: %d\n",ntohs(temp.sin_port));
-      fflush(where);
-    }
+  if (setsockopt(temp_socket,
+		 SOL_SOCKET,
+		 SO_REUSEADDR,
+		 &on,
+		 sizeof(on)) < 0) {
+    fprintf(where,
+	    "netperf: create_data_socket: SO_REUSEADDR failled %d\n",
+	    errno);
+    fflush(where);
   }
+  
+  bzero(&temp,sizeof(struct sockaddr));
+  temp.sin_port = htons(port);
+  temp.sin_family = AF_INET;
+  temp.sin_addr.s_addr = address;
+  if (bind(temp_socket,
+	   (struct sockaddr *)&temp,
+	   sizeof(struct sockaddr_in)) < 0) {
+    fprintf(where,
+	    "netperf: create_data_socket: data socket bind failed errno %d\n",
+	    errno);
+    fprintf(where," port: %d\n",ntohs(temp.sin_port));
+    fflush(where);
+  }
+  
 
   return(temp_socket);
 
@@ -4062,7 +4066,7 @@ if (send_width == 0) {
     
     if (sigprocmask(SIG_BLOCK, (sigset_t *)NULL, &signal_set) != 0) {
       fprintf(where,
-	      "send_udp_stream: unable to get sigmask errno %d\n",
+	      "sendfile_tcp_stream: unable to get sigmask errno %d\n",
 	      errno);
       fflush(where);
       exit(1);

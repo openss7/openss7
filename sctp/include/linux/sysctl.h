@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: net_snmp.h,v 0.9.2.5 2004/12/24 12:05:16 brian Exp $
+ @(#) $Id: sysctl.h,v 0.9.2.6 2004/12/29 07:22:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,45 +45,38 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/24 12:05:16 $ by $Author: brian $
+ Last Modified $Date: 2004/12/29 07:22:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __OS7_NET_NET_SNMP_H__
-#define __OS7_NET_NET_SNMP_H__
+#ifndef __OS7_LINUX_LINUX_SYSCTL_H__
+#define __OS7_LINUX_LINUX_SYSCTL_H__
 
-#ident "@(#) $RCSfile: net_snmp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sysctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-/*
- *  In accordance with draft-ietf-sigtran-sctp-mib-07
- */
-struct __os7_sctp_mib {
-	unsigned long SctpRtoAlgorithm;
-	unsigned long SctpRtoMin;
-	unsigned long SctpRtoMax;
-	unsigned long SctpRtoInitial;
-	unsigned long SctpMaxAssoc;
-	unsigned long SctpValCookieLife;
-	unsigned long SctpMaxInitRetr;
-	unsigned long SctpCurrEstab;
-	unsigned long SctpActiveEstabs;
-	unsigned long SctpPassiveEstabs;
-	unsigned long SctpAborteds;
-	unsigned long SctpShutdowns;
-	unsigned long SctpOutOfBlues;
-	unsigned long SctpChecksumErrors;
-	unsigned long SctpOutCtrlChunks;
-	unsigned long SctpOutOrderChunks;
-	unsigned long SctpOutUnorderChunks;
-	unsigned long SctpInCtrlChunks;
-	unsigned long SctpInOrderChunks;
-	unsigned long SctpInUnorderChunks;
-	unsigned long SctpFragUsrMsgs;
-	unsigned long SctpReasmUsrMsgs;
-	unsigned long SctpOutSCTPPacks;
-	unsigned long SctpInSCTPPacks;
-	unsigned long SctpDiscontinuityTime;
-	unsigned long __pad[0];
-} ____cacheline_aligned;
+enum {
+	__OS7_NET_SCTP_RTO_INITIAL = 200,
+	__OS7_NET_SCTP_RTO_MIN = 201,
+	__OS7_NET_SCTP_RTO_MAX = 202,
+	__OS7_NET_SCTP_HEARTBEAT_ITVL = 203,
+	__OS7_NET_SCTP_INIT_RETRIES = 204,
+	__OS7_NET_SCTP_VALID_COOKIE_LIFE = 205,
+	__OS7_NET_SCTP_MAX_SACK_DELAY = 206,
+	__OS7_NET_SCTP_PATH_MAX_RETRANS = 207,
+	__OS7_NET_SCTP_ASSOC_MAX_RETRANS = 208,
+	__OS7_NET_SCTP_MAC_TYPE = 209,
+	__OS7_NET_SCTP_CSUM_TYPE = 210,
+	__OS7_NET_SCTP_COOKIE_INC = 211,
+	__OS7_NET_SCTP_THROTTLE_ITVL = 212,
+	__OS7_NET_SCTP_MEM = 213,
+	__OS7_NET_SCTP_WMEM = 214,
+	__OS7_NET_SCTP_RMEM = 215,
+	__OS7_NET_SCTP_MAX_ISTREAMS = 216,
+	__OS7_NET_SCTP_REQ_OSTREAMS = 217,
+	__OS7_NET_SCTP_ECN = 218,
+	__OS7_NET_SCTP_ADAPTATION_LAYER_INFO = 219,
+	__OS7_NET_SCTP_PARTIAL_RELIABILITY = 220,
+	__OS7_NET_SCTP_MAX_BURST = 221,
+};
 
-#endif				/* __OS7_NET_NET_SNMP_H__ */
+#endif				/* __OS7_LINUX_LINUX_SYSCTL_H__ */

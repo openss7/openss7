@@ -87,6 +87,16 @@
 %N journal issue number
 %X annotation (separate paragraph after citation)
 
+%L RFC 1349
+%A Philip Almquist
+%E Philip Almquist
+%Q Internet Engineering Task Force
+%T Type of Service in the Internet Protocol Suite
+%R RFC 1349
+%D July 1992
+%I Internet Engineering Task Force
+%U http://www.ietf.org/rfc/rfc1349.txt
+
 %L RFC 2119
 %A Scott Bradner
 %E Scott Bradner

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netlib.h,v 1.1.1.2 2004/08/06 03:47:22 brian Exp $
+ @(#) $Id: netlib.h,v 1.1.1.3 2004/12/29 06:55:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 03:47:22 $ by $Author: brian $
+ Last Modified $Date: 2004/12/29 06:55:39 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -442,6 +442,7 @@ extern int optopt;		/* */
 extern  SOCKET     win_kludge_socket;
 #endif /* WIN32 */
 
+extern  int   proc_affinity;
 extern  union netperf_request_struct netperf_request;
 extern  union netperf_response_struct netperf_response;
 

@@ -60,7 +60,7 @@
 #include <linux/poll.h>
 #include <net/checksum.h>
 #include <net/tcp.h>		/* for sequence number functions, bind bucket */
-#include "include/linux/linux_sctp.h"
+#include "linux/sctp.h"
 
 /*
  *  =========================================================================

@@ -81,6 +81,7 @@ AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
 # _RPM_SPEC_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP], [dnl
+    _RPM_SPEC_SETUP_DIST
     _RPM_SPEC_SETUP_EPOCH
     _RPM_SPEC_SETUP_RELEASE
     _RPM_SPEC_SETUP_DATE
@@ -93,12 +94,287 @@ AC_DEFUN([_RPM_SPEC_SETUP], [dnl
 # =========================================================================
 
 # =========================================================================
+# _RPM_SPEC_SETUP_DIST
+# -------------------------------------------------------------------------
+AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
+    AC_ARG_WITH([rpm-extra],
+        AS_HELP_STRING([--with-rpm-extra=EXTRA],
+            [override or disable the EXTRA release string for built RPMS. @<:@default=auto@:>@]),
+        [with_rpm_extra="$withval"],
+        [if test -r .rpmextra ; then d= ; else d="$srcdir/" ; fi
+         if test -r ${d}.rpmextra
+         then with_rpm_extra="`cat ${d}.rpmextra`"
+         else with_rpm_extra=""
+         fi])
+    AC_CACHE_CHECK([for rpm distribution], [rpm_cv_dist_flavor], [dnl
+        rpm_cv_dist_vendor=
+        rpm_cv_dist_flavor=
+        #
+        # NOTE:- for LSB compliant systems we should also be able to
+        #  find /etc/lsb-release and if we source that file we should
+        #  see:
+        #
+        #    LSB_VERSION=               # the version supported
+        #    DISTRIB_ID="SuSE"          # the distribution id
+        #    DISTRIB_RELEASE="8.0"      # the distribution release
+        #    DISTRIB_DESCRIPTION="SuSE Linux 8.0 (i386)"   # the distribution line
+        #
+        # first check for a release file
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/whitebox-release
+        then
+            rpm_cv_dist_vendor=whitebox
+            rpm_cv_dist_flavor="White Box Enterprise Linux"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/fedora-release
+        then
+            rpm_cv_dist_vendor=redhat
+            rpm_cv_dist_flavor="Fedora Core"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/mandrake-release
+        then
+            rpm_cv_dist_vendor=mandrake
+            rpm_cv_dist_flavor="Mandrake Linux"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/redhat-release
+        then
+            rpm_cv_dist_vendor=redhat
+            rpm_cv_dist_flavor="Red Hat Linux"
+        fi
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/SuSE-release
+        then
+            rpm_cv_dist_vendor=suse
+            rpm_cv_dist_flavor="SuSE Linux"
+        fi
+        # look in /etc/lsb-release
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/lsb-release
+        then
+            . /etc/lsb-release
+            rpm_tmp="$DISTRIB_DESCRIPTION"
+            case "$rpm_tmp" in
+                *White?Box*)
+                    rpm_cv_dist_vendor=whitebox
+                    rpm_cv_dist_flavor="$DISTRIB_ID"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Fedora?Core*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="$DISTRIB_ID"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Mandrake*)
+                    rpm_cv_dist_vendor=mandrake
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Red?Hat*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *SuSE*)
+                    rpm_cv_dist_vendor=suse
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *Debian*)
+                    rpm_cv_dist_vendor=debian
+                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+                *)
+                    rpm_cv_dist_vendor="${DISTRIB_DESCRIPTION:+unknown}"
+                    rpm_cv_dist_flavor="${DISTRIB_ID:-Unknown} Linux"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
+            esac
+        fi
+        # look in /etc/issue
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/issue
+        then
+            rpm_tmp=`cat /etc/issue | grep 'Linux\|Fedora' | head -1`
+            case "$rpm_tmp" in
+                *White?Box*)
+                    rpm_cv_dist_vendor=whitebox
+                    rpm_cv_dist_flavor="White Box Enterprise Linux"
+                    ;;
+                *Fedora?Core*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Fedora Core"
+                    ;;
+                *Mandrake*)
+                    rpm_cv_dist_vendor=mandrake
+                    rpm_cv_dist_flavor="Mandrake Linux"
+                    ;;
+                *Red?Hat*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Red Hat Linux"
+                    ;;
+                *SuSE*)
+                    rpm_cv_dist_vendor=suse
+                    rpm_cv_dist_flavor="SuSE Linux"
+                    ;;
+                *Debian*)
+                    rpm_cv_dist_vendor=debian
+                    rpm_cv_dist_flavor="Debian Linux"
+                    ;;
+            esac
+        fi
+        # fall back to checking the compiler
+        if test -z "$rpm_cv_dist_vendor"
+        then
+            rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
+            case "$rpm_tmp" in
+                *White?Box*)
+                    rpm_cv_dist_vendor=whitebox
+                    rpm_cv_dist_flavor="White Box Enterprise Linux"
+                    ;;
+                *Fedora?Core*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Fedora Core"
+                    ;;
+                *Mandrake*)
+                    rpm_cv_dist_vendor=mandrake
+                    rpm_cv_dist_flavor="Mandrake Linux"
+                    ;;
+                *Red?Hat*)
+                    rpm_cv_dist_vendor=redhat
+                    rpm_cv_dist_flavor="Red Hat Linux"
+                    ;;
+                *SuSE*)
+                    rpm_cv_dist_vendor=suse
+                    rpm_cv_dist_flavor="SuSE Linux"
+                    ;;
+                *Debian*)
+                    rpm_cv_dist_vendor=debian
+                    rpm_cv_dist_flavor="Debian Linux"
+                    ;;
+                *)
+                    rpm_cv_dist_vendor=unknown
+                    rpm_cv_dist_flavor="Unknown Linux"
+                    ;;
+            esac
+        fi
+    ])
+    AC_CACHE_CHECK([for rpm distribution release], [rpm_cv_dist_release], [dnl
+        rpm_cv_dist_release=
+        # first check for a release file
+        if test -z "$rpm_cv_dist_release" -a -r /etc/fedora-release
+        then
+            rpm_tmp=`cat /etc/fedora-release | grep 'Fedora Core'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/mandrake-release
+        then
+            rpm_tmp=`cat /etc/mandrake-release | grep 'Mandrake Linux'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/redhat-release
+        then
+            rpm_tmp=`cat /etc/redhat-release | grep 'Red Hat Linux'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release" -a -r /etc/SuSE-release
+        then
+            rpm_tmp=`cat /etc/SuSE-release | grep 'SuSE Linux'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        # look in /etc/issue
+        if test -z "$rpm_cv_dist_release" -a -r /etc/issue
+        then
+            rpm_tmp=`cat /etc/issue | grep Linux`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+        if test -z "$rpm_cv_dist_release"
+        then
+            rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
+            rpm_tmp=`echo $rpm_tmp | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||'`
+            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
+        fi
+    ])
+    AC_CACHE_CHECK([for rpm extra release string], [rpm_cv_dist_extra], [dnl
+        case :${with_rpm_extra:-auto} in
+            :no)
+                rpm_cv_dist_extra=
+                ;;
+            :auto)
+                case "$rpm_cv_dist_flavor" in
+                    White?Box*)
+                        case $rpm_cv_dist_release in
+                            3.0)
+                                rpm_cv_dist_extra=".WB3"
+                                ;;
+                            4.0)
+                                rpm_cv_dist_extra=".WB4"
+                                ;;
+                        esac
+                        ;;
+                    Fedora?Core*)
+                        case $rpm_cv_dist_release in
+                            1)
+                                rpm_cv_dist_extra=".FC1"
+                                ;;
+                            2)
+                                rpm_cv_dist_extra=".FC2"
+                                ;;
+                            3)
+                                rpm_cv_dist_extra=".FC3"
+                                ;;
+                        esac
+                        ;;
+                    Red?Hat*)
+                        case $rpm_cv_dist_release in
+                            7.0|7.1|7.2|7.3)
+                                rpm_cv_dist_extra=".7.x"
+                                ;;
+                            8.0)
+                                rpm_cv_dist_extra=".8"
+                                ;;
+                            9)
+                                rpm_cv_dist_extra=".9"
+                                ;;
+                            2|2.?)
+                                rpm_cv_dist_extra=".EL"
+                                ;;
+                            3|3.0)
+                                rpm_cv_dist_extra=".E3"
+                                ;;
+                            4|4.0)
+                                rpm_cv_dist_extra=".E4"
+                                ;;
+                        esac
+                        ;;
+                    Mandrake*)
+                        rpm_tmp=`echo "$rpm_cv_dist_release" | sed -e 's|\.||g'`;
+                        rpm_cv_dist_extra=".${rpm_tmp}mdk"
+                        ;;
+                    SuSE*)
+                        rpm_cv_dist_extra=".${rpm_cv_dist_release:-SuSE}"
+                        ;;
+                esac
+                ;;
+            *)
+                rpm_cv_dist_extra="$with_rpm_extra"
+                ;;
+        esac
+    ])
+    PACKAGE_RPMDIST="${rpm_cv_dist_flavor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
+    AC_SUBST([PACKAGE_RPMDIST])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
+        defaults to automatic detection.])
+    PACKAGE_RPMEXTRA="${rpm_cv_dist_extra}"
+    AC_SUBST([PACKAGE_RPMEXTRA])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMEXTRA], ["$PACKAGE_RPMEXTRA"], [The RPM Extra Release string.
+        This defaults to automatic detection.])
+])# _RPM_SPEC_SETUP_DIST
+# =========================================================================
+
+# =========================================================================
 # _RPM_SPEC_SETUP_EPOCH
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
     AC_ARG_WITH([rpm-epoch],
         AS_HELP_STRING([--with-rpm-epoch=EPOCH],
-            [specify the EPOCH for the RPM spec file.  @<:@default=1@:>@]),
+            [specify the EPOCH for the RPM spec file.  @<:@default=auto@:>@]),
         [with_rpm_epoch="$withval"],
         [if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
          if test -r ${d}.rpmepoch
@@ -120,17 +396,16 @@ AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
     AC_ARG_WITH([rpm-release],
         AS_HELP_STRING([--with-rpm-release=RELEASE],
-            [specify the RELEASE for the RPM spec file.
-            @<:@default=Custom@:>@]),
+            [specify the RELEASE for the RPM spec file.  @<:@default=auto@:>@]),
         [with_rpm_release="$withval"],
         [if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
          if test -r ${d}.rpmrelease
          then with_rpm_release="`cat ${d}.rpmrelease`"
-         else with_rpm_release='Custom'
+         else with_rpm_release=1
          fi])
     AC_MSG_CHECKING([for rpm release])
-    AC_MSG_RESULT([${with_rpm_release:-Custom}])
-    PACKAGE_RELEASE="${with_rpm_release:-Custom}"
+    AC_MSG_RESULT([${with_rpm_release:-1}])
+    PACKAGE_RELEASE="${with_rpm_release:-1}"
     AC_SUBST([PACKAGE_RELEASE])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
         Release. This defaults to Custom.])
@@ -179,6 +454,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # =========================================================================
 # _RPM_SPEC_SETUP_OPTIONS
 # -------------------------------------------------------------------------
+# Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+# --with and --without rpmpopt syntax, so convert to the equivalent --define
+# syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
+# properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     PACKAGE_OPTIONS=
     arg=
@@ -187,15 +466,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
             if test -n "$arg" ; then
                 eval "arg=$arg"
                 AC_MSG_CHECKING([for rpm argument '$arg'])
-                if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-                    if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-                        arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
-                        PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
-                        AC_MSG_RESULT([$arg])
-                    else
-                        :
-                        AC_MSG_RESULT([no])
-                    fi
+                if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+                    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+                    arg="--define '${nam} ${arg}'"
+                    PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+                    AC_MSG_RESULT([yes])
                 else
                     :
                     AC_MSG_RESULT([no])
@@ -209,15 +484,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     if test -n "$arg" ; then
         eval "arg=$arg"
         AC_MSG_CHECKING([for rpm argument '$arg'])
-        if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-            if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-                arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
-                AC_MSG_RESULT([$arg])
-            else
-                :
-                AC_MSG_RESULT([no])
-            fi
+        if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+            nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+            arg="--define '${nam} ${arg}'"
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+            AC_MSG_RESULT([yes])
         else
             :
             AC_MSG_RESULT([no])
@@ -306,8 +577,8 @@ dnl          fi
 # _RPM_SPEC_OUTPUT
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).lsm)
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================
 

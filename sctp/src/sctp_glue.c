@@ -111,10 +111,10 @@ static char const ident[] = "sctp_glue.c,v LINUX-2-4-20-SCTP(1.1.6.3) 2004/02/09
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
 
-#include "include/net/net_sock.h"
-#include "include/net/net_snmp.h"
-#include "include/net/net_sctp.h"
-#include "include/os7_namespace.h"
+#include "net/sock.h"
+#include "net/snmp.h"
+#include "net/sctp.h"
+#include "os7_namespace.h"
 
 #if	defined(CONFIG_SCTP_HMAC_MD5)
 #define SCTP_HMAC_DEFAULT SCTP_HMAC_MD5

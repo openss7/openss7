@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/12/22 11:27:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/29 07:22:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/22 11:27:41 $ by $Author: brian $
+# Last Modified $Date: 2004/12/29 07:22:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,12 +54,11 @@ nobase_include_HEADERS = \
 	netinet/sctp.h
 
 EXTRA_DIST = \
-	linux/linux_sctp.h \
-	linux/linux_sysctl.h \
-	net/net_sctp.h \
-	net/net_snmp.h \
-	net/net_sock.h \
+	linux/sctp.h \
+	linux/sysctl.h \
+	net/sctp.h \
+	net/snmp.h \
+	net/sock.h \
 	os7_namespace.h
-
 
 # vim: ft=automake

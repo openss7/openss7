@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:35:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/12 08:56:58 $ by $Author: brian $
+ Last Modified $Date: 2004/12/29 06:35:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:35:40 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/12 08:56:58 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:35:40 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1133,9 +1133,9 @@ paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor
 regulations).\n\
 \n\
 \n\
-COPYRIGHT (C) 1993-2001 HEWLETT-PACKARD COMPANY
+COPYRIGHT (C) 1993-2001 HEWLETT-PACKARD COMPANY\n\
 \n\
-ALL RIGHTS RESERVED.
+ALL RIGHTS RESERVED.\n\
 \n\
 The  enclosed software and documention  includes  copyrighted  works of Hewlett-\n\
 Packard  Co. For as long as you  comply with the following  limitations, you are\n\

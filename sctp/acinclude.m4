@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.16 2004/12/24 12:13:16 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.17 2004/12/29 07:22:19 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/24 12:13:16 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/29 07:22:19 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -306,7 +306,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
                            __xfrm_sk_clone_policy])
     _LINUX_KERNEL_ENV([dnl
         AC_CACHE_CHECK([for kernel struct sk_buff.cb size], [linux_cv_sk_buff_cb_size], [dnl
-            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -318,9 +318,9 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-#include "include/net/net_sock.h"
-#include "include/linux/linux_sctp.h"
-#include "include/net/net_sctp.h"
+#include "net/sock.h"
+#include "linux/sctp.h"
+#include "net/sctp.h"
                 ]], [[
 struct sk_buff system_sk_buff_structure;
 struct __os7_sctp_skb_cb mycb;
@@ -365,7 +365,7 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
     esac
     _LINUX_KERNEL_ENV([dnl
         AC_CACHE_CHECK([for kernel struct sock union size], [linux_cv_sock_size], [dnl
-            CPPFLAGS="$CPPFLAGS -I. -I$srcdir -I./src -I$srcdir/src -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -377,16 +377,20 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-#include "include/net/net_sock.h"
-#include "include/linux/linux_sctp.h"
-#include "include/net/net_sctp.h"
+#include "net/sock.h"
+#include "linux/sctp.h"
+#include "net/sctp.h"
                 ]], [[
-if (sizeof(((struct sock *)(0))->tp_pinfo) < sizeof(struct __os7_sctp_opt_dummy)) {
+static const size_t s1 = sizeof(((struct sock *)(0))->tp_pinfo);
+static const size_t s2 = sizeof(struct __os7_sctp_opt_dummy);
+static const size_t s3 = sizeof(((struct sock *)(0))->protinfo);
+static const size_t s4 = sizeof(((struct sock *)(0))->protinfo.af_inet);
+static const size_t s5 = sizeof(struct __os7_sctp_opt);
+static const size_t s6 = sizeof(((struct __os7_sctp_opt *)(0))->__jump);
+if (s1 < s2) {
     first_overlap_section_of_sctp_opt_is_too_large(NULL, 0, 0);
 }
-if (sizeof(((struct sock *)(0))->protinfo) < sizeof(((struct sock *)(0))->protinfo.af_inet) +
-    sizeof(struct __os7_sctp_opt) - sizeof(struct __os7_sctp_opt_dummy) -
-    sizeof(((struct __os7_sctp_opt *)(0))->__jump)) {
+if (s3 < s4 + s5 - s2 - s6) {
     second_overlap_section_of_sctp_opt_is_too_large(NULL, 0, 0);
 }
                 ]])
@@ -418,7 +422,6 @@ if (sizeof(((struct sock *)(0))->protinfo) < sizeof(((struct sock *)(0))->protin
         linux_cv_sock_tp_pinfo_size='unknown'
         linux_cv_sock_protinfo_size='unknown'
         linux_cv_sock_size='unknown'
-        cp -f conftest.$ac_objext error_object.$ac_objext
             ])
         ])
     ])

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/12/20 10:06:01 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/12/29 08:55:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/20 10:06:01 $ by $Author: brian $
+# Last Modified $Date: 2004/12/29 08:55:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,11 +83,11 @@ if BUILD_RPMS
 #
 
 RPMFLAGS  = -vv
-SRPMFLAGS = $(RPMFLAGS)
+SRPMFLAGS = $(RPMFLAGS) --nodeps
 
 RPMICONS = \
-	--define "_gif_icon openss7-logo-small.gif" \
-	--define "_xpm_icon openss7-logo-small.xpm"
+	--define "_gif_icon $(PACKAGE_TARNAME).gif" \
+	--define "_xpm_icon $(PACKAGE_TARNAME).xpm"
 
 RPMOPTS = \
 	--define "__source_payload w9.bzdio" \
@@ -98,8 +98,8 @@ RPMOPTS = \
 RPMBOPTS = \
 	--define "extrarelease $(PACKAGE_RPMEXTRA)" \
 	--define "distribution $(PACKAGE_RPMDIST)" \
-	--define "_gif openss7-logo-small.gif" \
-	--define "_xpm openss7-logo-small.xpm" \
+	--define "_gif $(PACKAGE_TARNAME).gif" \
+	--define "_xpm $(PACKAGE_TARNAME).xpm" \
 	$(RPMOPTS)
 
 
@@ -113,7 +113,7 @@ RPMSOPTS = \
 
 RPMTARGET = $(target)
 
-EXTRA_DIST += $(PACKAGE_TARNAME).spec openss7-logo-small.gif openss7-logo-small.xpm
+EXTRA_DIST += $(PACKAGE_TARNAME).spec $(PACKAGE_TARNAME).gif $(PACKAGE_TARNAME).xpm
 
 #
 #   This builds an SRPM for the current target.  Note: rpm demands icon in
@@ -122,8 +122,8 @@ EXTRA_DIST += $(PACKAGE_TARNAME).spec openss7-logo-small.gif openss7-logo-small.
 srpm:
 	$(MAKE) $(AM_MAKEFLAGS) distdir='$(tardir)' dist
 	$(mkinstalldirs) $(top_builddir)/BUILD $(top_builddir)/SRPMS $(top_builddir)/SPECS $(top_builddir)/SOURCES $(top_builddir)/RPMS
-	/bin/cp -f $(top_srcdir)/openss7-logo-small.gif .
-	/bin/cp -f $(top_srcdir)/openss7-logo-small.xpm .
+	/bin/cp -f $(top_srcdir)/$(PACKAGE_TARNAME).gif .
+	/bin/cp -f $(top_srcdir)/$(PACKAGE_TARNAME).xpm .
 	$(RPMBUILD) -ts $(SRPMFLAGS) $(AM_SRPMFLAGS) $(RPMOPTS) $(RPMICONS) --target $(target) -- $(tardir).tar.bz2
 
 #
@@ -132,13 +132,15 @@ srpm:
 #   AM_RPMTARGETS
 #
 rpms: srpm
-	@for t in $(RPMTARGET) $(AM_RPMTARGETS) ; do \
+	@targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
+	for t in $$targets ; do \
 		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t --" SRPMS/$(tardir).src.rpm; \
 		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(tardir).src.rpm; \
 	done
 
 sign:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		if test ! -f $$f ; then \
 			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 			break ; \
@@ -147,7 +149,7 @@ sign:
 	if test ! -f SRPMS/$(tardir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
-	for f in $(RPM_ARCHIVES) ; do \
+	for f in $$archives ; do \
 		if test -f $$f ; then \
 			rm -f $$f.asc ; \
 			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
@@ -205,13 +207,14 @@ srpm:
 rpms: srpm
 
 sign:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		if test ! -f $$f ; then \
 			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 			break ; \
 		fi ; \
 	done ; \
-	@for f in $(RPM_ARCHIVES) ; do \
+	for f in $$archives ; do \
 		if test -f $$f ; then \
 			rm -f $$f.asc ; \
 			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
@@ -222,7 +225,8 @@ sign:
 	done
 
 rebuild:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		if test ! -f $$f ; then \
 			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 			break ; \
@@ -246,16 +250,18 @@ distclean-archives:
 	fi
 
 distclean-rpms:
-	rm -f openss7-logo-small.gif
-	rm -f openss7-logo-small.xpm
+	rm -f $(PACKAGE_TARNAME).gif
+	rm -f $(PACKAGE_TARNAME).xpm
 	rm -fr BUILD RPMS SOURCES SPECS SRPMS
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		echo "rm -f $$f" ; \
 		rm -f $$f ; \
 	done
 
 distclean-sign:
-	@for f in $(RPM_ARCHIVES) ; do \
+	@archives="$(RPM_ARCHIVES)" ; \
+	for f in $$archives ; do \
 		echo "rm -f $$f.asc" ; \
 		rm -f $$f.asc ; \
 	done

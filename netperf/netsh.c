@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/08/20 20:55:58 $
+ @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2004/12/29 06:55:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/20 20:55:58 $ by $Author: brian $
+ Last Modified $Date: 2004/12/29 06:55:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/08/20 20:55:58 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2004/12/29 06:55:39 $"
 
-static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/08/20 20:55:58 $";
+static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2004/12/29 06:55:39 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
 #endif /* NEED_MAKEFILE_EDIT */
 char	netsh_id[]="\
-@(#)netsh.c (c) Copyright 1993-2004 Hewlett-Packard Company. Version 2.3";
+@(#)netsh.c (c) Copyright 1993-2004 Hewlett-Packard Company. Version 2.3pl1";
 
 
 /****************************************************************/
@@ -157,9 +157,9 @@ double atof(const char *);
  /* getopt to parse the command line, we will tell getopt that they do */
  /* not take parms, and then look for them ourselves */
 #ifdef _GNU_SOURCE
-#define GLOBAL_CMD_LINE_ARGS "A:a:b:C::c::dDf:F:H:hi:I:l:n:O:o:P:p:t:v:VW:w:46"
+#define GLOBAL_CMD_LINE_ARGS "A:a:b:C::c::dDf:F:H:hi:I:l:n:O:o:P:p:t:T:v:VW:w:46"
 #else /* _GNU_SOURCE */
-#define GLOBAL_CMD_LINE_ARGS "A:a:b:CcdDf:F:H:hi:I:l:n:O:o:P:p:t:v:VW:w:46"
+#define GLOBAL_CMD_LINE_ARGS "A:a:b:CcdDf:F:H:hi:I:l:n:O:o:P:p:t:T:v:VW:w:46"
 #endif /* _GNU_SOURCE */
 
 /************************************************************************/
@@ -299,6 +299,7 @@ Global options:\n\
     -p port           Specify netserver port number\n\
     -P 0|1            Don't/Do display test headers\n\
     -t testname       Specify test to perform\n\
+    -T cpu            Request remote netserver be bound to cpu\n\
     -v verbosity      Specify the verbosity level\n\
     -W send,recv      Set the number of send,recv buffers\n\
 \n\
@@ -811,9 +812,9 @@ paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor
 regulations).\n\
 \n\
 \n\
-COPYRIGHT (C) 1993-2001 HEWLETT-PACKARD COMPANY
+COPYRIGHT (C) 1993-2001 HEWLETT-PACKARD COMPANY\n\
 \n\
-ALL RIGHTS RESERVED.
+ALL RIGHTS RESERVED.\n\
 \n\
 The  enclosed software and documention  includes  copyrighted  works of Hewlett-\n\
 Packard  Co. For as long as you  comply with the following  limitations, you are\n\
@@ -1052,6 +1053,11 @@ scan_cmd_line(int argc, char *argv[])
     case 't':
       /* set the test name */
       strcpy(test_name,optarg);
+      break;
+    case 'T':
+      /* We want to set the processor on which netserver */
+      /* will run on the remote system. */
+      proc_affinity = convert(optarg);
       break;
     case 'W':
       /* set the "width" of the user space data buffer ring. This will */

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/17 11:41:09 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/12/29 07:25:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,10 +48,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/17 11:41:09 $ by $Author: brian $
+# Last Modified $Date: 2004/12/29 07:25:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 # $Log: openss7.m4,v $
+# Revision 1.1.2.2  2004/12/29 07:25:14  brian
+# - Synchronized m4 files with recent changes.
+#
 # Revision 1.1.2.1  2004/08/17 11:41:09  brian
 # - Added package description macros.
 #
@@ -65,7 +68,42 @@ AC_DEFUN([_OPENSS7_PACKAGE], [
     AC_SUBST([PACKAGE_TITLE])dnl
     PACKAGE_SHORTTITLE='$1'
     AC_SUBST([PACKAGE_SHORTTITLE])dnl
+    _OPENSS7_CACHE
 ])# _OPENSS7_PACKAGE
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_CACHE
+# -----------------------------------------------------------------------------
+# A little trick with caches and site files.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_CACHE], [
+    # force a cache file to be created even if not specified
+    if test "$cache_file" = '/dev/null' -o :"$cache_file" = :
+    then
+        cache_file='config.cache'
+        if test ! -e "$cache_file"
+        then
+            cat /dev/null > "$cache_file"
+        fi
+    fi
+    # if site file not specified, use local site file
+    if test :"$CONFIG_SITE" = :
+    then
+        CONFIG_SITE='config.site'
+    fi
+    AC_CONFIG_COMMANDS([siteconfig], [dnl
+        if test :"$CONFIG_SITE" != : -a :"$cache_file" != :
+        then
+            for config_site in $CONFIG_SITE
+            do
+                if test -w "$config_site" -o ! -e "$config_site"
+                then
+                    cat "$cache_file" | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|sctp_cv_|xns_cv_|lis_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_)' > "$config_site" 2>/dev/null
+                fi
+            done
+        fi], [cache_file="$cache_file" ; CONFIG_SITE="$CONFIG_SITE"])
+])# _OPENSS7_CACHE
 # =============================================================================
 
 # =============================================================================

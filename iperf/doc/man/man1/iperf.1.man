@@ -1,12 +1,116 @@
-.TH iperf 1 "January 16, 2003"
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
+.\" @(#) $Id: iperf.1.man,v 1.1.2.2 2004/12/29 06:38:03 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/12/29 06:38:03 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so iperf.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database iperf.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH IPERF 1 "$Date: 2004/12/29 06:38:03 $" "$Name:  $" "User Commands"
+.\" =========================================================================
+.\" =========================================================================
 .SH NAME
-iperf \- Modified version of a tool for measuring maximum TCP and UDP bandwidth
-in the sense that also a bandwidth for TCP may be specified
-.\"
+.\" =========================================================================
+.B iperf
+\- an internet protocol performance measurement and tuning tool
+.\" =========================================================================
+.\" =========================================================================
+.SH SYNOPSIS
+.\" =========================================================================
+.PP
+.\" .HP 12
+.\" \fBiperf\fR
+.\" [\fB-s\fR|\fB-c\fR\ \fIHOST\fR]
+.\" [\fB-p\fR\ \fIPORT\fR]
+.\" [\fB-t\fR\ \fISECONDS\fR]
+.\" [\fB-w\fR\ \fIBYTES\fR] ...
+.HP 12
+\fBiperf\fR
+{\fB-s\fR|\fB--server\fR}
+[\fISERVER-OPTIONS\fR]
+[\fICLIENT-SERVER-OPTIONS\fR]
+.HP 12
+\fBiperf\fR
+{\fB-c\fR|\fB--client\fR} \fIHOST\fR
+[\fICLIENT-OPTIONS\fR]
+[\fICLIENT-SERVER-OPTIONS\fR]
+.HP 12
+\fBiperf\fR
+{\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBiperf\fR
+{\fB-v\fR|\fB--version\fR}
+.\" =========================================================================
+.\" =========================================================================
 .SH DESCRIPTION
+.\" =========================================================================
 This program
-.I iperf
+.B iperf
 is the modified version of the original
 .B iperf
 program.
@@ -16,60 +120,1101 @@ may be specified.
 This can be done with the option
 .B \-a
 which was not available in the original version.
+.PP
+.B iperf
+is an operational measurement tool for internet protocols with the following features:
+.PP
+For measuring
+.BR sctp (7),
+.B iperf
+measures bandwidth,
+reports MSS/MTU size and observed read sizes,
+supports window size via socket buffers, and
+runs
+mutli-threaded if pthreads are available: client and server can have multiple simultaneous
+connections.
+For measuring
+.BR tcp (7),
+.B iperf
+measures bandwidth,
+reports MSS/MTU size and observed read sizes,
+supports window size via socket buffers, and
+runs
+mutli-threaded if pthreads or Win32 threads are available: client and server can have multiple
+simultaneous connections.
+For measuring
+.BR udp (7),
+.B iperf
+client can create UDP streams of specified bandwidth,
+measures packet loss,
+measures delay jitter,
+is multicast capable, and
+runs
+multi-threaded if pthreads are available: client and server can have multiple simultaneous
+connections (but not in Windows).
+.PP
+Where appropriate, options can be specified with K (kilo-) and M (mega-) suffices.  So 128K instead
+of 131072 bytes.
+.B iperf
+can run for specified time, rather than a set amount of data to transfer;
+picks the best units for the size of data being reported;
+the server handles multiple connections, rather than quitting after a single test;
+prints periodic, intermediate bandwidth, jitter, and loss reports at specified intervals;
+runs the server as a daemon (check out Nettest for running it as a secure daemon); and
+uses representative streams to test out how link layer compression affects your achievable bandwidth.
 .\"
+.\" =========================================================================
+.\" =========================================================================
+.SH ARGUMENTS
+.\" =========================================================================
+.PP
+None.
+.\" =========================================================================
+.\" =========================================================================
+.SH OPTIONS
+.\" =========================================================================
+
+.PP
+.B iperf
+runs in two modes (client or server) and measures one of three internet protocols
+.RB ( udp (7),
+.BR tcp (7)
+or
+.BR sctp (7)).
+Client mode is specified using the
+.BR -c " or " --client
+option detailed below.
+Server mode is specified using the
+.BR -s " or " --server
+option detail below.
+Default operation is for TCP.
+To specify operation for UDP, use the
+.BR -u " or " --udp
+option.
+To specify operation for
+.BR sctp (7),
+use the
+.BR -z " or " --sctp
+option.
+Additional options are described below.
+.\" =========================================================================
+.SS Modes 
+.\" -------------------------------------------------------------------------
+.TP
+\fB-s\fR,\ \fB--server\fR
+Specifies server mode operation.  In server mode, the server listens on a specific
+.I PORT
+for client connections.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-c\fR,\ \fB--client\fR\ [\fIHOST\fR]
+Specifies client mode of operation.  In client mode, the client connects to the specified
+.I HOST
+at which the server mode
+.B iperf
+should be running.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-h\fR,\ \fB--help\fR
+Displays usage information an exits.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-v\fR,\ \fB--version\fR
+Displays version information and exits.
+.\" =========================================================================
+.SS Server Options
+.\" -------------------------------------------------------------------------
+.PP
+The following
+.I SERVER-OPTIONS
+are only applicable to server operation:
+.\" -------------------------------------------------------------------------
+.TP
+\fB-1\fR,\ \fB--singleclient\fR
+Specifies that the server should accept only a single client at a time.  The default is to accept
+and report all clients simultaneously.
+Also specified by the environment variable
+.IR IPERF_SINGLECLIENT .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-D\fR,\ \fB--daemon\fR
+Runs the server in daemon mode.
+.B iperf
+will close standard input, output and error, detach itself from the controlling terminal and run in
+the background.  The default behavior without this option specified is to run in the foreground.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-c\fR,\ \fB--client\fR \fIHOST\fR
+In server mode, limit the clients that can connect to the server to
+.IR HOST .
+Also specified by the environment variable
+.IR IPERF_CLIENT .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-P\fR,\ \fB--parallel\fR \fICOUNT\fR
+Specifies the number of connections handled by the server before closing.  The default is zero (0),
+indicating that the number connections is unlimited.
+Also specified by the environment variable
+.IR IPERF_PARALLEL .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-U\fR,\ \fB--single_udp\fR
+Specifies that the UDP server execute single threaded.  Normally the UDP server will be
+multithreaded where possible.
+Also specified by the environment variable
+.IR IPERF_SINGLE_UDP .
+.\" =========================================================================
+.SS Client Options
+.\" -------------------------------------------------------------------------
+.PP
+The following
+.I CLIENT-OPTIONS
+are only applicable to client operation:
+.\" -------------------------------------------------------------------------
+.\".TP
+.\"\fB-a\fR,\ \fB--tcp_bandwidth\fR\ \fIBANDWIDTH\fR[KM]
+.\"Specifies the bandwidth (in [kM]bits per second) for TCP or SCTP operation.
+.\"Also specified by the environment variable
+.\".IR IPERF_TCP_BANDWIDTH .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-b\fR,\ \fB--bandwidth\fR\ \fIBANDWIDTH\fR[KM]
+Specifies the UDP bandwidth (in [kM]bits per second) at which to send.  This is only meaningful for
+UDP operation (see option
+.BR -u ).
+The default is 1 Mbit/sec.
+Also specified by the environment variable
+.IR IPERF_BANDWIDTH .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-d\fR,\ \fB--dualtest\fR
+Specifies that
+.B iperf
+should be run in dual testing mode.  This will cause the server to connect back to the client on the
+port specified with the
+.B -L
+option (or defaults to the port on which the client connected to the server).  This is done
+immediately, therefore running the tests simultaneously.  If you want an alternate test, see option
+.BR -r .
+Also specified by the environment variable
+.IR IPERF_DUALTEST .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-n\fR,\ \fB--num\fR\ \fIBUFFERS\fR[KM]
+Specifies the number of
+.I BUFFERS
+to transmit.  Normally,
+.B iperf
+sends for 10 seconds.  The
+.B -n
+option overrides this behavior and sends an array of
+.I LENGTH
+bytes,
+.I BUFFERS
+times, no matter how long it takes.  See also the
+.BR -l " and " -t
+options.
+Also specified by the environment variable
+.IR IPERF_NUM .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-r\fR,\ \fB--tradeoff\fR
+Run the
+.B iperf
+tradeoff testing mode.  This will cause the server to connect back to the client on the port
+specified with the
+.B -L
+option (or defaults to the port on which the client connected to the server).  This is dones
+following the client connection termination, therefore running the tests alternating.  If you want a
+simultaneous test, try option
+.BR -d .
+Also specified by the environment variable
+.IR IPERF_TRADEOFF .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-t\fR,\ \fB--time\fR\ \fIDURATION\fR
+Specifies the
+.I DURATION
+in seconds for which to transmit.
+.B iperf
+normally works by repeatedly sending an array of
+.I LENGTH
+bytes for
+.I DURATION
+seconds.  The default is 10 seconds.  See also the
+.BR -l " and " -n
+options.
+Also specified by the environment variable
+.IR IPERF_TIME .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-F\fR,\ \fB--file_input\fR\ \fIFILENAME\fR
+Specifies a representative stream to measure bandwidth.  The data for transmission will be read from
+.IR FILENAME .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-I\fR,\ \fB--stdin_input\fR
+Specifies a representative stream to measure bandwidth.  The data for transmission will be read from
+.BR stdin .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-L\fR,\ \fB--listenport\fR
+Specifies the port that the server will connect back to the client on (see
+.B -d
+and
+.B -r
+options).
+It defaults to the port used to connect to the server from the client.
+Also specified by the environment variable
+.IR IPERF_LISTENPORT .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-P\fR,\ \fB--parallel\fR\ \fINUMBER\fR
+Specifies the number of simultaneous connections to make to the server.
+Default is 1.
+Requires thread support on both the client and server.
+Also specified by the environment variable
+.IR IPERF_PARALLEL .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-S\fR,\ \fB--tos\fR\ \fITOS\fR
+Specifies the type-of-service for outgoing packets.  (Many routers ignore the TOS field.)  You may
+specify the value in hex with a '0x' prefix, in octal with a '0' prefix, or in decimal.  For
+example, '0x10' hex = '020' octal = '16' decimal.  The TOS numbers specified in RFC 1349
+.[
+rfc1349
+.]
+are:
+.RS
+.RS
+.PP
+.TS
+tab(:);
+lll.
+IPTOS_LOWDELAY:minimize delay:0x10
+IPTOS_THROUGHPUT:minimize throughput:0x08
+IPTOS_RELIABILITY:maximize reliability:0x04
+IPTOS_LOWCOST:minimize cost:0x02
+.TE
+.RE
+.PP
+Also specified by the environment variable
+.IR IPERF_TOS .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-T\fR,\ \fB--ttl\fR\ \fITTL\fR
+Specifies the time-to-live for outgoing multicast packets.  This is essentially the number of router
+hops that the packet will traverse, and is also used for scoping.  The default time-to-live is 1, or
+link-local.
+Also specified by the environment variable
+.IR IPERF_TTL .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-W\fR,\ \fB--suggest_win_size\fR
+The
+.B -W
+option is not available in this release.
+Also specified by the environment variable
+.IR IPERF_SUGGEST_WIN_SIZE .
+.\" =========================================================================
+.SS Client/Server Options
+.\" -------------------------------------------------------------------------
+.PP
+The following
+.I CLIENT-SERVER-OPTIONS
+are applicable to both client and server operation:
+.\" -------------------------------------------------------------------------
+.TP
+\fB-f\fR,\ \fB--format\fR\ [\fIbkmaBKMA\fR]
+Specifies the format in which to print bandwidth information.  Supported formats are:
+.RS
+.RS
+.PP
+.TS
+tab(:);
+clcl.
+b:bits/sec:B:bytes/sec
+k:kbits/sec:K:kbytes/sec
+m:Mbits/sec:M:Mbytes/sec
+g:Gbits/sec:G:Gbytes/sec
+a:adaptive bits/sec:A:adaptive bytes/sec
+.TE
+.RE
+.PP
+The adaptive formats choose between kilo- and mega- as appropriate.  Fields other than bandwidth
+always print bytes, but otherwise follow the requested format.  The default format is 'a'. 'k', 'm' and 'g'
+correspond to multipliers of 10^3, 10^6, 10^9.  'K', 'M' and 'G' corresponds to multipliers of 2^10,
+2^20 and 2^30.
+.PP
+Also specified by the environment variable
+.IR IPERF_FORMAT .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-i\fR,\ \fB--interval\fR \fIINTERVAL\fR
+Specifies the time interval (in seconds) between periodic bandwidth, jitter and loss reports.  If
+non-zero, a report is made every interval seconds of the bandwidth since the last report.  If zero,
+no periodic reports are printed.  The default is zero (do no print periodic reports).
+Also specified by the environment variable
+.IR IPERF_INTERVAL .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-l\fR,\ \fB--len\fR \fILENGTH\fR[KM]
+Specifies the length (in bytes) of buffers to read or write.
+.B iperf
+works by writing an array of
+.I LENGTH
+bytes a number of iterations.  The default is 8 KB for TCP, 8 KB for SCTP, and 1470 bytes for UDP.
+Note, for UDP, this is the datagram size and needs to be lowered when using IPv6 addressing to 1450
+or less to avoid IP fragmentation.  See also the
+.B -n
+and
+.B -t
+options.
+Also specified by the environment variable
+.IR IPERF_LEN .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-m\fR,\ \fB--print_mss\fR
+Print the reported SCTP or TCP MSS size (via the SCTP_MAXSEG or TCP_MAXSEG option) and the observed
+read sizes which often correlate with the MSS. The MSS is usually the MTU minus 40 bytes for the
+TCP/IP header. Often a slightly smaller MSS is reported because of extra header space from IP
+options. The interface type corresponding to the MTU is also printed (ethernet, FDDI, etc.). This
+option is not implemented on many operating systems, but the read sizes may still indicate the MSS.
+Also specified by the environment variable
+.IR IPERF_PRINT_MSS .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-p\fR,\ \fB--port\fR \fIPORT\fR
+The server
+.I PORT
+number upon which the server will listen, or the
+.I PORT
+number to which the client will connect.  This should be specified the same for both client and
+server.  The default is 5001, the same as ttcp.
+Also specified by the environment variable
+.IR IPERF_PORT .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-q\fR,\ \fB--seqpacket\fR
+Use a
+.B SOCK_SEQPACKET
+socket for SCTP rather than a TCP compatible
+.B SOCK_STREAM
+socket.
+This is only meaningful when SCTP is specified (see the
+.B -z
+option).
+.B SOCK_SEQPACKET
+produces SCTP behavior more closely resembling UDP; whereas,
+.B SOCK_STREAM
+produces SCTP behavior more closely resembling TCP.
+Also specified by the environment variable
+.IR IPERF_SEQPACKET .
+.RS
+.PP
+This option is an OpenSS7 SCTP-specific modification to
+.BR iperf .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-u\fR,\ \fB--udp\fR
+Use UDP rather than TCP or SCTP.  See also the
+.B -b
+option.
+Also specified by the environment variable
+.IR IPERF_UDP .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-x\fR,\ \fB--reportexclude\fR \fIEXCLUDE\fR
+Specifies which reports to
+.IR EXCLUDE .
+.I EXCLUDE
+can be one ore more of the following characters:
+.RS
+.RS
+.PP
+.TS
+tab(:);
+lbl.
+s:exclude set reports
+c:exclude connection reports
+d:exclude data reports
+v:exclude server reports
+m:exclude multiple reports
+.TE
+.RE
+.PP
+Also specified by the environment variable
+.IR IPERF_REPORTEXCLUDE .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-y\fR,\ \fB--reportstyle\fR \fISTYLE\fR
+Specifies the
+.I STYLE
+of the reports.
+.I STYLE
+can be one or more of the following characters:
+.RS
+.RS
+.PP
+.TS
+tab(:);
+lbl.
+c:reports in CSV style
+.TE
+.RE
+.PP
+Also specified by the environment variable
+.IR IPERF_REPORTSTYLE .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-w\fR,\ \fB--window\fR \fISIZE\fR[KM]
+Specifies the socket buffer sizes.  For SCTP and TCP, this sets the window size.  For UDP, this is
+just the size of the buffer into which datagrams are received, and so limits the largest receivable
+datagram size.
+Also specified by the environment variable
+.IR TCP_WINDOW_SIZE .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-z\fR,\ \fB--sctp\fR
+Use SCTP rather than TCP or UDP.  See also the
+.B -q
+option.
+Also specified by the environment variable
+.IR IPERF_SCTP .
+.RS
+.PP
+This option is an OpenSS7 SCTP-specific modification to
+.BR iperf .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-B\fR,\ \fB--bind\fR \fIHOST\fR
+Specify the
+.I HOST
+or ip address to which to bind.  This is the local interface in both client and server mode.
+.RS
+.PP
+For
+.BR sctp (7)
+operation, this restricts a multihomed association to a single local IP address.  When not
+specified, all outgoing interfaces will be used on
+.BR connect (2)
+for clients, and all incoming interfaces will be automaticlly selected on
+.BR accept (2)
+for servers.
+.PP
+For
+.BR tcp (7)
+operation, this is useful on a multihomed host, which has multiple network interfaces, to
+specify the local interface address.  When not specified, the outgoing interface will be
+automatically selected on
+.BR connect (2)
+for clients, and the incoming interface will be automatically selected on
+.BR accept (2)
+for servers.
+.PP
+For
+.BR udp (7)
+operation, this can be used to bind and join to a multicast group.  Use addresses in the
+range 224.0.0.0 to 239.255.255.255 for multicast.  See also the
+.B -T
+option.
+Also specified by the environment variable
+.IR IPERF_BIND .
+.RE
+.\" -------------------------------------------------------------------------
+.TP
+\fB-C\fR,\ \fB--compatibility\fR
+Specifies that compatibility with older versions of
+.B iperf
+should be provided.  This mode is not required for interoperability between different versions of
+client and server, however, it is highly recommended.  In some cases when using representative
+streaming you could cause a 1.7 server to crash or cause undesired connection attempts.
+Also specified by the environment variable
+.IR IPERF_COMPAT .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-M\fR,\ \fB--mss\fR \fISIZE\fR[KM]
+Specifies the SCTP or TCP maximum segment size (MSS) in [KM]bytes via the SCTP_MAXSEG or TCP_MAXSEG
+option.  The MSS is usually the MTU minus 40 bytes for the TCP/IP header.  For ethernet, the MSS is
+1460 bytes (1500 byte MTU).  This option is not implemented on many operating systems.
+Also specified by the environment variable
+.IR IPERF_MSS .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-N\fR,\ \fB--nodelay\fR
+Set the SCTP or TCP no delay option, disabling Nagle's algorithm.  Normally this is only disabled
+for interactive applications like telnet.
+Also specified by the environment variable
+.IR IPERF_NODELAY .
+.\" -------------------------------------------------------------------------
+.TP
+\fB-V\fR,\ \fB--ipv6_domain\fR
+Bind to an IPv6 address.
+.RS
+.PP
+Server side: 
+.br
+$ iperf -s -V
+.PP
+Client side: 
+.br
+$ iperf -c <Server IPv6 Address> -V 
+.PP
+Note: On version 1.6.3 and later a specific IPv6 Address does not need to be bound with the
+.B -B
+option, previous 1.6 versions do.  Also on most operating systems using this option will also
+respond to IPv4 clients using IPv4 mapped addresses.
+.PP
+Also specified by the environment variable
+.IR IPERF_IPV6_DOMAIN .
+.RE
+.\" =========================================================================
+.\" =========================================================================
 .SH USAGE
+.\" =========================================================================
+.PP
+.B iperf
+is used for testing throughput and performance under a number of factors for internet protocols:
+UDP, TCP and SCTP.  The effect of the options differ somewhat based on the protocol under test.
+These effects are detailed in the following subsections:
+.\" =========================================================================
+.SS Tuning an SCTP Connection
+.\" -------------------------------------------------------------------------
+.PP
+This version of
+.B iperf
+has been modified to work with Stream Control Transmission Protocol (SCTP) as described in RFC 2960.
+.[
+rfc2960
+.]
+Although most of the discussion under
+.RI \(lq "Tuning a TCP Connection" ,\(rq
+below, also applies to SCTP, one of the most siginificant factors affecting SCTP performance for the
+OpenSS7 SCTP implementation is packet mode and the number of interfaces in a multihomed host.
+.PP
+There are two packet modes for SCTP (see
+.BR sctp (7)):
+.TP
+.I SOCK_STREAM
+This is the default mode of operation for SCTP under
+.BR iperf .
+.RS
+.PP
+The stream mode SCTP socket is intended as a drop in compatible replacement for TCP sockets.  These
+sockets do not respect record boundaries, and transmit packets in a single SCTP stream.  Alhtough
+SCTP has a few more packet overheads than TCP, performance of SCTP in
+.B SOCK_STREAM
+mode is closely comparable to TCP when a single interface is used.  However, when multiple
+interfaces are used, OpenSS7 SCTP exhibits multiplicative increases in throughput because the
+bandwidth of multiple interfaces can be used up to the maximum throughput of the underlying network.
+.RE
+.TP
+.I SOCK_SEQPACKET
+This packet mode can be selected using the
+.BR -q " or " --seqpacket
+option under
+.BR iperf .
+.RS
+.PP
+The sequenced packet mode SCTP socket is intended to utilized the features of the SCTP protocol.
+These sockets respect record boundaries, transmit packets on multiple SCTP streams, and supports
+both sequenced and unsequenced delivery.  Performance of SCTP in
+.B SOCK_SEQPACKET
+mode is closely comparable to UDP when a single interface is used.  However, when multiple
+interfaces are used, OpenSS7 SCTP exhibits multiplicative increases in throughput because the
+bandwidth of multiple interfaces can be used up to the maximum throughput of the underlying network.
+.RE
+.PP
+Controlling the number of interfaces on a multihomed host utilized by an SCTP association under
+.B iperf
+is controlled using the
+.BR -B " or " --bind
+option.
+When the
+.B -B
+option is not specified, the server or client will bind to all available interface addresses and
+will form an association with all of them.  The server or client will then transmit on multiple
+interfaces and multiplicative throughputs will be experienced.
+When the
+.B -B
+option is specified, the server or client will bind to only the specified interface address and will
+form an association with only the specified interface.  The server or client will then transmit on a
+single interface and comparable throughputs to TCP or UDP will be experienced.
+.PP
+Some examples of test runs on a low-latency, low-error, high-speed LAN connection with multiple
+interfaces are shown below under
+.RI \(lq EXAMPLES .\(rq
+.\" =========================================================================
+.SS Tuning a TCP Connection
+.\" -------------------------------------------------------------------------
+.PP
+The primary goal of
+.B iperf
+is to help in tuning TCP connections over a particular path.  The most fundamental tuning issue for
+TCP is the TCP window size, which controls how much data can be in the network at any one point.  If
+it is too small, the sending will be idle at times and get poor performance.  The theoretical value
+to use for the TCP window size is the bandwidth delay product,
+.PP
+.RS
 .nf
-sage: iperf [-s|-c host] [-p port] [-t secs] [-w bytes] ...
-       iperf [-h|--help] [-v|--version]
-
-Client/Server:
-  -f, --format    [kmKM]   format to report: Kbits, Mbits, KBytes, MBytes
-  -i, --interval  #        seconds between periodic bandwidth reports
-  -l, --len       #[KM]    length of buffer to read or write (default 8 KB)
-  -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)
-  -p, --port      #        server port to listen on/connect to
-  -u, --udp                use UDP rather than TCP
-  -w, --window    #[KM]    TCP window size (socket buffer size)
-  -B, --bind      <host>   bind to <host>, an interface or multicast address
-  -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)
-  -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm
-  -V, --IPv6Version        Set the domain to IPv6
-Server specific:
-  -s, --server             run in server mode
-  -D, --daemon             run the server as a daemon
-
-Client specific:
-  -a, --tcp_bandwidth \    for TCP, bandwidth to send at in bits/sec
-		  #[KM]    (default no bandwidth limit used)
-  -b, --bandwidth #[KM]    for UDP, bandwidth to send at in bits/sec
-                           (default 1 Mbit/sec, implies -u)
-  -c, --client    <host>   run in client mode, connecting to <host>
-  -n, --num       #[KM]    number of bytes to transmit (instead of -t)
-  -t, --time      #        time in seconds to transmit for (default 10 secs)
-  -F, --fileinput <name>   input the data to be transmitted from a file
-  -I, --stdin              input the data to be transmitted from stdin
-  -P, --parallel  #        number of parallel client threads to run
-  -S, --tos       #        set type-of-service for outgoing packets
-  -T, --ttl       #        time-to-live, for multicast (default 1)
-  -W, --windowSizeSuggest  Run the client so as to suggest a suitable window size (default off)
-
-Miscellaneous:
-  -h, --help               print this message and quit
-  -v, --version            print version information and quit
-
-[KM] Indicates options that support a K or M suffix for kilo- or mega-
-
-The TCP window size option can be set by the environment variable
-TCP_WINDOW_SIZE. Most other options can be set by an environment variable
-IPERF_<long option name>, such as IPERF_BANDWIDTH.
-
-Report bugs to <dast@nlanr.net>
+\fC\s-1\
+bottleneck bandwidth x round trip time
+\s+1\fP
 .fi
-.\"
-.SH ORIGINAL IPERF DOCUMENTATION
-.\"
-.IP "@[DOC_DIR]/*.html"
-The local documentation.
-.\"
-.IP "http://dast.nlanr.net/Projects/Iperf/iperfdocs_1.6.5.html"
-The Iperf V.\ 1.6.5 User Docs.
+.RE
+.PP
+In the examples, see section
+.RI \(lq EXAMPLES ,\(rq
+the bottleneck link is a 45 Mbit/sec DS3 link and the round trip time measured with
+.BR ping (8)
+is 42 ms.  The bandwidth delay product is:
+.PP
+.RS
+.nf
+\fC\s-1\
+45 Mbit/sec x 42 ms
+= (45E06) x (42E-03)
+= 1890000 bits
+= 230 KByte
+\s+1\fP
+.fi
+.RE
+.PP
+That is the starting point for figuring the best window size; setting it higher or lower may produce
+better results.  In the example, below, buffer sizes over 130K did not improve the performance,
+despite the bandwidth delay product of 230K.
+.PP
+Note that many Operating Systems and hosts have upper limits on the TCP window size.  These may be
+as low as 64 kilobytes, or as high as several megabytes.
+.B iperf
+tires to detect when these occur and give a warning that the actual and requested window sizes are
+not equal (as below, though that is due to rounding in IRIX).  PSC has a list
+.[
+%L PSC
+%T PSC List of TCP Window Sizes
+%U http://www.psc.edu/networking/perf_tune.html
+.]
+detailing how to change the default and maximum window sizes for various operating systems.  For
+more information on TCP window sizes, see the
+.RI \(lq "User's Guide for TCP Windows" .\(rq
+.[
+%L TCPUG
+%T User's Guide for TCP Windows
+%U http://dast.nlanr.net/Guides/GettingStarted/TCP_window_size.html
+.]
+.\" =========================================================================
+.SS Tuning a UDP Connection
+.\" -------------------------------------------------------------------------
+.PP
+.B iperf
+creates a constant bit rate UDP stream.  This is a very artificial stream, similar to voice
+communication but not much else.
+.PP
+You will want to adjust the datagram size
+.RB ( -l )
+to the size your application uses.
+.PP
+The service detects UDP datagram loss by ID numbers in the datagrams.  Usually a UDP datagram
+becomes several IP packets.  Losing a single IP packet will lose the entire datagram.  To measure
+packet loss instead of datagram loss, make the datagrams small enough to fit into a single packet,
+using the
+.B -l
+option.  The default size of 1470 bytes works for ethernet.  Out-of-order packets are also detected.
+(Out-of-order packets cause some ambiguity in the lost packet count;
+.B iperf
+assumes they are not duplicate packets, so they are excluded from the lost packet count.)  Since TCP
+does not report loss to the user, I find UDP tests helpful to see packet loss along a path.
+.PP
+Jitter calculations are continuously computed by the server, as specified by RTP in RFC 1889.
+.[
+rfc1889
+.]
+The client records a 64 bit second/microsecond timestamp in the packet.  The server computes the
+relative transmit time as (server's receive time minus client's send time).  The client's and
+server's clocks do not need to by synchornized; any difference is subtracted out in the jitter
+calculation.  Jitter is the smoothed mean of differences between consecutive transit times.
+.\" =========================================================================
+.\" =========================================================================
+.SH ENVIRONMENT VARIABLES
+.\" =========================================================================
+.PP
+Most of the options can also be set using environment variables.  The environment variable
+.B TCP_WINDOW_SIZE
+sets the TCP window size, whereas other options may be set using the environment variable named
+.BI IPERF_ "[long option name]"
+as follows:
+.TP
+.B IPERF_BANDWIDTH
+Same as option
+.BR -b " or " --bandwidth .
+.TP
+.B IPERF_BIND
+Same as option
+.BR -B " or " --bind .
+.TP
+.B IPERF_CLIENT
+Same as option
+.BR -c " or " --client .
+.TP
+.B IPERF_COMPAT
+Same as option
+.BR -C " or " --compatibility .
+.TP
+.B IPERF_DUALTEST
+Same as option
+.BR -d " or " --dualtest .
+.TP
+.B IPERF_FILE_INPUT
+Same as option
+.BR -F " or " --file_input .
+.TP
+.B IPERF_FORMAT
+Same as option
+.BR -f " or " --format .
+.TP
+.B IPERF_INTERVAL
+Same as option
+.BR -i " or " --interval .
+.TP
+.B IPERF_IPV6_DOMAIN
+Same as option
+.BR -V " or " --ipv6_domain .
+.TP
+.B IPERF_LEN
+Same as option
+.BR -l " or " --len .
+.TP
+.B IPERF_LISTENPORT
+Same as option
+.BR -L " or " --listenport .
+.TP
+.B IPERF_MSS
+Same as option
+.BR -M " or " --mss .
+.TP
+.B IPERF_NODELAY
+Same as option
+.BR -N " or " --nodelay .
+.TP
+.B IPERF_NUM
+Same as option
+.BR -n " or " --num .
+.TP
+.B IPERF_PARALLEL
+Same as option
+.BR -P " or " --parallel .
+.TP
+.B IPERF_PORT
+Same as option
+.BR -p " or " --port .
+.TP
+.B IPERF_PRINT_MSS
+Same as option
+.BR -m " or " --print_mss .
+.TP
+.B IPERF_REPORTEXCLUDE
+Same as option
+.BR -x " or " --reportexclude .
+.TP
+.B IPERF_REPORTSTYLE
+Same as option
+.BR -y " or " --reportstyle .
+.TP
+.B IPERF_SCTP
+Same as option
+.BR -z " or " --sctp .
+.TP
+.B IPERF_SEQPACKET
+Same as option
+.BR -q " or " --seqpacket .
+.TP
+.B IPERF_SERVER
+Same as option
+.BR -s " or " --server .
+.TP
+.B IPERF_SINGLECLIENT
+Same as option
+.BR -1 " or " --singleclient .
+.TP
+.B IPERF_SINGLE_UDP
+Same as option
+.BR -U " or " --single_udp .
+.TP
+.B IPERF_STDIN_INPUT
+Same as option
+.BR -I " or " --stdin_input .
+.TP
+.B IPERF_SUGGEST_WIN_SIZE
+Same as option
+.BR -W " or " --suggest_win_size .
+.TP
+.B IPERF_TIME
+Same as option
+.BR -t " or " --time .
+.TP
+.B IPERF_TOS
+Same as option
+.BR -S " or " --tos .
+.TP
+.B IPERF_TRADEOFF
+Same as option
+.BR -r " or " --tradeoff .
+.TP
+.B IPERF_TTL
+Same as option
+.BR -T " or " --ttl .
+.TP
+.B IPERF_UDP
+Same as option
+.BR -u " or " --udp .
+.TP
+.B TCP_WINDOW_SIZE
+Same as option
+.BR -w " or " --window .
+
+.\" =========================================================================
+.\" =========================================================================
+.SH EXAMPLES
+.\" =========================================================================
+.PP
+.SS Tuning an SCTP Connection
+.\" -------------------------------------------------------------------------
+.PP
+.\" =========================================================================
+.SS Tuning a TCP Connection
+.\" -------------------------------------------------------------------------
+.PP
+Here is an example session, between
+.B node1
+in Illinois and
+.B node2
+in North Carolina.  There are connected via tht vBNS backbone and a 45 Mbit/sec DS3 link.  Note we
+improve bandwidth performance by a factor of 3 using proper TCP window size.  Use the adaptive
+window sizes feature on platforms that allow setting window sizes in the granularity of bytes.
+.PP
+Following is an example of performance from the default TCP window size:
+.PP
+.RS 0.25i
+.nf
+\fC\s-2\
+\f(BCnode2>\f(CR iperf -s
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 60.0 KByte (default)
+------------------------------------------------------------
+[  4] local <IP Addr node2> port 5001 connected with <IP Addr node1> port 2357
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0-10.1 sec   6.5 MBytes   \f(BC5.2 Mbits/sec\f(CR
+
+\f(BCnode1>\f(CR iperf -c node2
+------------------------------------------------------------
+Client connecting to node2, TCP port 5001
+TCP window size: 59.9 KByte (default)
+------------------------------------------------------------
+[  3] local <IP Addr node1> port 2357 connected with <IP Addr node2> port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec   6.5 MBytes   \f(BC5.2 Mbits/sec\f(CR
+\s+2\fP
+.fi
+.RE
+.PP
+Following is an example of performance using an increated TCP window size:
+.PP
+.RS 0.25i
+.nf
+\fC\s-2\
+\f(BCnode2>\f(CR iperf -s -w 130k
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size:  130 KByte
+------------------------------------------------------------
+[  4] local <IP Addr node2> port 5001 connected with <IP Addr node1> port 2530
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0-10.1 sec  19.7 MBytes   \f(BC15.7 Mbits/sec\f(CR
+
+\f(BCnode1>\f(CR iperf -c node2 -w 130k
+------------------------------------------------------------
+Client connecting to node2, TCP port 5001
+TCP window size:  130 KByte
+------------------------------------------------------------
+[  3] local <IP Addr node1> port 2530 connected with <IP Addr node2> port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec  19.7 MBytes   \f(BC15.8 Mbits/sec\f(CR
+\s+2\fP
+.fi
+.RE
+.PP
+Another test to do is run parallel TCP streams.  If the total aggregate bandwidth is more than what
+an individual stream gets, something is wrong.  Either the TCP window size is too small, or the
+operating system's TCP implementation has bugs, or the network itself has deficientices.  See above
+for TCP window sizes; otherwise diagnosing which is somewhat difficult.  If
+.B iperf
+is compiled with
+.BR pthreads (3),
+a single client and server can test this, otherwise, set up multiple clients and servers on
+different ports.  Following is an example where a single stream gets 16.5 Mbit/sec, but two parallel
+streams together get 16.7 + 9.4 = 26.1 Mbit/sec, even when using large TCP window sizes:
+.PP
+.RS 0.25i
+.nf
+\fC\s-2\
+\f(CBnode2>\f(CR iperf -s -w 300k
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size:  300 KByte
+------------------------------------------------------------
+[  4] local <IP Addr node2> port 5001 connected with <IP Addr node1> port 6902
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0-10.2 sec  20.9 MBytes  \f(CB16.5 Mbits/sec\f(CR
+
+[  4] local <IP Addr node2> port 5001 connected with <IP Addr node1> port 6911
+[  5] local <IP Addr node2> port 5001 connected with <IP Addr node2> port 6912
+[ ID] Interval       Transfer     Bandwidth
+[  5]  0.0-10.1 sec  21.0 MBytes  \f(CB16.7 Mbits/sec\f(CR
+[  4]  0.0-10.3 sec  12.0 MBytes  \f(CB 9.4 Mbits/sec\f(CR
+
+\f(CBnode1>\f(CR ./iperf -c node2 -w 300k
+------------------------------------------------------------
+Client connecting to node2, TCP port 5001
+TCP window size:  299 KByte (WARNING: requested  300 KByte)
+------------------------------------------------------------
+[  3] local <IP Addr node2> port 6902 connected with <IP Addr node1> port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.2 sec  20.9 MBytes  16.4 Mbits/sec
+
+\f(CBnode1>\f(CR iperf -c node2 -w 300k -P 2
+------------------------------------------------------------
+Client connecting to node2, TCP port 5001
+TCP window size:  299 KByte (WARNING: requested  300 KByte)
+------------------------------------------------------------
+[  4] local <IP Addr node2> port 6912 connected with <IP Addr node1> port 5001
+[  3] local <IP Addr node2> port 6911 connected with <IP Addr node1> port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0-10.1 sec  21.0 MBytes  16.6 Mbits/sec
+[  3]  0.0-10.2 sec  12.0 MBytes   9.4 Mbits/sec
+\s+2\fP
+.fi
+.RE
+.PP
+A secondary tuning issue for TCP is the maximum transmission unit (MTU).  To be most effective, both
+hosts should support Path MTU Discovery.  PSC has a list
+.[
+%L PSC
+%T Path MTU Discovery
+%U http://www.psc.edu/networking/perf_tune.html
+.]
+detailing what operating systems support Path MTU Discovery.  Hosts without Path MTU Discovery often
+use 536 as the MSS, which wastes bandwidth and processing time.  Use the
+.B -m
+option to display what MSS is being used, and see if this matches what you expect.  Often it is
+around 1460 bytes for ethernet.
+.PP
+.RS 0.25i
+.nf
+\fC\s-2\
+\f(CBnode3>\f(CR iperf -s -m
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 60.0 KByte (default)
+------------------------------------------------------------
+[  4] local <IP Addr node3> port 5001 connected with <IP Addr node4> port 1096
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0- 2.0 sec   1.8 MBytes   6.9 Mbits/sec
+[  4] \f(CBMSS size 1448 bytes (MTU 1500 bytes, ethernet)\f(CR
+[  4] Read lengths occurring in more than 5% of reads:
+[  4]   952 bytes read   219 times (16.2%)
+[  4]  1448 bytes read  1128 times (83.6%)
+\s+2\fP
+.fi
+.RE
+.PP
+Here is a host that doesn't support Path MTU Discovery. It will only send and receive small 576 byte
+packets. 
+.PP
+.RS 0.25i
+.nf
+\fC\s-2\
+\f(CBnode4>\f(CR iperf -s -m
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 32.0 KByte (default)
+------------------------------------------------------------
+[  4] local <IP Addr node4> port 5001 connected with <IP Addr node3> port 13914
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0- 2.3 sec   632 KBytes   2.1 Mbits/sec
+\f(CBWARNING: Path MTU Discovery may not be enabled.\f(CR
+[  4] \f(CBMSS size 536 bytes (MTU 576 bytes, minimum)\f(CR
+[  4] Read lengths occurring in more than 5% of reads:
+[  4]   536 bytes read   308 times (58.4%)
+[  4]  1072 bytes read    91 times (17.3%)
+[  4]  1608 bytes read    29 times (5.5%)
+\s+2\fP
+.fi
+.RE
+.PP
+.B iperf
+supports other tuning options, which were added for exceptional network situations lik
+HIPPI-to-HIPPI over ATM.
+.\" =========================================================================
+.SS Tuning a UDP Connection
+.\" -------------------------------------------------------------------------
+.PP
+.\" =========================================================================
+.\" =========================================================================
+.SH SEE ALSO
+.\" =========================================================================
+.PP
+.BR sctp (7),
+.BR tcp (7),
+.BR udp (7),
+.BR ip (7),
+.BR connect (2),
+.BR accept (2),
+.BR ping (8),
+.BR pthreads (3),
+.BR netperf (1).
+.\" =========================================================================
+.\" =========================================================================
+.SH BUGS
+.\" =========================================================================
+.PP
+.B iperf
+has no known bugs.
+.PP
+Report bugs related to the SCTP extensions to
+.RI < bugs@openss7.org >.
+.PP
+Report bugs related to
+.B iperf
+other than SCTP extensions to
+.RI < dast@nlanr.net >.
+.\" =========================================================================
+.\" =========================================================================
+.SH COMPATIBILITY
+.\" =========================================================================
+.PP
+.B iperf
+modified for SCTP operation is compatible for TCP and UDP operation with unmodified versions of
+.BR iperf .
+.\" =========================================================================
+.\" =========================================================================
+.SH HISTORY
+.\" =========================================================================
+.PP
+.B iperf
+is a replacement modified version of the University of Illinois
+.B iperf
+package.  The first version modified by OpenSS7 for use with OpenSS7 Linux Native Sockets SCTP was
+.B iperf
+version 1.6.5.  This is a modification of
+.B iperf
+version 2.0.1.  Modifications are consistent with those made to version 1.6.5.
+.\" =========================================================================
+.\" =========================================================================
+.T5
