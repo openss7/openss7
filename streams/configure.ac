@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/03/04 23:15:46 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.6 2004/03/08 03:58:39 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/08 03:58:39 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.5 2004/03/04 23:15:46 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.6 2004/03/08 03:58:39 brian Exp $])
 AC_PREREQ(2.57)
 AC_INIT([streams],[0.9.2],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/timod.c])
@@ -95,11 +95,17 @@ AM_GNU_GETTEXT_VERSION(0.13.1)
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lc':
 AC_CHECK_LIB([c], [main])
+# FIXME: Replace `main' with a function in `-lpthread':
+AC_CHECK_LIB([pthread], [main])
+# FIXME: Replace `main' with a function in `-lstreams':
+#AC_CHECK_LIB([streams], [main])
+# FIXME: Replace `main' with a function in `-lxnet':
+#AC_CHECK_LIB([xnet], [main])
 
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_CHECK_HEADERS([argz.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h unistd.h wchar.h arpa/inet.h netinet/in.h sys/time.h])
+AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STAT
@@ -112,16 +118,21 @@ AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_CHECK_MEMBERS([struct stat.st_blksize])
+AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_STRUCT_ST_BLOCKS
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
+AC_STRUCT_TM
 AC_C_VOLATILE
 AC_CHECK_TYPES([ptrdiff_t])
 
 # Checks for library functions.
 AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_FORK
+if test :"${cross_compiling-no}" != :yes ; then
+	:
+	AC_FUNC_FORK
+fi
 AC_PROG_GCC_TRADITIONAL
 AC_HEADER_MAJOR
 if test :"${cross_compiling-no}" != :yes ; then
@@ -137,7 +148,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero gettimeofday getcwd inet_ntoa mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul])
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero gettimeofday getcwd inet_ntoa localtime_r mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strrchr strstr strtol strtoul])
 
 AC_LFS
 

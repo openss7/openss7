@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 03:59:01 $
+ @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 10:19:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 03:59:01 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 10:19:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 03:59:01 $"
+#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 10:19:59 $"
 
-static char const ident[] = "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 03:59:01 $";
+static char const ident[] = "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 10:19:59 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -206,13 +206,13 @@ void
 strvf_exit(int retval)
 {
 	if (retval) {
-		fprintf(stderr, "------------------------------------------------\n");
+		fprintf(stderr, "--------------------------------------------------\n");
 		fprintf(stderr, "-> Linux Fast-STREAMS is NOT operational.\n");
-		fprintf(stderr, "------------------------------------------------\n");
+		fprintf(stderr, "--------------------------------------------------\n");
 	} else {
-		fprintf(stderr, "------------------------------------------------\n");
+		fprintf(stderr, "--------------------------------------------------\n");
 		fprintf(stderr, "-> Linux Fast-STREAMS is installed and operational\n");
-		fprintf(stderr, "------------------------------------------------\n");
+		fprintf(stderr, "--------------------------------------------------\n");
 	}
 	fflush(stderr);
 	exit(retval);
@@ -252,11 +252,11 @@ strvf(int argc, char *argv[])
 	}
 	syslog(LOG_NOTICE, "Startup complete.");
 	fprintf(stderr, "-> Logging results to %s\n", outpath);
-	fprintf(stderr, "------------------------------------------------\n");
+	fprintf(stderr, "--------------------------------------------------\n");
 	fprintf(stderr, "-> Verify Linux Fast-STREAMS installation.\n");
 	fprintf(stderr, "-> Verify open, putmsg, getmsg, ioctl, and close\n");
 	fprintf(stderr, "-> can be performed on a stream.\n");
-	fprintf(stderr, "------------------------------------------------\n");
+	fprintf(stderr, "--------------------------------------------------\n");
 	fflush(stderr);
 	{
 		fprintf(stdout, "Open device %s\n", devname);
