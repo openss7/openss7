@@ -27,7 +27,7 @@
  * 
  */
 
-#ident "@(#) LiS port.c 2.14 5/30/03 21:39:56 "
+#ident "@(#) LiS port.c 2.16 04/09/04 14:20:35 "
 
 #include <sys/stream.h>
 #include <errno.h>
@@ -336,7 +336,7 @@ int	port_get_fs_byte(struct file *f, const void *uaddr)
 * For user level testing, this is a dummy routine.			*
 *									*
 ************************************************************************/
-void	port_splstr(int *save_state)
+void	port_splstr(lis_flags_t *save_state)
 {
     (void) save_state ;
 
@@ -350,7 +350,7 @@ void	port_splstr(int *save_state)
 * in the integer pointed to by saved_state.				*
 *									*
 ************************************************************************/
-void	port_splx(int *saved_state)
+void	port_splx(lis_flags_t *saved_state)
 {
     (void) saved_state ;
 
@@ -371,7 +371,7 @@ void	lis_splx_fcn(lis_flags_t x, char *file, int line)
 * in the integer pointed to by save_state.				*
 *									*
 ************************************************************************/
-void	port_spl0(int *save_state)
+void	port_spl0(lis_flags_t *save_state)
 {
     (void) save_state ;
 
@@ -388,7 +388,7 @@ void	port_spl0(int *save_state)
 ************************************************************************/
 int	port_sem_P(struct semaphore *sem_addr)
 {
-    int		flags ;
+    lis_flags_t		flags ;
 
     check_for_holding_spinlock() ;
     SPLSTR(flags) ;
@@ -540,6 +540,110 @@ void	lis_print_spl_track(void)
 int	lis_own_spl(void)
 {
     return(0) ;
+}
+
+#undef FL
+
+/************************************************************************
+*                         Read/Write Spin Locks                         *
+*************************************************************************
+*									*
+* Simulation of read-write locks.					*
+*									*
+************************************************************************/
+
+#define	FL	char *file, int line
+
+void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
+{
+}
+
+void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				     lis_flags_t *flags, FL)
+{
+}
+
+void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
+				      lis_flags_t *flags, FL)
+{
+}
+
+void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					  lis_flags_t *flags, FL)
+{
+}
+
+void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+					   lis_flags_t *flags, FL)
+{
+}
+
+static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name, FL)
+{
+    if (name == NULL) name = "RW-Lock" ;
+
+    lock->name 		= (char *) name ;
+    lock->spinner_file  = "Initialized" ;
+    lock->owner_file    = lock->spinner_file ;
+    lock->unlocker_file = lock->spinner_file ;
+}
+
+
+void    lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
+{
+    memset((void *)lock, 0, sizeof(*lock)) ;
+    lis_rw_lock_fill(lock, name, file, line) ;
+}
+
+lis_rw_lock_t *
+lis_rw_lock_alloc_fcn(const char *name, FL)
+{
+    lis_rw_lock_t	*lock ;
+    int			 lock_size ;
+
+    lock_size = sizeof(*lock) ;
+    lock = (lis_rw_lock_t *) ALLOCF(lock_size, "RW-Lock ");
+    if (lock == NULL) return(NULL) ;
+
+    lis_rw_lock_init_fcn(lock, name, file, line) ;
+    lock->allocated = 1 ;
+    return(lock) ;
+}
+
+lis_rw_lock_t *
+lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
+{
+    if (lock->allocated)
+	FREE((void *)lock) ;
+    return(NULL) ;
 }
 
 #undef FL
@@ -780,6 +884,11 @@ int	lis_down_fcn(lis_semaphore_t *lsem, FL)
     }
 
     return(ret) ;
+}
+
+void	lis_down_nosig_fcn(lis_semaphore_t *lsem, FL)
+{
+    lis_down_fcn(lsem, file, line) ;
 }
 
 #undef FL
