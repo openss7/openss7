@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 12:23:13 $ by $Author: brian $
+ Last Modified $Date: 2004/11/08 07:01:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $";
 
 #include "compat.h"
 
@@ -73,7 +73,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:13 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2004/11/08 07:01:19 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -96,11 +96,11 @@ MODULE_LICENSE(IP2XINET_LICENSE);
 #endif				/* LINUX */
 
 #ifdef LFS
-#define IP2XINET_DRV_ID		CONFIG_STREMS_IP2XINET_MODID
-#define IP2XINET_DRV_NAME	CONFIG_STREMS_IP2XINET_NAME
-#define IP2XINET_CMAJORS	CONFIG_STREMS_IP2XINET_NMAJORS
-#define IP2XINET_CMAJOR_0	CONFIG_STREMS_IP2XINET_MAJOR
-#define IP2XINET_UNITS		CONFIG_STREMS_IP2XINET_NMINORS
+#define IP2XINET_DRV_ID		CONFIG_STREAMS_IP2XINET_MODID
+#define IP2XINET_DRV_NAME	CONFIG_STREAMS_IP2XINET_NAME
+#define IP2XINET_CMAJORS	CONFIG_STREAMS_IP2XINET_NMAJORS
+#define IP2XINET_CMAJOR_0	CONFIG_STREAMS_IP2XINET_MAJOR
+#define IP2XINET_UNITS		CONFIG_STREAMS_IP2XINET_NMINORS
 #endif				/* LFS */
 
 #define DRV_ID		IP2XINET_DRV_ID
@@ -311,7 +311,7 @@ ip2xinet_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 		ip2xinet_numopen = 1;
 
 	if (q->q_count != 0)
-		printk("ip2x level:q_count is %lu", q->q_count);
+		printk("ip2x level:q_count is %u", q->q_count);
 
 	/* Set up the flow control parameters and send them up to the stream head.  */
 	minor = getminor(*devp);
