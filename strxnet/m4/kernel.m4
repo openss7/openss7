@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/01/19 10:04:45 $
+dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/01/22 05:01:51 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/19 10:04:45 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 05:01:51 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -246,21 +246,24 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
     AC_MSG_CHECKING([for kernel linkage])
-    AC_ARG_ENABLE([modules],
-        AS_HELP_STRING([--disable-modules],
-            [disable kernel modules, prepare object for linking into the
-            kernel.  @<:@default=no@:>@]),
-        [enable_modules="$enableval"],
-        [enable_modules='yes'])
-    if test :"${enable_modules:-yes}" != :yes 
-    then
-        linux_cv_modules='no'
-        linux_tmp='linkable object'
-    else
-        linux_cv_modules='yes'
-        linux_tmp='loadable modules'
-        KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
-    fi
+        AC_ARG_WITH([k-linkage],
+            AS_HELP_STRING([--with-k-linkage=LINKAGE],
+                [specify the kernel LINKAGE, either 'loadable' for loadable modules or 'linkable'
+                for linkable objects.  @<:@default=loadable@:>@]), [dnl
+            with_k_linkage="$withval"
+            case :${with_k_linkage:-loadable} in
+                (:linkable|:objects)   with_k_linkage='linkable' ;;
+                (:loadable|:modules|:*) with_k_linkage='loadable';;
+            esac],
+            [with_k_linkage='loadable'])
+        if test :${with_k_linkage:-loadable} = :linkable ; then
+            linux_cv_k_linkage='linkable'
+            linux_tmp='linkable objects'
+        else
+            linux_cv_k_linkage='loadable'
+            linux_tmp='loadable modules'
+            KERNEL_MODFLAGS="$KERNEL_MODFLAGS${KERNEL_MODFLAGS:+ }-DMODULE"
+        fi
     AC_MSG_RESULT([$linux_tmp])
 ])# _LINUX_CHECK_KERNEL_LINKAGE
 # =========================================================================
