@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/01/10 18:59:22 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/01/13 12:18:16 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/10 18:59:22 $ by $Author: brian $
+# Last Modified $Date: 2005/01/13 12:18:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,7 +283,7 @@ fi
     %{?_without_compat_hpux:     %disable%_without_compat_hpux} \
     %{?_with_compat_lis:         %enable %_with_compat_lis} \
     %{?_without_compat_lis:      %disable%_without_compat_lis} \
-    || rm -f %{cache_file}
+    || { rm -f %{cache_file} ; exit 1 ; }
 
 make
 
@@ -876,14 +876,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.52  2005/01/10 18:59:22  brian
-# - mandrake places libexec files in /usr/lib, correct globbing
-# - updated change logs
+# Revision 0.9.2.53  2005/01/13 12:18:16  brian
+# *** empty log message ***
 #
-# Revision 0.9.2.20  2005/01/10 18:59:22  brian
-# - mandrake places libexec files in /usr/lib, correct globbing
-# - updated change logs
+# Revision 0.9.2.21  2005/01/13 12:18:16  brian
+# *** empty log message ***
 #
+
+* Mon Jan 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.20  2005/01/10 18:59:22  brian
+- mandrake places libexec files in /usr/lib, correct globbing
+- updated change logs
 
 * Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.19  2004/12/30 21:22:27  brian

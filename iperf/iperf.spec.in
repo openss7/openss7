@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/01/10 18:59:10 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/01/13 12:18:01 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/10 18:59:10 $ by $Author: brian $
+# Last Modified $Date: 2005/01/13 12:18:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -222,7 +222,7 @@ fi
     %{?_without_cooked_manpages:            %_without_cooked_manpages} \
     %{?_with_public:                        %enable %_with_public} \
     %{?_without_public:                     %disable %_without_public} \
-    || rm -f %{cache_file}
+    || { rm -f %{cache_file} ; exit 1 ; }
 
 make
 
@@ -261,10 +261,15 @@ make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install-strip
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.5  2005/01/10 18:59:10  brian
-# - mandrake places libexec files in /usr/lib, correct globbing
-# - updated change logs
+# Revision 1.1.2.6  2005/01/13 12:18:01  brian
+# - Exit when configure fails
+# - update logs and copyright dates
 #
+
+Mon Jan 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.5  2005/01/10 18:59:10  brian
+- mandrake places libexec files in /usr/lib, correct globbing
+- updated change logs
 
 Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.4  2004/12/29 21:31:50  brian

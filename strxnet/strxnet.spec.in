@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/01/10 18:59:31 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/01/13 12:18:17 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/10 18:59:31 $ by $Author: brian $
+# Last Modified $Date: 2005/01/13 12:18:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -316,7 +316,7 @@ fi
     %{?_without_modules:                    %disable %_without_modules} \
     %{?_with_lis:                           %_with_lis} \
     %{?_with_lfs:                           %_with_lfs} \
-    || rm -f %{cache_file}
+    || { rm -f %{cache_file} ; exit 1 ; }
 
 make
 
@@ -897,10 +897,14 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.46  2005/01/10 18:59:31  brian
-# - mandrake places libexec files in /usr/lib, correct globbing
-# - updated change logs
+# Revision 0.9.2.47  2005/01/13 12:18:17  brian
+# *** empty log message ***
 #
+
+* Mon Jan 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.46  2005/01/10 18:59:31  brian
+- mandrake places libexec files in /usr/lib, correct globbing
+- updated change logs
 
 * Thu Dec 30 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.45  2004/12/30 21:22:39  brian
