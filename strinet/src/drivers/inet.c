@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/07/20 02:09:09 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/20 02:09:09 $ by $Author: brian $
+ Last Modified $Date: 2004/08/12 15:02:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/07/20 02:09:09 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/07/20 02:09:09 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -257,7 +257,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/07/20 02:09:09 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"
@@ -10604,19 +10604,19 @@ ss_disconnect(ss_t * ss)
 STATIC int
 ss_getsockname(ss_t * ss)
 {
-	int err, len = 0;
+	int err, len = sizeof(ss->src);
 	ensure(ss, return (-EFAULT));
 	__ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->getname, return (-EFAULT));
-	if ((err = ss->sock->ops->getname(ss->sock, &ss->dst, &len, 0)))
+	if ((err = ss->sock->ops->getname(ss->sock, &ss->src, &len, 0)))
 		return (err);
 	return (len);
 }
 STATIC int
 ss_getpeername(ss_t * ss)
 {
-	int err, len = 0;
+	int err, len = sizeof(ss->dst);
 	ensure(ss, return (-EFAULT));
 	__ensure(ss->sock, return (-EPROTO));
 	ensure(ss->sock->ops, return (-EFAULT));
