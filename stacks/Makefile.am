@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/08/26 23:37:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/31 09:17:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/26 23:37:41 $ by $Author: brian $
+# Last Modified $Date: 2004/08/31 09:17:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -235,6 +235,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
+				  src/include/os7/compat.h \
 				  strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
@@ -535,6 +536,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/include/os7/priv.h \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
+				  src/include/os7/compat.h \
 				  strconf.h
 
 if WITH_LIS
