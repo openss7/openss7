@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 0.9.2.2 2004/05/24 12:48:48 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.3 2004/06/28 08:59:34 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/24 12:48:48 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/28 08:59:34 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -120,8 +120,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 # _MAN_CONVERSION_OUTPUT
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
-    AM_CONDITIONAL([COOKED_MANPAGES], test :"${with_cooked_manpages:-no}" != :no)dnl
-    AM_CONDITIONAL([COMPRESS_MANPAGES], test :"${enable_compress_manpages:-yes}" = :yes)dnl
+    AM_CONDITIONAL([COOKED_MANPAGES], [test :"${with_cooked_manpages:-no}" != :no])dnl
+    AM_CONDITIONAL([COMPRESS_MANPAGES], [test :"${enable_compress_manpages:-yes}" = :yes])dnl
 ])# _MAN_CONVERSION_OUTPUT
 # =========================================================================
 

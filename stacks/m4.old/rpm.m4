@@ -147,7 +147,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
         [enable_tools='yes'])
     AC_MSG_CHECKING([for rpm build/install of user packages])
     AC_MSG_RESULT([${enable_tools:-yes}])
-    AM_CONDITIONAL([RPM_BUILD_USER], test :"${enable_tools:-yes}" = :yes)dnl
+    AM_CONDITIONAL([RPM_BUILD_USER], [test :"${enable_tools:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_TOOLS
 # =========================================================================
 
@@ -162,7 +162,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
         [enable_modules='yes'])
     AC_MSG_CHECKING([for rpm build/install of kernel packages])
     AC_MSG_RESULT([${enable_modules:-yes}])
-    AM_CONDITIONAL([RPM_BUILD_KERNEL], test :"${enable_modules:-yes}" = :yes)dnl
+    AM_CONDITIONAL([RPM_BUILD_KERNEL], [test :"${enable_modules:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_MODULES
 # =========================================================================
 
@@ -171,15 +171,48 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
     PACKAGE_OPTIONS=
-    for arg in $ac_configure_args ; do
-        if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-            eval "arg=$arg"
-            if (echo "$arg" | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-                arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+    arg=
+    for arg_part in $ac_configure_args ; do
+        if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
+            if test -n "$arg" ; then
+                eval "arg=$arg"
+                AC_MSG_CHECKING([for rpm argument '$arg'])
+                if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
+                    if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+                        arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
+                        PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+                        AC_MSG_RESULT([$arg])
+                    else
+                        :
+                        AC_MSG_RESULT([no])
+                    fi
+                else
+                    :
+                    AC_MSG_RESULT([no])
+                fi
             fi
+            arg="$arg_part"
+        else
+            arg="${arg}${arg:+ }${arg_part}"
         fi
     done
+    if test -n "$arg" ; then
+        eval "arg=$arg"
+        AC_MSG_CHECKING([for rpm argument '$arg'])
+        if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
+            if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+                arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
+                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
+                AC_MSG_RESULT([$arg])
+            else
+                :
+                AC_MSG_RESULT([no])
+            fi
+        else
+            :
+            AC_MSG_RESULT([no])
+        fi
+    fi
     AC_SUBST([PACKAGE_OPTIONS])dnl
 ])# _RPM_SPEC_SETUP_OPTIONS
 # =========================================================================
@@ -201,7 +234,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     if test :"${RPMBUILD:-no}" = :no ; then
         RPMBUILD="$RPM"
     fi
-    AM_CONDITIONAL([BUILD_RPMS], test :"${RPMBUILD:-no}" != :no)dnl
+    AM_CONDITIONAL([BUILD_RPMS], [test :"${RPMBUILD:-no}" != :no])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =========================================================================
 

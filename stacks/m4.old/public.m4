@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: public.m4,v 0.9.2.4 2004/05/24 12:48:51 brian Exp $
+dnl @(#) $Id: public.m4,v 0.9.2.5 2004/06/28 08:59:38 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/24 12:48:51 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/28 08:59:38 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -102,7 +102,7 @@ AC_DEFUN([_PUBLIC_RELEASE_OUTPUT], [dnl
     else
         AC_MSG_RESULT([yes])
     fi
-    AM_CONDITIONAL([PUBLIC_RELEASE], test :"${enable_public:-yes}" = :yes)dnl
+    AM_CONDITIONAL([PUBLIC_RELEASE], [test :"${enable_public:-yes}" = :yes])dnl
 ])# _PUBLIC_RELEASE_OUTPUT
 # =========================================================================
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/20 20:16:08 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/28 08:59:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 20:16:08 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 08:59:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1027,7 +1027,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
     AC_SUBST([KERNEL_MODFLAGS])dnl
     KERNEL_NOVERSION="-D__NO_VERSION__"
     AC_SUBST([KERNEL_NOVERSION])dnl
-dnl AM_CONDITIONAL([KERNEL_VERSIONS], test x"$linux_cv_k_versions" = xyes)dnl
+dnl AM_CONDITIONAL([KERNEL_VERSIONS], [test x"$linux_cv_k_versions" = xyes])dnl
 ])# _LINUX_CHECK_KERNEL_VERSIONS
 # =========================================================================
 
@@ -1049,7 +1049,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
         linux_cv_k_modversions='no'
     fi
     AC_MSG_RESULT([$linux_cv_k_modversions])
-    AM_CONDITIONAL([KERNEL_VERSIONS], test x"$linux_cv_k_modversions" = xyes)dnl
+    AM_CONDITIONAL([KERNEL_VERSIONS], [test x"$linux_cv_k_modversions" = xyes])dnl
 ])# _LINUX_CHECK_KERNEL_MODVERSIONS
 # =========================================================================
 

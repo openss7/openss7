@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/06/27 10:12:38 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/28 11:33:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 10:12:38 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 11:33:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,6 +75,9 @@
 %define kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
 %define core_name core-%{_kversion}
 %define epoch @PACKAGE_EPOCH@
+%define majbase @STRCONF_MAJBASE@
+%define makedev @STRCONF_MAKEDEV@
+%define base @PACKAGE_TARNAME@
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -95,21 +98,30 @@
 
 %define _streams lis
 %define _ksubdir lis
+%define _kmodext lis
 %if %{BUILD_lfs}
 %define _STREAMS LfS
 %define _streams streams
 %define _ksubdir streams
+%define _kmodext streams
+%define _conflict LiS
 %endif
 %if %{BUILD_lis}
 %define _STREAMS LiS
 %define _streams LiS
 %define _ksubdir lis
+%define _kmodext lis
+%define _conflict streams
 %endif
 
 # we have some more options that control configure for the build
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS INET for Linux
+Summary:        OpenSS7 %{_STREAMS} STREAMS XNET for Linux
+%if %{?_without_public: 0}%{!?_without_public: 1}
 Name:           @PACKAGE_TARNAME@
+%else
+Name:           @PACKAGE_TARNAME@-bin
+%endif
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
 Release:        @PACKAGE_RELEASE@
@@ -130,19 +142,22 @@ Icon:           %{_icon}
 ExclusiveArch:  i386 i686 i586 athlon x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
 Source:         %{name}-%{version}-%{release}.tar.bz2
+Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      XNET
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
 %if %{BUILD_lfs}
-Requires:       streams >= 0.7a
+Requires:       %{_streams} >= 0.7a
 %endif
 %if %{BUILD_lis}
-Requires:       LiS >= 2:2.16.18
+Requires:       %{_streams} >= 2:2.16.18
 %endif
 Provides:       XNET
+%if %{BUILD_modules}
 BuildRequires:  kernel-source >= 2.4
+%endif
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
 %else
@@ -153,11 +168,11 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-%if %{BUILD_lis}
-BuildRequires:  LiS-devel >= 2:2.16.18
-%endif
 %if %{BUILD_lfs}
-BuildRequires:  streams-devel >= 0.7a
+BuildRequires:  %{_streams}-devel >= 0.7a
+%endif
+%if %{BUILD_lis}
+BuildRequires:  %{_streams}-devel >= 2:2.16.18
 %endif
 Autoreq:        true
 
@@ -165,7 +180,7 @@ Autoreq:        true
 %description
 The %{name} package includes kernel modules, %{_STREAMS} STREAMS drivers,
 modules, libraries, utilities, test programs, daemons, and development
-environment for the development and execution of Internet Protocols (INET)
+environment for the development and execution of X/Open Networking (XNET)
 protocol stack components and applications for the %{_STREAMS} STREAMS
 environment.  This distribution is only currently applicable to 2.4 kernels
 and was targetted at ix86 and ppc architectures, but should build and install
@@ -187,38 +202,34 @@ cd     build-%{_target_cpu}
 preferred_cflags="%{optflags}"
 
 %ifarch %{ix86}
-preferred_cflags="-march=%{_target_cpu} -D__USE_STRING_INLINES -fstrict-aliasing"
-%endif
-
-%ifarch alphaev6
-preferred_cflags="-mcpu=ev6"
+preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
 %endif
 
 %ifarch sparc
-preferred_cflags="-m32 -fcall-used-g7"
+preferred_cflags="$preferred_cflags -fcall-used-g7"
 %endif
 
 %ifarch sparcv9
-preferred_cflags="-m32 -mcpu=ultrasparc -fcall-used-g7"
+preferred_cflags="$preferred_cflags -fcall-used-g7"
 %endif
 
 %ifarch sparc64
-preferred_cflags="-m64 -mcpu=ultrasparc -mvis -fcall-used-g7"
+preferred_cflags="$preferred_cflags -mvis -fcall-used-g7"
 %endif
 
 %ifnarch ia64 s390 s390x ppc ppciseries ppc64
-preferred_cflags="-freorder-blocks"
+preferred_cflags="$preferred_cflags -freorder-blocks"
 %endif
 
 ../configure \
-    CC=${CC} \
-    CFLAGS=${CFLAGS:-$preferred_cflags} \
-    LDFLAGS=${LDFLAGS} \
-    CPPFLAGS=${CPPFLAGS} \
-    CPP=${CPP} \
-    CXX=${CXX:-$CC} \
-    CXXFLAGS=${CXXFLAGS:-$preferred_cflags} \
-    CXXCPP=${CXXCPP:-$CPP} \
+    CC="${CC}" \
+    CFLAGS="${CFLAGS:-$preferred_cflags}" \
+    LDFLAGS="${LDFLAGS}" \
+    CPPFLAGS="${CPPFLAGS}" \
+    CPP="${CPP}" \
+    CXX="${CXX:-$CC}" \
+    CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
+    CXXCPP="${CXXCPP:-$CPP}" \
     --build=%{_build} \
     --host=%{_target_platform} \
     --prefix=%{_prefix} \
@@ -241,7 +252,7 @@ preferred_cflags="-freorder-blocks"
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
     --with-rpm-epoch=%{epoch} \
     --with-rpm-release=%{release} \
-    --with-base-major=@STRCONF_MAJBASE@ \
+    --with-base-major=%{majbase} \
     %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
     %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
     %{?_with_public:              --enable-public} \
@@ -254,6 +265,10 @@ preferred_cflags="-freorder-blocks"
     %{?_without_k_safe:           --disable-k-safe} \
     %{?_with_k_inline:            --enable-k-inline} \
     %{?_without_k_inline:         --disable-k-inline} \
+    %{?_with_tools:               --enable-tools} \
+    %{?_without_tools:            --disable-tools} \
+    %{?_with_modules:             --enable-modules} \
+    %{?_without_modules:          --disable-modules} \
     %{?_with_lis:                %{_with_lis}} \
     %{?_with_lfs:                %{_with_lfs}}
 
@@ -274,7 +289,7 @@ mkdir -p $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
 
 # add a directory for our devices
-#mkdir -p $RPM_BUILD_ROOT/dev/inet
+#mkdir -p $RPM_BUILD_ROOT/dev/xnet
 
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
@@ -287,21 +302,23 @@ mkdir -p $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
 # get the installed info directory out of the build root
 [ -e "$RPM_BUILD_ROOT/%{_infodir}/dir" ] && rm -f "$RPM_BUILD_ROOT/%{_infodir}/dir"
 
+%if 0
 # create a device list
-# sh scripts/strconf-sh -b@STRCONF_MAJBASE@ --strmknods=devices.lst build-%{_target_cpu}/Config.master
-
+sh scripts/strconf-sh -b%{majbase} --strmknods=%{makedev} build-%{_target_cpu}/Config.master
+%else
 # copy up device list
-[ -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ ] && cp -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ .
+[ -f build-%{_target_cpu}/%{makedev} ] && cp -f build-%{_target_cpu}/%{makedev} .
+%endif
 
 rm -rf build-%{_target_cpu}
 
-%if %{BUILD_tools}
+%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
 # punch rpm release to Custom
 echo 'Custom' > .rpmrelease
 
 # tar and move the sources for source release
 tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
-ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
+ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{base}
 %endif
 
 %clean
@@ -317,12 +334,19 @@ Summary:        OpenSS7 %{_STREAMS} STREAMS INET kernel modules.
 Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       kernel = %{kernel_version}
-%if %{BUILD_lis}
-Requires:       LiS-%{core_name} >= 2:2.16.18
-%endif
 %if %{BUILD_lfs}
-Requires:       streams-%{core_name} >= 0.7a
+Requires:       %{_streams}-%{core_name} >= 0.7a
 %endif
+%if %{BUILD_lis}
+Requires:       %{_streams}-%{core_name} >= 2:2.16.18
+Conflicts:      %{_streams}-%{core_name} <= 1:2.16.18
+%endif
+Conflicts:      %{_conflict}-%{core_name}
+Prereq:         /sbin/depmod
+Prereq:         /sbin/lsmod
+Prereq:         /sbin/insmod
+Prereq:         /sbin/modprobe
+Prereq:         /usr/sbin/lsof
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -331,12 +355,12 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description %{_streams}-%{core_name}
 The %{name}-%{_streams}-%{core_name} package contains the kernel modules
-that provide the Linux kernel INET %{_STREAMS} STREAMS drivers and modules.
+that provide the Linux kernel XNET %{_STREAMS} STREAMS drivers and modules.
 This also includes assorted drivers and modules for additional protocol stacks
-such as SCTP.  This package is heavily tied to the kernel for which it and the
-Linux %{_STREAMS} STREAMS facility was compiled.  This package applies to
-kernel version %{kernel_version} and requires a STREAMS package compiled for
-the same kernel.
+such as XNET.  This package is heavily tied to the kernel for which it and the
+%{_STREAMS} STREAMS facility was compiled.  This package applies to kernel
+version %{kernel_version} and requires a %{_STREAMS} STREAMS package compiled
+for the same kernel.
 
 %pre %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
@@ -344,24 +368,24 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
 #   installing new on the running kernel, we have to worry about previous
 #   loaded modules for the old version or a non-rpm version
-    ( lsmod | grep -q '^streams' ) || exit 0
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
 #   modules running, kick the stack
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
     fdetach -a 2>/dev/null
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
-    lsof | while read -a tokens; do
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
+    /usr/sbin/lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge @STRCONF_MAJBASE@ ]; then
+            if [ $major -eq %{majbase} ]; then
                 eval "kill -HUP $tokens[1]"
             fi
         fi
     done
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
-    echo 'Cannot install or upgrade with streams modules running.' >&2
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
+    echo 'Cannot install or upgrade with streams-xnet modules running.' >&2
     exit 1
 fi
 
@@ -369,9 +393,9 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
-#   Check that our line is in the modules.%{name} file
+#   Check that our line is in the modules.%{base} file
     conf_old=/etc/modules.conf
-    if ( grep -q 'include.*modules.%{name}' $conf_old ) ; then :; else
+    if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
         streams_dir=/%{_lib}/modules/%{kernel_version}/%{_ksubdir}
         streams_prf=/%{_lib}/modules/preferred/%{_ksubdir}
         conf_new=%{_tmppath}/modules.conf.new.$$
@@ -379,7 +403,7 @@ if [ $1 = 1 ] ; then
 #       if not, check for an old non-rpm LiS
         if ( grep -q 'BEGIN LiS' $conf_old ) ; then
             conf_tmp=%{_tmppath}/modules.conf.tmp.$$
-            list=`find /%{_lib}/modules/%{kernel_version}/%{name} -name "*.o"`
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
             for p in $list ; do
                 m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
 #               Remove references to our modules from old installation.
@@ -392,12 +416,12 @@ if [ $1 = 1 ] ; then
         fi
 #       check for forced over installs of older LiS or LfS rpm installations
 #       or installs over older LiS or LfS autoconf installations
-        streams_old=/%{_lib}/modules/%{kernel_version}/modules.streams
+        streams_old=/%{_lib}/modules/%{kernel_version}/modules.%{_kmodext}
         if [ -d $streams_dir -a -f $streams_old ] ; then
-            streams_new=%{_tmppath}/modules.streams.new.$$
-            streams_tmp=%{_tmppath}/modules.streams.tmp.$$
+            streams_new=%{_tmppath}/modules.%{_kmodext}.new.$$
+            streams_tmp=%{_tmppath}/modules.%{_kmodext}.tmp.$$
             cp -f $streams_old $streams_new
-            list=`find /%{_lib}/modules/%{kernel_version}/%{name} -name "*.o"`
+            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
             for p in $list ; do
                 m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
 #               Remove references to our modules from old installation.
@@ -407,13 +431,14 @@ if [ $1 = 1 ] ; then
                 rm -f $streams_dir/$m.o
                 rm -f $streams_prf/$m.o
             done
+#           can't make backups in modules directory
             chmod --reference=$streams_old $streams_new
-            cp -fb --suffix=.rpmsave $streams_new $streams_old
+            cp -f $streams_new $streams_old
             rm -f $streams_new
         fi
-        echo 'prune modules.%{name}' >> $conf_new
-        echo 'if -f /lib/modules/`uname -r`/modules.%{name}' >> $conf_new
-        echo 'include /lib/modules/`uname -r`/modules.%{name}' >> $conf_new
+        echo 'prune modules.%{base}' >> $conf_new
+        echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
+        echo 'include /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
         echo 'endif' >> $conf_new
         chmod --reference=$conf_old $conf_new
         cp -fb --suffix=.rpmsave $conf_new $conf_old
@@ -421,12 +446,12 @@ if [ $1 = 1 ] ; then
     fi
 fi
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-#   this is a running kernel, do a depmod on the modules directory for
-    depmod -ae
+#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    /sbin/depmod -ae
 elif [ -r /boot/System.map-%{kernel_version} ] ; then
-#   non-running kernels a depmod will be performed on boot by depmod anyway
+#   non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
-    depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
 fi
 
 %preun %{_streams}-%{core_name}
@@ -434,24 +459,24 @@ fi
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
 #   worry about which modules are running
-    ( lsmod | grep -q '^streams' ) || exit 0
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
 #   modules running, kick the stack
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
     fdetach -a
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
-    lsof | while read -a tokens; do
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
+    /usr/sbin/lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge @STRCONF_MAJBASE@ ]; then
+            if [ $major -eq %{majbase} ]; then
                 eval "kill -KILL $tokens[1]"
             fi
         fi
     done
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
-    echo "Cannot uninstall with streams modules running." >&2
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
+    echo "Cannot uninstall with streams-xnet modules running." >&2
     exit 1
 fi
 
@@ -462,42 +487,42 @@ if [ $1 = 0 ]; then
 #   this is the last stage of a removal we are going away: we need to see if
 #   we need to remove our line from modules.conf and remove our devices
     remove_line=yes
-    for file in /lib/modules/*/modules.%{name} ; do
+    for file in /lib/modules/*/modules.%{base} ; do
         if [ -f $file ] ; then
             remove_line=no
             break
         fi
     done
     if [ ":$remove_line" = :yes ] ; then
-        sed -e '/prune modules.%{name}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
+        sed -e '/prune modules.%{base}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
         chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
         cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
         rm -f %{_tmppath}/modules.conf.tmp.$$
     fi
 fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
-#   this is a running kernel, do a depmod on the modules directory for
-    depmod -ae
+#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    /sbin/depmod -ae
 elif [ -r /boot/System.map-%{kernel_version} ] ; then
-#   non-running kernels a depmod will be performed on boot but depmod anyway
+#   non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
-    depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+    /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
 fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   one more kick at killing any loaded modules on uninstall, last stage of
 #   the upgrade on a running kernel for upgrade.
-    ( lsmod | grep -q '^streams' ) || exit 0
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
 #   modules running, kick the stack
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
     fdetach -a
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
-    insmod -ar streams
-    lsof | while read -a tokens; do
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
+    /sbin/insmod -ar streams-xnet
+    /usr/sbin/lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge @STRCONF_MAJBASE@ ]; then
+            if [ $major -eq %{majbase} ]; then
                 if [ $1 = 0 ] ; then
 #                   extreme prejudice for removal
                     eval "kill -KILL $tokens[1]"
@@ -508,10 +533,10 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
             fi
         fi
     done
-    modprobe -r `lsmod | grep '^streams' | cut -f1 '-d '`
-    ( lsmod | grep -q '^streams' ) || exit 0
+    /sbin/modprobe -r `/sbin/lsmod | grep '^streams-xnet' | cut -f1 '-d '`
+    ( /sbin/lsmod | grep -q '^streams-xnet' ) || exit 0
     echo "Error: modules may be still loaded" >&2
-    lsmod | grep '^streams' >&2
+    /sbin/lsmod | grep '^streams-xnet' >&2
     echo "you may have to reboot" >&2
     exit 1
 fi
@@ -520,9 +545,9 @@ fi
 %files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{name}
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{name}
-/%{_lib}/modules/%{kernel_version}/%{name}/*
+%dir /%{_lib}/modules/%{kernel_version}/%{base}
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
+/%{_lib}/modules/%{kernel_version}/%{base}/*
 %endif
 
 # ===========================================================================
@@ -544,23 +569,24 @@ INET.
 
 %if %{BUILD_tools}
 # ---------------------------------------------------------------------------
-%files dev -f devices.lst
+%files dev -f %{makedev}
 %defattr(-,root,root)
 %endif
 
 # ===========================================================================
 %package %{_streams}-lib
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS INET run-time libraries.
+Summary:        OpenSS7 %{_STREAMS} STREAMS XNET run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_datadir}/locale
-%if %{BUILD_lis}
-Requires:       LiS-lib >= 2:2.16.18
-%endif
 %if %{BUILD_lfs}
-Requires:       streams-lib >= 0.7a
+Requires:       %{_streams}-lib >= 0.7a
 %endif
+%if %{BUILD_lis}
+Requires:       %{_streams}-lib >= 2:2.16.18
+%endif
+Prereq:         /sbin/ldconfig
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -570,14 +596,14 @@ Icon:           %{_icon}
 %description %{_streams}-lib
 The %{name}-%{_streams}-lib package contains the run-time shared libraries
 necessary to run applications programs and utilities developed for OpenSS7
-%{_STREAMS} STREAMS INET.
+%{_STREAMS} STREAMS XNET.
 
 %pre %{_streams}-lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then
 #   this is supposed to be a fresh install
 #   see if there are any libraries hanging around from a non-rpm install
-    old_libs="`( ldconfig -p | grep '\<lib.*xnet\> | cut '-d ' -f4 ) 2>/dev/null`"
+    old_libs="`( /sbin/ldconfig -p | grep '\<lib.*xnet\> | cut '-d ' -f4 ) 2>/dev/null`"
     if [ -n "$old_libs" ] ; then
 #       old libraries hanging around, delete them
         echo "warning: Deleting old non-rpm libraries $old_libs" >&2
@@ -592,8 +618,8 @@ fi
 # ---------------------------------------------------------------------------
 # do a load config
 if [ $1 = 0 ] ; then
-#   end of fresh install, do ldconfig
-    ldconfig >/dev/null
+#   end of fresh install, do /sbin/ldconfig
+    /sbin/ldconfig >/dev/null
 else
     :
 #   upgrade, wait for old postun
@@ -606,7 +632,7 @@ fi
 %postun %{_streams}-lib
 # ---------------------------------------------------------------------------
 # whether complete removal or upgrade, do a load config
-ldconfig
+/sbin/ldconfig
 
 %if %{BUILD_tools}
 %files %{_streams}-lib
@@ -620,12 +646,18 @@ ldconfig
 # ===========================================================================
 %package doc
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS INET manpages and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS XNET manpages and doc.
 Group:          Documentation
-Conflicts:      texinfo < 3.11
-Prereq:         /sbin/install-info
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
+#%if %{BUILD_lfs}
+#Requires:       %{_streams}-doc >= 0.7a
+#%endif
+#%if %{BUILD_lis}
+#Requires:       %{_streams}-doc >= 2:2.16.18
+#%endif
+Conflicts:      texinfo < 3.11
+Prereq:         /sbin/install-info
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -634,7 +666,7 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description doc
 The %{name}-doc package contains html documentation for the development of
-OpenSS7 %{_STREAMS} STREAMS INET applications, modules and drivers.
+OpenSS7 %{_STREAMS} STREAMS XNET applications, modules and drivers.
 
 %pre doc
 # ---------------------------------------------------------------------------
@@ -644,7 +676,7 @@ OpenSS7 %{_STREAMS} STREAMS INET applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    for n in %{name} libxnet ; do
+    for n in %{base} libxnet ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -656,7 +688,7 @@ fi
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
-    for n in %{name} libxnet ; do
+    for n in %{base} libxnet ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
@@ -673,7 +705,7 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{?_with_xnet: 1}%{!?_with_xnet: 0}
+%if 1
 %doc ABOUT-NLS
 %endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
@@ -686,17 +718,17 @@ fi
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS INET headers, lib and doc.
 Group:          Development/System
-Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
-Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
-%if %{BUILD_lis}
-Requires:       LiS-devel >= 2:2.16.18
-%endif
-%if %{BUILD_lfs}
-Requires:       streams-devel >= 0.7a
-%endif
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
+#Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
+#Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
+#%if %{BUILD_lfs}
+#Requires:       %{_streams}-devel >= 0.7a
+#%endif
+#%if %{BUILD_lis}
+#Requires:       %{_streams}-devel >= 2:2.16.18
+#%endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -705,11 +737,11 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description devel
 The %{name}-devel package contains library archives for static compilation,
-and headers files to develop OpenSS7 %{_STREAMS} STREAMS INET applications.
+and headers files to develop OpenSS7 %{_STREAMS} STREAMS XNET applications.
 This also includes the header files and static libraries required to compile
-OpenSS7 %{_STREAMS} STREAMS INET applications programs.  In addition it
+OpenSS7 %{_STREAMS} STREAMS XNET applications programs.  In addition it
 contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
-STREAMS INET application programs.
+STREAMS XNET application programs.
 
 %pre devel
 # ---------------------------------------------------------------------------
@@ -733,8 +765,8 @@ STREAMS INET application programs.
 %defattr(-,root,root)
 %{_libdir}/*.a
 %{_includedir}/*
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
-@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 #%{_mandir}/man2/*
 %{_mandir}/man3/*
 %{_mandir}/man4/*
@@ -743,11 +775,10 @@ STREAMS INET application programs.
 #%{_mandir}/man9/*
 %endif
 
-
 # ===========================================================================
 %package source
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS INET source package.
+Summary:        OpenSS7 %{_STREAMS} STREAMS XNET source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
@@ -758,8 +789,8 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description source
 The %{name}-source package contains the source code necessary for building the
-%{name} release.  It includes the autoconf configuration utilities
-necessary to create and distribute this rpm.
+%{name} release.  It includes the autoconf configuration utilities necessary
+to create and distribute this rpm.
 
 %pre source
 # ---------------------------------------------------------------------------
@@ -777,7 +808,7 @@ necessary to create and distribute this rpm.
 # ---------------------------------------------------------------------------
 # let rpm do its job
 
-%if %{BUILD_tools}
+%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
@@ -788,19 +819,21 @@ necessary to create and distribute this rpm.
 # ===========================================================================
 %package %{_streams}-util
 
-Summary:        OpenSS7 %{_STREAMS} STREAMS INET admin utilities.
+Summary:        OpenSS7 %{_STREAMS} STREAMS XNET admin utilities.
 Group:          System Environment/Base
-Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
 Prefix:         %{_libexecdir}
-%if %{BUILD_lis}
-Requires:       LiS-lib >= 2:2.16.18
-%endif
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
 %if %{BUILD_lfs}
-Requires:       streams-lib >= 0.7a
+Requires:       %{_streams}-lib >= 0.7a
 %endif
+%if %{BUILD_lis}
+Requires:       %{_streams}-lib >= 2:2.16.18
+Conflicts:      %{_streams}-lib <= 1:2.16.18
+%endif
+Conflicts:      %{_conflict}-lib
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -810,7 +843,7 @@ Icon:           %{_icon}
 %description %{_streams}-util
 The %{name}-%{_streams}-util package provides adminstrative and configuration
 test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
-INET package.
+XNET package.
 
 %pre %{_streams}-util
 # ---------------------------------------------------------------------------
@@ -835,8 +868,8 @@ INET package.
 #%{_bindir}/*
 %{_sbindir}/*
 %{_libexecdir}/*
-#@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
-#@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
+#@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
+#@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 #%{_mandir}/man1/*
 #%{_mandir}/man8/*
 %endif
@@ -845,9 +878,16 @@ INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.22  2004/06/27 10:12:38  brian
-# - Updated changelog.
+# Revision 0.9.2.24  2004/06/28 11:33:15  brian
+# - Support binary release.
 #
+# Revision 0.9.2.23  2004/06/28 09:01:18  brian
+# - Updated spec files.
+#
+
+* Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.22  2004/06/27 10:12:38  brian
+- Updated changelog.
 
 * Sun Jun 27 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.21  2004/06/27 10:11:41  brian

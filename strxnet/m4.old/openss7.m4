@@ -120,7 +120,7 @@ AC_DEFUN([_OPENSS7_XNET_CHECK_SCTP], [
     if test :"$os7_cv_need_sctp" = :yes ; then :;
         _OPENSS7_XNET_SETUP_SCTP
     fi
-    AM_CONDITIONAL_([WITH_SCTP], test :"$os7_cv_need_sctp" = :yes )
+    AM_CONDITIONAL_([WITH_SCTP], [test :"$os7_cv_need_sctp" = :yes])
 ])# _OPENSS7_XNET_CHECK_SCTP
 # =========================================================================
 
@@ -154,7 +154,7 @@ AC_DEFUN([_OPENSS7_XNET_CHECK_XNS], [
     if test :"$os7_cv_need_xns" = :yes ; then :;
         _OPENSS7_XNET_SETUP_XNS
     fi
-    AM_CONDITIONAL_([WITH_XNS], test :"$os7_cv_need_xns" = :yes )
+    AM_CONDITIONAL_([WITH_XNS], [test :"$os7_cv_need_xns" = :yes])
 ])# _OPENSS7_XNET_CHECK_XNS
 # =========================================================================
 
@@ -183,7 +183,7 @@ AC_DEFUN([_OPENSS7_XNET_CHECK_TLI], [
     if test :"$os7_cv_need_tli" = :yes ; then :;
         _OPENSS7_XNET_SETUP_TLI
     fi
-    AM_CONDITIONAL_([WITH_TLI], test :"$os7_cv_need_tli" = :yes )
+    AM_CONDITIONAL_([WITH_TLI], [test :"$os7_cv_need_tli" = :yes])
 ])# _OPENSS7_XNET_CHECK_TLI
 # =========================================================================
 
@@ -212,7 +212,7 @@ AC_DEFUN([_OPENSS7_XNET_CHECK_INET], [
     if test :"$os7_cv_need_inet" = :yes ; then :;
         _OPENSS7_XNET_SETUP_INET
     fi
-    AM_CONDITIONAL_([WITH_INET], test :"$os7_cv_need_inet" = :yes )
+    AM_CONDITIONAL_([WITH_INET], [test :"$os7_cv_need_inet" = :yes])
 ])# _OPENSS7_XNET_CHECK_INET
 # =========================================================================
 
@@ -241,7 +241,7 @@ AC_DEFUN([_OPENSS7_XNET_CHECK_XNET], [
     if test :"$os7_cv_need_xnet" = :yes ; then :;
         _OPENSS7_XNET_SETUP_XNET
     fi
-    AM_CONDITIONAL_([WITH_XNET], test :"$os7_cv_need_xnet" = :yes )
+    AM_CONDITIONAL_([WITH_XNET], [test :"$os7_cv_need_xnet" = :yes])
 ])# _OPENSS7_XNET_CHECK_XNET
 # =========================================================================
 
@@ -270,7 +270,7 @@ AC_DEFUN([_OPENSS7_XNET_CHECK_SOCK], [
     if test :"$os7_cv_need_sock" = :yes ; then :;
         _OPENSS7_XNET_SETUP_SOCK
     fi
-    AM_CONDITIONAL_([WITH_SOCK], test :"$os7_cv_need_sock" = :yes )
+    AM_CONDITIONAL_([WITH_SOCK], [test :"$os7_cv_need_sock" = :yes])
 ])# _OPENSS7_XNET_CHECK_SOCK
 # =========================================================================
 

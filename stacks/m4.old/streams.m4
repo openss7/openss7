@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.7 2004/05/23 07:24:24 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.8 2004/06/28 08:59:38 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/23 07:24:24 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/28 08:59:38 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -173,7 +173,7 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
                 PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lfs"
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
             fi
-            AC_MSG_RESULT([--with-lis])
+            AC_MSG_RESULT([--with-lfs])
             ;;
         *)
             AC_MSG_ERROR([
@@ -186,8 +186,8 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
     esac
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
-    AM_CONDITIONAL([WITH_LIS], test :"${streams_cv_package:-LiS}" = :LiS)
-    AM_CONDITIONAL([WITH_LFS], test :"${streams_cv_package:-LiS}" = :LfS)
+    AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_package:-LiS}" = :LiS])
+    AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_package:-LiS}" = :LfS])
 ])# _LINUX_STREAMS_SETUP
 # =========================================================================
 
