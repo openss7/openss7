@@ -16,7 +16,7 @@
 #if defined(LINUX) && !defined(OSIF_H)
 #define OSIF_H		/* file included */
 
-#ident "@(#) LiS osif.h 1.32 12/18/02"
+#ident "@(#) LiS osif.h 1.34 9/24/03"
 
 #ifndef LINUX_VERSION_CODE
 #include <linux/version.h>
@@ -171,6 +171,7 @@
 
 #if LINUX_VERSION_CODE >= 0x020400	/* 2.4 kernel */
 
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 #ifdef pci_alloc_consistent
 #undef pci_alloc_consistent
 #endif
@@ -252,6 +253,7 @@
 #endif
 #define sg_dma_len lis_osif_sg_dma_len
 
+#endif          /* S390 or S390X */
 #endif
 
 
@@ -407,7 +409,6 @@
 #endif				/* !defined(INCL_FROM_OSIF_DRIVER) */
 
 
-#if (!defined(_SPARC_LIS_) && !defined(_PPC_LIS_))
 /*
  * PCI BIOS routines
  */
@@ -454,7 +455,6 @@ int lis_pcibios_write_config_dword(unsigned char  bus,
 				    unsigned int   val) ;
 const char *lis_pcibios_strerror(int error) ;
 
-#endif /* ifndef _SPARC_LIS_, _PPC_LIS_ */ 
 
 /*
  * New style PCI interface

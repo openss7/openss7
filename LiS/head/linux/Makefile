@@ -45,7 +45,11 @@ XOBJS = poll.o
 ifeq ($(KVER_MAJOR),2)
 ifeq ($(KVER_MINOR),0)
 else
+  ifneq ($(ARCH),s390)
+  ifneq ($(ARCH),s390x)
   XOBJS += lispci.o
+  endif
+  endif
 endif
 endif
 

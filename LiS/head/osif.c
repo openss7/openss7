@@ -28,7 +28,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS osif.c 1.42 5/30/03"
+#ident "@(#) LiS osif.c 1.44 9/24/03"
 
 #include <sys/stream.h>
 #include <linux/autoconf.h>		/* Linux config defines */
@@ -335,6 +335,7 @@ void lis_osif_pci_unregister_driver( struct pci_driver *p )
 #endif
 
 #if LINUX_VERSION_CODE >= 0x020400		/* 2.4 kernel */
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 
 	 /***************************************
 	 *        PCI DMA Mapping Fcns		*
@@ -343,13 +344,21 @@ void lis_osif_pci_unregister_driver( struct pci_driver *p )
 void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 	                                  dma_addr_t *dma_handle)
 {
+#ifdef CONFIG_PCI
     return(pci_alloc_consistent(hwdev, size, dma_handle));
+#else
+    return 0;
+#endif
 }
 
 void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size,
 	                                void *vaddr, dma_addr_t dma_handle)
 {
+#ifdef CONFIG_PCI
     pci_free_consistent(hwdev, size, vaddr, dma_handle);
+#else
+    return;
+#endif
 }
 
 dma_addr_t lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr,
@@ -462,6 +471,7 @@ void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 
 #endif                                  /* 2.4.13 */
 
+#endif          /* S390 or S390X */
 
 #endif		/* LINUX_VERSION_CODE >= 0x020400 */
 

@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS exports.c 1.13 5/19/03"
+#ident "@(#) LiS exports.c 1.14 9/24/03"
 
 #ifdef MODVERSIONS
 # ifdef LISMODVERS
@@ -220,7 +220,9 @@ EXPORT_SYMBOL(lis_major);
 EXPORT_SYMBOL(lis_malloc);
 EXPORT_SYMBOL(lis_mark_mem);
 EXPORT_SYMBOL(lis_max_mem);
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 EXPORT_SYMBOL(lis_membar);
+#endif          /* S390 or S390X */
 EXPORT_SYMBOL(lis_milli_to_ticks);
 EXPORT_SYMBOL(lis_mknod);
 EXPORT_SYMBOL(lis_mount);
@@ -251,6 +253,7 @@ EXPORT_SYMBOL(lis_osif_pci_write_config_dword);
 EXPORT_SYMBOL(lis_osif_pci_write_config_word);
 EXPORT_SYMBOL(lis_osif_sti);
 EXPORT_SYMBOL(lis_own_spl);
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 EXPORT_SYMBOL(lis_pcibios_find_class);
 EXPORT_SYMBOL(lis_pcibios_find_device);
 EXPORT_SYMBOL(lis_pcibios_init);
@@ -284,6 +287,7 @@ EXPORT_SYMBOL(lis_pci_unmap_single);
 EXPORT_SYMBOL(lis_pci_write_config_byte);
 EXPORT_SYMBOL(lis_pci_write_config_dword);
 EXPORT_SYMBOL(lis_pci_write_config_word);
+#endif          /* S390 or S390X */
 EXPORT_SYMBOL(lis_phys_to_virt);
 EXPORT_SYMBOL(lis_pipe);
 EXPORT_SYMBOL(lis_poll_2_1);
@@ -421,6 +425,7 @@ EXPORT_SYMBOL(lis_wake_up_interruptible);
 EXPORT_SYMBOL(lis_xmsgsize);
 EXPORT_SYMBOL(lis_zmalloc);
 
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 #if defined(KERNEL_2_3)			/* only for 2.4 or newer kernels */
 
 EXPORT_SYMBOL(lis_osif_pci_alloc_consistent);
@@ -447,3 +452,4 @@ EXPORT_SYMBOL(lis_osif_pci_dac_page_to_dma);
 #endif                                  /* 2.4.13 */
 
 #endif					/* defined(KERNEL_2_3) */
+#endif          /* S390 or S390X */

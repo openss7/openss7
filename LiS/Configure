@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.72 6/10/03"
+Configure_version="2.74 9/24/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -518,7 +518,7 @@ rh_get_smp()
 	return 1
     fi
 
-    if grep -w -q cpu_online_map $SMAP; then
+    if grep -w -q $SMP_GREP_ID $SMAP; then
 	NEED_KSMP=0
 	KSMP=y			# SMP kernel
     else
@@ -535,7 +535,7 @@ get_smp()
 {
     NEED_KSMP=0				# default is "found"
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
-	if grep -q cpu_online_map /proc/ksyms; then
+	if grep -q $SMP_GREP_ID /proc/ksyms; then
 	    KSMP=y
 	else
 	    KSMP=
@@ -545,7 +545,7 @@ get_smp()
 	if [ $? -eq 0 ]; then		# found
 	    : OK
 	elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
-	    if nm -g $KSRC/vmlinux |grep -w -q cpu_online_map; then
+	    if nm -g $KSRC/vmlinux |grep -w -q $SMP_GREP_ID; then
 		KSMP=y			# SMP kernel
 	    else
 		KSMP=			# non-SMP kernel
@@ -638,6 +638,74 @@ get_modules()
     fi
 }
 
+#
+# Get the IPV6 configuration option from kernel
+#
+get_ipv6()
+{
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	if grep -q ipv6_addr_type /proc/ksyms; then
+	    IPV6=y
+	else
+	    IPV6=
+	fi
+    else
+	IPV6=`ac_get_config CONFIG_IPV6`	# check autoconf.h
+	if [ $? -eq 0 ]; then		# found
+	    : OK
+	elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
+	    if nm -g $KSRC/vmlinux |grep -w -q ipv6_addr_type; then
+		IPV6=y			# SMP kernel
+	    else
+		IPV6=			# non-SMP kernel
+	    fi
+	elif [ -f $KSRC/.config ]; then	# kernel .config file?
+	    IPV6=`dc_get_config "CONFIG_IPV6=y"`
+	else
+	    IPV6=
+	    echo "Cannot determine if kernel supports IPV6, assume not."
+	fi
+    fi
+
+    if [ "$IPV6..." = "y..." ]; then
+	echo "Kernel support for IP version 6 detected."
+    else
+	echo "No kernel support for IP version 6 detected."
+    fi
+}
+
+get_ipv6_module()
+{
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	if grep -q tcp_openreq_cachep /proc/ksyms; then
+	    IPV6_MODULE=y
+	else
+	    IPV6_MODULE=
+	fi
+    else
+	IPV6_MODULE=`ac_get_config CONFIG_IPV6_MODULE`	# check autoconf.h
+	if [ $? -eq 0 ]; then		# found
+	    : OK
+	elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
+	    if nm -g $KSRC/vmlinux |grep -w -q tcp_openreq_cachep; then
+		IPV6_MODULE=y			# SMP kernel
+	    else
+		IPV6_MODULE=			# non-SMP kernel
+	    fi
+	elif [ -f $KSRC/.config ]; then	# kernel .config file?
+	    IPV6_MODULE=`dc_get_config "CONFIG_IPV6_MODULE=y"`
+	else
+	    IPV6_MODULE=
+	    echo "Cannot determine if kernel supports IPV6_MODULE, assume not."
+	fi
+    fi
+
+    if [ "$IPV6_MODULE..." = "y..." ]; then
+	echo "Kernel support for IP version 6 modules detected."
+    else
+	echo "No kernel support for IP version 6 modules detected."
+    fi
+}
 
 
 #
@@ -823,6 +891,12 @@ else
     INT_PSW=y
 fi
 
+if [ "$MACHINE" = "s390" -o "$MACHINE" = "s390x" ]; then
+  SMP_GREP_ID='smp_num_cpus'
+else
+  SMP_GREP_ID='cpu_online_map'
+fi
+
 #
 # LIS_HOME
 #
@@ -975,6 +1049,8 @@ the currently running kernel?"
     get_kver
     get_smp
     get_modules
+    get_ipv6
+    get_ipv6_module
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	verify_kver
     fi
@@ -1497,6 +1573,8 @@ if [ "$TARGET" = "l" ]; then
     cfg_out KMODVERS $KMODVERS
     cfg_out LISMODVERS $LISMODVERS
     cfg_out LISAUTOCONF $LISAUTOCONF
+    cfg_out IPV6 $IPV6
+    cfg_out IPV6_MODULE $IPV6_MODULE
     cfg_out CONFIG_MK_KERNEL $CONFIG_MK_KERNEL 
     cfg_out STRMS_QUEUES $STRMS_QUEUES
     cfg_out MOD_INST_DIR $MOD_INST_DIR

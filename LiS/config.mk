@@ -160,6 +160,13 @@ endif
 ifeq ($(ARCH),ppc)
 XOPTS += -D__powerpc__ -fno-builtin -pipe -D_PPC_LIS_
 endif
+# For s390 & s390x architecture we need some bypasses
+ifeq ($(ARCH),s390)
+XOPTS += -D_S390_LIS_
+endif
+ifeq ($(ARCH),s390x)
+XOPTS += -D_S390X_LIS_
+endif
 
 #
 # This will make glibc define only the types defined in the good old SysV
@@ -190,6 +197,14 @@ ifeq ($(KSMP),y)
 XOPTS += -D__SMP__
 endif
 endif
+ifeq ($(ARCH),s390)
+XOPTS += -D__BOOT_KERNEL_SMP
+endif
+ifeq ($(ARCH),s390x)
+XOPTS += -D__BOOT_KERNEL_SMP
+endif
+
+
 
 #
 # If LiS generated a modversions.h file, note that fact.  linux-mdep.h

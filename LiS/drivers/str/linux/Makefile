@@ -25,6 +25,12 @@ TOBJS := ip_strm_mod ldl connld mtdrv
 ifneq ($(KVER_MAJORMINOR),2.2)
 TOBJS += ip_to_dlpi
 endif
+ifeq ($(ARCH),s390)
+TOBJS := connld
+endif
+ifeq ($(ARCH),s390x)
+TOBJS := connld
+endif
 
 # Similar to TOBJS, but non-streams modules
 ZOBJS := liskmod
