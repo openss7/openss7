@@ -225,6 +225,35 @@ static _NI _syscall2(long, syscall_umount2, char *, file, int, flags)
 #undef _NI
 
 /************************************************************************
+*                            lis_bug                                    *
+*************************************************************************
+*									*
+* This is called to report bugs in the STREAMS subsystem.               *
+*									*
+* It sends a warning message to the kernel logger, then calls either	*
+* BUG() or panic(), depending on lis_dont_panic                         *
+*									*
+************************************************************************/
+__attribute__ ((format(printf, 3, 4)))
+void lis_bug(const char *file, unsigned int line, const char *fmt, ...)
+{
+	static char buf[256];
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	va_end(args);
+	if(lis_panic_when_killed) {
+		panic("STREAMS file %s line %d: %s\n",
+		      file, line, buf);
+	} else {
+		printk(KERN_EMERG "STREAMS file %s line %d: %s\n",
+		       file, line, buf);
+		BUG();
+	}
+}
+
+/************************************************************************
 *                            lis_assert_fail                            *
 *************************************************************************
 *									*
@@ -3930,11 +3959,9 @@ int lis_init_module( void )
 	"Major device number %d.\n"
 	"Version %s %s. Compiled for kernel version %s.\n"
 	"Using %s %s\n"
-	"Kernel register args %d, LiS register args %d\n"
 	"==================================================================\n",
 	lis_major, lis_version, lis_date, lis_kernel_version,
-	lis_poll_file, lis_stropts_file,
-	CCREGPARM, STREAMS_REGPARM);
+	lis_poll_file, lis_stropts_file);
 
     return(0);
 }
@@ -4260,7 +4287,7 @@ int	lis_thread_runqueues(void *p)
 	    static int	msg_cnt ;
 	    char	buf[200] ;
 
-#if defined(KERNEL_2_5)
+#if 0 && defined(KERNEL_2_5)
 	    cpumask_scnprintf(buf, sizeof(buf), current->cpus_allowed) ;
 #else
 	    sprintf(buf, "0x%lx", current->cpus_allowed) ;
@@ -4615,7 +4642,7 @@ int	_RP lis_mknod(char *name, int mode, dev_t dev)
     old_fs = get_fs();
     set_fs(KERNEL_DS);
 
-#if defined(KENEL_2_5)
+#if defined(KERNEL_2_5) && !defined(KERNEL_2_6)
     ret = syscall_mknod(name, mode, kdev_val(dev)) ;
 #else
     ret = syscall_mknod(name, mode, dev) ;
@@ -4793,17 +4820,17 @@ int	lis_umount2(char *path, int flags)
  * This is said to be equivalent to GPL for symbol exporting purposes and
  * is also supposed to span LGPL.
  */
+
+/* Note: this release is GPL. -bb */
+
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("David Grothe <dave@gcom.com>");
 #endif
 #if defined(MODULE_DESCRIPTION)
-MODULE_DESCRIPTION("SVR4 STREAMS for Linux (LGPL Code)");
-#endif
-#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
-MODULE_INFO(vermagic, VERMAGIC_STRING);
+MODULE_DESCRIPTION("SVR4 STREAMS for Linux (GPL Code)");
 #endif
 
 /************************************************************************
@@ -4951,7 +4978,7 @@ void *lis_alloc_timer(char *file, int line)
 {
     void	*t ;
 
-#if defined(CONFIG_DEV)
+#if !defined(USE_KMEM_TIMER)
     t = LISALLOC(lis_timer_size,file, line) ;
 #else
     t = kmem_cache_alloc(lis_timer_cachep, GFP_ATOMIC) ;
@@ -4962,7 +4989,7 @@ void *lis_alloc_timer(char *file, int line)
 
 void *lis_free_timer(void *timerp)
 {
-#if defined(CONFIG_DEV)
+#if !defined(USE_KMEM_TIMER)
     FREE(timerp) ;
 #else
     kmem_cache_free(lis_timer_cachep, timerp);

@@ -113,9 +113,6 @@ EXPORT_SYMBOL_GPL(lis_copymsg);
 EXPORT_SYMBOL_GPL(lis_date);
 EXPORT_SYMBOL_GPL(lis_debug_mask);
 EXPORT_SYMBOL_GPL(lis_debug_mask2);
-#if 0 && defined(CONFIG_DEV)
-EXPORT_SYMBOL_GPL(lis_dec_mod_cnt_fcn);
-#endif
 EXPORT_SYMBOL_GPL(lis_disable_irq);
 EXPORT_SYMBOL_GPL(lis_down_fcn);
 EXPORT_SYMBOL_GPL(lis_down_nosig_fcn);
@@ -142,9 +139,6 @@ EXPORT_SYMBOL_GPL(lis_getint);
 EXPORT_SYMBOL_GPL(lis_getq);
 EXPORT_SYMBOL_GPL(lis_gettimeofday);
 EXPORT_SYMBOL_GPL(lis_hitime);
-#if 0 && defined(CONFIG_DEV)
-EXPORT_SYMBOL_GPL(lis_inc_mod_cnt_fcn);
-#endif
 EXPORT_SYMBOL_GPL(lis_insq);
 EXPORT_SYMBOL_GPL(lis_in_interrupt);
 EXPORT_SYMBOL_GPL(lis_interruptible_sleep_on);
@@ -172,9 +166,6 @@ EXPORT_SYMBOL_GPL(lis_membar);
 #endif          /* S390 or S390X or HPPA */
 EXPORT_SYMBOL_GPL(lis_milli_to_ticks);
 EXPORT_SYMBOL_GPL(lis_mknod);
-#if 0 && defined(CONFIG_DEV)
-EXPORT_SYMBOL_GPL(lis_mod_cnt_sync_fcn);
-#endif
 EXPORT_SYMBOL_GPL(lis_msecs);
 EXPORT_SYMBOL_GPL(lis_msgdsize);
 EXPORT_SYMBOL_GPL(lis_msgpullup);

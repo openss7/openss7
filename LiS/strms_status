@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # =============================================================================
 # 
 # @(#) $RCSfile: strload,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/14 21:54:01 $
@@ -52,7 +52,7 @@
 # =============================================================================
 
 ECHO='echo'
-SHELL='/bin/bash'
+SHELL='/bin/sh'
 SED='sed'
 
 # Check that we have a woring $ECHO.
@@ -376,39 +376,35 @@ if [ -f /usr/src/LiS/version ]; then
 . /usr/src/LiS/version
 fi
 
-arg1()
+PATH="/sbin:/usr/sbin:$PATH"
+
+# argn() usage: argn <n> <args>...
+#
+argn()
 {
-    printf "%s" $1
-}
-arg4()
-{
-    printf "%s" $4
-}
-arg5()
-{
-    printf "%s" $5
+    n=$1;  shift;  echo -n $(eval "echo -n \$$n")
 }
 
 print_stat()
 {
-    psinfo="`arg1 $*` `arg5 $*`"
+    psinfo="`argn 1 $*` `argn 5 $*`"
     if [ "$psinfo" = " " ]; then
-	psinfo="(LiS-$LISVER not running)"
+	psinfo="(LiS not running)"
 	retval=1		# loaded but no queue runner running
     else
 	retval=0		# loaded and running
     fi
-    echo "Streams loaded $psinfo"
+    echo "LiS loaded: $psinfo"
     return $retval
 }
 
-/sbin/lsmod 2>/dev/null | grep -q -w "streams"
+lsmod 2>/dev/null | grep -q -w "streams"
 if [ $? -eq 0 ]; then
     streams -s >/dev/null 2>&1
     lisps=`ps ax 2>/dev/null`
-    print_stat `echo "$lisps" | grep "LiS-$LISVER"`
+    print_stat `echo "$lisps" | grep "LiS-"` | grep -v grep
     exit $?
 fi
 
-echo "Streams not loaded"
+echo "LiS not loaded"
 exit 2				# not loaded

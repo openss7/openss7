@@ -135,9 +135,6 @@ typedef struct lis_module_info {
  *  Per-Module statistic record
  */
 
-/* use non-standard but MP-safe statistics */
-#define LIS_ATOMIC_STATS
-
 typedef struct module_stat {
   SHARE
     char *ms_xptr;              /* pointer to private statistics */
@@ -151,6 +148,7 @@ typedef struct module_stat {
     long ms_ccnt;               /* count of calls to close proc */
     long ms_acnt;               /* count of calls to admin proc */
 #else
+/* use non-standard but MP-safe statistics */
     lis_atomic_t ms_pcnt;               /* count of calls to put proc */
     lis_atomic_t ms_scnt;               /* count of calls to service proc */
     lis_atomic_t ms_ocnt;               /* count of calls to open proc */

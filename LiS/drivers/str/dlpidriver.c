@@ -18,7 +18,7 @@
  * 
  */
 
-#ident "@(#) LiS dlpidriver.c 2.6 09/13/04 10:12:30 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <linux/types.h>
 #include <linux/stream.h>

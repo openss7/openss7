@@ -40,7 +40,7 @@
  * 
  */
 
-#ident "@(#) LiS clone.c 2.8 09/13/04 10:12:30 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <sys/stream.h>
 #include <sys/osif.h>

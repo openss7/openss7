@@ -63,8 +63,6 @@
 
 #ident "@(#) LiS ip_strm_mod.c 2.27 09/13/04 10:12:45 "
 
-#define SAFE
-
 /*
  * C language includes
  */

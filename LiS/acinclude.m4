@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:13:44 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:44 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 01:39:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -166,24 +166,7 @@ AC_DEFUN([_LIS_SETUP], [dnl
 # -----------------------------------------------------------------------------
 # Null out all the definitions that we don't need when not building for linux
 AC_DEFUN([_LIS_NO_LINUX], [dnl
-    LIS_KSRC=
-    LIS_KVER=
-    LIS_KVER_MAJOR=
-    LIS_KVER_MINOR=
-    LIS_KVER_PATCH=
-    LIS_KVER_PATCHNO=
-    LIS_USE_RUNNING_KERNEL=
-    LIS_CONFIG_MK_KERNEL=
-    LIS_KERN_TARGET=
-    LIS_STRMS_QUEUES=
-    LIS_MOD_INST_DIR=
-    LIS_MOD_INSTALL=
-    LIS_KSMP=
-    LIS_KMODULES=
-    LIS_CONFIG_STREAMS=
-    LIS_CONFIG_DEV=
-    LIS_USE_KMEM_CACHE=
-    LIS_USE_LINUX_KMEM_TIMER=
+dnl LIS_KERN_TARGET=
     STRCONF_MAJBASE=230
     STRCONF_CONFIG='include/sys/LiS/config.h'
     STRCONF_MODCONF='head/modconf.inc'
@@ -285,12 +268,8 @@ AC_DEFUN([_LIS_LINUX_SETUP], [dnl
     AC_MSG_NOTICE([-----------------------------------])
     _LINUX_KERNEL
     _GENKSYMS
-    _LIS_HOME
     _LIS_CONFIG_SYSCALLS
-    _LIS_RH_71_KLUDGE
-    _LIS_GET_EMPTY_INODE
-    _LIS_SIGMASKLOCK
-    _LIS_RCVOID
+    _LIS_SETUP_LIS
     AC_MSG_NOTICE([-----------------------------------])
     AC_MSG_NOTICE([complete linux kernel configuration])
     AC_MSG_NOTICE([-----------------------------------])
@@ -309,34 +288,101 @@ AC_DEFUN([_LIS_LINUX_SETUP], [dnl
 # _LIS_SETUP_LIS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SETUP_LIS], [dnl
-	if test -z "$with_k_release" ; then
-	    LIS_USE_RUNNING_KERNEL=y
-	else
-	    LIS_USE_RUNNING_KERNEL=n
+    LIS_KSRC="${kbuilddir}"
+    LIS_KINCL="${kincludedir}"
+    LIS_NOKSRC=0
+    if test :"${linux_cv_k_running:-no}" = :no
+    then
+	LIS_USE_RUNNING_KERNEL=n
+    else
+	LIS_USE_RUNNING_KERNEL=y
+    fi
+    LIS_NKVER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
+    LIS_KVER="$linux_cv_k_release"
+    LIS_KVER_MAJOR="$linux_cv_k_major"
+    LIS_KVER_MINOR="$linux_cv_k_minor"
+    LIS_KVER_PATCH="$linux_cv_k_patch"
+    LIS_KVER_PATCHNO="$linux_cv_k_extra"
+    LIS_KVER_MAJORMINOR="${linux_cv_k_major}.${linux_cv_k_minor}"
+dnl we don't actually grep the header file
+    LIS_KVER_H="$LIS_KVER"
+    LIS_NKVER_H="$LIS_NKVER"
+    AH_TEMPLATE([__SMP__], [Define for SMP compile.])
+    _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_SMP],
+	[LIS_KSMP=y], [LIS_KSMP=n ; AC_DEFINE([__SMP__], [1])])
+    LIS_KMODULES=y
+    _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_MODVERSIONS],
+	[LIS_KMODVERS=y], [LIS_KMODVERS=n])
+    LIS_LISMODVERS=y
+    AH_TEMPLATE([LISMODVERS], [Define if a modversions.h file needs to be included.])
+dnl AC_DEFINE([LISMODVERS], [1])
+    LIS_LISAUTOCONF=n
+# 
+#   this is just to generate the template
+# 
+    AH_TEMPLATE([LISAUTOCONF], [Define if an autoconf.h file was generated.
+	LISAUTOCONF is used by "include/sys/LiS/linux-mdep.h" to know when to
+	include "LiS/sys/autoconf.h" and to prevent linux from including its
+	own.  In autoconf we do this by setting the appropriate include
+	directory order in the makefile.  Our local "include/linux/autoconf.h"
+	will be included in preference to the kernel one.  I don't know about
+	LiS's practice of mucking around with include file wrapper macros.  A
+	renaming of some macros would kil portability.  We never define this
+	macro even when we build our own autoconf but we do mark it in gcom's
+	old config.in file when we build it.])
+    _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_IPV6],
+	[LIS_IPV6=y], [LIS_IPV6=n])
+    _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_IPV6_MODULE],
+	[LIS_IPV6_MODULE=y], [LIS_IPV6_MODULE=n])
+    LIS_CONFIG_MK_KERNEL=n
+    LIS_STRMS_QUEUES=t
+    AH_TEMPLATE([USE_KTHREAD], [Define (always) for kernel thread queues.])
+    AC_DEFINE([USE_KTHREAD], [1])
+    eval "LIS_MOD_INST_DIR=\"$DESTDIR$kmoduledir\""
+    if test :"${enable_k_install:-yes}" = :yes
+    then LIS_MOD_INSTALL=y
+    else LIS_MOD_INSTALL=n
+    fi
+    _LIS_RH_71_KLUDGE
+    _LIS_SIGMASKLOCK
+    _LIS_RCVOID
+    _LIS_OLD_GCOM_CONFIG_IN
+    LIS_KINCL_MACH_GENERIC="-I${kbuilddir}/include/asm-${linux_cv_k_mach}/mach-generic"
+    LIS_KINCL_MACH_DEFAULT="-I${kbuilddir}/include/asm-${linux_cv_k_mach}/mach-default"
+    _LIS_GET_EMPTY_INODE
+    _LIS_SET_CPUS_ALLOWED
+    _LIS_INT_PSW
+    _LIS_KMEM_OPTS
+    LIS_CONFIG_INET=n
+    LIS_PKGCOMPILE=n
+    LIS_PKGMODULES=n
+    LIS_SILENT_BUILD=y
+dnl
+dnl We don't really care about this.  We have our own modpost.  This is just for
+dnl the GCOM config.in file.
+dnl
+    if test :"${linux_cv_k_ko_modules:-no}" = :yes
+    then LIS_KBUILD=y
+	LIS_MODUTILS=n
+	LIS_MODULE_INIT_TOOLS=y
+	if test "$linux_cv_k_major$linux_cv_k_minor" -eq 26 -a "$linux_cv_k_patch" -gt 3
+	then LIS_KBUILD_NEEDS_SYMVERS=y
+	     LIS_KBUILD_NEEDS_MODNAME=y
+	else LIS_KBUILD_NEEDS_SYMVERS=n
+	     LIS_KBUILD_NEEDS_MODNAME=n
 	fi
-	LIS_KVER="$linux_cv_k_release"
-	LIS_NKVER="${linux_cv_k_major}.${linux_cv_k_minor}.${linux_cv_k_patch}"
-	LIS_KVER_MAJOR="$linux_cv_k_major"
-	LIS_KVER_MINOR="$linux_cv_k_minor"
-	LIS_KVER_PATCH="$linux_cv_k_patch"
-	LIS_KVER_PATCHNO="$linux_cv_k_extra"
-	LIS_KVER_MAJORMINOR="${linux_cv_k_major}.${linux_cv_k_minor}"
-	LIS_KSRC="${linux_cv_k_build}"
-	LIS_NOKSRC=0
-	_LIS_ARCH_DEFINES
-dnl     _LIS_KVER_H
-dnl     _LIS_NKVER_H
-dnl     _LIS_KSMP
-dnl     _LIS_KMODULES
-dnl     _LIS_KMODVERS
-dnl     _LIS_LISMODVERS
-dnl     _LIS_LISAUTOCONF
-dnl     _LIS_IPV6
-dnl     _LIS_IPV6_MODULE
-	_LIS_CONFIG_MK_KERNEL
-	_LIS_STRMS_QUEUES
-	_LIS_MOD_INST_DIR
-	_LIS_MOD_INSTALL dnl
+    else LIS_KBUILD=n
+	 LIS_MODUTILS=y
+	 LIS_MODULE_INIT_TOOLS=n
+	 LIS_KBUILD_NEEDS_SYMVERS=n
+	 LIS_KBUILD_NEEDS_MODNAME=n
+    fi
+dnl
+dnl We don't care about this one either.  We rip symbols from the System.map and
+dnl the kernel modules themselves.
+dnl
+    LIS_KSYMVERS="${MODPOST_SYSVER}"
+    _LIS_ARCH_DEFINES
 ])# _LIS_SETUP_LIS
 # =============================================================================
 
@@ -345,6 +391,51 @@ dnl     _LIS_IPV6_MODULE
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
     AC_REQUIRE([AC_CANONICAL_HOST])dnl
+    AH_TEMPLATE([_HPPA_LIS_], [Define when compiling for HPPA.  This define is
+	only used for linux kernel target.  This is really the wrong way to go
+	about doing this: the function should be checked for by autoconf instead
+	of placing the architectural dependencies in the LiS source.  The define
+	is used in "head/linux-mdep.c" to determine whether lis_pci_cleanup
+	exists; "head/linux/exports.c" to determine whether a bunch of functions
+	are available; "head/osif.c" to determine whether a bunch of PCI DMA
+	mapping functions are available.])
+    AH_TEMPLATE([_PPC_LIS_], [Define when compiling for PPC.  This define is
+	only used for linux kernel target.  This is really the wrong way to go
+	about doing this: the function should be checked for by autoconf instead
+	of placing the architectural dependencies in the LiS source.  The define
+	is used in <LiS/include/sys/osif.h> and "head/osif.c" to determine
+	whether PCI BIOS is present; in (head/linux-mdep.c) to determine whether
+	cpu binding is possible; to determine whether spin_is_locked() is
+	available in "head/linux/lislocks.c"; in "head/mod.c" to determine
+	whether to define struct pt_regs; and in <LiS/include/sys/lislocks.h> to
+	determine the size of semaphore memory.])
+    AH_TEMPLATE([_S390X_LIS_], [Define when compiling for S390X.  This define is
+	only used for the linux kernel target.  This is really the wrong way to
+	go about doing this: the function should be checked for by autoconf
+	instead of placing the architectural depdendencies in the LiS source.
+	The define is used in "head/linux-mdep.c" to determine whether
+	lis_pci_cleanup exists; "head/linux/exports.c" to determine whether a
+	bunch of functions are available; "head/osif.c" to determine whether a
+	bunch of PCI DMA mapping functions are available; "include/sys/osif.h"
+	to determine whether a bunch of PCI DMA mapping functions are
+	available.])
+    AH_TEMPLATE([_S390_LIS_], [Define when compiling for S390.  Strangely
+	enough, _S390_LIS_ is never checked without _S390X_LIS_.  Rendering it
+	as an alias for the above.])
+    AH_TEMPLATE([_SPARC64_LIS_], [Define when compiling for Sparc64.  This
+	define is only used for the linux kernel target.  This is really the
+	wrong way to go about doing this: the function should be checked for by
+	autoconf instead of placing the architectural dependencies in the LiS
+	source.  The define is used to determine when ioremap functions are not
+	available <LiS/include/osif.h>.  Strangely enough, none of the other
+	checks are performed as for _SPARC_LIS_ below.])
+    AH_TEMPLATE([_SPARC_LIS_], [Define when compiling for Sparc.  This define is
+	used for the linux kernel target.  This is really the wrong way to go
+	about doing this: the function should be checked for by autoconf instead
+	of placing architectural depedencies in the LiS source.  The define is
+	used to determine when ioremap functions are not available
+	<LiS/include/osif.h>, when PCI BIOS is not present (head/osif.c), and
+	when <linux/poll.h> is missing POLLMSG <LiS/include/sys/poll.h>])
     case "$linux_cv_march" in
 	alpha*)			: ;;
 	arm*)			: ;;
@@ -354,88 +445,27 @@ AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
 	m68*)			: ;;
 	mips64*)		: ;;
 	mips*)			: ;;
-	hppa*)
-	    AC_DEFINE([_HPPA_LIS_], [1], [Define when compiling for HPPA.
-		This define is only used for linux kernel target.  This is
-		really the wrong way to go about doing this: the function
-		should be checked for by autoconf instead of placing the
-		architectural dependencies in the LiS source.  The define is
-		used in "head/linux-mdep.c" to determine whether
-		lis_pci_cleanup exists; "head/linux/exports.c" to determine
-		whether a bunch of functions are available; "head/osif.c" to
-		determine whether a bunch of PCI DMA mapping functions are
-		available.])
-	    ;;
-	ppc* | powerpc*)	
-	    AC_DEFINE([_PPC_LIS_], [1], [Define when compiling for PPC.  This
-		define is only used for linux kernel target.  This is really the
-		wrong way to go about doing this: the function should be checked
-		for by autoconf instead of placing the architectural dependencies
-		in the LiS source.  The define is used in <LiS/include/sys/osif.h>
-		and "head/osif.c" to determine whether PCI BIOS is present; in
-		(head/linux-mdep.c) to determine whether cpu binding is possible;
-		to determine whether spin_is_locked() is available in
-		"head/linux/lislocks.c"; in "head/mod.c" to determine whether to
-		define struct pt_regs; and in <LiS/include/sys/lislocks.h> to
-		determine the size of semaphore memory.])
-	    ;;
-	s390x*)			
-	    AC_DEFINE([_S390X_LIS_], [1], [Define when compiling for S390X.  This
-		define is only used for the linux kernel target.  This is really
-		the wrong way to go about doing this: the function should be
-		checked for by autoconf instead of placing the architectural
-		depdendencies in the LiS source.  The define is used in
-		"head/linux-mdep.c" to determine whether lis_pci_cleanup exists;
-		"head/linux/exports.c" to determine whether a bunch of functions
-		are available; "head/osif.c" to determine whether a bunch of PCI
-		DMA mapping functions are available; "include/sys/osif.h" to
-		determine whether a bunch of PCI DMA mapping functions are
-		available.])
-	    ;;
-	s390*)			
-	    AC_DEFINE([_S390_LIS_], [1], [Define when compiling for S390.
-		Strangely enough, _S390_LIS_ is never checked without _S390X_LIS_.
-		Rendering it as an alias for the above.])
-	    ;;
+	hppa*)			AC_DEFINE([_HPPA_LIS_],    [1]) ;;
+	ppc* | powerpc*)	AC_DEFINE([_PPC_LIS_],     [1]) ;;
+	s390x*)			AC_DEFINE([_S390X_LIS_],   [1]) ;;
+	s390*)			AC_DEFINE([_S390_LIS_],    [1]) ;;
 	sh*)			: ;;
-	sparc64*)		
-	    AC_DEFINE([_SPARC64_LIS_], [1], [Define when compiling for Sparc64.
-		This define is only used for the linux kernel target.  This is
-		really the wrong way to go about doing this: the function should
-		be checked for by autoconf instead of placing the architectural
-		dependencies in the LiS source.  The define is used to determine
-		when ioremap functions are not available <LiS/include/osif.h>.
-		Strangely enough, none of the other checks are performed as for
-		_SPARC_LIS_ below.])
-	    ;;
-	sparc*)			
-	    AC_DEFINE([_SPARC_LIS_], [1], [Define when compiling for Sparc.  This
-		define is used for the linux kernel target.  This is really the
-		wrong way to go about doing this: the function should be checked
-		for by autoconf instead of placing architectural depedencies in
-		the LiS source.  The define is used to determine when ioremap
-		functions are not available <LiS/include/osif.h>, when PCI BIOS is
-		not present (head/osif.c), and when <linux/poll.h> is missing
-		POLLMSG <LiS/include/sys/poll.h>])
-	    ;;
+	sparc64*)		AC_DEFINE([_SPARC64_LIS_], [1]) ;;
+	sparc*)			AC_DEFINE([_SPARC_LIS_],   [1]) ;;
 	*)			: ;;
     esac
-    case "$linux_cv_march" in
-	ppc* | powerpc*)	
-#           AC_DEFINE([__powerpc__], [1], [Define when compiling for PPC.
-#               This define is only used for the linux target.  This is an
-#               error, this value is defined by the GNU compiler when it
-#               compiles.  It is not used by LiS source code.])
-	    :
-	    ;;
-	s390*)			
-#           AC_DEFINE([__BOOT_KERNEL_SMP], [1], [Define when compiling for
-#               S390 or S390X.  This is an error.  __BOOT_KERNEL_SMP should
-#               only be defined in kernel.h.  This is not used by the LiS
-#               source and will be handled by kernel source checks.])
-	    :
-	    ;;
-    esac dnl
+dnl AH_TEMPLATE([__powerpc__], [Define when compiling for PPC.  This define is
+dnl	only used for the linux target.  This is an error, this value is defined
+dnl	by the GNU compiler when it compiles.  It is not used by LiS source
+dnl	code.])
+dnl AH_TEMPLATE([__BOOT_KERNEL_SMP], [Define when compiling for S390 or S390X.
+dnl	This is an error.  __BOOT_KERNEL_SMP should only be defined in kernel.h.
+dnl	This is not used by the LiS source and will be handled by kernel source
+dnl	checks.])
+dnl case "$linux_cv_march" in
+dnl	ppc* | powerpc*)	: AC_DEFINE([__powerpc__],   [1]) ;;
+dnl	s390*)			: AC_DEFINE([__BOOT_KERNEL_SMP], [1]) ;;
+dnl esac dnl
 ])# _LIS_ARCH_DEFINES
 # =============================================================================
 
@@ -444,87 +474,6 @@ AC_DEFUN([_LIS_ARCH_DEFINES], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_GET_SYSTEM_MAP], [dnl
 ])#_LIS_GET_SYSTEM_MAP
-# =============================================================================
-
-# =============================================================================
-# _LIS_CHECK_KVER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_CHECK_KVER], [dnl
-])#_LIS_CHECK_KVER
-# =============================================================================
-
-# =============================================================================
-# _LIS_GET_VERS_H
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_GET_VERS_H], [dnl
-])#_LIS_GET_VERS_H
-# =============================================================================
-
-# =============================================================================
-# _LIS_GET_KVER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_GET_KVER], [dnl
-])#_LIS_GET_KVER
-# =============================================================================
-
-# =============================================================================
-# _LIS_VERIFY_KVER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_VERIFY_KVER], [dnl
-])#_LIS_VERIFY_KVER
-# =============================================================================
-
-# =============================================================================
-# _LIS_GET_SMP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_GET_SMP], [dnl
-])#_LIS_GET_SMP
-# =============================================================================
-
-# =============================================================================
-# _LIS_GET_MODULES
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_GET_MODULES], [dnl
-])#_LIS_GET_MODULES
-# =============================================================================
-
-# =============================================================================
-# _LIS_GET_IPV6
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_GET_IPV6], [dnl
-])#_LIS_GET_IPV6
-# =============================================================================
-
-# =============================================================================
-# _LIS_GENERATE_SYMBOL_NAMES
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_GENERATE_SYMBOL_NAMES], [dnl
-])#_LIS_GENERATE_SYMBOL_NAMES
-# =============================================================================
-
-# =============================================================================
-# _LIS_C_COMPILER_VERSION
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_C_COMPILER_VERSION], [dnl
-])#_LIS_C_COMPILER_VERSION
-# =============================================================================
-
-# =============================================================================
-# _LIS_OUTPUT_CONFIGVAR
-# -----------------------------------------------------------------------------
-# _LIS_OUTPUT_CONFIGVAR(LISCONFVARNAME) output a variable to the LiS
-# configuration file config.in
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_OUTPUT_CONFIGVAR], [dnl
-])#_LIS_OUTPUT_CONFIGVAR
-# =============================================================================
-
-# =============================================================================
-# _LIS_HOME
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_HOME], [dnl
-    LIS_HOME="$srcdir" dnl
-])# _LIS_HOME
 # =============================================================================
 
 # =============================================================================
@@ -559,261 +508,27 @@ AC_DEFUN([_LIS_CONFIG_SYSCALLS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _LIS_KSRC
-# -----------------------------------------------------------------------------
-# Determines the kernel source for a linux build
-AC_DEFUN([_LIS_KSRC], [dnl
-])# _LIS_KSRC
-# =============================================================================
-
-# =============================================================================
-# _LIS_KVER
-# -----------------------------------------------------------------------------
-# Determines the kernel version for a linux build
-AC_DEFUN([_LIS_KVER], [dnl
-    if test :"${with_k_release:-no}" = :no
-    then
-	if test :"${enable_user_mode:-no}" != :yes
-	then
-	    AC_MSG_WARN([*** could not determine kernel version ***])
-	    LIS_KVER=''
-	    LIS_NKVER=''
-	else
-	    LIS_KVER=''
-	    LIS_NKVER=''
-	fi
-    else
-	LIS_KVER="${with_k_release}"
-	LIS_NKVER=`echo -n ${LIS_KVER} | sed -e 's|-.*||'`
-    fi dnl
-])# _LIS_KVER
-# =============================================================================
-
-# =============================================================================
-# _LIS_KVER_MAJOR
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KVER_MAJOR], [dnl
-    AC_MSG_CHECKING([for lis kernel major version number])
-    changequote(, )
-    LIS_KVER_MAJOR=`echo -n ${LIS_KVER} | sed -e 's|[.].*||'`
-    changequote([, ])
-    if test :"$LIS_KVER_MAJOR" != :2; then
-	AC_MSG_ERROR([*** unsupported kernel major number $LIS_KVER_MAJOR])
-    fi
-    AC_MSG_RESULT([$LIS_KVER_MAJOR]) dnl
-])# _LIS_KVER_MAJOR
-# =============================================================================
-
-# =============================================================================
-# _LIS_KVER_MINOR
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KVER_MINOR], [dnl
-    AC_MSG_CHECKING([for lis kernel minor version number])
-    changequote(, )
-    LIS_KVER_MINOR=`echo -n ${LIS_KVER} | sed -e 's|^[^.]*[.]||' -e 's|\..*||'`
-    changequote([, ])
-    if test "${LIS_KVER_MINOR-0}" -lt 3 -o "${LIS_KVER_MINOR-0}" -gt 4; then
-	AC_MSG_ERROR([*** unsupported kernel minor number $LIS_KVER_MINOR])
-    fi
-    if test "${LIS_KVER_MINOR-0}" -ne 4; then
-	AC_MSG_WARN([*** good luck compiling for kernel minor number $LIS_KVER_MINOR ***])
-    fi
-    AC_MSG_RESULT([$LIS_KVER_MINOR]) dnl
-])# _LIS_KVER_MINOR
-# =============================================================================
-
-# =============================================================================
-# _LIS_KVER_PATCH
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KVER_PATCH], [dnl
-    AC_MSG_CHECKING([for lis kernel patch level])
-    changequote(, )
-    LIS_KVER_PATCH=`echo -n ${LIS_KVER} | sed -e 's|^[^.]*[.][^.]*[.]||'`
-    changequote([, ])
-    AC_MSG_RESULT([$LIS_KVER_PATCH]) dnl
-])# _LIS_KVER_PATCH
-# =============================================================================
-
-# =============================================================================
-# _LIS_KVER_PATCHNO
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KVER_PATCHNO], [dnl
-    AC_MSG_CHECKING([for lis kernel patch level number])
-    changequote(, )
-    LIS_KVER_PATCHNO=`echo -n ${LIS_KVER} | sed -e 's|^[^.]*[.][^.]*[.]||' -e 's|[-].*||'`
-    changequote([, ])
-    AC_MSG_RESULT([$LIS_KVER_PATCHNO]) dnl
-])# _LIS_KVER_PATCHNO
-# =============================================================================
-
-# =============================================================================
-# _LIS_KVER_MAJORMINOR
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KVER_MAJORMINOR], [dnl
-    LIS_KVER_MAJORMINOR="${LIS_KVER_MAJOR}.${LIS_KVER_MINOR}" dnl
-dnl AC_MSG_WARN([*** major/minor kernel release is ${LIS_KVER_MAJORMINOR} ***])
-])# _LIS_KVER_MAJORMINOR
-# =============================================================================
-
-
-# =============================================================================
-# _LIS_KVER_H
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KVER_H], [dnl
-    LIS_KVER_H='' dnl
-])# _LIS_KVER_H
-# =============================================================================
-
-# =============================================================================
-# _LIS_NKVER_H
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_NKVER_H], [dnl
-    LIS_NKVER_H='' dnl
-])# _LIS_NKVER_H
-# =============================================================================
-
-# =============================================================================
-# _LIS_KSMP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KSMP], [dnl
-    AC_ARG_ENABLE(debug, [  --enable-smp            force compile for SMP])
-    if test :"${lis_smp:-no}" = :no
-    then
-	LIB_KSMP=''
-    else
-	LIB_KSMP='y'
-	AC_DEFINE([__SMP__], [1], [LiS source code wants this defined when it is
-			       configure for SMP.])
-    fi dnl
-])# _LIS_KSMP
-# =============================================================================
-
-# =============================================================================
-# _LIS_KMODULES
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KMODULES], [dnl
-    LIS_KMODULES='y' dnl
-])# _LIS_KMODULES
-# =============================================================================
-
-# =============================================================================
-# _LIS_KMODVERS
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_KMODVERS], [dnl
-    LIS_KMODVERS='' dnl
-])# _LIS_KMODVERS
-# =============================================================================
-
-# =============================================================================
-# _LIS_LISMODVERS
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_LISMODVERS], [dnl
-    LIS_LISMODVERS=''
-    if test :"${lis_never_set_this_variable:+never}" != :never
-	AC_DEFINE([LISMODVERS], [1], [Define if a modversions.h file was generated.])
-    fi dnl
-])# _LIS_LISMODVERS
-# =============================================================================
-
-# =============================================================================
-# _LIS_LISAUTOCONF
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_LISAUTOCONF], [dnl
-    LIS_LISAUTOCONF=n
-# 
-#   this is just to generate the template
-# 
-    if test :"${lis_never_set_this_variable:+never}" != :never
-    then
-	AC_DEFINE([LISAUTOCONF], [1], [Define if an autoconf.h file was
-		   generated.  LISAUTOCONF is used by
-		   "include/sys/LiS/linux-mdep.h" to know when to include
-		   "LiS/sys/autoconf.h" and to prevent linux from including its
-		   own.  In autoconf we do this by setting the appropriate
-		   include directory order in the makefile.  Our local
-		   "include/linux/autoconf.h" will be included in preference to
-		   the kernel one.  I don't know about LiS's practice of mucking
-		   around with include file wrapper macros.  A renaming of some
-		   macros would kil portability.  We never define this macro
-		   even when we build our own autoconf but we do mark it in
-		   gcom's old config.in file when we build it.])
-    fi dnl
-])# _LIS_LISAUTOCONF
-# =============================================================================
-
-# =============================================================================
-# _LIS_IPV6
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_IPV6], [dnl
-    LIS_IPV6='' dnl
-])# _LIS_IPV6
-# =============================================================================
-
-# =============================================================================
-# _LIS_IPV6_MODULE
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_IPV6_MODULE], [dnl
-    LIS_IPV6_MODULE='' dnl
-])# _LIS_IPV6_MODULE
-# =============================================================================
-
-# =============================================================================
-# _LIS_CONFIG_MK_KERNEL
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_CONFIG_MK_KERNEL], [dnl
-    LIS_CONFIG_MK_KERNEL='n' dnl
-])# _LIS_CONFIG_MK_KERNEL
-# =============================================================================
-
-# =============================================================================
-# _LIS_STRMS_QUEUES
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_STRMS_QUEUES], [dnl
-    LIS_STRMS_QUEUES='t'
-    AC_DEFINE([USE_KTHREAD], [1], [Define (always) for kernel thread queues.]) dnl
-])# _LIS_STRMS_QUEUES
-# =============================================================================
-
-# =============================================================================
-# _LIS_MOD_INST_DIR
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_MOD_INST_DIR], [dnl
-    LIS_MOD_INST_DIR="$linux_cv_k_modules" dnl
-])# _LIS_MOD_INST_DIR
-# =============================================================================
-
-# =============================================================================
-# _LIS_MOD_INSTALL
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LIS_MOD_INSTALL], [dnl
-    if test :"${enable_k_install:-yes}" = :yes
-    then
-	LIS_MOD_INSTALL='y'
-    else
-	LIS_MOD_INSTALL='n'
-    fi dnl
-])# _LIS_MOD_INSTALL
-# =============================================================================
-
-# =============================================================================
 # _LIS_RH_71_KLUDGE
 # -----------------------------------------------------------------------------
 # this is not really a RH 7.1 kludge but a 2.4.2 kludge
 AC_DEFUN([_LIS_RH_71_KLUDGE], [dnl
+    AH_TEMPLATE([RH_71_KLUDGE], [Define if you have redhat kernel 2.4.2])
     AC_MSG_CHECKING([for broken RH 7.1 2.4.2 kernel])
     LIS_RH_71_KLUDGE=''
-    if test "${LIS_KVER_MAJOR}:${LIS_KVER_MINOR}:${LIS_KVER_PATCHNO}" = "2:4:2"
+    if test "${linux_cv_k_major}:${linux_cv_k_minor}:${linux_cv_k_patch}" = "2:4:2"
     then
 	# - should also check for redhat something (in kernel source directory)
 	if test -e "${linux_cv_k_includes}/linux/rhconfig.h"
 	then
 	    LIS_RH_71_KLUDGE='y'
-	    AC_DEFINE([RH_71_KLUDGE], [1], [Define if you have redhat kernel 2.4.2])
+	    AC_DEFINE([RH_71_KLUDGE], [1])
 	    AC_MSG_RESULT([yes])
 	else
+	    LIS_RH_71_KLUDGE='n'
 	    AC_MSG_RESULT([no])
 	fi
     else
+	LIS_RH_71_KLUDGE='n'
 	AC_MSG_RESULT([no])
     fi dnl
 ])# _LIS_RH_71_KLUDGE
@@ -824,6 +539,10 @@ AC_DEFUN([_LIS_RH_71_KLUDGE], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
+    AH_TEMPLATE([SIGMASKLOCK], [This is necessary due to RedHat mangling of
+	kernel header files.  RedHat changes some of the use of sigmask_lock.
+	Autoconf will check your header files.  The code will lock sigmask_lock
+	when required.])
     AC_CACHE_CHECK([for sigmask_lock], [lis_cv_sigmask_lock], [dnl
 	_LINUX_KERNEL_ENV([dnl
 	    AC_EGREP_CPP([\<sigmask_lock(_R(smp_)?........)?\>], [
@@ -836,10 +555,7 @@ AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
     if test :"$lis_cv_sigmask_lock" = :yes
     then
 	LIS_SIGMASKLOCK='y'
-	AC_DEFINE([SIGMASKLOCK], [1], [This is necessary due to RedHat
-	    mangling of kernel header files.  RedHat changes some of the use
-	    of sigmask_lock.  Autoconf will check your header files.  The code
-	    will lock sigmask_lock when required.])
+	AC_DEFINE([SIGMASKLOCK], [1])
     else
 	LIS_SIGMASKLOCK='n'
     fi dnl
@@ -851,6 +567,12 @@ AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_RCVOID], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
+    AH_TEMPLATE([RCVOID], [This is necessary due to RedHat mangling of kernel
+	header files.  RedHat changes recalc_sigpending to take void instead of
+	a task_struct pointer and defines a new recalc_sigpending_tsk to take
+	the other's place.  Autoconf will check your header files.  The code
+	will try to use recalc_sigpending() if this is defined, or
+	recalc_sigpending(current) otherwise.])
     AC_CACHE_CHECK([for recalc_sigpending_tsk() function], [lis_cv_rctsk], [dnl
 	_LINUX_KERNEL_ENV([dnl
 	    AC_EGREP_CPP([\<recalc_sigpending_tsk(_R(smp_)?........)?\>[(][^()]*[)]], [
@@ -872,13 +594,7 @@ AC_DEFUN([_LIS_RCVOID], [dnl
     if test :"$lis_cv_rcvoid" = :yes -o :"$lis_cv_rctsk" = :yes
     then
 	LIS_RCVOID='y'
-	AC_DEFINE([RCVOID], [1], [This is necessary due to RedHat
-	    mangling of kernel header files.  RedHat changes
-	    recalc_sigpending to take void instead of a task_struct pointer
-	    and defines a new recalc_sigpending_tsk to take the other's place.
-	    Autoconf will check your header files.  The code will try to use
-	    recalc_sigpending() if this is defined, or
-	    recalc_sigpending(current) otherwise.])
+	AC_DEFINE([RCVOID], [1])
     else
 	LIS_RCVOID='n'
     fi dnl
@@ -893,56 +609,45 @@ AC_DEFUN([_LIS_RCVOID], [dnl
 # configuration files, in case someone wants to perform the old gcom build.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_OLD_GCOM_CONFIG_IN], [dnl
-    # 
-    # old gcom configuration script uses `uname -m`, but of course that is the
-    # build host and not the target host.  This allows proper cross compiling.
-    # 
+dnl
+dnl old gcom configuration script uses `uname -m`, but of course that is the
+dnl build host and not the target host.  This allows proper cross compiling.
+dnl
     LIS_MACHINE=$host_cpu
-    AC_SUBST([LIS_MACHINE])dnl
-    # 
-    # old gcom files use the base CC name just as the linux kernel makefiles
-    # do.  This does not work for proper cross-compiling.  This is the CC name
-    # as provided to the configuration script in the CC environment variable,
-    # after we make adjustments to it.  This could be either *-*-*-gcc or just
-    # plain cc, even in a cross-compiling situation.  For compatibility with
-    # the gcom makefiles we adjust CC_NAME to be just the CC root and strip
-    # off or regenerate the CROSS_COMPILE component.
-    # 
+dnl
+dnl old gcom files use the base CC name just as the linux kernel makefiles
+dnl do.  This does not work for proper cross-compiling.  This is the CC name
+dnl as provided to the configuration script in the CC environment variable,
+dnl after we make adjustments to it.  This could be either *-*-*-gcc or just
+dnl plain cc, even in a cross-compiling situation.  For compatibility with
+dnl the gcom makefiles we adjust CC_NAME to be just the CC root and strip
+dnl off or regenerate the CROSS_COMPILE component.
+dnl
     AC_REQUIRE([AC_PROG_CC])dnl
-    if test :"${cross_compiling:+set}" = :set
+    if test :"${cross_compiling:-no}" = :yes
     then
-	LIS_CC_NAME==`echo $CC | sed -e's|.*-||g'`
-	LIS_CC_OPTIMIZE=-O2
+	LIS_CC_NAME==`eval "echo $CC | sed -e 's|.*-||g'"`
 	LIS_CROSS_COMPILING=y
-	LIS_CROSS_COMPILE="`echo $CC | sed -e's|-[[^-]]*[$]||'`"-
+	LIS_CROSS_COMPILE=`eval "echo $CC | sed -e 's|-[[^-]]*[$]||'"`-
 	if test :"${LIS_CROSS_COMPILE:-no}" = :no
 	then
 	    AC_REQUIRE([AC_CANONICAL_TARGET])dnl
 	    LIS_CROSS_COMPILE="$host"-
 	fi
-	# need to add cross-compile file for old gcom makefiles
-	AC_CONFIG_FILES([cross-compile])
     else
 	LIS_CC_NAME=$CC
-	LIS_CC_OPTIMIZE=-O2
 	LIS_CROSS_COMPILING=n
 	LIS_CROSS_COMPILE=
     fi
     AC_SUBST([LIS_CROSS_COMPILE])dnl
-    #
-    # this might not work for other than GCC, but I don't think that the gcom
-    # make files really support other than GCC builds anyways.  We do support
-    # (kinda) non-gcc builds
-    #
-    LIS_CC_VERS=`eval $CC --version </dev/null`
-    # 
-    # gcom makefiles set this to -I$KSRC/arch/i386/mach-generic for some
-    # reason, but not for others and it is unclear why this is being done
-    # because the directory does not appear to exist.  All machine specific
-    # includes are behind the asm symbolic link.  We will double check for a
-    # kernel build that the proper asm links are there.
-    #
-    LIS_MACHINE_INCL= dnl
+dnl
+dnl this might not work for other than GCC, but I don't think that the gcom
+dnl make files really support other than GCC builds anyways.  We do support
+dnl (kinda) non-gcc builds
+dnl
+    LIS_CC_VERS=`eval "$CC -v 2>&1 | grep 'gcc version' | sed -r -e 's|gcc version[[[:space:]]]*([[^[:space:]]]*).*|\1|'"`
+    LIS_CC_OPTIMIZE=`echo "$KERNEL_CFLAGS" | grep -- '-O' | sed -r -e 's|.*(-O[[^[:space:]]]*).*|\1|'`
+    LIS_CC_OPT2=`echo "$KERNEL_CFLAGS" | grep -- '-mpreferred-stack-boundary=2' | sed -r -e 's|.*(-mpreferred-stack-boundary=2).*|\1|'`
 ])# _LIS_OLD_GCOM_CONFIG_IN
 # =============================================================================
 
@@ -969,7 +674,7 @@ AC_DEFUN([_LIS_GET_EMPTY_INODE], [dnl
 	    ], [lis_cv_have_get_empty_inode=yes], [lis_cv_have_get_empty_inode=no]) ]) ])
     if test :"$lis_cv_have_new_inode" = :yes
     then
-	LIS_GET_EMPTY_INODE='new_inode(LIS_SB)'
+	LIS_GET_EMPTY_INODE='new_inode((_sb))'
     else
 	if test :"$lis_cv_have_get_empty_inode" = :yes
 	then
@@ -1006,28 +711,106 @@ dnl                     these functions, then this is probably the cause.])
 # =============================================================================
 
 # =============================================================================
+# _LIS_SET_CPUS_ALLOWED
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LIS_SET_CPUS_ALLOWED], [dnl
+    _LINUX_CHECK_FUNC([set_cpus_allowed],
+	[LIS_SET_CPUS_ALLOWED=y],
+	[LIS_SET_CPUS_ALLOWED=n], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/slab.h>
+#include <linux/sched.h>
+	])
+])# _LIS_SET_CPUS_ALLOWED
+# =============================================================================
+
+# =============================================================================
 # _LIS_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_OUTPUT], [dnl
-# 
-#   The following are common setup requirements that do not depend on the
-#   architecutre or build target.
-#
-    _LIS_INT_PSW
+dnl
+dnl The following are common setup requirements that do not depend on the
+dnl architecutre or build target.
+dnl
+    LIS_CONFIG="config.in"
+    LIS_SRCDIR="$srcdir"
+    LIS_GENCONF="$srcdir/include/sys/LiS/genconf.h"
+    LIS_CONFIG_STREAMS=m
+dnl LIS_TARGET="$LIS_TARGET"
+    _LIS_CONFIG_DEV
+dnl
+dnl I don't know why these are for all architectures...  We don't need 'em.
+dnl
+    LIS_CCREGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=3' | sed -r -e 's|.*(-mregparm=3).*|\1|'`
+    LIS_STREAMS_REGPARM=`echo "$KERNEL_CFLAGS" | grep -- '-mregparm=[[0-9]]*' | sed -r -e 's|.*-mregparm=([[0-9]]*).*|\1|'`
+    LIS_STREAMS_REGPARM="${LIS_STREAMS_REGPARM:-0}"
     _LIS_OLD_CONSTS
     _LIS_SOLARIS_STYLE_CMN_ERR
     _LIS_DBG_OPT
-    _LIS_KMEM_OPTS
     _LIS_SHLIB
     _LIS_ATOMIC_STATS
-# 
-#   Acutally generating output files is last.  We don't want to generate a
-#   thing until we have performed all the checks and balances.
-# 
+dnl
+dnl All of these come straight from autoconf.
+dnl
+    LIS_PACKAGE="$PACKAGE"
+    if test :"$prefix" = :NONE
+    then LIS_PREFIX="$ac_default_prefix"
+    else LIS_PREFIX="$prefix"
+    fi
+    if test :"$exec_prefix" = :NONE
+    then LIS_EXECPREFIX="$LIS_PREFIX"
+    else LIS_EXECPREFIX="$exec_prefix"
+    fi
+    LIS_INCLUDEDIR=`eval "echo \"$DESTDIR$includedir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    LIS_LIBDIR=`eval "echo \"$DESTDIR$libdir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    LIS_BINDIR=`eval "echo \"$DESTDIR$bindir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    LIS_SBINDIR=`eval "echo \"$DESTDIR$sbindir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    LIS_SYSCONFDIR=`eval "echo \"$DESTDIR$sysconfdir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    LIS_DATADIR=`eval "echo \"$DESTDIR$datadir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    LIS_PKGINCLUDEDIR="$DESTDIR$LIS_INCLUDEDIR/$PACKAGE"
+    LIS_PKGLIBDIR="$DESTDIR$LIS_LIBDIR/$LIS_PACKAGE"
+    LIS_PKGDATADIR="$DESTDIR$LIS_DATADIR/$LIS_PACKAGE"
+    LIS_PKGSRCDIR="$DESTDIR$rootdir/usr/src"
+    LIS_MANDIR=`eval "echo \"$mandir\" | sed -e 's|\<NONE\>|$LIS_PREFIX|g'"`
+    eval "LIS_MODSUBDIR=\"$DESTDIR$kmoduledir/$PACKAGE_LCNAME\""
+dnl
+dnl This is done by autoconf.
+dnl
+    LIS_MAKE_DIRS=
+dnl
+dnl Acutally generating output files is last.  We don't want to generate a
+dnl thing until we have performed all the checks and balances.
+dnl
     _LIS_STRCONF
+    LIS_MAJOR_BASE="$STRCONF_MAJBASE"
     _LIS_OUTPUT_CONFIG_IN dnl
     AM_CONDITIONAL(WITH_LFS, false)dnl
     AM_CONDITIONAL(WITH_LIS, false)dnl
+dnl
+dnl Missing templates.
+dnl
+    AH_TEMPLATE([DO_ADDERROR], [Unused.])
+    AH_TEMPLATE([DO_STREAMDEBUG], [Unused.])
+    AH_TEMPLATE([FIFO_DEBUG], [Unused.])
+    AH_TEMPLATE([FIFO_IMPL], [Unused.])
+    AH_TEMPLATE([GCOM], [Unused.])
+    AH_TEMPLATE([GCOM_OPEN], [Unused.])
+    AH_TEMPLATE([IP2XINET_DEBUG], [Unused.])
+    AH_TEMPLATE([NOKSRC], [Unused.])
+    AH_TEMPLATE([PIPE_DEBUG], [Unused.])
+    AH_TEMPLATE([TC_PRIO_BULK], [Unused.])
+    AH_TEMPLATE([TC_PRIO_BESTEFFORT], [Unused.])
+    AH_TEMPLATE([TC_PRIO_INTERACTIVE], [Unused.])
+    AH_TEMPLATE([SOPRI_BACKGROUND], [Unused.])
+    AH_TEMPLATE([SOPRI_NORMAL], [Unused.])
+    AH_TEMPLATE([SOPRI_INTERACTIVE], [Unused.])
+    AH_TEMPLATE([STREAMS_DEBUG], [Unused.])
+    AH_TEMPLATE([USE_VOID_PUT_PROC], [Unused.])
+
 ])# _LIS_OUTPUT
 # =============================================================================
 
@@ -1068,6 +851,33 @@ AC_DEFUN([_LIS_INT_PSW],[dnl
 # =============================================================================
 
 # =============================================================================
+# _LIS_CONFIG_DEV
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LIS_CONFIG_DEV], [dnl
+    AC_ARG_ENABLE([lis-development],
+	AS_HELP_STRING([--enable-lis-development],
+	    [configure to report source code path trace @<:@default=no@:>@]),
+	    [enable_lis_development="$enableval"],
+	    [case :"$linux_cv_debug" in
+		(:_DEBUG|:_TEST|:_SAFE) enable_lis_development=yes ;;
+		(:_NONE|:*)		enable_lis_development=no  ;;
+	    esac])
+    AH_TEMPLATE([CONFIG_DEV], [Does what LIS_CONFIG_SAFE and SAFE used to.  The
+	name of this macro was a spectacularly poor choice given that we are
+	compiling kernel modules.])
+    AC_MSG_CHECKING([for lis development build])
+    if test :"${enable_lis_development:-no}" = :no
+    then
+	LIS_CONFIG_DEV=n
+    else
+	LIS_CONFIG_DEV=y
+	AC_DEFINE([CONFIG_DEV], [1])
+    fi
+    AC_MSG_RESULT([${enable_lis_development:-no}])
+])# _LIS_CONFIG_DEV
+# =============================================================================
+
+# =============================================================================
 # _LIS_OLD_CONSTS
 # -----------------------------------------------------------------------------
 # Determine from the --with-solaris-consts option whether to use
@@ -1078,6 +888,9 @@ AC_DEFUN([_LIS_INT_PSW],[dnl
 # constants within the STREAMS environment.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_OLD_CONSTS], [dnl
+    AH_TEMPLATE([USE_OLD_CONSTS], [Define to use LiS backware compatible
+	constants (which have no bearing in reality).  Leave this undefined to
+	get Solaris/Unixware compatible constants.])
     AC_ARG_WITH([solaris-consts],
 	AS_HELP_STRING([--with-solaris-consts],
 	    [use Unixware/Solaris compatible constants if yes, or use LiS
@@ -1091,9 +904,7 @@ AC_DEFUN([_LIS_OLD_CONSTS], [dnl
 	AC_MSG_RESULT([no])
     else
 	LIS_OLD_CONSTS=y
-	AC_DEFINE([USE_OLD_CONSTS], [1], [Define to use LiS backware compatible
-		   constants (which have no bearing in reality).  Leave this
-		   undefined to get Solaris/Unixware compatible constants.])
+	AC_DEFINE([USE_OLD_CONSTS], [1])
 	AC_MSG_RESULT([yes])
     fi dnl
 ])# _LIS_OLD_CONSTS
@@ -1107,6 +918,10 @@ AC_DEFUN([_LIS_OLD_CONSTS], [dnl
 # this to the gcom makefile default, messes up your log files.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SOLARIS_STYLE_CMN_ERR], [dnl
+    AH_TEMPLATE([SOLARIS_STYLE_CMN_ERR], [Define for solaris style cmn_err().
+	This should always be defined for Linux, otherwise, the newlines
+	generated at the beginning of cmn_err() will mess up the appearance of
+	your logs.])
     AC_ARG_WITH([solaris-cmn_err],
 	AS_HELP_STRING([--with-solaris-cmn_err],
 	    [use a Solaris-style cmn_err that puts a newline at the end of the
@@ -1117,10 +932,7 @@ AC_DEFUN([_LIS_SOLARIS_STYLE_CMN_ERR], [dnl
     if test :"${with_solaris_cmn_err:-yes}" = :yes
     then
 	LIS_SOLARIS_STYLE_CMN_ERR=y
-	AC_DEFINE([SOLARIS_STYLE_CMN_ERR], [1], [Define for solaris style
-		   cmn_err().  This should always be defined for Linux,
-		   otherwise, the newlines generated at the beginning of
-		   cmn_err() will mess up the appearance of your logs.])
+	AC_DEFINE([SOLARIS_STYLE_CMN_ERR], [1])
 	AC_MSG_RESULT([yes])
     else
 	LIS_SOLARIS_STYLE_CMN_ERR=n
@@ -1146,52 +958,54 @@ AC_DEFUN([_LIS_SOLARIS_STYLE_CMN_ERR], [dnl
 # --enable-k-debug.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_DBG_OPT], [dnl
+    AH_TEMPLATE([LIS_CONFIG_SAFE], [Setting this macro is pointless (now).  LiS
+	uses it to set another useless macro called SAFE which is never checked
+	anywhere in the LiS code.  Perhaps Matt will use this macro (again), so
+	I left it in here.])
+    AH_TEMPLATE([LIS_TESTING], [Setting this macro is pointless (now).  LiS uses
+	it to set another useless macro called TEST which is never checked
+	anywhere in the LiS code.  Perhaps Matt will use this macro (again), so
+	I left it in here.])
+    AH_TEMPLATE([LIS_DEBUG], [Setting this macro is pointless (now).  LiS uses
+	it to set another useless macro called TEST which is never checked
+	anywhere in the LiS code.  Perhaps Matt will use this macro (again), so
+	I left it in here.])
+    AH_TEMPLATE([LIS_SRC], [LiS source code wants this defined when it is
+	configured for debug.])
+    AH_TEMPLATE([DEBUG], [Define this macro for debugging source code.])
+    AH_TEMPLATE([POISON_MEM], [When defined, slab allocation will poison memory
+	and redzone.  This should be done when in debugging or test modes.])
+    AH_TEMPLATE([INLINE], [define to inline directive])
+    AH_TEMPLATE([STATIC], [define to static directive])
     if test :"${enable_k_safe:-no}" != :no
     then
-	AC_DEFINE([LIS_CONFIG_SAFE], [1], [Setting this macro is pointless
-		  (now).  LiS uses it to set another useless macro called SAFE
-		  which is never checked anywhere in the LiS code.  Perhaps
-		  Matt will use this macro (again), so I left it in here.])
-
-	AC_DEFINE([CONFIG_DEV], [1], [Does what the one above used to.  The
-		  name of this macro was a spectacularly poor choice given
-		  that we are compiling kernel modules.])
-	LIS_CONFIG_DEV=y
-    else
-	LIS_CONFIG_DEV=n
+	AC_DEFINE([LIS_CONFIG_SAFE], [1])
     fi
     if test :"${enable_k_test:-no}" != :no
     then
-	AC_DEFINE([LIS_TESTING], [1], [Setting this macro is pointless (now).
-		   LiS uses it to set another useless macro called TEST which
-		   is never checked anywhere in the LiS code.  Perhaps Matt
-		   will use this macro (again), so I left it in here.])
+	AC_DEFINE([LIS_TESTING], [1])
     fi
     if test :"${enable_k_debug:-no}" != :no
     then
 	LIS_DBG_OPT=y
 	lis_inline=
 	lis_static=
-	AC_DEFINE([LIS_DEBUG], [1], [Setting this macro is pointless (now).
-		   LiS uses it to set another useless macro called TEST which
-		   is never checked anywhere in the LiS code.  Perhaps Matt
-		   will use this macro (again), so I left it in here.])
+	AC_DEFINE([LIS_DEBUG], [1])
 	#
 	# FIXME: This should actually be the install directory for the source
 	# code rather than the build directory that contains the source code.
 	#
-	AC_DEFINE_UNQUOTED([LIS_SRC], "`(cd $srcdir; pwd)`", [LiS source code
-			    wants this defined when it is configured for
-			    debug.])
-	AC_DEFINE([DEBUG], [1], [Define this macro for debugging source code.])
+	AC_DEFINE_UNQUOTED([LIS_SRC], "`(cd $srcdir; pwd)`")
+	AC_DEFINE([DEBUG], [1])
+	AC_DEFINE([POISON_MEM], [1])
     else
 	LIS_DBG_OPT=n
 	AC_REQUIRE([AC_C_INLINE])dnl
 	lis_inline=$ac_cv_c_inline
 	lis_static="static"
     fi
-    AC_DEFINE_UNQUOTED([INLINE], [$lis_inline], [define to inline directive])
-    AC_DEFINE_UNQUOTED([STATIC], [$lis_static], [define to static directive]) dnl
+    AC_DEFINE_UNQUOTED([INLINE], [$lis_inline])
+    AC_DEFINE_UNQUOTED([STATIC], [$lis_static])
 ])# _LIS_DBG_OPT
 # =============================================================================
 
@@ -1199,6 +1013,14 @@ AC_DEFUN([_LIS_DBG_OPT], [dnl
 # _LIS_KMEM_OPTS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_KMEM_OPTS], [dnl
+    AH_TEMPLATE([USE_KMEM_CACHE], [Define this macro to use Linux kernel memory
+	caches for queue structures and other highly used structures for some
+	performance improvement.  For the best improvement, use Linux
+	Fast-STREAMS.])
+    AH_TEMPLATE([USE_KMEM_TIMER], [Define this macro to use the kernel memory
+	caches for timer structures rather than sequential list searches.  This
+	can really break, especially on SMP and is not safe at all.  It is
+	disabled by default.])
     AC_ARG_ENABLE([k-timers],
 	AS_HELP_STRING([--enable-k-timers],
 	    [enable kernel memory caches for timers for speed.
@@ -1215,25 +1037,18 @@ AC_DEFUN([_LIS_KMEM_OPTS], [dnl
     fi
     AC_MSG_CHECKING([for lis kernel caches])
     if test :"$enable_k_cache" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_LINUX_KMEM_CACHE], [1], [Define this macro
-	    to use Linux kernel memory caches for queue structures and
-	    other highly used structures for some performance improvement.
-	    For the best improvement, use Linux Fast-STREAMS.])
 	LIS_USE_KMEM_CACHE=y
+	AC_DEFINE([USE_KMEM_CACHE], [1])
     else
 	LIS_USE_KMEM_CACHE=n
     fi
     AC_MSG_RESULT([$enable_k_cache])
     AC_MSG_CHECKING([for lis timer caches])
     if test :"$enable_k_timers" = :yes ; then
-	AC_DEFINE_UNQUOTED([USE_LINUX_KMEM_TIMER], [1], [Define this macro
-	    to use the kernel memory cacnes for timer structures rather
-	    than sequential list searches.  This can really break,
-	    especially on SMP and is not safe at all.  It is disabled by
-	    default.])
-	LIS_USE_LINUX_KMEM_TIMER=y
+	LIS_USE_KMEM_TIMER=y
+	AC_DEFINE([USE_KMEM_TIMER], [1])
     else
-	LIS_USE_LINUX_KMEM_TIMER=n
+	LIS_USE_KMEM_TIMER=n
     fi
     AC_MSG_RESULT([$enable_k_timers])
 ])# _LIS_KMEM_OPTS
@@ -1294,54 +1109,90 @@ AC_DEFUN([_LIS_ATOMIC_STATS], [dnl
 # someone really wants to use the old gcom build process (yuck).
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_OUTPUT_CONFIG_IN], [dnl
-dnl -----------------------------------     -----------------------
-dnl substitution                            config.in variable name
-dnl -----------------------------------     -----------------------
-    AC_SUBST([LIS_HOME])                    dnl LIS_HOME
-    AC_SUBST([LIS_CONFIG_STREAMS])          dnl CONFIG_STREAMS
-    AC_SUBST([LIS_TARGET])                  dnl TARGET
-    AC_SUBST([LIS_CROSS_COMPILING])         dnl CROSS_COMPILING
-    AC_SUBST([LIS_KSRC])                    dnl KSRC
-    AC_SUBST([LIS_NOKSRC])                  dnl NOKSRC
-    AC_SUBST([LIS_USE_RUNNING_KERNEL])      dnl USE_RUNNING_KERNEL
-    AC_SUBST([LIS_NKVER])                   dnl NKVER
-    AC_SUBST([LIS_KVER])                    dnl KVER
-    AC_SUBST([LIS_KVER_MAJOR])              dnl KVER_MAJOR
-    AC_SUBST([LIS_KVER_MINOR])              dnl KVER_MINOR
-    AC_SUBST([LIS_KVER_PATCH])              dnl KVER_PATCH
-    AC_SUBST([LIS_KVER_PATCHNO])            dnl KVER_PATCHNO
-    AC_SUBST([LIS_KVER_MAJORMINOR])         dnl KVER_MAJORMINOR
-    AC_SUBST([LIS_KVER_H])                  dnl KVER_H
-    AC_SUBST([LIS_NKVER_H])                 dnl NKVER_H
-    AC_SUBST([LIS_KSMP])                    dnl KSMP
-    AC_SUBST([LIS_KMODULES])                dnl KMODULES
-    AC_SUBST([LIS_KMODVERS])                dnl KMODVERS
-    AC_SUBST([LIS_LISMODVERS])              dnl LISMODVERS
-    AC_SUBST([LIS_LISAUTOCONF])             dnl LISAUTOCONF
-    AC_SUBST([LIS_IPV6])                    dnl IPV6
-    AC_SUBST([LIS_IPV6_MODULE])             dnl IPV6_MODULE
-    AC_SUBST([LIS_CONFIG_MK_KERNEL])        dnl CONFIG_MK_KERNEL
-    AC_SUBST([LIS_STRMS_QUEUES])            dnl STRMS_QUEUES
-    AC_SUBST([LIS_MOD_INST_DIR])            dnl MOD_INST_DIR
-    AC_SUBST([LIS_MOD_INSTALL])             dnl MOD_INSTALL
-    AC_SUBST([LIS_RH_71_KLUDGE])            dnl RH_71_KLUDGE
-    AC_SUBST([LIS_SIGMASKLOCK])             dnl SIGMASKLOCK
-    AC_SUBST([LIS_RCVOID])                  dnl RCVOID
-    AC_SUBST([LIS_MACHINE])                 dnl MACHINE
-    AC_SUBST([LIS_CC_NAME])                 dnl CC_NAME
-    AC_SUBST([LIS_CC_VERS])                 dnl CC_VERS
-    AC_SUBST([LIS_CC_OPTIMIZE])             dnl CC_OPTIMIZE
-    AC_SUBST([LIS_MACHINE_INCL])            dnl MACHINE_INCL
-    AC_SUBST([LIS_GET_EMPTY_INODE])         dnl GET_EMPTY_INODE
-    AC_SUBST([LIS_INT_PSW])                 dnl INT_PSW
-    AC_SUBST([LIS_OLD_CONSTS])              dnl LIS_OLD_CONSTS
-    AC_SUBST([LIS_SOLARIS_STYLE_CMN_ERR])   dnl SOLARIS_STYLE_CMN_ERR
-    AC_SUBST([LIS_DBG_OPT])                 dnl DBG_OPT
-    AC_SUBST([LIS_SHLIB])                   dnl LIS_SHLIB
-    AC_SUBST([LIS_CONFIG_DEV])              dnl CONFIG_DEV
-    AC_SUBST([LIS_USE_KMEM_CACHE])          dnl USE_KMEM_CACHE
-    AC_SUBST([LIS_USE_LINUX_KMEM_TIMER])    dnl USE_LINUX_KMEM_TIMER
-dnl -----------------------------------     -----------------------
+    AC_CONFIG_FILES([config.in])
+dnl -----------------------------------		-----------------------
+dnl substitution				config.in variable name
+dnl -----------------------------------		-----------------------
+    AC_SUBST([LIS_CONFIG])			dnl CONFIG
+    AC_SUBST([LIS_SRCDIR])			dnl SRCDIR
+    AC_SUBST([LIS_GENCONF])			dnl GENCONF
+    AC_SUBST([LIS_CONFIG_STREAMS])		dnl CONFIG_STREAMS
+    AC_SUBST([LIS_TARGET])			dnl TARGET
+    AC_SUBST([LIS_CROSS_COMPILING])		dnl CROSS_COMPILING
+    AC_SUBST([LIS_KSRC])			dnl KSRC
+    AC_SUBST([LIS_KINCL])			dnl KINCL
+    AC_SUBST([LIS_NOKSRC])			dnl NOKSRC
+    AC_SUBST([LIS_USE_RUNNING_KERNEL])		dnl USE_RUNNING_KERNEL
+    AC_SUBST([LIS_NKVER])			dnl NKVER
+    AC_SUBST([LIS_KVER])			dnl KVER
+    AC_SUBST([LIS_KVER_MAJOR])			dnl KVER_MAJOR
+    AC_SUBST([LIS_KVER_MINOR])			dnl KVER_MINOR
+    AC_SUBST([LIS_KVER_PATCH])			dnl KVER_PATCH
+    AC_SUBST([LIS_KVER_PATCHNO])		dnl KVER_PATCHNO
+    AC_SUBST([LIS_KVER_MAJORMINOR])		dnl KVER_MAJORMINOR
+    AC_SUBST([LIS_KVER_H])			dnl KVER_H
+    AC_SUBST([LIS_NKVER_H])			dnl NKVER_H
+    AC_SUBST([LIS_KSMP])			dnl KSMP
+    AC_SUBST([LIS_KMODULES])			dnl KMODULES
+    AC_SUBST([LIS_KMODVERS])			dnl KMODVERS
+    AC_SUBST([LIS_LISMODVERS])			dnl LISMODVERS
+    AC_SUBST([LIS_LISAUTOCONF])			dnl LISAUTOCONF
+    AC_SUBST([LIS_IPV6])			dnl IPV6
+    AC_SUBST([LIS_IPV6_MODULE])			dnl IPV6_MODULE
+    AC_SUBST([LIS_CONFIG_MK_KERNEL])		dnl CONFIG_MK_KERNEL
+    AC_SUBST([LIS_STRMS_QUEUES])		dnl STRMS_QUEUES
+    AC_SUBST([LIS_MOD_INST_DIR])		dnl MOD_INST_DIR
+    AC_SUBST([LIS_MOD_INSTALL])			dnl MOD_INSTALL
+    AC_SUBST([LIS_RH_71_KLUDGE])		dnl RH_71_KLUDGE
+    AC_SUBST([LIS_SIGMASKLOCK])			dnl SIGMASKLOCK
+    AC_SUBST([LIS_RCVOID])			dnl RCVOID
+    AC_SUBST([LIS_MACHINE])			dnl MACHINE
+    AC_SUBST([LIS_CC_NAME])			dnl CC_NAME
+    AC_SUBST([LIS_CC_VERS])			dnl CC_VERS
+    AC_SUBST([LIS_CC_OPTIMIZE])			dnl CC_OPTIMIZE
+    AC_SUBST([LIS_CC_OPT2])			dnl CC_OPT2
+    AC_SUBST([LIS_KINCL_MACH_GENERIC])		dnl KINCL_MACH_GENERIC
+    AC_SUBST([LIS_KINCL_MACH_DEFAULT])		dnl KINCL_MACH_DEFAULT
+    AC_SUBST([LIS_GET_EMPTY_INODE])		dnl GET_EMPTY_INODE
+    AC_SUBST([LIS_SET_CPUS_ALLOWED])		dnl SET_CPUS_ALLOWED
+    AC_SUBST([LIS_INT_PSW])			dnl INT_PSW
+    AC_SUBST([LIS_CONFIG_DEV])			dnl CONFIG_DEV
+    AC_SUBST([LIS_USE_KMEM_CACHE])		dnl USE_KMEM_CACHE
+    AC_SUBST([LIS_USE_KMEM_TIMER])		dnl USE_KMEM_TIMER
+    AC_SUBST([LIS_MAJOR_BASE])			dnl LIS_MAJOR_BASE
+    AC_SUBST([LIS_CONFIG_INET])			dnl CONFIG_INET
+    AC_SUBST([LIS_PKGCOMPILE])			dnl PKGCOMPILE
+    AC_SUBST([LIS_PKGMODULES])			dnl PKGMODULES
+    AC_SUBST([LIS_SILENT_BUILD])		dnl SILENT_BUILD
+    AC_SUBST([LIS_KBUILD])			dnl KBUILD
+    AC_SUBST([LIS_KBUILD_NEEDS_MODNAME])	dnl KBUILD_NEEDS_MODNAME
+    AC_SUBST([LIS_KBUILD_NEEDS_SYMVERS])	dnl KBUILD_NEEDS_SYMVERS
+    AC_SUBST([LIS_MODUTILS])			dnl MODUTILS
+    AC_SUBST([LIS_MODULE_INIT_TOOLS])		dnl MODULE_INIT_TOOLS
+    AC_SUBST([LIS_KSYMVERS])			dnl KSYMVERS
+    AC_SUBST([LIS_CCREGPARM])			dnl CCREGPARM
+    AC_SUBST([LIS_STREAMS_REGPARM])		dnl STREAMS_REGPARM
+    AC_SUBST([LIS_OLD_CONSTS])			dnl LIS_OLD_CONSTS
+    AC_SUBST([LIS_SOLARIS_STYLE_CMN_ERR])	dnl SOLARIS_STYLE_CMN_ERR
+    AC_SUBST([LIS_DBG_OPT])			dnl DBG_OPT
+    AC_SUBST([LIS_SHLIB])			dnl LIS_SHLIB
+    AC_SUBST([LIS_PACKAGE])			dnl package
+    AC_SUBST([LIS_PREFIX])			dnl prefix
+    AC_SUBST([LIS_EXECPREFIX])			dnl execprefix
+    AC_SUBST([LIS_INCLUDEDIR])			dnl includedir
+    AC_SUBST([LIS_LIBDIR])			dnl libdir
+    AC_SUBST([LIS_BINDIR])			dnl bindir
+    AC_SUBST([LIS_SBINDIR])			dnl sbindir
+    AC_SUBST([LIS_SYSCONFDIR])			dnl sysconfdir
+    AC_SUBST([LIS_DATADIR])			dnl datadir
+    AC_SUBST([LIS_PKGINCLUDEDIR])		dnl pkgincludedir
+    AC_SUBST([LIS_PKGLIBDIR])			dnl pkglibdir
+    AC_SUBST([LIS_PKGDATADIR])			dnl pkgdatadir
+    AC_SUBST([LIS_PKGSRCDIR])			dnl pkgsrcdir
+    AC_SUBST([LIS_MANDIR])			dnl mandir
+    AC_SUBST([LIS_MODSUBDIR])			dnl modsubdir
+    AC_SUBST([LIS_MAKE_DIRS])			dnl LIS_MAKE_DIRS
+dnl -----------------------------------		-----------------------
 ])#_LIS_OUTPUT_CONFIG_IN
 # =============================================================================
 

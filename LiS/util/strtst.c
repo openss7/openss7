@@ -111,8 +111,7 @@ static char const ident[] =
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <stdlib.h>	/* won't pick up strtoull for some reason */
-extern unsigned long long int strtoull (char *nptr, char **endptr, int base);
+#include <stdlib.h>
 #include <sys/LiS/linuxio.h>
 #else
 # if defined(SCO)
@@ -195,27 +194,26 @@ struct test_context ctx_none = { id: -1 };
 
 int		printk_fd = -1 ;	/* file descr for printk */
 
-/*
- * Command line options
- */
-unsigned long long	debug_mask = ALL_DEBUG_BITS ;
+static void init_ctx(struct test_context *ctx)
+{
+	memset(ctx, 0, sizeof(*ctx));
+	ctx->id = (ctx-ctx_list);
+	ctx->mod_list = (struct str_list){10, ctx->mod_names} ;
+	ctx->wr_ctl = (struct strbuf){0, 0, ctx->ctlbuf} ;
+	ctx->wr_dta = (struct strbuf){0, 0, ctx->buf} ;
+	ctx->rd_ctl = (struct strbuf){0, 0, ctx->rdctlbuf} ;
+	ctx->rd_dta = (struct strbuf){0, 0, ctx->rdbuf} ;
+	ctx->pk_str = (struct strpeek){
+		{0, 0, ctx->rdctlbuf},	/* ctlbuf */
+		{0, 0, ctx->rdbuf},	/* databuf */
+		0			/* flags */
+	} ;
+}
 
-/*
- * For I_LIST
- */
-struct str_mlist	mod_names[10] ;
-struct str_list		mod_list = {10, mod_names} ;
+extern void make_nodes(void) ;
+extern int  n_read(int fd) ;
 
-extern void     make_nodes(void);
-extern int      n_read(int fd);
-
-#ifdef DIRECT_USER		/* tie-in to cmn_err */
-#define	ENO(neg_e)	(-(neg_e))
-#else
-#define	ENO(dmy)	(errno)
-#endif
-
-extern int      n_read_msgs(int fd);	/* forward decl */
+extern int	n_read_msgs(int fd) ;		/* forward decl */
 
 /*
  * command-line tunables
@@ -235,7 +233,9 @@ int all_tests = 1;
 
 #ifdef LINUX
 
-long            lis_mem_alloced;
+
+long	lis_mem_alloced ;
+
 
 #endif
 
@@ -247,18 +247,18 @@ long            lis_mem_alloced;
 *									*
 ************************************************************************/
 #ifndef DIRECT_USER
-static char    *now(void)
+static char *now(void)
 {
-    time_t          tim;
-    char           *p;
-    static char     buf[100];
+    time_t	tim ;
+    char	*p ;
+    static char	buf[100] ;
 
-    tim = time(NULL);
-    strcpy(buf, ctime(&tim));
-    p = strrchr(buf, '\n');
+    tim = time(NULL) ;
+    strcpy(buf, ctime(&tim)) ;
+    p = strrchr(buf, '\n') ;
     if (p != NULL)
-	*p = 0;
-    return (buf);
+	*p = 0 ;
+    return(buf) ;
 }
 #endif
 
@@ -270,23 +270,24 @@ static char    *now(void)
 *									*
 ************************************************************************/
 #if 0				/* superceded by printk mechanism */
-void msg_to_syslog(char *msg)
+void
+msg_to_syslog(char *msg)
 {
 #ifdef LINUX
-    static int      initialized;
+    static int		initialized ;
 
     if (!initialized)
     {
-	openlog("strtst", LOG_NDELAY, LOG_SYSLOG);
-	initialized = 1;
+	openlog("strtst", LOG_NDELAY, LOG_SYSLOG) ;
+	initialized = 1 ;
     }
 
-    syslog(LOG_WARNING, msg);
+    syslog(LOG_WARNING, msg) ;
 
 #else
-    (void) msg;
+    (void) msg ;
 #endif
-}				/* msg_to_syslog */
+} /* msg_to_syslog */
 #endif
 /************************************************************************
 *                           print                                       *
@@ -295,12 +296,14 @@ void msg_to_syslog(char *msg)
 * Like printf only it also arranges to print to syslog for Linux.	*
 *									*
 ************************************************************************/
-void print(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-void print(char *fmt, ...)
+void
+print(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+void
+print(char *fmt, ...)
 {
-    char            bfr[2048];
-    extern int      vsprintf(char *, const char *, va_list);
-    va_list         args;
+    char	 bfr[2048];
+    extern int	 vsprintf (char *, const char *, va_list);
+    va_list	 args;
 
     va_start (args, fmt);
     vsprintf (bfr+8, fmt, args);
@@ -316,7 +319,7 @@ void print(char *fmt, ...)
 	user_write(printk_fd, bfr, strlen(bfr)) ;
     }
 
-}				/* print */
+} /* print */
 
 #define tprint(fmt,args...) print("[%02d]" fmt,ctx->id, ## args)
 
@@ -345,7 +348,7 @@ struct test_context * current_ctx(void)
 * This routine is called to exit the program when a test fails.		*
 *									*
 ************************************************************************/
-void xit(void)
+void	xit(void)
 {
     struct test_context *ctx = current_ctx();
 
@@ -357,16 +360,16 @@ void xit(void)
     tprint("%s", "Dump of memory areas in use:\n\n") ;
 
 #ifndef LINUX
-    port_print_mem();
+    port_print_mem() ;
 #endif
 
 #ifdef DIRECT_USER
-    print("\n\n\nDirectory listing:\n\n");
-    user_print_dir(NULL, USR_PRNT_INODE);
+    print("\n\n\nDirectory listing:\n\n") ;
+    user_print_dir(NULL, USR_PRNT_INODE) ;
 #endif
-    exit(1);
+    exit(1) ;
 
-}				/* xit */
+} /* xit */
 
 /************************************************************************
 *                                FAIL                                   *
@@ -404,13 +407,14 @@ do {							\
 * streams.								*
 *									*
 ************************************************************************/
-void register_drivers(void)
+void	register_drivers(void)
 {
 #ifndef LINUX
-    port_init();		/* stream head init routine */
+    port_init() ;			/* stream head init routine */
 #endif
 
-}				/* register_drivers */
+} /* register_drivers */
+
 
 /************************************************************************
 *                          set_debug_mask                               *
@@ -419,7 +423,7 @@ void register_drivers(void)
 * Use stream ioctl to set the debug mask for streams.			*
 *									*
 ************************************************************************/
-void set_debug_mask(unsigned long long msk)
+void	set_debug_mask(unsigned long long msk)
 {
     int			fd ;
     int			rslt ;
@@ -430,26 +434,24 @@ void set_debug_mask(unsigned long long msk)
     mask1 = (unsigned long)(msk & 0xFFFFFFFF) ;
     mask2 = (msk >> 32) ;
 
-    fd = user_open(LOOP_1, O_RDWR, 0);
+    fd = user_open(LOOP_1, O_RDWR, 0) ;
     if (fd < 0)
     {
-	print("loop.1: %s\n", strerror(ENO(fd))) ;
-	xit() ;
+	FAIL("loop.1: %s\n", STRERROR(-fd)) ;
     }
 
-    rslt = user_ioctl(fd, I_LIS_SDBGMSK, mask1);
+    rslt = user_ioctl(fd, I_LIS_SDBGMSK, mask1) ;
     if (rslt < 0)
     {
-	print("loop.1: I_LIS_SDBGMSK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_LIS_SDBGMSK: %s\n", STRERROR(-rslt)) ;
     }
 
-    rslt = user_ioctl(fd, I_LIS_SDBGMSK2, mask2);
-    print("\nSTREAMS debug mask set to 0x%08lx%08lx\n", mask2, mask1);
+    rslt = user_ioctl(fd, I_LIS_SDBGMSK2, mask2) ;
+    print("\nSTREAMS debug mask set to 0x%08lx%08lx\n", mask2, mask1) ;
 
-    user_close(fd);
+    user_close(fd) ;
 
-}				/* set_debug_mask */
+} /* set_debug_mask */
 
 /************************************************************************
 *                           file_size                                   *
@@ -458,16 +460,16 @@ void set_debug_mask(unsigned long long msk)
 * Return the number of bytes in the file or -1 if file does not exist.	*
 *									*
 ************************************************************************/
-off_t file_size(char *file_name)
+off_t
+file_size(char *file_name)
 {
-    struct stat     b;
+    struct stat		b ;
 
-    if (stat(file_name, &b) < 0)
-	return (-1);
+    if (stat(file_name, &b) < 0) return(-1) ;
 
-    return (b.st_size);
+    return(b.st_size) ;
 
-}				/* file_size */
+} /* file_size */
 
 /************************************************************************
 *                          wait_for_logfile 				*
@@ -480,24 +482,25 @@ off_t file_size(char *file_name)
 * we have to let it catch up from time to time or we lose messages.	*
 *									*
 ************************************************************************/
-void wait_for_logfile(char *msg)
+void
+wait_for_logfile(char *msg)
 {
-    off_t           messages_size;
-    off_t           syslog_size;
-    off_t           new_messages_size = -1;
-    off_t           new_syslog_size = -1;
-    int             n;
+    off_t	messages_size ;
+    off_t	syslog_size ;
+    off_t	new_messages_size = -1 ;
+    off_t	new_syslog_size = -1 ;
+    int		n ;
 
     if (msg != NULL)
     {
-	print("Wait for log file to stabilize: %s ", msg);
-	fflush(stdout);
+	print("Wait for log file to stabilize: %s ", msg) ;
+	fflush(stdout) ;
     }
 
     messages_size = file_size("/var/log/messages") ;
     syslog_size = file_size("/var/log/syslog") ;
 
-    for (n = 0;; n++)
+    for (n = 0;;n++)
     {
 	sleep(1) ;
 	printf(".") ; fflush(stdout) ;
@@ -508,17 +511,17 @@ void wait_for_logfile(char *msg)
 	   )
 	    break ;
 
-	messages_size = new_messages_size;
-	syslog_size = new_syslog_size;
+	messages_size = new_messages_size ;
+	syslog_size   = new_syslog_size ;
     }
 
     if (n)
-	sync();			/* ensure log file integrity */
+	sync() ;			/* ensure log file integrity */
 
     if (msg != NULL)
-	print("\n");
+	print("\n") ;
 
-}				/* wait_for_logfile */
+} /* wait_for_logfile */
 
 /************************************************************************
 *                             print_mem                                 *
@@ -527,30 +530,28 @@ void wait_for_logfile(char *msg)
 * Issue streams ioctl to print out allocated memory.			*
 *									*
 ************************************************************************/
-void print_mem(void)
+void	print_mem(void)
 {
-    int             fd;
-    int             rslt;
+    int		fd ;
+    int		rslt ;
 
-    fd = user_open(LOOP_1, O_RDWR, 0);
+    fd = user_open(LOOP_1, O_RDWR, 0) ;
     if (fd < 0)
     {
-	print("loop.1: %s\n", strerror(ENO(fd))) ;
-	xit() ;
+	FAIL("loop.1: %s\n", STRERROR(-fd)) ;
     }
 
-    print("\n\nBegin dump of in-use memory areas\n\n");
-    rslt = user_ioctl(fd, I_LIS_PRNTMEM, 0);
+    print("\n\nBegin dump of in-use memory areas\n\n") ;
+    rslt = user_ioctl(fd, I_LIS_PRNTMEM, 0) ;
     if (rslt < 0)
     {
-	print("loop.1: I_LIS_PRNTMEM: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_LIS_PRNTMEM: %s\n", STRERROR(-rslt)) ;
     }
 
-    print("\n\nEnd dump of in-use memory areas\n\n");
-    user_close(fd);
+    print("\n\nEnd dump of in-use memory areas\n\n") ;
+    user_close(fd) ;
 
-}				/* print_mem */
+} /* print_mem */
 
 /************************************************************************
 *                              print_stream                             *
@@ -559,18 +560,17 @@ void print_mem(void)
 * Issue the print-stream ioctl on the file.				*
 *									*
 ************************************************************************/
-void print_stream(int fd)
+void	print_stream(int fd)
 {
-    int             rslt;
+    int		rslt;
 
-    rslt = user_ioctl(fd, I_LIS_PRNTSTRM, 0);
+    rslt = user_ioctl(fd, I_LIS_PRNTSTRM, 0) ;
     if (rslt < 0)
     {
-	print("I_LIS_PRNTSTRM: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("I_LIS_PRNTSTRM: %s\n", STRERROR(-rslt)) ;
     }
 
-}				/* print_stream */
+} /* print_stream */
 
 /************************************************************************
 *                           nread_wait                                  *
@@ -580,10 +580,10 @@ void print_stream(int fd)
 * data to show up at the queue head.					*
 *									*
 ************************************************************************/
-int nread_wait(int fd, int n)
+int	nread_wait(int fd, int n)
 {
-    int             w = 0;
-    int             rslt;
+    int w = 0 ;
+    int rslt ;
 
     do
     {
@@ -591,10 +591,9 @@ int nread_wait(int fd, int n)
 	if (rslt < 0) FAIL("%s", "n_read\n");
 	if (w > 0) sleep(1) ;
 
-    }
-    while (rslt < n && w++ < 5);
+    } while (rslt < n && w++ < 5) ;
 
-    return (rslt);
+    return(rslt) ;
 }
 
 /************************************************************************
@@ -604,10 +603,10 @@ int nread_wait(int fd, int n)
 * Wait for 'n' messages to show up at the stream head.			*
 *									*
 ************************************************************************/
-int nread_wait_msgs(int fd, int n)
+int	nread_wait_msgs(int fd, int n)
 {
-    int             w = 0;
-    int             rslt;
+    int w = 0 ;
+    int rslt ;
 
     do
     {
@@ -615,10 +614,9 @@ int nread_wait_msgs(int fd, int n)
 	if (rslt < 0) FAIL("%s", "n_read_msgs\n") ;
 	if (w > 0) sleep(1) ;
 
-    }
-    while (rslt < n && w++ < 5);
+    } while (rslt < n && w++ < 5) ;
 
-    return (rslt);
+    return(rslt) ;
 }
 
 /************************************************************************
@@ -629,21 +627,21 @@ int nread_wait_msgs(int fd, int n)
 * at the queue head to go to zero.					*
 *									*
 ************************************************************************/
-int flush_wait(int fd)
+int	flush_wait(int fd)
 {
-    int             w = 0;
-    int             rslt;
+    int w = 0 ;
+    int rslt ;
 
     do
     {
 	rslt = n_read(fd) ;
 	if (rslt < 0) FAIL("%s", "n_read\n") ;
 
-    }
-    while (rslt > 0 && w++ < 50);
+    } while (rslt > 0 && w++ < 50) ;
 
-    return (rslt);
+    return(rslt) ;
 }
+
 
 /************************************************************************
 *                         open_close_test                               *
@@ -655,12 +653,12 @@ int flush_wait(int fd)
 ************************************************************************/
 void	open_close_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             fd3;
-    int             rslt;
-    int             i;
-    struct strioctl ioc;
+    int		fd1 ;
+    int		fd2 ;
+    int		fd3 ;
+    int		rslt ;
+    int		i ;
+    struct strioctl	ioc ;
 
     /*
      * Make this loop iteration large to wring out memory
@@ -670,24 +668,24 @@ void	open_close_test(struct test_context *ctx)
     {
 	tprint("open_close_test iteration #%d\n", i) ;
 
-	fd1 = user_open(LOOP_1, O_RDWR, 0);
+	fd1 = user_open(LOOP_1, O_RDWR, 0) ;
 	if (fd1 < 0)
 	{
-	    print("loop.1: %s\n", strerror(ENO(fd1))) ;
+	    FAIL("loop.1: %s\n", STRERROR(-fd1)) ;
 	    break ;
 	}
 
-	fd2 = user_open(LOOP_2, O_RDWR, 0);
+	fd2 = user_open(LOOP_2, O_RDWR, 0) ;
 	if (fd2 < 0)
 	{
-	    print("loop.2: %s\n", strerror(ENO(fd2))) ;
+	    FAIL("loop.2: %s\n", STRERROR(-fd2)) ;
 	    break ;
 	}
 
-	fd3 = user_open(LOOP_1, O_RDWR, 0);
+	fd3 = user_open(LOOP_1, O_RDWR, 0) ;
 	if (fd3 < 0)
 	{
-	    print("loop.1 (second open): %s\n", strerror(ENO(fd3))) ;
+	    FAIL("loop.1 (second open): %s\n", STRERROR(-fd3)) ;
 	    break ;
 	}
 
@@ -699,14 +697,14 @@ void	open_close_test(struct test_context *ctx)
 	    break ;
 	}
 
-	ioc.ic_timout = 10;
-	ioc.ic_dp = NULL;
-	ioc.ic_cmd = LOOP_DENY_OPEN;
-	ioc.ic_len = 0;
-	rslt = user_ioctl(fd2, I_STR, &ioc);
+	ioc.ic_timout	  = 10 ;
+	ioc.ic_dp	  = NULL;
+	ioc.ic_cmd 	  = LOOP_DENY_OPEN ;
+	ioc.ic_len	  = 0 ;
+	rslt = user_ioctl(fd2, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: ioctl LOOP_DENY_OPEN: %s\n", strerror(ENO(rslt))) ;
+	    FAIL("loop.2: ioctl LOOP_DENY_OPEN: %s\n", STRERROR(-rslt)) ;
 	    break ;
 	}
 
@@ -718,12 +716,12 @@ void	open_close_test(struct test_context *ctx)
 	    break ;
 	}
 
-	user_close(fd1);
-	user_close(fd2);
-	user_close(fd3);
+	user_close(fd1) ;
+	user_close(fd2) ;
+	user_close(fd3) ;
     }
 
-}				/* open_close_test */
+} /* open_close_test */
 
 /************************************************************************
 *                            open_files                                 *
@@ -733,43 +731,43 @@ void	open_close_test(struct test_context *ctx)
 * connect the two streams together with an ioctl.			*
 *									*
 ************************************************************************/
-int open_files(int *fd1, int *fd2)
+int	open_files(int *fd1, int *fd2)
 {
-    int             arg;
-    int             rslt;
-    struct strioctl ioc;
+    int			arg ;
+    int			rslt ;
+    struct strioctl	ioc ;
 
-    *fd1 = user_open(LOOP_1, O_RDWR, 0);
+    *fd1 = user_open(LOOP_1, O_RDWR, 0) ;
     if (*fd1 < 0)
     {
-	print("loop.1: %s\n", strerror(ENO(*fd1))) ;
+	ERR("loop.1: %s\n", STRERROR(-*fd1)) ;
 	return(*fd1) ;
     }
 
-    *fd2 = user_open(LOOP_2, O_RDWR, 0);
+    *fd2 = user_open(LOOP_2, O_RDWR, 0) ;
     if (*fd2 < 0)
     {
-	print("loop.2: %s\n", strerror(ENO(*fd2))) ;
+	ERR("loop.2: %s\n", STRERROR(-*fd2)) ;
 	user_close(*fd1) ;
 	return(*fd2) ;
     }
 
-    ioc.ic_cmd = LOOP_SET;
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = LOOP_SET ;
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    arg = 2;
-    rslt = user_ioctl(*fd1, I_STR, &ioc);
+    arg = 2 ;
+    rslt = user_ioctl(*fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_SET: %s\n", strerror(ENO(rslt))) ;
+	ERR("loop.1: ioctl LOOP_SET: %s\n", STRERROR(-rslt)) ;
 	return(rslt) ;
     }
 
-    return (1);
+    return(1) ;
 
-}				/* open_files */
+} /* open_files */
 
 /************************************************************************
 *                            open_clones                                *
@@ -778,56 +776,52 @@ int open_files(int *fd1, int *fd2)
 * Open the loop driver as clone devices.				*
 *									*
 ************************************************************************/
-int open_clones(int *fd1, int *fd2)
+int	open_clones(int *fd1, int *fd2)
 {
-    int             arg;
-    int             rslt;
-    struct strioctl ioc;
+    int			arg ;
+    int			rslt ;
+    struct strioctl	ioc ;
 
-    *fd1 = user_open(LOOP_CLONE, O_RDWR, 0);
+    *fd1 = user_open(LOOP_CLONE, O_RDWR, 0) ;
     if (*fd1 < 0)
     {
-	print("loop_clone.1: %s\n", strerror(ENO(*fd1))) ;
-	xit() ;
+	FAIL("loop_clone.1: %s\n", STRERROR(-*fd1)) ;
     }
 
-    *fd2 = user_open(LOOP_CLONE, O_RDWR, 0);
+    *fd2 = user_open(LOOP_CLONE, O_RDWR, 0) ;
     if (*fd2 < 0)
     {
-	print("loop_clone.2: %s\n", strerror(ENO(*fd2))) ;
-	xit() ;
+	FAIL("loop_clone.2: %s\n", STRERROR(-*fd2)) ;
     }
 
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    ioc.ic_cmd = LOOP_GET_DEV;
-    arg = -1;
-    rslt = user_ioctl(*fd2, I_STR, &ioc);
+    ioc.ic_cmd 	  = LOOP_GET_DEV ;
+    arg = -1 ;
+    rslt = user_ioctl(*fd2, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: ioctl LOOP_GET_DEV: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: ioctl LOOP_GET_DEV: %s\n", STRERROR(-rslt)) ;
     }
 
     if (arg < 0)
     {
-	    FAIL("loop_clone.2: ioctl LOOP_GET_DEV returned %d\n", arg) ; /* missing ? */
+	FAIL("loop_clone.2: ioctl LOOP_GET_DEV returned %d\n", arg) ; /* missing ? */
     }
 
-    ioc.ic_cmd = LOOP_SET;
-    ioc.ic_len = sizeof(int);
-    rslt = user_ioctl(*fd1, I_STR, &ioc);
+    ioc.ic_cmd 	  = LOOP_SET ;
+    ioc.ic_len	  = sizeof(int) ;
+    rslt = user_ioctl(*fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_SET: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.1: ioctl LOOP_SET: %s\n", STRERROR(-rslt)) ;
     }
 
-    return (1);
+    return(1) ;
 
-}				/* open_clones */
+} /* open_clones */
 
 /************************************************************************
 *                           n_read                                      *
@@ -837,21 +831,21 @@ int open_clones(int *fd1, int *fd2)
 * count if successful.							*
 *									*
 ************************************************************************/
-int n_read(int fd)
+int	n_read(int fd)
 {
-    int             rslt;
-    int             arg;
+    int		rslt ;
+    int		arg ;
 
-    rslt = user_ioctl(fd, I_NREAD, &arg);
+    rslt = user_ioctl(fd, I_NREAD, &arg) ;
     if (rslt < 0)
     {
-	print("I_NREAD: %s\n", strerror(ENO(rslt))) ;
+	ERR("I_NREAD: %s\n", STRERROR(-rslt)) ;
 	return(rslt) ;
     }
 
-    return (arg);
+    return(arg) ;
 
-}				/* n_read */
+} /* n_read */
 
 /************************************************************************
 *                            n_read_msgs                                *
@@ -860,18 +854,18 @@ int n_read(int fd)
 * Do an I_NREAD and return the number of messages queued.		*
 *									*
 ************************************************************************/
-int n_read_msgs(int fd)
+int	n_read_msgs(int fd)
 {
-    int             rslt;
-    int             arg;
+    int		rslt ;
+    int		arg ;
 
-    rslt = user_ioctl(fd, I_NREAD, &arg);
+    rslt = user_ioctl(fd, I_NREAD, &arg) ;
     if (rslt < 0)
-	print("I_NREAD: %s\n", strerror(ENO(rslt))) ;
+	ERR("I_NREAD: %s\n", STRERROR(-rslt)) ;
 
-    return (rslt);
+    return(rslt) ;
 
-}				/* n_read_msgs */
+} /* n_read_msgs */
 
 /************************************************************************
 *                             write_data                                *
@@ -880,20 +874,20 @@ int n_read_msgs(int fd)
 * Write data and check results.						*
 *									*
 ************************************************************************/
-int write_data(int fd, char *bfr, int cnt)
+int	write_data(int fd, char *bfr, int cnt)
 {
-    int             rslt;
+    int		rslt;
 
-    rslt = user_write(fd, bfr, cnt);
+    rslt = user_write(fd, bfr, cnt) ;
     if (rslt < 0)
-	print("write_data: %s\n", strerror(ENO(rslt))) ;
+	ERR("write_data: %s\n", STRERROR(-rslt)) ;
     else
     if (rslt != cnt)
 	print("write_data: write returned %d, expected %d\n", rslt, cnt) ;
 
-    return (rslt);
+    return(rslt) ;
 
-}				/* write_data */
+} /* write_data */
 
 /************************************************************************
 *                             put_msg                                   *
@@ -902,21 +896,23 @@ int write_data(int fd, char *bfr, int cnt)
 * An interface routine to putpmsg().  This one checks return conditions.*
 *									*
 ************************************************************************/
-int put_msg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band,
-	    int flags)
+int	put_msg(int fd, struct strbuf *ctlptr,
+			struct strbuf *dataptr,
+			int band,
+			int flags)
 {
-    int             rslt;
+    int		rslt ;
 
-    rslt = user_putpmsg(fd, ctlptr, dataptr, band, flags);
+    rslt = user_putpmsg(fd, ctlptr, dataptr, band, flags) ;
     if (rslt < 0)
-	print("put_msg: %s\n", strerror(ENO(rslt))) ;
+	ERR("put_msg: %s\n", STRERROR(-rslt)) ;
     else
     if (rslt > 0)
 	print("put_msg: putpmsg returned %d, expected <= 0\n", rslt) ;
 
-    return (rslt);
+    return(rslt) ;
 
-}				/* put_msg */
+} /* put_msg */
 
 /************************************************************************
 *                           input_sig                                   *
@@ -928,9 +924,10 @@ int put_msg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band,
 ************************************************************************/
 void input_sig(int signo)
 {
-    print("\ninput_sig:  SIGPOLL (%d) caught\n", signo);
+    print("\ninput_sig:  SIGPOLL (%d) caught\n", signo) ;
 
-}				/* input_sig */
+} /* input_sig */
+
 
 /************************************************************************
 *                             ioctl_test                                *
@@ -941,16 +938,16 @@ void input_sig(int signo)
 ************************************************************************/
 void	ioctl_test(struct test_context *ctx)
 {
-    int             i;
-    int             fd1;
-    int             fd2;
-    int             arg;
-    int             rslt;
-    int             lgth;
-    int             lgth2;
-    struct strioctl ioc;
-    struct str_mlist *mlp;
-    loop_xparent_t  xp;
+    int			i ;
+    int			fd1 ;
+    int			fd2 ;
+    int			arg ;
+    int			rslt ;
+    int			lgth ;
+    int			lgth2 ;
+    struct strioctl	ioc ;
+    struct str_mlist	*mlp ;
+    loop_xparent_t	xp ;
 
     /*
      * Make this loop iteration large to wring out memory
@@ -964,34 +961,32 @@ void	ioctl_test(struct test_context *ctx)
 		*           Open Files          * 
 		********************************/
 
-	fd1 = user_open(LOOP_1, O_RDWR, 0);
+	fd1 = user_open(LOOP_1, O_RDWR, 0) ;
 	if (fd1 < 0)
 	{
-	    print("loop.1: %s\n", strerror(ENO(fd1))) ;
-	    xit() ;
+	    FAIL("loop.1: %s\n", STRERROR(-fd1)) ;
 	}
 
-	fd2 = user_open(LOOP_2, O_RDWR, 0);
+	fd2 = user_open(LOOP_2, O_RDWR, 0) ;
 	if (fd2 < 0)
 	{
-	    print("loop.2: %s\n", strerror(ENO(fd2))) ;
-	    xit() ;
+	    FAIL("loop.2: %s\n", STRERROR(-fd2)) ;
 	}
 
 		/********************************
 		*             I_STR             * 
 		********************************/
 
-	ioc.ic_cmd = LOOP_SET;
-	ioc.ic_timout = 10;
-	ioc.ic_len = sizeof(int);
-	ioc.ic_dp = (char *) &arg;
+	ioc.ic_cmd 	  = LOOP_SET ;
+	ioc.ic_timout 	  = 10 ;
+	ioc.ic_len	  = sizeof(int) ;
+	ioc.ic_dp	  = (char *) &arg ;
 
-	arg = 2;
-	rslt = user_ioctl(fd1, I_STR, &ioc);
+	arg = 2 ;
+	rslt = user_ioctl(fd1, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: ioctl LOOP_SET: %s\n", strerror(ENO(rslt))) ;
+	    FAIL("loop.1: ioctl LOOP_SET: %s\n", STRERROR(-rslt)) ;
 	}
 
 	/*
@@ -999,26 +994,26 @@ void	ioctl_test(struct test_context *ctx)
 	 * by the loop driver because the previous one set up both
 	 * sides of the loopback connection.
 	 */
-	arg = 1;
-	ioc.ic_len = sizeof(int);
-	rslt = user_ioctl(fd2, I_STR, &ioc);
+	arg = 1 ;
+	ioc.ic_len	 = sizeof(int) ;
+	rslt = user_ioctl(fd2, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: ioctl returned expected error: %s\n",
-		  strerror(ENO(rslt))) ;
+	    ERR("loop.2: ioctl returned expected error: %s\n",
+		  STRERROR(-rslt)) ;
 	}
 	else
 	    tprint("%s", "loop.2: ioctl returned unexpected success, "
 	          "should fail with EBUSY\n") ;
 
-	user_close(fd1);
-	user_close(fd2);
+	user_close(fd1) ;
+	user_close(fd2) ;
 
-	fd1 = user_open(LOOP_1, O_RDWR, 0);
+
+	fd1 = user_open(LOOP_1, O_RDWR, 0) ;
 	if (fd1 < 0)
 	{
-	    print("loop.1: %s\n", strerror(ENO(fd1))) ;
-	    xit() ;
+	    FAIL("loop.1: %s\n", STRERROR(-fd1)) ;
 	}
 
 		/********************************
@@ -1029,11 +1024,10 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_PUSH, "relay") ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_PUSH (relay): %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_PUSH (relay): %s\n", STRERROR(-rslt)) ;
 	}
 
-	print_mem();
+	print_mem() ;
 
 		/********************************
 		*             I_LOOK            * 
@@ -1044,8 +1038,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_LOOK, ctx->buf) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_LOOK: %s\n", strerror(ENO(fd1))) ;
-	    xit() ;
+	    FAIL("loop.1: I_LOOK: %s\n", STRERROR(-fd1)) ;
 	}
 
 	tprint("I_LOOK returned \"%s\"\n", ctx->buf) ;
@@ -1059,12 +1052,11 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_PUSH, "relay2") ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_PUSH (relay2): %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_PUSH (relay2): %s\n", STRERROR(-rslt)) ;
 	}
 
-	print_stream(fd1);
-	print_mem();
+	print_stream(fd1) ;
+	print_mem() ;
 
 		/********************************
 		*             I_FIND            * 
@@ -1074,36 +1066,34 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_FIND, "relay") ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_FIND: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_FIND: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt > 0)	tprint("%s", "Module \"relay\" is present in the stream\n");
 	else		tprint("%s", "Module \"relay\" is not present in the stream\n");
 
-	print_mem();
+	print_mem() ;
 
 		/********************************
 		*         Read/Write            * 
 		********************************/
 
-	fd2 = user_open(LOOP_2, O_RDWR, 0);
+	fd2 = user_open(LOOP_2, O_RDWR, 0) ;
 	if (fd2 < 0)
 	{
-	    print("loop.2: %s\n", strerror(ENO(fd2))) ;
-	    xit() ;
+	    FAIL("loop.2: %s\n", STRERROR(-fd2)) ;
 	}
 
-	ioc.ic_cmd = LOOP_SET;
-	ioc.ic_timout = 10;
-	ioc.ic_len = sizeof(int);
-	ioc.ic_dp = (char *) &arg;
+	ioc.ic_cmd 	  = LOOP_SET ;
+	ioc.ic_timout 	  = 10 ;
+	ioc.ic_len	  = sizeof(int) ;
+	ioc.ic_dp	  = (char *) &arg ;
 
-	arg = 2;
-	rslt = user_ioctl(fd1, I_STR, &ioc);
+	arg = 2 ;
+	rslt = user_ioctl(fd1, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: ioctl LOOP_SET: %s\n", strerror(ENO(rslt))) ;
+	    FAIL("loop.1: ioctl LOOP_SET: %s\n", STRERROR(-rslt)) ;
 	}
 
 	tprint("%s", "Testing read and write\n") ;
@@ -1121,8 +1111,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_read(fd2, ctx->rdbuf, lgth);
 	if (rslt < 0)
 	{
-	    print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: read: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt != lgth)
@@ -1157,8 +1146,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_read(fd2, ctx->rdbuf, lgth);
 	if (rslt < 0)
 	{
-	    print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: read: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt != lgth)
@@ -1213,14 +1201,14 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_read(fd2, ctx->rdbuf, lgth);
 	if (rslt < 0)
 	{
-	    print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: read: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt != lgth)
 	{
 	    FAIL("loop.2:  read returned %d, expected %d\n", rslt, lgth) ;
 	}
+
 
 		/********************************
 		*             I_FLUSH           * 
@@ -1246,14 +1234,13 @@ void	ioctl_test(struct test_context *ctx)
 	    FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 3) ;
 	}
 
-	rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW);
+	rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
 	}
 
-	rslt = flush_wait(fd2);
+	rslt = flush_wait(fd2) ;
 	if (rslt != 0)
 	{
 	    FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 0) ;
@@ -1263,9 +1250,9 @@ void	ioctl_test(struct test_context *ctx)
 
 	rslt = write_data(fd1, ctx->buf, lgth) ;
 	if (rslt < 0)
-	    xit();
+	    xit() ;
 
-	rslt = nread_wait_msgs(fd2, 1);
+	rslt = nread_wait_msgs(fd2, 1) ;
 	if (rslt != 1)
 	{
 	    FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 1) ;
@@ -1279,21 +1266,21 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop_clone.1: ioctl LOOP_FLUSH: %s\n", strerror(ENO(rslt))) ;
+	    print("loop_clone.1: ioctl LOOP_FLUSH: %s\n", STRERROR(-rslt)) ;
 	}
 
 	memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
 	rslt = user_read(fd2, ctx->rdbuf, ioc.ic_len);
 	if (rslt < 0)
 	{
-	    print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
+	    print("loop.2: read: %s\n", STRERROR(-rslt)) ;
 	    xit() ;
 	}
 
 	if (rslt != ioc.ic_len)
 	{
 	    print("loop.2:  read returned %d, expected %d\n", rslt, ioc.ic_len);
-	    xit();
+	    xit() ;
 	}
 
 	if (strcmp(ctx->buf, ctx->rdbuf))
@@ -1312,8 +1299,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd2, I_CANPUT, 0) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_CANPUT: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_CANPUT: %s\n", STRERROR(-rslt)) ;
 	}
 
 	tprint("loop.2: I_CANPUT returned %d\n", rslt) ;
@@ -1326,8 +1312,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd2, I_SETCLTIME, 50) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_SETCLTIME: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_SETCLTIME: %s\n", STRERROR(-rslt)) ;
 	}
 
 	tprint("loop.2: I_SETCLTIME returned %d\n", rslt) ;
@@ -1341,8 +1326,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd2, I_GETCLTIME, &arg) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_GETCLTIME: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_GETCLTIME: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (arg != 50)
@@ -1358,17 +1342,15 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_LIST, NULL) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_LIST: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_LIST: %s\n", STRERROR(-rslt)) ;
 	}
 	tprint("I_LIST(loop.1, NULL) = %d\n", rslt) ;
 	lgth = rslt ;			/* length of list */
 
-	rslt = user_ioctl(fd2, I_LIST, NULL);
+	rslt = user_ioctl(fd2, I_LIST, NULL) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_LIST: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_LIST: %s\n", STRERROR(-rslt)) ;
 	}
 	tprint("I_LIST(loop.1, NULL) = %d\n", rslt) ;
 	lgth2 = rslt ;			/* length of list */
@@ -1377,8 +1359,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_LIST, &ctx->mod_list) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_LIST: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_LIST: %s\n", STRERROR(-rslt)) ;
 	}
 	if (rslt > 0)
 	{
@@ -1401,8 +1382,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd2, I_LIST, &ctx->mod_list) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_LIST: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_LIST: %s\n", STRERROR(-rslt)) ;
 	}
 	if (rslt > 0)
 	{
@@ -1434,14 +1414,14 @@ void	ioctl_test(struct test_context *ctx)
 	 * ioctl before the message gets to the other stream via the service
 	 * queue.
 	 */
-	ioc.ic_timout = 10;
-	ioc.ic_dp = NULL;
-	ioc.ic_cmd = LOOP_PUTNXT;	/* use putnext rather then svcq */
-	ioc.ic_len = 0;
-	rslt = user_ioctl(fd1, I_STR, &ioc);
+	ioc.ic_timout	  = 10 ;
+	ioc.ic_dp	  = NULL;
+	ioc.ic_cmd 	  = LOOP_PUTNXT ;  /* use putnext rather then svcq */
+	ioc.ic_len	  = 0 ;
+	rslt = user_ioctl(fd1, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	    FAIL("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
 	}
 
 	strcpy(ctx->buf, "Data to send down the file for testing I_ATMARK") ;
@@ -1451,8 +1431,7 @@ void	ioctl_test(struct test_context *ctx)
 	tprint("%s", "loop.2: I_ATMARK w/no messages: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	tprint("%s", "OK\n") ;
@@ -1463,38 +1442,34 @@ void	ioctl_test(struct test_context *ctx)
 
 	if (nread_wait_msgs(fd2, 1) != 1)
 	{
-	    print("loop.2: message failed to appear\n") ;
-	    xit() ;
+	    FAIL("%s", "loop.2: message failed to appear\n") ;
 	}
 
 	rslt = user_ioctl(fd2, I_ATMARK, ANYMARK) ;
 	tprint("%s", "loop.2: I_ATMARK w/non-marked message: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	tprint("%s", "OK\n") ;
 
-	rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW);
+	rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
 	}
 
 	rslt = flush_wait(fd2);
 
-	ioc.ic_cmd = LOOP_MARK;	/* mark the next msg */
-	ioc.ic_len = 0;
-	ioc.ic_dp = NULL;
+	ioc.ic_cmd 	  = LOOP_MARK ;		/* mark the next msg */
+	ioc.ic_len	  = 0 ;
+	ioc.ic_dp	  = NULL ;
 
-	rslt = user_ioctl(fd1, I_STR, &ioc);
+	rslt = user_ioctl(fd1, I_STR, &ioc) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: ioctl LOOP_MARK: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: ioctl LOOP_MARK: %s\n", STRERROR(-rslt)) ;
 	}
 
 	rslt = write_data(fd1, ctx->buf, lgth) ;
@@ -1503,15 +1478,13 @@ void	ioctl_test(struct test_context *ctx)
 
 	if (nread_wait_msgs(fd2, 1) != 1)
 	{
-	    print("loop.2: message failed to appear\n") ;
-	    xit() ;
+	    FAIL("%s", "loop.2: message failed to appear\n") ;
 	}
 	rslt = user_ioctl(fd2, I_ATMARK, ANYMARK) ;
 	tprint("%s", "loop.2: I_ATMARK(ANYMARK) w/marked message: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt == 1)
@@ -1525,8 +1498,7 @@ void	ioctl_test(struct test_context *ctx)
 	tprint("%s", "loop.2: I_ATMARK(LASTMARK) w/marked message last: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt == 1)
@@ -1542,15 +1514,13 @@ void	ioctl_test(struct test_context *ctx)
 
 	if (nread_wait_msgs(fd2, 2) != 2)
 	{
-	    print("loop.2: messages failed to appear\n") ;
-	    xit() ;
+	    FAIL("%s", "loop.2: messages failed to appear\n") ;
 	}
 	rslt = user_ioctl(fd2, I_ATMARK, ANYMARK) ;
 	tprint("%s", "loop.2: I_ATMARK(ANYMARK) w/marked message: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt == 1)
@@ -1564,8 +1534,7 @@ void	ioctl_test(struct test_context *ctx)
 	tprint("%s", "loop.2: I_ATMARK(LASTMARK) w/marked message last: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt == 1)
@@ -1575,12 +1544,11 @@ void	ioctl_test(struct test_context *ctx)
 	    FAIL("returned %d, expected 1\n", rslt) ;
 	}
 
-	ioc.ic_len = 0;
-	rslt = user_ioctl(fd1, I_STR, &ioc);	/* mark nxt msg */
+	ioc.ic_len	  = 0 ;
+	rslt = user_ioctl(fd1, I_STR, &ioc) ;		/* mark nxt msg */
 	if (rslt < 0)
 	{
-	    print("loop.1: ioctl LOOP_MARK: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: ioctl LOOP_MARK: %s\n", STRERROR(-rslt)) ;
 	}
 
 	rslt = write_data(fd1, ctx->buf, lgth) ;
@@ -1589,15 +1557,13 @@ void	ioctl_test(struct test_context *ctx)
 
 	if (nread_wait_msgs(fd2, 3) != 3)
 	{
-	    print("loop.2: messages failed to appear\n") ;
-	    xit() ;
+	    FAIL("%s", "loop.2: messages failed to appear\n") ;
 	}
 	rslt = user_ioctl(fd2, I_ATMARK, ANYMARK) ;
 	tprint("%s", "loop.2: I_ATMARK(ANYMARK) w/marked message: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt == 1)
@@ -1611,23 +1577,20 @@ void	ioctl_test(struct test_context *ctx)
 	tprint("%s", "loop.2: I_ATMARK(LASTMARK) w/marked message not last: ") ;
 	if (rslt < 0)
 	{
-	    print("%s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("%s\n", STRERROR(-rslt)) ;
 	}
 
 	if (rslt == 0)
 	    tprint("%s", "OK\n") ;
 	else
 	{
-	    print("returned %d, expected 0\n", rslt) ;
-	    xit() ;
+	    FAIL("returned %d, expected 1\n", rslt) ;
 	}
 
-	rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW);
+	rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
 	}
 
 	flush_wait(fd2) ;
@@ -1641,15 +1604,13 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_SETSIG, S_INPUT) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_SETSIG: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_SETSIG: %s\n", STRERROR(-rslt)) ;
 	}
 
-	rslt = user_ioctl(fd1, I_GETSIG, &arg);
+	rslt = user_ioctl(fd1, I_GETSIG, &arg) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_GETSIG: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_GETSIG: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (arg == S_INPUT)
@@ -1676,8 +1637,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_POP, 0) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: I_POP: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: I_POP: %s\n", STRERROR(-rslt)) ;
 	}
 
 		/********************************
@@ -1692,8 +1652,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, LOOP_XPARENT_COPYIN, &xp) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: LOOP_XPARENT_COPYIN: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: LOOP_XPARENT_COPYIN: %s\n", STRERROR(-rslt)) ;
 	}
 
 	xp.cmnd  = LOOP_XPARENT_COPYOUT ;
@@ -1702,8 +1661,7 @@ void	ioctl_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, LOOP_XPARENT_COPYOUT, &xp) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: LOOP_XPARENT_COPYOUT: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: LOOP_XPARENT_COPYOUT: %s\n", STRERROR(-rslt)) ;
 	}
 
 	tprint("Snt: %s\n", ctx->buf) ;
@@ -1719,17 +1677,16 @@ void	ioctl_test(struct test_context *ctx)
 
 	print_mem() ;
 
-	print_mem();
 
 		/********************************
 		*         Close Files           * 
 		********************************/
 
-	user_close(fd1);
-	user_close(fd2);
+	user_close(fd1) ;
+	user_close(fd2) ;
     }
 
-}				/* ioctl_test */
+} /* ioctl_test */
 
 /************************************************************************
 *                             rdopt_test                                *
@@ -1740,14 +1697,14 @@ void	ioctl_test(struct test_context *ctx)
 ************************************************************************/
 void	rdopt_test(struct test_context *ctx)
 {
-    int             i;
-    int             fd1;
-    int             fd2;
-    int             arg;
-    int             rslt;
-    int             lgth;
-    int             lgth2;
-    struct strioctl ioc;
+    int			i ;
+    int			fd1 ;
+    int			fd2 ;
+    int			arg ;
+    int			rslt ;
+    int			lgth ;
+    int			lgth2 ;
+    struct strioctl	ioc ;
 
     tprint("%s", "Read option test\n") ;
 
@@ -1758,21 +1715,21 @@ void	rdopt_test(struct test_context *ctx)
     rslt = open_files(&fd1, &fd2) ;
     if (rslt < 0) FAIL("%s", "open_files\n") ;
 
-    ioc.ic_timout = 10;
-    ioc.ic_dp = NULL;
-    ioc.ic_cmd = LOOP_PUTNXT;	/* use putnxt rather then svcq */
-    ioc.ic_len = 0;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_timout = 10 ;
+    ioc.ic_dp	  = NULL;
+    ioc.ic_cmd 	  = LOOP_PUTNXT ;	/* use putnxt rather then svcq */
+    ioc.ic_len	  = 0 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
-    ioc.ic_len = 0;
-    rslt = user_ioctl(fd2, I_STR, &ioc);
+    ioc.ic_len	  = 0 ;
+    rslt = user_ioctl(fd2, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
 	    /********************************
@@ -1783,15 +1740,13 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_SRDOPT, RNORM) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SRDOPT(RNORM): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SRDOPT(RNORM): %s\n", STRERROR(-rslt)) ;
     }
 
-    rslt = user_ioctl(fd1, I_GRDOPT, &arg);
+    rslt = user_ioctl(fd1, I_GRDOPT, &arg) ;
     if (rslt < 0)
     {
-	print("loop.1: I_GRDOPT(RNORM): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_GRDOPT(RNORM): %s\n", STRERROR(-rslt)) ;
     }
 
     if ((arg & RMODEMASK) == RNORM)
@@ -1817,18 +1772,16 @@ void	rdopt_test(struct test_context *ctx)
      */
     if (nread_wait_msgs(fd1, 3) != 3)
     {
-	print("loop.1: messages failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: messages failed to appear\n") ;
     }
-    memset(rdbuf, 0, sizeof(rdbuf)) ;
-    rslt = user_read(fd1, rdbuf, 2*lgth+1);
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
+    rslt = user_read(fd1, ctx->rdbuf, 2*lgth+1);
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
-    if (rslt != 2 * lgth + 1)
+    if (rslt != 2*lgth+1)
     {
 	FAIL("loop.1:  read returned %d, expected %d\n", rslt, 2*lgth+1) ;
     }
@@ -1840,11 +1793,10 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_read(fd1, &ctx->rdbuf[2*lgth+1], 2*lgth);
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
-    if (rslt != lgth - 1)
+    if (rslt != lgth-1)
     {
 	FAIL("loop.1:  read returned %d, expected %d\n", rslt, lgth-1) ;
     }
@@ -1870,15 +1822,13 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_SRDOPT, RMSGD) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SRDOPT(RMSGD): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SRDOPT(RMSGD): %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = user_ioctl(fd1, I_GRDOPT, &arg);
     if (rslt < 0)
     {
-	print("loop.1: I_GRDOPT(RMSGD): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_GRDOPT(RMSGD): %s\n", STRERROR(-rslt)) ;
     }
 
     if ((arg & RMODEMASK) == RMSGD)
@@ -1902,15 +1852,13 @@ void	rdopt_test(struct test_context *ctx)
      */
     if (nread_wait_msgs(fd1, 1) != 1)
     {
-	print("loop.1: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: message failed to appear\n") ;
     }
-    memset(rdbuf, 0, sizeof(rdbuf)) ;	
-    rslt = user_read(fd1, rdbuf, lgth/2);	/* read half the message */
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;	
+    rslt = user_read(fd1, ctx->rdbuf, lgth/2);	/* read half the message */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth / 2)
@@ -1944,15 +1892,13 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_SRDOPT, RMSGN) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SRDOPT(RMSGN): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SRDOPT(RMSGN): %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = user_ioctl(fd1, I_GRDOPT, &arg);
     if (rslt < 0)
     {
-	print("loop.1: I_GRDOPT(RMSGN): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_GRDOPT(RMSGN): %s\n", STRERROR(-rslt)) ;
     }
 
     if ((arg & RMODEMASK) == RMSGN)
@@ -1976,18 +1922,16 @@ void	rdopt_test(struct test_context *ctx)
      */
     if (nread_wait_msgs(fd1, 1) != 1)
     {
-	print("loop.1: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: message failed to appear\n") ;
     }
-    memset(rdbuf, 0, sizeof(rdbuf)) ;	
-    rslt = user_read(fd1, rdbuf, lgth/2);	/* read half the message */
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;	
+    rslt = user_read(fd1, ctx->rdbuf, lgth/2);	/* read half the message */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
-    if (rslt != lgth / 2)
+    if (rslt != lgth/2)
     {
 	FAIL("loop.1:  read returned %d, expected %d\n", rslt, lgth/2) ;
     }
@@ -2005,11 +1949,10 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_read(fd1, &ctx->rdbuf[lgth/2], lgth) ;	/* read the rest */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
-    if (rslt != lgth - lgth / 2)
+    if (rslt != lgth - lgth/2)
     {
 	FAIL("%d bytes on second read, should be %d\n",
 		 rslt, lgth - lgth/2);
@@ -2033,15 +1976,13 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_SRDOPT, RNORM|RPROTDAT) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SRDOPT(RPROTDAT): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SRDOPT(RPROTDAT): %s\n", STRERROR(-rslt)) ;
     }
 
-    rslt = user_ioctl(fd1, I_GRDOPT, &arg);
+    rslt = user_ioctl(fd1, I_GRDOPT, &arg) ;
     if (rslt < 0)
     {
-	print("loop.1: I_GRDOPT(RPROTDAT): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_GRDOPT(RPROTDAT): %s\n", STRERROR(-rslt)) ;
     }
 
     if (arg == (RNORM|RPROTDAT))
@@ -2063,15 +2004,13 @@ void	rdopt_test(struct test_context *ctx)
 
     if (nread_wait_msgs(fd1, 1) != 1)
     {
-	print("loop.1: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: message failed to appear\n") ;
     }
-    memset(rdbuf, 0, sizeof(rdbuf)) ;	
-    rslt = user_read(fd1, rdbuf, lgth);		/* read the message */
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;	
+    rslt = user_read(fd1, ctx->rdbuf, lgth);		/* read the message */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth)
@@ -2106,14 +2045,12 @@ void	rdopt_test(struct test_context *ctx)
     lgth = lgth + lgth2 ;			/* combined message lgth */
     if (nread_wait_msgs(fd1, 1) != 1)
     {
-	print("loop.1: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: message failed to appear\n") ;
     }
-    rslt = user_read(fd1, rdbuf, lgth);		/* read the message */
+    rslt = user_read(fd1, ctx->rdbuf, lgth);		/* read the message */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth)
@@ -2140,15 +2077,13 @@ void	rdopt_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_SRDOPT, RMSGN|RPROTDIS) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SRDOPT(RPROTDIS): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SRDOPT(RPROTDIS): %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = user_ioctl(fd1, I_GRDOPT, &arg);
     if (rslt < 0)
     {
-	print("loop.1: I_GRDOPT(RPROTDIS): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_GRDOPT(RPROTDIS): %s\n", STRERROR(-rslt)) ;
     }
 
     if (arg == (RMSGN|RPROTDIS))
@@ -2173,8 +2108,7 @@ void	rdopt_test(struct test_context *ctx)
 
     if (nread_wait_msgs(fd1, 1) != 1)
     {
-	print("loop.1: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: message failed to appear\n") ;
     }
 
     rslt = n_read(fd1);				/* check how many bytes */
@@ -2185,16 +2119,14 @@ void	rdopt_test(struct test_context *ctx)
 	FAIL("loop.1:  I_NREAD returned %d, expected %d\n", rslt, 0) ;
     }
 
-    rslt = user_read(fd1, rdbuf, sizeof(rdbuf));	/* read the message */
+    rslt = user_read(fd1, ctx->rdbuf, sizeof(ctx->rdbuf));	/* read the message */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
     if (rslt > 0)
     {
-	print("loop.1:  read returned %d, expected 0\n", rslt) ;
-	xit() ;
+	FAIL("loop.1:  read returned %d, expected 0\n", rslt) ;
     }
 
     /*
@@ -2211,17 +2143,15 @@ void	rdopt_test(struct test_context *ctx)
     ctx->wr_dta.len	= lgth2 ;
     if (put_msg(fd2, &ctx->wr_ctl, &ctx->wr_dta, 0, MSG_BAND) < 0) FAIL("%s", "put_msg\n") ;
 
-    memset(rdbuf, 0, sizeof(rdbuf)) ;	
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;	
     if (nread_wait_msgs(fd1, 1) != 1)
     {
-	print("loop.1: messages failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.1: messages failed to appear\n") ;
     }
-    rslt = user_read(fd1, rdbuf, sizeof(rdbuf));	/* read the message */
+    rslt = user_read(fd1, ctx->rdbuf, sizeof(ctx->rdbuf));	/* read the message */
     if (rslt < 0)
     {
-	print("loop.1: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth2)
@@ -2247,7 +2177,7 @@ void	rdopt_test(struct test_context *ctx)
     user_close(fd1) ;
     user_close(fd2) ;
 
-}				/* rdopt_test */
+} /* rdopt_test */
 
 /************************************************************************
 *                               write_test                              *
@@ -2258,15 +2188,15 @@ void	rdopt_test(struct test_context *ctx)
 ************************************************************************/
 void	write_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             arg;
-    int             rslt;
-    int             i;
-    struct strioctl ioc;
-    int             lgth;
-#if 0				/* needed for ioctl tst below */
-    int             unblocked;
+    int			fd1 ;
+    int			fd2 ;
+    int			arg ;
+    int			rslt ;
+    int			i ;
+    struct strioctl	ioc ;
+    int			lgth ;
+#if 0					/* needed for ioctl tst below */
+    int			unblocked ;
 #endif
 
     tprint("%s", "Write option test\n") ;
@@ -2291,8 +2221,8 @@ void	write_test(struct test_context *ctx)
 	tprint("loop.1: *** write zero bytes returned %d.  Should it?\n", rslt) ;
 #else
     if (rslt < 0)
-	print("loop.1: write zero bytes: %s: expected error\n",
-		    strerror(ENO(rslt))) ;
+	ERR("loop.1: write zero bytes: %s: expected error\n", 
+		    STRERROR(-rslt)) ;
     else
     {
 	FAIL("loop.1: write zero bytes: returned %d instead of error\n",
@@ -2304,15 +2234,13 @@ void	write_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_SWROPT, SNDZERO) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SWROPT(SNDZERO): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SWROPT(SNDZERO): %s\n", STRERROR(-rslt)) ;
     }
 
-    rslt = user_ioctl(fd1, I_GWROPT, &arg);
+    rslt = user_ioctl(fd1, I_GWROPT, &arg) ;
     if (rslt < 0)
     {
-	print("loop.1: I_SWROPT(SNDZERO): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: I_SWROPT(SNDZERO): %s\n", STRERROR(-rslt)) ;
     }
 
     if (arg == SNDZERO)
@@ -2326,23 +2254,20 @@ void	write_test(struct test_context *ctx)
     rslt = user_write(fd1, ctx->buf, 0) ;
     if (rslt < 0)
     {
-	print("loop.1: write zero bytes: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: write zero bytes: %s\n", STRERROR(-rslt)) ;
     }
     else
 	tprint("loop.1: write zero bytes: returned %d\n", rslt) ;
 
-    memset(rdbuf, 0, sizeof(rdbuf)) ;	
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;	
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: message failed to appear\n") ;
     }
-    rslt = user_read(fd2, rdbuf, sizeof(rdbuf)) ;
+    rslt = user_read(fd2, ctx->rdbuf, sizeof(ctx->rdbuf)) ;
     if (rslt < 0)
     {
-	print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != 0)
@@ -2356,18 +2281,18 @@ void	write_test(struct test_context *ctx)
 	    *         Message Burst	    * 
 	    ********************************/
 
-    print("\nTesting a burst of messages at the stream head\n");
+    print("\nTesting a burst of messages at the stream head\n") ;
 
-    ioc.ic_cmd = LOOP_BURST;
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = LOOP_BURST ;
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    arg = 60;			/* number of burst messages */
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    arg = 60 ;			/* number of burst messages */
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_BURST: %s\n", strerror(ENO(rslt))) ;
+	print("loop.1: ioctl LOOP_BURST: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
@@ -2377,7 +2302,7 @@ void	write_test(struct test_context *ctx)
     rslt = user_write(fd1, ctx->buf, lgth) ;
     if (rslt < 0)
     {
-	print("loop.1: write: %s\n", strerror(ENO(rslt))) ;
+	print("loop.1: write: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
@@ -2387,10 +2312,10 @@ void	write_test(struct test_context *ctx)
     /*
      * Set RMSGN so that read will just return a single message.
      */
-    rslt = user_ioctl(fd2, I_SRDOPT, RMSGN);
+    rslt = user_ioctl(fd2, I_SRDOPT, RMSGN) ;
     if (rslt < 0)
     {
-	print("loop.2: I_SRDOPT(RMSGN): %s\n", strerror(ENO(rslt))) ;
+	print("loop.2: I_SRDOPT(RMSGN): %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
@@ -2399,14 +2324,14 @@ void	write_test(struct test_context *ctx)
 	rslt = user_read(fd2, ctx->rdbuf, sizeof(ctx->rdbuf)) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
+	    print("loop.2: read: %s\n", STRERROR(-rslt)) ;
 	    xit() ;
 	}
 
 	if (rslt != lgth)
 	{
-	    print("Expected %d bytes, got %d\n", lgth, rslt);
-	    xit();
+	    print("Expected %d bytes, got %d\n", lgth, rslt) ;
+	    xit() ;
 	}
 
 	if (strcmp(ctx->buf, ctx->rdbuf) != 0)
@@ -2419,9 +2344,10 @@ void	write_test(struct test_context *ctx)
 
     if (i != arg)
     {
-	print("Read %d messages, expected %d\n", i, arg);
-	xit();
+	print("Read %d messages, expected %d\n", i, arg) ;
+	xit() ;
     }
+
 #if 0
 
     /*
@@ -2435,17 +2361,16 @@ void	write_test(struct test_context *ctx)
 
     tprint("Testing downstream flow control\n") ;
 
-    ioc.ic_cmd = LOOP_MSGLVL;	/* set queue message level */
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = LOOP_MSGLVL ;		/* set queue message level */
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    arg = 20;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    arg = 20 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_MSGLVL: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl LOOP_MSGLVL: %s\n", STRERROR(-rslt)) ;
     }
 
     strcpy(ctx->buf, "Flow control data test:  ............data pattern.......") ;
@@ -2461,24 +2386,22 @@ void	write_test(struct test_context *ctx)
 
     if (rslt < 0)
     {
-	print("loop.1: ioctl or write: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl or write: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("Flow control blocked with %d messages queued at driver\n",
 		20 - arg) ;
 
-    ioc.ic_cmd = LOOP_MSGLVL;	/* set queue message level */
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = LOOP_MSGLVL ;		/* set queue message level */
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    arg = 0;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    arg = 0 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_MSGLVL: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl LOOP_MSGLVL: %s\n", STRERROR(-rslt)) ;
     }
 
     while (arg--)
@@ -2486,8 +2409,7 @@ void	write_test(struct test_context *ctx)
 	rslt = user_write(fd1, ctx->buf, lgth) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: write: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: write: %s\n", STRERROR(-rslt)) ;
 	}
     }
 
@@ -2498,8 +2420,7 @@ void	write_test(struct test_context *ctx)
 	rslt = user_ioctl(fd1, I_CANPUT, 0) ;
 	if (rslt < 0)
 	{
-	    print("loop.1: ioctl during readback: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.1: ioctl during readback: %s\n", STRERROR(-rslt)) ;
 	}
 
 	if (!unblocked && rslt > 0)
@@ -2512,8 +2433,7 @@ void	write_test(struct test_context *ctx)
 	rslt = user_read(fd2, ctx->rdbuf, sizeof(ctx->rdbuf)) ;
 	if (rslt < 0)
 	{
-	    print("loop.2: read: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.2: read: %s\n", STRERROR(-rslt)) ;
 	}
     }
 
@@ -2530,10 +2450,10 @@ void	write_test(struct test_context *ctx)
 	    *         Close Files           * 
 	    ********************************/
 
-    user_close(fd1);
-    user_close(fd2);
+    user_close(fd1) ;
+    user_close(fd2) ;
 
-}				/* write_test */
+} /* write_test */
 
 /************************************************************************
 *                           close_timer_test                            *
@@ -2544,11 +2464,11 @@ void	write_test(struct test_context *ctx)
 ************************************************************************/
 void	close_timer_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             arg;
-    int             rslt;
-    struct strioctl ioc;
+    int			fd1 ;
+    int			fd2 ;
+    int			arg ;
+    int			rslt ;
+    struct strioctl	ioc ;
 
     tprint("%s", "Close timer test\n") ;
 
@@ -2564,17 +2484,17 @@ void	close_timer_test(struct test_context *ctx)
 	    *         Set 'loop' Optns      *
 	    ********************************/
 
-    ioc.ic_cmd = LOOP_MSGLVL;	/* set queue message level */
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
 
-    arg = 2;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_cmd 	  = LOOP_MSGLVL ;		/* set queue message level */
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
+
+    arg = 2 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_MSGLVL: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl LOOP_MSGLVL: %s\n", STRERROR(-rslt)) ;
     }
 
 	    /********************************
@@ -2594,8 +2514,9 @@ void	close_timer_test(struct test_context *ctx)
 	    *         Close Files           * 
 	    ********************************/
 
-    user_close(fd1);
-    user_close(fd2);
+    user_close(fd1) ;
+    user_close(fd2) ;
+
 
 	    /********************************
 	    *         Open Files            * 
@@ -2609,27 +2530,26 @@ void	close_timer_test(struct test_context *ctx)
 	    *         Set 'loop' Optns      *
 	    ********************************/
 
-    ioc.ic_cmd = LOOP_MSGLVL;	/* set queue message level */
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
 
-    arg = 2;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_cmd 	  = LOOP_MSGLVL ;		/* set queue message level */
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
+
+    arg = 2 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_MSGLVL: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl LOOP_MSGLVL: %s\n", STRERROR(-rslt)) ;
     }
 
-    ioc.ic_cmd = LOOP_TIMR;	/* set timer for queue */
-    arg = 10;			/* # timer ticks */
-    ioc.ic_len = sizeof(int);
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_cmd 	  = LOOP_TIMR ;		/* set timer for queue */
+    arg = 10 ;				/* # timer ticks */
+    ioc.ic_len	  = sizeof(int) ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_TIMR: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl LOOP_TIMR: %s\n", STRERROR(-rslt)) ;
     }
 
 	    /********************************
@@ -2649,10 +2569,10 @@ void	close_timer_test(struct test_context *ctx)
 	    *         Close Files           * 
 	    ********************************/
 
-    user_close(fd1);
-    user_close(fd2);
+    user_close(fd1) ;
+    user_close(fd2) ;
 
-}				/* close_timer_test */
+} /* close_timer_test */
 
 /************************************************************************
 *                          check_getmsg_rslts                           *
@@ -2673,7 +2593,7 @@ void	check_getmsg_rslts(struct test_context *ctx,
 			   int		  band,
 			   int		  rband)
 {
-    (void) rslt;
+    (void) rslt ;
 
     if (rd_ctlp != NULL && rd_ctlp->len != ctx->wr_ctl.len)
     {
@@ -2726,7 +2646,7 @@ void	check_getmsg_rslts(struct test_context *ctx,
 	tprint("check_getmsg_rslts: sent on band %d, received on band %d\n",
 		band, rband) ;
 
-}				/* check_getmsg_rslts */
+} /* check_getmsg_rslts */
 
 /************************************************************************
 *                             do_get_put                                *
@@ -2759,13 +2679,12 @@ void	do_get_put(struct test_context *ctx, int putfd, int getfd,
 
     if (nread_wait_msgs(getfd, 1) != 1)
     {
-	print("do_get_put: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "do_get_put: message failed to appear\n") ;
     }
-    rslt = user_getpmsg(getfd, &rd_ctl, &rd_dta, &rband, &flags) ;
-    check_getmsg_rslts(rslt, &rd_ctl, &rd_dta, &flags, band, rband) ;
+    rslt = user_getpmsg(getfd, &ctx->rd_ctl, &ctx->rd_dta, &rband, &flags) ;
+    check_getmsg_rslts(ctx, rslt, &ctx->rd_ctl, &ctx->rd_dta, &flags, band, rband) ;
 
-}				/* do_get_put */
+} /* do_get_put */
 
 /************************************************************************
 *                           do_put                                      *
@@ -2776,14 +2695,14 @@ void	do_get_put(struct test_context *ctx, int putfd, int getfd,
 ************************************************************************/
 void	do_put(struct test_context *ctx, int putfd, int ctl_lgth, int data_lgth, int band)
 {
-    int             flags = MSG_ANY;
+    int		flags = MSG_ANY;
 
     (void) flags ;			/* compiler happiness */
     ctx->wr_ctl.len	= ctl_lgth ;
     ctx->wr_dta.len	= data_lgth ;
     if (put_msg(putfd, &ctx->wr_ctl, &ctx->wr_dta, band, MSG_BAND) < 0) FAIL("%s", "put_msg\n") ;
 
-}				/* do_put */
+} /* do_put */
 
 /************************************************************************
 *                              do_peek                                  *
@@ -2827,14 +2746,12 @@ void	do_peek_fcn(struct test_context *ctx, int putfd, int getfd,
 
     if (nread_wait_msgs(getfd, msgs) != msgs)
     {
-	print("loop.1: %d message(s) failed to appear\n", msgs) ;
-	xit() ;
+	FAIL("loop.1: %d message(s) failed to appear\n", msgs) ;
     }
-    rslt = user_ioctl(getfd, I_PEEK, &pk_str) ;
+    rslt = user_ioctl(getfd, I_PEEK, &ctx->pk_str) ;
     if (rslt < 0)
     {
-	print("do_peek: ioctl I_PEEK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("do_peek: ioctl I_PEEK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("do_peek: maxlen    len  I_PEEK returned %d\n", rslt) ;
@@ -2846,12 +2763,12 @@ void	do_peek_fcn(struct test_context *ctx, int putfd, int getfd,
     if (rd_ctl_lgth >= wr_ctl_lgth)
 	ctlp = &ctx->pk_str.ctlbuf ;
     else
-	ctlp = NULL;
+	ctlp = NULL ;
 
     if (rd_data_lgth >= wr_data_lgth)
 	dtap = &ctx->pk_str.databuf ;
     else
-	dtap = NULL;
+	dtap = NULL ;
 
     check_getmsg_rslts(ctx, rslt, ctlp, dtap, &flags, 0, 0) ;
 
@@ -2867,7 +2784,7 @@ void	do_peek_fcn(struct test_context *ctx, int putfd, int getfd,
     else
 	ctx->rd_dta.maxlen	= -1 ;
 
-    flags = 0;
+    flags		= 0 ;
 
     memset(ctx->rdctlbuf, 0, sizeof(ctx->rdctlbuf)) ;
     memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
@@ -2876,7 +2793,7 @@ void	do_peek_fcn(struct test_context *ctx, int putfd, int getfd,
     rslt = user_getpmsg(getfd, &ctx->rd_ctl, &ctx->rd_dta, &rband, &flags) ;
     check_getmsg_rslts(ctx, rslt, &ctx->rd_ctl, &ctx->rd_dta, &flags, band, rband) ;
 
-}				/* do_peek */
+} /* do_peek */
 
 /************************************************************************
 *                              do_peek                                  *
@@ -2894,7 +2811,7 @@ void	do_peek(struct test_context *ctx, int putfd, int getfd,
     do_peek_fcn(ctx, putfd, getfd, ctl_lgth, data_lgth,
 			sizeof(ctx->rdctlbuf), sizeof(ctx->rdbuf), band) ;
 
-}				/* do_peek */
+} /* do_peek */
 
 /************************************************************************
 *                            putmsg_test                                *
@@ -2905,15 +2822,15 @@ void	do_peek(struct test_context *ctx, int putfd, int getfd,
 ************************************************************************/
 void	putmsg_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             rslt;
-    int             lgth;
-    int             lgth2;
-    int             arg;
-    int             flags;
-    int             rband;
-    struct strioctl ioc;
+    int			fd1 ;
+    int			fd2 ;
+    int			rslt ;
+    int			lgth ;
+    int			lgth2 ;
+    int			arg ;
+    int			flags ;
+    int			rband ;
+    struct strioctl	ioc ;
 
     tprint("%s", "putmsg/getmsg test\n") ;
 
@@ -2935,17 +2852,15 @@ void	putmsg_test(struct test_context *ctx)
     ctx->wr_dta.len	= lgth ;
     if (put_msg(fd1, &ctx->wr_ctl, &ctx->wr_dta, 0, MSG_BAND) < 0) FAIL("%s", "put_msg\n") ;
 
-    memset(rdbuf, 0, sizeof(rdbuf)) ;
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: message failed to appear\n") ;
     }
-    rslt = user_read(fd2, rdbuf, lgth);
+    rslt = user_read(fd2, ctx->rdbuf, lgth);
     if (rslt < 0)
     {
-	print("loop_clone.2: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth)
@@ -2972,15 +2887,14 @@ void	putmsg_test(struct test_context *ctx)
     ctx->wr_dta.len	= lgth ;			/* from before */
     if (put_msg(fd1, &ctx->wr_ctl, &ctx->wr_dta, 0, MSG_BAND) < 0) FAIL("%s", "put_msg\n") ;
 
-    memset(rdbuf, 0, sizeof(rdbuf)) ;
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: message failed to appear\n") ;
     }
-    rslt = user_read(fd2, rdbuf, lgth);
+    rslt = user_read(fd2, ctx->rdbuf, lgth);
     if (rslt < 0)
-	print("loop_clone.2: read returned expected error: %s\n", strerror(ENO(rslt))) ;
+	ERR("loop_clone.2: read returned expected error: %s\n", STRERROR(-rslt)) ;
     else
     {
 	FAIL("loop_clone.2:  read returned %d, but expected error rtn\n",
@@ -3046,21 +2960,21 @@ void	putmsg_test(struct test_context *ctx)
 
     tprint("%s", "Use putmsg to send data, use getmsg to read back data\n") ;
 
-    ioc.ic_timout = 10;
-    ioc.ic_dp = NULL;
-    ioc.ic_cmd = LOOP_PUTNXT;	/* use putnxt rather then svcq */
-    ioc.ic_len = 0;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_timout = 10 ;
+    ioc.ic_dp	  = NULL;
+    ioc.ic_cmd 	  = LOOP_PUTNXT ;		/* use putnxt rather then svcq */
+    ioc.ic_len	  = 0 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
-    ioc.ic_len = 0;
-    rslt = user_ioctl(fd2, I_STR, &ioc);
+    ioc.ic_len	  = 0 ;
+    rslt = user_ioctl(fd2, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "Peek with no message present\n") ;
@@ -3114,7 +3028,7 @@ void	putmsg_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_CONCAT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_CONCAT: %s\n", STRERROR(-rslt)) ;
     }
 
     strcpy(ctx->buf, "Test data for putmsg/getmsg") ;
@@ -3138,14 +3052,12 @@ void	putmsg_test(struct test_context *ctx)
     rband = 0 ;
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: messages failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: messages failed to appear\n") ;
     }
-    rslt = user_getpmsg(fd2, &rd_ctl, &rd_dta, &rband, &flags) ;
+    rslt = user_getpmsg(fd2, &ctx->rd_ctl, &ctx->rd_dta, &rband, &flags) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: getpmsg: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: getpmsg: %s\n", STRERROR(-rslt)) ;
     }
 
     if (ctx->rd_ctl.len != -1)
@@ -3183,7 +3095,7 @@ void	putmsg_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_CONCAT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_CONCAT: %s\n", STRERROR(-rslt)) ;
     }
 
     strcpy(ctx->ctlbuf, "Control message") ;
@@ -3207,14 +3119,12 @@ void	putmsg_test(struct test_context *ctx)
     rband = 0 ;
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: message failed to appear\n") ;
     }
-    rslt = user_getpmsg(fd2, &rd_ctl, &rd_dta, &rband, &flags) ;
+    rslt = user_getpmsg(fd2, &ctx->rd_ctl, &ctx->rd_dta, &rband, &flags) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: getpmsg: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: getpmsg: %s\n", STRERROR(-rslt)) ;
     }
 
     if (ctx->rd_dta.len != -1)
@@ -3251,7 +3161,7 @@ void	putmsg_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_CONCAT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_CONCAT: %s\n", STRERROR(-rslt)) ;
     }
 
     strcpy(ctx->ctlbuf, "Control message") ;
@@ -3280,14 +3190,12 @@ void	putmsg_test(struct test_context *ctx)
     rband = 0 ;
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: messages failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: messages failed to appear\n") ;
     }
-    rslt = user_getpmsg(fd2, &rd_ctl, &rd_dta, &rband, &flags) ;
+    rslt = user_getpmsg(fd2, &ctx->rd_ctl, &ctx->rd_dta, &rband, &flags) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: getpmsg: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: getpmsg: %s\n", STRERROR(-rslt)) ;
     }
 
     if (ctx->rd_dta.len != 3*lgth)
@@ -3328,7 +3236,7 @@ void	putmsg_test(struct test_context *ctx)
     user_close(fd1) ;
     user_close(fd2) ;
 
-}				/* putmsg_test */
+} /* putmsg_test */
 
 /************************************************************************
 *                            poll_test                                  *
@@ -3342,35 +3250,24 @@ char	*poll_events(short events, char *ascii_events)
 {
     ascii_events[0] = 0 ;
 
-    if (events & POLLIN)
-	strcat(ascii_events, "POLLIN ");
-    if (events & POLLRDNORM)
-	strcat(ascii_events, "POLLRDNORM ");
-    if (events & POLLRDBAND)
-	strcat(ascii_events, "POLLRDBAND ");
-    if (events & POLLPRI)
-	strcat(ascii_events, "POLLPRI ");
-    if (events & POLLOUT)
-	strcat(ascii_events, "POLLOUT ");
-    if (events & POLLWRNORM)
-	strcat(ascii_events, "POLLWRNORM ");
-    if (events & POLLWRBAND)
-	strcat(ascii_events, "POLLWRBAND ");
-    if (events & POLLMSG)
-	strcat(ascii_events, "POLLMSG ");
-    if (events & POLLERR)
-	strcat(ascii_events, "POLLERR ");
-    if (events & POLLHUP)
-	strcat(ascii_events, "POLLHUP ");
-    if (events & POLLNVAL)
-	strcat(ascii_events, "POLLNVAL ");
+    if (events & POLLIN) strcat(ascii_events, "POLLIN ") ;
+    if (events & POLLRDNORM) strcat(ascii_events, "POLLRDNORM ") ;
+    if (events & POLLRDBAND) strcat(ascii_events, "POLLRDBAND ") ;
+    if (events & POLLPRI) strcat(ascii_events, "POLLPRI ") ;
+    if (events & POLLOUT) strcat(ascii_events, "POLLOUT ") ;
+    if (events & POLLWRNORM) strcat(ascii_events, "POLLWRNORM ") ;
+    if (events & POLLWRBAND) strcat(ascii_events, "POLLWRBAND ") ;
+    if (events & POLLMSG) strcat(ascii_events, "POLLMSG ") ;
+    if (events & POLLERR) strcat(ascii_events, "POLLERR ") ;
+    if (events & POLLHUP) strcat(ascii_events, "POLLHUP ") ;
+    if (events & POLLNVAL) strcat(ascii_events, "POLLNVAL ") ;
 
     if (ascii_events[0] == 0)
-	sprintf(ascii_events, "0x%x", events);
+	sprintf(ascii_events, "0x%x", events) ;
 
-    return (ascii_events);
+    return(ascii_events) ;
 
-}				/* poll_events */
+} /* poll_events */
 
 void	poll_test(struct test_context *ctx)
 {
@@ -3392,8 +3289,7 @@ void	poll_test(struct test_context *ctx)
     rslt = user_poll(fds, 0, 50) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
     else
 	tprint("Poll returned %d\n", rslt) ;
@@ -3417,20 +3313,20 @@ void	poll_test(struct test_context *ctx)
     ctx->wr_dta.len	= lgth ;
     if (put_msg(fd1, &ctx->wr_ctl, &ctx->wr_dta, 0, MSG_BAND) < 0) FAIL("%s", "put_msg\n") ;
 
-    fds[0].fd = fd1;		/* writing fd */
-    fds[0].events = 0;		/* no events */
-    fds[0].revents = 0;		/* returned events */
-    fds[1].fd = fd2;		/* reading fd */
-    fds[1].events = POLLIN;
-    fds[1].revents = 0;		/* returned events */
+    fds[0].fd		= fd1 ;		/* writing fd */
+    fds[0].events	= 0 ;		/* no events */
+    fds[0].revents	= 0 ;		/* returned events */
+    fds[1].fd		= fd2 ;		/* reading fd */
+    fds[1].events	= POLLIN ;
+    fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 1)
+    else
+    if (rslt != 1)
     {
 	tprint("Poll returned %d, expected 1\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3453,13 +3349,13 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLRDNORM ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 1)
+    else
+    if (rslt != 1)
     {
 	tprint("Poll returned %d, expected 1\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3482,13 +3378,13 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLRDBAND ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 0)
+    else
+    if (rslt != 0)
     {
 	tprint("Poll returned %d, expected 0\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3511,13 +3407,13 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLPRI ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 0)
+    else
+    if (rslt != 0)
     {
 	tprint("Poll returned %d, expected 0\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3539,8 +3435,7 @@ void	poll_test(struct test_context *ctx)
     rslt = user_read(fd2, ctx->rdbuf, lgth);
     if (rslt < 0)
     {
-	print("loop_clone.2: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth)
@@ -3575,13 +3470,13 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLIN ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 0)
+    else
+    if (rslt != 0)
     {
 	tprint("Poll returned %d, expected 0\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3607,10 +3502,10 @@ void	poll_test(struct test_context *ctx)
     rslt = user_poll(fds, 2, 100);
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 0)
+    else
+    if (rslt != 0)
     {
 	tprint("Poll returned %d, expected 0\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3633,13 +3528,13 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLRDBAND ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 0)
+    else
+    if (rslt != 0)
     {
 	tprint("Poll returned %d, expected 0\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3662,11 +3557,10 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLPRI ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
     else if (rslt != 1)
     {
@@ -3692,13 +3586,13 @@ void	poll_test(struct test_context *ctx)
     fds[1].events	= POLLPRI ;
     fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 2)
+    else
+    if (rslt != 2)
     {
 	tprint("Poll returned %d, expected 2\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3730,33 +3624,32 @@ void	poll_test(struct test_context *ctx)
 
     tprint("%s", "Poll for high priority message with delayed delivery\n") ;
 
-    ioc.ic_cmd = LOOP_TIMR;	/* set timer for queue */
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = LOOP_TIMR ;		/* set timer for queue */
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    arg = 50;			/* # timer ticks */
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    arg = 50 ;				/* # timer ticks */
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop.1: ioctl LOOP_TIMR: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.1: ioctl LOOP_TIMR: %s\n", STRERROR(-rslt)) ;
     }
 
     if (put_msg(fd1, &ctx->wr_ctl, &ctx->wr_dta, 0, MSG_HIPRI) < 0) FAIL("%s", "put_msg\n") ;
 
-    fds[0].events = 0;
-    fds[0].revents = 0;		/* returned events */
-    fds[1].events = POLLPRI;
-    fds[1].revents = 0;		/* returned events */
+    fds[0].events	= 0 ;
+    fds[0].revents	= 0 ;		/* returned events */
+    fds[1].events	= POLLPRI ;
+    fds[1].revents	= 0 ;		/* returned events */
 
-    rslt = user_poll(fds, 2, 100);
+    rslt = user_poll(fds, 2, 100) ;
     if (rslt < 0)
     {
-	print("poll: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("poll: %s\n", STRERROR(-rslt)) ;
     }
-    else if (rslt != 1)
+    else
+    if (rslt != 1)
     {
 	tprint("Poll returned %d, expected 1\n", rslt) ;
 	tprint("fds[0].events  = %s\n", poll_events(fds[0].events, ascii_events)) ;
@@ -3794,7 +3687,8 @@ void	poll_test(struct test_context *ctx)
     user_close(fd1) ;
     user_close(fd2) ;
 
-}				/* poll_test */
+
+} /* poll_test */
 
 /************************************************************************
 *                             mux_test                                  *
@@ -3822,7 +3716,6 @@ void	mux_test(struct test_context *ctx)
 
     tprint("%s", "STREAMS multiplexor test\n") ;
 
-    print("\nSTREAMS multiplexor test\n");
 
 	    /********************************
 	    *         Open Files            * 
@@ -3831,17 +3724,17 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd1                 muxfd2       fd1  fd2
-     *                |                       |          |    |
-     *          +-----------+           +-----------+    X    X
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd1		   muxfd2	fd1  fd2
+     *		      |			      |		 |    |
+     *		+-----------+		+-----------+    X    X
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd1 and muxfd2 are the control streams for the multiplxor.
      * When they are closed the whole mux is dismantled.
@@ -3856,24 +3749,21 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: open another mux-clone device\n") ;
     muxfd2 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: I_LINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_LINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -3882,8 +3772,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd2, I_LINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -3917,23 +3806,23 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd3                 muxfd4       fd1  fd2 muxfd1 muxfd2
-     *                |                       |          |    |     |      |
-     *          +-----------+           +-----------+    X    X     X      X
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid3                | muxid4
-     *                |                       |
-     *                | (muxfd1)              | (muxfd2)
-     *          +-----------+           +-----------+
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd3		   muxfd4	fd1  fd2 muxfd1 muxfd2
+     *		      |			      |		 |    |     |      |
+     *		+-----------+		+-----------+    X    X     X      X
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid3		      | muxid4
+     *		      |			      |
+     *		      |	(muxfd1)	      | (muxfd2)
+     *		+-----------+		+-----------+
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd3 and muxfd4 are the control streams for the upper level of
      * the mux.  muxfd1 and muxfd2 are also control streams but for the
@@ -3951,24 +3840,21 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: open another mux-clone device\n") ;
     muxfd2 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: I_LINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_LINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -3977,8 +3863,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd2, I_LINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -3987,24 +3872,21 @@ void	mux_test(struct test_context *ctx)
     muxfd3 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd3 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd3))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd3)) ;
     }
 
     tprint("%s", "mux_test: open another mux-clone device to cascade\n") ;
     muxfd4 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd4 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd4))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd4)) ;
     }
 
     tprint("%s", "mux_test: I_LINK mux driver under mux (muxfd3->muxfd1)\n") ;
     muxid3 = user_ioctl(muxfd3, I_LINK, muxfd1) ; /* link muxfd1 below muxfd3 */
     if (muxid3 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid3))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid3)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid3) ;
@@ -4013,8 +3895,7 @@ void	mux_test(struct test_context *ctx)
     muxid4 = user_ioctl(muxfd4, I_LINK, muxfd2) ; /* link muxfd2 below muxfd4 */
     if (muxid4 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid4))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid4)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid4) ;
@@ -4049,17 +3930,17 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd1                              fd1  fd2
-     *                |                                  |    |
-     *          +-----------------------------------+    X    X
-     *          |               mini-mux            |
-     *          +-----------------------------------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd1		         	fd1  fd2
+     *		      |			      		 |    |
+     *		+-----------------------------------+    X    X
+     *		|               mini-mux            |
+     *		+-----------------------------------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd1 is the control stream for the multiplxor.
      * When they it is closed the whole mux is dismantled.
@@ -4071,10 +3952,6 @@ void	mux_test(struct test_context *ctx)
      * fd1 and fd1 can be closed with no impact on the multiplexor.
      */
 
-    print("\nTest 2 lowers under one control stream\n");
-    rslt = open_clones(&fd1, &fd2);
-    if (rslt < 0)
-	xit();
 
     tprint("%s", "Test 2 lowers under one control stream\n") ;
     rslt = open_clones(&fd1, &fd2) ;
@@ -4084,16 +3961,14 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: I_LINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_LINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -4102,8 +3977,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd1, I_LINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -4113,27 +3987,25 @@ void	mux_test(struct test_context *ctx)
     user_close(fd1) ;
     user_close(fd2) ;
 
-    ioc.ic_cmd = MINIMUX_DOWN;	/* set downstream linkage */
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(int);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = MINIMUX_DOWN ;	/* set downstream linkage */
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(int) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    arg = muxid1;		/* downstream muxfd1 -> muxid1 */
-    rslt = user_ioctl(muxfd1, I_STR, &ioc);
+    arg = muxid1 ;			/* downstream muxfd1 -> muxid1 */
+    rslt = user_ioctl(muxfd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("minimux.1: ioctl MINIMUX_DOWN: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux.1: ioctl MINIMUX_DOWN: %s\n", STRERROR(-rslt)) ;
     }
 
-    ioc.ic_cmd = MINIMUX_UP;	/* set upstream linkage */
-    arg = muxid2;		/* upstream muxfd1 <- muxid2 */
-    ioc.ic_len = sizeof(int);
-    rslt = user_ioctl(muxfd1, I_STR, &ioc);
+    ioc.ic_cmd 	  = MINIMUX_UP ;	/* set upstream linkage */
+    arg = muxid2 ;			/* upstream muxfd1 <- muxid2 */
+    ioc.ic_len	  = sizeof(int) ;
+    rslt = user_ioctl(muxfd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("minimux.1: ioctl MINIMUX_UP: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux.1: ioctl MINIMUX_UP: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: send data down through the mux/loop and read back\n") ;
@@ -4156,17 +4028,17 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd1                 muxfd2       fd1  fd2
-     *                |                       |          |    |
-     *          +-----------+           +-----------+    X    X
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd1		   muxfd2	fd1  fd2
+     *		      |			      |		 |    |
+     *		+-----------+		+-----------+    X    X
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd1 and muxfd2 are the control streams for the multiplxor.
      * When they are closed the whole mux is dismantled.
@@ -4183,24 +4055,21 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: open another mux-clone device\n") ;
     muxfd2 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: I_LINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_LINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -4209,8 +4078,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd2, I_LINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_LINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_LINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -4228,16 +4096,14 @@ void	mux_test(struct test_context *ctx)
     rslt = user_ioctl(muxfd1, I_UNLINK, muxid1) ;
     if (rslt < 0)
     {
-	print("minimux: I_UNLINK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_UNLINK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: I_UNLINK muxid2 from muxfd2\n") ;
     rslt = user_ioctl(muxfd2, I_UNLINK, muxid2) ;
     if (rslt < 0)
     {
-	print("minimux: I_UNLINK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_UNLINK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: send data down through the loop and read back\n") ;
@@ -4263,17 +4129,17 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd1                 muxfd2       fd1  fd2
-     *                |                       |          |    |
-     *          +-----------+           +-----------+    X    X
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd1		   muxfd2	fd1  fd2
+     *		      |			      |		 |    |
+     *		+-----------+		+-----------+    X    X
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd1 and muxfd2 are the control streams for the multiplxor.
      *
@@ -4292,24 +4158,21 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_1, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: open a mux-clone device\n") ;
     muxfd2 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: I_PLINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_PLINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_PLINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_PLINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -4318,8 +4181,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd2, I_PLINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_PLINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_PLINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -4339,8 +4201,7 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_1, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print("mux_clone: %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL("mux_clone: %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: I_PUNLINK muxid1 from muxfd1\n") ;
@@ -4348,8 +4209,7 @@ void	mux_test(struct test_context *ctx)
     rslt = user_ioctl(muxfd1, I_PUNLINK, muxid1) ;
     if (rslt < 0)
     {
-	print("minimux: I_PUNLINK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_PUNLINK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: stream linkage after I_PUNLINK\n") ;
@@ -4360,8 +4220,7 @@ void	mux_test(struct test_context *ctx)
     rslt = user_ioctl(muxfd2, I_PUNLINK, muxid2) ;
     if (rslt < 0)
     {
-	print("minimux: I_PUNLINK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_PUNLINK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: stream linkage after I_PUNLINK\n") ;
@@ -4390,17 +4249,17 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd1                 muxfd2       fd1  fd2
-     *                |                       |          |    |
-     *          +-----------+           +-----------+    X    X
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd1		   muxfd2	fd1  fd2
+     *		      |			      |		 |    |
+     *		+-----------+		+-----------+    X    X
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd1 and muxfd2 are the control streams for the multiplxor.
      *
@@ -4419,24 +4278,21 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_1, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print(MUX_1 ": %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL(MUX_1 ": %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: open minimux.2\n") ;
     muxfd2 = user_open(MUX_2, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print(MUX_2 ": %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL(MUX_2 ": %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: I_PLINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_PLINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_PLINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_PLINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -4445,8 +4301,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd2, I_PLINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_PLINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_PLINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -4462,24 +4317,22 @@ void	mux_test(struct test_context *ctx)
 
     tprint("%s", "mux_test: close mux streams\n") ;
 
-    user_close(muxfd1);
-    user_close(muxfd2);
+    user_close(muxfd1) ;
+    user_close(muxfd2) ;
 
     tprint("%s", "mux_test: re-open first mux-clone stream\n") ;
     tprint("%s", "mux_test: re-open minimux.1\n") ;
     muxfd1 = user_open(MUX_1, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print(MUX_1 ": %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL(MUX_1 ": %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: re-open minimux.2\n") ;
     muxfd2 = user_open(MUX_2, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print(MUX_2 ": %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL(MUX_2 ": %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: print mux topology\n") ;
@@ -4496,16 +4349,14 @@ void	mux_test(struct test_context *ctx)
     rslt = user_ioctl(muxfd1, I_PUNLINK, muxid1) ;
     if (rslt < 0)
     {
-	print("minimux: I_PUNLINK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_PUNLINK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: I_PUNLINK muxid2 from muxfd2\n") ;
     rslt = user_ioctl(muxfd2, I_PUNLINK, muxid2) ;
     if (rslt < 0)
     {
-	print("minimux: I_PUNLINK: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_PUNLINK: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "mux_test: send data down through the loop and read back\n") ;
@@ -4530,17 +4381,17 @@ void	mux_test(struct test_context *ctx)
     /*
      * Here is what we are building:
      *
-     *              muxfd1                 muxfd2       fd1  fd2
-     *                |                       |          |    |
-     *          +-----------+           +-----------+    X    X
-     *          |  mini-mux |           |  mini-mux |
-     *          +-----------+           +-----------+
-     *                | muxid1                | muxid2
-     *                |                       |
-     *                | (fd1)                 | (fd2)
-     *          +-----------+           +-----------+
-     *          |    loop   |<--------->|    loop   |
-     *          +-----------+           +-----------+
+     *     	    muxfd1		   muxfd2	fd1  fd2
+     *		      |			      |		 |    |
+     *		+-----------+		+-----------+    X    X
+     *		|  mini-mux |		|  mini-mux |
+     *		+-----------+		+-----------+
+     *		      | muxid1		      | muxid2
+     *		      |			      |
+     *		      | (fd1)		      | (fd2)
+     *		+-----------+		+-----------+
+     *		|    loop   |<--------->|    loop   |
+     *		+-----------+		+-----------+
      *
      * muxfd1 and muxfd2 are the control streams for the multiplxor.
      *
@@ -4561,24 +4412,21 @@ void	mux_test(struct test_context *ctx)
     muxfd1 = user_open(MUX_1, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print(MUX_1 ": %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL(MUX_1 ": %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: open minimux.2\n") ;
     muxfd2 = user_open(MUX_2, O_RDWR, 0) ;
     if (muxfd2 < 0)
     {
-	print(MUX_2 ": %s\n", strerror(ENO(muxfd2))) ;
-	xit() ;
+	FAIL(MUX_2 ": %s\n", STRERROR(-muxfd2)) ;
     }
 
     tprint("%s", "mux_test: I_PLINK loop driver under mux (muxfd1->fd1)\n") ;
     muxid1 = user_ioctl(muxfd1, I_PLINK, fd1) ;	/* link fd1 below muxfd1 */
     if (muxid1 < 0)
     {
-	print("mux_clone: I_PLINK: %s\n", strerror(ENO(muxid1))) ;
-	xit() ;
+	FAIL("mux_clone: I_PLINK: %s\n", STRERROR(-muxid1)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid1) ;
@@ -4587,8 +4435,7 @@ void	mux_test(struct test_context *ctx)
     muxid2 = user_ioctl(muxfd2, I_PLINK, fd2) ;	/* link fd2 below muxfd2 */
     if (muxid2 < 0)
     {
-	print("mux_clone: I_PLINK: %s\n", strerror(ENO(muxid2))) ;
-	xit() ;
+	FAIL("mux_clone: I_PLINK: %s\n", STRERROR(-muxid2)) ;
     }
     else
 	tprint("                   muxid=%d\n", muxid2) ;
@@ -4604,23 +4451,21 @@ void	mux_test(struct test_context *ctx)
 
     tprint("%s", "mux_test: close mux streams\n") ;
 
-    user_close(muxfd1);
-    user_close(muxfd2);
+    user_close(muxfd1) ;
+    user_close(muxfd2) ;
 
     tprint("%s", "mux_test: re-open first mux-clone stream\n") ;
     muxfd1 = user_open(MUX_CLONE, O_RDWR, 0) ;
     if (muxfd1 < 0)
     {
-	print(MUX_1 ": %s\n", strerror(ENO(muxfd1))) ;
-	xit() ;
+	FAIL(MUX_1 ": %s\n", STRERROR(-muxfd1)) ;
     }
 
     tprint("%s", "mux_test: I_PUNLINK MUXID_ALL from mux-clone stream\n") ;
     rslt = user_ioctl(muxfd1, I_PUNLINK, MUXID_ALL) ;
     if (rslt < 0)
     {
-	print("minimux: I_PUNLINK(MUXID_ALL): %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("minimux: I_PUNLINK(MUXID_ALL): %s\n", STRERROR(-rslt)) ;
     }
 
 	    /********************************
@@ -4635,7 +4480,7 @@ void	mux_test(struct test_context *ctx)
     user_close(fd2) ;
 
 
-}				/* mux_test */
+} /* mux_test */
 
 /************************************************************************
 *                           clone_test                                  *
@@ -4647,12 +4492,12 @@ void	mux_test(struct test_context *ctx)
 ************************************************************************/
 void	clone_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             fd3;
-    int             fd4;
-    int             fd5;
-    int             rslt;
+    int			fd1 ;
+    int			fd2 ;
+    int			fd3 ;
+    int			fd4 ;
+    int			fd5 ;
+    int			rslt ;
 
     tprint("%s", "clone open test\n") ;
 
@@ -4676,11 +4521,11 @@ void	clone_test(struct test_context *ctx)
     user_print_inodes() ;
 #endif
 
-    user_close(fd1);
-    user_close(fd2);
-    user_close(fd3);
-    user_close(fd4);
-    user_close(fd5);
+    user_close(fd1) ;
+    user_close(fd2) ;
+    user_close(fd3) ;
+    user_close(fd4) ;
+    user_close(fd5) ;
 
 #ifdef DIRECT_USER
     tprint("Directory listing after closes\n\n") ;
@@ -4703,11 +4548,11 @@ void	clone_test(struct test_context *ctx)
     user_print_inodes() ;
 #endif
 
-    user_close(fd1);
-    user_close(fd2);
-    user_close(fd3);
-    user_close(fd4);
-    user_close(fd5);
+    user_close(fd1) ;
+    user_close(fd2) ;
+    user_close(fd3) ;
+    user_close(fd4) ;
+    user_close(fd5) ;
 
 #ifdef DIRECT_USER
     tprint("Directory listing after 2nd round of closes\n\n") ;
@@ -4722,11 +4567,11 @@ void	clone_test(struct test_context *ctx)
 ************************************************************************/
 void bufcall_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             rslt;
-    int             lgth;
-    struct strioctl ioc;
+    int			fd1 ;
+    int			fd2 ;
+    int			rslt ;
+    int			lgth ;
+    struct strioctl	ioc ;
 
     tprint("%s", "bufcall test\n") ;
 
@@ -4748,14 +4593,14 @@ void bufcall_test(struct test_context *ctx)
      * Tell the loop driver to use bufcall to drive the service
      * queue enable.
      */
-    ioc.ic_timout = 10;
-    ioc.ic_dp = NULL;
-    ioc.ic_cmd = LOOP_BUFCALL;	/* use bufcall to enable svcq */
-    ioc.ic_len = 0;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_timout = 10 ;
+    ioc.ic_dp	  = NULL;
+    ioc.ic_cmd 	  = LOOP_BUFCALL ;	/* use bufcall to enable svcq */
+    ioc.ic_len	  = 0 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_BUFCALL: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_BUFCALL: %s\n", STRERROR(-rslt)) ;
     }
 
     strcpy(ctx->buf, "Test data for bufcall putmsg/read") ;
@@ -4764,19 +4609,17 @@ void bufcall_test(struct test_context *ctx)
     ctx->wr_dta.len	= lgth ;
     if (put_msg(fd1, &ctx->wr_ctl, &ctx->wr_dta, 0, MSG_BAND) < 0) FAIL("%s", "put_msg\n") ;
 
-    memset(rdbuf, 0, sizeof(rdbuf)) ;
+    memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
 #ifndef DIRECT_USER
     if (nread_wait_msgs(fd2, 1) != 1)
     {
-	print("loop.2: message failed to appear\n") ;
-	xit() ;
+	FAIL("%s", "loop.2: message failed to appear\n") ;
     }
 #endif
-    rslt = user_read(fd2, rdbuf, lgth);
+    rslt = user_read(fd2, ctx->rdbuf, lgth);
     if (rslt < 0)
     {
-	print("loop_clone.2: read: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop_clone.2: read: %s\n", STRERROR(-rslt)) ;
     }
 
     if (rslt != lgth)
@@ -4805,19 +4648,18 @@ void bufcall_test(struct test_context *ctx)
     user_close(fd1) ;
     user_close(fd2) ;
 
-}				/* bufcall_test */
+} /* bufcall_test */
 
 /************************************************************************
 *                           sad_vml_test                                *
 ************************************************************************/
 int sad_vml_test(struct test_context *ctx, int fd, struct str_list *list)
 {
-    int             rslt;
+	int rslt;
 
 	rslt = user_ioctl(fd, SAD_VML, list);
 	if (rslt < 0) {
-		print("sad_vml_test: SAD_VML ioctl failed: %s\n", strerror(ENO(rslt)));
-		xit();
+		FAIL("sad_vml_test: SAD_VML ioctl failed: %s\n", STRERROR(-rslt));
 	}
 	return rslt;
 }
@@ -4827,35 +4669,32 @@ int sad_vml_test(struct test_context *ctx, int fd, struct str_list *list)
 ************************************************************************/
 void autopush_test(struct test_context *ctx)
 {
-    int             fd;
-    int             rslt;
+	int	fd ;
+	int	rslt ;
 
-    print("\nSTREAMS Auto-Push test\n");
+	print("\nSTREAMS Auto-Push test\n");
 
 	print("autopush_test: open loop.9 w/autopush relay module\n");
 	fd = user_open(LOOP_9, O_RDWR, 0);
 	if (fd < 0) {
-		print("autopush_test: loop.9 open: %s\n", strerror(ENO(fd)));
-		xit();
+		FAIL("autopush_test: loop.9 open: %s\n", STRERROR(fd));
 	}
 
 	rslt = user_ioctl(fd, I_FIND, "relay") ;
 	if (rslt < 0)
 	{
-	    print("loop.9: I_FIND: %s\n", strerror(ENO(rslt))) ;
-	    xit() ;
+	    FAIL("loop.9: I_FIND: %s\n", STRERROR(rslt));
 	}
 
-    if (rslt > 0)
-	print("Module \"relay\" is present in the stream\n");
-    else
-    {
-	print("Error: module \"relay\" is not present in the stream\n");
-	xit();
-    }
+	if (rslt > 0)
+	    tprint("%s", "Module \"relay\" is present in the stream\n");
+	else
+	{
+      	    FAIL("%s", "Error: module \"relay\" is not present in the stream\n");
+	}
 
-    print("autopush_test: closing files\n");
-    user_close(fd);
+	print("autopush_test: closing files\n");
+	user_close(fd) ;
 }
 
 /************************************************************************
@@ -4874,8 +4713,7 @@ void sad_test(struct test_context *ctx)
 	tprint("%s", "sad_test: open a sad device\n");
 	fd = user_open(SAD_CLONE, O_RDWR, 0);
 	if (fd < 0) {
-		print("sad_test: SAD driver open: %s\n", strerror(ENO(fd)));
-		xit();
+		FAIL("sad_test: SAD driver open: %s\n", STRERROR(-fd));
 	}
 
 
@@ -4934,8 +4772,7 @@ void sad_test(struct test_context *ctx)
 	if (-rslt == ENODEV)
 		tprint("sad_test: Autopush is unconfigured for loop minor 1.\n");
 	else {
-		print("sad_test: SAD_GAP ioctl failed: %s\n", strerror(ENO(rslt)));
-		xit();
+		FAIL("sad_test: SAD_GAP ioctl failed: %s\n", STRERROR(-rslt));
 	}
 #else
 	if (errno == ENODEV)
@@ -4954,21 +4791,18 @@ void sad_test(struct test_context *ctx)
 	strcpy(apush.sap_list[1], "relay2");
 	rslt = user_ioctl(fd, SAD_SAP, &apush);
 	if (rslt < 0) {
-		print("sad_test: SAD_SAP ioctl failed: %s\n", strerror(ENO(rslt)));
-		xit();
+		FAIL("sad_test: SAD_SAP ioctl failed: %s\n", STRERROR(-rslt));
 	}
 
 	/* Test autopush */
 	fd2 = user_open(LOOP_1, O_RDWR, 0);
 	if (fd2 < 0) {
-		print("sad_test: loop driver open: %s\n", strerror(ENO(fd)));
-		xit();
+		FAIL("sad_test: loop driver open: %s\n", STRERROR(-fd));
 	}
 	list.sl_nmods = 4;
 	rslt = user_ioctl(fd2, I_LIST, &list);
 	if (rslt < 0) {
-		print("sad_test: I_LIST: %s\n", strerror(ENO(rslt)));
-		xit();
+		FAIL("sad_test: I_LIST: %s\n", STRERROR(-rslt));
 	}
 	if (list.sl_nmods != 3) {
 		tprint("sad_test: loop driver open autopushed %d modules.\n", list.sl_nmods);
@@ -4996,8 +4830,7 @@ void sad_test(struct test_context *ctx)
 	apush.sap_minor = 1;
 	rslt = user_ioctl(fd, SAD_SAP, &apush);
 	if (rslt < 0) {
-		print("sad_test: SAD_SAP ioctl failed: %s\n", strerror(ENO(rslt)));
-		xit();
+		FAIL("sad_test: SAD_SAP ioctl failed: %s\n", STRERROR(-rslt));
 	}
 	
 	/* Check that autopush configuration was removed */
@@ -5012,8 +4845,7 @@ void sad_test(struct test_context *ctx)
 	}
 #ifdef DIRECT_USER
 	if (-rslt != ENODEV) {
-		print("sad_test: SAD_GAP ioctl failed: %s\n", strerror(ENO(rslt)));
-		xit();
+		FAIL("sad_test: SAD_GAP ioctl failed: %s\n", STRERROR(-rslt));
 	}
 #else
 	if (errno != ENODEV) {
@@ -5032,8 +4864,8 @@ void sad_test(struct test_context *ctx)
 ************************************************************************/
 void fifo_test(struct test_context *ctx)
 {
-    int             fd[2];
-    int             i;
+    int fd[2];
+    int i;
     struct user_stat stat;
 
     tprint("%s", "STREAMS-based FIFO/pipe test\n");
@@ -5050,9 +4882,8 @@ void fifo_test(struct test_context *ctx)
     }
     user_close(fd[0]);
     user_close(fd[1]);
-
-    for (i = 0; i < 2; i++)
-    {
+    
+    for (i = 0;  i < 2;  i++) {
 	fd[i] = user_open(FIFO_0, O_RDWR, 0);
 	if (fd[i] < 0) {
 	    FAIL("fifo_test: fifo open: %s\n", STRERROR(errno));
@@ -5148,21 +4979,19 @@ void passfd_test(struct test_context *ctx)
 #define	_M_PROTO	2
 #define	_M_PCPROTO	3
 
-void ck_band(int fd, int band, int expected, int nmsgs)
+void ck_band(struct test_context *ctx, int fd, int band, int expected, int nmsgs)
 {
-    int             rslt;
+    int		rslt ;
 
     if ((rslt = nread_wait_msgs(fd, nmsgs)) < nmsgs)
     {
-	print("loop.2: expected < %d message(s) got %d\n", nmsgs, rslt) ;
-	xit() ;
+	FAIL("loop.2: expected < %d message(s) got %d\n", nmsgs, rslt) ;
     }
 
     rslt = user_ioctl(fd, I_CKBAND, band) ;
     if (rslt < 0)
     {
-	print("ck_band(%d): I_CKBAND: %s\n", band, strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("ck_band(%d): I_CKBAND: %s\n", band, STRERROR(-rslt));
     }
 
     if (rslt == expected)
@@ -5176,13 +5005,13 @@ void ck_band(int fd, int band, int expected, int nmsgs)
 
 void send_band(struct test_context *ctx, int fd, int band, int seq, int mtype)
 {
-    int             flags;
+    int		flags ;
 
-    flags = MSG_BAND;
+    flags = MSG_BAND ;
     if (mtype == _M_PCPROTO)
     {
-	flags = MSG_HIPRI;
-	band = 0;
+	flags = MSG_HIPRI ;
+	band = 0 ;
     }
 
     if (mtype == _M_DATA)
@@ -5202,7 +5031,7 @@ void send_band(struct test_context *ctx, int fd, int band, int seq, int mtype)
 	FAIL("%s", "put_msg\n") ;
 }
 
-int             receive_band_quiet;
+int	receive_band_quiet ;
 
 void receive_band(struct test_context *ctx, int fd, int band, int seq, int mtype)
 {
@@ -5222,43 +5051,33 @@ void receive_band(struct test_context *ctx, int fd, int band, int seq, int mtype
     memset(ctx->rdctlbuf, 0, sizeof(ctx->rdctlbuf)) ;
     memset(ctx->rdbuf, 0, sizeof(ctx->rdbuf)) ;
 
-    nread_wait_msgs(fd, 1) ;
-    rslt = user_getpmsg(fd, &rd_ctl, &rd_dta, &rband, &flags) ;
+    rslt = user_getpmsg(fd, &ctx->rd_ctl, &ctx->rd_dta, &rband, &flags) ;
     if (rslt < 0)
     {
-	print("receive_band(%d): seq=%d %s\n", band, seq, strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("receive_band(%d): %s\n", band, STRERROR(-rslt)) ;
     }
 
     if (band != rband)
     {
-	print("receive_band: seq=%d expected msg on band %d, "
-		"got one on band %d\n",
-		seq, band, rband) ;
-	xit() ;
+	FAIL("receive_band: expected msg on band %d, got one on band %d\n",
+		band, rband) ;
     }
 
     if (mtype == _M_PCPROTO && !(flags & MSG_HIPRI))
     {
-	print("receive_band: seq=%d expected hi-pri msg, "
-		"got normal-pri instead\n", seq);
-	xit() ;
+	FAIL("%s", "receive_band: expected hi-pri msg, got normal-pri instead\n");
     }
 
     if (mtype != _M_PCPROTO && (flags & MSG_HIPRI))
     {
-	print("receive_band: seq=%d expected normal-pri msg, "
-		"got hi-pri instead\n", seq);
-	xit() ;
+	FAIL("%s", "receive_band: expected normal-pri msg, got hi-pri instead\n");
     }
 
     if (mtype == _M_DATA)
     {
 	if (ctx->rd_ctl.len > 0)
 	{
-	    print("receive_band: seq=%d expected M_DATA, "
-		    "got M_PROTO instead\n", seq);
-	    xit() ;
+	    FAIL("%s", "receive_band: expected M_DATA, got M_PROTO instead\n");
 	}
 
 	ptr = ctx->rdbuf ;
@@ -5269,9 +5088,7 @@ void receive_band(struct test_context *ctx, int fd, int band, int seq, int mtype
     {
 	if (ctx->rd_dta.len > 0)
 	{
-	    print("receive_band: seq=%d expected M_PROTO, "
-		    "got M_DATA instead\n", seq);
-	    xit() ;
+	    FAIL("%s", "receive_band: expected M_PROTO, got M_DATA instead\n");
 	}
 
 	ptr = ctx->rdctlbuf ;
@@ -5284,17 +5101,15 @@ void receive_band(struct test_context *ctx, int fd, int band, int seq, int mtype
 
     if (len != lgth)
     {
-	print("receive_band: seq=%d expected %d bytes, "
-		"got %d bytes\n", seq, lgth, len) ;
-	xit() ;
+	FAIL("receive_band: expected %d bytes, got %d bytes\n", lgth, len) ;
     }
 
     if (strcmp(ctx->buf, ptr) != 0)
     {
-	print("receive_band: seq=%d buffer compare error\n", seq) ;
-	print("              wrote \"%s\"\n", buf) ;
-	print("              read  \"%s\"\n", ptr) ;
-	xit() ;
+	tprint("%s", "receive_band: buffer compare error\n") ;
+	tprint("              wrote \"%s\"\n", ctx->buf) ;
+	tprint("              read  \"%s\"\n", ptr) ;
+	FAIL("%s", "\n") ;
     }
 
     if (!receive_band_quiet)
@@ -5324,81 +5139,78 @@ void band_test(struct test_context *ctx)
     rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = user_ioctl(fd2, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
 
-    print("\nband_test: band 0 (easy case)\n") ;
-    send_band(fd1, 0, 1, _M_DATA) ;
-    ck_band(fd2, 0, 1, 1) ;
-    receive_band(fd2, 0, 1, _M_DATA) ;
-    ck_band(fd2, 0, 0, 0) ;
+    tprint("%s", "band_test: band 0 (easy case)\n") ;
+    send_band(ctx, fd1, 0, 1, _M_DATA) ;
+    ck_band(ctx, fd2, 0, 1, 1) ;
+    receive_band(ctx, fd2, 0, 1, _M_DATA) ;
+    ck_band(ctx, fd2, 0, 0, 0) ;
 
-    print("\nband_test: write band 0, 1; read band 1, 0\n") ;
-    send_band(fd1, 0, 2, _M_DATA) ;
-    send_band(fd1, 1, 3, _M_DATA) ;
-    ck_band(fd2, 1, 1, 2) ;
-    receive_band(fd2, 1, 3, _M_DATA) ;
-    ck_band(fd2, 1, 0, 1) ;
-    receive_band(fd2, 0, 2, _M_DATA) ;
+    tprint("%s", "band_test: write band 0, 1; read band 1, 0\n") ;
+    send_band(ctx, fd1, 0, 2, _M_DATA) ;
+    send_band(ctx, fd1, 1, 3, _M_DATA) ;
+    ck_band(ctx, fd2, 1, 1, 2) ;
+    receive_band(ctx, fd2, 1, 3, _M_DATA) ;
+    ck_band(ctx, fd2, 1, 0, 1) ;
+    receive_band(ctx, fd2, 0, 2, _M_DATA) ;
 
-    print("\nband_test: write band 1, 2, 3; read band 3, 2, 1\n") ;
-    send_band(fd1, 1, 4, _M_DATA) ;
-    send_band(fd1, 2, 5, _M_DATA) ;
-    send_band(fd1, 3, 6, _M_DATA) ;
-    ck_band(fd2, 3, 1, 3) ;
-    receive_band(fd2, 3, 6, _M_DATA) ;
-    ck_band(fd2, 3, 0, 2) ;
-    ck_band(fd2, 2, 1, 2) ;
-    receive_band(fd2, 2, 5, _M_DATA) ;
-    ck_band(fd2, 2, 0, 1) ;
-    ck_band(fd2, 1, 1, 1) ;
-    receive_band(fd2, 1, 4, _M_DATA) ;
-    ck_band(fd2, 1, 0, 0) ;
+    tprint("%s", "band_test: write band 1, 2, 3; read band 3, 2, 1\n") ;
+    send_band(ctx, fd1, 1, 4, _M_DATA) ;
+    send_band(ctx, fd1, 2, 5, _M_DATA) ;
+    send_band(ctx, fd1, 3, 6, _M_DATA) ;
+    ck_band(ctx, fd2, 3, 1, 3) ;
+    receive_band(ctx, fd2, 3, 6, _M_DATA) ;
+    ck_band(ctx, fd2, 3, 0, 2) ;
+    ck_band(ctx, fd2, 2, 1, 2) ;
+    receive_band(ctx, fd2, 2, 5, _M_DATA) ;
+    ck_band(ctx, fd2, 2, 0, 1) ;
+    ck_band(ctx, fd2, 1, 1, 1) ;
+    receive_band(ctx, fd2, 1, 4, _M_DATA) ;
+    ck_band(ctx, fd2, 1, 0, 0) ;
 
-    print("\nband_test: write band 1, 3; read band 3, 1\n") ;
-    send_band(fd1, 1, 7, _M_DATA) ;
-    send_band(fd1, 3, 8, _M_DATA) ;
+    tprint("%s", "band_test: write band 1, 3; read band 3, 1\n") ;
+    send_band(ctx, fd1, 1, 7, _M_DATA) ;
+    send_band(ctx, fd1, 3, 8, _M_DATA) ;
     if ((rslt = nread_wait_msgs(fd2, 2)) != 2)
     {
-	print("loop.2: expected < %d message(s) got %d\n", 2, rslt) ;
-	xit() ;
+	FAIL("loop.2: expected < %d message(s) got %d\n", 2, rslt) ;
     }
-    receive_band(fd2, 3, 8, _M_DATA) ;
-    receive_band(fd2, 1, 7, _M_DATA) ;
+    receive_band(ctx, fd2, 3, 8, _M_DATA) ;
+    receive_band(ctx, fd2, 1, 7, _M_DATA) ;
 
-    print("\nband_test: write band 1, 3, 1; read band 3, 1, 1\n") ;
-    send_band(fd1, 1, 9, _M_DATA) ;
-    send_band(fd1, 3, 10, _M_DATA) ;
-    send_band(fd1, 1, 11, _M_DATA) ;
+    tprint("%s", "band_test: write band 1, 3, 1; read band 3, 1, 1\n") ;
+    send_band(ctx, fd1, 1, 9, _M_DATA) ;
+    send_band(ctx, fd1, 3, 10, _M_DATA) ;
+    send_band(ctx, fd1, 1, 11, _M_DATA) ;
     if ((rslt = nread_wait_msgs(fd2, 3)) != 3)
     {
-	print("loop.2: expected < %d message(s) got %d\n", 3, rslt) ;
-	xit() ;
+	FAIL("loop.2: expected < %d message(s) got %d\n", 3, rslt) ;
     }
-    receive_band(fd2, 3, 10, _M_DATA) ;
-    receive_band(fd2, 1, 9, _M_DATA) ;
-    receive_band(fd2, 1, 11, _M_DATA) ;
+    receive_band(ctx, fd2, 3, 10, _M_DATA) ;
+    receive_band(ctx, fd2, 1, 9, _M_DATA) ;
+    receive_band(ctx, fd2, 1, 11, _M_DATA) ;
 
     tprint("%s", "band_test: "
 	    "write band 1, 2, M_PCPROTO; read M_PCPROTO, band 2, 1\n");
-    send_band(fd1, 1, 12, _M_DATA) ;
-    send_band(fd1, 2, 13, _M_DATA) ;
-    send_band(fd1, 0, 14, _M_PCPROTO) ;
+    send_band(ctx, fd1, 1, 12, _M_DATA) ;
+    send_band(ctx, fd1, 2, 13, _M_DATA) ;
+    send_band(ctx, fd1, 0, 14, _M_PCPROTO) ;
     if ((rslt = nread_wait_msgs(fd2, 3)) != 3)
     {
-	print("loop.2: expected < %d message(s) got %d\n", 3, rslt) ;
-	xit() ;
+	FAIL("loop.2: expected < %d message(s) got %d\n", 3, rslt) ;
     }
-    receive_band(fd2, 0, 14, _M_PCPROTO) ;
-    receive_band(fd2, 2, 13, _M_DATA) ;
-    receive_band(fd2, 1, 12, _M_DATA) ;
+    receive_band(ctx, fd2, 0, 14, _M_PCPROTO) ;
+    receive_band(ctx, fd2, 2, 13, _M_DATA) ;
+    receive_band(ctx, fd2, 1, 12, _M_DATA) ;
 
     tprint("%s", "band_test: "
 	    "fill up band 1, then write band 2; read 2, 1, 1, ...\n");
@@ -5407,26 +5219,26 @@ void band_test(struct test_context *ctx)
     {
 	send_band(ctx, fd1, 1, send_seq + n_sent, _M_DATA) ;
 	if (n_sent == 0)
-	    set_debug_mask(0x00000000L);
+	    set_debug_mask(0x00000000L) ;
     }
 
-    print("\nband_test: band 1 full (%d msgs), write band 2\n", n_sent) ;
+    tprint("band_test: band 1 full (%d msgs), write band 2\n", n_sent) ;
     set_debug_mask(debug_mask) ;
-    send_band(fd1, 2, send_seq + n_sent + 1, _M_DATA) ;
+    send_band(ctx, fd1, 2, send_seq + n_sent + 1, _M_DATA) ;
     sleep(1) ;				/* allow messages to flow */
-    print("   %d messages available to read\n", nread_wait_msgs(fd2, 1)) ;
-    receive_band(fd2, 2, send_seq + n_sent + 1, _M_DATA) ;
+    tprint("   %d messages available to read\n", nread_wait_msgs(fd2, 1)) ;
+    receive_band(ctx, fd2, 2, send_seq + n_sent + 1, _M_DATA) ;
     for (i = 0; i < n_sent; i++)
     {
 	receive_band(ctx, fd2, 1, send_seq + i, _M_DATA) ;
 	if (i == 0)
 	{
-	    set_debug_mask(0x00000000L);
-	    receive_band_quiet = 1;
+	    set_debug_mask(0x00000000L) ;
+	    receive_band_quiet = 1 ;
 	}
     }
 
-    print("\nband_test: wr band 1, fill band 2, wr band 1; read 2,2,... 1\n");
+    tprint("%s", "band_test: wr band 1, fill band 2, wr band 1; read 2,2,... 1\n");
     set_debug_mask(debug_mask) ;
     receive_band_quiet = 0 ;
     send_seq = 20000 ;
@@ -5435,20 +5247,20 @@ void band_test(struct test_context *ctx)
     {
 	send_band(ctx, fd1, 2, send_seq + n_sent, _M_DATA) ;
 	if (n_sent == 0)
-	    set_debug_mask(0x00000000L);
+	    set_debug_mask(0x00000000L) ;
     }
 
-    print("\nband_test: band 2 full (%d msgs), write band 1\n", n_sent) ;
-    send_band(fd1, 1, 21, _M_DATA) ;
+    tprint("band_test: band 2 full (%d msgs), write band 1\n", n_sent) ;
+    send_band(ctx, fd1, 1, 21, _M_DATA) ;
     sleep(1) ;				/* allow messages to flow */
-    print("   %d messages available to read\n", nread_wait_msgs(fd2, 1)) ;
+    tprint("   %d messages available to read\n", nread_wait_msgs(fd2, 1)) ;
     for (i = 0; i < n_sent; i++)
     {
 	receive_band(ctx, fd2, 2, send_seq + i, _M_DATA) ;
 	if (i == 0)
 	{
-	    set_debug_mask(0x00000000L);
-	    receive_band_quiet = 1;
+	    set_debug_mask(0x00000000L) ;
+	    receive_band_quiet = 1 ;
 	}
     }
     set_debug_mask(debug_mask) ;
@@ -5457,7 +5269,7 @@ void band_test(struct test_context *ctx)
     receive_band(ctx, fd2, 1, 21, _M_DATA) ;
 
 
-    print("\nband_test: wr band 1, fill band 2, wr band 1; test backenable\n");
+    tprint("%s", "band_test: wr band 1, fill band 2, wr band 1; test backenable\n");
     set_debug_mask(debug_mask) ;
     receive_band_quiet = 0 ;
     send_seq = 30000 ;
@@ -5466,21 +5278,21 @@ void band_test(struct test_context *ctx)
     {
 	send_band(ctx, fd1, 2, send_seq + n_sent, _M_DATA) ;
 	if (n_sent == 0)
-	    set_debug_mask(0x00000000L);
+	    set_debug_mask(0x00000000L) ;
     }
 
-    print("band_test: band 2 full (%d msgs), write band 1\n", n_sent) ;
-    send_band(fd1, 1, 23, _M_DATA) ;
+    tprint("band_test: band 2 full (%d msgs), write band 1\n", n_sent) ;
+    send_band(ctx, fd1, 1, 23, _M_DATA) ;
     sleep(1) ;				/* allow messages to flow */
-    print("   %d messages available to read\n", nread_wait_msgs(fd2, 1)) ;
+    tprint("   %d messages available to read\n", nread_wait_msgs(fd2, 1)) ;
     flow_ok = 0 ;
     for (i = 0; i < n_sent; i++)
     {
 	receive_band(ctx, fd2, 2, send_seq + i, _M_DATA) ;
 	if (i == 0)
 	{
-	    set_debug_mask(0x00000000L);
-	    receive_band_quiet = 1;
+	    set_debug_mask(0x00000000L) ;
+	    receive_band_quiet = 1 ;
 	}
 	if (!flow_ok && user_ioctl(fd1, I_CANPUT, 2) == 1)
 	{
@@ -5500,6 +5312,7 @@ void band_test(struct test_context *ctx)
 	FAIL("%s", "band_test: all messages read but backpressure still in place\n");
     }
 
+
     user_close(fd1);
     user_close(fd2);
 
@@ -5511,48 +5324,47 @@ void band_test(struct test_context *ctx)
 ************************************************************************/
 void flush_test(struct test_context *ctx)
 {
-    int             fd1;
-    int             fd2;
-    int             rslt;
-    struct strioctl ioc;
-    bandinfo_t      bi;
+    int			fd1 ;
+    int			fd2 ;
+    int			rslt ;
+    struct strioctl	ioc ;
+    bandinfo_t		bi ;
 
     tprint("%s", "Queue flushing test\n") ;
 
     rslt = open_clones(&fd1, &fd2) ;
     if (rslt < 0) FAIL("%s", "open_clones\n") ;
 
-    ioc.ic_timout = 10;
-    ioc.ic_dp = NULL;
-    ioc.ic_cmd = LOOP_PUTNXT;	/* use putnext rather then svcq */
-    ioc.ic_len = 0;
-    rslt = user_ioctl(fd1, I_STR, &ioc);
+    ioc.ic_timout = 10 ;
+    ioc.ic_dp	  = NULL;
+    ioc.ic_cmd 	  = LOOP_PUTNXT ;  /* use putnext rather then svcq */
+    ioc.ic_len	  = 0 ;
+    rslt = user_ioctl(fd1, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.1: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
-    rslt = user_ioctl(fd2, I_STR, &ioc);
+    rslt = user_ioctl(fd2, I_STR, &ioc) ;
     if (rslt < 0)
     {
-	print("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", strerror(ENO(rslt))) ;
+	FAIL("loop_clone.2: ioctl LOOP_PUTNXT: %s\n", STRERROR(-rslt)) ;
     }
 
     tprint("%s", "flush_test: simple band 0 data\n") ;
     send_band(ctx, fd1, 0, 1, _M_DATA) ;
     send_band(ctx, fd1, 0, 2, _M_DATA) ;
 
-    rslt = nread_wait_msgs(fd2, 2);
+    rslt = nread_wait_msgs(fd2, 2) ;
     if (rslt != 2)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 2) ;
     }
 
-    rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW);
+    rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = flush_wait(fd2);
@@ -5569,17 +5381,16 @@ void flush_test(struct test_context *ctx)
     send_band(ctx, fd1, 1, 3, _M_DATA) ;
     send_band(ctx, fd1, 1, 4, _M_DATA) ;
 
-    rslt = nread_wait_msgs(fd2, 2);
+    rslt = nread_wait_msgs(fd2, 2) ;
     if (rslt != 2)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 2) ;
     }
 
-    rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW);
+    rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = flush_wait(fd2);
@@ -5589,8 +5400,6 @@ void flush_test(struct test_context *ctx)
     }
 
     tprint("%s", "flush_test: band 1 data via I_FLUSH -- OK\n") ;
-
-    print("\nflush_test: band 1 data via I_FLUSHBAND\n");
 
     tprint("%s", "flush_test: band 1 data via I_FLUSHBAND\n") ;
 
@@ -5603,17 +5412,16 @@ void flush_test(struct test_context *ctx)
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 2) ;
     }
 
-    bi.bi_pri = 1;		/* flush band 1 */
-    bi.bi_flag = FLUSHRW;	/* flush both read/write */
+    bi.bi_pri = 1 ;			/* flush band 1 */
+    bi.bi_flag = FLUSHRW ;		/* flush both read/write */
 
-    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi);
+    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSHBAND: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSHBAND: %s\n", STRERROR(-rslt)) ;
     }
 
-    rslt = flush_wait(fd2);
+    rslt = flush_wait(fd2) ;
     if (rslt != 0)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 0) ;
@@ -5629,26 +5437,25 @@ void flush_test(struct test_context *ctx)
     send_band(ctx, fd1, 2, 9, _M_DATA) ;
     send_band(ctx, fd1, 2, 10, _M_DATA) ;
 
-    rslt = nread_wait_msgs(fd2, 4);
+    rslt = nread_wait_msgs(fd2, 4) ;
     if (rslt != 4)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 4) ;
     }
 
-    bi.bi_pri = 2;		/* flush band 2 */
-    bi.bi_flag = FLUSHRW;	/* flush both read/write */
+    bi.bi_pri = 2 ;			/* flush band 2 */
+    bi.bi_flag = FLUSHRW ;		/* flush both read/write */
 
-    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi);
+    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSHBAND: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSHBAND: %s\n", STRERROR(-rslt)) ;
     }
 
     receive_band(ctx, fd2, 1, 7, _M_DATA) ;
     receive_band(ctx, fd2, 1, 8, _M_DATA) ;
 
-    rslt = flush_wait(fd2);
+    rslt = flush_wait(fd2) ;
     if (rslt != 0)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 0) ;
@@ -5667,17 +5474,16 @@ void flush_test(struct test_context *ctx)
     send_band(ctx, fd1, 0, 12, _M_DATA) ;
     send_band(ctx, fd1, 0, 13, _M_PCPROTO) ;
 
-    rslt = nread_wait_msgs(fd2, 3);
+    rslt = nread_wait_msgs(fd2, 3) ;
     if (rslt != 3)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 3) ;
     }
 
-    rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW);
+    rslt = user_ioctl(fd2, I_FLUSH, FLUSHRW) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
     }
 
     rslt = flush_wait(fd2);
@@ -5704,14 +5510,13 @@ void flush_test(struct test_context *ctx)
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 3) ;
     }
 
-    bi.bi_pri = 0;		/* flush band 0 */
-    bi.bi_flag = FLUSHRW;	/* flush both read/write */
+    bi.bi_pri = 0 ;			/* flush band 0 */
+    bi.bi_flag = FLUSHRW ;		/* flush both read/write */
 
-    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi);
+    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
     }
 
     receive_band(ctx, fd2, 0, 16, _M_PCPROTO) ;
@@ -5734,20 +5539,19 @@ void flush_test(struct test_context *ctx)
     send_band(ctx, fd1, 0, 19, _M_PCPROTO) ;
     send_band(ctx, fd1, 2, 20, _M_DATA) ;
 
-    rslt = nread_wait_msgs(fd2, 4);
+    rslt = nread_wait_msgs(fd2, 4) ;
     if (rslt != 4)
     {
 	FAIL("loop.2: I_NREAD returned %d, expected %d\n", rslt, 4) ;
     }
 
-    bi.bi_pri = 1;		/* flush band 1 */
-    bi.bi_flag = FLUSHRW;	/* flush both read/write */
+    bi.bi_pri = 1 ;			/* flush band 1 */
+    bi.bi_flag = FLUSHRW ;		/* flush both read/write */
 
-    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi);
+    rslt = user_ioctl(fd2, I_FLUSHBAND, &bi) ;
     if (rslt < 0)
     {
-	print("loop.2: I_FLUSH: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("loop.2: I_FLUSH: %s\n", STRERROR(-rslt)) ;
     }
 
     receive_band(ctx, fd2, 0, 19, _M_PCPROTO) ;
@@ -5777,14 +5581,13 @@ void flush_test(struct test_context *ctx)
 ************************************************************************/
 void pullupmsg_test(struct test_context *ctx)
 {
-    int             rslt;
+    int		rslt ;
 
     tprint("%s", "Begin pullupmsg test\n") ;
     rslt = user_open(PUTST, O_RDWR, 0) ;
     if (rslt < 0)
     {
-	print("putst: %s\n", strerror(ENO(rslt))) ;
-	xit() ;
+	FAIL("putst: %s\n", STRERROR(-rslt)) ;
     }
 
     user_close(rslt) ;
@@ -5801,79 +5604,79 @@ void pullupmsg_test(struct test_context *ctx)
 ************************************************************************/
 #ifndef DIRECT_USER
 
-pthread_mutex_t mt_state_lock;
-volatile int    mt_state;
-pthread_mutex_t mt_quit;
+pthread_mutex_t		mt_state_lock ;
+volatile int		mt_state ;
+pthread_mutex_t		mt_quit ;
 
-void mt_set_state(int state)
+void	 mt_set_state(int state)
 {
-    pthread_mutex_lock(&mt_state_lock);
-    mt_state = state;
-    pthread_mutex_unlock(&mt_state_lock);
+    pthread_mutex_lock(&mt_state_lock) ;
+    mt_state = state ;
+    pthread_mutex_unlock(&mt_state_lock) ;
 }
 
-int mt_get_state(void)
+int	 mt_get_state(void)
 {
-    int             state;
-    pthread_mutex_lock(&mt_state_lock);
-    state = mt_state;
-    pthread_mutex_unlock(&mt_state_lock);
-    return (state);
+    int		state ;
+    pthread_mutex_lock(&mt_state_lock) ;
+    state = mt_state ;
+    pthread_mutex_unlock(&mt_state_lock) ;
+    return(state) ;
 }
 
-int mt_await_state(int statenr)
+int	mt_await_state(int statenr)
 {
-    int             st;
+    int		st ;
 
     while ((st = mt_get_state()) < statenr && st >= 0)
-	sleep(1);
+	sleep(1) ;
 
-    return (st);
+    return(st) ;
 }
 
-int mt_ioctl(int fd, int cmd, int arg)
+int	mt_ioctl(int fd, int cmd, int arg)
 {
-    struct strioctl ioc;
+    struct strioctl	ioc ;
 
-    ioc.ic_cmd = cmd;
-    ioc.ic_timout = 10;
-    ioc.ic_len = sizeof(arg);
-    ioc.ic_dp = (char *) &arg;
+    ioc.ic_cmd 	  = cmd ;
+    ioc.ic_timout = 10 ;
+    ioc.ic_len	  = sizeof(arg) ;
+    ioc.ic_dp	  = (char *) &arg ;
 
-    return (ioctl(fd, I_STR, &ioc));
+    return(ioctl(fd, I_STR, &ioc)) ;
 }
 
-void           *mt_thread(void *arg)
+void	*mt_thread(void *arg)
 {
-    intptr_t        thrno = (intptr_t) arg;
-    int             state = 0;
-    int             prev_state;
-    int             fd = -1;
-    int             fdc = -1;
-    int             ctl_fd;
-    char            buf[300];
+    intptr_t	thrno = (intptr_t) arg ;
+    int		state = 0 ;
+    int		prev_state ;
+    int		fd = -1 ;
+    int		fdc = -1 ;
+    int		ctl_fd ;
+    char	buf[300] ;
 
-    print("%s: Thread%d: Starting up\n", now(), thrno);
-    sprintf(buf, "/dev/mtdrv.%d", thrno);
-    ctl_fd = open(buf, O_RDWR, 0);
+    print("%s: Thread%d: Starting up\n", now(), thrno) ;
+    sprintf(buf, "/dev/mtdrv.%d", thrno) ;
+    ctl_fd = open(buf, O_RDWR, 0) ;
     if (ctl_fd < 0)
     {
-	perror(buf);
-	mt_set_state(-1);
+	perror(buf) ;
+	mt_set_state(-1) ;
     }
 
-    print("%s: Thread%d: opened %s\n", now(), thrno, buf);
+    print("%s: Thread%d: opened %s\n", now(), thrno, buf) ;
 
     do
     {
-	prev_state = state;
-	state = mt_get_state();
-	print("%s: Thread%d: state %d\n", now(), thrno, state);
+	prev_state = state ;
+	state = mt_get_state() ;
+	print("%s: Thread%d: state %d\n", now(), thrno, state) ;
 	switch (state)
 	{
-	case 0:		/* initial idle state */
-	    mt_await_state(1);
-	    break;
+	case 0:				/* initial idle state */
+	    mt_await_state(1) ;
+	    break ;
 
 	case 1:
 	    /*
@@ -5883,36 +5686,36 @@ void           *mt_thread(void *arg)
 	     */
 	    if (prev_state == 1)
 	    {
-		mt_await_state(2);
-		break;
+		mt_await_state(2) ;
+		break ;
 	    }
 
 	    if (thrno == 2)
 	    {
-		sleep(1);
-		break;
+		sleep(1) ;
+		break ;
 	    }
 
 	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 400) < 0)
 	    {
-		perror("ioctl: MTDRV_SET_OPEN_SLEEP");
-		mt_set_state(-1);
-		break;
+		perror("ioctl: MTDRV_SET_OPEN_SLEEP") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
-	    mt_set_state(2);
+	    mt_set_state(2) ;
 
-	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno);
-	    fd = open("/dev/mtdrv.3", O_RDWR, 0);
+	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno) ;
+	    fd = open("/dev/mtdrv.3", O_RDWR, 0) ;
 	    if (fd < 0)
 	    {
-		perror("mtdrv.3");
-		mt_set_state(-1);
-		break;
+		perror("mtdrv.3") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
-	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd);
-	    break;
+	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd) ;
+	    break ;
 
 	case 2:
 	    /*
@@ -5923,29 +5726,29 @@ void           *mt_thread(void *arg)
 	     */
 	    if (prev_state == 2)
 	    {
-		mt_await_state(3);
-		break;
+		mt_await_state(3) ;
+		break ;
 	    }
 
 	    if (thrno == 1)
 	    {
-		sleep(1);
-		break;
+		sleep(1) ;
+		break ;
 	    }
 
-	    sleep(1);
-	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno);
-	    fd = open("/dev/mtdrv.3", O_RDWR, 0);
+	    sleep(1) ;
+	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno) ;
+	    fd = open("/dev/mtdrv.3", O_RDWR, 0) ;
 	    if (fd < 0)
 	    {
-		perror("mtdrv.3");
-		mt_set_state(-1);
-		break;
+		perror("mtdrv.3") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
-	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd);
-	    mt_set_state(3);
-	    break;
+	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd) ;
+	    mt_set_state(3) ;
+	    break ;
 
 	case 3:
 	    /*
@@ -5955,24 +5758,24 @@ void           *mt_thread(void *arg)
 	     */
 	    if (prev_state == 3)
 	    {
-		sleep(1);
-		break;
+		sleep(1) ;
+		break ;
 	    }
 
 	    if (thrno == 1)
 	    {
-		sleep(2);
-		print("%s: Thread%d: close fd=%d\n", now(), thrno, fd);
-		close(fd);
-		fd = -1;
-		break;
+		sleep(2) ;
+		print("%s: Thread%d: close fd=%d\n", now(), thrno, fd) ;
+		close(fd) ;
+		fd = -1 ;
+		break ;
 	    }
 
 	    if (mt_ioctl(ctl_fd, MTDRV_SET_CLONE_DEV, 3) < 0)
 	    {
-		perror("ioctl: MTDRV_SET_CLONE_DEV");
-		mt_set_state(-1);
-		break;
+		perror("ioctl: MTDRV_SET_CLONE_DEV") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
 	    print("%s: Thread%d: opening mtdrv_clone\n", now(), thrno) ;
@@ -5998,12 +5801,12 @@ void           *mt_thread(void *arg)
 
 	    print("%s: Thread%d: mtdrv_clone "
 		  "got expected EBUSY return opening dev 3\n",
-		    now(), thrno, fdc) ;
+		    now(), thrno) ;
 	    sleep(1) ;
 	    print("%s: Thread%d: close fd=%d\n", now(), thrno, fd) ;
 	    close(fd) ;
 	    fd = -1 ;
-	    fdc = -1 ;
+	    fdc = -1;
 	    mt_set_state(4) ;
 	    break ;
 
@@ -6015,36 +5818,37 @@ void           *mt_thread(void *arg)
 	     */
 	    if (prev_state == 4)
 	    {
-		sleep(1);
-		break;
+		sleep(1) ;
+		break ;
 	    }
+
 
 	    if (thrno == 2)
 	    {
-		mt_await_state(5);
-		break;
+		mt_await_state(5) ;
+		break ;
 	    }
 
 	    if (mt_ioctl(ctl_fd, MTDRV_SET_OPEN_SLEEP, 300) < 0)
 	    {
-		perror("ioctl: MTDRV_SET_OPEN_SLEEP");
-		mt_set_state(-1);
-		break;
+		perror("ioctl: MTDRV_SET_OPEN_SLEEP") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
-	    mt_set_state(5);
+	    mt_set_state(5) ;
 
-	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno);
-	    fd = open("/dev/mtdrv.3", O_RDWR, 0);	/* open will sleep */
+	    print("%s: Thread%d: opening mtdrv.3\n", now(), thrno) ;
+	    fd = open("/dev/mtdrv.3", O_RDWR, 0) ;	/* open will sleep */
 	    if (fd < 0)
 	    {
-		perror("mtdrv.3");
-		mt_set_state(-1);
-		break;
+		perror("mtdrv.3") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
-	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd);
-	    break;
+	    print("%s: Thread%d: mtdrv.3 opened fd=%d\n", now(), thrno, fd) ;
+	    break ;
 
 	case 5:
 	    /*
@@ -6056,21 +5860,22 @@ void           *mt_thread(void *arg)
 	     */
 	    if (prev_state == 5)
 	    {
-		sleep(1);
-		break;
+		sleep(1) ;
+		break ;
 	    }
+
 
 	    if (thrno == 1)
 	    {
-		mt_await_state(6);
-		break;
+		mt_await_state(6) ;
+		break ;
 	    }
 
 	    if (mt_ioctl(ctl_fd, MTDRV_SET_CLONE_DEV, 3) < 0)
 	    {
-		perror("ioctl: MTDRV_SET_CLONE_DEV");
-		mt_set_state(-1);
-		break;
+		perror("ioctl: MTDRV_SET_CLONE_DEV") ;
+		mt_set_state(-1) ;
+		break ;
 	    }
 
 	    print("%s: Thread%d: opening mtdrv_clone\n", now(), thrno) ;
@@ -6096,7 +5901,7 @@ void           *mt_thread(void *arg)
 
 	    print("%s: Thread%d: mtdrv_clone "
 		  "got expected EBUSY return opening dev 3\n",
-		    now(), thrno, fdc) ;
+		    now(), thrno) ;
 
 	    print("%s: Thread%d: close fd=%d\n", now(), thrno, fdc) ;
 	    close(fdc) ;
@@ -6106,46 +5911,45 @@ void           *mt_thread(void *arg)
 	    break ;
 
 	case 6:
-	    sleep(1);
-	    mt_set_state(-1);
-	    break;
+	    sleep(1) ;
+	    mt_set_state(-1) ;
+	    break ;
 	}
 
-    }
-    while (state >= 0);
+    } while (state >= 0) ;
 
-    print("%s: Thread%d: close fd=%d\n", now(), thrno, fd);
-    close(fd);
-    fd = -1;
-    close(ctl_fd);
-    print("%s: Thread%d: Exiting\n", now(), thrno);
-    pthread_mutex_unlock(&mt_quit);	/* awaken parent */
+    print("%s: Thread%d: close fd=%d\n", now(), thrno, fd) ;
+    close(fd) ;
+    fd = -1 ;
+    close(ctl_fd) ;
+    print("%s: Thread%d: Exiting\n", now(), thrno) ;
+    pthread_mutex_unlock(&mt_quit) ;	/* awaken parent */
 
-    return ((void *) 0);
+    return((void *)0) ;
 }
 
 
 void mt_open_test(struct test_context *ctx)
 {
-    int             rslt;
-    pthread_t       thr1;
-    pthread_t       thr2;
-    pthread_mutexattr_t attr;
+    int		rslt ;
+    pthread_t	thr1 ;
+    pthread_t	thr2 ;
+    pthread_mutexattr_t	 attr ;
 
     print("Begin multi-thread open test\n") ;
     system("rmmod streams-mtdrv 2>&1") ;
     if (system("modprobe streams-mtdrv 2>&1") != 0)
     {
-	print("modprobe failed: %s\n", strerror(errno));
-	xit();
+	print("modprobe failed: %s\n", strerror(errno)) ;
+	xit() ;
     }
 
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_DEFAULT);
-    pthread_mutex_init(&mt_state_lock, &attr);
-    pthread_mutex_init(&mt_quit, &attr);
-    pthread_mutex_lock(&mt_quit);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_DEFAULT) ;
+    pthread_mutex_init(&mt_state_lock, &attr) ;
+    pthread_mutex_init(&mt_quit, &attr) ;
+    pthread_mutex_lock(&mt_quit) ;
 
-    rslt = pthread_create(&thr1, NULL, mt_thread, (void *) 1);
+    rslt = pthread_create(&thr1, NULL, mt_thread, (void *) 1) ;
     if (rslt < 0)
     {
 	fprintf(stderr, "Thread #%d: ", 1) ;
@@ -6154,7 +5958,7 @@ void mt_open_test(struct test_context *ctx)
 	xit() ;
     }
 
-    rslt = pthread_create(&thr2, NULL, mt_thread, (void *) 2);
+    rslt = pthread_create(&thr2, NULL, mt_thread, (void *) 2) ;
     if (rslt < 0)
     {
 	fprintf(stderr, "Thread #%d: ", 2) ;
@@ -6170,44 +5974,6 @@ void mt_open_test(struct test_context *ctx)
     system("rmmod streams-mtdrv 2>&1") ;
 }
 #endif
-/************************************************************************
-*                              test list                                *
-************************************************************************/
-
-struct test_spec {
-	char *name;
-	char *desc;
-	void (*func) (struct test_context *ctx);
-	int flags;
-};
-
-#define TST_DO_TEST	1
-#define TST_PRINT_MEM	2
-#define TST_MT_SAFE	4
-
-struct test_spec test_list[] = {
-	{ "open", "open/close test", open_close_test, TST_PRINT_MEM|TST_MT_SAFE },
-	{ "ioctl", "ioctl test", ioctl_test, TST_PRINT_MEM },
-	{ "rdopt", "read options test", rdopt_test, TST_PRINT_MEM },
-	{ "write", "write test", write_test, TST_PRINT_MEM },
-	{ "timer", "close timer test", close_timer_test, TST_PRINT_MEM },
-	{ "putmsg", "putmsg test", putmsg_test, TST_PRINT_MEM|TST_MT_SAFE },
-	{ "poll", "poll test", poll_test, TST_PRINT_MEM|TST_MT_SAFE },
-	{ "mux", "multiplexor test", mux_test, TST_PRINT_MEM },
-	{ "clone", "clone driver test", clone_test , 0}, /* crash */
-	{ "bufcall", "bufcall test", bufcall_test, TST_MT_SAFE },
-	{ "sad", "sad driver test", sad_test, 0 },
-	{ "fifo", "FIFO/pipe test", fifo_test, TST_MT_SAFE },
-	{ "passfd", "FD passing test", passfd_test, TST_MT_SAFE },
-	{ "band", "Q-band test", band_test, TST_MT_SAFE },
-	{ "flush", "flushing test", flush_test, TST_MT_SAFE },
-	{ "autopush", "autopush test", autopush_test , 0 },
-	{ "mt_open", "MT open test", mt_open_test , 0},
-#ifdef DIRECT_USER
-	{ "pullupmsg", "pullupmsg", pullupmsg_test, TST_PRINT_MEM },
-#endif
-	{ NULL, NULL, NULL, 0 }
-};
 
 /************************************************************************
 *                           module_test                                 *
@@ -6223,7 +5989,7 @@ int module_is_present(int fd, char *name)
     rslt = user_ioctl(fd, I_FIND, name) ;
     if (rslt < 0)
     {
-	print("module_is_present(%s): I_FIND: %s\n", name, strerror(ENO(rslt))) ;
+	print("module_is_present(%s): I_FIND: %s\n", name, STRERROR(-rslt)) ;
 	xit() ;
     }
 
@@ -6262,7 +6028,7 @@ void module_push(int fd, char *name)
 
     if ((rslt = user_ioctl(fd, I_PUSH, name)) < 0)
     {
-	print("module_push(%s): I_PUSH: %s\n", name, strerror(ENO(rslt))) ;
+	print("module_push(%s): I_PUSH: %s\n", name, STRERROR(-rslt)) ;
 	xit() ;
     }
 
@@ -6283,14 +6049,14 @@ void module_pop(int fd)
     rslt = user_ioctl(fd, I_POP, 0) ;
     if (rslt < 0)
     {
-	print("module_pop: I_POP: %s\n", strerror(ENO(rslt))) ;
+	print("module_pop: I_POP: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
     else
 	print("module_pop OK\n") ;
 }
 
-void module_test_data(int fd1, int fd2)
+void module_test_data(struct test_context *ctx, int fd1, int fd2)
 {
     int		 rslt ;
     static char	*msg = "Test data for modules" ;
@@ -6298,52 +6064,52 @@ void module_test_data(int fd1, int fd2)
 
     if ((rslt = user_write(fd1, msg, lgth)) < 0)
     {
-	print("module_test_data: write fd1: %s\n", strerror(ENO(rslt))) ;
+	print("module_test_data: write fd1: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
-    memset(rdbuf, 0, lgth+1) ;
-    if ((rslt = user_read(fd2, rdbuf, lgth)) < 0)
+    memset(ctx->rdbuf, 0, lgth+1) ;
+    if ((rslt = user_read(fd2, ctx->rdbuf, lgth)) < 0)
     {
-	print("module_test_data: read fd2: %s\n", strerror(ENO(rslt))) ;
+	print("module_test_data: read fd2: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
-    if (strcmp(rdbuf, msg))
+    if (strcmp(ctx->rdbuf, msg))
     {
 	print("module_test_data: read fd2: Data compare error\n"
 	      "Exp: %s\n"
 	      "Got: %s\n",
-	      msg, rdbuf) ;
+	      msg, ctx->rdbuf) ;
 	xit() ;
     }
 
     if ((rslt = user_write(fd2, msg, lgth)) < 0)
     {
-	print("module_test_data: write fd2: %s\n", strerror(ENO(rslt))) ;
+	print("module_test_data: write fd2: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
-    memset(rdbuf, 0, lgth+1) ;
-    if ((rslt = user_read(fd1, rdbuf, lgth)) < 0)
+    memset(ctx->rdbuf, 0, lgth+1) ;
+    if ((rslt = user_read(fd1, ctx->rdbuf, lgth)) < 0)
     {
-	print("module_test_data: read fd1: %s\n", strerror(ENO(rslt))) ;
+	print("module_test_data: read fd1: %s\n", STRERROR(-rslt)) ;
 	xit() ;
     }
 
-    if (strcmp(rdbuf, msg))
+    if (strcmp(ctx->rdbuf, msg))
     {
 	print("module_test_data: read fd1: Data compare error\n"
 	      "Exp: %s\n"
 	      "Got: %s\n",
-	      msg, rdbuf) ;
+	      msg, ctx->rdbuf) ;
 	xit() ;
     }
 
     print("module_test_data OK\n") ;
 }
 
-void module_test(void)
+void module_test(struct test_context *ctx)
 {
     int		fds[2] ;
 #define fd1	fds[0]
@@ -6356,7 +6122,7 @@ void module_test(void)
 
     print("\nSimple test of relay module linked with LiS\n") ;
     module_push(fd1, "relay") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
 
@@ -6372,7 +6138,7 @@ void module_test(void)
 	xit() ;
     }
     module_push(fd1, "relay3") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
     module_unload("relay3") ;
@@ -6388,7 +6154,7 @@ void module_test(void)
 	xit() ;
     }
     module_push(fd1, "relay3") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
     module_unload("relay3") ;
@@ -6401,7 +6167,7 @@ void module_test(void)
 	xit();
     }
     module_push(fd1, "pipemod") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
     module_unload("pipemod") ;
@@ -6413,7 +6179,7 @@ void module_test(void)
 	xit();
     }
     module_push(fd1, "pipemod") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
     module_unload("pipemod") ;
@@ -6429,7 +6195,7 @@ void module_test(void)
 	xit() ;
     }
     module_push(fd1, "pipemod") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
     module_unload("pipemod") ;
@@ -6445,7 +6211,7 @@ void module_test(void)
 	xit() ;
     }
     module_push(fd1, "pipemod") ;
-    module_test_data(fd1, fd2) ;
+    module_test_data(ctx, fd1, fd2) ;
     user_close(fd1) ;
     user_close(fd2) ;
     module_unload("pipemod") ;
@@ -6453,6 +6219,46 @@ void module_test(void)
 #undef fd1
 #undef fd2
 }
+
+/************************************************************************
+*                              test list                                *
+************************************************************************/
+
+struct test_spec {
+	char *name;
+	char *desc;
+	void (*func) (struct test_context *ctx);
+	int flags;
+};
+
+#define TST_DO_TEST	1
+#define TST_PRINT_MEM	2
+#define TST_MT_SAFE	4
+
+struct test_spec test_list[] = {
+	{ "open", "open/close test", open_close_test, TST_PRINT_MEM|TST_MT_SAFE },
+	{ "ioctl", "ioctl test", ioctl_test, TST_PRINT_MEM },
+	{ "module", "module test", module_test, TST_PRINT_MEM },
+	{ "rdopt", "read options test", rdopt_test, TST_PRINT_MEM },
+	{ "write", "write test", write_test, TST_PRINT_MEM },
+	{ "timer", "close timer test", close_timer_test, TST_PRINT_MEM },
+	{ "putmsg", "putmsg test", putmsg_test, TST_PRINT_MEM|TST_MT_SAFE },
+	{ "poll", "poll test", poll_test, TST_PRINT_MEM|TST_MT_SAFE },
+	{ "mux", "multiplexor test", mux_test, TST_PRINT_MEM },
+	{ "clone", "clone driver test", clone_test , 0}, /* crash */
+	{ "bufcall", "bufcall test", bufcall_test, TST_MT_SAFE },
+	{ "sad", "sad driver test", sad_test, 0 },
+	{ "fifo", "FIFO/pipe test", fifo_test, TST_MT_SAFE },
+	{ "passfd", "FD passing test", passfd_test, TST_MT_SAFE },
+	{ "band", "Q-band test", band_test, TST_MT_SAFE },
+	{ "flush", "flushing test", flush_test, TST_MT_SAFE },
+	{ "autopush", "autopush test", autopush_test , 0 },
+	{ "mt_open", "MT open test", mt_open_test , 0},
+#ifdef DIRECT_USER
+	{ "pullupmsg", "pullupmsg", pullupmsg_test, TST_PRINT_MEM },
+#endif
+	{ NULL, NULL, NULL, 0 }
+};
 
 /************************************************************************
 *                              main                                     *
@@ -6473,86 +6279,19 @@ void *test(void *thread_ctx)
 #endif
     tprint("Memory allocated = %ld\n", lis_mem_alloced) ;
 
-    open_close_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("open/close test") ;
-
-#ifndef DIRECT_USER
-    mt_open_test();
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("mt open test") ;
-#endif
-
-    ioctl_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("ioctl test") ;
-
-    module_test() ;
-    wait_for_logfile("module test") ;
-
-    rdopt_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("read options test") ;
-
-    write_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("write test") ;
-
-    close_timer_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("close timer test") ;
-
-    putmsg_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("putmsg test") ;
-
-    poll_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("poll test") ;
-
-    mux_test() ;
-    print_mem() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("multiplexor test") ;
-
-    clone_test() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("clone driver test") ;
-
-    bufcall_test() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("bufcall test") ;
-
-    autopush_test() ;
-    wait_for_logfile("sad driver test") ;
-
-    sad_test() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("sad driver test") ;
-
-    fifo_test() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced) ;
-    wait_for_logfile("FIFO/pipe test") ;
-
-    passfd_test();
-    print("Memory allocated = %ld\n", lis_mem_alloced);
-    wait_for_logfile("FD passing test");
-
-    band_test() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced);
-    wait_for_logfile("Q-band test");
-
-    flush_test() ;
-    print("Memory allocated = %ld\n", lis_mem_alloced);
-    wait_for_logfile("Flushing test");
+    for(tst = &(test_list[0]) ; tst->name != NULL; tst++) {
+	    if((!all_tests) && (!(tst->flags & TST_DO_TEST)))
+		    continue;
+	    if((nthreads > 1) && (!(tst->flags & TST_MT_SAFE)))
+		    continue;
+	    tprint("*** BEGIN %s:%u TEST ***\n", tst->name, ctx->id);
+	    tst->func(ctx);
+	    if(tst->flags & TST_PRINT_MEM)
+		    print_mem();
+	    tprint("Memory allocated = %ld\n", lis_mem_alloced);
+	    wait_for_logfile(tst->desc);
+	    tprint("*** END %s:%u TEST ***\n", tst->name, ctx->id);
+    }
 
 #ifdef DIRECT_USER
     tprint("Directory listing:\n\n") ;
@@ -6568,15 +6307,17 @@ void *test(void *thread_ctx)
 /************************************************************************
 *                             print_options                             *
 ************************************************************************/
-void tst_print_trace(char *bfrp)
+void print_options(void)
 {
-    print("%s", bfrp);
-
-}				/* tst_print_trace */
+    printf("strtst [<options>]\n");
+    printf("  -d<mask>     Set debug mask (long long argument)\n");
+    printf("  -h           Print this message\n");
+}
 
 /************************************************************************
 *                           main                                        *
 ************************************************************************/
+
 int output = 1;
 
 void copying(int argc, char *argv[])
@@ -6790,6 +6531,9 @@ int main(int argc, char *argv[])
 	}
     }
 
+#ifdef DIRECT_USER
+    lis_print_trace = tst_print_trace;
+#endif
 
     register_drivers() ;
     print("Memory allocated = %ld\n", lis_mem_alloced) ;
@@ -6799,13 +6543,6 @@ int main(int argc, char *argv[])
     print("Memory allocated = %ld\n", lis_mem_alloced);
 #endif
 
-#ifndef DIRECT_USER
-    printk_fd = user_open(NPRINTK, O_RDWR, 0) ;
-    if (printk_fd < 0)
-    {
-	printf( NPRINTK ": %s\n", strerror(ENO(printk_fd))) ;
-	xit() ;
-    }
     ctx_list = malloc(nthreads*sizeof(*ctx_list));
     if(ctx_list == NULL) {
 	    FAIL("malloc: %s\n", STRERROR(errno));

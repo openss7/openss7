@@ -356,7 +356,7 @@ static int _RP connld_rput( queue_t *q, mblk_t *mp )
     return 0;
 }
 
-#ifdef MODULE
+#if !defined __NO_VERSION__
 
 /*
  *  Linux loadable module interface
@@ -405,7 +405,7 @@ module_exit(connld_cleanup_module) ;
 #define __attribute_used__
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
@@ -413,9 +413,6 @@ MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("STREAMS unique pipe generator pseudo-module");
 #endif
-#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
-MODULE_INFO(vermagic, VERMAGIC_STRING);
-#endif
 
 #endif					/* LINUX */
-#endif					/* MODULE */
+#endif					/* !defined __NO_VERSION__ */

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:13:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:50 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 01:39:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,6 +76,8 @@ nobase_pkginclude_HEADERS = \
 	sys/lismem.h \
 	sys/LiS/minimux.h \
 	sys/LiS/mod.h \
+	sys/LiS/modcnt.h \
+	sys/LiS/module.h \
 	sys/LiS/msg.h \
 	sys/LiS/msgutl.h \
 	sys/LiS/mtdrv.h \
@@ -106,6 +108,8 @@ nobase_pkginclude_HEADERS = \
 	sys/strmsg.h \
 	sys/stropts.h \
 	sys/strport.h
+
+EXTRA_DIST += $(nobase_pkginclude_HEADERS)
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/LiS/genconf.h

@@ -33,7 +33,7 @@
  * 
  */
 
-#ident "@(#) LiS putst.c 1.5 09/13/04"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>

@@ -30,7 +30,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ident "@(#) LiS nullstrm.c 2.3 09/13/04 10:12:31 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 /*  -------------------------------------------------------------------  */
 

@@ -28,15 +28,13 @@
  *
  */
 
-#ident "@(#) LiS relay.c 2.8 09/13/04 10:12:31 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 /*  -------------------------------------------------------------------  */
 
-/*
- * The module that goes by the name "relay3" is a separately loadable
- * module that is not configured into LiS.  Used for testing.
- */
-#include <sys/LiS/module.h>	/* first ... */
+#include <sys/LiS/module.h>	/* should be first */
+
+#include <sys/LiS/config.h>
 
 #include <sys/stream.h>
 #include <sys/osif.h>
@@ -270,7 +268,7 @@ relay_close (queue_t *q, int dummy, cred_t *credp)
 /*				Module Routines				 */
 /*  -------------------------------------------------------------------  */
 
-#ifdef MODULE
+#if !defined __NO_VERSION__
 
 #ifdef KERNEL_2_5
 int relay3_init_module(void)
@@ -305,7 +303,7 @@ module_init(relay3_init_module) ;
 module_exit(relay3_cleanup_module) ;
 #endif
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 
-#endif			/* MODULE */
+#endif			/* !defined __NO_VERSION__ */

@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS log.c 2.3 09/13/04 10:12:31 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 /* Streams logging module */
 

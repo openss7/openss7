@@ -763,6 +763,7 @@ lis_register_module_qlock_option(modID_t id, int qlock_option)
 static int _RP unregister_module(fmodsw_t *slot)
 {
     modID_t id;
+    int err;
     char    name[LIS_NAMESZ + 1];
 
     if (slot->f_str == NULL)

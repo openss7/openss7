@@ -25,7 +25,7 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS pipemod.c 1.14 09/13/04"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <sys/LiS/module.h>	/* should be first */
 
@@ -257,16 +257,13 @@ module_exit(pipemod_cleanup_module) ;
 #define __attribute_used__
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
 #endif
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("STREAMS 'pipemod' pipe flushing module");
-#endif
-#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
-MODULE_INFO(vermagic, VERMAGIC_STRING);
 #endif
 
 #endif					/* LINUX */

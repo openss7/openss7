@@ -29,7 +29,7 @@
  * 
  */
 
-#ident "@(#) LiS minimux.c 2.10 09/13/04 10:12:31 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>

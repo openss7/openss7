@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # =============================================================================
 # 
 # @(#) $RCSfile: strload,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/14 21:54:01 $
@@ -52,7 +52,7 @@
 # =============================================================================
 
 ECHO='echo'
-SHELL='/bin/bash'
+SHELL='/bin/sh'
 SED='sed'
 
 # Check that we have a woring $ECHO.
@@ -378,7 +378,7 @@ getarg1()
 
 getstrmmods()
 {
-    /sbin/lsmod | grep "^streams-" | \
+    /sbin/lsmod | grep "^streams[-_]" | \
     while read line; do
         echo -n "`getarg1 $line` "
     done
@@ -391,10 +391,10 @@ fi
 
 strmmods=`getstrmmods`
 if [ "$strmmods..." != "..." ]; then
-    if ! modprobe -r $strmmods ; then
+    if ! modprobe -r $strmmods 2>/dev/null; then
 	echo "Could not unload module(s): ${strmmods}."
     fi
 fi
 
-modprobe -r streams
+modprobe -r streams 2>/dev/null
 exit $?

@@ -98,7 +98,7 @@ STATIC struct qinit sad_winit =
 	NULL		/* No statistics	*/
 };
 
-#ifdef MODULE
+#if !defined __NO_VERSION__
 STATIC
 #endif
 struct streamtab sad_info = 
@@ -416,7 +416,7 @@ STATIC int _RP sad_wput(queue_t *q, mblk_t *mp)
 /*                                                                          */
 /****************************************************************************/
 
-#ifdef MODULE
+#if !defined __NO_VERSION__
 
 #ifdef KERNEL_2_5
 int sad_init_module(void)
@@ -456,11 +456,9 @@ module_init(sad_init_module) ;
 module_exit(sad_cleanup_module) ;
 #endif
 
-#endif					/* MODULE */
-
 #if defined(LINUX)			/* linux kernel */
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("Ole Husgaard (sparre@login.dknet.dk");
@@ -470,3 +468,4 @@ MODULE_DESCRIPTION("STREAMS Administrative Driver");
 #endif
 #endif
 
+#endif					/* !defined  __NO_VERSION__ */

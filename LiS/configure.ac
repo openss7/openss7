@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:13:44 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,16 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:44 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 01:39:39 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 1.1.6.1 2005/03/09 23:13:44 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 1.1.6.2 2005/03/11 01:39:39 brian Exp $])
 AC_PREREQ(2.59)
-AC_INIT([LiS],[2.16],[bugs@openss7.org],[LiS])
+AC_INIT([LiS],[2.18],[bugs@openss7.org],[LiS])
 
 _OPENSS7_DIRCHANGE
 
@@ -157,7 +157,6 @@ AC_CHECK_FUNCS([atexit bzero gettimeofday memset select strchr strerror strrchr 
 AC_LIS
 
 AC_CONFIG_FILES([Makefile
-		 config.in
 		 include/sys/LiS/genconf.h
 		 include/Makefile
 		 man/Makefile

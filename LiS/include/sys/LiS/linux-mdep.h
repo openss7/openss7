@@ -40,6 +40,7 @@
 #ident "@(#) LiS linux-mdep.h 2.78 09/16/04 11:41:59 "
 
 #ifdef __KERNEL__
+#define dev_t	kernel_dev_t	/* we are going to redefine this */
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
@@ -48,6 +49,9 @@
 
 /* Here follows complete drivel: */
 
+#ifndef _RP
+#define _RP
+#endif
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -57,7 +61,9 @@
 /*
  * We want to discard the kernel's definition of dev_t
  */
+#ifndef dev_t
 #define dev_t	kernel_dev_t	/* we are going to redefine this */
+#endif
 
 /*
  * We want to discard the kernel's definition of module_info since
@@ -110,6 +116,9 @@
 #  endif
 #  if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
 #  define	KERNEL_2_5	/* 2.5.x and 2.6.x kernel */
+#  endif
+#  if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,0)
+#  define	KERNEL_2_6	/* 2.6.x kernel */
 #  endif
 
 # endif

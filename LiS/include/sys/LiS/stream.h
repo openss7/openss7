@@ -44,24 +44,6 @@ extern "C" {
 
 #ident "@(#) LiS stream.h 2.12 08/23/04 11:42:44 "
 
-/*
- * Always use the safe routines.  A driver writer can make
- * a simple mistake and easily panic the kernel anyway, so why
- * make it even easier?  -- DMG
- */
-#ifndef SAFE
-#define	SAFE		1
-#endif
-
-/*
- * I heartily recommend using this feature.  It allows you to know
- * who allocated pieces of memory used by streams.  It makes it
- * particularly easy to track down lost streams buffers.
- */
-#ifndef MSG_TRACE
-#define	MSG_TRACE	1
-#endif
-
 /*  -------------------------------------------------------------------  */
 /*                               Dependencies                            */
 

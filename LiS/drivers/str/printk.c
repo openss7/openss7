@@ -32,7 +32,7 @@
  * 
  */
 
-#ident "@(#) LiS printk.c 2.5 09/13/04 10:12:31 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <sys/stream.h>
 #include <sys/osif.h>

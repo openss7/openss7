@@ -332,7 +332,7 @@ module_exit(tirdwr_cleanup_module) ;
 
 #if defined(LINUX)			/* linux kernel */
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("Ole Husgaard (sparre@login.dknet.dk");

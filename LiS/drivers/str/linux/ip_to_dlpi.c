@@ -80,7 +80,7 @@
  * is also supposed to span LGPL.
  */
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("The Software Group Ltd.");

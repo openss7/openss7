@@ -17,7 +17,7 @@
  * 
  */
 
-#ident "@(#) LiS module-skeleton.c 2.3 09/13/04 10:12:31 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #ifdef LINUX
 

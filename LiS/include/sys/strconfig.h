@@ -49,21 +49,6 @@
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
 
-
-
-/* this is to use safe version of streams api, to get nice warnings and so
- * on...
- */
-#ifdef LIS_CONFIG_SAFE
-#define SAFE 1
-#endif
-
-/* This is to use a test version
- */
-#if defined(LIS_TESTING) || defined(LIS_DEBUG)
-#define TEST 1
-#endif
-
 /*
  * The dimension of LiS structures that exist for each CPU.
  */

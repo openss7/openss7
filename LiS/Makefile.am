@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:13:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:44 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 01:39:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,8 +132,6 @@ libLiShead_a_SOURCES		= head/head.c \
 				  head/strmdbg.c \
 				  head/wait.c \
 				  head/cmn_err.c \
-				  head/slog.c \
-				  head/sputbuf.c \
 				  head/version.c \
 				  head/osif.c \
 				  head/poll.c \
@@ -153,6 +151,8 @@ libLiSdrvr_a_SOURCES		= drivers/str/clone.c \
 				  drivers/str/loop.c \
 				  drivers/str/minimux.c \
 				  drivers/str/printk.c \
+				  drivers/str/sad.c \
+				  drivers/str/linux/connld.c \
 				  drivers/str/relay.c
 libLiSdrvr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiSdrvr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
@@ -162,9 +162,7 @@ libLiSdrvr_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLiSdrvr_a_OBJECTS): $(libLiSdrvr_a_DEPENDENCIES)
 
 libLiSload_a_SOURCES		= drivers/str/pipemod.c \
-				  drivers/str/sad.c \
 				  drivers/str/linux/liskmod.c \
-				  drivers/str/linux/connld.c \
 				  drivers/str/linux/mtdrv.c
 
 libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -191,7 +189,7 @@ libLiS_la_SOURCES		= libc/fattach.c \
 				  libc/pipe.c \
 				  libc/putmsg.c \
 				  libc/putpmsg.c
-libLiS_la_LDFLAGS		= -no-undefined -version-info 0:0:0
+libLiS_la_LDFLAGS		= -no-undefined -version-info 0:1:0
 libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
 
@@ -203,7 +201,7 @@ libpLiS_la_SOURCES		= libc/fattach.c \
 				  libc/isastream.c \
 				  libc/putmsg.c \
 				  libc/putpmsg.c
-libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:0:0
+libpLiS_la_LDFLAGS		= -no-undefined -version-info 0:1:0
 libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 

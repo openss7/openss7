@@ -32,11 +32,13 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ident "@(#) LiS loop.c 2.26 01/23/04 15:48:09 "
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 /*  -------------------------------------------------------------------  */
 
-#include <sys/LiS/module.h>	/* must be VERY first include */
+#include <sys/LiS/module.h>	/* should be first */
+
+#include <sys/LiS/config.h>
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -906,7 +908,7 @@ static int _RP loop_close(queue_t * q, int dummy, cred_t * credp)
 }
 
 
-#ifdef MODULE
+#if !defined __NO_VERSION__
 
 #ifdef KERNEL_2_5
 int loop_init_module(void)
@@ -942,10 +944,10 @@ module_init(loop_init_module) ;
 module_exit(loop_cleanup_module) ;
 #endif
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL and additional rights");
+MODULE_LICENSE("GPL");
 #endif
 
-#endif			/* MODULE */
+#endif			/* !defined __NO_VERSION__ */
 
 
 

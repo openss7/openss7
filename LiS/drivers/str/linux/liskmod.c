@@ -211,6 +211,3 @@ MODULE_AUTHOR("David Grothe <dave@gcom.com>");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("Linux Kernel Compatibility Code for Linux STREAMS (LiS)");
 #endif
-#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
-MODULE_INFO(vermagic, VERMAGIC_STRING);
-#endif
