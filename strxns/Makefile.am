@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 12:23:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/11/06 09:53:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/09/02 12:23:13 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 09:53:45 $ by $Author: brian $
 #
 # =============================================================================
+
+#
+#   General rules
+#
+include am/openss7.am
 
 lib_LTLIBRARIES			= 
 
@@ -276,19 +281,6 @@ KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
 
 include am/kernel.am
 
-EXPORT_SRCFILES =
-
-EXPORT_VERFILES =
-
-PKGINCL = include/sys/$(PACKAGE_NAME)
-
-GENKSYMS_CPPFLAGS = \
-	-I./src/modules -I$(srcdir)/src/modules \
-	-I./src/drivers -I$(srcdir)/src/drivers \
-	$(XNS_INCLUDES) $(KERNEL_CPPFLAGS)
-
-include am/genksyms.am
-
 STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
@@ -303,7 +295,11 @@ uninstall-devices: $(STRMAKENODES)
 
 endif
 
+if RPM_BUILD_USER
+
 SUBDIRS = src doc
+
+endif
 
 #
 #   Rules for making rpms
@@ -312,10 +308,5 @@ AM_RPMFLAGS = --define "_kversion $(PACKAGE_KVERSION)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
-
-#
-#   General rules
-#
-include am/openss7.am
 
 # vim: ft=automake

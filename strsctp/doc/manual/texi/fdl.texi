@@ -1,4 +1,4 @@
-@setfilename fdl.info
+@c @setfilename fdl.info
 
 @node GNU Free Documentation License
 @section GNU Free Documentation License

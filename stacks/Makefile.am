@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/10/13 01:39:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/11/06 09:58:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 01:39:34 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 09:58:59 $ by $Author: brian $
 #
 # =============================================================================
+
+#
+#   General rules
+#
+include am/openss7.am
 
 if PUBLIC_RELEASE
 
@@ -875,17 +880,6 @@ endif
 INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
 
-EXPORT_SRCFILES =
-
-EXPORT_VERFILES =
-
-PKGINCL = include/sys/$(PACKAGE_NAME)
-
-GENSYMS_CPPFLAGS = \
-	$(SS7_INCLUDES) $(KERNEL_CPPFLAGS)
-
-include am/genksyms.am
-
 STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
@@ -922,11 +916,5 @@ AM_RPMFLAGS = --define "_kversion $(kversion)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
-
-#
-#   General rules
-#
-
-include am/openss7.am
 
 # vim: ft=automake

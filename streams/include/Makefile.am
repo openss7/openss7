@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/08/22 22:08:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/11/06 10:21:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/22 22:08:21 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 10:21:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,30 +78,6 @@ nobase_pkginclude_HEADERS = \
 	sys/svr4ddi.h \
 	sys/uw7ddi.h
 
-nobase_nodist_pkginclude_HEADERS = \
-	sys/@PACKAGE_NAME@/modversions.h
-
-if KERNEL_VERSIONS
-nobase_nodist_pkginclude_HEADERS += \
-	sys/@PACKAGE_NAME@/versions/aixcompat.ver \
-	sys/@PACKAGE_NAME@/versions/clone.ver \
-	sys/@PACKAGE_NAME@/versions/hpuxcompat.ver \
-	sys/@PACKAGE_NAME@/versions/liscompat.ver \
-	sys/@PACKAGE_NAME@/versions/osfcompat.ver \
-	sys/@PACKAGE_NAME@/versions/sth.ver \
-	sys/@PACKAGE_NAME@/versions/strattach.ver \
-	sys/@PACKAGE_NAME@/versions/strlookup.ver \
-	sys/@PACKAGE_NAME@/versions/strpipe.ver \
-	sys/@PACKAGE_NAME@/versions/strreg.ver \
-	sys/@PACKAGE_NAME@/versions/strsad.ver \
-	sys/@PACKAGE_NAME@/versions/strsched.ver \
-	sys/@PACKAGE_NAME@/versions/strspecfs.ver \
-	sys/@PACKAGE_NAME@/versions/strsyms.ver \
-	sys/@PACKAGE_NAME@/versions/strsysctl.ver \
-	sys/@PACKAGE_NAME@/versions/strutil.ver \
-	sys/@PACKAGE_NAME@/versions/suncompat.ver \
-	sys/@PACKAGE_NAME@/versions/svr4compat.ver \
-	sys/@PACKAGE_NAME@/versions/uw7compat.ver
-endif
+nobase_nodist_pkginclude_HEADERS =
 
 # vim: ft=automake

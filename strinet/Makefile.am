@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/09/02 12:24:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/11/06 09:55:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/09/02 12:24:02 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 09:55:13 $ by $Author: brian $
 #
 # =============================================================================
+
+#
+#   General rules
+#
+include am/openss7.am
 
 if PUBLIC_RELEASE
 
@@ -232,20 +237,6 @@ KERNEL_SUBDIR			= $(PACKAGE_TARNAME)
 
 include am/kernel.am
 
-#include am/libraries.am
-
-EXPORT_SRCFILES			=
-
-EXPORT_VERFILES			=
-
-PKGINCL = include/sys/$(PACKAGE_NAME)
-
-GENKSYMS_CPPFLAGS = \
-	-I./src/drivers -I$(srcdir)/src/drivers \
-	$(INET_INCLUDES) $(KERNEL_CPPFLAGS)
-
-include am/genksyms.am
-
 STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
@@ -268,7 +259,11 @@ EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 endif
 
+if RPM_BUILD_USER
+
 SUBDIRS = src doc
+
+endif
 
 #
 #   Rules for making rpms
@@ -277,10 +272,5 @@ AM_RPMFLAGS = --define "_kversion $(PACKAGE_KVERSION)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
-
-#
-#   General rules
-#
-include am/openss7.am
 
 # vim: ft=automake

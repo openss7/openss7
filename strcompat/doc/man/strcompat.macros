@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strcompat.macros,v 0.9.2.1 2004/08/22 06:17:39 brian Exp $
+.\" @(#) $Id: strcompat.macros,v 0.9.2.2 2004/11/06 10:20:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:39 $ by $Author: brian $
+.\" Last Modified $Date: 2004/11/06 10:20:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -71,6 +71,7 @@ Trademarks mentioned are the property of their owners.
 ..
 .de ][
 .if !'\\*([T'' \{\
+.hy 4
 .if !'\\*([R'' \{\
 .\"\fB\\*([R\fR,
 .rm [R
@@ -262,7 +263,7 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/11/06 10:20:22 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -275,7 +276,7 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/11/06 10:20:22 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -290,7 +291,7 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/11/06 10:20:22 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -305,7 +306,7 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+OpenSS7 X/Open Networking: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/11/06 10:20:22 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -318,7 +319,7 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2004/08/22 06:17:39 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.2 $); $Date: 2004/11/06 10:20:22 $.
 ..
 .de AU
 .SH "AUTHOR"
@@ -363,6 +364,8 @@ Other trademarks are the property of their respective owners.
 .I3
 ..
 .de T4
+.\".C4
+.\".TH
 .I4
 ..
 .de TI
@@ -370,14 +373,17 @@ Other trademarks are the property of their respective owners.
 ..
 .ie '\\*(.T'ps' \{\
 .nr ps 0.4v
+.hy 6
 .\}
 .el \{\
 .nr ps 1v
+.hy 4
 .\}
 .if !r LL .nr LL \n(.lu
+.if !r LT .nr LT \n(.lu
 .ev 1
-.lt \n(LLu
+.lt \n(LTu
 .xl \n(LLu
 .ll \n(LLu
 .ev
-.\" vim: ft=nroff
+.\" vim: ft=groff

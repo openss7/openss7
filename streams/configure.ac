@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.25 2004/08/22 09:20:04 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.26 2004/11/06 10:24:34 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,13 +51,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/22 09:20:04 $ by $Author: brian $
+dnl Last Modified $Date: 2004/11/06 10:24:34 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.25 2004/08/22 09:20:04 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.26 2004/11/06 10:24:34 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([streams],[0.7a],[bugs@openss7.org])
 
@@ -163,7 +163,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
-		 doc/manual/texi/args.texi
+		 scripts/texi/args.texi
 		 src/modules/Config
 		 src/drivers/Config])
 

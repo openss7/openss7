@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2004/08/22 09:20:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2004/11/06 10:21:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/22 09:20:04 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 10:21:02 $ by $Author: brian $
 #
 # =============================================================================
+
+#
+# General rules
+#
+include am/openss7.am
 
 if RPM_BUILD_USER
 
@@ -233,7 +238,15 @@ streams.o: $(libLfSkernel_a_OBJECTS)
 
 endif
 
-EXTRA_DIST			=
+EXTRA_TEX			= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi
+
+EXTRA_DIST			= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			=
 
@@ -442,56 +455,56 @@ test_streams_CFLAGS		= $(LFS_CFLAGS)
 
 endif
 
-EXPORT_SRCFILES = \
-	src/compat/aix/aixcompat.c \
-	src/compat/hpux/hpuxcompat.c \
-	src/compat/lis/liscompat.c \
-	src/compat/osf/osfcompat.c \
-	src/compat/sun/suncompat.c \
-	src/compat/svr4/svr4compat.c \
-	src/compat/uw7/uw7compat.c \
-	src/drivers/clone.c \
-	src/kernel/strattach.c \
-	src/kernel/strlookup.c \
-	src/kernel/strpipe.c \
-	src/kernel/strreg.c \
-	src/kernel/strsad.c \
-	src/kernel/strsched.c \
-	src/kernel/strspecfs.c \
-	src/kernel/strsysctl.c \
-	src/kernel/strutil.c \
-	src/kernel/strsyms.c \
-	src/modules/sth.c
+PKGINCL				= include/sys/$(PACKAGE_NAME)
 
-EXPORT_VERFILES = \
-	include/sys/@PACKAGE_NAME@/versions/aixcompat.ver \
-	include/sys/@PACKAGE_NAME@/versions/hpuxcompat.ver \
-	include/sys/@PACKAGE_NAME@/versions/liscompat.ver \
-	include/sys/@PACKAGE_NAME@/versions/osfcompat.ver \
-	include/sys/@PACKAGE_NAME@/versions/suncompat.ver \
-	include/sys/@PACKAGE_NAME@/versions/svr4compat.ver \
-	include/sys/@PACKAGE_NAME@/versions/uw7compat.ver \
-	include/sys/@PACKAGE_NAME@/versions/clone.ver \
-	include/sys/@PACKAGE_NAME@/versions/strattach.ver \
-	include/sys/@PACKAGE_NAME@/versions/strlookup.ver \
-	include/sys/@PACKAGE_NAME@/versions/strpipe.ver \
-	include/sys/@PACKAGE_NAME@/versions/strreg.ver \
-	include/sys/@PACKAGE_NAME@/versions/strsad.ver \
-	include/sys/@PACKAGE_NAME@/versions/strsched.ver \
-	include/sys/@PACKAGE_NAME@/versions/strspecfs.ver \
-	include/sys/@PACKAGE_NAME@/versions/strsysctl.ver \
-	include/sys/@PACKAGE_NAME@/versions/strutil.ver \
-	include/sys/@PACKAGE_NAME@/versions/strsyms.ver \
-	include/sys/@PACKAGE_NAME@/versions/sth.ver
+EXPORT_SRCFILES			= \
+				src/compat/aix/aixcompat.c \
+				src/compat/hpux/hpuxcompat.c \
+				src/compat/lis/liscompat.c \
+				src/compat/osf/osfcompat.c \
+				src/compat/sun/suncompat.c \
+				src/compat/svr4/svr4compat.c \
+				src/compat/uw7/uw7compat.c \
+				src/drivers/clone.c \
+				src/kernel/strattach.c \
+				src/kernel/strlookup.c \
+				src/kernel/strpipe.c \
+				src/kernel/strreg.c \
+				src/kernel/strsad.c \
+				src/kernel/strsched.c \
+				src/kernel/strspecfs.c \
+				src/kernel/strsysctl.c \
+				src/kernel/strutil.c \
+				src/kernel/strsyms.c \
+				src/modules/sth.c
 
-PKGINCL = include/sys/$(PACKAGE_NAME)
+EXPORT_VERFILES			= \
+				$(PKGINCL)/versions/aixcompat.ver \
+				$(PKGINCL)/versions/hpuxcompat.ver \
+				$(PKGINCL)/versions/liscompat.ver \
+				$(PKGINCL)/versions/osfcompat.ver \
+				$(PKGINCL)/versions/suncompat.ver \
+				$(PKGINCL)/versions/svr4compat.ver \
+				$(PKGINCL)/versions/uw7compat.ver \
+				$(PKGINCL)/versions/clone.ver \
+				$(PKGINCL)/versions/strattach.ver \
+				$(PKGINCL)/versions/strlookup.ver \
+				$(PKGINCL)/versions/strpipe.ver \
+				$(PKGINCL)/versions/strreg.ver \
+				$(PKGINCL)/versions/strsad.ver \
+				$(PKGINCL)/versions/strsched.ver \
+				$(PKGINCL)/versions/strspecfs.ver \
+				$(PKGINCL)/versions/strsysctl.ver \
+				$(PKGINCL)/versions/strutil.ver \
+				$(PKGINCL)/versions/strsyms.ver \
+				$(PKGINCL)/versions/sth.ver
 
-GENKSYMS_CPPFLAGS = \
-	-I./src/compat -I$(srcdir)/src/compat \
-	-I./src/kernel -I$(srcdir)/src/kernel \
-	-I./src/drivers -I$(srcdir)/src/drivers \
-	-I./src/modules -I$(srcdir)/src/modules \
-	$(LFS_INCLUDES) $(KERNEL_CPPFLAGS)
+GENKSYMS_CPPFLAGS		= \
+				-I./src/compat -I$(srcdir)/src/compat \
+				-I./src/kernel -I$(srcdir)/src/kernel \
+				-I./src/drivers -I$(srcdir)/src/drivers \
+				-I./src/modules -I$(srcdir)/src/modules \
+				$(LFS_INCLUDES) $(KERNEL_CPPFLAGS)
 
 include am/genksyms.am
 
@@ -522,10 +535,5 @@ AM_RPMFLAGS = --define "_kversion $(PACKAGE_KVERSION)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
-
-#
-# General rules
-#
-include am/openss7.am
 
 # vim: ft=automake

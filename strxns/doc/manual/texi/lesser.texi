@@ -1,4 +1,4 @@
-@setfilename lesser.info
+@c @setfilename lesser.info
 
 @node GNU Lesser General Public License
 @section GNU Lesser General Public License

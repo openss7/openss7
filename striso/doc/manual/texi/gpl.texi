@@ -1,4 +1,4 @@
-@setfilename gpl.info
+@c @setfilename gpl.info
 
 @node GNU General Public License
 @section GNU General Public License

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 12:23:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/11/06 09:56:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/09/02 12:23:57 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 09:56:40 $ by $Author: brian $
 #
 # =============================================================================
+
+#
+#   General rules
+#
+include am/openss7.am
 
 if PUBLIC_RELEASE
 
@@ -397,15 +402,6 @@ KMODCONF_EXT				= @PACKAGE_TARNAME@
 
 include am/kernel.am
 
-include am/libraries.am
-
-EXPORT_SRCFILES				=
-EXPORT_VERFILES				=
-PKGINCL					= include/sys/$(PACKAGE_NAME)
-GENKSYMS_CPPFLAGS			= $(SCTP_INCLUDES) $(KERNEL_CPPFLAGS)
-
-include am/genksyms.am
-
 SCTPMAKENODES				= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
@@ -416,7 +412,11 @@ install-devices: $(SCTPMAKENODES)
 uninstall-devices: $(SCTPMAKENODES)
 	./$(SCTPMAKENODES) --remove
 
-SUBDIRS = doc src
+if RPM_BUILD_USER
+
+SUBDIRS = src doc
+
+endif
 
 #
 #   Rules for making rpms
@@ -425,11 +425,5 @@ AM_RPMFLAGS				= --define "_kversion $(kversion)"
 AM_SRPMFLAGS				=
 
 include am/rpm.am
-
-#
-#   General rules
-#
-
-include am/openss7.am
 
 # vim: ft=automake

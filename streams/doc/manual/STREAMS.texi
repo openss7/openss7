@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.6 2004/08/22 07:28:53 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.7 2004/11/06 10:24:35 brian Exp $
 %
 % =========================================================================
 %
@@ -53,38 +53,35 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/22 07:28:53 $ by $Author: brian $
+% Last Modified $Date: 2004/11/06 10:24:35 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename STREAMS.info
-@settitle Linux Fast-STREAMS Programmer's Guide
-@setchapternewpage odd
+@settitle Linux Fast-STREAMS
+
+@include texi/args.texi
 
 @dircategory STREAMS
 @direntry
-* STREAMS: (STREAMS).           STREAMS Manual
+* STREAMS: (STREAMS).		STREAMS Manual
 @end direntry
-
-@set xref-automatic-section-title
-
-@set EDITION 0.9.1
-@set VERSION 0.9.1
-@set UPDATED 2004-03-12
 
 @defindex op
 
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file provides the Linux Fast-STREAMS Manual.
+This file documents the @value{PACKAGE_TITLE} package.
 
-This is Edition @value{EDITION}, last updated @value{UPDATED}, of
-@cite{The Linux Fast-STREAMS Manual}, for Version @value{VERSION}.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{UPDATE}, of the
+@cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
 
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@@openss7.org>
+Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
-All Rights Reserved.
+All Rights Reserved. @*
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -94,11 +91,11 @@ copies.
 Permission is granted to process this file through Tex and print the results,
 provided the printed document carries copying permission notice identical to
 this one except for the removal of this paragraph (this paragraph not being
-relevant ot the printed manual).
+relevant to the printed manual).
 
 @end ignore
 Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided that the entire resulting
+under the conditions for verbatim copying, provided the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
@@ -106,19 +103,23 @@ Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
 
-@iftex
-@shorttitlepage Linux Fast-STREAMS Manual
-@end iftex
+@shorttitlepage @value{PACKAGE_TITLE} Installation and Reference Manual
 @titlepage
-@title Linux Fast-STREAMS Manual
-@subtitle Edition @value{EDITION} for version @value{VERSION}
-@subtitle @value{UPDATED}
-@author Brian Bidulock  @cite{@email{bidulock@@openss7.org}}
+@titlefont{@value{PACKAGE_TITLE}}
+@sp 0.5
+@title Installation and Reference Manual
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @email{bidulock@@openss7.org} @*
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
 Published by OpenSS7 Corporation @*
@@ -126,172 +127,617 @@ Published by OpenSS7 Corporation @*
 Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
+@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
 
+@noindent
 Permission is granted to copy and distribute modified versions of this manual
 under the conditions for verbatim copying, provided that the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
+@noindent
 Permission is granted to copy and distribute translations of this manual into
 another language, under the same conditions as for modified versions.
 @end titlepage
 @page
 
-@node Top, Acknowledgements, (dir), (dir)
-@top Linux Fast-STREAMS
-@unnumbered About This Manual
-This is Edition @value{EDITION}, last updated @value{UPDATED}, of
-@cite{Linux Fast-STREAMS Manual}, for Version @value{VERSION}.
+@node Top
+@top About This Manual
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{PACKAGE_TITLE} Installation and Reference Manual}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @menu
-* Acknowledgements::
-* Overview::
-* Appendices::
-
- --- The Detailed Node Listing ---
+* Acknowledgements::		Sponsors and Contributors
+* Introduction::		Introduction to the package
+* Objective::			Objective of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Copying::			Copying information for this Software
+* Documentation License::	Copying information for this Manual
+* Indices::			Indices
+@end menu
+@ignore
+@menu
+ ----- detailed node listing -----
 
 Acknowledgements
 
-* Sponsors::                    Sponsors of Linux Fast-STREAMS
-* Contributors::                Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors of the package
+* Contributors::		People who contributed to the development of
+				the package.
+Introduction
 
-Overview
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
 
-* Introduction::                An Introduction to Linux Fast-STREAMS
-* Concepts::                    STREAMS Concepts
+Objective
 
-Appendices
+Reference
 
-* Copying::                     Copying information for this Software
-* Documentation License::       Copying information for this Manual
-* Indices::                     Indices
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Libraries::			Libraries includedi in the package
+* Utilities::			Utilities includedi in the package
+* Development::			Development against the package
+
+Conformance
+
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Bugs::			Known Bugs
+* Schedule::			Development and Bug Fix Schedule
+
+Installation
+
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removal::			Removal of the package
+* Loading::			Loading the package
+
+Indices
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
 @end menu
+@end ignore
 
 @c --------------------------------------------------------------------------
 
-@iftex
 @node Acknowledgements
-@end iftex
-@ifnottex
-@node Acknowledgements, Overview, Top, Top
-@end ifnottex
 @unnumbered Acknowledgements
 @cindex credits
 
 @menu
-* Sponsors::                    Sponsors of Linux Fast-STREAMS
-* Contributors::                Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors
+* Contributors::		Contributors
 @end menu
 
-@node Sponsors,  ,  , Acknowledgements
-@unnumberedsec Sponsors of Linux Fast-STREAMS
+@node Sponsors
+@section Sponsors
 @cindex sponsors
 
-Funding for completion of Linux Fast-STREAMS was provided by:
+Funding for completion of the @value{PACKAGE_TITLE} package was provided in
+part by:
 
-OpenSS7 Corporation
+@itemize
+@item OpenSS7 Corporation
+@end itemize
 
-Additional funding for The OpenSS7 Project was provided by:
-
-@node Contributors,  ,  , Acknowledgements
-@unnumberedsec Contributors to Linux Fast-STREAMS
+@node Contributors
+@section Contributors
 @cindex contributors
 
-The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
+The primary contributor to the @value{PACKAGE_TITLE} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.
+@ignore
+The following is a list of significant contributors to the project:
+@end ignore
 
-@node Overview, Appendices, Acknowledgements, Top
-@chapter Overview of Linux Fast-STREAMS
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and
+future development schedule of the @value{PACKAGE_TITLE} package.
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+@end menu
+
+@node Notice
+@section Notice
+@cindex notice
+@cindex licensing
+
+This package is released and distributed under the @cite{GNU General Public License}
+(@pxref{Copying}).  Please note, however, that there are different licensing terms for the manual
+pages and some of the documentation (derived from X/Open publications and other sources).  Consult
+the permission notices contained in the documentation for more information.  This document, is
+released under the @cite{GNU Free Documentation License} (@pxref{Documentation License}) with all
+sections invariant.
+
+@node Overview
+@section Overview
 @cindex overview
+
+This manual documents the design, implementation, installation, operation and future development of
+the @value{PACKAGE_TITLE} package.
+
+@node Organization
+@section Organization of this Document
+@cindex organization
+
+This document is organized (loosely) into several sections as follows:
+
+@ifnottex
 @menu
-* Introduction::                An Introduction to Linux Fast-STREAMS
-* Concepts::                    STREAMS Concepts
+  Introduction::		This introduction
+* Objective::			Objective of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+@end menu
+@end ifnottex
+@iftex
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@end multitable
+@end iftex
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Objective
+@chapter Objective
+@cindex objective
+
+@cite{@value{PACKAGE_TITLE}} is intended as a high-performance, production replacement for
+@cite{Linux STREAMS (LiS)}.  @cite{@value{PACKAGE_TITLE}} has the following features in contrast to
+@cite{Linux STREAMS}:
+
+@sp 1
+@multitable @columnfractions .5 .5
+@item @b{Linux Fast-STREAMS}
+@tab @b{LiS}
+@item @  @tab @ 
+@item Provided and optimized for Linux.
+@tab Maintains portability across Linux, User Space, QNX, DOS and other ports.
+@item @  @tab @ 
+@item Promotes mainstream kernel adoption.
+@tab Places portability concerns before mainstream kernel adoption.
+@item @  @tab @ 
+@item Lindented and follows normal kernel formatting and coding practices.
+@tab Non-lindented, does not follow normal kernel formatting and coding practices.
+@item @  @tab @ 
+@item Provides compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2 and LiS.  Supports
+all major SVR 4.2 variants.
+@tab Provides some compatibility interfaces but also many Linux-derived interfaces specific to LiS.
+@item @  @tab @ 
+@item Licensed under GPL with commercial licensing available.
+@tab Dubiously licensed under LGPL (yet parts are GPL).
+@item @  @tab @ 
+@item Supports full SVR 4.2 ES/MP synchronization models.
+@tab Supports only single, Linux derived sychronization models.
+@item @  @tab @ 
+@item Runs at SoftIRQ.  By running at SoftIRQ, Linux Fast-STREAMS ensures that its place within the
+scheduling network-based events is appropriate for the Linux kernel.
+@tab Separate kernel threads.
+@item @  @tab @ 
+@item Provides common SVR 4.2 system tunable parameters and system controls as well as /proc
+filesystem for support and debugging.
+@tab Provides only log-based debugging.
+@item @  @tab @ 
+@item Provides support for SVR 4.2 STREAMS and other utilities.
+@tab Provides limited set of LiS only Linux-derived utilities.
+@item @  @tab @ 
+@item Provides full named-streams device and device filesystem support.
+@tab Provides only character-based node support.
+@end multitable
+
+@c ----------------------------------------------------------------------------
+
+@node Reference
+@chapter Reference
+@cindex reference
+
+@menu
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Libraries::			Libraries includedi in the package
+* Utilities::			Utilities includedi in the package
+* Development::			Development against the package
 @end menu
 
-This manual documents how to develop and port STREAMS drivers and modules for
-Linux Fast-STREAMS.
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 
-@node Introduction, Concepts, , Overview
-@section Introduction
-@cpindex introduction
+@node Files
+@section Files
+@cindex headers
+
+@include tree.texi
+
+@table @file
+@item specfs.o
+@pgindex specfs.o
+@item streams.o
+@pgindex streams.o
+@item streams-aixcompat.o
+@pgindex streams-aixcompat.o
+@item streams-hpuxcompat.o
+@pgindex streams-hpuxcompat.o
+@item streams-liscompat.o
+@pgindex streams-liscompat.o
+@item streams-osfcompat.o
+@pgindex streams-osfcompat.o
+@item streams-suncompat.o
+@pgindex streams-suncompat.o
+@item streams-svr4compat.o
+@pgindex streams-svr4compat.o
+@item streams-uw7compat.o
+@pgindex streams-uw7compat.o
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers
+@section Drivers
+@cindex drivers
+
+@table @file
+@item streams-clone.o
+@pgindex streams-clone.o
+Clone device driver.
+@item streams-echo.o
+@pgindex streams-echo.o
+Echo (loopback) device driver.
+@item streams-fifo.o
+@pgindex streams-fifo.o
+FIFO (Named Pipe) driver.
+@item streams-log.o
+@pgindex streams-log.o
+STREAMS log driver.
+@item streams-nsdev.o
+@pgindex streams-nsdev.o
+Named STREAMS device driver.
+@item streams-nuls.o
+@pgindex streams-nuls.o
+Null stream driver.
+@item streams-pipe.o
+@pgindex streams-pipe.o
+Pipe driver.
+@item streams-sad.o
+@pgindex streams-sad.o
+STREAMS Administrative Driver.
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules
+@section Modules
+@cindex modules
+
+@table @file
+@item streams-connld.o
+@pgindex streams-connld.o
+Connld module.
+@item streams-pipemod.o
+@pgindex streams-pipemod.o
+Pipe module.
+@item streams-sc.o
+@pgindex streams-sc.o
+STREAMS configuration module.
+@item streams-sth.o
+@pgindex streams-sth.o
+Stream Head module.
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Libraries
+@section Libraries
+@cindex libraries
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities
+@section Utilities
+@cindex utilities
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Development
+@section Development
+@cindex developing
+
+For development using the @cite{@value{PACKAGE_NAME}} package, @xref{Top, About This Manual, About
+This Manual, SPG, STREAMS Programmer's Guide}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance
+@chapter Conformance
+@cindex conformance
+
 @menu
-* Q and A::			Questions and Answers
+* Compatibility::
+* Porting::
 @end menu
 
-@node Q and A, , , Introduction
-@subsection Questions and Answers
-@cpindex questions
-@cpindex answers
-@cpindex FAQ
+@node Compatibility
+@section Compatibility
+@cindex compatibility
 
-@subsubsection What is STREAMS?
+@cite{@value{PACKAGE_TITLE}} provides some degree of compatibility with other @dfn{STREAMS}
+implementation as follows:
 
-@subsubsection Doesn't Linux have STREAMS?
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{SVR 4.2 ES/MP}
+to ease portability and common comprehension,
+@pxref{SVR 4.2 MP DDI/DKI Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
 
-@subsubsection Why STREAMS?
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{AIX 5L Version 5.1}
+to ease portability and common comprehension,
+@pxref{AIX 5L Version 5.1 Compatibility Functions , , SPG, STREAMS Programmer's Guide}.
 
-@subsubsection Why Fast?
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{HP-UX 11.0i v2}
+to ease portability and common comprehension,
+@pxref{HP-UX 11.0i v2 Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
 
-@subsubsection Why Linux?
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{OSF/1 1.2/Digital UNIX}
+to ease portability and common comprehension,
+@pxref{OSF/1 1.2/Digital UNIX Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
 
-@subsubsection Why Compatibility?
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+to ease portability and common comprehension,
+@pxref{UnixWare 7.1.3 (OpenUnix 8) Compatiblity Functions, , , SPG, STREAMS Programmer's Guide}.
 
-@node Concepts, , Introduction, Overview
-@section Concepts
-@cpindex concepts
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{Solaris 9/SunOS 5.9}
+to ease portability and common comprehension,
+@pxref{Solaris 9/SunOS 5.9 Compatiblity Functions, , , SPG, STREAMS Programmer's Guide}.
 
-@node Appendices, , Overview, Top
-@appendix Appendices
-@menu
-* Copying::                     Copying information for this Software
-* Documentation License::       Copying information for this Manual
-* Indices::                     Indices
-@end menu
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{SUPER-UX}
+to ease portability and common comprehension,
+@pxref{SVR 4.2 MP DDI/DKI Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
 
-@node Copying, Documentation License, , Appendices
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{UXP/V}
+to ease portability and common comprehension,
+@pxref{SVR 4.2 MP DDI/DKI Compatibility Functions, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{LiS 2.16}
+to ease portability and common comprehension,
+@pxref{LiS 2.16 Compatiblity Functions, , , SPG, STREAMS Programmer's Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, SPG, STREAMS Programmer's Guide}.
+
+@node Porting
+@section Porting
+@cindex porting
+
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SVR 4.2 ES/MP}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{AIX 5L Version 5.1}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{HP-UX 11.0i v2}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{OSF/1 1.2/Digital UNIX/True 64}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{Solaris 9/SunOS 5.9}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SUPER-UX}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UXP/V}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{LiS-2.16.18}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, proting, Linux Fast-STREAMS Porting Guide}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installation
+@chapter Installation
+@cindex installation
+
+@include install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Copying
 @unnumbered Copying
+
+@menu
+* GNU General Public License::
+@end menu
+
 @include texi/gpl.texi
 
-@node Documentation License, Indices, Copying, Appendices
-@unnumbered Documentation License
-@include texi/fdl.texi
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 
-@node Indices, , Documentation License, Appendices
-@unnumbered Indices
+@node Documentation License
+@unnumbered Documentation License
+
 @menu
-* Concept Index::               Concept Index
-* Type Index::                  Type Index
-* Function Index::              Function Index
-* Variable Index::              Variable Index
-* File Index::                  File Index
+* GNU Free Documentation License::
 @end menu
 
-@node Concept Index, Type Index, , Indices
-@unnumbered Concept Index
+@include texi/fdl.texi
 
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
+@unnumbered Indices
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Concept Index
+@section Index of Concepts
 @printindex cp
 
-@node Type Index, Function Index, Concept Index, Indices
-@unnumbered Type Index
-
+@page
+@node Type Index
+@section Index of Data Types
 @printindex tp
 
-@node Function Index, Variable Index, Type Index, Indices
-@unnumbered Function and Macro Index
-
+@page
+@node Function Index
+@section Index of Functions and Macros
 @printindex fn
 
-@node Variable Index, File Index, Function Index, Indices
-@unnumbered Variable and Constant Macro Index
-
+@page
+@node Variable Index
+@section Index of Variables and Constants
 @printindex vr
 
-@node File Index, , Variable Index, Indices
-@unnumbered Program and File Index
-
+@page
+@node File Index
+@section Index of Files and Prorams
 @printindex pg
+
+@page
+@node Option Index
+@section Index of Configuration Options
+@printindex op
+
+@c ----------------------------------------------------------------------------
 
 @page
 @shortcontents

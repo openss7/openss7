@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.6 2004/08/22 07:28:53 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.7 2004/11/06 10:24:35 brian Exp $
 %
 % =========================================================================
 %
@@ -53,7 +53,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/22 07:28:53 $ by $Author: brian $
+% Last Modified $Date: 2004/11/06 10:24:35 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -140,7 +140,7 @@ another language, under the same conditions as for modified versions.
 @end titlepage
 @page
 
-@node Top, Acknowledgements, (dir), (dir)
+@node Top
 @top Main Menu
 This is Edition @value{EDITION}, last updated @value{UPDATED}, of
 @cite{STREAMS Programmer's Guide for Linux Fast-STREAMS}, for Version
@@ -163,34 +163,34 @@ This is Edition @value{EDITION}, last updated @value{UPDATED}, of
 
 Acknowledgements
 
-* Sponsors::                    Sponsors of Linux Fast-STREAMS
-* Contributors::                Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors of Linux Fast-STREAMS
+* Contributors::		Contributors to Linux Fast-STREAMS
 
 Overview
 
-* Introduction::                An Introduction to Linux Fast-STREAMS
-* Concepts::                    STREAMS Concepts
+* Introduction::		An Introduction to Linux Fast-STREAMS
+* Concepts::			STREAMS Concepts
 
 Reference
 
-* Header Files::                STREAMS Header Files
-* Drivers::                     STREAMS Drivers
-* Modules::                     STREAMS Modules
-* System Calls::                STREAMS System Calls
-* Module Entry Points::         STREAMS Module Entry Points
-* Structures::                  STREAMS Structures
-* Registration::                STREAMS Module and Driver Registration Functions
-* Message Handling::            STREAMS Message Handling Functions
-* Queue Handling::              STREAMS Queue Handling Functions
-* Miscellaneous Functions::     STREAMS Miscellaneous Functions
-* Extensions::                  STREAMS Extension Functions
-* System Controls::             STREAMS System Controls
-* /proc Filesystem::            STREAMS /proc Filesystem
+* Header Files::		STREAMS Header Files
+* Drivers::			STREAMS Drivers
+* Modules::			STREAMS Modules
+* System Calls::		STREAMS System Calls
+* Module Entry Points::		STREAMS Module Entry Points
+* Structures::			STREAMS Structures
+* Registration::		STREAMS Module and Driver Registration Functions
+* Message Handling::		STREAMS Message Handling Functions
+* Queue Handling::		STREAMS Queue Handling Functions
+* Miscellaneous Functions::	STREAMS Miscellaneous Functions
+* Extensions::			STREAMS Extension Functions
+* System Controls::		STREAMS System Controls
+* /proc Filesystem::		STREAMS /proc Filesystem
 
 Examples
 
-* Module Example::              STREAMS Module Example
-* Driver Example::              STREAMS Driver Example
+* Module Example::		STREAMS Module Example
+* Driver Example::		STREAMS Driver Example
 
 Device Numbers
 
@@ -202,63 +202,58 @@ Device Numbers
 
 Multi-Threading
 
-* Configuration::               MP STREAMS Configuration
-* Asynchronous Entry Points::   MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::      MP STREAMS Asynchronous Callbacks
-* Synchronous Entry Points::    MP STREAMS Synchronous Entry Points
-* Synchronous Callbacks::       MP STREAMS Synchronous Callbacks
+* Configuration::		MP STREAMS Configuration
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
+* Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
 
 Conformance
 
-* SVR 4.2 Compatibility::       SVR 4.2 MP DDI/DKI compatibility
-* AIX Compatibility::           AIX 5L Version 5.1 compatibility
-* HP-UX Compatibility::         HP-UX 11.0i v2 compatibility
-* OSF/1 Compatibility::         OSF/1 1.2/Digital UNIX comptatibility
-* UnixWare Compatibility::      UnixWare 7.1.3 compatibility
-* Solaris Compatibility::       Solaris 9/SunOS 5.9 compatibility
-* SUX Compatibility::           Super/UX compatibilty
-* UXP Compatibility::           UX/P compatibilty
-* LiS Compatibility::           LiS 2.16 compatibilty
+* SVR 4.2 Compatibility::	SVR 4.2 MP DDI/DKI compatibility
+* AIX Compatibility::		AIX 5L Version 5.1 compatibility
+* HP-UX Compatibility::		HP-UX 11.0i v2 compatibility
+* OSF/1 Compatibility::		OSF/1 1.2/Digital UNIX comptatibility
+* UnixWare Compatibility::	UnixWare 7.1.3 compatibility
+* Solaris Compatibility::	Solaris 9/SunOS 5.9 compatibility
+* SUX Compatibility::		Super/UX compatibilty
+* UXP Compatibility::		UX/P compatibilty
+* LiS Compatibility::		LiS 2.16 compatibilty
 
 Portability
 
-* SVR 4.2 Portability::         Porting from SVR 4.2 MP
-* AIX Portability::             Porting from AIX 5L Version 5.1
-* HP-UX Portability::           Porting from HP-UX 11.0i v2
-* OSF/1 Portability::           Porting from OSF/1 1.2/Digital UNIX
-* UnixWare Portability::        Porting from UnixWare 7.1.3
-* Solaris Portability::         Porting from Solaris 9/SunOS 5.9
-* SUX Portability::             Porting from Super/UX
-* UXP Portability::             Porting from UX/P
-* LiS Portability::             Porting from LiS 2.16
+* SVR 4.2 Portability::		Porting from SVR 4.2 MP
+* AIX Portability::		Porting from AIX 5L Version 5.1
+* HP-UX Portability::		Porting from HP-UX 11.0i v2
+* OSF/1 Portability::		Porting from OSF/1 1.2/Digital UNIX
+* UnixWare Portability::	Porting from UnixWare 7.1.3
+* Solaris Portability::		Porting from Solaris 9/SunOS 5.9
+* SUX Portability::		Porting from Super/UX
+* UXP Portability::		Porting from UX/P
+* LiS Portability::		Porting from LiS 2.16
 
 Indices
 
-* Concept Index::               Concept Index
-* Type Index::                  Type Index
-* Function Index::              Function Index
-* Variable Index::              Variable Index
-* File Index::                  File Index
+* Concept Index::		Concept Index
+* Type Index::			Type Index
+* Function Index::		Function Index
+* Variable Index::		Variable Index
+* File Index::			File Index
 
 @end menu
 
 @c --------------------------------------------------------------------------
 
-@iftex
 @node Acknowledgements
-@end iftex
-@ifnottex
-@node Acknowledgements, Overview, Top, Top
-@end ifnottex
 @unnumbered Acknowledgements
 @cindex credits
 
 @menu
-* Sponsors::                    Sponsors of Linux Fast-STREAMS
-* Contributors::                Contributors to Linux Fast-STREAMS
+* Sponsors::			Sponsors of Linux Fast-STREAMS
+* Contributors::		Contributors to Linux Fast-STREAMS
 @end menu
 
-@node Sponsors,  ,  , Acknowledgements
+@node Sponsors
 @unnumberedsec Sponsors of Linux Fast-STREAMS
 @cindex sponsors
 
@@ -268,74 +263,74 @@ OpenSS7 Corporation
 
 Additional funding for The OpenSS7 Project was provided by:
 
-@node Contributors,  ,  , Acknowledgements
+@node Contributors
 @unnumberedsec Contributors to Linux Fast-STREAMS
 @cindex contributors
 
 The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
 
 
-@node Overview, Reference, Acknowledgements, Top
+@node Overview
 @chapter Overview of Linux Fast-STREAMS
 @cindex overview
 @menu
-* Introduction::                An Introduction to Linux Fast-STREAMS
-* Concepts::                    STREAMS Concepts
+* Introduction::		An Introduction to Linux Fast-STREAMS
+* Concepts::			STREAMS Concepts
 @end menu
 
 This manual documents how to develop and port STREAMS drivers and modules for
 Linux Fast-STREAMS.
 
-@node Introduction, Concepts, , Overview
+@node Introduction
 @section Introduction
 @cpindex introduction
 
-@node Concepts, , Introduction, Overview
+@node Concepts
 @section Concepts
 @cpindex concepts
 
 
-@node Reference, Examples, Overview, Top
+@node Reference
 @chapter Reference
 @cpindex reference
 @menu
-* Header Files::                STREAMS Header Files
-* Drivers::                     STREAMS Drivers
-* Modules::                     STREAMS Modules
-* System Calls::                STREAMS System Calls
-* Module Entry Points::         STREAMS Module Entry Points
-* Structures::                  STREAMS Structures
-* Registration::                STREAMS Module and Driver Registration Functions
-* Message Handling::            STREAMS Message Handling Functions
-* Queue Handling::              STREAMS Queue Handling Functions
-* Miscellaneous Functions::     STREAMS Miscellaneous Functions
-* Extensions::                  STREAMS Extension Functions
-* System Controls::             STREAMS System Controls
-* /proc Filesystem::            STREAMS /proc Filesystem
+* Header Files::		STREAMS Header Files
+* Drivers::			STREAMS Drivers
+* Modules::			STREAMS Modules
+* System Calls::		STREAMS System Calls
+* Module Entry Points::		STREAMS Module Entry Points
+* Structures::			STREAMS Structures
+* Registration::		STREAMS Module and Driver Registration Functions
+* Message Handling::		STREAMS Message Handling Functions
+* Queue Handling::		STREAMS Queue Handling Functions
+* Miscellaneous Functions::	STREAMS Miscellaneous Functions
+* Extensions::			STREAMS Extension Functions
+* System Controls::		STREAMS System Controls
+* /proc Filesystem::		STREAMS /proc Filesystem
 @end menu
 
-@node Header Files, Drivers, , Reference
+@node Header Files
 @section Header Files
 @cpindex header files
 @menu
 Header Files
 @end menu
 
-@node Drivers, Modules, Header Files, Reference
+@node Drivers
 @section Drivers
 @cpindex drivers
 @menu
 Drivers
 @end menu
 
-@node Modules, System Calls, Drivers, Reference
+@node Modules
 @section Modules
 @cpindex modules
 @menu
 Modules
 @end menu
 
-@node System Calls, Module Entry Points, Modules, Reference
+@node System Calls
 @section System Calls
 @cpindex system calls
 @menu
@@ -374,14 +369,14 @@ System Calls
 @subsubsection pipe(2)
 @fnindex pipe(2)
 
-@node Module Entry Points, Structures, System Calls, Reference
+@node Module Entry Points
 @section Module entry points
 @cpindex module entry points
 @menu
 Module Entry Points
 @end menu
 
-@node Structures, Registration, Module Entry Points, Reference
+@node Structures
 @section Structures
 @cpindex structures
 @menu
@@ -417,7 +412,7 @@ Structures
 @subsubsection streamadm(9)
 @tpindex streamadm(9)
 
-@node Registration, Message Handling, Structures, Reference
+@node Registration
 @section Registration
 @cpindex registration
 @menu
@@ -467,7 +462,7 @@ Registration
 @subsubsection unregister_strmod(9)
 @fnindex unregister_strmod(9)
 
-@node Message Handling, Queue Handling, Registration, Reference
+@node Message Handling
 @section Message Handling
 @cpindex message handling
 @menu
@@ -517,7 +512,7 @@ Message Handling
 @subsubsection unlinkb(9)
 @fnindex unlinkb(9)
 
-@node Queue Handling, Miscellaneous Functions, Message Handling, Reference
+@node Queue Handling
 @section Queue Handling
 @cpindex queue handling
 @menu
@@ -598,7 +593,7 @@ Queue Handling
 @subsubsection unfreezestr(9)
 @fnindex unfreezestr(9)
 
-@node Miscellaneous Functions, Extensions, Queue Handling, Reference
+@node Miscellaneous Functions
 @section Miscellaneous Functions
 @cpindex miscellaneous functions
 @menu
@@ -664,7 +659,7 @@ Miscellaneous Functions
 @subsubsection untimeout(9)
 @fnindex untimeout(9)
 
-@node Extensions, System Controls, Miscellaneous Functions, Reference
+@node Extensions
 @section Extensions
 @cpindex extensions
 @menu
@@ -1191,7 +1186,7 @@ Extensions
 @subsubsection lis_xmsgsize(9)
 @fnindex lis_xmsgsize(9)
 
-@node System Controls, /proc Filesystem, Extensions, Reference
+@node System Controls
 @section System Controls
 @cpindex system controls
 @menu
@@ -1221,11 +1216,10 @@ Fast-STREAMS:
 
 @subsubsection sys.streams.cltime
 @vrindex sys.streams.cltime
-Defines the default time interval (in milliseconds) that closing stream will
-linger for messages to clear its queues before finally closing.  Valid values
-are zero (0) or greater (MAXINT).  The default value is the traditional UNIX
-value of 15,000 milliseconds (15 seconds).  This system control defines the
-default for all new streams.  The value for a given stream can be changed with
+Defines the default time interval (in milliseconds) that closing stream will linger for messages to
+clear its queues before finally closing.  Valid values are zero (0) or greater (MAXINT).  The
+default value is the traditional UNIX value of 15,000 milliseconds (15 seconds).  This system
+control defines the default for all new streams.  The value for a given stream can be changed with
 the
 @iftex
 @b{streamio}(7)
@@ -1239,90 +1233,82 @@ after the stream is opened and before the stream is closed.
 
 @subsubsection sys.streams.max_apush
 @vrindex sys.streams.max_apush
-Defines the maximum number of modules that can be configured for autopush onto
-a STREAMS driver.  Valid values are zero (0) or greater (MAXINT).  The default
-value is the traditional UNIX value of 8 modules.  This system control defines
-the maximum for all new autopush configurations.  Existing autopush
-configurations are unchanged.
+Defines the maximum number of modules that can be configured for autopush onto a STREAMS driver.
+Valid values are zero (0) or greater (MAXINT).  The default value is the traditional UNIX value of 8
+modules.  This system control defines the maximum for all new autopush configurations.  Existing
+autopush configurations are unchanged.
 
 @subsubsection sys.streams.max_mblk
 @vrindex sys.streams.max_mblk
-Defines the maximum number of combined message data blocks that will be held
-on the per-CPU free list between runs of
+Defines the maximum number of combined message data blocks that will be held on the per-CPU free
+list between runs of
 @iftex
 @b{runqueues}(9).
 @end iftex
 @ifnottex
 @inforef{runqueues(9), , *manpages*}.
 @end ifnottex
-Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the
-traditional @i{UNIX} value of 10 blocks.  This system control defines the
-maximum for the next run of
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the traditional @i{UNIX}
+value of 10 blocks.  This system control defines the maximum for the next run of
 @iftex
 @b{runqueues}(9)
 @end iftex
 @ifnottex
 @inforef{runqueues(9), , *manpages*}
 @end ifnottex
-for all CPUs.  Increasing or decreasing this number may have a positive or
-negative performance impact.
+for all CPUs.  Increasing or decreasing this number may have a positive or negative performance
+impact.
 
 @subsubsection sys.streams.max_stramod
 @vrindex sys.streams.max_stramod
-Defines the maximum number of autopush structures that can be defined for the
-entire system.  Valid values are zero (0) or greater (@b{MAXINT}).  The
-default value is eight (8) ???????  This system control defines the
-system-wide maximum.
+Defines the maximum number of autopush structures that can be defined for the entire system.  Valid
+values are zero (0) or greater (@b{MAXINT}).  The default value is eight (8) ???????  This system
+control defines the system-wide maximum.
 
 @subsubsection sys.streams.max_strdev
 @vrindex sys.streams.max_strdev
-Defines the maximum number of streams devices.  This is normally the maximum
-number of character devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or
-greater (@b{MAXINT}).  The default value is @b{MAX_CHRDEV} (256).  This is a
-read-only system control.
+Defines the maximum number of streams devices.  This is normally the maximum number of character
+devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or greater (@b{MAXINT}).  The default value is
+@b{MAX_CHRDEV} (256).  This is a read-only system control.
 
 @subsubsection sys.streams.max_strmod
 @vrindex sys.streams.max_strmod
-Defines the maximum number of streams modules.  This is normally the maximum
-number of character devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or
-greater (@b{MAXINT}).  The default value is @b{MAX_CHRDEV} (256).  This is a
-read-only system control.
+Defines the maximum number of streams modules.  This is normally the maximum number of character
+devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or greater (@b{MAXINT}).  The default value is
+@b{MAX_CHRDEV} (256).  This is a read-only system control.
 
 @subsubsection sys.streams.msg_priority
 @vrindex sys.streams.msg_priority
-Defines whether allocation priority will honored or whether all allocations
-will be treated the same.  See
+Defines whether allocation priority will honored or whether all allocations will be treated the
+same.  See
 @iftex
 @b{allocb}(9).
 @end iftex
 @ifnottex
 @inforef{allocb(9), , *manpages*}.
 @end ifnottex
-When true (non-zero), allocation priority will be honored when allocating
-message blocks.  When false (zero), allocation priority will be ignored.
-Valid values are zero (0) or non-zero.  The default value is zero (0).
-Changing this value may have a positive or negative impact on system
+When true (non-zero), allocation priority will be honored when allocating message blocks.  When
+false (zero), allocation priority will be ignored.  Valid values are zero (0) or non-zero.  The
+default value is zero (0).  Changing this value may have a positive or negative impact on system
 performance.
 
 @subsubsection sys.streams.nband
 @vrindex sys.streams.nband
-Defines the number of queue bands available.  Valid values are zero (0) or
-greater (@b{MAXINT}).  The default value is the traditional UNIX value of 256.
-This system control defines the system wide value.  This system control is
-read-only.
+Defines the number of queue bands available.  Valid values are zero (0) or greater (@b{MAXINT}).
+The default value is the traditional UNIX value of 256.  This system control defines the system wide
+value.  This system control is read-only.
 
 @subsubsection sys.streams.nstrmsgs
 @vrindex sys.streams.nstrmsgs
-Defines the maximum number of combined message data blocks that will be
-allocated.  Valid values are zero (0) or greater (@b{MAXINT}).  The default
-value is 2^12.  Changing this value may have a positive or negative impact on
-system performance.  Setting this value to a small number may be useful for
-debugging @i{STREAMS} drivers and modules.
+Defines the maximum number of combined message data blocks that will be allocated.  Valid values are
+zero (0) or greater (@b{MAXINT}).  The default value is 2^12.  Changing this value may have a
+positive or negative impact on system performance.  Setting this value to a small number may be
+useful for debugging @i{STREAMS} drivers and modules.
 
 @subsubsection sys.streams.nstrpush
 @vrindex sys.streams.nstrpush
-Deinfes the maximum number of modules that can be pushed on a stream.  This
-includes both autopushed modules and modules pushed using the
+Deinfes the maximum number of modules that can be pushed on a stream.  This includes both autopushed
+modules and modules pushed using the
 @b{I_PUSH}
 @vrindex I_PUSH
 IO control of
@@ -1332,77 +1318,69 @@ IO control of
 @ifnottex
 @inforef{streamio(7), , *manpages*}.
 @end ifnottex
-Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the
-tranditional @i{UNIX} value of 64.  This is the default values for all new
-streams.  Existing streams are unaffected.
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the tranditional @i{UNIX}
+value of 64.  This is the default values for all new streams.  Existing streams are unaffected.
 
 @subsubsection sys.streams.hiwat
 @vrindex sys.streams.hiwat
-Defines the default high water mark (in message bytes) for the stream head.
-Valid values are zero (0) or greater (@b{MAXINT}).  The default value is 5120.
-This is the default value for all new stream heads.  Existing stream heads are
-unaffected.  The value on existing stream heads can be changed by a driver or
-module by sending an
+Defines the default high water mark (in message bytes) for the stream head.  Valid values are zero
+(0) or greater (@b{MAXINT}).  The default value is 5120.  This is the default value for all new
+stream heads.  Existing stream heads are unaffected.  The value on existing stream heads can be
+changed by a driver or module by sending an
 @b{M_SETOPTS}
 @vrindex M_SETOPTS
 message to the stream head.
 
 @subsubsection sys.streams.lowat
 @vrindex sys.streams.lowat
-Defines the default low water mark (in mesasge bytes) for the stream head.
-Valid values are zero (0) or greater (@b{MAXINT}).  The default value is 1024.
-This is the default value for all new stream heads.  Existing stream heads are
-unaffected.  The value on existing stream heads can be changed by a driver or
-module by sending an
+Defines the default low water mark (in mesasge bytes) for the stream head.  Valid values are zero
+(0) or greater (@b{MAXINT}).  The default value is 1024.  This is the default value for all new
+stream heads.  Existing stream heads are unaffected.  The value on existing stream heads can be
+changed by a driver or module by sending an
 @b{M_SETOPTS}
 @vrindex M_SETOPTS
 message to the stream head.
 
 @subsubsection sys.streams.maxpsz
 @vrindex sys.streams.maxpsz
-Defines the maximum packet size accepted (in message bytes) for the stream
-head.  Valid values are zero (0) or greater (@b{MAXINT}).  The default value
-is 2^12.  This is the default value for all new stream heads.  Existing stream
-heads are unaffected.  The value on existing stream heads can be changed by a
-driver or module by sending an
+Defines the maximum packet size accepted (in message bytes) for the stream head.  Valid values are
+zero (0) or greater (@b{MAXINT}).  The default value is 2^12.  This is the default value for all new
+stream heads.  Existing stream heads are unaffected.  The value on existing stream heads can be
+changed by a driver or module by sending an
 @b{M_SETOPTS}
 @vrindex M_SETOPTS
 message to the stream head.
 
 @subsubsection sys.streams.minpsz
 @vrindex sys.streams.minpsz
-Defines the minimum packet size accepted (in message bytes) for the stream
-head.  Valid values are zero (0) or greater (@b{MAXINT}).  The default value
-is 0.  This is the default value for all new stream heads.  Existing stream
-heads are unaffected.  The value on existing stream heads can be changed by a
-driver or module by sending an
+Defines the minimum packet size accepted (in message bytes) for the stream head.  Valid values are
+zero (0) or greater (@b{MAXINT}).  The default value is 0.  This is the default value for all new
+stream heads.  Existing stream heads are unaffected.  The value on existing stream heads can be
+changed by a driver or module by sending an
 @b{M_SETOPTS}
 @vrindex M_SETOPTS
 message to the stream head.
 
 @subsubsection sys.streams.reuse_fmodsw
 @vrindex sys.streams.reuse_fmodsw
-Defines whether fmodsw table entries will be reused.  When false (zero),
-fmodsw table entries will not be reused.  When true (non-zero), fmodsw table
-entries will be reused.  Valid values are zero (0) and non-zero.  The default
-value is false (zero).
+Defines whether fmodsw table entries will be reused.  When false (zero), fmodsw table entries will
+not be reused.  When true (non-zero), fmodsw table entries will be reused.  Valid values are zero
+(0) and non-zero.  The default value is false (zero).
 
 @subsubsection sys.streams.rtime
 @vrindex sys.streams.rtime
-Defines the time interval (in milliseconds) that the stream head will wait to
-forward held messages when SNDHOLD is set for the stream head.  Valid values
-are zero (0) or greater (@b{MAXINT}).  The default value is 10 milliseconds
-(one clock tick).  This is the system wide value for all streams.  Changing
-this value may have a positive or negative impact on system performance.
+Defines the time interval (in milliseconds) that the stream head will wait to forward held messages
+when SNDHOLD is set for the stream head.  Valid values are zero (0) or greater (@b{MAXINT}).  The
+default value is 10 milliseconds (one clock tick).  This is the system wide value for all streams.
+Changing this value may have a positive or negative impact on system performance.
 
 @subsubsection sys.streams.strhold
 @vrindex sys.streams.strhold
-Defines whether the @b{SNDHOLD} feature is active or not.  When false (0), the
-@b{SNDHOLD} feature is deactivated.  When true (non-zero), the @b{SNDHOLD}
-feature is activated.  Valid values are zero (0) or non-zero.  The default
-value is false (0).  This is the default value for all new streams.  Existing
-streams are unaffected.  This setting can be examined and altered on an open
-stream using the
+Defines whether the @b{SNDHOLD} feature is active or not.  When false (0), the @b{SNDHOLD} feature
+is deactivated.  When true (non-zero), the @b{SNDHOLD} feature is activated.  Valid values are zero
+(0) or non-zero.  The default value is false (0).  This is the default value for all new streams.
+Existing streams are unaffected.  This setting can be examined and altered on an open stream using
+the
 @b{I_GWROPT}
 @vrindex I_GWROPT
 and
@@ -1418,10 +1396,9 @@ IO controls of
 
 @subsubsection sys.streams.strctlsz
 @vrindex sys.streams.strctlsz
-Defines the maximum @i{STREAMS} control part size.  Valid values are zero (0)
-or greater (@b{MAXINT}).  The default value is 2^12.  This is the system wide
-maximum.  Existing allocations are unaffected by lowering this value.
-Changing this value can have an impact on users of
+Defines the maximum @i{STREAMS} control part size.  Valid values are zero (0) or greater
+(@b{MAXINT}).  The default value is 2^12.  This is the system wide maximum.  Existing allocations
+are unaffected by lowering this value.  Changing this value can have an impact on users of
 @iftex
 @b{putpmsg}(2).
 @end iftex
@@ -1431,10 +1408,9 @@ Changing this value can have an impact on users of
 
 @subsubsection sys.streams.strmsgsz
 @vrindex sys.streams.strmsgsz
-Defines the maximum @i{STREAMS} message size.  Valid values are zero (0) or
-greater (@b{MAXINT}).  The default value is 2^18.  This is the system wide
-maximum.  Existing allocations are unaffected by lowering this value.
-Changing this value can have an impact on users of
+Defines the maximum @i{STREAMS} message size.  Valid values are zero (0) or greater (@b{MAXINT}).
+The default value is 2^18.  This is the system wide maximum.  Existing allocations are unaffected by
+lowering this value.  Changing this value can have an impact on users of
 @iftex
 @b{write}(2),
 @end iftex
@@ -1457,8 +1433,7 @@ and
 
 @subsubsection sys.streams.strthresh
 @vrindex sys.streams.strthresh
-Defines the maximum amount of memory that will be allocated for use by the
-STREAMS subsystem via
+Defines the maximum amount of memory that will be allocated for use by the STREAMS subsystem via
 @iftex
 @b{kmem_alloc}(9)
 @end iftex
@@ -1479,55 +1454,55 @@ or indirectly using
 @ifnottex
 @inforef{allocb (9), , *manpages*}
 @end ifnottex
-or allocating other @i{STREAMS} datastructures.  Valid values are zero (0) or
-greater (@b{MAXINT}).  This is the system wide maximum.  Existing allocations
-are unaffected by lowering this value.  Changing this value to a low value may
-have some use in debugging @i{STREAMS} drivers and modules.
+or allocating other @i{STREAMS} datastructures.  Valid values are zero (0) or greater (@b{MAXINT}).
+This is the system wide maximum.  Existing allocations are unaffected by lowering this value.
+Changing this value to a low value may have some use in debugging @i{STREAMS} drivers and modules.
 
-@node /proc Filesystem, , System Controls, Reference
+@node /proc Filesystem
 @section /proc Filesystem
 @cpindex /proc filesystem
 @menu
 /proc Filesystem
 @end menu
 
-@node Examples, Device Numbers, Reference, Top
+@node Examples
 @chapter Examples
 @cpindex examples
 @menu
-* Module Example::              STREAMS Module Example
-* Driver Example::              STREAMS Driver Example
+* Module Example::		STREAMS Module Example
+* Driver Example::		STREAMS Driver Example
 @end menu
 
-@node Module Example, Driver Example, , Examples
+@node Module Example
 @section Module Example
 @cpindex module example
 
-@node Driver Example, , Module Example, Examples
+@node Driver Example
 @section Driver Example
 @cpindex driver example
 
-@node Device Numbers, Multi-Threading, Examples, Top
+@node Device Numbers
 @chapter Device Numbers
 @cpindex device numbers
 @menu
 * External Device Numbers::	External Device Numbering
 * Internal Device Numbers::	Internal Device Numbering
-* spec Filesystem::		Avoiding Device Numbering
 * Clone Device::		Clone Device Numbering
 * Named STREAMS Device::	Reusable Device Numbering
+* spec Filesystem::		Avoiding Device Numbering
 @end menu
 
-Linux Fast-STREAMS supports the concept of internal and external device
-numbering with base majors and extended minors.
+Linux Fast-STREAMS supports the concept of internal and external device numbering with base majors
+and extended minors.
 
-Linux Fast-STREAMS uses several device numbering schemes intended to be
-compatible with SVR 4.2 MP DDI/DKI and implementations based on SVR 4.2
-including AIX, HP-UX, LiS, OSF/1, Solaris, SUPER-UX, UnixWare, and UXP/V.
+Linux Fast-STREAMS uses several device numbering schemes intended to be compatible with SVR 4.2 MP
+DDI/DKI and implementations based on SVR 4.2 including AIX, HP-UX, LiS, OSF/1, Solaris, SUPER-UX,
+UnixWare, and UXP/V.
 
-@node External Device Numbers, Internal Device Numbers, , Device Numbers
+@node External Device Numbers
 @section External Device Numbers
 @cpindex external device numbers
+@cpindex device numbers, external
 
 Linux Fast-STREAMS provides real external device numbering using the functions
 @iftex
@@ -1555,73 +1530,237 @@ procedures of a STREAMS driver or module,
 and
 @inforef{geteminor(9), , *manpages*}
 @end ifnottex
-will return the real external major or minor device number.  The real external
-major or minor device number is the major or minor device number that is seen
-by user applications.
+will return the real external major or minor device number.  The real external major or minor device
+number is the major or minor device number that is seen by user applications.
 
-A number of administrative utilities are provided that assist with the
-assignment of device names and number and are useful in boot scripts:
+A number of administrative utilities are provided that assist with the assignment of device names
+and number and are useful in boot scripts:
 
-@node Internal Device Numbers, spec Filesystem, External Device Numbers, Device Numbers
+@multitable @columnfractions .15 .85
+@item @dfn{@b{autopush}(8)}
+@fnindex autopush(8)
+@tab -- verify modules and establish autopush lists
+@item @dfn{@b{insf}(8)}
+@fnindex insf(8)
+@tab -- install special device files
+@item @dfn{@b{scls}(8)}
+@fnindex scls(8)
+@tab -- list @dfn{STREAMS} drivers
+@item @dfn{@b{strinfo}(8)}
+@fnindex strinfo(8)
+@tab -- provide information on @dfn{STREAMS} drivers and modules
+@item @dfn{@b{strload}(8)}
+@fnindex strload(8)
+@tab -- load or unload @dfn{STREAMS} drviers and modules
+@item @dfn{@b{strsetup}(8)}
+@fnindex strsetup(8)
+@tab -- create @dfn{STREAMS} devices
+@end multitable
+
+Another approach to establishment of dynamically allocated major device numbers is to use the
+LiS approach of creating minor device nodes using the
+@b{mknod}(9) and @b{unlink}(9) facilities provided by the LiS compatibility module.  But this
+approach does not work well with demand loading of kernel modules because it relies upon the
+@b{Linux} character device demand loading approach, or requires informing @dfn{STREAMS} of all
+devices and drivers when @dfn{STREAMS} is being compiled.
+
+@dfn{Linux Fast-STREAMS} supports the @b{Linux} character device module demand loading; however, the
+@b{Linux} mechanism requires prior knowledge of the character major device number.  Some of the
+administrative utilities above can load kernel modules and establish what major device number was
+assigned.  See the individual manual pages for more information.
+
+@node Internal Device Numbers
 @section Internal Device Numbers
 @cpindex internal device numbers
+@cpindex device numbers, internal
 
-@node spec Filesystem, Clone Device, Internal Device Numbers, Device Numbers
-@section spec Filesystem
-@cpindex spec filesystem
+Internal extended minor device number is a scheme whereby the @dfn{STREAMS} device driver does not
+have to be concerned with architectural limitations on the number of minor device number available
+to user applications (0 to 255 in @b{Linux 2.4}).  Instead, the driver treats the major device
+number as a base internal device number against which a range of minor devices can be assigned
+(currently 0 to 65535).  For external applications, device numbering consists of multiple (real)
+external major device numbers that correspond to a single base internal major device number.
+Internal extended device numbering is provided by the @b{getmajor}(9), @b{getminor}(9) and
+@b{makedevice}(9) facilities.  Conversions between external (real) major device numbers and internal
+(base) major device numbers can be performed with the @b{etoimajor}(9) and @b{itoemajor}(9)
+utilities provided by the @dfn{UnixWare} compatibility modules.
 
-@node Clone Device, Named STREAMS Device, spec Filesystem, Device Numbers
+Extended device numbering further complicates the matter of dynamic assignment of major device
+numbers and makes it harder for boot and configuration scripts to properly create device nodes.
+
+@node Clone Device
 @section Clone Device
 @cpindex clone device
 
-@node Named STREAMS Device, , Clone Device, Device Numbers
+@subsection Traditional Cloning
+
+The @b{clone}(4) driver supports traditional clone devices.  Traditional clone devices work by
+assigning the clone major device number adn a unique minor device number to a ``clone'' device.
+When this device is opened, the minor device number of the device is used as the new major device
+number and zero (0) is used as the minor device number, and the @b{qopen}(9) is chaned to the
+@b{qopen}(9) procedure of the new @b{streamtab}(9) structure resulting from looking up this newly
+created device number.  @var{sflag} is always set to @samp{CLONEOPEN} when the traditional clone
+driver opens a device.
+
+@b{getemajor}(9), @b{geteminor}(9), @b{getmajor}(9) and @b{getminor}(9) still function as normal on
+the resulting @var{devp} argument passed to the ultimate driver's @b{qopen}(9) procedure.  This is
+true both for base and extended major device numbers.  The following table illustrates the situation
+(assuming that the major device number assigned to the @b{clone}(4) device is 72):
+
+@multitable @columnfractions .25 .25 .25 .25
+@item @b{clone}		@tab @b{external}	@tab @b{internal}	@tab @var{sflag}
+@item @t{72:32}		@tab @t{32:0}		@tab @t{32:000}		@tab @samp{CLONEOPEN}
+@item @t{72:35}		@tab @t{35:0}		@tab @t{32:256}		@tab @samp{CLONEOPEN}
+@item @t{72:37}		@tab @t{37:0}		@tab @t{32:512}		@tab @samp{CLONEOPEN}
+@end multitable
+
+If a driver wishes to assign an extended major device number in response to a @b{CLONEOPEN}, it
+should use @b{makedevice}(9) with the major device number obtained with @b{getmajor}(9) and an
+extended minor device number assigned by the driver.  In this way, extended minor device numbers are
+transparent to the operation of the @b{clone}(4) driver and @samp{CLONEOPEN}.
+
+@subsection New Cloning
+
+@dfn{Linux Fast-STREAMS} supports the new cloning approach whereby a driver is permitted to alter
+the device number returned in the @var{devp} argument to @b{qopen}(9) even though @var{sflag} is set
+to @samp{DRVOPEN} instead of @samp{CLONEOPEN}.  The driver, at its discretion, can treat any minor
+device number as a new style clone device, although normally minor device number zero (0) is usually
+used as the clone minor.
+
+The driver may either use an external (real) major device number or the internal (base) major device
+number.  That is, when calling @b{makedevice}(9) to create the device to return to the @var{devp}
+argument to @b{qopen}(9), the driver can use an external (real) major device number (returned by
+@b{getemajor}(9)) combind with an assigned external (real) minor device number (from 0 to 255); or,
+it can use an internal (base) major device number (returned by @b{getmajor}(9)) combined with an
+assigned extended minor device number (from 0 to 65535).  The latter approach is often easier to
+use.
+
+@node Named STREAMS Device
 @section Named STREAMS Device
 @cpindex named streams device
 
-@node Multi-Threading, Conformance, Device Numbers, Top
+The @b{nsdev}(4) driver provides for a @dfn{Named STREAMS Device}.  This is a device numbering
+approach unique to @dfn{Linux Fast-STREAMS}.  The @b{nsdev}(4) driver operates in a similar manner
+to the @b{clone}(4) driver, however, the major number is derived from the prefix name of the device
+and the minor number is taken directly from the minor number of the @b{nsdev}(4) device.
+
+The following table summarizes the approach (assuming that the major device numbers assigned to the
+@b{nsdev}(4) device are 74, 75, 76 and 77 and the major device numbers assigned to the @b{inet}(4)
+driver are 32, 35 and 37):
+
+@multitable @columnfractions .2 .2 .2 .2 .2
+@item @b{nsdev}		@tab		@tab @b{external}	@tab @b{internal}	@tab @var{sflag}
+@item inet		@tab @t{74:000}	@tab @t{32:000}		@tab @t{32:000}		@tab @samp{DRVOPEN}
+@item inet.udp		@tab @t{74:017}	@tab @t{32:017}		@tab @t{32:017}		@tab @samp{DRVOPEN}
+@item inet.99		@tab @t{74:099}	@tab @t{32:099}		@tab @t{32:099}		@tab @samp{DRVOPEN}
+@item inet.512		@tab @t{76:000}	@tab @t{37:000}		@tab @t{32:512}		@tab @samp{DRVOPEN}
+@end multitable
+
+The @b{nsdev}(4) device also has the characteristic that if a device name with a major device number
+of the @b{nsdev}(4) device is opened and there is no device loaded that corresponds to the prefix
+name of the device from which to obtain a major device number, the @b{nsdev}(4) will attempt to laod
+the `@t{@b{streams-}@i{prefix}}' kernel module using @b{request_module}(9) and try again: where,
+@samp{prefix} is the prefix of the device name up to the first point character (corresponding to a
+digit @kbd{.}).  So, in the example above, if the @samp{inet} driver was not loaded, but an attempt
+was made to open the @file{/dev/inet.99} device, @dfn{STREAMS} would request the @file{streams-inet}
+kernel module be loaded.  This approach simplifies kernel module loading as well as device numbering
+and makes it easier for boot scripts to initialize devices.
+
+@node spec Filesystem
+@section spec Filesystem
+@cpindex spec filesystem
+
+Another approach to creation and assignment of device numbers is the mountable @b{specfs}(5) file
+system.  The @b{specfs}(5) file system can be mounted to provide an in-kernel device directory
+similar to the @b{Linux} @file{devfs} file ssytem and the @dfn{Solaris} devices file system.  The
+@b{spefs}(5) file system should normally be mounted on the @file{/dev/streams} subdirectory by
+system initialization scripts using a command such as: @command{mount -t specfs none /dev/streams}.
+See @b{mount}(8) for more information.  Once mounted over the @file{/dev/streams} subdirectory,
+subdirectories of @file{/dev/streams} corresponding to each loaded driver will appear.  So, for
+example, when the @b{inet}(4) driver is loaded, the ``inet'' subdirectory will appear at
+@file{/dev/streams/inet}.  Within each device subdirectory @file{/dev/streams/@i{devicename}/}, each
+instance of the device will appear as a character device named with the instance number of the
+device and having the eternal (real) major and external (real) minor device number.
+
+The mounted @b{specfs}(5) file system also has the characteristic that if a device subdirectory
+@file{/dev/streams/@i{devname}/} does not exist, but an attempt is made to read such a directory,
+@dfn{Linux Fast-STREAMS} will attempt to load kernel module @file{streams-@i{devname}} into the
+kernel with @b{request_module}(9).  If the load is successful, the kernel module will register and
+the subdirectory will be created and read.
+
+Also, if an attempt is make to open a numbered file within a device subdirectory of
+@file{/dev/streams/@i{devname}/@i{nnnn}} where, @samp{nnnn} is an octal, hexadecimal or decimal
+ASCII number, @dfn{STREAMS} will open the driver (call @b{qopen}(9) for driver @samp{devname}) with
+the instance number resulting from the conversion of the device name @samp{nnnn} to an instance
+number.
+
+These two characteristics permit symbolic links to be placed in the @file{/dev} directory that link
+to a device name and instance number in the @file{/dev/stream} directory.  An example is given in
+the table below:
+
+@multitable @columnfractions .55 .15 .15 .15
+@item @b{link} @tab @b{external} @tab @b{internal} @tab @var{sflag}
+@item @file{/dev/tcp}@ ->@ @file{/dev/streams/inet/36} @tab @t{30:36} @tab @t{30:36} @tab @samp{DRVOPEN}
+@item @file{/dev/udp}@ ->@ @file{/dev/streams/inet/39} @tab @t{30:39} @tab @t{30:39} @tab @samp{DRVOPEN}
+@end multitable
+
+In fact, it does not matter what the character device major or minor device number is on the node in
+the @b{specfs}(5) file system.  This is because the inode in the file system is directly associated
+with the @b{streamtab}(9) structue and instance number without using the normal @b{Linux} character
+device mechanisms.  When a device instance exceeds the extended minor device numbering space
+assigned to a device driver in the @b{specfs}(5) file system, device number displayed by
+@b{stat}(2), @b{lstat}(2) or @b{fstat}(2) is chosen by wrapping the instance number into the
+extended minor device numbering space.
+
+This approach makes it unnecessary to statically assign major device numbers, or to dynamically
+assign major device numers to devices in boot scripts, and is by far the easiest approach.  All that
+is required by packages at installation is that they establish the necessary symbolic links on
+device name and instance number without concern for major device numbers.
+
+@node Multi-Threading
 @chapter Multi-Threading
 @cpindex multi-threading
 @menu
-* Configuration::               MP STREAMS Configuration
-* Asynchronous Entry Points::   MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::      MP STREAMS Asynchronous Callbacks
-* Synchronous Entry Points::    MP STREAMS Synchronous Entry Points
-* Synchronous Callbacks::       MP STREAMS Synchronous Callbacks
+* Configuration::		MP STREAMS Configuration
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
+* Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
 @end menu
 
-@node Configuration, Asynchronous Entry Points, , Multi-Threading
+@node Configuration
 @section Configuration
 @cpindex conformance
 
-@node Asynchronous Entry Points, Asynchronous Callbacks, Configuration, Multi-Threading
+@node Asynchronous Entry Points
 @section Asynchronous Entry Points
 @cpindex asynchronous entry points
 
-@node Asynchronous Callbacks, Synchronous Entry Points, Asynchronous Entry Points, Multi-Threading
+@node Asynchronous Callbacks
 @section Asynchronous Callbacks
 @cpindex asynchronous callbacks
 
-@node Synchronous Entry Points, Synchronous Callbacks, Asynchronous Callbacks, Multi-Threading
+@node Synchronous Entry Points
 @section Synchronous Entry Points
 @cpindex synchronous entry points
 
-@node Synchronous Callbacks, , Synchronous Entry Points, Multi-Threading
+@node Synchronous Callbacks
 @section Synchronous Callbacks
 @cpindex synchronous callbacks
 
-@node Conformance, Portability, Multi-Threading, Top
+@node Conformance
 @chapter Conformance
 @cpindex conformance
 @menu
-* SVR 4.2 Compatibility::       SVR 4.2 MP DDI/DKI compatibility
-* AIX Compatibility::           AIX 5L Version 5.1 compatibility
-* HP-UX Compatibility::         HP-UX 11.0i v2 compatibility
-* OSF/1 Compatibility::         OSF/1 1.2/Digital UNIX comptatibility
-* UnixWare Compatibility::      UnixWare 7.1.3 compatibility
-* Solaris Compatibility::       Solaris 9/SunOS 5.9 compatibility
-* SUX Compatibility::           Super/UX compatibilty
-* UXP Compatibility::           UX/P compatibilty
-* LiS Compatibility::           LiS 2.16 compatibilty
+* SVR 4.2 Compatibility::	SVR 4.2 MP DDI/DKI compatibility
+* AIX Compatibility::		AIX 5L Version 5.1 compatibility
+* HP-UX Compatibility::		HP-UX 11.0i v2 compatibility
+* OSF/1 Compatibility::		OSF/1 1.2/Digital UNIX comptatibility
+* UnixWare Compatibility::	UnixWare 7.1.3 compatibility
+* Solaris Compatibility::	Solaris 9/SunOS 5.9 compatibility
+* SUX Compatibility::		Super/UX compatibilty
+* UXP Compatibility::		UX/P compatibilty
+* LiS Compatibility::		LiS 2.16 compatibilty
 @end menu
 
 @node SVR 4.2 Compatibility
@@ -1660,19 +1799,19 @@ assignment of device names and number and are useful in boot scripts:
 @section LiS 2.16 compatibilty
 @cpindex lis 2.16 compatibilty
 
-@node Portability, Copying, Conformance, Top
+@node Portability
 @chapter Portability
 @cpindex portability
 @menu
-* SVR 4.2 Portability::         Porting from SVR 4.2 MP
-* AIX Portability::             Porting from AIX 5L Version 5.1
-* HP-UX Portability::           Porting from HP-UX 11.0i v2
-* OSF/1 Portability::           Porting from OSF/1 1.2/Digital UNIX
-* UnixWare Portability::        Porting from UnixWare 7.1.3
-* Solaris Portability::         Porting from Solaris 9/SunOS 5.9
-* SUX Portability::             Porting from Super/UX
-* UXP Portability::             Porting from UX/P
-* LiS Portability::             Porting from LiS 2.16
+* SVR 4.2 Portability::		Porting from SVR 4.2 MP
+* AIX Portability::		Porting from AIX 5L Version 5.1
+* HP-UX Portability::		Porting from HP-UX 11.0i v2
+* OSF/1 Portability::		Porting from OSF/1 1.2/Digital UNIX
+* UnixWare Portability::	Porting from UnixWare 7.1.3
+* Solaris Portability::		Porting from Solaris 9/SunOS 5.9
+* SUX Portability::		Porting from Super/UX
+* UXP Portability::		Porting from UX/P
+* LiS Portability::		Porting from LiS 2.16
 @end menu
 
 @node SVR 4.2 Portability
@@ -1713,45 +1852,45 @@ assignment of device names and number and are useful in boot scripts:
 
 @appendix Appendices
 
-@node Copying, Documentation License, Portability, Top
+@node Copying
 @unnumbered Copying
 @include texi/gpl.texi
 
-@node Documentation License, Indices, Copying, Top
+@node Documentation License
 @unnumbered Documentation License
 @include texi/fdl.texi
 
-@node Indices, , Documentation License, Top
+@node Indices
 @unnumbered Indices
 @menu
-* Concept Index::               Concept Index
-* Type Index::                  Type Index
-* Function Index::              Function Index
-* Variable Index::              Variable Index
-* File Index::                  File Index
+* Concept Index::		Concept Index
+* Type Index::			Type Index
+* Function Index::		Function Index
+* Variable Index::		Variable Index
+* File Index::			File Index
 @end menu
 
-@node Concept Index, Type Index, , Indices
+@node Concept Index
 @unnumbered Concept Index
 
 @printindex cp
 
-@node Type Index, Function Index, Concept Index, Indices
+@node Type Index
 @unnumbered Type Index
 
 @printindex tp
 
-@node Function Index, Variable Index, Type Index, Indices
+@node Function Index
 @unnumbered Function and Macro Index
 
 @printindex fn
 
-@node Variable Index, File Index, Function Index, Indices
+@node Variable Index
 @unnumbered Variable and Constant Macro Index
 
 @printindex vr
 
-@node File Index, , Variable Index, Indices
+@node File Index
 @unnumbered Program and File Index
 
 @printindex pg

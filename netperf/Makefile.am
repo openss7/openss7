@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2004/10/13 09:47:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2004/11/06 10:18:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,9 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/10/13 09:47:52 $ by $Author: brian $
+# Last Modified $Date: 2004/11/06 10:18:30 $ by $Author: brian $
 #
 # =============================================================================
+
+#
+#   General rules
+#
+include am/openss7.am
 
 dist_bin_SCRIPTS		= \
 				  netperf_arr \
@@ -197,12 +202,5 @@ AM_RPMFLAGS			=
 AM_SRPMFLAGS			=
 
 include am/rpm.am
-
-#
-#   General rules
-#
-
-include am/openss7.am
-
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.9 2004/08/21 23:11:58 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.10 2004/11/06 09:52:04 brian Exp $
 %
 % =========================================================================
 %
@@ -54,24 +54,19 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/21 23:11:58 $ by $Author: brian $
+% Last Modified $Date: 2004/11/06 09:52:04 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
+@include texi/args.texi
 @setfilename strxns.info
 @settitle @value{PACKAGE_TITLE}
-@setchapternewpage odd
-@footnotestyle separate
 
 @dircategory Kernel
 @direntry
-* OpenSS7 XNS: (@value{PACKAGE}).      An Open STREAMS XNS Networking Package.
+* OpenSS7 XNS: (@value{PACKAGE}).	An Open STREAMS XNS Networking Package.
 @end direntry
-
-@set xref-automatic-section-title
-
-@include texi/args.texi
 
 @defindex op
 
@@ -112,7 +107,7 @@ another language, under the above conditions for modified versions.
 @end ignore
 @titlepage
 @titlefont{@value{PACKAGE_TITLE}}
-@sp 0.2
+@sp 0.5
 @title Installation and Reference Manual
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
@@ -180,16 +175,14 @@ another language, under the same conditions as for modified versions.
 @c @syncodeindex tr cp
 @c @syncodeindex cm cp
 
+@node Top
 @ifnottex
-@node Top, , (dir), (dir)
 @top @value{PACKAGE_TITLE}
 @end ifnottex
-@comment  node-name,  next,  previous,  up
 @unnumbered About This Manual
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of
-@cite{The @value{PACKAGE_TITLE} Installation and Reference Manual}, for
-Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
-@value{PACKAGE_TITLE} package.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{PACKAGE_TITLE} Installation and Reference Manual}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 
 @menu
 * Acknowledgments::		Sponsors and Contributors
@@ -259,7 +252,7 @@ Indices
 
 @c --------------------------------------------------------------------------
 
-@node Acknowledgments, Introduction, , Top
+@node Acknowledgments
 @unnumbered Acknowledgments
 @cindex credits
 
@@ -272,7 +265,7 @@ Foundation} and the @cite{Linux Kernel Community}.
 * Contributors::		Contributors
 @end menu
 
-@node Sponsors, Contributors, , Acknowledgments
+@node Sponsors
 @unnumberedsec Sponsors
 @cindex sponsors
 
@@ -288,7 +281,7 @@ part by:
 @item Sonus Networks
 @end itemize
 
-@node Contributors, , Sponsors, Acknowledgments
+@node Contributors
 @unnumberedsec Contributors
 @cindex contributors
 
@@ -306,7 +299,7 @@ of significant contributors to the project:
 @item Others
 @end itemize
 
-@node Introduction, Reference, Acknowledgments, Top
+@node Introduction
 @chapter Introduction
 @cindex introduction
 
@@ -322,7 +315,7 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 * Conventions::			Conventions
 @end menu
 
-@node Notice, Overview, , Introduction
+@node Notice
 @section Notice
 @cindex notice
 
@@ -343,16 +336,15 @@ the documentation for more information.  This document, is released under the
 invariant.
 
 
-@node Overview, Organization, Notice, Introduction
+@node Overview
 @section Overview
 @cindex overview
 
-This manual documents the design, implementation, installation, operation and
-future development of the @value{PACKAGE_TITLE} package.
-package.
+This manual documents the design, implementation, installation, operation and future development of
+the @value{PACKAGE_TITLE} package.
 
-The @value{PACKAGE_TITLE} package is an X/Open Networking Services (XNS)
-package for Linux that can be used with
+The @value{PACKAGE_TITLE} package is an X/Open Networking Services (XNS) package for Linux that can
+be used with
 @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
@@ -373,19 +365,18 @@ In addition, it provides STREAMS drivers and modules for DLPI including:
 @item DLPI to Linux IP Module (@file{streams-ip_strm_mod.o}).
 @end itemize
 
-The @value{PACKAGE_TITLE} package is essential to the development and support
-of XNS STREAMS netowrking modules and drivers and provides a fundamental set
-of X/Open header files and manual pages for such development.
+The @value{PACKAGE_TITLE} package is essential to the development and support of XNS STREAMS
+networking modules and drivers and provides a fundamental set of X/Open header files and manual
+pages for such development.
 
-The @value{PACKAGE_TITLE} does @emph{not} provide the X/Open Transport
-Interface (XTI), Transport Provider Interface (TPI) or Transport Layer
-Interface (TLI) components.  See the OpenSS7
+The @value{PACKAGE_TITLE} does @emph{not} provide the X/Open Transport Interface (XTI), Transport
+Provider Interface (TPI) or Transport Layer Interface (TLI) components.  See the OpenSS7
 @command{strxnet}@footnote{@xref{Top, OpenSS7 XTI/TLI, About This Manual, strxnet, OpenSS7 XTI/TLI Library Reference Manual}}
 and
 @command{strinet}@footnote{@xref{Top, OpenSS7 INET, About This Manual, strinet, OpenSS7 INET Reference Manual}}
 packages.
 
-@node Organization, Conventions, Overview, Introduction
+@node Organization
 @section Organization of this Document
 @cindex organization
 
@@ -415,15 +406,16 @@ This document is organized (loosely) into several sections as follows:
 @end multitable
 @end iftex
 
-
-@node Conventions, , Organization,  Introduction
+@node Conventions
 @section Conventions and Definitions
 @cindex conventions
 @cindex definitions
 
+This manual uses @cite{texinfo} typographic conventions.
+
 @c ----------------------------------------------------------------------------
 
-@node Reference, Conformance, Introduction, Top
+@node Reference
 @chapter Reference
 @cindex reference
 
@@ -438,7 +430,7 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Files, Drivers, , Reference
+@node Files
 @section Files
 @cindex headers
 
@@ -447,7 +439,7 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Drivers, Modules, Files, Reference
+@node Drivers
 @section Drivers
 @cindex drivers
 
@@ -480,7 +472,7 @@ An OpenSS7 GPL header has been added to the source code to make this clear.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Modules, Utilities, Drivers, Reference
+@node Modules
 @section Modules
 @cindex modules
 
@@ -507,7 +499,7 @@ driver to Linux TCP/IP.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Utilities, Development, Modules, Reference
+@node Utilities
 @section Utilities
 @cindex utilities
 
@@ -524,21 +516,21 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Development, , Utilities, Reference
+@node Development
 @section Development
 @cindex developing
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Conformance, Releases, Reference, Top
+@node Conformance
 @chapter Conformance
 @cindex conformance
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Releases, Installation, Conformance, Top
+@node Releases
 @chapter Releases
 @cindex releases
 
@@ -547,7 +539,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Installation, GPL, Releases, Top
+@node Installation
 @chapter Installation
 @cindex installation
 
@@ -556,7 +548,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node GPL, LGPL, Installation, Top
+@node GPL
 @appendix GPL
 @cindex license GPL
 
@@ -564,7 +556,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @include texi/gpl.texi
 
-@node LGPL, FDL, GPL, Top
+@node LGPL
 @appendix LGPL
 @cindex license LGPL
 
@@ -572,7 +564,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @include texi/lesser.texi
 
-@node FDL, Indices, LGPL, Top
+@node FDL
 @appendix FDL
 @cindex license FDL
 
@@ -580,7 +572,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @include texi/fdl.texi
 
-@node Indices, , FDL, Top
+@node Indices
 @appendix Indices
 @cindex indices
 
@@ -596,31 +588,31 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 * Author Index::		Index of Authors
 @end menu
 
-@node Concept Index, Type Index, , Indices
+@node Concept Index
 @appendixsec Index of Concepts
 @printindex cp
 
-@node Type Index, Function Index, Concept Index, Indices
+@node Type Index
 @appendixsec Index of Data Types
 @printindex tp
 
-@node Function Index, Variable Index, Type Index, Indices
+@node Function Index
 @appendixsec Index of Functions and Macros
 @printindex fn
 
-@node Variable Index, File Index, Function Index, Indices
+@node Variable Index
 @appendixsec Index of Variables and Constants
 @printindex vr
 
-@node File Index, Option Index, Variable Index, Indices
+@node File Index
 @appendixsec Index of Files and Programs
 @printindex pg
 
-@node Option Index, Author Index, File Index, Indices
+@node Option Index
 @appendixsec Index of Configuration Options
 @printindex op
 
-@node Author Index, , Option Index, Indices
+@node Author Index
 @appendixsec Index of Authors
 @printindex au
 
