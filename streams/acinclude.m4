@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.11 2004/04/16 19:24:57 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.12 2004/04/17 08:17:50 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,13 +53,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/16 19:24:57 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/17 08:17:50 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-m4_include([m4/public.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/man.m4])
+m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 
 # =========================================================================
@@ -70,8 +70,6 @@ AC_DEFUN([AC_LFS], [
     AC_MAN_CONVERSION
     AC_PUBLIC_RELEASE
     _LFS_SETUP_COMPAT
-    _LFS_SETUP_PUBLIC
-    _LFS_SETUP_DEBUG
     LFS_INCLUDES="-D_LFS_SOURCE=1 -I- -imacros ./config.h -I./include -I${srcdir}/include"
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
@@ -103,11 +101,6 @@ dnl
 # _LFS_OPTIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_OPTIONS], [
-    AC_ARG_ENABLE([public],
-                  AC_HELP_STRING([--enable-public],
-                                 [enable public release. @<:@default=yes@:>@]),
-                  [enable_public=$enableval],
-                  [enable_public=''])
     AC_ARG_ENABLE([compat-svr4],
                   AC_HELP_STRING([--enable-compat-svr4],
                                  [enable source compatibility with SVR 4.2 MP
@@ -154,66 +147,15 @@ AC_DEFUN([_LFS_OPTIONS], [
 # =========================================================================
 
 # =========================================================================
-# _LFS_SETUP_PUBLIC
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_SETUP_PUBLIC], [
-    AC_CACHE_CHECK([for public release], [lfs_cv_public], [dnl
-        if test :"$enable_public" = :no ; then
-            lfs_cv_public=no
-        else
-            lfs_cv_public=yes
-        fi
-    ])
-    AM_CONDITIONAL(LFS_PUBLIC_RELEASE, test :"$lfs_cv_public" = :yes)
-])# _LFS_SETUP_PUBLIC
-# =========================================================================
-
-# =========================================================================
 # _LFS_SETUP_DEBUG
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_DEBUG], [
-    AC_CACHE_CHECK([for debugging], [lfs_cv_debug], [dnl
-        if test :"$enable_k_debug" = :yes ; then
-            lfs_cv_debug=_DEBUG
-        else
-            if test :"$enable_k_test" = :yes ; then
-                lfs_cv_debug=_TEST
-            else
-                if test :"$enable_k_safe" != :no ; then
-                    lfs_cv_debug=_SAFE
-                else
-                    lfs_cv_debug=_NONE
-                fi
-            fi
-        fi
-    ])
-    case "$lfs_cv_debug" in
-        _DEBUG)
-            AC_DEFINE_UNQUOTED([_DEBUG], [], [Define for kernel symbol
-            debugging.  This has the effect of defeating inlines, making
-            static declarations global, and activating all debugging macros.])
-            ;;
-        _TEST)
-            AC_DEFINE_UNQUOTED([_TEST], [], [Define for kernel testing.  This
-            has the same effect as _DEBUG for now.])
-            ;;
-        _SAFE)
-            AC_DEFINE_UNQUOTED([_SAFE], [], [Define for kernel safety.  This
-            has the effect of enabling safety debugging macros.  This is the
-            default.])
-            ;;
-        *)
-            AC_DEFINE_UNQUOTED([_NONE], [], [Define for maximum performance
-            and minimum size.  This has the effect of disabling all safety
-            debugging macros.])
-            ;;
-    esac
-    case "$lfs_cv_debug" in
+    case "$linux_cv_debug" in
         _DEBUG | _TEST)
-            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to peform
-            internal structure tracking within the STREAMS executive as well
-            as to provide additional /proc filesystem files for examining
-            internal structures.])
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DEBUG], [], [Define to perform
+                    internal structure tracking within the STREAMS executive
+                    as well as to provide additional /proc filesystem files
+                    for examining internal structures.])
             ;;
     esac
 ])# _LFS_SETUP_DEBUG
@@ -324,6 +266,7 @@ AC_DEFUN([_LFS_SETUP], [
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _LFS_CHECK_KERNEL
+    _LFS_SETUP_DEBUG
     # all our config substitutions
     LFS_SC_MAJBASE=230
     LFS_SC_CONFIG='include/sys/config.h'
