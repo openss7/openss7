@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/25 07:29:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/11 21:50:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 07:29:05 $ by $Author: brian $
+# Last Modified $Date: 2004/05/11 21:50:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1621,5 +1621,69 @@ install-data-local: install-manpages
 uninstall-local: uninstall-manpages
 
 clean-local: clean-manpages
+
+if COMPRESS_MANPAGES
+
+#
+# If there are compressed files in the install directory for manpages, then we will compress our
+# manpages as well, unless it was specifically requested to configure that manpages not be
+# compressed.  Note that for an rpm install, we have installed into a sandbox directory that should
+# contain no compressed manpages and compress will be supressed.  rpm will do compression during the
+# rpm install process.
+#
+post-manpages:
+	@$(NORMAL_INSTALL)
+	@if find $(DESTDIR)$(mandir) -name "*.gz" 2>&1 >/dev/null ; then \
+		if test -n "$(GZIP)" ; then \
+			for f in $(man_MANS) ; do \
+				if test -f $(DESTDIR)$(mandir)/$$f ; then \
+					echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/$$f" ; \
+					$(GZIP) -f -9 $(DESTDIR)$(mandir)/$$f ; \
+				fi ; \
+			done ; \
+		fi ; \
+	fi
+
+#
+# When we comrpess manpages, we must remove the compressed versions after uninstall.
+#
+postun-manpages:
+	@$(NORMAL_UNINSTALL)
+	@if find $(DESTDIR)$(mandir) -name "*.gz" 2>&1 >/dev/null ; then \
+		if test -n "$(GZIP)" ; then \
+			for f in $(man_MANS) ; do \
+				if test -f $(DESTDIR)$(mandir)/$$f.gz ; then \
+					echo "rm -f $(DESTDIR)$(mandir)/$$f.gz" ; \
+					rm -f $(DESTDIR)$(mandir)/$$f.gz ; \
+				fi ; \
+			done ; \
+		fi ; \
+	fi
+
+else
+
+post-manpages:
+
+postun-manpages:
+
+endif
+
+#
+# The install-data-hook target is run after the files have been installed.  It is essentially
+# equivalent to the rpm %post, but it is only executed when the install directory is fully
+# configured for compressed manpages.  (That is, this does not run when building an rpm, because the
+# manpages are installed in a temporary, unconfigured directory.)  This is for alien systems and
+# embedded targets that cannot build from packages.
+#
+install-data-hook: post-manpages
+
+#
+# The uninstall-hook target is run after the files have been removed.  It is essentially equivalent
+# to the rpm %postun, but it is only executed when the uninstall directory is fully configured for
+# compressed manpages.  (That is, this does not run when building an rpm, because the mangpages are
+# installed in a temporary, unconfigured directory.)  This is for alien systems and embedded targets
+# that cannot build from packages.
+#
+uninstall-hook: postun-manpages
 
 # vim: ft=automake
