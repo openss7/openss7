@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/03/28 08:52:22 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/03/28 09:46:47 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/28 08:52:22 $ by $Author: brian $
+## Last Modified $Date: 2005/03/28 09:46:47 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -92,8 +92,6 @@ debian_tar_file		= $(debbuilddir)/$(debianpkg).tar.gz
 debian_dsc_file		= $(debbuilddir)/$(debianpkg).dsc
 debian_sig_file		= $(debbuilddir)/$(debianpkg).dsc.sig
 debian_source_files	= $(debian_tar_file) $(debian_dsc_file) $(debian_sig_file)
-##debian_chg_file		= $(debbuilddir)/$(debianpkg)_%.changes
-##debian_asc_file		= $(debbuilddir)/$(debianpkg)_%.changes.asc
 debian_change_files	= $(debbuilddir)/$(debianpkg)_*.changes \
 			  $(debbuilddir)/$(debianpkg)_*.changes.asc
 debian_binary_files	= $(debbuilddir)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb
@@ -102,8 +100,6 @@ debtop_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
 debtop_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
 debtop_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
 debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
-debtop_chg_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes
-debtop_asc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes.asc
 debtop_change_files	= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_*.changes \
 			  $(PACKAGE_DEBTOPDIR)/$(debianpkg)_*.changes.asc
 debtop_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb
@@ -139,7 +135,7 @@ $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(debbuildd
 $(debian_dsc_file) $(debian_tar_file): $(debian_dir)
 	(cd "$(debbuilddir)" ; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
-$(debtop_dsc_file) $(debtop_tar_file) $(debtop_chg_file)::
+$(debtop_dsc_file) $(debtop_tar_file)::
 	@f=`$(ECHO) "$@" | sed -e 's|^$(PACKAGE_DEBTOPDIR)/|$(debbuilddir)/|'` ; \
 	test "$@" -ef "$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
@@ -150,7 +146,7 @@ $(debtop_dsc_file) $(debtop_tar_file) $(debtop_chg_file)::
 		$(ECHO) "cp -f -- $$f $@" ; \
 		cp -f -- $$f $@ ; }
 
-$(debtop_sig_file): $(debtop_dsc_file)
+%.dsc.sig: %.dsc
 	@\
 	user="$(GNUPGUSER)" ; user="$${user:+ -u $$user}" ; \
 	home="$(GNUPGHOME)" ; home="$${home:+ --homedir $$home}" ; \
@@ -165,6 +161,8 @@ $(debtop_sig_file): $(debtop_dsc_file)
 
 dsc: $(debtop_dsc_file) $(debtop_tar_file)
 
+sigs: $(debtop_sig_file)
+
 AM_BINARY_TARGET = binary-arch
 
 ##
@@ -174,17 +172,6 @@ AM_BINARY_TARGET = binary-arch
 each-deb: $(debian_dir)
 	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
 #	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
-	@if test "$(PACKAGE_DEBTOPDIR)" != "$(debbuilddir)" ; then \
-		list="$(debian_binary_files) $(debian_change_files)" ; for f in $$list ; do \
-			test -f $$f || continue ; \
-			t=`echo $$f | sed -e 's|^$(debbuilddir)/|$(PACKAGE_DEBTOPDIR)/|'` ; \
-			if test ":$(FORCE)" = :force -o \( ! -f "$$t" -o "$$t" -ot "$$f" \) ; then \
-				$(ECHO) "cp -f -- $$f $$t" ; \
-				cp -f -- $$f $$t ; \
-			fi ; \
-		done ; \
-	fi
-
 
 ##
 # This below is pretty obfuscated, but it is what we need to rebujild a deb once for LiS and another
@@ -202,11 +189,21 @@ lis-deb:
 lfs-deb:
 @WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--with-lfs --without-lis' AM_BINARY_TARGET='binary-indep binary-lfs' each-deb
 
-chg-deb: $(debtop_chg_file)
+chg-deb:
+	@if test "$(PACKAGE_DEBTOPDIR)" != "$(debbuilddir)" ; then \
+		list="$(debian_binary_files) $(debian_change_files)" ; for f in $$list ; do \
+			test -f $$f || continue ; \
+			t=`echo $$f | sed -e 's|^$(debbuilddir)/|$(PACKAGE_DEBTOPDIR)/|'` ; \
+			if test ":$(FORCE)" = :force -o \( ! -f "$$t" -o "$$t" -ot "$$f" \) ; then \
+				$(ECHO) "cp -f -- $$f $$t" ; \
+				cp -f -- $$f $$t ; \
+			fi ; \
+		done ; \
+	fi
 
 debs: lis-deb lfs-deb one-deb chg-deb
 
-$(debtop_asc_file): $(debtop_chg_file)
+%.changes.asc: %.changes
 	@\
 	user="$(GNUPGUSER)" ; user="$${user:+ -u $$user}" ; \
 	home="$(GNUPGHOME)" ; home="$${home:+ --homedir $$home}" ; \
@@ -219,9 +216,13 @@ $(debtop_asc_file): $(debtop_chg_file)
 	cp -fp $@ $<
 	touch $@
 
-sigs: $(debtop_sig_file)
-
-csig: $(debtop_asc_file)
+csig:
+	@list="$(debtop_change_files)" ; for f in $$list ; do \
+		test -f $$f || continue ; \
+		b=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'` ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -f debian/rules $(ALL_EXPORT_OPTS) $$b" ; \
+		$(MAKE) $(AM_MAKEFLAGS) -f debian/rules $(ALL_EXPORT_OPTS) $$b ; \
+	done
 
 # Another sneaky trick
 all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
@@ -262,7 +263,7 @@ RELEASECLEANFILES	+= $(debian_cache_files) \
 			   $(debtop_binary_files)
 
 MY_PHONY		+= dsc debs each-deb one-deb lis-deb lfs-deb sigs csig
-ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-sigs
+ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-sigs all-csig
 
 endif
 ## BUILD_DPKG
