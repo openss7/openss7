@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:41 $ by $Author: brian $
+ Last Modified $Date: 2005/02/16 10:33:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:43 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:43 $";
 
 #include "compat.h"
 
@@ -68,7 +68,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/27 07:31:41 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:43 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1086,7 +1086,7 @@ n_data_ind(sdl_t * sp, mblk_t *mp)
 	// N_data_ind_t *p = (N_data_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
-	ensure(mlen >= sizeof(*p), return (-EFAULT));
+	ensure(mlen >= sizeof(N_data_ind_t), return (-EFAULT));
 	(void) mlen;
 	if ((dp = mp->b_cont)) {
 		if (sp->state == LMI_ENABLED) {
@@ -1123,7 +1123,7 @@ n_exdata_ind(sdl_t * sp, mblk_t *mp)
 	// N_exdata_ind_t *p = (N_exdata_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
-	ensure(mlen >= sizeof(*p), return (-EFAULT));
+	ensure(mlen >= sizeof(N_exdata_ind_t), return (-EFAULT));
 	(void) mlen;
 	if ((dp = mp->b_cont)) {
 		if (sp->state == LMI_ENABLED) {

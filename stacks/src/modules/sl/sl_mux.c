@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/24 07:48:36 $ by $Author: brian $
+ Last Modified $Date: 2005/02/16 10:33:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:40 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:40 $";
 
 #include "compat.h"
 
@@ -61,7 +61,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:48:36 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:40 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -393,7 +393,7 @@ ls_put(struct ls *ls)
 {
 	if (ls && atomic_dec_and_test(&ls->refcnt)) {
 		kmem_cache_free(slm_ls_cachep, ls);
-		printd(("%s: %s: %p: deallocated ls structure", DRV_NAME, __FUNCTION__, dl));
+		printd(("%s: %s: %p: deallocated ls structure", DRV_NAME, __FUNCTION__, ls));
 	}
 }
 
@@ -401,7 +401,7 @@ STATIC struct ls *
 slm_alloc_ls(queue_t *q, struct ls **lpp, ulong index, cred_t *crp)
 {
 	struct ls *ls;
-	printd(("%s: %s: create ls index = %lu\n", DRV_NAME, __FUNCITON__, index));
+	printd(("%s: %s: create ls index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((ls = kmem_cache_alloc(slm_ls_cachep, SLAB_ATOMIC))) {
 		bzero(ls, sizeof(*ls));
 		ls_get(ls);	/* first get */
@@ -752,7 +752,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 						break;
 				if (ls == NULL) {
 					ret = -EINVAL;
-					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid %lu\n",
+					ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid %u\n",
 						DRV_NAME, sl, lb->l_index));
 					spin_unlock_irqrestore(&master.lock, flags);
 					break;
@@ -950,7 +950,7 @@ sl_close(queue_t *q, int sflag, cred_t *crp)
 	psw_t flags;
 	(void) sl;
 	printd(("%s: %p: closing character device %hu:%hu\n", DRV_NAME, sl, sl->u.dev.cmajor,
-		cc->u.dev.cminor));
+		sl->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	{
 		slm_free_sl(q);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:56 $ by $Author: brian $
+ Last Modified $Date: 2005/02/16 10:33:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:56 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -429,7 +429,7 @@ sd_put(struct sd *sd)
 {
 	if (sd && atomic_dec_and_test(&sd->refcnt)) {
 		kmem_cache_free(sdlm_sd_cachep, sd);
-		printd(("%s: %s: %p: deallocated sd structure", DRV_NAME, __FUNCTION__, dl));
+		printd(("%s: %s: %p: deallocated sd structure", DRV_NAME, __FUNCTION__, sd));
 	}
 }
 
@@ -437,7 +437,7 @@ STATIC struct sd *
 sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
 {
 	struct sd *sd;
-	printd(("%s: %s: create sd index = %lu\n", DRV_NAME, __FUNCITON__, index));
+	printd(("%s: %s: create sd index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((sd = kmem_cache_alloc(sdlm_sd_cachep, SLAB_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
 		sd_get(sd);	/* first get */
@@ -947,7 +947,7 @@ sdlm_close(queue_t *q, int flag, cred_t *crp)
 	psw_t flags;
 	(void) dl;
 	printd(("%s: %p: closing character device %hu:%hu\n", DRV_NAME, dl, dl->u.dev.cmajor,
-		cc->u.dev.cminor));
+		dl->u.dev.cminor));
 	spin_lock_irqsave(&master.lock, flags);
 	{
 		sdlm_free_dl(q);
