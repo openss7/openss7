@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS queue.c 2.34 01/12/04 10:50:27 "
+#ident "@(#) LiS queue.c 2.60 10/08/04 11:38:25 "
 
 
 
@@ -41,6 +41,7 @@
 
 #include <sys/stream.h>
 #include <sys/osif.h>
+#include <stdarg.h>
 
 /*  -------------------------------------------------------------------  */
 /*			   Local functions & macros                      */
@@ -53,15 +54,331 @@
 /*  -------------------------------------------------------------------  */
 /*			   Global Variables				 */
 
+/*
+ * Queue contention tracking.
+ *
+ * These variables are used to keep track of lock contention amoung
+ * queues.
+ */
+lis_atomic_t	lis_queue_contention_count ;
+lis_spin_lock_t	lis_queue_contention_lock ;
+
+#define	QUEUE_CONTENTION_SIZE	4	/* # locks to keep track of */
+queue_t		*lis_queue_contention_table[QUEUE_CONTENTION_SIZE] ;
+
+extern lis_q_sync_t      lis_queue_sync;         /* single threads q running */
 extern lis_atomic_t	 lis_runq_req_cnt ;
 extern lis_spin_lock_t	 lis_qhead_lock ;
-extern void lis_safe_putmsg(queue_t *, mblk_t *, char *, int); /* safe.c */
+extern int lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry,
+		       char *f, int l);
 
 #if defined(CONFIG_DEV)
 extern void lis_cpfl(void *p, long a, const char *fcn, const char *f, int l);
+#define CP(p,a)		lis_cpfl((p),(a),__FUNCTION__,__LIS_FILE__,__LINE__)
 #else
 #define lis_cpfl(a,b,c,d,e)
+#define CP(p,a)		do {} while (0)
 #endif
+
+/*  -------------------------------------------------------------------  */
+/*
+ * Queue lock contention
+ *
+ * Base upon a debug bit we track the 4 most popular queues in terms
+ * of contention for the semaphore based queue lock.
+ *
+ */
+static void track_queue_contention(queue_t *q)
+{
+    queue_t		**p = lis_queue_contention_table ;
+    queue_t		**e = NULL;
+    queue_t		**r = NULL;
+    lis_flags_t		  psw ;
+
+    lis_spin_lock_irqsave(&lis_queue_contention_lock, &psw) ;
+
+    for ( ; p != &lis_queue_contention_table[QUEUE_CONTENTION_SIZE]; p++)
+    {
+	if ((*p) == q)
+	{
+	    r = NULL ;			/* don't replace */
+	    e = NULL ;			/* don't plug empty slot */
+	    break ;
+	}
+
+	if ((*p) == NULL)
+	{
+	    if (e == NULL)
+		e = p ;			/* first empty slot */
+	    continue ;
+	}
+
+	if ((*p)->q_contention_cnt < q->q_contention_cnt)
+	{
+	    e = NULL ;			/* don't plug empty slot */
+	    r = p ;
+	}
+    }
+
+    if (r != NULL)		/* entry to be replaced */
+	*r = q ;
+    else
+    if (e != NULL)		/* empty slot, lock not in table */
+	*e = q ;		/* enter it into the table */
+
+    lis_spin_unlock_irqrestore(&lis_queue_contention_lock, &psw) ;
+}
+
+static void purge_queue_contention(queue_t *q)
+{
+    queue_t		**p = lis_queue_contention_table ;
+    lis_flags_t		  psw ;
+
+    lis_spin_lock_irqsave(&lis_queue_contention_lock, &psw) ;
+
+    for ( ; p != &lis_queue_contention_table[QUEUE_CONTENTION_SIZE]; p++)
+    {
+	if ((*p) == q)
+	    *p = NULL ;
+    }
+
+    lis_spin_unlock_irqrestore(&lis_queue_contention_lock, &psw) ;
+}
+
+/*
+ * Return a message with the decode of the contention table in it.
+ */
+mblk_t *lis_queue_contention_msg(void)
+{
+    mblk_t		 *mp ;
+    queue_t		**p = lis_queue_contention_table ;
+    queue_t		**p2 ;
+    queue_t		 *t ;
+    const char		 *name ;
+    lis_flags_t		  psw ;
+    unsigned		  tot_contention ;
+
+    mp = allocb(QUEUE_CONTENTION_SIZE * 100 + 50, BPRI_MED) ;
+    if (mp == NULL)
+	return(NULL) ;
+
+
+    lis_spin_lock_irqsave(&lis_queue_contention_lock, &psw) ;
+
+    /*
+     * Bubble sort the table in increasing lock contention order.
+     */
+    for ( ; p != &lis_queue_contention_table[QUEUE_CONTENTION_SIZE-1]; p++)
+    {
+	if ((*p) == NULL)
+	    continue ;
+
+	for (p2 = p + 1;
+	     p2 != &lis_queue_contention_table[QUEUE_CONTENTION_SIZE];
+	     p2++
+	    )
+	{
+	    if ((*p2) == NULL)
+		continue ;
+
+	    if ( (*p2)->q_contention_cnt < (*p)->q_contention_cnt )
+	    {
+		t   = *p;
+		*p  = *p2 ;
+		*p2 = t ;
+	    }
+	}
+    }
+
+
+    tot_contention = K_ATOMIC_READ(&lis_queue_contention_count) ;
+    sprintf(mp->b_wptr, "Total Queue Contention: %u\n", tot_contention) ;
+    while (*mp->b_wptr) mp->b_wptr++;
+
+    for (p = lis_queue_contention_table;
+	 p != &lis_queue_contention_table[QUEUE_CONTENTION_SIZE];
+	 p++
+	)
+    {
+	if ((*p) == NULL)
+	    continue ;
+
+	if ((*p)->q_str)
+	    name = ((stdata_t *) (*p)->q_str)->sd_name ;
+	else
+	if (!(*p)->q_qinfo || !(*p)->q_qinfo || !(*p)->q_qinfo->qi_minfo ||
+			    !(name = (*p)->q_qinfo->qi_minfo->mi_idname))
+	    name = "Anonymous" ;
+
+	sprintf(mp->b_wptr, "%10lu(%ld%%): %s last-owner: %s %d\n",
+		(*p)->q_contention_cnt,
+		tot_contention ? ((*p)->q_contention_cnt * 100) / tot_contention
+			       : 0,
+	        name,
+		(*p)->q_owner_file ? (*p)->q_owner_file : "Unknown",
+		(*p)->q_owner_line) ;
+	while (*mp->b_wptr) mp->b_wptr++;
+    }
+
+    lis_spin_unlock_irqrestore(&lis_queue_contention_lock, &psw) ;
+
+    return(mp) ;
+}
+
+
+
+/*  -------------------------------------------------------------------  */
+/*
+ * Queue locking and unlocking
+ *
+ * The same task that first locks the queue can continue to lock it
+ * in nested fashion.
+ *
+ * These semaphores are used more like spin locks than producer/consumer
+ * coordination via semaphores.  We use a semaphore so that it is safe
+ * to sleep or schedule while the queue is locked.
+ *
+ * This queue lock is only used from background task-level code.  There
+ * is a separate spin lock that is used from ISR level to protect
+ * fields from modification.  The lock being operated on here is used
+ * to protect from re-entry of put and service procedures.
+ */
+int lis_lockq_fcn(queue_t *q, char *file, int line)
+{
+    int			 ret = 0 ;
+    lis_q_sync_t	*qs ;
+
+    if (q == NULL)
+    {
+	printk("lis_lockq: called w/NULL q ptr from %s #%d\n", file, line) ;
+	return(-EINVAL) ;
+    }
+
+    if ((q->q_flag & QOPENING) || (qs = q->q_qsp) == NULL)
+	return(0) ;		/* no locking, no contention */
+
+    if (lis_is_current_task(qs->qs_taskp))
+    {
+	K_ATOMIC_INC(&qs->qs_nest) ;		/* nested q lock */
+	return(0) ;
+    }
+
+    if (LIS_DEBUG_LOCK_CONTENTION && qs->qs_taskp != NULL)
+    {
+	K_ATOMIC_INC(&lis_queue_contention_count) ;
+	q->q_contention_cnt++ ;
+	track_queue_contention(q) ;
+    }
+
+    ret = lis_down_fcn(&qs->qs_sem, file, line) ;
+
+    if (ret == 0)
+    {
+	K_ATOMIC_INC(&qs->qs_nest) ;
+	qs->qs_taskp = lis_current_task_ptr ;
+	if (LIS_DEBUG_LOCK_CONTENTION)
+	{
+	    q->q_owner_file = file ;
+	    q->q_owner_line = line ;
+	}
+    }
+
+    return(ret) ;
+}
+
+void lis_unlockq_fcn(queue_t *q, char *file, int line)
+{
+    lis_q_sync_t	*qs = q->q_qsp ;
+
+    if (qs == NULL)
+	return ;		/* no locking, no contention */
+
+    if (lis_is_current_task(qs->qs_taskp))
+	K_ATOMIC_DEC(&qs->qs_nest) ;
+
+    if (K_ATOMIC_READ(&qs->qs_nest) == 0)
+    {
+	qs->qs_taskp = NULL ;
+	lis_up_fcn(&qs->qs_sem, file, line) ;
+    }
+}
+
+/*  -------------------------------------------------------------------  */
+/*
+ * lis_set_q_flags, lis_clr_q_flags
+ *
+ * This routine accepts a list of queues in varargs format and a bit
+ * mask of q_flag bits to be set in all of them.  It gets the ISR lock
+ * for all of the queues and then sets the requested bits.
+ *
+ * The final argument to the routine must be NULL to stop the argument
+ * scanning.
+ */
+static void set_q_flags(ulong flags, int both_qs, va_list argp)
+{
+    queue_t	*q ;
+    queue_t	*oq ;
+    lis_flags_t  psw1, psw2 ;
+
+    q = va_arg(argp, queue_t *) ;
+    if (q == NULL) return ;
+
+
+    oq = OTHER(q) ;
+    LIS_QISRLOCK(q, &psw1) ;
+    if (both_qs) LIS_QISRLOCK(oq, &psw2) ;
+
+    set_q_flags(flags, both_qs, argp) ;		/* recurse and lock more */
+
+    q->q_flag |= flags ;
+    if (both_qs) oq->q_flag |= flags ;
+
+    if (both_qs) LIS_QISRUNLOCK(oq, &psw2) ;
+    LIS_QISRUNLOCK(q, &psw1) ;
+}
+
+void lis_set_q_flags(ulong flags, int both_qs, ...)
+{
+    va_list	 args ;
+
+    va_start (args, both_qs);
+    set_q_flags(flags, both_qs, args) ;
+    va_end (args);
+
+}
+
+static void clr_q_flags(ulong flags, int both_qs, va_list argp)
+{
+    queue_t	*q ;
+    queue_t	*oq ;
+    lis_flags_t  psw1, psw2 ;
+
+    q = va_arg(argp, queue_t *) ;
+    if (q == NULL) return ;
+
+
+    oq = OTHER(q) ;
+    LIS_QISRLOCK(q, &psw1) ;
+    if (both_qs) LIS_QISRLOCK(oq, &psw2) ;
+
+    clr_q_flags(flags, both_qs, argp) ;		/* recurse and lock more */
+
+    q->q_flag &= ~flags ;
+    if (both_qs) oq->q_flag &= ~flags ;
+
+    if (both_qs) LIS_QISRUNLOCK(oq, &psw2) ;
+    LIS_QISRUNLOCK(q, &psw1) ;
+}
+
+void lis_clr_q_flags(ulong flags, int both_qs, ...)
+{
+    va_list	 args ;
+
+    va_start (args, both_qs);
+    clr_q_flags(flags, both_qs, args) ;
+    va_end (args);
+
+}
 
 /*  -------------------------------------------------------------------  */
 /* find_qband
@@ -132,12 +449,13 @@ find_qband(queue_t *q, int msg_class)
  * need to release and reacquire that lock if we decide to call qenable.
  */
 static INLINE void
-updatequeue(queue_t *q, mblk_t *mp, int from_insq, lis_flags_t *pswp)
+updatequeue(queue_t *q, mblk_t *mp, int from_insq, lis_flags_t *pswp,
+		int band_ptrs)
 {
     uchar	 msg_class = mp->b_band;
     uchar	 msg_type  = mp->b_datap->db_type ;
 
-    if (msg_type >= QPCTL || mp->b_band == 0)
+    if (msg_type >= QPCTL || msg_class == 0)
     {
         q->q_count += lis_msgsize(mp);
         if (q->q_count > q->q_hiwat)
@@ -153,18 +471,21 @@ updatequeue(queue_t *q, mblk_t *mp, int from_insq, lis_flags_t *pswp)
 	    if (qp->qb_count > qp->qb_hiwat)
 		qp->qb_flag |= QB_FULL | QB_WASFULL ;
 
-	    if (qp->qb_first == NULL)
-		qp->qb_first = mp;		/* this is 1st msg in band */
-	    else
-	    if (mp->b_next == qp->qb_first)	/* mp inserted b4 first msg */
-		qp->qb_first = mp;		/* mp is now 1st in band */
+	    if (band_ptrs)
+	    {
+		if (qp->qb_first == NULL)
+		    qp->qb_first = mp;		/* this is 1st msg in band */
+		else
+		if (mp->b_next == qp->qb_first)	/* mp inserted b4 first msg */
+		    qp->qb_first = mp;		/* mp is now 1st in band */
 
-	    if (qp->qb_last == NULL)		/* new qband */
-		qp->qb_last = mp;
-	    else
-	    if (mp->b_prev == qp->qb_last)	/* mp inserted after last msg */
-		qp->qb_last = mp;		/* mp is now last in band */
-	    /* Otherwise is could be somewhere in the middle */
+		if (qp->qb_last == NULL)		/* new qband */
+		    qp->qb_last = mp;
+		else
+		if (mp->b_prev == qp->qb_last)	/* mp inserted after last msg */
+		    qp->qb_last = mp;		/* mp is now last in band */
+		/* Otherwise is could be somewhere in the middle */
+	    }
 	}
     }
 
@@ -371,7 +692,7 @@ chk_band(queue_t *q, struct qband *qp)
  * just about to be.
  */
 static INLINE void
-adjust_q_count(queue_t *q, mblk_t *mp)
+adjust_q_count(queue_t *q, mblk_t *mp, int band_ptrs)
 {
     q->q_flag &= ~QWANTR;		/* no implicit qenable now */
 
@@ -386,7 +707,7 @@ adjust_q_count(queue_t *q, mblk_t *mp)
 	    /* mp may be in the middle or end of a band if this was	*/
 	    /* done via rmvq().						*/
 
-	    if (qp->qb_first == mp)		/* rmving 1st msg of band */
+	    if (band_ptrs && qp->qb_first == mp)/* rmving 1st msg of band */
 	    {
 		if (mp->b_next && mp->b_next->b_band == mp->b_band)
 		    qp->qb_first = mp->b_next ;	/* nxt msg in same band */
@@ -397,7 +718,7 @@ adjust_q_count(queue_t *q, mblk_t *mp)
 		}
 	    }
 
-	    if (qp->qb_last == mp)		/* rmving last msg of band */
+	    if (band_ptrs && qp->qb_last == mp)	/* rmving last msg of band */
 	    {
 		if (mp->b_prev && mp->b_prev->b_band == mp->b_band)
 		    qp->qb_last = mp->b_prev ;	/* nxt msg in same band */
@@ -443,7 +764,7 @@ rmv_msg(queue_t *q, mblk_t *mp)
 	return(mp) ;
     }
 
-    adjust_q_count(q, mp) ;		/* adjust count and flags */
+    adjust_q_count(q, mp, 1) ;		/* adjust count and flags */
 
     /* perform q remove here */
 
@@ -503,7 +824,7 @@ int	lis_check_q_magic(queue_t *q, char *file, int line)
  * If q is a read queue then return the ptr to the downstream queue.
  * If q is a write queue then return the ptr to the upstream queue.
  */
-queue_t *
+queue_t * _RP
 lis_backq_fcn(queue_t *q, char *f, int l)
 {
     queue_t	*oq ;
@@ -522,7 +843,7 @@ lis_backq_fcn(queue_t *q, char *f, int l)
 
 }/*lis_backq_fcn*/
 
-queue_t *
+queue_t * _RP
 lis_backq(queue_t *q)
 {
     return(lis_backq_fcn(q, __FILE__,__LINE__)) ;
@@ -549,7 +870,7 @@ lis_backenable(queue_t *q)
     lis_flags_t	 pswoq ;
     queue_t	*oq = q ;			/* original queue */
 
-    LIS_QISRLOCK(oq, &pswoq) ;
+    LIS_RDQISRLOCK(oq, &pswoq) ;
     if (   (   (oq->q_flag & (QWANTW|QBACK))==(QWANTW|QBACK)
             || (oq->q_flag & QCLOSEWT)
            )
@@ -564,16 +885,18 @@ lis_backenable(queue_t *q)
 	 * marked all the queues from the queue head down to the driver as
 	 * QCLOSING, which will keep us from scanning them.
 	 */
+	LIS_RDQISRUNLOCK(q, &pswoq) ;
+	LIS_QISRLOCK(oq, &pswoq) ;
     	oq->q_flag &= ~(QWANTW|QBACK);
 	LIS_QISRUNLOCK(oq, &pswoq) ;		/* unlock orig queue */
         while((q = lis_backq(q)) != NULL)
 	{
-	    LIS_QISRLOCK(q, &psw) ;		/* lock new queue */
+	    LIS_RDQISRLOCK(q, &psw) ;		/* lock new queue */
 	    if (   !LIS_CHECK_Q_MAGIC(q)
 		|| (q->q_flag & (QPROCSOFF | QCLOSING))
 	       )				/* busted or closing queue */
 	    {
-		LIS_QISRUNLOCK(q, &psw) ;
+		LIS_RDQISRUNLOCK(q, &psw) ;
 		break ;
 	    }
 
@@ -581,17 +904,17 @@ lis_backenable(queue_t *q)
 		&& q->q_qinfo->qi_srvp != NULL
 		&& lis_canenable(q))		/* noenable not in effect */
 	    {
-		LIS_QISRUNLOCK(q, &psw) ;	/* unlock new queue */
+		LIS_RDQISRUNLOCK(q, &psw) ;	/* unlock new queue */
 	     	lis_qenable(q);
 	     	if (!F_ISSET(q->q_flag,QCLOSEWT) || q->q_count != 0)
 		    break;			/* quit searching */
 	    }
 	    else				/* keep searching */
-		LIS_QISRUNLOCK(q, &psw) ;	/* unlock new queue */
+		LIS_RDQISRUNLOCK(q, &psw) ;	/* unlock new queue */
 	}					/* iterate w/queue unlocked */
     }
     else					/* no back-enabling to do */
-	LIS_QISRUNLOCK(oq, &pswoq) ;		/* unlock orig qeuue */
+	LIS_RDQISRUNLOCK(oq, &pswoq) ;		/* unlock orig qeuue */
 
 }/*lis_backenable*/
 
@@ -599,7 +922,7 @@ lis_backenable(queue_t *q)
 /* lis_getq - get message from head of queue
  */
 
-mblk_t *
+mblk_t * _RP
 lis_getq(queue_t *q)
 {
     mblk_t *rtn;
@@ -625,18 +948,12 @@ lis_getq(queue_t *q)
 /*  -------------------------------------------------------------------  */
 /* putq- put a message into a queue
  */
-int
+int _RP
 lis_putq(queue_t *q, mblk_t *mp)
 {
     lis_flags_t     psw;
-    if (mp == NULL)
+    if (mp == NULL || q == NULL)
 	return 0;
-
-    if (q == NULL)
-    {
-    	lis_freemsg(mp);
-    	return 0;
-    }
 
     LIS_QISRLOCK(q, &psw) ;
     if (   !LIS_CHECK_Q_MAGIC(q)
@@ -644,34 +961,33 @@ lis_putq(queue_t *q, mblk_t *mp)
        )
     {
 	LIS_QISRUNLOCK(q, &psw) ;
-    	lis_freemsg(mp);
     	return 0;
     }
 
     ins_before(q, find_q_spot_tail(q, mp), mp) ;
 
-    updatequeue(q, mp, 0, &psw);	/* Update queue counts and flags */
+    updatequeue(q, mp, 0, &psw, 1);	/* Update queue counts and flags */
     LIS_QISRUNLOCK(q, &psw) ;
     return 1;				/* success */
 
 }/*lis_putq*/
 
+void _RP lis_putqf(queue_t *q, mblk_t *mp)
+{
+    if (!lis_putq(q,mp)) freemsg(mp) ;
+}
+
 
 /*  -------------------------------------------------------------------  */
 /* putbq - return a message to a queue
  */
-int
+int _RP
 lis_putbq(queue_t *q, mblk_t *mp)
 {
     lis_flags_t     psw;
 
-    if (mp == NULL) return 0;
-
-    if (q == NULL)
-    {
-    	lis_freemsg(mp);
+    if (mp == NULL || q == NULL)
     	return 0;
-    }
 
     LIS_QISRLOCK(q, &psw) ;
     if (   !LIS_CHECK_Q_MAGIC(q)
@@ -679,43 +995,41 @@ lis_putbq(queue_t *q, mblk_t *mp)
        )
     {
 	LIS_QISRUNLOCK(q, &psw) ;
-    	lis_freemsg(mp);
     	return 0;
     }
 
     ins_before(q, find_q_spot_head(q, mp), mp) ;
 
-    updatequeue(q, mp, 0, &psw);	/* Update queue counts and flags */
+    updatequeue(q, mp, 0, &psw, 1);	/* Update queue counts and flags */
     LIS_QISRUNLOCK(q, &psw) ;
     return 1;				/* success */
 
 }/*lis_putbq*/
+
+
+void _RP lis_putbqf(queue_t *q, mblk_t *mp)
+{
+    if (!lis_putbq(q, mp)) freemsg(mp) ;
+}
 
 /*  -------------------------------------------------------------------  */
 /*insq - insert mp before emp. If emp is NULL, insert at end
  *	of queue. If the insertion is out-of-order, the insert fails.
  *	Returns 1 on success; 0 otherwise.
  */
-int
+int _RP
 lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
 {
     lis_flags_t     psw;
 
-    if (mp == NULL) return 0;
+    if (q == NULL || mp == NULL) return 0;
 
-    if (q == NULL)
-    {
-    	lis_freemsg(mp);
-    	return 0;
-    }
-
-    LIS_QISRLOCK(q, &psw) ;
+    LIS_RDQISRLOCK(q, &psw) ;
     if (   !LIS_CHECK_Q_MAGIC(q)
 	|| (q->q_flag & (QCLOSING | QPROCSOFF))
        )
     {
-	LIS_QISRUNLOCK(q, &psw) ;
-    	lis_freemsg(mp);
+	LIS_RDQISRUNLOCK(q, &psw) ;
     	return 0;
     }
 
@@ -732,14 +1046,16 @@ lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
            )
        )
     {
-	LIS_QISRUNLOCK(q, &psw) ;
+	LIS_RDQISRUNLOCK(q, &psw) ;
 	LisUpFailCount(MSGSQD) ;		/* error queueing msg */
 	return(0) ;				/* failed */
     }
 
+    LIS_RDQISRUNLOCK(q, &psw) ;
+    LIS_QISRLOCK(q, &psw) ;
     ins_before(q, emp, mp) ;
 
-    updatequeue(q, mp, 1, &psw);
+    updatequeue(q, mp, 1, &psw, 1);
     LIS_QISRUNLOCK(q, &psw) ;
     return 1;					/* success */
 
@@ -749,7 +1065,7 @@ lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
 /* rmvq - remove a message from a queue. If the message
  *		does not exist, panic.
  */
-void
+void _RP
 lis_rmvq(queue_t *q, mblk_t *mp)
 {
     mblk_t *bp;
@@ -761,10 +1077,10 @@ lis_rmvq(queue_t *q, mblk_t *mp)
 	return ;
     }
 
-    LIS_QISRLOCK(q, &psw) ;
+    LIS_RDQISRLOCK(q, &psw) ;
     if (!LIS_CHECK_Q_MAGIC(q) || (q->q_flag & (QCLOSING | QPROCSOFF)))
     {
-	LIS_QISRUNLOCK(q, &psw) ;
+	LIS_RDQISRUNLOCK(q, &psw) ;
 	return ;
     }
 
@@ -774,12 +1090,14 @@ lis_rmvq(queue_t *q, mblk_t *mp)
 	bp = bp->b_next;
     if (bp == NULL)
     {
-	LIS_QISRUNLOCK(q, &psw) ;
+	LIS_RDQISRUNLOCK(q, &psw) ;
 	printk("rmvq: message not in queue");
 	return ;
     }
 
+    LIS_RDQISRUNLOCK(q, &psw) ;
     /* Remove message from queue */
+    LIS_QISRLOCK(q, &psw) ;
     rmv_msg(q, bp) ;
     LIS_QISRUNLOCK(q, &psw) ;			/* unlock b4 backenable */
     lis_backenable(q);
@@ -804,8 +1122,10 @@ void lis_put_rput_q(stdata_t *hd, mblk_t *mp)
 
     LIS_QISRLOCK(hd->sd_rq, &psw) ;
 
+    mp->b_prev = NULL ;
     if (hd->sd_rput_hd == NULL)
     {					/* empty list */
+	mp->b_next = NULL ;
 	hd->sd_rput_tl = mp ;
 	hd->sd_rput_hd = mp ;
 	need_qenable = 1 ;
@@ -816,7 +1136,7 @@ void lis_put_rput_q(stdata_t *hd, mblk_t *mp)
 	hd->sd_rput_tl = mp ;
     }
 
-    updatequeue(hd->sd_rq, mp, 1, &psw); /* Update queue counts and flags */
+    updatequeue(hd->sd_rq, mp, 1, &psw, 0); /* Update queue counts and flags */
 
     LIS_QISRUNLOCK(hd->sd_rq, &psw) ;
 
@@ -841,9 +1161,10 @@ mblk_t *lis_get_rput_q(stdata_t *hd)
     {
 	hd->sd_rput_hd = mp->b_next ;	/* link around message */
 	mp->b_next = NULL ;
+	mp->b_prev = NULL ;
 	if (hd->sd_rput_hd == NULL)	/* queue empty?  */
 	    hd->sd_rput_tl = NULL ;	/* clobber tail ptr */
-	adjust_q_count(hd->sd_rq, mp) ;	/* adjust count and flags */
+	adjust_q_count(hd->sd_rq, mp, 0) ; /* adjust count and flags */
 	LIS_QISRUNLOCK(hd->sd_rq, &psw) ;
 	lis_backenable(hd->sd_rq);
     }
@@ -851,6 +1172,90 @@ mblk_t *lis_get_rput_q(stdata_t *hd)
 	LIS_QISRUNLOCK(hd->sd_rq, &psw) ;
 
     return(mp) ;
+}
+
+/*  -------------------------------------------------------------------  */
+/*
+ * Put message into the deferred list.  Queue is ISR locked by caller
+ */
+void lis_defer_msg(queue_t *q, mblk_t *mp, int retry, lis_flags_t *psw)
+{
+    if (LIS_DEBUG_PUTNEXT)
+    {
+	printk("lis_defer_msg: %s to \"%s\" size %d retry=%d\n",
+			    lis_msg_type_name(mp), lis_queue_name(q),
+			    lis_msgsize(mp), retry) ;
+
+	if (LIS_DEBUG_ADDRS)
+	    printk("        q=%p, mp=%p, mp->b_rptr=%p, wptr=%p\n",
+		    q, mp, mp->b_rptr, mp->b_wptr);
+    }
+
+    mp->b_prev = NULL ;
+    if (retry)
+    {					/* insert at head */
+	mp->b_next = q->q_defer_head ;
+	q->q_defer_head = mp ;
+	if (q->q_defer_tail == NULL)
+	    q->q_defer_tail = mp ;
+	return ;
+    }
+
+    /* insert at tail */
+    mp->b_next = NULL ;
+    if (q->q_defer_head == NULL)
+	q->q_defer_head = mp ;
+
+    if (q->q_defer_tail)
+	q->q_defer_tail->b_next = mp ;
+
+    q->q_defer_tail = mp ;
+    updatequeue(q, mp, 1, psw, 0);	/* Update queue counts and flags */
+}
+
+void lis_do_deferred_puts(queue_t *q)
+{
+    mblk_t	   *mp ;
+    lis_flags_t     psw;
+
+    LIS_QISRLOCK(q, &psw) ;
+    if (q->q_defer_head == NULL || (q->q_flag & QDEFERRING))
+    {
+	LIS_QISRUNLOCK(q, &psw) ;
+	return ;
+    }
+
+    q->q_flag |= QDEFERRING ;
+    while ((mp = q->q_defer_head) != NULL)
+    {
+	q->q_defer_head = mp->b_next ;
+	if (q->q_defer_head == NULL)
+	    q->q_defer_tail = NULL ;
+	mp->b_next = NULL ;
+	mp->b_prev = NULL ;
+	adjust_q_count(q, mp, 0) ;	/* adjust count and flags */
+	LIS_QISRUNLOCK(q, &psw) ;
+
+	if (LIS_DEBUG_PUTNEXT)
+	{
+	    printk("lis_do_deferred_puts: %s from \"%s\" size %d\n",
+				lis_msg_type_name(mp), lis_queue_name(q),
+				lis_msgsize(mp)) ;
+
+	    if (LIS_DEBUG_ADDRS)
+		printk("        q=%p, mp=%p, mp->b_rptr=%p, wptr=%p\n",
+			q, mp, mp->b_rptr, mp->b_wptr);
+	}
+
+	if (!lis_safe_do_putmsg(q, mp, QOPENING, 1, __FILE__, __LINE__))
+	{
+	    LIS_QISRLOCK(q, &psw) ;
+	    break ;
+	}
+	LIS_QISRLOCK(q, &psw) ;
+    }
+    q->q_flag &= ~QDEFERRING ;
+    LIS_QISRUNLOCK(q, &psw) ;
 }
 
 /*  -------------------------------------------------------------------  */
@@ -864,7 +1269,24 @@ mblk_t *lis_get_rput_q(stdata_t *hd)
  * Locking order:  Get the lis_qhead_lock before the queue isr lock.  See
  * 		   queuerun in stream.c for similar lock pair acquisition.
  */
-void 
+void lis_retry_qenable(queue_t *q)
+{
+    lis_flags_t pswq;
+
+    CP(q, q->q_flag) ;
+    LIS_QISRLOCK(q, &pswq) ;
+    if ((q->q_flag & QWANTENAB) && !(q->q_flag & Q_INH_ENABLE))
+    {
+	q->q_flag &= ~QWANTENAB ;
+	LIS_QISRUNLOCK(q, &pswq) ;
+	lis_qenable(q) ;
+	return ;
+    }
+
+    LIS_QISRUNLOCK(q, &pswq) ;
+}
+
+void  _RP
 lis_qenable(queue_t *q)
 {
     lis_flags_t psw, pswq;
@@ -876,15 +1298,23 @@ lis_qenable(queue_t *q)
     if (q->q_qinfo == NULL || q->q_qinfo->qi_srvp == NULL)
 	return ;
 
-    lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
+    hd = (stdata_t *) q->q_str ;
+    /* If any of the "inhibit" bits are set do not schedule the queue.
+     * If any of the "defer" bits are set then set the QWANTENAB flag
+     * so that the qenable can be retried when the indicated operation
+     * is complete.
+     */
     LIS_QISRLOCK(q, &pswq) ;
-    /* if already enabled, just return; don't schedule closing queues */
-    if ((q->q_flag & (QENAB | QPROCSOFF | QCLOSING)) != 0)
+    if (q->q_flag & Q_INH_ENABLE)
     {
+	if (q->q_flag & Q_DEFER_ENABLE)
+	    q->q_flag |= QWANTENAB ;		/* qenable called */
+	CP(q->q_str, q->q_flag) ;
 	LIS_QISRUNLOCK(q, &pswq) ;
-	lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
 	return ;
     }
+    q->q_flag |= QENAB;
+    CP(q->q_str, q->q_flag) ;
     LIS_QISRUNLOCK(q, &pswq) ;
 
     /*
@@ -892,20 +1322,15 @@ lis_qenable(queue_t *q)
      * the stream head.  We will decrement after calling the service
      * procedure.
      */
-    hd = (stdata_t *) q->q_str ;
-    if (   hd->magic == STDATA_MAGIC
+    if (   hd != NULL
+	&& hd->magic == STDATA_MAGIC
 	&& (hd->sd_wq == q || hd->sd_rq == q)
        )
 	lis_head_get(hd) ;
 
-    /* link into tail of list of scheduled queues (qtail)
-     *
-     * Don't set the QENAB bit until after the insertion is made and keep it
-     * under protection of the qhead_lock.  This means that an external
-     * observer, such as lis_qdetach, will see a consistent setting of QENAB and
-     * the actual presence of the queue in the list.
-     */
-
+    /* link into tail of list of scheduled queues (qtail) */
+    lis_spin_lock_irqsave(&lis_qhead_lock, &psw) ;
+#if 0			/* minimize time with qhead_lock held */
     lis_cpfl((void *) lis_qhead, (long) lis_qtail,
 				__FUNCTION__, __FILE__, __LINE__) ;
     if (   (lis_qhead != NULL && lis_qtail == NULL)
@@ -914,21 +1339,14 @@ lis_qenable(queue_t *q)
 	printk("LiS: qenable before: Qhead error: "
 	       "lis_qhead=%lx lis_qtail=%lx\n",
 	       lis_qhead, lis_qtail) ;
-
+#endif
     q->q_link = NULL;
     if (lis_qhead == NULL)
 	lis_qhead = q;
     else
     	lis_qtail->q_link = q;
     lis_qtail = q;		
-    LisUpCount(QSCHEDS) ;
-    lis_atomic_inc(&lis_runq_req_cnt) ;
-    LIS_QISRLOCK(q, &pswq) ;
-    q->q_flag |= QENAB;
-    LIS_QISRUNLOCK(q, &pswq) ;
-
-    lis_cpfl((void *) lis_qhead, (long) lis_qtail,
-				__FUNCTION__, __FILE__, __LINE__) ;
+#if 0			/* minimize time with qhead_lock held */
     if (   (lis_qhead != NULL && lis_qtail == NULL)
 	|| (lis_qhead == NULL && lis_qtail != NULL)
        )
@@ -936,8 +1354,13 @@ lis_qenable(queue_t *q)
 	       "lis_qhead=%lx lis_qtail=%lx\n",
 	       lis_qhead, lis_qtail) ;
 
+    lis_cpfl((void *) lis_qhead, (long) lis_qtail,
+				__FUNCTION__, __FILE__, __LINE__) ;
+#endif
+    K_ATOMIC_INC(&lis_runq_req_cnt) ;
     lis_spin_unlock_irqrestore(&lis_qhead_lock, &psw) ;
 
+    LisUpCount(QSCHEDS) ;
     lis_setqsched(0);			/* schedule, but don't call now */
 
 }/*lis_qenable*/
@@ -1007,6 +1430,7 @@ static void
 flush_worker(queue_t *q, int band, int flush_all)
 {
     mblk_t	 *mp;			/* owns entire list of msgs */
+    mblk_t	 *mp_deferred ;
     mblk_t	 *p_next;
     struct qband *qp ;
     int		  q_flag;
@@ -1034,11 +1458,16 @@ flush_worker(queue_t *q, int band, int flush_all)
 	qp->qb_count = 0;
 	qp->qb_flag &= ~QB_FULL ;
     }
+
+    mp_deferred = q->q_defer_head ;
+    q->q_defer_head = NULL ;
+    q->q_defer_tail = NULL ;
     LIS_QISRUNLOCK(q, &psw) ;
 
     /*
      * Now walk the message list and selectively free or re-queue messages.
      */
+flush_list:
     while (mp != NULL)
     {
     	p_next = mp->b_next; 
@@ -1079,10 +1508,17 @@ flush_worker(queue_t *q, int band, int flush_all)
 			lis_msg_type_name(mp), mtype,
 			mp->b_band, lis_queue_name(q)) ;
 
-	    lis_putq(q, mp);
+	    lis_putqf(q, mp);
 	}
 
 	mp = p_next;
+    }
+
+    if (mp_deferred != NULL)			/* any deferred messages? */
+    {
+	mp = mp_deferred ;
+	mp_deferred = NULL ;
+	goto flush_list ;			/* do it again */
     }
 
     LIS_QISRLOCK(q, &psw) ;
@@ -1135,7 +1571,7 @@ flush_worker(queue_t *q, int band, int flush_all)
  *	flag can be FLUSHDATA (flush only M_DATA, M_DELAY,
  *	M_PROTO, M_PCPROTO) or FLUSHALL.
  */
-void
+void _RP
 lis_flushband(queue_t *q, unsigned char band, int flag)
 {
     flush_worker(q, (int) band, flag & FLUSHALL) ;
@@ -1147,7 +1583,7 @@ lis_flushband(queue_t *q, unsigned char band, int flag)
  *	service routines if applicable. The flag is the same as for
  *	lis_flushband.
  */
-void
+void _RP
 lis_flushq(queue_t *q, int flag)
 {
     flush_worker(q, -1, flag & FLUSHALL) ;
@@ -1160,7 +1596,7 @@ lis_flushq(queue_t *q, int flag)
  *	0 if the allocation failed or type is one of
  *	M_DATA, M_PROTO or M_PCPROTO
  */
-int
+int _RP
 lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
 {
     mblk_t *mp;
@@ -1180,7 +1616,7 @@ lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
 
 }/*lis_putctl*/
 
-int lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
+int _RP lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
 {
     if (q == NULL || q->q_next == NULL)
 	return(0) ;				/* no can do */
@@ -1192,7 +1628,7 @@ int lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
 /*  -------------------------------------------------------------------  */
 /* lis_putctl1 - as for lis_putctl, but with a one byte parameter
  */
-int
+int _RP
 lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 {
     mblk_t *mp;
@@ -1201,7 +1637,6 @@ lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 	|| type == M_DATA
 	|| type == M_PROTO
 	|| type == M_PCPROTO
-	|| type == M_DELAY
 	|| (mp = lis_allocb(1, BPRI_HI, file_name, line_nr)) == NULL
        )
     	   return 0;
@@ -1213,7 +1648,7 @@ lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 
 }/*lis_putctl1*/
 
-int
+int _RP
 lis_putnextctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 {
     if (q == NULL || q->q_next == NULL)
@@ -1226,7 +1661,7 @@ lis_putnextctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
 /*  -------------------------------------------------------------------  */
 /* lis_qsize - returns the number of messages on a queue
  */
-int
+int _RP
 lis_qsize(queue_t *q)
 {
     mblk_t *mp;
@@ -1234,10 +1669,10 @@ lis_qsize(queue_t *q)
     lis_flags_t psw;
     if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
 
-    LIS_QISRLOCK(q, &psw) ;
+    LIS_RDQISRLOCK(q, &psw) ;
     for (mp = q->q_first; mp; mp = mp->b_next)
 	rtn++;
-    LIS_QISRUNLOCK(q, &psw) ;
+    LIS_RDQISRUNLOCK(q, &psw) ;
     return rtn;
 }/*lis_qsize*/
 
@@ -1247,7 +1682,7 @@ lis_qsize(queue_t *q)
  *	QMINPSZ, QCOUNT, QFIRST, QLAST, QFLAG.
  *	Returns 0 on success.
  */
-int 
+int  _RP
 lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
     struct qband *qp ;
@@ -1255,13 +1690,13 @@ lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 
     if ( val == NULL || !LIS_CHECK_Q_MAGIC(q)) return(EINVAL) ;
 
-    LIS_QISRLOCK(q, &psw) ;
+    LIS_RDQISRLOCK(q, &psw) ;
     if (band > 0)
     {
 	qp = find_qband(q, band) ;			/* get qband struct */
 	if (qp == NULL)
 	{
-	    LIS_QISRUNLOCK(q, &psw) ;
+	    LIS_RDQISRUNLOCK(q, &psw) ;
 	    return(EINVAL);
 	}
 
@@ -1288,11 +1723,11 @@ lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 	default:
 	case QMAXPSZ:
 	case QMINPSZ:
-	    LIS_QISRUNLOCK(q, &psw) ;
+	    LIS_RDQISRUNLOCK(q, &psw) ;
 	    return(EINVAL) ;
 	}
 
-	LIS_QISRUNLOCK(q, &psw) ;
+	LIS_RDQISRUNLOCK(q, &psw) ;
 	return(0) ;				/* success */
     }
 
@@ -1323,11 +1758,11 @@ lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 	*val = q->q_flag ;
 	break ;
     default:
-	LIS_QISRUNLOCK(q, &psw) ;
+	LIS_RDQISRUNLOCK(q, &psw) ;
 	return(EINVAL) ;
     }
 
-    LIS_QISRUNLOCK(q, &psw) ;
+    LIS_RDQISRUNLOCK(q, &psw) ;
     return(0);				/* return 0 for success */
 
 }/*lis_strqget*/
@@ -1338,7 +1773,7 @@ lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
  *	QMINPSZ.
  *	Returns 0 on success.
  */
-int
+int _RP
 lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 {
     struct qband *qp ;
@@ -1411,6 +1846,96 @@ lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 
 }/*lis_strqset*/
 
+/*  -------------------------------------------------------------------  */
+/*
+ * lis_set_q_sync
+ *
+ * Set up the queue sync structures for a queue.
+ */
+void lis_free_q_sync(queue_t *q)
+{
+    switch (q->q_qlock_option)
+    {
+    case LIS_QLOCK_NONE:
+    case LIS_QLOCK_GLOBAL:
+	break ;				/* nothing allocated */
+
+    case LIS_QLOCK_QUEUE:
+	  if (q->q_other->q_qsp != NULL)
+	  {
+	      lis_sem_destroy(&q->q_other->q_qsp->qs_sem) ;
+	      LIS_QSYNC_FREE(q->q_other->q_qsp) ;
+	  }
+	  /* fall into next case */
+    case LIS_QLOCK_QUEUE_PAIR:
+	  if (q->q_qsp != NULL)
+	  {
+	      lis_sem_destroy(&q->q_qsp->qs_sem) ;
+	      LIS_QSYNC_FREE(q->q_qsp) ;
+	  }
+	break ;
+    }
+
+    q->q_qsp = NULL ;
+    q->q_other->q_qsp = NULL ;
+    q->q_qlock_option = -1 ;		/* not specified */
+    q->q_other->q_qlock_option = -1 ;	/* not specified */
+}
+
+int lis_set_q_sync(queue_t *q, int qlock_option)
+{
+    static lis_q_sync_t	qsz ;
+
+    lis_free_q_sync(q) ;		/* clear out old option */
+					/* sets q_qlock_option to -1 */
+    switch (qlock_option)
+    {
+    case LIS_QLOCK_NONE:
+	q->q_qsp = NULL ;
+	q->q_other->q_qsp = NULL ;
+	break ;
+
+    case LIS_QLOCK_QUEUE:
+    default:
+	  qlock_option = LIS_QLOCK_QUEUE ;
+	  q->q_qsp	     = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync") ;
+	  q->q_other->q_qsp  = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync") ;
+	  if (q->q_qsp == NULL || q->q_other->q_qsp == NULL)
+	  {
+	      if (q->q_qsp != NULL)
+		  LIS_QSYNC_FREE(q->q_qsp) ;
+	      if (q->q_other->q_qsp != NULL)
+		  LIS_QSYNC_FREE(q->q_other->q_qsp) ;
+
+	      q->q_qsp = NULL ;
+	      q->q_other->q_qsp = NULL ;
+	      return(-ENOMEM) ;
+	  }
+	  *q->q_qsp	     = qsz ;
+	  *q->q_other->q_qsp = qsz ;
+	  lis_sem_init(&q->q_qsp->qs_sem, 1) ;
+	  lis_sem_init(&q->q_other->q_qsp->qs_sem, 1) ;
+	break ;
+
+    case LIS_QLOCK_QUEUE_PAIR:
+	  q->q_qsp	     = LIS_QSYNC_ALLOC(sizeof(lis_q_sync_t), "Qsync") ;
+	  if (q->q_qsp == NULL)
+	      return(-ENOMEM) ;
+	  q->q_other->q_qsp  = q->q_qsp ;
+	  *q->q_qsp	     = qsz ;
+	  lis_sem_init(&q->q_qsp->qs_sem, 1) ;
+	break ;
+
+    case LIS_QLOCK_GLOBAL:
+	  q->q_qsp = &lis_queue_sync ;
+	  q->q_other->q_qsp = &lis_queue_sync ;
+	break ;
+    }
+
+    q->q_qlock_option = qlock_option ;
+    q->q_other->q_qlock_option = qlock_option ;
+    return(0) ;
+}
 
 /*  -------------------------------------------------------------------  */
 /* Allocate a new NULL-initilized queue pair
@@ -1432,11 +1957,14 @@ lis_allocq( const char *name )
   q->q_flag = QREADR | QUSE ;		/* read side of queue */
   q->q_other->q_flag = QUSE ;		/* queue in use */
 
-  lis_spin_lock_init(&q->q_lock, name) ;
-  lis_spin_lock_init(&q->q_isr_lock, name) ;
+  if (lis_set_q_sync(q, LIS_QLOCK_QUEUE) < 0)	/* default */
+  {
+    lis_freeq(q) ;
+    return(NULL) ;
+  }
 
-  lis_spin_lock_init(&q->q_other->q_lock, name) ;
-  lis_spin_lock_init(&q->q_other->q_isr_lock, name) ;
+  lis_rw_lock_init(&q->q_isr_lock, name) ;
+  lis_rw_lock_init(&q->q_other->q_isr_lock, name) ;
 
   return(q);
 
@@ -1455,12 +1983,15 @@ lis_freeq( queue_t *q )
     queue_t	 *wq ;
     int i ;
 
+    lis_free_q_sync(q) ;
+
     rq = q = LIS_RD(q) ;
     wq = LIS_WR(q) ;
     for (i = 1; i <= 2; i++, q = wq)
     {
 	if (!LIS_CHECK_Q_MAGIC(q)) continue ;
 
+	purge_queue_contention(q) ;
 	q->q_magic = Q_MAGIC ^ 1;
 	for (qp = q->q_bandp; qp != NULL; )
 	{
@@ -1480,7 +2011,7 @@ lis_freeq( queue_t *q )
  * This is the same as inserting mp2 just in front of the next
  * message after mp1.
  */
-void
+void _RP
 lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 {
     if (mp1 == NULL || mp2 == NULL )
@@ -1492,7 +2023,7 @@ lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 	return ;
     }
 
-    lis_insq(q, mp1->b_next, mp2) ;
+    if (!lis_insq(q, mp1->b_next, mp2)) freemsg(mp2) ;
 
 }/*lis_appq*/
 
@@ -1505,16 +2036,16 @@ lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
  *	For band==0 this is equivalent to canput. Returns 0 if
  *	flow controlled; 1 otherwise.
  */
-int 
+int  _RP
 lis_bcanput(queue_t *q, unsigned char band)
 {
-    lis_flags_t	  opsw, psw;
+    lis_flags_t	  psw;
     struct qband *qp ;
     queue_t	 *oq = q;
 
     if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
 
-    LIS_QISRLOCK(oq, &opsw) ;
+    LIS_RDQISRLOCK(oq, &psw) ;
 
     /* search the stream for the next module with a service
      * procedure, and check its high water mark.  If no queue
@@ -1527,7 +2058,15 @@ lis_bcanput(queue_t *q, unsigned char band)
 	    q = q->q_next;
 
     if (q != oq)
-        LIS_QISRLOCK (q, &psw);
+    {
+	LIS_RDQISRUNLOCK(oq, &psw) ;
+	LIS_RDQISRLOCK(q, &psw);
+    }
+
+    /*
+     * 'q' is now read-locked.  'oq' is unlocked if different from 'q'.
+     * From here on, we just work with 'q'.
+     */
 
     /* if the queue is flow controlled, set the QWANTW flag */
     if (band > 0)
@@ -1535,30 +2074,32 @@ lis_bcanput(queue_t *q, unsigned char band)
 	qp = find_qband(q, band) ;			/* get qband struct */
 	if (qp == NULL)
 	{
+	    LIS_RDQISRUNLOCK (q, &psw);
 return_failure:
 	    LisUpFailCount(CANPUTS) ;
-            if (q != oq)
-                LIS_QISRUNLOCK (q, &psw);
-	    LIS_QISRUNLOCK(oq, &opsw) ;
 	    return(0);
 	}
 	if (qp->qb_flag & QB_FULL)
 	{
+	    LIS_RDQISRUNLOCK (q, &psw);
+	    LIS_QISRLOCK (q, &psw);
 	    qp->qb_flag |= QB_WANTW ;
+	    LIS_QISRUNLOCK (q, &psw);
 	    goto return_failure ;
 	}
     }
     else
     if (q->q_flag & QFULL)
     {
-    	q->q_flag |= QWANTW;
+	LIS_RDQISRUNLOCK (q, &psw);
+	LIS_QISRLOCK (q, &psw);
+	q->q_flag |= QWANTW;
+	LIS_QISRUNLOCK (q, &psw);
 	goto return_failure ;
     }
 
     LisUpCount(CANPUTS) ;
-    if (q != oq)
-        LIS_QISRUNLOCK (q, &psw);
-    LIS_QISRUNLOCK(oq, &opsw) ;
+    LIS_RDQISRUNLOCK (q, &psw);
     return 1;
 
 }/*lis_bcanput*/
@@ -1569,7 +2110,7 @@ return_failure:
  *
  *	This routine shows up in AT&T's MP spec for SVR4.
  */
-int 
+int  _RP
 lis_bcanputnext(queue_t *q, unsigned char band)
 {
     if (!LIS_CHECK_Q_MAGIC(q) || 
@@ -1589,7 +2130,7 @@ lis_bcanputnext(queue_t *q, unsigned char band)
  *	the band with available space in it.  This actually sounds
  *	pretty useless to me.  -- DMG
  */
-int 
+int  _RP
 lis_bcanputnext_anyband(queue_t *q)
 {
     lis_flags_t   psw;
@@ -1604,7 +2145,7 @@ lis_bcanputnext_anyband(queue_t *q)
 
 
     oq = q ;
-    LIS_QISRLOCK(oq, &psw) ;
+    LIS_RDQISRLOCK(oq, &psw) ;
 
     /* search the stream for the next module with a service procedure */
     while (   q->q_next != NULL
@@ -1623,12 +2164,12 @@ lis_bcanputnext_anyband(queue_t *q)
     if (qp == NULL)			/* no bands with room */
     {
         LisUpFailCount(CANPUTS) ;
-	LIS_QISRUNLOCK(oq, &psw) ;
+	LIS_RDQISRUNLOCK(oq, &psw) ;
 	return(0);
     }
 
     LisUpCount(CANPUTS) ;
-    LIS_QISRUNLOCK(oq, &psw) ;
+    LIS_RDQISRUNLOCK(oq, &psw) ;
     return 1;
 
 }/*lis_bcanputnext_anyband*/
@@ -1638,7 +2179,7 @@ lis_bcanputnext_anyband(queue_t *q)
  *
  * Return the q_qcount field from the next queue.
  */
-int	lis_qcountstrm(queue_t *q)
+int	_RP lis_qcountstrm(queue_t *q)
 {
     lis_flags_t  psw;
     int		 nbytes = 0 ;
@@ -1646,7 +2187,7 @@ int	lis_qcountstrm(queue_t *q)
 
     if (!LIS_CHECK_Q_MAGIC(q)) return(0) ;
 
-    LIS_QISRLOCK(oq, &psw) ;
+    LIS_RDQISRLOCK(oq, &psw) ;
 
     nbytes += q->q_count ;
 
@@ -1657,7 +2198,7 @@ int	lis_qcountstrm(queue_t *q)
 	nbytes += q->q_count ;
     }
 
-    LIS_QISRUNLOCK(oq, &psw) ;
+    LIS_RDQISRUNLOCK(oq, &psw) ;
     return(nbytes) ;
 
 } /* lis_qcountstrm */
@@ -1667,26 +2208,13 @@ int	lis_qcountstrm(queue_t *q)
  *
  * Allow q put/svc procedures to be called.
  */
-void	lis_qprocson(queue_t *rdq)
+void	_RP lis_qprocson(queue_t *rdq)
 {
-    lis_flags_t psw;
-    int		i ;
-
-    for (i = 0; i < 2; i++)			/* do twice */
-    {
-	LIS_QISRLOCK(rdq, &psw) ;
-	rdq->q_flag &= ~QPROCSOFF ;
-	if (rdq->q_flag & QENAB)		/* was enabled */
-	{
-	    rdq->q_flag &= ~QENAB ;
-	    LIS_QISRUNLOCK(rdq, &psw) ;
-	    lis_qenable(rdq) ;			/* get scheduled */
-	}
-	else
-	    LIS_QISRUNLOCK(rdq, &psw) ;
-
-	rdq = WR(rdq) ;
-    }
+    lis_clr_q_flags((QPROCSOFF | QENAB), 1, rdq, NULL);
+    lis_do_deferred_puts(rdq) ;		/* if any deferred */
+    lis_do_deferred_puts(OTHER(rdq)) ;
+    lis_retry_qenable(rdq) ;		/* see if qsched required */
+    lis_retry_qenable(OTHER(rdq)) ;		/* see if qsched required */
 }
 
 /*  -------------------------------------------------------------------  */
@@ -1694,19 +2222,9 @@ void	lis_qprocson(queue_t *rdq)
  *
  * Prevent q put/svc procedures from being called.
  */
-void	lis_qprocsoff(queue_t *rdq)
+void	_RP lis_qprocsoff(queue_t *rdq)
 {
-    lis_flags_t psw;
-    int		i ;
-
-    for (i = 0; i < 2; i++)			/* do twice */
-    {
-	LIS_QISRLOCK(rdq, &psw) ;
-	rdq->q_flag |= QPROCSOFF ;
-	LIS_QISRUNLOCK(rdq, &psw) ;
-
-	rdq = WR(rdq) ;
-    }
+    lis_set_q_flags(QPROCSOFF, 1, rdq, NULL);
 }
 
 /*----------------------------------------------------------------------
