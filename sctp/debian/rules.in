@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/27 12:24:02 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/28 11:05:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/27 12:24:02 $ by $Author: brian $
+## Last Modified $Date: 2005/03/28 11:05:37 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,6 +57,7 @@ VERSION = @VERSION@
 PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
 PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
+debbuilddir = @debbuilddir@
 mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
 
 rootdir = @rootdir@
@@ -87,9 +88,11 @@ pkgdatadir = $(datadir)/$(PACKAGE)
 pkglibdir = $(libdir)/$(PACKAGE)
 pkgincludedir = $(includedir)/$(PACKAGE)
 
+export DEB_HOST_ARCH
 export DH_VERBOSE = 1
 export DH_COMPAT = 4
 export DH_OPTIONS =
+export BUILD_CFGOPTIONS =
 
 name = $(PACKAGE)
 
@@ -230,9 +233,9 @@ debian/$(PACKAGE_LCNAME)-init.modules:
 ##debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh:
 ##	cp -f -- $(srcdir)/src/util/init/sctp.sh $@
 ##
-cache_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
-csite_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-config.site
-mpost_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
+cache_file=$(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
+csite_file=$(debbuilddir)/$(DEB_HOST_ARCH)-config.site
+mpost_file=$(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
 
 build: build-stamp
 build-stamp:
@@ -279,8 +282,6 @@ build-stamp:
 clean:
 	dh_testdir -v
 	dh_testroot -v
-	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
-	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
 	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
 	rm -fr $(mytmpdir)
 	rm -f build-stamp
@@ -323,8 +324,14 @@ binary-indep: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
 # Build architecture-dependent files here.
-binary-arch: build install
-	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+binary-arch:
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --with-lis "*) targ=binary-lis ;; \
+		(*" --with-lfs "*) targ=binary-lfs ;; \
+		(*)		   targ=binary-nos ;; \
+	esac ; \
+	echo "$(MAKE) -f debian/rules $$targ" ; \
+	$(MAKE) -f debian/rules $$targ
 
 binary:
 	$(MAKE) -f debian/rules binary-indep
@@ -333,6 +340,9 @@ binary:
 binary-lis:
 
 binary-lfs:
+
+binary-nos: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
 
 binary-%: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
@@ -344,8 +354,14 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
-# Revision 0.9.2.9  2005/03/27 12:24:02  brian
-# - slimmer build of lis and lfs components
+# Revision 0.9.2.11  2005/03/28 11:05:37  brian
+# - export deb host arch
+#
+# Revision 1.11  2005/03/28 11:05:37  brian
+# - export deb host arch
+#
+# Revision 1.10  2005/03/28 07:41:37  brian
+# - correct multiple streams targets
 #
 # Revision 1.9  2005/03/27 12:24:02  brian
 # - slimmer build of lis and lfs components

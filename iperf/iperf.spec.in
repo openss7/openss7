@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.28 $) $Date: 2005/03/22 19:44:13 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.29 $) $Date: 2005/03/28 07:42:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/22 19:44:13 $ by $Author: brian $
+# Last Modified $Date: 2005/03/28 07:42:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -568,9 +568,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.28  2005/03/22 19:44:13  brian
-# - do not need symbolic link in prep anymore
+# Revision 1.1.2.29  2005/03/28 07:42:28  brian
+# - better debian build
 #
+
+* Tue Mar 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.28  2005/03/22 19:44:13  brian
+- do not need symbolic link in prep anymore
 
 * Thu Mar 17 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.27  2005/03/17 11:22:33  brian

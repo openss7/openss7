@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2005/03/27 12:23:57 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2005/03/28 11:05:18 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/27 12:23:57 $ by $Author: brian $
+## Last Modified $Date: 2005/03/28 11:05:18 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,6 +57,7 @@ VERSION = @VERSION@
 PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
 PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
+debbuilddir = @debbuilddir@
 mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
 
 rootdir = @rootdir@
@@ -83,9 +84,11 @@ pkgdatadir = $(datadir)/$(PACKAGE)
 pkglibdir = $(libdir)/$(PACKAGE)
 pkgincludedir = $(includedir)/$(PACKAGE)
 
+export DEB_HOST_ARCH
 export DH_VERBOSE = 1
 export DH_COMPAT = 4
 export DH_OPTIONS =
+export BUILD_CFGOPTIONS = '--with-lfs --without-lis'
 
 name = $(PACKAGE)
 
@@ -168,9 +171,7 @@ pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
 debian/$(PACKAGE_LCNAME)-doc.info:
 	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
 
-cache_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
-csite_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-config.site
-mpost_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
+csite_file=$(debbuilddir)/$(DEB_HOST_ARCH)-config.site
 
 build: build-stamp
 build-stamp:
@@ -186,8 +187,6 @@ build-stamp:
 		CXXFLAGS='$(CXXFLAGS)' \
 		CXXCPP='$(CXXCPP)' \
 		CONFIG_SITE="$(csite_file)" \
-		MODPOST_CACHE="$(mpost_file)" \
-		--cache-file="$(cache_file)" \
 		--host="$(DEB_HOST_GNU_ARCH)" \
 		--prefix=$(prefix) \
 		--exec_prefix=$(exec_prefix) \
@@ -206,8 +205,7 @@ build-stamp:
 		--disable-dependency-tracking \
 		--with-gnu-ld \
 		$(PACKAGE_DEBOPTIONS) \
-		$(BUILD_CFGOPTIONS) \
-		|| { rm -f $(cache_file) ; exit 1 ; }
+		$(BUILD_CFGOPTIONS)
 	$(MAKE) -f Makefile
 	$(MAKE) -f Makefile check
 	chmod +x debian/rules
@@ -216,8 +214,6 @@ build-stamp:
 clean:
 	dh_testdir -v
 	dh_testroot -v
-	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
-	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
 	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
 	rm -fr $(mytmpdir)
 	rm -f build-stamp
@@ -238,7 +234,7 @@ build-lis: build-lis-stamp
 build-lis-stamp:
 	rm -f build-lfs-stamp build-stamp
 	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
-	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='--with-lis --without-lfs' build
+	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules build
 	touch build-lis-stamp
 
 install-lis: DH_OPTIONS =
@@ -255,7 +251,7 @@ build-lfs: build-lfs-stamp
 build-lfs-stamp:
 	rm -f build-lis-stamp build-stamp
 	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
-	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='--with-lfs --without-lis' build
+	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules build
 	touch build-lfs-stamp
 
 install-lfs: DH_OPTIONS =
@@ -267,7 +263,6 @@ install-lfs: build-lfs
 	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
 	$(MAKE) -f debian/rules $(pkg_lfs_control_files) $(pkg_lfs_scripts_files)
 	dh_install -v
-
 
 binary-common:
 	dh_testdir -v
@@ -294,7 +289,14 @@ binary-indep: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
 # Build architecture-dependent files here.
-binary-arch: binary-lis binary-lfs
+binary-arch:
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --with-lis "*) targ=binary-lis ;; \
+		(*" --with-lfs "*) targ=binary-lfs ;; \
+		(*)		   targ=binary-nos ;; \
+	esac ; \
+	echo "$(MAKE) -f debian/rules $$targ" ; \
+	$(MAKE) -f debian/rules $$targ
 
 binary:
 	$(MAKE) -f debian/rules binary-indep
@@ -306,6 +308,8 @@ binary-lis: build-lis install-lis
 binary-lfs: build-lfs install-lfs
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams binary-common
 
+binary-nos:
+
 binary-%: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
 
@@ -316,6 +320,12 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.11  2005/03/28 11:05:18  brian
+# - non kernel builds should not use kernel cache
+#
+# Revision 1.1.2.10  2005/03/28 07:41:37  brian
+# - correct multiple streams targets
+#
 # Revision 1.1.2.9  2005/03/27 12:23:57  brian
 # - slimmer build of lis and lfs components
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/03/26 03:11:10 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/03/28 07:42:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:10 $ by $Author: brian $
+# Last Modified $Date: 2005/03/28 07:42:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1353,15 +1353,21 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
-# Revision 0.9.2.52  2005/03/26 03:11:10  brian
-# - Reworking maintainance scripts
+# Revision 0.9.2.53  2005/03/28 07:42:30  brian
+# - better debian build
 #
-# Revision 0.9.2.51  2005/03/24 05:18:54  brian
-# - always include sysconfdir in util package
-#
-# Revision 0.9.2.50  2005/03/22 19:44:14  brian
-# - do not need symbolic link in prep anymore
-#
+
+* Sat Mar 26 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.52  2005/03/26 03:11:10  brian
+- Reworking maintainance scripts
+
+* Thu Mar 24 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.51  2005/03/24 05:18:54  brian
+- always include sysconfdir in util package
+
+* Tue Mar 22 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.50  2005/03/22 19:44:14  brian
+- do not need symbolic link in prep anymore
 
 * Thu Mar 17 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.49  2005/03/17 11:22:35  brian
