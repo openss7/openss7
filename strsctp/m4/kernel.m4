@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.57 $) $Date: 2005/03/16 09:07:09 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/03/18 11:40:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 09:07:09 $ by $Author: brian $
+# Last Modified $Date: 2005/03/18 11:40:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -444,8 +444,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 		AC_MSG_ERROR([
 ***
 *** This package does not support headless kernel build.  Install the
-*** appropriate built kernel source package for the target kernel
-*** "${kversion}" and then configure again.
+*** appropriate built kernel-source or kernel-headers package for the
+*** target kernel "${kversion}" and then configure again.
 *** 
 *** The following directories do no exist in the build environment:
 ***	"$with_k_build"
@@ -462,8 +462,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 		    AC_MSG_ERROR([
 ***
 *** This package does not support headless kernel build.  Install the
-*** appropriate built kernel source package for the target kernel
-*** "${kversion}" and then configure again.
+*** appropriate built kernel-source or kernel-headers package for the
+*** target kernel "${kversion}" and then configure again.
 *** 
 *** The following directories do not exist in the build environment:
 ***     ${linux_cv_k_build}
@@ -471,7 +471,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
 *** Check the settings of the following options before repeating:
 ***     --with-k-release ${kversion:-no}
 ***     --with-k-modules ${kmoduledir:-no}
-***     --with-k-build   ${kversion:-no}
+***     --with-k-build   ${with_k_build:-no}
 *** ])
 		fi
 	    fi
@@ -607,6 +607,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KSYMS], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [dnl
     AC_CACHE_CHECK([for kernel headers], [linux_cv_k_includes], [dnl
+	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-includes],
 	    AS_HELP_STRING([--with-k-includes=DIR],
 		[specify the include directory of the kernel for which the build
@@ -618,32 +619,72 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [dnl
 	    linux_cv_k_includes="$with_k_includes"
 	else
 dnl
-dnl	NOTE: This is for a redhat style build.  Amazingly, debian does not
-dnl	create a proper build directory link from /lib/modules so, k_build is
-dnl	really the /usr/src/linux directory on Debian.  It might be possible to
-dnl	use the /usr/include directory under Debian if the kernel-headers
-dnl	package of the right version is installed, but we need the top level
-dnl	Makefile in the kernel build tree to generate CFLAGS now.  Nevertheless,
-dnl	the Debian source package comes unconfigured (basically a tarball).  I
-dnl	still need to check if the kernel-headers package has modversions
-dnl	included (and whether Debian production kernels have kernel versions
-dnl	enabled at all).  If they don't or if the versions are included in the
-dnl	kernel-headers package it might be a better idea to Build-Depends the
-dnl	kernel-headers rather than requiring the builder to unpack and configure
-dnl	the kernel source.
+dnl	We don't have to search a redhat style build, but, amazingly, debian does not create a
+dnl	proper build directory link from /lib/modules so, k_build is really the /usr/src/linux
+dnl	directory on Debian.  We want to use the /usr/src/kernel-headers-kversion directory under
+dnl	Debian if the kernel-headers package of the right version is installed for correct
+dnl	modversions, however, we need the Makefile in the kernel build tree to generate CFLAGS now,
+dnl	so we need the kernel-source package unpacked.
 dnl
-	    linux_cv_k_includes="${kbuilddir}/include"
+	    eval "k_include_search_path=\"
+		${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/include
+		${DESTDIR}/usr/src/kernel-headers-${kversion}/include
+		${kbuilddir}/include\""
+	    k_include_search_path=`echo "$k_include_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_includes=
+	    for linux_dir in $k_include_search_path ; do
+		AC_MSG_CHECKING([for kernel headers directory... $linux_dir])
+		if test -d "$linux_dir" -a -r "$linux_dir/linux/version.h"
+		then
+		    linux_cv_k_includes="$linux_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
 	fi
-	if test ! -d "$linux_cv_k_includes"
+	if test :"${linux_cv_k_includes:-no}" = :no -o ! -d "$linux_cv_k_includes"
 	then
+	    if test :"${linux_cv_k_includes:-no}" = :no
+	    then
 	    AC_MSG_ERROR([
+***
+*** This package does not support headless kernel build.  Install the
+*** appropriate built kernel-source or kernel-headers package for the
+*** target kernel "${kversion}" and then configure again.
 *** 
-*** Kernel headers directory:
-***     "$linux_cv_k_includes"
-*** does not exit.  Specify a correct kernel header directory using the
-*** --with-k-includes option to configure before attempting again.
+*** The following directories do no exist in the build environment:
+***	"$with_k_includes"
+***	"$k_include_search_path"
+*** 
+*** Check the settings of the following options before repeating:
+***     --with-k-release  ${kversion:-no}
+***     --with-k-modules  ${kmoduledir:-no}
+***     --with-k-build    ${kbuilddir:-no}
+***     --with-k-includes ${with_k_includes:-no}
 *** ])
-	fi ])
+	    else
+		if ! -d "$linux_cv_k_includes"
+		then
+		    AC_MSG_ERROR([
+***
+*** This package does not support headless kernel build.  Install the
+*** appropriate built kernel-source or kernel-headers package for the
+*** target kernel "${kversion}" and then configure again.
+*** 
+*** The following directories do not exist in the build environment:
+***     "$linux_cv_k_includes"
+*** 
+*** Check the settings of the following options before repeating:
+***     --with-k-release  ${kversion:-no}
+***     --with-k-modules  ${kmoduledir:-no}
+***     --with-k-build    ${kbuilddir:-no}
+***     --with-k-includes ${with_k_includes:-no}
+*** ])
+		fi
+	    fi
+	fi
+	AC_MSG_CHECKING([for kernel includes directory]) ])
     kincludedir="$linux_cv_k_includes"
     AC_SUBST([kincludedir])dnl
 ])# _LINUX_CHECK_KERNEL_HEADERS
@@ -932,7 +973,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIGDIR], [dnl
 		linux_cv_k_config_spec=
 		;;
 	    (debian)
-		linux_cv_k_config_spec=
+dnl
+dnl		Debian doesn't do configuration this way.  We use the kernel-headers package and the
+dnl		configuration file is the .config file in the kernel-headers package.  For debian
+dnl		the kbuilddir is /usr/src/linux but we want /usr/src/kernel-headers for the correct
+dnl		.config file.  So, we do the search.
+dnl
+		linux_cv_k_config_spec='
+		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
+		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config'
 		;;
 	    (*)
 		# try to figure out if we have a redhat or mandrake variant
@@ -953,7 +1002,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
     AC_CACHE_CHECK([for kernel $dist_cv_host_distrib boot], [linux_cv_k_boot], [dnl
 	linux_cv_k_boot=no
 	linux_cv_k_base="$kversion"
-dnl	all redhat variants use this file, even mandrake
+dnl	all redhat variants use this file, even mandrake, but not debian
 	if test -r "${kincludedir}/linux/rhconfig.h"
 	then
 	    case "${kversion}" in
@@ -1153,6 +1202,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 	then
 	    linux_cv_k_config="$with_k_config"
 	else
+dnl
+dnl	    The addition of kbuildir/.config catches debian.
+dnl
 	    k_config_search_pathspec="
 		$k_config_search_pathspec
 		$linux_cv_k_config_spec"'
@@ -1165,28 +1217,31 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}/boot/config-${kversion}
 		    ${DESTDIR}/boot/config'
 	    fi
+dnl
+dnl	    The addition of /usr/src/kernel-headers-kvesion/.config also catches debian.
+dnl
 	    k_config_search_pathspec="
 		$k_config_search_pathspec"'
+		${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}/.config
 		${DESTDIR}${rootdir}/usr/src/linux-2.4/.config
 		${DESTDIR}${rootdir}/usr/src/linux/.config
+		${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
 		${DESTDIR}/usr/src/linux-${kversion}/.config
 		${DESTDIR}/usr/src/linux-2.4/.config
 		${DESTDIR}/usr/src/linux/.config'
 	    eval "k_config_search_path=\"$k_config_search_pathspec\""
 	    k_config_search_path=`echo "$k_config_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-    dnl
-    dnl	If we are configuring for the running kernel and DESTDIR is null, we can
-    dnl	check whether the /boot directories.  Otherwise this is dangerous.
-    dnl	Redhat puts different configuration files in the /boot directory
-    dnl	depending upon which architecture of kernel (with the same name) is
-    dnl	being booted.  In these other cases, the kernel configuration needs to
-    dnl	be obtained from the kernel source package.
-    dnl	/usr/src/linux-2.4/configs/*.config for RedHat/Fedora/EL3 and
-    dnl	/usr/src/linux-2.4/arch/MACHDIR/defconfig-* for Mandrake.  Debian and
-    dnl	Suse do not build multiple kernels from the same source package and in
-    dnl	their case the file will be in /usr/src/linux-2.4/.config.
-    dnl
+dnl
+dnl	If we are configuring for the running kernel and DESTDIR is null, we can check the
+dnl	/boot directories.  Otherwise this is dangerous.  Redhat puts different configuration files
+dnl	in the /boot directory depending upon which architecture of kernel (with the same name) is
+dnl	being booted.  In these other cases, the kernel configuration needs to be obtained from the
+dnl	kernel source package.  /usr/src/linux-2.4/configs/*.config for RedHat/Fedora/EL3 and
+dnl	/usr/src/linux-2.4/arch/MACHDIR/defconfig-* for Mandrake.  Debian and Suse do not build
+dnl	multiple kernels from the same source package and in their case the file will be in
+dnl	/usr/src/kernel-headers-kversion/.config and /usr/src/linux-2.4/.config respectively.
+dnl
 	    linux_cv_k_config=
 	    for linux_file in $k_config_search_path ; do
 		AC_MSG_CHECKING([for kernel config file... $linux_file])
@@ -1213,7 +1268,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 *** ])
 	else
 	    case "$linux_cv_k_config" in
-		(*/configs/*|*/arch/*/defconf*)
+		(*/configs/*|*/arch/*/defconf*|*/kernel-headers-*)
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    AC_MSG_WARN([
@@ -1288,7 +1343,8 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	then
 	    linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
 	fi
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude\>| -I${kbuilddir}/include|g"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude\>| -I${kincludedir}|g"`
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s|${kbuilddir}/include\>|${kincludedir}|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9]]* | $linux_cflags |"`
 dnl
 dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
@@ -1318,10 +1374,13 @@ dnl	location of the source directory.  include2 on the otherhand is properly
 dnl	set up for the asm directory.
 dnl
 	linux_cv_k_cppflags="$linux_cv_k_cppflags $linux_cv_k_more_cppflags"
-	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude\>| -I${kbuilddir}/include|g"`
+	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude\>| -I${kincludedir}|g"`
+	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s|${kbuilddir}/include\>|${kincludedir}|g"`
     ])
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
-	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} modflag-check`" ])
+	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} modflag-check`"
+	linux_cv_k_modflags=`echo "$linux_cv_k_modflags" | sed -e "s|${kbuilddir}/include\>|${kincludedir}|g"`
+    ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"
     KERNEL_MODFLAGS="$linux_cv_k_modflags"
