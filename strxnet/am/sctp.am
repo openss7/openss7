@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 12:27:20 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 12:23:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
+# Last Modified $Date: 2005/02/10 12:23:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,25 +65,36 @@
 
 if RPM_BUILD_KERNEL
 
-kernel-all: $(KERNEL_MODULES)
+Modules.map: $(KERNEL_MODULES)
+	nm -s $(KERNEL_MODULES) > $@
+
+all-kernel: $(KERNEL_MODULES) Modules.map
 
 STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 
 #
 # This is equivalent to the source rpm %install scriptlet, and is in fact invoked by that scriptlet.
 # This is performed both for the install as well as the install-strip targets.  This simply installs
-# and strips if required.  We use libtool to install even though these are not .la libraries but at
+# and strips if required.  We use libtool to install even though these are not .la libraries but
 # just objects.  We set kernel module stripping as above.
-
+#
 install-modules: $(KERNEL_MODULES)
 	@$(NORMAL_INSTALL)
-	@k='$(DESTDIR)$(kmoduledir)' ; d="$$k/$(KERNEL_SUBDIR)" ; \
-	echo "$(mkinstalldirs) $$d" ; \
-	$(mkinstalldirs) $$d ; \
+	@r='$(DESTDIR)$(krootdir)' ; k='$$r$(kmoduledir)' ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
+	if test -n "$(KERNEL_PRELOADS)" ; then \
+		echo "$(mkinstalldirs) $$d/boot" ; \
+		$(mkinstalldirs) $$d/boot ; \
+	elif test -n "$(KERNEL_MODULES)" ; then \
+		echo "$(mkinstalldirs) $$d" ; \
+		$(mkinstalldirs) $$d ; \
+	else \
+		echo "$(mkinstalldirs) $$k" ; \
+		$(mkinstalldirs) $$k ; \
+	fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		if test -f $$p; then \
 			f="`echo $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
-			f="$$p" ; \
 			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f ; \
 			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
@@ -95,7 +106,18 @@ install-modules: $(KERNEL_MODULES)
 				$(COMPRESS_KERNEL_MODULES) $$d/$$f ; \
 			fi ; \
 		else :; fi ; \
-	done
+	done ; \
+	list='$(KERNEL_PRELOADS)'; for p in $$list ; do \
+		p="$$p$$kext" ; \
+		if test -f $$d/$$p ; then \
+			echo "(cd $$d/boot ; $(LN_S) ../$$p . )" ; \
+			(cd $$d/boot ; $(LN_S) ../$$p . ) ; \
+		fi ; \
+	done ; \
+	if test -n "$(KERNEL_MODCONF)" ; then \
+		echo "$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT)" ; \
+		$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT) ; \
+	fi
 
 INSTALL_EXEC_LOCAL += install-modules
 
@@ -107,7 +129,7 @@ INSTALL_EXEC_LOCAL += install-modules
 # target with install-exec-hook that runs after install-exec has completed.
 #
 # The post-modules target checks for a fully configured install directory by checking for
-# modules.dep in the kernel modules directory $(DESTDIR)$(kmoduledir).
+# modules.dep in the kernel modules directory $(DESTDIR)$(krootdir)$(kmoduledir).
 #
 # If modules.dep does not exist, we simply exit.
 #
@@ -123,46 +145,75 @@ INSTALL_EXEC_LOCAL += install-modules
 # installing the source package under rpm.
 #
 post-modules:
-	@r='$(DESTDIR)$(krootdir)' ; k='$(DESTDIR)$(kmoduledir)' ; conf_fil="$$k/modules.dep" ; \
+	@r='$(DESTDIR)$(krootdir)' ; k='$$r$(kmoduledir)' ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
-	if test -e "$$conf_fil" ; then \
+	if test -f "$$conf_fil" ; then \
 		if test -e "$$k/net/sctp/sctp.o$$kext" ; then \
 			mv -f "$$k/net/sctp/sctp.o$$kext" "$$k/net/sctp/sctp_deprecated.o$$kext" ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			s='$(DESTDIR)$(ksysmap)' ; \
-			if test -r "$$s" ; then \
-				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -F $$s $(kversion)" ; \
-				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -F $$s $(kversion) ; \
+			s='$$r$(ksysmap)' ; \
+			if test -f "$$s" ; then \
+				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
 			fi ; \
 		fi ; \
-		u="$$r/usr/src" ; \
-		if test -d $$u ; then \
-			p="$$u/$(PACKAGE_TARNAME)" ; \
-			d=`(cd $(srcdir); pwd)` ; \
-			echo "rm -f -- $$p" ; \
-			rm -f -- "$$p" ; \
-			echo "$(LN_S) -f $$d $$p" ; \
-			$(LN_S) -f "$$d" "$$p" ; \
+		prel_fil="$$r/etc/modules" ; \
+		if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
+			prel_tmp="$$prel_fil.tmp.$$$$" ; \
+			prel_new="$$prel_fil.new.$$$$" ; \
+			cp -f $$prel_fil $$prel_new ; \
+			list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
+				f=`basename $$p .o` ; \
+				sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
+				mv -f $$prel_tmp $$prel_new ; \
+				echo "$$f" >> $$prel_new ; \
+			done ; \
+			chmod --reference=$$prel_fil $$prel_new ; \
+			cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
+			rm -f -- "$$prel_new" ; \
 		fi ; \
 	fi
 
-INSTALL_EXEC_HOOK += post-modules
+post-source:
+	@u='$(DESTDIR)$(krootdir)/usr/src' ; \
+	if test -d $$u ; then \
+		p="$$u/$(PACKAGE_TARNAME)" ; \
+		d=`(cd $(srcdir); pwd)` ; \
+		echo "rm -f -- $$p" ; \
+		rm -f -- "$$p" ; \
+		echo "$(LN_S) -f $$d $$p" ; \
+		$(LN_S) -f "$$d" "$$p" ; \
+	fi
+
+#
+# This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
+# installs.  It is only executed when the install directory is fully configured for kernel modules.
+# That is, this does not run when building an rpm because the binaries are installed in a temporary,
+# unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
+# target with install-exec-hook that runs after install-exec has completed.
+#
+INSTALL_EXEC_HOOK += post-modules post-source
 
 #
 # There is no rpm equivalent for this target.  This simply removes kernel modules.  It is not
 # invoked by rpm but is only used from the tarball uninstall.  We simply remove our modules (and
 # possibly the directory that they are in).
-
+#
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
-	@k='$(DESTDIR)$(kmoduledir)' ; d="$$k/$(KERNEL_SUBDIR)" ; \
+	@r='$(DESTDIR)$(krootdir)' ; k='$$r$(kmoduledir)' ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
 		p="$$p$$kext" ; \
 		echo "$(LIBTOOL) --mode=uninstall rm -f -- $$d/$$p" ; \
 		$(LIBTOOL) --mode=uninstall rm -f -- "$$d/$$p" ; \
+	done ; \
+	list='$(KERNEL_PRELOADS)'; for p in $$list; do \
+		p="$$p$$kext" ; \
+		echo "rm -f -- $$d/boot/$$p" ; \
+		rm -f -- $$d/boot/$$p;; \
 	done ; \
 	echo "rmdir --ignore-fail-on-non-empty $$d" ; \
 	rmdir --ignore-fail-on-non-empty "$$d" ; \
@@ -190,35 +241,73 @@ UNINSTALL_LOCAL += uninstall-modules
 # under rpm.
 #
 postun-modules:
-	@r='$(DESTDIR)$(krootdir)' ; k='$(DESTDIR)$(kmoduledir)' ; conf_fil="$$k/modules.dep" ; \
+	@r='$(DESTDIR)$(krootdir)' ; k='$$r$(kmoduledir)' ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
-	if test -e "$$conf_fil" ; then \
-		if test -e "$$k/net/sctp/sctp_deprecated.o$$kext" ; then \
-			mv -f "$$k/net/sctp/sctp_deprecated.o$$kext" "$$k/net/sctp/sctp.o$$kext" ; \
-		fi ; \
-		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			s='$(DESTDIR)$(ksysmap)' ; \
-			if test -r $$s ; then \
-				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -F $$s $(kversion)" ; \
-				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -F $$s $(kversion) ; \
+	if test -f "$$conf_fil" ; then \
+		l=yes ; \
+		for f in $$r/lib/modules/*/$(KERNEL_SUBDIR)/sctp.o* ; do \
+			if test -f $$f ; then l=no ; break ; fi ; \
+		done ; \
+		if test ":$$l" = :yes ; then \
+			if test -e "$$k/net/sctp/sctp_deprecated.o$$kext" ; then \
+				mv -f "$$k/net/sctp/sctp_deprecated.o$$kext" "$$k/net/sctp/sctp.o$$kext" ; \
+			fi ; \
+			prel_fil="$$r/etc/modules" ; \
+			if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
+				prel_tmp="$$prel_fil.tmp.$$$$" ; \
+				prel_new="$$prel_fil.new.$$$$" ; \
+				cp -f $$prel_fil $$prel_new ; \
+				list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
+					f=`basename $$p .o` ; \
+					sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
+					mv -f $$prel_tmp $$prel_new ; \
+				done ; \
+				chmod --reference=$$prel_fil $$prel_new ; \
+				cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
+				rm -f -- "$$prel_new" ; \
 			fi ; \
 		fi ; \
-		p="$$r/usr/src/$(PACKAGE_TARNAME)" ; \
-		echo "rm -f -- $$p" ; \
-		rm -f -- "$$p" ; \
+		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
+			s='$$r$(ksysmap)' ; \
+			if test -f $$s ; then \
+				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
+			fi ; \
+		fi ; \
 	fi
 
-UNINSTALL_HOOK += postun-modules
+postun-source:
+	rm -f -- "$(DESTDIR)$(krootdir)/usr/src/$(PACKAGE_TARNAME)"
+
+#
+# This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when
+# the uninstall directory is fully configured for kernel modules.  That is, this does not run when
+# building an rpm because the binaries are not uninstalled (they are usually just removed
+# wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
+# runs after uninstall has completed.
+#
+UNINSTALL_HOOK += postun-modules postun-source
+
+if PERFORM_CHECKS
+dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
+TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
+			   ksysmap='$(ksysmap)' \
+			   KERNEL_MODULES='$(KERNEL_MODULES)' \
+			   KERNEL_MODMAPS='$(KERNEL_MODMAPS)'
+CLEANFILES		+= check_modules.log
+DISTCLEANFILES		+= *.err *.out
+endif
 
 else
 
-kernel-all:
+all-kernel:
 
 endif
 
-ALL_LOCAL += kernel-all
+ALL_LOCAL += all-kernel
 
-.PHONY: kernel-all install-modules post-modules uninstall-modules postun-modules
+CLEANFILES += Modules.map
+
+.PHONY: all-kernel install-modules post-modules uninstall-modules postun-modules
 
 # vim: ft=automake
-

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/01 18:59:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/02/10 12:25:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/01 18:59:42 $ by $Author: brian $
+# Last Modified $Date: 2005/02/10 12:25:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -241,19 +241,30 @@ libSCTPmodl_a_CPPFLAGS		= -I./src -I$(srcdir)/src \
 libSCTPmodl_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPmodl_a_OBJECTS: $(libSCTPmodl_a_DEPENDENCIES)
+
 sctp.o: $(libSCTPmodl_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-KERNEL_MODULES			= $(ADDON_OBJS)
-EXTRA_KERNEL_MODULES		+=
-
 endif
 
-EXTRA_DIST			+= $(sctp_source_FILES)
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX) $(sctp_source_FILES)
 dist_noinst_SCRIPTS		= configure.nexusware
 EXTRA_SCRIPTS			+=
 
-KERNEL_SUBDIR			= kernel/net/ipv4
+export KERNEL_MODULES		= $(ADDON_OBJS)
+export KERNEL_PRELOADS		= sctp.o
+export KERNEL_MODCONF		=
+export KERNEL_SUBDIR		= kernel/net/ipv4
+export KMODCONF_EXT		= $(PACKAGE_TARNAME)
+export KERNEL_MODMAPS		=
 
 include am/sctp.am
 
@@ -264,11 +275,26 @@ SUBDIRS = include doc
 endif
 
 #
-#   Rules for making rpms
+# Rules for making rpms
 #
 AM_RPMFLAGS 			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS 			=
 
 include am/rpm.am
+
+MAINTAINERCLEANFILES	+= \
+			$(top_srcdir)/aclocal.m4 \
+			$(top_srcdir)/config.h.in \
+			$(top_srcdir)/configure \
+			$(top_srcdir)/COPYING \
+			$(top_srcdir)/INSTALL \
+			$(top_srcdir)/scripts/compile \
+			$(top_srcdir)/scripts/config.guess \
+			$(top_srcdir)/scripts/config.sub \
+			$(top_srcdir)/scripts/depcomp \
+			$(top_srcdir)/scripts/install-sh \
+			$(top_srcdir)/scripts/ltmain.sh \
+			$(top_srcdir)/scripts/missing \
+			$(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake
