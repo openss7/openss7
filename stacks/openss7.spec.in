@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/28 11:33:10 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/28 19:40:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/28 11:33:10 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 19:40:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -823,8 +823,9 @@ to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%dir %{_usrsrc}/%{name}-%{version}-%{release}
-%{_usrsrc}/*
+%dir %{_usrsrc}/%{name}-%{version}-%{release}
+%{_usrsrc}/%{name}-%{version}-%{release}/*
+%{_usrsrc}/%{name}-%{version}-%{release}/.*
 %endif
 
 # ===========================================================================
@@ -890,6 +891,9 @@ SS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 0.9.2.27  2004/06/28 19:40:23  brian
+# - Do not package up debug files on recent rpmbuild.
+#
 # Revision 0.9.2.26  2004/06/28 11:33:10  brian
 # - Support binary release.
 #

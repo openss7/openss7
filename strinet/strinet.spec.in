@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/06/28 11:33:14 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/28 19:40:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/28 11:33:14 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 19:40:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -812,8 +812,9 @@ to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%dir %{_usrsrc}/%{name}-%{version}-%{release}
-%{_usrsrc}/*
+%dir %{_usrsrc}/%{name}-%{version}-%{release}
+%{_usrsrc}/%{name}-%{version}-%{release}/*
+%{_usrsrc}/%{name}-%{version}-%{release}/.*
 %endif
 
 # ===========================================================================
@@ -878,6 +879,9 @@ INET package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.7  2004/06/28 19:40:29  brian
+# - Do not package up debug files on recent rpmbuild.
+#
 # Revision 0.9.2.6  2004/06/28 11:33:14  brian
 # - Support binary release.
 #

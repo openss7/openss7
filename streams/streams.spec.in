@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2004/06/28 11:33:11 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2004/06/28 19:40:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/28 11:33:11 $ by $Author: brian $
+# Last Modified $Date: 2004/06/28 19:40:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -726,8 +726,9 @@ to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#%dir %{_usrsrc}/%{name}-%{version}-%{release}
-%{_usrsrc}/*
+%dir %{_usrsrc}/%{name}-%{version}-%{release}
+%{_usrsrc}/%{name}-%{version}-%{release}/*
+%{_usrsrc}/%{name}-%{version}-%{release}/.*
 %endif
 
 # ===========================================================================
@@ -814,8 +815,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.28  2004/06/28 11:33:11  brian
-# - Support binary release.
+# Revision 0.9.2.29  2004/06/28 19:40:26  brian
+# - Do not package up debug files on recent rpmbuild.
+#
+# Revision 1.29  2004/06/28 19:40:26  brian
+# - Do not package up debug files on recent rpmbuild.
 #
 # Revision 1.28  2004/06/28 11:33:11  brian
 # - Support binary release.
