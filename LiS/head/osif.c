@@ -28,7 +28,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS osif.c 1.41 12/18/02"
+#ident "@(#) LiS osif.c 1.42 5/30/03"
 
 #include <sys/stream.h>
 #include <linux/autoconf.h>		/* Linux config defines */
@@ -75,63 +75,41 @@
 *									*
 ************************************************************************/
 
-#if (!defined(_SPARC_LIS_) && !defined(_PPC_LIS_))
-
-#if defined(KERNEL_2_5)		/* pcibios_xxx functions de-implemented */
-
-static int pcibios_present(void)
-{
-    return(-ENOSYS) ;
-}
-static int pcibios_find_class(unsigned int   class_code,
-			    unsigned short index,
-                            unsigned char *bus,
-			    unsigned char *dev_fn)
-{
-    return(-ENOSYS) ;
-}
-static int pcibios_find_device(unsigned short vendor,
-			     unsigned short dev_id,
-			     unsigned short index,
-			     unsigned char *bus,
-			     unsigned char *dev_fn)
-{
-    return(-ENOSYS) ;
-}
-
+/*
+ * Determine which systems have this old PCI BIOS stuff.  LiS provides
+ * routines anyway, but they all return errors.
+ */
+#if 	defined(_SPARC_LIS_) || defined(_PPC_LIS_) || \
+	defined(KERNEL_2_5) || defined(__s390__)
+#undef HAS_PCIBIOS
+#else
+#define HAS_PCIBIOS	1
 #endif
+
 
 int lis_pcibios_present(void)
 {
+#if defined(HAS_PCIBIOS)
     return(pcibios_present()) ;
+#else
+    return(-ENOSYS) ;
+#endif
 }
 
 /*
  * PCO BIOS init routine is not an exported symbol, but we define it
  * anyway in case some driver was calling it.
  */
-#if LINUX_VERSION_CODE < 0x020100               /* 2.0 kernel */
-unsigned long lis_pcibios_init(unsigned long memory_start,
-			        unsigned long memory_end)
-{
-#if defined(CONFIG_PCI)
-    return(1) ;			/* assume if configured then init'd by now */
-#else
-    return(0) ;			/* not configured, not initialized */
-#endif
-}
-#else                                           /* 2.1 or 2.2 kernel */
 void lis_pcibios_init(void)
 {
 }
-#endif
 
 int lis_pcibios_find_class(unsigned int   class_code,
 			    unsigned short index,
                             unsigned char *bus,
 			    unsigned char *dev_fn)
 {
-#if !defined(__s390__)
+#if defined(HAS_PCIBIOS)
     return(pcibios_find_class(class_code, index, bus, dev_fn)) ;
 #else
     return(-ENXIO) ;
@@ -144,7 +122,7 @@ int lis_pcibios_find_device(unsigned short vendor,
 			     unsigned char *bus,
 			     unsigned char *dev_fn)
 {
-#if !defined(__s390__)
+#if defined(HAS_PCIBIOS)
     return(pcibios_find_device(vendor, dev_id, index, bus, dev_fn)) ;
 #else
     return(-ENXIO) ;
@@ -156,9 +134,7 @@ int lis_pcibios_read_config_byte(unsigned char  bus,
 				  unsigned char  where,
 				  unsigned char *val)
 {
-#if LINUX_VERSION_CODE < 0x020100       /* 2.0 kernel */
-    return pcibios_read_config_byte(bus, dev_fn, where, val);
-#else					/* 2.1/2.2 kernel */
+#if defined(HAS_PCIBIOS)
     if (where != PCI_INTERRUPT_LINE) 
 	return pcibios_read_config_byte(bus, dev_fn, where, val);
     else {
@@ -171,6 +147,8 @@ int lis_pcibios_read_config_byte(unsigned char  bus,
     }
     *val = 0;
     return PCIBIOS_DEVICE_NOT_FOUND;
+#else
+    return(-ENOSYS) ;
 #endif
 }
 
@@ -179,7 +157,11 @@ int lis_pcibios_read_config_word(unsigned char   bus,
 				  unsigned char   where,
 				  unsigned short *val)
 {
+#if defined(HAS_PCIBIOS)
     return(pcibios_read_config_word(bus, dev_fn, where, val)) ;
+#else
+    return(-ENOSYS) ;
+#endif
 }
 
 int lis_pcibios_read_config_dword(unsigned char  bus,
@@ -187,7 +169,11 @@ int lis_pcibios_read_config_dword(unsigned char  bus,
 				   unsigned char  where,
 				   unsigned int  *val)
 {
+#if defined(HAS_PCIBIOS)
     return(pcibios_read_config_dword(bus, dev_fn, where, val)) ;
+#else
+    return(-ENOSYS) ;
+#endif
 }
 
 int lis_pcibios_write_config_byte(unsigned char  bus,
@@ -195,7 +181,11 @@ int lis_pcibios_write_config_byte(unsigned char  bus,
 				   unsigned char  where,
 				   unsigned char  val)
 {
+#if defined(HAS_PCIBIOS)
     return(pcibios_write_config_byte(bus, dev_fn, where, val)) ;
+#else
+    return(-ENOSYS) ;
+#endif
 }
 
 int lis_pcibios_write_config_word(unsigned char   bus,
@@ -203,7 +193,11 @@ int lis_pcibios_write_config_word(unsigned char   bus,
 				   unsigned char   where,
 				   unsigned short  val)
 {
+#if defined(HAS_PCIBIOS)
     return(pcibios_write_config_word(bus, dev_fn, where, val)) ;
+#else
+    return(-ENOSYS) ;
+#endif
 }
 
 int lis_pcibios_write_config_dword(unsigned char  bus,
@@ -211,14 +205,16 @@ int lis_pcibios_write_config_dword(unsigned char  bus,
 				    unsigned char  where,
 				    unsigned int   val)
 {
+#if defined(HAS_PCIBIOS)
     return(pcibios_write_config_dword(bus, dev_fn, where, val)) ;
+#else
+    return(-ENOSYS) ;
+#endif
 }
 
 const char *lis_pcibios_strerror(int error)
 {
-#if LINUX_VERSION_CODE < 0x020100       /* 2.0 kernel */
-    return(pcibios_strerror(error)) ;
-#else					/* 2.1 and beyond */
+#if defined(HAS_PCIBIOS)
     switch (error)
     {
     case PCIBIOS_SUCCESSFUL:		return("PCIBIOS_SUCCESSFUL") ;
@@ -235,10 +231,15 @@ const char *lis_pcibios_strerror(int error)
 	sprintf(msg, "PCIBIOS Error #%d", error) ;
 	return(msg) ;
     }
+#else
+    return("No PCI BIOS functions") ;
 #endif
 }
 
-#endif /* ifndef _SPARC_LIS_, _PPC_LIS_ */
+/*
+ * End of old PCI BIOS routines
+ */
+
 
 
 struct pci_dev  *lis_osif_pci_find_device(unsigned int vendor,
