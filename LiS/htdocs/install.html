@@ -1,0 +1,595 @@
+<html>
+
+
+
+<head>
+
+<title>Installing LiS</title>
+<meta name="title" content="Installing LiS">
+<meta name="keywords" content="Linux, streams, install, installing, LiS">
+<meta name="description" content="How to install LiS">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>Installation of LiS </h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+
+    <td width="600" height="100%" align="left" valign="top"> 
+
+      <p>Installation of LiS is performed using a configuration script and then 
+
+        running &quot;make&quot;. If you run &quot;make&quot; with no configuration 
+
+        file present, the makefile will run the configuration script automatically. 
+
+      </p>
+
+      <p>For the installation to proceed to its conclusion you must be logged 
+
+        in as &quot;root&quot;. However, you can install LiS using a non-privileged 
+
+        user id. In this case the compilation of LiS will proceed but the installation 
+
+        of the resulting module will likely fail due to permission problems. </p>
+
+      <p>The easiest way to install LiS is to proceed as follows. </p>
+
+      <blockquote> 
+
+        <p><font size="2" face="Courier New">cd /usr/src/LiS-2.12</font> <font size="2">(Or 
+          wherever you installed the files)</font><br>
+
+          <font size="2" face="Courier New">make</font><br>
+
+          <font size="2" face="Courier New">make install</font></p>
+
+      </blockquote>
+
+      <p>The version number in the above example is used for illustrative purposes 
+
+        only. Use the version number of the package that you downloaded. </p>
+
+      <p>The makefile will automatically run the LiS <font face="Courier New, Courier, mono">Configure</font> 
+        script. You will be asked a series of questions by the configuration script 
+        and then the build will proceed. If your intent is to install and run 
+        LiS on your currently running Linux kernel then you are safe in answering 
+        all questions by hitting the Enter key, that is, using default answers.</p>
+
+      <p>The configuration script will make a symbolic link from <font face="Courier New, Courier, mono">/usr/src/LiS</font> 
+        to whatever directory the <font face="Courier New, Courier, mono">Configure</font> 
+        script was run from. This makes it easy to refer to the directory containing 
+        the latest installed version of LiS. This symbolic link will only be made 
+        if the <font face="Courier New, Courier, mono">Configure</font> script 
+        (or initial &quot;make&quot;) is run under &quot;root&quot;. </p>
+
+      <p>Once the &quot;make&quot; is complete, enter <font
+
+        size="2" face="Courier New">make install</font><font
+
+        size="2"> </font>to install the LiS utility programs in their proper places 
+
+        on your system. </p>
+
+      		   
+      <p>If you want to uninstall LiS, enter <font size="2"
+
+        face="Courier New">make very-clean</font>. When it completes you can then 
+        do <font size="2"
+
+        face="Courier New">rm -rf /usr/src/LiS-2.12 </font>(or whatever version 
+        of LiS you are removing). For more information about uninstalling LiS, 
+        click <a
+
+        href="removal.html">here</a>. </p>
+
+      <h2><font size="4">Configuration</font> </h2>
+
+      <p>The configuration is extremely simple for the most common case of using 
+        LiS. This case occurs when you intend to run LiS as a loadable module 
+        installed in the directory <font face="Courier New, Courier, mono">/lib/modules/<i>kernel-version</i>/misc</font> 
+        and your kernel source resides in the directory <font face="Courier New, Courier, mono">/usr/src/linux</font>. 
+        For this case you can simply hit Enter/Return to select the default answer 
+        for each question and proceed quickly to the compilation phase. </p>
+
+      <p>If at any time you think that the configuration process has taken a wrong 
+        turn, you can terminate it by typing <font face="Courier New, Courier, mono">Ctrl-C</font> 
+        (or your equivalent &quot;intr&quot; character). You can then start over 
+        from the beginning. </p>
+
+      <h2><font size="4">Re-Configuration</font> </h2>
+
+      <p>You can re-configure LiS by running the <font face="Courier New, Courier, mono">Configure</font> 
+        script again at any time. The defaults for a re-configuration are the 
+        settings arrived at by the most recent previous run of <font face="Courier New, Courier, mono">Configure</font>. 
+      </p>
+
+      <p>If you get your configuration hopelessly out of whack, just remove the 
+        file <font face="Courier New, Courier, mono">config.in</font> and run 
+        <font face="Courier New, Courier, mono">Configure</font> (or make). This 
+        will start over just as for a fresh installation. </p>
+
+      <p>When you change the configuration parameters it is a good idea to do 
+
+        a &quot;make clean&quot; before doing a &quot;make&quot;. </p>
+
+      <h2><font size="4">Making LiS</font> </h2>
+
+      <p>You can make LiS by typing &quot;make; make install&quot; in the LiS 
+
+        installation directory. </p>
+
+      <p>The following make targets are defined. </p>
+
+      <table border="1" cellpadding="7" cellspacing="1">
+        <tr valign="top"> 
+          <td width="30%" height="8">Default target</td>
+          <td width="70%" height="8">Compile LiS plus binary drivers into streams.o. 
+            Copy to modules directory if configured to do so. Compile utility 
+            programs.</td>
+        </tr>
+        <tr valign="top"> 
+          <td>install</td>
+          <td>Makes the LiS library routines and utilities. Installs utilities 
+            in their proper directories. Runs <font size="2" face="Courier New">strmakenodes</font> 
+            to make <font size="2" face="Courier New">/dev</font> entries for 
+            STREAMS drivers.</td>
+        </tr>
+        <tr valign="top"> 
+          <td>uninstall</td>
+          <td>Removes the STREAMS utility programs and the files created in the 
+            /dev directory.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">clean</td>
+          <td width="70%" height="8">Remove all object code and utility programs. 
+            Leave configuration file in place.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">realclean</td>
+          <td width="70%" height="8">Like &quot;clean&quot; except remove configuration 
+            files as well.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">very-clean</td>
+          <td width="70%" height="8" valign="top">This is equivalent to &quot;make 
+            uninstall clean realclean&quot;.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">dep</td>
+          <td width="70%" height="8">Make dependencies. Done automatically by 
+            default target.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">all</td>
+          <td width="70%" height="8">Like default target except skip steps requiring 
+            root login.</td>
+        </tr>
+      </table>
+
+      <h2 align="center"><font size="4">Utility Programs Made</font> </h2>
+
+      <p>In addition to the file <font face="Courier New, Courier, mono">streams.o</font>, 
+        which contains LiS and any STREAMS drivers linked with it, the build procedure 
+        also makes the following utility programs. These programs are copied to 
+        the indicated directory if the &quot;make&quot; uses the default make 
+        target and if you are logged in as &quot;root&quot;. These programs are 
+        documented <a href="cmds.html">separately</a>. </p>
+
+      <table border="1" cellpadding="7" cellspacing="1">
+
+        <tr> 
+
+          <td width="30%" height="8">/usr/sbin/streams</td>
+
+          <td width="70%" height="8">Prints out statistics from running LiS. Sets 
+
+            debug mask for LiS.</td>
+
+        </tr>
+
+        <tr> 
+
+          <td width="30%" height="8">/usr/sbin/strconf</td>
+
+          <td width="70%" height="8">Interprets STREAMS driver Config file and 
+
+            generates corresponding config.h and makenodes.c files.</td>
+
+        </tr>
+
+        <tr> 
+
+          <td width="30%" height="8">/usr/sbin/strmakenodes</td>
+
+          <td width="70%" height="8">Program to make /dev entries for STREAMS 
+
+            drivers. The result of compiling makenodes.c.</td>
+
+        </tr>
+
+        <tr> 
+
+          <td width="30%" height="8">/usr/local/bin/strtst</td>
+
+          <td width="70%" height="8">A comprehensive test program for STREAMS.</td>
+
+        </tr>
+
+        <tr> 
+
+          <td width="30%" height="8">/usr/local/bin/timetst</td>
+
+          <td width="70%" height="8">Times round-trip delay from user application 
+
+            to STREAMS loopback driver.</td>
+
+        </tr>
+
+      </table>
+
+      <p>Of these programs, only <font face="Courier New, Courier, mono">strmakenodes</font> 
+        and <font face="Courier New, Courier, mono">strconf</font> are essential 
+        to the operation of LiS. <font face="Courier New, Courier, mono">Strmakenodes</font> 
+        must be run prior to attempting to use any STREAMS application programs 
+        to make the proper entries in the <font face="Courier New, Courier, mono">/dev</font> 
+        directory for STREAMS files. </p>
+
+      <p>The <font face="Courier New, Courier, mono">strconf</font> program is 
+        needed for the build of LiS itself. However, the LiS build executes the 
+        program from the local LiS installation directory. Thus it is not necessary 
+        to copy this program to <font face="Courier New, Courier, mono">/usr/sbin</font> 
+        in order to make <font face="Courier New, Courier, mono">streams.o</font>. 
+      </p>
+
+      <hr>
+
+      <h1><font size="5"><b>Configuration Procedure</b></font> </h1>
+
+      <p>The following sections describe the steps of the <font face="Courier New, Courier, mono">Configure</font> 
+        script. </p>
+      <h2><font size="4">User or Kernel</font></h2>
+      <p>The first question posed by the <font face="Courier New, Courier, mono">Configure</font> 
+        script is the type of environment that LiS is to run in. The default is 
+        to build LiS to run in the Linux kernel. You can also build a user-space 
+        version of LiS that can be used for &quot;laboratory&quot; testing. The 
+        QNX alternative is not useful.</p>
+
+      <h2><font size="4"><b>Module or Kernel</b></font> </h2>
+
+      <p>The next question posed by the <font face="Courier New, Courier, mono">Configure</font> 
+        script is whether you want to run LiS as a separate loadable module or 
+        link it into the kernel. The default is to run as a separate module. It 
+        used to be useful to link LiS into the kernel when you wanted to use GDB 
+        to debug kernel based STREAMS drivers. However, the kernel GDB tools are 
+        now sophisticated enough that it is just as easy to debug LiS as a loadable 
+        module. </p>
+
+      <h2><font size="4"><b>Kernel Source Location</b> </font></h2>
+
+      <p><font face="Courier New, Courier, mono">Configure</font> asks you for 
+        the location of your kernel source tree. The default is <font face="Courier New, Courier, mono">/usr/src/linux</font> 
+        and likely suffices for the vast majority of cases. Once <font face="Courier New, Courier, mono">Configure</font> 
+        has this information it can determine the version of the kernel for which 
+        you are compiling LiS. The kernel version makes a difference in the amount 
+        of patching that must go into the kernel. Older (2.0) kernels require 
+        patching, new ones (2.2 and 2.4) do not. </p>
+
+      <p>If you are compiling for the kernel located in <font face="Courier New, Courier, mono">/usr/src/linux</font> 
+        and the kernel version is 2.0.36 or 2.2.0 or later there is no patching 
+        of the kernel required to install LiS as a module. To link directly with 
+        the kernel, the &quot;make&quot; of LiS will insert a small patch into 
+        the kernel to cause LiS to be linked into the kernel and to arrange to 
+        call the LiS initialization routine at boot time. </p>
+
+      <p>We recommend that you use kernel version 2.0.36 or 2.2.x for installing 
+        the latest version of LiS. This latest version of LiS has been tested 
+        with 2.2 kernels only. It may not install or run properly on older kernels.</p>
+
+      <p>If your kernel source has not had &quot;menuconfig&quot; run on it yet, 
+        <font face="Courier New, Courier, mono">Configure</font> will propose 
+        doing so at this time automatically. </p>
+
+      <p>Likewise, if you have not done a &quot;make dep&quot; on your kernel 
+        source yet, <font face="Courier New, Courier, mono">Configure</font> will 
+        propose doing so at this time automatically. </p>
+
+      <h2><font size="4"><b>Kernel Version Verification</b> </font></h2>
+
+      <p>The LiS <font face="Courier New, Courier, mono">Configure</font> script 
+        discovers the version of your kernel by looking in several places in your 
+        kernel source directory. If it cannot determine your kernel version the 
+        LiS configuration will terminate. The <font face="Courier New, Courier, mono">Configure</font> 
+        script cannot proceed without this information. </p>
+
+      <p>The <font face="Courier New, Courier, mono">Configure</font> script then 
+        asks for your verification of the kernel version for which LiS is to be 
+        compiled. Note, that the kernel for which you are compiling LiS does not 
+        have to be the kernel version on which your system is running. If you 
+        gave <font face="Courier New, Courier, mono">Configure</font> a pathname 
+        to your intended kernel source version in the previous step this could 
+        be a different kernel version than the one that is running on your machine. 
+      </p>
+
+      <p>You can also enter a kernel version other than the one found in version.h 
+        at this time. However, entering such a version may cause the subsequent 
+        &quot;make&quot; to make unverified assumptions about your kernel version. 
+        So be careful about answering this question with anything other than an 
+        Enter/Return. </p>
+
+      <p>If the kernel version displayed does not match your idea of the version 
+        of the kernel that resides at the indicated location on disk, it is probably 
+        best to terminate the <font face="Courier New, Courier, mono">Configure</font> 
+        program at this point and investigate rather than end up compilation or 
+        module loading errors. </p>
+      <h2><font size="4">Kernel Option Verification</font></h2>
+      <p>The <font face="Courier New, Courier, mono">Configure</font> script will 
+        ask you if you intend to run LiS on the same kernel that is running on 
+        the installation machine. This is the most common case of installing LiS, 
+        so the default answer is &quot;yes.&quot;</p>
+      <p>If you answer &quot;yes&quot; to this question then the <font face="Courier New, Courier, mono">Configure</font> 
+        script will verify that the kernel version in you kernel source directory 
+        matches the stated version of your running kernel. It will also verify 
+        that the kernel options of SMP and module versions are the same between 
+        the two kernel locations. If any discrepencies are found the installation 
+        of LiS will terminate.</p>
+      <p>It is important for the correct operation of LiS, and the STREAMS drivers 
+        that utilize LiS, that these options be in agreement between the running 
+        kernel and the kernel source. If they are not, the consequences can be 
+        anything from unresolved externals when attempting to load LiS all the 
+        way to system hangs on multi-CPU systems because of having the SMP option 
+        set incorrectly.</p>
+      <p>Therefore, it is important that you correct these problems and bring 
+        the kernel source and running kernel into agreement before installing 
+        LiS.</p>
+      <p>One common source of error is to recompile your kernel in <font face="Courier New, Courier, mono">/usr/src/linux</font> 
+        and run <font face="Courier New, Courier, mono">lilo</font>, but fail 
+        to copy the kernel executable to one of the kernel locations specified 
+        in <font face="Courier New, Courier, mono">/etc/lilo.conf</font>. In this 
+        case you may think that you have successfully compiled and booted a new 
+        kernel when, in fact, you are running on your old kernel.</p>
+
+      <h2><font size="4"><b>Automatic Kernel Building</b> </font></h2>
+
+      <p>If you answered the first question posed by <font face="Courier New, Courier, mono">Configure</font> 
+        by indicating that you wish to have LiS linked directly in with the kernel, 
+        <font face="Courier New, Courier, mono">Configure</font> now offers you 
+        the option of having a &quot;make&quot; in the LiS directory also proceed 
+        to a &quot;make&quot; in your indicated kernel directory. The default, 
+        selected by hitting Enter/Return, is not to do so. </p>
+
+      <p>If you elected to have an LiS build perform a kernel build automatically 
+        then <font face="Courier New, Courier, mono">Configure</font> will now 
+        ask you which kernel build target you would like to have used. The default 
+        is <font face="Courier New, Courier, mono">bzImage</font>, the theory 
+        being that you may be installing large STREAMS drivers into the kernel 
+        and therefore will need a &quot;big&quot; kernel image. LiS will add about 
+        85K of code and data to your kernel size. The default is not <font face="Courier New, Courier, mono">bzlilo</font> 
+        based on the idea that you likely are using this machine as a development 
+        machine and intend to run the resulting LiS module on a different system. 
+      </p>
+
+      <p>In any case, you can select the kernel &quot;make&quot; target that suits 
+
+        your needs. </p>
+
+      <h2><font size="4"><b>LiS Module Location</b></font> </h2>
+
+      <p>If you have elected to build LiS as an installable module, rather than 
+        to link directly into the kernel, you will be asked whether or not you 
+        wish the &quot;make&quot; to copy the resulting <font face="Courier New, Courier, mono">streams.o</font> 
+        file to the modules directory associated with your selected kernel version. 
+        The alternative is to have &quot;make&quot; build <font face="Courier New, Courier, mono">streams.o</font> 
+        in the LiS directory and simply leave it there for manual copying later. 
+      </p>
+
+      <p>If you are intending to run LiS on the machine that you are using for 
+
+        the compilation you will probably want to answer this question with a 
+
+        &quot;y&quot;. If you are intending to compile on this machine and copy 
+
+        the result to another machine for testing, then &quot;n&quot; is the appropriate 
+
+        answer here. </p>
+
+      <h2><font size="4"><b>Debugging</b> </font></h2>
+
+      <p>If you intend to link LiS directly into the kernel and use GDB for kernel 
+        level debugging then you will likely want LiS to be compiled using the 
+        <font face="Courier New, Courier, mono">-g</font> option. <font face="Courier New, Courier, mono">Configure</font> 
+        asks you about this so that you can control whether to compile using <font face="Courier New, Courier, mono">-g</font> 
+        or not. </p>
+
+      <p>&nbsp; </p>
+
+      </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+

@@ -1,0 +1,324 @@
+<html>
+
+
+
+<head>
+
+<title>Intro to LiS</title>
+<meta name="title" content="Introduction to LiS">
+<meta name="keywords" content="Linux, streams, introduction, LiS">
+<meta name="description" content="Introduction to LiS">
+
+
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif','i/command_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Linux STREAMS (LiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="100" align="left" valign="top"> 
+
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr>
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+
+    </td>
+
+    <td width="600" height="75"> 
+
+      <div align="center"> 
+
+        <h2>Introduction to LiS</h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+
+    <td width="600" height="100%" align="left" valign="top"> 
+
+      <p align="center"><font color="#FF0000" size="+2"><a href="kernel.html"><font face="Times New Roman, Times, serif"><b>Information 
+        about the latest version of LiS</b></font></a></font></p>
+      <p align="center"><font color="#FF0000" size="+2"><a href="#LiSDocumentation" target="_self"><font face="Times New Roman, Times, serif"><b>Searchable 
+        LiS Documentation</b></font></a></font></p>
+      <p>LiS is a software package that comprises an implementation of SVR4 compatible 
+        STREAMS for Linux. It takes the form of a loadable module for the Linux 
+        kernel. LiS <a href="install.html">installs</a> in any directory on your 
+        system, not in the kernel source tree. When it is built it is possible 
+        to link <a href="compiled.html">pre-compiled STREAMS drivers</a> with 
+        it so that when LiS loads into the kernel it brings "application" drivers 
+        with it. Alternatively, STREAMS drivers can be coded as <a href="demand.html">loadable 
+        Linux drivers</a> which depend upon LiS. In this way, individual STREAMS 
+        drivers can be loaded and unloaded dynamically.&nbsp; </p>
+
+      <p>LiS includes two adapter drivers to assist in interfacing STREAMS drivers 
+        to the Linux Kernel's TCP/IP protocols. One driver (<a href="drvrs.html">ip_strm_mod</a>) 
+        acts as an IP interface driver. It fits below IP using standard ifconfig 
+        procedures. It, in turn, communicates downstream with any STREAMS driver 
+        using the DLPI protocol in a fashion similar to the manner in which IP 
+        on Unix systems interfaces to lower interface drivers. This allows a DLPI 
+        STREAMS driver to act as an interface driver to Linux TCP/IP.&nbsp; 
+      <p>A second driver (<a href="drvrs.html">ldl</a>) sits on top of any existing 
+        Linux IP interface driver and presents a DLPI interface to STREAMS drivers 
+        above. This allows any STREAMS driver that communicates downstream using 
+        DLPI to utilize the services of existing Linux drivers for Ethernet, token 
+        ring, etc.&nbsp; 
+      <p>LiS-2.12 and beyond utilizes aggressive multi-tasking in multiple CPU 
+        SMP environments. For further information concerning this implementation, 
+        see the section on <a href="smp.html">LiS SMP Implementation</a>.
+      <p>LiS is licensed using the GNU General Public Library License (except 
+        for ldl, which is licensed under the standard GNU Public License). This 
+        means that you can link proprietary STREAMS drivers with LiS and load 
+        the entirety into the Linux kernel without violating license restrictions. 
+        This licensing arrangement is intended to encourage commercial software 
+        vendors to port STREAMS based driver packages to Linux.&nbsp;
+      <h2><font size="+1">LiS Documentation<a name="LiSDocumentation"></a></font></h2>
+      <p>These documentation pages are included in the LiS distribution. You can 
+        also access them from Gcom's home page at <a href="http://www.gcom.com">http://www.gcom.com</a>. 
+        Gcom's site offers a search capability that allows you to search the LiS 
+        documentation. Just use the search mechanism on the home page and restrict 
+        the search to the Linux portion of the site.
+      <h2> <b><font size=+1>Authors</font>&nbsp;</b></h2>
+
+      <p>Linux STREAMS, termed LiS, is an SVR4 compatible STREAMS executive which 
+
+        runs in the Linux Kernel as a loadable module. It is the product of a 
+
+        joint effort among the following authors.&nbsp; <br>
+
+        &nbsp; </p>
+
+      <table BORDER cellpadding=7 NOSAVE >
+        <tr NOSAVE> 
+          <td valign=TOP width="50%" height="33" NOSAVE> 
+            <p>Francisco J. Ballesteros</p>
+          </td>
+          <td valign=TOP width="50%" height="33"><a href="mailto:nemo@gsyc.escet.urjc.es">nemo@gsyc.escet.urjc.es</a></td>
+        </tr>
+        <tr>
+          <td valign=TOP width="50%" height="33"> 
+            <p>John Boyd</p>
+          </td>
+          <td valign=TOP width="50%" height="33"><a href="mailto:jaboydjr@netwalk.com">jaboydjr@netwalk.com</a></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="50%" height="33"> 
+            <p>Denis Froschauer</p>
+          </td>
+          <td valign=TOP width="50%" height="33"><a href="mailto:Denis.Froschauer@hol.fr">Denis.Froschauer@hol.fr</a></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="50%" height="33"> 
+            <p>David Grothe</p>
+          </td>
+          <td valign=TOP width="50%" height="33"><a href="mailto:dave@gcom.com">dave@gcom.com</a></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="50%" height="33"> 
+            <p>Ole Husgaard</p>
+          </td>
+          <td valign=TOP width="50%" height="33"><a href="mailto:sparre@login.dknet.dk">sparre@login.dknet.dk</a></td>
+        </tr>
+        <tr> 
+          <td width="50%"> 
+            <p>&nbsp;J&uuml;rgen Magin</p>
+          </td>
+          <td width="50%">&nbsp;<a href="mailto:Jürgen Magin <juergen.magin@octogon.de>">juergen.magin@octogon.de</a></td>
+        </tr>
+        <tr> 
+          <td valign=TOP width="50%" height="33"> 
+            <p>Graham Wheeler</p>
+          </td>
+          <td valign=TOP width="50%" height="33"><a href="mailto:gram@cdsec.com">gram@cdsec.com</a></td>
+        </tr>
+        <tr> 
+          <td width="50%"> 
+            <p>G Yeganjaiah</p>
+          </td>
+          <td width="50%"><a href="mailto:yegag@hclt.com">yegag@hclt.com</a></td>
+        </tr>
+      </table>
+
+      		   <p>David Grothe is the principal active supporter of LiS, so please direct 
+					questions to him rather than to the others. Ole Husgaard is 
+					responsible for the ldl driver and has contributed to the 
+					kerneld support and installation procedures.&nbsp; J&uuml;rgen 
+					Magin contributed patches for Linux SPARC.&nbsp; G Yeganjaiah 
+					added interrupt routine support.&nbsp;John Boyd implemented 
+					fattach and STREAMS pipes and FIFOs. Francisco Ballesteros 
+					still maintains an LiS mailing list. 
+			   <form method=post action="http://gsyc.escet.urjc.es/mailman/listinfo/linux-streams" enctype="text/plain">
+        <input type="submit" value="Click Here to Subscribe to the LiS mailing list" name="submit">
+      </form>
+			   
+      <p>You can mail to the group by addressing email to <a href="mailto:linux-streams@gsyc.escet.urjc.es">linux-streams@gsyc.escet.urjc.es</a>. 
+      <p>You can view the archives at <a href="http://gsyc.escet.urjc.es/mailarchive/linux-streams">http://gsyc.escet.urjc.es/mailarchive/linux-streams</a>.
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
