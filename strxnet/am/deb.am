@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/22 12:38:10 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/23 02:19:15 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/22 12:38:10 $ by $Author: brian $
+## Last Modified $Date: 2005/03/23 02:19:15 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,9 +77,9 @@ if BUILD_DPKG
 ##
 
 ##
-# Because we *are* the upstream source, we always use debian version @PACKAGE_DEBRELEASE@ and pack the RPM release
-# number onto the upstream version, but with a period instead of a dash to suppress warnings from
-# dpkg-source.
+# Because we *are* the upstream source, we always use debian version @PACKAGE_DEBRELEASE@ and pack
+# the RPM release number onto the upstream version, but with a period instead of a dash to suppress
+# warnings from dpkg-source.
 ##
 debianpkg		= $(PACKAGE_LCNAME)_$(VERSION)-$(PACKAGE_DEBRELEASE)
 debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)
@@ -93,6 +93,9 @@ debian_source_files	= $(debian_dsc_file) $(debian_tar_file) $(debian_sig_file)
 debian_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb
 debian_change_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes \
 			  $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes.asc
+debian_cache_files	= $(PACKAGE_DEBTOPDIR)/*config.cache \
+			  $(PACKAGE_DEBTOPDIR)/*config.site \
+			  $(PACKAGE_DEBTOPDIR)/*modpost.cache
 
 RELEASE_DIRECTORIES	+= $(PACKAGE_DEBTOPDIR)
 
@@ -141,7 +144,7 @@ $(debian_sig_file): $(debian_dsc_file)
 dsc: $(debian_dsc_file) $(debian_tar_file)
 
 debs: $(debian_dir)
-	( cd $(debian_dir) ; $(DPKG_BUILDPACKAGE) -b -rfakeroot -uc $(DEBXOPTS) -nc )
+	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERSBOSE=1 $(DPKG_BUILDPACKAGE) -b -rfakeroot -uc $(DEBXOPTS) -nc )
 
 # Another sneaky trick
 all-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)'
@@ -169,14 +172,8 @@ csig:
 		fi ; \
 	done
 
-release-deb: dsc debs
-
-release-sign-dsc: sigs
-release-sign-chg: csig
-
-RELEASE			+= release-deb
-RELEASE_SIGN		+= release-sign-dsc release-sign-chg
-RELEASECLEANFILES	+= $(debian_source_files) $(debian_dir_stamp) $(debian_binary_files) $(debian_change_files)
+RELEASE			+= dsc debs
+RELEASE_SIGN		+= sigs csig
 RELEASE_DIRECTORIES	+= $(debian_dir)
 
 distclean-deb:
@@ -184,14 +181,24 @@ distclean-deb:
 
 DISTCLEAN_LOCAL		+= distclean-deb
 
-RELEASE_CLEAN_LOCAL	+= distclean-deb
+DISTCLEANFILES		+= $(debian_cache_files) \
+			   $(debian_dir_stamp)
 
-EXTRA_DIST		+= \
-			debian/changelog \
-			debian/control \
-			debian/rules \
-			.pkgrelease \
-			.pkgepoch
+release-clean-deb: distclean-deb
+
+RELEASE_CLEAN_LOCAL	+= release-clean-deb
+
+RELEASECLEANFILES	+= $(debian_source_files) \
+			   $(debian_cache_files) \
+			   $(debian_dir_stamp) \
+			   $(debian_binary_files) \
+			   $(debian_change_files)
+
+EXTRA_DIST		+= debian/changelog \
+			   debian/control \
+			   debian/rules \
+			   .debrelease \
+			   .debepoch
 
 MY_PHONY		+= dsc debs sigs csig
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-sigs
