@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/12 23:20:20 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/21 00:53:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/12 23:20:20 $ by $Author: brian $
+ Last Modified $Date: 2004/06/21 00:53:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/12 23:20:20 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/21 00:53:12 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/12 23:20:20 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/21 00:53:12 $";
 
 #define __NO_VERSION__
 
@@ -2283,7 +2283,16 @@ static int str_init_caches(void)
 	return (0);
 }
 
-static typeof(&open_softirq) _open_softirq = (typeof(_open_softirq)) HAVE_OPEN_SOFTIRQ_ADDR;
+#ifndef open_softirq
+#ifdef HAVE_OPEN_SOFTIRQ_ADDR
+void
+open_softirq(int nr, void (*action)(struct softirq_action*), void *data)
+{
+	static void (*func)(int, void (*)(struct softirq_action*), void *) = (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
+	return func(nr, action, data);
+}
+#endif
+#endif
 
 /**
  *  strsched_init:  - initialize the STREAMS scheduler
@@ -2313,12 +2322,12 @@ static typeof(&open_softirq) _open_softirq = (typeof(_open_softirq)) HAVE_OPEN_S
 		t->freeevnt_head = NULL;
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
-	_open_softirq(STREAMS_SOFTIRQ, runqueues, NULL);
+	open_softirq(STREAMS_SOFTIRQ, runqueues, NULL);
 	return (0);
 }
 
 void strsched_exit(void)
 {
-	_open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
+	open_softirq(STREAMS_SOFTIRQ, NULL, NULL);
 	str_term_caches();
 }
