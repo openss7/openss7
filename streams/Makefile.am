@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/03/07 06:09:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2005/03/07 13:27:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/07 06:09:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/07 13:27:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -139,7 +139,7 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strargs.h
 
 libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_specfs_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_specfs_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfS_specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_specfs_a_OBJECTS): $(libLfS_specfs_a_DEPENDENCIES)
@@ -231,7 +231,7 @@ endif
 #endif
 
 libLfS_streams_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_streams_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_streams_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfS_streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_streams_a_OBJECTS): $(libLfS_streams_a_DEPENDENCIES)
@@ -274,7 +274,7 @@ endif
 #endif
 
 libLfS_drivers_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_drivers_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_drivers_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfS_drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_drivers_a_OBJECTS): $(libLfS_drivers_a_DEPENDENCIES)
@@ -295,7 +295,7 @@ libLfS_modules_a_SOURCES	+= src/modules/sc.c include/sys/sc.h
 endif
 
 libLfS_modules_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_modules_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_modules_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfS_modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_modules_a_OBJECTS): $(libLfS_modules_a_DEPENDENCIES)
@@ -325,7 +325,7 @@ libLfS_compat_a_SOURCES		+= src/compat/lis/liscompat.c
 endif
 
 libLfS_compat_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
-libLfS_compat_a_CPPFLAGS	= $(LOCAL_INCLUDES) $(LFS_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
+libLfS_compat_a_CPPFLAGS	= $(LFS_INCLUDES) $(LOCAL_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) -DEXPORT_SYMTAB
 libLfS_compat_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_compat_a_OBJECTS): $(libLfS_compat_a_DEPENDENCIES)
