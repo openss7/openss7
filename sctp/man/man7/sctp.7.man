@@ -2,7 +2,7 @@
 .\" Don't change the line above, it tells man that tbl is needed.
 .\" -*- nroff -*-
 .\"
-.\" @(#) $Id: sctp.7.man,v 0.9.2.10 2003/03/06 12:33:31 brian Exp $
+.\" @(#) $Id: sctp.7.man,v 0.9.2.11 2003/03/08 08:14:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -32,7 +32,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2003/03/06 12:33:31 $ by $Author: brian $
+.\" Modified $Date: 2003/03/08 08:14:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .TH SCTP 7 "8 May 2002" "Linux Man Page" "Linux Programmer's Manual"
@@ -52,375 +52,325 @@ sctp \- Stream Control Transmission Protocol (SCTP).
 
 .SH "DESCRIPTION"
 .PP
-\fBSCTP\fR is an implementation of the SCTP (Stream Transmission Control
-Protocol) defined in RFC 2960.  \fBSCTP\fR provides reliable delivery of
-ordered or unordered packets over a full duplex connection between two
-\fI\fCSOCK_SEQPACKET\fR sockets on top of \fBip\fR(7).  \fBSCTP\fR can
-guarantee that the data arrives in order on a stream, if requested, and
-retransmits lost packets.  It generates and checks a per packet checksum to
-catch transmission errors.
+\fBSCTP\fR is an implementation of the SCTP (Stream Transmission Control Protocol) defined in
+RFC 2960.  \fBSCTP\fR provides reliable delivery of ordered or unordered packets over a full
+duplex connection between two \fI\fCSOCK_SEQPACKET\fR sockets on top of \fBip\fR(7).
+\fBSCTP\fR can guarantee that the data arrives in order on a stream, if requested, and
+retransmits lost packets.  It generates and checks a per packet checksum to catch transmission
+errors.
 .PP
 \fBSCTP\fR provides the following socket types:
 .TP
 .B \f(CBSOCK_SEQPACKET\fR
-A standard \fI\fCSOCK_SEQPACKET\fR socket that preserve message boundaries,
-Nagles at the association level, and provides ordered and unordered reliable
-and partial reliable, acknowledged and unacknowledged delivery on multiple
-streams.
+A standard \fI\fCSOCK_SEQPACKET\fR socket that preserves message boundaries, Nagles at the
+association level, and provides ordered and unordered reliable and partial reliable,
+acknowledged and unacknowledged delivery on multiple streams.
 .TP
 .B \f(CBSOCK_STREAM\fR
-A \fBtcp\fR(7) compatible \fI\fCSOCK_STREAM\fR socket that does not preserve
-message boundaries, Nagles at the stream level, and provides ordered and
-out-of-band unacknowledged delivery on a single stream.  This is an optional
-capability of \fBSCTP\fR which provides for maximum compatibility with
-applications written for \fBtcp\fR(7).  This socket type is available when
-\fBSCTP\fR is compiled with the kernel configuration parameter
+A \fBtcp\fR(7) compatible \fI\fCSOCK_STREAM\fR socket that does not preserve message
+boundaries, Nagles at the stream level, and provides ordered and out-of-band unacknowledged
+delivery on a single stream.  This is an optional capability of \fBSCTP\fR which provides for
+maximum compatibility with applications written for \fBtcp\fR(7).  This socket type is
+available when \fBSCTP\fR is compiled with the kernel configuration parameter
 \fI\fCCONFIG_SCTP_TCP_COMPATIBLE\fR set.
 .TP
 .B \f(CBSOCK_RDM\fR
-A \fBudp\fR(7) compatible \fI\fCSOCK_RDM\fR socket that preserves message
-boundaries, does not Nagle, and provides only unordered but reliable or
-partially reliable delivery on multiple streams.  This is an optional
-capability of \fBSCTP\fR which provides for maximum compatibility with
-applications written for \fBrudp\fR(7).  This socket type is available when
-\fBSCTP\fR is compiled with the kernel configuration parameter
-\fI\fCCONFIG_SCTP_UDP_COMPATIBLE\fR set.
+A \fBudp\fR(7) compatible \fI\fCSOCK_RDM\fR socket that preserves message boundaries, does not
+Nagle, and provides only unordered but reliable or partially reliable delivery on multiple
+streams.  This is an optional capability of \fBSCTP\fR which provides for maximum compatibility
+with applications written for \fBrudp\fR(7).  This socket type is available when \fBSCTP\fR is
+compiled with the kernel configuration parameter \fI\fCCONFIG_SCTP_UDP_COMPATIBLE\fR set.
 .SS "Connection Establishment"
 .PP
-A fresh \fBSCTP\fR socket has no remote or local address and is not fully
-specified.  To create an outgoing \fBSCTP\fR association use \fBconnect\fR(2)
-to establish an association with another \fBSCTP\fR endpoint.  To receive
-incoming associations \fBbind\fR(2) the socket first to a number of local
-addresses and a port and then call \fBlisten\fR(2) to put the socket into
-listening state.  Then a new socket for each incoming association can be
-accepted using \fBaccept\fR(2).  A socket that has had \fBaccept\fR(2) or
-\fBconnect\fR(2) successfully called on it is fully specified and may transmit
-data.  Data cannot be transmitted on listening or not yet connected sockets.
+A fresh \fBSCTP\fR socket has no remote or local address and is not fully specified.  To create
+an outgoing \fBSCTP\fR association use \fBconnect\fR(2) to establish an association with
+another \fBSCTP\fR endpoint.  To receive incoming associations \fBbind\fR(2) the socket first
+to a number of local addresses and a port and then call \fBlisten\fR(2) to put the socket into
+listening state.  Then a new socket for each incoming association can be accepted using
+\fBaccept\fR(2).  A socket that has had \fBaccept\fR(2) or \fBconnect\fR(2) successfully called
+on it is fully specified and may transmit data.  Data cannot be transmitted on listening or not
+yet connected sockets.
 .PP
-\fBSCTP\fR supports large windows to support links with high latency or
-bandwidth.  Large \fBSCTP\fR windows can be used by increasing the send and
-receive buffer sizes.  They can be set globally with the
-\fBnet.core.wmem_default\fR and \fBnet.core.rmem_default\fR system controls,
-or on individual sockets by using the \fI\fCSO_SNDBUF\fR and
-\fI\fCSO_RCVBUF\fR socket options.  The maximum sizes for socket buffers are
-limited by the \fBnet.core.wmem_max\fR and \fBnet.core.rmem_max\fR system
-controls.  See \fBsocket\fR(7) for more information.
+\fBSCTP\fR supports large windows to support links with high latency or bandwidth.  Large
+\fBSCTP\fR windows can be used by increasing the send and receive buffer sizes.  They can be
+set globally with the \fBnet.core.wmem_default\fR and \fBnet.core.rmem_default\fR system
+controls, or on individual sockets by using the \fI\fCSO_SNDBUF\fR and \fI\fCSO_RCVBUF\fR
+socket options.  The maximum sizes for socket buffers are limited by the
+\fBnet.core.wmem_max\fR and \fBnet.core.rmem_max\fR system controls.  See \fBsocket\fR(7) for
+more information.
 .SS "Sending Data"
 .PP
-When sending data, the specific destination address within the association to
-which to send the data can be specified by providing a valid destination
-address as an argument to \fBsendto\fR(2) or \fBsendmsg\fR(2).  Data sent with
-\fBsend\fR(2) or \fBwrite\fR(2) will use \fBSCTP\fR's destination transport
-address selection policies for transmission and retransmission to single- and
-multi-homed hosts.  The stream upon which to send the data can also be set
-with the \fI\fCSCTP_SID\fR socket option on a socket basis with
-\fBsetsockopt\fR(2) or on a per-message basis with \fI\fCSCTP_SID\fR control
-message to \fBsendmsg\fR(2).  In addition, the \fBip\fR(7) \fI\fCIP_PKTINFO\fR
-option can be used with \fBsendmsg\fR(2) to specify the interface, first-hop
-destination address and source address to be used in the outbound packet on
-\fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets.  IP options can also be
-specified for the outbound packet with the \fBip\fR(7) \fI\fCIP_OPTIONS\fR or
+When sending data, the specific destination address within the association to which to send the
+data can be specified by providing a valid destination address as an argument to
+\fBsendto\fR(2) or \fBsendmsg\fR(2).  Data sent with \fBsend\fR(2) or \fBwrite\fR(2) will use
+\fBSCTP\fR's destination transport address selection policies for transmission and
+retransmission to single- and multi-homed hosts.  The stream upon which to send the data can
+also be set with the \fI\fCSCTP_SID\fR socket option on a socket basis with \fBsetsockopt\fR(2)
+or on a per-message basis with \fI\fCSCTP_SID\fR control message to \fBsendmsg\fR(2).  In
+addition, the \fBip\fR(7) \fI\fCIP_PKTINFO\fR option can be used with \fBsendmsg\fR(2) to
+specify the interface, first-hop destination address and source address to be used in the
+outbound packet on \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets.  IP options can also
+be specified for the outbound packet with the \fBip\fR(7) \fI\fCIP_OPTIONS\fR or
 \fI\fCIP_RETOPTS\fR control messages to \fBsendmsg\fR(2).
 .PP
-For \fI\fCSOCK_SEQPACKET\fR socket, send operations may also use the
-\fI\fCMSG_MORE\fR flag when sending with \fBsend\fR(2), \fBsendto\fR(2) or
-\fBsendmsg\fR(2) to indicate that the next write operation will provide
-additional data belonging to the same packet.  \fI\fCSOCK_STREAM\fR sockets do
-not support send options and do not return the \fI\fCMSG_TRUNC\fR flag on send
-operations.
+For \fI\fCSOCK_SEQPACKET\fR socket, send operations may also use the \fI\fCMSG_MORE\fR flag
+when sending with \fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2) to indicate that the next
+write operation will provide additional data belonging to the same packet.
+\fI\fCSOCK_STREAM\fR sockets do not support send options and do not return the
+\fI\fCMSG_TRUNC\fR flag on send operations.
 .PP
-If a \fI\fCSOCK_SEQPACKET\fR or \fI\fCSOCK_STREAM\fR socket does not have
-sufficient room to buffer the sent data, it buffers what it can and returns
-the amount of user data buffered.  \fI\fCSOCK_RDM\fR sockets wait for
-sufficient room to buffer the entire sent packet before returning.
-\fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_STREAM\fR sockets will segment large
-data writes in to smaller segments for delivery to the peer.
+If a \fI\fCSOCK_SEQPACKET\fR or \fI\fCSOCK_STREAM\fR socket does not have sufficient room to
+buffer the sent data, it buffers what it can and returns the amount of user data buffered.
+\fI\fCSOCK_RDM\fR sockets wait for sufficient room to buffer the entire sent packet before
+returning.  \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_STREAM\fR sockets will segment large data
+writes in to smaller segments for delivery to the peer.
 .PP
-\fBSCTP\fR provides a mechanism for receiving positive and negative
-acknowledgments of sent data on \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR
-sockets.  When the socket option \fI\fCSCTP_DISPOSITION\fR is set to
-\fI\fCSCTP_DISPOSITION_ACKED\fR, or when data is sent using the
-\fI\fCMSG_CONFIRM\fR flag to \fBsend\fR(2), \fBsendto\fR(2) or
-\fBsendmsg\fR(2), message confirmation or delivery failures can be received by
-passing the \fI\fCMSG_CONFIRM\fR flag to \fBrecv\fR(2), \fBrecvfrom\fR(2) or
-\fBrecvmsg\fR(2).  This mechanism also provides for retrieval and disposition
-of undelivered messages after the association has aborted or shut down, but
-before a call to \fBclose\fR(2).
+\fBSCTP\fR provides a mechanism for receiving positive and negative acknowledgments of sent
+data on \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets.  When the socket option
+\fI\fCSCTP_DISPOSITION\fR is set to \fI\fCSCTP_DISPOSITION_ACKED\fR, or when data is sent using
+the \fI\fCMSG_CONFIRM\fR flag to \fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2), message
+confirmation or delivery failures can be received by passing the \fI\fCMSG_CONFIRM\fR flag to
+\fBrecv\fR(2), \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2).  This mechanism also provides for
+retrieval and disposition of undelivered messages after the association has aborted or shut
+down, but before a call to \fBclose\fR(2).
 .SS "Receiving Data"
 .PP
-For \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets, all receive
-operations return only one packet, or a portion of one packet.  When the
-packet is smaller than the passed buffer only that much data is returned, when
-it is larger the packet is truncated and the \fI\fCMSG_TRUNC\fR flag is set
-for \fI\fCSOCK_RDM\fR sockets.  Subsequent \fBrecv\fR or \fBread\fR(2), or a
-subsequent \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) for the same stream will
-return the remainder of the packet for \fI\fCSOCK_SEQPACKET sockets.
-\fI\fCSOCK_SEQPACKET\fR sockets also return the \fI\fCMSG_EOR\fR flag when the
-end of the packet has been received successfully.  For \fI\fCSOCK_STREAM\fR
-sockets, all receive operations return only the amount of data available on
-the current stream.  \fI\fCMSG_TRUNC\fR and \fI\fCMSG_EOR\fR are never set for
-\fI\fCSOCK_STREAM\fR sockets.
+For \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets, all receive operations return only
+one packet, or a portion of one packet.  When the packet is smaller than the passed buffer only
+that much data is returned, when it is larger the packet is truncated and the
+\fI\fCMSG_TRUNC\fR flag is set for \fI\fCSOCK_RDM\fR sockets.  Subsequent \fBrecv\fR or
+\fBread\fR(2), or a subsequent \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) for the same stream will
+return the remainder of the packet for \fI\fCSOCK_SEQPACKET\fR sockets.  \fI\fCSOCK_SEQPACKET\fR
+sockets also return the \fI\fCMSG_EOR\fR flag when the end of the packet has been received
+successfully.  For \fI\fCSOCK_STREAM\fR sockets, all receive operations return only the amount
+of data available on the current stream.  \fI\fCMSG_TRUNC\fR and \fI\fCMSG_EOR\fR are never set
+for \fI\fCSOCK_STREAM\fR sockets.
 .PP
-IP options may be sent or received using the socket options described in
-\fBip\fR(7).  They are only processed by the kernel when the appropriate
-system control is enabled (but still passed to the user even when it is turned
-off).  See \fBip\fR(7).
+IP options may be sent or received using the socket options described in \fBip\fR(7).  They are
+only processed by the kernel when the appropriate system control is enabled (but still passed
+to the user even when it is turned off).  See \fBip\fR(7).
 .PP
-When the \fI\fCMSG_DONTROUTE\fR flag is set on sending, the destination
-address must refer to a local interface address and the packet is only sent to
-that interface.
+When the \fI\fCMSG_DONTROUTE\fR flag is set on sending, the destination address must refer to a
+local interface address and the packet is only sent to that interface.
 .PP
-\fBSCTP\fR fragments a packet when its total length exceeds the association
-MTU (Maximum Transmission Unit).  A more network friendly alternative is to
-use path MTU discovery as described in the \fI\fCIP_PMTU_DISCOVER\fR section
-of \fBip\fR(7).
+\fBSCTP\fR fragments a packet when its total length exceeds the association MTU (Maximum
+Transmission Unit).  A more network friendly alternative is to use path MTU discovery as
+described in the \fI\fCIP_PMTU_DISCOVER\fR section of \fBip\fR(7).
 .PP
-\fBSCTP\fR supports urgent data similar to \fBtcp\fR(7).  Urgent data is used
-to signal the receiver that some important message is part of the data stream
-and that it should be processed as soon as possible.  Urgent data is always
-sent out of order.  To send urgent (or out of order) data specify the
-\fI\fCMSG_OOB\fR option to \fBsend\fR(2), \fBsendto\fR(2), or
-\fBsendmsg\fR(2).  When urgent data is received, the kernel sends a
-\fI\fCSIGURG\fR signal to the reading process or the process or process group
-that has been set for the socket using the \fI\fCFIOCSPGRP\fR or
-\fI\fCFIOCSETOWN\fR I/O controls.  When the \fI\fCSO_OOBINLINE\fR socket
-option is enabled, urgent data is put into the normal data stream (and can be
-tested for by the \fI\fCSIOCATMARK\fR I/O control), otherwise it can only be
-received when the \fI\fCMSG_OOB\fR flag is set for \fBrecvmsg\fR(2).
+\fBSCTP\fR supports urgent data similar to \fBtcp\fR(7).  Urgent data is used to signal the
+receiver that some important message is part of the data stream and that it should be processed
+as soon as possible.  Urgent data is always sent out of order.  To send urgent (or out of
+order) data specify the \fI\fCMSG_OOB\fR option to \fBsend\fR(2), \fBsendto\fR(2), or
+\fBsendmsg\fR(2).  When urgent data is received, the kernel sends a \fI\fCSIGURG\fR signal to
+the reading process or the process or process group that has been set for the socket using the
+\fI\fCFIOCSPGRP\fR or \fI\fCFIOCSETOWN\fR I/O controls.  When the \fI\fCSO_OOBINLINE\fR socket
+option is enabled, urgent data is put into the normal data stream (and can be tested for by the
+\fI\fCSIOCATMARK\fR I/O control), otherwise it can only be received when the \fI\fCMSG_OOB\fR
+flag is set for \fBrecvmsg\fR(2).
 .SS "ADDRESS FORMATS"
-\fBSCTP\fR is built on top of \fBIP\fR (see \fBip\fR(7)).  The address formats
-defined by \fBip\fR(7) apply to \fBSCTP\fR.  \fBSCTP\fR uses the IPv4
-\fBsockaddr_in\fR address format described in \fBip\fR(7).
+\fBSCTP\fR is built on top of \fBIP\fR (see \fBip\fR(7)).  The address formats defined by
+\fBip\fR(7) apply to \fBSCTP\fR.  \fBSCTP\fR uses the IPv4 \fBsockaddr_in\fR address format
+described in \fBip\fR(7).
 .PP
-\fBSCTP\fR supports multiple-stream point-to-point communication within
-multi-homed associations; broadcasting and multi-casting are not supported.
+\fBSCTP\fR supports multiple-stream point-to-point communication within multi-homed
+associations; broadcasting and multi-casting are not supported.
 .PP
-In addition to normal IP addressing, \fBSCTP\fR provides extensions on the
-\fBbind\fR(2), \fBaccept\fR(2), \fBconnect\fR(2), \fBgetsockname\fR(2), and
-\fBgetpeername\fR(2) system calls.  These functions normally take or return a
-single \fBsockaddr_in\fR as an address argument.  When used in conjunction
-with an \fBSCTP\fR socket on or to a multi-homed host, these calls will accept
-or return an array of \fBsockaddr_in\fR structures.  The number of addresses
-in the structure is indicated by the length of the structure and the protocol
-family of the socket.  \fBSCTP\fR will only support one port number being
-specified in the address list, and each \fBsockaddr_in\fR structure in the
-list must contain the same \fIsin_port\fR.  (Note: Linux uses
-\fI\fCMAX_SOCK_ADDR\fR as a maximum size of the socket address length.  This
-is currently only 128 bytes or eight (8) \fBsockaddr_in\fR structures. Eight
-(8) addresses should be sufficient for most applications.)
+In addition to normal IP addressing, \fBSCTP\fR provides extensions on the \fBbind\fR(2),
+\fBaccept\fR(2), \fBconnect\fR(2), \fBgetsockname\fR(2), and \fBgetpeername\fR(2) system calls.
+These functions normally take or return a single \fBsockaddr_in\fR as an address argument.
+When used in conjunction with an \fBSCTP\fR socket on or to a multi-homed host, these calls
+will accept or return an array of \fBsockaddr_in\fR structures.  The number of addresses in the
+structure is indicated by the length of the structure and the protocol family of the socket.
+\fBSCTP\fR will only support one port number being specified in the address list, and each
+\fBsockaddr_in\fR structure in the list must contain the same \fIsin_port\fR.  (Note: Linux
+uses \fI\fCMAX_SOCK_ADDR\fR as a maximum size of the socket address length.  This is currently
+only 128 bytes or eight (8) \fBsockaddr_in\fR structures. Eight (8) addresses should be
+sufficient for most applications.)
 .PP
-Multiple addresses provided to the \fBbind\fR(2) system call will be
-interpreted as multiple local addresses to provide to the peer at connection
-time as well as the local address/port combinations upon which a listening
-socket will accept incoming associations.  A call to \fBaccept\fR(2)
-requesting the source address of the peer will return multiple transport
-addresses if the connecting peer is multi-homed.  Multiple addresses provided
-to the \fBconnect\fR(2) system call will be interpreted as multiple
-destination address/port combinations to which to attempt to form an
-association. The \fBgetpeername\fR(2) system call returns the list of
-destination address/port combinations to which the socket is connected.  The
-\fBgetsockname\fR(2) system call returns the list of local address/port
-combinations to which the socket is bound.
+Multiple addresses provided to the \fBbind\fR(2) system call will be interpreted as multiple
+local addresses to provide to the peer at connection time as well as the local address/port
+combinations upon which a listening socket will accept incoming associations.  A call to
+\fBaccept\fR(2) requesting the source address of the peer will return multiple transport
+addresses if the connecting peer is multi-homed.  Multiple addresses provided to the
+\fBconnect\fR(2) system call will be interpreted as multiple destination address/port
+combinations to which to attempt to form an association. The \fBgetpeername\fR(2) system call
+returns the list of destination address/port combinations to which the socket is connected.
+The \fBgetsockname\fR(2) system call returns the list of local address/port combinations to
+which the socket is bound.
 .TP
 .BR getsockname (2)
-A call to \fBgetsockname\fR(2) can provide multiple bound transport addresses
-for a multi-homed host when the socket is bound to multiple addresses or
-\fI\fCINADDR_ANY\fR using \fBbind\fR(2).  The first address in the list is the
-primary address to which the socket is bound.  This is the first address that
-will be attempted to be used as a source address when sending an INIT chunk to
-the \fBSCTP\fR peer as a result of a call to \fBconnect\fR(2).  Otherwise, the
-order of the addresses has no significance.  When the socket is not bound to
-any address, the call to \fBgetsockname\fR(2) returns a socket address with
-address family \fI\fCAF_UNSPEC\fR.
+A call to \fBgetsockname\fR(2) can provide multiple bound transport addresses for a multi-homed
+host when the socket is bound to multiple addresses or \fI\fCINADDR_ANY\fR using \fBbind\fR(2).
+The first address in the list is the primary address to which the socket is bound.  This is the
+first address that will be attempted to be used as a source address when sending an INIT chunk
+to the \fBSCTP\fR peer as a result of a call to \fBconnect\fR(2).  Otherwise, the order of the
+addresses has no significance.  When the socket is not bound to any address, the call to
+\fBgetsockname\fR(2) returns a socket address with address family \fI\fCAF_UNSPEC\fR.
 .IP
-As a result of binding to \fI\fCINADDR_ANY\fR or the \fBADD-IP\fR extension,
-subsequent calls to \fBgetsockname\fR(2) may return different addresses
-depending on the state of the connection or resulting from the exchange of
-ASCONF control chunks.  This list of transport addresses returned by
-\fBgetsockname\fR(2) represents the current list of local transport addresses
-bound to the endpoint.  When the connection is multi-homed or supports
-\fBADD-IP\fR, this behavior is different from \fBtcp\fR(7) and other
-connection-oriented protocols, whose bound address does not change during the
-lifespan of a connection.
+As a result of binding to \fI\fCINADDR_ANY\fR or the \fBADD-IP\fR extension, subsequent calls
+to \fBgetsockname\fR(2) may return different addresses depending on the state of the connection
+or resulting from the exchange of ASCONF control chunks.  This list of transport addresses
+returned by \fBgetsockname\fR(2) represents the current list of local transport addresses bound
+to the endpoint.  When the connection is multi-homed or supports \fBADD-IP\fR, this behavior is
+different from \fBtcp\fR(7) and other connection-oriented protocols, whose bound address does
+not change during the lifespan of a connection.
 .TP
 .BR getpeername (2)
-A call to \fBgetpeername\fR(2) can provide multiple peer transport addresses
-for a multi-homed peer when the socket is connecting or connected to multiple
-addresses using \fBconnect\fR(2).  The first address is always the current
-primary destination transport address.  The current primary destination
-transport address is the address to which all messages will be sent in the
+A call to \fBgetpeername\fR(2) can provide multiple peer transport addresses for a multi-homed
+peer when the socket is connecting or connected to multiple addresses using \fBconnect\fR(2).
+The first address is always the current primary destination transport address.  The current
+primary destination transport address is the address to which all messages will be sent in the
 absence of congestion or failure.
 .IP
-As a result of connecting to multiple transport addresses using
-\fBconnect\fR(2) or the \fBADD-IP\fR extension, the membership of the list of
-transport addresses returned by \fBgetpeername\fR(2) may change due to the
-state of the socket or resulting from the exchange of ASCONF control chunks.
-When the \fBSCTP\fR connection is multi-homed or supports \fBADD-IP\fR, this
-behavior is different from \fBtcp\fR(7) and other connection-oriented
-protocol, whose peer address does not change during the lifespan of a
-connection.
+As a result of connecting to multiple transport addresses using \fBconnect\fR(2) or the
+\fBADD-IP\fR extension, the membership of the list of transport addresses returned by
+\fBgetpeername\fR(2) may change due to the state of the socket or resulting from the exchange
+of ASCONF control chunks.  When the \fBSCTP\fR connection is multi-homed or supports
+\fBADD-IP\fR, this behavior is different from \fBtcp\fR(7) and other connection-oriented
+protocol, whose peer address does not change during the lifespan of a connection.
 .SS "SOCKET CALLS"
 .PP
-Socket calls for \fI\fCSOCK_STREAM\fR, \fI\fCSOCK_SEQPACKET\fR and
-\fI\fCSOCK_RDM\fR sockets are different in some respects (addressing and
-options) than their \fBtcp\fR(7) or \fBudp\fR(7) counterparts.  These
-differences are described here.  For common behavior, please see the indicated
-manual page in Section 2.
+Socket calls for \fI\fCSOCK_STREAM\fR, \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets
+are different in some respects (addressing and options) than their \fBtcp\fR(7) or \fBudp\fR(7)
+counterparts.  These differences are described here.  For common behavior, please see the
+indicated manual page in Section 2.
 .TP
 .BR bind (2)
-A call to \fBbind\fR(2) can provide multiple address if the host is
-multi-homed.  Binds to \fI\fCINADDR_ANY\fR will result in a binding to all of
-the local transport addresses belonging to host that do not cause a conflict
-at the time that a connection is formed.  As with other sockets, the local
-port number is assigned at the time that \fBbind\fR(2) is called.
+A call to \fBbind\fR(2) can provide multiple address if the host is multi-homed.  Binds to
+\fI\fCINADDR_ANY\fR will result in a binding to all of the local transport addresses belonging
+to the host that do not cause a conflict at the time that a connection is formed.  As with
+other sockets, the local port number is assigned at the time that \fBbind\fR(2) is called.
 .IP
-As with other sockets, binding to a socket address with address family
-\fI\fCAF_UNSPEC\fR will cause the socket to be unbound from all transport
-addresses.
+As with other sockets, binding to a socket address with address family \fI\fCAF_UNSPEC\fR will
+cause the socket to be unbound from all transport addresses.
 .IP
-Consistent with \fBtcp\fR(7), \fBSCTP\fR supports binding of multiple sockets
-to the same transport address providing that the socket option
-\fI\fCSO_REUSEADDR\fR (see \fBsocket\fR(7)) is set on the sockets and that no
-sockets have executed \fBlisten\fR(2) bound to the same transport address.
+Consistent with \fBtcp\fR(7), \fBSCTP\fR supports binding of multiple sockets to the same
+transport address providing that the socket option \fI\fCSO_REUSEADDR\fR (see \fBsocket\fR(7))
+is set on the sockets and that no sockets have executed \fBlisten\fR(2) bound to the same
+transport address.
 .TP
 .BR accept (2)
-A call to \fBaccept\fR(2) requesting the peer address of the connection will
-return multiple transport addresses if the connecting peer is multi-homed.
-The first transport address in the list is the primary transport address of
-the connecting peer.  The primary transport address is the address upon which
-the INIT message was received.  Otherwise, the \fBaccept\fR(2) operation is
-unchanged.
+A call to \fBaccept\fR(2) requesting the peer address of the connection will return multiple
+transport addresses if the connecting peer is multi-homed.  The first transport address in the
+list is the primary transport address of the connecting peer.  The primary transport address is
+the address upon which the INIT message was received.  Otherwise, the \fBaccept\fR(2) operation
+is unchanged.
 .TP
 .BR connect (2)
-A call to \fBconnect\fR(2) can provide multiple destination transport
-addresses if the peer host is multi-homed.  If an INIT chunk sent to the first
-destination transport address is not acknowledged, the next INIT chunk will be
-sent to the next address in the list.  This will occur until an acknowledgment
-is received from one of the addresses or the connection attempt times out.
-Each address will be retried \fBsctp_max_init_retries\fR times before the
-connection process is considered to have timed out.  Broadcast and multicast
-addresses are permitted for the call to \fBconnect\fR(2) but will not form an
-endpoint address in the association.  This feature permits fast and reliable
-initialization of associations.
+A call to \fBconnect\fR(2) can provide multiple destination transport addresses if the peer
+host is multi-homed.  If an INIT chunk sent to the first destination transport address is not
+acknowledged, the next INIT chunk will be sent to the next address in the list.  This will
+occur until an acknowledgment is received from one of the addresses or the connection attempt
+times out.  Each address will be retried \fBsctp_max_init_retries\fR times before the
+connection process is considered to have timed out.  Broadcast and multicast addresses are
+permitted for the call to \fBconnect\fR(2) but will not form an endpoint address in the
+association.  This feature permits fast and reliable initialization of associations.
 .IP
-As with other connection-oriented sockets, connecting to a socket address with
-address family \fI\fCAF_UNSPEC\fR will cause a socket engaged in active
-connections to be disconnected.
+As with other connection-oriented sockets, connecting to a socket address with address family
+\fI\fCAF_UNSPEC\fR will cause a socket engaged in active connections to be disconnected.
 .TP
 .BR read "(2), " recv "(2), " recvfrom "(2) and " recvmsg "(2)"
-\fBSCTP\fR preserves message boundaries on read for \fI\fCSOCK_SEQPACKET\fR
-and \fI\fCSOCK_RDM\fR sockets.  Message boundaries are never preserved for
-\fI\fCSOCK_STREAM\fR sockets.
+\fBSCTP\fR preserves message boundaries on read for \fI\fCSOCK_SEQPACKET\fR and
+\fI\fCSOCK_RDM\fR sockets.  Message boundaries are never preserved for \fI\fCSOCK_STREAM\fR
+sockets.
 .IP
-The following message flags to or returned from \fBrecv\fR(2),
-\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2) have special interpretations for
-\fBSCTP\fR:
+The following message flags to, or returned from, \fBrecv\fR(2), \fBrecvfrom\fR(2) and
+\fBrecvmsg\fR(2) have special interpretations for \fBSCTP\fR:
 .RS
 .TP
 .B \f(CBMSG_OOB
-\fBSCTP\fR supports the return of the \fI\fCMSG_OOB\fR flag from
-\fBrecv\fR(2), \fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).  Data read with the
-\fI\fCMSG_OOB\fR flag set indicates that the data was received on the
-specified \fBSCTP\fR stream with the Unordered bit set.  Operation is similar
-to \fBtcp\fR(7).
+\fBSCTP\fR supports the return of the \fI\fCMSG_OOB\fR flag from \fBrecv\fR(2),
+\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).  Data read with the \fI\fCMSG_OOB\fR flag set indicates
+that the data was received on the specified \fBSCTP\fR stream with the Unordered bit set.
+Operation is similar to \fBtcp\fR(7).
 .TP
 .B \f(CBMSG_EOR
-For \fI\fCSOCK_SEQPACKET\fR sockets, the \fI\fCMSG_EOR\fR flag returned from
-\fBrecv\fR(2), \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) indicates that the data
-read has been read to the end of a record.  The \fI\fCMSG_EOR\fR flag is not
-used for \fI\fCSOCK_STREAM\fR or \fI\fCSOCK_RDM\fR sockets.
+For \fI\fCSOCK_SEQPACKET\fR sockets, the \fI\fCMSG_EOR\fR flag returned from \fBrecv\fR(2),
+\fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) indicates that the data read has been read to the end of
+a record.  The \fI\fCMSG_EOR\fR flag is not used for \fI\fCSOCK_STREAM\fR or \fI\fCSOCK_RDM\fR
+sockets.
 .TP
 .B \f(CBMSG_TRUNC
-\fBSCTP\fR supports the use of the \fI\fCMSG_TRUNC\fR flag to \fBrecv\fR(2),
-\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).  Data read with the \fI\fCMSG_TRUNC\fR
-flag set will return the number of bytes available in the packet rather than
-the number of bytes read.
+\fBSCTP\fR supports the use of the \fI\fCMSG_TRUNC\fR flag to \fBrecv\fR(2), \fBrecvfrom\fR(2)
+and \fBrecvmsg\fR(2).  Data read with the \fI\fCMSG_TRUNC\fR flag set will return the number of
+bytes available in the packet rather than the number of bytes read.
 .IP
-When the \fI\fCMSG_TRUNC\fR flag is returned from \fBrecv\fR(2),
-\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2), it indicates that the record was
-truncated.  \fI\fCMSG_TRUNC\fR will only be returned on \fI\fCSOCK_RDM\fR
-sockets.  \fI\fCMSG_TRUNC\fR is never set on return for \fI\fCSOCK_STREAM\fR
-and \fI\fCSOCK_SEQPACKET\fR sockets.
+When the \fI\fCMSG_TRUNC\fR flag is returned from \fBrecv\fR(2), \fBrecvfrom\fR(2) and
+\fBrecvmsg\fR(2), it indicates that the record was truncated.  \fI\fCMSG_TRUNC\fR will only be
+returned on \fI\fCSOCK_RDM\fR sockets.  \fI\fCMSG_TRUNC\fR is never set on return for
+\fI\fCSOCK_STREAM\fR and \fI\fCSOCK_SEQPACKET\fR sockets.
 .TP
 .B \f(CBMSG_CONFIRM
 \fBSCTP\fR supports the use of the \fI\fCMSG_CONFIRM\fR flag to \fBrecv\fR(2),
-\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).  Data read with the
-\fI\fCMSG_CONFIRM\fR flag set will return messages receipt acknowledgments as
-well as messages which have exceeded their life-times, messages which have
-been dropped by \fBPR-SCTP\fR, and messages held for retrieval after abort or
-shutdown.
+\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).  Data read with the \fI\fCMSG_CONFIRM\fR flag set will
+return messages receipt acknowledgments as well as messages which have exceeded their
+life-times, messages which have been dropped by \fBPR-SCTP\fR, and messages held for retrieval
+after abort or shutdown.
 .IP
-When the \fI\fCMSG_CONFIRM\fR flag is returned from \fBrecv\fR(2),
-\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2), it indicates that the read data
-represents data that was confirmed as acknowledged by the peer.  See also
-\fI\fCSCTP_DISPOSITION\fR under \fBSOCKET OPTIONS\fR.
+When the \fI\fCMSG_CONFIRM\fR flag is returned from \fBrecv\fR(2), \fBrecvfrom\fR(2) and
+\fBrecvmsg\fR(2), it indicates that the read data represents data that was confirmed as
+acknowledged by the peer.  See also \fI\fCSCTP_DISPOSITION\fR under \fBSOCKET OPTIONS\fR.
 .RE
 .IP
-Other message flags have the same interpretation as described in
-\fBrecv\fR(2), \fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).
+Other message flags have the same interpretation as described in \fBrecv\fR(2),
+\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2).
 .TP
 .BR write "(2), " send "(2), " sendto "(2) and " sendmsg "(2)"
-\fBSCTP\fR preserves message boundaries on write for \fI\fCSOCK_SEQPACKET\fR
-and \fI\fCSOCK_RDM\fR sockets.  Message boundaries are never preserved for
-\fI\fCSOCK_STREAM\fR sockets.
+\fBSCTP\fR preserves message boundaries on write for \fI\fCSOCK_SEQPACKET\fR and
+\fI\fCSOCK_RDM\fR sockets.  Message boundaries are never preserved for \fI\fCSOCK_STREAM\fR
+sockets.
 .IP
-The following message flags to \fBsend\fR(2), \fBsendto\fR(2) and
-\fBsendmsg\fR(2) have special interpretations for \fBSCTP\fR:
+The following message flags to \fBsend\fR(2), \fBsendto\fR(2) and \fBsendmsg\fR(2) have special
+interpretations for \fBSCTP\fR:
 .RS
 .TP
 .B \f(CBMSG_OOB
-\fBSCTP\fR supports the use of the \fI\fCMSG_OOB\fR flag to \fBsend\fR(2),
-\fBsendto\fR(2) and \fBsendmsg\fR(2).  Data written with the \fI\fCMSG_OOB\fR
-flag set indicates that the data is to be sent on the specified \fBSCTP\fR
-stream with the Unordered bit set.
+\fBSCTP\fR supports the use of the \fI\fCMSG_OOB\fR flag to \fBsend\fR(2), \fBsendto\fR(2) and
+\fBsendmsg\fR(2).  Data written with the \fI\fCMSG_OOB\fR flag set indicates that the data is
+to be sent on the specified \fBSCTP\fR stream with the Unordered bit set.
 .TP
 .B \f(CBMSG_MORE
-\fBSCTP\fR supports the use of the \fI\fCMSG_MORE\fR flag to \fBsend\fR(2),
-\fBsendto\fR(2) and \fBsendmsg\fR(2).  Data written with the \fI\fCMSG_MORE\fR
-flag set indicates that the data of a subsequent send operation on the same
-stream contains additional data belonging to the same record.  Use of the
-\fI\fCMSG_MORE\fR flag is only supported for \fI\fCSOCK_SEQPACKET\fR sockets.
-Data written with \fBwrite\fR(2) is assumed to contain an entire record.
+\fBSCTP\fR supports the use of the \fI\fCMSG_MORE\fR flag to \fBsend\fR(2), \fBsendto\fR(2) and
+\fBsendmsg\fR(2).  Data written with the \fI\fCMSG_MORE\fR flag set indicates that the data of
+a subsequent send operation on the same stream contains additional data belonging to the same
+record.  Use of the \fI\fCMSG_MORE\fR flag is only supported for \fI\fCSOCK_SEQPACKET\fR
+sockets.  Data written with \fBwrite\fR(2) is assumed to contain an entire record.
 .TP
 .B \f(CBMSG_PROBE
-\fBSCTP\fR supports the use of the \fI\fCMSG_PROBE\fR flag to \fBsend\fR(2),
-\fBsendto\fR(2) and \fBsendmsg\fR(2).  Data written with the
-\fI\fCMSG_PROBE\fR flag set indicates that the data is to be used to fill out
-the heartbeat data in a HEARTBEAT chunk and request that \fBSCTP\fR send a
-HEARTBEAT to the peer.  Use of the \fI\fCMSG_PROBE\fR flag is supported on all
-socket types.
+\fBSCTP\fR supports the use of the \fI\fCMSG_PROBE\fR flag to \fBsend\fR(2), \fBsendto\fR(2)
+and \fBsendmsg\fR(2).  Data written with the \fI\fCMSG_PROBE\fR flag set indicates that the
+data is to be used to fill out the heartbeat data in a HEARTBEAT chunk and request that
+\fBSCTP\fR send a HEARTBEAT to the peer.  Use of the \fI\fCMSG_PROBE\fR flag is supported on
+all socket types.
 .TP
 .B \f(CBMSG_EOF
-\fBSCTP\fR supports the use of the \fI\fCMSG_EOF\fR flag to \fBsend\fR(2),
-\fBsendto\fR(2) and \fBsendmsg\fR(2).  Data written with the \fI\fCMSG_EOF\fR
-flag will be the last data sent on the association and then a shutdown
-initiated.
+\fBSCTP\fR supports the use of the \fI\fCMSG_EOF\fR flag to \fBsend\fR(2), \fBsendto\fR(2) and
+\fBsendmsg\fR(2).  Data written with the \fI\fCMSG_EOF\fR flag will be the last data sent on
+the association and then a shutdown initiated.
 .TP
 .B \f(CBMSG_CONFIRM
-\fBSCTP\fR supports the use of the \fI\fCMSG_CONFIRM\fR flag to \fBsend\fR(2)
-\fBsendto\fR(2) and \fBsendmsg\fR(2) for \fI\fCSOCK_SEQPACKET\fR and
-\fI\fCSOCK_RDM\fR sockets.  Records or packets written with the
-\fI\fCMSG_CONFIRM\fR flag set are marked for acknowledgment.  Acknowledgments
-can be received with the \fI\fCMSG_CONFIRM\fR flag to \fBrecv\fR(2),
-\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2) as described above.  See also
-\fI\fCSCTP_DISPOSITION\fR under \fBSOCKET OPTIONS\fR.
+\fBSCTP\fR supports the use of the \fI\fCMSG_CONFIRM\fR flag to \fBsend\fR(2) \fBsendto\fR(2)
+and \fBsendmsg\fR(2) for \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets.  Records or
+packets written with the \fI\fCMSG_CONFIRM\fR flag set are marked for acknowledgment.
+Acknowledgments can be received with the \fI\fCMSG_CONFIRM\fR flag to \fBrecv\fR(2),
+\fBrecvfrom\fR(2) and \fBrecvmsg\fR(2) as described above.  See also \fI\fCSCTP_DISPOSITION\fR
+under \fBSOCKET OPTIONS\fR.
 .RE
 .IP
-Other message flags have the same interpretation as described in
-\fBsend\fR(2), \fBsendto\fR(2) and \fBsendmsg\fR(2).
+Other message flags have the same interpretation as described in \fBsend\fR(2), \fBsendto\fR(2)
+and \fBsendmsg\fR(2).
 .TP
 .BR shutdown "(2) and " close (2)
-\fBSCTP\fR supports orderly release using \fBshutdown\fR(2) and both orderly
-and abortive release using \fBclose\fR(2) similar to \fBtcp\fR(7).
+\fBSCTP\fR supports orderly release using \fBshutdown\fR(2) and both orderly and abortive
+release using \fBclose\fR(2) similar to \fBtcp\fR(7).
 .IP
-When the \fI\fCSHUT_RD\fR flag is given to \fBshutdown\fR(2), receive will be
-disabled locally and further receive operations on the socket will fail.  When
-the \fI\fCSHUT_WR\fR or \fI\fCSHUT_RDWR\fR flag is given to \fBshutdown\fR(2),
-orderly release will be initiated and further send operations on the socket
-will fail.
+When the \fI\fCSHUT_RD\fR flag is given to \fBshutdown\fR(2), receive will be disabled locally
+and further receive operations on the socket will fail.  When the \fI\fCSHUT_WR\fR or
+\fI\fCSHUT_RDWR\fR flag is given to \fBshutdown\fR(2), orderly release will be initiated and
+further send operations on the socket will fail.
 .IP
-Distinctions between orderly and abortive release when \fBclose\fR(2) or
-\fBexit\fR(2) are called are similar to that of \fBtcp\fR(7).
+Distinctions between orderly and abortive release when \fBclose\fR(2) or \fBexit\fR(2) are
+called are similar to that of \fBtcp\fR(7).
 .SS "FEATURES"
 .\" ------------------------------------------------------------------------
 .\" ------------------------------------------------------------------------
@@ -434,515 +384,463 @@ Compiled into kernel or as a loadable module.
 Standards support for socket type \fI\fCSOCK_SEQPACKET\fR.
 .TP 3
 \(bu
-Supports a partial packet delivery interface on all packets.
-\fI\fCMSG_TRUNC\fR set when receiving a packet does not discard the remainder
-of the packet but permits subsequent reads to read the remainder of the
-packet.
+Supports a partial packet delivery interface on all packets.  \fI\fCMSG_TRUNC\fR set when
+receiving a packet does not discard the remainder of the packet but permits subsequent reads to
+read the remainder of the packet.
 .TP 3
 \(bu
-Silly Window Syndrome (SWS) avoidance per RFC 1122 Section 4.2.3.2 and 4.2.3.3
-as recommended in the SCTP Implementor's Guide.
+Silly Window Syndrome (SWS) avoidance per RFC 1122 Section 4.2.3.2 and 4.2.3.3 as recommended
+in the SCTP Implementor's Guide.
 .TP 3
 \(bu
-Nagle algorithm per RFC 896 and RFC 1122 Section 4.2.3 with delayed ACK
-modifications presented by Minshall in draft-minshall-tsvwg-nagle-01.txt.
+Nagle algorithm per RFC 896 and RFC 1122 Section 4.2.3 with delayed ACK modifications presented
+by Minshall in draft-minshall-tsvwg-nagle-01.txt.
 .TP 3
 \(bu
-Message disposition and retrieval on connection shutdown or abort, lifetime
-expiry, and receipt confirmation acknowledgment.
+Message disposition and retrieval on connection shutdown or abort, lifetime expiry, and receipt
+confirmation acknowledgment.
 .TP 3
 \(bu
-Support for hardware assisted checksum for drivers which support
-\fI\fCNETIF_F_HW_CSUM\fR.
+Support for hardware assisted checksum for drivers which support \fI\fCNETIF_F_HW_CSUM\fR.
 .TP 3
 \(bu
-Support for hardware assisted scatter/gather and fragmentation for devices
-which support \fI\fCNETIF_F_SG\fR and \fI\fCNETIF_F_FRAGLIST\fR.
+Support for hardware assisted scatter/gather and fragmentation for devices which support
+\fI\fCNETIF_F_SG\fR and \fI\fCNETIF_F_FRAGLIST\fR.
 .TP 3
 \(bu
-For security of HMACs, \fBSCTP\fR includes a re-keying algorithm for secret
-keys that rotates secret keys after the key's first cookie lifetime to provide
-for maximum security for HMACs.
+For security of HMACs, \fBSCTP\fR includes a re-keying algorithm for secret keys that rotates
+secret keys after the key's first cookie lifetime to provide for maximum security for HMACs.
 .TP 3
 \(bu
-High performance routing algorithm alters multi-homed routes on a per-packet
-basis.
+High performance routing algorithm alters multi-homed routes on a per-packet basis.
 .TP 3
 \(bu
-Wide range of settings for timers and protocol parameters permitting average
-5ms failover between failed destination addresses on high-speed networks.
+Wide range of settings for timers and protocol parameters permitting fast (average 5ms with
+100Hz tick clock; 0.5ms with 1000Hz tick clock) failover between failed destination addresses
+on high-speed networks.
 .TP 3
 \(bu
-Deferral of checksum calculation until after socket lookup for protection from
-software checksum DoS attacks.
+Deferral of checksum calculation until after socket lookup for protection from software
+checksum DoS attacks.
 .TP 3
 \(bu
-Full support for the changes and modifications in the SCTP Implementers Guide
-(draft-ietf-tsvwg-sctpimpguide-05.txt).
+Support for the changes and modifications in the SCTP Implementers Guide
+(draft-ietf-tsvwg-sctpimpguide-05.txt).  (See \fB\)CAVEATS\fR.).
 .\" ------------------------------------------------------------------------
 .\" ------------------------------------------------------------------------
 .PP
 \fBSCTP\fR provides the following added features:
 .TP 3
 \(bu
-A \fBtcp\fR(7)-compatible mode for sockets of type \fI\fCSOCK_STREAM\fR when
-\fBSCTP\fR is compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_TCP_COMPATIBLE\fR set.
+A \fBtcp\fR(7)-compatible mode for sockets of type \fI\fCSOCK_STREAM\fR when \fBSCTP\fR is
+compiled with kernel configuration parameter \fI\fCCONFIG_SCTP_TCP_COMPATIBLE\fR set.
 .TP 3
 \(bu
-A \fBudp\fR(7)-compatible mode for sockets of type \fI\fCSOCK_RDM\fR when
-\fBSCTP\fR is compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_UDP_COMPATIBLE\fR set.
+A \fBudp\fR(7)-compatible mode for sockets of type \fI\fCSOCK_RDM\fR when \fBSCTP\fR is
+compiled with kernel configuration parameter \fI\fCCONFIG_SCTP_UDP_COMPATIBLE\fR set.
 .TP 3
 \(bu
-Support for both Adler32 and CRC-32c checksums with automatic detection of
-checksum on receive when \fBSCTP\fR is compiled with kernel configuration
-parameters \fI\fCCONFIG_SCTP_ADLER_32\fR or \fI\fCCONFIG_SCTP_CRC_32C\fR set.
+Support for both Adler32 and CRC-32c checksums with automatic detection of checksum on receive
+when \fBSCTP\fR is compiled with kernel configuration parameters \fI\fCCONFIG_SCTP_ADLER_32\fR
+or \fI\fCCONFIG_SCTP_CRC_32C\fR set.
 .TP 3
 \(bu
-Support for multiple HMAC types when compiled with kernel configuration
-parameters \fI\fCCONFIG_SCTP_HMAC_SHA_1\fR or \fI\fCCONFIG_SCTP_HMAC_MD5\fR.
+Support for multiple HMAC types when compiled with kernel configuration parameters
+\fI\fCCONFIG_SCTP_HMAC_SHA_1\fR or \fI\fCCONFIG_SCTP_HMAC_MD5\fR.
 .TP 3
 \(bu
-Support for RFC 2960 Appendix A and RFC 3168 compatible Explicit Congestion
-Notification when compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_ECN\fR set.
+Support for RFC 2960 Appendix A and RFC 3168 compatible Explicit Congestion Notification when
+compiled with kernel configuration parameter \fI\fCCONFIG_SCTP_ECN\fR set.
 .TP 3
 \(bu
-Support for draft-ietf-tsvwg-addip-sctp-05.txt Adaptation Layer Indication
-when compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_ADAPTATION_LAYER_INFO\fR set.
+Support for draft-ietf-tsvwg-addip-sctp-05.txt Adaptation Layer Indication when compiled with
+kernel configuration parameter \fI\fCCONFIG_SCTP_ADAPTATION_LAYER_INFO\fR set.
 .TP 3
 \(bu
-Support for \fBADD-IP\fR extensions from draft-ietf-tsvwg-addip-sctp-05.txt
-when compiled with kernel configuration parameter \fI\fCCONFIG_SCTP_ADD_IP\fR
-set.
+Support for \fBADD-IP\fR extensions from draft-ietf-tsvwg-addip-sctp-05.txt when compiled with
+kernel configuration parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
 .TP 3
 \(bu
-Support for \fBPR-SCTP\fR extensions as described in
-draft-stewart-tsvwg-prsctp-00.txt when compiled with kernel configuration
-parameter \fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR set.
+Support for \fBPR-SCTP\fR extensions as described in draft-stewart-tsvwg-prsctp-00.txt when
+compiled with kernel configuration parameter \fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR set.
 .SH "SYSCTLS"
 .PP
-\fBSCTP\fR provides and supports a number of system controls that can be
-accessed using the \fB\f(CB/proc/sys/net/ipv4/*\fR files, with the
-\fBsysctl\fR(2) interface or using \fBsysctl\fR(8).
+\fBSCTP\fR provides and supports a number of system controls that can be accessed using the
+\fB\f(CB/proc/sys/net/ipv4/*\fR files, with the \fBsysctl\fR(2) interface or using
+\fBsysctl\fR(8).
 .PP
-\fBSCTP\fR supports all \fBsocket\fR(7) system controls \fBrmem_default\fR,
-\fBrmem_max\fR, \fBwmem_default\fR, \fBwmem_max\fR, \fBmsg_cost\fR,
-\fBmsg_burst\fR, \fBnetdev_max_backlog\fR and \fBoptmem_max\fR in the normal
-fashion.  For more information, see \fBsocket\fR(7).
+\fBSCTP\fR supports all \fBsocket\fR(7) system controls \fBrmem_default\fR, \fBrmem_max\fR,
+\fBwmem_default\fR, \fBwmem_max\fR, \fBmsg_cost\fR, \fBmsg_burst\fR, \fBnetdev_max_backlog\fR
+and \fBoptmem_max\fR in the normal fashion.  For more information, see \fBsocket\fR(7).
 .PP
-\fBSCTP\fR supports \fBip\fR(7) system controls \fBip_default_ttl\fR,
-\fBip_dynaddr\fR, \fBip_autoconfig\fR, \fBip_local_port_range\fR and
-\fBip_no_pmtu_disc\fR in the normal fashion.  \fBip\fR(7) system controls
-\fBip_forward\fR, \fBipfrag_high_thresh\fR, \fBipfrag_low_thresh\fR and
-\fBip_always_defrag\fR are not applicable to \fBSCTP\fR.  For more
-information, see \fBip\fR(7).
+\fBSCTP\fR supports \fBip\fR(7) system controls \fBip_default_ttl\fR, \fBip_dynaddr\fR,
+\fBip_autoconfig\fR, \fBip_local_port_range\fR and \fBip_no_pmtu_disc\fR in the normal fashion.
+\fBip\fR(7) system controls \fBip_forward\fR, \fBipfrag_high_thresh\fR, \fBipfrag_low_thresh\fR
+and \fBip_always_defrag\fR are not applicable to \fBSCTP\fR.  For more information, see
+\fBip\fR(7).
 .PP
 The following \fBSCTP\fR specific system controls are provided by \fBSCTP\fR:
 .TP
 .B sctp_checksum_algorithm
-Defines the default checksum algorithm that will be used when checksumming
-packets associated with a socket.  Valid values are as follows:
+Defines the default checksum algorithm that will be used when checksumming packets associated
+with a socket.  Valid values are as follows:
 .RS
 .TP
 .I \f(CBSCTP_CSUM_ADLER_32
-for the RFC 2960 Appendix B algorithm.  To set this value, \fBSCTP\fR must
-have been compiled with \fI\fCCONFIG_SCTP_ADLER_32\fR or without
-\fI\fCCONFIG_SCTP_CRC_32C\fR.  When computed in software, Adler 32 checksum
-algorithm is more amenable to Van Jacobson partial checksum and copy from use
-approaches and exhibits higher performance than CRC-32c.
+for the RFC 2960 Appendix B algorithm.  To set this value, \fBSCTP\fR must have been compiled
+with \fI\fCCONFIG_SCTP_ADLER_32\fR or without \fI\fCCONFIG_SCTP_CRC_32C\fR.  When computed in
+software, Adler 32 checksum algorithm is more amenable to Van Jacobson partial checksum and
+copy from user approaches and exhibits higher performance than CRC-32c.
 .TP
 .I \f(CBSCTP_CSUM_CRC_32C
-for the draft-ietf-tsvwg-sctpcsum-06.txt (soon to be RFC) CRC-32c checksum
-algorithm.  To set this value, \fBSCTP\fR must have been compiled with
-\fI\fCCONFIG_SCTP_CRC_32C\fR.  When computed in software, CRC-32c checksum is
+for the RFC 3309 CRC-32c checksum algorithm.  To set this value, \fBSCTP\fR must have been
+compiled with \fI\fCCONFIG_SCTP_CRC_32C\fR.  When computed in software, CRC-32c checksum is
 more processor intensive than Adler-32.
 .RE
 .IP
-As draft-ietf-tsvwg-sctpcsum-06.txt has been approved and replaces RFC 2960
-checksum algorithm, the default value for this system control is now
-\fI\fCSCTP_CSUM_CRC_32C\fR.  This value may also be set for a given socket
-using the \fI\fCSCTP_CKSUM_TYPE\fR socket option as described in \fBSOCKET
-OPTIONS\fR.  This system control will soon be deprecated, should always be set
-to \fI\fCSCTP_CSUM_CRC_32C\fR and should not be used by portable programs.
+As RFC 3309 has been approved and replaces RFC 2960 checksum algorithm, the default value for
+this system control is now \fI\fCSCTP_CSUM_CRC_32C\fR.  This value may also be set for a given
+socket using the \fI\fCSCTP_CKSUM_TYPE\fR socket option as described in \fBSOCKET OPTIONS\fR.
+This system control will soon be deprecated, should always be set to \fI\fCSCTP_CSUM_CRC_32C\fR
+and should not be used by portable programs.
 .TP
 .B sctp_mac_type
-Defines the default MAC (Message Authentication Code) type that will be used
-when signing cookies in INIT-ACK messages.  Valid values are:
+Defines the default MAC (Message Authentication Code) type that will be used when signing
+cookies in INIT-ACK messages.  Valid values are:
 .RS
 .TP
 .I \f(CBSCTP_HMAC_SHA_1
-for the FIPS 180-1 Secure Hash Algorithm SHA-1 HMAC.  SHA-1 performs well on
-big-endian machines.  This option setting is only supported if \fBSCTP\fR was
-compiled with the kernel configuration parameter
-\fI\fCCONFIG_SCTP_HMAC_SHA1\fR set.
+for the FIPS 180-1 Secure Hash Algorithm SHA-1 HMAC.  SHA-1 performs well on big-endian
+machines.  This option setting is only supported if \fBSCTP\fR was compiled with the kernel
+configuration parameter \fI\fCCONFIG_SCTP_HMAC_SHA1\fR set.
 .TP
 .I \f(CBSCTP_HMAC_MD5
-for the RFC 1321 Message Digest 5 HMAC.  MD5 performs well on little-endian
-machines.  This option setting is only supported if \fBSCTP\fR was compiled
-with the kernel configuration parameter \fI\fCCONFIG_SCTP_HMAC_MD5\fR set.
+for the RFC 1321 Message Digest 5 HMAC.  MD5 performs well on little-endian machines.  This
+option setting is only supported if \fBSCTP\fR was compiled with the kernel configuration
+parameter \fI\fCCONFIG_SCTP_HMAC_MD5\fR set.
 .TP
 .I \f(CBSCTP_HMAC_NONE
-for no secure signature.  Not signing the cookie performs well on all
-machines; however, this option should only be used if some other mechanism
-provides security (such as IPSec) or the system is closed and trusted.  This
-option setting is always supported.
+for no secure signature.  Not signing the cookie performs well on all machines; however, this
+option should only be used if some other mechanism provides security (such as IPSec) or the
+system is closed and trusted.  This option setting is always supported.
 .RE
 .IP
-There is no required or recommended value in RFC 2960.  The default value is
-(in priority of availability) \fI\fCSCTP_HMAC_MD5\fR,
-\fI\fCSCTP_HMAC_SHA_1\fR, then \fI\fCSCTP_HMAC_NONE\fR.  This is a default for
-new sockets.  The MAC for a given socket can be changed before the call to
-\fBlisten\fR(2), or before receiving a passive connection attempt, with the
-socket option \fI\fCSCTP_MAC_TYPE\fR as described under \fBSOCKET OPTIONS\fR.
+There is no required or recommended value in RFC 2960.  The default value is (in priority of
+availability) \fI\fCSCTP_HMAC_MD5\fR, \fI\fCSCTP_HMAC_SHA_1\fR, then \fI\fCSCTP_HMAC_NONE\fR.
+This system control defines the default for new sockets.  The MAC for a given socket can be
+changed before the call to \fBlisten\fR(2), or before receiving a passive connection attempt,
+with the socket option \fI\fCSCTP_MAC_TYPE\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 .B sctp_valid_cookie_life
-Defines the default time interval (in milliseconds) in conjunction with
-\fBsctp_cookie_inc\fR beyond which a COOKIE-ECHO received with a cookie sent
-in a INIT-ACK will not longer be accepted.  For \fBSCTP\fR, this also limits
-the default maximum time interval for which the HMAC secret key for the cookie
-will be valid.  Valid values are zero (0) or greater (\fCMAXINT\fR).  Values
-of zero (0) will be converted to a Linux system clock tick (1000/HZ
-milliseconds).  The default value is the value recommended in RFC 2960 (60,000
-milliseconds).  This is a default for new sockets.  The value for a given
-socket can be changed with the socket option \fI\fCSCTP_COOKIE_LIFE\fR before
-a call to \fBlisten\fR(2), or before receiving passive connection attempt, as
-described under \fBSOCKET OPTIONS\fR.
+Defines the default time interval (in milliseconds) in conjunction with \fBsctp_cookie_inc\fR
+beyond which a COOKIE-ECHO received with a cookie sent in a INIT-ACK will not longer be
+accepted.  For \fBSCTP\fR, this also limits the default maximum time interval for which the
+HMAC secret key for the cookie will be valid.  Valid values are zero (0) or greater
+(\fCMAXINT\fR).  Values of zero (0) will be converted to a Linux system clock tick (1000/HZ
+milliseconds).  The default value is the value recommended in RFC 2960 (60,000 milliseconds).
+This system control defines the default for new sockets.  The value for a given socket can be
+changed with the socket option \fI\fCSCTP_COOKIE_LIFE\fR before a call to \fBlisten\fR(2), or
+before receiving passive connection attempt, as described under \fBSOCKET OPTIONS\fR.
 .IP
-Reducing this value will increase the chances that passive connection attempts
-will fail due to expired cookies.  Increasing the value will reduce the
-overall security of the system by permitting attackers and increased interval
-to crack HMACs and guess verification tags.  This value may be adjusted in
-conjunction with \fBsctp_cookie_inc\fR to meet most objectives for successful
-passive connection attempts with the best security afforded by smaller values
-of \fBsctp_valid_cookie_life\fR.
+Reducing this value will increase the chances that passive connection attempts will fail due to
+expired cookies.  Increasing the value will reduce the overall security of the system by
+permitting attackers and increased interval to crack HMACs and guess verification tags.  This
+value may be adjusted in conjunction with \fBsctp_cookie_inc\fR to meet most objectives for
+successful passive connection attempts with the best security afforded by smaller values of
+\fBsctp_valid_cookie_life\fR.
 .IP
-Unfortunately the \fI\fCSCTP_COOKIE_LIFE\fR and \fI\fCSCTP_COOKIE_INC\fR must
-be adjusted to accommodate the slowest peer on the slowest connection.  The
-default setting is adequate for Internet applications.
+Unfortunately the \fI\fCSCTP_COOKIE_LIFE\fR and \fI\fCSCTP_COOKIE_INC\fR must be adjusted to
+accommodate the slowest peer on the slowest connection.  The default setting is adequate for
+Internet applications.
 .TP
 .B sctp_cookie_inc
-Defines the default time increment (in milliseconds) that will be added to the
-lifespan of the cookie in an INIT ACK if the received INIT requests cookie
-preservative to lengthen the lifespan of the cookie.  Valid values are zero
-(0) or greater (\fCMAXINT\fR).  The default value is the value recommended in
-RFC 2960 5.2.6 (1,000 milliseconds).  This is a default for new sockets.  The
-cookie lifetime increment for a given socket can be changed before a call to
-\fBlisten\fR(2), or before receiving a passive connection attempt, with the
-socket option \fI\fCSCTP_COOKIE_INC\fR as described under \fBSOCKET
-OPTIONS\fR.
+Defines the default time increment (in milliseconds) that will be added to the lifespan of the
+cookie in an INIT ACK if the received INIT requests cookie preservative to lengthen the
+lifespan of the cookie.  Valid values are zero (0) or greater (\fCMAXINT\fR).  The default
+value is the value recommended in RFC 2960 5.2.6 (1,000 milliseconds).  This system control
+defines the default for
+new sockets.  The cookie lifetime increment for a given socket can be changed before a call to
+\fBlisten\fR(2), or before receiving a passive connection attempt, with the socket option
+\fI\fCSCTP_COOKIE_INC\fR as described under \fBSOCKET OPTIONS\fR.
 .IP
-This value can be adjusted in conjunction with \fBsctp_valid_cookie_life\fR,
-above, to meet objectives of successful passive connection attempts and
-security.  The default setting is adequate for Internet applications.
+This value can be adjusted in conjunction with \fBsctp_valid_cookie_life\fR, above, to meet
+objectives of successful passive connection attempts and security.  The default setting is
+adequate for Internet applications.
 .TP
 .B sctp_throttle_itvl
-Defines the default time interval (in milliseconds) within which the receiver
-will not accept more than one INIT or COOKIE ECHO.  Zero (don't throttle) is a
-valid value.  The default value is 50 milliseconds.  This is a default for new
-sockets.  The throttle interval for a given socket can be changed before the
-call to \fBlisten\fR(2), or before a passive connection attempt, with the
-socket option \fI\fCSCTP_THROTTLE_ITVL\fR as described under \fBSOCKET
-OPTIONS\fR.
+Defines the default time interval (in milliseconds) within which the receiver will not accept
+more than one INIT or COOKIE ECHO.  Zero (don't throttle) is a valid value.  The default value
+is 50 milliseconds.  This system control defines the default for new sockets.  The throttle
+interval for a given socket can be changed before the call to \fBlisten\fR(2), or before a
+passive connection attempt, with the socket option \fI\fCSCTP_THROTTLE_ITVL\fR as described
+under \fBSOCKET OPTIONS\fR.
 .IP
-When the HMAC type is SHA-1 or MD5, and when CRC-32c software checksum is
-used, the implementation is particularly vulnerable to DoS flood attacks using
-bogus INIT or COOKIE ECHO messages.  When \fBSCTP\fR is compiled with
-\fI\fCCONFIG_SCTP_THROTTLE_PASSIVEOPENS\fR, this permits the throttling of
-INIT and COOKIE ECHO messages.  Only one INIT and one COOKIE ECHO message will
-be accepted in the interval set by this control.
+When the HMAC type is SHA-1 or MD5, and when CRC-32c software checksum is used, the
+implementation is particularly vulnerable to DoS flood attacks using bogus INIT or COOKIE ECHO
+messages.  When \fBSCTP\fR is compiled with \fI\fCCONFIG_SCTP_THROTTLE_PASSIVEOPENS\fR, this
+permits the throttling of INIT and COOKIE ECHO messages.  Only one INIT and one COOKIE ECHO
+message will be accepted in the interval set by this control.
 .TP
 .B sctp_max_istreams
-Defines the default maximum number of inbound streams that will be requested
-when forming or receiving connections on a socket.  Valid values are in the
-range from 1 to 65,535 streams.  This is a default for new sockets.  The
-actual value used by a socket for both outgoing and incoming connections can
-be changed with the socket option \fI\fCSCTP_ISTREAMS\fR before a call to
-\fBconnect\fR(2) or \fBaccept\fR(2) as described under \fBSOCKET OPTIONS\fR.
+Defines the default maximum number of inbound streams that will be requested when forming or
+receiving connections on a socket.  Valid values are in the range from 1 to 65,535 streams.
+This system control defines the default for new sockets.  The actual value used by a socket for
+both outgoing and incoming connections can be changed with the socket option
+\fI\fCSCTP_ISTREAMS\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2) as described under
+\fBSOCKET OPTIONS\fR.
 .IP
-Usable default values for \fBsctp_max_istreams\fR are highly dependent upon
-the intended applications.  \fBSIGTRAN\fR UAs, for example, seldom need more
-than 257 inbound or outbound streams.  The default valid is set to
-thirty-three (33) streams for \fI\fCSOCK_SEQPACKET\fR sockets.  This system
-control only affects \fI\fCSOCK_SEQPACKET\fR sockets: \fI\fCSOCK_STREAM\fR
-sockets always have both inbound and outbound streams set to one (1).
+Usable default values for \fBsctp_max_istreams\fR are highly dependent upon the intended
+applications.  \fBSIGTRAN\fR UAs, for example, seldom need more than 257 inbound or outbound
+streams.  The default valid is set to thirty-three (33) streams for \fI\fCSOCK_SEQPACKET\fR
+sockets.  This system control only affects \fI\fCSOCK_SEQPACKET\fR sockets:
+\fI\fCSOCK_STREAM\fR sockets always have both inbound and outbound streams set to one (1).
 .TP
 .B sctp_req_ostreams
-Defines the default requested number of outbound streams that will be
-requested when forming or receiving connections on a socket.  Valid values are
-in the range from 1 to 65,535 streams.  This is a default for new sockets.
-The actual value used by a socket for both outgoing and incoming connections
-can be changed with socket option \fI\fCSCTP_OSTREAMS\fR before a call to
-\fBconnect\fR(2) or \fBaccept\fR(2) as described under \fBSOCKET OPTIONS\fR.
+Defines the default requested number of outbound streams that will be requested when forming or
+receiving connections on a socket.  Valid values are in the range from 1 to 65,535 streams.
+This system control defines the default for new sockets.  The actual value used by a socket for
+both outgoing and incoming connections can be changed with socket option \fI\fCSCTP_OSTREAMS\fR
+before a call to \fBconnect\fR(2) or \fBaccept\fR(2) as described under \fBSOCKET OPTIONS\fR.
 .IP
-Usable default values for \fBsctp_max_istreams\fR are highly dependent upon
-the intended applications.  \fBSIGTRAN\fR UAs, for example, seldom need more
-than 257 inbound or outbound streams.  The default valid is set to one (1)
-streams for \fI\fCSOCK_SEQPACKET\fR sockets.  This system control only affects
-\fI\fCSOCK_SEQPACKET\fR sockets: \fI\fCSOCK_STREAM\fR sockets always have both
-inbound and outbound streams set to one (1).
+Usable default values for \fBsctp_max_istreams\fR are highly dependent upon the intended
+applications.  \fBSIGTRAN\fR UAs, for example, seldom need more than 257 inbound or outbound
+streams.  The default valid is set to one (1) streams for \fI\fCSOCK_SEQPACKET\fR sockets.
+This system control only affects \fI\fCSOCK_SEQPACKET\fR sockets: \fI\fCSOCK_STREAM\fR sockets
+always have both inbound and outbound streams set to one (1).
 .TP
 .B sctp_ecn
-Defines a default flag that allows disabling of Explicit Congestion
-Notification (ECN) operation for \fBSCTP\fR when cleared.  This is a default
-for new sockets.  ECN can be overridden on a per-socket basis with the socket
-option \fI\fCSCTP_ECN\fR, as described under \fBSOCKET OPTIONS\fR.  For this
-system control to have any effect, the kernel must have been compiled with
-both kernel configuration parameters \fI\fCCONFIG_INET_ECN\fR and
-\fI\fRCONFIG_SCTP_ECN\fR set.
+Defines a default flag that allows disabling of Explicit Congestion Notification (ECN)
+operation for \fBSCTP\fR when cleared.  This system control defines the default for new
+sockets.  ECN can be overridden on a per-socket basis with the socket option \fI\fCSCTP_ECN\fR,
+as described under \fBSOCKET OPTIONS\fR.  For this system control to have any effect, the
+kernel must have been compiled with both kernel configuration parameters
+\fI\fCCONFIG_INET_ECN\fR and \fI\fCCONFIG_SCTP_ECN\fR set.
 .TP
 .B sctp_adaptation_layer_info
-Defines the default adaptation layer information flags that will be sent in an
-INIT or INIT-ACK message.  Valid values include any 32-bit unsigned integer.
-The default value for backward compatibility is zero (0) which indicates to
-not send the Adaptation Layer Information parameter in INIT and INIT-ACK.
-This is a default for new sockets.  The actual value for both outgoing and
-incoming connections can be changed with socket option \fI\fCSCTP_ALI\fR
-before a call to \fBconnect\fR(2) or \fBlisten\fR(2), or before a passive
-connection indication on a listening socket, as described under \fBSOCKET
-OPTIONS\fR.  For this system control to have any effect, the kernel must have
-been compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_ADAPTATION_LEVEL_INFO\fR set.
+Defines the default adaptation layer information flags that will be sent in an INIT or INIT-ACK
+message.  Valid values include any 32-bit unsigned integer.  The default value for backward
+compatibility is zero (0) which indicates to not send the Adaptation Layer Information
+parameter in INIT and INIT-ACK.  This system control defines the default for new sockets.  The
+actual value for both outgoing and incoming connections can be changed with socket option
+\fI\fCSCTP_ALI\fR before a call to \fBconnect\fR(2) or \fBlisten\fR(2), or before a passive
+connection indication on a listening socket, as described under \fBSOCKET OPTIONS\fR.  For this
+system control to have any effect, the kernel must have been compiled with kernel configuration
+parameter \fI\fCCONFIG_SCTP_ADAPTATION_LEVEL_INFO\fR set.
 .TP
 .B sctp_partial_reliability
-Defines the default partial reliability preference that will be used for the
-socket.  Valid values include zero (0) \- no partial reliability reported, one
-(1) partial reliability support preferred but not required, and two (2),
-partial reliability support required.  The default value for backward
-compatibility is zero (0).  This is a default for new sockets.  The actual
-value for both outgoing and incoming connections can be changed with socket
-option \fI\fCSCTP_PR\fR before a call to \fBconnect\fR(2) or \fBlisten\fR(2),
-or before a passive connection indication on a listening socket, as described
-under \fBSOCKET OPTIONS\fR.  For this system control to have any effect, the
-kernel must have been compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR
-set.
+Defines the default partial reliability preference that will be used for the socket.  Valid
+values include zero (0) \- no partial reliability reported, one (1) partial reliability support
+preferred but not required, and two (2), partial reliability support required.  The default
+value for backward compatibility is zero (0).  This system control defines the default for new
+sockets.  The actual value for both outgoing and incoming connections can be changed with
+socket option \fI\fCSCTP_PR\fR before a call to \fBconnect\fR(2) or \fBlisten\fR(2), or before
+a passive connection indication on a listening socket, as described under \fBSOCKET OPTIONS\fR.
+For this system control to have any effect, the kernel must have been compiled with kernel
+configuration parameter \fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR set.
 .TP
 .B sctp_wmem
-Defines three values (lower, default, upper) for the socket write buffer.  The
-value associated with a given socket can also be changed with the
-\fI\fCSO_SNDBUF\fR option, see \fBsocket\fR(7).
+Defines three values (lower, default, upper) for the socket write buffer.  The value associated
+with a given socket can also be changed with the \fI\fCSO_SNDBUF\fR option, see
+\fBsocket\fR(7).
 .TP
 .B sctp_rmem
-Defines three values (lower, default, upper) for the socket read buffer.  The
-value associated with a given socket can also be changed with the
-\fI\fCSO_RCVBUF\fR option, see \fBsocket\fR(7).
+Defines three values (lower, default, upper) for the socket read buffer.  The value associated
+with a given socket can also be changed with the \fI\fCSO_RCVBUF\fR option, see
+\fBsocket\fR(7).
 .TP
 .B sctp_max_init_retries
-Defines the default number of times that an INIT or COOKIE-ECHO will be resent
-to a given destination before abandoning an active open attempt.  Valid values
-are zero (0) or greater (\fCMAXINT\fR).  The default value is the value
-recommended in RFC 2960 (8 retries).  This is a default for new sockets.  The
-value for a given socket can be changed with the socket option
+Defines the default number of times that an INIT or COOKIE-ECHO will be resent to a given
+destination before abandoning an active open attempt.  Valid values are zero (0) or greater
+(\fCMAXINT\fR).  The default value is the value recommended in RFC 2960 (8 retries).  This
+system control defines the
+default for new sockets.  The value for a given socket can be changed with the socket option
 \fI\fCSCTP_MAX_INIT_RETRIES\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 .B sctp_max_burst
-Defines the default maximum number of MTUs of new data chunks that will be
-sent in a burst in accordance with draft-ietf-tsvwg-sctpimpguide-05.txt.
-Valid values are one (1) or greater (\fCMAXINT\fR).  The default value is the
-value recommended in draft-ietf-tsvwg-sctpimpguide-05.txt (4 MTUs).  This is a
-default for new sockets.  The value for a given socket can be changed with the
-socket option \fI\fCSCTP_MAX_BURST\fR as described under \fBSOCKET OPTIONS\fR.
+Defines the default maximum number of MTUs of new data chunks that will be sent in a burst in
+accordance with draft-ietf-tsvwg-sctpimpguide-05.txt.  Valid values are one (1) or greater
+(\fCMAXINT\fR).  The default value is the value recommended in
+draft-ietf-tsvwg-sctpimpguide-05.txt (4 MTUs).  This system control defines the default for new
+sockets.  The value for a given socket can be changed with the socket option
+\fI\fCSCTP_MAX_BURST\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 .B sctp_assoc_max_retrans
-Defines the number of times that the sending endpoint will attempt
-retransmitting a packet on any active destination transport address before it
-aborts the association.  Valid values are zero (0) or greater (\fCMAXINT\fR).
-The default value is the value recommended in RFC 2960 (10 retries).  This is
-a default for new sockets.  The value for a given socket can be changed with
-the socket option \fI\fCSCTP_ASSOC_MAX_RETRANS\fR as described under \fBSOCKET
-OPTIONS\fR.
+Defines the number of times that the sending endpoint will attempt retransmitting a packet on
+any active destination transport address before it aborts the association.  Valid values are
+zero (0) or greater (\fCMAXINT\fR).  The default value is the value recommended in RFC 2960 (10
+retries).  This system control defines the default for new sockets.  The value for a given
+socket can be changed with the socket option \fI\fCSCTP_ASSOC_MAX_RETRANS\fR as described under
+\fBSOCKET OPTIONS\fR.
 .IP
-This value should be larger than the sum of the \fBsctp_path_max_retrans\fR
-values of each of the destinations.  Setting this value to less that sum of
-the \fBsctp_path_max_retrans\fR values for all of the destinations has the
-interesting effect of permitting a connection to persist even when all
-destinations have been deemed inactive.
+This value should be larger than the sum of the \fBsctp_path_max_retrans\fR values of each of
+the destinations.  Setting this value to less that sum of the \fBsctp_path_max_retrans\fR
+values for all of the destinations has the interesting effect of permitting a connection to
+persist even when all destinations have been deemed inactive.
 .TP
 .B sctp_max_sack_delay
-Defines the default interval of time (in milliseconds) that the sending
-endpoint is permitted to delay an acknowledgment of received data.  Valid
-values are in the range from zero (0) to 500 milliseconds.  (RFC 2960 forbids
-setting this value larger than 500 milliseconds.) The default value is the
-value recommended in RFC 2960 (200 milliseconds).  This is a default for new
-sockets.  The value for a given socket can be changed with the socket option
+Defines the default interval of time (in milliseconds) that the sending endpoint is permitted
+to delay an acknowledgment of received data.  Valid values are in the range from zero (0) to
+500 milliseconds.  (RFC 2960 forbids setting this value larger than 500 milliseconds.) The
+default value is the value recommended in RFC 2960 (200 milliseconds).  This system control
+defines the default for
+new sockets.  The value for a given socket can be changed with the socket option
 \fI\fCSCTP_SACK_DELAY\fR as described under \fBSOCKET OPTIONS\fR.
 .TP
 .B sctp_rto_min
-Defines the default time interval (in milliseconds) that will be used as a RTO
-(Retransmission Time Out) value when sending packets to a destination
-transport address.  Valid values are zero (0) or greater (\fCMAXINT\fR) and
-must be less than or equal to both \fBsctp_rto_initial\fR and
-\fBsctp_rto_max\fR.  The default value is the value recommended in RFC 2960
-(1,000 milliseconds).  The actual value used can be changed with the socket
-option \fI\fCSCTP_RTO_MIN\fR before a call to \fBconnect\fR(2) or
-\fBaccept\fR(2) or before a new destination transport address is added by the
-peer.  After a socket is connected or a destination transport address has been
-added, the destination-specific value can be changed using the socket option
-\fI\fCSCTP_RTO\fR as described under \fBSOCKET OPTIONS\fR.
+Defines the default time interval (in milliseconds) that will be used as a RTO (Retransmission
+Time Out) value when sending packets to a destination transport address.  Valid values are zero
+(0) or greater (\fCMAXINT\fR) and must be less than or equal to both \fBsctp_rto_initial\fR and
+\fBsctp_rto_max\fR.  The default value is the value recommended in RFC 2960 (1,000
+milliseconds).  The actual value used can be changed with the socket option
+\fI\fCSCTP_RTO_MIN\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2) or before a new
+destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has been added, the destination-specific value can be changed
+using the socket option \fI\fCSCTP_RTO\fR as described under \fBSOCKET OPTIONS\fR.
 .IP
-In general, \fBsctp_rto_min\fR should not be less than the peer's
-\fBsctp_max_sack_delay\fR.  Otherwise, excessive retransmissions might occur
-while the peer is delaying acknowledgments.
+In general, \fBsctp_rto_min\fR should not be less than the peer's \fBsctp_max_sack_delay\fR.
+Otherwise, excessive retransmissions might occur while the peer is delaying acknowledgments.
 .TP
 .B sctp_rto_initial
-Defines the default time interval (in milliseconds) that will be used as an
-initial RTO (Retransmission Time Out) value when sending packets to a
-destination for the first time, or after the destination has been idle for
-some time.  Valid values are zero (0) or greater (\fCMAXINT\fR) and must be in
-the range from \fBsctp_rto_min\fR to \fBsctp_rto_max\fR.  The default value is
-the value recommended in RFC 2960 (3,000 milliseconds).  This is a default for
+Defines the default time interval (in milliseconds) that will be used as an initial RTO
+(Retransmission Time Out) value when sending packets to a destination for the first time, or
+after the destination has been idle for some time.  Valid values are zero (0) or greater
+(\fCMAXINT\fR) and must be in the range from \fBsctp_rto_min\fR to \fBsctp_rto_max\fR.  The
+default value is the value recommended in RFC 2960 (3,000 milliseconds).  This system control
+defines the default for
 new sockets.  The actual value used can be changed with the socket option
-\fI\fCSCTP_RTO_INITIAL\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2)
-or before a new destination transport address is added by the peer.  After a
-socket is connected or a destination transport address has been added, the
-destination-specific value can be changed using the socket option
-\fI\fCSCTP_RTO\fR as described under \fBSOCKET OPTIONS\fR.
+\fI\fCSCTP_RTO_INITIAL\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2) or before a new
+destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has been added, the destination-specific value can be changed
+using the socket option \fI\fCSCTP_RTO\fR as described under \fBSOCKET OPTIONS\fR.
 .IP
 In general, \fBsctp_rto_initial\fR should not be less than the peer's
-\fBsctp_max_sack_delay\fR.  Otherwise, excessive retransmissions might occur
-while the peer is delaying acknowledgments.
+\fBsctp_max_sack_delay\fR.  Otherwise, excessive retransmissions might occur while the peer is
+delaying acknowledgments.
 .TP
 .B sctp_rto_max
-Defines the default time interval (in milliseconds) that will be used as a
-maximum RTO (Retransmission Time Out) value when sending packets to a
-destination.  Valid values are zero (0) or greater (\fCMAXINT\fR) and must be
-greater than or equal to both \fBsctp_rto_min\fR and \fBsctp_rto_initial\fR.
-The default value is the value recommended in RFC 2960 (60,000 milliseconds).
-This is a default maximum for new sockets.  The actual value used can be
-changed with the socket option \fI\fCSCTP_RTO_MAX\fR before a call to
-\fBconnect\fR(2) or \fBaccept\fR(2) or before a new destination transport
-address is added by the peer.  After an socket is connected or a destination
-transport address has been added, the destination-specific value can be
-changed using the socket option \fI\fCSCTP_RTO\fR as described under \fBSOCKET
-OPTIONS\fR.
+Defines the default time interval (in milliseconds) that will be used as a maximum RTO
+(Retransmission Time Out) value when sending packets to a destination.  Valid values are zero
+(0) or greater (\fCMAXINT\fR) and must be greater than or equal to both \fBsctp_rto_min\fR and
+\fBsctp_rto_initial\fR.  The default value is the value recommended in RFC 2960 (60,000
+milliseconds).  This system control defines the default maximum for new sockets.  The actual
+value used can be changed with the socket option \fI\fCSCTP_RTO_MAX\fR before a call to
+\fBconnect\fR(2) or \fBaccept\fR(2) or before a new destination transport address is added by
+the peer.  After an socket is connected or a destination transport address has been added, the
+destination-specific value can be changed using the socket option \fI\fCSCTP_RTO\fR as
+described under \fBSOCKET OPTIONS\fR.
 .IP
 In general, \fBsctp_rto_initial\fR should not be less than the peer's
-\fBsctp_max_sack_delay\fR.  Otherwise, excessive retransmissions might occur
-while the peer is delaying acknowledgments.
+\fBsctp_max_sack_delay\fR.  Otherwise, excessive retransmissions might occur while the peer is
+delaying acknowledgments.
 .TP
 .B sctp_path_max_retrans
-Defines the default number of times that \fBSCTP\fR will attempt
-retransmitting a packet on to a given destination transport address before it
-considers that destination transport address inactive.  Valid values are zero
-(0) or greater (\fCMAXINT\fR).  The default value is the value recommended in
-RFC 2960 (5 retries).  This is a default maximum for new sockets.  The actual
-value used can be changed with the socket option
-\fI\fCSCTP_PATH_MAX_RETRANS\fR before a call to \fBconnect\fR(2) or
-\fBaccept\fR(2) or before a new destination transport address is added by the
-peer.  After a socket is connected or a destination transport address has ben
-added, the destination-specific value can be changed using the socket option
-\fI\fCSCTP_RTO\fR as described under \fBSOCKET OPTIONS\fR.
+Defines the default number of times that \fBSCTP\fR will attempt retransmitting a packet on to
+a given destination transport address before it considers that destination transport address
+inactive.  Valid values are zero (0) or greater (\fCMAXINT\fR).  The default value is the value
+recommended in RFC 2960 (5 retries).  This system control defines the default maximum for new
+sockets.  The actual value used can be changed with the socket option
+\fI\fCSCTP_PATH_MAX_RETRANS\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2) or before a
+new destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has ben added, the destination-specific value can be changed
+using the socket option \fI\fCSCTP_RTO\fR as described under \fBSOCKET OPTIONS\fR.
 .IP
-Adjusting this value has an effect on the period of time taken to fail-over
-between destinations for multi-homed connections.  Lower values (including
-zero) will yield faster fail-over response times.  Lower values, however, may
-cause thrashing between destinations contributing to congestion in the
-network.  Default values are applicable to Internet applications.
+Adjusting this value has an effect on the period of time taken to fail-over between
+destinations for multi-homed connections.  Lower values (including zero) will yield faster
+fail-over response times.  Lower values, however, may cause thrashing between destinations
+contributing to congestion in the network.  Default values are applicable to Internet
+applications.
 .TP
 .B sctp_heartbeat_itvl
-Defines the default interval (in seconds) between successive HEARTBEAT
-messages used to probe destination transport address for RTT calculation and
-activity.  Valid values are 1 second or greater.  The default value is the
-value recommended in RFC 2960 (30 seconds).  This is a default for new
-sockets.  The actual value used can be changed with the socket option
-\fI\fCSCTP_HEARTBEAT_ITVL\fR before a call to \fBconnect\fR(2) or
-\fBaccept\fR(2) or before a new destination transport address is added by the
-peer.  After a socket is connected or a destination transport address has been
-added, the destination-specific value can be changed using the socket option
-\fI\fCSCTP_HB\fR as described under \fBSOCKET OPTIONS\fR.
+Defines the default interval (in seconds) between successive HEARTBEAT messages used to probe
+destination transport address for RTT calculation and activity.  Valid values are 1 second or
+greater.  The default value is the value recommended in RFC 2960 (30 seconds).  This system
+control defines the
+default for new sockets.  The actual value used can be changed with the socket option
+\fI\fCSCTP_HEARTBEAT_ITVL\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2) or before a
+new destination transport address is added by the peer.  After a socket is connected or a
+destination transport address has been added, the destination-specific value can be changed
+using the socket option \fI\fCSCTP_HB\fR as described under \fBSOCKET OPTIONS\fR.
 .IP
-If the kernel configuration parameter \fI\fCCONFIG_SCTP_THROTTLE_HEARTBEATS\fR
-is set, then half this value is also used for throttling heartbeats.  Then
-only two heartbeats per interval are permitted, any additional heartbeats are
-discarded.
+If the kernel configuration parameter \fI\fCCONFIG_SCTP_THROTTLE_HEARTBEATS\fR is set, then
+half this value is also used for throttling heartbeats.  Then only two heartbeats per interval
+are permitted, any additional heartbeats are discarded.
 .SH "SOCKET_OPTIONS"
-To set or get a socket option, call \fBgetsockopt\fR(2) to read or
-\fBsetsockopt\fR(2) to write the option with the socket \fIlevel\fR argument
-set to \fB\f(CBSOL_SCTP\fR.  In addition, most \fB\f(CBSOL_SOCKET\fR and
-\fB\f(CBSOL_IP\fR socket options are valid on \fBSCTP\fR sockets.  For more
-information see \fBsocket\fR(7) and \fBip\fR(7).
+To set or get a socket option, call \fBgetsockopt\fR(2) to read or \fBsetsockopt\fR(2) to write
+the option with the socket \fIlevel\fR argument set to \fB\f(CBSOL_SCTP\fR.  In addition, most
+\fB\f(CBSOL_SOCKET\fR and \fB\f(CBSOL_IP\fR socket options are valid on \fBSCTP\fR sockets.
+For more information see \fBsocket\fR(7) and \fBip\fR(7).
 .PP
-The following \fB\f(CBSOL_SOCKET\fR \fBsocket\fR(7) socket options are supported
-by \fBSCTP\fR:
+The following \fB\f(CBSOL_SOCKET\fR \fBsocket\fR(7) socket options are supported by \fBSCTP\fR:
 .TP
 .B SO_KEEPALIVE
-Set or get a flag that controls heartbeats for the entire association.  See
-\fBsocket\fR(7) for additional information.
+Set or get a flag that controls heartbeats for the entire association.  See \fBsocket\fR(7) for
+additional information.
 .IP
-Normally \fBSCTP\fR is required to send HEARTBEAT chunks on a per-destination
-basis.  Clearing this flag (setting \fI\fCSO_KEEPALIVE\fR to zero) disables
-exchanging heartbeats on an association level.  Exchanging heartbeats is an
-essential part of the Stream Control Transmission Protocol (SCTP).  It is
-required for clearing retransmission counts against destinations that
-otherwise will not be cleared if no data is sent and acknowledged to that
-destination.  Disabling heartbeats is provided for in the SCTP specifications
-(RFC 2960); however, disabling heartbeats is not recommended.  This is in
-contrast to \fBtcp\fR(7) that only rarely heartbeats and for which heartbeats
-are neither an essential nor necessary part of the protocol.
+Normally \fBSCTP\fR is required to send HEARTBEAT chunks on a per-destination basis.  Clearing
+this flag (setting \fI\fCSO_KEEPALIVE\fR to zero) disables exchanging heartbeats on an
+association level.  Exchanging heartbeats is an essential part of the Stream Control
+Transmission Protocol (SCTP).  It is required for clearing retransmission counts against
+destinations that otherwise will not be cleared if no data is sent and acknowledged to that
+destination.  Disabling heartbeats is provided for in the SCTP specifications (RFC 2960);
+however, disabling heartbeats is not recommended.  This is in contrast to \fBtcp\fR(7) that
+only rarely heartbeats and for which heartbeats are neither an essential nor necessary part of
+the protocol.
 .IP
-Heartbeats can also be enabled or disabled on a destination basis using the
-\fI\fCSCTP_HB\fR socket option.  It is also possible to generate a HEARTBEAT
-under user control by sending heartbeat data with the \fI\fCMSG_PROBE\fR flag
-set using \fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2).
+Heartbeats can also be enabled or disabled on a destination basis using the \fI\fCSCTP_HB\fR
+socket option.  It is also possible to generate a HEARTBEAT under user control by sending
+heartbeat data with the \fI\fCMSG_PROBE\fR flag set using \fBsend\fR(2), \fBsendto\fR(2) or
+\fBsendmsg\fR(2).
 .TP
 .B SO_OOBINLINE
-If this option is enabled, out of order data that has been received on a
-stream will be placed between the ordered data for that stream.  Otherwise,
-out of order data is only returned on a read call when the \fI\fCMSG_OOB\fR
-flag is set when receiving.  This option is ignored for \fI\fCSOCK_RDM\fR
-sockets and only applies to \fI\fCSOCK_STREAM\fR and \fI\fCSOCK_SEQPACKET\fR
+If this option is enabled, out of order data that has been received on a stream will be placed
+between the ordered data for that stream.  Otherwise, out of order data is only returned on a
+read call when the \fI\fCMSG_OOB\fR flag is set when receiving.  This option is ignored for
+\fI\fCSOCK_RDM\fR sockets and only applies to \fI\fCSOCK_STREAM\fR and \fI\fCSOCK_SEQPACKET\fR
 sockets.  See \fBsocket\fR(7) for additional information.
 .TP
 .B SO_BINDTODEVICE
-Binds the socket to a particular device.  This is not yet supported for
-\fBSCTP\fR; however, support for it is planned for the future.  See
-\fBsocket\fR(7) for additional information.
+Binds the socket to a particular device.  This is not yet supported for \fBSCTP\fR; however,
+support for it is planned for the future.  See \fBsocket\fR(7) for additional information.
 .TP
 .B SO_REUSEADDR
-Supported by \fBSCTP\fR without modification; however, consideration is made
-for binding of multiple transport addresses.  See \fBsocket\fR(7) for
-additional information.
+Supported by \fBSCTP\fR without modification; however, consideration is made for binding of
+multiple transport addresses.  See \fBsocket\fR(7) for additional information.
 .TP
 .BR SO_RCVLOWAT ", " SO_SNDLOWAT ", " SO_RCVTIMEO ", " SO_SNDTIMEO ", " SO_DEBUG ", " SO_TYPE ", " SO_DONTROUTE ", " SO_SNDBUF ", " SO_RCVBUF ", " SO_LINGER ", " SO_PRIORITY " and " SO_ERROR
-These socket options are supported by \fBSCTP\fR without modification.  See
-\fBsocket\fR(7) for additional information.
+These socket options are supported by \fBSCTP\fR without modification.  See \fBsocket\fR(7) for
+additional information.
 .PP
-The following \fB\f(CBSOL_IP\fR \fBip\fR(7) socket options are supported
-by \fBSCTP\fR:
+The following \fB\f(CBSOL_IP\fR \fBip\fR(7) socket options are supported by \fBSCTP\fR:
 .TP
 .B IP_OPTIONS
-Set or get the IP options to be sent with every packet from this socket.
-See \fBip\fR(7) for additional information.
+Set or get the IP options to be sent with every packet from this socket.  See \fBip\fR(7) for
+additional information.
 .TP
 .B IP_PKTINFO
-Pass an \fI\fCIP_PKINFO\fR ancillary message that contains the \fBpktinfo\fR
-structure that supplies some information about the incoming or outgoing
-packet.  This only works for \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR
-sockets.  It is ignored for \fI\fCSOCK_STREAM\fR sockets.  For
-\fBsetsockopt\fR(2) and \fBgetsockopt\fR(2), the argument is a flag that tells
-the socket wither the \fI\fCIP_PKTINFO\fR message should be passed or not.
-The message itself can only be sent or retrieved as a control message with a
-packet using \fBrecvmsg\fR(2) or \fBsendmsg\fR(2).
+Pass an \fI\fCIP_PKINFO\fR ancillary message that contains the \fBpktinfo\fR structure that
+supplies some information about the incoming or outgoing packet.  This only works for
+\fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets.  It is ignored for \fI\fCSOCK_STREAM\fR
+sockets.  For \fBsetsockopt\fR(2) and \fBgetsockopt\fR(2), the argument is a flag that tells
+the socket whether the \fI\fCIP_PKTINFO\fR message should be passed or not.  The message itself
+can only be sent or retrieved as a control message with a packet using \fBrecvmsg\fR(2) or
+\fBsendmsg\fR(2).
 .IP
 .nf
-.ps -1
+.ps -2
 \fC\
 struct in_pktinfo {
         unsigned int    ipi_ifindex;    /* Interface index      */
         struct in_addr  ipi_spec_dst;   /* Local address        */
         struct in_addr  ipi_addr;       /* Header Dest Address  */
 };
-.ps +1
+.ps +2
 .fi
 .IP
 .RS
 .TP
 .I ipi_ifindex
-is the unique index of the interface the packet was received on, or the index
-of the interface upon which the packet is to be sent;
+is the unique index of the interface the packet was received on, or the index of the interface
+upon which the packet is to be sent;
 .TP
 .I ipi_spec_dst
 is the local address of the received packet or sent packet, and
@@ -951,205 +849,177 @@ is the local address of the received packet or sent packet, and
 is the destination address in the packet header.
 .RE
 .IP
-If \fI\fCIP_PKTINFO\fR is passed to \fBsendmsg\fR(2) then the outgoing packet
-will be sent over the interface specified in \fIipi_ifindex\fR with the
-destination address set to \fIipi_spec_dst\fR.
+If \fI\fCIP_PKTINFO\fR is passed to \fBsendmsg\fR(2) then the outgoing packet will be sent over
+the interface specified in \fIipi_ifindex\fR with the destination address set to
+\fIipi_spec_dst\fR.
 .IP
-This option is used to control the source (local) address of packets sent with
-\fBsendmsg\fR(2) and to retrieve the destination (local) address of packets
-received with \fBrecvmsg\fR(2).  See \fBip\fR(7) for additional information.
+This option is used to control the source (local) address of packets sent with \fBsendmsg\fR(2)
+and to retrieve the destination (local) address of packets received with \fBrecvmsg\fR(2).  See
+\fBip\fR(7) for additional information.
 .IP
-Support for \fI\fCIP_PKTINFO\fR is similar to support for this socket option
-under \fBudp\fR(7).  Under \fBudp\fR(7), \fI\fCIP_PKTINFO\fR is used for
-multi-homed UDP hosts to specify the local address to \fBsendmsg\fR(2) and
-return remote address from \fBrecvmsg\fR(2).  \fBSCTP\fR uses this in a
-similar fashion where the choice of addresses consists of the address space of
-the association.
+Support for \fI\fCIP_PKTINFO\fR is similar to support for this socket option under
+\fBudp\fR(7).  Under \fBudp\fR(7), \fI\fCIP_PKTINFO\fR is used for multi-homed UDP hosts to
+specify the local address to \fBsendmsg\fR(2) and return remote address from \fBrecvmsg\fR(2).
+\fBSCTP\fR uses this in a similar fashion where the choice of addresses consists of the address
+space of the association.
 .TP
 .B IP_RECVTOS
-Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return
-the type of service field for the received packet in an ancillary message as
-a \fI\fCIP_TOS\fR control message for sockets of type \fI\fCSOCK_SEQPACKET\fR
-and \fI\fCSOCK_RDM\fR.  This option is ignored for
-\fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional information.
+Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return the type of
+service field for the received packet in an ancillary message as a \fI\fCIP_TOS\fR control
+message for sockets of type \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR.  This option is
+ignored for \fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional information.
 .TP
 .B IP_RECVTTL
-Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return
-the time to live field for the received packet an ancillary message as a
-\fI\fCIP_TTL\fR control message for sockets of type \fI\fCSOCK_SEQPACKET\fR
-and \fI\fCSOCK_RDM\fR.  This option is ignored for
+Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return the time to live
+field for the received packet in an ancillary message as a \fI\fCIP_TTL\fR control message for
+sockets of type \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR.  This option is ignored for
 \fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional information.
 .TP
 .B IP_RECVOPTS
-Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return
-the IP options for the received packet in an ancillary message as an
-\fI\fCIP_OPTIONS\fR control message for sockets of type
-\fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR.  This option is ignored for
-\fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional
-information.
+Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return the IP options for
+the received packet in an ancillary message as an \fI\fCIP_OPTIONS\fR control message for
+sockets of type \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR.  This option is ignored for
+\fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional information.
 .TP
 .B IP_RETOPTS
-Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will
-return the IP options for the received packet in an ancillary message as an
-\fI\fCIP_RETOPTS\fR control message for sockets of type
-\fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR.  This option is ignored for
-\fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional
-information.
+Set or get the flag indicating whether the \fBrecvmsg\fR(2) call will return the IP options for
+the received packet in an ancillary message as an \fI\fCIP_RETOPTS\fR control message for
+sockets of type \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR.  This option is ignored for
+\fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional information.
 .IP
-In contrast to \fI\fCIP_OPTIONS\fR, the \fI\fCIP_RETOPTS\fR ancillary message
-contains raw, unprocessed options, with the time stamp and route record options
-not filled in for this hop.  It is also possible to pass an
-\fI\fCIP_RETOPTS\fR ancillary message to \fBsendmsg\fR(2).
+In contrast to \fI\fCIP_OPTIONS\fR, the \fI\fCIP_RETOPTS\fR ancillary message contains raw,
+unprocessed options, with the time stamp and route record options not filled in for this hop.
+It is also possible to pass an \fI\fCIP_RETOPTS\fR ancillary message to \fBsendmsg\fR(2).
 .TP
 .B IP_TOS
-Set or get the default type of service to be used in IP packets associated
-with the connection.  For \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR
-sockets, this option can also be passed to \fBsendmsg\fR(2) in the ancillary
-data and will be used as the type of service field in the IP packet containing
-the data chunk associated with the user data provided in the call to
-\fBsendmsg\fR(2).  For \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets,
-this option returns the type of service parameter associated with a packet in
-the ancillary data returned from a call to \fBrecvmsg\fR(2) when the
-\fI\fCIP_RECVTOS\fR option has been set on the socket.  This option is ignored
-for \fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for
-additional information.
-.TP
-.B IP_TTL
-Set or get the default time to live to be used in IP packets associated with
-the connection.  This option can also be passed to \fBsendmsg\fR(2) in the
-ancillary data and will be used as the time to live field in the IP packet
-containing the data chunk associated with the user data provided in the call
-to \fBsendmsg\fR(2).  See \fBip\fR(7) for additional information.
-.TP
-.B IP_MTU
-For \fBSCTP\fR sockets, this returns only the Path MTU for the association.
-This value is the minimum MTU of all the peer destinations.  See \fBSCTP\fR
-socket options for a mechanism for obtaining MTU on a per-destination basis.
-When the peer is not multi-homed, this option returns the same value as would
-be obtained on a per-destination basis.  See \fBip\fR(7) for additional
+Set or get the default type of service to be used in IP packets associated with the connection.
+For \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets, this option can also be passed to
+\fBsendmsg\fR(2) in the ancillary data and will be used as the type of service field in the IP
+packet containing the data chunk associated with the user data provided in the call to
+\fBsendmsg\fR(2).  For \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets, this option
+returns the type of service parameter associated with a packet in the ancillary data returned
+from a call to \fBrecvmsg\fR(2) when the \fI\fCIP_RECVTOS\fR option has been set on the socket.
+This option is ignored for \fI\fCSOCK_STREAM\fR sockets.  See \fBip\fR(7) for additional
 information.
 .TP
+.B IP_TTL
+Set or get the default time to live to be used in IP packets associated with the connection.
+This option can also be passed to \fBsendmsg\fR(2) in the ancillary data and will be used as
+the time to live field in the IP packet containing the data chunk associated with the user data
+provided in the call to \fBsendmsg\fR(2).  See \fBip\fR(7) for additional information.
+.TP
+.B IP_MTU
+For \fBSCTP\fR sockets, this returns only the Path MTU for the association.  This value is the
+minimum MTU of all the peer destinations.  See \fBSCTP\fR socket options for a mechanism for
+obtaining MTU on a per-destination basis.  When the peer is not multi-homed, this option
+returns the same value as would be obtained on a per-destination basis.  See \fBip\fR(7) for
+additional information.
+.TP
 .B IP_RECVERR
-For \fBSCTP\fR sockets, this enables extended reliable error messages with the
-use of \fI\fCSO_ERROR\fR as for \fBtcp\fR(7).  Error queues are not supported
-for \fBSCTP\fR (they are not supported for \fBtcp\fR(7) either).  As for
-\fBtcp\fR(7), \fBSCTP\fR does not permit calling \fBrecvmsg\fR(2) with the
-\fI\fCMSG_ERRQUEUE\fR flag for \fI\fCSOCK_SEQPACKET\fR and
-\fI\fRSOCK_STREAM\fR sockets.
+For \fBSCTP\fR sockets, this enables extended reliable error messages with the use of
+\fI\fCSO_ERROR\fR as for \fBtcp\fR(7).  Error queues are not supported for \fBSCTP\fR (they are
+not supported for \fBtcp\fR(7) either).  As for \fBtcp\fR(7), \fBSCTP\fR does not permit
+calling \fBrecvmsg\fR(2) with the \fI\fCMSG_ERRQUEUE\fR flag for \fI\fCSOCK_SEQPACKET\fR and
+\fI\fCSOCK_STREAM\fR sockets.
 .TP
 .BR IP_PMTU_DISCOVER
-Supported for \fBSCTP\fR sockets without modification.  See \fBip\fR(7) for
-additional information.
+Supported for \fBSCTP\fR sockets without modification.  See \fBip\fR(7) for additional
+information.
 .PP
-The following \fB\f(CBSOL_SCTP\fR socket options are supported: (A number of
-the following socket options may also be passed as an ancillary message with
-level \fB\f(CBSOL_SCTP\fR when calling \fBsendmsg\fR(2) or returned as a
-control message from a call to \fBrecvmsg\fR(2).)
+The following \fB\f(CBSOL_SCTP\fR socket options are supported: (A number of the following
+socket options may also be passed as an ancillary message with level \fB\f(CBSOL_SCTP\fR when
+calling \fBsendmsg\fR(2) or returned as a control message from a call to \fBrecvmsg\fR(2).)
 .TP
 .B SCTP_NODELAY
-Turn the Nagle algorithm off.  This means that packets are always sent as soon
-as possible and no unnecessary delays are introduced, at the cost of more
-packets in the network.  Expects an integer boolean flag.
+Turn the Nagle algorithm off.  This means that packets are always sent as soon as possible and
+no unnecessary delays are introduced, at the cost of more packets in the network.  Expects an
+integer boolean flag.
 .IP
-This parallels the \fI\fCTCP_NODELAY\fR socket option for compatibility with
-\fBtcp\fR(7).  \fI\fCSCTP_NODELAY\fR and \fI\fCTCP_NODELAY\fR can be used
-interchangeably.  For \fI\fCSOCK_STREAM\fR sockets, this setting applies to
-the default stream as set by the \fI\fCSCTP_SID\fR socket option.  For regular
-\fI\fCSOCK_SEQPACKET\fR sockets, this setting applies to the entire
-association.  For \fI\fCSOCK_STREAM\fR sockets, this setting
-has the same effect as \fBtcp\fR(7).  This option has no effect on
-\fI\fCSOCK_RDM\fR sockets.  See \fBtcp\fR(7) for additional information.
+This parallels the \fI\fCTCP_NODELAY\fR socket option for compatibility with \fBtcp\fR(7).
+\fI\fCSCTP_NODELAY\fR and \fI\fCTCP_NODELAY\fR can be used interchangeably.  For
+\fI\fCSOCK_STREAM\fR sockets, this setting applies to the default stream as set by the
+\fI\fCSCTP_SID\fR socket option.  For regular \fI\fCSOCK_SEQPACKET\fR sockets, this setting
+applies to the entire association.  For \fI\fCSOCK_STREAM\fR sockets, this setting has the same
+effect as \fBtcp\fR(7).  This option has no effect on \fI\fCSOCK_RDM\fR sockets.  See
+\fBtcp\fR(7) for additional information.
 .IP
-When Nagle is enabled, \fBSCTP\fR uses the Nagle algorithm (RFC 896) for
-bundling DATA chunks into a packet.  This results in far fewer short packets
-in the network.  The algorithm is that described in RFC 896 and RFC 1122 with
-the Minshall modifications to accommodate delayed SACK as described in
-draft-minshall-nagle-01.txt.  (Note: later versions of \fBtcp\fR(7) also in
+When Nagle is enabled, \fBSCTP\fR uses the Nagle algorithm (RFC 896) for bundling DATA chunks
+into a packet.  This results in far fewer short packets in the network.  The algorithm is that
+described in RFC 896 and RFC 1122 with the Minshall modifications to accommodate delayed SACK
+as described in draft-minshall-nagle-01.txt.  (Note: later versions of \fBtcp\fR(7) also in
 include the Minshall modification).
 .TP
 .B SCTP_MAXSEG
-Set or get the maximum segment size for outgoing packets.  Values greater than
-the association MTU are ignored and have no effect.
+Set or get the maximum segment size for outgoing packets.  Values greater than the association
+MTU are ignored and have no effect.
 .IP
-This parallels the \fI\fCTCP_MAXSEG\fR socket option for compatibility with
-\fBtcp\fR(7).  \fI\fCSCTP_MAXSEG\fR and \fI\fCTCP_MAXSEG\fR can be used
-interchangeably.  This option is applicable to both \fI\fCSOCK_SEQPACKET\fR
-and \fI\fCSOCK_STREAM\fR sockets.
+This parallels the \fI\fCTCP_MAXSEG\fR socket option for compatibility with \fBtcp\fR(7).
+\fI\fCSCTP_MAXSEG\fR and \fI\fCTCP_MAXSEG\fR can be used interchangeably.  This option is
+applicable to both \fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_STREAM\fR sockets.
 .IP
-This value determines the maximum size (in bytes) above which \fBSCTP\fR will
-fragment larger DATA chunks into smaller DATA chunks, and beneath which
-\fBSCTP\fR will bundle DATA chunks into a single packet or combine smaller
-DATA chunks into larger DATA chunks.  Normally this value is the association
-MTU value minus the size of the current IP and SCTP headers, minus the size of
-one DATA chunk header.  If the user sets this to a lower value, the lower
-value will be used.
+This value determines the maximum size (in bytes) above which \fBSCTP\fR will fragment larger
+DATA chunks into smaller DATA chunks, and beneath which \fBSCTP\fR will bundle DATA chunks into
+a single packet or combine smaller DATA chunks into larger DATA chunks.  Normally this value is
+the association MTU value minus the size of the current IP and SCTP headers, minus the size of
+one DATA chunk header.  If the user sets this to a lower value, the lower value will be used.
 .TP
 .B SCTP_CORK
-If enabled don't send out partial frames.  All queued partial frames are sent
-when the option is cleared again.  This is useful for prefixing headers
-before calling \fBsendfile\fR(2), or for throughput optimization.  This option
-cannot be combined with \fI\fCSCTP_NODELAY\fR.
+If enabled don't send out partial frames.  All queued partial frames are sent when the option
+is cleared again.  This is useful for prefixing headers before calling \fBsendfile\fR(2), or
+for throughput optimization.  This option cannot be combined with \fI\fCSCTP_NODELAY\fR.
 .IP
-This parallels the \fI\fCTCP_CORK\fR socket option for compatibility with
-\fBtcp\fR(7).  \fI\fCSCTP_CORK\fR and \fI\fCTCP_CORK\fR can be used
-interchangeably.  For \fI\fCSOCK_STREAM\fR sockets, this setting applies to
-the default stream as set by the \fI\fCSCTP_SIB\fR socket option.  For regular
-\fI\fCSOCK_SEQPACKET\fR sockets, this setting applies to the entire
+This parallels the \fI\fCTCP_CORK\fR socket option for compatibility with \fBtcp\fR(7).
+\fI\fCSCTP_CORK\fR and \fI\fCTCP_CORK\fR can be used interchangeably.  For \fI\fCSOCK_STREAM\fR
+sockets, this setting applies to the default stream as set by the \fI\fCSCTP_SIB\fR socket
+option.  For regular \fI\fCSOCK_SEQPACKET\fR sockets, this setting applies to the entire
 association.  This option has no effect on \fI\fCSOCK_RDM\fR sockets.
 .TP
 .B SCTP_SID
-Set or get the default stream identifier for all outgoing packets associated
-with the connection.  If \fI\fCSCTP_SID\fR is passed to \fBsendmsg\fR(2) then
-the outgoing packet will be sent over the stream specified by the integer
-stream identifier contained in the ancillary message.   If \fI\fCSCTP_SID\fR
-is received from a call to \fBrecvmsg\fR(2) then the incoming packet was
-received over the stream specified by the integer stream identifier contained
-in the ancillary message.  See also \fI\fCSCTP_RECVSID\fR.
+Set or get the default stream identifier for all outgoing packets associated with the
+connection.  If \fI\fCSCTP_SID\fR is passed to \fBsendmsg\fR(2) then the outgoing packet will
+be sent over the stream specified by the integer stream identifier contained in the ancillary
+message.   If \fI\fCSCTP_SID\fR is received from a call to \fBrecvmsg\fR(2) then the incoming
+packet was received over the stream specified by the integer stream identifier contained in the
+ancillary message.  See also \fI\fCSCTP_RECVSID\fR.
 .TP
 .B SCTP_PPI
-Set or get the default payload protocol identifier for all outgoing packets.
-If \fI\fCSCTP_PPI\fR is passed to \fBsendmsg(\fR(2) then the outgoing packet
-will be sent with the payload protocol identifier specified by the integer
-payload protocol identifier contains in the ancillary message.  If
-\fI\fCSCTP_PPI\fR is received from a call to \fBrecvmsg\fR(2) then the
-incoming packet was received with the payload protocol identifier specified in
-by the integer payload protocol identifier contained in the ancillary
-message.  See also \fI\fCSCTP_RECVPPI\fR.
+Set or get the default payload protocol identifier for all outgoing packets.  If
+\fI\fCSCTP_PPI\fR is passed to \fBsendmsg(\fR(2) then the outgoing packet will be sent with the
+payload protocol identifier specified by the integer payload protocol identifier contains in
+the ancillary message.  If \fI\fCSCTP_PPI\fR is received from a call to \fBrecvmsg\fR(2) then
+the incoming packet was received with the payload protocol identifier specified the
+integer payload protocol identifier contained in the ancillary message.  See also
+\fI\fCSCTP_RECVPPI\fR.
 .TP
 .B SCTP_RECVSID
-When this flag is set, pass a \fI\fCSCTP_SID\fR control message with the stream
-identifier for received packets as an integer in an ancillary message that may
-be received with \fBrecvmsg\fR(2).  Otherwise, no \fI\fCSCTP_SID\fR control
-message will be passed with normal data.
-\fI\fCSCTP_SID\fR is always passed for retrieved or negatively acknowledged data.
+When this flag is set, pass a \fI\fCSCTP_SID\fR control message with the stream identifier for
+received packets as an integer in an ancillary message that may be received with
+\fBrecvmsg\fR(2).  Otherwise, no \fI\fCSCTP_SID\fR control message will be passed with normal
+data.  \fI\fCSCTP_SID\fR is always passed for retrieved or negatively acknowledged data.
 .TP
 .B SCTP_RECVPPI
-When this flag is set, pass a \fI\fCSCTP_PPI\fR control message with the
-payload protocol identifier for received packets as an integer in an ancillary
-message that may be received with \fBrecvmsg\fR(2).  Otherwise, no
-\fI\fCSCTP_PPI\fR control message will be passed with normal data.
-\fI\fCSCTP_PPI\fR is always passed for retrieved or negatively acknowledged data.
+When this flag is set, pass a \fI\fCSCTP_PPI\fR control message with the payload protocol
+identifier for received packets as an integer in an ancillary message that may be received with
+\fBrecvmsg\fR(2).  Otherwise, no \fI\fCSCTP_PPI\fR control message will be passed with normal
+data.  \fI\fCSCTP_PPI\fR is always passed for retrieved or negatively acknowledged data.
 .TP
 .B SCTP_HEARTBEAT_ITVL
-Set or get the time interval (in seconds) between successive HEARTBEAT messages
-used to probe destination transport addresses for RTT calculation and activity.
-Valid values are zero (0) \- do not heartbeat, or a value of 1 second or
-greater.  The default value is set by the system control \fBsctp_heartbeat_itvl\fR.
-This is the default value that will be assigned to new destinations.  Active
-destinations can be controlled with the socket option \fI\fCSCTP_HB\fR.  This
-socket option must be set before the call to \fBconnect\fR(2) or
-\fBlisten\fR(2), or before a passive connection indication is received on a
-listening socket.
+Set or get the time interval (in seconds) between successive HEARTBEAT messages used to probe
+destination transport addresses for RTT calculation and activity.  Valid values are zero (0) \-
+do not heartbeat, or a value of 1 second or greater.  The default value is set by the system
+control \fBsctp_heartbeat_itvl\fR.  This is the default value that will be assigned to new
+destinations.  Active destinations can be controlled with the socket option \fI\fCSCTP_HB\fR.
+This socket option must be set before the call to \fBconnect\fR(2) or \fBlisten\fR(2), or
+before a passive connection indication is received on a listening socket.
 .TP
 .B SCTP_HB
-Set or get the heartbeat activation and interval associated with the specified
-destination address. The expected value is a \fBsctp_hbitvl\fR structure.
-This option will return an error if it is attempted on a socket in the
-unconnected state.
+Set or get the heartbeat activation and interval associated with the specified destination
+address. The expected value is a \fBsctp_hbitvl\fR structure.  This option will return an error
+if it is attempted on a socket in the unconnected state.
 .IP
 .RS
 .nf
-.ps -1
+.ps -2
 \fC\
     struct sctp_hbitvl {
         struct sockaddr_in
@@ -1157,7 +1027,7 @@ unconnected state.
         uint  active; /* activation flag          */
         uint  itvl;   /* interval in milliseconds */
     };
-.ps +1
+.ps +2
 .fi
 .PP
 The \fBsctp_hbitvl\fR structure has the following fields:
@@ -1174,61 +1044,54 @@ on the destination.
 is the integer heartbeat interval in milliseconds.
 .RE
 .IP
-For use with \fBsetsockopt\fR(2), \fIdest\fR must be one of the valid
-destination addresses associated with the connection: that is, it must be one
-of the addresses returned from a call to \fBgetpeername\fR(2).  Note that
-heartbeat activity and interval can also be set on an association basis with
-\fI\fCSO_KEEPALIVE\fR and \fI\fCSCTP_HEARTBEAT_ITVL\fR.
+For use with \fBsetsockopt\fR(2), \fIdest\fR must be one of the valid destination addresses
+associated with the connection: that is, it must be one of the addresses returned from a call
+to \fBgetpeername\fR(2).  Note that heartbeat activity and interval can also be set on an
+association basis with \fI\fCSO_KEEPALIVE\fR and \fI\fCSCTP_HEARTBEAT_ITVL\fR.
 .TP
 .B SCTP_RTO_INITIAL
-Set or get the time interval (in milliseconds) that will be used as an
-initial RTO (Retransmission Time Out) value when sending packets to a
-destination for the first time.  Value values are zero or greater and must be
-within the range from \fI\fCSCTP_RTO_MIN\fR to \fI\fCSCTP_RTO_MAX\fR.  The
-default value is the value set by \fBsctp_rto_initial\fR.  This socket option
-must be set before the call to \fBconnect\fR(2) or \fBlisten\fR(2), or before
-a passive connection attempt, but the value may be controlled on active
-destination with the \fI\fCSCTP_RTO\fR socket option.
+Set or get the time interval (in milliseconds) that will be used as an initial RTO
+(Retransmission Time Out) value when sending packets to a destination for the first time.
+Valid values are zero or greater and must be within the range from \fI\fCSCTP_RTO_MIN\fR to
+\fI\fCSCTP_RTO_MAX\fR.  The default value is the value set by \fBsctp_rto_initial\fR.  This
+socket option must be set before the call to \fBconnect\fR(2) or \fBlisten\fR(2), or before a
+passive connection attempt, but the value may be controlled on active destination with the
+\fI\fCSCTP_RTO\fR socket option.
 .TP
 .B SCTP_RTO_MIN
-Set or get the time interval (in milliseconds) that will be used as a
-minimum RTO (Retransmission Time Out) value when sending packets.  Valid
-values are zero or greater and must be less than or equal to the value of
-\fI\fCSCTP_RTO_MAX\fR.  The default value is set by the system control
-\fBsctp_rto_min\fR.  This socket option must be set before the call to
-\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt,
-but the value associated with active destinations can be controlled using the
-\fI\fCSCTP_RTO\fR socket option.
-.TP
-.B SCTP_RTO_MAX
-Set or get the time interval (in milliseconds) that will be used as a
-maximum RTO (Retransmission Time Out) value when sending packets.  Valid
-values are zero or greater and must be greater than or equal to the value of
-\fI\fCSCTP_RTO_MIN\fR.  The default value is set by the system control
-\fBsctp_rto_max\fR.  This socket option must be set before the call to
-\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt,
-but the value associated with active destinations can be controlled using the
-\fI\fCSCTP_RTO\fR socket option.
-.TP
-.B SCTP_PATH_MAX_RETRANS
-Set or get the number of times that the sending endpoint will attempt
-retransmitting a packet to a given destination transport address before it
-considers that destination transport address inactive.  Valid values include
-zero.  The default values is set by the system control \fBsctp_path_max_retrans\fR.
-This is the default value assigned to destinations before the call to
-\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt.
-Active destinations can be controlled with the \fI\fCSCTP_RTO\fR socket
+Set or get the time interval (in milliseconds) that will be used as a minimum RTO
+(Retransmission Time Out) value when sending packets.  Valid values are zero or greater and
+must be less than or equal to the value of \fI\fCSCTP_RTO_MAX\fR.  The default value is set by
+the system control \fBsctp_rto_min\fR.  This socket option must be set before the call to
+\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt, but the value
+associated with active destinations can be controlled using the \fI\fCSCTP_RTO\fR socket
 option.
 .TP
+.B SCTP_RTO_MAX
+Set or get the time interval (in milliseconds) that will be used as a maximum RTO
+(Retransmission Time Out) value when sending packets.  Valid values are zero or greater and
+must be greater than or equal to the value of \fI\fCSCTP_RTO_MIN\fR.  The default value is set
+by the system control \fBsctp_rto_max\fR.  This socket option must be set before the call to
+\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt, but the value
+associated with active destinations can be controlled using the \fI\fCSCTP_RTO\fR socket
+option.
+.TP
+.B SCTP_PATH_MAX_RETRANS
+Set or get the number of times that the sending endpoint will attempt retransmitting a packet
+to a given destination transport address before it considers that destination transport address
+inactive.  Valid values include zero.  The default values is set by the system control
+\fBsctp_path_max_retrans\fR.  This is the default value assigned to destinations before the
+call to \fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt.  Active
+destinations can be controlled with the \fI\fCSCTP_RTO\fR socket option.
+.TP
 .B SCTP_RTO
-Set or get the retransmission timeout parameters associated with the specified
-destination address.  The expected value is a \fBsctp_rtoval\fR structure.
-This option will return an error if it is attempted on a socket in the
-unconnected state.
+Set or get the retransmission timeout parameters associated with the specified destination
+address.  The expected value is a \fBsctp_rtoval\fR structure.  This option will return an
+error if it is attempted on a socket in the unconnected state.
 .IP
 .RS
 .nf
-.ps -1
+.ps -2
 \fC\
     struct sctp_rtoval {
         struct sockaddr_in
@@ -1238,371 +1101,326 @@ unconnected state.
         uint  rto_max;     /* RTO.Max     (milliseconds) */
         uint  max_retrans; /* Path.Max.Retrans (retries) */
     };
-.ps +1
+.ps +2
 .fi
 .PP
 The \fBsctp_rtoval\fR structure has the following fields:
 .TP
 .I dest
-is a \fBsockaddr_in\fR structure that contains the destination address to
-which the rto parameter setting applies.
+is a \fBsockaddr_in\fR structure that contains the destination address to which the rto
+parameter setting applies.
 .TP
 .I rto_initial
-is the integer initial retransmission timeout value in milliseconds.  For
-expected values see \fI\fCSCTP_RTO_INITIAL\fR.
+is the integer initial retransmission timeout value in milliseconds.  For expected values see
+\fI\fCSCTP_RTO_INITIAL\fR.
 .TP
 .I to_min
-is the integer minimum retransmission timeout value in milliseconds.  For
-expected values see \fI\fCSCTP_RTO_MIN\fR.
+is the integer minimum retransmission timeout value in milliseconds.  For expected values see
+\fI\fCSCTP_RTO_MIN\fR.
 .TP
 .I to_max
-is the integer maximum retransmission timeout value in milliseconds.  For
-expected values see \fI\fCSCTP_RTO_MAX\fR.
+is the integer maximum retransmission timeout value in milliseconds.  For expected values see
+\fI\fCSCTP_RTO_MAX\fR.
 .TP
 .I ax_retrans
 is the integer maximum number of retransmissions.  For expected values see
 \fI\fCSCTP_PATH_MAX_RETRANS\fR.
 .RE
 .IP
-For use with \fBsetsockopt\fR(2), \fIdest\fR must be one of the valid
-destination addresses associated with the connection: that is, it must be one
-of the addresses returned from a call to \fBgetpeername\fR(2).
+For use with \fBsetsockopt\fR(2), \fIdest\fR must be one of the valid destination addresses
+associated with the connection: that is, it must be one of the addresses returned from a call
+to \fBgetpeername\fR(2).
 .TP
 .B SCTP_CKSUM_TYPE
 Set or get the checksum algorithm associated with socket.  Valid values are
-\fI\fCSCTP_CSUM_ADLER_32\fR and \fI\fCSCTP_CSUM_CRC_32C\fR.  The default value
-is set by the system control \fBsctp_csum_algorithm\fR.  This socket option must be
-set before the call to \fBconnect\fR(2) or \fBlisten\fR(2), or before a
-passive connection attempt on a listening socket.
+\fI\fCSCTP_CSUM_ADLER_32\fR and \fI\fCSCTP_CSUM_CRC_32C\fR.  The default value is set by the
+system control \fBsctp_csum_algorithm\fR.  This socket option must be set before the call to
+\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt on a listening
+socket.
 .TP
 .B SCTP_MAC_TYPE
-Set or get the MAC (Message Authentication Code) type that will be used when
-signing cookies in INIT ACK messages.  Valid values are
-\fI\fCSCTP_HMAC_SHA_1\fR, \fI\fCSCTP_HMAC_MD5\fR, and \fI\fCSCTP_HMAC_NONE\fR.
-The default value is set by the system control \fBsctp_mac_type\fR.  This socket
-option must be set before the call to \fBlisten\fR(2), or before a passive
+Set or get the MAC (Message Authentication Code) type that will be used when signing cookies in
+INIT ACK messages.  Valid values are \fI\fCSCTP_HMAC_SHA_1\fR, \fI\fCSCTP_HMAC_MD5\fR, and
+\fI\fCSCTP_HMAC_NONE\fR.  The default value is set by the system control \fBsctp_mac_type\fR.
+This socket option must be set before the call to \fBlisten\fR(2), or before a passive
 connection attempt on a listening socket.
 .TP
 .B SCTP_COOKIE_LIFE
-Set or get the cookie lifetime associated with a socket.  This is the amount
-of time that cookies sent to a peer endpoint in an INIT-ACK message will be
-valid.  For \fBSCTP\fR this also limits the maximum for which the HMAC secret
-key for the cookie will be valid.  The value is a integer time interval in
-milliseconds.  Valid values are zero (0) or greater (\fCMAXINT\fR).  The
-default value is set by the system control \fBsctp_cookie_life\fR.  This socket option
-must be set before the call to \fBlisten\fR(2), or before receiving a passive
-connection attempt.  When changing this value, the new value will apply to all
-passive connection attempts (INIT messages) received on a listening socket
-after the change is made.
+Set or get the cookie lifetime associated with a socket.  This is the amount of time that
+cookies sent to a peer endpoint in an INIT-ACK message will be valid.  For \fBSCTP\fR this also
+limits the maximum for which the HMAC secret key for the cookie will be valid.  The value is a
+integer time interval in milliseconds.  Valid values are zero (0) or greater (\fCMAXINT\fR).
+The default value is set by the system control \fBsctp_cookie_life\fR.  This socket option must
+be set before the call to \fBlisten\fR(2), or before receiving a passive connection attempt.
+When changing this value, the new value will apply to all passive connection attempts (INIT
+messages) received on a listening socket after the change is made.
 .IP
-Reducing this value will increase the chances that passive connection attempts
-will fail due to expired cookies.  Increasing the value will reduce the
-overall security of the system by permitting attackers and increased interval
-to crack HMACs and guess verification tags.  This value may be adjusted in
-conjunction with \fI\fCSCTP_COOKIE_INC\fR to meet most objectives for
-successful passive connection attempts with the best security afforded by
-smaller values of \fI\fCSCTP_COOKIE_LIFE\fR.
+Reducing this value will increase the chances that passive connection attempts will fail due to
+expired cookies.  Increasing the value will reduce the overall security of the system by
+permitting attackers and increased interval to crack HMACs and guess verification tags.  This
+value may be adjusted in conjunction with \fI\fCSCTP_COOKIE_INC\fR to meet most objectives for
+successful passive connection attempts with the best security afforded by smaller values of
+\fI\fCSCTP_COOKIE_LIFE\fR.
 .IP
-Unfortunately the \fI\fCSCTP_COOKIE_LIFE\fR and \fI\fCSCTP_COOKIE_INC\fR must
-be adjusted to accommodate the slowest peer on the slowest connection.  The
-default setting is adequate for Internet applications.
+Unfortunately the \fI\fCSCTP_COOKIE_LIFE\fR and \fI\fCSCTP_COOKIE_INC\fR must be adjusted to
+accommodate the slowest peer on the slowest connection.  The default setting is adequate for
+Internet applications.
 .TP
 .B SCTP_COOKIE_INC
-Set or get the time increment (in milliseconds) that will be added to the
-lifespan of the cookie in an INIT ACK if the sender of the INIT requested
-cookie preservation to lengthen the lifespan of the cookie.  Valid values
-include zero.  The default value is set by the system control
-\fBsctp_cookie_inc\fR.  This socket option must be set before the call to
-\fBlisten\fR(2), or before a passive connection attempt on the listening
-socket, but can be read at any time.
+Set or get the time increment (in milliseconds) that will be added to the lifespan of the
+cookie in an INIT ACK if the sender of the INIT requested cookie preservation to lengthen the
+lifespan of the cookie.  Valid values include zero.  The default value is set by the system
+control \fBsctp_cookie_inc\fR.  This socket option must be set before the call to
+\fBlisten\fR(2), or before a passive connection attempt on the listening socket, but can be
+read at any time.
 .TP
 .B SCTP_THROTTLE_ITVL
-Set or get the interval (in milliseconds) within which the receiver will not
-accept more than one INIT or COOKIE ECHO.  Zero (don't throttle) is a valid
-value.  The default is set by the system control \fBsctp_throttle_itvl\fR.  This
-socket option must be set before the call to \fBlisten\fR(2), or before a
-passive connection attempt on the listening socket.
+Set or get the interval (in milliseconds) within which the receiver will not accept more than
+one INIT or COOKIE ECHO.  Zero (don't throttle) is a valid value.  The default is set by the
+system control \fBsctp_throttle_itvl\fR.  This socket option must be set before the call to
+\fBlisten\fR(2), or before a passive connection attempt on the listening socket.
 .TP
 .B SCTP_ISTREAMS
-Set the maximum number of inbound streams or get the actual number of inbound
-streams associated with a connection.  Valid values are from 1 to 16,736.  The
-default value is set by the system control \fBsctp_max_istreams\fR.  This
-socket option must be set before the call to \fBconnect\fR(2) or
-\fBlisten\fR(2), or before a passive connection attempt, but can be read at
-any time.  For \fBtcp\fR(7)-compatible \fI\fCSOCK_STREAM\fR sockets, the
-number of inbound streams is fixed at one (1) and this socket option has no
-effect.
+Set the maximum number of inbound streams or get the actual number of inbound streams
+associated with a connection.  Valid values are from 1 to 16,736.  The default value is set by
+the system control \fBsctp_max_istreams\fR.  This socket option must be set before the call to
+\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt, but can be read at
+any time.  For \fBtcp\fR(7)-compatible \fI\fCSOCK_STREAM\fR sockets, the number of inbound
+streams is fixed at one (1) and this socket option has no effect.
 .TP
 .B SCTP_OSTREAMS
-Set the number of requested outbound streams or get the actual number of
-outbound streams associated with a connection.  Valid values are from 1 to
-16,736.  The default value is set by the system control \fBsctp_req_ostreams\fR.  This
-socket option must be set before the call to \fBconnect\fR(2) or
-\fBlisten\fR(2), or before a passive connection attempt on a listening socket,
-but can be read at any time.  For \fBtcp\fR(7)-compatible \fI\fCSOCK_STREAM\fR
-sockets, the number of outbound streams is fixed at one
-(1) and this socket option has no effect.
+Set the number of requested outbound streams or get the actual number of outbound streams
+associated with a connection.  Valid values are from 1 to 16,736.  The default value is set by
+the system control \fBsctp_req_ostreams\fR.  This socket option must be set before the call to
+\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt on a listening
+socket, but can be read at any time.  For \fBtcp\fR(7)-compatible \fI\fCSOCK_STREAM\fR sockets,
+the number of outbound streams is fixed at one (1) and this socket option has no effect.
 .TP
 .B SCTP_ECN
-When set to zero (0), disables the local transport Explicit Congestion
-Notification (ECN) capability, or get the transport ECN capability of the
-peer on a connected socket.
+When set to zero (0), disables the local transport Explicit Congestion Notification (ECN)
+capability, or get the transport ECN capability of the peer on a connected socket.
 .IP
-This socket option supports the ECN capability of RFC 3168 and Appendix A of
-RFC 2960 and is only available if \fBSCTP\fR was compiled with the kernel
-configuration parameters \fI\fCCONFIG_INET_ECN\fR and \fI\fCCONFIG_SCTP_ECN\fR
-set.
+This socket option supports the ECN capability of RFC 3168 and Appendix A of RFC 2960 and is
+only available if \fBSCTP\fR was compiled with the kernel configuration parameters
+\fI\fCCONFIG_INET_ECN\fR and \fI\fCCONFIG_SCTP_ECN\fR set.
 .TP
 .B SCTP_ALI
-Set the adaptation layer information to be used in the INIT or INIT-ACK
-on all passive or active connection attempts on the socket, or
-get the adaptation layer information provided by the peer on a connected
-socket.
+Set the adaptation layer information to be used in the INIT or INIT-ACK on all passive or
+active connection attempts on the socket, or get the adaptation layer information provided by
+the peer on a connected socket.
 .IP
-When set to zero (0), no adaptation layer information will be included in the
-INIT or INIT-ACK; when non-zero, it contains the flag bits that will be sent
-in the adaptation layer information in the INIT or INIT-ACK when set before the
-call to \fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection
-information is received on a listening socket.
+When set to zero (0), no adaptation layer information will be included in the INIT or INIT-ACK;
+when non-zero, it contains the flag bits that will be sent in the adaptation layer information
+in the INIT or INIT-ACK when set before the call to \fBconnect\fR(2) or \fBlisten\fR(2), or
+before a passive connection information is received on a listening socket.
 .IP
-If the socket is in a disconnected state (and has never been connected),
-getting this option returns zero (0).  If the socket has been in a connected
-state, getting this option returns zero (0) if no adaptation layer information
-was present during connection, or returns the adaptation layer information bits
-if provided by the peer.
+If the socket is in a disconnected state (and has never been connected), getting this option
+returns zero (0).  If the socket has been in a connected state, getting this option returns
+zero (0) if no adaptation layer information was present during connection, or returns the
+adaptation layer information bits if provided by the peer.
 .IP
-This socket option supports the adaptation layer information feature described
-in draft-ietf-tsvwg-addip-sctp-05.txt and is only supported if \fBSCTP\fR was
-compiled with kernel configuration parameter
-\fI\fCCONFIG_SCTP_ADAPTATION_LAYER_INFO\fR set.
+This socket option supports the adaptation layer information feature described in
+draft-ietf-tsvwg-addip-sctp-05.txt and is only supported if \fBSCTP\fR was compiled with kernel
+configuration parameter \fI\fCCONFIG_SCTP_ADAPTATION_LAYER_INFO\fR set.
 .TP
 .B SCTP_PR
-Set whether Partial Reliability (draft-stewart-tsvwg-prsctp-00.txt> will be
-supported or required on connection establishment, or get the indication of
-support for \fBPR-SCTP\fR provided by the peer on a connected socket.
-Valid values are as follows:
+Set whether Partial Reliability (draft-stewart-tsvwg-prsctp-00.txt> will be supported or
+required on connection establishment, or get the indication of support for \fBPR-SCTP\fR
+provided by the peer on a connected socket.  Valid values are as follows:
 .RS
 .TP
 .I \f(CBSCTP_PR_NONE
-Do not place or respond with Forward TSN parameter in an INIT or INIT-ACK
-indicating that this socket does not support \fBPR-SCTP\fR.
+Do not place or respond with Forward TSN parameter in an INIT or INIT-ACK indicating that this
+socket does not support \fBPR-SCTP\fR.
 .TP
 .I \f(CBSCTP_PR_PREFERRED
-Place and respond with a Forward TSN parameter in an INIT or INIT-ACK
-indicating to the peer that we support \fBPR-SCTP\fR for this connection, but
-do not require the peer to support \fBPR-SCTP\fR.
+Place and respond with a Forward TSN parameter in an INIT or INIT-ACK indicating to the peer
+that we support \fBPR-SCTP\fR for this connection, but do not require the peer to support
+\fBPR-SCTP\fR.
 .TP
 .I \f(CBSCTP_PR_REQUIRED
-Place and respond with a Forward TSN parameter in an INIT or INIT-ACK
-indicating to the peer that we support \fBPR-SCTP\fR and require the peer to
-do the same.
+Place and respond with a Forward TSN parameter in an INIT or INIT-ACK indicating to the peer
+that we support \fBPR-SCTP\fR and require the peer to do the same.
 .RE
 .IP
 The default setting is provided by the \fBsctp_pr\fR system control.
 .IP
-For a connected socket, when this flag is true, it indicates that the peer
-supports \fBPR-SCTP\fR.  When this flag is false, it indicates that the peer
-does not support \fBPR-SCTP\fR.
+For a connected socket, when this flag is true, it indicates that the peer supports
+\fBPR-SCTP\fR.  When this flag is false, it indicates that the peer does not support
+\fBPR-SCTP\fR.
 .IP
 This socket options supports the partial reliability feature
-<draft-stewart-tsvwg-prsctp-00.txt> and is only available if \fBSCTP\fR was
-compiled with the kernel configuration parameter
-\fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR set.
+<draft-stewart-tsvwg-prsctp-00.txt> and is only available if \fBSCTP\fR was compiled with the
+kernel configuration parameter \fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR set.
 .TP
 .B SCTP_MAX_INIT_RETRIES
-Set or get the number of times that an INIT or COOKIE ECHO will be resent
-before abandoning the association initialization.  Valid values include zero.
-The default value is set by the system control \fBsctp_max_init_retries\fR.  This
-socket option must be set before the call to \fBconnect\fR(2) or
-\fBlisten\fR(2), or before a passive connection attempt on a listening socket.
+Set or get the number of times that an INIT or COOKIE ECHO will be resent before abandoning the
+association initialization.  Valid values include zero.  The default value is set by the system
+control \fBsctp_max_init_retries\fR.  This socket option must be set before the call to
+\fBconnect\fR(2) or \fBlisten\fR(2), or before a passive connection attempt on a listening
+socket.
 .TP
 .B SCTP_MAX_BURST
-Set or get the number of MTUs of data that will be sent in a single burst as
-defined by draft-ietf-tsvwg-sctpimpguide-05.txt.  Valid values are one (1) or
-greater.  The default value is set by the system control \fBsctp_max_burst\fR.
-This socket option may be changed at any time during the life of the socket.
+Set or get the number of MTUs of data that will be sent in a single burst as defined by
+draft-ietf-tsvwg-sctpimpguide-05.txt.  Valid values are one (1) or greater.  The default value
+is set by the system control \fBsctp_max_burst\fR.  This socket option may be changed at any
+time during the life of the socket.
 .TP
 .B SCTP_ASSOC_MAX_RETRANS
-Set or get the number of times that the sending endpoint will attempt
-retransmitting a packet on a given association before it aborts the
-association.  Valid values include zero.  The default value is set by the
-system control \fBsctp_assoc_max_retrans\fR.  This value should be larger than the
-sum of all the \fI\fCSCTP_PATH_MAX_RETRANS\fR values of each of the
-destinations.
-This socket option may be changed at any time during the life of the socket.
+Set or get the number of times that the sending endpoint will attempt retransmitting a packet
+on a given association before it aborts the association.  Valid values include zero.  The
+default value is set by the system control \fBsctp_assoc_max_retrans\fR.  This value should be
+larger than the sum of all the \fI\fCSCTP_PATH_MAX_RETRANS\fR values of each of the
+destinations.  This socket option may be changed at any time during the life of the socket.
 .TP
 .B SCTP_SACK_DELAY
-Set or get the maximum SACK delay as the interval of time (in milliseconds)
-that the sending endpoint will delay an acknowledgment of a received data
-chunk.  Valid values are in the range from 0 to \fCMAXINT\fR, however, the
-value of the maximum SACK delay should not exceed 500 milliseconds (setting
-this value to greater than 500 milliseconds is forbidden by RFC 2960) for
-Internet Applications.  The default value is set by the system control
-\fBsctp_sack_delay\fR.
+Set or get the maximum SACK delay as the interval of time (in milliseconds) that the sending
+endpoint will delay an acknowledgment of a received data chunk.  Valid values are in the range
+from 0 to \fCMAXINT\fR, however, the value of the maximum SACK delay should not exceed 500
+milliseconds (setting this value to greater than 500 milliseconds is forbidden by RFC 2960) for
+Internet Applications.  The default value is set by the system control \fBsctp_sack_delay\fR.
 This socket option may be changed at any time during the life of the socket.
 .TP
 .B SCTP_DISPOSITION
-Gets or sets a flag that determines whether \fBSCTP\fR will retain and deliver
-messages that we not successfully acknowledged by the peer for retrieval, or
-will deliver confirmation of acknowledgment for messages successfully
-acknowledged by the peer.  If \fI\fCSCTP_DISPOSITION\fR is return in a control
-message from a call to \fBrecvmsg\fR(2) with the \fI\fCMSG_CONFIRM\fR flag
-set, then the read packet represents a packet that was held for retrieval,
-exceeded its life-time, was dropped by \fBPR-SCTP\fR or had message
-confirmation set and was successfully acknowledged.  In addition, if the
-message was successfully acknowledged, the \fI\fCMSG_CONFIRM\fR flag will be
-returned in a call to \fBrecv\fR(2), \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2).
-Valid values are:
+Gets or sets a flag that determines whether \fBSCTP\fR will retain and deliver messages that
+were not successfully acknowledged by the peer for retrieval, or will deliver confirmation of
+acknowledgment for messages successfully acknowledged by the peer.  If
+\fI\fCSCTP_DISPOSITION\fR is return in a control message from a call to \fBrecvmsg\fR(2) with
+the \fI\fCMSG_CONFIRM\fR flag set, then the read packet represents a packet that was held for
+retrieval, exceeded its life-time, was dropped by \fBPR-SCTP\fR or had message confirmation set
+and was successfully acknowledged.  In addition, if the message was successfully acknowledged,
+the \fI\fCMSG_CONFIRM\fR flag will be returned in a call to \fBrecv\fR(2), \fBrecvfrom\fR(2) or
+\fBrecvmsg\fR(2).  Valid values are:
 .RS
 .TP
 .I \f(CBSCTP_DISPOSITION_NONE
-When this option is set to \fI\fCSCTP_DISPOSITION_NONE\fR, messages will not be
-retained for retrieval and acknowledgments will not be provided for messages
-unless overridden with the \fI\fCMSG_CONFIRM\fR flag to \fBsend\fR(2),
-\fBsendto\fR(2) or \fBsendmsg\fR(2).
+When this option is set to \fI\fCSCTP_DISPOSITION_NONE\fR, messages will not be retained for
+retrieval and acknowledgments will not be provided for messages unless overridden with the
+\fI\fCMSG_CONFIRM\fR flag to \fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2).
 .TP
 .I \f(CBSCTP_DISPOSITION_UNSENT
-When set to \fI\fCSCTP_DISPOSITION_UNSENT\fR, \fBSCTP\fR will retain and
-provide for retrieval only messages that were unsent.  When set to
-\fI\fCSCTP_DISPOSITION_UNSENT\fR in an ancillary message returned by
-\fBrecvmsg\fR(2) called with the \fI\fCMSG_CONFIRM\fR flag set, the read data
-represents a packet that was unsent at the time that the connection shut down
-or aborted.  When \fI\fCSCTP_PR\fR is enabled on the connection, unsent data
-that was dropped by \fBPR-SCTP\fR will be delivered before shut down or abort.
+When set to \fI\fCSCTP_DISPOSITION_UNSENT\fR, \fBSCTP\fR will retain and provide for retrieval
+only messages that were unsent.  When set to \fI\fCSCTP_DISPOSITION_UNSENT\fR in an ancillary
+message returned by \fBrecvmsg\fR(2) called with the \fI\fCMSG_CONFIRM\fR flag set, the read
+data represents a packet that was unsent at the time that the connection shut down or aborted.
+When \fI\fCSCTP_PR\fR is enabled on the connection, unsent data that was dropped by
+\fBPR-SCTP\fR will be delivered before shut down or abort.
 .TP
 .I \f(CBSCTP_DISPOSITION_SENT
-When set to \fI\fCSCTP_DISPOSITION_SENT\fR, \fBSCTP\fR will retain and provide
-for retrieval all messages that were sent and unacknowledged, or that were
-unsent at the time that the connection shut down or aborted.  When set to
-\fI\fCSCTP_DISPOSITION_SENT\fR in an ancillary message returned by
-\fBrecvmsg\fR(2) called with the \fI\fCMSG_CONFIRM\fR flag set, then the read
-data was a packet that was sent but not acknowledged (with a cumulative ack)
-before the connection was shut down or aborted.  When \fI\fCSCTP_PR\fR is
-enabled on the connection, sent data that was dropped by \fBPR-SCTP\fR will be
-delivered before shut down or abort.
+When set to \fI\fCSCTP_DISPOSITION_SENT\fR, \fBSCTP\fR will retain and provide for retrieval
+all messages that were sent and unacknowledged, or that were unsent at the time that the
+connection shut down or aborted.  When set to \fI\fCSCTP_DISPOSITION_SENT\fR in an ancillary
+message returned by \fBrecvmsg\fR(2) called with the \fI\fCMSG_CONFIRM\fR flag set, then the
+read data was a packet that was sent but not acknowledged (with a cumulative ack) before the
+connection was shut down or aborted.  When \fI\fCSCTP_PR\fR is enabled on the connection, sent
+data that was dropped by \fBPR-SCTP\fR will be delivered before shut down or abort.
 .TP
 .I \f(CBSCTP_DISPOSITION_GAP_ACKED
-When set to \fI\fCSCTP_DISPOSITION_GAP_ACKED\fR, \fBSCTP\fR will retain and
-provide for retrieval all messages that were sent and gap acknowledged, sent
-and unacknowledged, or unsent at the time that the connection shut down or
-aborted.  When set to \fI\fCSCTP_DISPOSITION_GAP_ACKED\fR in an ancillary
-message returned by \fBrecvmsg\fR(2) called with the \fI\fCMSG_CONFIRM\fR flag
-set, then the read data was a packet that was sent but not acknowledged (with
-a cumulative ack) before the connection was shut down or aborted.  When
-\fI\fCSCTP_PR\fR is enabled on the connection, gap acknowledged data that was dropped
-by \fBPR-SCTP\fR will be delivered before shut down or abort.
+When set to \fI\fCSCTP_DISPOSITION_GAP_ACKED\fR, \fBSCTP\fR will retain and provide for
+retrieval all messages that were sent and gap acknowledged, sent and unacknowledged, or unsent
+at the time that the connection shut down or aborted.  When set to
+\fI\fCSCTP_DISPOSITION_GAP_ACKED\fR in an ancillary message returned by \fBrecvmsg\fR(2) called
+with the \fI\fCMSG_CONFIRM\fR flag set, then the read data was a packet that was sent but not
+acknowledged (with a cumulative ack) before the connection was shut down or aborted.  When
+\fI\fCSCTP_PR\fR is enabled on the connection, gap acknowledged data that was dropped by
+\fBPR-SCTP\fR will be delivered before shut down or abort.
 .TP
 .I \f(CBSCTP_DISPOSITION_ACKED
-When set to \fI\fCSCTP_DISPOSITION_ACKED\fR, \fBSCTP\fR will retain and
-provide for retrieval acknowledgments for all messages that were confirmed
-delivered (by cumulative ack).  When set to \fI\fCSCTP_DISPOSITION_ACKED\fR
-in the ancillary message return by \fBrecvmsg\fR(2) called with the
-\fI\fCMSG_CONFIRM\fR flag set, then the read data was a packet that was sent
-and acknowledged (with a cumulative ack) before the connection was shut down
-gracefully or at any time before shut down or abort.
+When set to \fI\fCSCTP_DISPOSITION_ACKED\fR, \fBSCTP\fR will retain and provide for retrieval
+acknowledgments for all messages that were confirmed delivered (by cumulative ack).  When set
+to \fI\fCSCTP_DISPOSITION_ACKED\fR in the ancillary message return by \fBrecvmsg\fR(2) called
+with the \fI\fCMSG_CONFIRM\fR flag set, then the read data was a packet that was sent and
+acknowledged (with a cumulative ack) before the connection was shut down gracefully or at any
+time before shut down or abort.
 .RE
 .IP
-This option permits messages that are unsent, sent but not acknowledged or sent
-and gap acknowledged, to be retrieved from the socket before close.  This is
-accomplished by setting the \fI\fCSCTP_DISPOSITION\fR socket option prior to
-shut down or abort, and then calling \fBrecvmsg\fR(2) after \fI\fCPOLLHUP\fR,
-\fI\fCSIGPIPE\fR or \fI\fCEPIPE\fR indicating shutdown or abort of the
-connection.  Messages then read with the \fI\fCMSG_CONFIRM\fR flag set on call
-to \fBrecv\fR(2), \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) will have the
-\fI\fCSCTP_DISPOSITION\fR ancillary message attached and will indicate
-whether they were \fI\fCSCTP_DISPOSITION_UNSENT\fR,
-\fI\fCSCTP_DISPOSITION_SENT\fR or \fI\fCSCTP_DISPOSITION_GAP_ACKED\fR.
+This option permits messages that are unsent, sent but not acknowledged or sent and gap
+acknowledged, to be retrieved from the socket before close.  This is accomplished by setting
+the \fI\fCSCTP_DISPOSITION\fR socket option prior to shut down or abort, and then calling
+\fBrecvmsg\fR(2) after \fI\fCPOLLHUP\fR, \fI\fCSIGPIPE\fR or \fI\fCEPIPE\fR indicating shutdown
+or abort of the connection.  Messages then read with the \fI\fCMSG_CONFIRM\fR flag set on call
+to \fBrecv\fR(2), \fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) will have the \fI\fCSCTP_DISPOSITION\fR
+ancillary message attached and will indicate whether they were
+\fI\fCSCTP_DISPOSITION_UNSENT\fR, \fI\fCSCTP_DISPOSITION_SENT\fR or
+\fI\fCSCTP_DISPOSITION_GAP_ACKED\fR.
 .IP
-If the socket option \fI\fCSCTP_PR\fR is set on the socket and the peer
-supports \fBPR-SCTP\fR, messages which have failed partial reliable delivery
-(were dropped) will also be retrieved by \fBrecvmsg\fR(2) called with the
-\fI\fCMSG_CONFIRM\fR flag set, with the \fI\fCSCTP_DISPOSITION\fR ancillary
-data message before shutdown.  \fBSCTP\fR must have been compiled with
-\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR for this feature to be available.
+If the socket option \fI\fCSCTP_PR\fR is set on the socket and the peer supports \fBPR-SCTP\fR,
+messages which have failed partial reliable delivery (were dropped) will also be retrieved by
+\fBrecvmsg\fR(2) called with the \fI\fCMSG_CONFIRM\fR flag set, with the
+\fI\fCSCTP_DISPOSITION\fR ancillary data message before shutdown.  \fBSCTP\fR must have been
+compiled with \fI\fCCONFIG_SCTP_PARTIAL_RELIABILITY\fR for this feature to be available.
 .IP
 Alternatively, if the socket option \fI\fCSCTP_DISPOSITION\fR is set to
-\fI\fCSCTP_DISPOSITION_ACKED\fR or messages were sent with the
-\fI\fCMSG_CONFIRM\fR flag set to \fBsend\fR(2), \fBsendto\fR(2) or
-\fBsendmsg\fR(2), then a call to \fBrecv\fR(2), \fBrecvfrom\fR(2) or
-\fBrecvmsg\fR(2) with the \fI\fCMSG_CONFIRM\fR flag set will return
+\fI\fCSCTP_DISPOSITION_ACKED\fR or messages were sent with the \fI\fCMSG_CONFIRM\fR flag set to
+\fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2), then a call to \fBrecv\fR(2),
+\fBrecvfrom\fR(2) or \fBrecvmsg\fR(2) with the \fI\fCMSG_CONFIRM\fR flag set will return
 acknowledgments with a \fI\fCSCTP_DISPOSITION\fR control message set to
-\fI\fCSCTP_DISPOSITION_ACKED\fR for all acknowledged messages a the time of
-the call.  Care should be taken when using this receipt confirmation service
-as the message will be held in the transmit buffers until confirmation has
-been received by the user. Receipt confirmation also has an impact on the
-performance of \fBSCTP\fR.
+\fI\fCSCTP_DISPOSITION_ACKED\fR for all acknowledged messages a the time of the call.  Care
+should be taken when using this receipt confirmation service as the message will be held in the
+transmit buffers until confirmation has been received by the user. Receipt confirmation also
+has an impact on the performance of \fBSCTP\fR.
 .TP
 .B SCTP_LIFETIME
-Get or set the SCTP lifetime or \fBPR-SCTP\fR timed reliability lifetime
-associated with messages which are sent on this socket.  When this option is
-included as an control message to \fBsendmsg\fR(2), the specified lifetime
-is associated with the written message.
+Get or set the SCTP lifetime or \fBPR-SCTP\fR timed reliability lifetime associated with
+messages which are sent on this socket.  When this option is included as an control message to
+\fBsendmsg\fR(2), the specified lifetime is associated with the written message.
 .IP
-Ordered mesaages waiting for acknowledgment beyond this lifetime will cause
-subsequent writes to the same stream to fail until all failed messages have
-been retrieved with \fBrecvmsg\fR(2) with the \fI\fCMSG_CONFIRM\fR flag set.
-Subsequent unordered writes to the stream will succeed, although unordered
-data can also be collected by setting both \fI\fCMSG_OOB\fR and
+Ordered mesaages waiting for acknowledgment beyond this lifetime will cause subsequent writes
+to the same stream to fail until all failed messages have been retrieved with \fBrecvmsg\fR(2)
+with the \fI\fCMSG_CONFIRM\fR flag set.  Subsequent unordered writes to the stream will
+succeed, although unordered data can also be collected by setting both \fI\fCMSG_OOB\fR and
 \fI\fCMSG_CONFIRM\fR in a call to \fBrecvmsg\fR(2).
 .TP
 .B SCTP_ADD
-Sets a flag that indicates whether \fBSCTP\fR will support the ADD-IP
-extensions (ADD IP and DEL IP) on this socket, or gets a flags that indicates
-whether the peer supports the ADD-IP extensions on a connected socket.  When
-the flag is set, requests that \fBSCTP\fR respond to ASCONF chunks with ADD IP
-or DEL IP requests.  When the flag is unset, \fBSCTP\fR will refuse these
-requests.  The default setting for this flag is unset for new sockets.
-This option is only available when the kernel is compiled with
-kernel confirmation parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
+Sets a flag that indicates whether \fBSCTP\fR will support the ADD-IP extensions (ADD IP and
+DEL IP) on this socket, or gets a flags that indicates whether the peer supports the ADD-IP
+extensions on a connected socket.  When the flag is set, requests that \fBSCTP\fR respond to
+ASCONF chunks with ADD IP or DEL IP requests.  When the flag is unset, \fBSCTP\fR will refuse
+these requests.  The default setting for this flag is unset for new sockets.  This option is
+only available when the kernel is compiled with kernel configuration parameter
+\fI\fCCONFIG_SCTP_ADD_IP\fR set.
 .TP
 .B SCTP_ADD_IP
-When set, requests that the provided IP address (\fIaddr\fR), provided in a
-\fBsockaddr_in\fR structure be added to the local IP addresses associated with
-the connection.  If the socket is in a connected or connecting state, this
-invokes the ASCONF procedure to add the IP address to the association.
-If the socket is in a disconnected state, setting this option will fail.
-This option is only available when the kernel is compiled with
-kernel confirmation parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
+When set, requests that the provided IP address (\fIaddr\fR), provided in a \fBsockaddr_in\fR
+structure be added to the local IP addresses associated with the connection.  If the socket is
+in a connected or connecting state, this invokes the ASCONF procedure to add the IP address to
+the association.  If the socket is in a disconnected state, setting this option will fail.
+This option is only available when the kernel is compiled with kernel configuration parameter
+\fI\fCCONFIG_SCTP_ADD_IP\fR set.
 .IP
-If a connected socket was initially bound to \fI\fCINADDR_ANY\fR, additional
-IP addresses may be automatically added to the socket if new network
-interfaces are added to the system, or if existing network interfaces are
-configured with \fBifconfig\fR(8) or equivalent commands.
+If a connected socket was initially bound to \fI\fCINADDR_ANY\fR, additional IP addresses may
+be automatically added to the socket if new network interfaces are added to the system, or if
+existing network interfaces are configured with \fBifconfig\fR(8) or equivalent commands.
 .TP
 .B SCTP_DEL_IP
-When set, requests that the provided IP address (\fIaddr\fR), provided in a
-\fBsockaddr_in\fR structure be deleted from the local IP addresses associated with
-the connection.  If the socket is in a connected or connecting state, this
-invokes the ASCONF procedure to remove the IP address from the association.
-If the socket is in a disconnected state, setting this option will fail.
-This option is only available when the kernel is compiled with
-kernel confirmation parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
+When set, requests that the provided IP address (\fIaddr\fR), provided in a \fBsockaddr_in\fR
+structure be deleted from the local IP addresses associated with the connection.  If the socket
+is in a connected or connecting state, this invokes the ASCONF procedure to remove the IP
+address from the association.  If the socket is in a disconnected state, setting this option
+will fail.  This option is only available when the kernel is compiled with kernel configuration
+parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
 .IP
-If the socket was initially bound to \fI\fCINADDR_ANY\fR, IP addresses may be
-automatically unbound from the socket if network interfaces are removed from
-the system, or if network interfaces are reconfigured with \fBifconfig\fR(8)
-or equivalent commands.
+If the socket was initially bound to \fI\fCINADDR_ANY\fR, IP addresses may be automatically
+unbound from the socket if network interfaces are removed from the system, or if network
+interfaces are reconfigured with \fBifconfig\fR(8) or equivalent commands.
 .TP
 .B SCTP_SET
-Sets a flag that indicates whether \fBSCTP\fR will support the ADD-IP
-extensions (SET PRIMARY) on this socket, or gets a flags that indicates
-whether the peer supports the ADD-IP extensions on a connected socket.  When
-the flag is set, requests that \fBSCTP\fR respond to ASCONF chunks with
-SET PRIMARY requests.  When the flag is unset, \fBSCTP\fR will refuse these
-requests.  The default setting for this flag is unset for new sockets.
-This option is only available when the kernel is compiled with
-kernel confirmation parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
+Sets a flag that indicates whether \fBSCTP\fR will support the ADD-IP extensions (SET PRIMARY)
+on this socket, or gets a flags that indicates whether the peer supports the ADD-IP extensions
+on a connected socket.  When the flag is set, requests that \fBSCTP\fR respond to ASCONF chunks
+with SET PRIMARY requests.  When the flag is unset, \fBSCTP\fR will refuse these requests.  The
+default setting for this flag is unset for new sockets.  This option is only available when the
+kernel is compiled with kernel configuration parameter \fI\fCCONFIG_SCTP_ADD_IP\fR set.
 .TP
 .B SCTP_STATUS
-Gets the association status and the status associated with each of the
-destination transport addresses forming the association.  The returned value
-is a \fBsctp_astat\fR structure following by \fIassoc_nrep\fR \fBsctp_dstat\fR
-structures (one for each destination transport address as returned by
-\fBgetpeername\fR(2)).
+Gets the association status and the status associated with each of the destination transport
+addresses forming the association.  The returned value is a \fBsctp_astat\fR structure
+following by \fIassoc_nrep\fR \fBsctp_dstat\fR structures (one for each destination transport
+address as returned by \fBgetpeername\fR(2)).
 .IP
 .RS
 .nf
-.ps -1
+.ps -2
 \fC\
     struct sctp_astat {
         uint assoc_rwnd;  /* receive window           */
@@ -1620,7 +1438,7 @@ structures (one for each destination transport address as returned by
         uint dst_rto;     /* current rto              */
         uint dst_sst;     /* slow start threshold     */
     };
-.ps +1
+.ps +2
 .fi
 .PP
 The \fBsctp_astat\fR structure has the following fields:
@@ -1643,27 +1461,25 @@ is the address associated with this \fBsctp_dstat\fR structure.
 is the congestion window for the given destination transport address in bytes.
 .TP
 .I dst_unack
-is the number of unacknowledged DATA chunks outstanding to the given
-destination transport address in chunks.
+is the number of unacknowledged DATA chunks outstanding to the given destination transport
+address in chunks.
 .TP
 .I dst_srtt
-is the current smoothed round trip time for the destination transport address
-in milliseconds.
+is the current smoothed round trip time for the destination transport address in milliseconds.
 .TP
 .I dst_rvar
 is the RTT variance for the destination transport address in milliseconds.
 .TP
 .I dst_rto
-is the current value of the RTO for the destination transport address in
-milliseconds.
+is the current value of the RTO for the destination transport address in milliseconds.
 .TP
 .I dst_sst
 is the current value of the slow start threshold in bytes.
 .RE
 .TP
 .B SCTP_DEBUG_OPTIONS
-Not Documented.  (This socket option provides for special debugging functions
-intended for developers of \fBSCTP\fR.)
+Not Documented.  (This socket option provides for special debugging functions intended for
+developers of \fBSCTP\fR.)
 .SH "IOCTLS"
 .PP
 These I/O controls can be accessed using \fBioctl\fR(2).  The correct syntax is:
@@ -1676,77 +1492,83 @@ These I/O controls can be accessed using \fBioctl\fR(2).  The correct syntax is:
 .RE
 .PP
 All \fBsocket\fR(7) I/O controls are supported by \fBSCTP\fR without modification:
-\fI\fCSIOCGSTAMP\fR, \fI\fCSIOCSPGRP\fR, \fI\fCFIOASYNC\fR and
-\fI\fCSIOCGPGRP\fR.  All \fBsocket\fR(7) fcntls are supported by \fBSCTP\fR:
-\fI\fCFIOCGETOWN\fR and \fI\fCFIOCSETOWN\fR.
+\fI\fCSIOCGSTAMP\fR, \fI\fCSIOCSPGRP\fR, \fI\fCFIOASYNC\fR and \fI\fCSIOCGPGRP\fR.  All
+\fBsocket\fR(7) fcntls are supported by \fBSCTP\fR: \fI\fCFIOCGETOWN\fR and
+\fI\fCFIOCSETOWN\fR.
 .PP
 The following \fBtcp\fR(7) I/O controls are supported by \fBSCTP\fR:
 .TP
 .B SIOCINQ
-Returns the amount of queued unread data in the receive buffer.  Argument is a
-pointer to an integer.
+Returns the amount of queued unread data in the receive buffer.  Argument is a pointer to an
+integer.
 .TP
 .B SIOCATMARK
-Returns true when all urgent data has already been received by the user
-program.  This is used together with \fI\fCSO_OOBINLINE\fR.  Argument is a
-pointer to an integer for the test result.
+Returns true when all urgent data has already been received by the user program.  This is used
+together with \fI\fCSO_OOBINLINE\fR.  Argument is a pointer to an integer for the test result.
 .TP
 .B SIOCOUTQ
-Returns the amount of unsent data in the socket send queue in the passed
-integer value pointer.
+Returns the amount of unsent data in the socket send queue in the passed integer value pointer.
 .SH "ERROR HANDLING"
-When a network error occurs, \fBSCTP\fR tries to resend the packet.  If it
-doesn't succeed after some time, either \fI\fCETIMEDOUT\fR or the last
-received error on this connection is reported.
+When a network error occurs, \fBSCTP\fR tries to resend the packet.  If it doesn't succeed
+after some time, either \fI\fCETIMEDOUT\fR or the last received error on this connection is
+reported.
 .PP
-Some applications require a quicker error notification.  This can be enabled
-with the \fB\f(CBSOL_IP\fR level \fI\fCIP_RECVERR\fR socket option.  When this
-option is enabled, all incoming errors are immediately passed to the user
-program.  Use this option with care: it makes \fBSCTP\fR less tolerant to
-routing changes and other normal network conditions.
+Some applications require a quicker error notification.  This can be enabled with the
+\fB\f(CBSOL_IP\fR level \fI\fCIP_RECVERR\fR socket option.  When this option is enabled, all
+incoming errors are immediately passed to the user program.  Use this option with care: it
+makes \fBSCTP\fR less tolerant to routing changes and other normal network conditions.
 .SH "NOTES"
 .PP
-When an error occurs doing a connection setup occurring in a socket write
-\fI\fCSIGPIPE\fR is only raised when the \fI\fCSO_KEEPOPEN\fR socket option is
-set.
+When an error occurs doing a connection setup occurring in a socket write \fI\fCSIGPIPE\fR is
+only raised when the \fI\fCSO_KEEPOPEN\fR socket option is set.
 .PP
-\fBSCTP\fR has no real out-of-band or urgent data; it has out-of-order data.
-In Linux this means if the other end sends newer out-of-band data the older
-urgent data may arrive later.
+\fBSCTP\fR has no real out-of-band or urgent data; it has out-of-order data.  In Linux this
+means if the other end sends newer out-of-band data the older urgent data may arrive later.
 .PP
-If the socket option \fI\fCSO_KEEPALIVE\fR is not set (see \fBsocket\fR(7)),
-\fBSCTP\fR will not generate heartbeats to any destination.  For regular
-\fI\fCSOCK_SEQPACKET\fR and \fI\fCSOCK_RDM\fR sockets, \fI\fCSO_KEEPALIVE\fR
-defaults to set.  For \fBtcp\fR(7)-compatible \fI\fCSOCK_STREAM\fR sockets,
-\fI\fCSO_KEEPALIVE\fR defaults to unset.
+If the socket option \fI\fCSO_KEEPALIVE\fR is not set (see \fBsocket\fR(7)), \fBSCTP\fR will
+not generate heartbeats to any destination.  For regular \fI\fCSOCK_SEQPACKET\fR and
+\fI\fCSOCK_RDM\fR sockets, \fI\fCSO_KEEPALIVE\fR defaults to set.  For \fBtcp\fR(7)-compatible
+\fI\fCSOCK_STREAM\fR sockets, \fI\fCSO_KEEPALIVE\fR defaults to unset.
 .SH "ERRORS"
 .TP
 .B EPIPE
-The other end closed the socket unexpectedly or a read is executed on a shut
-down socket.
+The other end closed the socket unexpectedly or a read is executed on a shut down socket.
 .TP
 .B ETIMEDOUT
 The other end didn't acknowledge retransmitted data after some time.
 .TP
 .B EAFNOTSUPPORT
-Passed socket address type in \fIsin_family\fR was not \fI\fCAF_INET\fR.
+Passed socket address type in \fIsin_family\fR was not \fI\fCAF_INET\fR or \fI\fCAF_UNSPEC\fR.
 .PP
-Any errors defined for \fBip\fR(7) or the generic \fBsocket\fR(7) layer may
-also be returned for \fBSCTP\fR.
+Any errors defined for \fBip\fR(7) or the generic \fBsocket\fR(7) layer may also be returned
+for \fBSCTP\fR.
 .SH "NETWORK STATISTICS"
 .SS "Protocol Information"
 .PP
-\fBSCTP\fR keeps a number of statistics provided for in the the IP MIB.  IP
-protocol statistics are available in \fI\fC/proc/net/snmp\fR as well as with
-the \fI-s\fR or \fI--statistics\fR flag to \fBnetstat\fR(8).  For additional
-information see \fBproc\fR(5) and \fBnetstat\fR(8).  IP Protocol statistics
-that are applicable to \fBSCTP\fR are as follows:
+\fBSCTP\fR keeps a number of statistics provided for in the the IP MIB.  IP protocol statistics
+are available in \fI\fC/proc/net/snmp\fR as well as with the \fI-s\fR or \fI--statistics\fR
+flag to \fBnetstat\fR(8).  For additional information see \fBproc\fR(5) and \fBnetstat\fR(8).
+ICMP Protocol statistics that are applicable to \fBSCTP\fR are as follows:
+.TP 18
+.B InErrors
+The number of ICMP messages received in error.  This represents the value for
+all protocols including \fBSCTP\fR.
+.PP
+\fBSCTP\fR provides the following information in the Linux MIB.  Linux MIB
+statistics are available in \fI\fC/proc/net/netstat\fR.  For additional
+information see \fBproc\fR(5).  Linux protocol statistics that are applicable
+also to \fBSCTP\fR are as follows:
+.TP 18
+.B LockDroppedIcmps
+The number of ICMP errors that were dropped because the socket was locked.
+.TP 18
+.B ListenOverflows
+The number of COOKIE-ECHO chunks dropped due to listen queue overflows.
 .PP
 \fBSCTP\fR provides for SNMP Protocol Information following the SCTP MIB
 <draft-ietf-tsvwg-sctpmib-07.txt>.  Protocol information is available in
-\fI\fC/proc/net/snmp\fR as well as with the \fI-s\fR flag to the
-\fBnetstat\fR(8) command.  SCTP Protocol Statistics that are applicable to
-\fBSCTP\fR are as follows:
+\fI\fC/proc/net/snmp\fR as well as with the \fI-s\fR flag to the \fBnetstat\fR(8) command.
+SCTP Protocol Statistics that are applicable to \fBSCTP\fR are as follows:
 .TP 18
 .B RtoAlgorithm
 .TP 18
@@ -1760,10 +1582,9 @@ This value can be obtained by reading the system control \fBsctp_rto_max\fR.
 This value can be obtained by reading the system control \fBsctp_rto_initial\fR.
 .TP 18
 .B MaxAssoc
-There is no controllable upper limit on the maximum number of associations.
-The maximum number of associations is constrained by the system maximum number
-of file descriptors, the process maximum number of file descriptors, and the
-amount of memory in the system.
+There is no controllable upper limit on the maximum number of associations.  The maximum number
+of associations is constrained by the system maximum number of file descriptors, the process
+maximum number of file descriptors, and the amount of memory in the system.
 .TP 18
 .B ValCookieLife
 This value can be obtained by reading the system control \fBsctp_valid_cookie_life\fR.
@@ -1787,12 +1608,11 @@ The number of times that an established \fBSCTP\fR socket completed an abortive 
 The number of times that an established \fBSCTP\fR socket completed an orderly release.
 .TP 18
 .B OutOfBlues
-The number of out of the blue packets received.  Out of the blue packets are
-packets for which no corresponding \fBSCTP\fR socket could be found.
+The number of out of the blue packets received.  Out of the blue packets are packets for which
+no corresponding \fBSCTP\fR socket could be found.
 .TP 18
 .B ChecksumErrors
-The number of received packets that discovered a checksum error and were
-discarded.
+The number of received packets that discovered a checksum error and were discarded.
 .TP 18
 .B OutCtrlChunks
 The number of out SCTP Control Chunks that were processed for transmission.
@@ -1816,8 +1636,7 @@ The number of out SCTP Data Chunks were received with the Unordered Bit set.
 The number of times that \fBSCTP\fR further fragmented a user message.
 .TP 18
 .B ReasmUserMsgs
-The number of times that \fBSCTP\fR reassembled fragemented chunks into a user
-messages.
+The number of times that \fBSCTP\fR reassembled fragemented chunks into a user messages.
 .TP 18
 .B OutSCTPPacks
 The number of packets delivered for transmission to the IP layer.
@@ -1828,76 +1647,89 @@ The number of packets received for processing from the IP layer.
 .PP
 \fBSCTP\fR provides for SNMP Connection Information following the SCTP MIB
 <draft-ietf-tsvwg-sctpmib-07.txt>.  Connection information is available in
-\fI\fC/proc/net/sctp\fR but is not yet available with a \fI-sctp\fR flag to
-the \fBnetstat\fR(8) command.  (Extensions to the \fBnetstat\fR(8) command are
-required to access this information.)
+\fI\fC/proc/net/sctp\fR but is not yet available with a \fI-sctp\fR flag to the
+\fBnetstat\fR(8) command.  (Extensions to the \fBnetstat\fR(8) command are required to access
+this information.)
+.SS "Socket Usage Information"
+.PP
+\fBSCTP\fR provides for socket usage information available in \fI\fC/proc/net/sockstat\fR.
 .SH "CAVEATS"
 .PP
-\fBSCTP\fR does not subscribe to the RFC 2960 restriction to assign sequential
-TSNs (Transmit Sequence Numbers) to each fragmented DATA chunk of a large
-record for \fI\fCSOCK_SEQPACKET\fR sockets.  Multiple calls to \fBwrite\fR(2),
-\fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2) for portions of different
-records may result in fragments from multiple records being assigned
-interleaving TSNs.
+\fBSCTP\fR does not subscribe to the RFC 2960 restriction to assign sequential TSNs (Transmit
+Sequence Numbers) to each fragmented DATA chunk of a large record for \fI\fCSOCK_SEQPACKET\fR
+sockets.  Multiple calls to \fBwrite\fR(2), \fBsend\fR(2), \fBsendto\fR(2) or \fBsendmsg\fR(2)
+for portions of different records may result in fragments from multiple records being assigned
+interleaving TSNs.  Portable programs should refrain from writing record fragments to more
+than one stream at a time.
 .PP
-\fBSCTP\fR does not implement the UDP-like interface of
-<draft-ietf-tsvwg-sctpsocket-04.txt>.  This is because the socket interface
-presented in that draft provides unorthodox interface to a
-\fI\fCSOCK_SEQPACKET\fR socket which is against both the traditional and
-standard usage of \fI\fCSOCK_SEQPACKET\fR sockets in BSD, XNS 5.2, and POSIX.
-In BSD, XNS 5.2 and POSIX, \fI\fCSOCK_SEQPACKET\fR sockets are strictly
-connection-oriented, whereas in this flawed draft they are connectionless.
+\fBSCTP\fR ignores the source address list in INIT and INIT-ACK chunks when searching for
+Transmission Control Blocks in opposition to <draft-ietf-tsvwg-sctpimpguide-08.txt> section
+2.18.  This is because the procedure described there introduces sevvere vulnerability to DoS
+and Spoofing attacks.  \fBSCTP\fR does not have this vulnerability.
+.PP
+\fBSCTP\fR ignores the source address list in INIT chunks when searching for Transmission
+Control Block matches in opposition to <draft-ietf-tsvwg-sctpimpguide-08.txt> section 2.6.
+This is because the procedure described there introduces severe vulnerability to DoS attacks
+by revealing detailed information about existing associations.  \fBSCTP\fR does not have this
+vulnerability.
+.PP
+\fBSCTP\fR does not implement the UDP-like interface of <draft-ietf-tsvwg-sctpsocket-04.txt>.
+This is because the socket interface presented in that draft provides unorthodox interface to a
+\fI\fCSOCK_SEQPACKET\fR socket which is against both the traditional and standard usage of
+\fI\fCSOCK_SEQPACKET\fR sockets in BSD, XNS 5.2, and POSIX.  In BSD, XNS 5.2 and POSIX,
+\fI\fCSOCK_SEQPACKET\fR sockets are strictly connection-oriented, whereas in this draft they
+are connectionless.  A connectionless use of \fI\fCSOCK_SEQPACKET\fR would conflict with common
+standard socket code used by X.25, AX.25, DECNET, and other users of \fI\fCSOCK_SEQPACKET\fR
+sockets.
 .PP
 Although similar, \fBSCTP\fR does not implement the TCP-like interface of
-<draft-ietf-tsvwg-sctpsocket-04.txt>.  This is because the
-\fI\fCSOCK_STREAM\fR socket interface presented in that draft only provides
-limited compatibility with \fBtcp\fR(7).  The \fBtcp\fR(7) compatible socket
-interface provided by \fBSCTP\fR more closely follows the \fBtcp\fR(7)
-interface making it suitable to use \fBSCTP\fR as a drop-in replacement for
-\fBtcb\fR(7) with minimal (\fI\fCIPPROTO_SCTP\fR) adjustment to applications
-programs written to \fBtcp\fR(7).
+<draft-ietf-tsvwg-sctpsocket-04.txt>.  This is because the \fI\fCSOCK_STREAM\fR socket
+interface presented in that draft only provides limited compatibility with \fBtcp\fR(7).  The
+\fBtcp\fR(7) compatible socket interface provided by \fBSCTP\fR more closely follows the
+\fBtcp\fR(7) interface making it suitable to use \fBSCTP\fR as a drop-in replacement for
+\fBtcb\fR(7) with minimal (\fI\fCIPPROTO_SCTP\fR) adjustment to applications programs written
+to \fBtcp\fR(7).
 .PP
-\fBSCTP\fR has way too many options.  This is mostly because \fBSCTP\fR is an
-new protocol and experimentation with the protocol is high.  These options
-provide close control of the interesting features of the protocol.
-Unfortunately, when all options are compiled, the performance of \fBSCTP\fR is
-necessarily impacted.  Many of these options will become deprecated in future
-releases.  Portable programs should not rely on the availability of specific
-\fBSCTP\fR socket options.
+\fBSCTP\fR has way too many options.  This is mostly because \fBSCTP\fR is an new protocol and
+experimentation with the protocol is high.  These options provide close control of the
+interesting features of the protocol.  Unfortunately, when all options are compiled, the
+performance of \fBSCTP\fR is necessarily impacted.  Many of these options will become
+deprecated in future releases.  Portable programs should minimize their use of
+\fBSCTP\fR-specific socket options.
 .PP
-Although \fBSCTP\fR permits the user maximum control over the various SCTP
-protocol parameters, it is also possible to set protocol parameters in
-violation of the requirements of RFC 2960 and subsequent SCTP drafts and RFCs.
-Internet applications should take extreme care with protocol parameter
-settings, by either using the default values for all protocol parameters (as
-recommended in RFC 2960 and others) or by taking care not to adjust protocol
-parameters outside the ranges recommended in RFC 2960 and subsequent RFCs.
+Although \fBSCTP\fR permits the user maximum control over the various SCTP protocol parameters,
+it is also possible to set protocol parameters in violation of the requirements of RFC 2960 and
+subsequent SCTP drafts and RFCs.  Internet applications should take extreme care with protocol
+parameter settings, by either using the default values for all protocol parameters (as
+recommended in RFC 2960 and others) or by taking care not to adjust protocol parameters outside
+the ranges recommended in RFC 2960 and subsequent RFCs.
 .PP
 \fBSCTP\fR does not currently support IPv6.
 .PP
 \fBSCTP\fR host name addresses are not supported.
 .PP
-\fBSCTP\fR does not implement \fBMOBILE-SCTP\fR extensions due to Intellectual
-Property Rights claims made against the technologies in \fBMOBILE-SCTP\fR.
+\fBSCTP\fR does not implement \fBMOBILE-SCTP\fR extensions due to Intellectual Property Rights
+claims made against the technologies in \fBMOBILE-SCTP\fR.
 .PP
-\fBSCTP\fR does not currently support \fBtcp\fR(7) undocumented Linux
-\fBsendpage\fR(2) socket call.
+\fBSCTP\fR does not currently support \fBtcp\fR(7) undocumented Linux \fBsendpage\fR(2) socket
+call.
 .PP
-Transparent proxy options and other enhanced IP capabilities available with
-the kernel configuration parameter \fI\fCCONFIG_SCTP_EXTENDED_IP_SUPPORT\fR
-are not described, or not implemented.
+Transparent proxy options and other enhanced IP capabilities available with the kernel
+configuration parameter \fI\fCCONFIG_SCTP_EXTENDED_IP_SUPPORT\fR are not described, or not
+implemented.
 .PP
-Providing destination addresses to \fBsend\fR(2), \fBsendto\fR(2) and
-\fBsendmsg\fR(2) does not work as described (it is largely ignored).
+Providing destination addresses to \fBsend\fR(2), \fBsendto\fR(2) and \fBsendmsg\fR(2) does not
+work as described (it is largely ignored).
 .PP
 \fI\fCSOCK_RDM\fR sockets are not fully supported as described.
 .PP
 The use of \fI\fCSO_BINDTODEVICE\fR, \fI\fCIP_OPTIONS\fR, \fI\fCIP_PKTINFO\fR,
-\fI\fCIP_RECVOPTS\fR, \fI\fCIP_RETOPTS\fR and \fI\fCSCTP_STATUS\fR socket
-options are not fully implemented and will probably not work as described.
+\fI\fCIP_RECVOPTS\fR, \fI\fCIP_RETOPTS\fR and \fI\fCSCTP_STATUS\fR socket options are not fully
+implemented and will probably not work as described.
 .SH "AUTHOR"
 .PP
 Brian F. G. Bidulock <bidulock@openss7.org>.
+The OpenSS7 Project.  http://www.openss7.org/
 .SH "VERSIONS"
 This \fBSCTP\fR implementation and interface was new for Linux 2.2.
 .IR \f(CBSCTP_NODELAY ,
@@ -1972,42 +1804,38 @@ and
 .SH "REFERENCES"
 RFC2960 for the SCTP specification.
 .br
-draft-ietf-tsvwg-sctpimpguide-05.txt for the SCTP Implementer's Guide
-modifications to RFC 2960.
+draft-ietf-tsvwg-sctpimpguide-08.txt for the SCTP Implementer's Guide modifications to RFC
+2960.
 .br
-draft-ietf-tsvwg-sctpsocket-03.txt for the description of a TCP-compatible
-SCTP API for sockets.
+draft-ietf-tsvwg-sctpsocket-05.txt for the description of a TCP-compatible SCTP API for
+sockets.
 .br
 RFC1122 for a description of the Nagle algorithm.
 .br
-draft-ietf-tsvwg-sctpcsum-06.txt for a description of the CRC-32c checksum
-algorithm.
+RFC 3309 for a description of the CRC-32c checksum algorithm.
 .br
 RFC 3168 for Explicit Congestion Notification
 .SH "COPYRIGHT NOTICE"
 .PP
-\f(HRCopyright \(co 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+\f(HRCopyright \(co 1997-2003 OpenSS7 Corporation.  All Rights Reserved.
 .PP
 .ce 1
 \f(HRPERMISSION NOTICE\fR
 .PP
-\f(HRPermission is granted to make and distribute verbatim copies of this manual
-provided that the copyright notice and this permission notice are preserved on
-all copies.
+\f(HRPermission is granted to make and distribute verbatim copies of this manual provided that
+the copyright notice and this permission notice are preserved on all copies.
 .PP
-\f(HRPermission is grated to copy and distribute modified version of this manual
-under the conditions for verbatim copying, provided that the entire resulting
-derived work is distributed under the terms of a permission notice identical
-to this one.
+\f(HRPermission is grated to copy and distribute modified version of this manual under the
+conditions for verbatim copying, provided that the entire resulting derived work is distributed
+under the terms of a permission notice identical to this one.
 .PP
-\f(HRSince the Linux kernel and libraries are constantly changing, this manual may
-be incorrect or out-of-date.  The author(s) and copyright holder(s) assume no
-responsibility whatsoever for errors or omissions, or for damage resulting
-from the use of the information contained herein.  The author(s) and copyright
-holder(s) may not have taken the same level of care in the production of this
-manual, which is licensed free of charge, as they might when working
+\f(HRSince the Linux kernel and libraries are constantly changing, this manual may be incorrect
+or out-of-date.  The author(s) and copyright holder(s) assume no responsibility whatsoever for
+errors or omissions, or for damage resulting from the use of the information contained herein.
+The author(s) and copyright holder(s) may not have taken the same level of care in the
+production of this manual, which is licensed free of charge, as they might when working
 professionally.
 .PP
-\f(HRFormated or processed versions of this manual, if unaccompanied by the source,
-must acknowledge the copyright and authors of this work.
+\f(HRFormated or processed versions of this manual, if unaccompanied by the source, must
+acknowledge the copyright and authors of this work.
 
