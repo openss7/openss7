@@ -28,7 +28,7 @@
  * 
  */
 
-#ident "@(#) LiS dki.c 2.9 7/15/03 19:58:21 "
+#ident "@(#) LiS dki.c 2.11 8/18/03 14:06:47 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
@@ -68,22 +68,22 @@ volatile int	  lis_tlist_handle ;	/* next handle to use */
  * This is always the function passed to the kernel.  'arg' is a pointer to
  * the tlist_t for the timeout.
  */
-static void sys_timeout_fcn(caddr_t arg)
+static void sys_timeout_fcn(ulong arg)
 {
     tlist_t		*tp = (tlist_t *) arg ;
     timo_fcn_t		*fcn ;
-    caddr_t		 arg ;
+    caddr_t		 uarg ;
     lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
     if (tp->handle != 0 && tp->fcn != NULL)
     {
 	fcn        = tp->fcn ;		/* save local copy */
-	arg        = tp->arg ;
+	uarg       = tp->arg ;
 	tp->handle = 0 ;		/* entry now available */
 	tp->fcn    = NULL ;
 	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-	fcn(arg) ;			/* call fcn while not holding lock */
+	fcn(uarg) ;			/* call fcn while not holding lock */
     }
     else
 	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
@@ -116,16 +116,8 @@ toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
 	for (tp = (tlist_t *) lis_tlist_head; tp != NULL; tp = tp->next)
 	{					/* find one not-in use */
 	    if (tp->handle == handle) unique = 0 ;	/* handle not unique */
-	    if (   found == NULL
-		&& (   tp->handle == 0
-		    || (TL_NEXT(tp->tl) == NULL && TL_PREV(tp->tl) == NULL)
-		   )
-	       )
-	    {
-		tp->handle  = 0xFFFFFFFF ;	/* protect from "find" */
-		TL_NEXT(tp->tl) = TL_PREV(tp->tl) = &(tp->tl) ;
+	    if (found == NULL && tp->handle == 0)
 		found = tp ;
-	    }
 
 	    if (!unique && found != NULL)
 		break ;				/* try w/another handle */
@@ -173,9 +165,7 @@ toid_t	lis_untimeout(toid_t id)
 	if (tp->handle == id)			/* is this our timer?  */
 	{
 	    lis_mark_mem(tp, "unused", MEM_TIMER) ;
-	    if (TL_NEXT(tp->tl) != NULL || TL_PREV(tp->tl) != NULL)
-		lis_untmout(&tp->tl) ;		/* stop it */
-
+	    lis_untmout(&tp->tl) ;		/* stop it */
 	    tp->handle = 0 ;			/* make available */
 	    break ;				/* done */
 	}
@@ -195,13 +185,11 @@ void lis_terminate_dki(void)
 	 *  Better be on the safe side.
 	 */
         lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-	while (lis_tlist_head != NULL) {
+	while (lis_tlist_head != NULL)
+	{
 		tlist_t *tp = (tlist_t *) lis_tlist_head;
 
-		if (TL_NEXT(tp->tl) != NULL || TL_PREV(tp->tl) != NULL) {
-			printk("Cancelling forgotten timeout.\n");
-			lis_untmout(&tp->tl);
-		}
+		lis_untmout(&tp->tl);
 		lis_tlist_head = tp->next;
 		FREE(tp);
 	}

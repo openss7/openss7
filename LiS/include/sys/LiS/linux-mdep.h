@@ -37,7 +37,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) LiS linux-mdep.h 2.54 6/6/03 16:27:56 "
+#ident "@(#) LiS linux-mdep.h 2.55 8/18/03 14:07:57 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -748,21 +748,7 @@ extern void    lis_dec_mod_cnt_fcn(const char *file, int line) ;
 #define lis_inc_mod_cnt()	lis_inc_mod_cnt_fcn(__LIS_FILE__,__LINE__)
 #define lis_dec_mod_cnt()	lis_dec_mod_cnt_fcn(__LIS_FILE__,__LINE__)
 
-/*  -------------------------------------------------------------------  */
 
-/*
- *  timers
- */
-#if defined(KERNEL_2_5)
-#define TL_NEXT(tl)  (struct timer_list *)(tl).entry.next
-#define TL_PREV(tl)  (struct timer_list *)(tl).entry.prev
-#elif defined(KERNEL_2_3)
-#define TL_NEXT(tl)  (struct timer_list *)(tl).list.next
-#define TL_PREV(tl)  (struct timer_list *)(tl).list.prev
-#else
-#define TL_NEXT(tl)  (tl).next
-#define TL_PREV(tl)  (tl).prev
-#endif
 
 #endif				/* __KERNEL__ */
 

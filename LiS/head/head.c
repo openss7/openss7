@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.122 5/30/03 21:40:39 "
+#ident "@(#) LiS head.c 2.124 8/18/03 14:07:32 "
 
 /* BEWARE: should check:
  * tty stuff
@@ -2368,8 +2368,12 @@ open_mods( stdata_t *head, dev_t *devp, int flags, cred_t *creds )
  * lis_head_flush - called to process an M_FLUSH received from below
  *
  * This may be running at interrupt time.
+ *
+ * Return 0 if the flush is complete and mp is disposed of.  Return 1 if
+ * the flush is deferred and mp is still valid.
  */
-void lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp)
+static
+int lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp, int flush_rputq)
 {
     int		msgs_before = lis_qsize(q) ;
     lis_flags_t	psw ;
@@ -2377,22 +2381,48 @@ void lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp)
 
     if ( LIS_DEBUG_FLUSH )
 	printk("lis_head_flush: "
-		"M_FLUSH from \"%s\" on stream %s flags=0x%x\n",
+		"M_FLUSH from \"%s\" on stream %s flags=0x%x flush_rputq=%d\n",
 		lis_queue_name(backq(q)),
-		shead->sd_name, *mp->b_rptr & 0xFF) ;
+		shead->sd_name, *mp->b_rptr & 0xFF, flush_rputq) ;
 
+    /*
+     * Are we closing?  If so do not perform the flush, just wake up
+     * the closing code.
+     */
+    if (F_ISSET(shead->sd_flag, STRFLUSHWT))
+    {						/* close-time flush */
+	CP(q,mp) ;
+	freemsg(mp) ;				/* discard message */
+	CLR_SD_FLAG(shead, STRFLUSHWT) ;
+	lis_wakeup_close_wt(shead) ;
+	return(0) ;				/* "done" */
+    }
+
+    /*
+     * Is strrput or strread running?  If so, defer the flush until
+     * strrsrv runs.
+     */
     LIS_QISRLOCK(q, &psw) ;
+    if (q->q_flag & QREADING)		/* read/getpmsg running */
+    {
+	LIS_QISRUNLOCK(q, &psw) ;
+	return(1) ;			/* deferred, mp still allocated */
+    }
+
     if (*mp->b_rptr & FLUSHR)
     {					/* flush read queue */
 	CP(mp,0) ;
-	/*
-	 * Flush the rput temporary queue.  Its messages are 
-	 * accounted for in the stream head q structure.
-	 */
-	while ((xp = lis_get_rput_q(shead)) != NULL)
+	if (flush_rputq)
 	{
-	    msgs_before++ ;
-	    freemsg(xp) ;
+	    /*
+	     * Flush the rput temporary queue.  Its messages are 
+	     * accounted for in the stream head q structure.
+	     */
+	    while ((xp = lis_get_rput_q(shead)) != NULL)
+	    {
+		msgs_before++ ;
+		freemsg(xp) ;
+	    }
 	}
 	/*
 	 * Flush the "official" stream head queue.
@@ -2424,16 +2454,17 @@ void lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp)
 	{
 	    mp->b_flag |= MSGNOLOOP;
 	    lis_putnext(LIS_WR(q),mp);	/* send back downstream */
-	    return ;			/* w/head unlocked */
+	    return(0) ;			/* w/head unlocked */
 				 	/* do not use PUTNEXT */
 	}
 
 	lis_freemsg(mp);		/* free message */
-	return ;
+	return(0) ;			/* done */
     }
 
     LIS_QISRUNLOCK(q, &psw) ;
     lis_freemsg(mp);
+    return(0) ;				/* done */
 }
 
 /*  -------------------------------------------------------------------  */
@@ -2666,8 +2697,18 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 	break;
 
     case M_FLUSH:			/* should be done in strrput */
+	/*
+	 * This should not defer.  We have the q lock, so strrput or
+	 * strread should not be actively reading.  If this defers then
+	 * it is a bug.
+	 */
 	CP(q,mp) ;
-	lis_head_flush(shead, q, mp) ;
+	if (lis_head_flush(shead, q, mp, 0))	/* just the hd q */
+	{					/* deferred */
+	    printk("lis_process_rput: Bug: M_FLUSH: lis_head_flush fail\n") ;
+	    freemsg(mp) ;
+	}
+
 	break;
 
     case M_SIG:
@@ -2879,17 +2920,8 @@ lis_strrput(queue_t *q, mblk_t *mp)
 	break ;
 
     case M_FLUSH:
-	if (F_ISSET(hd->sd_flag, STRFLUSHWT))
-	{						/* close-time flush */
-	    CP(q,mp) ;
-	    freemsg(mp) ;				/* discard message */
-	    CLR_SD_FLAG(hd, STRFLUSHWT) ;
-	    lis_wakeup_close_wt(hd) ;
-	    return(0) ;				/* done */
-	}
-
-	CP(q,mp) ;
-	lis_head_flush(hd, q, mp) ;		/* flush immediately */
+	if (lis_head_flush(hd, q, mp, 1))	/* both queues */
+	    break ;				/* deferred */
 	return(0) ;				/* done */
 
     case M_IOCNAK: 
@@ -4555,6 +4587,8 @@ static void lis_check_m_sig(stdata_t *hd)
  * a high priority message at the head of the queue, then we should
  * delete the new message and insert our old one.  As if the new
  * message arrived at the stream head with ours still in place.
+ *
+ * The caller holds the queue lock.
  */
 static void lis_requeue(stdata_t *hd, mblk_t *mp)
 {
@@ -4575,16 +4609,19 @@ static void lis_requeue(stdata_t *hd, mblk_t *mp)
     {
 	SET_SD_FLAG(hd,STRPRI);
 	LIS_QISRLOCK(hd_rq, &psw) ;
+	hd_rq->q_flag |= QREADING ;		/* for strrput */
+	LIS_QISRUNLOCK(hd_rq, &psw) ;
 	hdmp  = hd_rq->q_first ;
 	if (hdmp != NULL && lis_btype(hdmp) == M_PCPROTO)
 	{				/* delete msg at head of q */
 	    hdmp = lis_getq(hd_rq) ;
-	    LIS_QISRUNLOCK(hd_rq, &psw) ;
 	    lis_freemsg(hdmp) ;
 	    LisDownCount(MSGQDSTRHD) ;	/* one fewer msg queued */
 	}
-	else
-	    LIS_QISRUNLOCK(hd_rq, &psw) ;
+
+	LIS_QISRLOCK(hd_rq, &psw) ;
+	hd_rq->q_flag &= ~QREADING;
+	LIS_QISRUNLOCK(hd_rq, &psw) ;
     }
 
     lis_putbq(hd_rq,mp);
@@ -4675,6 +4712,7 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 	mread_sent = 0 ;
 	LIS_QISRLOCK(hd_rq, &psw) ;
 	qisrlocked = 1 ;
+	hd_rq->q_flag |= QREADING ;		/* for strrput */
 	while (hd_rq->q_first == NULL && msgs_read == 0)
 	{					/* nothing to read */
 	    if (F_ISSET(hd->sd_flag,STRDERR))
@@ -4697,6 +4735,7 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 
 	    if (!mread_sent && F_ISSET(hd->sd_flag,SNDMREAD))
 	    {				/* only send once per user call */
+		hd_rq->q_flag &= ~QREADING;
 		LIS_QISRUNLOCK(hd_rq, &psw) ;
 		qisrlocked = 0 ;
 		lis_unlockq(hd_rq) ;
@@ -4715,6 +4754,7 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 		qlocked = 1 ;
 		LIS_QISRLOCK(hd_rq, &psw) ;
 		qisrlocked = 1 ;
+		hd_rq->q_flag |= QREADING ;		/* for strrput */
 		continue ;		/* go around again */
 	    }
 
@@ -4734,6 +4774,7 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 	    if (LIS_DEBUG_READ)
 		printk("strread: stream %s: O_NONBLOCK not set, sleep\n",
 			hd->sd_name) ;
+	    hd_rq->q_flag &= ~QREADING;
 	    LIS_QISRUNLOCK(hd_rq, &psw) ;
 	    qisrlocked = 0 ;
 	    CLOCKADD() ;
@@ -4744,11 +4785,13 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 
 	    LIS_QISRLOCK(hd_rq, &psw) ;
 	    qisrlocked = 1 ;
+	    hd_rq->q_flag |= QREADING ;		/* for strrput */
 	}
 
-	mp = lis_getq(hd_rq);			/* while q still isr-locked */
+	hd_rq->q_flag &= ~QREADING;
 	LIS_QISRUNLOCK(hd_rq, &psw) ;
 	qisrlocked = 0 ;
+	mp = lis_getq(hd_rq);			/* while q still isr-locked */
 	lis_check_m_sig(hd) ;			/* watch for M_SIG in q */
 	lis_unlockq(hd_rq) ;
 	qlocked = 0 ;
@@ -4909,14 +4952,17 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
     } while (1);
 
 return_point:
+    if (hd_rq != NULL && qisrlocked)
+    {
+	hd_rq->q_flag &= ~QREADING;
+	LIS_QISRUNLOCK(hd_rq, &psw) ;
+    }
+
     if (hd_rq != NULL && qlocked)		/* do we have the rq locked? */
     {
 	lis_check_m_sig(hd) ;			/* watch for M_SIG in q */
 	lis_unlockq(hd_rq) ;
     }
-
-    if (hd_rq != NULL && qisrlocked)
-	LIS_QISRUNLOCK(hd_rq, &psw) ;
 
     lis_wake_up_read_sem(hd) ;
     lis_head_put(hd) ;
@@ -5186,11 +5232,12 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
     int		 err= 0 ;
     int		 rtn = 0 ;
     int		 qlocked = 0 ;
+    int		 qreading = 0 ;
     lis_flags_t  psw ;
     stdata_t	*hd;
     strbuf_t	 kctl,kdat;
     mblk_t	*mp;
-    queue_t	*rdq ;
+    queue_t	*rdq = NULL;
     int		 band = 0 ;
     int		 flags = 0 ;
     int		 mtype ;
@@ -5323,8 +5370,11 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
      */
     if (!qlocked)
 	lis_lockq(rdq) ;
-    LIS_QISRLOCK(rdq, &psw) ;			/* prevent strrput */
     qlocked = 1 ;
+    LIS_QISRLOCK(rdq, &psw) ;
+    rdq->q_flag |= QREADING;			/* for strrput */
+    LIS_QISRUNLOCK(rdq, &psw) ;
+    qreading = 1 ;
 
     if ((mp = rdq->q_first) == NULL)		/* mp is 1st msg */
     {						/* empty read queue */
@@ -5344,7 +5394,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	 * copyout_msg will not modify our len values due to the NULL
 	 * message parameter.
 	 */
-	LIS_QISRUNLOCK(rdq, &psw) ;
 	rtn=copyout_msg(fp,NULL,&kctl,&kdat,
 		    (strbuf_t*)ctl,(strbuf_t*)dat,doit) ;
 
@@ -5386,7 +5435,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 
     case M_PASSFP:
 	mp = lis_getq(rdq);			/* remove from queue */
-	LIS_QISRUNLOCK(rdq, &psw) ;		/* then unlock */
 	LisDownCount(MSGQDSTRHD) ;
 	lis_free_passfp(mp);
 	mp = NULL ;
@@ -5394,16 +5442,10 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	err = -EBADMSG;
 	goto return_point;
     default:
-	LIS_QISRUNLOCK(rdq, &psw) ;
 	err = -EBADMSG;
 	goto return_point;
     }
 
-    /*
-     * Still holding ISR lock on read queue.  Don't let go until
-     * we remove the message from the queue, or dup it in the case
-     * of a PEEK.
-     */
     if (doit)					/* it's get[p]msg() */
     {
 	if (lis_hipri(mtype))			/* M_PCPROTO */
@@ -5418,20 +5460,17 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	    {
 	    case MSG_HIPRI:			/* user wanted hi-pri only */
 						/* same code as RS_HIPRI */
-		LIS_QISRUNLOCK(rdq, &psw) ;
 		err = -EBADMSG;			/* hi-pri not at head of q */
 		goto return_point ;		/* go return 'rtn' */
 
 	    case MSG_BAND:			/* wants from particular band */
 		if (bandp == NULL)		/* getmsg, not getpmsg */
 		{
-		    LIS_QISRUNLOCK(rdq, &psw) ;
 		    err = -EINVAL;		/* invalid flags */
 		    goto return_point ;		/* go return 'rtn' */
 		}
 		if (mp->b_band < (unsigned char) band) /* msg in wrong band */
 		{
-		    LIS_QISRUNLOCK(rdq, &psw) ;
 		    err = -EBADMSG;
 		    goto return_point ;		/* go return 'rtn' */
 		}
@@ -5440,7 +5479,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	    case MSG_ANY:			/* wants msg from any band */
 		if (bandp == NULL)		/* getmsg, not getpmsg */
 		{
-		    LIS_QISRUNLOCK(rdq, &psw) ;
 		    err = -EINVAL;		/* invalid flags */
 		    goto return_point ;		/* go return 'rtn' */
 		}
@@ -5452,7 +5490,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 		    || (bandp != NULL && flags == 0)	/* getpmsg w/flags=0 */
 		   )
 		{
-		    LIS_QISRUNLOCK(rdq, &psw) ;
 		    err = -EINVAL;			/* invalid flags */
 		    goto return_point ;		/* go return 'rtn' */
 		}
@@ -5466,11 +5503,8 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	 * Now we commit to removing the message from the read queue
 	 * Up until here error conditions could have left the message
 	 * in the queue.
-	 *
-	 * Still holding the read queue ISR lock.
 	 */
 	mp = lis_getq(rdq);			/* remove from queue */
-	LIS_QISRUNLOCK(rdq, &psw) ;		/* now safe to unlock rd que */
 	if ( mp == NULL )
 	{
 	    printk("strgetpmsg: empty queue: addr of queue 0x%lx\n",
@@ -5479,9 +5513,10 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	    goto return_point;
 	}
 
-	lis_check_m_sig(hd) ;		/* watch for M_SIG in q */
-	lis_unlockq(rdq) ;		/* now we can unlock the queue */
-	qlocked = 0 ;
+	LIS_QISRLOCK(rdq, &psw) ;
+	rdq->q_flag &= ~QREADING;	/* no longer "reading" */
+	LIS_QISRUNLOCK(rdq, &psw) ;
+	qreading = 0 ;
 
 	LisDownCount(MSGQDSTRHD) ;
 	if (LIS_DEBUG_GETMSG && LIS_DEBUG_DMP_DBLK)
@@ -5504,7 +5539,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 
 	if (mtype == M_SIG)			/* not suitable msg */
 	{					/* msg still in queue */
-	    LIS_QISRUNLOCK(rdq, &psw) ;
 	    lis_check_m_sig(hd) ;		/* watch for M_SIG in q */
 	    err = -EAGAIN ;
 	    goto return_point ;
@@ -5515,7 +5549,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	else					/* M_DATA or M_PROTO */
 	if (flags == RS_HIPRI)			/* wants hi-priority only */
 	{
-	    LIS_QISRUNLOCK(rdq, &psw) ;
 	    err = -EBADMSG;
 	    goto return_point ;			/* go return 'rtn' */
 	}
@@ -5523,7 +5556,6 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	    flags = MSG_BAND ;			/* regular priority */
 
 	peekmp = lis_dupmsg(mp);		/* prevents deallocation */
-	LIS_QISRUNLOCK(rdq, &psw) ;		/* safe to unlock now */
 	if (peekmp == NULL)
 	{
 	    err = -ENOMEM;
@@ -5531,6 +5563,11 @@ lis_strgetpmsg(struct inode *i, struct file *fp,
 	}
 
 	mp = peekmp ;				/* hold onto the dup'd mp */
+
+	LIS_QISRLOCK(rdq, &psw) ;
+	rdq->q_flag &= ~QREADING;		/* no longer "reading" */
+	LIS_QISRUNLOCK(rdq, &psw) ;
+	qreading = 0 ;
     }
 
     /*
@@ -5614,6 +5651,13 @@ return_point:
     }
 
 err_return_point:				/* return "err" */
+
+    if (rdq != NULL && qreading)
+    {
+	LIS_QISRLOCK(rdq, &psw) ;
+	rdq->q_flag &= ~QREADING;
+	LIS_QISRUNLOCK(rdq, &psw) ;
+    }
 
     lis_wake_up_read_sem(hd) ;
     lis_head_put(hd) ;
