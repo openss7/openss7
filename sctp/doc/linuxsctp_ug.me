@@ -1,0 +1,367 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: linuxsctp_ug.me,v 0.9.2.1 2002/05/20 05:04:18 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any success regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2002/05/20 05:04:18 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database idrefs
+annotate X pp
+move-punctuation
+discard YZ
+join-authors ", " ", " ", "
+et-al " et all" 1 2
+# reverse A
+.R2
+.if '\*(.T'ascii' \{\
+.\"'
+.ds #n <\\**>
+.m1 1
+.m2 1
+.m3 1
+.m4 0
+.pl 11.0i
+.\" .po 4
+.ll 7.6i
+.lt 7.6i
+.\" .nr LL 7.6i
+.\" .nr LT 7.6i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii \w'\0(000)\0'u
+.nr pi 4n
+.nr po 2n
+.nr bi 4n
+.\}
+.if '\*(.T'ps' \{\
+.\"'
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii \w'\0(000)\0'u
+.nr pi 0.5i
+.nr po 0.25i
+.nr bs 0
+.nr bi 0.5i
+.nr hi 0.5i
+.nr pp 11
+.nr fp 9
+.nr gp 10
+.nr sp 13
+.nr tp 10
+.\}
+.dn &n
+.dn &p
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.de #f
+.(l C F
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+\\*(&f\\n(&n \\$1
+.)x \\n(ch-\\n%
+.)l
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #e
+.if \\n($d>1 \{\
+.uh "Endnotes for Chapter \\\\n(ch"
+.pd
+.\}
+..
+.ds a \a
+.tp
+.(l C
+.uh "Stream Control Transmission Protocol (SCTP)"
+.uh "For Linux NET4"
+.uh "User's Guide"
+.)l
+.(z
+.(l C
+Published by:
+OpenSS7 Corporation
+Suite #424
+4701 Preston Park Boulevard
+Plano, TX 75093
+.)l
+.lp
+Copyright \(co 2001-2002, OpenSS7 Corporation
+.lp
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both the copyright notice and this
+permission notice appear in supporting documentation, and that the name
+OpenSS7 Corporation not be used in advertising or publicity pertaining to
+distribution of the software without specific, written permission.  OpenSS7
+Corporation makes no representation about the suitability of this
+documentation for any purpose.  It is provided "as is" without expcess or
+implied warranty.
+.lp
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION
+INCLUDING ALL IMPLIED WARRANTIES OF MECHANTABILITY AND FITNESS.  IN NO EVENT
+SHALL OPENSS& CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS.
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS DOCUMENTATION.
+.ce 1
+.uh "NOTICE"
+.lp
+OpenSS7 Corporation is making this documentation available as a reference
+point for the industry.  While OpenSS7 Corporation believes that these
+interfaces are well defined in this release of the document, minor changes may
+be made prior to products conforming to the interfaces being made available.
+.ce 1
+.uh "TRADEMARKS"
+.lp
+UNIX \(rg is a trademark.
+.)z
+.fo '$Revision: 0.9.2.1 $'Page \\\\n%'\\\\*(td'
+.pn 1
+.++ AB 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
+.+c Abstract
+.pp
+This document provides description and documentation of the OpenSS7 Linux
+Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+.]
+implementation for Linux NET4.  It provides general purpose user information
+that instructs users of the Linux SCTP socket interface in the writing,
+compilation and execution of user programs employing the services of SCTP.
+.[
+rfc 2960
+.]
+.pn 1
+.++ P 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
+.+c Preface
+.uh "Scope"
+.lp
+This document specifies a Signalling Link Manager for the SS7 Signalling Links
+supporting the OpenSS7 Signalling Link Interface.  It provides abstraction
+from device-specific Physical Point of Attachment addresses and provides a
+single Signalling Link Identifier management domain for the identification,
+allocation and activation of signalling links.
+.uh "Intent"
+.lp
+This document is intended to provide information for writers of OpenSS7
+Signalling Link Interface drivers as well as writers of OpenSS7 Signalling
+Link Users.  It also provides documentation for the Signalling Link Manager
+and the Siganlling Link Management Daemon.
+.uh "Target Audience"
+.lp
+The target audience is developers and users of the OpenSS7 SS7 stack.
+.uh "Disclaimer"
+.lp
+Although the author has attempted to ensure that the information in this
+document is complete and correct, neither the Author nor OpenSS7 Corporation
+will take any responsibility in it.
+.uh "Revision History"
+.lp
+Take care that you are working with a current version of this document: you
+will not be informed of updates.  For a current version, please see the source
+documentation at http://www.openss7.org/.
+
+.(l I
+$Log: linuxsctp_ug.me,v $
+Revision 0.9.2.1  2002/05/20 05:04:18  brian
+Added documentation.
+
+Revision 1.1  2002/05/20 05:04:18  brian
+Added documentation.
+
+Revision 0.8  2002/04/02 08:10:53  brian
+Started Linux 2.4 development branch.
+
+Revision 0.7.8.1  2002/01/11 00:57:10  brian
+Checkin.
+
+Revision 0.7  2001/12/20 21:14:09  brian
+Working on datamodel document.
+
+Revision 0.7.8.1  2001/12/11 13:14:59  brian
+Branched for new development.
+
+Revision 0.7.6.1  2001/12/11 11:06:00  brian
+Corrected PS output.
+
+Revision 0.7  2001/12/11 03:22:53  brian
+Added doc files.
+
+.)l
+.de $0
+.if \\$3>0 \{\
+.if \\$3<3 \{\
+.(x 0
+.ie '\\$2'' \\$1
+.el \\n(ch.\\$2 \\$1
+.\"'
+.)x \\n(ch-\\n%
+.\}
+.\}
+..
+.de $C
+.ds &f Figure \\$2-
+.ds &c \\n(ch
+.nr &n 1
+.nr &p 0
+.nr % 1
+.(x 0
+\\$2 \\$3
+.)x \\n(ch-\\n%
+..
+.fo '$Revision: 0.9.2.1 $'Page \\\\*(&c-\\\\n%'\\\\*(td'
+.pn 1
+.++ C 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
+.+c Introduction
+
+.sh 1 "Overview"
+.pp
+This document
+.lp
+Here is a reference.
+.[
+m2pa-03
+.]
+.lp
+This is a footnote\**.
+.(f
+\** This is a footnote.
+.)f
+.lp
+This is an endnote\*#.
+.(d
+.ip \*#
+This is an endnote.
+.)d 4
+This is another endnote\*#.
+.(d
+.ip \*#
+This is an endnote.
+.)d 4
+
+.sh 1 "Document Organization"
+
+.sh 1 "Terminology"
+.ip "\fI\}\fR\}"
+.ip "\fI\}\fR\}"
+.ip "\fI\}\fR\}"
+
+.#e
+.pn 1
+.+c "Introduction"
+.nr $1 0
+
+.sh 1 "Overview"
+.sh 2 "Overview"
+
+
+
+
+.#e
+.pn 1
+.++ A 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
+.+c "An\ Appendix"
+.nr $1 0
+.sh 1 "The Appendix"
+
+.(z C
+.(c
+.sz -2
+\fC\)\
+
+.sz +2
+.)c
+.#f "Overview"
+.)z
+
+.#e
+.pn 1
+.++ B 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
+.fo '$Revision: 0.9.2.1 $'Page \\\\n%'\\\\*(td'
+.af % I
+.de ]<
+.nr % 1
+.+c References
+.rm (f )f
+..
+.[
+$LIST$
+.]
+.+c "List\ of\ Illustrations"
+.(l
+.xp 2
+.)l
+.+c "Table\ of\ Contents"
+.(l
+.xp 0
+.)l
+
