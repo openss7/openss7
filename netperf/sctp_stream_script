@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp_stream_script,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/06 12:44:04 $
+# @(#) $RCSfile: sctp_stream_script,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/01/25 03:41:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/06 12:44:04 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 03:41:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,6 +77,8 @@ fi
 #NETHOME=/usr/local/netperf
 #NETHOME="/opt/netperf"
 NETHOME=.
+
+case "$1" in (--help|--version|--copying) $NETHOME/netperf $1 ; exit $?  ;; esac
 
 # at what port will netserver be waiting? If you decide to run
 # netserver at a differnet port than the default of 12865, then set

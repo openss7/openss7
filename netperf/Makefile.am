@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2005/01/23 08:12:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2005/01/25 03:41:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/23 08:12:21 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 03:41:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,8 +82,10 @@ dist_sbin_SCRIPTS		= \
 				  arr_script \
 				  packet_byte_script
 
+bin_PROGRAMS			= \
+				  netperf
+
 sbin_PROGRAMS			= \
-				  netperf \
 				  netserver
 
 noinst_LTLIBRARIES		= \
@@ -125,60 +127,60 @@ dist_noinst_SCRIPTS		= configure.nexusware
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS)
 
 man1_MANS			= \
-				  netperf.1 \
-				  sctp_range_script.1 \
-				  sctp_rr_script.1 \
-				  sctp_stream_script.1 \
-				  tcp_range_script.1 \
-				  tcp_rr_script.1 \
-				  tcp_stream_script.1 \
-				  udp_rr_script.1 \
-				  udp_stream_script.1 \
-				  snapshot_script.1 \
-				  arr_script.1 \
-				  packet_byte_script.1 \
-				  netperf_arr.1 \
-				  netperf_packet_byte.1 \
-				  netperf_sctp_range.1 \
-				  netperf_sctp_rr.1 \
-				  netperf_sctp_stream.1 \
-				  netperf_snapshot.1 \
-				  netperf_tcp_range.1 \
-				  netperf_tcp_rr.1 \
-				  netperf_tcp_stream.1 \
-				  netperf_udp_range.1 \
-				  netperf_udp_rr.1 \
-				  netperf_udp_stream.1
+				  man1/netperf.1 \
+				  man1/netperf_arr.1 \
+				  man1/netperf_packet_byte.1 \
+				  man1/netperf_sctp_range.1 \
+				  man1/netperf_sctp_rr.1 \
+				  man1/netperf_sctp_stream.1 \
+				  man1/netperf_snapshot.1 \
+				  man1/netperf_tcp_range.1 \
+				  man1/netperf_tcp_rr.1 \
+				  man1/netperf_tcp_stream.1 \
+				  man1/netperf_udp_range.1 \
+				  man1/netperf_udp_rr.1 \
+				  man1/netperf_udp_stream.1
 
 man8_MANS			= \
-				  netserver.8
+				  man8/sctp_range_script.8 \
+				  man8/sctp_rr_script.8 \
+				  man8/sctp_stream_script.8 \
+				  man8/tcp_range_script.8 \
+				  man8/tcp_rr_script.8 \
+				  man8/tcp_stream_script.8 \
+				  man8/udp_rr_script.8 \
+				  man8/udp_stream_script.8 \
+				  man8/snapshot_script.8 \
+				  man8/arr_script.8 \
+				  man8/packet_byte_script.8 \
+				  man8/netserver.8
 
 dist_noinst_MANS		= \
-				  netperf.man \
-				  sctp_range_script.man \
-				  sctp_rr_script.man \
-				  sctp_stream_script.man \
-				  tcp_range_script.man \
-				  tcp_rr_script.man \
-				  tcp_stream_script.man \
-				  udp_rr_script.man \
-				  udp_stream_script.man \
-				  snapshot_script.man \
-				  arr_script.man \
-				  packet_byte_script.man \
-				  netperf_arr.man \
-				  netperf_packet_byte.man \
-				  netperf_sctp_range.man \
-				  netperf_sctp_rr.man \
-				  netperf_sctp_stream.man \
-				  netperf_snapshot.man \
-				  netperf_tcp_range.man \
-				  netperf_tcp_rr.man \
-				  netperf_tcp_stream.man \
-				  netperf_udp_range.man \
-				  netperf_udp_rr.man \
-				  netperf_udp_stream.man \
-				  netserver.man
+				  man1/netperf.man \
+				  man1/netperf_arr.man \
+				  man1/netperf_packet_byte.man \
+				  man1/netperf_sctp_range.man \
+				  man1/netperf_sctp_rr.man \
+				  man1/netperf_sctp_stream.man \
+				  man1/netperf_snapshot.man \
+				  man1/netperf_tcp_range.man \
+				  man1/netperf_tcp_rr.man \
+				  man1/netperf_tcp_stream.man \
+				  man1/netperf_udp_range.man \
+				  man1/netperf_udp_rr.man \
+				  man1/netperf_udp_stream.man \
+				  man8/sctp_range_script.man \
+				  man8/sctp_rr_script.man \
+				  man8/sctp_stream_script.man \
+				  man8/tcp_range_script.man \
+				  man8/tcp_rr_script.man \
+				  man8/tcp_stream_script.man \
+				  man8/udp_rr_script.man \
+				  man8/udp_stream_script.man \
+				  man8/snapshot_script.man \
+				  man8/arr_script.man \
+				  man8/packet_byte_script.man \
+				  man8/netserver.man
 
 MANMACRO_PFX			= netperf
 

@@ -1,1 +1,1 @@
-.so netperf_sctp_range.man
+.so man1/netperf_sctp_range.man

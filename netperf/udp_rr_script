@@ -22,7 +22,9 @@ fi
 
 #NETHOME=/usr/local/netperf
 #NETHOME="/opt/netperf"
-NETHOME="."
+NETHOME=.
+
+case "$1" in (--help|--version|--copying) $NETHOME/netperf $1 ; exit $?  ;; esac
 
 # at what port will netserver be waiting? If you decide to run
 # netserver at a differnet port than the default of 12865, then set

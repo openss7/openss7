@@ -1988,6 +1988,12 @@ and UDP.
 .RS
 .RE
 
+.SH DIAGNOSTICS
+When successful,
+.B netperf
+exits with a zero (0) exit status;
+when it fails,
+it exists with a non-zero exit status and prints a diagnostic message.
 
 .SH BUGS 
 There is a fairly large list of known defects and misfeatures in the
@@ -2001,6 +2007,23 @@ Jones <raj@cup.hp.com>.
 Netperf: A Network Performance Benchmark
 .br
 http://www.netperf.org/
+
+.SH COMPATIBILITY
+.PP
+.B netperf
+is compatible in all respects with the original
+.B netperf
+releases from HP.
+
+.SH CONFORMANCE
+.PP
+.B netperf
+does not conform to any standards.
+
+.SH HISTORY
+.PP
+.B netperf
+was developed by HP.
 
 .SH AUTHORS
 HP Information Networks Division - Networking Performance Team.

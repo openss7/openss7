@@ -1,1 +1,1 @@
-.so netperf_packet_byte.man
+.so man1/netperf_packet_byte.man

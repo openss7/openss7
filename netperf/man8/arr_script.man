@@ -1,1 +1,1 @@
-.so netperf_arr.man
+.so man1/netperf_arr.man

@@ -11,6 +11,11 @@
 # rick jones 4/99
 #
 
+NETHOME=.
+NETPERF_CMD="$NETHOME/netperf"
+
+case "$1" in (--help|--version|--copying) $NETHOME/netperf $1 ; exit $?  ;; esac
+
 if [ $# -gt 2 ]; then
   echo "try again, correctly -> packet_byte_script hostname [CPU]"
   exit 1
@@ -20,9 +25,6 @@ if [ $# -eq 0 ]; then
   echo "try again, correctly -> packet_byte_script hostname [CPU]"
   exit 1
 fi
-
-# where is netperf
-NETPERF_CMD=${NETPERF_CMD:=/opt/netperf/netperf}
 
 # at what port will netserver be waiting? If you decide to run
 # netserver at a differnet port than the default of 12865, then set

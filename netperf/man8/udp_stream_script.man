@@ -1,1 +1,1 @@
-.so netperf_udp_stream.man
+.so man1/netperf_udp_stream.man

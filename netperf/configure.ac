@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 1.1.2.6 2005/01/24 11:59:27 brian Exp $
+dnl @(#) $Id: configure.ac,v 1.1.2.7 2005/01/25 03:41:15 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 11:59:27 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/25 03:41:15 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -89,6 +89,8 @@ AC_GNU_SOURCE
 #
 # Checks for programs.
 #
+AM_PROG_AS
+AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
@@ -98,6 +100,7 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 AC_PROG_GCC_TRADITIONAL
@@ -126,6 +129,7 @@ AC_CHECK_LIB([bind], [main])
 #
 # Checks for header files.
 #
+AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h malloc.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h])

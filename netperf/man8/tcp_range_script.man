@@ -1,1 +1,1 @@
-.so netperf_tcp_range.man
+.so man1/netperf_tcp_range.man

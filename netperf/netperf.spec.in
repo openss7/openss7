@@ -1,0 +1,493 @@
+# vim: ft=spec sw=4 et
+# =============================================================================
+# 
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/01/25 03:41:15 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/01/25 03:41:15 $ by $Author: brian $
+#
+# =============================================================================
+
+# default is to build kernel modules and tools
+# conditional builds of binary rpms relies on the sneaky spec trick that
+# rpmbuild will not build a binary rpm when it has no %files section
+%global BUILD_lis     1
+%global BUILD_lfs     0
+
+%global epoch @PACKAGE_EPOCH@
+%global base @PACKAGE_TARNAME@
+%global infofiles %{name}
+%global title @PACKAGE_TITLE@
+%global stitle @PACKAGE_SHORTTITLE@
+
+# because we only need to build the tools binaries once for each architecture,
+# but need to build the modules binaries once for each architecture and kernel
+# version, we accept the --with[out] options "modules" and "tools"
+%{?_without_lis:     %{expand: %%global BUILD_lis     0}}
+%{?_without_lis:     %{expand: %%global BUILD_lfs     1}}
+%{?_without_lfs:     %{expand: %%global BUILD_lfs     0}}
+%{?_without_lfs:     %{expand: %%global BUILD_lis     1}}
+
+%{?_with_lis:        %{expand: %%global BUILD_lis     1}}
+%{?_with_lis:        %{expand: %%global BUILD_lfs     0}}
+%{?_with_lfs:        %{expand: %%global BUILD_lfs     1}}
+%{?_with_lfs:        %{expand: %%global BUILD_lis     0}}
+
+%global _strxns  0
+%global _strxnet 0
+%global _strinet 0
+%global _strsctp 0
+
+%{?_without_xns:     %{expand: %%global _strxns       0}}
+%{?_without_xti:     %{expand: %%global _strxnet      0}}
+%{?_without_inet:    %{expand: %%global _strinet      0}}
+%{?_without_sctp:    %{expand: %%global _strsctp      0}}
+
+%{?_with_xns:        %{expand: %%global _strxns       1}}
+%{?_with_xti:        %{expand: %%global _strxnet      1}}
+%{?_with_inet:       %{expand: %%global _strinet      1}}
+%{?_with_sctp:       %{expand: %%global _strsctp      1}}
+
+%global _streams lis
+%if %{BUILD_lfs}
+%global _STREAMS LfS
+%global _streams streams
+%global _strvers 0.7a
+%global _conflict LiS
+%endif
+%if %{BUILD_lis}
+%global _STREAMS LiS
+%global _streams LiS
+%global _strvers 2:2.16.18
+%global _conflict streams
+%endif
+
+# we have some more options that control configure for the build
+%{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
+%global fullrelease @PACKAGE_RELEASE@%{extrarelease}
+
+# a macro to build require one package of the same version as another
+%define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
+%define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
+
+Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
+%if %{?_without_public: 0}%{!?_without_public: 1}
+Name:           @PACKAGE_NAME@
+%else
+Name:           @PACKAGE_NAME@-bin
+%endif
+Epoch:          @PACKAGE_EPOCH@
+Version:        @PACKAGE_VERSION@
+Release:        @PACKAGE_RELEASE@
+License:        GPL
+Group:          System Environment/Base
+%if %{?url: 1}%{!?url: 0}
+URL:            %{url}
+%endif
+%if %{?_xpm_icon: 1}%{!?_xpm_icon: 0}
+Icon:           %{_xpm_icon}
+%endif
+%if %{?_gif_icon: 1}%{!?_gif_icon: 0}
+Icon:           %{_gif_icon}
+%endif
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
+ExclusiveOs:    Linux
+#Source:         %{name}-%{version}-%{release}.tar.bz2
+Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}-%{release}.tar.bz2
+Obsoletes:      %{base}
+Obsoletes:      %{name}
+Obsoletes:      netperf
+Conflicts:      %{base}-%{_conflict}
+%if %{?buildroot: 0}%{!?buildroot: 1}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
+%endif
+Provides:       netperf
+BuildRequires:  %{_streams}-devel >= %{_strvers}
+%define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+%ifarch s390 s390x
+BuildRequires:  gcc >= 2.95.3
+%else
+%ifarch %{all_ppc}
+BuildRequires:  gcc >= 2.96-75
+%else
+%if %{newgcc}
+BuildRequires:  gcc >= 2.96-98
+%else
+BuildRequires:  gcc = 2.95.3
+%endif
+%endif
+%endif
+%if %{newgcc}
+BuildRequires:  gcc >= 2.96
+%else
+BuildRequires:  gcc = 2.95.3
+%endif
+%if %{_strxns}
+BuildRequires:  strxns-devel >= %{epoch}:0.9.2
+%endif
+%if %{_strxnet}
+BuildRequires:  strxnet-devel >= %{epoch}:0.9.2
+%endif
+%if %{_strinet}
+BuildRequires:  strinet-devel >= %{epoch}:0.9.2
+%endif
+%if %{_strsctp}
+BuildRequires:  strsctp-devel >= %{epoch}:0.9.2
+%endif
+# these are some needs of the configure script
+# to manipulate manual pages:
+BuildRequires:  /usr/bin/soelim
+BuildRequires:  /usr/bin/refer
+BuildRequires:  /usr/bin/tbl
+BuildRequires:  /usr/bin/pic
+BuildRequires:  /usr/bin/gzip
+# to generate kernel symbols:
+#BuildRequires:  /sbin/genksyms
+# find the rest automagically
+Autoreq:        true
+
+# ---------------------------------------------------------------------------
+%description
+The %{name} package include netperf test programs optioned and compiled for
+use with OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7
+%{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The purpose
+of this package is to be able to perform comparison tests agains TCP and SCTP.
+This distribution is currently only applicable to Linux release and was
+targetted at ix86 and ppc architectures, but should build and install for
+other architectures as well.
+
+%prep
+# ---------------------------------------------------------------------------
+
+rm -rf   %{name}-%{version}-%{fullrelease}
+rm -rf   %{name}-%{version}-%{fullrelease}-tmp.$$
+mkdir -p %{name}-%{version}-%{fullrelease}-tmp.$$
+cd       %{name}-%{version}-%{fullrelease}-tmp.$$
+bzip2 -dc %{_sourcedir}/%{name}-%{version}-%{release}.tar.bz2 | tar -xf-
+STATUS=$?
+if [ $STATUS -eq 0 ] ; then
+mv -f    %{name}-%{version}-%{release} ../%{name}-%{version}-%{fullrelease}
+fi
+cd       ..
+rm -rf   %{name}-%{version}-%{fullrelease}-tmp.$$
+if [ $STATUS -ne 0 ] ; then
+exit $STATUS
+fi
+cd       %{name}-%{version}-%{fullrelease}
+[ `id -u` = '0' ] && chown -Rhf root .
+[ `id -u` = '0' ] && chgrp -Rhf root .
+chmod -Rf a+rX,g-w,o-w .
+
+%build
+# ---------------------------------------------------------------------------
+
+cd %{_builddir}/%{name}-%{version}-%{fullrelease}
+
+preferred_cflags="%{optflags}"
+
+%ifarch %{ix86}
+preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
+%endif
+
+%ifarch sparc
+preferred_cflags="$preferred_cflags -fcall-used-g7"
+%endif
+
+%ifarch sparcv9
+preferred_cflags="$preferred_cflags -fcall-used-g7"
+%endif
+
+%ifarch sparc64
+preferred_cflags="$preferred_cflags -mvis -fcall-used-g7"
+%endif
+
+%ifnarch ia64 s390 s390x ppc ppciseries ppc64
+if test `gcc --version` != '2.95.3' ; then
+preferred_cflags="$preferred_cflags -freorder-blocks"
+fi
+%endif
+
+%define cache_file %{_builddir}/%{_target_platform}-%{kernel_version}-%{fullrelease}-%{_streams}-config.cache
+%define csite_file %{_builddir}/%{_target_platform}-%{fullrelease}-config.site
+
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
+
+%define mybuilddir %{buildroot}/%{_target_platform}-%{kernel_version}-%{fullrelease}-build
+
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+mkdir -p %{mybuilddir}
+cd %{mybuilddir}
+
+%{_builddir}/%{name}-%{version}-%{fullrelease}/configure \
+    CC="${CC}" \
+    CFLAGS="${CFLAGS:-$preferred_cflags}" \
+    LDFLAGS="${LDFLAGS}" \
+    CPPFLAGS="${CPPFLAGS}" \
+    CPP="${CPP}" \
+    CXX="${CXX:-$CC}" \
+    CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
+    CXXCPP="${CXXCPP:-$CPP}" \
+    CONFIG_SITE="%{csite_file}" \
+    --cache-file="%{cache_file}" \
+    --build=%{_build} \
+    --host=%{_target_platform} \
+    --prefix=%{_prefix} \
+    --exec-prefix=%{_exec_prefix} \
+    --bindir=%{_bindir} \
+    --sbindir=%{_sbindir} \
+    --sysconfdir=%{_sysconfdir} \
+    --datadir=%{_datadir} \
+    --includedir=%{_includedir} \
+    --libdir=%{_libdir} \
+    --libexecdir=%{_libexecdir} \
+    --localstatedir=%{_localstatedir} \
+    --sharedstatedir=%{_sharedstatedir} \
+    --mandir=%{_mandir} \
+    --infodir=%{_infodir} \
+    --disable-maintainer-mode \
+    --disable-dependency-tracking \
+    --with-gnu-ld \
+    --with-rpm-epoch=%{epoch} \
+    --with-rpm-release=%{release} \
+    %{?_with_checks:             %enable %_with_checks} \
+    %{?_without_checks:          %disable %_without_checks} \
+    %{?_with_autotest:           %enable %_with_autotest} \
+    %{?_without_autotest:        %disable %_without_autotest} \
+    %{?_with_cooked_manpages:    %_with_cooked_manpages} \
+    %{?_without_cooked_manpages: %_without_cooked_manpages} \
+    %{?_with_public:             %enable %_with_public} \
+    %{?_without_public:          %disable %_without_public} \
+    %{?_with_lis:                %_with_lis} \
+    %{?_with_lfs:                %_with_lfs} \
+    %{?_with_xns:                %_with_xns} \
+    %{?_without_xns:             %_without_xns} \
+    %{?_with_xti:                %_with_xti} \
+    %{?_without_xti:             %_without_xti} \
+    %{?_with_inet:               %_with_inet} \
+    %{?_without_inet:            %_without_inet} \
+    %{?_with_sctp:               %_with_sctp} \
+    %{?_without_sctp:            %_without_sctp} \
+    || { rm -f %{cache_file} ; exit 1 ; }
+
+make
+make check
+
+%install
+# ---------------------------------------------------------------------------
+
+%if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
+# we are going to create debug packages, so we need to install unstripped binaries.
+make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
+%else
+# use libtoolized install-strip to strip binaries, modules, shared and static libraries.
+make -C %{mybuilddir} DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
+%endif
+
+# copy out our devices list and then destroy the build directory
+#cp -pf %{mybuilddir}/%{makedev} .
+make -C %{mybuilddir} distclean
+
+# get the installed info directory out of the build root
+[ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
+
+# stupid mandrake spec-helper will compress our macros files otherwise
+@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+
+%clean
+# ---------------------------------------------------------------------------
+
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+
+# ===========================================================================
+%package %{_streams}
+Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
+Group:          System Environment/Base
+Prefix:         %{_docdir}
+Prefix:         %{_sbindir}
+Prefix:         %{_mandir}
+Requires:       %{_streams}-core >= %{_strvers}
+%if %{_strxns}
+Requires:       strxns-%{_streams}-core >= %{epoch}:0.9.2
+%endif
+%if %{_strxnet}
+Requires:       strxnet-%{_streams}-core >= %{epoch}:0.9.2
+%endif
+%if %{_strinet}
+Requires:       strinet-%{_streams}-core >= %{epoch}:0.9.2
+%endif
+%if %{_strsctp}
+Requires:       strsctp-%{_streams}-core >= %{epoch}:0.9.2
+%endif
+Autoreq:        true
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_streams}
+The %{name}-%{_streams} package includes netperf test programs optioned and
+compiled for use with OpenSS7 Linux Native SCTP sockets interface as well as
+OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET driver, and XTI SCTP driver.  The
+purpose of this package is to be able to perform comparison tests agains TCP
+and SCTP.  This distribution is currently only applicable to Linux release and
+was targetted at ix86 and ppc architectures, but should build and install for
+other architectures as well.
+
+%files %{_streams}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%doc ACKNWLDGMNTS AUTHORS ChangeLog COPYING COPYRIGHT INSTALL netperf.ps NEWS README README.ovms Release_Notes THANKS
+%doc *.ps *.pdf *.html *.lsm
+%{_sbindir}/*
+%{_mandir}/man*/*
+
+# ===========================================================================
+%changelog
+# ---------------------------------------------------------------------------
+# $Log: netperf.spec.in,v $
+# Revision 1.1.2.1  2005/01/25 03:41:15  brian
+# - Get manpages to pass check_mans.
+#
+# Revision 1.1.2.26  2005/01/21 08:39:40  brian
+# - Work around mandrake spec-helper for uncooked manpages.
+#
+# Revision 1.1.2.25  2005/01/20 00:51:59  brian
+# - Go back to quick no dependencies compile.
+#
+# Revision 1.1.2.24  2005/01/19 07:38:25  brian
+# - Added checks and autotest options to configure.
+#
+# Revision 1.1.2.23  2005/01/18 13:31:18  brian
+# - Support multiple builds on same NFS mount.
+#
+
+* Tue Jan 18 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.22  2005/01/18 10:42:34  brian
+- Rationalize to new separated build approach.
+
+* Thu Jan 13 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.21  2005/01/13 12:18:12  brian
+- *** empty log message ***
+
+* Mon Jan 10 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.20  2005/01/10 18:59:13  brian
+- mandrake places libexec files in /usr/lib, correct globbing
+- updated change logs
+
+* Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.19  2004/12/29 21:32:32  brian
+- Straighten out cache and site files.
+
+* Wed Dec 29 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.18  2004/12/29 06:37:09  brian
+- Add site file definition to spec file.
+
+* Tue Dec 21 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.17  2004/12/21 22:22:14  brian
+- Added automatic site configuration to rpm build.
+
+* Sun Dec 19 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.16  2004/12/19 15:11:45  brian
+- Working up better spec files.
+
+* Fri Dec 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.15  2004/12/17 04:02:37  brian
+- Improving spec files.
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.14  2004/12/15 15:25:33  brian
+- avoid undefined debug macro
+
+* Wed Dec 15 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.13  2004/12/15 14:59:06  brian
+- Update RPM build to build multiple distribution binary RPMs from a single SRPM.
+
+* Mon Dec 13 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.12  2004/12/13 10:52:09  brian
+- Removed vendor specific headers. (Define these in your .rpmmacros file.)
+- Added both .xpm and .gif icons into binary packages.
+- Fixed extrainfo empty macro body warning once and for all.
+
+* Wed Nov 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.11  2004/11/24 14:30:45  brian
+- Changes for multiple rpm distro builds.
+
+* Wed Nov 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.10  2004/11/24 11:27:50  brian
+- Changes to accomodate %_vendor macro for multiple distribution rpm builds.
+
+* Wed Oct 13 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.9  2004/10/13 01:49:05  brian
+- Updates spec changelogs.
+
+* Tue Aug 31 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.8  2004/08/31 04:49:03  brian
+- Avoid empty macro body error on extrainfo.
+
+* Tue Aug 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.7  2004/08/17 11:45:29  brian
+- Upgraded spec files.
+
+* Sat Aug  7 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.6  2004/08/07 11:00:46  brian
+- More rational provides structure.
+
+* Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.5  2004/08/06 20:59:02  brian
+- More final tweaks.
+
+* Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.4  2004/08/06 19:37:35  brian
+- Tweaking build and spec file.
+
+* Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.3  2004/08/06 14:35:38  brian
+- Getting spec file working.
+
+* Fri Aug  6 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.2  2004/08/06 03:47:22  brian
+- First stab at SCTP being included.
+
+# vim: ft=spec sw=4 et

@@ -43,8 +43,9 @@ PORT=""
 # where is netperf, and are there any "constant" options such as 
 # the netserver port number
 #NETHOME=/usr/etc/net_perf
-NETHOME="."
-NETPERF=$NETHOME/netperf $PORT
+NETHOME=.
+
+case "$1" in (--help|--version|--copying) $NETHOME/netperf $1 ; exit $?  ;; esac
 
 # How accurate we want the estimate of performance: 
 #      maximum and minimum test iterations (-i)
@@ -71,12 +72,12 @@ ADD=0
 # them in during the real tests. So, we execute the new CPU "tests"
 # of netperf and put the values into shell vars.
 case $LOC_CPU in
-\-c) LOC_RATE=`$NETPERF -t LOC_CPU`;;
+\-c) LOC_RATE=`$NETHOME/netperf $PORT -t LOC_CPU`;;
 *) LOC_RATE=""
 esac
 
 case $REM_CPU in
-\-C) REM_RATE=`$NETPERF -t REM_CPU -H $REM_HOST`;;
+\-C) REM_RATE=`$NETHOME/netperf $PORT -t REM_CPU -H $REM_HOST`;;
 *) REM_RATE=""
 esac
 
@@ -93,11 +94,11 @@ while [ $MESSAGE -le $END ]; do
   echo
   echo ------------------------------------
   echo Testing with the following command line:
-  echo  $NETPERF -l $TIME -H $REM_HOST -t TCP_STREAM\
+  echo  $NETHOME/netperf $PORT -l $TIME -H $REM_HOST -t TCP_STREAM\
         $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF --\
         -m $MESSAGE $SOCKET_SIZE 
   echo
-  $NETPERF -l $TIME -H $REM_HOST -t TCP_STREAM\
+  $NETHOME/netperf $PORT -l $TIME -H $REM_HOST -t TCP_STREAM\
   $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF --\
   -m $MESSAGE $SOCKET_SIZE
 

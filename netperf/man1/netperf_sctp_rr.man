@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: netperf_sctp_rr.man,v 1.1.2.2 2004/08/12 09:08:38 brian Exp $
+.\" @(#) $Id: netperf_sctp_rr.man,v 1.1.2.3 2005/01/25 03:41:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/12 09:08:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/25 03:41:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so netperf.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NETPERF_SCTP_RR 1 "$Date: 2004/08/12 09:08:38 $" "$Name:  $" "User Commands"
+.TH NETPERF_SCTP_RR 1 "$Date: 2005/01/25 03:41:17 $" "$Name:  $" "User Commands"
 .SH NAME
 .B netperf_sctp_rr, sctp_rr_script
 \- perform scripted netperf SCTP request/response benchmark tests
@@ -312,6 +312,12 @@ has the advantage over
 .BR tcp_rr_script (1)
 that it supports testing of XTI interface as well as Sockets and provides
 caller access to all options.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B netperf_sctp_rr
+does not conform to any standards.
 .\"
 .\"
 .SH HISTORY

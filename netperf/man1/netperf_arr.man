@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: netperf_arr.man,v 1.1.2.1 2004/08/12 01:05:54 brian Exp $
+.\" @(#) $Id: netperf_arr.man,v 1.1.2.2 2005/01/25 03:41:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/12 01:05:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/25 03:41:17 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so netperf.macros
@@ -71,11 +71,237 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NETPERF_ARR 1 "$Date: 2004/08/12 01:05:54 $" "$Name:  $" "User Commands"
+.TH NETPERF_ARR 1 "$Date: 2005/01/25 03:41:17 $" "$Name:  $" "User Commands"
 .SH NAME
-.B netperf_arr
+.B netperf_arr, arr_script
 \-
+.\"
+.\"
 .SH SYNOPSIS
+.HP 8
+\fBarr_script\fR\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
+.HP 8
+\fBnetperf_arr\fR\ [\fIoptions\fR]\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
+.HP 8
+\fBnetperf_arr\fR\ {\ \fB-h\fR\ |\ \fB--help\fR\ }
+.HP 8
+\fBnetperf_arr\fR\ {\ \fB-V\fR\ |\ \fB--version\fR\ }
+.HP 8
+\fBnetperf_arr\fR\ {\ \fB-C\fR\ |\ \fB--copying\fR\ }
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I
+HOSTNAME
+name of remote host [\fIDefault:\fR \fBlocalhost\fR]
+.TP
+.B
+CPU
+calibrate CPU [\fIDefault:\fR no]
+.\"
+.\"
 .SH DESCRIPTION
-
-
+.PP
+.B netperf_arr
+is an OpenSS7 replacement for the
+.BR arr_script (8)
+that normally ships with
+.BR netperf (1).
+Thsi script is a
+.BR bash (1)
+shell script front-end to
+.BR netperf (1).
+.PP
+.B netperf_arr
+performs
+xxx
+tests.  It performs this test on a number of combinations of
+xxx and yyy.
+This test is intended as a benchmark test for
+zzzz
+behavior at several interesting data points.
+(See
+.BR netperf (1)
+for more information on these tests.)
+.\"
+.\"
+.SH OPTIONS
+.TP
+\fB-c\fR, \fB--calibrate\fR
+calibrate CPU [\fIDefault:\fR no]
+.TP
+\fB-t\fR, \fB--testtime\fR=\fISECONDS\fR
+duration of each test in seconds [\fIDefault:\fR 60]
+.TP
+\fB-H\fR, \fB--hostname\fR=\fIHOSTNAME\fR[:\fIPORT\fR]
+add a name or address to the netserver host list
+.TP
+\fB-l\fR, \fB--hostnames\fR='\fIHOSTNAME\fR[:\fIPORT\fR][ \fIHOSTNAME\fR[:\fIPORT\fR]]*'
+names or addresses of netserver hosts [\fIDefault:\fR localhost]
+.TP
+\fB-n\fR, \fB--numproc\fR=\fINUMPROC\fR
+add a processor number to the list
+.TP
+\fB-N\fR, \fB--numprocs\fR=\fINUMPROC\fR[ \fINUMPROC\fR]*
+specify the processor number list [\fIDefault:\fR `1']
+.TP
+\fB-r\fR, \fB--rrsize\fR=[\fIREQ-SIZE\fR][,][\fIRSP-SIZE\fR]
+add a request/response size pair to the list
+.TP
+\fB-R\fR, \fB--rrsizes\fR=[\fIREQ-SIZE\fR][,][\fIRSP-SIZE\fR][ [\fIREQ-SIZE\fR][,][\fIRSP-SIZE\fR]]*
+specify the request/response size pair list [\fIDefault:\fR `1,1']
+.TP
+\fB-b\fR, \fB--bufsize\fR=[\fISND-SIZE\fR][,][\fIRCV-SIZE\fR]
+add a buffer size to the list
+.TP
+\fB-B\fR, \fB--bufsizse\fR=[\fISND-SIZE\fR][,][\fIRCV-SIZE\fR][ [\fISND-SIZE\fR][,][\fIRCV-SIZE\fR]]*
+specify the buffer size list [\fIDefault:\fR `32768']
+.TP
+\fB-x\fR, \fB--xti\fR
+use XTI interface instead of Sockets [\fIDefault:\fR no]
+.TP
+\fB+sctp\fR, \fB+s\fR, \fB+S\fR, \fB--sctp\fR=[\fIDEVICE\fR[,\fIREMDEV\fR]], \fB--sctps\fR=[\fIDEVICE\fR[,\fIREMDEV\fR][ [\fIDEVICE\fR[,\fIREMDEV\fR]]*, \fB-sctp\fR, \fB-S\fR, \fB--nosctp\fR
+activate (for XTI DEVICE) or suppress SCTP in test [\fIDefault:\fR no:/dev/sctp,/dev/sctp]
+.TP
+\fB+tcp\fR, \fB+t\fR, \fB+T\fR, \fB--tcp\fR=[[\fIDEVICE\fR[,\fIREMDEV\fR]], \fB--tcps\fR=[\fIDEVICE\fR[,\fIREMDEV\fR][ [\fIDEVICE\fR[,\fIREMDEV\fR]]*, \fB-tcp\fR, \fB-T\fR, \fB--notcp\fR
+activate (for XTI DEVICE) or suppress TCP in test [\fIDefault:\fR yes:/dev/tcp,/dev/tcp]
+.TP
+\fB+udp\fR, \fB+u\fR, \fB+U\fR, \fB--udp\fR=[[\fIDEVICE\fR[,\fIREMDEV\fR]], \fB--udps\fR=[\fIDEVICE\fR[,\fIREMDEV\fR][ [\fIDEVICE\fR[,\fIREMDEV\fR]]*, \fB-udp\fR, \fB-U\fR, \fB--noudp\fR
+activate (for XTI DEVICE) or suppress UDP in test [\fIDefault:\fR no:/dev/udp,/dev/udp]
+.TP
+\fB+lla\fR, \fB+l\fR, \fB+L\fR, \fB--lla\fR=[[\fIDEVICE\fR[,\fIREMDEV\fR]], \fB--llas\fR=[\fIDEVICE\fR[,\fIREMDEV\fR][ [\fIDEVICE\fR[,\fIREMDEV\fR]]*, \fB-lla\fR, \fB-L\fR, \fB--nolla\fR
+activate (for DLPI DEVICE) or suppress LLA in test [\fIDefault:\fR no:/dev/dlpi,/dev/dlpi]
+.TP
+\fB-d\fR, \fB--devices\fR=[\fIDEVICE\fR[,\fIREMDEV\fR][ [\fIDEVICE\fR[,\fIREMDEV\fR]]*
+for compatibility with arr_script
+.TP
+\fB-y\fR, \fB--dry-run
+do not execute but verify actions [\fIDefault:\fR run]
+.TP
+\fB-q\fR, \fB--quiet\fR
+supress normal output
+.TP
+\fB-D\fR, \fB--debug\fR [\fILEVEL\fR]
+increase or set debugging verbosity [\fIDefault:\fR 0]
+.TP
+\fB-v\fR, \fB--verbose\fR [LEVEL]
+increase or set output verbosity [\fIDefault:\fR 1]
+.TP
+\fB-h\fR, \fB--help\fR
+prints this usage information and exits
+.TP
+\fB-V\fR, \fB--version\fR
+prints the version information and exits
+.TP
+\fB-C\fR, \fB--copying\fR
+prints copying permissions and exits
+.\"
+.\"
+.SH ENVIRONMENT
+.TP
+.B
+NETPERF_CMD
+default netperf command [\fIDefault:\fR \fBnetperf\fR]
+.TP
+.B
+NETPERF_TIME
+default test case duration [\fIDefault:\fR \fB60\fR]
+.TP
+.B
+NETPERF_PORT
+default netserver port number [\fIDefault:\fR \fB12865\fR]
+.TP
+.B
+NETPERF_SKTS
+default buffer sizes [\fIDefault:\fR `\fB32768\fR']
+.TP
+.B
+NETPERF_STATS
+default statistics options [\fIDefault:\fR `\fB-i 10,2 -I 99,5\fR']
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.BR strerr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors can result from inadequate permissions, inability to locate the
+.BR netperf (1)
+command; failure of the
+.BR netperf (1)
+command.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.TP
+.B /dev/tcp
+the default XTI device
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/bin/netperf_arr
+contains the
+.B netperf_arr
+script
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR netperf (1),
+.BR netserver (8),
+.BR arr_script (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B netperf_arr
+has no known bugs.  Report bugs to <bugs@openss7.org>.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B netperf_arr
+arguments and output are consistent with
+.BR arr_script (1).
+.B netperf_arr
+has the advantage over
+.BR arr_script (1)
+that it supports testing of XTI interface as well as Sockets and provides
+caller access to all options.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B netperf_arr
+does not conform to any standards.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B netperf_arr
+is a replacement for the
+.BR arr_script (1)
+originally distributed with
+.BR netperf (1).
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.AU
+.\"
+.\"
+.TI

@@ -103,6 +103,13 @@ This is used when running as a standalone daemon.
 .TP
 \fB-6\fR,\ \fB--ipv6\fR
 
+.SH DIAGNOSTICS
+When successful,
+.B netserver
+exits with a zero (0) exit status;
+when it fails,
+it exists with a non-zero exit status and prints a diagnostic message.
+
 .SH BUGS
 No known bugs at this time. If you think you have found a bug, please send email to Rick Jones <raj@cup.hp.com>.
 
@@ -113,6 +120,23 @@ No known bugs at this time. If you think you have found a bug, please send email
 Netperf: A Network Performance Benchmark
 .br
 http://www.netperf.org/
+
+.SH COMPATIBILITY
+.PP
+.B netserver
+is compatible in all respects with the original
+.B netperf
+releases from HP.
+
+.SH CONFORMANCE
+.PP
+.B netserver
+does not conform to any standards.
+
+.SH HISTORY
+.PP
+.B netperf
+was developed by HP.
 
 .SH AUTHORS
 HP Information Networks Division - Networking Performance Team.
