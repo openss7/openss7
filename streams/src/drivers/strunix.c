@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strunix.c,v (0.9.2.6) 2003/10/21 21:50:22
+ @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/21 21:50:22 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) strunix.c,v (0.9.2.6) 2003/10/21 21:50:22"
+#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] =
-    "strunix.c,v (0.9.2.6) 2003/10/21 21:50:22";
+static char const ident[] = "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +77,7 @@ static char const ident[] =
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS strunix.c,v (0.9.2.6) 2003/10/21 21:50:22"
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"

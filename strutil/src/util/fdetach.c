@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 00:20:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $"
 
-static char const ident[] =
-    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
+static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $";
 
 /* 
  *  SVR 4.2: fdetach(8)
@@ -91,7 +90,7 @@ version(int argc, char **argv)
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
     Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }

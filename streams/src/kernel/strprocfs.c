@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strprocfs.c,v (0.9.2.14) 2003/10/26 17:25:54
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/26 17:25:54 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) strprocfs.c,v (0.9.2.14) 2003/10/26 17:25:54"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] =
-    "strprocfs.c,v (0.9.2.14) 2003/10/26 17:25:54";
+static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
 
 #define __NO_VERSION__
 

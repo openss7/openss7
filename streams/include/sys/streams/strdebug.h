@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strdebug.h,v 0.9.2.2 2003/10/27 12:23:15 brian Exp
+ @(#) $Id: strdebug.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/27 12:23:15 by brian
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
+
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
 
 #define __never() \
 do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)

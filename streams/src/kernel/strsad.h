@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) strsad.h,v 0.9.2.2 2003/09/22 12:20:56 brian Exp
+ @(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/09/22 12:20:56 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 

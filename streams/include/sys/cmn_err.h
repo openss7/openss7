@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) cmn_err.h,v 0.9.2.2 2003/10/08 10:33:48 brian Exp
+ @(#) $Id: cmn_err.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/08 10:33:48 by brian
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_CMN_ERR_H__
 #define __SYS_CMN_ERR_H__ 1
+
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
 
 #ifndef __KERNEL__
 #error "Do not include kernel header files in user space programs."

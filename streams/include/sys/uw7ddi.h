@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) uw7ddi.h,v 0.9.2.5 2003/10/28 08:00:08 brian Exp
+ @(#) $Id: uw7ddi.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:08 by brian
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
+
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

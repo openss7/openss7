@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:46:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 00:46:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:46:46 $"
 
-static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:46:46 $";
 
 /* 
  *  autopush(8)
@@ -88,9 +87,10 @@ static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
-	fprintf(stderr, "\
-%1$s %2$s\n\
-    Copyright (c) 2003  OpenSS7 Corporation.  All Rights Reserved.\n\
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
     Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }
@@ -116,8 +116,16 @@ static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
-	usage(argc, argv);
-	fprintf(stderr, "\
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options] {-f|--file} filename\n\
+    %1$s [options] {-g|--get} [{-M [major|name]|-N name} [-m minor]]\n\
+    %1$s [options] {-r|--reset} [{-M [major|name]|-N name} [-m minor]]\n\
+    %1$s [options] {-s|--set} {-M [major|name]|-N name} [-m minor [-l lastminor]] module ...\n\
+    %1$s [options] {-c|--clone} {-M [major|name]|-N name} [-m minor]\n\
+    %1$s [options] {-v|--verify} module ...\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
 Arguments:\n\
     filename\n\
         filename from which to load autopush configuration\n\
@@ -154,7 +162,7 @@ Options:\n\
         prints this usage information and exits\n\
     -V, --version\n\
         prints the version and exits\n\
-");
+", argv[0]);
 }
 
 static int sad_cmd(int fd, int cmd, struct strapush *sap)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
+static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -84,7 +84,7 @@ static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

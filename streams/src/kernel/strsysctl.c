@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strsysctl.c,v (0.9.2.8) 2003/10/21 21:50:22
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/21 21:50:22 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) strsysctl.c,v (0.9.2.8) 2003/10/21 21:50:22"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] =
-    "strsysctl.c,v (0.9.2.8) 2003/10/21 21:50:22";
+static char const ident[] = "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/07 23:39:10 $";
 
 #define __NO_VERSION__
 

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strutil.c,v (0.9.2.21) 2003/10/28 08:00:05
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/28 08:00:05 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) strutil.c,v (0.9.2.21) 2003/10/28 08:00:05"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] = "strutil.c,v (0.9.2.21) 2003/10/28 08:00:05";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
 
 #define __NO_VERSION__
 

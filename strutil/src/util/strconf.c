@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 00:20:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $"
 
-static char const ident[] =
-    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
+static char const ident[] = "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -91,7 +90,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
     Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }
@@ -233,7 +232,7 @@ main(int argc, char *argv[])
 			{"debug",	optional_argument,	NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
-			{"help",	no_argument,		NULL, 'h'},
+			{"help",	no_argument,		NULL, 'H'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'H'},

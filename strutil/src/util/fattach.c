@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $
+ @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 00:20:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/02 12:04:52 $ by $Author: brian $
+ Last Modified $Date: 2004/03/08 00:20:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $"
+#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 00:20:01 $"
 
-static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/02 12:04:52 $";
+static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 00:20:01 $";
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -81,11 +81,10 @@ version(int argc, char *argv[])
 	if (!output)
 		return;
 	fprintf(stdout, "\
-%1$s %2$s:\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-\n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
-    included here by reference.\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }
 

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.2 2004/03/02 05:31:29 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/02 05:31:29 $ by $Author: brian $
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DEBUG_H__
 #define __SYS_DEBUG_H__
+
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
 
 #include <linux/kernel.h>
 

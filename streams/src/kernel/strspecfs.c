@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) strspecfs.c,v (0.9.2.14) 2003/10/27 12:23:17
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/27 12:23:17 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) strspecfs.c,v (0.9.2.14) 2003/10/27 12:23:17"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] =
-    "strspecfs.c,v (0.9.2.14) 2003/10/27 12:23:17";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
 
 #define __NO_VERSION__
 

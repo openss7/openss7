@@ -1,11 +1,11 @@
 /*****************************************************************************
 
- @(#) strinet.c,v (0.9.2.5) 2003/10/21 21:50:20
+ @(#) $RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/10/21 21:50:20 by brian
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) strinet.c,v (0.9.2.5) 2003/10/21 21:50:20"
+#ident "@(#) $RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 
-static char const ident[] = "strinet.c,v (0.9.2.5) 2003/10/21 21:50:20";
+static char const ident[] = "$RCSfile: strinet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $";
 
 /* 
  *  This driver provides the functionality of IP (Internet Protocol) over a
@@ -90,7 +90,7 @@ static char const ident[] = "strinet.c,v (0.9.2.5) 2003/10/21 21:50:20";
 
 #define	INET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define INET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define INET_REVISION	"LfS strinet.c,v (0.9.2.5) 2003/10/21 21:50:20"
+#define INET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:39:10 $"
 #define INET_DEVICE	"SVR 4.2 XTIOS (XTI Over Sockets) for NET4"
 #define INET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define INET_LICENSE	"GPL"

@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $Id: strattach.h,v 0.9.2.2 2004/03/02 00:47:23 brian Exp $
+ @(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:39:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -45,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/02 00:47:23 $ by $Author: brian $
+ Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
 
  *****************************************************************************/
 

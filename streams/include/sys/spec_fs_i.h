@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) spec_fs_i.h,v 0.9.2.5 2003/09/20 08:09:54 brian Exp
+ @(#) $Id: spec_fs_i.h,v 0.9.2.3 2004/03/07 23:53:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2003  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2003/09/20 08:09:54 by brian
+ Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SPEC_FS_I_H__
 #define __SYS_SPEC_FS_I_H__
+
+#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/07 23:53:43 $"
 
  /* Note: this is identical layout to a socket (rearranged for validation).  The minor exception is 
     that the the sock pointer points to an stdata and the proto_ops pointer points to a stream_ops
