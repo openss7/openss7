@@ -85,7 +85,7 @@ AC_DEFUN([_RPM_SPEC_SETUP], [
     AC_ARG_WITH([rpm-epoch],
         AS_HELP_STRING([--with-rpm-epoch=EPOCH],
             [specify the EPOCH for the RPM spec file.  @<:@default=1@:>@]),
-        [with_rpm_epoch=$withval],
+        [with_rpm_epoch="$withval"],
         [with_rpm_epoch=1])
     AC_MSG_CHECKING([for rpm epoch])
     AC_MSG_RESULT([${with_rpm_epoch:-1}])
@@ -97,7 +97,7 @@ AC_DEFUN([_RPM_SPEC_SETUP], [
         AS_HELP_STRING([--with-rpm-release=RELEASE],
             [specify the RELEASE for the RPM spec file.
             @<:@default=Custom@:>@]),
-        [with_rpm_release=$withval],
+        [with_rpm_release="$withval"],
         [with_rpm_release='Custom'])
     AC_MSG_CHECKING([for rpm release])
     AC_MSG_RESULT([${with_rpm_release:-Custom}])
@@ -105,10 +105,26 @@ AC_DEFUN([_RPM_SPEC_SETUP], [
     AC_SUBST(PACKAGE_RELEASE)
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
         Release. This defaults to Custom.])
+    AC_ARG_ENABLE([tools],
+        AS_HELP_STRING([--enable-tools],
+            [build and install user packages.  @<:@default=yes@:>@]),
+        [enable_tools="$enableval"],
+        [enable_tools='yes'])
+    AC_MSG_CHECKING([for rpm build/install of user packages])
+    AC_MSG_RESULT([${enable_tools:-yes}])
+    AM_CONDITIONAL([RPM_BUILD_USER], test :"${enable_tools:-yes}" = :yes)
+    AC_ARG_ENABLE([modules],
+        AS_HELP_STRING([--enable-modules],
+            [build and install kernel packages.  @<:@default=yes@:>@]),
+        [enable_modules="$enableval"],
+        [enable_modules='yes'])
+    AC_MSG_CHECKING([for rpm build/install of kernel packages])
+    AC_MSG_RESULT([${enable_modules:-yes}])
+    AM_CONDITIONAL([RPM_BUILD_KERNEL], test :"${enable_modules:-yes}" = :yes)
     PACKAGE_OPTIONS=
     for arg in $ac_configure_args ; do
         if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
-            eval "arg=$arg"
+            eval "arg=\"$arg\""
             if (echo "$arg" | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
                 arg="`echo $arg | sed -e's|--enable|--with|;s|--disable|--without|;s|--with-|--with |;s|--without-|--without |;s|-|_|g;s|^__|--|'`"
                 PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
@@ -129,12 +145,12 @@ AC_DEFUN([_RPM_SPEC_SETUP], [
     AC_ARG_WITH([gpg-user],
         AS_HELP_STRING([--with-gpg-user=USERNAME],
             [specify the USER for signing RPMs and tarballs.
-            @<:@default=${USER}@:>@]),
-        [with_gpg_user=$withval],
-        [with_gpg_user=${USER}])
+            @<:@default=@:>@]),
+        [with_gpg_user="$withval"],
+        [with_gpg_user='openss7@openss7.org'])
     AC_ARG_VAR([GPGUSER], [GPG user name])
     AC_MSG_CHECKING([for gpg user])
-    GPGUSER="${with_gpg_user:-$USER}"
+    GPGUSER="${with_gpg_user:-openss7@openss7.org}"
     AC_MSG_RESULT([$GPGUSER])
     AC_ARG_VAR([GPG], [PGP signature command])
     AC_PATH_TOOL([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
