@@ -35,11 +35,48 @@ char	nettest_dns_id[]="\
  /* this presumes that the netserver process will be running on the */
  /* same machine as the DNS server :) raj 7/97 */
 
-
-#include <sys/types.h>
-#include <fcntl.h>
 #include <stdio.h>
-#include <string.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -50,36 +87,39 @@ char	nettest_dns_id[]="\
 #  include <time.h>
 # endif
 #endif
-#ifdef NOSTDLIBH
-#include <malloc.h>
-#else /* NOSTDLIBH */
-#include <stdlib.h>
-#endif /* NOSTDLIBH */
+
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif /* _GNU_SOURCE */
 
 #ifndef WIN32
-#include <sys/ipc.h>
-#include <unistd.h>
-#
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <netdb.h>
-#include <errno.h>
-#include <signal.h>
-#include <arpa/nameser.h>
-#include <resolv.h>
+# include <sys/ipc.h>
+# if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+# endif
+# if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+# endif
+# include <netinet/tcp.h>
+# if HAVE_NETDB_H
+#  include <netdb.h>
+# endif
+# if HAVE_ARPA_INET_H
+#  include <arpa/inet.h>
+# endif
+# include <errno.h>
+# include <signal.h>
+# include <arpa/nameser.h>
+# include <resolv.h>
 #else /* WIN32 */
-#include <process.h>
-#include <windows.h>
-#include <winsock.h>
-#include "pinc\nameser.h"
-#include "pinc\res.h"
-#include "pinc\resolv.h"
+# include <process.h>
+# include <windows.h>
+# include <winsock.h>
+# include "pinc\nameser.h"
+# include "pinc\res.h"
+# include "pinc\resolv.h"
 //#include "pinc\resolvp.h"
-#define close(x)	closesocket(x)
+# define close(x)	closesocket(x)
 #endif /* WIN32 */
 
 #include "netlib.h"
@@ -148,8 +188,6 @@ Seconds  per second   \n\n";
   
   char *tput_fmt_1_line_1 = "\
 %-6.2f   %7.2f   \n";
-  char *tput_fmt_1_line_2 = "\
-%-6d %-6d\n";
   
   char *cpu_title = "\
 Elapsed Trans.   CPU    CPU    S.dem   S.dem\n\
@@ -176,7 +214,6 @@ secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\n";
   double	thruput;
   
   struct	hostent	        *hp;
-  unsigned      int             addr;
 
   struct	dns_rr_request_struct	*dns_rr_request;
   struct	dns_rr_response_struct	*dns_rr_response;
@@ -505,7 +542,7 @@ secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\n";
 	fprintf(where,
 		"remote cpu util %g\n",dns_rr_result->cpu_util);
 	fprintf(where,
-		"remote num cpu %g\n",dns_rr_result->num_cpus);
+		"remote num cpu %d\n",dns_rr_result->num_cpus);
 	fflush(where);
       }
 		
@@ -704,7 +741,6 @@ void
 recv_dns_rr()
 {
   
-  int	timed_out = 0;
   float	elapsed_time;
   
   struct	dns_rr_request_struct	*dns_rr_request;
@@ -863,7 +899,7 @@ recv_dns_rr()
 
 
 void
-print_dns_usage()
+print_dns_usage(void)
 {
 
   fwrite(dns_usage, sizeof(char), strlen(dns_usage), stdout);
@@ -877,10 +913,6 @@ scan_dns_args(int argc, char *argv[])
   extern char	*optarg;	  /* pointer to option string	*/
   
   int		c;
-  
-  char	
-    arg1[BUFSIZ],  /* argument holders		*/
-    arg2[BUFSIZ];
   
   struct hostent *hp;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:55:39 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/01/22 13:25:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/29 06:55:39 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 13:25:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:55:39 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/01/22 13:25:44 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:55:39 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/01/22 13:25:44 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -107,50 +107,89 @@ char	nettest_id[]="\
 /*								*/
 /****************************************************************/
      
-#include <sys/types.h>
-#include <fcntl.h>
-#ifndef WIN32
-#include <errno.h>
-#include <signal.h>
-#endif
 #include <stdio.h>
-#include <string.h>
-#ifdef NOSTDLIBH
-#include <malloc.h>
-#else /* NOSTDLIBH */
-#include <stdlib.h>
-#endif /* NOSTDLIBH */
-
-#ifndef WIN32
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
 #else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
 # endif
 #endif
-#if !defined(__VMS)
-#include <sys/ipc.h>
-#endif /* !defined(__VMS) */
-#ifdef _GNU_SOURCE
-#include <getopt.h>
-#endif /* _GNU_SOURCE */
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#ifdef DO_SCTP
-#include <netinet/sctp.h>
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
 #endif
-#include <arpa/inet.h>
-#include <netdb.h>
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+#ifndef WIN32
+# include <errno.h>
+# include <signal.h>
+#endif
+
+#ifndef WIN32
+# if TIME_WITH_SYS_TIME
+#  include <sys/time.h>
+#  include <time.h>
+# else
+#  if HAVE_SYS_TIME_H
+#   include <sys/time.h>
+#  else
+#   include <time.h>
+#  endif
+# endif
+# if !defined(__VMS)
+#  include <sys/ipc.h>
+# endif /* !defined(__VMS) */
+# ifdef _GNU_SOURCE
+#  include <getopt.h>
+# endif /* _GNU_SOURCE */
+# if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+# endif
+# if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+# endif
+# include <netinet/tcp.h>
+# ifdef DO_SCTP
+#  include <netinet/sctp.h>
+# endif
+# if HAVE_ARPA_INET_H
+#  include <arpa/inet.h>
+# endif
+# if HAVE_NETDB_H
+#  include <netdb.h>
+# endif
 #else /* WIN32 */
-#include <process.h>
-#include <winsock2.h>
-#include <windows.h>
+# include <process.h>
+# include <winsock2.h>
+# include <windows.h>
 #endif /* WIN32 */
 
 #include "netlib.h"
@@ -326,6 +365,7 @@ get_tcp_info(SOCKET socket, int *mss)
 }
 
 static
+void
 complete_sockaddr(struct sockaddr_in *server, char *remote_host, int ip_address) 
 {
   unsigned int addr;
@@ -386,7 +426,6 @@ create_data_socket(int family, int type, int protocol, int address, unsigned sho
 
   SOCKET temp_socket;
   int one;
-  int sock_opt_len;
   struct sockaddr_in temp;
   int    on  = 1;
   
@@ -745,9 +784,7 @@ Size (bytes)\n\
 
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	sctp_stream_request_struct	*sctp_stream_request;
   struct	sctp_stream_response_struct	*sctp_stream_response;
@@ -1486,9 +1523,7 @@ Size (bytes)\n\
 
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	tcp_stream_request_struct	*tcp_stream_request;
   struct	tcp_stream_response_struct	*tcp_stream_response;
@@ -2227,9 +2262,7 @@ Size (bytes)\n\
 
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	sctp_maerts_request_struct	*sctp_maerts_request;
   struct	sctp_maerts_response_struct	*sctp_maerts_response;
@@ -2969,9 +3002,7 @@ Size (bytes)\n\
 
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	tcp_maerts_request_struct	*tcp_maerts_request;
   struct	tcp_maerts_response_struct	*tcp_maerts_response;
@@ -3628,7 +3659,9 @@ Size (bytes)\n\
     * which is defined & implemented in the kernel
     * but which has no libc stub.
     */
-#include <sys/types.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
 #include <sys/scall_define.h>
 #include <sys/uio.h>
 
@@ -3709,10 +3742,6 @@ Size (bytes)\n\
   /* the size of the local senc socket buffer. We will want to deal */
   /* with alignment and offset concerns as well. */
   
-#ifdef DIRTY
-  int	*message_int_ptr;
-#endif
-
   struct sendfile_ring_elt *send_ring;
   
   int len;
@@ -3726,10 +3755,6 @@ Size (bytes)\n\
   /* 64bit integral type, but those are not entirely common yet */
   double	bytes_sent = 0.0;
   
-#ifdef DIRTY
-  int	i;
-#endif /* DIRTY */
-  
   float	local_cpu_utilization;
   float	local_service_demand;
   float	remote_cpu_utilization;
@@ -3737,9 +3762,7 @@ Size (bytes)\n\
 
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
 
 #if defined(__linux) || defined(__SunOS_5_9)
   off_t     scratch_offset;   /* the linux sendfile() call will update
@@ -4565,10 +4588,6 @@ Size (bytes)\n\
   /* the size of the local senc socket buffer. We will want to deal */
   /* with alignment and offset concerns as well. */
   
-#ifdef DIRTY
-  int	*message_int_ptr;
-#endif
-
   struct sendfile_ring_elt *send_ring;
   
   int len;
@@ -4582,10 +4601,6 @@ Size (bytes)\n\
   /* 64bit integral type, but those are not entirely common yet */
   double	bytes_sent = 0.0;
   
-#ifdef DIRTY
-  int	i;
-#endif /* DIRTY */
-  
   float	local_cpu_utilization;
   float	local_service_demand;
   float	remote_cpu_utilization;
@@ -4593,9 +4608,7 @@ Size (bytes)\n\
 
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
 
 #if defined(__linux) || defined(__SunOS_5_9)
   off_t     scratch_offset;   /* the linux sendfile() call will update
@@ -6807,9 +6820,7 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
 
   struct	sctp_rr_request_struct	*sctp_rr_request;
   struct	sctp_rr_response_struct	*sctp_rr_response;
@@ -7492,9 +7503,7 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
 
   struct	tcp_rr_request_struct	*tcp_rr_request;
   struct	tcp_rr_response_struct	*tcp_rr_response;
@@ -8175,9 +8184,7 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
   int	i;
 #endif /* DIRTY */
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	udp_stream_request_struct	*udp_stream_request;
   struct	udp_stream_response_struct	*udp_stream_response;
@@ -9030,9 +9037,7 @@ bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server, myaddr_in;
-  unsigned      int             addr;
   int	                        addrlen;
   
   struct	udp_rr_request_struct	*udp_rr_request;
@@ -10718,10 +10723,8 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
   struct        sockaddr_in     *myaddr;
-  unsigned      int             addr;
   int                           myport;
   int                           ret;
 
@@ -10748,7 +10751,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%ld) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
     exit(1);
   }
 
@@ -11406,10 +11409,8 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
   struct        sockaddr_in     *myaddr;
-  unsigned      int             addr;
   int                           myport;
   int                           ret;
 
@@ -11436,7 +11437,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%ld) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
     exit(1);
   }
 
@@ -12787,7 +12788,7 @@ recv_tcp_conn_rr()
  /* it will also look (can look) much like the communication pattern */
  /* of http for www access. */
 
-int 
+void 
 send_sctp_tran_rr(char remote_host[])
 {
   
@@ -12849,10 +12850,8 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
   struct        sockaddr_in     *myaddr;
-  unsigned      int             addr;
   int                           myport;
 
   struct	sctp_tran_rr_request_struct	*sctp_tran_rr_request;
@@ -13434,8 +13433,8 @@ newport:
 }
 
 
-int 
-recv_sctp_tran_rr()
+void 
+recv_sctp_tran_rr(void)
 {
   
   char  *message;
@@ -13443,7 +13442,6 @@ recv_sctp_tran_rr()
   peeraddr_in;
   SOCKET	s_listen,s_data;
   int 	addrlen;
-  int   NoPush = 1;
 
   char	*recv_message_ptr;
   char	*send_message_ptr;
@@ -13866,7 +13864,7 @@ recv_sctp_tran_rr()
  /* it will also look (can look) much like the communication pattern */
  /* of http for www access. */
 
-int 
+void 
 send_tcp_tran_rr(char remote_host[])
 {
   
@@ -13928,10 +13926,8 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
   struct        sockaddr_in     *myaddr;
-  unsigned      int             addr;
   int                           myport;
 
   struct	tcp_tran_rr_request_struct	*tcp_tran_rr_request;
@@ -14513,8 +14509,8 @@ newport:
 }
 
 
-int 
-recv_tcp_tran_rr()
+void 
+recv_tcp_tran_rr(void)
 {
   
   char  *message;
@@ -14522,7 +14518,6 @@ recv_tcp_tran_rr()
   peeraddr_in;
   SOCKET	s_listen,s_data;
   int 	addrlen;
-  int   NoPush = 1;
 
   char	*recv_message_ptr;
   char	*send_message_ptr;
@@ -14939,7 +14934,7 @@ recv_tcp_tran_rr()
  /* this routine implements the sending (netperf) side of the SCTP_RR */
  /* test using POSIX-style non-blocking sockets. */
 
-int 
+void 
 send_sctp_nbrr(char remote_host[])
 {
   
@@ -15001,9 +14996,7 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	sctp_rr_request_struct	*sctp_rr_request;
   struct	sctp_rr_response_struct	*sctp_rr_response;
@@ -15621,8 +15614,8 @@ Send   Recv    Send   Recv\n\
 
  /* this routine implements the receive (netserver) side of a SCTP_RR */
  /* test */
-int 
-recv_sctp_nbrr()
+void 
+recv_sctp_nbrr(void)
 {
   
   struct ring_elt *send_ring;
@@ -16004,7 +15997,7 @@ recv_sctp_nbrr()
  /* this routine implements the sending (netperf) side of the TCP_RR */
  /* test using POSIX-style non-blocking sockets. */
 
-int 
+void 
 send_tcp_nbrr(char remote_host[])
 {
   
@@ -16066,9 +16059,7 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
-  unsigned      int             addr;
   
   struct	tcp_rr_request_struct	*tcp_rr_request;
   struct	tcp_rr_response_struct	*tcp_rr_response;
@@ -16686,8 +16677,8 @@ Send   Recv    Send   Recv\n\
 
  /* this routine implements the receive (netserver) side of a TCP_RR */
  /* test */
-int 
-recv_tcp_nbrr()
+void 
+recv_tcp_nbrr(void)
 {
   
   struct ring_elt *send_ring;
@@ -17133,10 +17124,8 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
   struct        sockaddr_in     *myaddr;
-  unsigned      int             addr;
   int                           myport;
   int                           ret;
 
@@ -17163,7 +17152,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%ld) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
     exit(1);
   }
 
@@ -18116,10 +18105,8 @@ Send   Recv    Send   Recv\n\
   float	remote_service_demand;
   double	thruput;
   
-  struct	hostent	        *hp;
   struct	sockaddr_in	server;
   struct        sockaddr_in     *myaddr;
-  unsigned      int             addr;
   int                           myport;
   int                           ret;
 
@@ -18146,7 +18133,7 @@ Send   Recv    Send   Recv\n\
   
   myaddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
   if (myaddr == NULL) {
-    printf("malloc(%ld) failed!\n", sizeof(struct sockaddr_in));
+    printf("malloc(%d) failed!\n", sizeof(struct sockaddr_in));
     exit(1);
   }
 
@@ -19031,7 +19018,7 @@ recv_tcp_cc()
 
 
 void
-print_sockets_usage()
+print_sockets_usage(void)
 {
 
   fwrite(sockets_usage, sizeof(char), strlen(sockets_usage), stdout);
@@ -19080,7 +19067,11 @@ scan_sockets_args(int argc, char *argv[])
   /* second will leave the first untouched. To change only the */
   /* first, use the form "first," (see the routine break_args.. */
   
+#ifdef _GNU_SOURCE
+  while ((c= getopt_long(argc, argv, SOCKETS_ARGS, long_options, &option_index)) != EOF) {
+#else
   while ((c= getopt(argc, argv, SOCKETS_ARGS)) != EOF) {
+#endif
     switch (c) {
     case '?':	
     case 'h':

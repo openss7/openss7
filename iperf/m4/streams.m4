@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.26 2005/01/22 13:52:59 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.27 2005/01/22 18:32:18 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/22 13:52:59 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 18:32:18 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -211,7 +211,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                 streams_dir=`echo "$srcdir/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
                     streams_cv_lis_includes="$streams_dir ../$streams_where"
-                    STREAMS_LDADD="-static ../LiS/libLiS.la"
+                    STREAMS_LDADD="../LiS/libLiS.la"
                     break
                 fi
             done
@@ -223,7 +223,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                 streams_dir=`echo "$srcdir/../$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
                     streams_cv_lis_includes="$streams_dir ../$streams_where"
-                    STREAMS_LDADD="-static ../LiS/libLiS.la"
+                    STREAMS_LDADD="../LiS/libLiS.la"
                     break
                 fi
             done
@@ -321,7 +321,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                 streams_dir=`echo "$srcdir/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
                     streams_cv_lfs_includes="$streams_dir ../$streams_where"
-                    STREAMS_LDADD="-static ../streams/libstreams.la"
+                    STREAMS_LDADD="../streams/libstreams.la"
                     break
                 fi
             done
@@ -333,7 +333,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                 streams_dir=`echo "$srcdir/../$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
                 if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
                     streams_cv_lfs_includes="$streams_dir ../$streams_where"
-                    STREAMS_LDADD="-static ../streams/libstreams.la"
+                    STREAMS_LDADD="../streams/libstreams.la"
                     break
                 fi
             done

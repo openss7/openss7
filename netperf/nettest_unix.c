@@ -33,23 +33,62 @@ char	nettest_unix_id[]="\
  /* at some point, I might want to go-in and see if I really need all */
  /* these includes, but for the moment, we'll let them all just sit */
  /* there. raj 8/94 */
-#include <sys/types.h>
-#include <fcntl.h>
 #include <stdio.h>
-#include <stdlib.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
 #ifndef WIN32
 #include <sys/ipc.h>
-#include <sys/socket.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
 #include <errno.h>
 #include <signal.h>
 #include <sys/un.h>
-#include <unistd.h>
 #else /* WIN32 */
 #include <process.h>
 #include <winsock2.h>
 #include <windows.h>
 #endif /* WIN32 */
-#include <string.h>
+
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -60,15 +99,11 @@ char	nettest_unix_id[]="\
 #  include <time.h>
 # endif
 #endif
+
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif /* _GNU_SOURCE */
-#if ! defined(__bsdi__) && ! defined(_APPLE_)
-#include <malloc.h>
-#else
-#include <sys/malloc.h>
-#endif
-     
+
 #include "netlib.h"
 #include "netsh.h"
 #include "nettest_unix.h"
@@ -120,7 +155,7 @@ comma.\n";
  /* this routing initializes all the test specific variables */
 
 static void
-init_test_vars()
+init_test_vars(void)
 {
   rss_size  = 0;
   rsr_size  = 0;
@@ -149,7 +184,6 @@ create_unix_socket(int family, int type)
 {
 
   SOCKET temp_socket;
-  int sock_opt_len;
 
   /*set up the data socket                        */
   temp_socket = socket(family, 
@@ -716,7 +750,6 @@ recv_stream_stream()
   struct ring_elt *recv_ring;
 
 #ifdef DIRTY
-  char	*message_ptr;
   int   *message_int_ptr;
   int   dirty_count;
   int   clean_count;
@@ -2230,7 +2263,7 @@ bytes  bytes  bytes   bytes  secs.   per sec  %%      %%      us/Tr   us/Tr\n\n"
   /* timing stuff */
 #define	MAX_KEPT_TIMES	1024
   int	time_index = 0;
-  int	unused_buckets;
+  int	unused_buckets = 0;
   int	kept_times[MAX_KEPT_TIMES];
   int	sleep_usecs;
   unsigned	int	total_times=0;
@@ -3346,7 +3379,7 @@ recv_stream_rr()
 }
 
 void
-print_unix_usage()
+print_unix_usage(void)
 {
 
   fwrite(unix_usage, sizeof(char), strlen(unix_usage), stdout);

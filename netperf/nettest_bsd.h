@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: nettest_bsd.h,v 1.1.1.2 2004/08/06 03:47:23 brian Exp $
+ @(#) $Id: nettest_bsd.h,v 1.1.1.4 2005/01/22 15:37:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 03:47:23 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 15:37:28 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -755,32 +755,56 @@ extern void send_sctp_maerts(char remote_host[]);
 extern void send_sctp_rr(char remote_host[]);
 extern void send_sctp_conn_rr(char remote_host[]);
 extern void send_sctp_cc(char remote_host[]);
+#ifdef DO_1644
+extern void send_sctp_tran_rr(char remote_host[]);
+#endif				/* DO_1644 */
+#ifdef DO_NBRR
+extern void send_sctp_nbrr(char remote_host[]);
+#endif				/* DO_NBRR */
 #endif				/* DO_SCTP */
 extern void send_tcp_stream(char remote_host[]);
 extern void send_tcp_maerts(char remote_host[]);
 extern void send_tcp_rr(char remote_host[]);
 extern void send_tcp_conn_rr(char remote_host[]);
 extern void send_tcp_cc(char remote_host[]);
+#ifdef DO_1644
+extern void send_tcp_tran_rr(char remote_host[]);;
+#endif
+#ifdef DO_NBRR
+extern void send_tcp_nbrr(char remote_host[]);
+#endif				/* DO_NBRR */
 extern void send_udp_stream(char remote_host[]);
 extern void send_udp_rr(char remote_host[]);
 
 #ifdef DO_SCTP
-extern void recv_sctp_stream();
-extern void recv_sctp_maerts();
-extern void recv_sctp_rr();
-extern void recv_sctp_conn_rr();
-extern void recv_sctp_cc();
+extern void recv_sctp_stream(void);
+extern void recv_sctp_maerts(void);
+extern void recv_sctp_rr(void);
+extern void recv_sctp_conn_rr(void);
+extern void recv_sctp_cc(void);
+#ifdef DO_1644
+extern void recv_sctp_tran_rr(void);
+#endif				/* DO_1644 */
+#ifdef DO_NBRR
+extern void recv_sctp_nbrr(void);
+#endif				/* DO_NBRR */
 #endif				/* DO_SCTP */
-extern void recv_tcp_stream();
-extern void recv_tcp_maerts();
-extern void recv_tcp_rr();
-extern void recv_tcp_conn_rr();
-extern void recv_tcp_cc();
-extern void recv_udp_stream();
-extern void recv_udp_rr();
+extern void recv_tcp_stream(void);
+extern void recv_tcp_maerts(void);
+extern void recv_tcp_rr(void);
+extern void recv_tcp_conn_rr(void);
+extern void recv_tcp_cc(void);
+#ifdef DO_1644
+extern void recv_tcp_tran_rr(void);
+#endif
+#ifdef DO_NBRR
+extern void recv_tcp_nbrr(void);
+#endif				/* DO_NBRR */
+extern void recv_udp_stream(void);
+extern void recv_udp_rr(void);
 
-extern void loc_cpu_rate();
-extern void rem_cpu_rate();
+extern void loc_cpu_rate(void);
+extern void rem_cpu_rate(void);
 
 #ifdef HAVE_SENDFILE
 #ifdef DO_SCTP

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 10:40:45 $
+ @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2005/01/22 13:25:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 10:40:45 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 13:25:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 10:40:45 $"
+#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2005/01/22 13:25:44 $"
 
-static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.3 $) $Date: 2004/08/06 10:40:45 $";
+static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.4 $) $Date: 2005/01/22 13:25:44 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -104,8 +104,42 @@ char	netperf_id[]="\
 @(#)netperf.c (c) Copyright 1993-2004 Hewlett-Packard Company. Version 2.3";
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
 
 #ifdef WIN32
 #include <winsock2.h>

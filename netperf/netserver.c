@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:35:40 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/01/22 15:37:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/29 06:35:40 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 15:37:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:35:40 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/01/22 15:37:28 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2004/12/29 06:35:40 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/01/22 15:37:28 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -122,8 +122,44 @@ char	netserver_id[]="\
 /*	Global include files						*/
 /*									*/
 /************************************************************************/
-#include <sys/types.h>
 #include <stdio.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
 #ifndef WIN32
 #include <errno.h>
 #include <signal.h>
@@ -131,7 +167,9 @@ char	netserver_id[]="\
 #if !defined(WIN32) && !defined(__VMS)
 #include <sys/ipc.h>
 #endif /* !defined(WIN32) && !defined(__VMS) */
-#include <fcntl.h>
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
 #ifdef WIN32
 #include <time.h>
 #include <winsock2.h>
@@ -150,18 +188,24 @@ char	netserver_id[]="\
 #  include <time.h>
 # endif
 #endif
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
+#if HAVE_SYS_IOCTL_H
+# include <sys/ioctl.h>
+#endif
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+#if HAVE_NETDB_H
+# include <netdb.h>
+#endif
 #ifndef DONT_WAIT
-#include <sys/wait.h>
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 #endif /* DONT_WAIT */
 #endif /* WIN32 */
-#include <string.h>
-#include <stdlib.h>
 #ifdef __VMS
 #include <tcpip$inetdef.h> 
 #include <unixio.h> 
@@ -187,6 +231,10 @@ char	netserver_id[]="\
 #ifdef DO_DNS
 #include "nettest_dns.h"
 #endif /* DO_DNS */
+
+#ifdef DO_XTI
+#include "nettest_xti.h"
+#endif /* DO_XTI */
 
 #include "netsh.h"
 
@@ -217,7 +265,7 @@ extern	int	optind, opterr;
  /* "schedule" performance tests on the server.				*/
 
 void 
-process_requests()
+process_requests(void)
 {
   
   float	temp_rate;
@@ -640,7 +688,7 @@ void set_up_server(int af)
 	   * one request at at time 
 	   */
 	  process_requests() ;
-#elif WIN32
+#elif defined WIN32
 		{
 			BOOL b;
 			char cmdline[80];
@@ -1214,7 +1262,7 @@ struct sockaddr name;
 	// Save away the program name
 	program = (char *)malloc(strlen(argv[0]) + 1);
 	if (program == NULL) {
-		printf("malloc(%ld) failed!\n", strlen(argv[0]) + 1);
+		printf("malloc(%d) failed!\n", strlen(argv[0]) + 1);
 		return 1 ;
 	}
 	strcpy(program, argv[0]);
@@ -1331,7 +1379,7 @@ struct sockaddr name;
   chmod(DEBUG_LOG_FILE,0644);
 #endif
   
-#if WIN32
+#if defined WIN32
   if (child) {
 	  server_sock = (SOCKET)GetStdHandle(STD_INPUT_HANDLE);
   }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netlib.h,v 1.1.1.3 2004/12/29 06:55:39 brian Exp $
+ @(#) $Id: netlib.h,v 1.1.1.4 2005/01/22 13:25:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/29 06:55:39 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 13:25:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -456,18 +456,21 @@ extern  FILE    *where;
 extern  int     loops_per_msec;
 extern  float   lib_local_per_cpu_util[];
   
-extern  void    netlib_init();
-extern  void    install_signal_catchers();
+#ifdef INTERVALS
+extern  void    start_itimer(unsigned int interval_len_msec);
+#endif
+extern  void    netlib_init(void);
+extern  void    install_signal_catchers(void);
 extern  void    establish_control(char hostname[], short int port);
-extern  void    shutdown_control();
-extern  void    init_stat();
-extern  void    send_request();
-extern  void    recv_response();
-extern  void    send_response();
-extern  void    recv_request();
-extern  void    dump_request();
+extern  void    shutdown_control(void);
+extern  void    init_stat(void);
+extern  void    send_request(void);
+extern  void    recv_response(void);
+extern  void    send_response(void);
+extern  void    recv_request(void);
+extern  void    dump_request(void);
 extern  void    start_timer(int time);
-extern  void    stop_timer();
+extern  void    stop_timer(void);
 extern  void    cpu_start(int measure_cpu);
 extern  void    cpu_stop(int measure_cpu, float *elapsed);
 extern  void	calculate_confidence(int confidence_iterations,
@@ -483,19 +486,19 @@ extern  void	retrieve_confident_values(float *elapsed_time,
 			  float *remote_cpu_utilization,
 			  float *local_service_demand,
 			  float *remote_service_demand);
-extern  void    display_confidence();
+extern  void    display_confidence(void);
 extern  void    set_sock_buffer(int sd,
 				enum sock_buffer which,
 				int requested_size,
 				int *effective_sizep);
-extern  char   *format_units();
+extern  char   *format_units(void);
 
 extern  double  ntohd(double net_double);
 extern  double  htond(double host_double);
-extern  void    libmain();
+extern  void    libmain(void);
 extern  double  calc_thruput(double units_received);
 extern  float   calibrate_local_cpu(float local_cpu_rate);
-extern  float   calibrate_remote_cpu();
+extern  float   calibrate_remote_cpu(void);
 #ifndef WIN32
 // WIN32 requires that at least one of the file sets to select be non-null.
 // Since msec_sleep routine is only called by nettest_dlpi & nettest_unix, 
@@ -512,10 +515,12 @@ extern  void    catcher(int, siginfo_t *,void *);
 #else
 extern  void    catcher(int);
 #endif /* __hpux */
-extern  struct ring_elt *allocate_buffer_ring();
+extern  struct ring_elt *allocate_buffer_ring(int width, int buffer_size, int alignment, int offset);
 #ifdef HAVE_SENDFILE
-extern  struct sendfile_ring_elt *alloc_sendfile_buf_ring();
+extern  struct sendfile_ring_elt *alloc_sendfile_buf_ring(int width, int buffer_size, int alignment, int offset);
+
 #endif /* HAVE_SENDFILE */
+extern  int     dl_accept(int fd, unsigned char *rem_addr, int rem_addr_len);
 extern  int     dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len);
 extern  int     dl_bind(int fd, int sap, int mode, char *dlsap_ptr, int *dlsap_len);
 extern  int     dl_open(char devfile[], int ppa);

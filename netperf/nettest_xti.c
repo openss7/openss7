@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/20 20:55:58 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2005/01/22 13:25:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/20 20:55:58 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 13:25:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/20 20:55:58 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2005/01/22 13:25:47 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.6 $) $Date: 2004/08/20 20:55:58 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.7 $) $Date: 2005/01/22 13:25:47 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -94,14 +94,61 @@ char	nettest_xti_id[]="\
 /*	recv_xti_udp_rr()					*/
 /*								*/
 /****************************************************************/
+#include <stdio.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
      
-#include <sys/types.h>
-#include <fcntl.h>
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
 #ifndef WIN32
 #include <sys/ipc.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+#if HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
+#if HAVE_NETDB_H
+# include <netdb.h>
+#endif
 #include <errno.h>
 #include <signal.h>
 #else /* WIN32 */
@@ -109,7 +156,7 @@ char	nettest_xti_id[]="\
 #include <winsock2.h>
 #include <windows.h>
 #endif /* WIN32 */
-#include <stdio.h>
+
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -120,10 +167,11 @@ char	nettest_xti_id[]="\
 #  include <time.h>
 # endif
 #endif
+
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif /* _GNU_SOURCE */
-#include <malloc.h>
+
  /* xti.h should be included *after* in.h because there are name */
  /* conflicts!( Silly standards people... raj 2/95 fortuenately, the */
  /* confilcts are on IP_TOP and IP_TTL, whcih netperf does not yet use */
@@ -220,9 +268,7 @@ comma.\n";
  /* for that reason, a second routine may be created that can be */
  /* called outside of the timing loop */
 void
-get_xti_info(socket, info_struct)
-     int socket;
-     struct t_info *info_struct;
+get_xti_info(int socket, struct t_info info_struct)
 {
 
 }
@@ -287,7 +333,7 @@ create_xti_endpoint(char *name, int level)
 
   if (debug) {
     fprintf(where,
-	    "create_xti_endpoint: opt_req->opt.buf %x maxlen %d len %d\n",
+	    "create_xti_endpoint: opt_req->opt.buf %p maxlen %d len %d\n",
 	    opt_req->opt.buf,
 	    opt_req->opt.maxlen,
 	    opt_req->opt.len);
@@ -306,7 +352,7 @@ create_xti_endpoint(char *name, int level)
 
   if (debug) {
     fprintf(where,
-	    "create_xti_endpoint: opt_ret->opt.buf %x maxlen %d len %d\n",
+	    "create_xti_endpoint: opt_ret->opt.buf %p maxlen %d len %d\n",
 	    opt_ret->opt.buf,
 	    opt_ret->opt.maxlen,
 	    opt_ret->opt.len);
@@ -374,7 +420,7 @@ create_xti_endpoint(char *name, int level)
   else {
     fprintf(where,"create_xti_endpoint: XTI_SNDBUF option status 0x%.4x",
 	    sock_option->myopthdr.status);
-    fprintf(where," value %d\n",
+    fprintf(where," value %ld\n",
 	    sock_option->value);
     fflush(where);
     lss_size = -1;
@@ -635,7 +681,7 @@ Size (bytes)\n\
   struct ring_elt *send_ring;
   
   int len;
-  unsigned int nummessages;
+  unsigned int nummessages = 0;
   SOCKET send_socket;
   int bytes_remaining;
   int sctp_mss = -1;  // possibly uninitialized on printf far below
@@ -644,7 +690,7 @@ Size (bytes)\n\
   /* during a test... ;-) at some point, this should probably become a */
   /* 64bit integral type, but those are not entirely common yet */
 
-  double	bytes_sent;
+  double	bytes_sent = 0;
   
 #ifdef DIRTY
   int	i;
@@ -1375,7 +1421,7 @@ Size (bytes)\n\
 /* implemented as one routine. I could break things-out somewhat, but */
 /* didn't feel it was necessary. */
 
-int 
+void 
 recv_xti_sctp_stream()
 {
   
@@ -1384,7 +1430,6 @@ recv_xti_sctp_stream()
   struct t_call      call_req;
 
   SOCKET       s_listen,s_data;
-  int           addrlen;
   int	        len;
   unsigned int	receive_calls;
   float	        elapsed_time;
@@ -1823,7 +1868,7 @@ recv_xti_sctp_stream()
  /* this routine implements the sending (netperf) side of the XTI_SCTP_RR */
  /* test. */
 
-int 
+void 
 send_xti_sctp_rr(char remote_host[])
 {
   
@@ -2617,7 +2662,7 @@ Size (bytes)\n\
   struct ring_elt *send_ring;
   
   int len;
-  unsigned int nummessages;
+  unsigned int nummessages = 0;
   SOCKET send_socket;
   int bytes_remaining;
   int tcp_mss = -1;  // possibly uninitialized on printf far below
@@ -2626,7 +2671,7 @@ Size (bytes)\n\
   /* during a test... ;-) at some point, this should probably become a */
   /* 64bit integral type, but those are not entirely common yet */
 
-  double	bytes_sent;
+  double	bytes_sent = 0;
   
 #ifdef DIRTY
   int	i;
@@ -3357,7 +3402,7 @@ Size (bytes)\n\
 /* implemented as one routine. I could break things-out somewhat, but */
 /* didn't feel it was necessary. */
 
-int 
+void 
 recv_xti_tcp_stream()
 {
   
@@ -3366,7 +3411,6 @@ recv_xti_tcp_stream()
   struct t_call      call_req;
 
   SOCKET       s_listen,s_data;
-  int           addrlen;
   int	        len;
   unsigned int	receive_calls;
   float	        elapsed_time;
@@ -3819,7 +3863,7 @@ recv_xti_tcp_stream()
  /* this routine implements the sending (netperf) side of the XTI_TCP_RR */
  /* test. */
 
-int 
+void 
 send_xti_tcp_rr(char remote_host[])
 {
   
@@ -4584,7 +4628,6 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
   unsigned int	failed_sends;
 
   float	elapsed_time,  
-        recv_elapsed,
         local_cpu_utilization,
         remote_cpu_utilization;
   
@@ -4594,7 +4637,6 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
   double bytes_recvd;
   
   
-  int	len;
   int	*message_int_ptr;
   struct ring_elt *send_ring;
   SOCKET data_socket;
@@ -5208,7 +5250,7 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
  /* this routine implements the receive side (netserver) of the */
  /* XTI_UDP_STREAM performance test. */
 
-int
+void
 recv_xti_udp_stream()
 {
   struct ring_elt *recv_ring;
@@ -5221,7 +5263,6 @@ recv_xti_udp_stream()
   struct sockaddr_in fromaddr_in;
 
   SOCKET s_data;
-  int 	addrlen;
   unsigned int	bytes_received = 0;
   float	elapsed_time;
   
@@ -5543,7 +5584,7 @@ recv_xti_udp_stream()
   
 }
 
-int send_xti_udp_rr(char remote_host[])
+void send_xti_udp_rr(char remote_host[])
 {
   
   char *tput_title = "\
@@ -5575,31 +5616,19 @@ bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\
   char *cpu_fmt_1_line_2 = "\
 %-6d %-6d\n";
   
-  char *ksink_fmt = "\
-Alignment      Offset\n\
-Local  Remote  Local  Remote\n\
-Send   Recv    Send   Recv\n\
-%5d  %5d   %5d  %5d";
-  
-  
   float			elapsed_time;
   
   struct ring_elt *send_ring;
   struct ring_elt *recv_ring;
 
-  struct t_bind bind_req, bind_resp;
-  struct t_unitdata unitdata;
   struct t_unitdata send_unitdata;
   struct t_unitdata recv_unitdata;
   int	            flags = 0;
 
-  int	len;
   int	nummessages;
   SOCKET send_socket;
   int	trans_remaining;
   int	bytes_xferd;
-  
-  int	rsp_bytes_recvd;
   
   float	local_cpu_utilization;
   float	local_service_demand;
@@ -5608,9 +5637,8 @@ Send   Recv    Send   Recv\n\
   double thruput;
   
   struct	hostent	        *hp;
-  struct	sockaddr_in	server, myaddr_in;
+  struct	sockaddr_in	server;
   unsigned      int             addr;
-  int	                        addrlen;
   
   struct	xti_udp_rr_request_struct	*xti_udp_rr_request;
   struct	xti_udp_rr_response_struct	*xti_udp_rr_response;
@@ -5993,13 +6021,13 @@ Send   Recv    Send   Recv\n\
 		t_errno,
 		t_look(send_socket));
 	fprintf(where,
-		"recv_unitdata.udata.buf %x\n",recv_unitdata.udata.buf);
+		"recv_unitdata.udata.buf %p\n",recv_unitdata.udata.buf);
 	fprintf(where,
 		"recv_unitdata.udata.maxlen %x\n",recv_unitdata.udata.maxlen);
 	fprintf(where,
 		"recv_unitdata.udata.len %x\n",recv_unitdata.udata.len);
 	fprintf(where,
-		"recv_unitdata.addr.buf %x\n",recv_unitdata.addr.buf);
+		"recv_unitdata.addr.buf %p\n",recv_unitdata.addr.buf);
 	fprintf(where,
 		"recv_unitdata.addr.maxlen %x\n",recv_unitdata.addr.maxlen);
 	fprintf(where,
@@ -6289,7 +6317,7 @@ Send   Recv    Send   Recv\n\
 
  /* this routine implements the receive side (netserver) of a XTI_UDP_RR */
  /* test. */
-int 
+void 
   recv_xti_udp_rr()
 {
   
@@ -6676,7 +6704,7 @@ int
 #ifdef DO_XTI_SCTP
  /* this routine implements the receive (netserver) side of a XTI_SCTP_RR */
  /* test */
-int 
+void 
 recv_xti_sctp_rr()
 {
   
@@ -6688,7 +6716,6 @@ recv_xti_sctp_rr()
   struct t_call call_req;
 
   SOCKET s_listen,s_data;
-  int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received;
   int	trans_remaining;
@@ -7107,7 +7134,7 @@ recv_xti_sctp_rr()
  /* it will also look (can look) much like the communication pattern */
  /* of http for www access. */
 
-int 
+void 
 send_xti_sctp_conn_rr(char remote_host[])
 {
   
@@ -7495,7 +7522,6 @@ Send   Recv    Send   Recv\n\
       fflush(where);
     }
 
-newport:
     /* pick a new port number */
     myport = ntohs(myaddr->sin_port);
     myport++;
@@ -7691,7 +7717,7 @@ newport:
 }
 
 
-int 
+void 
 recv_xti_sctp_conn_rr()
 {
   
@@ -8060,7 +8086,7 @@ recv_xti_sctp_conn_rr()
 
  /* this routine implements the receive (netserver) side of a XTI_TCP_RR */
  /* test */
-int 
+void 
 recv_xti_tcp_rr()
 {
   
@@ -8072,7 +8098,6 @@ recv_xti_tcp_rr()
   struct t_call call_req;
 
   SOCKET s_listen,s_data;
-  int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received;
   int	trans_remaining;
@@ -8491,7 +8516,7 @@ recv_xti_tcp_rr()
  /* it will also look (can look) much like the communication pattern */
  /* of http for www access. */
 
-int 
+void 
 send_xti_tcp_conn_rr(char remote_host[])
 {
   
@@ -8879,7 +8904,6 @@ Send   Recv    Send   Recv\n\
       fflush(where);
     }
 
-newport:
     /* pick a new port number */
     myport = ntohs(myaddr->sin_port);
     myport++;
@@ -9075,7 +9099,7 @@ newport:
 }
 
 
-int 
+void 
 recv_xti_tcp_conn_rr()
 {
   
@@ -9442,7 +9466,7 @@ recv_xti_tcp_conn_rr()
 }
 
 void
-print_xti_usage()
+print_xti_usage(void)
 {
 
   fwrite(xti_usage, sizeof(char), strlen(xti_usage), stdout);
@@ -9454,7 +9478,7 @@ void
 scan_xti_args(int argc, char *argv[])
 {
 #define XTI_ARGS "Dhm:M:r:s:S:Vw:W:X:"
-  extern int	optind, opterrs;  /* index of first unused arg 	*/
+  extern int	optind;		  /* index of first unused arg 	*/
   extern char	*optarg;	  /* pointer to option string	*/
   
   int		c;

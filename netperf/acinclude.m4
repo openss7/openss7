@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.10 2004/12/18 11:15:19 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.12 2005/01/22 13:53:26 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/18 11:15:19 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 13:53:26 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -77,7 +77,7 @@ AC_DEFUN([AC_NETPERF], [dnl
     _PUBLIC_RELEASE
     _MAN_CONVERSION
     _RPM_SPEC
-    _STREAMS
+    _LINUX_STREAMS
     if test :"${streams_cv_package:-no}" = :no ; then
         if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" != :no ; then
             AC_MSG_ERROR([
@@ -145,9 +145,9 @@ AC_DEFUN([AC_NETPERF], [dnl
             ])
         fi
     fi
-    CPPFLAGS="-I- -include ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    LDADD="$STREAMS_LDADD"
-    AC_SUBST([LDADD])
+    CPPFLAGS="-I- -include ./config.h${SCTP_CPPFLAGS:+ }${SCTP_CPPFLAGS}${INET_CPPFLAGS:+ }${INET_CPPFLAGS}${XTI_CPPFLAGS:+ }${XTI_CPPFLAGS}${XNS_CPPFLAGS:+ }${XNS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    NETPERF_LDADD="$STREAMS_LDADD $XTI_LDADD"
+    AC_SUBST([NETPERF_LDADD])
     _NETPERF_OUTPUT
 ])# AC_NETPERF
 # =========================================================================

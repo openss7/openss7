@@ -24,12 +24,52 @@
 char	nettest_dlpi_id[]="\
 @(#)nettest_dlpi.c (c) Copyright 1993,1995,2004 Hewlett-Packard Co. Version 2.2pl6";
 
-#include <sys/types.h>
-#include <fcntl.h>
+#include <stdio.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
-#include <string.h>
+
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -40,14 +80,17 @@ char	nettest_dlpi_id[]="\
 #  include <time.h>
 # endif
 #endif
-#include <malloc.h>
+
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif /* _GNU_SOURCE */
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+
+#if !defined LIS && !defined LFS
 #include <sys/stream.h>
-#endif
 #include <sys/stropts.h>
+#else
+#include <stropts.h>
+#endif
 #include <sys/poll.h>
 #ifdef __osf__
 #include <sys/dlpihdr.h>
@@ -114,7 +157,7 @@ comma.\n";
 
 
 void 
-send_dlpi_co_stream()
+send_dlpi_co_stream(char remote_host[])
 {
   
   char *tput_title = "\
@@ -162,16 +205,13 @@ Send   Recv    Send   Recv             Send (avg)          Recv (avg)\n\
   /* with alignment and offset concerns as well. */
   
   struct ring_elt *send_ring;
-  char	*message;
-  char	*message_ptr;
+  char	*message_ptr = NULL;
   struct strbuf send_message;
   char  dlsap[BUFSIZ];
   int   dlsap_len;
   int	*message_int_ptr;
-  int	message_offset;
-  int	malloc_size;
   
-  int	len;
+  int	len = 0;
   int	nummessages;
   int	send_descriptor;
   int	bytes_remaining;
@@ -698,18 +738,16 @@ Send   Recv    Send   Recv             Send (avg)          Recv (avg)\n\
 /* implemented as one routine. I could break things-out somewhat, but */
 /* didn't feel it was necessary. */
 
-int 
+void 
   recv_dlpi_co_stream()
 {
   
   int	data_descriptor;
   int	flags = 0;
-  int	measure_cpu;
-  int	bytes_received;
-  int	receive_calls;
+  int	bytes_received = 0;
+  int	receive_calls = 0;
   float	elapsed_time;
   
-  struct ring_elt *recv_ring;
   char	*message_ptr;
   char	*message;
   int   *message_int_ptr;
@@ -1006,7 +1044,7 @@ int
 
 /*********************************/
 
-int send_dlpi_co_rr(char remote_host[])
+void send_dlpi_co_rr(char remote_host[])
 {
   
   char *tput_title = "\
@@ -1063,9 +1101,6 @@ int send_dlpi_co_rr(char remote_host[])
   double	bytes_xferd;
   
   int	rsp_bytes_left;
-  
-  /* we assume that station adresses fit within two ints */
-  unsigned int   remote_address[1];
   
   float	local_cpu_utilization;
   float	local_service_demand;
@@ -1642,10 +1677,7 @@ frames  bytes    secs            #      #   %s/sec   %%       us/KB\n\n";
   
   char dlsap[BUFSIZ];
   int  dlsap_len;
-  int	message_offset;
-  int	message_max_offset;
   int	failed_sends;
-  int	failed_cows;
   int 	messages_sent;
   int 	data_descriptor;
   
@@ -2071,13 +2103,13 @@ frames  bytes    secs            #      #   %s/sec   %%       us/KB\n\n";
   }
 }
 
-int
+void
   recv_dlpi_cl_stream()
 {
   
   char  *message;
   int	data_descriptor;
-  int	len;
+  int	len = 0;
   char	*message_ptr;
   char  rctl_data[BUFSIZ];
   struct strbuf recv_message;
@@ -2085,14 +2117,12 @@ int
   int flags = 0;
   /* these are to make reading some of the DLPI control messages easier */
   dl_unitdata_ind_t *data_ind = (dl_unitdata_ind_t *)rctl_data;
-  dl_uderror_ind_t  *uder_ind = (dl_uderror_ind_t *)rctl_data;
   
   int	bytes_received = 0;
   float	elapsed_time;
   
   int	message_size;
   int	messages_recvd = 0;
-  int	measure_cpu;
   
   struct	dlpi_cl_stream_request_struct	*dlpi_cl_stream_request;
   struct	dlpi_cl_stream_response_struct	*dlpi_cl_stream_response;
@@ -2290,7 +2320,7 @@ int
 	break;
       }
       fprintf(where,
-	      "dlpi_recv_cl_stream: getmsg failure: errno %d primitive 0x%x\n",
+	      "dlpi_recv_cl_stream: getmsg failure: errno %d primitive 0x%lx\n",
 	      errno,
 	      data_ind->dl_primitive);
       fflush(where);
@@ -2358,7 +2388,7 @@ int
   
 }
 
-int send_dlpi_cl_rr(char remote_host[])
+void send_dlpi_cl_rr(char remote_host[])
 {
   
   char *tput_title = "\
@@ -2390,13 +2420,6 @@ frames frames bytes   bytes  secs.   per sec  %%      %%      us/Tr   us/Tr\n\n"
   char *cpu_fmt_1_line_2 = "\
 %-6d %-6d\n";
   
-  char *ksink_fmt = "\
-Alignment      Offset\n\
-Local  Remote  Local  Remote\n\
-Send   Recv    Send   Recv\n\
-%5d  %5d   %5d  %5d";
-  
-  
   float			elapsed_time;
   
   int   dlsap_len;
@@ -2415,7 +2438,6 @@ Send   Recv    Send   Recv\n\
   /* these are to make reading some of the DLPI control messages easier */
   dl_unitdata_ind_t *data_ind = (dl_unitdata_ind_t *)rctl_data;
   dl_unitdata_req_t *data_req = (dl_unitdata_req_t *)sctl_data;
-  dl_uderror_ind_t  *uder_ind = (dl_uderror_ind_t *)rctl_data;
   
   int	nummessages;
   int	send_descriptor;
@@ -2432,7 +2454,7 @@ Send   Recv    Send   Recv\n\
   /* timing stuff */
 #define	MAX_KEPT_TIMES	1024
   int	time_index = 0;
-  int	unused_buckets;
+  int	unused_buckets = 0;
   int	kept_times[MAX_KEPT_TIMES];
   int	sleep_usecs;
   unsigned	int	total_times=0;
@@ -2766,7 +2788,7 @@ Send   Recv    Send   Recv\n\
 	break;
       }
       fprintf(where,
-	      "send_dlpi_cl_rr: recv error: errno %d primitive 0x%x\n",
+	      "send_dlpi_cl_rr: recv error: errno %d primitive 0x%lx\n",
 	      errno,
 	      data_ind->dl_primitive);
       fflush(where);
@@ -3001,20 +3023,18 @@ Send   Recv    Send   Recv\n\
   }
 }
 
-int 
+void 
   recv_dlpi_cl_rr()
 {
   
   char  *message;
   int	data_descriptor;
   int   flags = 0;
-  int	measure_cpu;
   
   char	*recv_message_ptr;
   char	*send_message_ptr;
   char  sctl_data[BUFSIZ];
   char  rctl_data[BUFSIZ];
-  char  dlsap[BUFSIZ];
   struct strbuf send_message;
   struct strbuf recv_message;
   struct strbuf sctl_message;
@@ -3023,9 +3043,8 @@ int
   /* these are to make reading some of the DLPI control messages easier */
   dl_unitdata_ind_t *data_ind = (dl_unitdata_ind_t *)rctl_data;
   dl_unitdata_req_t *data_req = (dl_unitdata_req_t *)sctl_data;
-  dl_uderror_ind_t  *uder_ind = (dl_uderror_ind_t *)rctl_data;
   
-  int	trans_received;
+  int	trans_received = 0;
   int	trans_remaining;
   float	elapsed_time;
   
@@ -3236,7 +3255,7 @@ else {
 	break;
       }
       fprintf(where,
-	      "dlpi_recv_cl_rr: getmsg failure: errno %d primitive 0x%x\n",
+	      "dlpi_recv_cl_rr: getmsg failure: errno %d primitive 0x%lx\n",
 	      errno,
 	      data_ind->dl_primitive);
       fprintf(where,
@@ -3337,14 +3356,11 @@ else {
   
 }
 
-int 
+void 
   recv_dlpi_co_rr()
 {
   
   char  *message;
-  SOCKET	s_listen,data_descriptor;
-  
-  int	measure_cpu;
   
   int   flags = 0;
   char	*recv_message_ptr;
@@ -3352,7 +3368,9 @@ int
   struct strbuf send_message;
   struct strbuf recv_message;
   
-  int	trans_received;
+  int	data_descriptor;
+
+  int	trans_received = 0;
   int	trans_remaining;
   int	request_bytes_remaining;
   int	timed_out = 0;
@@ -3430,9 +3448,9 @@ int
   
   if (debug) {
     fprintf(where,"recv_dlpi_co_rr: receive alignment and offset set...\n");
-    fprintf(where,"recv_dlpi_co_rr: send_message.buf %x .len %d .maxlen %d\n",
+    fprintf(where,"recv_dlpi_co_rr: send_message.buf %p .len %d .maxlen %d\n",
 	    send_message.buf,send_message.len,send_message.maxlen);
-    fprintf(where,"recv_dlpi_co_rr: recv_message.buf %x .len %d .maxlen %d\n",
+    fprintf(where,"recv_dlpi_co_rr: recv_message.buf %p .len %d .maxlen %d\n",
 	    recv_message.buf,recv_message.len,recv_message.maxlen);
     fflush(where);
   }
@@ -3713,7 +3731,7 @@ else {
 
 /* this routine will display the usage string for the DLPI tests */
 void
-  print_dlpi_usage()
+  print_dlpi_usage(void)
 
 {
   fwrite(dlpi_usage, sizeof(char), strlen(dlpi_usage), stdout);
@@ -3724,7 +3742,7 @@ void
 void
   scan_dlpi_args(int argc, char *argv[])
 {
-  extern int	optind, opterrs;  /* index of first unused arg 	*/
+  extern int	optind;		  /* index of first unused arg 	*/
   extern char	*optarg;	  /* pointer to option string	*/
   
   int		c;

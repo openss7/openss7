@@ -197,20 +197,20 @@ struct dlpi_cl_rr_results_struct {
   int   num_cpus;       /* how many CPUs were there? */
 };
 
-extern void send_dlpi_co_stream();
+extern void send_dlpi_co_stream(char remote_host[]);
 
-extern int recv_dlpi_co_stream();
+extern void recv_dlpi_co_stream(void);
 
-extern int send_dlpi_co_rr(char remote_host[]);
+extern void send_dlpi_co_rr(char remote_host[]);
 
 extern void send_dlpi_cl_stream(char remote_host[]);
 
-extern int recv_dlpi_cl_stream();
+extern void recv_dlpi_cl_stream(void);
 
-extern int send_dlpi_cl_rr(char remote_host[]);
+extern void send_dlpi_cl_rr(char remote_host[]);
 
-extern int recv_dlpi_cl_rr();
+extern void recv_dlpi_cl_rr(void);
 
-extern int recv_dlpi_co_rr();
+extern void recv_dlpi_co_rr(void);
 
 extern void scan_dlpi_args(int argc, char *argv[]);

@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/14 06:38:47 $
+dnl @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 13:26:22 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,25 +48,202 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 13:26:22 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
-# =============================================================================
+# =========================================================================
 # _SCTP
-# -----------------------------------------------------------------------------
-# Common things that need to be done to support SCTP networking.
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+# Check for the existence of SCTP header files, particularly sys/xti_sctp.h.
+# SCTP headers files are required for building the XTI interface for SCTP.
+# Without SCTP header files, the SCTP interface to SCTP will not be built.
+# -------------------------------------------------------------------------
 AC_DEFUN([_SCTP], [dnl
+    AC_REQUIRE([_XTI])dnl
+    _SCTP_OPTIONS
+    _SCTP_SETUP
+    _SCTP_OPENSS7
+    AC_SUBST([SCTP_CPPFLAGS])
 ])# _SCTP
-# =============================================================================
+# =========================================================================
 
-# =============================================================================
+# =========================================================================
+# 
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_OPTIONS], [dnl
+    AC_ARG_WITH([sctp],
+        AC_HELP_STRING([--with-sctp=HEADERS],
+            [specify the SCTP header file directory.
+            @<:@default=$INCLUDEDIR/strsctp@:>@]),
+        [with_sctp="$withval"],
+        [with_sctp=''])
+])# _SCTP_OPTIONS
+# =========================================================================
+
+# =========================================================================
+# _SCTP_SETUP
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_SETUP], [dnl
+    _SCTP_CHECK_HEADERS
+    _SCTP_DEFINES
+])# _SCTP_SETUP
+# =========================================================================
+
+# =========================================================================
+# _SCTP_CHECK_HEADERS
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
+    # Test for the existence of Linux STREAMS SCTP header files.  The package
+    # normally requires SCTP header files to compile.
+    if test ":${with_sctp:-no}" != :no -a :"${with_sctp:-no}" != :yes ;  then
+        sctp_cv_includes="$with_sctp"
+    fi
+    sctp_what="sys/xti_sctp.h"
+    if test ":${sctp_cv_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built under
+            # the same top directory.
+            for sctp_where in strsctp/src/include ; do
+                sctp_dir=`echo "$srcdir/$sctp_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                AC_MSG_CHECKING([for sctp include directory $sctp_dir])
+                if test -d $sctp_dir -a -r $sctp_dir/$sctp_what ; then
+                    sctp_cv_includes="$sctp_dir ../$sctp_where"
+                    AC_MSG_RESULT([yes])
+                    break
+                fi
+                AC_MSG_RESULT([no])
+            done
+    fi
+    if test ":${sctp_cv_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built at
+            # the same directory level as this package.
+            for sctp_where in strsctp/src/include ; do
+                sctp_dir=`echo "$srcdir/../$sctp_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                AC_MSG_CHECKING([for sctp include directory $sctp_dir])
+                if test -d $sctp_dir -a -r $sctp_dir/$sctp_what ; then
+                    sctp_cv_includes="$sctp_dir ../$sctp_where"
+                    AC_MSG_RESULT([yes])
+                    break
+                fi
+                AC_MSG_RESULT([no])
+            done
+    fi
+    if test ":${sctp_cv_includes:-no}" = :no ; then
+        eval "sctp_search_path=\"
+            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strsctp/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strsctp
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strsctp/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strinet/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strinet
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strinet/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/strxnet/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/streams/src/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}$oldincludedir/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/include/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/local/include/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}${linux_cv_k_prefix}/usr/src/LiS/include
+            ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
+            ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
+        sctp_search_path=`echo "$sctp_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+        sctp_cv_includes=
+        for sctp_dir in $sctp_search_path ; do
+            AC_MSG_CHECKING([for sctp include directory $sctp_dir])
+            if test -d "$sctp_dir" -a -r "$sctp_dir/sys/xti_sctp.h" ; then
+                sctp_cv_includes="$sctp_dir"
+                AC_MSG_RESULT([yes])
+                break
+            fi
+            AC_MSG_RESULT([no])
+        done
+    fi
+    AC_MSG_CHECKING([for sctp include directory])
+    AC_MSG_RESULT([${sctp_cv_includes:-no}])
+    if test :"${sctp_cv_includes:-no}" = :no ; then
+        :
+#        AC_MSG_ERROR([
+#***
+#*** Could not find SCTP include directories.  This package requires the
+#*** presence of SCTP include directories to compile.  Specify the location of
+#*** SCTP include directories with option --with-sctp to configure and try again.
+#***
+#        ])
+    else
+        if test -z "$with_sctp" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with sctp"
+        fi
+    fi
+])# _SCTP_CHECK_HEADERS
+# =========================================================================
+
+# =========================================================================
+# _SCTP_DEFINES
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_DEFINES], [dnl
+    for sctp_include in $sctp_cv_includes ; do
+        SCTP_CPPFLAGS="${SCTP_CPPFLAGS}${SCTP_CPPFLAGS:+ }-I${sctp_include}"
+    done
+    AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
+        Define for SuSv3.  This is necessary for LiS and LfS and strsctp for
+        that matter.
+    ])
+])# _SCTP_DEFINES
+# =========================================================================
+
+# =========================================================================
+# _SCTP_OPENSS7
+# -------------------------------------------------------------------------
+AC_DEFUN([_SCTP_OPENSS7], [dnl
+    AC_CACHE_CHECK([for sctp openss7 kernel], [sctp_cv_openss7], [dnl
+        AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp_headers\>], [
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <netinet/sctp.h>
+#ifdef SCTP_DISPOSITION_UNSENT
+        yes_we_have_openss7_kernel_sctp_headers
+#endif
+        ], [sctp_cv_openss7=yes], [sctp_cv_openss7=no])
+    ])
+])# _SCTP_OPENSS7
+# =========================================================================
+
+# =========================================================================
 # _SCTP_
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_], [dnl
 ])# _SCTP_
-# =============================================================================
+# =========================================================================
+
 
 dnl =============================================================================
 dnl 

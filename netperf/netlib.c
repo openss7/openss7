@@ -52,21 +52,58 @@ char    netlib_id[]="\
 /*                                                              */
 /****************************************************************/
 
+#include <stdio.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
+#endif
  /* It would seem that most of the includes being done here from */
  /* "sys/" actually have higher-level wrappers at just /usr/include. */
  /* This is based on a spot-check of a couple systems at my disposal. */
  /* If you have trouble compiling you may want to add "sys/" raj 10/95 */
-#include <limits.h>
+#if HAVE_LIMITS_H
+# include <limits.h>
+#endif
 #include <signal.h>
 #ifdef MPE
 #  define NSIG _NSIG
 #endif /* MPE */
-#include <sys/types.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
 #include <math.h>
-#include <string.h>
 #include <assert.h>
 
 
@@ -75,8 +112,6 @@ char    netlib_id[]="\
  /* includes where appropriate. if you have a system that requires */
  /* them, speak now, or your system may not comile later revisions of */
  /* netperf. raj 1/96 */
-#include <unistd.h>
-#include <sys/stat.h>
 #include <sys/times.h>
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -88,14 +123,24 @@ char    netlib_id[]="\
 #  include <time.h>
 # endif
 #endif
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+#if HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
+#if HAVE_NETDB_H
+# include <netdb.h>
+#endif
 #include <errno.h>
 #include <sys/utsname.h>
 #if !defined(MPE) && !defined(__VMS)
-#include <sys/param.h>
+#if HAVE_SYS_PARAM_H
+# include <sys/param.h>
+#endif
 #endif /* MPE */
 
 #ifdef USE_LOOPER
@@ -118,7 +163,9 @@ char    netlib_id[]="\
 #endif /* WIN32 */
 
 #ifdef _AIX
-#include <sys/select.h>
+#if HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif
 #include <sys/sched.h>
 #include <sys/pri.h>
 #define PRIORITY PRI_LOW
@@ -176,10 +223,12 @@ DWORD SysPageSize()
 #endif /* _SC_PAGE_SIZE */
 
 #ifdef DO_DLPI
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#if !defined LIS && !defined LFS
 #include <sys/stream.h>
-#endif
 #include <sys/stropts.h>
+#else
+#include <stropts.h>
+#endif
 #include <sys/poll.h>
 #ifdef __osf__
 #include <sys/dlpihdr.h>
@@ -470,7 +519,7 @@ static int measuring_cpu;
 static unsigned int usec_per_itvl;
 
 void
-stop_itimer()
+stop_itimer(void)
 
 {
 
@@ -676,7 +725,7 @@ htond(double host_double)
 
 
 int
-get_num_cpus()
+get_num_cpus(void)
 
 {
 
@@ -860,7 +909,7 @@ catcher(int sig)
 
 
 void
-install_signal_catchers()
+install_signal_catchers(void)
 
 {
   /* just a simple little routine to catch a bunch of signals */
@@ -1020,7 +1069,7 @@ if (debug) {
 
  /* this routine will disable any running timer */
 void
-stop_timer()
+stop_timer(void)
 {
 #ifndef WIN32
   alarm(0);
@@ -1041,8 +1090,7 @@ stop_timer()
  /* should detect the presence of POSIX.4 timer_* routines one of */
  /* these days */
 void
-start_itimer( interval_len_msec )
-     unsigned int interval_len_msec;
+start_itimer( unsigned int interval_len_msec )
 {
 
   unsigned int ticks_per_itvl;
@@ -1108,7 +1156,7 @@ start_itimer( interval_len_msec )
 /****************************************************************/
 
 void
-netlib_init()
+netlib_init(void)
 {
   int i;
 
@@ -1217,7 +1265,7 @@ allocate_buffer_ring(int width, int buffer_size, int alignment, int offset)
     /* get the ring element */
     temp_link = (struct ring_elt *)malloc(sizeof(struct ring_elt));
     if (temp_link == NULL) {
-      printf("malloc(%ld) failed!\n", sizeof(struct ring_elt));
+      printf("malloc(%d) failed!\n", sizeof(struct ring_elt));
       exit(1);
 	}
     /* remember the first one so we can close the ring at the end */
@@ -1327,7 +1375,7 @@ alloc_sendfile_buf_ring(int width,
     temp_link = (struct sendfile_ring_elt *)
       malloc(sizeof(struct sendfile_ring_elt));
     if (temp_link == NULL) {
-      printf("malloc(%ld) failed!\n", sizeof(struct sendfile_ring_elt));
+      printf("malloc(%d) failed!\n", sizeof(struct sendfile_ring_elt));
       exit(1);
 	}
 
@@ -1374,7 +1422,7 @@ alloc_sendfile_buf_ring(int width,
  /***********************************************************************/
 
 void
-dump_request()
+dump_request(void)
 {
 int counter = 0;
 fprintf(where,"request contents:\n");
@@ -1405,7 +1453,7 @@ fflush(where);
  /***********************************************************************/
 
 void
-dump_response()
+dump_response(void)
 {
 int counter = 0;
 
@@ -1517,7 +1565,7 @@ format_cpu_method(int method)
 }
 
 char *
-format_units()
+format_units(void)
 {
   static        char    unitbuf[64];
   
@@ -1557,7 +1605,7 @@ format_units()
 /****************************************************************/
 
 void 
-shutdown_control()
+shutdown_control(void)
 {
 
   char  *buf = (char *)&netperf_response;
@@ -1627,7 +1675,7 @@ shutdown_control()
  /***********************************************************************/
 
 void
-send_request()
+send_request(void)
 {
   int   counter=0;
   
@@ -1664,7 +1712,7 @@ send_request()
     dump_request();
 
     fprintf(where,
-            "\nsend_request: about to send %ld bytes from %p\n",
+            "\nsend_request: about to send %d bytes from %p\n",
             sizeof(netperf_request),
             &netperf_request);
     fflush(where);
@@ -1693,7 +1741,7 @@ send_request()
  /***********************************************************************/
 
 void
-send_response()
+send_response(void)
 {
   int   counter=0;
   int	bytes_sent;
@@ -1703,7 +1751,7 @@ send_response()
 
   if (debug > 1) {
     fprintf(where,
-            "send_response: contents of %lu ints before htonl\n",
+            "send_response: contents of %u ints before htonl\n",
             sizeof(netperf_response)/4);
     dump_response();
   }
@@ -1723,7 +1771,7 @@ send_response()
             "send_response: contents after htonl\n");
     dump_response();
     fprintf(where,
-            "about to send %lu bytes from %p\n",
+            "about to send %u bytes from %p\n",
             sizeof(netperf_response),
             &netperf_response);
     fflush(where);
@@ -1754,7 +1802,7 @@ send_response()
  /***********************************************************************/
 
 void
-recv_request()
+recv_request(void)
 {
 int     tot_bytes_recvd,
         bytes_recvd, 
@@ -1858,7 +1906,7 @@ if (tot_bytes_recvd < buflen) {
  /***********************************************************************/
 
 void
-recv_response()
+recv_response(void)
 {
 int     tot_bytes_recvd,
         bytes_recvd = 0, 
@@ -2427,7 +2475,7 @@ static char* proc_stat_buf = NULL;
 static int proc_stat_buflen = 0;
 
 static long
-calibrate_proc_stat ()
+calibrate_proc_stat (void)
 {
   if (proc_stat_fd < 0) {
     proc_stat_fd = open (PROC_STAT_FILE_NAME, O_RDONLY, NULL);
@@ -2830,7 +2878,7 @@ calibrate_pstat(times,wait_time)
 #endif /* USE_PSTAT */
 
 
-void libmain()
+void libmain(void)
 {
 fprintf(where,"hello world\n");
 fprintf(where,"debug: %d\n",debug);
@@ -3057,7 +3105,7 @@ establish_control(char hostname[], short int port)
  /***********************************************************************/
 
 char *
-get_id()
+get_id(void)
 {
 	static char id_string[80];
 #ifdef WIN32
@@ -3113,7 +3161,7 @@ return (id_string);
  /***********************************************************************/
 
 void
-identify_local()
+identify_local(void)
 {
 
 char *local_id;
@@ -3144,7 +3192,7 @@ fprintf(where,"%s\n",
  /***********************************************************************/
 
 void
-identify_remote()
+identify_remote(void)
 {
 
 char    *remote_id="";
@@ -3341,7 +3389,9 @@ cpu_stop(int measure_cpu, float *elapsed)
 
 {
 #ifndef WIN32
-#include <sys/wait.h>
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 #endif /* WIN32 */
 
 int     sec,
@@ -3954,7 +4004,9 @@ sit_and_spin(int child_index)
       SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
 #else /* WIN32 */
 #if defined(__sun) && defined(__SVR4)
-#include <sys/types.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
 #include <sys/priocntl.h>
 #include <sys/rtpriocntl.h>
 #include <sys/tspriocntl.h>
@@ -4191,7 +4243,7 @@ calibrate_local_cpu(float local_cpu_rate)
 
 
 float
-calibrate_remote_cpu()
+calibrate_remote_cpu(void)
 {
   float remrate;
 
@@ -4353,7 +4405,7 @@ output_row(FILE *fd, char *title, int *row){
 
 int
 sum_row(int *row) {
-  int sum;
+  int sum = 0;
   int i;
   for (i = 0; i < 10; i++) sum += row[i];
   return(sum);
@@ -4432,8 +4484,7 @@ delta_micro(struct timeval *begin,struct timeval *end)
 #ifdef DO_DLPI
 
 int
-put_control(fd, len, pri, ack)
-     int fd, len, pri, ack;
+put_control(int fd, int len, int pri, int ack)
 {
   int error;
   int flags = 0;
@@ -4452,14 +4503,14 @@ put_control(fd, len, pri, ack)
     return(-1);
   }
   if (err_ack->dl_primitive != ack) {
-    fprintf(where,"put_control: acknowledgement error wanted %u got %u \n",
+    fprintf(where,"put_control: acknowledgement error wanted %u got %lu \n",
             ack,err_ack->dl_primitive);
     if (err_ack->dl_primitive == DL_ERROR_ACK) {
-      fprintf(where,"             dl_error_primitive: %u\n",
+      fprintf(where,"             dl_error_primitive: %lu\n",
               err_ack->dl_error_primitive);
-      fprintf(where,"             dl_errno:           %u\n",
+      fprintf(where,"             dl_errno:           %lu\n",
               err_ack->dl_errno);
-      fprintf(where,"             dl_unix_errno       %u\n",
+      fprintf(where,"             dl_unix_errno       %lu\n",
               err_ack->dl_unix_errno);
     }
     fflush(where);
@@ -4534,7 +4585,6 @@ int
 dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len)
 {
   dl_connect_req_t *connection_req = (dl_connect_req_t *)control_data;
-  dl_connect_con_t *connection_con = (dl_connect_con_t *)control_data;
   struct pollfd pinfo;
 
   int flags = 0;
@@ -4601,10 +4651,7 @@ dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len)
 }
 
 int
-dl_accept(fd, rem_addr, rem_addr_len)
-     int fd;
-     unsigned char *rem_addr;
-     int rem_addr_len;
+dl_accept(int fd, unsigned char *rem_addr, int rem_addr_len)
 {
   dl_connect_ind_t *connect_ind = (dl_connect_ind_t *)control_data;
   dl_connect_res_t *connect_res = (dl_connect_res_t *)control_data;
@@ -4634,30 +4681,28 @@ dl_accept(fd, rem_addr, rem_addr_len)
 
 }
 
+#if 0
 int
-dl_set_window(fd, window)
-     int fd, window;
+dl_set_window(int fd, int window)
 {
   return(0);
 }
 
 void
-dl_stats(fd)
-     int fd;
+dl_stats(int fd)
 {
 }
 
 int
-dl_send_disc(fd)
-     int fd;
+dl_send_disc(int fd)
 {
 }
 
 int
-dl_recv_disc(fd)
-     int fd;
+dl_recv_disc(int fd)
 {
 }
+#endif
 #endif /* DO_DLPI*/
 
  /* these routines for confidence intervals are courtesy of IBM. They */
@@ -4715,7 +4760,7 @@ double
 /*                                                                      */
 /************************************************************************/
 void 
-init_stat()
+init_stat(void)
 {
         measured_sum_result=0.0;
         measured_square_sum_result=0.0;
@@ -4978,7 +5023,7 @@ retrieve_confident_values(float *elapsed_time,
  /* desirec confidence in the results. it will print the achieved */
  /* confidence to "where" raj 11/94 */
 void
-display_confidence()
+display_confidence(void)
 
 {
   fprintf(where,

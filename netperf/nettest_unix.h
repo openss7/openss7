@@ -192,7 +192,7 @@ extern void send_stream_rr(char remote_host[]);
 extern void send_dg_stream(char remote_host[]);
 extern void send_dg_rr(char remote_host[]);
 
-extern void recv_stream_stream();
-extern void recv_stream_rr();
-extern void recv_dg_stream();
-extern void recv_dg_rr();
+extern void recv_stream_stream(void);
+extern void recv_stream_rr(void);
+extern void recv_dg_stream(void);
+extern void recv_dg_rr(void);

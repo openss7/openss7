@@ -42,7 +42,7 @@ extern void scan_dns_args(int argc, char *argv[]);
 
 extern void send_dns_rr(char remote_host[]);
 
-extern void recv_dns_rr();
+extern void recv_dns_rr(void);
 
-extern void loc_cpu_rate();
-extern void rem_cpu_rate();
+extern void loc_cpu_rate(void);
+extern void rem_cpu_rate(void);

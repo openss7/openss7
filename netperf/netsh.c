@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2004/12/29 06:55:39 $
+ @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/01/22 13:25:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/29 06:55:39 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 13:25:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2004/12/29 06:55:39 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/01/22 13:25:44 $"
 
-static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2004/12/29 06:55:39 $";
+static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/01/22 13:25:44 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -67,46 +67,86 @@ char	netsh_id[]="\
 /*								*/
 /****************************************************************/
 
-#include <sys/types.h>
-#ifndef WIN32
-#include <unistd.h>
-#ifndef __VMS
-#include <sys/ipc.h>
-#endif /* __VMS */
-#endif /* WIN32 */
-#include <fcntl.h>
-#ifndef WIN32
-#include <errno.h>
-#include <signal.h>
-#endif  // !WIN32
 #include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
- /* the following four includes should not be needed ?*/
-#ifndef WIN32
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
 #else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
 # endif
 #endif
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
 #else
-#include <time.h>
-#include <winsock2.h>
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#if HAVE_MALLOC_H
+# include <malloc.h>
 #endif
 
-#ifndef STRINGS
-#include <string.h>
-#else /* STRINGS */
-#include <strings.h>
-#endif /* STRINGS */
+#ifndef WIN32
+# ifndef __VMS
+#  include <sys/ipc.h>
+# endif /* __VMS */
+#endif /* WIN32 */
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
+#ifndef WIN32
+# include <errno.h>
+# include <signal.h>
+#endif  // !WIN32
+
+#include <ctype.h>
+
+ /* the following four includes should not be needed ?*/
+#ifndef WIN32
+# if TIME_WITH_SYS_TIME
+#  include <sys/time.h>
+#  include <time.h>
+# else
+#  if HAVE_SYS_TIME_H
+#   include <sys/time.h>
+#  else
+#   include <time.h>
+#  endif
+# endif
+# if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+# endif
+# if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+# endif
+# if HAVE_NETDB_H
+#  include <netdb.h>
+# endif
+#else
+# include <time.h>
+# include <winsock2.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -131,7 +171,9 @@ double atof(const char *);
 #ifdef DO_UNIX
 #include "nettest_unix.h"
 #ifndef WIN32
-#include "sys/socket.h"
+#if HAVE_SYS_SOCKET_H
+# include "sys/socket.h"
+#endif
 #endif  // !WIN32
 #endif /* DO_UNIX */
 #ifdef DO_XTI
@@ -337,7 +379,7 @@ break_args(char *s, char *arg1, char *arg2)
 }
 
 void
-set_defaults()
+set_defaults(void)
 {
   
   /* stuff to say where this test is going                              */
@@ -900,7 +942,7 @@ scan_cmd_line(int argc, char *argv[])
   
   program = (char *)malloc(strlen(argv[0]) + 1);
   if (program == NULL) {
-    printf("malloc(%ld) failed!\n", strlen(argv[0]) + 1);
+    printf("malloc(%d) failed!\n", strlen(argv[0]) + 1);
     exit(1);
   }
   strcpy(program, argv[0]);
@@ -1285,7 +1327,7 @@ scan_cmd_line(int argc, char *argv[])
 
 
 void
-dump_globals()
+dump_globals(void)
 {
   printf("Program name: %s\n", program);
   printf("Local send alignment: %d\n",local_send_align);
