@@ -2,11 +2,11 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.20 2004/12/31 04:01:43 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.21 2005/01/14 06:38:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (c) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corp. <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/31 04:01:43 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -76,7 +76,7 @@ dnl -------------------------------------------------------------------------
 # =========================================================================
 # _LINUX_STREAMS
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS], [
+AC_DEFUN([_LINUX_STREAMS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
@@ -89,7 +89,7 @@ AC_DEFUN([_LINUX_STREAMS], [
 # =========================================================================
 # _LINUX_STREAMS_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_OPTIONS], [
+AC_DEFUN([_LINUX_STREAMS_OPTIONS], [dnl
     AC_ARG_WITH([lis],
         AS_HELP_STRING([--with-lis=HEADERS],
             [specify the LiS header file directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
@@ -106,14 +106,14 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS], [
 # =========================================================================
 # _LINUX_STREAMS_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_SETUP], [
+AC_DEFUN([_LINUX_STREAMS_SETUP], [dnl
     if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
         _LINUX_STREAMS_LIS_CHECK_HEADERS
     fi
     if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
         _LINUX_STREAMS_LFS_CHECK_HEADERS
     fi
-    AC_CACHE_CHECK([for streams include directory], [streams_cv_includes], [
+    AC_CACHE_CHECK([for streams include directory], [streams_cv_includes], [dnl
         if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
             if test :"${streams_cv_lis_includes:-no}" != :no ; then
                 streams_cv_includes="$streams_cv_lis_includes"
@@ -125,7 +125,7 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [
             fi
         fi
     ])
-    AC_CACHE_CHECK([for streams package], [streams_cv_package], [
+    AC_CACHE_CHECK([for streams package], [streams_cv_package], [dnl
         if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
             if test :"${streams_cv_lis_includes:-no}" != :no ; then
                 streams_cv_package="LiS"
@@ -196,10 +196,10 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 # =========================================================================
 # _LINUX_STREAMS_LIS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
+AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS header files.  The package normally requires either
     # Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
-    AC_CACHE_CHECK([for streams lis include directory], [streams_cv_lis_includes], [
+    AC_CACHE_CHECK([for streams lis include directory], [streams_cv_lis_includes], [dnl
         if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes
         then
             streams_cv_lis_includes="$with_lis"
@@ -238,7 +238,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
 *** ])
         fi
     ])
-    AC_CACHE_CHECK([for streams lis sys/LiS/modversions.h], [streams_cv_lis_modversions], [
+    AC_CACHE_CHECK([for streams lis sys/LiS/modversions.h], [streams_cv_lis_modversions], [dnl
         streams_cv_lis_modversions='no'
         if test -n "$streams_cv_lis_includes"
         then
@@ -255,7 +255,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
             fi
         fi
     ])
-    AC_CACHE_CHECK([for streams lis sys/LiS/module.h], [streams_cv_lis_module], [
+    AC_CACHE_CHECK([for streams lis sys/LiS/module.h], [streams_cv_lis_module], [dnl
         streams_cv_lis_module='no'
         if test -n "$streams_cv_lis_includes"
         then
@@ -274,10 +274,10 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
 # =========================================================================
 # _LINUX_STREAMS_LFS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [
+AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS header files.  The package normally requires
     # either Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
-    AC_CACHE_CHECK([for streams lfs include directory], [streams_cv_lfs_includes], [
+    AC_CACHE_CHECK([for streams lfs include directory], [streams_cv_lfs_includes], [dnl
         if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes
         then
             streams_cv_lfs_includes="$with_lfs"
@@ -316,7 +316,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [
 *** something like "streams-0.7a-1.tar.gz".
 *** ])
     fi
-    AC_CACHE_CHECK([for streams lfs sys/streams/modversions.h], [streams_cv_lfs_modversions], [
+    AC_CACHE_CHECK([for streams lfs sys/streams/modversions.h], [streams_cv_lfs_modversions], [dnl
         streams_cv_lfs_modversions='no'
         if test -n "$streams_cv_lfs_includes"
         then
@@ -342,7 +342,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [
 # =========================================================================
 # _LINUX_STREAMS_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_OUTPUT], [
+AC_DEFUN([_LINUX_STREAMS_OUTPUT], [dnl
     case "$streams_cv_package" in
         LiS)
             _LINUX_STREAMS_LIS_DEFINES
@@ -357,7 +357,7 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT], [
 # =========================================================================
 # _LINUX_STREAMS_LIS_DEFINES
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
+AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
     if test :"${streams_cv_lis_modversions:-no}" != :no ; then
         AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [], [Define when the
             LiS release supports module versions such as the OpenSS7 autoconf
@@ -443,7 +443,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
 # =========================================================================
 # _LINUX_STREAMS_LFS_DEFINES
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [
+AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     if test :"${streams_cv_lfs_modversions:-no}" != :no ; then
         AC_DEFINE_UNQUOTED([HAVE_SYS_STREAMS_MODVERSIONS_H], [], [Define when
             the Linux Fast-STREAMS release supports module versions such as
@@ -459,13 +459,13 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [
 # =========================================================================
 # _LINUX_STREAMS_
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_], [
+AC_DEFUN([_LINUX_STREAMS_], [dnl
 ])# _LINUX_STREAMS_
 # =========================================================================
 
 dnl =========================================================================
 dnl 
-dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl 
 dnl =========================================================================

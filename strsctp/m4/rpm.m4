@@ -6,7 +6,8 @@ dnl @(#) rpm.m4,v 0.9.2.1 2004/01/13 16:11:35 brian Exp
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -645,7 +646,7 @@ AC_DEFUN([_RPM_], [dnl
 
 dnl =========================================================================
 dnl 
-dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl 
 dnl =========================================================================

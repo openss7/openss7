@@ -2,11 +2,12 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.9 2004/12/20 10:06:42 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.10 2005/01/14 06:38:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -53,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/20 10:06:42 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -262,7 +263,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 
 dnl =========================================================================
 dnl 
-dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl 
 dnl =========================================================================

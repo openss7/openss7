@@ -1,10 +1,12 @@
 dnl =========================================================================
+dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
+dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.4 2004/12/18 11:13:21 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.5 2005/01/14 06:38:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -52,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/18 11:13:21 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -97,7 +99,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS XTI header files.  The package
     # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
     # files (or both) to compile.
-    AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [
+    AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [dnl
         if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
             xti_cv_includes="$with_xti"
         else
@@ -183,7 +185,7 @@ AC_DEFUN([_XTI_], [dnl
 
 dnl =========================================================================
 dnl 
-dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl 
 dnl =========================================================================

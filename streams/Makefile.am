@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2004/11/08 04:02:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2005/01/14 06:39:48 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 04:02:30 $ by $Author: brian $
+# Last Modified $Date: 2005/01/14 06:39:48 $ by $Author: brian $
 #
 # =============================================================================
 
