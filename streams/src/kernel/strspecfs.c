@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/15 19:34:49 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
- #ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $"
+ #ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/15 19:34:49 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1530,6 +1530,9 @@ void specfs_put(void)
 /**
  *  strspecfs_init: - initialize the shadow special filesystem
  */
+#ifdef CONFIG_STREAMS_MODULE
+static
+#endif
 int __init specfs_init(void)
 {
 	int result;
@@ -1553,6 +1556,9 @@ int __init specfs_init(void)
 /**
  *  strspecfs_exit: - deinitialize the shadow special filesystem
  */
+#ifdef CONFIG_STREAMS_MODULE
+static
+#endif
 void __exit specfs_exit(void)
 {
 	strlookup_exit();

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -122,7 +122,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -277,7 +277,10 @@ int streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 
 EXPORT_SYMBOL(streams_close_comm);
 
-static int __init osfcomp_init(void)
+#ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
+static
+#endif
+int __init osfcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 	printk(KERN_INFO OSFCOMP_BANNER);
@@ -286,7 +289,10 @@ static int __init osfcomp_init(void)
 #endif
 	return (0);
 }
-static void __exit osfcomp_exit(void)
+#ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
+static
+#endif
+void __exit osfcomp_exit(void)
 {
 	return;
 }

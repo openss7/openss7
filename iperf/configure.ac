@@ -75,6 +75,12 @@ AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
+dnl
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
+dnl
+if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
+	enable_dependency_tracking='yes'
+fi
 
 AC_GNU_SOURCE
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -329,7 +329,10 @@ static struct cdevsw log_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-static int __init log_init(void)
+#ifdef CONFIG_STREAMS_LOG_MODULE
+static
+#endif
+int __init log_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_LOG_MODULE
@@ -344,7 +347,10 @@ static int __init log_init(void)
 		major = err;
 	return (0);
 }
-static void __exit log_exit(void)
+#ifdef CONFIG_STREAMS_LOG_MODULE
+static
+#endif
+void __exit log_exit(void)
 {
 	unregister_strdev(&log_cdev, major);
 }

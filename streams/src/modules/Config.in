@@ -10,6 +10,7 @@
 # Names must be a max of 8 chars for Solaris/UnixWare compatibility
 #
 #	name		prefix
+module	sth		sth
 module	pipemod		pipemod
 module	connld		connld
 module	sc		sc
@@ -21,6 +22,7 @@ module	sc		sc
 # Object name specifications
 #
 #	type	name		object name
+objname module	sth		sth
 objname module	pipemod		pipemod
 objname module	connld		connld
 objname	module	sc		sc
@@ -38,9 +40,10 @@ objname	module	sc		sc
 # If you do not use the loadable keyword at all, everything is linked
 # into streams.o.
 #
-loadable pipemod
-loadable connld
-loadable sc
+@CONFIG_STREAMS_STH_MODULE_TRUE@loadable sth
+@CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@loadable pipemod
+@CONFIG_STREAMS_CONNLD_MODULE_TRUE@loadable connld
+@CONFIG_STREAMS_SC_MODULE_TRUE@loadable sc
 #loadable timod
 #loadable tirdwr
 #loadable sockmod

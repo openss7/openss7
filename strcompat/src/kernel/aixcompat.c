@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -123,7 +123,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -480,7 +480,10 @@ int str_install_AIX(int cmd, strconf_t * sc)
 	return (EINVAL);
 }
 
-static int __init aixcomp_init(void)
+#ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
+static
+#endif
+int __init aixcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 	printk(KERN_INFO AIXCOMP_BANNER);
@@ -489,7 +492,10 @@ static int __init aixcomp_init(void)
 #endif
 	return (0);
 }
-static void __exit aixcomp_exit(void)
+#ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
+static
+#endif
+void __exit aixcomp_exit(void)
 {
 	return;
 }

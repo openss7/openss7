@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -88,7 +88,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -380,7 +380,10 @@ static struct fmodsw sc_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-static int __init sc_init(void)
+#ifdef CONFIG_STREAMS_SC_MODULE
+static
+#endif
+int __init sc_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_SC_MODULE
@@ -396,7 +399,10 @@ static int __init sc_init(void)
 	return (0);
 };
 
-static void __exit sc_exit(void)
+#ifdef CONFIG_STREAMS_SC_MODULE
+static
+#endif
+void __exit sc_exit(void)
 {
 	int err;
 	if ((err = unregister_strmod(&sc_fmod)))

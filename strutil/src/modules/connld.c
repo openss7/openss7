@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/08/22 06:17:55 $"
+#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/22 06:42:27 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -170,7 +170,10 @@ static struct fmodsw connld_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-static int __init connld_init(void)
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
+static
+#endif
+int __init connld_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_CONNLD_MODULE
@@ -185,7 +188,10 @@ static int __init connld_init(void)
 		modid = err;
 	return (0);
 };
-static void __exit connld_exit(void)
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
+static
+#endif
+void __exit connld_exit(void)
 {
 	int err;
 	if ((err = unregister_strmod(&connld_fmod)) < 0)

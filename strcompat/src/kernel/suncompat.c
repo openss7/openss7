@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -125,7 +125,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -590,7 +590,10 @@ int mod_info(struct modlinkage *ml, struct modinfo *mi)
 
 EXPORT_SYMBOL(mod_info);	/* strconf.h */
 
-static int __init suncomp_init(void)
+#ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
+static
+#endif
+int __init suncomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 	printk(KERN_INFO SUNCOMP_BANNER);
@@ -599,7 +602,10 @@ static int __init suncomp_init(void)
 #endif
 	return (0);
 }
-static void __exit suncomp_exit(void)
+#ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
+static
+#endif
+void __exit suncomp_exit(void)
 {
 	return;
 }

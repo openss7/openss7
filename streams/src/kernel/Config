@@ -10,13 +10,13 @@
 # Names must be a max of 8 chars for Solaris/UnixWare compatibility
 #
 #	name		prefix
-module	sth		sth
+#module	sth		sth
 
 #
 # Object name specifications
 #
 #	type	name		object name
-objname module	sth		sth
+#objname module	sth		sth
 
 #
 # Loadable specifications
@@ -28,7 +28,7 @@ objname module	sth		sth
 # If you do not use the loadable keyword at all, everything is linked
 # into streams.o.
 #
-loadable    sth
+#loadable    sth
 
 #
 # Initialization specifications

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/22 06:42:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/22 06:42:26 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/22 06:42:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/08/22 06:17:54 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/22 06:42:26 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -324,7 +324,10 @@ EXPORT_SYMBOL_GPL(unregister_clone);
  *  -------------------------------------------------------------------------
  */
 
-static int __init clone_init(void)
+#ifdef CONFIG_STREAMS_CLONE_MODULE
+static
+#endif
+int __init clone_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_CLONE_MODULE
@@ -340,7 +343,10 @@ static int __init clone_init(void)
 	return (0);
 };
 
-static void __exit clone_exit(void)
+#ifdef CONFIG_STREAMS_CLONE_MODULE
+static
+#endif
+void __exit clone_exit(void)
 {
 	unregister_cmajor(&clone_cdev, major);
 };

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.21 2005/01/14 06:38:47 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.26 2005/01/22 13:52:59 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 13:52:59 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -77,7 +77,6 @@ dnl -------------------------------------------------------------------------
 # _LINUX_STREAMS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
     _LINUX_STREAMS_OUTPUT
@@ -203,23 +202,52 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
         if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes
         then
             streams_cv_lis_includes="$with_lis"
-        else
+        fi
+        streams_what="sys/stream.h"
+        if test ":${streams_cv_lis_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built under
+            # the same top directory.
+            for streams_where in LiS/include ; do
+                streams_dir=`echo "$srcdir/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
+                    streams_cv_lis_includes="$streams_dir ../$streams_where"
+                    STREAMS_LDADD="-static ../LiS/libLiS.la"
+                    break
+                fi
+            done
+        fi
+        if test ":${streams_cv_lis_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built at
+            # the same directory level as this package.
+            for streams_where in LiS/include ; do
+                streams_dir=`echo "$srcdir/../$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
+                    streams_cv_lis_includes="$streams_dir ../$streams_where"
+                    STREAMS_LDADD="-static ../LiS/libLiS.la"
+                    break
+                fi
+            done
+        fi
+        if test ":${streams_cv_lis_includes:-no}" = :no ; then
+            # note if linux kernel macros have not run this reduces
             streams_cv_lis_includes=
             eval "streams_search_path=\"
-                $linux_cv_k_rootdir$includedir/LiS
-                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include
-                $linux_cv_k_rootdir$oldincludedir/LiS
-                $linux_cv_k_rootdir/usr/include/LiS
-                $linux_cv_k_rootdir/usr/local/include/LiS
-                $linux_cv_k_rootdir/usr/src/LiS/include\""
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/LiS/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
             streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for streams_dir in $streams_search_path ; do
-                if test -d "$streams_dir" -a -r "$streams_dir/sys/stream.h"
+                if test -d "$streams_dir" -a -r "$streams_dir/$streams_what"
                 then
                     streams_cv_lis_includes="$streams_dir"
+                    STREAMS_LDADD="-lLiS"
                     break
                 fi
             done
@@ -248,10 +276,13 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
                 break
             fi
             # new place for modversions
-            if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" ; then
-                streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
-                streams_cv_lis_modversions='yes'
-                break
+            if test -n $linux_cv_k_release ; then
+dnl             if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+                if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" ; then
+                    streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
+                    streams_cv_lis_modversions='yes'
+                    break
+                fi
             fi
         fi
     ])
@@ -281,23 +312,52 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
         if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes
         then
             streams_cv_lfs_includes="$with_lfs"
-        else
+        fi
+        streams_what="sys/stream.h"
+        if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built under
+            # the same top directory.
+            for streams_where in streams/include ; do
+                streams_dir=`echo "$srcdir/$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
+                    streams_cv_lfs_includes="$streams_dir ../$streams_where"
+                    STREAMS_LDADD="-static ../streams/libstreams.la"
+                    break
+                fi
+            done
+        fi
+        if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built at
+            # the same directory level as this package.
+            for streams_where in streams/include ; do
+                streams_dir=`echo "$srcdir/../$streams_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
+                    streams_cv_lfs_includes="$streams_dir ../$streams_where"
+                    STREAMS_LDADD="-static ../streams/libstreams.la"
+                    break
+                fi
+            done
+        fi
+        if test ":${streams_cv_lfs_includes:-no}" = :no ; then
+            # note if linux kernel macros have not run this reduces
             streams_cv_lfs_includes=
             eval "streams_search_path=\"
-                $linux_cv_k_rootdir$includedir/streams
-                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/streams
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/streams
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/streams
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/streams/include
-                $linux_cv_k_rootdir$oldincludedir/streams
-                $linux_cv_k_rootdir/usr/include/streams
-                $linux_cv_k_rootdir/usr/local/include/streams
-                $linux_cv_k_rootdir/usr/src/streams/include\""
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/streams/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include\""
             streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for streams_dir in $streams_search_path ; do
-                if test -d "$streams_dir" -a -r "$streams_dir/sys/stream.h"
+                if test -d "$streams_dir" -a -r "$streams_dir/$streams_what"
                 then
                     streams_cv_lfs_includes="$streams_dir"
+                    STREAMS_LDADD="-lstreams"
                     break
                 fi
             done
@@ -328,10 +388,13 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
                     break
                 fi
                 # new place for modversions
-                if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
-                    streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
-                    streams_cv_lfs_modversions='yes'
-                    break
+                if test -n $linux_cv_k_release ; then
+dnl                 if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+                    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" ; then
+                        streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
+                        streams_cv_lfs_modversions='yes'
+                        break
+                    fi
                 fi
             done
         fi
@@ -368,7 +431,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
             release provides its own module.h file such as 2.17 GCOM LiS
             releases.])
     fi
-    case "$linux_cv_march" in
+    case "$target_cpu" in
 	alpha*)			: ;;
 	arm*)			: ;;
 	cris*)			: ;;
@@ -436,7 +499,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
 	*)			: ;;
     esac
     STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    STREAMS_LDADD='-lLiS'
+dnl STREAMS_LDADD='-lLiS'
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =========================================================================
 
@@ -450,7 +513,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
             the OpenSS7 autoconf releases.])
     fi
     STREAMS_CPPFLAGS="-DLFS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    STREAMS_LDADD='-lstreams'
+dnl STREAMS_LDADD='-lstreams'
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [], [Linux Fast-STREAMS has this type.])
     AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [], [Linux Fast-STREAMS has this type.])
 ])# _LINUX_STREAMS_LFS_DEFINES

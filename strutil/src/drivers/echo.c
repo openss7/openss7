@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $"
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -297,7 +297,10 @@ static struct cdevsw echo_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-static int __init echo_init(void)
+#ifdef CONFIG_STREAMS_ECHO_MODULE
+static
+#endif
+int __init echo_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_ECHO_MODULE
@@ -312,7 +315,10 @@ static int __init echo_init(void)
 		major = err;
 	return (0);
 };
-static void __exit echo_exit(void)
+#ifdef CONFIG_STREAMS_ECHO_MODULE
+static
+#endif
+void __exit echo_exit(void)
 {
 	unregister_strdev(&echo_cdev, major);
 };

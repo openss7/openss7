@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -122,7 +122,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:53 $"
+#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:25 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -162,7 +162,10 @@ EXPORT_SYMBOL(get_sleep_lock);	/* hpuxddi.h */
 __HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
 EXPORT_SYMBOL(streams_put);	/* hpuxddi.h */
 
-static int __init hpuxcomp_init(void)
+#ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
+static
+#endif
+int __init hpuxcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 	printk(KERN_INFO HPUXCOMP_BANNER);
@@ -171,7 +174,10 @@ static int __init hpuxcomp_init(void)
 #endif
 	return (0);
 }
-static void __exit hpuxcomp_exit(void)
+#ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
+static
+#endif
+void __exit hpuxcomp_exit(void)
 {
 	return;
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/11/08 10:37:13 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 06:42:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/11/08 10:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/11/08 10:37:13 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 06:42:26 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/11/08 10:37:13 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 06:42:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/11/08 10:37:13 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 06:42:26 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2220,7 +2220,10 @@ int lis_unregister_strmod(struct streamtab *strtab)
 
 EXPORT_SYMBOL_GPL(lis_unregister_strmod);
 
-static int __init liscomp_init(void)
+#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
+static
+#endif
+int __init liscomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 	printk(KERN_INFO LISCOMP_BANNER);
@@ -2229,7 +2232,10 @@ static int __init liscomp_init(void)
 #endif
 	return (0);
 }
-static void __exit liscomp_exit(void)
+#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
+static
+#endif
+void __exit liscomp_exit(void)
 {
 	return;
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/08/22 06:17:54 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/01/22 06:42:27 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -230,7 +230,10 @@ static struct cdevsw pipe_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-static int __init pipe_init(void)
+#ifdef CONFIG_STREAMS_PIPE_MODULE
+static
+#endif
+int __init pipe_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_PIPE_MODULE
@@ -245,7 +248,10 @@ static int __init pipe_init(void)
 		major = err;
 	return (0);
 };
-static void __exit pipe_exit(void)
+#ifdef CONFIG_STREAMS_PIPE_MODULE
+static
+#endif
+void __exit pipe_exit(void)
 {
 	unregister_strdev(&pipe_cdev, major);
 };

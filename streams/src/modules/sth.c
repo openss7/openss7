@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:55 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:55 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/22 06:42:27 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:55 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/22 06:42:27 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3703,6 +3703,9 @@ static inline void put_filesystem(struct file_system_type *fs)
 		__MOD_DEC_USE_COUNT(fs->owner);
 }
 
+#ifdef CONFIG_STREAMS_STH_MODULE
+static
+#endif
 int __init sth_init(void)
 {
 	int result;
@@ -3721,6 +3724,9 @@ int __init sth_init(void)
 	return (result);
 }
 
+#ifdef CONFIG_STREAMS_STH_MODULE
+static
+#endif
 void __exit sth_exit(void)
 {
 	unregister_strmod(&sth_fmod);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -267,7 +267,10 @@ STATIC struct file_operations nsdev_f_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-static int __init nsdev_init(void)
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
+static
+#endif
+int __init nsdev_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
@@ -282,7 +285,10 @@ static int __init nsdev_init(void)
 		major = err;
 	return (0);
 };
-static void __exit nsdev_exit(void)
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
+static
+#endif
+void __exit nsdev_exit(void)
 {
 	unregister_cmajor(&nsdev_cdev, major);
 };

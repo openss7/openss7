@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/21 12:16:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/22 06:46:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 12:16:44 $ by $Author: brian $
+# Last Modified $Date: 2005/01/22 06:46:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,9 +61,11 @@ include ../am/openss7.am
 # pre-install checks.
 #
 
+# my rule
 TESTSUITE		= testsuite
 
-$(srcdir)/package.m4: $(top_srcdir)/configure
+# my rule
+package.m4: $(top_srcdir)/configure
 	@( \
 		echo 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
 		echo 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE_TARNAME@])'; \
@@ -71,7 +73,10 @@ $(srcdir)/package.m4: $(top_srcdir)/configure
 		echo 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
 		echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
+	cp -pf package.m4 $(srcdir)/package.m4
+	rm -f package.m4
 
+# my rule
 TESTSUITE_DEPS		= \
 			testsuite.at \
 			dummy1.m4 \
@@ -80,10 +85,14 @@ TESTSUITE_DEPS		= \
 			dummy4.m4 \
 			package.m4
 
-$(srcdir)/$(TESTSUITE): $(TESTSUITE_DEPS)
+# my rule
+$(TESTSUITE): $(TESTSUITE_DEPS)
 	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
-	mv -f $@.tmp $@
+	@file=`echo '$@' | sed -e 's|.*/||'` ; \
+	cp -pf $@.tmp $(srcdir)/$$file
+	rm -f $@.tmp
 
+# my rule
 atconfig: $(top_builddir)/config.status
 	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
@@ -92,39 +101,52 @@ atconfig: $(top_builddir)/config.status
 #atlocal: $(srcdir)/atlocal.in $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
+# my rule
 EXTRA_DIST		= $(TESTSUITE) $(TESTSUITE_DEPS)
+# my rule
 dist_noinst_SCRIPTS	= $(TESTSUITE)
 
-all-testsuite: $(srcdir)/$(TESTSUITE)
+# my rule
+all-testsuite: $(TESTSUITE)
 
 if PERFORM_TESTING
 
+# my rule
 installcheck-specfs:
 
+# my rule
 installcheck-streams:
 
+# my rule
 installcheck-xnet:
 
+# my rule
 installcheck-timod:
 
+# my rule
 installcheck-tirdwr:
 
+# my rule
 installcheck-inet:
 
-installcheck-test: $(srcdir)/$(TESTSUITE)
+# my rule
+installcheck-test: $(TESTSUITE)
 	$(SHELL) $< -x -v
 
+# my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal \
 	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod \
 	installcheck-tirdwr installcheck-inet installcheck-test
 
 else
 
-installcheck-testsuite: $(srcdir)/$(TESTSUITE) atconfig atlocal
+# my rule
+installcheck-testsuite: $(TESTSUITE) atconfig atlocal
 
 endif
 
-clean-testsuite: $(srcdir)/$(TESTSUITE)
+# my rule
+clean-testsuite: $(TESTSUITE)
 	@if test -r "$<" ; then \
 		echo "$(SHELL) $< --clean" ; \
 		$(SHELL) $< --clean ; \
@@ -133,12 +155,14 @@ clean-testsuite: $(srcdir)/$(TESTSUITE)
 CLEANFILES		+= \
 			$(TESTSUITE) \
 			atconfig \
-			atlocal
+			atlocal \
+			package.m4
 
 MAINTAINERCLEANFILES	+= \
 			$(srcdir)/$(TESTSUITE) \
 			$(srcdir)/atconfig \
-			$(srcdir)/atlocal
+			$(srcdir)/atlocal \
+			$(srcdir)/package.m4
 
 ALL_LOCAL += all-testsuite
 

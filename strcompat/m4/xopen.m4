@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/14 06:38:47 $
+dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 07:11:04 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 07:11:04 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -58,7 +58,6 @@ dnl ============================================================================
 # Common things that need to be done to support XOPEN/XNS networking.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
     _XOPEN_OPTIONS
     _XOPEN_SETUP
     _XOPEN_OUTPUT

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -122,7 +122,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:54 $"
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 06:42:26 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -334,7 +334,10 @@ EXPORT_SYMBOL(SLEEP_TRYLOCK);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp);
 EXPORT_SYMBOL(SLEEP_UNLOCK);	/* uw7ddi.h */
 
-static int __init uw7comp_init(void)
+#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
+static
+#endif
+int __init uw7comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 	printk(KERN_INFO UW7COMP_BANNER);
@@ -343,7 +346,10 @@ static int __init uw7comp_init(void)
 #endif
 	return (0);
 }
-static void __exit uw7comp_exit(void)
+#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
+static
+#endif
+void __exit uw7comp_exit(void)
 {
 	return;
 }

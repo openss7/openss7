@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/08/22 06:17:54 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/22 06:42:27 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -409,7 +409,10 @@ static struct devnode sad_node_user = {
 	n_mode:S_IFCHR,
 };
 
-static int __init sad_init(void)
+#ifdef CONFIG_STREAMS_SAD_MODULE
+static
+#endif
+int __init sad_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_SAD_MODULE
@@ -427,7 +430,10 @@ static int __init sad_init(void)
 	register_strnod(&sad_cdev, &sad_node_user, 1);
 	return (0);
 };
-static void __exit sad_exit(void)
+#ifdef CONFIG_STREAMS_SAD_MODULE
+static
+#endif
+void __exit sad_exit(void)
 {
 	unregister_strnod(&sad_cdev, 1);
 	unregister_strnod(&sad_cdev, 0);

@@ -68,15 +68,15 @@ objname driver	log		log
 #
 # Loadable specifications
 #
-loadable clone
-loadable fifo
-loadable loop
-loadable sad
-loadable nsdev
-loadable echo
-loadable nuls
-loadable pipe
-loadable log
+@CONFIG_STREAMS_CLONE_MODULE_TRUE@loadable clone
+@CONFIG_STREAMS_FIFO_MODULE_TRUE@loadable fifo
+@CONFIG_STREAMS_LOOP_MODULE_TRUE@loadable loop
+@CONFIG_STREAMS_SAD_MODULE_TRUE@loadable sad
+@CONFIG_STREAMS_NSDEV_MODULE_TRUE@loadable nsdev
+@CONFIG_STREAMS_ECHO_MODULE_TRUE@loadable echo
+@CONFIG_STREAMS_NULS_MODULE_TRUE@loadable nuls
+@CONFIG_STREAMS_PIPE_MODULE_TRUE@loadable pipe
+@CONFIG_STREAMS_LOG_MODULE_TRUE@loadable log
 #loadable sfx
 #loadable spx
 #loadable socksys

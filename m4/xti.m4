@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 0.9.2.5 2005/01/14 06:38:47 brian Exp $
+dnl @(#) $Id: xti.m4,v 0.9.2.10 2005/01/22 13:52:59 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 13:52:59 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -62,11 +62,11 @@ dnl =========================================================================
 # _XTI
 # -------------------------------------------------------------------------
 AC_DEFUN([_XTI], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XTI_OPTIONS
     _XTI_SETUP
     AC_SUBST([XTI_CPPFLAGS])
+    AC_SUBST([XTI_LDADD])
 ])# _XTI
 # =========================================================================
 
@@ -102,17 +102,33 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [dnl
         if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
             xti_cv_includes="$with_xti"
-        else
-            eval "xti_search_path=\"
-                $linux_cv_k_rootdir$includedir/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxnet/src/include
-                $linux_cv_k_rootdir$oldincludedir/strxnet
-                $linux_cv_k_rootdir/usr/include/strxnet
-                $linux_cv_k_rootdir/usr/local/include/strxnet
-                $linux_cv_k_rootdir/usr/src/strxnet/src/include \""
+        fi
+        xti_what="xti.h"
+        if test ":${xti_cv_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built under
+            # the same top directory.
+            for xti_where in strxnet/src/include ; do
+                xti_dir=`echo "$srcdir/$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
+                    xti_cv_includes="$xti_dir ../$xti_where"
+                    XTI_LDADD="../strxnet/libxnet.la"
+                    break
+                fi
+            done
+        fi
+        if test ":${xti_cv_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built at
+            # the same directory level as this package.
+            for xti_where in strxnet/src/include ; do
+                xti_dir=`echo "$srcdir/../$xti_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
+                    xti_cv_includes="$xti_dir ../$xti_where"
+                    XTI_LDADD="../strxnet/libxnet.la"
+                    break
+                fi
+            done
+        fi
+        if test ":${xti_cv_includes:-no}" = :no ; then
             case "$streams_cv_package" in
                 LiS)
                     # Some of our oldest RPM releases of LiS put the xti header files into their own
@@ -121,30 +137,52 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
                     # package.  This tests whether we need an additional -I/usr/include/xti in the
                     # streams includes line.  This check can be dropped when the older RPM releases
                     # of LiS fall out of favor.
-                    eval "xti_search_path=\"$xti_search_path
-                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS/xti
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS/xti
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS/xti
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include/xti
-                        $linux_cv_k_rootdir$oldincludedir/LiS/xti
-                        $linux_cv_k_rootdir/usr/include/LiS/xti
-                        $linux_cv_k_rootdir/usr/local/include/LiS/xti
-                        $linux_cv_k_rootdir/usr/src/LiS/include/xti
-                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/xti
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/xti
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/xti
-                        $linux_cv_k_rootdir$oldincludedir/xti
-                        $linux_cv_k_rootdir/usr/include/xti
-                        $linux_cv_k_rootdir/usr/local/include/xti\""
+                    eval "xti_search_path=\"
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/strxnet/src/include
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/LiS/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/LiS/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/LiS/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/LiS/include/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include
+                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/xti
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/xti\""
                     ;;
                 LfS)
                     # LfS has always been separate.
+                    eval "xti_search_path=\"
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/strxnet/src/include
+                        ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include\""
                     ;;
             esac
             xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for xti_dir in $xti_search_path ; do
-                if test -d "$xti_dir" -a -r "$xti_dir/xti.h" ; then
+                if test -d "$xti_dir" -a -r "$xti_dir/$xti_what" ; then
                     xti_cv_includes="$xti_dir"
+                    XTI_LDADD="-lxnet"
                     break
                 fi
             done

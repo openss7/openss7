@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/08/22 06:17:54 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/22 06:42:27 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -328,7 +328,10 @@ static struct cdevsw spx_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-static int __init spx_init(void)
+#ifdef CONFIG_STREAMS_SPX_MODULE
+static
+#endif
+int __init spx_init(void)
 {
 	int err;
 #ifdef CONFIG_STREAMS_SPX_MODULE
@@ -344,7 +347,10 @@ static int __init spx_init(void)
 	return (0);
 };
 
-static void __exit spx_exit(void)
+#ifdef CONFIG_STREAMS_SPX_MODULE
+static
+#endif
+void __exit spx_exit(void)
 {
 	unregister_strdev(&spx_cdev, major);
 };

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xns.m4,v 0.9.2.3 2005/01/14 06:38:47 brian Exp $
+dnl @(#) $Id: xns.m4,v 0.9.2.7 2005/01/22 13:26:23 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/14 06:38:47 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 13:26:23 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -66,7 +66,6 @@ dnl =========================================================================
 # NPI header files, the NPI interface to SCTP will not be built.
 # -------------------------------------------------------------------------
 AC_DEFUN([_XNS], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XNS_OPTIONS
     _XNS_SETUP
@@ -104,61 +103,90 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
     # normally requires XNS header files to compile.
     AC_CACHE_CHECK([for xns include directory], [xns_cv_includes], [dnl
         if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
+            # First thing to do is to take user specified director(ies)
             xns_cv_includes="$with_xns"
-        else
+        fi
+        xns_what="sys/npi.h"
+        if test ":${xns_cv_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built under
+            # the same top directory.
+            for xns_where in strxns/src/include ; do
+                xns_dir=`echo "$srcdir/$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
+                    xns_cv_includes="$xns_dir ../$xns_where"
+                    break
+                fi
+            done
+        fi
+        if test ":${xns_cv_includes:-no}" = :no ; then
+            # The next place to look now is for a peer package being built at
+            # the same directory level as this package.
+            for xns_where in strxns/src/include ; do
+                xns_dir=`echo "$srcdir/../$xns_where" | sed -e 's|[[^ /\.]][[^ /\.]]*/\.\./||g;s|/\./|/|g;s|//|/|g;'`
+                if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
+                    xns_cv_includes="$xns_dir ../$xns_where"
+                    break
+                fi
+            done
+        fi
+        if test ":${xns_cv_includes:-no}" = :no ; then
             # XNS header files are normally found in the strxns package now.
-            # They used to be part of the strxnet add-on package and even
-            # older versions are part of the LiS or LfS release packages.
+            # They used to be part of the strxnet add-on package and even older
+            # versions are part of the LiS or LfS release packages.
             eval "xns_search_path=\"
-                $linux_cv_k_rootdir$includedir/strxns
-                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxns
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxns
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxns
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxns/src/include
-                $linux_cv_k_rootdir$oldincludedir/strxns
-                $linux_cv_k_rootdir/usr/include/strxns
-                $linux_cv_k_rootdir/usr/local/include/strxns
-                $linux_cv_k_rootdir/usr/src/strxns/src/include
-                $linux_cv_k_rootdir$includedir/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/strxnet
-                $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/strxnet/src/include
-                $linux_cv_k_rootdir$oldincludedir/strxnet
-                $linux_cv_k_rootdir/usr/include/strxnet
-                $linux_cv_k_rootdir/usr/local/include/strxnet
-                $linux_cv_k_rootdir/usr/src/strxnet/src/include\""
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/strxns/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/strxnet/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxns
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxns/src/include
+                ${linux_cv_k_rootdir:-$DESTDIR}$includedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/strxnet
+                ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/strxnet/src/include\""
             case "$streams_cv_package" in
                 LiS)
                     # XNS header files used to be part of the LiS package.
                     eval "xns_search_path=\"$xns_search_path
-                        $linux_cv_k_rootdir$includedir/LiS
-                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/LiS
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/LiS
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/LiS
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/LiS/include
-                        $linux_cv_k_rootdir$oldincludedir/LiS
-                        $linux_cv_k_rootdir/usr/include/LiS
-                        $linux_cv_k_rootdir/usr/local/include/LiS
-                        $linux_cv_k_rootdir/usr/src/LiS/include\""
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/LiS/include
+                        ${linux_cv_k_rootdir:-$DESTDIR}$includedir/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/LiS
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/LiS/include\""
                     ;;
                 LfS)
                     # XNS header files used to be part of the LfS package.
                     eval "xns_search_path=\"$xns_search_path
-                        $linux_cv_k_rootdir$includedir/streams
-                        $linux_cv_k_rootdir$linux_cv_k_prefix$oldincludedir/streams
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/include/streams
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/local/include/streams
-                        $linux_cv_k_rootdir$linux_cv_k_prefix/usr/src/streams/src/include
-                        $linux_cv_k_rootdir$oldincludedir/streams
-                        $linux_cv_k_rootdir/usr/include/streams
-                        $linux_cv_k_rootdir/usr/local/include/streams
-                        $linux_cv_k_rootdir/usr/src/streams/include\""
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$includedir/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix$oldincludedir/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/include/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/local/include/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}$linux_cv_k_prefix/usr/src/streams/include
+                        ${linux_cv_k_rootdir:-$DESTDIR}$includedir/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}$oldincludedir/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/include/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/local/include/streams
+                        ${linux_cv_k_rootdir:-$DESTDIR}/usr/src/streams/include\""
                     ;;
             esac
             xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
             for xns_dir in $xns_search_path ; do
-                if test -d "$xns_dir" -a -r "$xns_dir/sys/npi.h" ; then
+                if test -d "$xns_dir" -a -r "$xns_dir/$xns_what" ; then
                     xns_cv_includes="$xns_dir"
                     break
                 fi

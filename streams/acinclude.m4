@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.38 2005/01/14 06:39:48 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.39 2005/01/22 06:40:33 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/14 06:39:48 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 06:40:33 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -77,8 +77,6 @@ AC_DEFUN([AC_LFS], [dnl
     _PUBLIC_RELEASE
     _RPM_SPEC
     _LDCONFIG
-    _LFS_SETUP_COMPAT
-    _LFS_SETUP_FIFOS
     LFS_INCLUDES="-DLFS=1 -I- -imacros ./config.h -I./include -I${srcdir}/include"
     AC_SUBST([LFS_INCLUDES])dnl
     USER_CPPFLAGS="$CPPFLAGS"
@@ -146,134 +144,550 @@ AC_DEFUN([_LFS_SETUP_DEBUG], [dnl
 # =========================================================================
 
 # =========================================================================
+# _LFS_SETUP_MODULES
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_MODULES], [dnl
+    AC_ARG_ENABLE([module-sth],
+        AS_HELP_STRING([--enable-module-sth],
+            [enable sth (stream head) module linked into streams object. @<:@default=module@:>@]),
+            [enable_module_sth="$enableval"],
+            [enable_module_sth='module'])
+    AC_ARG_ENABLE([module-pipemod],
+        AS_HELP_STRING([--enable-module-pipemod],
+            [enable pipemod module linked into streams object. @<:@default=module@:>@]),
+            [enable_module_pipemod="$enableval"],
+            [enable_module_pipemod='module'])
+    AC_ARG_ENABLE([module-connld],
+        AS_HELP_STRING([--enable-module-connld],
+            [enable connld module linked into streams object. @<:@default=module@:>@]),
+            [enable_module_connld="$enableval"],
+            [enable_module_connld='module'])
+    AC_ARG_ENABLE([module-sc],
+        AS_HELP_STRING([--enable-module-sc],
+            [enable sc module linked into streams object. @<:@default=module@:>@]),
+            [enable_module_sc="$enableval"],
+            [enable_module_sc='module'])
+    AC_CACHE_CHECK([for STREAMS module sth], [lfs_module_sth], [dnl
+        lfs_module_sth="${enable_module_sth:-module}"
+        if test :$lfs_module_sth = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_module_sth='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS module pipemod], [lfs_module_pipemod], [dnl
+        lfs_module_pipemod="${enable_module_pipemod:-module}"
+        if test :$lfs_module_pipemod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_module_pipemod='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS module connld],  [lfs_module_connld],  [dnl
+        lfs_module_connld="${enable_module_connld:-module}"
+        if test :$lfs_module_connld = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_module_connld='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS module sc],      [lfs_module_sc],      [dnl
+        lfs_module_sc="${enable_module_sc:-module}"
+        if test :$lfs_module_sc = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_module_sc='yes'
+        fi])
+    case ${lfs_module_sth:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_STH], [], [Define to link the sth module (stream
+            head) with the streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_STH_MODULE], [], [Define to create the sth (stream
+            head) module as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_module_pipemod:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD], [], [Define to link the pipemod module with
+            the streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD_MODULE], [], [Define to create the pipemod
+            module as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_module_connld:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD], [], [Define to link the connld module with
+            the streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD_MODULE], [], [Define to create the connld
+            module as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_module_sc:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC], [], [Define to link the sc module with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC_MODULE], [], [Define to create the sc module as a
+            standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_STH],            [test :${lfs_module_sth:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE],     [test :${lfs_module_sth:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],        [test :${lfs_module_pipemod:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE], [test :${lfs_module_pipemod:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],         [test :${lfs_module_connld:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],  [test :${lfs_module_connld:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC],             [test :${lfs_module_sc:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],      [test :${lfs_module_sc:-module} = :module])
+])# _LFS_SETUP_MODULES
+# =========================================================================
+
+# =========================================================================
+# _LFS_SETUP_DRIVERS
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
+    AC_ARG_ENABLE([driver-clone],
+        AS_HELP_STRING([--enable-driver-clone],
+            [enable clone driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_clone="$enableval"],
+            [enable_driver_clone='module'])
+    AC_ARG_ENABLE([driver-fifo],
+        AS_HELP_STRING([--enable-driver-fifo],
+            [enable fifo driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_fifo="$enableval"],
+            [enable_driver_fifo='module'])
+    AC_ARG_ENABLE([driver-loop],
+        AS_HELP_STRING([--enable-driver-loop],
+            [enable loop driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_loop="$enableval"],
+            [enable_driver_loop='module'])
+    AC_ARG_ENABLE([driver-sad],
+        AS_HELP_STRING([--enable-driver-sad],
+            [enable sad driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_sad="$enableval"],
+            [enable_driver_sad='module'])
+    AC_ARG_ENABLE([driver-nsdev],
+        AS_HELP_STRING([--enable-driver-nsdev],
+            [enable nsdev driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_nsdev="$enableval"],
+            [enable_driver_nsdev='module'])
+    AC_ARG_ENABLE([driver-echo],
+        AS_HELP_STRING([--enable-driver-echo],
+            [enable echo driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_echo="$enableval"],
+            [enable_driver_echo='module'])
+    AC_ARG_ENABLE([driver-nuls],
+        AS_HELP_STRING([--enable-driver-nuls],
+            [enable nuls driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_nuls="$enableval"],
+            [enable_driver_nuls='module'])
+    AC_ARG_ENABLE([driver-pipe],
+        AS_HELP_STRING([--enable-driver-pipe],
+            [enable pipe driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_pipe="$enableval"],
+            [enable_driver_pipe='module'])
+    AC_ARG_ENABLE([driver-log],
+        AS_HELP_STRING([--enable-driver-log],
+            [enable log driver linked into streams object. @<:@default=module@:>@]),
+            [enable_driver_log="$enableval"],
+            [enable_driver_log='module'])
+    AC_CACHE_CHECK([for STREAMS driver clone], [lfs_driver_clone], [dnl
+        lfs_driver_clone="${enable_driver_clone:-module}"
+        if test :$lfs_driver_clone = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_clone='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver fifo],  [lfs_driver_fifo],  [dnl
+        lfs_driver_fifo="${enable_driver_fifo:-module}"
+        if test :$lfs_driver_fifo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_fifo='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver loop],  [lfs_driver_loop],  [dnl
+        lfs_driver_loop="${enable_driver_loop:-module}"
+        if test :$lfs_driver_loop = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_loop='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver sad],   [lfs_driver_sad],   [dnl
+        lfs_driver_sad="${enable_driver_sad:-module}"
+        if test :$lfs_driver_sad = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_sad='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver nsdev], [lfs_driver_nsdev], [dnl
+        lfs_driver_nsdev="${enable_driver_nsdev:-module}"
+        if test :$lfs_driver_nsdev = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_nsdev='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver echo],  [lfs_driver_echo],  [dnl
+        lfs_driver_echo="${enable_driver_echo:-module}"
+        if test :$lfs_driver_echo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_echo='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver nuls],  [lfs_driver_nuls],  [dnl
+        lfs_driver_nuls="${enable_driver_nuls:-module}"
+        if test :$lfs_driver_nuls = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_nuls='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver pipe],  [lfs_driver_pipe],  [dnl
+        lfs_driver_pipe="${enable_driver_pipe:-module}"
+        if test :$lfs_driver_pipe = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_pipe='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS driver log],   [lfs_driver_log],   [dnl
+        lfs_driver_log="${enable_driver_log:-module}"
+        if test :$lfs_driver_log = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_driver_log='yes'
+        fi])
+    case ${lfs_driver_clone:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE], [], [Define to link the clone driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE_MODULE], [], [Define to create the clone driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_fifo:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [], [Define to link the fifo driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO_MODULE], [], [Define to create the fifo driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_loop:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP], [], [Define to link the loop driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP_MODULE], [], [Define to create the loop driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_sad:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD], [], [Define to link the sad driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD_MODULE], [], [Define to create the sad driver as
+            a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_nsdev:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV], [], [Define to link the nsdev driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV_MODULE], [], [Define to create the nsdev driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_echo:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO], [], [Define to link the echo driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO_MODULE], [], [Define to create the echo driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_nuls:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS], [], [Define to link the nuls driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS_MODULE], [], [Define to create the nuls driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_pipe:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE], [], [Define to link the pipe driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE_MODULE], [], [Define to create the pipe driver
+            as a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    case ${lfs_driver_log:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [], [Define to link the log driver with the
+            streams.o object.  Leave undefined otherwise.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG_MODULE], [], [Define to create the log driver as
+            a standalone loadable kernel module.  Leave undefined otherwise.])
+            ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE],          [test :${lfs_driver_clone:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE],   [test :${lfs_driver_clone:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO],           [test :${lfs_driver_fifo:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE],    [test :${lfs_driver_fifo:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP],           [test :${lfs_driver_loop:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],    [test :${lfs_driver_loop:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD],            [test :${lfs_driver_sad:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE],     [test :${lfs_driver_sad:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],          [test :${lfs_driver_nsdev:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],   [test :${lfs_driver_nsdev:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO],           [test :${lfs_driver_echo:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE],    [test :${lfs_driver_echo:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS],           [test :${lfs_driver_nuls:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],    [test :${lfs_driver_nuls:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE],           [test :${lfs_driver_pipe:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE],    [test :${lfs_driver_pipe:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG],            [test :${lfs_driver_log:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE],     [test :${lfs_driver_log:-module} = :module])
+])# _LFS_SETUP_DRIVERS
+# =========================================================================
+
+# =========================================================================
 # _LFS_SETUP_COMPAT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
     AC_ARG_ENABLE([compat-svr4],
         AS_HELP_STRING([--enable-compat-svr4],
             [enable source compatibility with SVR 4.2 MP variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
             [enable_compat_svr4="$enableval"],
-            [enable_compat_svr4='yes'])
-    AC_CACHE_CHECK([for UNIX(R) SVR 4.2 compatibility], [lfs_cv_svr4], [dnl
-        if test :"$enable_compat_svr4" != :no ; then lfs_cv_svr4=yes ; else lfs_cv_svr4=no ; fi
-        if test :"$enable_compat_sol8" != :no ; then lfs_cv_svr4=yes ; fi
-        if test :"$enable_compat_uw7"  != :no ; then lfs_cv_svr4=yes ; fi
-        if test :"$enable_compat_osf"  != :no ; then lfs_cv_svr4=yes ; fi
-        if test :"$enable_compat_aix"  != :no ; then lfs_cv_svr4=yes ; fi
-        if test :"$enable_compat_hpux" != :no ; then lfs_cv_svr4=yes ; fi ])
+            [enable_compat_svr4='module'])
     AC_ARG_ENABLE([compat-sol8],
         AS_HELP_STRING([--enable-compat-sol8],
             [enable source compatibility with Solaris 8 variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
         [enable_compat_sol8="$enableval"],
-        [enable_compat_sol8='yes'])
-    AC_CACHE_CHECK([for Solaris(R) 8 compatibility], [lfs_cv_sol8], [dnl
-        if test :"$enable_compat_sol8" != :no ; then lfs_cv_sol8=yes ; else lfs_cv_sol8=no ; fi ])
+        [enable_compat_sol8='module'])
     AC_ARG_ENABLE([compat-uw7],
         AS_HELP_STRING([--enable-compat-uw7],
             [enable source compatibility with UnixWare 7 variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
         [enable_compat_uw7="$enableval"],
-        [enable_compat_uw7='yes'])
-    AC_CACHE_CHECK([for UnixWare(R) 7 compatibility], [lfs_cv_uw7], [dnl
-        if test :"$enable_compat_uw7" != :no  ; then lfs_cv_uw7=yes  ; else lfs_cv_uw7=no  ; fi ])
+        [enable_compat_uw7='module'])
     AC_ARG_ENABLE([compat-osf],
         AS_HELP_STRING([--enable-compat-osf],
             [enable source compatibility with OSF/1.2 variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
         [enable_compat_osf="$enableval"],
-        [enable_compat_osf='yes'])
-    AC_CACHE_CHECK([for OSF/1.2 compatibility], [lfs_cv_osf], [dnl
-        if test :"$enable_compat_osf" != :no  ; then lfs_cv_osf=yes  ; else lfs_cv_osf=no  ; fi ])
+        [enable_compat_osf='module'])
     AC_ARG_ENABLE([compat-aix],
         AS_HELP_STRING([--enable-compat-aix],
             [enable source compatibility with AIX 4 variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
         [enable_compat_aix="$enableval"],
-        [enable_compat_aix='yes'])
-    AC_CACHE_CHECK([for AIX(R) 4 compatibility], [lfs_cv_aix], [dnl
-        if test :"$enable_compat_aix" != :no  ; then lfs_cv_aix=yes  ; else lfs_cv_aix=no  ; fi ])
+        [enable_compat_aix='module'])
     AC_ARG_ENABLE([compat-hpux],
         AS_HELP_STRING([--enable-compat-hpux],
             [enable source compatibility with HPUX variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
         [enable_compat_hpux="$enableval"],
-        [enable_compat_hpux='yes'])
-    AC_CACHE_CHECK([for HPUX(R) compatibility], [lfs_cv_hpux], [dnl
-        if test :"$enable_compat_hpux" != :no ; then lfs_cv_hpux=yes ; else lfs_cv_hpux=no ; fi ])
+        [enable_compat_hpux='module'])
     AC_ARG_ENABLE([compat-lis],
         AS_HELP_STRING([--enable-compat-lis],
             [enable source compatibility with LiS variants.
-            @<:@default=yes@:>@]),
+            @<:@default=module@:>@]),
         [enable_compat_lis="$enableval"],
-        [enable_compat_lis='yes'])
-    AC_CACHE_CHECK([for LiS compatibility], [lfs_cv_lis], [dnl
-        if test :"$enable_compat_lis" != :no  ; then lfs_cv_lis=yes  ; else lfs_cv_lis=no  ; fi ])
-    if test :"$lfs_cv_svr4" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the UNIX(R)
-                SVR 4.2 MP docs so that STREAMS drivers and modules written to
-                UNIX(R) SVR 4.2 MP specs will compile with Linux Fast STREAMS.
-                When undefined, STREAMS drivers and modules written for
-                UNIX(R) SVR 4.2 MP will require porting in more respects.])
-    fi
-    if test :"$lfs_cv_sol8" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the Solaris(R)
-                8 release so that STREAMS drivers and modules written for
-                Solaris(R) 8 will compile with Linux Fast STREAMS.  When
-                undefined, STREAMS drivers and modules written for Solaris(R)
-                8 will require porting in more respects.])
-    fi
-    if test :"$lfs_cv_uw7" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the
-                UnixWare(R) 7 release so that STREAMS drivers and modules
-                written for UnixWare(R) 7 will compile with Linux Fast
-                STREAMS.  When undefined, STREAMS drivers and modules written
-                for UnixWare(R) 7 will require porting in more respects.])
-    fi
-    if test :"$lfs_cv_osf" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the OSF(R)/1.2
-                release so that STREAMS drivers and modules written for
-                OSF(R)/1.2 will compile with Linux Fast STREAMS.  When
-                undefined, STREAMS drivers and modules written for OSF(R)/1.2
-                will require porting in more respects.])
-    fi
-    if test :"$lfs_cv_aix" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the AIX(R) 5L
-                Version 5.1 release so that STREAMS drivers and modules
-                written for AIX(R) 5L Version 5.1 will compile with Linux Fast
-                STREAMS.  When undefined, STREAMS drivers and modules written
-                for AIX(R) 5L Version 5.1 will require porting in more
-                respects.])
-    fi
-    if test :"$lfs_cv_hpux" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the HPUX(R)
-                release so that STREAMS drivers and modules written for
-                HPUX(R) will compile with Linux Fast STREAMS.  When undefined,
-                STREAMS drivers and modules written for HPUX(R) will require
-                porting in more respects.])
-    fi
-    if test :"$lfs_cv_lis" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS_MODULE], [], [When
-                defined, Linux Fast STREAMS will attempt to be as compatible
-                as possible (without replicating any bugs) with the LiS
-                release so that STREAMS drivers and modules written for LiS
-                will compile with Linux Fast STREAMS.  When undefined, STREAMS
-                drivers and modules written for LiS will require porting in
-                more respects.])
-    fi
+        [enable_compat_lis='module'])
+    AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 4.2 compatibility], [lfs_compat_svr4], [dnl
+        lfs_compat_svr4="${enable_compat_svr4:-module}"
+        if test :$lfs_compat_svr4 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_svr4='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS Solaris(R) 8 compatibility], [lfs_compat_sol8], [dnl
+        case ${enable_compat_sol8:-module} in
+            (yes) lfs_compat_svr4=yes ;;
+            (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+        esac
+        lfs_compat_sol8="${enable_compat_sol8:-module}"
+        if test :$lfs_compat_sol8 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_sol8='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS UnixWare(R) 7 compatibility], [lfs_compat_uw7], [dnl
+        case ${enable_compat_uw7:-module} in
+            (yes) lfs_compat_svr4=yes ;;
+            (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+        esac
+        lfs_compat_uw7="${enable_compat_uw7:-module}"
+        if test :$lfs_compat_uw7 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_uw7='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS OSF/1.2 compatibility], [lfs_compat_osf], [dnl
+        case ${enable_compat_osf:-module} in
+            (yes) lfs_compat_svr4=yes ;;
+            (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+        esac
+        lfs_compat_osf="${enable_compat_osf:-module}"
+        if test :$lfs_compat_osf = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_osf='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS AIX(R) 4 compatibility], [lfs_compat_aix], [dnl
+        case ${enable_compat_aix:-module} in
+            (yes) lfs_compat_svr4=yes ;;
+            (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+        esac
+        lfs_compat_aix="${enable_compat_aix:-module}"
+        if test :$lfs_compat_aix = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_aix='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS HPUX(R) compatibility], [lfs_compat_hpux], [dnl
+        case ${enable_compat_hpux:-module} in
+            (yes) lfs_compat_svr4=yes ;;
+            (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+        esac
+        lfs_compat_hpux="${enable_compat_hpux:-module}"
+        if test :$lfs_compat_hpux = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_hpux='yes'
+        fi])
+    AC_CACHE_CHECK([for STREAMS LiS compatibility], [lfs_compat_lis], [dnl
+        lfs_compat_lis="${enable_compat_lis:-module}"
+        if test :$lfs_compat_lis = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+            lfs_compat_lis='yes'
+        fi])
+    case ${lfs_compat_svr4:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4], [], [When defined, Linux Fast STREAMS
+            will attempt to be as compatible as possible (without replicating any bugs) with the
+            UNIX(R) SVR 4.2 MP docs so that STREAMS drivers and modules written to UNIX(R) SVR 4.2
+            MP specs will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and
+            modules written for UNIX(R) SVR 4.2 MP will require porting in more respects.  This
+            symbol determines whether compatibility will be compiled and linkable with Linux
+            Fast-STREAMS.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the UNIX(R) SVR 4.2 MP docs so that STREAMS drivers and modules written to UNIX(R) SVR
+            4.2 MP specs will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and
+            modules written for UNIX(R) SVR 4.2 MP will require porting in more respects.  This
+            symbol determines whether compatibility will be compiled as a loadable module to Linux
+            Fast-STREAMS.])
+            ;;
+    esac
+    case ${lfs_compat_sol8:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the Solaris(R) 8 release so that STREAMS drivers and modules written for Solaris(R) 8
+            will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules
+            written for Solaris(R) 8 will require porting in more respects.  This symbol determines
+            whether compatibility will be compiled and linkable with Linux Fast-STREAMS.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the Solaris(R) 8 release so that STREAMS drivers and modules written for Solaris(R) 8
+            will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules
+            written for Solaris(R) 8 will require porting in more respects.  This symbol determines
+            whether compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+            ;;
+    esac
+    case ${lfs_compat_uw7:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the UnixWare(R) 7 release so that STREAMS drivers and modules written for UnixWare(R) 7
+            will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules
+            written for UnixWare(R) 7 will require porting in more respects.  This symbol determines
+            whether compatibility will be compiled and linkable with Linux Fast-STREAMS.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the UnixWare(R) 7 release so that STREAMS drivers and modules written for UnixWare(R) 7
+            will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules
+            written for UnixWare(R) 7 will require porting in more respects.  This symbol determines
+            whether compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+            ;;
+    esac
+    case ${lfs_compat_osf:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the OSF(R)/1.2 release so that STREAMS drivers and modules written for OSF(R)/1.2 will
+            compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written
+            for OSF(R)/1.2 will require porting in more respects.  This symbol determines whether
+            compatibility will be compiled and linkable with Linux Fast-STREAMS.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the OSF(R)/1.2 release so that STREAMS drivers and modules written for OSF(R)/1.2 will
+            compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written
+            for OSF(R)/1.2 will require porting in more respects.  This symbol determines whether
+            compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+            ;;
+    esac
+    case ${lfs_compat_aix:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the AIX(R) 5L Version 5.1 release so that STREAMS drivers and modules written for AIX(R)
+            5L Version 5.1 will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers
+            and modules written for AIX(R) 5L Version 5.1 will require porting in more respects.
+            This symbol determines whether compatibility will be compiled and linkable with Linux
+            Fast-STREAMS.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the AIX(R) 5L Version 5.1 release so that STREAMS drivers and modules written for AIX(R)
+            5L Version 5.1 will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers
+            and modules written for AIX(R) 5L Version 5.1 will require porting in more respects.
+            This symbol determines whether compatibility will be compiled as a loadable module to
+            Linux Fast-STREAMS.])
+            ;;
+    esac
+    case ${lfs_compat_hpux:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the HPUX(R) release so that STREAMS drivers and modules written for HPUX(R) will compile
+            with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for
+            HPUX(R) will require porting in more respects.  This symbol determines whether
+            compatibility will be compiled and linkable with Linux Fast-STREAMS.  ])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the HPUX(R) release so that STREAMS drivers and modules written for HPUX(R) will compile
+            with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for
+            HPUX(R) will require porting in more respects.  This symbol determines whether
+            compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+            ;;
+    esac
+    case ${lfs_compat_lis:-module} in
+        (yes)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the LiS release so that STREAMS drivers and modules written for LiS will compile with
+            Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for LiS will
+            require porting in more respects.  This symbol determines whether compatibility will be
+            compiled and linkable with Linux Fast-STREAMS.])
+            ;;
+        (module)
+            AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS_MODULE], [], [When defined, Linux Fast
+            STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+            the LiS release so that STREAMS drivers and modules written for LiS will compile with
+            Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for LiS will
+            require porting in more respects.  This symbol determines whether compatibility will be
+            compiled as a loadable module to Linux Fast-STREAMS.])
+            ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4], [test :${lfs_compat_svr4:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE], [test :${lfs_compat_svr4:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN], [test :${lfs_compat_sol8:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE], [test :${lfs_compat_sol8:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7], [test :${lfs_compat_uw7:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7_MODULE], [test :${lfs_compat_uw7:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF], [test :${lfs_compat_osf:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF_MODULE], [test :${lfs_compat_osf:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX], [test :${lfs_compat_aix:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE], [test :${lfs_compat_aix:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX], [test :${lfs_compat_hpux:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${lfs_compat_hpux:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS], [test :${lfs_compat_lis:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE], [test :${lfs_compat_lis:-module} = :module])
 ])# _LFS_SETUP_COMPAT
 # =========================================================================
 
@@ -304,9 +718,13 @@ AC_DEFUN([_LFS_SETUP], [dnl
     _GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
-    _LFS_SETUP_MODULE
     _LFS_CHECK_KERNEL
     _LFS_SETUP_DEBUG
+    _LFS_SETUP_MODULE
+    _LFS_SETUP_MODULES
+    _LFS_SETUP_DRIVERS
+    _LFS_SETUP_COMPAT
+    _LFS_SETUP_FIFOS
 ])# _LFS_SETUP
 # =========================================================================
 
@@ -314,13 +732,15 @@ AC_DEFUN([_LFS_SETUP], [dnl
 # _LFS_SETUP_MODULE
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_MODULE], [dnl
-    if test :"${linux_cv_modules:-yes}" = :yes ; then
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
         AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MODULE], [], [When defined, STREAMS
             is being compiled as a loadable kernel module.])
     else
         AC_DEFINE_UNQUOTED([CONFIG_STREAMS], [], [When defined, STREAMS is
             being compiled as a kernel linkable object.])
     fi
+    AM_CONDITIONAL([CONFIG_STREAMS_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([CONFIG_STREAMS], [test :${linux_cv_k_linkage:-loadable} = :linkable])
 ])# _LFS_SETUP_MODULE
 # =========================================================================
 

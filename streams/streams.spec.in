@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/01/21 08:40:28 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/01/22 06:41:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 08:40:28 $ by $Author: brian $
+# Last Modified $Date: 2005/01/22 06:41:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -299,19 +299,47 @@ cd %{mybuilddir}
     %{?_with_modules:            %enable %_with_modules} \
     %{?_without_modules:         %disable %_without_modules} \
     %{?_with_compat_svr4:        %enable %_with_compat_svr4} \
-    %{?_without_compat_svr4:     %disable%_without_compat_svr4} \
+    %{?_without_compat_svr4:     %disable %_without_compat_svr4} \
     %{?_with_compat_sol8:        %enable %_with_compat_sol8} \
-    %{?_without_compat_sol8:     %disable%_without_compat_sol8} \
+    %{?_without_compat_sol8:     %disable %_without_compat_sol8} \
     %{?_with_compat_uw7:         %enable %_with_compat_uw7} \
-    %{?_without_compat_uw7:      %disable%_without_compat_uw7} \
+    %{?_without_compat_uw7:      %disable %_without_compat_uw7} \
     %{?_with_compat_osf:         %enable %_with_compat_osf} \
-    %{?_without_compat_osf:      %disable%_without_compat_osf} \
+    %{?_without_compat_osf:      %disable %_without_compat_osf} \
     %{?_with_compat_aix:         %enable %_with_compat_aix} \
-    %{?_without_compat_aix:      %disable%_without_compat_aix} \
+    %{?_without_compat_aix:      %disable %_without_compat_aix} \
     %{?_with_compat_hpux:        %enable %_with_compat_hpux} \
-    %{?_without_compat_hpux:     %disable%_without_compat_hpux} \
+    %{?_without_compat_hpux:     %disable %_without_compat_hpux} \
     %{?_with_compat_lis:         %enable %_with_compat_lis} \
-    %{?_without_compat_lis:      %disable%_without_compat_lis} \
+    %{?_without_compat_lis:      %disable %_without_compat_lis} \
+    %{?_with_module_sth:         %enable %_with_module_sth} \
+    %{?_without_module_sth:      %disable %_without_module_sth} \
+    %{?_with_module_pipemod:     %enable %_with_module_pipemod} \
+    %{?_without_module_pipemod:  %disable %_without_module_pipemod} \
+    %{?_with_module_connld:      %enable %_with_module_connld} \
+    %{?_without_module_connld:   %disable %_without_module_connld} \
+    %{?_with_module_sc:          %enable %_with_module_sc} \
+    %{?_without_module_sc:       %disable %_without_module_sc} \
+    %{?_with_driver_clone:       %enable %_with_driver_clone} \
+    %{?_without_driver_clone:    %disable %_without_driver_clone} \
+    %{?_with_driver_fifo:        %enable %_with_driver_fifo} \
+    %{?_without_driver_fifo:     %disable %_without_driver_fifo} \
+    %{?_with_driver_loop:        %enable %_with_driver_loop} \
+    %{?_without_driver_loop:     %disable %_without_driver_loop} \
+    %{?_with_driver_sad:         %enable %_with_driver_sad} \
+    %{?_without_driver_sad:      %disable %_without_driver_sad} \
+    %{?_with_driver_nsdev:       %enable %_with_driver_nsdev} \
+    %{?_without_driver_nsdev:    %disable %_without_driver_nsdev} \
+    %{?_with_driver_echo:        %enable %_with_driver_echo} \
+    %{?_without_driver_echo:     %disable %_without_driver_echo} \
+    %{?_with_driver_nuls:        %enable %_with_driver_nuls} \
+    %{?_without_driver_nuls:     %disable %_without_driver_nuls} \
+    %{?_with_driver_pipe:        %enable %_with_driver_pipe} \
+    %{?_without_driver_pipe:     %disable %_without_driver_pipe} \
+    %{?_with_driver_log:         %enable %_with_driver_log} \
+    %{?_without_driver_log:      %disable %_without_driver_log} \
+    %{?_with_streams_fifos:      %enable %_with_streams_fifos} \
+    %{?_without_streams_fifos:   %disable %_without_streams_fifos} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -922,8 +950,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.60  2005/01/21 08:40:28  brian
-# - Work around mandrake spec-helper for uncooked manpages.
+# Revision 0.9.2.61  2005/01/22 06:41:13  brian
+# - add more flags for configure
+#
+# Revision 0.9.2.29  2005/01/22 06:41:13  brian
+# - add more flags for configure
 #
 # Revision 0.9.2.28  2005/01/21 08:40:28  brian
 # - Work around mandrake spec-helper for uncooked manpages.

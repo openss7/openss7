@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.21 2005/01/12 08:55:36 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.22 2005/01/22 06:40:32 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/12 08:55:36 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/22 06:40:32 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -221,13 +221,15 @@ AC_DEFUN([_SCTP_SETUP], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_SCTP_SETUP_MODULE], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
-    if test :"${linux_cv_modules:-yes}" = :yes ; then
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
         AC_DEFINE_UNQUOTED([SCTP_CONFIG_MODULE], [], [When defined, SCTP is
                             being compiled as a loadable kernel module.])
     else
         AC_DEFINE_UNQUOTED([SCTP_CONFIG], [], [When defined, SCTP is being
                             compiled as a kernel linkable object.])
     fi
+    AM_CONDITIONAL([SCTP_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([SCTP_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
 ])# _SCTP_SETUP_MODULE
 # =========================================================================
 
