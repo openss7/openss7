@@ -35,7 +35,7 @@
 #ifndef _USER_MDEP_H
 #define _USER_MDEP_H
 
-#ident "@(#) LiS user-mdep.h 2.10 01/12/04 11:06:59 "
+#ident "@(#) LiS user-mdep.h 2.18 08/24/04 10:34:30 "
 
 #include <sys/errno.h>	      /* for errno */
 #ifndef _MEMORY_H
@@ -49,23 +49,13 @@
 #endif
 #include <sys/time.h>         /* for gettimeofday */
 #include <sys/LiS/config.h>
+#include <sys/LiS/genconf.h>
 
-#if 0 /* OSH: Not needed with -D_BSD_SOURCE */
-/*
- *  caddr_t is missing when we use glibc and -D_SVID_SOURCE
- */
-#ifdef __GLIBC__
-/* typedef unsigned char *caddr_t;  BSD gets this */
-#endif
 
 /*
- * sync(2) prototype is missing when we use glibc and -D_SVID_SOURCE
- * This is probably a bug in my glibc 2.0.7
+ * Used for memory allocation alignment
  */
-#ifdef __GLIBC__
-int sync(void);
-#endif
-#endif
+#define LIS_CACHE_BYTES	16
 
 /*
  * Major/minor representation is unique for each version
@@ -83,12 +73,25 @@ int sync(void);
 #define	STR_KMAJOR(dev_t_var)	STR_MAJOR(dev_t_var)
 #define	STR_KMINOR(dev_t_var)	STR_MINOR(dev_t_var)
 #define DEV_TO_INT(dev)		(dev)
-#define KDEV_TO_INT(dev_t_var)	(dev_t_var)
 #define DEV_SAME(a,b)		((a) == (b))
-#define MKDEV(majnum,minnum)	makedevice(majnum,minnum)
+#define UMKDEV(majr,minr)	MKDEV(majr, minr)
+#define MKDEV(majr,minr)	makedevice(majr,minr)
 
-#define makedevice(majornum,minornum) \
+#ifdef makedevice
+#undef makedevice
+#endif
+#define lis_makedevice(majornum,minornum) \
 		((((dev_t) (majornum)) << 16) | ((minornum) & 0xFFFF))
+#define lis_getmajor(dev)		((dev) >> 16)
+#define lis_getminor(dev)		((dev) & 0xFFFF)
+#define makedevice(majr,minr)	lis_makedevice((majr),(minr))
+#define getmajor(dev)		lis_getmajor(dev)
+#define getminor(dev)		lis_getminor(dev)
+#define lis_kern_to_lis_dev(dev) (dev)
+#define	DEV_TO_RDEV(dev)	((dev_t)(dev))
+#define	RDEV_TO_DEV(rdev)	((dev_t)(rdev))
+#define	RDEV_TO_INT(rdev)	((int)(rdev))
+#define	GET_I_RDEV(inode)	inode->i_rdev
 
 typedef unsigned long	port_dev_t ;		/* device major/minor */
 
@@ -100,6 +103,12 @@ typedef unsigned short	minor_t ;
 
 #define	LIS_FIFO  FIFO__CMAJOR_0
 #define LIS_CLONE CLONE__CMAJOR_0
+
+/*
+ * Task identity
+ */
+#define	lis_is_current_task(taskp)	1	/* just a dummy */
+#define	lis_current_task_ptr		((void *)0)
 
 /*
  * Atomic functions
@@ -116,6 +125,13 @@ typedef	volatile int	lis_atomic_t ;
 #define lis_atomic_inc(atomic_addr)		(*(atomic_addr))++
 #define lis_atomic_dec(atomic_addr)		(*(atomic_addr))--
 #define lis_atomic_dec_and_test(atomic_addr)	(*(atomic_addr))--,*(atomic_addr) != 0
+
+#define	K_ATOMIC_INC(lis_atomic_addr) lis_atomic_inc((lis_atomic_addr))
+#define	K_ATOMIC_DEC(lis_atomic_addr) lis_atomic_dec((lis_atomic_addr))
+#define	K_ATOMIC_READ(lis_atomic_addr) lis_atomic_read((lis_atomic_addr))
+#define	K_ATOMIC_SET(lis_atomic_addr,v) lis_atomic_set((lis_atomic_addr),v)
+#define	K_ATOMIC_ADD(lis_atomic_addr,v) lis_atomic_add((lis_atomic_addr),v)
+#define	K_ATOMIC_SUB(lis_atomic_addr,v) lis_atomic_sub((lis_atomic_addr),v)
 
 /*
  *  lis_gettimeofday -  used by lis_hitime and similar functions
@@ -172,11 +188,15 @@ typedef struct lis_select_struct
 
 } lis_select_t ;
 
-
+#define	LIS_QSYNC_FREE		FREE
+#define	LIS_HEAD_FREE		FREE
 #define	LIS_QBAND_FREE		FREE
 #define	LIS_QUEUE_FREE		FREE
 #define	LIS_QUEUE_ALLOC(nb,s)	ALLOCF_CACHE(nb,s)
 #define LIS_QBAND_ALLOC(nb,s)	ALLOCF(nb,s)
+#define LIS_HEAD_ALLOC(nb,s)	ALLOCF(nb,s)
+#define LIS_QSYNC_ALLOC(nb,s)	ALLOCF(nb,s)
+
 
 #ifndef PORTABLE
 #define	PORTABLE	1
@@ -200,13 +220,12 @@ typedef struct lis_select_struct
 void   lis_run_queues(int cpu) ;
 
 /*
- * Queue locking/unlocking dummies
+ * Macros for locking and unlocking a queue structure.
  */
-#define lis_lockqf(qp,f,l) do { } while(0)
-#define lis_lockq(qp)	lis_lockqf(qp,__FILE__,__LINE__)
-
-#define lis_unlockqf(qp,f,l) do { } while(0)
-#define lis_unlockq(qp)	lis_unlockqf(qp,__FILE__,__LINE__)
+#define lis_lockqf(qp,f,l)   lis_lockq_fcn((qp),f,l)
+#define lis_lockq(qp)	     lis_lockqf(qp,__FILE__,__LINE__)
+#define lis_unlockqf(qp,f,l) lis_unlockq_fcn((qp),f,l)
+#define lis_unlockq(qp)	     lis_unlockqf(qp,__FILE__,__LINE__)
 
 /*
  *  FIFO/pipe support

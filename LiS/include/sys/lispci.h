@@ -28,7 +28,9 @@
 #ifndef SYS_LISPCI_H
 #define SYS_LISPCI_H	1
 
-#ident "@(#) LiS lispci.h 1.7 4/28/03"
+#ident "@(#) LiS lispci.h 1.9 08/24/04"
+
+#include <sys/LiS/genconf.h>
 
 /************************************************************************
 *                       PCI Device Structure                            *
@@ -92,32 +94,32 @@ typedef struct lis_pci_dev
 ************************************************************************/
 
 lis_pci_dev_t	*lis_pci_find_device(unsigned vendor, unsigned device,
-				     lis_pci_dev_t *previous_struct) ;
+				     lis_pci_dev_t *previous_struct) _RP;
 lis_pci_dev_t	*lis_pci_find_class(unsigned class,
-				     lis_pci_dev_t *previous_struct) ;
-lis_pci_dev_t	*lis_pci_find_slot(unsigned bus, unsigned dev_fcn) ;
+				     lis_pci_dev_t *previous_struct) _RP;
+lis_pci_dev_t	*lis_pci_find_slot(unsigned bus, unsigned dev_fcn) _RP;
 
 int		 lis_pci_read_config_byte(lis_pci_dev_t *dev,
 					  unsigned       index,
-					  unsigned char *rtn_val) ;
+					  unsigned char *rtn_val) _RP;
 int		 lis_pci_read_config_word(lis_pci_dev_t  *dev,
 					  unsigned        index,
-					  unsigned short *rtn_val) ;
+					  unsigned short *rtn_val) _RP;
 int		 lis_pci_read_config_dword(lis_pci_dev_t *dev,
 					  unsigned        index,
-					  unsigned long  *rtn_val) ;
+					  unsigned long  *rtn_val) _RP;
 int		 lis_pci_write_config_byte(lis_pci_dev_t *dev,
 					  unsigned        index,
-					  unsigned char   val) ;
+					  unsigned char   val) _RP;
 int		 lis_pci_write_config_word(lis_pci_dev_t  *dev,
 					  unsigned         index,
-					  unsigned short   val) ;
+					  unsigned short   val) _RP;
 int		 lis_pci_write_config_dword(lis_pci_dev_t *dev,
 					  unsigned         index,
-					  unsigned long    val) ;
-void		 lis_pci_set_master(lis_pci_dev_t *dev) ;
-int		 lis_pci_enable_device (lis_pci_dev_t *dev) ;
-void		 lis_pci_disable_device (lis_pci_dev_t *dev) ;
+					  unsigned long    val) _RP;
+void		 lis_pci_set_master(lis_pci_dev_t *dev) _RP;
+int		 lis_pci_enable_device (lis_pci_dev_t *dev) _RP;
+void		 lis_pci_disable_device (lis_pci_dev_t *dev) _RP;
 
 /*
  * Internal routine, not to be called by user
@@ -152,31 +154,31 @@ typedef struct lis_dma_addr
  */
 void	*lis_pci_alloc_consistent(lis_pci_dev_t	 *dev,
 				  size_t	  size,
-				  lis_dma_addr_t *dma_handle);
+				  lis_dma_addr_t *dma_handle)_RP;
 
 /*
  * Deallocate memory allocated above.  'vaddr' is the address returned
  * by alloc_consistent.  'dma_handle' points to the DMA handle structure
  * returned by the allocate routine.
  */
-void	*lis_pci_free_consistent(lis_dma_addr_t *dma_handle);
+void	*lis_pci_free_consistent(lis_dma_addr_t *dma_handle)_RP;
 
-u32	lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle);
-u64	lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle);
+u32	lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle)_RP;
+u64	lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle)_RP;
 
 void	lis_pci_map_single(lis_pci_dev_t *dev,
 			   void		*ptr,
 			   size_t	 size,
 			   lis_dma_addr_t *dma_handle,
-			   int		 direction);
+			   int		 direction)_RP;
 
-void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle);
+void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)_RP;
 
 /*
  * Miscellaneous
  */
-int	lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
-int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
+int	lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask)_RP;
+int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)_RP;
 
 
 /************************************************************************
@@ -193,7 +195,7 @@ int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
 
 void lis_pci_dma_sync_single(lis_dma_addr_t	*dma_handle,
 			     size_t		 size,
-			     int		 direction);
+			     int		 direction)_RP;
 
 /************************************************************************
 *                          Memory Barrier                               *
@@ -204,7 +206,7 @@ void lis_pci_dma_sync_single(lis_dma_addr_t	*dma_handle,
 *									*
 ************************************************************************/
 
-void lis_membar(void) ;
+void lis_membar(void) _RP;
 
 
 

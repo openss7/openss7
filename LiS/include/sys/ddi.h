@@ -37,14 +37,26 @@
 #ifndef _DDI_H
 #define _DDI_H 1
 
-#ident "@(#) LiS ddi.h 2.1 04/04/99 11:34:27 "
+#ident "@(#) LiS ddi.h 2.4 08/24/04 10:34:30 "
+
+#include <sys/LiS/genconf.h>
 
 /* This file has to be updated with the Linux counterpart of SVR4 <sys/ddi.h>
  * header file. 
  */
+#ifdef makedevice
+#undef makedevice
+#endif
+#ifdef getmajor
+#undef getmajor
+#endif
+#ifdef getminor
+#undef getminor
+#endif
 
-#define	getmajor		MAJOR
-#define	getminor		MINOR
+#define makedevice		lis_makedevice
+#define	getmajor		lis_getmajor
+#define	getminor		lis_getminor
 
 #endif /*!_DDI_H*/
 

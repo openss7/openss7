@@ -30,7 +30,9 @@
 #ifndef SYS_LISMEM_H
 #define SYS_LISMEM_H	1
 
-#ident "@(#) LiS lismem.h 1.3 10/25/02"
+#ident "@(#) LiS lismem.h 1.5 08/24/04"
+
+#include <sys/LiS/genconf.h>
 
 /*
  * These are the functions that to the work.  Do not call them
@@ -41,15 +43,15 @@
  * value for the convenience of constructs such as ptr = lis_free_mem(ptr).
  * Also, the mem_area argument to lis_free_mem can be NULL.
  */
-void	*lis_alloc_atomic_fcn(int nbytes, char *file, int line) ;
-void	*lis_alloc_kernel_fcn(int nbytes, char *file, int line) ;
-void	*lis_alloc_dma_fcn(int nbytes, char *file, int line) ;
-void	*lis_free_mem_fcn(void *mem_area, char *file, int line) ;
-void	*lis_get_free_pages_fcn(int nbytes, int class, char *file, int line) ;
-void	*lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line) ;
-void	*lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line) ;
-void	*lis_free_pages_fcn(void *ptr, char *file, int line) ;
-void	 lis_free_all_pages(void) ;	/* internal cleanup routine */
+void	*lis_alloc_atomic_fcn(int nbytes, char *file, int line) _RP;
+void	*lis_alloc_kernel_fcn(int nbytes, char *file, int line) _RP;
+void	*lis_alloc_dma_fcn(int nbytes, char *file, int line) _RP;
+void	*lis_free_mem_fcn(void *mem_area, char *file, int line) _RP;
+void	*lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)_RP;
+void	*lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line) _RP;
+void	*lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line) _RP;
+void	*lis_free_pages_fcn(void *ptr, char *file, int line) _RP;
+void	 lis_free_all_pages(void) _RP;	/* internal cleanup routine */
 
 /*
  * These are the simplified routines that the STREAMS drivers call.
