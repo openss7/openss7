@@ -10,9 +10,9 @@ include $(LIS_HOME)/config.mk
 
 OPT = -DLINUX -D__KERNEL__
 MODOPT = -DMODULE
-ifeq ($(DBG_OPT),y)
-  OPT += -DDEBUG
-endif
+#ifeq ($(DBG_OPT),y)
+#  OPT += -DDEBUG
+#endif
 
 CC += -DLiS $(OPT) $(XOPTS)
 
@@ -21,7 +21,7 @@ CC += -DLiS $(OPT) $(XOPTS)
 OBJS := fifo loop relay clone minimux printk timod tirdwr sad pipemod
 
 # Object names only known to the Linux kernel target.
-TOBJS := ip_strm_mod ldl connld
+TOBJS := ip_strm_mod ldl connld ip_to_dlpi
 
 # Similar to TOBJS, but non-streams modules
 ZOBJS := liskmod
