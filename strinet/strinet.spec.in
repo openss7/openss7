@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/02/03 12:34:54 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/02/07 22:23:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/03 12:34:54 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 22:23:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -928,9 +928,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.42  2005/02/03 12:34:54  brian
-# - Spec file grand rework.
+# Revision 0.9.2.43  2005/02/07 22:23:21  brian
+# - Updated changelog.
 #
+
+* Thu Feb  3 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.42  2005/02/03 12:34:54  brian
+- Spec file grand rework.
 
 * Wed Feb  2 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.41  2005/02/02 10:43:02  brian

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.24 2005/02/04 10:57:44 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.25 2005/02/07 22:17:39 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/02/04 10:57:44 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/07 22:17:39 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -377,6 +377,8 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
     _LINUX_KERNEL_ENV([dnl
         AC_CACHE_CHECK([for kernel struct sk_buff.cb size], [linux_cv_sk_buff_cb_size], [dnl
             CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            CPPFLAGS=`echo "$CPPFLAGS" | sed -e 's| -Werror | |'`
+            CFLAGS=`echo "$CFLAGS" | sed -e 's| -Werror | |'`
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -436,6 +438,8 @@ if (sizeof(system_sk_buff_structure.cb) < sizeof(mycb)) {
     _LINUX_KERNEL_ENV([dnl
         AC_CACHE_CHECK([for kernel struct sock union size], [linux_cv_sock_size], [dnl
             CPPFLAGS="-I. -I$srcdir -I./src -I$srcdir/src -I./include -I$srcdir/include -I- $KERNEL_CPPFLAGS $KERNEL_MODFLAGS"
+            CPPFLAGS=`echo "$CPPFLAGS" | sed -e 's| -Werror | |'`
+            CFLAGS=`echo "$CFLAGS" | sed -e 's| -Werror | |'`
             AC_COMPILE_IFELSE([
                 AC_LANG_PROGRAM([[
 #include <linux/config.h>
@@ -480,7 +484,7 @@ if (s3 < s4 + s5 - s2 - s6) {
             linux_cv_sock_protinfo_size='(protinfo)'
             linux_cv_sock_size="$linux_cv_sock_size (protinfo)"
         else
-            linux_cv_sock_protonfo_size=''
+            linux_cv_sock_protinfo_size=''
         fi
         cp -f conftest.$ac_objext error_object.$ac_objext
     else

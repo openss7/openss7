@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2005/02/06 06:42:29 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2005/02/07 22:22:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/06 06:42:29 $ by $Author: brian $
+# Last Modified $Date: 2005/02/07 22:22:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -578,12 +578,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.15  2005/02/06 06:42:29  brian
-# - no manual for iperf yet.
+# Revision 1.1.2.16  2005/02/07 22:22:57  brian
+# - Updated changelog.
 #
-# Revision 1.1.2.14  2005/02/03 12:34:53  brian
-# - Spec file grand rework.
-#
+
+* Sun Feb  6 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.15  2005/02/06 06:42:29  brian
+- no manual for iperf yet.
+
+* Thu Feb  3 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.14  2005/02/03 12:34:53  brian
+- Spec file grand rework.
 
 * Wed Feb  2 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.13  2005/02/02 10:43:01  brian
