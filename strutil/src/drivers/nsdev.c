@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/29 08:28:14 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 21:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/29 08:28:14 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/29 08:28:14 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -86,7 +86,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/29 08:28:14 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/29 21:53:25 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -175,7 +175,7 @@ static int nsdevopen(struct inode *inode, struct file *file)
 		return (-ENOENT);
 	// argp->inode = argp->inode;
 	// argp->file = argp->file;
-	argp->dev = makedevice(cdev->d_str->st_rdinit->qi_minfo->mi_idnum, getminor(argp->dev));
+	argp->dev = makedevice(cdev->d_modid, getminor(argp->dev));
 	argp->name.name = file->f_dentry->d_name.name;
 	argp->name.len = file->f_dentry->d_name.len;
 	argp->name.hash = file->f_dentry->d_name.hash;

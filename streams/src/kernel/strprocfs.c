@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 21:53:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:17 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 21:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 21:53:25 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 08:28:17 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/29 21:53:25 $";
 
 #define __NO_VERSION__
 
@@ -352,6 +352,7 @@ static int get_streams_cdevsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", d_str { ");
 	len += get_streams_streamtab_drv_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, d_flag");
+	len += snprintf(page + len, maxlen - len, ", d_modid");
 	len += snprintf(page + len, maxlen - len, ", d_count");
 	len += snprintf(page + len, maxlen - len, ", d_inode");
 	len += snprintf(page + len, maxlen - len, ", d_sqlvl");
@@ -375,6 +376,7 @@ static int get_streams_cdevsw(char *page, ssize_t maxlen, struct cdevsw *d)
 	len += snprintf(page + len, maxlen - len, ", %p { ", d->d_str);
 	len += get_streams_streamtab_drv(page + len, maxlen - len, d->d_str);
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", d->d_flag);
+	len += snprintf(page + len, maxlen - len, ", %d", d->d_modid);
 	len += snprintf(page + len, maxlen - len, ", %hu", atomic_read(&d->d_count));
 	len += snprintf(page + len, maxlen - len, ", %p", d->d_inode);
 	len += snprintf(page + len, maxlen - len, ", %d", d->d_sqlvl);
@@ -459,6 +461,7 @@ static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", f_str { ");
 	len += get_streams_streamtab_mod_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, f_flag");
+	len += snprintf(page + len, maxlen - len, ", f_modid");
 	len += snprintf(page + len, maxlen - len, ", f_count");
 	len += snprintf(page + len, maxlen - len, ", f_inode");
 	len += snprintf(page + len, maxlen - len, ", f_sqlvl");
@@ -476,6 +479,7 @@ static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 	len += snprintf(page + len, maxlen - len, ", %p { ", f->f_str);
 	len += get_streams_streamtab_mod(page + len, maxlen - len, f->f_str);
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", f->f_flag);
+	len += snprintf(page + len, maxlen - len, ", %d", f->f_modid);
 	len += snprintf(page + len, maxlen - len, ", %d", atomic_read(&f->f_count));
 	len += snprintf(page + len, maxlen - len, ", %p", f->f_inode);
 	len += snprintf(page + len, maxlen - len, ", %d", f->f_sqlvl);

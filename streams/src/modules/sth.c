@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:20 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 21:53:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/29 08:28:20 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/29 21:53:26 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3432,18 +3432,18 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 		if (!(cdev = cdev_get(major)))
 			return (-ENXIO);
-		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		major = cdev->d_modid;
 		break;
 	case S_IFIFO:
 		if (!(cdev = cdev_find("fifo")))
 			return (-ENXIO);
-		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		major = cdev->d_modid;
 		minor = 0;
 		break;
 	case S_IFSOCK:
 		if (!(cdev = cdev_find("sock")))
 			return (-ENXIO);
-		major = cdev->d_str->st_rdinit->qi_minfo->mi_idnum;
+		major = cdev->d_modid;
 		minor = 0;
 		break;
 	default:

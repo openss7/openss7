@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/05/29 08:28:17 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/05/29 21:53:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:17 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 21:53:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/05/29 08:28:17 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/05/29 21:53:26 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/05/29 08:28:17 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/05/29 21:53:26 $";
 
 #define __NO_VERSION__
 
@@ -232,13 +232,13 @@ STATIC struct cdevsw *__cdev_lookup(major_t major)
  */
 STATIC struct cdevsw *__cdrv_lookup(modID_t modid)
 {
-	if (cdevsw_modid_cache && cdevsw_modid_cache->d_str->st_rdinit->qi_minfo->mi_idnum == modid)
+	if (cdevsw_modid_cache && cdevsw_modid_cache->d_modid == modid)
 		return (cdevsw_modid_cache);
 	else {
 		struct list_head *pos;
 		list_for_each(pos, strmod_hash_slot(modid)) {
 			struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_hash);
-			if (cdev->d_str->st_rdinit->qi_minfo->mi_idnum != modid)
+			if (cdev->d_modid != modid)
 				continue;
 			return ((cdevsw_modid_cache = cdev));
 		}
@@ -256,13 +256,13 @@ STATIC struct cdevsw *__cdrv_lookup(modID_t modid)
  */
 STATIC struct fmodsw *__fmod_lookup(modID_t modid)
 {
-	if (fmodsw_modid_cache && fmodsw_modid_cache->f_str->st_rdinit->qi_minfo->mi_idnum == modid)
+	if (fmodsw_modid_cache && fmodsw_modid_cache->f_modid == modid)
 		return (fmodsw_modid_cache);
 	else {
 		struct list_head *pos;
 		list_for_each(pos, strmod_hash_slot(modid)) {
 			struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_hash);
-			if (fmod->f_str->st_rdinit->qi_minfo->mi_idnum != modid)
+			if (fmod->f_modid != modid)
 				continue;
 			return ((fmodsw_modid_cache = fmod));
 		}
@@ -897,16 +897,13 @@ int register_strmod(struct fmodsw *fmod)
 				break;
 			}
 		}
-		if (!f) {
-			/* not on list: list heads might need initialization */
-			INIT_LIST_HEAD(&fmod->f_list);
-			INIT_LIST_HEAD(&fmod->f_hash);
-		} else if (f == fmod) {
+		if (f == fmod) {
 			/* already on lists: remove before adding back */
-			list_del_init(&fmod->f_list);
-			list_del_init(&fmod->f_hash);
+			list_del(&fmod->f_list);
+			list_del(&fmod->f_hash);
 			fmod_count--;
 		}
+		fmod->f_modid = modid;
 		/* add to list and hash */
 		list_add(&fmod->f_list, &fmodsw_list);
 		list_add(&fmod->f_hash, strmod_hash_slot(modid));
@@ -1016,16 +1013,13 @@ int register_strdrv(struct cdevsw *cdev)
 				break;
 			}
 		}
-		if (!d) {
-			/* not on list: list heads might need initialization */
-			INIT_LIST_HEAD(&cdev->d_list);
-			INIT_LIST_HEAD(&cdev->d_hash);
-		} else if (d == cdev) {
+		if (d == cdev) {
 			/* already on lists: remove before adding back */
-			list_del_init(&cdev->d_list);
-			list_del_init(&cdev->d_hash);
+			list_del(&cdev->d_list);
+			list_del(&cdev->d_hash);
 			cdev_count--;
 		}
+		cdev->d_modid = modid;
 		/* add to list and hash */
 		list_add(&cdev->d_list, &cdevsw_list);
 		list_add(&cdev->d_hash, strmod_hash_slot(modid));
@@ -1077,8 +1071,8 @@ EXPORT_SYMBOL_GPL(unregister_strdrv);
 
 /**
  *  register_cmajor: - register a character device inode
- *  @major: major device number
  *  @cdev: character device switch structure pointer
+ *  @major: major device number
  *  @fops: file operations to apply to external character device nodes
  *
  *  Registers and extenal character special device major number with Linux outside the STREAMS
@@ -1265,11 +1259,7 @@ modID_t getmid(const char *name)
 	modID_t modid = 0;
 	struct fmodsw *fmod;
 	if ((fmod = smod_search(name, !in_interrupt()))) {
-		struct streamtab *st;
-		struct qinit *qi;
-		struct module_info *mi;
-		if ((st = fmod->f_str) && (qi = st->st_rdinit) && (mi = qi->qi_minfo))
-			modid = mi->mi_idnum;
+		modid = fmod->f_modid;
 		fmod_put(fmod);
 	}
 	return (modid);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.16 2004/05/29 08:28:06 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.17 2004/05/29 21:53:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/29 08:28:06 $ by $Author: brian $
+ Last Modified $Date: 2004/05/29 21:53:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/29 08:28:06 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/29 21:53:25 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -569,6 +569,7 @@ struct fmodsw {
 	const char *f_name;		/* module name */
 	struct streamtab *f_str;	/* pointer to streamtab for module */
 	uint f_flag;			/* module flags */
+	uint f_modid;			/* module id */
 	atomic_t f_count;		/* open count */
 	struct inode *f_inode;		/* specfs inode */
 	int f_sqlvl;			/* q sychronization level */
@@ -580,9 +581,11 @@ struct file_operations;
 
 struct devnode {
 	struct list_head n_list;	/* list of all nodes for this device */
+	struct list_head n_hash;	/* list of major hashes in slot */
 	const char *n_name;		/* node name */
 	struct streamtab *n_str;	/* streamtab for node */
 	uint n_flag;			/* node flags */
+	uint n_modid;			/* node module id */
 	atomic_t n_count;		/* open count */
 	struct inode *n_inode;		/* specfs inode */
 	int n_minor;			/* node minor device number */
@@ -595,6 +598,7 @@ struct cdevsw {
 	const char *d_name;		/* driver name */
 	struct streamtab *d_str;	/* pointer to streamtab for driver */
 	uint d_flag;			/* driver flags */
+	uint d_modid;			/* driver moidule id */
 	atomic_t d_count;		/* open count */
 	struct inode *d_inode;		/* specfs inode */
 	int d_sqlvl;			/* q sychronization level */
