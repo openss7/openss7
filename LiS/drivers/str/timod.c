@@ -23,7 +23,7 @@
  *
  */
 
-#ident "@(#) LiS timod.c 2.8 11/7/02 19:58:55 "
+#ident "@(#) LiS timod.c 2.8 11/07/02 19:58:55 "
 
 #ifdef MODULE
 #  if defined(LINUX) && defined(__KERNEL__)
