@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/02/19 11:49:58 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/20 04:45:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 04:45:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -301,7 +301,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     if test :"${RPMBUILD:-no}" = :no ; then
 	RPMBUILD="$RPM"
     fi
-    AM_CONDITIONAL([BUILD_RPMS], [test :"${RPMBUILD:-no}" != :no])dnl
+dnl
+dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
+dnl but no rpm database and therefore cannot build rpm packages.
+dnl
+    AM_CONDITIONAL([BUILD_RPMS], [test :"${RPMBUILD:-no}" != :no -a -d /var/lib/rpm])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =============================================================================
 

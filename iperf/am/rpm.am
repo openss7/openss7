@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/02/19 11:50:24 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/02/20 06:55:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:50:24 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 06:55:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,12 +91,12 @@ RPMXOPTS =
 
 RPMTARGET = $(target)
 
-rpmtopdir	= $(PACKAGE_RPMTOPDIR)
-rpmsourcedir	= $(rpmtopdir)/SOURCES
-rpmbuilddir	= $(rpmtopdir)/BUILD
-rpmrpmdir	= $(rpmtopdir)/RPMS
-rpmsrpmdir	= $(rpmtopdir)/SRPMS
-rpmspecdir	= $(rpmtopdir)/SPECS
+rpm_topdir	= $(PACKAGE_RPMTOPDIR)
+rpm_sourcedir	= $(rpm_topdir)/SOURCES
+rpm_builddir	= $(rpm_topdir)/BUILD
+rpm_rpmdir	= $(rpm_topdir)/RPMS
+rpm_srcrpmdir	= $(rpm_topdir)/SRPMS
+rpm_specdir	= $(rpm_topdir)/SPECS
 
 #
 #   This builds an SRPM for the current target.
@@ -110,63 +110,65 @@ rpmspecdir	= $(rpmtopdir)/SPECS
 #   the -ts command on the resulting spec file.  -bs also leaves the sources in place, which is what
 #   we want for distribution.
 #
-$(rpmsourcedir)/$(distdir).tar.bz2:
-	@f=`echo "$@" | sed -e 's|$(rpmsourcedir)|.|'` ; \
+$(rpm_sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2:
+	@f=`echo "$@" | sed -e 's|$(rpm_sourcedir)|.|'` ; \
 	if test ! -e "$@" -a ! -e "$$f" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) $$f ; \
 	fi ; \
 	if test ! -e "$@" -o "$$f" -nt "$@" ; then \
-		if test ! -d $(rpmsourcedir) ; then \
-			echo " $(mkinstalldirs) $(rpmsourcedir)" ; \
-			$(mkinstalldirs) $(rpmsourcedir) ; \
+		if test ! -d $(rpm_sourcedir) ; then \
+			echo " $(mkinstalldirs) $(rpm_sourcedir)" ; \
+			$(mkinstalldirs) $(rpm_sourcedir) ; \
 		fi ; \
 		echo " cp -f $$f $@" ; \
 		cp -f $$f $@ ; \
 	fi
 
-$(rpmsourcedir)/$(PACKAGE_TARNAME).gif \
-$(rpmsourcedir)/$(PACKAGE_TARNAME).xpm:
-	@f=`echo "$@" | sed -e 's|$(rpmsourcedir)|$(srcdir)|'` ; \
+$(rpm_sourcedir)/$(PACKAGE_TARNAME).gif \
+$(rpm_sourcedir)/$(PACKAGE_TARNAME).xpm:
+	@f=`echo "$@" | sed -e 's|$(rpm_sourcedir)|$(srcdir)|'` ; \
 	if test ! -e "$@" -a ! -e "$$f" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) $$f ; \
 	fi ; \
 	if test ! -e "$@" ; then \
-		if test ! -d $(rpmsourcedir) ; then \
-			echo " $(mkinstalldirs) $(rpmsourcedir)" ; \
-			$(mkinstalldirs) $(rpmsourcedir) ; \
+		if test ! -d $(rpm_sourcedir) ; then \
+			echo " $(mkinstalldirs) $(rpm_sourcedir)" ; \
+			$(mkinstalldirs) $(rpm_sourcedir) ; \
 		fi ; \
 		echo " cp -f $$f $@" ; \
 		cp -f $$f $@ ; \
 	fi
 
-$(rpmspecdir)/$(PACKAGE_TARNAME).spec:
-	@f=`echo "$@" | sed -e 's|$(rpmspecdir)|.|'` ; \
+$(rpm_specdir)/$(PACKAGE_TARNAME).spec:
+	@f=`echo "$@" | sed -e 's|$(rpm_specdir)|.|'` ; \
 	if test ! -e "$@" -a ! -e "$$f" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) $$f ; \
 	fi ; \
 	if test ! -e "$@" ; then \
-		if test ! -d $(rpmspecdir) ; then \
-			echo " $(mkinstalldirs) $(rpmspecdir)" ; \
-			$(mkinstalldirs) $(rpmspecdir) ; \
+		if test ! -d $(rpm_specdir) ; then \
+			echo " $(mkinstalldirs) $(rpm_specdir)" ; \
+			$(mkinstalldirs) $(rpm_specdir) ; \
 		fi ; \
 		echo " cp -f $$f $@" ; \
 		cp -f $$f $@ ; \
 	fi
 
-$(rpmsrpmdir)/$(distdir).src.rpm: \
-	$(rpmspecdir)/$(PACKAGE_TARNAME).spec \
-	$(rpmsourcedir)/$(distdir).tar.bz2 \
-	$(rpmsourcedir)/$(PACKAGE_TARNAME).gif \
-	$(rpmsourcedir)/$(PACKAGE_TARNAME).xpm
+$(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm: \
+	$(rpm_specdir)/$(PACKAGE_TARNAME).spec \
+	$(rpm_sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2 \
+	$(rpm_sourcedir)/$(PACKAGE_TARNAME).gif \
+	$(rpm_sourcedir)/$(PACKAGE_TARNAME).xpm
 	@for d in BUILD BUILD/$(PACKAGE_RPMEXTRA) RPMS SOURCES SPECS SRPMS ; do \
-		if test ! -d $(rpmtopdir)/$$d ; then \
-			echo " $(mkinstalldirs) $(rpmtopdir)/$$d" ; \
-			$(mkinstalldirs) $(rpmtopdir)/$$d ; \
+		if test ! -d $(rpm_topdir)/$$d ; then \
+			echo " $(mkinstalldirs) $(rpm_topdir)/$$d" ; \
+			$(mkinstalldirs) $(rpm_topdir)/$$d ; \
 		fi ; \
 	done
 	$(RPMBUILD) -bs $(SRPMFLAGS) $(AM_SRPMFLAGS) $(RPMOPTS) $(RPMICONS) --target $(target) -- $<
 
-srpm: $(rpmsrpmdir)/$(distdir).src.rpm
+srpm: $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
+
+RELEASE += srpm
 
 #
 #   This is the type of thing that needs to be included in the master makefile
@@ -174,14 +176,14 @@ srpm: $(rpmsrpmdir)/$(distdir).src.rpm
 #   AM_RPMTARGETS
 #
 one-rpm: \
-	$(rpmspecdir)/$(PACKAGE_TARNAME).spec \
-	$(rpmsourcedir)/$(distdir).tar.bz2 \
-	$(rpmsourcedir)/$(PACKAGE_TARNAME).gif \
-	$(rpmsourcedir)/$(PACKAGE_TARNAME).xpm
+	$(rpm_specdir)/$(PACKAGE_TARNAME).spec \
+	$(rpm_sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2 \
+	$(rpm_sourcedir)/$(PACKAGE_TARNAME).gif \
+	$(rpm_sourcedir)/$(PACKAGE_TARNAME).xpm
 	@for d in BUILD BUILD/$(PACKAGE_RPMEXTRA) RPMS SOURCES SPECS SRPMS ; do \
-		if test ! -d $(rpmtopdir)/$$d ; then \
-			echo " $(mkinstalldirs) $(rpmtopdir)/$$d" ; \
-			$(mkinstalldirs) $(rpmtopdir)/$$d ; \
+		if test ! -d $(rpm_topdir)/$$d ; then \
+			echo " $(mkinstalldirs) $(rpm_topdir)/$$d" ; \
+			$(mkinstalldirs) $(rpm_topdir)/$$d ; \
 		fi ; \
 	done
 	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
@@ -208,13 +210,17 @@ AM_RPMSMAKETARGETS += one-rpm
 endif
 endif
 
+all-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+
 rpms: $(AM_RPMSMAKETARGETS)
 
-sign: $(rpmsrpmdir)/$(distdir).src.rpm
-	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
+sign srpm-sign: $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
+	@if ! $(RPM) -pipe  -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 		echo "$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $< || : ; \
 	fi
+
+RELEASE_SIGN += srpm-sign
 
 #
 #   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
@@ -238,10 +244,10 @@ rebuild all-rebuild:
 	done
 
 resign: sign
-	@rpms="`find $(rpmrpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+	@rpms="`find $(rpm_rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) rebuild ; \
-		rpms="`find $(rpmrpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+		rpms="`find $(rpm_rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -263,21 +269,21 @@ distclean-rpm:
 	rm -rf RPMS BUILD SRPMS SOURCES SPECS
 
 maintainer-clean-rpm:
-	@rpms="`find $(rpmrpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+	@rpms="`find $(rpm_rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 	for f in $$rpms ; do \
 		echo "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
 	done
-	rm -f -- $(rpmsrpmdir)/$(distdir).src.rpm
-	rm -f -- $(rpmbuilddir)/$(PACKAGE_RPMEXTRA)/*config.cache
-	rm -f -- $(rpmbuilddir)/$(PACKAGE_RPMEXTRA)/*config.site
-	rm -f -- $(rpmbuilddir)/$(PACKAGE_RPMEXTRA)/$(PACKAGE_TARNAME)
-	@if test -d "$(rpmbuilddir)/$(PACKAGE_RPMEXTRA)" ; then \
-		echo "$(RPMBUILD) --nodeps --clean --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpmspecdir)/$(PACKAGE_TARNAME).spec || :" ; \
-		$(RPMBUILD) --nodeps --clean --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpmspecdir)/$(PACKAGE_TARNAME).spec || : ; \
+	rm -f -- $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
+	rm -f -- $(rpm_builddir)/$(PACKAGE_RPMEXTRA)/*config.cache
+	rm -f -- $(rpm_builddir)/$(PACKAGE_RPMEXTRA)/*config.site
+	rm -f -- $(rpm_builddir)/$(PACKAGE_RPMEXTRA)/$(PACKAGE_TARNAME)
+	@if test -d "$(rpm_builddir)/$(PACKAGE_RPMEXTRA)" ; then \
+		echo "$(RPMBUILD) --nodeps --clean --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || :" ; \
+		$(RPMBUILD) --nodeps --clean --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || : ; \
 	else \
-		echo "$(RPMBUILD) --nodeps --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpmspecdir)/$(PACKAGE_TARNAME).spec || :" ; \
-		$(RPMBUILD) --nodeps --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpmspecdir)/$(PACKAGE_TARNAME).spec || : ; \
+		echo "$(RPMBUILD) --nodeps --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || :" ; \
+		$(RPMBUILD) --nodeps --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || : ; \
 	fi
 
 DISTCLEAN_LOCAL += distclean-rpm
@@ -295,7 +301,7 @@ EXTRA_DIST	+= \
 
 ALL_RECURSIVE_TARGETS += all-srpm all-rpms all-sign all-resign
 
-.PHONY: srpm rpms one-rpm lis-rpm lfs-rpm sign rebuild resign all-srpm all-rpms all-sign \
+.PHONY: srpm rpms one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign all-srpm all-rpms all-sign \
 	all-rebuild all-resign distclean-rpm maintainer-clean-rpm
 
 # vim: ft=automake
