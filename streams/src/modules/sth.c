@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:17:22 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 05:55:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/01 12:17:22 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3419,48 +3419,50 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 STATIC int cdev_open(struct inode *inode, struct file *file)
 {
 	struct cdevsw *cdev = NULL;
-	int dflag;
+	int dflag, err;
 	dev_t dev;
+	err = -ENXIO;
 	switch (inode->i_mode & S_IFMT) {
-#if 0
+		struct list_head *pos;
 		struct devnode *node;
-#endif
 		major_t major;
 		minor_t minor;
 	case S_IFCHR:
 		major = MAJOR(kdev_t_to_nr(inode->i_rdev));
 		if (!(cdev = cdev_get(major)))
-			goto enxio;
-		dflag = cdev->d_flag;
-		major = cdev->d_modid;
+			goto exit;
 		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
-#if 0
-		/* FIXME: convert to internal minor */
+		/* calculate internal minor device number */
+		ensure(!cdev->d_majors.next || list_empty(&cdev->d_majors), goto exit);
+		list_for_each(pos, &cdev->d_majors) {
+			struct devinfo *devi = list_entry(pos, struct devinfo, di_list);
+			if (major == devi->major)
+				break;
+			minor += (1U << MINORBITS);
+		}
+		dflag = cdev->d_flag;
+		/* if we have a specified minor, use its device flags */
+		/* this is what allows us to mark minor device nodes as clone nodes */
 		if ((node = node_search(cdev, minor)))
 			dflag = node->n_flag;
-#endif
-		dev = makedevice(major, minor);
+		dev = makedevice(cdev->d_modid, minor);
 		break;
 	case S_IFIFO:
 		if (!(cdev = cdev_find("fifo")))
-			goto enxio;
-		dflag = 0;
-		major = cdev->d_modid;
-		minor = 0;
-		dev = makedevice(major, minor);
+			goto exit;
+		dflag = cdev->d_flag | D_CLONE;	/* in case driver forgot to set */
+		dev = makedevice(cdev->d_modid, 0);
 		break;
 	case S_IFSOCK:
 		if (!(cdev = cdev_find("sock")))
-			goto enxio;
-		dflag = 0;
-		major = cdev->d_modid;
-		minor = 0;
-		dev = makedevice(major, minor);
+			goto exit;
+		dflag = cdev->d_flag | D_CLONE;	/* in case driver forgot to set */
+		dev = makedevice(cdev->d_modid, 0);
 		break;
 	default:
-	      enxio:
-		return (-ENXIO);
+		goto exit;
 	}
+	err = -EIO;
 	if (cdev->d_fop && cdev->d_fop->open) {
 		struct str_args args;
 		args.mnt = specfs_mnt;
@@ -3473,11 +3475,11 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 		args.oflag = make_oflag(file);
 		args.sflag = (dflag & D_CLONE) ? CLONEOPEN : DRVOPEN;
 		args.crp = current_creds;
-		cdev_put(cdev);
-		return strm_open(inode, file, &args);
+		err = strm_open(inode, file, &args);
 	}
 	cdev_put(cdev);
-	return (-EIO);
+      exit:
+	return (err);
 }
 
 STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {

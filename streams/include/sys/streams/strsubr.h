@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.11 2004/06/01 12:04:02 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.12 2004/06/02 05:55:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:02 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 05:55:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/06/01 12:04:02 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/02 05:55:09 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -514,22 +514,6 @@ extern mblk_t *mdbblock_alloc(uint priority, void *func);
 extern void freechain(mblk_t *mp, mblk_t **mpp);
 extern struct qband *allocqb(void);
 extern void freeqb(qband_t *qb);
-
-#if 0
-/* from strreg.c */
-extern struct cdevsw *cdev_get(major_t major); /* aixcompat liscompat uw7compat clone strsad sth */
-extern void cdev_put(struct cdevsw *cdev); /* aixcompat liscompat uw7compat clone nsdev strsad specfs sth */
-extern struct cdevsw *cdrv_get(modID_t modid); /* strm_open() uw7compat strsad strspecfs strutil sth */
-extern void cdrv_put(struct cdevsw *cdev); /* strm_open() strsad strutil sth */
-extern struct cdevsw *cdev_find(const char *name); /* specfs sth */
-extern struct cdevsw *cdev_match(const char *name); /* nsdev */
-//extern struct fmodsw *fmod_get(modID_t modid);
-extern void fmod_put(struct fmodsw *smod); /* liscompat, suncompat getmid() strsad strutil */
-extern struct fmodsw *fmod_find(const char *name);
-extern struct devnode *node_find(const struct cdevsw *cdev, const char *name); /* specfs */
-extern struct devnode *node_get(const struct cdevsw *cdev, minor_t minor); /* strm_open() */
-#endif
-
 
 /* from strlookup.c */
 extern struct list_head cdevsw_list;	/* Drivers go here */

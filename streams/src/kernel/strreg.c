@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/01 12:04:38 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/02 05:55:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 05:55:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/01 12:04:38 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/02 05:55:09 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/06/01 12:04:38 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/02 05:55:09 $";
 
 #define __NO_VERSION__
 
@@ -607,10 +607,8 @@ STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
  *  @dentry:	    the dentry to open
  *  @mnt:	    the vfsmount to open
  *  @cdev:	    the STREAMS device entry
- *  @argp:	    pointer to arguments
  */
-STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, int flags,
-					struct cdevsw *cdev, struct str_args *argp)
+STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct vfsmount *mnt, int flags, struct cdevsw *cdev)
 {
 #ifdef HAVE_FILE_MOVE_ADDR
 	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
@@ -663,41 +661,28 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
 	int err;
 	struct cdevsw *cdev;
 	struct devnode *node;
-	if ((err = down_interruptible(&inode->i_sem)) < 0)
+	err = ENXIO;
+	if (!(cdev = cdrv_get(getmajor(argp->dev))))
 		goto exit;
 	err = ENOENT;
-	if (!(cdev = cdrv_get(getmajor(argp->dev))))
-		goto up_exit;
-	argp->name.name = cdev->d_name;
-	argp->name.len = strnlen(cdev->d_name, FMNAMESZ);
-	argp->name.hash = getmajor(argp->dev);
-	parent = lookup_hash(&argp->name, argp->mnt->mnt_root);
-	if (!parent)
-		goto cput_exit;
-	if ((err = PTR_ERR(parent)) < 0)
+	if (!(parent = dget(cdev->d_dentry)))
 		goto cput_exit;
 	err = -ENOMEM;
-	if (!parent->d_inode)
+	if (!(inode = parent->d_inode))
 		goto pput_exit;
 	err = -ENODEV;
-	if (is_bad_inode(parent->d_inode))
+	if (is_bad_inode(inode))
 		goto pput_exit;
-	up(&inode->i_sem);
-	inode = parent->d_inode;
-	if ((err = down_interruptible(&inode->i_sem)) < 0) {
-		inode = NULL;
+	if ((err = down_interruptible(&inode->i_sem)) < 0)
 		goto pput_exit;
-	}
 	if ((node = node_get(cdev, getminor(argp->dev)))) {
-		argp->name.name = node->n_name;
-		argp->name.len = strnlen(node->n_name, FMNAMESZ);
-		argp->name.hash = argp->dev;
+		dentry = dget(node->n_dentry);
 	} else {
 		argp->name.name = argp->buf;
 		argp->name.len = snprintf(argp->buf, sizeof(argp->buf), "%u", getminor(argp->dev));
 		argp->name.hash = argp->dev;
+		dentry = lookup_hash(&argp->name, parent);
 	}
-	dentry = lookup_hash(&argp->name, parent);
 	if (!dentry)
 		goto pput_exit;
 	if ((err = PTR_ERR(dentry)) < 0)
@@ -712,7 +697,7 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
 		goto dput_exit;
 	up(&inode->i_sem);
 	inode = NULL;
-	file = dentry_open2(dentry, argp->mnt, ext_file->f_flags, cdev, argp);
+	file = dentry_open2(dentry, argp->mnt, ext_file->f_flags, cdev);
 	if ((err = PTR_ERR(file)) < 0)
 		goto dput_exit;
 	if (err == 0) {
@@ -727,9 +712,6 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
 	dput(parent);
       cput_exit:
 	cdrv_put(cdev);
-      up_exit:
-	if (inode)
-		up(&inode->i_sem);
       exit:
 	return (err);
 }
