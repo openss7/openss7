@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/02/19 12:19:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/20 09:54:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 12:19:56 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 09:54:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -295,7 +295,7 @@ include am/rpm.am
 #
 # Rules for making deb packages
 #
-#include am/deb.am
+include am/deb.am
 
 MAINTAINERCLEANFILES	+= \
 			$(top_srcdir)/aclocal.m4 \

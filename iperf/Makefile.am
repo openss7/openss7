@@ -81,6 +81,6 @@ include am/rpm.am
 #
 # Rules for making deb packages
 #
-#include am/deb.am
+include am/deb.am
 
 # vim: ft=automake

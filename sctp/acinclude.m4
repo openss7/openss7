@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/02/19 11:59:14 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/20 09:54:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:59:14 $ by $Author: brian $
+# Last Modified $Date: 2005/02/20 09:54:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,7 +70,7 @@ AC_DEFUN([AC_SCTP], [dnl
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _RPM_SPEC
-dnl _DEB_DPKG
+    _DEB_DPKG
     # user CPPFLAGS and CFLAGS
     USER_CPPFLAGS="${CPPFLAGS}"
     USER_CFLAGS="${CFLAGS}"
