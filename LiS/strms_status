@@ -1,0 +1,40 @@
+#!/bin/sh
+
+. /usr/src/LiS/version
+
+arg1()
+{
+    printf "%s" $1
+}
+arg4()
+{
+    printf "%s" $4
+}
+arg5()
+{
+    printf "%s" $5
+}
+
+print_stat()
+{
+    psinfo="`arg1 $*` `arg5 $*`"
+    if [ "$psinfo" = " " ]; then
+	psinfo="(LiS-$LISVER not running)"
+	retval=1		# loaded but no queue runner running
+    else
+	retval=0		# loaded and running
+    fi
+    echo "Streams loaded $psinfo"
+    return $retval
+}
+
+/sbin/lsmod 2>/dev/null | grep -q -w "streams"
+if [ $? -eq 0 ]; then
+    streams -s >/dev/null 2>&1
+    lisps=`ps ax 2>/dev/null`
+    print_stat `echo "$lisps" | grep "LiS-$LISVER"`
+    exit $?
+fi
+
+echo "Streams not loaded"
+exit 2				# not loaded
