@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/27 03:07:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/08/15 19:59:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,19 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 03:07:00 $ by $Author: brian $
+# Last Modified $Date: 2004/08/15 19:59:29 $ by $Author: brian $
 #
 # =============================================================================
 
-info_TEXINFOS	= STREAMS.texi SPG.texi porting.texi
-DVIS		= STREAMS.dvi SPG.dvi porting.dvi
-PSS		= STREAMS.ps SPG.ps porting.ps
-PDFS		= STREAMS.pdf SPG.pdf porting.pdf
-HTMLS		= STREAMS.html SPG.html porting.html
-INFO_DEPS	= $(srcdir)/STREAMS.info $(srcdir)/SPG.info $(srcdir)/porting.info
+info_TEXINFOS		= STREAMS.texi SPG.texi porting.texi
 
-MAKEINFOHTML	= $(MAKEINFO) --html --no-split
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
-EXTRA_DIST = gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+EXTRA_DIST		= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+
+all-local: info ps pdf html
 
 # vim: ft=automake

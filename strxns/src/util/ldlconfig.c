@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 02:02:19 $
+ @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,10 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/04 02:02:19 $ by $Author: brian $
+ Last Modified $Date: 2004/08/16 00:47:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: ldlconfig.c,v $
+ Revision 0.9.2.3  2004/08/16 00:47:50  brian
+ - Updated GNU long options and copying info.
+
+ Revision 0.9.2.2  2004/08/15 19:54:34  brian
+ - Sweeping documentation updates.
+
  Revision 0.9.2.1  2004/07/04 02:02:19  brian
  - Initial import of strxns package.
 
@@ -60,10 +66,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 02:02:19 $"
+#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $"
 
 static char const ident[] =
-    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 02:02:19 $";
+    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $";
 
 /*
  *  ldlconfig: A configuration helper for ldl clients
@@ -829,11 +835,57 @@ int do_bind(int fd, dl_ulong sap)
     return 0;
 }
 
+void copying(int argc, char *argv[])
+{
+    if (!output)
+	return;
+    fprintf(stdout, "\
+\n\
+%1$s %2$s:\n\
+\n\
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
+Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
+\n\
+All Rights Reserved.\n\
+\n\
+This program is free software;  you can  redistribute  it and/or modify it under\n\
+the terms of the GNU General  Public License as  published by the  Free Software\n\
+Foundation; either  version 2 of  the  License, or  (at  your option) any  later\n\
+version.\n\
+\n\
+This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
+WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received  a copy of the GNU  General  Public License along with\n\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
+Cambridge, MA 02139, USA.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+", argv[0], ident);
+}
+
 void version(int argc, char *argv[])
 {
     if (!output)
 	return;
     fprintf(stdout, "\
+\n\
 %1$s %2$s:\n\
     Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
@@ -841,6 +893,9 @@ void version(int argc, char *argv[])
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     included here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permissions.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -853,6 +908,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h,--help}\n\
     %1$s {-V,--version}\n\
+    %1$s {-C,--copying}\n\
 ", argv[0]);
 }
 
@@ -861,37 +917,42 @@ void help(int argc, char *argv[])
     if (!output)
 	return;
     fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options]\n\
     %1$s {-h,--help}\n\
     %1$s {-V,--version}\n\
+    %1$s {-C,--copying}\n\
 Options:\n\
     -a, --attach NAME\n\
-        The name to attach\n\
+        the name to attach\n\
     -b, --bind SAP\n\
-        The service access point identifier to bind\n\
+        the service access point identifier to bind\n\
     -d, --filedes FILEDES\n\
-        The integer file descriptor number to use\n\
+        the integer file descriptor number to use\n\
     -f, --flag FLAG\n\
-        A flag indicating the approoach.  FLAG can be one of:\n\
+        a flag indicating the approoach.  FLAG can be one of:\n\
         PENDANTIC_STANDARD or RAW.  This option may be repeated.\n\
     -F, --framing FRAMING\n\
-        The framing to use.  FRAMING can be one of: EII 802.2 802.3\n\
+        the framing to use   FRAMING can be one of: EII 802.2 802.3\n\
         SNAP RAWLLC\n\
     -I, --info\n\
-        Display the DL_INFO_ACK.\n\
+        display the DL_INFO_ACK.\n\
     -p, --promisc HOW\n\
-        Enter promiscuous mode.  HOW can be one of: PHYS SAP PROMISC_MULTI\n\
-        This option may be repeated.\n\
+        enter promiscuous mode   HOW can be one of: PHYS SAP PROMISC_MULTI\n\
+        this option may be repeated.\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -h, --help, -?, --?\n\
-        Print this usage message and exits\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Print the version and exits\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permission and exit\n\
+\n\
 ", argv[0]);
 }
 
@@ -902,24 +963,28 @@ void get_options(int argc, char *argv[])
 	int             c;
 #ifdef _GNU_SOURCE
 	int             option_index = 0;
+	/* *INDENT-OFF* */
 	static struct option long_options[] = {
-	    {"attach", 1, 0, 'a'},
-	    {"bind", 1, 0, 'b'},
-	    {"filedes", 1, 0, 'd'},
-	    {"flag", 1, 0, 'f'},
-	    {"framing", 1, 0, 'F'},
-	    {"info", 0, 0, 'I'},
-	    {"promisc", 1, 0, 'p'},
-	    {"quiet", 0, 0, 'q'},
-	    {"verbose", 2, 0, 'v'},
-	    {"help", 0, 0, 'h'},
-	    {"version", 0, 0, 'V'},
-	    {"?", 0, 0, 'h'},
+	    { "attach",	    required_argument,	NULL, 'a' },
+	    { "bind",	    required_argument,	NULL, 'b' },
+	    { "filedes",    required_argument,	NULL, 'd' },
+	    { "flag",	    required_argument,	NULL, 'f' },
+	    { "framing",    required_argument,	NULL, 'F' },
+	    { "info",	    no_argument,	NULL, 'I' },
+	    { "promisc",    required_argument,	NULL, 'p' },
+	    { "quiet",	    no_argument,	NULL, 'q' },
+	    { "verbose",    optional_argument,	NULL, 'v' },
+	    { "help",	    no_argument,	NULL, 'h' },
+	    { "version",    no_argument,	NULL, 'V' },
+	    { "copying",    no_argument,	NULL, 'C' },
+	    { "?",	    no_argument,	NULL, 'h' },
+	    { 0, }
 	};
-	c = getopt_long_only(argc, argv, "a:b:d:f:F:Ip:qv::hV?", long_options,
+	/* *INDENT-ON* */
+	c = getopt_long_only(argc, argv, "a:b:d:f:F:Ip:qv::hVC?", long_options,
 			     &option_index);
 #else				/* _GNU_SOURCE */
-	c = getopt(argc, argv, "a:b:d:f:F:Ip:qv::hV?");
+	c = getopt(argc, argv, "a:b:d:f:F:Ip:qv::hVC?");
 #endif				/* _GNU_SOURCE */
 	if (c == -1)
 	    break;
@@ -1035,6 +1100,9 @@ void get_options(int argc, char *argv[])
 		exit(0);
 	    case 'V':		/* -V, --version */
 		version(argc, argv);
+		exit(0);
+	    case 'C':		/* -C, --copying */
+		copying(argc, argv);
 		exit(0);
 	    case '?':
 	    default:

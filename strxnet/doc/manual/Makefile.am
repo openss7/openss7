@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/16 19:19:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,31 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 19:19:27 $ by $Author: brian $
+# Last Modified $Date: 2004/08/15 19:56:44 $ by $Author: brian $
 #
 # =============================================================================
 
+info_TEXINFOS		= strxnet.texi libxnet.texi
 
-info_TEXINFOS	= strxnet.texi
-DVIS		= strxnet.dvi
-PSS		= strxnet.ps
-PDFS		= strxnet.pdf
-HTMLS		= strxnet.html
-INFO_DEPS	= $(srcdir)/strxnet.info
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
-if WITH_XNET
+EXTRA_DIST		= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
 
-info_TEXINFOS	+= libxnet.texi
-DVIS		+= libxnet.dvi
-PSS		+= libxnet.ps
-PDFS		+= libxnet.pdf
-HTMLS		+= libxnet.html
-INFO_DEPS	+= $(srcdir)/libxnet.info
-
-endif
-
-MAKEINFOHTML	= $(MAKEINFO) --html --no-split
-
-EXTRA_DIST = gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
+all-local: info ps pdf html
 
 # vim: ft=automake

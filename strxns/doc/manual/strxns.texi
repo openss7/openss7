@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.3 2004/08/14 23:03:11 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.4 2004/08/15 19:54:17 brian Exp $
 %
 % =========================================================================
 %
@@ -54,19 +54,19 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/14 23:03:11 $ by $Author: brian $
+% Last Modified $Date: 2004/08/15 19:54:17 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename strxns.info
-@settitle OpenSS7 XNS Package
+@settitle @value{PACKAGE_TITLE}
 @setchapternewpage odd
 @footnotestyle separate
 
 @dircategory Kernel
 @direntry
-* OpenSS7 XNS: (strxns).      An Open STREAMS XNS/XTI Networking Package.
+* OpenSS7 XNS: (strxns).      An Open STREAMS XNS Networking Package.
 @end direntry
 
 @set xref-automatic-section-title
@@ -113,12 +113,12 @@ another language, under the above conditions for modified versions.
 @subtitle Edition @value{PACKAGE_VERSION} for @value{PACKAGE_TITLE}
 @subtitle Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
-@author Brian Bidulock @cite{@email<bidulock@@openss7.org>}
+@author Brian Bidulock @cite{<@email{bidulock@@openss7.org}>}
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @email{bidulock@@openss7.org} @*
+Copyright @copyright{} 2001-2004  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
 @noindent
@@ -165,8 +165,8 @@ Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
 * Installation::		Installation of the package
 
 * GPL::				GNU General Public License
-* LGPL::			Lesser GNU General Public License
-* GFDL::			GNU Free Documentation License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
 
 * Indices::			Index of Indices
 
@@ -235,7 +235,8 @@ Foundation} and the @cite{Linux Kernel Community}.
 @unnumberedsec Sponsors
 @cindex sponsors
 
-Funding for completion of the OpenSS7 XNS Package was provided in part by:
+Funding for completion of the @value{PACKAGE_TITLE} package was provided in
+part by:
 
 @itemize
 @item Lockheed Martin
@@ -250,8 +251,9 @@ Funding for completion of the OpenSS7 XNS Package was provided in part by:
 @unnumberedsec Contributors
 @cindex contributors
 
-The primary contributor to the OpenSS7 XNS Package is Brian F. G. Bidulock.
-The following is a list of significant contributors to the project:
+The primary contributor to the @value{PACKAGE_TITLE} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list
+of significant contributors to the project:
 
 @itemize
 @item Per Berquist
@@ -287,12 +289,12 @@ In stark contrast to many other software packages released by
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains
 code mostly developed by other parties.
 @cindex licensing
-This package is released and distributed under the @cite{GNU Public License}
+This package is released and distributed under the @cite{GNU General Public License}
 (@pxref{GPL}).  Please note, however, that there are different licensing terms
 for the manual pages and some of the documentation (derived from X/Open
 publications and other sources).  Consult the permission notices contained in
 the documentation for more information.  This document, is released under the
-@cite{GNU Free Documentation License} (@pxref{GFDL}) with all sections
+@cite{GNU Free Documentation License} (@pxref{FDL}) with all sections
 invariant.
 
 
@@ -301,10 +303,11 @@ invariant.
 @cindex overview
 
 This manual documents the design, implementation, installation, operation and
-future development of the OpenSS7 X/Open Networking Services (XNS) package.
+future development of the @value{PACKAGE_TITLE} package.
+package.
 
-The OpenSS7 XNS Package is an X/Open Networking Services (XNS) package for
-Linux that can be used with
+The @value{PACKAGE_TITLE} package is an X/Open Networking Services (XNS)
+package for Linux that can be used with
 @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
@@ -320,18 +323,18 @@ It includes development tools, header files and manual pages for
 In addition, it provides STREAMS drivers and modules for DLPI including:
 
 @itemize
-@item Linux Data Link (@file{streams-ldl.o}),
-@item IP to DLPI (@file{streams-ip_to_dlpi.o}), and
-@item (@file{streams-ip_strm_mod.o}).
+@item Linux IP to DLPI Driver (@file{streams-ldl.o}),
+@item DLPI to Linux IP Driver (@file{streams-ip_to_dlpi.o}), and
+@item DLPI to Linux IP Module (@file{streams-ip_strm_mod.o}).
 @end itemize
 
-The OpenSS7 XNS Package is essential to the development and support of XNS
-STREAMS netowrking modules and drivers and provides a fundamental set of
-X/Open header files and manual pages for such development.
+The @value{PACKAGE_TITLE} package is essential to the development and support
+of XNS STREAMS netowrking modules and drivers and provides a fundamental set
+of X/Open header files and manual pages for such development.
 
-The OpenSS7 XNS Package does @emph{not} provide the X/Open Transport Interface
-(XTI), Transport Provider Interface (TPI) or Transport Layer Interface (TLI)
-components.  See the OpenSS7
+The @value{PACKAGE_TITLE} does @emph{not} provide the X/Open Transport
+Interface (XTI), Transport Provider Interface (TPI) or Transport Layer
+Interface (TLI) components.  See the OpenSS7
 @command{strxnet}@footnote{@xref{Top, OpenSS7 XTI/TLI, About This Manual, strxnet, OpenSS7 XTI/TLI Library Reference Manual}}
 and
 @command{strinet}@footnote{@xref{Top, OpenSS7 INET, About This Manual, strinet, OpenSS7 INET Reference Manual}}
@@ -394,289 +397,7 @@ This document is organized (loosely) into several sections as follows:
 @section Files
 @cindex headers
 
-@table @file
-@item lib
-@table @file
-@item modules
-@table @file
-@item 2.4.20-28.7
-@table @file
-@item modules.strxns
-@item strxns
-@table @file
-@item streams-ip_strm_mod.o
-@item streams-ip_to_dlpi.o
-@item streams-ldl.o
-@end table
-@end table
-@end table
-@end table
-@item usr
-@table @file
-@item include
-@table @file
-@item strxns
-@table @file
-@item sys
-@table @file
-@item cdi.h
-@item dlpi.h
-@item ldl.h
-@item npi.h
-@end table
-@end table
-@end table
-@item lib
-@item libexec
-@table @file
-@item ldltest
-ldltest
-@end table
-@item sbin
-@table @file
-@item ldlconfig
-@item strxns_mknod
-@end table
-@item share
-@table @file
-@item info
-@table @file
-@item strxns.info
-@item strxns.info-1
-@item strxns.info-2
-@item strxns.info-3
-@item strxns.info-4
-@end table
-@item man
-@table @file
-@item man7
-@table @file
-@item CD_ABORT_OUTPUT_REQ.7
-@item CD_ALLOW_INPUT_REQ.7
-@item CD_ATTACH_REQ.7
-@item CD_BAD_FRAME_IND.7
-@item CD_DETACH_REQ.7
-@item CD_DISABLE_CON.7
-@item CD_DISABLE_REQ.7
-@item CD_ENABLE_CON.7
-@item CD_ENABLE_REQ.7
-@item CD_ERROR_ACK.7
-@item CD_ERROR_IND.7
-@item CD_HALT_INPUT_REQ.7
-@item CD_INFO_ACK.7
-@item CD_INFO_REQ.7
-@item CD_MODEM_SIG_IND.7
-@item CD_MODEM_SIG_POLL.7
-@item CD_MODEM_SIG_REQ.7
-@item CD_MUX_NAME_REQ.7
-@item CD_OK_ACK.7
-@item CD_READ_REQ.7
-@item CD_UNITDATA_ACK.7
-@item CD_UNITDATA_IND.7
-@item CD_UNITDATA_REQ.7
-@item CD_WRITE_READ_REQ.7
-@item DL_ATTACH_REQ.7
-@item DL_BIND_ACK.7
-@item DL_BIND_REQ.7
-@item DL_CONNECT_CON.7
-@item DL_CONNECT_IND.7
-@item DL_CONNECT_REQ.7
-@item DL_CONNECT_RES.7
-@item DL_DATA_ACK_IND.7
-@item DL_DATA_ACK_REQ.7
-@item DL_DATA_ACK_STATUS_IND.7
-@item DL_DATA_IND.7
-@item DL_DATA_REQ.7
-@item DL_DETACH_REQ.7
-@item DL_DISABMULTI_REQ.7
-@item DL_DISCONNECT_IND.7
-@item DL_DISCONNECT_REQ.7
-@item DL_ENABMULTI_REQ.7
-@item DL_ERROR_ACK.7
-@item DL_GET_STATISTICS_ACK.7
-@item DL_GET_STATISTICS_REQ.7
-@item DL_INFO_ACK.7
-@item DL_INFO_REQ.7
-@item DL_OK_ACK.7
-@item DL_PHYS_ADDR_ACK.7
-@item DL_PHYS_ADDR_REQ.7
-@item DL_PROMISCOFF_REQ.7
-@item DL_PROMISCON_REQ.7
-@item DL_REPLY_IND.7
-@item DL_REPLY_REQ.7
-@item DL_REPLY_STATUS_IND.7
-@item DL_REPLY_UPDATE_REQ.7
-@item DL_REPLY_UPDATE_STATUS_IND.7
-@item DL_RESET_CON.7
-@item DL_RESET_IND.7
-@item DL_RESET_REQ.7
-@item DL_RESET_RES.7
-@item DL_SET_PHYS_ADDR_REQ.7
-@item DL_SUBS_BIND_ACK.7
-@item DL_SUBS_BIND_REQ.7
-@item DL_SUBS_UNBIND_REQ.7
-@item DL_TEST_CON.7
-@item DL_TEST_IND.7
-@item DL_TEST_REQ.7
-@item DL_TEST_RES.7
-@item DL_TOKEN_ACK.7
-@item DL_TOKEN_REQ.7
-@item DL_UDERROR_IND.7
-@item DL_UDQOS_REQ.7
-@item DL_UNBIND_REQ.7
-@item DL_UNITDATA_IND.7
-@item DL_UNITDATA_REQ.7
-@item DL_XID_CON.7
-@item DL_XID_IND.7
-@item DL_XID_REQ.7
-@item DL_XID_RES.7
-@item N_BIND_ACK.7
-@item N_BIND_REQ.7
-@item N_CONN_CON.7
-@item N_CONN_IND.7
-@item N_CONN_REQ.7
-@item N_CONN_RES.7
-@item N_DATACK_IND.7
-@item N_DATACK_REQ.7
-@item N_DATA_IND.7
-@item N_DATA_REQ.7
-@item N_DISCON_IND.7
-@item N_DISCON_REQ.7
-@item N_ERROR_ACK.7
-@item N_EXDATA_IND.7
-@item N_EXDATA_REQ.7
-@item N_INFO_ACK.7
-@item N_INFO_REQ.7
-@item N_OK_ACK.7
-@item N_OPTMGMT_REQ.7
-@item N_RESET_CON.7
-@item N_RESET_IND.7
-@item N_RESET_REQ.7
-@item N_RESET_RES.7
-@item N_TOKEN_ACK.7
-@item N_TOKEN_REQ.7
-@item N_UDERROR_IND.7
-@item N_UNBIND_REQ.7
-@item N_UNITDATA_IND.7
-@item N_UNITDATA_REQ.7
-@item N_bind_ack_t.7
-@item N_bind_req_t.7
-@item N_conn_con_t.7
-@item N_conn_ind_t.7
-@item N_conn_req_t.7
-@item N_conn_res_t.7
-@item N_data_ind_t.7
-@item N_data_req_t.7
-@item N_datack_ind_t.7
-@item N_datack_req_t.7
-@item N_discon_ind_t.7
-@item N_discon_req_t.7
-@item N_error_ack_t.7
-@item N_exdata_ind_t.7
-@item N_exdata_req_t.7
-@item N_info_ack_t.7
-@item N_info_req_t.7
-@item N_ok_ack_t.7
-@item N_optmgmt_req_t.7
-@item N_reset_con_t.7
-@item N_reset_ind_t.7
-@item N_reset_req_t.7
-@item N_reset_res_t.7
-@item N_token_ack_t.7
-@item N_token_req_t.7
-@item N_uderror_ind_t.7
-@item N_unbind_req_t.7
-@item N_unitdata_ind_t.7
-@item N_unitdata_req_t.7
-@item cd_abort_output_req_t.7
-@item cd_allow_input_req_t.7
-@item cd_attach_req_t.7
-@item cd_bad_frame_ind_t.7
-@item cd_detach_req_t.7
-@item cd_disable_con_t.7
-@item cd_disable_req_t.7
-@item cd_enable_con_t.7
-@item cd_enable_req_t.7
-@item cd_error_ack_t.7
-@item cd_error_ind_t.7
-@item cd_halt_input_req_t.7
-@item cd_info_ack_t.7
-@item cd_modem_sig_ind_t.7
-@item cd_modem_sig_poll_t.7
-@item cd_modem_sig_req_t.7
-@item cd_mux_name_req_t.7
-@item cd_ok_ack_t.7
-@item cd_read_req_t.7
-@item cd_unitdata_ack_t.7
-@item cd_unitdata_ind_t.7
-@item cd_unitdata_req_t.7
-@item cd_write_read_req_t.7
-@item cdi.7
-@item dl_attach_req_t.7
-@item dl_bind_ack_t.7
-@item dl_bind_req_t.7
-@item dl_connect_con_t.7
-@item dl_connect_ind_t.7
-@item dl_connect_req_t.7
-@item dl_connect_res_t.7
-@item dl_data_ack_ind_t.7
-@item dl_data_ack_req_t.7
-@item dl_data_ack_status_ind_t.7
-@item dl_detach_req_t.7
-@item dl_disabmulti_req_t.7
-@item dl_disconnect_ind_t.7
-@item dl_disconnect_req_t.7
-@item dl_enabmulti_req_t.7
-@item dl_error_ack_t.7
-@item dl_get_statistics_ack_t.7
-@item dl_get_statistics_req_t.7
-@item dl_info_ack_t.7
-@item dl_info_req_t.7
-@item dl_ok_ack_t.7
-@item dl_phys_addr_ack_t.7
-@item dl_phys_addr_req_t.7
-@item dl_promiscoff_req_t.7
-@item dl_promiscon_req_t.7
-@item dl_reply_ind_t.7
-@item dl_reply_req_t.7
-@item dl_reply_status_ind_t.7
-@item dl_reply_update_req_t.7
-@item dl_reply_update_status_ind_t.7
-@item dl_reset_con_t.7
-@item dl_reset_ind_t.7
-@item dl_reset_req_t.7
-@item dl_reset_res_t.7
-@item dl_set_phys_addr_req_t.7
-@item dl_subs_bind_ack_t.7
-@item dl_subs_bind_req_t.7
-@item dl_subs_unbind_req_t.7
-@item dl_test_con_t.7
-@item dl_test_ind_t.7
-@item dl_test_req_t.7
-@item dl_test_res_t.7
-@item dl_token_ack_t.7
-@item dl_token_req_t.7
-@item dl_uderror_ind_t.7
-@item dl_udqos_req_t.7
-@item dl_unbind_req_t.7
-@item dl_unitdata_ind_t.7
-@item dl_unitdata_req_t.7
-@item dl_xid_con_t.7
-@item dl_xid_ind_t.7
-@item dl_xid_req_t.7
-@item dl_xid_res_t.7
-@item dlpi.7
-@item dlpi_eth.7
-@item npi.7
-@end table
-@end table
-@item strxns.macros
-@item strxns.refs
-@end table
-@end table
-@end table
-
-15 directories, 235 files
+@include tree.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -685,6 +406,32 @@ ldltest
 @section Drivers
 @cindex drivers
 
+@subsection Linux IP to DLPI Driver (ldl)
+
+The LDL driver sits atop any existing Linux IP interface driver and presents a
+DLPI interface to the STREAMS drivers above.  This allows any STREAMS driver
+that communicates downstream using DLPI to utilize the services of existing
+Linux drivers for Ethernet, Token Ring, etc.
+
+@subsubheading Licensing
+
+The LDL driver and the @command{ldltest} and @command{ldlconfig} programs were
+originally written by Ole Husgaard and is licensed under the GNU General
+Public License, @xref{GPL}.  This OpenSS7 release of the LDL driver also
+includes Hewlett-Packard proposed patches.
+An OpenSS7 GPL header has been added to the source code files to make this
+clear.
+
+@subsection DLPI to Linux IP Driver (ip_to_dlpi)
+
+@subsubheading Licensing
+
+The ip_to_dlpi driver was originally written by @cite{The Software Group
+Limited} and in licensed under the GNU Lesser General Public License @xref{LGPL}.
+Nevertheless, this OpenSS7 release of the @file{ip_to_dlpi} driver is released
+under the GNU General Public License @xref{GPL}.
+An OpenSS7 GPL header has been added to the source code to make this clear.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -692,12 +439,42 @@ ldltest
 @section Modules
 @cindex modules
 
+@subsection DLPI to Linux IP Module (ip_strm_mod)
+
+@subsubheading Licensing
+
+The @file{ip_strm_mod} module was originally written by Mikel L. Mathews and
+is licensed under the GNU Lesser General Public License @xref{LGPL}.  Nowever,
+this OpenSS7 release is distributed under the GNU General Public License
+@xref{GPL}.  An OpenSS7 GPL header has been added to the source code to make
+this clear.
+
+LiS includes two adapter drivers to assist in interfacing STREAMS drivers
+to the Linux Kernel's TCP/IP protocols.  One driver, @dfn{ip_strm_mod}
+acts as an IP interface driver.  It fits below IP using standard
+@command{ifconfig}@footnote{@xref{ifconfig(8), ifconfig(8), ifconfig(8),
+*manpages*, The Manual Pages}.} procedures.  It, in turn, communicates
+downstream with any STREAMS driver using the DLPI protocol in a fashion
+similar to the manner in which IP on Unix systems interfaces to lower
+interface drivers.  This allows a DLPI STREAMS driver to act as an interface
+driver to Linux TCP/IP.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Utilities, Development, Modules, Reference
 @section Utilities
 @cindex utilities
+
+@subsection @command{ldltest}
+
+Note that @command{ldltest} is mainatined as a manual page,
+@ref{ldltest(8), ldltest(8), ldltest(8), *manpages*, The Manual Pages}.
+
+@subsection @command{ldlconfig}
+
+Note that @command{ldlconfig} is mainatined as a manual page,
+@ref{ldlconfig(8), ldlconfig(8), ldlconfig(8), *manpages*, The Manual Pages}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -742,7 +519,7 @@ ldltest
 @c ----------------------------------------------------------------------------
 @include gpl.texi
 
-@node LGPL, GFDL, GPL, Top
+@node LGPL, FDL, GPL, Top
 @appendix LGPL
 @cindex license LGPL
 
@@ -750,15 +527,15 @@ ldltest
 @c ----------------------------------------------------------------------------
 @include lesser.texi
 
-@node GFDL, Indices, LGPL, Top
-@appendix GFDL
-@cindex license GFDL
+@node FDL, Indices, LGPL, Top
+@appendix FDL
+@cindex license FDL
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 @include fdl.texi
 
-@node Indices, , GFDL, Top
+@node Indices, , FDL, Top
 @appendix Indices
 @cindex indices
 

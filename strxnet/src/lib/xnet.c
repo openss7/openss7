@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/06 08:48:08 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/06 08:48:08 $ by $Author: brian $
+ Last Modified $Date: 2004/08/15 19:56:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/06 08:48:08 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:23 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/06 08:48:08 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/15 19:56:23 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -2861,17 +2861,23 @@ __xnet_t_peek(int fd)
 		pfd.events = (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
 		pfd.revents = 0;
 		switch (poll(&pfd, 1, 0)) {
-		case -1:
-			goto tsyserr;
+		case 1:
+			if (pfd.revents & (POLLMSG | POLLERR | POLLHUP))
+				goto tlook;
+			if (pfd.revents & (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND))
+				return __xnet_t_look(fd);
 		case 0:
 			break;
-		case 1:
-			return __xnet_t_look(fd);
+		case -1:
+			goto tsyserr;
 		default:
 			goto tproto;
 		}
 	}
 	return (user->event);
+      tlook:
+	t_errno = TLOOK;
+	goto error;
       tproto:
 	t_errno = TPROTO;
 	goto error;
@@ -5913,10 +5919,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.4 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.5 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.4 $)
- * @date \$Date: 2004/08/06 08:48:08 $
+ * @version \$Name:  $(\$Revision: 0.9.2.5 $)
+ * @date \$Date: 2004/08/15 19:56:23 $
  *
  * @}
  */

@@ -1,0 +1,346 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: ldlconfig.8.man,v 0.9.2.1 2004/08/15 19:54:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/08/15 19:54:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxns.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LDLCONFIG 8 "$Date: 2004/08/15 19:54:14 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.\"
+.\"
+.SH NAME
+.B ldlconfig
+\-
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 8
+\fBldlconfig\fR [\fIoptions\fR]
+.HP 8
+\fBldlconfig\fR {\fB-h\fR, \fB--help\fR}
+.HP 8
+\fBldlconfig\fR {\fB-V\fR, \fB--version\fR}
+.HP 8
+\fBldlconfig\fR {\fB-C\fR, \fB--copying\fR}
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-a\fR, \fB--attach\fR=\fINAME\fR
+The \fINAME\fR of the network driver interface to which to attach.  For
+example, \fB--attach\fR=\fIeth0\fR attaches to the \fBeth0\fR network driver.
+.TP
+\fB-b\fR, \fB--bind\fR=\fISAP\fR
+The Service Accpe Point identifier (\fISAP\fR) to bind.
+The interpretation of the \fISAP\fR depends upon the mode (see \fB-p\fR) and
+framing (see \fB-F\fR) being used.
+.TP
+\fB-d\fR, \fB--filedes\fR=\fIFILEDES\fR
+Instead of opening \fB/dev/ldl\fR, use the given integer file descriptor
+number (\fIFILEDES\fR).  This allows an external program to open
+\fB/dev/ldl\fR, use \fBldlconfig\fR to configure the STREAM, and then continue
+to use the open file descriptor for further operations.
+.TP
+\fB-f\fR, \fB--flag\fR=\fIFLAG\fR
+\fIFLAG\fR to set with ioctl.  Mnemonic values for \fIFLAG\fR are:
+.RS
+.TP
+.B PEDANTIC_STANDARD
+.TP
+.B RAW
+.RE
+.TP
+\fB-F\fR, \fB--framing\fR=\fIFRAMING\fR
+The type of \fIFRAMING\fR to use in interactions with the network driver.
+Mnemonic values for framing are as follows:
+.RS
+.TP
+.B EII
+.TP
+.B 802.2
+.TP
+.B SNAP
+.TP
+.B 802.3
+.TP
+.B RAWLLC
+.RE
+.TP
+\fB-I\fR, \fB--info\fR
+Display the information returned in a
+.B DL_INFO_ACK
+ to
+.BR stdout .
+.TP
+\fB-p\fR, \fB--promisc\fR=\fIMODE\fR
+Set promiscuous \fIMODE\fR.  Mnemonic values for mode are:
+.RS
+.TP
+.B PHYS
+.TP
+.B SAP
+.TP
+.B PROMISC_MULTI
+.RE
+This option may be repeated.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase verbosity of output or set to \fILEVEL\fR.  The default verbosity is
+.BR 1 .
+This option may be repeated.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppress normal output (equivalent to
+.BR --verbose=0 ).
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+Print a usage message on
+.B stdout
+and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+Print the version on
+.B stdout
+and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+Print the copying permissions on
+.B stdout
+and exit.
+.\"
+.\"
+.SH USAGE
+.PP
+.B ldlconfig
+opens the clone device
+.BR /dev/ldl ,
+or accepts a file descriptor to a file already opened to that device.  It
+performs a
+.BR DL_ATTACH_REQ (7)
+based upon the
+.B -a
+.I NAME
+option.  This attaches the file to a Linux network device.
+.PP
+It then sets operational options based upon the
+.B -f
+and
+.B -p
+options, if any were specified on the command line.
+If the
+.B -b
+option is specified, it also performs a
+.BR DL_BIND_REQ (7)
+on the stream.
+.PP
+The resulting stream connects to the
+.BR ldl (4)
+driver which acts as a DLPI Provider
+.[
+dlpi
+.]
+and translates between the DLPI STREAMS protocol from above to the Linux
+network driver interface below.  The effect is to present a
+.BR dlpi (7)
+interface from a Linux network driver.
+.PP
+The type of network driver (Ethernet, Token Ring, FDDI, HDLC) is compared to
+with the requested framing type (see
+.B -F
+option) and
+.B RAW
+flag (see
+.B -f
+option).  If the given driver does not support the requested framing type then
+the
+.B ldlconfig
+command will fail.  All drivers support the
+.B RAW
+frame interface.
+.PP
+Depending upon the driver type and framing type, the
+.BR ldl (4)
+driver will set up to decode incoming frames according to the framing type.
+This has an effet on where the driver looks in the incoming frame to find the
+SAP to match agains the requested SAP in the
+.BR DL_BIND_REQ (7)
+to
+.BR ldl (4)
+(see the
+.B -b
+option).  The framing type of
+.B RAWLLC
+generally means that the entire frame is passed upstream.  This allows the
+upstream client driver to interpret the LLC information within the frame.
+.PP
+Frame types other than
+.B RAWLLC
+generally mean that the LLC header will be stripped from received frames
+passing just the payload portion to the upstream client.  The received frame
+is passed upstream in a
+.BR DL_UNITDATA_IND (7)
+.BR M_PROTO (9)
+message and the address carried by this frame will be set to the source MAC
+address from the frame header.
+.PP
+In the transmit direction, a frame type of
+.B RAWLLC
+means that the formatting of the frame to be sent to the medium is under the
+control of the upstream client.
+.PP
+For other types of framing, the
+.BR ldl (4)
+driver will build the LLC header according to the framing type.  The address
+in the
+.BR DL_UNITDATA_REQ (7)
+is used to develop the destination MAC address.
+.PP
+For any given frame type and driver type, it is often necessary to consult the
+driver source code in order to understand the fine details of the frame
+processing involved.
+
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors can result from inadequate permissions, failure of a command on the
+underlying
+.BR ldl (4)
+driver, other failure of the
+.BR ldlconfig
+command.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/ldl
+the 
+.BR ldl (4)
+device
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/ldlconfig
+contains the
+.B ldlconfig
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ldl (4),
+.BR dlpi (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ldlconfig
+has no known bugs.  Report bugs to <bugs@openss7.org>.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/04 03:38:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/15 19:54:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/04 03:38:04 $ by $Author: brian $
+# Last Modified $Date: 2004/08/15 19:54:09 $ by $Author: brian $
 #
 # =============================================================================
 
 MANMACRO_PFX			= @PACKAGE_TARNAME@
 
 man_MANS = \
+	man4/XNS.4 \
+	man4/ip2xinet.4 \
+	man4/ip_strm.4 \
+	man4/ip_strms_mod.4 \
+	man4/ip_to_dlpi.4 \
+	man4/ldl.4 \
 	man7/CD_ABORT_OUTPUT_REQ.7 \
 	man7/cd_abort_output_req_t.7 \
 	man7/CD_ALLOW_INPUT_REQ.7 \
@@ -269,9 +275,17 @@ man_MANS = \
 	man7/N_UNITDATA_IND.7 \
 	man7/N_unitdata_ind_t.7 \
 	man7/N_UNITDATA_REQ.7 \
-	man7/N_unitdata_req_t.7
+	man7/N_unitdata_req_t.7 \
+	man8/ldlconfig.8 \
+	man8/ldltest.8
 
 dist_noinst_MANS = \
+	man4/XNS.4.man \
+	man4/ip2xinet.4.man \
+	man4/ip_strm.4.man \
+	man4/ip_strms_mod.4.man \
+	man4/ip_to_dlpi.4.man \
+	man4/ldl.4.man \
 	man7/CD_ABORT_OUTPUT_REQ.7.man \
 	man7/cd_abort_output_req_t.7.man \
 	man7/CD_ALLOW_INPUT_REQ.7.man \
@@ -488,7 +502,9 @@ dist_noinst_MANS = \
 	man7/N_UNITDATA_IND.7.man \
 	man7/N_unitdata_ind_t.7.man \
 	man7/N_UNITDATA_REQ.7.man \
-	man7/N_unitdata_req_t.7.man
+	man7/N_unitdata_req_t.7.man \
+	man8/ldlconfig.8.man \
+	man8/ldltest.8.man
 
 
 include ../../am/man.am

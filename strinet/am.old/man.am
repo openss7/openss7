@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 06:58:18 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/15 19:57:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/27 06:58:18 $ by $Author: brian $
+# Last Modified $Date: 2004/08/15 19:57:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,8 +59,7 @@
 man_MACROS = $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
 
 EXTRA_DIST = \
-	$(MANMACRO_PFX).refs \
-	$(MANMACRO_PFX).macros \
+	$(man_MACROS) \
 	$(dist_noinst_MANS)
 
 if COOKED_MANPAGES
@@ -71,7 +70,47 @@ $(man_MANS):: %: %.man
 	echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
+$(man1_MANS):: %.1: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
+
+$(man2_MANS):: %.2: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
+
+$(man3_MANS):: %.3: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
+
+$(man4_MANS):: %.4: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
+
+$(man5_MANS):: %.5: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
+
+$(man6_MANS):: %.6: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
+
+$(man7_MANS):: %.7: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
+
+$(man8_MANS):: %.8: %.man
+	@echo "converting (soelim, grefer, tbl, pic) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | $(TBL) 2>/dev/null | $(PIC) 2>/dev/null | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
+
 $(man_MANS):: $(man_MACROS)
+$(man1_MANS):: $(man_MACROS)
+$(man2_MANS):: $(man_MACROS)
+$(man3_MANS):: $(man_MACROS)
+$(man4_MANS):: $(man_MACROS)
+$(man5_MANS):: $(man_MACROS)
+$(man6_MANS):: $(man_MACROS)
+$(man7_MANS):: $(man_MACROS)
+$(man8_MANS):: $(man_MACROS)
 
 install-manpages:
 
@@ -88,14 +127,48 @@ $(man_MANS): %: %.man
 	echo "converting manpage $< to $@" ; \
 	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
-install-manpages: $(man_MANS) $(man_MACROS)
+$(man1_MANS): %.1: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.1/' > $@ ;
+
+$(man2_MANS): %.2: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.2/' > $@ ;
+
+$(man3_MANS): %.3: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.3/' > $@ ;
+
+$(man4_MANS): %.4: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.4/' > $@ ;
+
+$(man5_MANS): %.5: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.5/' > $@ ;
+
+$(man6_MANS): %.6: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.6/' > $@ ;
+
+$(man7_MANS): %.7: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.7/' > $@ ;
+
+$(man8_MANS): %.8: %.man
+	@echo "converting manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.so.*\.man/s/\.man/\.8/' > $@ ;
+
+install-manpages: $(man_MANS) $(man_MACROS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) $(man5_MANS) $(man6_MANS) $(man7_MANS) $(man8_MANS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(mandir)
-	@for f in $(man_MACROS) ; do \
-		if test -x $$f ; then d=; else d=$(srcdir)/ ; fi ; \
-		echo "$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir)" ; \
-		$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir) ; \
-	done
+	@list="$(man_MACROS)" ; if test -n "$$list" ; then \
+		for f in $$list ; do \
+			if test -x $$f ; then d=; else d=$(srcdir)/ ; fi ; \
+			echo "$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir)" ; \
+			$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir) ; \
+		done ; \
+	fi
 
 uninstall-manpages:
 	@$(NORMAL_UNINSTALL)
@@ -105,7 +178,42 @@ uninstall-manpages:
 endif
 
 clean-manpages:
-	rm -f $(man_MANS)
+	@if test -n "$(man_MANS)" ; then \
+		echo "rm -f $(man_MANS)" ; \
+		rm -f $(man_MANS) ; \
+	fi ; \
+	if test -n "$(man1_MANS)" ; then \
+		echo "rm -f $(man1_MANS)" ; \
+		rm -f $(man1_MANS) ; \
+	fi ; \
+	if test -n "$(man2_MANS)" ; then \
+		echo "rm -f $(man2_MANS)" ; \
+		rm -f $(man2_MANS) ; \
+	fi ; \
+	if test -n "$(man3_MANS)" ; then \
+		echo "rm -f $(man3_MANS)" ; \
+		rm -f $(man3_MANS) ; \
+	fi ; \
+	if test -n "$(man4_MANS)" ; then \
+		echo "rm -f $(man4_MANS)" ; \
+		rm -f $(man4_MANS) ; \
+	fi ; \
+	if test -n "$(man5_MANS)" ; then \
+		echo "rm -f $(man5_MANS)" ; \
+		rm -f $(man5_MANS) ; \
+	fi ; \
+	if test -n "$(man6_MANS)" ; then \
+		echo "rm -f $(man6_MANS)" ; \
+		rm -f $(man6_MANS) ; \
+	fi ; \
+	if test -n "$(man7_MANS)" ; then \
+		echo "rm -f $(man7_MANS)" ; \
+		rm -f $(man7_MANS) ; \
+	fi ; \
+	if test -n "$(man8_MANS)" ; then \
+		echo "rm -f $(man8_MANS)" ; \
+		rm -f $(man8_MANS) ; \
+	fi
 
 install-data-local: install-manpages
 
@@ -124,14 +232,80 @@ if COMPRESS_MANPAGES
 #
 post-manpages:
 	@$(NORMAL_INSTALL)
-	@if test -n "`find $(DESTDIR)$(mandir) -name \"*.gz\" 2>/dev/null`" ; then \
+	@if test -n "`find $(DESTDIR)$(mandir) -name \"*.gz\" 2>/dev/null`" -o -n "$(INSTALL_STRIP_FLAG)" ; then \
 		if test -n "$(GZIP)" ; then \
-			for f in $(man_MANS) ; do \
-				if test -f $(DESTDIR)$(mandir)/$$f ; then \
-					echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/$$f" ; \
-					$(GZIP) -f -9 $(DESTDIR)$(mandir)/$$f ; \
-				fi ; \
-			done ; \
+			list="$(man_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man1_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man1/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man1/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man1/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man2_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man2/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man2/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man2/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man3_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man3/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man3/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man3/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man4_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man4/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man4/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man4/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man5_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man5/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man5/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man5/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man6_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man6/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man6/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man6/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man7_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man7/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man7/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man7/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man8_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man8/$$f ; then \
+						echo "$(GZIP) -f -9 $(DESTDIR)$(mandir)/man8/$$f" ; \
+						$(GZIP) -f -9 $(DESTDIR)$(mandir)/man8/$$f ; \
+					fi ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 
@@ -142,12 +316,78 @@ postun-manpages:
 	@$(NORMAL_UNINSTALL)
 	@if test -n "`find $(DESTDIR)$(mandir) -name \"*.gz\" 2>/dev/null`" ; then \
 		if test -n "$(GZIP)" ; then \
-			for f in $(man_MANS) ; do \
-				if test -f $(DESTDIR)$(mandir)/$$f.gz ; then \
-					echo "rm -f $(DESTDIR)$(mandir)/$$f.gz" ; \
-					rm -f $(DESTDIR)$(mandir)/$$f.gz ; \
-				fi ; \
-			done ; \
+			list="$(man_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man1_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man1/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man1/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man1/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man2_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man2/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man2/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man2/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man3_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man3/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man3/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man3/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man4_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man4/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man4/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man4/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man5_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man5/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man5/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man5/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man6_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man6/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man6/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man6/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man7_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man7/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man7/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man7/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
+			list="$(man8_MANS)" ; if test -n "$$list" ; then \
+				for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/man8/$$f.gz ; then \
+						echo "rm -f $(DESTDIR)$(mandir)/man8/$$f.gz" ; \
+						rm -f $(DESTDIR)$(mandir)/man8/$$f.gz ; \
+					fi ; \
+				done ; \
+			fi ; \
 		fi ; \
 	fi
 

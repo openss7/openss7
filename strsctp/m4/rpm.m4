@@ -61,7 +61,7 @@ dnl =========================================================================
 # _RPM_SPEC
 # -------------------------------------------------------------------------
 # Common things that need to be done in setting up an RPM spec file from an
-# RPM.spec.in file.
+# RPM.spec.in file.  This also includes stuff for converting the LSM file.
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC], [dnl
     _RPM_SPEC_OPTIONS
@@ -83,6 +83,7 @@ AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP], [dnl
     _RPM_SPEC_SETUP_EPOCH
     _RPM_SPEC_SETUP_RELEASE
+    _RPM_SPEC_SETUP_DATE
     _RPM_SPEC_SETUP_TOOLS
     _RPM_SPEC_SETUP_MODULES
     _RPM_SPEC_SETUP_OPTIONS
@@ -134,6 +135,15 @@ AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
         Release. This defaults to Custom.])
 ])# _RPM_SPEC_SETUP_RELEASE
+# =========================================================================
+
+# =========================================================================
+# _RPM_SPEC_SETUP_DATE
+# -------------------------------------------------------------------------
+AC_DEFUN([_RPM_SPEC_SETUP_DATE], [dnl
+    PACKAGE_DATE=`date -I`
+    AC_SUBST([PACKAGE_DATE])dnl
+])# _RPM_SPEC_SETUP_DATE
 # =========================================================================
 
 # =========================================================================
@@ -297,6 +307,7 @@ dnl          fi
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).lsm)
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================
 

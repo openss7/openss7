@@ -1,0 +1,384 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: ldltest.8.man,v 0.9.2.1 2004/08/15 19:54:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/08/15 19:54:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxns.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LDLTEST 8 "$Date: 2004/08/15 19:54:14 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.\"
+.\"
+.SH NAME
+.B ldltest
+\-
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.HP 8
+\fBldltest\fr [\fIoptions\fR] \fIINTERFACE\fR \fILOCALIP\fR
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ldltest
+is used to test the
+.BR ldl (4)
+.I STREAMS
+driver by using one of the existing standard Linux network drivers to send a
+"ping" to another host on the network.  The command line parameters specify
+the local-IP and remote-IP addresses and the name of the Driver to use when
+sending the ping.
+.PP
+.B ldltest
+is also used to obtain statistics from the
+.BR ldl (4)
+STREAMS driver and to set debugging masks.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I INTERFACE
+local interface
+.TP
+.I LOCALIP
+local ip address
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-a\fR, \fB--arp\fR
+Respond to arp queries.
+.TP
+\fB-s\fR, \fB--ping\fR
+Respond to ping packets.
+Also enables LLC TEST/XID echo mode.
+.TP
+\fB-S\fR, \fB--sap\fR=\fIDSAP\fB:\fISSAP\fR
+.TP
+\fB-r\fR, \fB--remoteip\fR=\fIREMOTE-IP\fR
+The remote IP address to which the ping is to be directed.
+.TP
+\fB-R\fR, \fB--remotemac\fR=\fIREMOTE-MAC\fR
+The remote MAC address for sending LLC TEST/XID frames.
+.TP
+\fB-c\fR, \fB--count\fR=\fIPACKET-COUNT\fR
+The number of ping packets to send.  The default is
+.BR 1 .
+.TP
+\fB-f\fR, \fB--framing\fR=\fIFRAMING\fR
+Set framing style to \fBEII\fR (default), \fBRAW\fR or \fBSNAP\fR.
+.TP
+\fB-d\fR, \fB--debug\fR=\fIMASK\fR
+Set LDL debug mask.
+.I MASK
+is a bitwise OR of zero or more of the following:
+.RS
+.TP
+.B 0x01
+debug raw frame from net driver
+.PD 0
+.TP
+.B 0x02
+dump
+.BR DL_UNITDATA_IND (7)
+upstream
+.TP
+.B 0x04
+dump
+.BR DL_UNITDATA_REQ (7)
+downstream
+.TP
+.B 0x08
+dump Tx to net driver
+.TP
+.B 0x10
+dump full buffer, not just header
+.TP
+.B 0x20
+debug infor for
+.BR DL_ATTACH_REQ (7)
+.TP
+.B 0x40
+debuginfor for
+.B DL_BIND_REQ (7)
+.PD
+.RE
+.TP
+\fB-H\fR
+List debug flags (obsolete, see above, use \fB-h\fR)
+.TP
+\fB-g\fR, \fB--global\fR
+Print out global statistics obtained from the
+.BR ldl (4)
+driver.
+.TP
+\fB-T\fR, \fB--test\fR
+Send the LLC TEST command.
+.TP
+\fB-X\fR, \fB--xid\fR
+Send the LLC XID command.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase the verbosity of the output or set to
+.IR LEVEL .
+The default verbosity level is
+.BR 1 .
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppress normal output (equivalent to
+.BR --verbose=0 ).
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+Print usage message to
+.B stdout
+and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+Print version information to
+.B stdout
+and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+Print copying permissions to
+.B stdout
+and exit.
+.\"
+.\"
+.SH USAGE
+.PP
+In test mode,
+.B ldltest
+constructs a ping packet from the parameters given and sends it to the remote
+host.  It awaits the response and prints out the round trip time when it
+receives the response.  If the -c option is used it sends the ping repeatedly
+and prints out the round-trip time every 1,000 packets.
+.PP
+With the \fB-s\fR, \fB--ping\fR option,
+.B ldltest
+listens for received frames from the indicated interface driver.  If the
+framing is specified as
+.B RAW
+then it will receive LLC frames from the driver.  Other types of framing
+result in non-LLC Ethernet types of frames such as IP packets and ARP
+messages.  Thus, the setting of the
+.BR -f ", " --framing
+option conditions the type of messages that can be received from the
+interface.  When an ICMP ping is received, it is responded to.  When an LLC
+TEST or XID command is received it is responded to with the corresponding
+response frame.
+.PP
+With the
+.BR -g ", " --global
+option,
+.B ldltest
+obtains statistics maintained by the
+.BR ldl (4)
+driver and prints them out.  This is useful for troubleshooting protocol stack
+configuration since you can see whether packets entering
+.BR ldl (4)
+from either above or below was forwarded to the neighboring module.
+.PP
+By setting debug bits via the
+.BR -d ", " --debug
+option, you can cause the
+.BR ldl (4)
+driver to print the contents of packets flowing into it and out of it.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors can result from inadequate permissions, failure of a command on the
+underlying
+.BR ldl (4)
+driver, other failure of the
+.BR ldltest
+command.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+
+.nf
+\fC\s-1\
+ldltest -r 192.168.1.1 eth0 192.168.1.117
+\s+1\fP
+.fi
+
+.PP
+Sends a ping to 192.168.1.1.  The local host address is 192.168.1.117
+(obtainable from the ifconfig command).
+
+.nf
+\fC\s-1\
+ldltest -S 0x00:0x0C -T -R 00:00:C0:D7:54:F8 eth0
+\s+1\fP
+.fi
+.PP
+Sends an LLC TEST command to the remote system with Ethernet address
+00:00:C0:D7:54:F8, DSAP 0x00 and SSAP 0x0C.  Await the response.
+
+.nf
+\fC\s-1\
+ldltest -s -f RAW eth0 192.168.1.47
+\s+1\fP
+.fi
+.PP
+Listens for RAW LLC frames addressed to the local machine whose IP address is
+192.168.1.47.  Send responses to TEST and XID commands.
+
+.nf
+\fC\s-1\
+ldltest -d 0x0f
+\s+1\fP
+.fi
+.PP
+Sets the debug mask in the
+.BR ldl (4)
+driver.
+
+.nf
+\fC\s-1\
+ldltest -H
+\s+1\fP
+.fi
+.PP
+Prints the values assigned to the debug mask bits as follows:
+
+.RS
+.nf
+\fC\s-1\
+0x00000001 dump raw frame from net driver
+0x00000002 dump UNITDATA_IND upstream
+0x00000004 dump UNITDATA_REQ downstream
+0x00000008 dump Tx to net driver
+0x00000010 dump full buffer, not just header
+0x00000020 debug info for @code{DL_ATTACH}
+0x00000040 debug info for @code{DL_BIND}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/ldl
+the
+.BR ldl (4)
+device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/ldltest
+contains the
+.B ldltest
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

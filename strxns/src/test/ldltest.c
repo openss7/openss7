@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 02:02:09 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,10 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/04 02:02:09 $ by $Author: brian $
+ Last Modified $Date: 2004/08/16 00:47:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: ldltest.c,v $
+ Revision 0.9.2.3  2004/08/16 00:47:50  brian
+ - Updated GNU long options and copying info.
+
+ Revision 0.9.2.2  2004/08/15 19:54:31  brian
+ - Sweeping documentation updates.
+
  Revision 0.9.2.1  2004/07/04 02:02:09  brian
  - Initial import of strxns package.
 
@@ -60,10 +66,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 02:02:09 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 02:02:09 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -2437,17 +2443,65 @@ int initialize(void)
       return fd;
 }
 
+void copying(int argc, char *argv[])
+{
+    if (!verbose)
+	return;
+    fprintf(stdout, "\
+\n\
+%1$s %2$s:\n\
+\n\
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
+\n\
+All Rights Reserved.\n\
+\n\
+This program is free software;  you can  redistribute  it and/or modify it under\n\
+the terms of the GNU General  Public License as  published by the  Free Software\n\
+Foundation; either  version 2 of  the  License, or  (at  your option) any  later\n\
+version.\n\
+\n\
+This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
+WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received  a copy of the GNU  General  Public License along with\n\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
+Cambridge, MA 02139, USA.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+", argv[0], ident);
+}
+
 void version(int argc, char *argv[])
 {
       if (!verbose)
 	    return;
       fprintf(stdout, "\
+\n\
 %1$s %2$s:\n\
     Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     included here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permissions.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -2460,6 +2514,7 @@ Usage:\n\
     %1$s [options] INTERFACE LOCALIP\n\
     %1$s {-h,--help}\n\
     %1$s {-V,--version}\n\
+    %1$s {-C,--copying}\n\
 ", argv[0]);
 }
 
@@ -2468,10 +2523,12 @@ void help(int argc, char *argv[])
       if (!verbose)
 	    return;
       fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options] INTERFACE LOCALIP\n\
     %1$s {-h,--help}\n\
     %1$s {-V,--version}\n\
+    %1$s {-C,--copying}\n\
 Arguments:\n\
     INTERFACE\n\
         local interface\n\
@@ -2479,46 +2536,49 @@ Arguments:\n\
         local ip address\n\
 Options:\n\
     -a, --arp\n\
-        Respond to arp queries\n\
+        respond to arp queries\n\
     -s, --ping\n\
-        Respond to ping packets\n\
+        respond to ping packets\n\
     -S, --sap DSAP:SSAP\n\
-        Set DSAP and SSAP for TEST/XID\n\
+        set DSAP and SSAP for TEST/XID\n\
     -r, --remoteip REMOTE-IP\n\
-        Set remote IP number to ping\n\
+        set remote IP number to ping\n\
     -R, --remotemac REMOTE-MAC\n\
-        Set remote adapter address\n\
+        set remote adapter address\n\
     -c, --count PACKET-COUNT\n\
-        Number of ping packets to send\n\
+        number of ping packets to send\n\
     -f, --framing FRAMING\n\
-        Link framing: RAW or EII or SNAP\n\
+        link framing: RAW or EII or SNAP\n\
     -d, --debug MASK\n\
-        Set LDL debug mask.  MASK is a bitwise OR of zero or more of the\n\
+        set LDL debug mask   MASK is a bitwise OR of zero or more of the\n\
         following:\n\
-	    0x01 dump raw frame from net driver\n\
-	    0x02 dump UNITDATA_IND upstream\n\
-	    0x04 dump UNITDATA_REQ downstream\n\
-	    0x08 dump Tx to net driver\n\
-	    0x10 dump full buffer, not just header\n\
-	    0x20 debug info for DL_ATTACH\n\
-	    0x40 debug info for DL_BIND\n\
+            0x01 dump raw frame from net driver\n\
+            0x02 dump UNITDATA_IND upstream\n\
+            0x04 dump UNITDATA_REQ downstream\n\
+            0x08 dump Tx to net driver\n\
+            0x10 dump full buffer, not just header\n\
+            0x20 debug info for DL_ATTACH\n\
+            0x40 debug info for DL_BIND\n\
     -H\n\
-        List debug flags (obsolete, see above, use -h)\n\
+        list debug flags (obsolete, see above, use -h)\n\
     -g, --global\n\
-        Print global LDL statistics\n\
+        print global LDL statistics\n\
     -T, --test\n\
-        Send LLC TEST command\n\
+        send LLC TEST command\n\
     -X, --xid\n\
-        Send LLC XID command\n\
+        send LLC XID command\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -h, --help, -?, --?\n\
-        Print this usage message and exits\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Print the version and exits\n\
+        print version and exit\n\
+    -C, --copying\n\
+        print copying permission and exit\n\
+\n\
 ", argv[0]);
 }
 
@@ -2553,28 +2613,32 @@ int main(int argc, char *argv[])
 	                    val;
 #ifdef _GNU_SOURCE
 	    int             option_index = 0;
+	    /* *INDENT-OFF* */
 	    static struct option long_options[] = {
-		  {"arp", 0, 0, 'a'},
-		  {"ping", 0, 0, 's'},
-		  {"sap", 1, 0, 'S'},
-		  {"remoteip", 1, 0, 'r'},
-		  {"remotemac", 1, 0, 'R'},
-		  {"count", 1, 0, 'c'},
-		  {"framing", 1, 0, 'f'},
-		  {"debug", 1, 0, 'd'},
-		  {"global", 0, 0, 'g'},
-		  {"test", 0, 0, 'T'},
-		  {"xid", 0, 0, 'X'},
-		  {"quiet", 0, 0, 'q'},
-		  {"verbose", 2, 0, 'v'},
-		  {"help", 0, 0, 'h'},
-		  {"version", 0, 0, 'V'},
-		  {"?", 0, 0, 'h'},
+		{ "arp",	no_argument,	    NULL, 'a' },
+		{ "ping",	no_argument,	    NULL, 's' },
+		{ "sap",	required_argument,  NULL, 'S' },
+		{ "remoteip",	required_argument,  NULL, 'r' },
+		{ "remotemac",	required_argument,  NULL, 'R' },
+		{ "count",	required_argument,  NULL, 'c' },
+		{ "framing",	required_argument,  NULL, 'f' },
+		{ "debug",	required_argument,  NULL, 'd' },
+		{ "global",	no_argument,	    NULL, 'g' },
+		{ "test",	no_argument,	    NULL, 'T' },
+		{ "xid",	no_argument,	    NULL, 'X' },
+		{ "quiet",	no_argument,	    NULL, 'q' },
+		{ "verbose",	optional_argument,  NULL, 'v' },
+		{ "help",	no_argument,	    NULL, 'h' },
+		{ "version",	no_argument,	    NULL, 'V' },
+		{ "copying",    no_argument,	    NULL, 'C' },
+		{ "?",		no_argument,	    NULL, 'h' },
+		{ 0, }
 	    };
-	    c = getopt_long_only(argc, argv, "asgHTXr:R:c:v:f:d:S:hqV?", long_options,
+	    /* *INDENT-ON* */
+	    c = getopt_long_only(argc, argv, "asgHTXr:R:c:v:f:d:S:hqVC?", long_options,
 				 &option_index);
 #else				/* _GNU_SOURCE */
-	    c = getopt(argc, argv, "asgHTXr:R:c:v:f:d:S:hqV?");
+	    c = getopt(argc, argv, "asgHTXr:R:c:v:f:d:S:hqVC?");
 #endif				/* _GNU_SOURCE */
 	    if (c == -1)
 		  break;
@@ -2654,6 +2718,9 @@ int main(int argc, char *argv[])
 	    case 'V':		/* -V, --version */
 		  version(argc, argv);
 		  exit(0);
+	    case 'C':		/* -C, --copying */
+		copying(argc, argv);
+		exit(0);
 	    case '?':
 	    default:
 		bad_option:

@@ -36,7 +36,7 @@
 %D August 17, 1992
 %C Parsippany, New Jersey
 %I UNIX International Press
-%U http://www.openss7.org/doc/npi.pdf
+%U http://www.openss7.org/docs/npi.pdf
 
 %L DLPI
 %A UNIX International,\ Inc.
@@ -47,7 +47,7 @@
 %D August 20, 1991
 %C Parsippany, New Jersey
 %I UNIX International Press
-%U http://www.openss7.org/doc/dlpi.pdf
+%U http://www.openss7.org/docs/dlpi.pdf
 
 %L TLI
 %A UNIX\ International,\ Inc.
@@ -58,7 +58,7 @@
 %D December 10, 1992
 %C Parsippany, New Jersey
 %I Unix International Press
-%U http://www.openss7.org/doc/tpi.pdf
+%U http://www.openss7.org/docs/tpi.pdf
 
 %K xxx
 %A X Programmer's Group
@@ -3278,3 +3278,18 @@ Part 1: Protocol Specification
 %D May 2003
 %I OpenSS7 Corporation
 %U http://www.openss7.org/docs/mxi.pdf
+
+%K strxns
+%L STRXNS
+%A Brian F. G. Bidulock
+%E Brian F. G. Bidulock
+%Q OpenSS7 Corporation
+%T OpenSS7 XNS Networking - Installation and Reference Manual
+%R strxns Revision 0.9.2
+%N Edition 0.9.2, Release 1
+%C Edmonton
+%D August 2004
+%I The OpenSS7 Project
+%U http://www.openss7.org/docs/strxns.pdf
+
+

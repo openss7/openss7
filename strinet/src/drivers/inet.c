@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/12 15:02:36 $ by $Author: brian $
+ Last Modified $Date: 2004/08/15 19:57:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -257,7 +257,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/12 15:02:36 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/15 19:57:43 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"
@@ -11122,14 +11122,15 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 			ss_socket_get(as->sock, as);
 			ss_set_state(as, TS_DATA_XFER);
 			ss_set_options(as);	/* reset options against new socket */
-			if (bufq_length(&ss->conq))
-				ss_set_state(ss, TS_WRES_CIND);
-			else {
-				ss_set_state(ss, TS_IDLE);
-				/*
-				   make sure any backed up indications are processed 
-				 */
-				qenable(ss->rq);
+			if (as != ss) {
+				/* only change state if not accepting on listening socket */
+				if (bufq_length(&ss->conq))
+					ss_set_state(ss, TS_WRES_CIND);
+				else {
+					ss_set_state(ss, TS_IDLE);
+					/* make sure any backed up indications are processed */
+					qenable(ss->rq);
+				}
 			}
 			break;
 		case TS_WACK_DREQ7:
