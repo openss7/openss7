@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.12 2004/05/08 19:21:13 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.13 2004/05/09 07:22:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/09 07:22:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:13 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/09 07:22:32 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -909,13 +909,9 @@ extern void rmvq(queue_t *q, mblk_t *mp);
 extern void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 extern void setqsched(void);
 
+/* Note: Solaris has a different prototype for these: see sunddi.h */
 extern unsigned long freezestr(queue_t *q);
 extern void unfreezestr(queue_t *q, unsigned long pl);
-
-#ifdef _SUN_SOURCE
-#define unfreezestr(__q) unfreezestr((__q), -1UL)
-#define freezestr(__q) (void)freezestr((__q))
-#endif
 
 __EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg)
 {

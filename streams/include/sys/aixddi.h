@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: aixddi.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: aixddi.h,v 0.9.2.5 2004/05/09 07:22:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/05/09 07:22:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AXIDDI_H__
 #define __SYS_AXIDDI_H__
 
-#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/09 07:22:32 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -70,7 +70,6 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
 
-extern void mi_bufcall(queue_t *q, int size, int priority);
 extern int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *dev, int flag, int sflag,
 			cred_t *credp);
 extern int mi_close_comm(caddr_t *mi_list, queue_t *q);
@@ -78,6 +77,14 @@ extern caddr_t mi_next_ptr(caddr_t strptr);
 extern caddr_t mi_prev_ptr(caddr_t strptr);
 
 extern int wantio(queue_t *q, struct wantio *w);
+
+__AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
+{
+	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
+	// queue_t *rq = RD(q);
+	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
+	__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q);
+}
 
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
 {

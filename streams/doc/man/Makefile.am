@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/30 10:41:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/09 07:22:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/30 10:41:59 $ by $Author: brian $
+# Last Modified $Date: 2004/05/09 07:22:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -564,6 +564,7 @@ man_MANS = \
 	man9/freemsg.9 \
 	man9/freeq.9 \
 	man9/freezestr.9 \
+	man9/freezestr_SUN.9 \
 	man9/getadmin.9 \
 	man9/getemajor.9 \
 	man9/geteminor.9 \
@@ -572,6 +573,7 @@ man_MANS = \
 	man9/getmid.9 \
 	man9/getminor.9 \
 	man9/getq.9 \
+	man9/get_sleep_lock.9 \
 	man9/identify.9 \
 	man9/_info.9 \
 	man9/_init.9 \
@@ -596,356 +598,6 @@ man_MANS = \
 	man9/lis_date.9 \
 	man9/lis_esbbcall.9 \
 	man9/lis_find_strdev.9 \
-	man9lis/lis_add_timer.9lis \
-	man9lis/lis_adjmsg.9lis \
-	man9lis/lis_alloc_atomic_fcn.9lis \
-	man9lis/lis_allocb.9lis \
-	man9lis/lis_allocb_physreq.9lis \
-	man9lis/lis_alloc_dma_fcn.9lis \
-	man9lis/lis_alloc_kernel_fcn.9lis \
-	man9lis/lis_allocq.9lis \
-	man9lis/lis_appq.9lis \
-	man9lis/lis_apush_get.9lis \
-	man9lis/lis_apushm.9lis \
-	man9lis/lis_apush_set.9lis \
-	man9lis/lis_assert_fail.9lis \
-	man9lis/lis_atomic_add.9lis \
-	man9lis/lis_atomic_dec.9lis \
-	man9lis/lis_atomic_dec_and_test.9lis \
-	man9lis/lis_atomic_inc.9lis \
-	man9lis/lis_atomic_read.9lis \
-	man9lis/lis_atomic_set.9lis \
-	man9lis/lis_atomic_sub.9lis \
-	man9lis/lis_backq.9lis \
-	man9lis/lis_backq_fcn.9lis \
-	man9lis/lis_bcanput.9lis \
-	man9lis/lis_bcanputnext.9lis \
-	man9lis/lis_bcanputnext_anyband.9lis \
-	man9lis/lis_bcopy.9lis \
-	man9lis/lis_bprintf.9lis \
-	man9lis/lis_bufcall.9lis \
-	man9lis/lis_bzero.9lis \
-	man9lis/lis_canenable.9lis \
-	man9lis/lis_canput.9lis \
-	man9lis/lis_canputnext.9lis \
-	man9lis/lis_can_unload.9lis \
-	man9lis/lis_check_guard.9lis \
-	man9lis/lis_check_mem.9lis \
-	man9lis/lis_check_q_magic.9lis \
-	man9lis/lis_check_region.9lis \
-	man9lis/lis_check_umem.9lis \
-	man9lis/lis_clone_major.9lis \
-	man9lis/lis_cmn_err.9lis \
-	man9lis/lis_copyb.9lis \
-	man9lis/lis_copyin.9lis \
-	man9lis/lis_copymsg.9lis \
-	man9lis/lis_copyout.9lis \
-	man9lis/lis_datamsg.9lis \
-	man9lis/lis_date.9lis \
-	man9lis/lis_debug_mask2.9lis \
-	man9lis/lis_debug_mask.9lis \
-	man9lis/lis_dec_mod_cnt_fcn.9lis \
-	man9lis/lis_del_timer.9lis \
-	man9lis/lis_disable_irq.9lis \
-	man9lis/lis_dobufcall.9lis \
-	man9lis/lis_doclose.9lis \
-	man9lis/lis_down_fcn.9lis \
-	man9lis/lis_dsecs.9lis \
-	man9lis/lis_dupb.9lis \
-	man9lis/lis_dupmsg.9lis \
-	man9lis/lis_enable_intr.9lis \
-	man9lis/lis_enable_irq.9lis \
-	man9lis/lis_enableok.9lis \
-	man9lis/lis_esballoc.9lis \
-	man9lis/lis_esbbcall.9lis \
-	man9lis/lis_fattach.9lis \
-	man9lis/lis_fdetach.9lis \
-	man9lis/lis_fdetach_all.9lis \
-	man9lis/lis_fdetach_stream.9lis \
-	man9lis/lis_fifo_close_sync.9lis \
-	man9lis/lis_fifo_open_sync.9lis \
-	man9lis/lis_fifo_write_sync.9lis \
-	man9lis/lis_file_inode.9lis \
-	man9lis/lis_file_str.9lis \
-	man9lis/lis_find_strdev.9lis \
-	man9lis/lis_flushband.9lis \
-	man9lis/lis_flush_print_buffer.9lis \
-	man9lis/lis_flushq.9lis \
-	man9lis/lis_fmod_sw.9lis \
-	man9lis/lis_free.9lis \
-	man9lis/lis_freeb.9lis \
-	man9lis/lis_freedb.9lis \
-	man9lis/lis_free_dma.9lis \
-	man9lis/lis_free_irq.9lis \
-	man9lis/lis_free_mem_fcn.9lis \
-	man9lis/lis_freemsg.9lis \
-	man9lis/lis_free_pages_fcn.9lis \
-	man9lis/lis_free_passfp.9lis \
-	man9lis/lis_freeq.9lis \
-	man9lis/lis_fstr_sw.9lis \
-	man9lis/lis_get_fifo.9lis \
-	man9lis/lis_get_free_pages_atomic_fcn.9lis \
-	man9lis/lis_get_free_pages_fcn.9lis \
-	man9lis/lis_get_free_pages_kernel_fcn.9lis \
-	man9lis/lis_getint.9lis \
-	man9lis/lis_get_passfp.9lis \
-	man9lis/lis_get_pipe.9lis \
-	man9lis/lis_getq.9lis \
-	man9lis/lis_gettimeofday.9lis \
-	man9lis/lis_hitime.9lis \
-	man9lis/lis_inc_mod_cnt_fcn.9lis \
-	man9lis/lis_init_bufcall.9lis \
-	man9lis/lis_insq.9lis \
-	man9lis/lis_in_syscall.9lis \
-	man9lis/lis_interruptible_sleep_on.9lis \
-	man9lis/lis_ioc_fattach.9lis \
-	man9lis/lis_ioc_fdetach.9lis \
-	man9lis/lis_ioc_pipe.9lis \
-	man9lis/lis_ioremap.9lis \
-	man9lis/lis_ioremap_nocache.9lis \
-	man9lis/lis_iounmap.9lis \
-	man9lis/lis_isdatablk.9lis \
-	man9lis/lis_isdatamsg.9lis \
-	man9lis/lis_jiffies.9lis \
-	man9lis/lis_kernel_down.9lis \
-	man9lis/lis_kernel_up.9lis \
-	man9lis/lis_kernel_version.9lis \
-	man9lis/lis__kfree.9lis \
-	man9lis/lis_kfree.9lis \
-	man9lis/lis_kill_pg.9lis \
-	man9lis/lis_kill_proc.9lis \
-	man9lis/lis__kmalloc.9lis \
-	man9lis/lis_kmalloc.9lis \
-	man9lis/lis_linkb.9lis \
-	man9lis/lis_loadable_load.9lis \
-	man9lis/lis_maj_min_name.9lis \
-	man9lis/lis_major.9lis \
-	man9lis/lis_malloc.9lis \
-	man9lis/lis_mark_mem.9lis \
-	man9lis/lis_max_mem.9lis \
-	man9lis/lis_milli_to_ticks.9lis \
-	man9lis/lis_mknod.9lis \
-	man9lis/lis_mount.9lis \
-	man9lis/lis_msecs.9lis \
-	man9lis/lis_msgdsize.9lis \
-	man9lis/lis_msgpullup.9lis \
-	man9lis/lis_msgsize.9lis \
-	man9lis/lis_msg_type_name.9lis \
-	man9lis/lis_msgutil.9lis \
-	man9lis/lis_noenable.9lis \
-	man9lis/lis_num_cpus.9lis \
-	man9lis/lis_old_inode.9lis \
-	man9lis/lis_open_cnt.9lis \
-	man9lis/lis_osif_cli.9lis \
-	man9lis/lis_osif_do_gettimeofday.9lis \
-	man9lis/lis_osif_do_settimeofday.9lis \
-	man9lis/lis_osif_pci_alloc_consistent.9lis \
-	man9lis/lis_osif_pci_dac_dma_supported.9lis \
-	man9lis/lis_osif_pci_dac_dma_sync_single.9lis \
-	man9lis/lis_osif_pci_dac_dma_to_offset.9lis \
-	man9lis/lis_osif_pci_dac_dma_to_page.9lis \
-	man9lis/lis_osif_pci_dac_page_to_dma.9lis \
-	man9lis/lis_osif_pci_dac_set_dma_mask.9lis \
-	man9lis/lis_osif_pci_disable_device.9lis \
-	man9lis/lis_osif_pci_dma_supported.9lis \
-	man9lis/lis_osif_pci_dma_sync_sg.9lis \
-	man9lis/lis_osif_pci_dma_sync_single.9lis \
-	man9lis/lis_osif_pci_enable_device.9lis \
-	man9lis/lis_osif_pci_find_class.9lis \
-	man9lis/lis_osif_pci_find_device.9lis \
-	man9lis/lis_osif_pci_find_slot.9lis \
-	man9lis/lis_osif_pci_free_consistent.9lis \
-	man9lis/lis_osif_pci_map_page.9lis \
-	man9lis/lis_osif_pci_map_sg.9lis \
-	man9lis/lis_osif_pci_map_single.9lis \
-	man9lis/lis_osif_pci_module_init.9lis \
-	man9lis/lis_osif_pci_read_config_byte.9lis \
-	man9lis/lis_osif_pci_read_config_dword.9lis \
-	man9lis/lis_osif_pci_read_config_word.9lis \
-	man9lis/lis_osif_pci_set_dma_mask.9lis \
-	man9lis/lis_osif_pci_set_master.9lis \
-	man9lis/lis_osif_pci_unmap_page.9lis \
-	man9lis/lis_osif_pci_unmap_sg.9lis \
-	man9lis/lis_osif_pci_unmap_single.9lis \
-	man9lis/lis_osif_pci_unregister_driver.9lis \
-	man9lis/lis_osif_pci_write_config_byte.9lis \
-	man9lis/lis_osif_pci_write_config_dword.9lis \
-	man9lis/lis_osif_pci_write_config_word.9lis \
-	man9lis/lis_osif_sg_dma_address.9lis \
-	man9lis/lis_osif_sg_dma_len.9lis \
-	man9lis/lis_osif_sti.9lis \
-	man9lis/lis_OTHER.9lis \
-	man9lis/lis_OTHERQ.9lis \
-	man9lis/lis_own_spl.9lis \
-	man9lis/lis_pcibios_find_class.9lis \
-	man9lis/lis_pcibios_find_device.9lis \
-	man9lis/lis_pcibios_init.9lis \
-	man9lis/lis_pcibios_present.9lis \
-	man9lis/lis_pcibios_read_config_byte.9lis \
-	man9lis/lis_pcibios_read_config_dword.9lis \
-	man9lis/lis_pcibios_read_config_word.9lis \
-	man9lis/lis_pcibios_strerror.9lis \
-	man9lis/lis_pcibios_write_config_byte.9lis \
-	man9lis/lis_pcibios_write_config_dword.9lis \
-	man9lis/lis_pcibios_write_config_word.9lis \
-	man9lis/lis_pci_cleanup.9lis \
-	man9lis/lis_pci_disable_device.9lis \
-	man9lis/lis_pci_enable_device.9lis \
-	man9lis/lis_pci_find_class.9lis \
-	man9lis/lis_pci_find_device.9lis \
-	man9lis/lis_pci_find_slot.9lis \
-	man9lis/lis_pci_read_config_byte.9lis \
-	man9lis/lis_pci_read_config_dword.9lis \
-	man9lis/lis_pci_read_config_word.9lis \
-	man9lis/lis_pci_set_master.9lis \
-	man9lis/lis_pci_write_config_byte.9lis \
-	man9lis/lis_pci_write_config_dword.9lis \
-	man9lis/lis_pci_write_config_word.9lis \
-	man9lis/lis_phys_to_virt.9lis \
-	man9lis/lis_pipe.9lis \
-	man9lis/lis_poll_2_1.9lis \
-	man9lis/lis_poll_bits.9lis \
-	man9lis/lis_poll_events.9lis \
-	man9lis/lis_poll_file.9lis \
-	man9lis/lis_print_block.9lis \
-	man9lis/lis_print_data.9lis \
-	man9lis/lis_printk.9lis \
-	man9lis/lis_print_mem.9lis \
-	man9lis/lis_print_msg.9lis \
-	man9lis/lis_print_queue.9lis \
-	man9lis/lis_print_queues.9lis \
-	man9lis/lis_print_spl_track.9lis \
-	man9lis/lis_print_stream.9lis \
-	man9lis/lis_pullupmsg.9lis \
-	man9lis/lis_putbq.9lis \
-	man9lis/lis_putbyte.9lis \
-	man9lis/lis_putctl1.9lis \
-	man9lis/lis_putctl.9lis \
-	man9lis/lis_putnext.9lis \
-	man9lis/lis_putnextctl1.9lis \
-	man9lis/lis_putnextctl.9lis \
-	man9lis/lis_putq.9lis \
-	man9lis/lis_qattach.9lis \
-	man9lis/lis_qclose.9lis \
-	man9lis/lis_qcountstrm.9lis \
-	man9lis/lis_qdetach.9lis \
-	man9lis/lis_qenable.9lis \
-	man9lis/lis_qprocsoff.9lis \
-	man9lis/lis_qprocson.9lis \
-	man9lis/lis_qreply.9lis \
-	man9lis/lis_qsize.9lis \
-	man9lis/lis_queue_name.9lis \
-	man9lis/lis_queuerun_cnts.9lis \
-	man9lis/lis_queues_running.9lis \
-	man9lis/lis_RD.9lis \
-	man9lis/lis_recvfd.9lis \
-	man9lis/lis_register_strdev.9lis \
-	man9lis/lis_register_strmod.9lis \
-	man9lis/lis_release_region.9lis \
-	man9lis/lis_request_dma.9lis \
-	man9lis/lis_request_irq.9lis \
-	man9lis/lis_request_region.9lis \
-	man9lis/lis_rmvb.9lis \
-	man9lis/lis_rmvq.9lis \
-	man9lis/lis_runq_cnts.9lis \
-	man9lis/lis_runq_req_cnt.9lis \
-	man9lis/lis_rw_lock_alloc_fcn.9lis \
-	man9lis/lis_rw_lock_free_fcn.9lis \
-	man9lis/lis_rw_lock_init_fcn.9lis \
-	man9lis/lis_rw_read_lock_fcn.9lis \
-	man9lis/lis_rw_read_lock_irq_fcn.9lis \
-	man9lis/lis_rw_read_lock_irqsave_fcn.9lis \
-	man9lis/lis_rw_read_unlock_fcn.9lis \
-	man9lis/lis_rw_read_unlock_irq_fcn.9lis \
-	man9lis/lis_rw_read_unlock_irqrestore_fcn.9lis \
-	man9lis/lis_rw_write_lock_fcn.9lis \
-	man9lis/lis_rw_write_lock_irq_fcn.9lis \
-	man9lis/lis_rw_write_lock_irqsave_fcn.9lis \
-	man9lis/lis_rw_write_unlock_fcn.9lis \
-	man9lis/lis_rw_write_unlock_irq_fcn.9lis \
-	man9lis/lis_rw_write_unlock_irqrestore_fcn.9lis \
-	man9lis/lis_safe_canenable.9lis \
-	man9lis/lis_safe_enableok.9lis \
-	man9lis/lis_safe_noenable.9lis \
-	man9lis/lis_safe_OTHERQ.9lis \
-	man9lis/lis_safe_putmsg.9lis \
-	man9lis/lis_safe_putnext.9lis \
-	man9lis/lis_safe_qreply.9lis \
-	man9lis/lis_safe_RD.9lis \
-	man9lis/lis_safe_SAMESTR.9lis \
-	man9lis/lis_safe_WR.9lis \
-	man9lis/lis_SAMESTR.9lis \
-	man9lis/lis_secs.9lis \
-	man9lis/lis_sem_alloc.9lis \
-	man9lis/lis_sem_destroy.9lis \
-	man9lis/lis_sem_init.9lis \
-	man9lis/lis_sendfd.9lis \
-	man9lis/lis_set_file_str.9lis \
-	man9lis/lis_setq.9lis \
-	man9lis/lis_setqsched.9lis \
-	man9lis/lis_setqsched_cnts.9lis \
-	man9lis/lis_setqsched_isr_cnts.9lis \
-	man9lis/lis_sleep_on.9lis \
-	man9lis/lis_spin_is_locked_fcn.9lis \
-	man9lis/lis_spin_lock_alloc_fcn.9lis \
-	man9lis/lis_spin_lock_fcn.9lis \
-	man9lis/lis_spin_lock_free_fcn.9lis \
-	man9lis/lis_spin_lock_init_fcn.9lis \
-	man9lis/lis_spin_lock_irq_fcn.9lis \
-	man9lis/lis_spin_lock_irqsave_fcn.9lis \
-	man9lis/lis_spin_trylock_fcn.9lis \
-	man9lis/lis_spin_unlock_fcn.9lis \
-	man9lis/lis_spin_unlock_irq_fcn.9lis \
-	man9lis/lis_spin_unlock_irqrestore_fcn.9lis \
-	man9lis/lis_spl0_fcn.9lis \
-	man9lis/lis_splstr_fcn.9lis \
-	man9lis/lis_splx_fcn.9lis \
-	man9lis/lis_sprintf.9lis \
-	man9lis/lis_stdata_cnt.9lis \
-	man9lis/lis_strclose.9lis \
-	man9lis/lis_strcount.9lis \
-	man9lis/lis_stream_utils.9lis \
-	man9lis/lis_strgetpmsg.9lis \
-	man9lis/lis_strioctl.9lis \
-	man9lis/lis_strm_name.9lis \
-	man9lis/lis_strm_name_from_queue.9lis \
-	man9lis/lis_stropen.9lis \
-	man9lis/lis_stropts_file.9lis \
-	man9lis/lis_strputpmsg.9lis \
-	man9lis/lis_strqget.9lis \
-	man9lis/lis_strqset.9lis \
-	man9lis/lis_strread.9lis \
-	man9lis/lis_strstats.9lis \
-	man9lis/lis_strwrite.9lis \
-	man9lis/lis_testb.9lis \
-	man9lis/lis_thread_start.9lis \
-	man9lis/lis_thread_stop.9lis \
-	man9lis/lis_timeout.9lis \
-	man9lis/lis_timeout_fcn.9lis \
-	man9lis/lis_udelay.9lis \
-	man9lis/lis_umount2.9lis \
-	man9lis/lis_umount.9lis \
-	man9lis/lis_unbufcall.9lis \
-	man9lis/lis_unlink.9lis \
-	man9lis/lis_unlinkb.9lis \
-	man9lis/lis_unregister_strdev.9lis \
-	man9lis/lis_unregister_strmod.9lis \
-	man9lis/lis_untimeout.9lis \
-	man9lis/lis_up_fcn.9lis \
-	man9lis/lis_usecs.9lis \
-	man9lis/lis_usectohz.9lis \
-	man9lis/lis_valid_mod_list.9lis \
-	man9lis/lis_version.9lis \
-	man9lis/lis_vfree.9lis \
-	man9lis/lis_virt_to_phys.9lis \
-	man9lis/lis_vmalloc.9lis \
-	man9lis/lis_vremap.9lis \
-	man9lis/lis_vsprintf.9lis \
-	man9lis/lis_wake_up.9lis \
-	man9lis/lis_wake_up_interruptible.9lis \
-	man9lis/lis_WR.9lis \
-	man9lis/lis_xmsgsize.9lis \
-	man9lis/lis_zmalloc.9lis \
 	man9/lis_mknod.9 \
 	man9/lis_mount.9 \
 	man9/lis_OTHER.9 \
@@ -972,6 +624,7 @@ man_MANS = \
 	man9/mi_next_ptr.9 \
 	man9/minor.9 \
 	man9/mi_open_comm.9 \
+	man9/mi_prev_ptr.9 \
 	man9/mknod.9 \
 	man9/mod_info.9 \
 	man9/mod_install.9 \
@@ -1107,6 +760,7 @@ man_MANS = \
 	man9/umount.9 \
 	man9/unbufcall.9 \
 	man9/unfreezestr.9 \
+	man9/unfreezestr_SUN.9 \
 	man9/unlink.9 \
 	man9/unlinkb.9 \
 	man9/UNLOCK.9 \
@@ -1635,6 +1289,7 @@ dist_noinst_MANS = \
 	man9/freemsg.9.man \
 	man9/freeq.9.man \
 	man9/freezestr.9.man \
+	man9/freezestr_SUN.9.man \
 	man9/getadmin.9.man \
 	man9/getemajor.9.man \
 	man9/geteminor.9.man \
@@ -1643,6 +1298,7 @@ dist_noinst_MANS = \
 	man9/getmid.9.man \
 	man9/getminor.9.man \
 	man9/getq.9.man \
+	man9/get_sleep_lock.9.man \
 	man9/identify.9.man \
 	man9/_info.9.man \
 	man9/_init.9.man \
@@ -1667,356 +1323,6 @@ dist_noinst_MANS = \
 	man9/lis_date.9.man \
 	man9/lis_esbbcall.9.man \
 	man9/lis_find_strdev.9.man \
-	man9lis/lis_add_timer.9lis.man \
-	man9lis/lis_adjmsg.9lis.man \
-	man9lis/lis_alloc_atomic_fcn.9lis.man \
-	man9lis/lis_allocb.9lis.man \
-	man9lis/lis_allocb_physreq.9lis.man \
-	man9lis/lis_alloc_dma_fcn.9lis.man \
-	man9lis/lis_alloc_kernel_fcn.9lis.man \
-	man9lis/lis_allocq.9lis.man \
-	man9lis/lis_appq.9lis.man \
-	man9lis/lis_apush_get.9lis.man \
-	man9lis/lis_apushm.9lis.man \
-	man9lis/lis_apush_set.9lis.man \
-	man9lis/lis_assert_fail.9lis.man \
-	man9lis/lis_atomic_add.9lis.man \
-	man9lis/lis_atomic_dec.9lis.man \
-	man9lis/lis_atomic_dec_and_test.9lis.man \
-	man9lis/lis_atomic_inc.9lis.man \
-	man9lis/lis_atomic_read.9lis.man \
-	man9lis/lis_atomic_set.9lis.man \
-	man9lis/lis_atomic_sub.9lis.man \
-	man9lis/lis_backq.9lis.man \
-	man9lis/lis_backq_fcn.9lis.man \
-	man9lis/lis_bcanput.9lis.man \
-	man9lis/lis_bcanputnext.9lis.man \
-	man9lis/lis_bcanputnext_anyband.9lis.man \
-	man9lis/lis_bcopy.9lis.man \
-	man9lis/lis_bprintf.9lis.man \
-	man9lis/lis_bufcall.9lis.man \
-	man9lis/lis_bzero.9lis.man \
-	man9lis/lis_canenable.9lis.man \
-	man9lis/lis_canput.9lis.man \
-	man9lis/lis_canputnext.9lis.man \
-	man9lis/lis_can_unload.9lis.man \
-	man9lis/lis_check_guard.9lis.man \
-	man9lis/lis_check_mem.9lis.man \
-	man9lis/lis_check_q_magic.9lis.man \
-	man9lis/lis_check_region.9lis.man \
-	man9lis/lis_check_umem.9lis.man \
-	man9lis/lis_clone_major.9lis.man \
-	man9lis/lis_cmn_err.9lis.man \
-	man9lis/lis_copyb.9lis.man \
-	man9lis/lis_copyin.9lis.man \
-	man9lis/lis_copymsg.9lis.man \
-	man9lis/lis_copyout.9lis.man \
-	man9lis/lis_datamsg.9lis.man \
-	man9lis/lis_date.9lis.man \
-	man9lis/lis_debug_mask2.9lis.man \
-	man9lis/lis_debug_mask.9lis.man \
-	man9lis/lis_dec_mod_cnt_fcn.9lis.man \
-	man9lis/lis_del_timer.9lis.man \
-	man9lis/lis_disable_irq.9lis.man \
-	man9lis/lis_dobufcall.9lis.man \
-	man9lis/lis_doclose.9lis.man \
-	man9lis/lis_down_fcn.9lis.man \
-	man9lis/lis_dsecs.9lis.man \
-	man9lis/lis_dupb.9lis.man \
-	man9lis/lis_dupmsg.9lis.man \
-	man9lis/lis_enable_intr.9lis.man \
-	man9lis/lis_enable_irq.9lis.man \
-	man9lis/lis_enableok.9lis.man \
-	man9lis/lis_esballoc.9lis.man \
-	man9lis/lis_esbbcall.9lis.man \
-	man9lis/lis_fattach.9lis.man \
-	man9lis/lis_fdetach.9lis.man \
-	man9lis/lis_fdetach_all.9lis.man \
-	man9lis/lis_fdetach_stream.9lis.man \
-	man9lis/lis_fifo_close_sync.9lis.man \
-	man9lis/lis_fifo_open_sync.9lis.man \
-	man9lis/lis_fifo_write_sync.9lis.man \
-	man9lis/lis_file_inode.9lis.man \
-	man9lis/lis_file_str.9lis.man \
-	man9lis/lis_find_strdev.9lis.man \
-	man9lis/lis_flushband.9lis.man \
-	man9lis/lis_flush_print_buffer.9lis.man \
-	man9lis/lis_flushq.9lis.man \
-	man9lis/lis_fmod_sw.9lis.man \
-	man9lis/lis_free.9lis.man \
-	man9lis/lis_freeb.9lis.man \
-	man9lis/lis_freedb.9lis.man \
-	man9lis/lis_free_dma.9lis.man \
-	man9lis/lis_free_irq.9lis.man \
-	man9lis/lis_free_mem_fcn.9lis.man \
-	man9lis/lis_freemsg.9lis.man \
-	man9lis/lis_free_pages_fcn.9lis.man \
-	man9lis/lis_free_passfp.9lis.man \
-	man9lis/lis_freeq.9lis.man \
-	man9lis/lis_fstr_sw.9lis.man \
-	man9lis/lis_get_fifo.9lis.man \
-	man9lis/lis_get_free_pages_atomic_fcn.9lis.man \
-	man9lis/lis_get_free_pages_fcn.9lis.man \
-	man9lis/lis_get_free_pages_kernel_fcn.9lis.man \
-	man9lis/lis_getint.9lis.man \
-	man9lis/lis_get_passfp.9lis.man \
-	man9lis/lis_get_pipe.9lis.man \
-	man9lis/lis_getq.9lis.man \
-	man9lis/lis_gettimeofday.9lis.man \
-	man9lis/lis_hitime.9lis.man \
-	man9lis/lis_inc_mod_cnt_fcn.9lis.man \
-	man9lis/lis_init_bufcall.9lis.man \
-	man9lis/lis_insq.9lis.man \
-	man9lis/lis_in_syscall.9lis.man \
-	man9lis/lis_interruptible_sleep_on.9lis.man \
-	man9lis/lis_ioc_fattach.9lis.man \
-	man9lis/lis_ioc_fdetach.9lis.man \
-	man9lis/lis_ioc_pipe.9lis.man \
-	man9lis/lis_ioremap.9lis.man \
-	man9lis/lis_ioremap_nocache.9lis.man \
-	man9lis/lis_iounmap.9lis.man \
-	man9lis/lis_isdatablk.9lis.man \
-	man9lis/lis_isdatamsg.9lis.man \
-	man9lis/lis_jiffies.9lis.man \
-	man9lis/lis_kernel_down.9lis.man \
-	man9lis/lis_kernel_up.9lis.man \
-	man9lis/lis_kernel_version.9lis.man \
-	man9lis/lis__kfree.9lis.man \
-	man9lis/lis_kfree.9lis.man \
-	man9lis/lis_kill_pg.9lis.man \
-	man9lis/lis_kill_proc.9lis.man \
-	man9lis/lis__kmalloc.9lis.man \
-	man9lis/lis_kmalloc.9lis.man \
-	man9lis/lis_linkb.9lis.man \
-	man9lis/lis_loadable_load.9lis.man \
-	man9lis/lis_maj_min_name.9lis.man \
-	man9lis/lis_major.9lis.man \
-	man9lis/lis_malloc.9lis.man \
-	man9lis/lis_mark_mem.9lis.man \
-	man9lis/lis_max_mem.9lis.man \
-	man9lis/lis_milli_to_ticks.9lis.man \
-	man9lis/lis_mknod.9lis.man \
-	man9lis/lis_mount.9lis.man \
-	man9lis/lis_msecs.9lis.man \
-	man9lis/lis_msgdsize.9lis.man \
-	man9lis/lis_msgpullup.9lis.man \
-	man9lis/lis_msgsize.9lis.man \
-	man9lis/lis_msg_type_name.9lis.man \
-	man9lis/lis_msgutil.9lis.man \
-	man9lis/lis_noenable.9lis.man \
-	man9lis/lis_num_cpus.9lis.man \
-	man9lis/lis_old_inode.9lis.man \
-	man9lis/lis_open_cnt.9lis.man \
-	man9lis/lis_osif_cli.9lis.man \
-	man9lis/lis_osif_do_gettimeofday.9lis.man \
-	man9lis/lis_osif_do_settimeofday.9lis.man \
-	man9lis/lis_osif_pci_alloc_consistent.9lis.man \
-	man9lis/lis_osif_pci_dac_dma_supported.9lis.man \
-	man9lis/lis_osif_pci_dac_dma_sync_single.9lis.man \
-	man9lis/lis_osif_pci_dac_dma_to_offset.9lis.man \
-	man9lis/lis_osif_pci_dac_dma_to_page.9lis.man \
-	man9lis/lis_osif_pci_dac_page_to_dma.9lis.man \
-	man9lis/lis_osif_pci_dac_set_dma_mask.9lis.man \
-	man9lis/lis_osif_pci_disable_device.9lis.man \
-	man9lis/lis_osif_pci_dma_supported.9lis.man \
-	man9lis/lis_osif_pci_dma_sync_sg.9lis.man \
-	man9lis/lis_osif_pci_dma_sync_single.9lis.man \
-	man9lis/lis_osif_pci_enable_device.9lis.man \
-	man9lis/lis_osif_pci_find_class.9lis.man \
-	man9lis/lis_osif_pci_find_device.9lis.man \
-	man9lis/lis_osif_pci_find_slot.9lis.man \
-	man9lis/lis_osif_pci_free_consistent.9lis.man \
-	man9lis/lis_osif_pci_map_page.9lis.man \
-	man9lis/lis_osif_pci_map_sg.9lis.man \
-	man9lis/lis_osif_pci_map_single.9lis.man \
-	man9lis/lis_osif_pci_module_init.9lis.man \
-	man9lis/lis_osif_pci_read_config_byte.9lis.man \
-	man9lis/lis_osif_pci_read_config_dword.9lis.man \
-	man9lis/lis_osif_pci_read_config_word.9lis.man \
-	man9lis/lis_osif_pci_set_dma_mask.9lis.man \
-	man9lis/lis_osif_pci_set_master.9lis.man \
-	man9lis/lis_osif_pci_unmap_page.9lis.man \
-	man9lis/lis_osif_pci_unmap_sg.9lis.man \
-	man9lis/lis_osif_pci_unmap_single.9lis.man \
-	man9lis/lis_osif_pci_unregister_driver.9lis.man \
-	man9lis/lis_osif_pci_write_config_byte.9lis.man \
-	man9lis/lis_osif_pci_write_config_dword.9lis.man \
-	man9lis/lis_osif_pci_write_config_word.9lis.man \
-	man9lis/lis_osif_sg_dma_address.9lis.man \
-	man9lis/lis_osif_sg_dma_len.9lis.man \
-	man9lis/lis_osif_sti.9lis.man \
-	man9lis/lis_OTHER.9lis.man \
-	man9lis/lis_OTHERQ.9lis.man \
-	man9lis/lis_own_spl.9lis.man \
-	man9lis/lis_pcibios_find_class.9lis.man \
-	man9lis/lis_pcibios_find_device.9lis.man \
-	man9lis/lis_pcibios_init.9lis.man \
-	man9lis/lis_pcibios_present.9lis.man \
-	man9lis/lis_pcibios_read_config_byte.9lis.man \
-	man9lis/lis_pcibios_read_config_dword.9lis.man \
-	man9lis/lis_pcibios_read_config_word.9lis.man \
-	man9lis/lis_pcibios_strerror.9lis.man \
-	man9lis/lis_pcibios_write_config_byte.9lis.man \
-	man9lis/lis_pcibios_write_config_dword.9lis.man \
-	man9lis/lis_pcibios_write_config_word.9lis.man \
-	man9lis/lis_pci_cleanup.9lis.man \
-	man9lis/lis_pci_disable_device.9lis.man \
-	man9lis/lis_pci_enable_device.9lis.man \
-	man9lis/lis_pci_find_class.9lis.man \
-	man9lis/lis_pci_find_device.9lis.man \
-	man9lis/lis_pci_find_slot.9lis.man \
-	man9lis/lis_pci_read_config_byte.9lis.man \
-	man9lis/lis_pci_read_config_dword.9lis.man \
-	man9lis/lis_pci_read_config_word.9lis.man \
-	man9lis/lis_pci_set_master.9lis.man \
-	man9lis/lis_pci_write_config_byte.9lis.man \
-	man9lis/lis_pci_write_config_dword.9lis.man \
-	man9lis/lis_pci_write_config_word.9lis.man \
-	man9lis/lis_phys_to_virt.9lis.man \
-	man9lis/lis_pipe.9lis.man \
-	man9lis/lis_poll_2_1.9lis.man \
-	man9lis/lis_poll_bits.9lis.man \
-	man9lis/lis_poll_events.9lis.man \
-	man9lis/lis_poll_file.9lis.man \
-	man9lis/lis_print_block.9lis.man \
-	man9lis/lis_print_data.9lis.man \
-	man9lis/lis_printk.9lis.man \
-	man9lis/lis_print_mem.9lis.man \
-	man9lis/lis_print_msg.9lis.man \
-	man9lis/lis_print_queue.9lis.man \
-	man9lis/lis_print_queues.9lis.man \
-	man9lis/lis_print_spl_track.9lis.man \
-	man9lis/lis_print_stream.9lis.man \
-	man9lis/lis_pullupmsg.9lis.man \
-	man9lis/lis_putbq.9lis.man \
-	man9lis/lis_putbyte.9lis.man \
-	man9lis/lis_putctl1.9lis.man \
-	man9lis/lis_putctl.9lis.man \
-	man9lis/lis_putnext.9lis.man \
-	man9lis/lis_putnextctl1.9lis.man \
-	man9lis/lis_putnextctl.9lis.man \
-	man9lis/lis_putq.9lis.man \
-	man9lis/lis_qattach.9lis.man \
-	man9lis/lis_qclose.9lis.man \
-	man9lis/lis_qcountstrm.9lis.man \
-	man9lis/lis_qdetach.9lis.man \
-	man9lis/lis_qenable.9lis.man \
-	man9lis/lis_qprocsoff.9lis.man \
-	man9lis/lis_qprocson.9lis.man \
-	man9lis/lis_qreply.9lis.man \
-	man9lis/lis_qsize.9lis.man \
-	man9lis/lis_queue_name.9lis.man \
-	man9lis/lis_queuerun_cnts.9lis.man \
-	man9lis/lis_queues_running.9lis.man \
-	man9lis/lis_RD.9lis.man \
-	man9lis/lis_recvfd.9lis.man \
-	man9lis/lis_register_strdev.9lis.man \
-	man9lis/lis_register_strmod.9lis.man \
-	man9lis/lis_release_region.9lis.man \
-	man9lis/lis_request_dma.9lis.man \
-	man9lis/lis_request_irq.9lis.man \
-	man9lis/lis_request_region.9lis.man \
-	man9lis/lis_rmvb.9lis.man \
-	man9lis/lis_rmvq.9lis.man \
-	man9lis/lis_runq_cnts.9lis.man \
-	man9lis/lis_runq_req_cnt.9lis.man \
-	man9lis/lis_rw_lock_alloc_fcn.9lis.man \
-	man9lis/lis_rw_lock_free_fcn.9lis.man \
-	man9lis/lis_rw_lock_init_fcn.9lis.man \
-	man9lis/lis_rw_read_lock_fcn.9lis.man \
-	man9lis/lis_rw_read_lock_irq_fcn.9lis.man \
-	man9lis/lis_rw_read_lock_irqsave_fcn.9lis.man \
-	man9lis/lis_rw_read_unlock_fcn.9lis.man \
-	man9lis/lis_rw_read_unlock_irq_fcn.9lis.man \
-	man9lis/lis_rw_read_unlock_irqrestore_fcn.9lis.man \
-	man9lis/lis_rw_write_lock_fcn.9lis.man \
-	man9lis/lis_rw_write_lock_irq_fcn.9lis.man \
-	man9lis/lis_rw_write_lock_irqsave_fcn.9lis.man \
-	man9lis/lis_rw_write_unlock_fcn.9lis.man \
-	man9lis/lis_rw_write_unlock_irq_fcn.9lis.man \
-	man9lis/lis_rw_write_unlock_irqrestore_fcn.9lis.man \
-	man9lis/lis_safe_canenable.9lis.man \
-	man9lis/lis_safe_enableok.9lis.man \
-	man9lis/lis_safe_noenable.9lis.man \
-	man9lis/lis_safe_OTHERQ.9lis.man \
-	man9lis/lis_safe_putmsg.9lis.man \
-	man9lis/lis_safe_putnext.9lis.man \
-	man9lis/lis_safe_qreply.9lis.man \
-	man9lis/lis_safe_RD.9lis.man \
-	man9lis/lis_safe_SAMESTR.9lis.man \
-	man9lis/lis_safe_WR.9lis.man \
-	man9lis/lis_SAMESTR.9lis.man \
-	man9lis/lis_secs.9lis.man \
-	man9lis/lis_sem_alloc.9lis.man \
-	man9lis/lis_sem_destroy.9lis.man \
-	man9lis/lis_sem_init.9lis.man \
-	man9lis/lis_sendfd.9lis.man \
-	man9lis/lis_set_file_str.9lis.man \
-	man9lis/lis_setq.9lis.man \
-	man9lis/lis_setqsched.9lis.man \
-	man9lis/lis_setqsched_cnts.9lis.man \
-	man9lis/lis_setqsched_isr_cnts.9lis.man \
-	man9lis/lis_sleep_on.9lis.man \
-	man9lis/lis_spin_is_locked_fcn.9lis.man \
-	man9lis/lis_spin_lock_alloc_fcn.9lis.man \
-	man9lis/lis_spin_lock_fcn.9lis.man \
-	man9lis/lis_spin_lock_free_fcn.9lis.man \
-	man9lis/lis_spin_lock_init_fcn.9lis.man \
-	man9lis/lis_spin_lock_irq_fcn.9lis.man \
-	man9lis/lis_spin_lock_irqsave_fcn.9lis.man \
-	man9lis/lis_spin_trylock_fcn.9lis.man \
-	man9lis/lis_spin_unlock_fcn.9lis.man \
-	man9lis/lis_spin_unlock_irq_fcn.9lis.man \
-	man9lis/lis_spin_unlock_irqrestore_fcn.9lis.man \
-	man9lis/lis_spl0_fcn.9lis.man \
-	man9lis/lis_splstr_fcn.9lis.man \
-	man9lis/lis_splx_fcn.9lis.man \
-	man9lis/lis_sprintf.9lis.man \
-	man9lis/lis_stdata_cnt.9lis.man \
-	man9lis/lis_strclose.9lis.man \
-	man9lis/lis_strcount.9lis.man \
-	man9lis/lis_stream_utils.9lis.man \
-	man9lis/lis_strgetpmsg.9lis.man \
-	man9lis/lis_strioctl.9lis.man \
-	man9lis/lis_strm_name.9lis.man \
-	man9lis/lis_strm_name_from_queue.9lis.man \
-	man9lis/lis_stropen.9lis.man \
-	man9lis/lis_stropts_file.9lis.man \
-	man9lis/lis_strputpmsg.9lis.man \
-	man9lis/lis_strqget.9lis.man \
-	man9lis/lis_strqset.9lis.man \
-	man9lis/lis_strread.9lis.man \
-	man9lis/lis_strstats.9lis.man \
-	man9lis/lis_strwrite.9lis.man \
-	man9lis/lis_testb.9lis.man \
-	man9lis/lis_thread_start.9lis.man \
-	man9lis/lis_thread_stop.9lis.man \
-	man9lis/lis_timeout.9lis.man \
-	man9lis/lis_timeout_fcn.9lis.man \
-	man9lis/lis_udelay.9lis.man \
-	man9lis/lis_umount2.9lis.man \
-	man9lis/lis_umount.9lis.man \
-	man9lis/lis_unbufcall.9lis.man \
-	man9lis/lis_unlink.9lis.man \
-	man9lis/lis_unlinkb.9lis.man \
-	man9lis/lis_unregister_strdev.9lis.man \
-	man9lis/lis_unregister_strmod.9lis.man \
-	man9lis/lis_untimeout.9lis.man \
-	man9lis/lis_up_fcn.9lis.man \
-	man9lis/lis_usecs.9lis.man \
-	man9lis/lis_usectohz.9lis.man \
-	man9lis/lis_valid_mod_list.9lis.man \
-	man9lis/lis_version.9lis.man \
-	man9lis/lis_vfree.9lis.man \
-	man9lis/lis_virt_to_phys.9lis.man \
-	man9lis/lis_vmalloc.9lis.man \
-	man9lis/lis_vremap.9lis.man \
-	man9lis/lis_vsprintf.9lis.man \
-	man9lis/lis_wake_up.9lis.man \
-	man9lis/lis_wake_up_interruptible.9lis.man \
-	man9lis/lis_WR.9lis.man \
-	man9lis/lis_xmsgsize.9lis.man \
-	man9lis/lis_zmalloc.9lis.man \
 	man9/lis_mknod.9.man \
 	man9/lis_mount.9.man \
 	man9/lis_OTHER.9.man \
@@ -2043,6 +1349,7 @@ dist_noinst_MANS = \
 	man9/mi_next_ptr.9.man \
 	man9/minor.9.man \
 	man9/mi_open_comm.9.man \
+	man9/mi_prev_ptr.9.man \
 	man9/mknod.9.man \
 	man9/mod_info.9.man \
 	man9/mod_install.9.man \
@@ -2178,6 +1485,7 @@ dist_noinst_MANS = \
 	man9/umount.9.man \
 	man9/unbufcall.9.man \
 	man9/unfreezestr.9.man \
+	man9/unfreezestr_SUN.9.man \
 	man9/unlink.9.man \
 	man9/unlinkb.9.man \
 	man9/UNLOCK.9.man \
@@ -2193,7 +1501,6 @@ dist_noinst_MANS = \
 	man9/weldq.9.man \
 	man9/WR.9.man \
 	man9/xmsgsize.9.man
-
 
 #
 #   Need to generate "cooked" man pages from the source man pages.  This is

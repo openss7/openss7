@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/09 07:22:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
+ Last Modified $Date: 2004/05/09 07:22:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/09 07:22:33 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/08 19:21:16 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/09 07:22:33 $";
 
 #define __NO_VERSION__
 
@@ -92,30 +92,8 @@ static char const ident[] =
 #include <sys/stream.h>
 #include <sys/strsubr.h>
 #include <sys/strconf.h>
-
-#if defined(CONFIG_STREAMS_COMPAT_SVR4)||defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
-#define _SVR4_SOURCE
-#endif
-#if defined(CONFIG_STREAMS_COMPAT_AIX)||defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-#define _AIX_SOURCE
-#endif
-#if defined(CONFIG_STREAMS_COMPAT_HPUX)||defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
-#define _HPUX_SOURCE
-#endif
-#if defined(CONFIG_STREAMS_COMPAT_OSF)||defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
-#define _OSF_SOURCE
-#endif
-#if defined(CONFIG_STREAMS_COMPAT_SUN)||defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-#define _SUN_SOURCE
-#endif
-#if defined(CONFIG_STREAMS_COMPAT_UW7)||defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-#define _UW7_SOURCE
-#endif
-#if defined(CONFIG_STREAMS_COMPAT_LIS)||defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
-#define _LIS_SOURCE
-#endif
-
 #include <sys/ddi.h>
+#include <sys/kmem.h>
 
 #include "sys/config.h"
 #include "strdebug.h"
@@ -1067,6 +1045,10 @@ static struct strevent *find_event(int event_id)
 	return (*sep);
 }
 
+#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \
+    !defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+STATIC INLINE
+#endif
 /*
  *  __bufcall:	- generate a buffer callback
  *  @q:		queue against which to synchronize callback
@@ -1079,7 +1061,7 @@ static struct strevent *find_event(int event_id)
  *  invoked the buffer call.  This means that the callback function will not execute until after the
  *  caller exits or hits a pre-emption point.
  */
-static inline bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
+bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
 			       long arg)
 {
 	bcid_t bcid = 0;
@@ -1095,6 +1077,10 @@ static inline bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*f
 	}
 	return (bcid);
 }
+#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_SYMBOL_GPL(__bufcall);
+#endif
 
 /**
  *  bufcall:	- schedule a buffer callout
@@ -1108,41 +1094,6 @@ bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
 	return __bufcall(NULL, size, priority, function, arg);
 }
 EXPORT_SYMBOL(bufcall);
-
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-/**
- *  qbufcall:	- schedule a buffer callout
- *  @q:		queue used for synchronization
- *  @size:	the number of bytes of data buffer needed
- *  @priority:	the priority of the buffer allocation (ignored)
- *  @function:	the callback function when bytes and headers are available
- *  @arg:	a client argument to pass to the callback function
- */
-bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg)
-{
-	// queue_t *rq = RD(q);
-	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
-}
-EXPORT_SYMBOL(qbufcall);
-#endif
-
-#if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-/**
- *  mi_bufcall:	- enable a queue when a buffer available
- *  @q:		queue used for synchronization
- *  @size:	the number of bytes of data buffer needed
- *  @priority:	the priority of the buffer allocation (ignored)
- */
-void mi_bufcall(queue_t *q, int size, int priority)
-{
-	// queue_t *rq = RD(q);
-	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q);
-	return;
-}
-EXPORT_SYMBOL(mi_bufcall);
-#endif
 
 /**
  *  esbbcall:	- schedule a buffer callout
@@ -1166,20 +1117,6 @@ void unbufcall(bcid_t bcid)
 }
 EXPORT_SYMBOL(unbufcall);
 
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-/**
- *  qunbufcall:	- cancel a buffer callout
- *  @q:		queue used for synchronization
- *  @bcid:	buffer call id returned by qbufcall()
- *  Notices:	Don't ever call this function with an expired bufcall id.
- */
-void qunbufcall(queue_t *q, bufcall_id_t bcid)
-{
-	unbufcall(bcid);
-}
-EXPORT_SYMBOL(qunbufcall);
-#endif
-
 static void timeout_function(unsigned long arg)
 {
 	struct strevent *se = (struct strevent *) arg;
@@ -1190,7 +1127,12 @@ static void timeout_function(unsigned long arg)
 	if (!test_and_set_bit(strtimout, &t->flags))
 		cpu_raise_softirq(se->x.t.cpu, STREAMS_SOFTIRQ);
 }
-static toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
+
+#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \
+    !defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+STATIC INLINE
+#endif
+toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
 			int cpu)
 {
 	toid_t toid = 0;
@@ -1210,6 +1152,10 @@ static toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long tick
 	}
 	return (toid);
 }
+#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_SYMBOL_GPL(__timeout);
+#endif
 
 /**
  *  timeout:	- issue a timeout callback
@@ -1224,27 +1170,6 @@ toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 EXPORT_SYMBOL(timeout);
-
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks)
-{
-	// queue_t *rq = RD(q);
-	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());
-}
-EXPORT_SYMBOL(qtimeout);
-#endif
-
-#if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t cpu)
-{
-	return __timeout(NULL, timo_fcn, arg, ticks, pl, cpu);
-}
-toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
-{
-	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
-}
-#endif
 
 /**
  *  untimeout:	- cancel a timeout callback
@@ -1266,14 +1191,6 @@ clock_t untimeout(toid_t toid)
 	return (rem);
 }
 EXPORT_SYMBOL(untimeout);
-
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-clock_t quntimeout(queue_t *q, timeout_id_t toid)
-{
-	return untimeout(toid);
-}
-EXPORT_SYMBOL(quntimeout);
-#endif
 
 /*
  *  __weldq:	- weld/unweld two queue pairs together/apart
@@ -1382,7 +1299,8 @@ int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 }
 EXPORT_SYMBOL(unweldq);
 
-#if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) || defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
+#if defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) || \
+    defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /*
  *  defer_func:	- defer a STREAMS procedure call
  *  @func:	function call to defer
@@ -1394,7 +1312,7 @@ EXPORT_SYMBOL(unweldq);
  *
  *  Deferrable functions that use defer_func() are streams_put() and qwriter().
  */
-static int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
+int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
 		      int perim, int type)
 {
 	struct strevent *se;
@@ -1412,58 +1330,7 @@ static int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, v
 	}
 	return (ENOMEM);
 }
-#endif
-
-#if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
-/**
- *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
- *  @func:  put function (often the put() function)
- *  @q:	    queue against which to defer the call
- *  @mp:    message block to pass to the callback function
- *  @priv:  private data to pass to the callback function (often @q)
- *
- *  streams_put() will defer the function @func until it can synchronize with @q.  Once the @q has
- *  been syncrhonized, the STREAMS scheduler will call the callback function @func with arguments
- *  @priv and @mp.  streams_put() is closely related to qwrite() below.
- *
- *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
- *  streams_put().  @func is guarateed not to run until the caller exits or preempts.
- *
- *  Usage: streams_put() is intended to be called from contexts outside of the STREAMS scheduler
- *  (e.g. interrupt service routines) where @func is intended to run under the STREAMS scheduler.
- *
- *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
- *  guaranteed to be executed within the STREAMS scheduler.
- */
-void streams_put(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *priv)
-{
-	if (defer_func(func, q, mp, priv, 0, SE_STRPUT) == 0)
-		return;
-	never();
-}
-#endif
-
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-/**
- *  qwriter:	- deferred call to a callback function.
- *  @qp:	a pointer to the RD() queue of a queue pair
- *  @mp:	message pointer to pass to writer function
- *  @func:	writer function
- *  @perimeter:	perimeter to enter
- *
- *  qwriter() will defer the function @func until it can enter @perimeter associated with queue pair
- *  @qp.  Once the @perimeter has been entered, the STREAMS executive will call the callback
- *  function @func with arguments @qp and @mp.  qwriter() is closely related to streams_put() above.
- *
- *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
- *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
- */
-void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter)
-{
-	if (defer_func((void (*)(void *, mblk_t *)) func, qp, mp, qp, perimeter, SE_WRITER) == 0)
-		return;
-	never();
-}
+EXPORT_SYMBOL_GPL(defer_func);
 #endif
 
 /* 

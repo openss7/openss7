@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: uw7ddi.h,v 0.9.2.6 2004/05/04 21:36:57 brian Exp $
+ @(#) $Id: uw7ddi.h,v 0.9.2.7 2004/05/09 07:22:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/04 21:36:57 $ by $Author: brian $
+ Last Modified $Date: 2004/05/09 07:22:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/04 21:36:57 $"
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/09 07:22:32 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -126,7 +126,16 @@ extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
 extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
 
 typedef int processorid_t;
-toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
+__UW7_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, processor);
+}
+__UW7_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
+}
 
 int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
 
