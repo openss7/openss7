@@ -1,674 +1,338 @@
-dnl =========================================================================
-dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
-dnl =========================================================================
-dnl
-dnl @(#) $Id: rpm.m4,v 0.9.2.31 2005/02/17 12:51:05 brian Exp $
-dnl
-dnl =========================================================================
-dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-dnl
-dnl All Rights Reserved.
-dnl
-dnl Permission is granted to make and distribute verbatim copies of this
-dnl README file provided the copyright notice and this permission notice are
-dnl preserved on all copies.
-dnl 
-dnl Permission is granted to copy and distribute modified versions of this
-dnl manual under the conditions for verbatim copying, provided that the
-dnl entire resulting derived work is distributed under the terms of a
-dnl permission notice identical to this one
-dnl 
-dnl Since the Linux kernel and libraries are constantly changing, this README
-dnl file may be incorrect or out-of-date.  The author(s) assume no
-dnl responsibility for errors or omissions, or for damages resulting from the
-dnl use of the information contained herein.  The author(s) may not have
-dnl taken the same level of care in the production of this manual, which is
-dnl licensed free of charge, as they might when working professionally.
-dnl 
-dnl Formatted or processed versions of this manual, if unaccompanied by the
-dnl source, must acknowledge the copyright and authors of this work.
-dnl 
-dnl =========================================================================
-dnl 
-dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-dnl behalf of the U.S. Government ("Government"), the following provisions
-dnl apply to you.  If the Software is supplied by the Department of Defense
-dnl ("DoD"), it is classified as "Commercial Computer Software" under
-dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
-dnl Regulations ("DFARS") (or any successor regulations) and the Government is
-dnl acquiring only the license rights granted herein (the license rights
-dnl customarily provided to non-Government users).  If the Software is
-dnl supplied to any unit or agency of the Government other than DoD, it is
-dnl classified as "Restricted Computer Software" and the Government's rights
-dnl in the Software are defined in paragraph 52.227-19 of the Federal
-dnl Acquisition Regulations ("FAR") (or any success regulations) or, in the
-dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-dnl (or any successor regulations).
-dnl 
-dnl =========================================================================
-dnl 
-dnl Commercial licensing and support of this software is available from
-dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-dnl 
-dnl =========================================================================
-dnl
-dnl Last Modified $Date: 2005/02/17 12:51:05 $ by $Author: brian $
-dnl 
-dnl =========================================================================
+# =============================================================================
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# =============================================================================
+# 
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/02/19 11:49:58 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+#
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Common things that need to be done in setting up an RPM spec file from an
 # RPM.spec.in file.  This also includes stuff for converting the LSM file.
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC], [dnl
     _RPM_SPEC_OPTIONS
     _RPM_SPEC_SETUP
     _RPM_SPEC_OUTPUT
 ])# _RPM_SPEC
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_OPTIONS
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
 ])# _RPM_SPEC_OPTIONS
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP], [dnl
     _RPM_SPEC_SETUP_DIST
-    _RPM_SPEC_SETUP_EPOCH
-    _RPM_SPEC_SETUP_RELEASE
-    _RPM_SPEC_SETUP_DATE
     _RPM_SPEC_SETUP_TOOLS
     _RPM_SPEC_SETUP_MODULES
     _RPM_SPEC_SETUP_TOPDIR
     _RPM_SPEC_SETUP_OPTIONS
     _RPM_SPEC_SETUP_BUILD
-    _RPM_SPEC_SETUP_SIGN
 ])# _RPM_SPEC_SETUP
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP_DIST
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
+    AC_REQUIRE([_DISTRO])
     AC_ARG_WITH([rpm-extra],
-        AS_HELP_STRING([--with-rpm-extra=EXTRA],
-            [override or disable the EXTRA release string for built RPMS. @<:@default=auto@:>@]),
-        [with_rpm_extra="$withval"],
-        [if test -r .rpmextra ; then d= ; else d="$srcdir/" ; fi
-         if test -r ${d}.rpmextra
-         then with_rpm_extra="`cat ${d}.rpmextra`"
-         else with_rpm_extra=""
-         fi])
-    AC_CACHE_CHECK([for rpm distribution], [rpm_cv_dist_flavor], [dnl
-        rpm_cv_dist_vendor=
-        rpm_cv_dist_flavor=
-        #
-        # NOTE:- for LSB compliant systems we should also be able to
-        #  find /etc/lsb-release and if we source that file we should
-        #  see:
-        #
-        #    LSB_VERSION=               # the version supported
-        #    DISTRIB_ID="SuSE"          # the distribution id
-        #    DISTRIB_RELEASE="8.0"      # the distribution release
-        #    DISTRIB_DESCRIPTION="SuSE Linux 8.0 (i386)"   # the distribution line
-        #
-        # first check for a release file
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/whitebox-release
-        then
-            rpm_cv_dist_vendor=whitebox
-            rpm_cv_dist_flavor="White Box Enterprise Linux"
-        fi
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/fedora-release
-        then
-            rpm_cv_dist_vendor=redhat
-            rpm_cv_dist_flavor="Fedora Core"
-        fi
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/mandrake-release
-        then
-            rpm_cv_dist_vendor=mandrake
-            rpm_cv_dist_flavor="Mandrake Linux"
-        fi
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/redhat-release
-        then
-            rpm_cv_dist_vendor=redhat
-            rpm_cv_dist_flavor="Red Hat Linux"
-        fi
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/SuSE-release
-        then
-            rpm_cv_dist_vendor=suse
-            rpm_cv_dist_flavor="SuSE Linux"
-        fi
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/debian_version
-        then
-            rpm_cv_dist_vendor=debian
-            rpm_cv_dist_flavor="Debian Linux"
-        fi
-        # look in /etc/lsb-release
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/lsb-release
-        then
-            . /etc/lsb-release
-            rpm_tmp="$DISTRIB_DESCRIPTION"
-            case "$rpm_tmp" in
-                *White?Box*)
-                    rpm_cv_dist_vendor=whitebox
-                    rpm_cv_dist_flavor="$DISTRIB_ID"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-                *Fedora?Core*)
-                    rpm_cv_dist_vendor=redhat
-                    rpm_cv_dist_flavor="$DISTRIB_ID"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-                *Mandrake*)
-                    rpm_cv_dist_vendor=mandrake
-                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-                *Red?Hat*)
-                    rpm_cv_dist_vendor=redhat
-                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-                *SuSE*)
-                    rpm_cv_dist_vendor=suse
-                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-                *Debian*)
-                    rpm_cv_dist_vendor=debian
-                    rpm_cv_dist_flavor="$DISTRIB_ID Linux"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-                *)
-                    rpm_cv_dist_vendor="${DISTRIB_DESCRIPTION:+unknown}"
-                    rpm_cv_dist_flavor="${DISTRIB_ID:-Unknown} Linux"
-                    rpm_cv_dist_release="$DISTRIB_RELEASE"
-                    ;;
-            esac
-        fi
-        # look in /etc/issue
-        if test -z "$rpm_cv_dist_vendor" -a -r /etc/issue
-        then
-            rpm_tmp=`cat /etc/issue | grep 'Linux\|Fedora' | head -1`
-            case "$rpm_tmp" in
-                *White?Box*)
-                    rpm_cv_dist_vendor=whitebox
-                    rpm_cv_dist_flavor="White Box Enterprise Linux"
-                    ;;
-                *Fedora?Core*)
-                    rpm_cv_dist_vendor=redhat
-                    rpm_cv_dist_flavor="Fedora Core"
-                    ;;
-                *Mandrake*)
-                    rpm_cv_dist_vendor=mandrake
-                    rpm_cv_dist_flavor="Mandrake Linux"
-                    ;;
-                *Red?Hat*)
-                    rpm_cv_dist_vendor=redhat
-                    rpm_cv_dist_flavor="Red Hat Linux"
-                    ;;
-                *SuSE*)
-                    rpm_cv_dist_vendor=suse
-                    rpm_cv_dist_flavor="SuSE Linux"
-                    ;;
-                *Debian*)
-                    rpm_cv_dist_vendor=debian
-                    rpm_cv_dist_flavor="Debian Linux"
-                    ;;
-            esac
-        fi
-        # fall back to checking the compiler
-        if test -z "$rpm_cv_dist_vendor"
-        then
-            rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
-            case "$rpm_tmp" in
-                *White?Box*)
-                    rpm_cv_dist_vendor=whitebox
-                    rpm_cv_dist_flavor="White Box Enterprise Linux"
-                    ;;
-                *Fedora?Core*)
-                    rpm_cv_dist_vendor=redhat
-                    rpm_cv_dist_flavor="Fedora Core"
-                    ;;
-                *Mandrake*)
-                    rpm_cv_dist_vendor=mandrake
-                    rpm_cv_dist_topdir='/usr/src/RPM'
-                    ;;
-                *Red?Hat*)
-                    rpm_cv_dist_vendor=redhat
-                    rpm_cv_dist_flavor="Red Hat Linux"
-                    ;;
-                *SuSE*)
-                    rpm_cv_dist_vendor=suse
-                    rpm_cv_dist_flavor="SuSE Linux"
-                    ;;
-                *Debian*)
-                    rpm_cv_dist_vendor=debian
-                    rpm_cv_dist_flavor="Debian Linux"
-                    ;;
-                *)
-                    rpm_cv_dist_vendor=unknown
-                    rpm_cv_dist_flavor="Unknown Linux"
-                    ;;
-            esac
-        fi
-    ])
-    AC_CACHE_CHECK([for rpm distribution release], [rpm_cv_dist_release], [dnl
-        rpm_cv_dist_release=
-        # first check for a release file
-        if test -z "$rpm_cv_dist_release" -a -r /etc/fedora-release
-        then
-            rpm_tmp=`cat /etc/fedora-release | grep 'Fedora Core'`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-        if test -z "$rpm_cv_dist_release" -a -r /etc/mandrake-release
-        then
-            rpm_tmp=`cat /etc/mandrake-release | grep 'Mandrake Linux'`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-        if test -z "$rpm_cv_dist_release" -a -r /etc/redhat-release
-        then
-            rpm_tmp=`cat /etc/redhat-release | grep 'Red Hat Linux'`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-        if test -z "$rpm_cv_dist_release" -a -r /etc/SuSE-release
-        then
-            rpm_tmp=`cat /etc/SuSE-release | grep 'SuSE Linux'`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-        if test -z "$rpm_cv_dist_release" -a -r /etc/debian_version
-        then
-            rpm_tmp=`cat /etc/debian_version`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-        # look in /etc/issue
-        if test -z "$rpm_cv_dist_release" -a -r /etc/issue
-        then
-            rpm_tmp=`cat /etc/issue | grep Linux`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-        if test -z "$rpm_cv_dist_release"
-        then
-            rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
-            rpm_tmp=`echo $rpm_tmp | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||'`
-            rpm_cv_dist_release=`echo "$rpm_tmp" | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'`
-        fi
-    ])
-    AC_CACHE_CHECK([for rpm extra release string], [rpm_cv_dist_extra], [dnl
-        case :${with_rpm_extra:-auto} in
-            :no)
-                rpm_cv_dist_extra=
-                ;;
-            :auto)
-                case "$rpm_cv_dist_flavor" in
-                    White?Box*)
-                        case $rpm_cv_dist_release in
-                            3.0)
-                                rpm_cv_dist_extra=".WB3"
-                                ;;
-                            4.0)
-                                rpm_cv_dist_extra=".WB4"
-                                ;;
-                        esac
-                        ;;
-                    Fedora?Core*)
-                        case $rpm_cv_dist_release in
-                            1)
-                                rpm_cv_dist_extra=".FC1"
-                                ;;
-                            2)
-                                rpm_cv_dist_extra=".FC2"
-                                ;;
-                            3)
-                                rpm_cv_dist_extra=".FC3"
-                                ;;
-                        esac
-                        ;;
-                    Red?Hat*)
-                        case $rpm_cv_dist_release in
-                            7.0|7.1|7.2|7.3)
-                                rpm_cv_dist_extra=".7.x"
-                                ;;
-                            8.0)
-                                rpm_cv_dist_extra=".8"
-                                ;;
-                            9)
-                                rpm_cv_dist_extra=".9"
-                                ;;
-                            2|2.?)
-                                rpm_cv_dist_extra=".EL"
-                                ;;
-                            3|3.0)
-                                rpm_cv_dist_extra=".E3"
-                                ;;
-                            4|4.0)
-                                rpm_cv_dist_extra=".E4"
-                                ;;
-                        esac
-                        ;;
-                    Mandrake*)
-                        rpm_tmp=`echo "$rpm_cv_dist_release" | sed -e 's|\.||g'`;
-                        rpm_cv_dist_extra=".${rpm_tmp}mdk"
-                        ;;
-                    SuSE*)
-                        rpm_cv_dist_extra=".${rpm_cv_dist_release:-SuSE}"
-                        ;;
-                    Debian*)
-                        rpm_cv_dist_extra=".deb${rpm_cv_dist_release}"
-                        ;;
-                esac
-                ;;
-            *)
-                rpm_cv_dist_extra="$with_rpm_extra"
-                ;;
-        esac
+	AS_HELP_STRING([--with-rpm-extra=EXTRA],
+	    [override or disable the EXTRA release string for built RPMS. @<:@default=auto@:>@]),
+	[with_rpm_extra="$withval"],
+	[if test -r .rpmextra ; then d= ; else d="$srcdir/" ; fi
+	 if test -r ${d}.rpmextra
+	 then with_rpm_extra="`cat ${d}.rpmextra`"
+	 else with_rpm_extra=""
+	 fi])
+    AC_CACHE_CHECK([for rpm distribution extra release string], [rpm_cv_dist_extra], [dnl
+	case :${with_rpm_extra:-auto} in
+	    :no)
+		rpm_cv_dist_extra=
+		;;
+	    :auto)
+		case "$dist_cv_target_flavor" in
+		    (whitebox)
+			case $dist_cv_target_release in
+			    (3.0)	rpm_cv_dist_extra=".WB3" ;;
+			    (4.0)	rpm_cv_dist_extra=".WB4" ;;
+			esac
+			;;
+		    (fedora)
+			case $dist_cv_target_release in
+			    (1)		rpm_cv_dist_extra=".FC1" ;;
+			    (2)		rpm_cv_dist_extra=".FC2" ;;
+			    (3)		rpm_cv_dist_extra=".FC3" ;;
+			esac
+			;;
+		    (redhat)
+			case $dist_cv_target_release in
+			    (7.[[0-3]])	rpm_cv_dist_extra=".7.x" ;;
+			    (8.0)	rpm_cv_dist_extra=".8" ;;
+			    (9)		rpm_cv_dist_extra=".9" ;;
+			    (2|2.?)	rpm_cv_dist_extra=".EL" ;;
+			    (3|3.0)	rpm_cv_dist_extra=".E3" ;;
+			    (4|4.0)	rpm_cv_dist_extra=".E4" ;;
+			esac
+			;;
+		    (mandrake)
+			rpm_tmp=`echo "$dist_cv_target_release" | sed -e 's|\.||g'`
+			rpm_cv_dist_extra=".${rpm_tmp}mdk"
+			;;
+		    (suse)
+			rpm_cv_dist_extra=".${dist_cv_target_release:-SuSE}"
+			;;
+		    (debian)
+			rpm_cv_dist_extra=".deb${dist_cv_target_release}"
+			;;
+		esac
+		;;
+	    *)
+		rpm_cv_dist_extra="$with_rpm_extra"
+		;;
+	esac
     ])
     AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
-        case "$rpm_cv_dist_flavor" in
-            *White?Box*)
-                rpm_cv_dist_topdir='/usr/src/redhat'
-                ;;
-            *Fedora?Core*)
-                rpm_cv_dist_topdir='/usr/src/redhat'
-                ;;
-            *Mandrake*)
-                rpm_cv_dist_topdir='/usr/src/RPM'
-                ;;
-            *Red?Hat*)
-                rpm_cv_dist_topdir='/usr/src/redhat'
-                ;;
-            *SuSE*)
-                rpm_cv_dist_topdir='/usr/src/SuSE'
-                ;;
-            *Debian*)
-                rpm_cv_dist_topdir='/usr/src/rpm'
-                ;;
-            *)
-                rpm_cv_dist_topdir="$ac_abs_top_buiddir"
-                ;;
-        esac
+	case "$dist_cv_target_flavor" in
+	    (whitebox)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
+	    (fedora)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
+	    (mandrake)	rpm_cv_dist_topdir='/usr/src/RPM'    ;;
+	    (redhat)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
+	    (suse)	rpm_cv_dist_topdir='/usr/src/SuSE'   ;;
+	    (debian)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
+	    (*)		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
+	esac
     ])
-    PACKAGE_RPMDIST="${rpm_cv_dist_flavor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
+    PACKAGE_RPMDIST="${dist_cv_target_distrib:-Unknown Linux} ${dist_cv_target_release:-Unknown}"
     AC_SUBST([PACKAGE_RPMDIST])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
-        defaults to automatic detection.])
+	defaults to automatic detection.])
     PACKAGE_RPMEXTRA="${rpm_cv_dist_extra}"
     AC_SUBST([PACKAGE_RPMEXTRA])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMEXTRA], ["$PACKAGE_RPMEXTRA"], [The RPM Extra Release string.
-        This defaults to automatic detection.])
+	This defaults to automatic detection.])
 ])# _RPM_SPEC_SETUP_DIST
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
-# _RPM_SPEC_SETUP_EPOCH
-# -------------------------------------------------------------------------
-AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
-    AC_MSG_CHECKING([for rpm epoch])
-    AC_ARG_WITH([rpm-epoch],
-        AS_HELP_STRING([--with-rpm-epoch=EPOCH],
-            [specify the EPOCH for the RPM spec file.  @<:@default=auto@:>@]),
-        [with_rpm_epoch="$withval"],
-        [if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
-         if test -r ${d}.rpmepoch
-         then with_rpm_epoch="`cat ${d}.rpmepoch`"
-         else with_rpm_epoch=1
-         fi])
-    AC_MSG_RESULT([${with_rpm_epoch:-1}])
-    PACKAGE_EPOCH="${with_rpm_epoch:-1}"
-    AC_SUBST([PACKAGE_EPOCH])dnl
-    AC_DEFINE_UNQUOTED([PACKAGE_EPOCH], [$PACKAGE_EPOCH], [The RPM Epoch. This
-        defaults to 1.])
-])# _RPM_SPEC_SETUP_EPOCH
-# =========================================================================
-
-# =========================================================================
-# _RPM_SPEC_SETUP_RELEASE
-# -------------------------------------------------------------------------
-AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
-    AC_MSG_CHECKING([for rpm release])
-    AC_ARG_WITH([rpm-release],
-        AS_HELP_STRING([--with-rpm-release=RELEASE],
-            [specify the RELEASE for the RPM spec file.  @<:@default=auto@:>@]),
-        [with_rpm_release="$withval"],
-        [if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
-         if test -r ${d}.rpmrelease
-         then with_rpm_release="`cat ${d}.rpmrelease`"
-         else with_rpm_release=1
-         fi])
-    AC_MSG_RESULT([${with_rpm_release:-1}])
-    PACKAGE_RELEASE="${with_rpm_release:-1}"
-    AC_SUBST([PACKAGE_RELEASE])dnl
-    AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
-        Release. This defaults to Custom.])
-])# _RPM_SPEC_SETUP_RELEASE
-# =========================================================================
-
-# =========================================================================
-# _RPM_SPEC_SETUP_DATE
-# -------------------------------------------------------------------------
-AC_DEFUN([_RPM_SPEC_SETUP_DATE], [dnl
-    PACKAGE_DATE=`date -I`
-    AC_SUBST([PACKAGE_DATE])dnl
-])# _RPM_SPEC_SETUP_DATE
-# =========================================================================
-
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP_TOOLS
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# The RPM spec file is set up for either building kernel dependent packages
+# or kernel independent packages.  This option specifies whether kernel
+# independent (user space) packages are to be built.  This option can also
+# be used for general kernel independent builds.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
     AC_MSG_CHECKING([for rpm build/install of user packages])
     AC_ARG_ENABLE([tools],
-        AS_HELP_STRING([--enable-tools],
-            [build and install user packages.  @<:@default=yes@:>@]),
-        [enable_tools="$enableval"],
-        [enable_tools='yes'])
+	AS_HELP_STRING([--enable-tools],
+	    [build and install user packages.  @<:@default=yes@:>@]),
+	[enable_tools="$enableval"],
+	[enable_tools='yes'])
     AC_MSG_RESULT([${enable_tools:-yes}])
     AM_CONDITIONAL([RPM_BUILD_USER], [test :"${enable_tools:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_TOOLS
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP_MODULES
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# The RPM spec file is set up for either building kernel dependent packages
+# or kernel independent packages.  This option specifies whether kernel
+# dependent (kernel module) packages are to be built.  This option can also
+# be used for general kernel dependent builds.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
     AC_MSG_CHECKING([for rpm build/install of kernel packages])
     AC_ARG_ENABLE([modules],
-        AS_HELP_STRING([--enable-modules],
-            [build and install kernel packages.  @<:@default=yes@:>@]),
-        [enable_modules="$enableval"],
-        [enable_modules='yes'])
+	AS_HELP_STRING([--enable-modules],
+	    [build and install kernel packages.  @<:@default=yes@:>@]),
+	[enable_modules="$enableval"],
+	[enable_modules='yes'])
     AC_MSG_RESULT([${enable_modules:-yes}])
     AM_CONDITIONAL([RPM_BUILD_KERNEL], [test :"${enable_modules:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_MODULES
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP_TOPDIR
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
-    rpm_tmp=`(cd . ; pwd)`
-    AC_ARG_WITH([topdir],
-        AS_HELP_STRING([--with-topdir=TOPDIR],
-            [specify the rpm top directory.  @<:@default=$rpm_tmp@:>@]),
-        [with_topdir="$withval"],
-        [with_topdir="$rpm_tmp"])
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
+    rpm_tmp='$(PACKAGE_DISTDIR)/rpms'
+    AC_ARG_WITH([rpm-topdir],
+	AS_HELP_STRING([--with-rpm-topdir=DIR],
+	    [specify the rpm top directory.  @<:@default=PKG-DISTDIR/rpms@:>@]),
+	[with_rpm_topdir="$withval"],
+	[with_rpm_topdir="$rpm_tmp"])
     AC_CACHE_CHECK([for rpm top build directory], [rpm_cv_topdir], [dnl
-        case :"$with_topdir" in
-            :no | :NO)
-                rpm_cv_topdir="$rpm_tmp"
-                ;;
-            :yes | :YES | :default | :DEFAULT)
-                rpm_cv_topdir="$rpm_cv_dist_topdir"
-                ;;
-            *)
-                rpm_cv_topdir="$with_topdir"
-                ;;
-        esac
+	case :"${with_rpm_topdir:-default}" in
+	    :no | :NO)
+		rpm_cv_topdir="$rpm_tmp"
+		;;
+	    :yes | :YES | :default | :DEFAULT)
+		rpm_cv_topdir="$rpm_cv_dist_topdir"
+		;;
+	    *)
+		rpm_cv_topdir="$with_rpm_topdir"
+		;;
+	esac
     ])
     PACKAGE_RPMTOPDIR="$rpm_cv_topdir"
     AC_SUBST([PACKAGE_RPMTOPDIR])dnl
 ])# _RPM_SPEC_SETUP_TOPDIR
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP_OPTIONS
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Older rpms (particularly those used by SuSE) rpms are too stupid to handle
 # --with and --without rpmpopt syntax, so convert to the equivalent --define
 # syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
 # properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
-    PACKAGE_OPTIONS=
+    PACKAGE_RPMOPTIONS=
     arg=
     for arg_part in $ac_configure_args ; do
-        if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
-            if test -n "$arg" ; then
-                eval "arg=$arg"
-                AC_MSG_CHECKING([for rpm argument '$arg'])
-                if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-                    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
-                    arg="--define \"${nam} ${arg}\""
-                    PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
-                    AC_MSG_RESULT([yes])
-                else
-                    :
-                    AC_MSG_RESULT([no])
-                fi
-            fi
-            arg="$arg_part"
-        else
-            arg="${arg}${arg:+ }${arg_part}"
-        fi
+	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
+	    if test -n "$arg" ; then
+		eval "arg=$arg"
+		AC_MSG_CHECKING([for rpm argument '$arg'])
+		if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+		    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+		    arg="--define \"${nam} ${arg}\""
+		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }$arg"
+		    AC_MSG_RESULT([yes])
+		else
+		    :
+		    AC_MSG_RESULT([no])
+		fi
+	    fi
+	    arg="$arg_part"
+	else
+	    arg="${arg}${arg:+ }${arg_part}"
+	fi
     done
     if test -n "$arg" ; then
-        eval "arg=$arg"
-        AC_MSG_CHECKING([for rpm argument '$arg'])
-        if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-            nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
-            arg="--define \"${nam} ${arg}\""
-            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
-            AC_MSG_RESULT([yes])
-        else
-            :
-            AC_MSG_RESULT([no])
-        fi
+	eval "arg=$arg"
+	AC_MSG_CHECKING([for rpm argument '$arg'])
+	if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+	    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+	    arg="--define \"${nam} ${arg}\""
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }$arg"
+	    AC_MSG_RESULT([yes])
+	else
+	    :
+	    AC_MSG_RESULT([no])
+	fi
     fi
-    AC_SUBST([PACKAGE_OPTIONS])dnl
+    AC_SUBST([PACKAGE_RPMOPTIONS])dnl
 ])# _RPM_SPEC_SETUP_OPTIONS
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_SETUP_BUILD
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     AC_ARG_VAR([RPM], [Rpm command])
     AC_PATH_TOOL([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPM:-no}" = :no ; then
-        AC_MSG_WARN([Could not find rpm program in PATH.])
+	AC_MSG_WARN([Could not find rpm program in PATH.])
     fi
     AC_ARG_VAR([RPMBUILD], [Build rpms command])
     AC_PATH_TOOL([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPMBUILD:-${RPM:-no}}" = :no ; then
-        AC_MSG_WARN([Could not find rpmbuild program in PATH.])
+	AC_MSG_WARN([Could not find rpmbuild program in PATH.])
     fi
     if test :"${RPMBUILD:-no}" = :no ; then
-        RPMBUILD="$RPM"
+	RPMBUILD="$RPM"
     fi
     AM_CONDITIONAL([BUILD_RPMS], [test :"${RPMBUILD:-no}" != :no])dnl
 ])# _RPM_SPEC_SETUP_BUILD
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
-# _RPM_SPEC_SETUP_SIGN
-# -------------------------------------------------------------------------
-AC_DEFUN([_RPM_SPEC_SETUP_SIGN], [dnl
-    AC_ARG_VAR([GPG], [GPG signature command])
-    AC_PATH_TOOL([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${GPG:-no}" = :no ; then
-        AC_MSG_WARN([Could not find gpg program in PATH.])
-    fi
-dnl ---------------------------------------------------------
-    AC_MSG_CHECKING([for gpg user])
-    AC_ARG_VAR([GNUPGUSER], [GPG user name])
-    AC_ARG_WITH([gpg-user],
-        AS_HELP_STRING([--with-gpg-user=USERNAME],
-            [specify the USER for signing RPMs and tarballs.
-            @<:@default=${GNUPGUSER}@:>@]),
-        [with_gpg_user="$withval"],
-        [with_gpg_user="$GNUPGUSER"
-         if test :"${with_gpg_user:-no}" = :no ; then
-             if test -r .gnupguser; then d= ; else d="$srcdir/" ; fi
-             if test -r ${d}.gnupguser
-             then with_gpg_user="`cat ${d}.gnupguser`"
-             else with_gpg_user=''
-             fi
-dnl          if test :"${with_gpg_user:-no}" = :no ; then
-dnl              with_gpg_user="`whoami`"
-dnl          fi
-         fi])
-    GNUPGUSER="${with_gpg_user:-`whoami`}"
-    AC_MSG_RESULT([${GNUPGUSER:-no}])
-dnl ---------------------------------------------------------
-    AC_MSG_CHECKING([for gpg home])
-    AC_ARG_VAR([GNUPGHOME], [GPG home directory])
-    AC_ARG_WITH([gpg-home],
-        AS_HELP_STRING([--with-gpg-home=HOMEDIR],
-            [specify the HOME for signing RPMs and tarballs.
-            @<:@default=${GNUPGHOME:-~/.gnupg}@:>@]),
-        [with_gpg_home="$withval"],
-        [with_gpg_home="$GNUPGHOME"
-         if test :"${with_gpg_home:-no}" = :no ; then
-             if test -r .gnupghome; then d= ; else d="$srcdir/" ; fi
-             if test -r ${d}.gnupghome
-             then with_gpg_home="`cat ${d}.gnupghome`"
-             else with_gpg_home=''
-             fi
-dnl          if test :"${with_gpg_home:-no}" = :no ; then
-dnl              with_gpg_home='~/.gnupg'
-dnl          fi
-         fi])
-    GNUPGHOME="${with_gpg_home:-~/.gnupg}"
-    AC_MSG_RESULT([${GNUPGHOME:-no}])
-])# _RPM_SPEC_SETUP_SIGN
-# =========================================================================
-
-# =========================================================================
+# =============================================================================
 # _RPM_SPEC_OUTPUT
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
     if test :"${enable_public:-yes}" != :yes ; then
-        PACKAGE="${PACKAGE_TARNAME}"
-        VERSION="bin-${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+	PACKAGE="${PACKAGE_TARNAME}"
+	VERSION="bin-${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
     else
-        PACKAGE="${PACKAGE_TARNAME}"
-        VERSION="${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+	PACKAGE="${PACKAGE_TARNAME}"
+	VERSION="${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
     fi
 ])# _RPM_SPEC_OUTPUT
-# =========================================================================
+# =============================================================================
 
-# =========================================================================
+# =============================================================================
 # _RPM_
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_], [dnl
 ])# _RPM_
-# =========================================================================
+# =============================================================================
 
-dnl =========================================================================
-dnl 
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-dnl 
-dnl =========================================================================
-dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
-dnl =========================================================================
+# =============================================================================
+# 
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# 
+# =============================================================================
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# =============================================================================

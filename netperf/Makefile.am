@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.23 $) $Date: 2005/02/17 19:59:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.25 $) $Date: 2005/02/19 12:19:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/17 19:59:14 $ by $Author: brian $
+# Last Modified $Date: 2005/02/19 12:19:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -203,11 +203,26 @@ include am/info.am
 include am/man.am
 
 #
+# Rules for lsms
+#
+include am/lsm.am
+
+#
+# Rules for archives
+#
+include am/archive.am
+
+#
 #   Rules for making rpms
 #
 AM_RPMFLAGS			=
 AM_SRPMFLAGS			=
 
 include am/rpm.am
+
+#
+# Rules for making deb packages
+#
+#include am/deb.am
 
 # vim: ft=automake

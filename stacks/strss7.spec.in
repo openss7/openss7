@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/02/15 14:15:27 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/02/19 12:06:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/15 14:15:27 $ by $Author: brian $
+# Last Modified $Date: 2005/02/19 12:06:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -297,78 +297,78 @@ fi
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
-    --with-rpm-epoch=%{epoch} \
-    --with-rpm-release=%{release} \
+    --with-pkg-epoch=%{epoch} \
+    --with-pkg-release=%{release} \
     --with-base-major=%{majbase} \
-    %{?_with_checks:             %enable %_with_checks} \
-    %{?_without_checks:          %disable %_without_checks} \
-    %{?_with_autotest:           %enable %_with_autotest} \
-    %{?_without_autotest:        %disable %_without_autotest} \
-    %{?_with_k_optimize:         %_with_k_optimize} \
-    %{?_with_cooked_manpages:    %_with_cooked_manpages} \
-    %{?_without_cooked_manpages: %_without_cooked_manpages} \
-    %{?_with_public:             %enable %_with_public} \
-    %{?_without_public:          %disable %_without_public} \
-    %{?_with_k_debug:            %enable %_with_k_debug} \
-    %{?_without_k_debug:         %disable %_without_k_debug} \
-    %{?_with_k_test:             %enable %_with_k_test} \
-    %{?_without_k_test:          %disable %_without_k_test} \
-    %{?_with_k_safe:             %enable %_with_k_safe} \
-    %{?_without_k_safe:          %disable %_without_k_safe} \
-    %{?_with_k_inline:           %enable %_with_k_inline} \
-    %{?_without_k_inline:        %disable %_without_k_inline} \
-    %{?_with_tools:              %enable %_with_tools} \
-    %{?_without_tools:           %disable %_without_tools} \
-    %{?_with_modules:            %enable %_with_modules} \
-    %{?_without_modules:         %disable %_without_modules} \
-    %{?_with_lis:                %_with_lis} \
-    %{?_with_lfs:                %_with_lfs} \
-    %{?_with_sctp_slow_verification:        %enable %_with_sctp_slow_verification} \
-    %{?_without_sctp_slow_verification:     %disable %_without_sctp_slow_verification} \
-    %{?_with_sctp_throttle_heartbeats:      %enable %_with_sctp_throttle_heartbeats} \
-    %{?_without_sctp_throttle_heartbeats:   %disable %_without_sctp_throttle_heartbeats} \
-    %{?_with_sctp_discard_ootb:             %enable %_with_sctp_discard_ootb} \
-    %{?_without_sctp_discard_ootb:          %disable %_without_sctp_discard_ootb} \
-    %{?_with_sctp_extended_ip_support:      %enable %_with_sctp_extended_ip_support} \
-    %{?_without_sctp_extended_ip_support:   %disable %_without_sctp_extended_ip_support} \
-    %{?_with_sctp_hmac_sha1:                %enable %_with_sctp_hmac_sha1} \
-    %{?_without_sctp_hmac_sha1:             %disable %_without_sctp_hmac_sha1} \
-    %{?_with_sctp_hmac_md5:                 %enable %_with_sctp_hmac_md5} \
-    %{?_without_sctp_hmac_md5:              %disable %_without_sctp_hmac_md5} \
-    %{?_with_sctp_adler32:                  %enable %_with_sctp_adler32} \
-    %{?_without_sctp_adler32:               %disable %_without_sctp_adler32} \
-    %{?_with_sctp_crc32c:                   %enable %_with_sctp_crc32c} \
-    %{?_without_sctp_crc32c:                %disable %_without_sctp_crc32c} \
-    %{?_with_sctp_throttle_passiveopens:    %enable %_with_sctp_throttle_passiveopens} \
-    %{?_without_sctp_throttle_passiveopens: %disable %_without_sctp_throttle_passiveopens} \
-    %{?_with_sctp_ecn:                      %enable %_with_sctp_ecn} \
-    %{?_without_sctp_ecn:                   %disable %_without_sctp_ecn} \
-    %{?_with_sctp_lifetimes:                %enable %_with_sctp_lifetimes} \
-    %{?_without_sctp_lifetimes:             %disable %_without_sctp_lifetimes} \
-    %{?_with_sctp_add_ip:                   %enable %_with_sctp_add_ip} \
-    %{?_without_sctp_add_ip:                %disable %_without_sctp_add_ip} \
-    %{?_with_sctp_adaptation_layer_info:    %enable %_with_sctp_adaptation_layer_info} \
-    %{?_without_sctp_adaptation_layer_info: %disable %_without_sctp_adaptation_layer_info} \
-    %{?_with_sctp_partial_reliability:      %enable %_with_sctp_partial_reliability} \
-    %{?_without_sctp_partial_reliability:   %disable %_without_sctp_partial_reliability} \
-    %{?_with_sctp_debug:                    %enable %_with_sctp_debug} \
-    %{?_without_sctp_debug:                 %disable %_without_sctp_debug} \
-    %{?_with_sctp_error_generator:          %enable %_with_sctp_error_generator} \
-    %{?_without_sctp_error_generator:       %disable %_without_sctp_error_generator} \
-    %{?_with_sctp:                          %_with_sctp} \
-    %{?_without_sctp:                       %_without_sctp} \
-    %{?_with_sctp2:                         %_with_sctp2} \
-    %{?_without_sctp2:                      %_without_sctp2} \
-    %{?_with_xns:                           %_with_xns} \
-    %{?_without_xns:                        %_without_xns} \
-    %{?_with_tli:                           %_with_tli} \
-    %{?_without_tli:                        %_without_tli} \
-    %{?_with_inet:                          %_with_inet} \
-    %{?_without_inet:                       %_without_inet} \
-    %{?_with_xnet:                          %_with_xnet} \
-    %{?_without_xnet:                       %_without_xnet} \
-    %{?_with_sock:                          %_with_sock} \
-    %{?_without_sock:                       %_without_sock} \
+    %{?_with_checks:             '%enable %_with_checks'} \
+    %{?_without_checks:          '%disable %_without_checks'} \
+    %{?_with_autotest:           '%enable %_with_autotest'} \
+    %{?_without_autotest:        '%disable %_without_autotest'} \
+    %{?_with_k_optimize:         '%_with_k_optimize'} \
+    %{?_with_cooked_manpages:    '%_with_cooked_manpages'} \
+    %{?_without_cooked_manpages: '%_without_cooked_manpages'} \
+    %{?_with_public:             '%enable %_with_public'} \
+    %{?_without_public:          '%disable %_without_public'} \
+    %{?_with_k_debug:            '%enable %_with_k_debug'} \
+    %{?_without_k_debug:         '%disable %_without_k_debug'} \
+    %{?_with_k_test:             '%enable %_with_k_test'} \
+    %{?_without_k_test:          '%disable %_without_k_test'} \
+    %{?_with_k_safe:             '%enable %_with_k_safe'} \
+    %{?_without_k_safe:          '%disable %_without_k_safe'} \
+    %{?_with_k_inline:           '%enable %_with_k_inline'} \
+    %{?_without_k_inline:        '%disable %_without_k_inline'} \
+    %{?_with_tools:              '%enable %_with_tools'} \
+    %{?_without_tools:           '%disable %_without_tools'} \
+    %{?_with_modules:            '%enable %_with_modules'} \
+    %{?_without_modules:         '%disable %_without_modules'} \
+    %{?_with_lis:                '%_with_lis'} \
+    %{?_with_lfs:                '%_with_lfs'} \
+    %{?_with_sctp_slow_verification:        '%enable %_with_sctp_slow_verification'} \
+    %{?_without_sctp_slow_verification:     '%disable %_without_sctp_slow_verification'} \
+    %{?_with_sctp_throttle_heartbeats:      '%enable %_with_sctp_throttle_heartbeats'} \
+    %{?_without_sctp_throttle_heartbeats:   '%disable %_without_sctp_throttle_heartbeats'} \
+    %{?_with_sctp_discard_ootb:             '%enable %_with_sctp_discard_ootb'} \
+    %{?_without_sctp_discard_ootb:          '%disable %_without_sctp_discard_ootb'} \
+    %{?_with_sctp_extended_ip_support:      '%enable %_with_sctp_extended_ip_support'} \
+    %{?_without_sctp_extended_ip_support:   '%disable %_without_sctp_extended_ip_support'} \
+    %{?_with_sctp_hmac_sha1:                '%enable %_with_sctp_hmac_sha1'} \
+    %{?_without_sctp_hmac_sha1:             '%disable %_without_sctp_hmac_sha1'} \
+    %{?_with_sctp_hmac_md5:                 '%enable %_with_sctp_hmac_md5'} \
+    %{?_without_sctp_hmac_md5:              '%disable %_without_sctp_hmac_md5'} \
+    %{?_with_sctp_adler32:                  '%enable %_with_sctp_adler32'} \
+    %{?_without_sctp_adler32:               '%disable %_without_sctp_adler32'} \
+    %{?_with_sctp_crc32c:                   '%enable %_with_sctp_crc32c'} \
+    %{?_without_sctp_crc32c:                '%disable %_without_sctp_crc32c'} \
+    %{?_with_sctp_throttle_passiveopens:    '%enable %_with_sctp_throttle_passiveopens'} \
+    %{?_without_sctp_throttle_passiveopens: '%disable %_without_sctp_throttle_passiveopens'} \
+    %{?_with_sctp_ecn:                      '%enable %_with_sctp_ecn'} \
+    %{?_without_sctp_ecn:                   '%disable %_without_sctp_ecn'} \
+    %{?_with_sctp_lifetimes:                '%enable %_with_sctp_lifetimes'} \
+    %{?_without_sctp_lifetimes:             '%disable %_without_sctp_lifetimes'} \
+    %{?_with_sctp_add_ip:                   '%enable %_with_sctp_add_ip'} \
+    %{?_without_sctp_add_ip:                '%disable %_without_sctp_add_ip'} \
+    %{?_with_sctp_adaptation_layer_info:    '%enable %_with_sctp_adaptation_layer_info'} \
+    %{?_without_sctp_adaptation_layer_info: '%disable %_without_sctp_adaptation_layer_info'} \
+    %{?_with_sctp_partial_reliability:      '%enable %_with_sctp_partial_reliability'} \
+    %{?_without_sctp_partial_reliability:   '%disable %_without_sctp_partial_reliability'} \
+    %{?_with_sctp_debug:                    '%enable %_with_sctp_debug'} \
+    %{?_without_sctp_debug:                 '%disable %_without_sctp_debug'} \
+    %{?_with_sctp_error_generator:          '%enable %_with_sctp_error_generator'} \
+    %{?_without_sctp_error_generator:       '%disable %_without_sctp_error_generator'} \
+    %{?_with_sctp:                          '%_with_sctp'} \
+    %{?_without_sctp:                       '%_without_sctp'} \
+    %{?_with_sctp2:                         '%_with_sctp2'} \
+    %{?_without_sctp2:                      '%_without_sctp2'} \
+    %{?_with_xns:                           '%_with_xns'} \
+    %{?_without_xns:                        '%_without_xns'} \
+    %{?_with_tli:                           '%_with_tli'} \
+    %{?_without_tli:                        '%_without_tli'} \
+    %{?_with_inet:                          '%_with_inet'} \
+    %{?_without_inet:                       '%_without_inet'} \
+    %{?_with_xnet:                          '%_with_xnet'} \
+    %{?_without_xnet:                       '%_without_xnet'} \
+    %{?_with_sock:                          '%_with_sock'} \
+    %{?_without_sock:                       '%_without_sock'} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -992,6 +992,10 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
+# Revision 0.9.2.11  2005/02/19 12:06:51  brian
+# - rpm-epoch to pkg-epoch, rpm-release to pkg-release
+# - proper quotation of configure options
+#
 # Revision 0.9.2.10  2005/02/15 14:15:27  brian
 # - Remove link before linking.
 #

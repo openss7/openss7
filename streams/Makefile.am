@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/02/18 01:12:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/02/19 11:58:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/18 01:12:56 $ by $Author: brian $
+# Last Modified $Date: 2005/02/19 11:58:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -656,12 +656,27 @@ endif
 include am/init.am
 
 #
+# Rules for lsms
+#
+include am/lsm.am
+
+#
+# Rules for archives
+#
+include am/archive.am
+
+#
 # Rules for making rpms
 #
 AM_RPMFLAGS 			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS 			=
 
 include am/rpm.am
+
+#
+# Rules for making deb packages
+#
+include am/deb.am
 
 MAINTAINERCLEANFILES	+= \
 			$(top_srcdir)/aclocal.m4 \

@@ -1,0 +1,83 @@
+Source: @PACKAGE_TARNAME@-@PACKAGE_VERSION@
+Section: devel
+Priority: optional
+Maintainer: Brian Bidulock <bidulock@openss7.org>
+Standards-Version: 3.5.6.1
+
+Package: @PACKAGE_TARNAME@-core-@PACKAGE_VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_TARNAME@-core, @PACKAGE_TARNAME@-core-@PACKAGE_VERSION@
+Conflicts: LiS-core
+Description: This package contains the kernel modules that provide the Linux
+ kernel SVR 4.2 MP STREAMS facility.  This also includes assorted basic STREAMS
+ drivers and modules such as pipes, fifos, echo, etc.  This package is heavily
+ tied to the kernel for which it was compiled.  This package applies to kernel
+ version @PACKAGE_KVERSION@.
+
+Package: @PACKAGE_TARNAME@-info-@PACKAGE_VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_TARNAME@-info, @PACKAGE_TARNAME@-info-@PACKAGE_VERSION@
+Description: This package contains the kernel modules symbol information for
+ development of kernel modules against the core kernel modules included in the
+ @PACKAGE_TARNAME@-core package.  This package is tied to the core kernel
+ modules and kernel for which they were compiled.  This package applies to core
+ kernel modules @PACKAGE_TARNAME@-core-@PACKAGE_VERSION@ for kernel version
+ @PACKAGE_KVERSION@.
+
+Package: @PACKAGE_TARNAME@-lib-@PACKAGE_VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_TARNAME@-lib
+Description: This package contains the run-time shared libraries necessary to
+ run applications programs developed for @PACKAGE_TITLE@.
+
+Package: @PACKAGE_TARNAME@-util-@PACKAGE_VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_TARNAME@-util
+Description: This package provides adminstrative and configuration test
+ utilities and commands associated with the @PACKAGE_TITLE@ package.  It also
+ includes necessary init scripts and configuration files.
+
+Package: @PACKAGE_TARNAME@-devel-@PACKAGE_VERSION@
+Architecture: any
+Section: devel
+Priority: optional
+Provides: @PACKAGE_TARNAME@-devel
+Description: This package contains library archives for static compilation, and
+ headers files to develop @PACKAGE_TITLE@ modules and drivers.  This also
+ includes the header files and static libraries required to compile
+ @PACKAGE_TITLE@ applications programs.  In addition it contains all of the
+ manual pages necessary for developing @PACKAGE_TITLE@ application programs.
+
+Package: @PACKAGE_TARNAME@-dev-@PACKAGE_VERSION@
+Architecture: all
+Section: base
+Priority: optional
+Provides: @PACKAGE_TARNAME@-dev
+Description: This package contains the device definitions necessary to run
+ applications programs and utilities developed for @PACKAGE_TITLE@.
+
+Package: @PACKAGE_TARNAME@-doc-@PACKAGE_VERSION@
+Architecture: all
+Section: doc
+Priority: optional
+Provides: @PACKAGE_TARNAME@-doc
+Description: This package contains html documentation for the development of
+ @PACKAGE_TARNAME@ applications, modules and drivers.
+
+Package: @PACKAGE_TARNAME@-source-@PACKAGE_VERSION@
+Architecture: all
+Section: devel
+Priority: optional
+Provides: @PACKAGE_TARNAME@-source
+Description: This package contains the source code necessary for building the
+ @PACKAGE_TARNAME@ release.  It includes the autoconf configuration utilities
+ necessary to create and distribute this dpkg.
+

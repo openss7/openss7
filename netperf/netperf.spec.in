@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2005/02/15 14:15:21 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2005/02/19 12:06:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/15 14:15:21 $ by $Author: brian $
+# Last Modified $Date: 2005/02/19 12:06:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -269,26 +269,26 @@ fi
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
-    --with-rpm-epoch=%{epoch} \
-    --with-rpm-release=%{release} \
-    %{?_with_checks:             %enable %_with_checks} \
-    %{?_without_checks:          %disable %_without_checks} \
-    %{?_with_autotest:           %enable %_with_autotest} \
-    %{?_without_autotest:        %disable %_without_autotest} \
-    %{?_with_cooked_manpages:    %_with_cooked_manpages} \
-    %{?_without_cooked_manpages: %_without_cooked_manpages} \
-    %{?_with_public:             %enable %_with_public} \
-    %{?_without_public:          %disable %_without_public} \
-    %{?_with_lis:                %_with_lis} \
-    %{?_with_lfs:                %_with_lfs} \
-    %{?_with_xns:                %_with_xns} \
-    %{?_without_xns:             %_without_xns} \
-    %{?_with_xti:                %_with_xti} \
-    %{?_without_xti:             %_without_xti} \
-    %{?_with_inet:               %_with_inet} \
-    %{?_without_inet:            %_without_inet} \
-    %{?_with_sctp:               %_with_sctp} \
-    %{?_without_sctp:            %_without_sctp} \
+    --with-pkg-epoch=%{epoch} \
+    --with-pkg-release=%{release} \
+    %{?_with_checks:             '%enable %_with_checks'} \
+    %{?_without_checks:          '%disable %_without_checks'} \
+    %{?_with_autotest:           '%enable %_with_autotest'} \
+    %{?_without_autotest:        '%disable %_without_autotest'} \
+    %{?_with_cooked_manpages:    '%_with_cooked_manpages'} \
+    %{?_without_cooked_manpages: '%_without_cooked_manpages'} \
+    %{?_with_public:             '%enable %_with_public'} \
+    %{?_without_public:          '%disable %_without_public'} \
+    %{?_with_lis:                '%_with_lis'} \
+    %{?_with_lfs:                '%_with_lfs'} \
+    %{?_with_xns:                '%_with_xns'} \
+    %{?_without_xns:             '%_without_xns'} \
+    %{?_with_xti:                '%_with_xti'} \
+    %{?_without_xti:             '%_without_xti'} \
+    %{?_with_inet:               '%_with_inet'} \
+    %{?_without_inet:            '%_without_inet'} \
+    %{?_with_sctp:               '%_with_sctp'} \
+    %{?_without_sctp:            '%_without_sctp'} \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -373,6 +373,10 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.9  2005/02/19 12:06:51  brian
+# - rpm-epoch to pkg-epoch, rpm-release to pkg-release
+# - proper quotation of configure options
+#
 # Revision 1.1.2.8  2005/02/15 14:15:21  brian
 # - Remove link before linking.
 #

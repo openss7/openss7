@@ -1,12 +1,12 @@
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) kernel.m4,v LiS-2_16_18-1(1.1.2.1) 2004/01/13 16:11:34
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/02/19 11:59:14 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -37,7 +37,7 @@
 # users).  If the Software is supplied to any unit or agency of the Government
 # other than DoD, it is classified as "Restricted Computer Software" and the
 # Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 # the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 # (or any successor regulations).
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified 2004/01/13 16:11:34 by brian
+# Last Modified $Date: 2005/02/19 11:59:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,14 +57,15 @@ m4_include([m4/dast.m4])
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
 m4_include([m4/rpm.m4])
+m4_include([m4/deb.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/02/13 09:20:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/19 12:19:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/13 09:20:25 $ by $Author: brian $
+# Last Modified $Date: 2005/02/19 12:19:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -280,11 +280,26 @@ SUBDIRS = src doc
 endif
 
 #
+# Rules for lsms
+#
+include am/lsm.am
+
+#
+# Rules for archives
+#
+include am/archive.am
+
+#
 #   Rules for making rpms
 #
 AM_RPMFLAGS 			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS 			=
 
 include am/rpm.am
+
+#
+# Rules for making deb packages
+#
+#include am/deb.am
 
 # vim: ft=automake

@@ -61,11 +61,26 @@ AM_CPPFLAGS = @STRIP_BEGIN@ \
 EXTRA_DIST += autogen.sh LICENSE
 
 #
+# Rules for lsms
+#
+include am/lsm.am
+
+#
+# Rules for archives
+#
+include am/archive.am
+
+#
 #   Rules for making rpms
 #
 AM_RPMFLAGS			=
 AM_SRPMFLAGS			=
 
 include am/rpm.am
+
+#
+# Rules for making deb packages
+#
+#include am/deb.am
 
 # vim: ft=automake

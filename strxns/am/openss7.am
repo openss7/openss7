@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/02/17 08:04:13 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/02/19 11:50:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/17 08:04:13 $ by $Author: brian $
+# Last Modified $Date: 2005/02/19 11:50:24 $ by $Author: brian $
 #
 # =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.9 dist-bzip2 std-options -Wall
+AUTOMAKE_OPTIONS = gnits 1.8 dist-bzip2 std-options -Wall
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -75,7 +75,7 @@ INSTALLCHECK_LOCAL	=
 DISTCHECK_HOOK		=
 
 #
-# In cas we only need the files version:
+# In case we only need the files version:
 #
 MOSTLYCLEANFILES	=
 CLEANFILES		=
@@ -95,8 +95,6 @@ EXTRA_TEX		=
 
 dist_noinst_SCRIPTS	=
 
-MY_RECURSIVE_TARGETS =
-
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
 
 if MAINTAINER_MODE
@@ -104,6 +102,8 @@ MAINTAINER_MODE = yes
 else
 MAINTAINER_MODE = no
 endif
+
+MY_RECURSIVE_TARGETS =
 
 $(MY_RECURSIVE_TARGETS):
 	@set fnord $$MAKEFLAGS; amf=$$2; \
@@ -123,6 +123,17 @@ $(MY_RECURSIVE_TARGETS):
 	if test "$$dot_seen" = "no"; then \
 	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
 	fi; test -z "$$fail"
+
+ALL_EXPORT_OPTS =
+
+ALL_RECURSIVE_TARGETS =
+
+$(ALL_RECURSIVE_TARGETS):
+	@list='$(subdirs)' ; for subdir in $$list ; do \
+		target=`echo $@ | sed -e 's|^all-||'` ; \
+		echo "Making $$target in $$subdir" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) || exit 1 ; \
+	done
 
 if PERFORM_CHECKS
 dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
@@ -218,6 +229,6 @@ distcheck-hook: $(DISTCHECK_HOOK)
 #
 # Collected phonys from other automake fragments.
 #
-.PHONY: ifnames
+.PHONY: ifnames $(MY_RECURSIVE_TARGETS) $(ALL_RECURSIVE_TARGETS)
 
 # vim: ft=automake

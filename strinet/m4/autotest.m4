@@ -1,62 +1,57 @@
-dnl =========================================================================
-dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
-dnl =========================================================================
-dnl
-dnl @(#) $Id: autotest.m4,v 0.9.2.5 2005/01/22 07:11:04 brian Exp $
-dnl
-dnl =========================================================================
-dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-dnl
-dnl All Rights Reserved.
-dnl
-dnl Permission is granted to make and distribute verbatim copies of this
-dnl README file provided the copyright notice and this permission notice are
-dnl preserved on all copies.
-dnl 
-dnl Permission is granted to copy and distribute modified versions of this
-dnl manual under the conditions for verbatim copying, provided that the
-dnl entire resulting derived work is distributed under the terms of a
-dnl permission notice identical to this one
-dnl 
-dnl Since the Linux kernel and libraries are constantly changing, this README
-dnl file may be incorrect or out-of-date.  The author(s) assume no
-dnl responsibility for errors or omissions, or for damages resulting from the
-dnl use of the information contained herein.  The author(s) may not have
-dnl taken the same level of care in the production of this manual, which is
-dnl licensed free of charge, as they might when working professionally.
-dnl 
-dnl Formatted or processed versions of this manual, if unaccompanied by the
-dnl source, must acknowledge the copyright and authors of this work.
-dnl 
-dnl =========================================================================
-dnl 
-dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-dnl behalf of the U.S. Government ("Government"), the following provisions
-dnl apply to you.  If the Software is supplied by the Department of Defense
-dnl ("DoD"), it is classified as "Commercial Computer Software" under
-dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
-dnl Regulations ("DFARS") (or any successor regulations) and the Government is
-dnl acquiring only the license rights granted herein (the license rights
-dnl customarily provided to non-Government users).  If the Software is
-dnl supplied to any unit or agency of the Government other than DoD, it is
-dnl classified as "Restricted Computer Software" and the Government's rights
-dnl in the Software are defined in paragraph 52.227-19 of the Federal
-dnl Acquisition Regulations ("FAR") (or any success regulations) or, in the
-dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-dnl (or any successor regulations).
-dnl 
-dnl =========================================================================
-dnl 
-dnl Commercial licensing and support of this software is available from
-dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-dnl 
-dnl =========================================================================
-dnl
-dnl Last Modified $Date: 2005/01/22 07:11:04 $ by $Author: brian $
-dnl 
-dnl =========================================================================
+# =============================================================================
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# =============================================================================
+# 
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/19 11:49:58 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/02/19 11:49:58 $ by $Author: brian $
+#
+# =============================================================================
+
 
 # ===========================================================================
 # _AUTOTEST
@@ -74,15 +69,15 @@ AC_DEFUN([_AUTOTEST], [dnl
 AC_DEFUN([_AUTOTEST_OPTIONS], [dnl
     AC_MSG_CHECKING([for autotest on installcheck])
     AC_ARG_ENABLE([autotest],
-        AC_HELP_STRING([--enable-autotest],
-            [enable pre- and post-install testing.  @<:@default=auto@:>@]),
-        [enable_autotest="$enableval"], [dnl
-            if test :"${USE_MAINTAINER_MODE:-no}" != :no
-            then
-                enable_autotest='yes'
-            else
-                enable_autotest='no'
-            fi])
+	AC_HELP_STRING([--enable-autotest],
+	    [enable pre- and post-install testing.  @<:@default=auto@:>@]),
+	[enable_autotest="$enableval"], [dnl
+	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	    then
+		enable_autotest='yes'
+	    else
+		enable_autotest='no'
+	    fi])
     AC_MSG_RESULT([${enable_autotest}])
     AM_CONDITIONAL([PERFORM_TESTING], [test :"${enable_autotest:-yes}" = :yes])dnl
 ])# _AUTOTEST_OPTIONS
@@ -104,8 +99,8 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
     AC_ARG_VAR([AUTOM4TE], [Autom4te command])
     AC_PATH_TOOL([AUTOM4TE], [autom4te], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${AUTOM4TE:-no}" = :no ; then
-        AC_MSG_WARN([Could not find autom4te program in PATH.])
-        AUTOM4TE='autom4te'
+	AC_MSG_WARN([Could not find autom4te program in PATH.])
+	AUTOM4TE='autom4te'
     fi
 ])# _AUTOTEST_SETUP_AUTOM4TE
 # ===========================================================================
@@ -117,8 +112,8 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
     AC_ARG_VAR([AUTOTEST], [Autotest macro build command])
     AC_PATH_TOOL([AUTOTEST], [autotest], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${AUTOTEST:-no}" = :no ; then
-        AC_MSG_WARN([Could not find autotest program in PATH.])
-        AUTOTEST="$AUTOM4TE --language=autotest"
+	AC_MSG_WARN([Could not find autotest program in PATH.])
+	AUTOTEST="$AUTOM4TE --language=autotest"
     fi
 ])# _AUTOTEST_SETUP_AUTOTEST
 # ===========================================================================
@@ -174,11 +169,11 @@ AC_DEFUN([_AUTOTEST_], [dnl
 ])# _AUTOTEST_
 # ===========================================================================
 
-dnl =========================================================================
-dnl
-dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-dnl
-dnl =========================================================================
-dnl ENDING    OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
-dnl =========================================================================
+# =============================================================================
+# 
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# 
+# =============================================================================
+# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# =============================================================================
