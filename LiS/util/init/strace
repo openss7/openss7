@@ -1,0 +1,229 @@
+#!/bin/sh
+#
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# All Rights Reserved.
+#
+# Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
+# permissions.
+#
+# Redhat chkconfig init script conventions
+#
+# strace:	start and stop strace facility
+# chkconfig:	- 55 88
+# lockfile:	/var/lock/subsys/strace
+# config:	/etc/default/strace
+# processname:	strace
+# pidfile:	/var/run/strace.pid
+# probe:	true
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is \
+#		responsible for starting and stopping the STREAMS trace \
+#		logger.  The STREAMS trace logger should only be run under \
+#		exceptional circumstances and this init script not activated \
+#		automatically.
+#
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: strace
+# Required-Start: streams
+# Required-Stop: streams
+# Default-Start: 
+# Default-Stop: 0 1 2 3 4 5 6
+# Short-Description: start and stop strace
+# License: GPL
+# Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
+#	responsible for starting and stopping the STREAMS trace logger.  The
+#	STREAMS trace logger should only be run under exceptional circumstances
+#	and this init script is not activated in any run level by default.
+### END INIT INFO
+
+# Source init script functions library
+[ -f /etc/init.d/functions ] && . /etc/init.d/functions
+
+name='strace'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+processname="$name"
+pidfile="/var/run/$processname.pid"
+execfile="/usr/sbin/$processname"
+
+[ -x $execfile ] || exit 0
+
+# Specify defaults
+
+STRACEOPTIONS=
+STRACE_DIRECTORY="/var/log/streams"
+STRACE_BASENAME="trace"
+STRACE_OUTFILE=
+STRACE_ERRFILE=
+STRACE_LOGDEVICE="/dev/streams/log"
+STRACE_MODULES=
+STRACE_OPTIONS=
+
+# Source config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+RETVAL=0
+
+umask 077
+
+start() {
+    daemon $processname $STRACE_OPTIONS
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+stop() {
+    killproc $processname
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reload() {
+    echo "Reloading the STREAMS trace logger: "
+    killproc $processname -HUP
+    return $?
+}
+
+build_options() {
+    # Build up the options string
+    STRACE_OPTIONS="-p $pidfile"
+    [ -n "$STRACEOPTIONS" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACEOPTIONS}"
+    [ -n "$STRACE_DIRECTORY" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-d ${STRACE_DIRECTORY}"
+    [ -n "$STRACE_BASENAME" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-b ${STRACE_BASENAME}"
+    [ -n "$STRACE_OUTFILE" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-o ${STRACE_OUTFILE}"
+    [ -n "$STRACE_ERRFILE" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-e ${STRACE_ERRFILE}"
+    [ -n "$STRACE_LOGDEVICE" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-l ${STRACE_LOGDEVICE}"
+    [ -n "$STRACE_MODULES" ] && \
+	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACE_MODULES}"
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	build_options
+	$1 || RETVAL=$?
+	;;
+    (status)
+	$1 $name || RETVAL=$?
+	;;
+    (condrestart)
+	build_options
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	if /sbin/pidof $processname >/dev/null 2>&1 ; then
+	    # running
+	    if [ "`/sbin/pidof $processname`" -eq "`cat $pidfile`" ] ; then
+		# running with the right pid
+		if [ ! -f $lockfile ] ; then
+		    # running but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # subsystem locked
+		    for file in $config ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# running, but with the wrong pid, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # not running
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		# dead but subsystem locked, need to restart
+		echo 'restart'
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|reload|restart|condrestart|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
+# =============================================================================
+# 
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/03/13 06:28:07 $ by $Author: brian $
+#
+# =============================================================================
+
+# vim: ft=sh sw=4 tw=80

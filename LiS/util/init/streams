@@ -1,0 +1,278 @@
+#!/bin/sh
+#
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# All Rights Reserved.
+#
+# Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
+# permissions.
+#
+# Redhat chkconfig init script conventions
+#
+# streams:	start and stop streams subsystem
+# chkconfig:	2345 02 97
+# lockfile:	/var/lock/subsys/streams
+# config:	/etc/sysconfig/streams
+# probe:	true
+# hide:		false
+# license:	GPL
+# description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
+#		It is responsible for ensuring that the necessary STREAMS \
+#		character devices are present in the /dev directory and \
+#		that the STREAMS subsystem is configured and loaded.  It \
+#		is also responsible for starting the STREAMS log and trace \
+#		facilities.
+#
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: streams
+# Required-Start: specfs
+# Required-Stop: specfs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop streams subsystem
+# License: GPL
+# Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
+#	reponsible for ensuring that the necessary STREAMS character devices are
+#	present in the /dev directory and that the STREAMS subsystem is
+#	configured and loaded.  It is also responsible for starting the STREAMS
+#	log and trace facilities.
+### END INIT INFO
+
+# Source init script functions library.
+. /etc/init.d/functions
+
+name='streams'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+
+[ -f /proc/modules ] || exit 0
+
+for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
+    if [ -x $STREAMS_MKNOD ] ; then
+	break
+    else
+	STREAMS_MKNOD=
+    fi
+done
+
+# Specify defaults
+
+STREAMS_MAKEDEVICES="no"
+STREAMS_REMOVEDEVICES="no"
+STREAMS_MOUNTSPECFS="yes"
+STREAMS_MOUNTPOINT="/dev/streams"
+
+# Source redhat and/or debian config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES='no'
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES='no'
+
+RETVAL=0
+
+umask 077
+
+start() {
+    for module in streams streams-clone streams-sth ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	    action $"Loading kernel module $module: " \
+		insmod -k -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
+    if grep '^[[:space:]]*streams[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+	action $"Reconfiguring kernel parameters: " \
+	    sysctl -e -p /etc/sysctl.conf || :
+    fi
+    if [ -f /etc/streams.conf ] ; then
+	action $"Configuring STREAMS parameters: " \
+	    sysctl -e -p /etc/streams.conf || :
+    fi
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	action $"Making STREAMS devices: " \
+	    $STREAMS_MKNOD
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing STREAMS modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
+}
+
+stop() {
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	action $"Removing STREAMS devices: " \
+	    $STREAMS_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-]?' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reload() {
+    stop
+    start
+    return $?
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	$1 || RETVAL=$?
+	;;
+    (status)
+	LOADED='yes'
+	for module in streams streams-clone streams-sth ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    if true ; then
+		echo $"$name is running..."
+		RETVAL=0
+	    fi
+	else
+	    if [ -f $lockfile ] ; then
+		echo $"$name is stopped but sybsys locked"
+		RETVAL=2
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
+	;;
+    (condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	LOADED='yes'
+	for module in streams streams-clone streams-sth ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    # loaded
+	    if true ; then
+		if [ ! -f $lockfile ] ; then
+		    # loaded, but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # loaded and subsystem locked
+		    for file in $config /etc/$name.conf ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updeated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# loaded, but with wrong options, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unloaded
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if true ; then
+		    # unloaded but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
+# =============================================================================
+# 
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/13 06:28:07 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/03/13 06:28:07 $ by $Author: brian $
+#
+# =============================================================================
+
+# vim: ft=sh sw=4 tw=80
