@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:48 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/25 08:33:11 $
 
  -----------------------------------------------------------------------------
 
@@ -41,13 +41,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:48 $ by $Author: brian $
+ Last Modified $Date: 2004/05/25 08:33:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:48 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/25 08:33:11 $"
 
-static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:48 $";
+static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/25 08:33:11 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -429,7 +429,7 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
-#if 0
+#ifdef CONFIG_PM
 STATIC int xp_suspend(struct pci_dev *pdev, u32 state);
 STATIC int xp_resume(struct pci_dev *pdev);
 #endif
@@ -9297,7 +9297,7 @@ STATIC int __devinit xp_probe(struct pci_dev *dev, const struct pci_device_id *i
 	return (-ENODEV);
 }
 
-#if 0
+#ifdef CONFIG_PM
 /*
  *  X100P-SS7 Suspend
  *  -----------------------------------
