@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: fdetach.8.man,v 0.9.2.2 2004/03/04 23:15:46 brian Exp $
+.\" @(#) $Id: fdetach.8.man,v 0.9.2.3 2004/03/06 21:39:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FDETACH 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH FDETACH 8 "$Date: 2004/03/06 21:39:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -82,24 +82,54 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP
-\fBfdetach\fI  path\fP
+\fBfdetach\fR [\fIoptions\fR] [\fIpath\fR]
 .HP
-\fBfdetach\fR { \fB-h\fR | \fB--help\fR }
+\fBfdetach\fR {\fB-h\fR|\fB--help\fR}
 .HP
-\fBfdetach\fR { \fB-v\fR | \fB--version\fR }
+\fBfdetach\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBfdetach\fR {\fB-C\fR|\fB--copying\fR}
 .\"
 .\"
 .SH OPTIONS
 .PP
-.TP 12
+.TP
 .I path
 the path to the file to which the
 .I STREAMS
 special file is attached.
 .TP
-.BR -h ", " --help
+.BR -d ", " --debug " [" \fIlevel\fR ]
+Increase or specify the debug verbosity level of the output.  This option may
+be repeated.
 .TP
-.BR -v ", " --version
+.BR -q ", " --quiet
+Suppresses normal output.
+.TP
+.BR -v ", " --verbose " [" \fIlevel\fR ]
+Increase or specify the verbosity level of the output.  This option may be
+repeated.
+.TP
+.BR -h ", " --help
+When this option is encountered,
+.B fdetach
+displays usage information on
+.I stdout
+and exits.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+.B fdetach
+displays version information on
+.I stdout
+and exits.
+.TP
+.BR -C ", " --copying
+When this option is encountered,
+.B fdetach
+displays copying and copyright information on
+.I stdout
+and exits.
 .PP
 If
 .B fdetach
@@ -141,6 +171,18 @@ returns 0 (zero) on success.  If
 .B fdetach
 fails, it returns 1 and prints a message to
 .IR stderr .
+.PP
+An exit status of zero (0) indicates that the
+.B fdetach
+command was successful; one (1) indicates that an error occured and a
+diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.IR stderr .
+.PP
+Errors may result from inadequate permissions, inability to detach the named
+stream.
 .\"
 .\"
 .SH NOTICES
@@ -155,7 +197,8 @@ for the specified
 .SH "SEE ALSO"
 .PP
 .BR fattach (3),
-.BR fdetach (3).
+.BR umount (1),
+.BR umount (8).
 .\"
 .\"
 .SH BUGS
@@ -185,14 +228,36 @@ LiS
 with the following considerations:
 .IP \(em 4
 .BR AIX \(rg
-does not support the
+does not
+document
+.[
+aixspg
+.]
+support the
 .B fdetach
 command.  However,
 .BR umount (1)
 may be used in its stead.
+For compatibility with
+.BR AIX \(rg,
+.B Linux Fast-STREAMS
+supports the use of the
+.BR umount (8)
+command to detach named streams.
 .IP \(em 4
+Versions of
+.B fdetach
+based on
+.B SVR 4.2
+do not document long options.
 .IP \(em 4
-.IP \(em 4
+Versions of
+.B fdetach
+based on
+.B SVR 4.2
+do not document the
+.BR -q ", " -v ", " -h ", " -V " or " -C
+options.
 .\"
 .\"
 .SH CONFORMANCE
@@ -202,11 +267,26 @@ may be used in its stead.
 svr42cr
 .]
 .BR HPUX \(rg,
+.[
+hpuxspg
+.]
 .BR OSF \(rg,
+.[
+osfspg
+.]
 .BR Solaris \(rg,
+.[
+solspg
+.]
 .BR UnixWare \(rg
+.[
+uw7doc
+.]
 and
 .BR UXP/V \(rg
+.[
+uxpdoc
+.]
 documentation.
 .\"
 .\"

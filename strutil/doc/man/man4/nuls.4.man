@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: nuls.4.man,v 0.9.2.1 2004/03/01 02:44:06 brian Exp $
+.\" @(#) $Id: nuls.4.man,v 0.9.2.2 2004/03/06 21:39:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/01 02:44:06 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/06 21:39:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NULS 4 "$Date: 2004/03/01 02:44:06 $" "$Name:  $" "Linux Fast-STREAMS Modules"
+.TH NULS 4 "$Date: 2004/03/06 21:39:46 $" "$Name:  $" "Linux Fast-STREAMS Modules"
 .\"
 .\"
 .SH NAME
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <unistd.h>
 .br
-.B #include <sys/stropts.h>
+.B #include <stropts.h>
 .HP 12
 .BI "int " fd " = open(" /dev/nuls ", " oflag );
 .\"
@@ -101,6 +101,58 @@ This device is accessible to all users.
 The
 .B nuls
 device is characterized by the following behavior:
+.IP \(em
+All data written to 
+.B /dev/nuls
+with
+.BR write (2),
+.BR writev (2),
+.BR putmsg (2)
+and
+.BR putpmsg (2)
+is discarded.
+.IP \(em
+All attempts to read
+.B /dev/nuls
+with
+.BR read (2),
+.BR readv (2),
+.BR getmsg (2)
+or
+.BR getpmsg (2)
+will return zero length data.
+.PP
+In contrast to the Linux
+.B /dev/null
+and
+.B /dev/zero
+(see
+.BR null (4),
+.BR zero (4)),
+.B /dev/nuls
+is a
+.B STREAMS
+null device with the following additional characteristics:
+.IP \(em
+.I STREAMS
+modules can be pushed and popped from the device.
+.IP \(em
+The device response to all
+.I STREAMS
+I/O controls described in
+.BR streamio (7).
+.IP \(em
+The device can be linked under a multiplexing driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B /dev/nuls
+does not support any I/O controls of its own and all I/O controls delivered to
+the driver will return an
+.IR errno (3)
+of
+.RB [ EOPNOTSUPP ].
 .\"
 .\"
 .SH USAGE
@@ -111,19 +163,76 @@ device can be opened when no other suitable device exists and modules may be
 pushed on the
 .B nuls
 device.
-Ths is used with the
+.PP
+Pushing a
+.I STREAMS
+module that reponsds to administrative I/O controls on
+.B /dev/nuls
+is a method of providing administrative drivers without consuming major device
+numbers.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B nuls
+device is used on systems that provide the older
+.BR "SVR 3"
+.[
+svr3
+.]
+style
+.B /dev/null
+or
+.BR /dev/zero .
+On those systems, the
+.B /dev/null
+and
+.B /dev/zero
+devices are not
+.I STREAMS
+based and will not respond to
+.I STREAMS
+I/O controls.
+.PP
+The
+.B nuls
+device is used with the
 .BR sc (4)
-module on
+module as on
+.BR AIX \(rg,
+.BR HPUX \(rg,
+and
 .BR OSF \(rg
-systems.
-.\"
-.\"
-.SH IOCTLS
+systems in support of the
+.BR autopush (8),
+.BR scls (8),
+.BR strinfo (8),
+.BR strload (8),
+and
+.BR strsetup (8)
+commands.
 .PP
+Under
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+the
+.B nuls
+device is also used with the
+.BR sockmod (4)
+module in support of
+.BR libsocket ,
+and by
+.BR libstreams ,
+as an anonymous stream for non-file-descriptor related system call emulation
+for
+.BR fdetach (3).
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES
@@ -133,23 +242,74 @@ systems.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR null (4),
+.BR zero (4),
 .BR echo (4),
 .\"
 .\"
 .SH BUGS
 .PP
+.B nuls
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR /dev/nuls
+is compatible with
+.BR "SVR 4.2" ,
+.BR AIX \(rg,
+.BR HPUX \(rg,
+and
+.BR OSF \(rg
+with the following portability considerations:
+.IP \(em
+.B /dev/nuls
+can be used instead of
+.B /dev/null
+or
+.B /dev/zero
+for any purpose for which those devices are used.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.BR "SVR 4.2" ,
+.[
+svr42cr
+.]
+and
+.BR AIX \(rg,
+.BR HPUX \(rg,
+and
+.BR OSF \(rg
+documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B nuls
+device first appeared in
+.B SVR 4.2
+.[
+svr42
+.]
+implementations for
+.BR AIX \(rg,
+.BR HPUX \(rg,
+and
+.BR OSF \(rg.
+
 .\"
 .\"
 .[

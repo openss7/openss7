@@ -52,10 +52,15 @@
 #ifndef __SYS_SAD_H__
 #define __SYS_SAD_H__
 
-#define SAD_IOC_MAGIC	'D'
+
+#define SAD_IOC_MAGIC	'D' /* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
+
 #define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/* set autopush */
 #define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/* get autopush */
 #define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/* validate modules */
+
+#define SAD_SAP_SOL	((SAD_IOC_MAGIC << 8) | 0x17)	/* set autopush (anchor) */
+#define SAD_GAP_SOL	((SAD_IOC_MAGIC << 8) | 0x18)	/* get autopush (anchor) */
 
 #ifndef MAX_APUSH
 #define MAX_APUSH 8
@@ -70,7 +75,10 @@ struct strapush {
 	long sap_lastminor;
 	uint sap_npush;
 	char sap_list[MAXAPUSH][FMNAMESZ + 1];
-	char sap_module[FMNAMESZ + 1];
+	/* Solaris adds sap_anchor which is the integer anchor position */
+	int sap_anchor;
+	/* This one is Linux Fast-STREAMS specific */
+	char sap_module[FMNAMESZ + 1]; /* This is mine. */
 };
 
 #define SAP_CLEAR	0x00		/* clear entry */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: strinfo.8.man,v 0.9.2.2 2004/03/04 23:15:47 brian Exp $
+.\" @(#) $Id: strinfo.8.man,v 0.9.2.3 2004/03/06 21:39:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRINFO 8 "$Date: 2004/03/04 23:15:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH STRINFO 8 "$Date: 2004/03/06 21:39:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -83,26 +83,67 @@ sort-adjacent-labels
 .PP
 .HP 12
 \fBstrinfo \fR{\fB-m\fR|\fB-q\fR}\fP
+.HP 12
+\fBstrinfo\fR {\fB-H\fR|\fB--help\fR}
+.HP 12
+\fBstrinfo\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrinfo\fR {\fB-C\fR|\fB--copying\fR}
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B strinfo
+command displays information for debugging purposes about
+.I STREAMS
+drivers and modules, or stream heads and the
+.I STREAMS
+run queue.
 .\"
 .\"
 .SH OPTIONS
 .PP
 .TP
-.B -m
+.BR -m ", " --modules
 Print information about the
 .I STREAMS
 drivers and modules loaded on the system.
 .TP
-.B -q
+.BR -q ", " --queues
 Print information about the
 .I STREAMS
 active stream heads and on the run queues upon which 
 drivers and modules are
 scheduled.
+.TP
+.BR -Q ", " --quiet
+Suppresses normal output.
+.TP
+.BR -v ", " --verbose " [" \fIlevel\fR ]
+Increases or specifies the verbosity level of the output.  This option may be
+repeated.
+.TP
+.BR -H ", " --help
+When this option is encountered,
+.B strinfo
+displays usage information on
+.I stdout
+and exists.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+.B strinfo
+displays version information on
+.I stdout
+and exists.
+.TP
+.BR -C ", " --copying
+When this option is encountered,
+.B strinfo
+displays copying and copyright information on
+.I stdout
+and exists.
 .PP
 Only one of
 .BR -m " or " -q
@@ -188,6 +229,9 @@ provide
 .B strinfo
 for compatibility with
 .BR AIX \(rg.
+.IP \(bu
+.BR AIX \(rg
+does not document long options.
 .\"
 .\"
 .SH CONFORMANCE
@@ -198,6 +242,9 @@ documentation.
 .\"
 .SH HISTORY
 .PP
+.B strinfo
+first appeared in
+.BR AIX \(rg.
 .\"
 .\"
 .[

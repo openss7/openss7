@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.1 2004/03/04 23:15:47 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.2 2004/03/06 21:39:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SC_H__
 #define __SYS_SC_H__
+
+#define SC_IOC_MAGIC 'C'
+#define SC_IOC_LIST ((SC_IOC_MAGIC << 8) | 0x01)
 
 #define SCI_FOO 1
 #define SCI_BAR 2
@@ -61,6 +64,41 @@ struct foo {
 
 struct bar {
 	int bar;
+};
+
+#ifndef __KERNEL__
+#undef  module_info
+#define module_info smodule_info
+struct module_info {
+	ushort mi_idnum;		/* module id number */
+	char *mi_idname;		/* module name */
+	ssize_t mi_minpsz;		/* min packet size accepted *//* OSF/Mac OT: long */
+	ssize_t mi_maxpsz;		/* max packet size accepted *//* OSF/Mac OT: long */
+	size_t mi_hiwat;		/* hi water mark *//* OSF/Mac OT: ulong */
+	size_t mi_lowat;		/* lo water mark *//* OSF/Mac OT: ulong */
+};
+
+typedef struct module_stat {
+	long ms_pcnt;			/* calls to qi_putp() */
+	long ms_scnt;			/* calls to qi_srvp() */
+	long ms_ocnt;			/* calls to qi_qopen() */
+	long ms_ccnt;			/* calls to qi_qclose() */
+	long ms_acnt;			/* calls to qi_qadmin() */
+	void *ms_xprt;			/* module private stats */
+	short ms_xsize;			/* len of private stats */
+	uint ms_flags;			/* bool stats -- for future use */
+} module_stat_t;
+#endif
+
+struct sc_mlist {
+	int major;
+	struct module_info mi;
+	struct module_stat ms;
+};
+
+struct sc_list {
+	int sc_nmods;
+	struct sc_mlist *sc_mlist;
 };
 
 #endif				/* __SYS_SC_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
 
-static char const ident[] = "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] = "$RCSfile: strchg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
 
 /* 
  * SVR 4.2 utility: strchg - Changes stream configuration.
@@ -88,9 +88,7 @@ version(int argc, char *argv[])
 %1$s:\n\
     %2$s\n\
     Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-\n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
-    included here by reference.\n\
+    Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }
 
@@ -159,6 +157,8 @@ copying(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 --------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
 Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -194,7 +194,7 @@ regulations).\n\
 Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
 --------------------------------------------------------------------------------\n\
-");
+", ident);
 }
 
 #ifndef PATH_MAX

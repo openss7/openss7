@@ -68,11 +68,15 @@ static char const ident[] = "nuls.c,v (1.1.2.2) 2003/10/21 21:50:19";
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
-#include "strdebug.h"
-#include "strreg.h"		/* for struct str_args */
-#include "strsched.h"		/* for ap_get/ap_put */
+// #include "strdebug.h"
+// #include "strreg.h" /* for struct str_args */
+// #include "strsched.h" /* for ap_get/ap_put */
 
+#ifndef _LIS_
 #include "sys/config.h"
+#else
+#include "sys/LiS/config.h"
+#endif
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
@@ -94,16 +98,25 @@ MODULE_SUPPORTED_DEVICE(NULS_DEVICE);
 MODULE_LICENSE(NULS_LICENSE);
 
 #ifndef CONFIG_STREAMS_NULS_NAME
-//#define CONFIG_STREAMS_NULS_NAME "nuls"
-#error "CONFIG_STREAMS_NULS_NAME must be defined."
+#define CONFIG_STREAMS_NULS_NAME "nuls"
 #endif
+
+#ifndef _LIS_
 #ifndef CONFIG_STREAMS_NULS_MODID
-//#define CONFIG_STREAMS_NULS_MODID 3
-#error "CONFIG_STREAMS_NULS_MODID must be defined."
+#error CONFIG_STREAMS_NULS_MODID must be defined.
 #endif
 #ifndef CONFIG_STREAMS_NULS_MAJOR
-//#define CONFIG_STREAMS_NULS_MAJOR 0
-#error "CONFIG_STREAMS_NULS_MAJOR must be defined."
+#error CONFIG_STREAMS_NULS_MAJOR must be defined.
+#endif
+#else
+#ifndef NULS__CMAJOR_0
+#error NULS__CMAJOR_0 must be defined.
+#endif
+#ifndef NULS__ID
+#error NULS__ID must be defined.
+#endif
+#define CONFIG_STREAMS_NULS_MAJOR NULS__CMAJOR_0
+#define CONFIG_STREAMS_NULS_MODID NULS__ID
 #endif
 
 static unsigned short major = CONFIG_STREAMS_NULS_MAJOR;
@@ -111,15 +124,16 @@ MODULE_PARM(major, "b");
 MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto allocation)");
 
 static struct module_info nuls_minfo = {
-	mi_idnum:CONFIG_STREAMS_NULS_MODID,
-	mi_idname:CONFIG_STREAMS_NULS_NAME,
-	mi_minpsz:0,
-	mi_maxpsz:INFPSZ,
-	mi_hiwat:STRHIGH,
-	mi_lowat:STRLOW,
+      mi_idnum:CONFIG_STREAMS_NULS_MODID,
+      mi_idname:CONFIG_STREAMS_NULS_NAME,
+      mi_minpsz:0,
+      mi_maxpsz:INFPSZ,
+      mi_hiwat:STRHIGH,
+      mi_lowat:STRLOW,
 };
 
-static int nuls_put(queue_t *q, mblk_t *mp)
+static int
+nuls_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 	switch (mp->b_datap->db_type) {
@@ -147,6 +161,11 @@ static int nuls_put(queue_t *q, mblk_t *mp)
 	case M_IOCDATA:
 		err = -EINVAL;
 		goto nak;
+	case M_READ:
+		mp->b_wptr = mp->b_rptr;
+		mp->b_datap->db_type = M_DATA;
+		qreply(q, mp);
+		return (0);
 	}
 	freemsg(mp);
 	return (0);
@@ -171,7 +190,8 @@ typedef struct nuls {
 static spinlock_t nuls_lock = SPIN_LOCK_UNLOCKED;
 static struct nuls *nuls_list = NULL;
 
-static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int
+nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct nuls *p, **pp = &nuls_list;
 	int cmajor, cminor;
@@ -195,8 +215,8 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			return (ENXIO);
 		spin_lock(&nuls_lock);
 		for (; *pp && (dmajor = getmajor((*pp)->dev)) < cmajor; pp = &(*pp)->next) ;
-		for (; *pp && dmajor == getmajor((*pp)->dev) &&
-		     cminor == getminor(makedevice(cmajor, cminor)); pp = &(*pp)->next, cminor++) {
+		for (; *pp && dmajor == getmajor((*pp)->dev)
+		     && cminor == getminor(makedevice(cmajor, cminor)); pp = &(*pp)->next, cminor++) {
 			int dminor = getminor((*pp)->dev);
 			if (cminor < dminor)
 				break;
@@ -224,7 +244,8 @@ static int nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-static int nuls_close(queue_t *q, int oflag, cred_t *crp)
+static int
+nuls_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct nuls *p;
 	if ((p = q->q_ptr) == NULL)
@@ -239,28 +260,35 @@ static int nuls_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-static struct qinit nuls_qinit = {
-	qi_putp:nuls_put,
-	qi_qopen:nuls_open,
-	qi_qclose:nuls_close,
-	qi_minfo:&nuls_minfo,
+static struct qinit nuls_rqinit = {
+      qi_qopen:nuls_open,
+      qi_qclose:nuls_close,
+      qi_minfo:&nuls_minfo,
+};
+
+static struct qinit nuls_wqinit = {
+      qi_putp:nuls_put,
+      qi_minfo:&nuls_minfo,
 };
 
 static struct streamtab nuls_info = {
-	st_rdinit:&nuls_qinit,
-	st_wrinit:&nuls_qinit,
+      st_rdinit:&nuls_rqinit,
+      st_wrinit:&nuls_wqinit,
 };
 
+#ifndef _LIS_
 static struct cdevsw nuls_cdev = {
-	d_name:CONFIG_STREAMS_NULS_NAME,
-	d_str:&nuls_info,
-	d_flag:0,
-	d_fop:NULL,
-	d_mode:S_IFCHR,
-	d_kmod:THIS_MODULE,
+      d_name:CONFIG_STREAMS_NULS_NAME,
+      d_str:&nuls_info,
+      d_flag:0,
+      d_fop:NULL,
+      d_mode:S_IFCHR,
+      d_kmod:THIS_MODULE,
 };
+#endif
 
-static int __init nuls_init(void)
+static int __init
+nuls_init(void)
 {
 	int err;
 #ifdef MODULE
@@ -268,15 +296,25 @@ static int __init nuls_init(void)
 #else
 	printk(KERN_INFO NULS_SPLASH);
 #endif
+#ifndef _LIS_
 	if ((err = register_strdev(makedevice(major, 0), &nuls_cdev)) < 0)
 		return (err);
+#else
+	if ((err = lis_register_strdev(major, &nuls_info, 255, CONFIG_STREAMS_NULS_NAME)) < 0)
+		return (err);
+#endif
 	if (err > 0)
 		major = err;
 	return (0);
 };
-static void __exit nuls_exit(void)
+static void __exit
+nuls_exit(void)
 {
+#ifndef _LIS_
 	unregister_strdev(makedevice(major, 0), &nuls_cdev);
+#else
+	lis_unregister_strdev(major);
+#endif
 };
 
 module_init(nuls_init);

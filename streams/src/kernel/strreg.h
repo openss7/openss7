@@ -66,6 +66,9 @@ typedef struct str_args {
 extern rwlock_t cdevsw_lock;
 extern rwlock_t fmodsw_lock;
 
+extern int cdev_count;
+extern int fmod_count;
+
 extern struct list_head cdevsw_list;
 extern struct list_head fmodsw_list;
 

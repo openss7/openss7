@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocindent
 .\"
-.\" @(#) $Id: scls.8.man,v 0.9.2.1 2004/03/04 23:15:46 brian Exp $
+.\" @(#) $Id: scls.8.man,v 0.9.2.2 2004/03/06 21:39:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SCLS 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH SCLS 8 "$Date: 2004/03/06 21:39:47 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -105,25 +105,151 @@ produced is for only those names.
 .SH OPTIONS
 .PP
 .TP
-\fB-c\fR, \fB--count\fR
-Produces a listing showing the number of times an interface routine was
-called.
+[\fImodule\fR ...]
+When issued without the
+.BR -c " or " -l
+options,
+.B scls
+lists the specified driver or module name if it is loaded on the
+.I STREAMS
+system, or, if no
+.I module
+name is specified, the names of all of the drivers and modules currently
+loaded on the
+.I STREAMS
+system.
+.RS
+.PP
+The format of the output without the
+.BR -c " or " -l
+options is
+.sp
+.RB < name >,
+where
 .TP
-\fB-l\fR, \fB--long\fR
+.RB < name >
+is the name of the driver or module.
+.RE
+.TP
+\fB-l\fR, \fB--long\fR [\fImodule\fR ...]
 Produces a listing that shows the extension type, major number, and
 information pertaining to the
 .B module_info
-structure.
+structure, for each
+.I module
+name listed, or, if no
+.I module
+name is specified, all modules on the system.
+.RS
+.PP
+The format of the output with the
+.B -l
+option is
+.sp
+.RB < type "> <" major "> <" mi_idnum "> <" mi_idname "> <" mi_minpsz "> <" mi_maxpsz "> <" mi_hiwat "> <" mi_lowat >,
+where
+.TP
+.RB < type >
+The module type.  This is either: \(lqmodule\(rq or \(lqdriver\(rq.
+.TP
+.RB < major >
+The major device number
+.RI ( %d )
+when
+.I type
+is \(lqDriver\(rq, and a space otherwise.
+.TP
+.RB < mi_idnum >
+The module ID number for the module
+.RI ( %d ).
+.TP
+.RB < mi_idname >
+The module name.
+.TP
+.RB < mi_minpsz >
+The minimum packet size accepted.
+.TP
+.RB < mi_maxpsz >
+The maximum packet size accepted.
+.TP
+.RB < mi_hiwat >
+The (initial) high water mark for the queue pair.
+.TP
+.RB < mi_lowat >
+The (initial) low water mark for the queue pair.
+.RE
+.TP
+\fB-c\fR, \fB--count\fR [\fImodule\fR ...]
+Produces a listing showing the number of times an interface routine was
+called for each
+.I module
+name listed, or, if no
+.I module
+name is specified, all modules on the system.  Information is obtained from
+the
+.BR module_stat (9)
+structure if one is specified for the module.
+.RS
+.PP
+The format of the output with the
+.B -c
+option is
+.sp
+.RB < ms_pcnt "> <" ms_scnt "> <" ms_ocnt "> <" ms_acnt "> <" ms_flags >,
+where
+.TP
+.RB < ms_pcnt >
+The number of calls to the module's
+.BR putp (9)
+procedure, as a decimal number
+.RI ( %lu ).
+.TP
+.RB < ms_scnt >
+The number of calls to the module's
+.BR srvp (9)
+procedure, as a decimal number
+.TP
+.RB < ms_ocnt >
+The number of calls to the module's
+.BR qopen (9)
+procedure.
+.TP
+.RB < ms_acnt >
+The number of calls to the module's
+.BR qadmin (9)
+procedure.
+.TP
+.RB < ms_flags >
+Boolean statistics flags.
+.RE
 .TP
 \fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
 .TP
-\fB-v\fR, \fB--verbose\fR
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase or specify the verbosity level of the output.  This option may be
+repeated.
 .TP
 \fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B scls
+displays usage information on
+.I stdout
+and exits.
 .TP
 \fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B scls
+displays versions information on
+.I stdout
+and exits.
 .TP
 \fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B scls
+displays copying and copyright information on
+.I stdout
+and exits.
 .PP
 The
 .BR -c " and " -l
@@ -132,6 +258,19 @@ options are mutually exclusive.
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of zero (0) indicates that the command was successful;
+one (1) indicates that an error occured and a diagnostic messages is 
+printed to
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors may result from inadequate permissions, inability to open the
+.BR nuls (4)
+driver, inability to push the
+.BR sc (4)
+module.
 .\"
 .\"
 .SH NOTICES
@@ -152,6 +291,129 @@ command will not be successful.
 .\"
 .SH EXAMPLES
 .PP
+Following is an example of the output of the
+.B scls
+command without options:
+.RS
+.nf
+\fC\s-1
+#> scls
+clone
+dlb
+kinfo
+log
+nuls
+echo
+sad
+pipe
+xtisoUDP
+xtisoTCP
+ptm
+pts
+bba
+lat
+pppif
+pppasync
+pppcomp
+bufcall
+null
+pass
+errm
+ptem
+spass
+rspass
+pipemod
+timod
+tirdwr
+ldtty
+ifnet
+\s+1\fP
+.fi
+.RE
+.PP
+Following is an example of the output of the
+.B scls
+command with the
+.B -l
+option:
+.RS
+.nf
+\fC\s-1
+#> scls -l
+clone           driver     32       0 xxxx xxxxx xxxxx xxxxx
+dlb             driver     52    5010 xxxx xxxxx xxxxx xxxxx
+kinfo           driver     53    5020 xxxx xxxxx xxxxx xxxxx
+log             driver     54      44 xxxx xxxxx xxxxx xxxxx
+nuls            driver     55    5001 xxxx xxxxx xxxxx xxxxx
+echo            driver     56    5000 xxxx xxxxx xxxxx xxxxx
+sad             driver     57      45 xxxx xxxxx xxxxx xxxxx
+pipe            driver     58    5304 xxxx xxxxx xxxxx xxxxx
+xtisoUDP        driver     59    5010 xxxx xxxxx xxxxx xxxxx
+xtisoTCP        driver     60    5010 xxxx xxxxx xxxxx xxxxx
+ptm             driver     63    7609 xxxx xxxxx xxxxx xxxxx
+pts             driver      6    7608 xxxx xxxxx xxxxx xxxxx
+bba             driver     64   24880 xxxx xxxxx xxxxx xxxxx
+lat             driver      5       5 xxxx xxxxx xxxxx xxxxx
+pppif           module           6002 xxxx xxxxx xxxxx xxxxx
+pppasync        module           6000 xxxx xxxxx xxxxx xxxxx
+pppcomp         module           6001 xxxx xxxxx xxxxx xxxxx
+bufcall         module              0 xxxx xxxxx xxxxx xxxxx
+null            module           5002 xxxx xxxxx xxxxx xxxxx
+pass            module           5003 xxxx xxxxx xxxxx xxxxx
+errm            module           5003 xxxx xxxxx xxxxx xxxxx
+ptem            module           5003 xxxx xxxxx xxxxx xxxxx
+spass           module           5007 xxxx xxxxx xxxxx xxxxx
+rpass           module           5008 xxxx xxxxx xxxxx xxxxx
+pipemod         module           5303 xxxx xxxxx xxxxx xxxxx
+timod           module           5006 xxxx xxxxx xxxxx xxxxx
+tirdwr          module              0 xxxx xxxxx xxxxx xxxxx
+ldtty           module           7701 xxxx xxxxx xxxxx xxxxx
+ifnet           module           5501 xxxx xxxxx xxxxx xxxxx
+\s+1\fP
+.fi
+.RE
+.PP
+Following is an example of the output of the
+.B scls
+command with the
+.B -c
+option:
+.RS
+.nf
+\fC\s-1
+#> scls -c
+clone           %lu     %lu     %lu     %lu     %lx
+dlb             %lu     %lu     %lu     %lu     %lx
+kinfo           %lu     %lu     %lu     %lu     %lx
+log             %lu     %lu     %lu     %lu     %lx
+nuls            %lu     %lu     %lu     %lu     %lx
+echo            %lu     %lu     %lu     %lu     %lx
+sad             %lu     %lu     %lu     %lu     %lx
+pipe            %lu     %lu     %lu     %lu     %lx
+xtisoUDP        %lu     %lu     %lu     %lu     %lx
+xtisoTCP        %lu     %lu     %lu     %lu     %lx
+ptm             %lu     %lu     %lu     %lu     %lx
+pts             %lu     %lu     %lu     %lu     %lx
+bba             %lu     %lu     %lu     %lu     %lx
+lat             %lu     %lu     %lu     %lu     %lx
+pppif           %lu     %lu     %lu     %lu     %lx
+pppasync        %lu     %lu     %lu     %lu     %lx
+pppcomp         %lu     %lu     %lu     %lu     %lx
+bufcall         %lu     %lu     %lu     %lu     %lx
+null            %lu     %lu     %lu     %lu     %lx
+pass            %lu     %lu     %lu     %lu     %lx
+errm            %lu     %lu     %lu     %lu     %lx
+ptem            %lu     %lu     %lu     %lu     %lx
+spass           %lu     %lu     %lu     %lu     %lx
+rpass           %lu     %lu     %lu     %lu     %lx
+pipemod         %lu     %lu     %lu     %lu     %lx
+timod           %lu     %lu     %lu     %lu     %lx
+tirdwr          %lu     %lu     %lu     %lu     %lx
+ldtty           %lu     %lu     %lu     %lu     %lx
+ifnet           %lu     %lu     %lu     %lu     %lx
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH DEVICES
@@ -179,11 +441,15 @@ command.
 .PP
 .BR sc (4),
 .BR nuls (4),
-.BR strload (8).
+.BR strinfo (8),
+.BR strload (8),
+.BR strsetup (8).
 .\"
 .\"
 .SH BUGS
 .PP
+.B scls
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -196,6 +462,26 @@ command.
 is provide in
 .B Linux Fast-STREAMS
 for compatibility with
+.BR AIX \(rg
+with the following portability considerations:
+.IP \(bu
+.BR AIX \(rg
+does not document long options.
+.IP \(bu
+.BR AIX \(rg
+does not document the
+.BR -q ", " -v ", " -h ", " -V " or " -C
+options.
+.IP \(bu
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards.
+.IP \(bu
+The format of the output from the
+.B scls
+command with the
+.BR -c " or " -l
+options may be different from that of
 .BR AIX \(rg.
 .\"
 .\"
@@ -203,10 +489,16 @@ for compatibility with
 .PP
 .BR AIX \(rg
 documentation.
+.[
+aixdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B scls
+first appeared in
+.BR AIX \(rg.
 .\"
 .\"
 .[

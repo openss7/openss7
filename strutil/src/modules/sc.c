@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
 
-static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -77,13 +77,14 @@ static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 
 #include <sys/sc.h>
 
+#include "strreg.h"
 #include "strdebug.h"
 
 #include "sys/config.h"
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -129,6 +130,8 @@ static struct module_info sc_minfo = {
  */
 struct sc {
 	int iocstate;
+	int transparent;
+	int count;
 };
 
 /* 
@@ -168,78 +171,113 @@ sc_wput(queue_t *q, mblk_t *mp)
 	case M_IOCTL:
 		ioc = (typeof(ioc)) mp->b_rptr;
 		switch (ioc->iocblk.ioc_cmd) {
-		case SCI_FOO:
+		case SC_IOC_LIST:
 			err = -EPERM;
 			if (ioc->iocblk.ioc_uid != 0)
 				goto nak;
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
+				void *addr = *(void **) dp->b_rptr;
+				if (addr == NULL) {
+					rval = /* how name drivers and modules? */ 0;
+					goto ack;
+				}
 				mp->b_datap->db_type = M_COPYIN;
-				ioc->copyreq.cq_addr = *(void **) dp->b_rptr;
-				ioc->copyreq.cq_size = sizeof(struct foo);
+				ioc->copyreq.cq_addr = addr;
+				ioc->copyreq.cq_size = sizeof(struct sc_list);
 				ioc->copyreq.cq_flag = 0;
 				sc->iocstate = 1;
+				sc->transparent = 1;
 				qreply(q, mp);
 				return (0);
 			}
-			err = -EFAULT;
-			if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct foo))
-				goto nak;
 			sc->iocstate = 1;
-			goto sc_foo_state_1;
-		case SCI_BAR:
-			err = -EPERM;
-			if (ioc->iocblk.ioc_uid != 0)
-				goto nak;
-			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				mp->b_datap->db_type = M_COPYIN;
-				ioc->copyreq.cq_addr = *(void **) dp->b_rptr;
-				ioc->copyreq.cq_size = sizeof(struct bar);
-				ioc->copyreq.cq_flag = 0;
-				sc->iocstate = 1;
-				qreply(q, mp);
-				return (0);
-			}
-			err = -EFAULT;
-			if (!dp || dp->b_wptr < dp->b_rptr + sizeof(struct bar))
-				goto nak;
-			sc->iocstate = 1;
-			goto sc_bar_state_1;
+			sc->transparent = 0;
+			goto sc_list_state_1;
 		}
 		break;
 	case M_IOCDATA:
 		ioc = (typeof(ioc)) mp->b_rptr;
 		switch (ioc->copyresp.cp_cmd) {
-		case SCI_FOO:
+		case SC_IOC_LIST:
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
-				struct foo *foo;
+				int i, j, count;
+				struct sc_list *list;
+				struct sc_mlist *mlist;
+				struct list_head *pos;
 				switch (sc->iocstate) {
 				case 1:
-				      sc_foo_state_1:
+				      sc_list_state_1:
 					err = -EFAULT;
-					if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*foo))
+					if (!dp)
 						goto nak;
-					foo = (typeof(foo)) dp->b_rptr;
-					/* do something with foo */
+					if (dp->b_wptr == dp->b_rptr) {
+						err = 0;
+						rval = cdev_count + fmod_count;
+						goto ack;
+					}
+					err = -EFAULT;
+					if (dp->b_wptr < dp->b_rptr + sizeof(*list))
+						goto nak;
+					list = (typeof(list)) dp->b_rptr;
+					err = -EINVAL;
+					if (list->sc_nmods < 0)
+						goto nak;
+					count = sc->count;
+					list->sc_nmods = count;
+					mlist = (typeof(mlist)) dp->b_rptr;
+					/* list all devices */
+					read_lock(&cdevsw_lock);
+					for (i = 0, j = 0; i < MAX_STRDEV && j < count; i++) {
+						struct cdevsw *cdev;
+						if ((cdev = cdevsw[i])) {
+							struct qinit *qinit =
+							    cdev->d_str->st_rdinit;
+							mlist->major = i;
+							mlist->mi = *qinit->qi_minfo;
+							if (qinit->qi_mstat)
+								mlist->ms = *qinit->qi_mstat;
+							j++;
+							mlist++;
+						}
+					}
+					read_unlock(&cdevsw_lock);
+					/* list all modules */
+					read_lock(&fmodsw_lock);
+					list_for_each(pos, &fmodsw_list) {
+						if (j < count) {
+							struct fmodsw *fmod =
+							    list_entry(pos, struct fmodsw, f_list);
+							struct qinit *qinit =
+							    fmod->f_str->st_rdinit;
+							mlist->major = 0;
+							mlist->mi = *qinit->qi_minfo;
+							if (qinit->qi_mstat)
+								mlist->ms = *qinit->qi_mstat;
+							j++;
+							mlist++;
+						} else
+							break;
+					}
+					read_unlock(&fmodsw_lock);
+					/* zero all excess elements */
+					for (; j < count; j++, mlist++) {
+						mlist->major = -1;
+					}
+					mp->b_datap->db_type = M_COPYOUT;
+					ioc->copyreq.cq_addr = (void *) list->sc_mlist;
+					ioc->copyreq.cq_size = sc->count * sizeof(struct sc_mlist);
+					ioc->copyreq.cq_flag = 0;
+					sc->iocstate = 2;
+					qreply(q, mp);
+					return (0);
+				case 2:
+					/* done */
+					sc->iocstate = 0;
+					goto ack;
 				}
 			}
 			goto nak;
-		case SCI_BAR:
-			err = -(long) ioc->copyresp.cp_rval;
-			if (err == 0) {
-				struct bar *bar;
-				switch (sc->iocstate) {
-				case 1:
-				      sc_bar_state_1:
-					err = -EFAULT;
-					if (!dp || dp->b_wptr < dp->b_rptr + sizeof(*bar))
-						goto nak;
-					bar = (typeof(bar)) dp->b_rptr;
-					/* do something with bar */
-				}
-			}
-			goto nak;
-			goto ack;
 		}
 	      nak:
 		sc->iocstate = 0;
@@ -285,6 +323,7 @@ sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (!(sc = kmem_alloc(sizeof(*sc), KM_NOSLEEP)))
 			return (-ENOMEM);
 		sc->iocstate = 0;
+		sc->transparent = 0;
 		q->q_ptr = WR(q)->q_ptr = sc;
 		return (0);
 	}
@@ -299,6 +338,7 @@ sc_close(queue_t *q, int oflag, cred_t *crp)
 	if (!sc)
 		return (ENXIO);
 	sc->iocstate = 0;
+	sc->transparent = 0;
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	kmem_free(q->q_ptr, sizeof(struct sc));
 	return (0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/06 21:39:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/06 21:39:47 $"
 
-static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/06 21:39:47 $";
 
 /*
  * AIX Utility: Loads and configures STREAMS.
@@ -77,6 +77,7 @@ static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
+int debug = 0;
 int verbose = 1;
 
 void
@@ -88,9 +89,7 @@ version(int argc, char *argv[])
 %1$s:\n\
     %2$s\n\
     Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-\n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
-    included here by reference.\n\
+    Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }
 
@@ -146,6 +145,53 @@ Options:\n\
     -V, --version\n\
 	print the version and exits\n\
 ", argv[0]);
+}
+
+static void
+copying(int argc, char *argv[])
+{
+	if (verbose < 1 && !debug)
+		return;
+	fprintf(stdout, "\
+--------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+--------------------------------------------------------------------------------\n\
+This program is free software; you can  redistribute  it and/or modify  it under\n\
+the terms  of the GNU General Public License  as  published by the Free Software\n\
+Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
+version.\n\
+\n\
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+\n\
+You should  have received a copy of the GNU  General  Public License  along with\n\
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
+Cambridge, MA 02139, USA.\n\
+--------------------------------------------------------------------------------\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
+the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
+as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the  license rights granted\n\
+herein (the license rights customarily provided to non-Government users). If the\n\
+Software is supplied to any unit or agency of the Government  other than DoD, it\n\
+is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
+Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
+regulations).\n\
+--------------------------------------------------------------------------------\n\
+Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
+Corporation at a fee.  See http://www.openss7.com/\n\
+--------------------------------------------------------------------------------\n\
+", ident);
 }
 
 enum { CMD_NONE, CMD_LOAD, CMD_UNLOAD, CMD_QUERY, };

@@ -3209,8 +3209,8 @@ Part 1: Protocol Specification
 %U http://www.gcom.com/
 
 %K lfs
-%L LfS 0.9.2
-%R LfS 0.9.2
+%L LfS-0.9.2
+%R LfS-0.9.2
 %A OpenSS7
 %Q OpenSS7
 %T Linux Fast-STREAMS (LfS) 0.9.2 Source Code

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: autopush.8.man,v 0.9.2.2 2004/03/04 23:15:46 brian Exp $
+.\" @(#) $Id: autopush.8.man,v 0.9.2.3 2004/03/06 21:39:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2004/03/06 21:39:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH AUTOPUSH 8 "$Date: 2004/03/04 23:15:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
+.TH AUTOPUSH 8 "$Date: 2004/03/06 21:39:46 $" "$Name:  $" "Linux Fast-STREAMS Administration"
 .\"
 .\"
 .SH NAME
@@ -81,7 +81,7 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
+.HP
 \fBautopush \fR[\fIoptions\fR]\fB \fR{\fP-f\fR|\fP--file\fR}\fP \fIfilename\fP
 .HP
 \fBautopush \fR[\fIoptions\fR]\fB \fR{\fP-g\fR|\fP--get\fR} [{\fP-M \fR[\fImajor\fR|\fIname\fR]|\fB-N \fIdriver\fR} [\fB-m\fI minor\fR]]\fP
@@ -338,16 +338,16 @@ When the
 .I filename
 option is specified, the format the supplied file contains autopush specified
 entries.
-.IP \- 3
+.IP \(bu
 Each line in the file contains one entry or comment per line.
-.IP \- 3
+.IP \(bu
 Each entry consists of of a number of fields delimited by whitespace (see
 .BR isspace (3)).
-.IP \- 3
+.IP \(bu
 Any field that begins with a
 .RI \' # \'
 character is a comment that continues to the end of the line.
-.IP \- 3
+.IP \(bu
 Any line containing only a comment (beginning with optional whitespace and a
 .RI \' # \'
 character) is ignored.
@@ -756,9 +756,9 @@ should be avoided.
 .\"
 .SH CONFORMANCE
 .PP
-.BR "SVR 4" ;
+.BR "SVR 4.2" ;
 .[
-svr4cr
+svr42cr
 .]
 .BR UnixWare \(rg,
 .BR Solaris \(rg,

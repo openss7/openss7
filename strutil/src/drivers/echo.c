@@ -64,15 +64,21 @@ static char const ident[] = "echo.c,v (1.1.2.2) 2003/10/21 21:50:08";
 #include <sys/kmem.h>
 #include <sys/stropts.h>
 #include <sys/stream.h>
+#ifndef _LIS_
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
+#endif
 #include <sys/ddi.h>
 
+#ifndef _LIS_
 #include "sys/config.h"
+#else
+#include "sys/LiS/config.h"
+#endif
 
-#include "strdebug.h"
-#include "strreg.h"		/* for struct str_args */
-#include "strsched.h"		/* for ap_get/ap_put */
+//#include "strdebug.h"
+//#include "strreg.h"		/* for struct str_args */
+//#include "strsched.h"		/* for ap_get/ap_put */
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
@@ -94,16 +100,24 @@ MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
 MODULE_LICENSE(ECHO_LICENSE);
 
 #ifndef CONFIG_STREAMS_ECHO_NAME
-//#define CONFIG_STREAMS_ECHO_NAME "echo"
-#error "CONFIG_STREAMS_ECHO_NAME must be defined."
+#define CONFIG_STREAMS_ECHO_NAME "echo"
 #endif
+#ifndef _LIS_
 #ifndef CONFIG_STREAMS_ECHO_MODID
-//#define CONFIG_STREAMS_ECHO_MODID 2
-#error "CONFIG_STREAMS_ECHO_MODID must be defined."
+#error CONFIG_STREAMS_ECHO_MODID must be defined.
 #endif
 #ifndef CONFIG_STREAMS_ECHO_MAJOR
-//#define CONFIG_STREAMS_ECHO_MAJOR 0
-#error "CONFIG_STREAMS_ECHO_MAJOR must be defined."
+#error CONFIG_STREAMS_ECHO_MAJOR must be defined.
+#endif
+#else
+#ifndef ECHO__ID
+#error ECHO__ID must be defined.
+#endif
+#ifndef ECHO__CMAJOR_0
+#error ECHO__CMAJOR_0 must be defined.
+#endif
+#define CONFIG_STREAMS_ECHO_MODID ECHO__ID
+#define CONFIG_STREAMS_ECHO_MAJOR ECHO__CMAJOR_0
 #endif
 
 static unsigned short major = CONFIG_STREAMS_ECHO_MAJOR;
@@ -248,18 +262,23 @@ static int echo_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-static struct qinit echo_qinit = {
-	qi_putp:echo_put,
+static struct qinit echo_rqinit = {
 	qi_qopen:echo_open,
 	qi_qclose:echo_close,
 	qi_minfo:&echo_minfo,
 };
 
-static struct streamtab echo_info = {
-	st_rdinit:&echo_qinit,
-	st_wrinit:&echo_qinit,
+static struct qinit echo_wqinit = {
+	qi_putp:echo_put,
+	qi_minfo:&echo_minfo,
 };
 
+static struct streamtab echo_info = {
+	st_rdinit:&echo_rqinit,
+	st_wrinit:&echo_wqinit,
+};
+
+#ifndef _LIS_
 static struct cdevsw echo_cdev = {
 	d_name:CONFIG_STREAMS_ECHO_NAME,
 	d_str:&echo_info,
@@ -268,6 +287,7 @@ static struct cdevsw echo_cdev = {
 	d_mode:S_IFCHR,
 	d_kmod:THIS_MODULE,
 };
+#endif
 
 static int __init echo_init(void)
 {
@@ -277,15 +297,24 @@ static int __init echo_init(void)
 #else
 	printk(KERN_INFO ECHO_SPLASH);
 #endif
+#ifndef _LIS_
 	if ((err = register_strdev(makedevice(major, 0), &echo_cdev)) < 0)
 		return (err);
+#else
+	if ((err = lis_register_strdev(major, &echo_info, 255, CONFIG_STREAMS_ECHO_NAME)) < 0)
+		return (err);
+#endif
 	if (err > 0)
 		major = err;
 	return (0);
 };
 static void __exit echo_exit(void)
 {
+#ifndef _LIS_
 	unregister_strdev(makedevice(major, 0), &echo_cdev);
+#else
+	lis_unregister_strdev(major);
+#endif
 };
 
 module_init(echo_init);

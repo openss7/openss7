@@ -104,6 +104,9 @@ struct list_head minors_list = LIST_HEAD_INIT(minors_list);	/* Minors go here */
 struct fmodsw *fmodsw[MAX_STRMOD] ____cacheline_aligned = { NULL, };
 struct cdevsw *cdevsw[MAX_STRDEV] ____cacheline_aligned = { NULL, };
 
+int cdev_count = 0;
+int fmod_count = 0;
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -440,6 +443,7 @@ int register_inode_major(dev_t dev, struct cdevsw *cdev, struct file_operations 
 				INIT_LIST_HEAD(&cdev->d_apush);
 		}
 		cdevsw[major] = cdev;
+		cdev_count++;
 	} else
 		ptrace(("[ERROR:%d] - cdev %p, major %hhu, minor %hhu\n", err, cdev, major, minor));
       unlock_and_out:
@@ -475,6 +479,7 @@ int unregister_inode_major(dev_t dev, struct cdevsw *cdev)
 			list_del_init(&cdev->d_list);
 		}
 		cdevsw[major] = NULL;
+		cdev_count--;
 	} else
 		ptrace(("[ERROR:%d] - cdev %p, major %hhu, minor %hhu\n", err, cdev, major, minor));
       unlock_and_out:
@@ -795,6 +800,7 @@ int register_strmod(modID_t modid, struct fmodsw *fmod)
 	if (!fmod->f_regs++)
 		list_add_tail(&fmod->f_list, &fmodsw_list);
 	fmodsw[modid] = fmod;
+	fmod_count++;
 	err = modid;
       done:
 	write_unlock(&fmodsw_lock);
@@ -835,6 +841,7 @@ int unregister_strmod(modID_t modid, struct fmodsw *fmod)
 	if (!--fmod->f_regs)
 		list_del_init(&fmod->f_list);
 	fmodsw[modid] = NULL;
+	fmod_count--;
 	err = modid;
       unlock_out:
 	write_unlock(&fmodsw_lock);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,15 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by $Author: brian $
+ Last Modified $Date: 2004/03/06 21:39:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $"
 
-static char const ident[] = "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] =
+    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/06 21:39:47 $";
 
-/*
+#define _XOPEN_SOURCE 600
+
+/* 
  * SVR 4.2 Utility: strconf - Queries stream configuration.
  */
 
@@ -77,7 +80,8 @@ static char const ident[] = "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
-int verbose = 1;
+static int debug = 0;
+static int verbose = 1;
 
 void
 version(int argc, char *argv[])
@@ -88,9 +92,7 @@ version(int argc, char *argv[])
 %1$s:\n\
     %2$s\n\
     Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
-\n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
-    included here by reference.\n\
+    Distributed under GPL Version 2, included here by reference.\n\
 ", argv[0], ident);
 }
 
@@ -159,6 +161,8 @@ copying(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 --------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
 Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -194,7 +198,7 @@ regulations).\n\
 Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
 --------------------------------------------------------------------------------\n\
-");
+", ident);
 }
 
 enum { CMN_NONE, CMN_PUSH, CMN_POP, CMN_POPUPTO, CMN_POPALL, CMN_FILE };
@@ -226,6 +230,7 @@ main(int argc, char *argv[])
 			{"upto",	required_argument,	NULL, 'u'},
 			{"all",		no_argument,		NULL, 'a'},
 			{"file",	required_argument,	NULL, 'f'},
+			{"debug",	optional_argument,	NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
@@ -234,45 +239,57 @@ main(int argc, char *argv[])
 			{"?",		no_argument,		NULL, 'H'},
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "h:pu:af:qvHVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "h:pu:af:dqvHVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "h:pu:af:qvHVC?");
+		c = getopt(argc, argv, "h:pu:af:dqvHVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
-		case 'h': /* -h, --push modulelist */
+		case 0:
+			goto bad_usage;
+		case 'h':	/* -h, --push modulelist */
 			if (command != CMN_NONE && command != CMN_FILE)
 				goto bad_option;
 			command = CMN_PUSH;
 			mlen = strnlen(optarg, OPTS_MAX);
 			strncpy(mbuf, optarg, OPTS_MAX);
 			break;
-		case 'p': /* -p, --pop */
+		case 'p':	/* -p, --pop */
 			if (command != CMN_NONE && command != CMN_FILE)
 				goto bad_option;
 			command = CMN_POP;
 			break;
-		case 'u': /* -u, --upto module */
+		case 'u':	/* -u, --upto module */
 			if (command != CMN_POP)
 				goto bad_option;
 			mlen = strnlen(optarg, OPTS_MAX);
 			strncpy(mbuf, optarg, OPTS_MAX);
 			command = CMN_POPUPTO;
 			break;
-		case 'a': /* -a, --all */
+		case 'a':	/* -a, --all */
 			if (command != CMN_POP)
 				goto bad_option;
 			command = CMN_POPALL;
 			break;
-		case 'f': /* -f, --file filename */
+		case 'f':	/* -f, --file filename */
 			if (command != CMN_NONE)
 				goto bad_option;
 			command = CMN_FILE;
 			flen = strnlen(optarg, PATH_MAX);
 			strncpy(fbuf, optarg, PATH_MAX);
 			break;
+		case 'd':	/* -d, --debug */
+			if (optarg == NULL) {
+				debug++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			debug = val;
+			break;
 		case 'q':
+			debug = 0;
 			verbose = -1;
 			break;
 		case 'v':
@@ -298,15 +315,20 @@ main(int argc, char *argv[])
 		      bad_option:
 			optind--;
 		      bad_nonopt:
-			if (optind < argc && verbose) {
-				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-				while (optind < argc)
-					fprintf(stderr, "%s ", argv[optind++]);
-				fprintf(stderr, "\n");
+			if (verbose) {
+				if (optind < argc) {
+					fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+					while (optind < argc)
+						fprintf(stderr, "%s ", argv[optind++]);
+					fprintf(stderr, "\n");
+				} else {
+					fprintf(stderr, "%s: missing option or argument", argv[0]);
+					fprintf(stderr, "\n");
+				}
 				fflush(stderr);
+			      bad_usage:
+				usage(argc, argv);
 			}
-		      bad_usage:
-			usage(argc, argv);
 			exit(2);
 		}
 	}
@@ -319,5 +341,3 @@ main(int argc, char *argv[])
 		goto bad_nonopt;
 	exit(0);
 }
-
-
