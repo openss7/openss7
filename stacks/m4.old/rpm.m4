@@ -85,9 +85,9 @@ AC_DEFUN(_RPM_SPEC_OPTIONS,
     AC_ARG_WITH([rpm-release],
         AC_HELP_STRING([--with-rpm-release=RELEASE],
             [specify the RELEASE for the RPM spec file.
-            @<:@default=Custom1@:>@]),
+            @<:@default=1@:>@]),
         [with_rpm_release=$withval],
-        [with_rpm_release='Custom1'])
+        [with_rpm_release='1'])
 ])# _RPM_SPEC_OPTIONS
 # =========================================================================
 
@@ -101,10 +101,10 @@ AC_DEFUN(_RPM_SPEC_SETUP,
     AC_SUBST(PACKAGE_EPOCH)
     AC_DEFINE_UNQUOTED([PACKAGE_EPOCH], [$PACKAGE_EPOCH], [The RPM Epoch. This
         defaults to 1.])
-    PACKAGE_RELEASE="${with_rpm_release:-Custom1}"
+    PACKAGE_RELEASE="${with_rpm_release:-1}"
     AC_SUBST(PACKAGE_RELEASE)
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
-        Release. This defaults to Custom1.])
+        Release. This defaults to 1.])
     PACKAGE_OPTIONS=
     for arg in $ac_configure_args ; do
         if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then

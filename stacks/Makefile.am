@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:56:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/12 02:36:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/01/19 22:56:32 $ by $Author: brian $
+# Last Modified $Date: 2004/02/12 02:36:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,6 +109,15 @@ EXTRA_PROGRAMS			= \
 				  test-x400p-sdt \
 				  test-x400p-sdt2 \
 				  test-x400p-sl
+
+sbin_PROGRAMS			= \
+				  ss7makenodes
+
+ss7makenodes_SOURCES		= ss7makenodes.c
+ss7makenodes_DEPENDENCIES	= strconf.h
+ss7makenodes_LDDADD		=
+ss7makenodes_CPPFLAGS		= @SS7_INCLUDES@ @USER_CPPFLAGS@
+ss7makenodes_CFLAGS		= @USER_CFLAGS@
 
 test_inet_raw_SOURCES		= src/test/inet/test-inet_raw.c
 test_inet_raw_LDFLAGS		= -lLiS
@@ -299,6 +308,7 @@ libSS7mods_a_SOURCES		= \
 				  src/include/os7/queue.h \
 				  src/include/os7/timer.h \
 				  ./strconf.h
+#				  src/modules/sctp/sctp2.c  # later
 
 EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/acb56/sdl_acb56.c \
@@ -496,42 +506,14 @@ streams-tali.o: $(libSS7tali_a_OBJECTS)
 KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
 
-all-am: $(KERNEL_MODULES)
+KERNEL_MODCONF			= conf.modules
+KERNEL_SUBDIR			= ss7
+KMODCONF_EXT			= ss7
 
-#STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
+MANMACRO_PFX			= openss7
+mansrcdir			= $(srcdir)/doc/man
 
-install-exec-local: $(KERNEL_MODULES) conf.modules
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/ss7
-	@list='$(KERNEL_MODULES)'; for p in $$list; do \
-		if test -f $$p; then \
-			f="`echo $$p | sed -e 's|^.*/||;s|libSS7mods_a|streams|;s|_|-|g'`" ; \
-			echo "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/ss7/$$f" ; \
-			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/ss7/$$f ; \
-			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULE)" ; then \
-				echo "$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/ss7/$$f" ; \
-				$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/ss7/$$f ; \
-			fi ; \
-		else :; fi ; \
-	done
-	$(INSTALL) -m 600 conf.modules $(DESTDIR)$(kmoduledir)/modules.ss7
-
-install-data-local: $(man_MANS) $(srcdir)/doc/man/openss7.macros $(srcdir)/doc/man/openss7.refs
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(mandir)
-	$(INSTALL_DATA) $(srcdir)/doc/man/openss7.macros $(DESTDIR)$(mandir)
-	$(INSTALL_DATA) $(srcdir)/doc/man/openss7.refs   $(DESTDIR)$(mandir)
-
-uninstall-local:
-	@$(NORMAL_UNINSTALL)
-	@list='$(KERNEL_MODULES)'; for p in $$list; do \
-		p="`echo $$p | sed -e 's|^.*/||;s|libSS7mods_a|streams|;s|_|-|g'`" ; \
-		echo "$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/ss7/$$p" ; \
-		$(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(kmoduledir)/ss7/$$p ; \
-	done
-	rm -f $(DESTDIR)$(kmoduledir)/modules.ss7
-	rm -f $(DESTDIR)$(mandir)/openss7.macros
-	rm -f $(DESTDIR)$(mandir)/openss7.refs
+include kernel.am
 
 man_MANS = \
 	doc/man/man3/cframe.3 doc/man/man3/soon.3 doc/man/man3/xti_mtp.3 doc/man/man3/xti_sccp.3 \
@@ -907,6 +889,7 @@ uninstall-nobase_includeHEADERS:
 
 STRCONF_SCRIPT	    = $(auxdir)/strconf-sh
 STRCONF		    = $(SHELL) $(STRCONF_SCRIPT) -b190
+STRMAKENODES	    = ss7makenodes
 
 Config.master: $(strconf_FILES)
 	cat /dev/null > Config.master
@@ -925,7 +908,16 @@ strconf.h: Config.master $(STRCONF_SCRIPT)
 devices.lst: Config.master $(STRCONF_SCRIPT)
 	$(STRCONF) --strmknods=devices.lst Config.master
 
+ss7makenodes.c: Config.master $(STRCONF_SCRIPT)
+	$(STRCONF) --makenodes=ss7makenodes.c Config.master
+
 $(libSS7mods_a_OBJECTS): strconf.h
+
+install-devices: $(STRMAKENODES)
+	$(STRMAKENODES)
+
+uninstall-devices: $(STRMAKENODES)
+	$(STRMAKENODES) --remove
 
 all-am: conf.modules strconf.h devices.lst
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) kernel.m4,v LiS-2_16_18-1(1.1.2.1) 2004/01/13 16:11:34
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/12 02:36:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified 2004/01/13 16:11:34 by brian
+# Last Modified $Date: 2004/02/12 02:36:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -338,7 +338,9 @@ AC_DEFUN(_LINUX_CHECK_KERNEL_MODULES,
             fi
         fi
     fi
+    krootdir="${linux_cv_module_prefix}"
     kmoduledir="${linux_cv_k_modules}"
+    AC_SUBST(krootdir)
     AC_SUBST(kmoduledir)
 ])# _LINUX_CHECK_KERNEL_MODULES
 # =========================================================================
