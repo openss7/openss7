@@ -1,0 +1,421 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: strsetup,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/09 01:21:48 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/03/09 01:21:48 $ by $Author: brian $
+#
+# =============================================================================
+
+ECHO='echo'
+SHELL='/bin/bash'
+SED='sed'
+
+# Check that we have a woring $ECHO.
+if test "X$1" = X--no-reexec ; then
+    # Discard the --no-reexec flag, and continue
+    shift
+elif test "X`(echo '\t')` 2>/dev/null " = 'X\t' ; then
+    :
+else
+    exec $SHELL "$0" --no-reexec ${1+"$@"}
+fi
+
+if test "X$1" = X--fallback-echo ; then
+    shift
+    cat <<EOF
+$*
+EOF
+    exit 0
+fi
+
+program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
+modename="$program"
+reexec="$SHELL $0"
+
+ident='$RCSfile: strsetup,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/09 01:21:48 $'
+
+HELP="Try \`$program --help' for more information."
+
+MKDIR='mkdir'
+MV='/bin/mv -f'
+RM='/bin/rm -f'
+
+# Sed substitution that helps us do robust quoting.  It backslashifies
+# metacharacters that are still active within double-quoted strings.
+Xsed="$SED"' -e 1s/^X//'
+sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
+# test EBCDIC or ASCII
+case `$ECHO A | od -x` in
+    *[Cc]1*) # EBCDIC based system
+	SP2NL="tr '\100' '\n'"
+	NL2SP="tr '\r\n' '\100\100'"
+	;;
+    *) # Assume ASCII based system
+	SP2NL="tr '\040' '\012'"
+	NL2SP="tr '\015\012' '\040\040'"
+	;;
+esac
+
+# NLS nuisances.
+# Only set LANG and LC_ALL to C if already set.
+# These must not be set unconditionally because not all systems understand
+# e.g. LANG=C (notably SCO).
+# We save the old values to restore during execute mode.
+if test "${LC_ALL+set}" = set ; then
+    save_LC_ALL="$LC_ALL"; LC_ALL=C; export LC_ALL
+fi
+if test "${LANG+set}" = set ; then
+    save_LANG="$LANG"; LANG=C; export LANG
+fi
+
+# Make sure IFS has a sensible default
+: ${IFS=" 	"}
+
+strsetup_letters='abcdefghijklmnopqrstuvwxyz'
+strsetup_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+strsetup_Letters=$strsetup_letters$strsetup_LETTERS
+strsetup_numbers='0123456789'
+strsetup_alphano=$strsetup_Letters$strsetup_numbers
+strsetup_uppercase="$SED y%*$strsetup_letters%P$strsetup_LETTERS%;s%[^_$strsetup_alphano]%_%g"
+strsetup_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+
+# Defaults
+
+default_command="config"
+default_filename="/etc/strsetup.conf"
+
+command=
+filename=
+debug=0
+verbose=1
+
+function version()
+{
+    cat <<EOF
+$program:
+    $ident
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.
+    Distributed under GPL Version 2, included here by reference.
+EOF
+    exit 0
+}
+
+function usage()
+{
+    cat <<EOF
+Usage:
+    $program [options] { -c | --config }
+    $program [options] { -i | --install }
+    $program [options] { -f | --filename } FILENAME
+    $program [options] { -d | --delete }
+    $program { -h | --help }
+    $program { -V | --version }
+    $program { -C | --copying }
+EOF
+}
+
+function help()
+{
+    usage
+    cat <<EOF
+Options:
+    -a, --age=AGE
+        age of files (in days) to delete [default: '$default_age']
+    -b, --basename=BASENAME
+        file basename [default: '$default_basename']
+    -d, --directory=DIRECTORY
+        directory in which to search for logfiles [default: '$default_directory']
+    -o, --outfile=OUTFILE
+        remove files matching outfile [default: '$default_outfile']
+    -e, --errfile=ERRFILE
+        remove files matching errfile [default: '$default_errfile']
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+    exit 0
+}
+
+function copying()
+{
+    cat <<EOF
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the GNU General Public License  as  published by the Free Software
+Foundation; either  version  2  of  the  License, or (at  your option) any later
+version.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should  have received a copy of the GNU  General  Public License  along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,
+Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+    exit 0
+}
+
+# Parse our command line options once, thoroughly.
+while test "$#" -gt 0
+do
+    arg="$1"
+    shift
+    if test x"$more_options" = xno ; then
+	nonopt="$arg"
+	break
+    fi
+    # check for attached option argument
+    case $arg in
+	--*=*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'`
+	    ;;
+	-c | -d | -f | -i | -q | -D | -v | -h | -V | -C)
+	    optarg=
+	    ;;
+	-c* | -d* | -f* | -i* | -q* | -D* | -v* | -h* | -V* | -C*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's/-[cdfiqDvhVC]//'`
+	    ;;
+	*)
+	    optarg=
+	    ;;
+    esac
+    # check for optional or required option argument
+    if test -n "$prev" ; then
+	case $arg in
+	    -*)
+		case $prev in
+		    # these have optional arguments
+		    debug | verbose)
+			eval "prev=\"\$(($prev++))\""
+			reexec="$reexec $prevopt"
+			;;
+		    # these have required arguments
+		    filename)
+			$ECHO "$program: option \`$prevopt' requires an argument" 1>&2
+			$ECHO "$HELP" 1>&2
+			exit 2
+			;;
+		    *)
+			$ECHO "$program: option \`$prevopt' requires an argument" 1>&2
+			$ECHO "$HELP" 1>&2
+			exit 2
+			;;
+		esac
+		;;
+	    *)
+		# if the previous option needs an argument, assign it.
+		eval "$prev=\"\$arg\""
+		reexec="$reexec --$prev=\"$arg\""
+		;;
+	esac
+	prev=
+	prevopt=
+	continue
+    fi
+    # Have we seen a non-optional argument yet?
+    case $arg in
+	--help | --h | --Help | --H | -h | -H | -\? | --\?)
+	    help
+	    reexec="$reexec --help"
+	    ;;
+	--version | --versio | --versi | --vers | -V)
+	    version
+	    reexec="$reexec --version"
+	    ;;
+	--copying | --copyin | --copyi | --copy | --cop | --co | --c | -C)
+	    copying
+	    reexec="$reexec --copying"
+	    ;;
+	--verbose | --verbos | --verbo | --verb | -v)
+	    prevopt="$arg"
+	    prev=verbose
+	    ;;
+	--verbose=* | --verbos=* | --verbo=* | --verb=* | -v*)
+	    verbose="$optarg"
+	    reexec="$reexec --verbose=\"$optarg\""
+	    ;;
+	--debug | -D)
+	    $ECHO "$program: enabling shell trace mode" 1>&2
+	    reexec="$reexec --debug"
+	    set -x
+	    ;;
+	--dry-run | --dryrun | --n | -n)
+	    reexec="$reexec --dryrun"
+	    run=:
+	    ;;
+	--quiet | --silent | -q)
+	    reexec="$reexec --quiet"
+	    show=:
+	    ;;
+	--filename | --filenam | --filena | --filen | --file | --fis | --fi | --f | -f)
+	    prevopt="$arg"
+	    prev=filename
+	    ;;
+	--filename=* | --filenam=* | --filena=* | --filen=* | --file=* | --fil=* | --fi=* | --f=* | -f*)
+	    filename="$optarg"
+	    if test ":$command" != ":" ; then
+		:
+	    fi
+	    command=filename
+	    reexec="$reexec --filename=\"$optarg\""
+	    ;;
+	--config | --confi | --conf | --con | --co | --c | -c)
+	    if test ":$command" != ":" ; then
+		:
+	    fi
+	    command=config
+	    reexec="$reexec --config"
+	    ;;
+	--install | --instal | --insta | --inst | --ins | --in | --i | -i)
+	    if test ":$command" != ":" ; then
+		:
+	    fi
+	    command=install
+	    reexec="$reexec --install"
+	    ;;
+	--delete | --delet | --dele | --del | --de | --d | -d)
+	    if test ":$command" != ":" ; then
+		:
+	    fi
+	    command=delete
+	    reexec="$reexec --delete"
+	    ;;
+	--)
+	    # end of options
+	    more_options=no
+	    ;;
+	-*)
+	    $ECHO "$program: unrecognized option \`$arg'" 1>&2
+	    $ECHO "$HELP" 1>&2
+	    exit 2
+	    ;;
+	*)
+	    nonopt="$arg"
+	    break
+	    ;;
+    esac
+done
+
+# hit end of list wanting an argument
+if test -n "$prev" ; then
+    case $arg in
+	-*)
+	    case $prev in
+		# these have optional arguments
+		debug | verbose)
+		    eval "$prev=\"\$(($prev++))\""
+		    reexec="$reexec $prevopt"
+		    ;;
+		# the rest have required arguments
+		*)
+		    $ECHO "$program: option \`$prevopt' requires an argument" 1>&2
+		    $ECHO "$HELP" 1>&2
+		    ;;
+	    esac
+	    ;;
+	*)
+	    # if the previous option needs an argument, assign it
+	    eval "$prev=\"\$arg\""
+	    reexec="$reexec --$prev=\"$arg\""
+	    ;;
+    esac
+fi
+
+if test x"$nonopt" != "x" ; then
+    files="$nonopt ${1-$@}"
+    reexec="$reexec $files"
+else
+    files=''
+fi
+
+# assign all defaults
+if test ":$command" = ":" ; then
+    command=config
+fi
+if test ":$filename" = ":" ; then
+    filename="$default_filename"
+fi
+
+echo "executing: $reexec"
+
+# vim: ft=sh sw=4
