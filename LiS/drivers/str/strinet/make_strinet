@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Argument to this script can be:
+#
+# <empty>	Do a default make in strinet
+# clean		Do a make clean in strinet
+# realclean	Remove the subdirectory, leave the archive
+#
+#ident "@(#) LiS make_strinet 1.1 4/12/03"
+
+archive=`ls *.tgz`
+dir=`echo $archive | sed -e 's/\.tgz//'`
+
+if [ "$1..." = "realclean..." ]; then
+    if [ -d $dir ]; then
+	rm -rf $dir 2>/dev/null
+	exit 0
+    fi
+fi
+
+if [ "$1..." = "uninstall..." ]; then
+    echo '*** No uninstall target for strinet ***'
+    exit 0
+fi
+
+if [ ! -d $dir ]; then
+    tar xzf $archive
+fi
+
+if [ ! -d $dir ]; then
+    echo "No directory `pwd`/$dir"
+    exit 1
+fi
+
+cd $dir
+make $1

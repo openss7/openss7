@@ -1,4 +1,4 @@
-Makefile_ident="@(#) LiS Makefile 2.25 3/10/03"
+Makefile_ident="@(#) LiS Makefile 2.26 4/12/03"
 #
 # Makefile for the kernel STREAMS device drivers.
 #
@@ -183,6 +183,7 @@ ifeq ($(LIS_TARG),linux)
 install: all
 	$(MAKE) -C $(LIBOBJ) $@
 	$(MAKE) -C $(UTILOBJ) $@
+	$(MAKE) -C $(DRVROBJ) $@
 	$(MAKE) -C man $@
 	$(INST_SBIN)/strmakenodes
 
@@ -197,6 +198,7 @@ uninstall:
 	-$(INST_SBIN)/strmakenodes -r
 	-$(MAKE) -C $(LIBOBJ) $@
 	-$(MAKE) -C $(UTILOBJ) $@
+	-$(MAKE) -C $(DRVROBJ) $@
 	-$(MAKE) -C man $@
 ifeq ($(CONFIG_STREAMS),m)
 	- ./update_conf.modules

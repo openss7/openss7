@@ -45,6 +45,10 @@ common-clean:
 common-realclean: clean
 	-rm -f .depend
 
+common-install:
+
+common-uninstall:
+
 #
 # Dependency stuff
 #

@@ -67,7 +67,7 @@ endif  # ifdef CONFIG_MODULES
 #
 # Our default target
 #
-default: drivers.o
+default: drivers.o strinet
 
 ifneq ($(strip $(MODLS) $(TMODLS)),)
 
@@ -84,13 +84,17 @@ endif
 #
 # Rules
 #
-clean: common-clean
+clean: common-clean clean_strinet
 	-rm -f $(OBJS:%=streams-%.o)
 	-rm -f $(TOBJS:%=streams-%.o)
 	-rm -f $(ZOBJS:%=%.o)
 
-realclean: clean common-realclean
+realclean: clean common-realclean realclean_strinet
 	-rm -f .depend.modules
+
+install:	common-install install_strinet
+
+uninstall:	common-uninstall uninstall_strinet
 
 # How to compile a loadable only known here ( $(TMODLS) )
 streams-%.o: %.c
@@ -114,6 +118,24 @@ streams-%.o: $(DRVRDIR)/%.c
 # Here because the general rule is in-effective
 liskmod.o:	liskmod.c
 	$(CC) $(MODOPT) -DLIS_OBJNAME=$* -c -o $@ $^
+
+#
+# OPEN SS7 strinet package
+#
+strinet:
+	cd ../strinet; ./make_strinet
+
+clean_strinet:
+	cd ../strinet; ./make_strinet clean
+
+realclean_strinet:
+	cd ../strinet; ./make_strinet realclean
+
+install_strinet:
+	cd ../strinet; ./make_strinet install
+
+uninstall_strinet:
+	cd ../strinet; ./make_strinet uninstall
 
 include $(DRVRDIR)/mk.bdy
 
