@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/20 19:40:23 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/12/21 00:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/20 19:40:23 $ by $Author: brian $
+ Last Modified $Date: 2004/12/21 00:32:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/20 19:40:23 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/12/21 00:32:59 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/20 19:40:23 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/12/21 00:32:59 $";
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,6 +80,9 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $
 #endif
 
 #include <net/inet_common.h>
+#if defined HAVE_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
 #include <net/icmp.h>
 #include <net/sctp.h>
 #include <net/ip.h>
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $
 
 #include "linux/hooks.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.4 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.6 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
@@ -3251,7 +3254,14 @@ STATIC int sctp_update_routes(struct sock *sk, int force_reselect)
 			rt = NULL;
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
+#if defined HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0);
+#elif defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY
+			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sk), 0,
+					IPPROTO_SCTP, sk->sport, sk->dport, NULL);
+#else
+#error One of HAVE_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+#endif
 			if (err < 0 || !rt || rt->u.dst.obsolete) {
 				rare();
 				if (rt)
@@ -3297,12 +3307,12 @@ STATIC int sctp_update_routes(struct sock *sk, int force_reselect)
 			sd->rto = sp->rto_ini;
 			sd->rttvar = 0;
 			sd->srtt = 0;
-			sd->mtu = rt->u.dst.pmtu;
+			sd->mtu = dst_pmtu(&rt->u.dst);
 			sd->dmps =
 			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
 			    sizeof(struct sctphdr);
-			sd->ssthresh = 2 * rt->u.dst.pmtu;
-			sd->cwnd = rt->u.dst.pmtu;
+			sd->ssthresh = 2 * dst_pmtu(&rt->u.dst);
+			sd->cwnd = dst_pmtu(&rt->u.dst);
 			/* SCTP IG Section 2.9 */
 			sd->partial_ack = 0;
 			sd->dst_cache = &rt->u.dst;
@@ -3312,20 +3322,29 @@ STATIC int sctp_update_routes(struct sock *sk, int force_reselect)
 		if (sysctl_ip_dynaddr && sk->state == SCTP_COOKIE_WAIT && sd == sp->daddr) {
 			/* see if route changed on primary as result of INIT that was discarded */
 			struct rtable *rt2 = NULL;
+#if defined HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
 			if (!ip_route_connect
-			    (&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif)) {
+			    (&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif))
+#elif defined HAVE_STRUCT_INET_PROTOCOL_NO_POLICY
+			if (!ip_route_connect
+			    (&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sk), sd->dif, IPPROTO_SCTP,
+			     sk->sport, sk->dport, NULL))
+#else
+#error One of HAVE_STRUCT_INET_PROTOCOL_PROTOCOL or HAVE_STRUCT_INET_PROTOCOL_NO_POLICY must be defined.
+#endif
+			{
 				if (rt2->rt_src != rt->rt_src) {
 					rare();
 					rt2 = xchg(&rt, rt2);
 					sd->rto = sp->rto_ini;
 					sd->rttvar = 0;
 					sd->srtt = 0;
-					sd->mtu = rt->u.dst.pmtu;
+					sd->mtu = dst_pmtu(&rt->u.dst);
 					sd->dmps =
 					    sd->mtu - sp->ext_header_len -
 					    sizeof(struct iphdr) - sizeof(struct sctphdr);
-					sd->ssthresh = 2 * rt->u.dst.pmtu;
-					sd->cwnd = rt->u.dst.pmtu;
+					sd->ssthresh = 2 * dst_pmtu(&rt->u.dst);
+					sd->cwnd = dst_pmtu(&rt->u.dst);
 					/* SCTP IG Section 2.9 */
 					sd->partial_ack = 0;
 					sd->dst_cache = &rt->u.dst;
@@ -3338,8 +3357,8 @@ STATIC int sctp_update_routes(struct sock *sk, int force_reselect)
 		viable_route = 1;
 		/* always update MTU if we have a viable route */
 		sk->route_caps &= rt->u.dst.dev->features;
-		if (sd->mtu != rt->u.dst.pmtu) {
-			sd->mtu = rt->u.dst.pmtu;
+		if (sd->mtu != dst_pmtu(&rt->u.dst)) {
+			sd->mtu = dst_pmtu(&rt->u.dst);
 			sd->dmps =
 			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
 			    sizeof(struct sctphdr);
@@ -3400,7 +3419,7 @@ STATIC INLINE int sctp_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
-	if (skb->len > rt->u.dst.pmtu) {
+	if (skb->len > dst_pmtu(&rt->u.dst)) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
 	} else {
@@ -3513,7 +3532,11 @@ STATIC void sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb,
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
+#ifdef HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
+#elif HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_UC_TTL
+			iph->ttl = ip->uc_ttl;
+#endif
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = sk->protocol;
@@ -3627,7 +3650,11 @@ STATIC void sctp_send_msg(struct sock *sk, struct sctp_daddr *sd,
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
+#ifdef HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
+#elif HAVE_STRUCT_SOCK_PROTOINFO_AF_INET_UC_TTL
+		iph->ttl = ip->uc_ttl;
+#endif
 		iph->daddr = sd->daddr;
 		iph->saddr = sd->saddr;
 		iph->protocol = sk->protocol;
@@ -4630,6 +4657,9 @@ STATIC void sctp_destroy_orphan(struct sock *sk)
 	__skb_queue_purge(&sk->sndq);
 	__skb_queue_purge(&sp->urgq);
 	sk->wmem_queued = 0;
+#if defined HAVE_XFRM_POLICY_DELETE_EXPORT || defined HAVE_XFRM_POLICY_DELETE_ADDR
+	xfrm_sk_free_policy(sk);
+#endif
 	atomic_dec(&sctp_orphan_count);
 	printd(("INFO: There are now %d orphan sockets\n",
 		atomic_read(&sctp_orphan_count)));
@@ -9923,6 +9953,13 @@ STATIC struct sock *sctp_conn_res(struct sock *lsk, struct sk_buff *skb, int *er
 	if (sk->filter)
 		sk_filter_charge(sk, sk->filter);
 #endif
+#if defined HAVE___XFRM_SK_CLONE_POLICY_EXPORT || defined HAVE___XFRM_SK_CLONE_POLICY_ADDR
+	if (unlikely(xfrm_sk_clone_policy(sk))) {
+		sk->destruct = NULL;
+		sk_free(sk);
+		return NULL;
+	}
+#endif
 	sk->err = 0;
 	sk->priority = 0;
 	sk->socket = NULL;
@@ -11782,10 +11819,18 @@ STATIC int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 		     sctp_lookup(SCTP_SKB_SH(skb), skb->nh.iph->daddr,
 				 skb->nh.iph->saddr))) {
 			bh_lock_sock(nsk);
+#if defined HAVE_IPSEC_SK_POLICY_EXPORT || defined HAVE_IPSEC_SK_POLICY_ADDR
 			if (!ipsec_sk_policy(sk, skb)) {
 				bh_unlock_sock(nsk);
 				goto discard;
 			}
+#endif
+#if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
+			if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb)) {
+				bh_unlock_sock(nsk);
+				goto discard;
+			}
+#endif
 			if (sock_locked(nsk))
 				sk_add_backlog(nsk, skb);
 			else
@@ -12299,9 +12344,12 @@ __SCTP_STATIC void sctp_v4_err(struct sk_buff *skb, uint32_t info)
 			if (sd && sd->dst_cache) {
 				size_t mtu = htons(skb->h.icmph->un.frag.mtu);
 				ip_rt_update_pmtu(sd->dst_cache, mtu);
-				if (sd->dst_cache->pmtu > mtu && mtu && mtu >= 68 &&
-				    !(sd->dst_cache->mxlock & (1 << RTAX_MTU))) {
-					sd->dst_cache->pmtu = mtu;
+				if (dst_pmtu(sd->dst_cache) > mtu && mtu && mtu >= 68
+#ifdef HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
+				    && !(sd->dst_cache->mxlock & (1 << RTAX_MTU))
+#endif
+				    ) {
+					dst_update_pmtu(sd->dst_cache, mtu);
 					dst_set_expires(sd->dst_cache,
 							ip_rt_mtu_expires);
 				}
@@ -12397,8 +12445,14 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 		sh->check = htonl(skb->csum);
 	}
 	bh_lock_sock(sk);
+#if defined HAVE_IPSEC_SK_POLICY_EXPORT || defined HAVE_IPSEC_SK_POLICY_ADDR
 	if (!ipsec_sk_policy(sk, skb))
 		goto failed_security;
+#endif
+#if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
+	if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb))
+		goto failed_security;
+#endif
 	skb->dev = NULL;
 	if (sock_locked(sk))
 		sk_add_backlog(sk, skb);
@@ -12446,11 +12500,16 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 	}
 	ptrace(("ERROR: Received OOTB packet\n"));
 	SCTP_INC_STATS_BH(SctpOutOfBlues);
+#if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
+	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb))
+		goto discard_it;
+#endif
 #ifndef CONFIG_SCTP_DISCARD_OOTB
 	/* RFC 2960 Section 8.4 */
 	return sctp_rcv_ootb(skb);
 #endif
 	goto discard_it;
+	goto failed_security; /* shut up compiler */
       failed_security:
 	ptrace(("ERROR: Packet failed security policy\n"));
 	goto discard_and_putsk;
@@ -12826,12 +12885,41 @@ STATIC struct inet_protosw sctpsw_array[] = {
 
 #define SCTPSW_ARRAY_LEN (sizeof(sctpsw_array)/sizeof(struct inet_protosw))
 
+#ifdef HAVE_STRUCT_INET_PROTOCOL_PROTOCOL
 STATIC struct inet_protocol sctp_protocol = {
-	handler:	sctp_v4_rcv,
-	err_handler:	sctp_v4_err,
-	protocol:	IPPROTO_SCTP,
-	name:		"SCTP",
+	.handler = sctp_v4_rcv,		/* SCTP data handler */
+	.err_handler = sctp_v4_err,	/* SCTP error control */
+	.protocol = IPPROTO_SCTP,	/* protocol ID */
+	.name = "SCTP",			/* name */
 };
+STATIC void
+sctp_init_proto(void)
+{
+	inet_add_protocol(&sctp_protocol);
+}
+STATIC void
+sctp_term_proto(void)
+{
+	inet_del_protocol(&sctp_protocol);
+}
+#endif
+
+#ifdef HAVE_STRUCT_INET_PROTOCOL_NO_POLICY
+STATIC struct inet_protocol sctp_protocol = {
+	.handler = sctp_v4_rcv,		/* SCTP data handler */
+	.err_handler = sctp_v4_err,	/* SCTP error control */
+};
+STATIC void
+sctp_init_proto(void)
+{
+	inet_add_protocol(&sctp_protocol, IPPROTO_SCTP);
+}
+STATIC void
+sctp_term_proto(void)
+{
+	inet_del_protocol(&sctp_protocol, IPPROTO_SCTP);
+}
+#endif
 /* *INDENT-ON* */
 
 /* from af_inet.c */
@@ -12850,7 +12938,7 @@ int init_module(void)
 		return -EFAULT;
 	}
 #endif
-	inet_add_protocol(&sctp_protocol);
+	sctp_init_proto();
 	for (s = sctpsw_array; s < &sctpsw_array[SCTPSW_ARRAY_LEN]; ++s)
 		inet_register_protosw(s);
 	sctp_v4_init(&inet_family_ops);
@@ -12872,6 +12960,6 @@ void cleanup_module(void)
 	sctp_v4_cleanup();
 	for (s = sctpsw_array; s < &sctpsw_array[SCTPSW_ARRAY_LEN]; ++s)
 		inet_unregister_protosw(s);
-	inet_del_protocol(&sctp_protocol);
+	sctp_term_proto();
 }
 #endif				/* CONFIG_SCTP_MODULE */
