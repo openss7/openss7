@@ -64,12 +64,8 @@
 #ifndef _EXTRACTOR_H
 #define _EXTRACTOR_H
 
-#include <cstdlib>
-#include <cstdio>
-
-#ifndef WIN32
-using namespace std;
-#endif
+#include <stdlib.h>
+#include <stdio.h>
 
 class Extractor {
 

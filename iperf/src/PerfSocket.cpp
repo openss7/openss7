@@ -75,7 +75,6 @@
 #include "headers.h"
 
 #include "PerfSocket.hpp"
-#include "Settings.hpp"
 #include "Locale.hpp"
 #include "util.h"
 
@@ -95,22 +94,29 @@ int PerfSocket::sReportCount = 0;
  * create the Extractor class for getting data from the file
  * ------------------------------------------------------------------- */
 
-PerfSocket::PerfSocket( unsigned short inPort,
-                        bool inUDP )
-: Socket( inPort, inUDP ) {
-    // initialize buffer
-    mBufLen = gSettings->GetBufferLen();
-    mBuf = new char[ mBufLen ];
-    pattern( mBuf, mBufLen );
-    sReportCount = 0;
-    if ( gSettings->GetFileInput() ) {
-        if ( !gSettings->GetStdin() )
-            extractor = new Extractor(gSettings->GetFileName(),mBufLen);
-        else
-            extractor = new Extractor(stdin,mBufLen);
+PerfSocket::PerfSocket( ext_Settings *inSettings,
+                        Notify* toNotify )
+: Socket( inSettings->mPort, (inSettings->mUDPRate > 0) ) {
 
-        if ( !extractor->canRead() ) {
-            gSettings->SetFileInput(false);
+    mSettings = inSettings;
+    ptr_parent = toNotify;
+    mBuf = NULL;
+    extractor = NULL;
+
+    // initialize buffer
+    mBuf = new char[ mSettings->mBufLen ];
+    pattern( mBuf, mSettings->mBufLen );
+    sReportCount = 0;
+    if ( mSettings->mServerMode == kMode_Client ) {
+        if ( mSettings->mFileInput ) {
+            if ( !mSettings->mStdin )
+                extractor = new Extractor( mSettings->mFileName, mSettings->mBufLen );
+            else
+                extractor = new Extractor( stdin, mSettings->mBufLen );
+
+            if ( !extractor->canRead() ) {
+                mSettings->mFileInput = false;
+            }
         }
     }
 }
@@ -121,9 +127,8 @@ PerfSocket::PerfSocket( unsigned short inPort,
  * ------------------------------------------------------------------- */
 
 PerfSocket::~PerfSocket() {
-    DELETE_PTR( mBuf );
-    if ( gSettings->GetFileInput() )
-        DELETE_PTR( extractor );
+    DELETE_ARRAY( mBuf );
+    DELETE_PTR( extractor );
 }
 // end ~PerfSocket
 
@@ -134,7 +139,7 @@ PerfSocket::~PerfSocket() {
 void PerfSocket::InitTransfer( void ) {
     assert( mSock >= 0   );
     assert( mBuf != NULL );
-    assert( mBufLen > 0  );
+    assert( mSettings->mBufLen > 0  );
 
     ReportPeer( mSock );
 
@@ -145,9 +150,8 @@ void PerfSocket::InitTransfer( void ) {
     mJitter = 0.0;
 
     // for periodic reports of bandwidth and lost datagrams
-    double interval = gSettings->GetInterval();
-    mPInterval.set( interval );
-    mPReporting      = (interval > 0.0);
+    mPInterval.set( mSettings->mInterval );
+    mPReporting      = (mSettings->mInterval > 0.0);
     mPLastErrorcnt   = 0;
     mPLastDatagramID = 0;
     mPLastTotalLen   = 0;
@@ -155,17 +159,21 @@ void PerfSocket::InitTransfer( void ) {
     // start timers
     mStartTime.setnow();
 
+    if ( ptr_parent != NULL ) {
+        ptr_parent->StartTime(mStartTime);
+    }
+
     mPLastTime = mStartTime;
     mPNextTime = mStartTime;
     mPNextTime.add( mPInterval );
 
     // setup termination variables
-    mMode_time = (gSettings->GetTerminationMode() == kMode_Time);
+    mMode_time = ( mSettings->mAmount < 0 );
     if ( mMode_time ) {
         mEndTime = mStartTime;
-        mEndTime.add( gSettings->GetTime());
+        mEndTime.add( (-mSettings->mAmount) / 100.0 );
     } else {
-        mAmount = gSettings->GetAmount();
+        mAmount = mSettings->mAmount;
     }
 }
 // end InitTransfer
@@ -179,22 +187,29 @@ void PerfSocket::ReportPeriodicBW( void ) {
          mPacketTime.after( mPNextTime ) ) {
 
         double inStart = mPLastTime.subSec( mStartTime );
-        double inStop = mPacketTime.subSec( mStartTime );
+        double inStop = mPNextTime.subSec( mStartTime );
 
-        if ( (long) mPacketTime.subUsec(mPLastTime ) < 500000 ) {
-            printf(report_interval_small,mSock,inStart,inStop);
-            fflush(stdout);
-            mPNextTime.add(mPInterval);
-            return;
-        }
-
+        sReporting.Lock();
         ReportBW( mTotalLen - mPLastTotalLen,
-                  inStart,inStop);
+                  inStart,
+                  inStop );
 
-        mPLastTime = mPacketTime;
+        if ( ptr_parent ) {
+            ptr_parent->PeriodicUpdate( inStart,
+                                        inStop,
+                                        mTotalLen - mPLastTotalLen );
+        }
+        sReporting.Unlock();
+
+        mPLastTime = mPNextTime;
         mPNextTime.add( mPInterval );
 
         mPLastTotalLen   = mTotalLen;
+
+        if ( mPacketTime.after( mPNextTime ) ) {
+            ReportPeriodicBW();
+        }
+
     }
 }
 
@@ -210,28 +225,34 @@ void PerfSocket::ReportPeriodicBW_Jitter_Loss( int32_t errorCnt,
          mPacketTime.after( mPNextTime ) ) {
 
         double inStart = mPLastTime.subSec( mStartTime );
-        double inStop = mPacketTime.subSec( mStartTime );
+        double inStop = mPNextTime.subSec( mStartTime );
 
-        if ( (long) mPacketTime.subUsec(mPLastTime ) < 500000 ) {
-            printf(report_interval_small,mSock,inStart,inStop);
-            fflush(stdout);
-            return;
-        }
-
+        sReporting.Lock();
         ReportBW_Jitter_Loss( mTotalLen - mPLastTotalLen,
                               inStart,
                               inStop,
                               errorCnt - mPLastErrorcnt,
                               outofOrder - mPLastOutofOrder,
                               datagramID - mPLastDatagramID );
+        if ( ptr_parent ) {
+            ptr_parent->PeriodicUpdate( inStart,
+                                        inStop,
+                                        mTotalLen - mPLastTotalLen );
+        }
+        sReporting.Unlock();
 
-        mPLastTime = mPacketTime;
+        mPLastTime = mPNextTime;
         mPNextTime.add( mPInterval );
 
         mPLastTotalLen   = mTotalLen;
         mPLastDatagramID = datagramID;
         mPLastErrorcnt   = errorCnt;
         mPLastOutofOrder = outofOrder;
+
+        if ( mPacketTime.after( mPNextTime ) ) {
+            ReportPeriodicBW_Jitter_Loss( errorCnt, outofOrder, datagramID );
+        }
+
     }
 }
 
@@ -242,8 +263,6 @@ void PerfSocket::ReportPeriodicBW_Jitter_Loss( int32_t errorCnt,
 void PerfSocket::ReportBW( max_size_t inBytes,
                            double inStart,
                            double inStop ) {
-    sReporting.Lock();
-
     // print a field header every 20 lines
     if ( --sReportCount <= 0 ) {
         printf( report_bw_header );
@@ -253,16 +272,15 @@ void PerfSocket::ReportBW( max_size_t inBytes,
     char bytes[ 32 ];
     char speed[ 32 ];
 
-    byte_snprintf( bytes, sizeof(bytes), inBytes,
-                   toupper( gSettings->GetFormat()));
+    byte_snprintf( bytes, sizeof(bytes), (double) inBytes,
+                   toupper( mSettings->mFormat));
     byte_snprintf( speed, sizeof(speed),
-                   inBytes / (inStop - inStart), gSettings->GetFormat());
+                   inBytes / (inStop - inStart), mSettings->mFormat);
 
     printf( report_bw_format,
             mSock, inStart, inStop, bytes, speed );
     fflush( stdout );
 
-    sReporting.Unlock();
 }
 // end ReportBW
 
@@ -276,8 +294,6 @@ void PerfSocket::ReportBW_Jitter_Loss( max_size_t inBytes,
                                        int32_t inErrorcnt,
                                        int32_t inOutofOrder,
                                        int32_t inDatagrams ) {
-    sReporting.Lock();
-
     // print a field header every 20 lines
     if ( --sReportCount <= 0 ) {
         printf( report_bw_jitter_loss_header );
@@ -290,10 +306,10 @@ void PerfSocket::ReportBW_Jitter_Loss( max_size_t inBytes,
     char bytes[ 32 ];
     char speed[ 32 ];
 
-    byte_snprintf( bytes, sizeof(bytes), inBytes,
-                   toupper( gSettings->GetFormat()));
+    byte_snprintf( bytes, sizeof(bytes), (double) inBytes,
+                   toupper( mSettings->mFormat));
     byte_snprintf( speed, sizeof(speed),
-                   inBytes / (inStop - inStart), gSettings->GetFormat());
+                   inBytes / (inStop - inStart), mSettings->mFormat);
 
     // assume most of the time out-of-order packets are not
     // duplicate packets, so subtract them from the lost packets.
@@ -307,8 +323,6 @@ void PerfSocket::ReportBW_Jitter_Loss( max_size_t inBytes,
                 mSock, inStart, inStop, inOutofOrder );
     }
     fflush( stdout );
-
-    sReporting.Unlock();
 }
 // end ReportBW_Jitter_Loss
 
@@ -317,8 +331,6 @@ void PerfSocket::ReportBW_Jitter_Loss( max_size_t inBytes,
  * ------------------------------------------------------------------- */
 
 void PerfSocket::ReportPeer( int inSock ) {
-    sReporting.Lock();
-
     assert( inSock >= 0 );
 
     SocketAddr local  = getLocalAddress();
@@ -331,7 +343,8 @@ void PerfSocket::ReportPeer( int inSock ) {
     char remote_addr[ REPORT_ADDRLEN ];
     remote.getHostAddress( remote_addr, sizeof(remote_addr));
 
-    // note: see also the RecvUDP code, which has this same printf
+    sReporting.Lock();
+
     printf( report_peer,
             inSock,
             local_addr,  local.getPort(),
@@ -403,11 +416,11 @@ void PerfSocket::ReportWindowSize( void ) {
     // sReporting already locked from ReportClient/ServerSettings
 
     int win = get_tcp_windowsize( mSock );
-    int win_requested = gSettings->GetTCPWindowSize();
+    int win_requested = mSettings->mTCPWin;
 
     char window[ 32 ];
     byte_snprintf( window, sizeof(window), win,
-                   toupper( gSettings->GetFormat()));
+                   toupper( mSettings->mFormat));
     printf( "%s: %s", (mUDP ? udp_buffer_size : tcp_window_size), window );
 
     if ( win_requested == 0 ) {
@@ -415,7 +428,7 @@ void PerfSocket::ReportWindowSize( void ) {
     } else if ( win != win_requested ) {
         char request[ 32 ];
         byte_snprintf( request, sizeof(request), win_requested,
-                       toupper( gSettings->GetFormat()));
+                       toupper( mSettings->mFormat));
         printf( warn_window_requested, request );
     }
     printf( "\n" );
@@ -444,11 +457,11 @@ void PerfSocket::ReportClientSettings( const char* inHost,
     }
 
     if ( mUDP ) {
-        printf( client_datagram_size, mBufLen );
+        printf( client_datagram_size, mSettings->mBufLen );
 
         SocketAddr remote = getRemoteAddress();
         if ( remote.isMulticast() ) {
-            printf( multicast_ttl, gSettings->GetMcastTTL());
+            printf( multicast_ttl, mSettings->mTTL);
         }
     }
 
@@ -483,7 +496,7 @@ void PerfSocket::ReportServerSettings( const char* inLocalhost ) {
         }
     }
     if ( mUDP ) {
-        printf( server_datagram_size, mBufLen );
+        printf( server_datagram_size, mSettings->mBufLen );
     }
     ReportWindowSize();
     printf( seperator_line );
@@ -508,16 +521,16 @@ void PerfSocket::Sig_Interupt( int inSigno ) {
  * ------------------------------------------------------------------- */
 
 void PerfSocket::SetSocketOptions( void ) {
-  // set the TCP window size (socket buffer sizes)
-  // also the UDP buffer size
-  // must occur before call to accept() for large window sizes
-  set_tcp_windowsize( mSock, gSettings->GetTCPWindowSize() );
+    // set the TCP window size (socket buffer sizes)
+    // also the UDP buffer size
+    // must occur before call to accept() for large window sizes
+    set_tcp_windowsize( mSock, mSettings->mTCPWin );
 
 #ifdef IP_TOS
 
     // set IP TOS (type-of-service) field
-    if ( gSettings->GetTOS() ) {
-        int  tos = gSettings->GetTOS();
+    if ( mSettings->mTOS > 0 ) {
+        int  tos = mSettings->mTOS;
         Socklen_t len = sizeof(tos);
         int rc = setsockopt( mSock, IPPROTO_IP, IP_TOS,
                              (char*) &tos, len );
@@ -527,12 +540,12 @@ void PerfSocket::SetSocketOptions( void ) {
 
     if ( ! mUDP ) {
         // set the TCP maximum segment size
-        setsock_tcp_mss( mSock, gSettings->GetTCP_MSS() );
+        setsock_tcp_mss( mSock, mSettings->mMSS );
 
 #ifdef TCP_NODELAY
 
         // set TCP nodelay option
-        if ( gSettings->GetTCP_Nodelay() ) {
+        if ( mSettings->mNodelay ) {
             int nodelay = 1;
             Socklen_t len = sizeof(nodelay);
             int rc = setsockopt( mSock, IPPROTO_TCP, TCP_NODELAY,
@@ -543,3 +556,4 @@ void PerfSocket::SetSocketOptions( void ) {
     }
 }
 // end SetSocketOptions
+
