@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.3 2004/08/31 03:26:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
+ Last Modified $Date: 2004/08/31 03:26:13 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -323,7 +323,7 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 STATIC void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
-	int flags;
+	unsigned long flags;
 	spin_lock_irqsave(&pool->lock, flags);
 	if (pool->initialized) {
 		mblk_t *bp;
