@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/25 15:36:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/26 13:04:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/25 15:36:41 $ by $Author: brian $
+# Last Modified $Date: 2005/01/26 13:04:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -400,8 +400,10 @@ man_MANS = \
 	man9/lis_major.9 \
 	man9/lis_malloc.9 \
 	man9/lis_mark_mem.9 \
+	man9/lis_max.9 \
 	man9/lis_max_mem.9 \
 	man9/lis_milli_to_ticks.9 \
+	man9/lis_min.9 \
 	man9/lis_mknod.9 \
 	man9/lis_mount.9 \
 	man9/lis_msecs.9 \
@@ -743,7 +745,12 @@ man_MANS = \
 	man9/spl6.9 \
 	man9/spl7.9 \
 	man9/spl.9 \
+	man9/splbase.9 \
+	man9/spldisk.9 \
+	man9/splhi.9 \
 	man9/splstr.9 \
+	man9/spltimeout.9 \
+	man9/spltty.9 \
 	man9/splx.9 \
 	man9/STREAMS.9 \
 	man9/streams_close_comm.9 \
@@ -1154,8 +1161,10 @@ dist_noinst_MANS = \
 	man9/lis_major.9.man \
 	man9/lis_malloc.9.man \
 	man9/lis_mark_mem.9.man \
+	man9/lis_max.9.man \
 	man9/lis_max_mem.9.man \
 	man9/lis_milli_to_ticks.9.man \
+	man9/lis_min.9.man \
 	man9/lis_mknod.9.man \
 	man9/lis_mount.9.man \
 	man9/lis_msecs.9.man \
@@ -1497,7 +1506,12 @@ dist_noinst_MANS = \
 	man9/spl6.9.man \
 	man9/spl7.9.man \
 	man9/spl.9.man \
+	man9/splbase.9.man \
+	man9/spldisk.9.man \
+	man9/splhi.9.man \
 	man9/splstr.9.man \
+	man9/spltimeout.9.man \
+	man9/spltty.9.man \
 	man9/splx.9.man \
 	man9/STREAMS.9.man \
 	man9/streams_close_comm.9.man \

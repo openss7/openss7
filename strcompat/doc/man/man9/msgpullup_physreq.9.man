@@ -1,1 +1,311 @@
-.so undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: msgpullup_physreq.9.man,v 0.9.2.3 2005/01/26 13:03:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/01/26 13:03:50 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MSGPULLUP_PHYSREQ 9 "$Date: 2005/01/26 13:03:50 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B msgpullup_physreq
+\-
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #define _UW7_SOURCE
+.HP
+.B #include <sys/stream.h>
+.PD 0
+.HP
+.B #include <sys/ddi.h>
+.PD
+.HP
+mblk_t *\fBmsgpullup_physreq\fR(mblk_t *\fImp\fR, size_t \fIlen\fR, physreq_t *\fIprp\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+the message to pull up.
+.PD 0
+.TP
+.I len
+the number of bytes to pull up.
+.TP
+.I prp
+physical requirements for the pulled up message.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR msgpullup_physreq ()
+will copy and align
+.I len
+bytes from the message pointed to by
+.I mp
+into a new message, if possible, whose pointer is returned.
+If the passed in message pointed to by
+.I mp
+contains more bytes than specified by
+.IR len ,
+.BR msgpullup_physreq ()
+will copy the remaining bytes onto the end of the new message.
+If the passed in message pointed to by
+.I mp
+contains less than
+.I len
+bytes,
+.BR msgpullup_physreq ()
+fails and returns
+.BR NULL .
+If
+.I len
+is specified as -1,
+all the bytes of the passed in message pointed to by
+.I mp
+will be concatenated, copied and aligned into the new message.
+.\"
+.\"
+.SH USAGE
+.PP
+This is a non-portable function and is largely deprecated.  For better approaches, where only the
+data buffer has physical memory requirements, allocate the memory with a suitable memory allocator,
+copy the data with
+.BR bcopy (9),
+and then use
+.BR esballoc (9)
+to acquire a message header.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR msgpullup_physreq ()
+returns a pointer to the new message.
+.PP
+Upon failure,
+.BR msgpullup_physreq ()
+returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR msgpullup_physreq ()
+fails and returns
+.B NULL
+when the number of bytes in the passed in message pointed to by
+.I mp
+is less than
+.IR len ;
+and when allocation for the new message fails.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR msgpullup_physreq ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR msgpullup_physreq ()
+is MP-safe.  It is the caller's responsibility to ensure exclusive access to
+the passed in message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR msgpullup_physreq ()
+is a
+.IR UnixWare \(rg-specific
+function:
+.B _UW7_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_UW7
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR msgpullup_physreq ()
+fails if the requested physical requirements do not match those that already exist for the message
+block.  Otherwise,
+.BR msgpullup (9)
+is called.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR msgpullup (9),
+.BR uw7compat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR msgpullup_physreq ()
+does not perform alignment of the copied in bytes and will leave bytes in
+place without proper alignment.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR msgpullup_physreq ()
+is compatible with
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR msgpullup_physreq ()
+is a fake that simply returns
+.B NULL
+if the requested physical requirements are not already met and then calls
+.BR msgpullup (9).
+Avoid use of this function if at all possible.
+.IP \(em
+.BR msgpullup_physreq ()
+is an
+.IR UnixWare \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR msgpullup (9)
+function should be used in its stead.
+.IP \(em
+.BR msgpullup_physreq ()
+is provided for source level compatibility with
+.IR UnixWare \(rg
+for the purpose of porting
+.IR UnixWare \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR UnixWare \(rg
+binaries are incompatible.
+.IP \(em
+.BR msgpullup_physreq ()
+only provides functionality comparable to
+.IR UnixWare \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR msgpullup_physreq ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR uw7compat (9)
+and
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR UnixWare \(rg.
+.[
+uw7doc
+.]
+.[
+uw7spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR msgpullup_physreq ()
+first appeared in
+.IR UnixWare \(rg.
+.[
+uw7doc
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

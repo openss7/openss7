@@ -1,1 +1,1 @@
-.so undoc.9.man
+.so spl.9.man

@@ -1,1 +1,1 @@
-.so undoc.9.man
+.so umount.9.man

@@ -1,1 +1,366 @@
-.so undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: spl.9.man,v 0.9.2.3 2005/01/26 13:03:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/01/26 13:03:50 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SPL 9 "$Date: 2005/01/26 13:03:50 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B spl0, spl1, spl2, spl3, spl4, spl5, spl6, spl7, spl, splbase, spldisk, splhi, splstr, spltimeout, spltty, splx,
+\- set or restore priority levels
+
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #define _SVR4_SOURCE
+.HP
+.B #include <sys/stream.h>
+.PD 0
+.HP
+.B #include <sys/ddi.h>
+.PD
+.HP
+pl_t \fBspl\fR(const pl_t \fIlevel\fR);
+.PD 0
+.HP
+pl_t \fBspl0\fR(void);
+.HP
+pl_t \fBspl1\fR(void);
+.HP
+pl_t \fBspl2\fR(void);
+.HP
+pl_t \fBspl3\fR(void);
+.HP
+pl_t \fBspl4\fR(void);
+.HP
+pl_t \fBspl5\fR(void);
+.HP
+pl_t \fBspl6\fR(void);
+.HP
+pl_t \fBspl7\fR(void);
+.HP
+pl_t \fBsplbase\fR(void);
+.HP
+pl_t \fBspldisk\fR(void);
+.HP
+pl_t \fBsplhi\fR(void);
+.HP
+pl_t \fBsplstr\fR(void);
+.HP
+pl_t \fBspltimeout\fR(void);
+.HP
+pl_t \fBspltty\fR(void);
+.PD
+.HP
+void \fBsplx\fR(const pl_t \fIlevel\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I level
+the priority level to set.  The priority level can be one of the following values:
+.RS
+.TP \w'pltimeout\(em'u
+.B invpl
+invalid priority level.
+.PD 0
+.TP
+.B plbase
+base priority level.
+.TP
+.B pltimeout
+timeout priority level, suitable for use within timeout functions.
+.TP
+.B pltty
+tty priority level, suitable for use by ttys and pseudo-ttys.
+.TP
+.B plstr
+.I STREAMS
+priority level, suitable for use within
+.I STREAMS
+procedures.
+.TP
+.B pldisk
+disk priority level, suitable for use within disk drivers.
+.TP
+.B plhi
+high priority level, suitable for all other high priority tasks.
+.PD
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+All of the
+.BR spl ()
+functions, except
+.BR splx (),
+return the priority level that was in effect before the
+.BR spl ()
+function was called.
+.BR splx ()
+restores a previous priority level and returns
+.BR void .
+.PP
+.BR splbase (),
+.BR spldisk (),
+.BR splhi (),
+.BR splstr (),
+.BR spltimeout ()
+and
+.BR spltty ()
+are equivalent to
+.BI spl( plbase ),
+.BI spl( pldisk ),
+.BI spl( plhi ),
+.BI spl( plstr )
+and
+.BI spl( pltimeout ).
+.PP
+.BR splbase (),
+.BR spldisk (),
+.BR splhi (),
+.BR splstr (),
+.BR spltimeout ()
+and
+.BR spltty ()
+are also equivalent to
+.BR spl0 (),
+.BR spl6 (),
+.BR spl7 (),
+.BR spl5 (),
+and
+.BR spl4 ().
+.\"
+.\"
+.SH USAGE
+.PP
+The following code snippet illustrates the use of the
+.BR spl ()
+functions:
+.sp
+.nf
+{
+        pl_t save_pl = splstr();
+
+        /* do some stuff */
+
+        splx(save_pl);
+}
+.fi
+.\"
+.\"
+.SH RETURN
+.PP
+When the
+.BR spl ()
+function, other than
+.BR splx (),
+succeed, they sets the calling processor's priority level and returns
+the priority level that was in effect prior to the call;
+when they fails, they return
+.BR invpl .
+.PP
+When the
+.BR splx ()
+function succeeds, it restores the specified priority level and returns
+.BR void ;
+when it fails, it fails silently.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR spl ()
+functions fail when it is not possible to set the specified priority level.
+.PP
+.BR splx ()
+fails when the specified
+.I level
+is invalid.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR spl ()
+functions can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR spl ()
+functions are MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR spl ()
+and family are
+.IR "SVR 4.2" -specific
+functions:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR spl ()
+functions use a combination of eneable or disabling using local bottom half suppression and hard irq
+suppression.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR spl ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR spl ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR spl ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR spl ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR spl ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR spl ()
+first appeared in
+.IR "SVR 4.2" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

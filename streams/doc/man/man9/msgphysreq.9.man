@@ -1,1 +1,334 @@
-.so undoc.9.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: msgphysreq.9.man,v 0.9.2.4 2005/01/26 13:03:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/01/26 13:03:50 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MSGPHYSREQ 9 "$Date: 2005/01/26 13:03:50 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B msgphysreq
+\- cause a message block to meet physical requirements
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #define _UW7_SOURCE
+.HP
+.B #include <sys/stream.h>
+.PD 0
+.HP
+.B #include <sys/ddi.h>
+.PD
+.HP
+int \fBmsgphysreq\fR(mblk_t *\fImp\fP, physreq_t *\fIprp\fP);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+a pointer to a message block that will be made to conform to the physical memory requirement.
+.TP
+.I prp
+a pointer to a
+.B physreq_t
+structure that describes the physical memory request.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR msgphysreq ()
+creates, if necessary, and returns a message block that contains the information in the message
+block passed in argument
+.I mp
+and meets the physical memory requirements in the
+.I prp
+argument.
+The
+.I prp
+argument is a specification of the physical requirements and points ot a
+.B physreq
+structure, with members as follows:
+.sp
+.nf
+typedef struct physreq {
+	paddr_t phys_align;
+	paddr_t phys_boundary;
+	unsigned char phys_dmasize;
+	unsigned char phys_max_scgth;
+	unsigned char phys_flags;
+} physreq_t;
+.fi
+.TP
+.I phys_align
+Specifies the alignment of the physical memory.
+.TP
+.I phys_boundary
+Specifies the boundary within which the memory must reside.
+.TP
+.I phys_dmasize
+Specifies the DMA size, if requested.  When not requested, this member should be set to zero (0).
+When requested,
+.I phys_dmasize
+should be set to one of the following values:
+.RS
+.TP
+.B 0
+DMA is not used or not requested.
+.PD 0
+.TP
+.B 24
+24-bit addresses suitable for 24-bit (ISA) devices.
+.TP
+.B 32
+32-bit addresses suitable for 32-bit (PCI, EISA, or MCA) devices.
+.TP
+.B 64
+64-bit addresses suitable for 64-bit (PCI-X, AGP+) devices.
+.PD
+.RE
+.TP
+.I phys_max_scgth
+Specifies the maximum number of scatter gather elements.
+.TP
+.I phys_flags
+Specifies flags associated with the memory and may be zero or more of the following:
+.RS
+.TP
+.B PREQ_PHYSCONTIG
+This flag requests that the memory in the buffer be made to reside contiguously in physical memory.
+.RE
+.\"
+.\"
+.SH USAGE
+.PP
+This is a non-portable function and is largely deprecated.  For better approaches, where only the
+data buffer has physical memory requirements, allocate the memory with a suitable memory allocator
+and then use
+.BR esballoc (9)
+to acquire a message header.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR msgphysreq ()
+succeeds, it returns a pointer to a message block that meets the physical requirements;
+when it fails, it returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR msgphysreq ()
+fails when 
+a message block to the requested physical requirements cannot be created.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR msgphysreq ()
+can be called from
+any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR msgphysreq ()
+is MP-safe when called correctly.  It is the caller's responsibility to ensure the exclusive use of
+the referenced message block and physical requirements structure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR msgphysreq ()
+is a
+.IR UnixWare \(rg-specific
+function:
+.B _UW7_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_UW7
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR msgphysreq ()
+fails if the requested physical requirements do not match those that already exist for the message
+block.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR uw7compat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR msgphysreq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR msgphysreq ()
+is compatible with
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR msgphysreq ()
+is a fake that will simply return
+.B NULL
+if the passed in message block does not meet the specified physical requirements.
+Do not use this function if it can at all be avoided.
+.IP \(em
+.BR msgphysreq ()
+fails an returns
+.B NULL
+if the requested physical requirements do not match those that already exist for the message block.
+.IP \(em
+.BR msgphysreq ()
+is an
+.IR UnixWare \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR esballoc (9)
+function should be used in its stead.
+.IP \(em
+.BR msgphysreq ()
+is provided for source level compatibility with
+.IR UnixWare \(rg
+for the purpose of porting
+.IR UnixWare \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR UnixWare \(rg
+binaries are incompatible.
+.IP \(em
+.BR msgphysreq ()
+only provides functionality comparable to
+.IR UnixWare \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR msgphysreq ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR uw7compat (9)
+and
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR UnixWare \(rg.
+.[
+uw7doc
+.]
+.[
+uw7spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR msgphysreq ()
+first appeared in
+.IR UnixWare \(rg.
+.[
+uw7doc
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
