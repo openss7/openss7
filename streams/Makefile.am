@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/03/08 01:21:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/03/08 21:34:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/08 01:21:42 $ by $Author: brian $
+# Last Modified $Date: 2004/03/08 21:34:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,13 +62,15 @@ sbin_PROGRAMS			= \
 				insf \
 				scls \
 				strace \
-				strclean \
 				strerr \
 				strinfo \
 				strload \
 				strsetup \
 				strvf \
 				strmakenodes
+
+sbin_SCRIPTS			= \
+				$(srcdir)/src/util/strclean
 
 libexec_PROGRAMS		= \
 				test-inet_raw \
@@ -293,11 +295,11 @@ strace_LDFLAGS			= -static libstreams.la
 strace_CPPFLAGS			= @LFS_INCLUDES@ @USER_CPPFLAGS@
 strace_CFLAGS			= @USER_CFLAGS@
 
-strclean_SOURCES		= src/util/strclean.c $(top_builddir)/include/sys/config.h
-strclean_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
-strclean_LDFLAGS		= -static libstreams.la
-strclean_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
-strclean_CFLAGS			= @USER_CFLAGS@
+#strclean_SOURCES		= src/util/strclean.c $(top_builddir)/include/sys/config.h
+#strclean_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
+#strclean_LDFLAGS		= -static libstreams.la
+#strclean_CPPFLAGS		= @LFS_INCLUDES@ @USER_CPPFLAGS@
+#strclean_CFLAGS			= @USER_CFLAGS@
 
 strerr_SOURCES			= src/util/strerr.c $(top_builddir)/include/sys/config.h
 strerr_DEPENDENCIES		= $(top_builddir)/include/sys/config.h
@@ -422,7 +424,7 @@ nodist_man_MANS = \
 	doc/man/man4/bssap.4 doc/man/man4/bssap_ioctl.4 doc/man/man4/bua.4 doc/man/man4/bua_ioctl.4 doc/man/man4/capi.4 \
 	doc/man/man4/capi_ioctl.4 doc/man/man4/clone.4 doc/man/man4/connld.4 doc/man/man4/connld.old.4 doc/man/man4/dl.4 \
 	doc/man/man4/dlb.4 doc/man/man4/dl_ioctl.4 doc/man/man4/dua.4 doc/man/man4/echo.4 doc/man/man4/egp.4 doc/man/man4/eth.4 \
-	doc/man/man4/fifo.4 doc/man/man4/fifo.4s doc/man/man4/fifo.old.4 doc/man/man4/ggp.4 doc/man/man4/gr303.4 \
+	doc/man/man4/fifo.4s doc/man/man4/fifo.old.4 doc/man/man4/ggp.4 doc/man/man4/gr303.4 \
 	doc/man/man4/gr303_ioctl.4 doc/man/man4/gr303ua.4 doc/man/man4/gr303ua_ioctl.4 doc/man/man4/gsma.4 doc/man/man4/h225.4 \
 	doc/man/man4/h225_ioctl.4 doc/man/man4/h245.4 doc/man/man4/h248.4 doc/man/man4/h248_ioctl.4 doc/man/man4/hdlc.4 \
 	doc/man/man4/hdlc_ioctl.4 doc/man/man4/icmp.4 doc/man/man4/idp.4 doc/man/man4/ifnet.4 doc/man/man4/INET.4 \
@@ -728,7 +730,7 @@ EXTRA_MAN_SOURCES = \
 	doc/man/man4/bua.4.man doc/man/man4/bua_ioctl.4.man doc/man/man4/capi.4.man doc/man/man4/capi_ioctl.4.man \
 	doc/man/man4/clone.4.man doc/man/man4/connld.4.man doc/man/man4/connld.old.4.man doc/man/man4/dl.4.man \
 	doc/man/man4/dlb.4.man doc/man/man4/dl_ioctl.4.man doc/man/man4/dua.4.man doc/man/man4/echo.4.man doc/man/man4/egp.4.man \
-	doc/man/man4/eth.4.man doc/man/man4/fifo.4.man doc/man/man4/fifo.4s.man doc/man/man4/fifo.old.4.man doc/man/man4/ggp.4.man \
+	doc/man/man4/eth.4.man doc/man/man4/fifo.4s.man doc/man/man4/fifo.old.4.man doc/man/man4/ggp.4.man \
 	doc/man/man4/gr303.4.man doc/man/man4/gr303_ioctl.4.man doc/man/man4/gr303ua.4.man doc/man/man4/gr303ua_ioctl.4.man \
 	doc/man/man4/gsma.4.man doc/man/man4/h225.4.man doc/man/man4/h225_ioctl.4.man doc/man/man4/h245.4.man \
 	doc/man/man4/h248.4.man doc/man/man4/h248_ioctl.4.man doc/man/man4/hdlc.4.man doc/man/man4/hdlc_ioctl.4.man \
@@ -1094,6 +1096,8 @@ nobase_include_HEADERS = include/xti.h include/xti_inet.h \
 	include/xti/xti_inet.h include/xti/xti_ip.h include/xti/xti_local.h include/xti/xti_mosi.h \
 	include/xti/xti_osi.h include/xti/xti_sctp.h include/xti/xti_tcp.h include/xti/xti_udp.h
 
+noinst_SCRIPTS = \
+	$(STRCONF_SCRIPT)
 #
 #   Need to override the following two automake rules to strip the first path
 #   component from the header file path name.
@@ -1125,7 +1129,7 @@ uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
 	DESTDIR=$(DESTDIR) $(INET_RMDEV)
 
 EXTRA_DIST = streams.spec.in streams.spec doc/man/streams.refs doc/man/streams.macros \
-	$(STRCONF_SCRIPT) $(lfs_configs) openss7-logo-small.gif openss7-logo-small.xpm \
+	$(noinst_SCRIPTS) $(sbin_SCRIPTS) $(lfs_configs) openss7-logo-small.gif openss7-logo-small.xpm \
 	$(INET_MKDEV) $(INET_RMDEV) m4/kernel.m4 m4/rpm.m4 $(EXTRA_MAN_SOURCES)
 
 SUBDIRS = intl m4 po
