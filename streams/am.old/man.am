@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/02 05:33:17 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/16 19:07:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,32 +47,56 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/02 05:33:17 $ by $Author: brian $
+# Last Modified $Date: 2004/04/16 19:07:19 $ by $Author: brian $
 #
 # =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.7 dist-bzip2 std-options -Wall
+#
+#   Need to generate "cooked" man pages from the source man pages.  This is
+#   for systems (such as debian) that will not do not do grefer on man pages.
+#
+if COOKED_MANPAGES
+$(nodist_man_MANS): %: %.man $(mansrcdir)/$(MANMACRO_PFX).macros $(mansrcdir)/$(MANMACRO_PFX).refs
+	@d="`echo $@ | sed -e 's|/[^/]*$$||'`" ; \
+	p="`echo $< | sed -e 's|/[^/]*$$||;s|/[^/]*$$||'`" ; \
+	$(mkinstalldirs) $$d ; \
+	echo "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | ( cd $$p ; soelim 2>/dev/null | refer ) | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
-ACLOCAL_AMFLAGS = -I m4
+install-manpages:
 
-#
-# Have the makefile regenerate libtool if necessary
-#
-$(OBJECTS): libtool
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status --recheck
+uninstall-manpages:
 
-#
-# I use vim, not emacs.  The following triggers Automake 1.7 to include
-# targets for making vim tags files along with emacs TAGS files.
-#
-CTAGS = ctags
-AM_CTAGSFLAGS = --c-types=+px
+else
+$(nodist_man_MANS): %: %.man
+	@d="`echo $@ | sed -e 's|/[^/]*$$||'`" ; \
+	p="`echo $< | sed -e 's|/[^/]*$$||;s|/[^/]*$$||'`" ; \
+	$(mkinstalldirs) $$d ; \
+	echo "converting (strip) manpage $< to $@" ; \
+	cat $< | sed -e '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//' > $@ ;
 
-#
-# A rule to generate an ifnames.log file
-#
-ifnames:
-	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
+install-manpages: $(man_MANS) $(mansrcdir)/$(MANMACRO_PFX).macros $(mansrcdir)/$(MANMACRO_PFX).refs
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(mandir)
+	$(INSTALL_DATA) $(mansrcdir)/$(MANMACRO_PFX).macros $(DESTDIR)$(mandir)
+	$(INSTALL_DATA) $(mansrcdir)/$(MANMACRO_PFX).refs   $(DESTDIR)$(mandir)
+
+uninstall-manpages:
+	@$(NORMAL_UNINSTALL)
+	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
+	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
+
+endif
+
+clean-manpages:
+	rm -f $(nodist_man_MANS)
+
+install-data-local: install-manpages
+
+uninstall-local: uninstall-manpages
+
+clean-local: clean-manpages
+
+#.PHONY: clean-manpages install-manpages uninstall-manpages
 
 # vim: ft=automake

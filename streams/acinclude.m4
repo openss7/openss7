@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.10 2004/03/13 05:46:33 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.11 2004/04/16 19:24:57 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,11 +53,13 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/13 05:46:33 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/16 19:24:57 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
+m4_include([m4/public.m4])
 m4_include([m4/kernel.m4])
+m4_include([m4/man.m4])
 m4_include([m4/rpm.m4])
 
 # =========================================================================
@@ -65,6 +67,8 @@ m4_include([m4/rpm.m4])
 # -------------------------------------------------------------------------
 AC_DEFUN([AC_LFS], [
     _LFS_OPTIONS
+    AC_MAN_CONVERSION
+    AC_PUBLIC_RELEASE
     _LFS_SETUP_COMPAT
     _LFS_SETUP_PUBLIC
     _LFS_SETUP_DEBUG
@@ -104,24 +108,6 @@ AC_DEFUN([_LFS_OPTIONS], [
                                  [enable public release. @<:@default=yes@:>@]),
                   [enable_public=$enableval],
                   [enable_public=''])
-    AC_ARG_ENABLE([k-debug],
-                  AC_HELP_STRING([--enable-k-debug],
-                                 [enable kernel module run-time debugging.
-                                 @<:@default=no@:>@]),
-                  [enable_k_debug=$enableval],
-                  [enable_k_debug=''])
-    AC_ARG_ENABLE([k-test],
-                  AC_HELP_STRING([--enable-k-test],
-                                 [enable kernel module run-time testing.
-                                 @<:@default=no@:>@]),
-                  [enable_k_test=$enableval],
-                  [enable_k_test=''])
-    AC_ARG_ENABLE([k-safe],
-                  AC_HELP_STRING([--enable-k-safe],
-                                 [enable kernel module run-time safety checks.
-                                 @<:default=no@:>@]),
-                  [enable_k_safe=$enableval],
-                  [enable_k_safe=''])
     AC_ARG_ENABLE([compat-svr4],
                   AC_HELP_STRING([--enable-compat-svr4],
                                  [enable source compatibility with SVR 4.2 MP
