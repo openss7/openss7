@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 00:22:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/24 00:26:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 00:26:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -235,10 +235,10 @@ dnl
 	if test :${init_cv_configdir:-no} = :no ; then
 	    if test :${init_cv_rcs_dir:-no} = :no ; then
 dnl             redhat style
-		init_cv_configdir="${DESTDIR}/${sysconfdir}/sysconfig"
+		init_cv_configdir="${DESTDIR}${sysconfdir}/sysconfig"
 	    else
 dnl             debian style
-		init_cv_configdir="${DESTDIR}/${sysconfdir}/default"
+		init_cv_configdir="${DESTDIR}${sysconfdir}/default"
 	    fi
 	fi
     ])
@@ -274,9 +274,9 @@ dnl         debian style
 dnl
 dnl configdir is where we are going to put init script default files
 dnl
-    if test :"$init_cv_configdir:-no}" != :no ; then
+    if test :"${init_cv_configdir:-no}" != :no ; then
 	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	configdir="${init_cv_configdir#$init_dir}"
+	configdir="${init_cv_configdir#$init_tmp}"
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then
 dnl         redhat style

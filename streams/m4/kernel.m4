@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/03/22 10:38:04 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/03/24 05:16:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/22 10:38:04 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 05:16:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -162,6 +162,8 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_REGPARM
     _LINUX_CHECK_KERNEL_VERSIONS
     _LINUX_CHECK_KERNEL_MODVERSIONS
+    _LINUX_CHECK_KERNEL_UPDATE_MODULES
+    _LINUX_CHECK_KERNEL_MODULE_PRELOAD
     PACKAGE_KNUMBER="${knumber}"
     AC_SUBST([PACKAGE_KNUMBER])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_KNUMBER], ["$PACKAGE_KNUMBER"], [The Linux
@@ -1920,6 +1922,83 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
     AM_CONDITIONAL([KERNEL_VERSIONS], [test x"$linux_cv_k_modversions" = xyes])dnl
 ])# _LINUX_CHECK_KERNEL_MODVERSIONS
 # =========================================================================
+
+# =============================================================================
+# _LINUX_CHECK_KERNEL_UPDATE_MODULES
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_UPDATE_MODULES], [dnl
+    AC_CACHE_CHECK([for kernel update-modules directory], [linux_cv_modutildir], [dnl
+	linux_cv_modutildir='no'
+	eval "linux_search_path=\"
+	    ${DESTDIR}${sysconfdir}/modutils
+	    ${sysconfdir}/modutils
+	    ${DESTDIR}${rootdir}/etc/modutils
+	    ${DESTDIR}/etc/modutils
+	    /etc/modutils\""
+	linux_search_path=`echo "$linux_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	for linux_tmp in $linux_search_path ; do
+	    if test -d $linux_tmp ; then
+		linux_cv_modutildir="$linux_tmp"
+		break
+	    fi
+	done
+    ])
+    if test :"${linux_cv_modutildir:-no}" != :no
+    then
+	linux_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	modutildir="${linux_cv_modutildir#$linux_tmp}"
+    else
+	modutildir='${sysconfdir}/modutils'
+    fi
+    AC_SUBST([modutildir])dnl
+])# _LINUX_CHECK_KERNEL_UPDATE_MODULES
+# =============================================================================
+
+# =============================================================================
+# _LINUX_CHECK_KERNEL_MODULE_PRELOAD
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_MODULE_PRELOAD], [dnl
+    AC_CACHE_CHECK([for kernel module preload file], [linux_cv_preloads], [dnl
+	linux_cv_preloads='no'
+	if test :"${linux_cv_k_ko_modules:-no}" = :no
+	then
+	    eval "linux_search_path=\"
+		${DESTDIR}${sysconfdir}/modules
+		${sysconfdir}/modules
+		${DESTDIR}${rootdir}/etc/modules
+		${DESTDIR}/etc/modules
+		/etc/modules\""
+	else
+	    eval "linux_search_path=\"
+		${DESTDIR}${sysconfdir}/modprobe.preload
+		${sysconfdir}/modprobe.preload
+		${DESTDIR}${rootdir}/etc/modprobe.preload
+		${DESTDIR}/etc/modprobe.preload
+		/etc/modprobe.preload\""
+	fi
+	linux_search_path=`echo "$linux_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	for linux_tmp in $linux_search_path ; do
+	    if test -f $linux_tmp ; then
+		linux_cv_preloads="$linux_tmp"
+		break
+	    fi
+	done
+    ])
+    if test :"${linux_cv_preloads:-no}" != :no
+    then
+	linux_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	preloads="${linux_cv_preloads#$linux_tmp}"
+    else
+	if test :"${linux_cv_k_ko_modules:-no}" = :no
+	then
+	    preloads='${sysconfdir}/modules'
+	else
+	    preloads='${sysconfdir}/modprobe.preload'
+	fi
+    fi
+    AC_SUBST([preloads])dnl
+])# _LINUX_CHECK_KERNEL_MODULE_PRELOAD
+# =============================================================================
 
 # =============================================================================
 # _LINUX_KERNEL_SYMBOL_ADDR(SYMBOLNAME, [ACTION-IF-NOT-FOUND], [ACTION-IF-FOUND])
