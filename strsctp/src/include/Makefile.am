@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/20 20:35:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,45 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 20:35:45 $ by $Author: brian $
+# Last Modified $Date: 2004/08/21 11:04:34 $ by $Author: brian $
 #
 # =============================================================================
 
-sctp_headers	= \
+nobase_pkginclude_HEADERS = \
+	sys/npi_sctp.h \
+	sys/tpi_sctp.h \
+	sys/xti_sctp.h \
 	ss7/sctp.h \
 	ss7/sctpi.h \
 	ss7/sctpi_ioctl.h
-
-xns_headers	= \
-	sys/npi_sctp.h
-
-tli_headers	= \
-	sys/tpi_sctp.h
-
-inet_headers	=
-
-xnet_headers	= \
-	sys/xti_sctp.h
-
-sock_headers	= 
-
-nobase_pkginclude_HEADERS = $(sctp_headers)
-
-if WITH_XNS
-nobase_pkginclude_HEADERS += $(xns_headers)
-endif
-if WITH_TLI
-nobase_pkginclude_HEADERS += $(tli_headers)
-endif
-if WITH_INET
-nobase_pkginclude_HEADERS += $(inet_headers)
-endif
-if WITH_XNET
-nobase_pkginclude_HEADERS += $(xnet_headers)
-endif
-if WITH_SOCK
-nobase_pkginclude_HEADERS += $(sock_headers)
-endif
 
 nobase_nodist_pkginclude_HEADERS = 
 #	sys/strxnet/modversions.h

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_input.h,v 0.9 2004/06/22 06:39:01 brian Exp $
+ @(#) $Id: sctp_input.h,v 0.9.2.1 2004/08/21 10:53:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:53:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_INPUT_H__
 #define __SCTP_INPUT_H__
 
-#ident "@(#) $RCSfile: sctp_input.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $"
+#ident "@(#) $RCSfile: sctp_input.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:57 $"
 
 extern void sctp_init_proto(void);
 extern void sctp_term_proto(void);

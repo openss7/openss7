@@ -9,3 +9,41 @@
 @set PACKAGE_TARNAME @PACKAGE_TARNAME@
 @set PACKAGE_TITLE @PACKAGE_TITLE@
 @set PACKAGE_VERSION @PACKAGE_VERSION@
+@set PACKAGE_SHORTTITLE @PACKAGE_SHORTTITLE@
+
+@set _bindir @prefix@/bin
+@set _datadir @prefix@/share
+@set _exec_prefix @prefix@
+@set _includedir @prefix@/include
+@set _infodir @prefix@/share/info
+@set _kmoduledir @kmoduledir@
+@set _krootdir @krootdir@
+@set _ksysmap @ksysmap@
+@set _kversion @kversion@
+@set _libdir @prefix@/lib
+@set _libexecdir @prefix@/libexec
+@set _localstatedir @localstatedir@
+@set _mandir @prefix@/share/man
+@set _oldincludedir @oldincludedir@
+@set _prefix @prefix@
+@set _sbindir @prefix@/sbin
+@set _sharedstatedir @prefix@/com
+@set _sysconfdir @sysconfdir@
+
+@set _build @build@
+@set _build_alias @build_alias@
+@set _build_cpu @build_cpu@
+@set _build_os @build_os@
+@set _build_vendor @build_vendor@
+
+@set _host @host@
+@set _host_alias @host_alias@
+@set _host_cpu @host_cpu@
+@set _host_os @host_os@
+@set _host_vendor @host_vendor@
+
+@set _target @target@
+@set _target_alias @target_alias@
+@set _target_cpu @target_cpu@
+@set _target_os @target_os@
+@set _target_vendor @target_vendor@

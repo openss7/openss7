@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/20 20:35:11 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 20:35:11 $ by $Author: brian $
+# Last Modified $Date: 2004/08/21 11:04:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,9 +74,14 @@ CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SY
 ifnames:
 	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
 
+distclean-logs:
+	rm -f *.log
+
+distclean-local: distclean-logs
+
 #
 # Collected phonys from other automake fragments.
 #
-.PHONY: ifnames
+.PHONY: ifnames distclean-logs
 
 # vim: ft=automake

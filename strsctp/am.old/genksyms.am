@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/20 20:35:11 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 20:35:11 $ by $Author: brian $
+# Last Modified $Date: 2004/08/21 11:04:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -86,8 +86,8 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	for s in $(EXPORT_SRCFILES) ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
-		echo "$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v$$r.ver -MD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver" ; \
-		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v$$r.ver -MD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver ; \
+		echo "$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v$$r.ver -MD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) | sed -e '/^#define __ver_/s/\<\([0-9a-f]*\)\>$$/_ver_str(&)/' > $$v$$r.ver" ; \
+		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v$$r.ver -MD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) | sed -e '/^#define __ver_/s/\<\([0-9a-f]*\)\>$$/_ver_str(&)/' > $$v$$r.ver ; \
 	done
 else
 if AMDEP
@@ -98,9 +98,9 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
 		echo "source=\"$$s\" object=\"$$v$$r.ver\" libtool=no depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
-		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver" ; \
+		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) | sed -e '/^#define __ver_/s/\<\([0-9a-f]*\)\>$$/_ver_str(&)/' > $$v$$r.ver" ; \
 		source="$$s" object="$$v$$r.ver" libtool=no depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp) \
-		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver ; \
+		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) | sed -e '/^#define __ver_/s/\<\([0-9a-f]*\)\>$$/_ver_str(&)/' > $$v$$r.ver ; \
 	done
 else
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
@@ -109,8 +109,8 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	for s in $(EXPORT_SRCFILES) ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
-		echo "$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver" ; \
-		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver ; \
+		echo "$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) | sed -e '/^#define __ver_/s/\<\([0-9a-f]*\)\>$$/_ver_str(&)/' > $$v$$r.ver" ; \
+		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) | sed -e '/^#define __ver_/s/\<\([0-9a-f]*\)\>$$/_ver_str(&)/' > $$v$$r.ver ; \
 	done
 endif
 endif
@@ -125,12 +125,40 @@ $(MODVERSIONS_H): $(EXPORT_VERFILES)
 		echo "$(mkdir_p) $$v" ; \
 		$(mkdir_p) $$v ; \
 		touch $(MODVERSIONS_H) ; \
-		echo "echo \"#ifndef _SYS_MODVERSIONS_H\"  > $(MODVERSIONS_H)" ; \
-		echo "#ifndef _SYS_MODVERSIONS_H"  > $(MODVERSIONS_H) ; \
-		echo "echo \"#define _SYS_MODVERSIONS_H\" >> $(MODVERSIONS_H)" ; \
-		echo "#define _SYS_MODVERSIONS_H" >> $(MODVERSIONS_H) ; \
-		echo "echo \" \" > ./$(DEPDIR)/modversions.Ph" ; \
-		echo " " > ./$(DEPDIR)/modversions.Ph ; \
+		echo "echo \"#ifndef _SYS_MODVERSIONS_H\"		>  $(MODVERSIONS_H)" ; \
+		echo "#ifndef _SYS_MODVERSIONS_H"			>  $(MODVERSIONS_H) ; \
+		echo "echo \"#define _SYS_MODVERSIONS_H\"		>> $(MODVERSIONS_H)" ; \
+		echo "#define _SYS_MODVERSIONS_H"			>> $(MODVERSIONS_H) ; \
+		echo "echo \"#undef _ver_str\"				>> $(MODVERSIONS_H)" ; \
+		echo "#undef _ver_str"					>> $(MODVERSIONS_H) ; \
+		echo "echo \"#ifdef CONFIG_SMP\"			>> $(MODVERSIONS_H)" ; \
+		echo "#ifdef CONFIG_SMP"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"# ifdef CONFIG_REGPARM\"			>> $(MODVERSIONS_H)" ; \
+		echo "# ifdef CONFIG_REGPARM"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) smp_regparm_ ## x\"	>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) smp_regparm_ ## x"		>> $(MODVERSIONS_H) ; \
+		echo "echo \"# else\"					>> $(MODVERSIONS_H)" ; \
+		echo "# else"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) smp_ ## x\"		>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) smp_ ## x"			>> $(MODVERSIONS_H) ; \
+		echo "echo \"# endif\"					>> $(MODVERSIONS_H)" ; \
+		echo "# endif"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#else\"					>> $(MODVERSIONS_H)" ; \
+		echo "#else"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"# ifdef CONFIG_REGPARM\"			>> $(MODVERSIONS_H)" ; \
+		echo "# ifdef CONFIG_REGPARM"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) regparm_ ## x\"	>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) regparm_ ## x"		>> $(MODVERSIONS_H) ; \
+		echo "echo \"# else\"					>> $(MODVERSIONS_H)" ; \
+		echo "# else"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) x\"			>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) x"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"# endif\"					>> $(MODVERSIONS_H)" ; \
+		echo "# endif"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#endif\"					>> $(MODVERSIONS_H)" ; \
+		echo "#endif"						>> $(MODVERSIONS_H) ; \
+		echo "echo \" \"					>  ./$(DEPDIR)/modversions.Ph" ; \
+		echo " "						>  ./$(DEPDIR)/modversions.Ph ; \
 		vers='' ; \
 		list='$(EXPORT_SRCFILES)'; \
 		for s in $$list ; do \
@@ -138,19 +166,19 @@ $(MODVERSIONS_H): $(EXPORT_VERFILES)
 			r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
 			if test -f $$v$$r.ver ; then \
 				p=`echo "$$v" | sed -e 's|^[^/]*/||'` ; \
-				echo "echo \"#include \"$$p$$r.ver\"\" >> $(MODVERSIONS_H)" ; \
-				echo "#include \"$$p$$r.ver\"" >> $(MODVERSIONS_H) ; \
-				echo "( echo \"sinclude ./$(DEPDIR)/$$r.Pver\" ; echo \"\" ) >> ./$(DEPDIR)/modversions.Ph" ; \
-				( echo "sinclude ./$(DEPDIR)/$$r.Pver" ; echo "" ) >> ./$(DEPDIR)/modversions.Ph ; \
-				echo "( echo \"$$v$$r.ver: $$d$$s\" ; echo \"\" ) >> ./$(DEPDIR)/modversions.Ph" ; \
-				( echo "$$v$$r.ver: $$d$$s" ; echo "" ) >> ./$(DEPDIR)/modversions.Ph ; \
+				echo "echo \"#include \"$$p$$r.ver\"\"				>> $(MODVERSIONS_H)" ; \
+				echo "#include \"$$p$$r.ver\""					>> $(MODVERSIONS_H) ; \
+				echo "( echo \"sinclude ./$(DEPDIR)/$$r.Pver\" ; echo \"\" )	>> ./$(DEPDIR)/modversions.Ph" ; \
+				( echo "sinclude ./$(DEPDIR)/$$r.Pver" ; echo "" )		>> ./$(DEPDIR)/modversions.Ph ; \
+				echo "( echo \"$$v$$r.ver: $$d$$s\" ; echo \"\" )		>> ./$(DEPDIR)/modversions.Ph" ; \
+				( echo "$$v$$r.ver: $$d$$s" ; echo "" )				>> ./$(DEPDIR)/modversions.Ph ; \
 				vers="$${vers}$${vers:+ }$$v$$r.ver" ; \
 			fi ; \
 		done ; \
-		echo "echo \"#endif /* _SYS_MODVERSIONS_H */\" >> $(MODVERSIONS_H)" ; \
-		echo "#endif /* _SYS_MODVERSIONS_H */" >> $(MODVERSIONS_H) ; \
-		echo "( echo \"\" ; echo \"$(MODVERSIONS_H): $$vers\" ) >> ./$(DEPDIR)/modversions.Ph" ; \
-		( echo "" ; echo "$(MODVERSIONS_H): $$vers" ) >> ./$(DEPDIR)/modversions.Ph ; \
+		echo "echo \"#endif /* _SYS_MODVERSIONS_H */\"		>> $(MODVERSIONS_H)" ; \
+		echo "#endif /* _SYS_MODVERSIONS_H */"			>> $(MODVERSIONS_H) ; \
+		echo "( echo \"\" ; echo \"$(MODVERSIONS_H): $$vers\" )	>> ./$(DEPDIR)/modversions.Ph" ; \
+		( echo "" ; echo "$(MODVERSIONS_H): $$vers" )		>> ./$(DEPDIR)/modversions.Ph ; \
 	fi
 else
 $(MODVERSIONS_H): $(EXPORT_VERFILES)
@@ -162,10 +190,38 @@ $(MODVERSIONS_H): $(EXPORT_VERFILES)
 		echo "$(mkdir_p) $$v" ; \
 		$(mkdir_p) $$v ; \
 		touch $(MODVERSIONS_H) ; \
-		echo "echo \"#ifndef _SYS_MODVERSIONS_H\"  > $(MODVERSIONS_H)" ; \
-		echo "#ifndef _SYS_MODVERSIONS_H"  > $(MODVERSIONS_H) ; \
-		echo "echo \"#define _SYS_MODVERSIONS_H\" >> $(MODVERSIONS_H)" ; \
-		echo "#define _SYS_MODVERSIONS_H" >> $(MODVERSIONS_H) ; \
+		echo "echo \"#ifndef _SYS_MODVERSIONS_H\"		>  $(MODVERSIONS_H)" ; \
+		echo "#ifndef _SYS_MODVERSIONS_H"			>  $(MODVERSIONS_H) ; \
+		echo "echo \"#define _SYS_MODVERSIONS_H\"		>> $(MODVERSIONS_H)" ; \
+		echo "#define _SYS_MODVERSIONS_H"			>> $(MODVERSIONS_H) ; \
+		echo "echo \"#undef _ver_str\"				>> $(MODVERSIONS_H)" ; \
+		echo "#undef _ver_str"					>> $(MODVERSIONS_H) ; \
+		echo "echo \"#ifdef CONFIG_SMP\"			>> $(MODVERSIONS_H)" ; \
+		echo "#ifdef CONFIG_SMP"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"# ifdef CONFIG_REGPARM\"			>> $(MODVERSIONS_H)" ; \
+		echo "# ifdef CONFIG_REGPARM"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) smp_regparm_ ## x\"	>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) smp_regparm_ ## x"		>> $(MODVERSIONS_H) ; \
+		echo "echo \"# else\"					>> $(MODVERSIONS_H)" ; \
+		echo "# else"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) smp_ ## x\"		>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) smp_ ## x"			>> $(MODVERSIONS_H) ; \
+		echo "echo \"# endif\"					>> $(MODVERSIONS_H)" ; \
+		echo "# endif"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#else\"					>> $(MODVERSIONS_H)" ; \
+		echo "#else"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"# ifdef CONFIG_REGPARM\"			>> $(MODVERSIONS_H)" ; \
+		echo "# ifdef CONFIG_REGPARM"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) regparm_ ## x\"	>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) regparm_ ## x"		>> $(MODVERSIONS_H) ; \
+		echo "echo \"# else\"					>> $(MODVERSIONS_H)" ; \
+		echo "# else"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#  define _ver_str(x) x\"			>> $(MODVERSIONS_H)" ; \
+		echo "#  define _ver_str(x) x"				>> $(MODVERSIONS_H) ; \
+		echo "echo \"# endif\"					>> $(MODVERSIONS_H)" ; \
+		echo "# endif"						>> $(MODVERSIONS_H) ; \
+		echo "echo \"#endif\"					>> $(MODVERSIONS_H)" ; \
+		echo "#endif"						>> $(MODVERSIONS_H) ; \
 		vers='' ; \
 		list='$(EXPORT_SRCFILES)'; \
 		for s in $$list ; do \
@@ -173,13 +229,13 @@ $(MODVERSIONS_H): $(EXPORT_VERFILES)
 			r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
 			if test -f $$v$$r.ver ; then \
 				p=`echo "$$v" | sed -e 's|^[^/]*/||'` ; \
-				echo "echo \"#include \"$$p$$r.ver\"\" >> $(MODVERSIONS_H)" ; \
-				echo "#include \"$$p$$r.ver\"" >> $(MODVERSIONS_H) ; \
+				echo "echo \"#include \"$$p$$r.ver\"\"	>> $(MODVERSIONS_H)" ; \
+				echo "#include \"$$p$$r.ver\""		>> $(MODVERSIONS_H) ; \
 				vers="$${vers}$${vers:+ }$$v$$r.ver" ; \
 			fi ; \
 		done ; \
-		echo "echo \"#endif /* _SYS_MODVERSIONS_H */\" >> $(MODVERSIONS_H)" ; \
-		echo "#endif /* _SYS_MODVERSIONS_H */" >> $(MODVERSIONS_H) ; \
+		echo "echo \"#endif /* _SYS_MODVERSIONS_H */\"	>> $(MODVERSIONS_H)" ; \
+		echo "#endif /* _SYS_MODVERSIONS_H */"		>> $(MODVERSIONS_H) ; \
 	fi
 endif
 
@@ -196,9 +252,9 @@ else
 
 $(MODVERSIONS_H):
 	$(mkdir_p) $(PKGINCL) ; \
-	echo "#ifndef _SYS_MODVERSIONS_H"  > $(MODVERSIONS_H) ; \
-	echo "#define _SYS_MODVERSIONS_H" >> $(MODVERSIONS_H) ; \
-	echo "#endif /* _SYS_MODVERSIONS_H */" >> $(MODVERSIONS_H)
+	echo "#ifndef _SYS_MODVERSIONS_H"	>  $(MODVERSIONS_H) ; \
+	echo "#define _SYS_MODVERSIONS_H"	>> $(MODVERSIONS_H) ; \
+	echo "#endif /* _SYS_MODVERSIONS_H */"	>> $(MODVERSIONS_H)
 
 clean-ksyms:
 	rm -f $(MODVERSIONS_H)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $";
 
 #define __NO_VERSION__
 
@@ -122,10 +122,9 @@ sctp_get_vtag(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
 static inline void
 set_timeout(sctp_t * sp, int *tidp, timo_fcn_t *fnc, void *data, long ticks)
 {
-	psw_t flags;
 	assert(tidp);
 	assert(data);
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_bh(&sp->qlock);
 	{
 		if (*tidp) {
 			abnormal(*tidp);
@@ -133,23 +132,22 @@ set_timeout(sctp_t * sp, int *tidp, timo_fcn_t *fnc, void *data, long ticks)
 		}
 		*tidp = timeout(fnc, data, ticks ? ticks : 1);
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_bh(&sp->qlock);
 }
 
 static inline void
 mod_timeout(sctp_t * sp, int *tidp, timo_fcn_t *fnc, void *data, long ticks)
 {
-	psw_t flags;
 	assert(tidp);
 	assert(data);
-	lis_spin_lock_irqsave(&sp->lock, &flags);
+	spin_lock_bh(&sp->qlock);
 	{
 		if (*tidp) {
 			untimeout(xchg(tidp, 0));
 		}
 		*tidp = timeout(fnc, data, ticks ? ticks : 1);
 	}
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_unlock_bh(&sp->qlock);
 }
 
 /*
@@ -2895,9 +2893,9 @@ sctp_rtt_calc(sd, time)
 	sd->rto = sd->rto_max < sd->rto ? sd->rto_max : sd->rto;	/* RFC 2960 6.3.1 (C7) */
 
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 	if (sd->retransmits && (sd->sp->options & SCTP_OPTION_BREAK)
-	    && (sd->packets > BREAK_GENERATOR_LEVEL))
+	    && (sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL))
 		ptrace(("Aaaarg! Reseting counts for address %d.%d.%d.%d\n",
 			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
 			(sd->daddr >> 24) & 0xff));

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/20 20:35:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/20 91:04:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,30 +46,35 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 20:35:34 $ by $Author: brian $
+# Last Modified $Date: 2004/08/20 91:04:32 $ by $Author: brian $
 #
 # =============================================================================
 
-info_TEXINFOS	= strsctp.texi
-DVIS		= strsctp.dvi
-PSS		= strsctp.ps
-PDFS		= strsctp.pdf
-HTMLS		= strsctp.html
-INFO_DEPS	= $(srcdir)/strsctp.info
+info_TEXINFOS		= strsctp.texi
 
-#if WITH_XNET
+EXTRA_info_TEXINFOS	= \
+			  args.texi \
+			  rpm.texi \
+			  configure.texi \
+			  install.texi \
+			  releases.texi \
+			  gpl.texi \
+			  lesser.texi \
+			  fdl.texi
+
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate --commands-in-node-names
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections --commands-in-node-names
+
+EXTRA_DIST		= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS)
+
 #
-#info_TEXINFOS	+= libxnet.texi
-#DVIS		+= libxnet.dvi
-#PSS		+= libxnet.ps
-#PDFS		+= libxnet.pdf
-#HTMLS		+= libxnet.html
-#INFO_DEPS	+= $(srcdir)/libxnet.info
+# This breaks distcheck (I think it's the INFO_DEPS dependency;
+# however, distcheck is not run in maintainer mode
 #
-#endif
+if MAINTAINER_MODE
+$(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
+endif
 
-MAKEINFOHTML	= $(MAKEINFO) --html --no-split
-
-EXTRA_DIST = gpl.texi lesser.texi fdl.texi libxnet.texi $(PSS) $(PDFS) $(HTMLS)
+all-local: info ps pdf html
 
 # vim: ft=automake

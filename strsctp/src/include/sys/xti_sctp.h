@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9 2004/06/20 20:35:50 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.1 2004/08/21 10:53:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/20 20:35:50 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:53:59 $ by $Author: brian $
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.1  2004/08/21 10:53:59  brian
+ - Force checkin on branch.
+
  Revision 0.9  2004/06/20 20:35:50  brian
  - Working up separate sctp release.
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 

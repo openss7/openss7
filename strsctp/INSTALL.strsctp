@@ -69,13 +69,6 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --disable-compress-manpages
-                          compress manpges with gzip -9 or leave them
-                          uncompressed. [default=yes]
-  --disable-public        disable public release. [default=no]
-  --enable-tools          build and install user packages. [default=yes]
-  --enable-modules        build and install kernel packages.
-                          [default=yes]
   --disable-modules       disable kernel modules, prepare object for linking
                           into the kernel. [default=no]
   --enable-k-inline       enable kernel inline functions. [default=no]
@@ -88,6 +81,48 @@ Optional Features:
   --enable-k-modversions  specify whether symbol versioning is to be used on
                           symbols exported from built modules.
                           [default=yes]
+  --disable-compress-manpages
+                          compress manpges with gzip -9 or leave them
+                          uncompressed. [default=yes]
+  --disable-public        disable public release. [default=no]
+  --enable-tools          build and install user packages. [default=yes]
+  --enable-modules        build and install kernel packages.
+                          [default=yes]
+  --enable-sctp-slow-verification
+                          enable slow verification of addresses and tags.
+                          [default=no]
+  --disable-sctp-throttle-heartbeats
+                          enable heartbeat throttling. [default=yes]
+  --enable-sctp-discard-ootb
+                          enable discard out-of-the-blue packets.
+                          [default=no]
+  --enable-sctp-extended-ip-support
+                          enable extended IP support for SCTP.
+                          [default=disabled]
+  --disable-sctp-hmac-sha1
+                          disable SHA-1 HMAC. [default=enabled]
+  --disable-sctp-hmac-md5 disable MD5 HMAC. [default=enabled]
+  --enable-sctp-adler32   enable Adler32 checksum. [default=disabled]
+  --disable-sctp-crc32c   disable CRC-32C checksum. [default=enabled]
+  --enable-sctp-throttle-passiveopens
+                          enable throttling of passive opens.
+                          [default=disabled]
+  --disable-sctp-ecn      disable Explicit Congestion Notification.
+                          [default=enabled]
+  --disable-sctp-lifetimes
+                          disable SCTP message lifetimes.
+                          [default=enabled]
+  --disable-sctp-add-ip   disable ADD-IP. [default=enabled]
+  --disable-sctp-adaptation-layer-info
+                          disable ALI. [default=enabled]
+  --disable-sctp-partial-reliability
+                          disable SCTP Partial Reliability (PR-SCTP).
+                          [default=enabled]
+  --disable-sctp-debug    disable SCTP debugging. [default=enabled]
+  --disable-sctp-safe     disable SCTP safety. [default=enabled]
+  --disable-sctp-error-generator
+                          disable SCTP error generator.
+                          [default=enabled]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -97,18 +132,6 @@ Optional Packages:
                           both]
   --with-tags[=TAGS]
                           include additional configurations [automatic]
-  --with-cooked-manpages  convert manual pages to remove macro dependencies
-                          and grefer references. [default=no]
-  --with-rpm-epoch=EPOCH  specify the EPOCH for the RPM spec file.
-                          [default=1]
-  --with-rpm-release=RELEASE
-                          specify the RELEASE for the RPM spec file.
-                          [default=Custom]
-  --with-gpg-user=USERNAME
-                          specify the USER for signing RPMs and tarballs.
-                          [default=${GNUPGUSER}]
-  --with-gpg-home=HOMEDIR specify the HOME for signing RPMs and tarballs.
-                          [default=${GNUPGHOME:-~/.gnupg}]
   --with-k-release=UTSRELEASE
                           specify the UTS release of the linux kernel for
                           which the build is targetted. If this option is not
@@ -136,24 +159,30 @@ Optional Packages:
                           directory. [default=K-ARCHDIR/ARCH]
   --with-k-optimize=HOW   specify optimization, normal, size, speed or quick.
                           [default=normal]
+  --with-sctp             include sctp version 1 driver in build.
+                          [default=yes]
+  --with-sctp2            include sctp version 2 driver in build.
+                          [default=no]
+  --with-cooked-manpages  convert manual pages to remove macro dependencies
+                          and grefer references. [default=no]
+  --with-rpm-epoch=EPOCH  specify the EPOCH for the RPM spec file.
+                          [default=1]
+  --with-rpm-release=RELEASE
+                          specify the RELEASE for the RPM spec file.
+                          [default=Custom]
+  --with-gpg-user=USERNAME
+                          specify the USER for signing RPMs and tarballs.
+                          [default=${GNUPGUSER}]
+  --with-gpg-home=HOMEDIR specify the HOME for signing RPMs and tarballs.
+                          [default=${GNUPGHOME:-~/.gnupg}]
   --with-lis=HEADERS      specify the LiS header file directory.
                           [default=INCLUDEDIR/LiS]
   --with-lfs=HEADERS      specify the LfS header file directory.
                           [default=INCLUDEDIR/LfS]
-  --with-sctp             include xopen sctp driver in build.
-                          [default=yes]
-  --with-sctp2            include xopen sctp version 2 driver in build.
-                          [default=no]
-  --with-xns              include xopen xns headers in install.
-                          [default=yes]
-  --with-tli              include xopen tli modules in build.
-                          [default=yes]
-  --with-inet             include xopen inet driver in build.
-                          [default=yes]
-  --with-xnet             include xopen xnet library in build.
-                          [default=yes]
-  --with-sock             include xopen sock library in build.
-                          [default=yes]
+  --with-xns=HEADERS      specify the XNS header file directory.
+                          [default=$INCLUDEDIR/strxns]
+  --with-xti=HEADERS      specify the XTI header file directory.
+                          [default=$INCLUDEDIR/xti]
   --with-strconf-master=FILENAME
                           specify the file name to which the configuration
                           master file is written [default=Config.master]
@@ -161,21 +190,24 @@ Optional Packages:
                           start numbering major devices [default=230]
 
 Some influential environment variables:
-  CC          C compiler command
-  CFLAGS      C compiler flags
+  CXX         C++ compiler command
+  CXXFLAGS    C++ compiler flags
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
               nonstandard directory <lib dir>
   CPPFLAGS    C/C++ preprocessor flags, e.g. -I<include dir> if you have
               headers in a nonstandard directory <include dir>
-  CCAS        assembler compiler command (defaults to CC)
-  CCASFLAGS   assembler compiler flags (defaults to CFLAGS)
-  CXX         C++ compiler command
-  CXXFLAGS    C++ compiler flags
+  CC          C compiler command
+  CFLAGS      C compiler flags
   CPP         C preprocessor
   LD          Linker loader command
   CXXCPP      C++ preprocessor
   F77         Fortran 77 compiler command
   FFLAGS      Fortran 77 compiler flags
+  DESTDIR     Cross build root directory
+  DEPMOD      Build kernel module dependencies command
+  MODPROBE    Probe kernel module dependencies command
+  LSMOD       List kernel modules command
+  LSOF        List open files command
   SOELIM      Roff source elminiation command
   REFER       Roff references command
   TBL         Roff table command
@@ -186,12 +218,6 @@ Some influential environment variables:
   GPG         GPG signature command
   GNUPGUSER   GPG user name
   GNUPGHOME   GPG home directory
-  LDCONFIG    Configure loader command
-  DESTDIR     Cross build root directory
-  DEPMOD      Build kernel module dependencies command
-  MODPROBE    Probe kernel module dependencies command
-  LSMOD       List kernel modules command
-  LSOF        List open files command
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.

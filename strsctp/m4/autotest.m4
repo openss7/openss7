@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: autotest.m4,v 0.9 2004/08/18 21:01:45 brian Exp $
+dnl @(#) $Id: autotest.m4,v 0.9.2.1 2004/08/21 10:53:56 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/18 21:01:45 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/21 10:53:56 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 

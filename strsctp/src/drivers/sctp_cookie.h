@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_cookie.h,v 0.9 2004/06/22 06:39:01 brian Exp $
+ @(#) $Id: sctp_cookie.h,v 0.9.2.1 2004/08/21 10:53:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:53:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_COOKIE_H__
 #define __SCTP_COOKIE_H__
 
-#ident "@(#) $RCSfile: sctp_cookie.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $"
+#ident "@(#) $RCSfile: sctp_cookie.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:57 $"
 
 #define HMAC_SIZE (160/8)
 #define raw_cookie_size(__ck) \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9 2004/06/22 08:41:40 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.2 2004/08/21 11:04:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 08:41:40 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:34 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 08:41:40 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $"
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -63,7 +63,7 @@
 #endif
 
 typedef struct bufq {
-	lis_spin_lock_t q_lock;
+	spinlock_t q_lock;
 	mblk_t *q_head;
 	mblk_t *q_tail;
 	size_t q_msgs;
@@ -73,21 +73,21 @@ typedef struct bufq {
 static inline void
 bufq_init(bufq_t * q)
 {
-	lis_spin_lock_init(&q->q_lock, "bufq-lock");
+	spin_lock_init(&q->q_lock);
 	q->q_head = NULL;
 	q->q_tail = NULL;
 	q->q_msgs = 0;
 	q->q_count = 0;
 }
 static inline void
-bufq_lock(bufq_t * q, psw_t *flags)
+bufq_lock(bufq_t * q)
 {
-	lis_spin_lock_irqsave(&q->q_lock, flags);
+	spin_lock_bh(&q->q_lock);
 }
 static inline void
-bufq_unlock(bufq_t * q, psw_t *flags)
+bufq_unlock(bufq_t * q)
 {
-	lis_spin_unlock_irqrestore(&q->q_lock, flags);
+	spin_unlock_bh(&q->q_lock);
 }
 
 static inline size_t
@@ -164,19 +164,17 @@ __bufq_queue(bufq_t * q, mblk_t *mp)
 static inline void
 bufq_queue(bufq_t * q, mblk_t *mp)
 {
-	psw_t flags;
 	ensure(q && mp, return);
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	__bufq_queue(q, mp);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline void
 bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
-	psw_t flags;
 	ensure(q && mp, return);
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	if ((mp->b_next = q->q_head))
 		mp->b_next->b_prev = mp;
 	else
@@ -184,14 +182,13 @@ bufq_queue_head(bufq_t * q, mblk_t *mp)
 	mp->b_prev = NULL;
 	q->q_head = mp;
 	__bufq_add(q, mp);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline void
 bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
-	psw_t flags;
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	ensure(q && mp && np, return);
 	if ((np->b_prev = mp->b_prev))
 		np->b_prev->b_next = np;
@@ -200,15 +197,14 @@ bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 	mp->b_prev = np;
 	np->b_next = mp;
 	__bufq_add(q, np);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline void
 bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
-	psw_t flags;
 	ensure(q && mp && np, return);
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	if ((np->b_next = mp->b_next))
 		np->b_next->b_prev = np;
 	else
@@ -216,7 +212,7 @@ bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 	mp->b_next = np;
 	np->b_prev = mp;
 	__bufq_add(q, np);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline mblk_t *
@@ -238,12 +234,11 @@ __bufq_dequeue(bufq_t * q)
 static inline mblk_t *
 bufq_dequeue(bufq_t * q)
 {
-	psw_t flags;
 	mblk_t *mp;
 	ensure(q, return (NULL));
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	mp = __bufq_dequeue(q);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 	return mp;
 }
 
@@ -266,12 +261,11 @@ __bufq_dequeue_tail(bufq_t * q)
 static inline mblk_t *
 bufq_dequeue_tail(bufq_t * q)
 {
-	psw_t flags;
 	mblk_t *mp;
 	ensure(q, return (NULL));
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	mp = __bufq_dequeue_tail(q);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 	return mp;
 }
 
@@ -296,11 +290,10 @@ __bufq_unlink(bufq_t * q, mblk_t *mp)
 static inline mblk_t *
 bufq_unlink(bufq_t * q, mblk_t *mp)
 {
-	psw_t flags;
 	ensure(q && mp, return (NULL));
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	__bufq_unlink(q, mp);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 	return (mp);
 }
 
@@ -332,21 +325,19 @@ bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 static inline void
 bufq_freehead(bufq_t * q)
 {
-	psw_t flags;
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	if (q->q_head)
 		freemsg(__bufq_dequeue(q));
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline void
 bufq_purge(bufq_t * q)
 {
-	psw_t flags;
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	while (q->q_head)
 		freemsg(__bufq_dequeue(q));
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline void
@@ -365,31 +356,31 @@ __bufq_supply(bufq_t * q, mblk_t *mp)
 static inline void
 bufq_supply(bufq_t * q, mblk_t *mp)
 {
-	psw_t flags;
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	__bufq_supply(q, mp);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 }
 
 static inline mblk_t *
 bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 {
-	psw_t flags;
-	bufq_lock(q, &flags);
+	bufq_lock(q);
 	if (bufq_length(q) > maxcount || bufq_size(q) > maxsize) {
-		bufq_unlock(q, &flags);
+		bufq_unlock(q);
 		return mp;
 	}
 	__bufq_supply(q, mp);
-	bufq_unlock(q, &flags);
+	bufq_unlock(q);
 	return NULL;
 }
 
+#ifndef SCTP_VERSION_2
 static inline void
 freechunks(mblk_t *mp)
 {
 	mblk_t *dp, *dp_next;
 	for (dp = mp; dp; dp_next = dp->b_next, freemsg(dp), dp = dp_next) ;
 }
+#endif
 
 #endif				/* __BUFQ_H__ */

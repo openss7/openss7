@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9 2004/06/22 06:39:02 brian Exp $
+ @(#) $Id: sctp_output.h,v 0.9.2.2 2004/08/21 11:04:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,24 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_OUTPUT_H__
 #define __SCTP_OUTPUT_H__
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $"
+#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
 extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
 extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);
 extern void sctp_send_msg(sctp_t * sp, sctp_daddr_t * sd, mblk_t *mp);
 
-#define ERROR_GENERATOR
+#define SCTP_CONFIG_ERROR_GENERATOR
 
-#define ERROR_GENERATOR_LEVEL  8
-#define ERROR_GENERATOR_LIMIT 13
-#define BREAK_GENERATOR_LEVEL 50
-#define BREAK_GENERATOR_LIMIT 200
+#define SCTP_CONFIG_ERROR_GENERATOR_LEVEL  8
+#define SCTP_CONFIG_ERROR_GENERATOR_LIMIT 13
+#define SCTP_CONFIG_BREAK_GENERATOR_LEVEL 50
+#define SCTP_CONFIG_BREAK_GENERATOR_LIMIT 200
 
 #endif				/* __SCTP_OUTPUT_H__ */

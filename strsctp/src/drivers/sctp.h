@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9 2004/06/22 06:39:00 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.2 2004/08/21 11:04:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:00 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_H__
 #define __SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:00 $"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:32 $"
 
 #ifndef tid_t
 typedef int tid_t;
@@ -243,16 +243,18 @@ struct sctp {
 	queue_t *rq;			/* read queue */
 	queue_t *wq;			/* write queue */
 	cred_t cred;			/* credentials of opener */
+
+	spinlock_t qlock;		/* queue lock */
+	queue_t *rwait;			/* RD queue waiting on lock */
+	queue_t *wwait;			/* WR queue waiting on lock */
+	int users;			/* lock holders */
+
 	struct sctp_ifops *ops;		/* interface operations */
 	uint i_flags;			/* Interface flags */
 	uint i_state;			/* Interface state */
 	uint s_state;			/* SCTP state */
 	uint options;			/* options flags */
 	size_t conind;			/* max number outstanding conn_inds */
-
-	lis_spin_lock_t lock;		/* stream lock */
-	void *userq;			/* queue holding this lock */
-	queue_t *waitq;			/* queue waiting on locks */
 
 	struct sctp *bnext;		/* linkage for bind hash */
 	struct sctp **bprev;		/* linkage for bind hash */

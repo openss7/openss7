@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $
+ @(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $"
+#ident "@(#) $RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
-static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $";
+static char const ident[] = "$RCSfile: sctp_output.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $";
 
 #define __NO_VERSION__
 
@@ -338,26 +338,26 @@ sctp_send_msg(sp, sd, mp)
 			struct net_device *dev;
 			size_t hlen, plen, tlen;
 
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 			if ((sp->options & SCTP_OPTION_DBREAK)
-			    && sd->daddr == 0x010000ff && ++break_packets > BREAK_GENERATOR_LEVEL) {
-				if (break_packets > BREAK_GENERATOR_LIMIT)
+			    && sd->daddr == 0x010000ff && ++break_packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
+				if (break_packets > SCTP_CONFIG_BREAK_GENERATOR_LIMIT)
 					break_packets = 0;
 				return;
 			}
 			if ((sp->options & SCTP_OPTION_BREAK)
 			    && (sd == sp->daddr || sd == sp->daddr->next)
-			    && ++sd->packets > BREAK_GENERATOR_LEVEL) {
+			    && ++sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 				return;
 			}
 			if ((sp->options & SCTP_OPTION_DROPPING)
-			    && ++sd->packets > ERROR_GENERATOR_LEVEL) {
-				if (sd->packets > ERROR_GENERATOR_LIMIT)
+			    && ++sd->packets > SCTP_CONFIG_ERROR_GENERATOR_LEVEL) {
+				if (sd->packets > SCTP_CONFIG_ERROR_GENERATOR_LIMIT)
 					sd->packets = 0;
 				return;
 			}
 			if ((sp->options & SCTP_OPTION_RANDOM)
-			    && ++sd->packets > 2 * ERROR_GENERATOR_LEVEL) {
+			    && ++sd->packets > 2 * SCTP_CONFIG_ERROR_GENERATOR_LEVEL) {
 				if (!(random() & 0x03))
 					return;
 			}

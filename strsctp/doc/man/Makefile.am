@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/20 20:35:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,32 +46,29 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/20 20:35:16 $ by $Author: brian $
+# Last Modified $Date: 2004/08/21 11:04:32 $ by $Author: brian $
 #
 # =============================================================================
 
 MANMACRO_PFX = strsctp
 
 man_MANS = \
-	man4/sctp.4 \
-	man4/sctp_ioctl.4 \
-	man4/strsctp_soon.4 \
 	man7/npi_sctp.7 \
-	man7/tpi_sctp.7 \
 	man7/strsctp_soon.7 \
 	man8/sctp.8
 
-if WITH_XNET
+if WITH_OPENSS7_SCTP
+else
 man_MANS += \
-	man3/xti_sctp.3
-endif
-
-if WITH_INET
-man_MANS += \
-	man4/sctp.4
+	man3/xti_sctp.3 \
+	man4/sctp.4 \
+	man4/sctp_ioctl.4 \
+	man4/strsctp_soon.4 \
+	man7/tpi_sctp.7
 endif
 
 dist_noinst_MANS = \
+	man3/xti_sctp.3.man \
 	man4/sctp.4.man \
 	man4/sctp_ioctl.4.man \
 	man4/strsctp_soon.4.man \
@@ -79,16 +76,6 @@ dist_noinst_MANS = \
 	man7/tpi_sctp.7.man \
 	man7/strsctp_soon.7.man \
 	man8/sctp.8.man
-
-if WITH_XNET
-dist_noinst_MANS += \
-	man3/xti_sctp.3.man
-endif
-
-if WITH_INET
-dist_noinst_MANS += \
-	man4/sctp.4.man
-endif
 
 include ../../am/man.am
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $
+ @(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $"
+#ident "@(#) $RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
-static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $";
+static char const ident[] = "$RCSfile: sctp_route.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $";
 
 #define __NO_VERSION__
 
@@ -230,6 +230,28 @@ dst_pmtu(struct dst_entry *dst)
 	return (dst->pmtu);
 }
 #endif
+#if defined HAVE_NEW_STYLE_INET_PROTOCOL
+#ifndef ip_route_output_flow
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+int
+ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags) {
+	int (*func) (struct rtable **, struct flowi *, struct sock *, int)
+		= (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
+	return func(rp, flp, sk, flags);
+}
+#endif
+#endif
+#ifndef __ip_route_output_key
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+int
+__ip_route_output_key(struct rtable **rp, const struct flowi *flp) {
+	int (*func) (struct rtable **, const struct flowi *)
+		= (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
+	return func(rp, flp);
+}
+#endif
+#endif
+#endif
 /*
  *  sysctl_ip_dynaddr: this symbol is normally not exported, but we exported
  *  for the Linux Native version of SCTP, so we may have to treat it as extern
@@ -393,7 +415,7 @@ sctp_update_routes(sp, force_reselect)
 	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr
 	    || !sp->raddr) {
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 		int bad_choice = 0;
 #endif
 #endif
@@ -401,10 +423,10 @@ sctp_update_routes(sp, force_reselect)
 		usual(sp->taddr);
 
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 		if ((sp->options & SCTP_OPTION_BREAK)
 		    && (sp->taddr == sp->daddr || sp->taddr == sp->daddr->next)
-		    && sp->taddr->packets > BREAK_GENERATOR_LEVEL) {
+		    && sp->taddr->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 			ptrace(("Primary sp->taddr %03d.%03d.%03d.%03d chosen poorly on %x\n",
 				(sp->taddr->daddr >> 0) & 0xff, (sp->taddr->daddr >> 8) & 0xff,
 				(sp->taddr->daddr >> 16) & 0xff, (sp->taddr->daddr >> 24) & 0xff,
@@ -425,10 +447,10 @@ sctp_update_routes(sp, force_reselect)
 		usual(sp->raddr);
 
 #ifdef _DEBUG
-#ifdef ERROR_GENERATOR
+#ifdef SCTP_CONFIG_ERROR_GENERATOR
 		if ((sp->options & SCTP_OPTION_BREAK)
 		    && (sp->raddr == sp->daddr || sp->raddr == sp->daddr->next)
-		    && sp->raddr->packets > BREAK_GENERATOR_LEVEL) {
+		    && sp->raddr->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL) {
 			ptrace(("Secondary sp->raddr %03d.%03d.%03d.%03d chosen poorly on %x\n",
 				(sp->raddr->daddr >> 0) & 0xff, (sp->raddr->daddr >> 8) & 0xff,
 				(sp->raddr->daddr >> 16) & 0xff, (sp->raddr->daddr >> 24) & 0xff,

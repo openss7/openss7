@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_cache.h,v 0.9 2004/06/22 06:39:00 brian Exp $
+ @(#) $Id: sctp_cache.h,v 0.9.2.2 2004/08/21 11:04:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:00 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_CACHE_H__
 #define __SCTP_CACHE_H__
 
-#ident "@(#) $RCSfile: sctp_cache.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:00 $"
+#ident "@(#) $RCSfile: sctp_cache.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
 /*
  *  Cache pointers
@@ -134,72 +134,52 @@ sctp_ostrm_find(sp, sid, errp)
 	return (st);
 }
 
-#define sctp_init_lock(__sp) lis_spin_lock_init(&((__sp)->lock),"sctp-private")
-#define sctp_locked(__sp) ((__sp)->userq)
+#define sctp_init_lock(__sp) spin_lock_init(&((__sp)->qlock))
+#define sctp_locked(__sp) ((__sp)->users > 0)
 
 static inline int
-sctp_trylock(queue_t *q)
+sctp_trylockq(queue_t *q)
 {
+	int res;
 	sctp_t *sp = (sctp_t *) q->q_ptr;
-	psw_t flags;
-	if (lis_spin_is_locked(&sp->lock))
-		return (!0);
-	lis_spin_lock_irqsave(&sp->lock, &flags);
-	if (sp->userq && sp->userq != q) {
-		lis_spin_unlock_irqrestore(&sp->lock, &flags);
-		return (!0);
+	spin_lock_bh(&sp->qlock);
+	if (!(res = !sp->users++)) {
+		if (q == sp->rq)
+			sp->rwait = q;
+		if (q == sp->wq)
+			sp->wwait = q;
 	}
-	sp->userq = q;
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
-	return (0);
-}
-static inline int
-sctp_waitlock(queue_t *q)
-{
-	sctp_t *sp = (sctp_t *) q->q_ptr;
-	psw_t flags;
-	lis_spin_lock_irqsave(&sp->lock, &flags);
-	if (sp->userq && sp->userq != q) {
-		if (sp->waitq && sp->waitq != q)
-			ptrace(("SWERR: More than two queues in pair!\n"));
-		sp->waitq = q;
-		lis_spin_unlock_irqrestore(&sp->lock, &flags);
-		return (!0);
-	}
-	sp->userq = q;
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
-	return (0);
+	spin_unlock_bh(&sp->qlock);
+	return (res);
 }
 
 extern void sctp_cleanup_read(sctp_t * sp);
 extern void sctp_transmit_wakeup(sctp_t * sp);
 
 static inline void
-sctp_unlock(queue_t *q)
+sctp_unlockq(queue_t *q)
 {
 	sctp_t *sp = (sctp_t *) q->q_ptr;
-	psw_t flags;
 	sctp_cleanup_read(sp);	/* deliver to userq what is possible */
 	sctp_transmit_wakeup(sp);	/* reply to peer what is necessary */
-	lis_spin_lock_irqsave(&sp->lock, &flags);
-	if (sp->userq && sp->userq == q) {
-		sp->userq = NULL;
-		if (sp->waitq && sp->waitq != q)	/* run the other queue in the queue * pair
-							   if it was blocked */
-			qenable(xchg(&sp->waitq, NULL));
-		else
-			ptrace(("SWERR: Bogus wait\n"));
-	} else
-		ptrace(("SWERR: Bogus unlock\n"));
-	lis_spin_unlock_irqrestore(&sp->lock, &flags);
+	spin_lock_bh(&sp->qlock);
+	if (sp->rwait)
+		qenable(xchg(&sp->rwait, NULL));
+	if (sp->wwait)
+		qenable(xchg(&sp->wwait, NULL));
+	if (--sp->users < 0) {
+		swerr();
+		sp->users = 0;
+	}
+	spin_unlock_bh(&sp->qlock);
 }
 
 /*
  *  These two are used by timeout functions to lock normal queue functions
  *  from entering put and srv routines.
  */
-#define sctp_bh_lock(__sp) lis_spin_lock(&((__sp)->lock))
-#define sctp_bh_unlock(__sp) lis_spin_unlock(&((__sp)->lock))
+#define sctp_bh_lock(__sp) spin_lock(&((__sp)->qlock))
+#define sctp_bh_unlock(__sp) spin_unlock(&((__sp)->qlock))
 
 extern sctp_t *sctp_alloc_priv(queue_t *q, sctp_t ** spp, int cmajor, int cminor,
 			       struct sctp_ifops *ops);

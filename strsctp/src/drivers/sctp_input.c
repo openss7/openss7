@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $
+ @(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:01 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $"
+#ident "@(#) $RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
-static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:01 $";
+static char const ident[] = "$RCSfile: sctp_input.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $";
 
 #define __NO_VERSION__
 
@@ -199,7 +199,8 @@ sctp_err(struct sk_buff *skb, u32 info)
 			*((uint32_t *) mp->b_wptr)++ = iph->daddr;
 			*((struct icmphdr *) mp->b_wptr)++ = *(skb->h.icmph);
 			if (canput(sp->rq)) {
-				putq(sp->rq, mp);
+				if (!putq(sp->rq, mp))
+					__ctrace(freemsg(mp));	/* FIXME */
 				return;
 			}
 			freemsg(mp);
@@ -284,7 +285,8 @@ sctp_rcv(struct sk_buff *skb)
 					if (sp) {
 						if (canput(sp->rq)) {
 							skb->dev = NULL;
-							putq(sp->rq, mp);
+							if (!putq(sp->rq, mp))
+								__ctrace(freemsg(mp));	/* FIXME */
 							return (0);
 						}
 						freemsg(mp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/22 06:39:02 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 11:04:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/06/22 06:39:02 $";
+static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:33 $";
 
 #define __NO_VERSION__
 
@@ -150,11 +150,12 @@ STATIC struct streamtab sctp_t_info = {
 
 #define QR_DONE		0
 #define QR_ABSORBED	1
-#define QR_TRIMMED	2
-#define QR_LOOP		3
-#define QR_PASSALONG	4
-#define QR_PASSFLOW	5
-#define QR_DISABLE	6
+#define QR_STRIP	2
+#define QR_TRIMMED	3
+#define QR_LOOP		4
+#define QR_PASSALONG	5
+#define QR_PASSFLOW	6
+#define QR_DISABLE	7
 
 /*
  *  =========================================================================
@@ -3669,37 +3670,24 @@ sctp_t_r_error(queue_t *q, mblk_t *mp)
  *  This is complete flush handling in both directions.  Standard stuff.
  */
 STATIC int
-sctp_t_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag, const uint8_t oflag)
+sctp_t_w_flush(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & mflag) {
+	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHALL);
 		else
 			flushq(q, FLUSHALL);
-		if (q->q_next) {
-			putnext(q, mp);
-			return (QR_ABSORBED);
-		}
-		*mp->b_rptr &= ~mflag;
+		*mp->b_rptr &= ~FLUSHW;
 	}
-	if (*mp->b_rptr & oflag) {
-		queue_t *oq = q->q_other;
+	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(oq, mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
 		else
-			flushq(oq, FLUSHALL);
-		if (oq->q_next) {
-			putnext(oq, mp);
-			return (QR_ABSORBED);
-		}
-		*mp->b_rptr &= ~oflag;
+			flushq(OTHERQ(q), FLUSHALL);
+		qreply(q, mp);
+		return (QR_ABSORBED);
 	}
-	return (0);
-}
-STATIC int
-sctp_t_w_flush(queue_t *q, mblk_t *mp)
-{
-	return sctp_t_m_flush(q, mp, FLUSHW, FLUSHR);
+	return (QR_DONE);
 }
 
 /*
@@ -3775,78 +3763,104 @@ sctp_t_r_prim(queue_t *q, mblk_t *mp)
  *  PUTQ Put Routine
  *  -----------------------------------
  */
-STATIC INLINE int
-sctp_t_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE int sctp_t_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
+	int rtn = 0, locked = 0;
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
-	if (mp->b_datap->db_type >= QPCTL && !q->q_count && !sctp_trylock(q)) {
-		int rtn;
-		switch ((rtn = proc(q, mp))) {
-		case QR_DONE:
-			freemsg(mp);
-		case QR_ABSORBED:
-			break;
-		case QR_TRIMMED:
-			freeb(mp);
-			break;
-		case QR_LOOP:
-			if (!q->q_next) {
-				qreply(q, mp);
+	if ((mp->b_datap->db_type >= QPCTL || !q->q_count) &&
+	    ((locked = sctp_trylockq(q)) || mp->b_datap->db_type == M_FLUSH)) {
+		do {
+			/* 
+			 *  Fast Path
+			 */
+			if ((rtn = (*proc) (q, mp)) == QR_DONE) {
+				freemsg(mp);
 				break;
 			}
-		case QR_PASSALONG:
-			if (q->q_next) {
-				putnext(q, mp);
+			switch (rtn) {
+			case QR_DONE:
+				freemsg(mp);
+			case QR_ABSORBED:
+				break;
+			case QR_STRIP:
+				if (mp->b_cont)
+					if (!putq(q, mp->b_cont))
+						__ctrace(freemsg(mp->b_cont));	/* FIXME */
+			case QR_TRIMMED:
+				freeb(mp);
+				break;
+			case QR_LOOP:
+				if (!q->q_next) {
+					qreply(q, mp);
+					break;
+				}
+			case QR_PASSALONG:
+				if (q->q_next) {
+					putnext(q, mp);
+					break;
+				}
+				rtn = -EOPNOTSUPP;
+			default:
+				ptrace(("ERROR: (q dropping) %d\n", rtn));
+				freemsg(mp);
+				break;
+			case QR_DISABLE:
+				if (!putq(q, mp))
+					__ctrace(freemsg(mp));	/* FIXME */
+				rtn = 0;
+				break;
+			case QR_PASSFLOW:
+				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
+					putnext(q, mp);
+					break;
+				}
+			case -ENOBUFS:
+			case -EBUSY:
+			case -ENOMEM:
+			case -EAGAIN:
+				if (!putq(q, mp))
+					__ctrace(freemsg(mp));	/* FIXME */
 				break;
 			}
-			rtn = -EOPNOTSUPP;
-		default:
-			ptrace(("ERROR: (q dropping) %d\n", rtn));
-			freemsg(mp);
-			break;
-		case QR_DISABLE:
-			putq(q, mp);
-			rtn = 0;
-			break;
-		case QR_PASSFLOW:
-			if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
-				putnext(q, mp);
-				break;
-			}
-		case -ENOBUFS:
-		case -EBUSY:
-		case -ENOMEM:
-		case -EAGAIN:
-			putq(q, mp);
-			break;
-		}
-		sctp_unlock(q);
-		return (rtn);
+		} while (0);
+		if (locked)
+			sctp_unlockq(q);
 	} else {
 		seldom();
-		putq(q, mp);
-		return (0);
+		if (!putq(q, mp))
+			__ctrace(freemsg(mp));	/* FIXME */
 	}
+	return (rtn);
 }
 
 /*
  *  SRVQ Put Routine
  *  -----------------------------------
  */
-STATIC INLINE int
-sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
+STATIC INLINE int sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 {
+	int rtn = 0;
 	ensure(q, return (-EFAULT));
-	if (!sctp_waitlock(q)) {
-		int rtn = 0;
+	if (sctp_trylockq(q)) {
 		mblk_t *mp;
 		while ((mp = getq(q))) {
-			switch ((rtn = proc(q, mp))) {
+			/* 
+			 * Fast Path
+			 */
+			if ((rtn = (*proc) (q, mp)) == QR_DONE) {
+				freemsg(mp);
+				continue;
+			}
+			switch (rtn) {
 			case QR_DONE:
 				freemsg(mp);
 			case QR_ABSORBED:
 				continue;
+			case QR_STRIP:
+				if (mp->b_cont)
+					if (!putbq(q, mp->b_cont))
+						__ctrace(freemsg(mp->b_cont));	/* FIXME */
 			case QR_TRIMMED:
 				freeb(mp);
 				continue;
@@ -3868,7 +3882,8 @@ sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			case QR_DISABLE:
 				ptrace(("ERROR: (q disabling) %d\n", rtn));
 				noenable(q);
-				putbq(q, mp);
+				if (!putbq(q, mp))
+					__ctrace(freemsg(mp));	/* FIXME */
 				rtn = 0;
 				break;
 			case QR_PASSFLOW:
@@ -3882,13 +3897,15 @@ sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			case -EAGAIN:	/* proc must schedule re-enable */
 				if (mp->b_datap->db_type < QPCTL) {
 					ptrace(("ERROR: (q stalled) %d\n", rtn));
-					putbq(q, mp);
+					if (!putbq(q, mp))
+						__ctrace(freemsg(mp));	/* FIXME */
 					break;
 				}
 				if (mp->b_datap->db_type == M_PCPROTO) {
 					mp->b_datap->db_type = M_PROTO;
 					mp->b_band = 255;
-					putq(q, mp);
+					if (!putq(q, mp))
+						__ctrace(freemsg(mp));	/* FIXME */
 					break;
 				}
 				ptrace(("ERROR: (q dropping) %d\n", rtn));
@@ -3897,10 +3914,9 @@ sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 			}
 			break;
 		}
-		sctp_unlock(q);
-		return (rtn);
+		sctp_unlockq(q);
 	}
-	return (-EAGAIN);
+	return (rtn);
 }
 
 STATIC int

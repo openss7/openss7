@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tpi_sctp.h,v 0.9 2004/06/20 20:35:50 brian Exp $
+ @(#) $Id: tpi_sctp.h,v 0.9.2.1 2004/08/21 10:53:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/20 20:35:50 $ by $Author: brian $
+ Last Modified $Date: 2004/08/21 10:53:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TPI_SCTP_H
 #define _SYS_TPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 #ifndef T_CURRENT_VERSION
 
