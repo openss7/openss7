@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: module_info.9.man,v 0.9.2.3 2004/04/19 02:58:19 brian Exp $
+.\" @(#) $Id: module_info.9.man,v 0.9.2.4 2004/04/26 22:06:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 02:58:19 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/26 22:06:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,18 +71,71 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MODULE_INFO 9 "$Date: 2004/04/19 02:58:19 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH MODULE_INFO 9 "$Date: 2004/04/26 22:06:46 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
+.BR module_info ", " module_info_t
+\- \fISTREAMS\fR module information structure
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <sys/stream.h>
+.PP
+.nf
+\fC\s-1\
+struct module_info {
+    ushort mi_idnum;	/* module id number */
+    char *mi_idname;	/* module name */
+    ssize_t mi_minpsz;	/* min packet size accepted */
+    ssize_t mi_maxpsz;	/* max packet size accepted */
+    size_t mi_hiwat;	/* hi water mark */
+    size_t mi_lowat;	/* lo water mark */
+};
+\s+1\fP
+.fi
 .\"
 .\"
 .SH MEMBERS
 .PP
+The following members correspond to SVR 4.2 EFT members:
+.TP \w'mi_maxpsz\(em'u
+.I mi_idnum
+The module identification number.  This number is unique across all
+.I STREAMS
+modules and drivers.  It can be assigned by the module at
+.I STREAMS
+module initialization, or the module can request that the
+.I STREAMS
+executive assign a unique number.
+.TP
+.I mi_idname
+The module name.  This name is unique across all
+.I STREAMS
+modules and drivers.  It must be assigned by the module at
+.I STREAMS
+module initialization.
+.TP
+.I mi_minpsz
+The minimum packet size accepted.  This is the minimum size of a
+.I STREAMS
+message that will be accepted by the stream head on write.
+.TP
+.I mi_maxpsz
+The maximum packet size accepted.  This is the maximum size of a
+.I STREAMS
+message that will be accepted by the stream head on write.
+.TP
+.I mi_hiwat
+The high water mark for flow control.  For modules with a service procedure,
+this is the number of octets of queued messages beyond which the queue will be
+considered flow controlled.
+.TP
+.I mi_lowat
+The low water mark for flow control.  For modules with a service procedrue,
+this is the number of octents of queue messages beneath which the queue will
+be considered no longer flow controlled and back-enabling will occur.
 .\"
 .\"
 .SH DESCRIPTION
@@ -91,6 +144,8 @@ sort-adjacent-labels
 .\"
 .SH CONTEXT
 .PP
+Functions that operat on a module information structure can be called from any
+context.
 .\"
 .\"
 .SH MP-STREAMS
@@ -99,6 +154,24 @@ sort-adjacent-labels
 .\"
 .SH NOTICES
 .PP
+Members of the
+.B module_info
+structure should not be accessed directly by
+.I STREAMS
+modules or drivers after the structure has been registered with the
+.B "Linux Fast-STREAMS"
+executive.
+.I STREAMS
+modules or drivers should use the other facilities provided by
+.BR strqget "(9) and " strqset (9)
+for implementation and architecture independence.
+.PP
+The
+.B module_info
+structu is only a subset of the implementation structure used by the
+.I STREAMS
+scheduler.  Additional hidden fields are present in the implementation
+structure.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -107,6 +180,38 @@ sort-adjacent-labels
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B module_info
+structure is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+Some implementations (e.g.
+.IR OSF/1 " and " "Mac OT" )
+declare
+.IR mi_minpsz " and " mi_maxpsz
+as type
+.BR ulong .
+.IP \(em
+Some implementations (e.g.
+.IR OSF/1 " and " "Mac OT" )
+declare
+.IR mi_hiwat " and " mi_lowat
+as type
+.BR long .
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
 .PP
 See
 .BR STREAMS (9)
@@ -115,10 +220,21 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+SVR 4.2 EFT MP
+.[
+usldk
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B module_info
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .[

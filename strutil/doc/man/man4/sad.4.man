@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: sad.4.man,v 0.9.2.3 2004/04/17 23:14:55 brian Exp $
+.\" @(#) $Id: sad.4.man,v 0.9.2.4 2004/04/26 22:16:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:14:55 $ by $Author: brian $
+.\" Last Modified $Date: 2004/04/26 22:16:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SAD 4 "$Date: 2004/04/17 23:14:55 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH SAD 4 "$Date: 2004/04/26 22:16:40 $" "$Name:  $" "Linux Fast-STREAMS Devices"
 .\"
 .\"
 .SH NAME
@@ -85,7 +85,7 @@ sort-adjacent-labels
 .B #include <sys/stropts.h>
 .br
 .B #include <sys/sad.h>
-.HP 12
+.HP
 .BI "int ioctl(int " fd ", int " cmd ", int" arg );
 .\"
 .\"
@@ -112,7 +112,7 @@ driver implements the IO controls that can be performed on an open device
 using the
 .BR ioctl (2)
 system call as follows:
-.HP 12
+.HP
 .BI "int ioctl(int " fd ", int " cmd ", int" arg );
 .TP
 .I fd
@@ -156,7 +156,7 @@ driver.
 points to a
 .B strapush
 structure formatted as follows:
-.RS 12
+.RS
 .nf
 \fC\s-1
 struct strapush {
@@ -171,15 +171,15 @@ struct strapush {
 \s+1\fP
 .fi
 .RE
-.TP
+.TP \w'sap_lastminor\(em'u
 .I sap_cmd
 Specifies the command to execute when setting the autopush list for a
 .IR STREAMS (4)
 driver.
 .I sap_cmd
 can be one of the following values:
-.RS 12
-.TP
+.RS
+.TP \w'SAP_CLEAR\(em'u
 .B SAP_CLEAR
 Requests that the autopush list for the
 .IR STREAMS (4)
@@ -300,7 +300,7 @@ returns -1, does not alter autopush list for any
 device, and sets
 .IR errno (3)
 to an appropriate error number as follows:
-.TP
+.TP \w'[EEXIST]\(em'u
 .RB [ EFAULT ]
 .I arg
 is
@@ -380,7 +380,7 @@ driver.
 points to a
 .B strapush
 structure formatted as follows:
-.RS 12
+.RS
 .nf
 \fC\s-1
 struct strapush {
@@ -394,7 +394,7 @@ struct strapush {
 \s+1\fP
 .fi
 .RE
-.TP
+.TP \w'sap_lastminor\(em'u
 .I sap_cmd
 This member is ignored on call an is unchanged on return.
 .TP
@@ -462,7 +462,7 @@ Upon failure,
 returns -1, does not alter any members, and sets
 .IR errno (3)
 to an appropriate error number as follows:
-.TP
+.TP \w'[EEXIST]\(em'u
 .RB [ EFAULT ]
 .I arg
 is
@@ -498,7 +498,7 @@ Verify that a module list is valid.
 points to a
 .B str_list
 structure formatted as follows:
-.RS 12
+.RS
 .nf
 \fC\s-1
 struct str_list {
@@ -508,11 +508,11 @@ struct str_list {
 \s+1\fP
 .fi
 .RE
-.TP
+.TP \w'sap_lastminor\(em'u
 .I sl_nmods
 .TP
 .I sl_modlist
-.RS 12
+.RS
 .nf
 \fC\s-1
 struct str_mlist {
@@ -545,7 +545,7 @@ returns one (1) if an invalid module name is present in the list, or returns
 minus one (-1) and sets
 .IR errno (3)
 to an appropriate error number as follows:
-.TP
+.TP \w'[EEXIST]\(em'u
 .RB [ EFAULT ]
 .I arg
 is

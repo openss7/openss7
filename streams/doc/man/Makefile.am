@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/04/25 07:38:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/26 22:21:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 07:38:09 $ by $Author: brian $
+# Last Modified $Date: 2004/04/26 22:21:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -142,12 +142,10 @@ man_MANS = \
 	man3/xti_udp.3 \
 	man4/clone.4 \
 	man4/connld.4 \
-	man4/connld.old.4 \
 	man4/echo.4 \
 	man4/egp.4 \
 	man4/eth.4 \
 	man4/fifo.4s \
-	man4/fifo.old.4 \
 	man4/ggp.4 \
 	man4/icmp.4 \
 	man4/idp.4 \
@@ -159,7 +157,6 @@ man_MANS = \
 	man4/nuls.4 \
 	man4/pipe.4 \
 	man4/pipemod.4 \
-	man4/pipemod.old.4 \
 	man4/pup.4 \
 	man4/rawip.4 \
 	man4/sad.4 \
@@ -398,76 +395,74 @@ man_MANS = \
 	man7/N_unitdata_req_t.7 \
 	man7/soon.7 \
 	man7/streamio.7 \
-	man7/T_ADDR_ACK.7 \
 	man7/T_addr_ack.7 \
-	man7/T_ADDR_REQ.7 \
+	man7/T_ADDR_ACK.7 \
 	man7/T_addr_req.7 \
-	man7/T_BIND_ACK.7 \
+	man7/T_ADDR_REQ.7 \
 	man7/T_bind_ack.7 \
-	man7/T_BIND_REQ.7 \
+	man7/T_BIND_ACK.7 \
 	man7/T_bind_req.7 \
-	man7/T_CAPABILITY_ACK.7 \
+	man7/T_BIND_REQ.7 \
 	man7/T_capability_ack.7 \
-	man7/T_CAPABILITY_REQ.7 \
+	man7/T_CAPABILITY_ACK.7 \
 	man7/T_capability_req.7 \
-	man7/T_CONN_CON.7 \
+	man7/T_CAPABILITY_REQ.7 \
 	man7/T_conn_con.7 \
-	man7/T_CONN_IND.7 \
+	man7/T_CONN_CON.7 \
 	man7/T_conn_ind.7 \
-	man7/T_CONN_REQ.7 \
+	man7/T_CONN_IND.7 \
 	man7/T_conn_req.7 \
-	man7/T_CONN_RES.7 \
+	man7/T_CONN_REQ.7 \
 	man7/T_conn_res.7 \
-	man7/T_DATA_IND.7 \
+	man7/T_CONN_RES.7 \
 	man7/T_data_ind.7 \
-	man7/T_DATA_REQ.7 \
+	man7/T_DATA_IND.7 \
 	man7/T_data_req.7 \
-	man7/T_DISCON_IND.7 \
+	man7/T_DATA_REQ.7 \
 	man7/T_discon_ind.7 \
-	man7/T_DISCON_REQ.7 \
+	man7/T_DISCON_IND.7 \
 	man7/T_discon_req.7 \
-	man7/T_ERROR_ACK.7 \
+	man7/T_DISCON_REQ.7 \
 	man7/T_error_ack.7 \
-	man7/T_EXDATA_IND.7 \
+	man7/T_ERROR_ACK.7 \
 	man7/T_exdata_ind.7 \
-	man7/T_EXDATA_REQ.7 \
+	man7/T_EXDATA_IND.7 \
 	man7/T_exdata_req.7 \
-	man7/T_INFO_ACK.7 \
+	man7/T_EXDATA_REQ.7 \
 	man7/T_info_ack.7 \
-	man7/T_INFO_REQ.7 \
+	man7/T_INFO_ACK.7 \
 	man7/T_info_req.7 \
-	man7/T_OK_ACK.7 \
+	man7/T_INFO_REQ.7 \
 	man7/T_ok_ack.7 \
-	man7/T_OPTDATA_IND.7 \
+	man7/T_OK_ACK.7 \
 	man7/T_optdata_ind.7 \
-	man7/T_OPTDATA_REQ.7 \
+	man7/T_OPTDATA_IND.7 \
 	man7/T_optdata_req.7 \
-	man7/T_OPTMGMT_ACK.7 \
+	man7/T_OPTDATA_REQ.7 \
 	man7/T_optmgmt_ack.7 \
-	man7/T_OPTMGMT_REQ.7 \
+	man7/T_OPTMGMT_ACK.7 \
 	man7/T_optmgmt_req.7 \
-	man7/T_ORDREL_IND.7 \
+	man7/T_OPTMGMT_REQ.7 \
 	man7/T_ordrel_ind.7 \
-	man7/T_ORDREL_REQ.7 \
+	man7/T_ORDREL_IND.7 \
 	man7/T_ordrel_req.7 \
+	man7/T_ORDREL_REQ.7 \
 	man7/tpi.7 \
 	man7/tpi_ip.7 \
 	man7/tpi_sctp.7 \
 	man7/tpi_tcp.7 \
 	man7/tpi_udp.7 \
-	man7/T_UDERROR_IND.7 \
 	man7/T_uderror_ind.7 \
-	man7/T_UNBIND_REQ.7 \
+	man7/T_UDERROR_IND.7 \
 	man7/T_unbind_req.7 \
-	man7/T_UNITDATA_IND.7 \
+	man7/T_UNBIND_REQ.7 \
 	man7/T_unitdata_ind.7 \
-	man7/T_UNITDATA_REQ.7 \
+	man7/T_UNITDATA_IND.7 \
 	man7/T_unitdata_req.7 \
+	man7/T_UNITDATA_REQ.7 \
 	man8/autopush.8 \
 	man8/fattach.8 \
-	man8/fattach.old.8 \
 	man8/fdetach.8 \
-	man8/fdetach.old.8 \
 	man8/insf.8 \
 	man8/lisbcm.8 \
 	man8/scls.8 \
@@ -982,6 +977,7 @@ man_MANS = \
 	man9/mod_install.9 \
 	man9/mod_remove.9 \
 	man9/module_info.9 \
+	man9/module_stat.9 \
 	man9/mount.9 \
 	man9/mp-streams.9 \
 	man9/MPSTR_QLOCK.9 \
@@ -1225,12 +1221,10 @@ dist_noinst_MANS = \
 	man3/xti_udp.3.man \
 	man4/clone.4.man \
 	man4/connld.4.man \
-	man4/connld.old.4.man \
 	man4/echo.4.man \
 	man4/egp.4.man \
 	man4/eth.4.man \
 	man4/fifo.4s.man \
-	man4/fifo.old.4.man \
 	man4/ggp.4.man \
 	man4/icmp.4.man \
 	man4/idp.4.man \
@@ -1242,7 +1236,6 @@ dist_noinst_MANS = \
 	man4/nuls.4.man \
 	man4/pipe.4.man \
 	man4/pipemod.4.man \
-	man4/pipemod.old.4.man \
 	man4/pup.4.man \
 	man4/rawip.4.man \
 	man4/sad.4.man \
@@ -1481,76 +1474,74 @@ dist_noinst_MANS = \
 	man7/N_unitdata_req_t.7.man \
 	man7/soon.7.man \
 	man7/streamio.7.man \
-	man7/T_ADDR_ACK.7.man \
 	man7/T_addr_ack.7.man \
-	man7/T_ADDR_REQ.7.man \
+	man7/T_ADDR_ACK.7.man \
 	man7/T_addr_req.7.man \
-	man7/T_BIND_ACK.7.man \
+	man7/T_ADDR_REQ.7.man \
 	man7/T_bind_ack.7.man \
-	man7/T_BIND_REQ.7.man \
+	man7/T_BIND_ACK.7.man \
 	man7/T_bind_req.7.man \
-	man7/T_CAPABILITY_ACK.7.man \
+	man7/T_BIND_REQ.7.man \
 	man7/T_capability_ack.7.man \
-	man7/T_CAPABILITY_REQ.7.man \
+	man7/T_CAPABILITY_ACK.7.man \
 	man7/T_capability_req.7.man \
-	man7/T_CONN_CON.7.man \
+	man7/T_CAPABILITY_REQ.7.man \
 	man7/T_conn_con.7.man \
-	man7/T_CONN_IND.7.man \
+	man7/T_CONN_CON.7.man \
 	man7/T_conn_ind.7.man \
-	man7/T_CONN_REQ.7.man \
+	man7/T_CONN_IND.7.man \
 	man7/T_conn_req.7.man \
-	man7/T_CONN_RES.7.man \
+	man7/T_CONN_REQ.7.man \
 	man7/T_conn_res.7.man \
-	man7/T_DATA_IND.7.man \
+	man7/T_CONN_RES.7.man \
 	man7/T_data_ind.7.man \
-	man7/T_DATA_REQ.7.man \
+	man7/T_DATA_IND.7.man \
 	man7/T_data_req.7.man \
-	man7/T_DISCON_IND.7.man \
+	man7/T_DATA_REQ.7.man \
 	man7/T_discon_ind.7.man \
-	man7/T_DISCON_REQ.7.man \
+	man7/T_DISCON_IND.7.man \
 	man7/T_discon_req.7.man \
-	man7/T_ERROR_ACK.7.man \
+	man7/T_DISCON_REQ.7.man \
 	man7/T_error_ack.7.man \
-	man7/T_EXDATA_IND.7.man \
+	man7/T_ERROR_ACK.7.man \
 	man7/T_exdata_ind.7.man \
-	man7/T_EXDATA_REQ.7.man \
+	man7/T_EXDATA_IND.7.man \
 	man7/T_exdata_req.7.man \
-	man7/T_INFO_ACK.7.man \
+	man7/T_EXDATA_REQ.7.man \
 	man7/T_info_ack.7.man \
-	man7/T_INFO_REQ.7.man \
+	man7/T_INFO_ACK.7.man \
 	man7/T_info_req.7.man \
-	man7/T_OK_ACK.7.man \
+	man7/T_INFO_REQ.7.man \
 	man7/T_ok_ack.7.man \
-	man7/T_OPTDATA_IND.7.man \
+	man7/T_OK_ACK.7.man \
 	man7/T_optdata_ind.7.man \
-	man7/T_OPTDATA_REQ.7.man \
+	man7/T_OPTDATA_IND.7.man \
 	man7/T_optdata_req.7.man \
-	man7/T_OPTMGMT_ACK.7.man \
+	man7/T_OPTDATA_REQ.7.man \
 	man7/T_optmgmt_ack.7.man \
-	man7/T_OPTMGMT_REQ.7.man \
+	man7/T_OPTMGMT_ACK.7.man \
 	man7/T_optmgmt_req.7.man \
-	man7/T_ORDREL_IND.7.man \
+	man7/T_OPTMGMT_REQ.7.man \
 	man7/T_ordrel_ind.7.man \
-	man7/T_ORDREL_REQ.7.man \
+	man7/T_ORDREL_IND.7.man \
 	man7/T_ordrel_req.7.man \
+	man7/T_ORDREL_REQ.7.man \
 	man7/tpi.7.man \
 	man7/tpi_ip.7.man \
 	man7/tpi_sctp.7.man \
 	man7/tpi_tcp.7.man \
 	man7/tpi_udp.7.man \
-	man7/T_UDERROR_IND.7.man \
 	man7/T_uderror_ind.7.man \
-	man7/T_UNBIND_REQ.7.man \
+	man7/T_UDERROR_IND.7.man \
 	man7/T_unbind_req.7.man \
-	man7/T_UNITDATA_IND.7.man \
+	man7/T_UNBIND_REQ.7.man \
 	man7/T_unitdata_ind.7.man \
-	man7/T_UNITDATA_REQ.7.man \
+	man7/T_UNITDATA_IND.7.man \
 	man7/T_unitdata_req.7.man \
+	man7/T_UNITDATA_REQ.7.man \
 	man8/autopush.8.man \
 	man8/fattach.8.man \
-	man8/fattach.old.8.man \
 	man8/fdetach.8.man \
-	man8/fdetach.old.8.man \
 	man8/insf.8.man \
 	man8/lisbcm.8.man \
 	man8/scls.8.man \
@@ -2065,6 +2056,7 @@ dist_noinst_MANS = \
 	man9/mod_install.9.man \
 	man9/mod_remove.9.man \
 	man9/module_info.9.man \
+	man9/module_stat.9.man \
 	man9/mount.9.man \
 	man9/mp-streams.9.man \
 	man9/MPSTR_QLOCK.9.man \
@@ -2217,6 +2209,7 @@ dist_noinst_MANS = \
 	man9/weldq.9.man \
 	man9/WR.9.man \
 	man9/xmsgsize.9.man
+
 
 #
 #   Need to generate "cooked" man pages from the source man pages.  This is
