@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/03/02 17:41:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/03/05 11:08:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/02 17:41:26 $ by $Author: brian $
+# Last Modified $Date: 2005/03/05 11:08:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -330,9 +330,6 @@ libLfS_compat_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_compat_a_OBJECTS): $(libLfS_compat_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-## WITH_KO_MODULES
-
 specfs.o: stamp-verobjs
 	@list=`$(ECHO) " $(libLfS_specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
@@ -342,19 +339,6 @@ streams.o: stamp-verobjs
 	@list=`$(ECHO) " $(libLfS_streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
-
-## WITH_KO_MODULES
-else
-## !WITH_KO_MODULES
-
-specfs.o: $(libLfS_specfs_a_OBJECTS)
-	$(LD) -r -o $@ $^
-
-streams.o: $(libLfS_streams_a_OBJECTS)
-	$(LD) -r -o $@ $^
-
-## !WITH_KO_MODULES
-endif
 
 endif
 
@@ -370,13 +354,13 @@ EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+= configure.nexusware
 
-export KERNEL_OBJECTS		= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
-export KERNEL_MODULES		= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
-export KERNEL_PRELOADS		=
-export KERNEL_MODCONF		= $(STRCONF_CONFMOD)
-export KERNEL_SUBDIR		= $(PACKAGE_LCNAME)
-export KMODCONF_EXT		= $(PACKAGE_LCNAME)
-export KERNEL_MODMAPS		=
+KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
+KERNEL_MODULES			= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
+KERNEL_PRELOADS			=
+KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			=
 
 include am/kernel.am
 

@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/05 11:08:49 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+## Last Modified $Date: 2005/03/05 11:08:49 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -165,7 +165,7 @@ post-modules:
 			cp -f $$prel_fil $$prel_new ; \
 			list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 				f=`basename $$p .o` ; \
-				sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
+				sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
 				mv -f $$prel_tmp $$prel_new ; \
 				$(ECHO) "$$f" >> $$prel_new ; \
 			done ; \
@@ -259,7 +259,7 @@ postun-modules:
 				cp -f $$prel_fil $$prel_new ; \
 				list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 					f=`basename $$p .o` ; \
-					sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
+					sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
 					mv -f $$prel_tmp $$prel_new ; \
 				done ; \
 				chmod --reference=$$prel_fil $$prel_new ; \

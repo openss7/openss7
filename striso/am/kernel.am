@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/03/03 10:28:04 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/03/05 12:32:34 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/03 10:28:04 $ by $Author: brian $
+## Last Modified $Date: 2005/03/05 12:32:34 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -64,19 +64,15 @@ if WITH_KO_MODULES
 
 if AMDEP
 ## AMDEP
-@am__include@ $(DEPDIR)/modules.Pk
+sinclude $(DEPDIR)/modules.Pk
 
-$(DEPDIR)/modules.Pk: $(KERNEL_OBJECTS)
+$(DEPDIR)/modules.Pk:
 	@$(ECHO) "Creating $@ dependencies..." ; \
 	( \
-		list=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
-		$(ECHO) "stamp-modpost: $$list" ; $(ECHO) "" ; \
 		srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o |.mod.c |g'` ; \
 		$(ECHO) "stamp-mobjects: $$srcs" ; $(ECHO) "" ; \
 		objs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o |.o |g'` ; \
 		$(ECHO) "stamp-kobjects: $$objs" ; $(ECHO) "" ; \
-		kobj=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o |.ko |g'` ; \
-		$(ECHO) "stamp-kernel: $$kobj" ; $(ECHO) "" ; \
 		mods=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g'` ; \
 		for m in $$mods ; do \
 			$(ECHO) "sinclude $(DEPDIR)/$$m.mod.Po" ; \
@@ -84,7 +80,62 @@ $(DEPDIR)/modules.Pk: $(KERNEL_OBJECTS)
 		done \
 	) >$(DEPDIR)/modules.Tpk || { rm -f $(DEPDIR)/modules.Tpk ; exit 1 ; } ; \
 	mv -f $(DEPDIR)/modules.Tpk $@
+## AMDEP
+endif
 
+stamp-modpost: stamp-verobjs $(KERNEL_MODULES)
+	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
+	$(ECHO) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv -i $(MODPOST_SYSVER) -o $(MODPOST_MODVER) $$list" ; \
+	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv -i $(MODPOST_SYSVER) -o $(MODPOST_MODVER) $$list ; \
+	touch stamp-modpost
+
+CLEANFILES += System.symver Modules.symver
+
+if am__fastdepCC
+## am__fastdepCC
+stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+	for m in $$mods ; do \
+		test :$$m != :stamp-modpost || continue ; \
+		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$$m.mod.Tpo ; exit 1 ; fi" ; \
+		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$$m.mod.Tpo ; exit 1 ; fi ; \
+	done ; \
+	touch stamp-mobjects
+## am__fastdepCC
+else
+## !am__fastdepCC
+if AMDEP
+## AMDEP
+stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+	for m in $$mods ; do \
+		test :$$m != :stamp-modpost || continue ; \
+		$(ECHO) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
+	done ; \
+	touch stamp-mobjects
+## AMDEP
+else
+## !AMDEP
+stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+	for m in $$mods ; do \
+		test :$$m != :stamp-modpost || continue ; \
+		$(ECHO) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
+	done ; \
+	touch stamp-mobjects
+## !AMDEP
+endif
+## !am__fastdepCC
+endif
+
+if AMDEP
+## AMDEP
 .o.ko:
 	@m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; \
 	$(ECHO) "if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) \"$@: $$m.o $$m.mod.o\" > $(DEPDIR)/$$m.Pko ; fi" ; \
@@ -101,58 +152,9 @@ endif
 
 MY_SUFFIXES		+= .ko .o
 
-stamp-modpost: $(KERNEL_MODULES) stamp-verobjs
-	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
-	$(ECHO) "$(MODPOST) -vv -i $(MODPOST_SYSVER) -o $(MODPOST_MODVER) $$list" ; \
-	$(MODPOST) -vv -i $(MODPOST_SYSVER) -o $(MODPOST_MODVER) $$list ; \
-	touch stamp-modpost
-
-if am__fastdepCC
-## am__fastdepCC
-stamp-mobjects: $(KERNEL_MODULES) stamp-modpost
-	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
-	for m in $$mods ; do \
-		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
-		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$m.mod.Tpo ; exit 1 ; fi" ; \
-		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
-		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$m.mod.Tpo ; exit 1 ; fi ; \
-	done ; \
-	touch stamp-mobjects
-## am__fastdepCC
-else
-## !am__fastdepCC
 if AMDEP
 ## AMDEP
-stamp-mobjects: $(KERNEL_MODULES) stamp-modpost
-	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
-	for m in $$mods ; do \
-		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
-		source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
-	done ; \
-	touch stamp-mobjects
-## AMDEP
-else
-## !AMDEP
-stamp-mobjects: $(KERNEL_MODULES) stamp-modpost
-	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
-	for m in $$mods ; do \
-		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
-	done ; \
-	touch stamp-mobjects
-## !AMDEP
-endif
-## !am__fastdepCC
-endif
-
-if AMDEP
-## AMDEP
-stamp-kobjects: $(KERNEL_MODULES) stamp-mobjects
+stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| streams-|g;s|(\.mod)?\.o | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-mobjects || continue ; \
@@ -163,10 +165,10 @@ stamp-kobjects: $(KERNEL_MODULES) stamp-mobjects
 ## AMDEP
 else
 ## !AMDEP
-stamp-kobjects: $(KERNEL_MODULES) stamp-mobjects
+stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| streams-|g;s|(\.mod)?\.o | |g'` ; \
-		test :$$m != :stamp-mobjects || continue ; \
 	for m in $$mods ; do \
+		test :$$m != :stamp-mobjects || continue ; \
 		$(ECHO) "$(LD) -r -o $$m.ko $$m.o $$m.mod.o" ; \
 		$(LD) -r -o $$m.ko $$m.o $$m.mod.o ; \
 	done ; \
@@ -174,23 +176,18 @@ stamp-kobjects: $(KERNEL_MODULES) stamp-mobjects
 ## !AMDEP
 endif
 
-stamp-kernel: $(KERNEL_MODULES) stamp-kobjects
-	touch stamp-kernel
-
 clean-kernel:
 	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o |.mod.c |g'` ; \
 	objs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o |.mod.o |g'` ; \
 	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g;s|\.o |.ko |g'` ; \
-	$(ECHO) "rm -f -- stamp-modpost stamp-mobjects stamp-kobjects stamp-kernel $$srcs $$objs $$mods" ; \
-	rm -f -- stamp-modpost stamp-mobjects stamp-kobjects stamp-kernel $$srcs $$objs $$mods
+	$(ECHO) "rm -f -- stamp-modpost stamp-mobjects stamp-kobjects $$srcs $$objs $$mods" ; \
+	rm -f -- stamp-modpost stamp-mobjects stamp-kobjects $$srcs $$objs $$mods
 
-all-kernel: stamp-kernel Modules.map
+all-kernel: stamp-kobjects Modules.map
 
 ALL_LOCAL 		+= all-kernel
 CLEAN_LOCAL 		+= clean-kernel
-
-STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug -X -x
-kext			= .ko
+DISTCLEANFILES		+= modpost.cache
 
 ## WITH_KO_MODULES
 ###################################################################################################
@@ -198,16 +195,15 @@ else
 ###################################################################################################
 ## !WITH_KO_MODULES
 
-all-kernel: $(KERNEL_MODULES) Modules.map
+all-kernel: stamp-verobjs Modules.map
 
 ALL_LOCAL 		+= all-kernel
-
-STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug -X -x
-kext			= .o
 
 ## !WITH_KO_MODULES
 ###################################################################################################
 endif
+
+STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug -X -x
 
 ##
 # This is equivalent to the source rpm %install scriptlet, and is in fact invoked by that scriptlet.
@@ -217,69 +213,60 @@ endif
 ##
 install-modules: $(KERNEL_MODULES)
 	@$(NORMAL_INSTALL)
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
-	$(ECHO) "test -d $$d ||$(mkinstalldirs) $$d" ; \
-	test -d $$d ||$(mkinstalldirs) $$d ; \
-	list='$(KERNEL_MODULES)'; for p in $$list; do \
-		if test -f $$p; then \
-			f="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\.o$$|$(kext)|'`" ; \
-			$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f" ; \
-			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f ; \
-			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
-				$(ECHO) "$(STRIP_KERNEL_MODULES) $$d/$$f" ; \
-				$(STRIP_KERNEL_MODULES) $$d/$$f ; \
-			fi ; \
-			if test -n "$(COMPRESS_KERNEL_MODULES)" ; then \
-				$(ECHO) "$(COMPRESS_KERNEL_MODULES) $$d/$$f" ; \
-				$(COMPRESS_KERNEL_MODULES) $$d/$$f ; \
-			fi ; \
-		else :; fi ; \
-	done
-
-install-preloads:
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
-	$(ECHO) "test -d $$d/boot || $(mkinstalldirs) $$d/boot" ; \
-	test -d $$d/boot || $(mkinstalldirs) $$d/boot ; \
-	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kzip='.gz' ; else kzip='' ; fi ; \
-	list='$(KERNEL_PRELOADS)'; for p in $$list ; do \
-		p="$$p$$kzip" ; \
-		if test -f $$d/$$p ; then \
-			$(ECHO) "(cd $$d/boot ; $(LN_S) ../$$p . )" ; \
-			(cd $$d/boot ; $(LN_S) ../$$p . ) ; \
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)
+	@list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; for p in $$list ; do \
+		$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+		$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
+		if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
+			$(ECHO) "$(STRIP_KERNEL_MODULES) $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+			$(STRIP_KERNEL_MODULES) $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
+		fi ; \
+		if test -n "$(COMPRESS_KERNEL_MODULES)" ; then \
+			$(ECHO) "$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+			$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
 		fi ; \
 	done
 
-install-modconf: $(KERNEL_MODCONF)
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; \
-	$(ECHO) "test -d $$k || $(mkinstalldirs) $$k" ; \
-	test -d $$k || $(mkinstalldirs) $$k ; \
-	if test -n "$(KERNEL_MODCONF)" ; then \
-		$(ECHO) "$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT)" ; \
-		$(INSTALL) -m 600 $(KERNEL_MODCONF) $$k/modules.$(KMODCONF_EXT) ; \
-	fi
+##
+# This target creates symbolic links from the boot subdirectory to the appropriate kernel module.
+# This is for the older-style modprobe with classes.  Therefore it is 2.4 specific.
+##
+install-preloads:
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/boot
+	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
+		test -f $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p || continue ; \
+		$(ECHO) "( cd $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/boot ; $(LN_S) -fn ../$$p . )" ; \
+		( cd $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/boot ; $(LN_S) -fn ../$$p . ) ; \
+	done
 
-if WITH_KO_MODULES
-## WITH_KO_MODULES
-## For 2.6 kernels, we don't need modules.conf entries, because we put the character device file
+##
+# This target installs the kernel module directory specific aliases file.  These files are only
+# specific to the old modprobe and are therefore 2.4 specific.
+##
+install-modconf: $(KERNEL_MODCONF)
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kmoduledir)
+	@test -f "$(KERNEL_MODCONF)" || exit 0 ; \
+	$(ECHO) "$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$(KMODCONF_EXT)" ; \
+	$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$(KMODCONF_EXT)
+
+##
+# For 2.6 kernels, we don't need modules.conf entries, because we put the character device file
 # aliases directly into the kernel modules.  Preloads is another way around init scripts for things
 # that should be loaded at boot time and only applies to the old insmod.  We normally install init
 # scripts now.
 ##
-INSTALL_EXEC_LOCAL += install-modules
-## WITH_KO_MODULES
-else
-## !WITH_KO_MODULES
-INSTALL_EXEC_LOCAL += install-modules install-preloads install-modconf
-## !WITH_KO_MODULES
-endif
-
-##
 # Note that for 2.4 kernels and SySV initscripts we used to put boot-time modprobe loadable modules
 # into the /etc/modules file and the initscripts would load them with /etc/rc.d/rc.modules.  Now, at
 # least on Mandrakelinux we need to place them in /etc/modprobe.preload for the same effect.
+##
+if WITH_KO_MODULES
+INSTALL_EXEC_LOCAL += install-modules
+else
+INSTALL_EXEC_LOCAL += install-modules install-preloads install-modconf
+endif
 
 ##
-# The post-modules target checks for a fully configured install directory by checking for the
+# The post-modconf target checks for a fully configured install directory by checking for the
 # existence of the /etc/modules.conf file in the target install directory $(DESTDIR)$(rootdir).
 ##
 # If it exists, then we are doing a non-rpm (autoconf) install and need to configure
@@ -307,150 +294,161 @@ endif
 # required to restore them.  Use current version of the openss7 autoconf/rpm LiS or LfS instead,
 # please.
 ##
-post-modules:
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; t=`dirname $$k` ; conf_fil="$$r/etc/modules.conf" ; \
-	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kzip='.gz' ; else kzip='' ; fi ; \
-	if test -f "$$conf_fil" ; then \
-		if ( grep -q 'include.*modules.$(KMODCONF_EXT)' $$conf_fil ) ; then :; else \
-			conf_new="$$conf_fil.new.$$$$" ; \
-			cp -f $$conf_fil $$conf_new ; \
-			if ( grep -q 'BEGIN LiS' $$conf_fil ) ; then \
-				conf_tmp="$$conf_fil.tmp.$$$$" ; \
-				list='$(KERNEL_MODULES)'; for p in $$list; do \
-					m="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\\.o$$||'`" ; \
-					sed -e "/$$m/d" $$conf_new > $$conf_tmp ; \
-					mv -f $$conf_tmp $$conf_new ; \
-					$(ECHO) "rm -f -- $$k/misc/$$m.o$$kzip" ; \
-					rm -f -- "$$k/misc/$$m.o$$kzip" ; \
-					$(ECHO) "rm -f -- $$t/preferred/misc/$$m.o$$kzip" ; \
-					rm -f -- "$$t/preferred/misc/$$m.o$$kzip" ; \
-					$(ECHO) "rm -f -- $$t/default/misc/$$m.o$$kzip" ; \
-					rm -f -- "$$t/default/misc/$$m.o$$kzip" ; \
-				done ; \
-				$(ECHO) "rmdir --ignore-fail-on-non-empty $$k/misc" ; \
-				rmdir --ignore-fail-on-non-empty $$k/misc ; \
-				$(ECHO) "rmdir --ignore-fail-on-non-empty $$t/preferred/misc" ; \
-				rmdir --ignore-fail-on-non-empty $$t/preferred/misc ; \
-				$(ECHO) "rmdir --ignore-fail-on-non-empty $$t/default/misc" ; \
-				rmdir --ignore-fail-on-non-empty $$t/default/misc ; \
+post-modconf:
+	@test -f "$(DESTDIR)$(rootdir)/etc/modules.conf" || exit 0 ; \
+	grep -q 'include.*modules.$(KMODCONF_EXT)' $(DESTDIR)$(rootdir)/etc/modules.conf || exit 0 ; \
+	cp -f $(DESTDIR)$(rootdir)/etc/modules.conf $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+	if ( grep -q 'BEGIN LiS' $(DESTDIR)$(rootdir)/etc/modules.conf ) ; then \
+		list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? | |g'` ; for m in $$list ; do \
+			p="$$m$(kext)$(kzip)" ; \
+			sed -e "/$$m/d" $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ > $(DESTDIR)$(rootdir)/etc/modules.conf.tmp.$$$$ ; \
+			mv -f $(DESTDIR)$(rootdir)/etc/modules.conf.tmp.$$$$ $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/misc/$$p" ; \
+			rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/misc/$$p ; \
+			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/misc/$$p" ; \
+			rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/misc/$$p ; \
+			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../default/misc/$$p" ; \
+			rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../default/misc/$$p ; \
+		done ; \
+		$(ECHO) "rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/misc" ; \
+		rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/misc ; \
+		$(ECHO) "rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/misc" ; \
+		rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/misc ; \
+		$(ECHO) "rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../default/misc" ; \
+		rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../default/misc ; \
+	fi ; \
+	if test "$(PACKAGE_TARNAME)" != "LiS" -a "$(PACKAGE_TARNAME)" != "streams" ; then \
+		for ext in lis streams ; do \
+			if ( grep -q "include.*modules.$$ext" $(DESTDIR)$(rootdir)/etc/modules.conf ) ; then \
+				if test -f $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext ; then \
+					cp -f $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext.new.$$$$ ; \
+					list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? | |g'` ; for m in $$list ; do \
+						p="$$m$(kext)$(kzip)" ; \
+						sed -e "/$$m/d" $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext.new.$$$$ > $(DESTDIR)$(rootdir)$(kmoduledir)/etc/modules.$$ext.tmp.$$$$ ; \
+						mv -f $(DESTDIR)$(rootdir)$(kmoduledir)/etc/modules.$$ext.tmp.$$$$ $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext.new.$$$$ ; \
+						for dir in misc lis streams ; do \
+							$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/$$dir/$$p" ; \
+							rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/$$dir/$$p ; \
+							$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/$$dir/$$p" ; \
+							rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/$$dir/$$p ; \
+							$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../default/$$dir/$$p" ; \
+							rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/../default/$$dir/$$p ; \
+						done ; \
+					done ; \
+					for dir in misc lis streams ; do \
+						$(ECHO) "rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/$$dir" ; \
+						rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/$$dir ; \
+						$(ECHO) "rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/$$dir" ; \
+						rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../preferred/$$dir ; \
+						$(ECHO) "rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../default/$$dir" ; \
+						rmdir --ignore-fail-on-non-empty $(DESTDIR)$(rootdir)$(kmoduledir)/../default/$$dir ; \
+					done ; \
+				fi ; \
+				chmod --reference=$(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext.new.$$$$ ; \
+				cp -fb --suffix=$$ext.bak $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext.new.$$$$ $(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext ; \
+				rm -f -- "$(DESTDIR)$(rootdir)$(kmoduledir)/modules.$$ext.new.$$$$" ; \
 			fi ; \
-			if test "$(PACKAGE_TARNAME)" != "LiS" -a "$(PACKAGE_TARNAME)" != "streams" ; then \
-				for ext in lis streams ; do \
-					if ( grep -q "include.*modules.$$ext" $$conf_fil ) ; then \
-						modl_fil="$$k/modules.$$ext" ; \
-						if test -f $$modl_fil ; then \
-							modl_tmp="$$modl_fil.tmp.$$$$" ; \
-							modl_new="$$modl_fil.new.$$$$" ; \
-							cp -f $$modl_fil $$modl_new ; \
-							list='$(KERNEL_MODULES)'; for p in $$list ; do \
-								m="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\\.o$$||'`" ; \
-								sed -e "/$$m/d" $$modl_new > $$modl_tmp ; \
-								mv -f $$modl_tmp $$modl_new ; \
-								for dir in misc lis streams ; do \
-									$(ECHO) "rm -f -- $$k/$$dir/$$m.o$$kzip" ; \
-									rm -f -- "$$k/$$dir/$$m.o$$kzip" ; \
-									$(ECHO) "rm -f -- $$t/preferred/$$dir/$$m.o$$kzip" ; \
-									rm -f -- "$$t/preferred/$$dir/$$m.o$$kzip" ; \
-									$(ECHO) "rm -f -- $$t/default/$$dir/$$m.o$$kzip" ; \
-									rm -f -- "$$t/default/$$dir/$$m.o$$kzip" ; \
-								done ; \
-							done ; \
-							for dir in misc lis streams ; do \
-								$(ECHO) "rmdir --ignore-fail-on-non-empty $$k/$$dir" ; \
-								rmdir --ignore-fail-on-non-empty $$k/$$dir ; \
-								$(ECHO) "rmdir --ignore-fail-on-non-empty $$t/preferred/$$dir" ; \
-								rmdir --ignore-fail-on-non-empty $$t/preferred/$$dir ; \
-								$(ECHO) "rmdir --ignore-fail-on-non-empty $$t/default/$$dir" ; \
-								rmdir --ignore-fail-on-non-empty $$t/default/$$dir ; \
-							done ; \
-						fi ; \
-						chmod --reference=$$modl_fil $$modl_new ; \
-						cp -fb --suffix=$$ext.bak $$modl_new $$modl_fil ; \
-						rm -f -- "$$modl_new" ; \
-					fi ; \
-				done ; \
-			fi ; \
-			$(ECHO) 'prune modules.$(KMODCONF_EXT)' >> $$conf_new ; \
-			$(ECHO) 'if -f /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
-			$(ECHO) 'include /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
-			$(ECHO) 'endif' >> $$conf_new ; \
-			chmod --reference=$$conf_fil $$conf_new ; \
-			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
-			rm -f -- "$$conf_new" ; \
-		fi ; \
-		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			s="$$r$(ksysmap)" ; \
-			if test -f "$$s" ; then \
-				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
-				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
-			fi ; \
-		fi ; \
-		prel_fil="$$r/etc/modules" ; \
-		if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
-			prel_tmp="$$prel_fil.tmp.$$$$" ; \
-			prel_new="$$prel_fil.new.$$$$" ; \
-			cp -f $$prel_fil $$prel_new ; \
-			list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
-				f=`basename $$p .o` ; \
-				sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
-				mv -f $$prel_tmp $$prel_new ; \
-				$(ECHO) "$$f" >> $$prel_new ; \
-			done ; \
-			chmod --reference=$$prel_fil $$prel_new ; \
-			cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
-			rm -f -- "$$prel_new" ; \
-		fi ; \
-	fi
+		done ; \
+	fi ; \
+	$(ECHO) 'prune modules.$(KMODCONF_EXT)' >> $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+	$(ECHO) 'if -f /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+	$(ECHO) 'include /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+	$(ECHO) 'endif' >> $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+	chmod --reference=$(DESTDIR)$(rootdir)/etc/modules.conf $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ ; \
+	cp -fb --suffix=.$(KMODCONF_EXT).bak $(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$ $(DESTDIR)$(rootdir)/etc/modules.conf ; \
+	rm -f -- "$(DESTDIR)$(rootdir)/etc/modules.conf.new.$$$$"
 
+
+##
+# If we have preload modules defined, we are the first install, and we have the appropriate preload
+# file (not all distros do), then we add our module names to the head of that file.  We do not worry
+# about placing markers in the file as we do with modules.conf.
+##
+post-preload:
+	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
+	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
+		test `grep -l "/$$p:" $(DESTDIR)$(rootdir)/lib/modules/*/modules.dep | wc -l` -eq 0 || exit 0 ; \
+	done ; \
+	if test "$(kext)" = ".ko" ; \
+	then prel_fil=$(DESTDIR)$(rootdir)/etc/modprobe.preload ; \
+	else prel_fil=$(DESTDIR)$(rootdir)/etc/modules ; \
+	fi ; \
+	test -f $$prel_fil || exit 0 ; \
+	cp -f $$prel_fil $$prel_fil.new.$$$$ ; \
+	list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
+		f=`$(ECHO) "$$p" | sed -e 's|\.o$$||'` ; \
+		sed -e "/^$$f\>/d" $$prel_fil.new.$$$$ > $$prel_fil.tmp.$$$$ ; \
+		mv -f $$prel_fil.tmp.$$$$ $$prel_fil.new.$$$$ ; \
+		$(ECHO) "$$f" >> $$prel_fil.new.$$$$ ; \
+	done ; \
+	chmod --reference=$$prel_fil $$prel_fil.new.$$$$ ; \
+	cp -fb --suffix=$$ext.bak $$prel_fil.new.$$$$ $$prel_fil ; \
+	rm -f -- "$$prel_fil.new.$$$$"
+
+##
+# If we have a usable depmod command and the modules.dep file already exists in the modules
+# directory, and the system map file is available, then perform the depmod on the modules.  We had
+# to change the -ae flag to -Ae for compatibility with 2.5.48+, but that should not cause a problem
+# (it should just run quicker).
+##
+post-depmod:
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(rootdir)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
+
+##
+# Pull the trick of linking /usr/src/PACKAGE_TARNAME to the source directory on autoconf installs.
+# For rpm and debian installs, $(DESTDIR)$(rootdir)/usr/src does not exist (yet) in the rpm build
+# directory, so this symbolic link is not made.
+##
 post-source:
-	@u='$(DESTDIR)$(rootdir)/usr/src' ; \
-	if test -d $$u ; then \
-		p="$$u/$(PACKAGE_TARNAME)" ; \
-		d=`(cd $(srcdir); pwd)` ; \
-		$(ECHO) "rm -f -- $$p" ; \
-		rm -f -- "$$p" ; \
-		$(ECHO) "$(LN_S) -f $$d $$p" ; \
-		$(LN_S) -f "$$d" "$$p" ; \
-	fi
+	@test -d $(DESTDIR)$(rootdir)/usr/src || exit 0 ; \
+	$(ECHO) "$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)" ; \
+	$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)
 
 ##
-# This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
-# installs.  It is only executed when the install directory is fully configured for kernel modules.
-# That is, this does not run when building an rpm because the binaries are installed in a temporary,
-# unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
-# target with install-exec-hook that runs after install-exec has completed.
+## These post- targets are equivalent to the kernel modules package rpm %post scriptlet for non-rpm
+## (autoconf) installs.  It is only executed when the install directory is fully configured for
+## kernel modules.  That is, this does not run when building an rpm because the binaries are
+## installed in a temporary, unconfigured directory.  Autoconf has no post-install targets, so we
+## hook this into the install target with install-exec-hook that runs after install-exec has
+## completed.
 ##
-INSTALL_EXEC_HOOK += post-modules post-source
+if WITH_KO_MODULES
+INSTALL_EXEC_HOOK += post-depmod post-source
+else
+INSTALL_EXEC_HOOK += post-modconf post-preload post-depmod post-source
+endif
 
 ##
 # There is no rpm equivalent for this target.  This simply removes kernel modules.  It is not
-# invoked by rpm but is only used from the tarball uninstall.  We simply remove our modules (and
-# possibly the directory that they are in).
+# invoked by rpm but is only used from the tarball uninstall.  We simply remove our modules and any
+# preload links that were built (and possibly the directories that they are in).
 ##
+uninstall-preload:
+	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
+		$(ECHO_C)rm -f -- $(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/boot/$$p ; \
+	done
+	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/boot"
+
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
-	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kzip='.gz' ; else kzip='' ; fi ; \
-	list='$(KERNEL_MODULES)'; for p in $$list; do \
-		p="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
-		p="$$p$$kzip" ; \
-		$(ECHO) "$(LIBTOOL) --mode=uninstall rm -f -- $$d/$$p" ; \
-		$(LIBTOOL) --mode=uninstall rm -f -- "$$d/$$p" ; \
-	done ; \
-	list='$(KERNEL_PRELOADS)'; for p in $$list; do \
-		p="$$p$$kzip" ; \
-		$(ECHO) "rm -f -- $$d/boot/$$p" ; \
-		rm -f -- $$d/boot/$$p ; \
-	done ; \
-	$(ECHO) "rmdir --ignore-fail-on-non-empty $$d" ; \
-	rmdir --ignore-fail-on-non-empty "$$d" ; \
-	$(ECHO) "rm -f -- $$k/modules.$(KMODCONF_EXT)" ; \
-	rm -f -- "$$k/modules.$(KMODCONF_EXT)"
+	@list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
+		$(ECHO_C)$(LIBTOOL) --mode=uninstall rm -f -- "$(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+	done
+	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(rootdir)$(kmoduledir)/$(KERNEL_SUBDIR)"
 
+uninstall-modconf:
+	rm -f -- "$(DESTDIR)$(rootdir)$(kmoduledir)/modules.$(KMODCONF_EXT)"
+
+if WITH_KO_MODULES
 UNINSTALL_LOCAL += uninstall-modules
+else
+UNINSTALL_LOCAL += uninstall-preload uninstall-modules uninstall-modconf
+endif
 
 ##
-# The postun-modules target checks for a fully configured uninstall directory by checking for the
+# The postun-modconf target checks for a fully configured uninstall directory by checking for the
 # existence of the /etc/modules.conf file in the target uninstall directory $(DESTDIR)$(rootdir).
 # It it exists, then we are doing a non-rpm (autoconf) uninstall and need to unconfigure
 # modules.conf in the target directory.
@@ -466,43 +464,53 @@ UNINSTALL_LOCAL += uninstall-modules
 # rpm LiS or LfS releases.  You need to reinstall those packages (if desired) to restore the removed
 # modules and entries.  Use current versions of the openss7 autoconf/rpm LiS or LfS instead, please.
 ##
-postun-modules:
-	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
-	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kzip='.gz' ; else kzip='' ; fi ; \
-	if test -f "$$conf_fil" ; then \
-		l=yes ; \
-		for f in $$r/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
-			if test -f $$f ; then l=no ; break ; fi ; \
-		done ; \
-		if test ":$$l" = :yes ; then \
-			conf_new="$$conf_fil.new.$$$$" ; \
-			sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_fil > $$conf_new ; \
-			chmod --reference=$$conf_fil $$conf_new ; \
-			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
-			rm -f -- $$conf_new ; \
-			prel_fil="$$r/etc/modules" ; \
-			if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
-				prel_tmp="$$prel_fil.tmp.$$$$" ; \
-				prel_new="$$prel_fil.new.$$$$" ; \
-				cp -f $$prel_fil $$prel_new ; \
-				list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
-					f=`basename $$p .o` ; \
-					sed -e "/^$$f\>/d" $prel_new > $prel_tmp ; \
-					mv -f $$prel_tmp $$prel_new ; \
-				done ; \
-				chmod --reference=$$prel_fil $$prel_new ; \
-				cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
-				rm -f -- "$$prel_new" ; \
-			fi ; \
-		fi ; \
-		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
-			s="$$r$(ksysmap)" ; \
-			if test -f $$s ; then \
-				$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion)" ; \
-				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $$r/ -C $$conf_fil -F $$s $(kversion) ; \
-			fi ; \
-		fi ; \
-	fi
+postun-modconf:
+	@test -f $(DESTDIR)$(rootdir)/etc/modules.conf || exit 0 ; \
+	conf_fil="$(DESTDIR)$(rootdir)/etc/modules.conf" ; \
+	for f in $(DESTDIR)$(rootdir)/lib/modules/*/modules.$(KMODCONF_EXT) ; do \
+		test -f $$f || exit 0 ; \
+	done ; \
+	conf_new="$$conf_fil.new.$$$$" ; \
+	sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_fil > $$conf_new ; \
+	chmod --reference=$$conf_fil $$conf_new ; \
+	cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
+	rm -f -- $$conf_new ; \
+	prel_fil="$(DESTDIR)$(rootdir)/etc/modules"
+
+##
+# If we have preload modules defined, we are the last uninstall, and we have the appropriate preload
+# file, then we remove our module names from that file.
+##
+postun-preload:
+	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
+	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| streams-|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
+		test `grep -l "/$$p:" $(DESTDIR)$(rootdir)/lib/modules/*/modules.dep | wc -l` -eq 0 || exit 0 ; \
+	done ; \
+	if test "$(kext)" = ".ko" ; \
+	then prel_fil=$(DESTDIR)$(rootdir)/etc/modprobe.preload ; \
+	else prel_fil=$(DESTDIR)$(rootdir)/etc/modules ; \
+	fi ; \
+	test -f $$prel_fil || exit 0 ; \
+	cp -f $$prel_fil $$prel_fil.new.$$$$ ; \
+	list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
+		f=`$(ECHO) $$p | sed -e 's|\.o$$||'` ; \
+		sed -e "/^$$f\>/d" $$prel_fil.new.$$$$ > $$prel_fil.tmp.$$$$ ; \
+		mv -f $$prel_fil.tmp.$$$$ $$prel_fil.new.$$$$ ; \
+		$(ECHO) $$f >> $$prel_fil.new.$$$$ ; \
+	done ; \
+	chmod --reference=$$prel_fil $$prel_fil.new.$$$$ ; \
+	cp -fb --suffix=$$ext.bak $$prel_fil.new.$$$$ $$prel_fil ; \
+	rm -f -- "$$prel_fil.new.$$$$"
+
+##
+# We run depmod -Ae instead of -ae on autoconf install because installed files have current
+# timestamps.  For rpm intalls, installed binary files have original timestamps and -Ae will
+# not result in updated files.
+##
+postun-depmod:
+	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(rootdir)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
+	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
+	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $$conf_fil -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
 
 postun-source:
 	rm -f -- "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)"
@@ -514,8 +522,17 @@ postun-source:
 # wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
 # runs after uninstall has completed.
 ##
-UNINSTALL_HOOK += postun-modules postun-source
+if WITH_KO_MODULES
+UNINSTALL_HOOK += postun-depmod postun-source
+else
+UNINSTALL_HOOK += postun-modconf postun-preload postun-depmod postun-source
+endif
 
+##
+# Checking for undefined symbols is rather pointless on .ko objects.  The reason is that these must
+# have been checked when we were performing modpost on the .ko objects anyway.  But we let them run
+# here in the check target anyway.
+##
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
@@ -533,7 +550,5 @@ endif
 
 dist_noinst_SCRIPTS	+= scripts/cflagcheck $(top_srcdir)/scripts/modpost.sh
 EXTRA_SCRIPTS		+= scripts/cflagcheck
-
-.PHONY: install-modules post-modules uninstall-modules postun-modules
 
 ## vim: ft=automake

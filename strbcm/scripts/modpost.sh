@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/03 10:28:04 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/05 11:08:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/03 10:28:04 $ by $Author: brian $
+# Last Modified $Date: 2005/03/05 11:08:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/03 10:28:04 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/05 11:08:50 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -126,7 +126,7 @@ modpost_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
 
 # defaults
 
-defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion modules command"
+defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion modules command cachefile"
 
 #default_sysmap=/boot/System.map-`uname -r`
 #default_moddir=/lib/modules/`uname -r`
@@ -149,6 +149,7 @@ default_modversions=n
 default_allsrcversion=n
 default_modules=
 default_command=process
+default_cachefile=$MODPOST_CACHE
 
 debug=0
 verbose=1
@@ -194,6 +195,8 @@ Arguments:
     MODULE ...
         modules for which to generate symbols
 Options:
+    -c, --cachefile CACHEFILE
+        where to cache system symbol versions
     -d, --moddir MODDIR
         module directory
     -F, --filename SYSMAP
@@ -311,16 +314,17 @@ function option_with()
 }
 
 # Parse our command line options once, thoroughly.
-while test "$#" -gt 0 -o ":$more" != ":"
+while test "$#" -gt 0 -o :"$more" != :
 do
-    if test ":$more" != ":" ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
+    if test :"$more" != : ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
     # check for attached option argument
     case $arg in
 	(--filename=*|--filenam=*|--filena=*|--filen=*|--file=*|--fil=*|--fi=*|--f=*|\
 	 --moddir=*|--moddi=*|--modd=*|--mod=*|--mo=*|--m=*|\
 	 --infile=*|--infil=*|--infi=*|--inf=*|--in=*|--i=*|\
 	 --outfile=*|--outfil=*|--outfi=*|--outf=*|--out=*|--ou=*|--o=*|\
-	 --sysfile=*|--sysfil=*|--sysfi=*|--sysf=*|--sys=*|--sy=*|--s=*)
+	 --sysfile=*|--sysfil=*|--sysfi=*|--sysf=*|--sys=*|--sy=*|--s=*|\
+	 --cachefile=*|--cachefil=*|--cachefi=*|--cachef=*|--cache=*|--cach=*|--cac=*|--ca=*|--c=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
 	(--*=*)
 	    option_noarg $arg ;;
@@ -331,21 +335,21 @@ do
 	    more=`$ECHO "X$arg" | $Xsed -e 's|-[umanqDvhVC]||'`
 	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
 	    ;;
-	(-[fdios])
+	(-[fdiosc])
 	    optarg= ;;
-	(-[fdios]*)
-	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[fdios]||'` ;;
+	(-[fdiosc]*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[fdiosc]||'` ;;
 	(*)
 	    optarg= ;;
     esac
     # check for optional or required option argument
-    if test -n "$prev" ; then
+    if test :"$prev" != : ; then
 	case $arg in
 	    (-*) # optional arguments not forthcoming
 		case $prev in
 		    (debug|verbose) eval "(($prev++))" ;;
 		    # the rest have required arguments
-		    (sysmap|moddir|infile|outfile|sysfile)
+		    (sysmap|moddir|infile|outfile|sysfile|cachefile)
 			option_needarg $prevopt ;;
 		esac
 		prev= ; prevopt=
@@ -370,15 +374,15 @@ do
     case $arg in
 	(--help|--h|--Help|--H|-h|-H|-\?|--\?)
 	    show_help=yes
-	    if test ":$command" = ":" ; then command=none ; fi
+	    if test :"$command" = : ; then command=none ; fi
 	    ;;
 	(--version|--versio|--versi|--vers|-V)
 	    show_version=yes
-	    if test ":$command" = ":" ; then command=none ; fi
+	    if test :"$command" = : ; then command=none ; fi
 	    ;;
 	(--copying|--copyin|--copyi|--copy|--cop|--co|--c|-C)
 	    show_copying=yes
-	    if test ":$command" = ":" ; then command=none ; fi
+	    if test :"$command" = : ; then command=none ; fi
 	    ;;
 	(--verbose|--verbos|--verbo|--verb)
 	    prevopt="$arg"
@@ -444,6 +448,13 @@ do
 	(--sysfile=*|--sysfil=*|--sysfi=*|--sysf=*|--sys=*|--sy=*|--s=*|-s*)
 	    sysfile="$optarg"
 	    ;;
+	(--cachefile|--cachefil|--cachefi|--cachef|--cache|--cach|--cac|--ca|--c|-c)
+	    prevopt="$arg"
+	    prev=cachefile
+	    ;;
+	(--cachefile=*|--cachefil=*|--cachefi=*|--cachef=*|--cache=*|--cach=*|--cac=*|--ca=*|--c=*|-c*)
+	    cachefile="$optarg"
+	    ;;
 	(--unload|--unloa|--unlo|--unl|--un|--u|-u)
 	    unload=y
 	    ;;
@@ -471,7 +482,7 @@ case $prev in
     # these have optional arguments
     (debug|verbose) eval "(($prev++))" ;;
     # the rest have required arguments
-    (sysmap|moddir|infile|outfile|sysfile)
+    (sysmap|moddir|infile|outfile|sysfile|cachefile)
 	option_needarg $prevopt ;;
 esac
 
@@ -544,7 +555,6 @@ _ACEOF
 # result is the same when modules are compiled without -DKBUILD_MODNAME.
 #
 add_this_module() {
-    test -n "$1" || return 1
     name="$1"
     token=`echo "$name" | $modpost_tokenize`
     eval "this=\"\${mod_${token}_this:-no}\""
@@ -587,7 +597,6 @@ _ACEOF
 # if modversions is not set.
 #
 add_versions() {
-    test -n "$1" || return 1
     name="$1"
     token=`echo "$name" | $modpost_tokenize`
     cat<<_ACEOF
@@ -600,7 +609,7 @@ _ACEOF
     eval "syms=\"\$mod_${token}_undefs\""
     for sym in $syms ; do
 	eval "crc=\"\$sym_${sym}_crc\""
-	test -n "$crc" || { command_warn "symbol $sym remains uresolved" ; continue ; }
+	test :"$crc" != : || { command_warn "symbol $sym remains uresolved" ; continue ; }
 	printf "\t{ 0x%08x, \"%s\" },\n" $crc $sym
 	case " $(eval '$ECHO "$mod_'${token}'_deps"') " in
 	    (*" `eval '$ECHO "$sym_'${sym}'_name"'` "*) ;;
@@ -617,7 +626,6 @@ _ACEOF
 # This function is the same from 2.6.3 through 2.6.10
 #
 add_depends() {
-    test -n "$1" || return 1
     name="$1"
     token=`echo "$name" | $modpost_tokenize`
     cat<<_ACEOF
@@ -653,7 +661,6 @@ add_moddevtable() {
 # figure out which one the change was made in.  Addition of source version is optional.
 #
 add_srcversion() {
-    test -n "$1" || return 1
     name="$1"
     token=`echo "$name" | $modpost_tokenize`
     shift
@@ -677,7 +684,6 @@ _ACEOF
 }
 
 write_modsrc() {
-    test -n "$1" || return 1
     name="$1"
     add_header $name
     add_this_module $name
@@ -689,7 +695,7 @@ write_modsrc() {
 }
 
 write_sources() {
-    if test -n "$my_mod_names" ; then
+    if test :"$my_mod_names" != : ; then
 	command_info "writing module source files"
 	for name in $my_mod_names ; do
 	    command_info "writing module source file $name.mod.c"
@@ -714,7 +720,7 @@ write_dump_ours() {
 	count=0
 	for sym in $syms ; do
 	    eval "crc=\"\$mod_${token}_sym_${sym}_crc\""
-	    if test -n "$crc" ; then
+	    if test :"$crc" != : ; then
 		((count++))
 		printf "0x%08x\t%s\t%s\n" $crc $sym $name
 	    else
@@ -728,8 +734,8 @@ write_dump_ours() {
 }
 
 write_outfile() {
-    test -n "$outfile" || return 0
-    touch "$outfile" || return 1
+    test :"$outfile" != : || return 0
+    touch $outfile || return 1
     command_info "dumping module symbols to $outfile"
     write_dump_ours >$outfile
 }
@@ -751,7 +757,7 @@ write_dump_others() {
 	count=0
 	for sym in $syms ; do
 	    eval "crc=\"\$mod_${token}_sym_${sym}_crc\""
-	    if test -n "$crc" ; then
+	    if test :"$crc" != : ; then
 		((count++))
 		printf "0x%08x\t%s\t%s\n" $crc $sym $name
 	    else
@@ -765,13 +771,13 @@ write_dump_others() {
 }
 
 write_sysfile() {
-    test -n "$sysfile" || return 0
-    touch "$sysfile" || return 1
+    test :"$sysfile" != : || return 0
+    touch $sysfile || return 1
     command_info "dumping system sybols to $sysfile"
     write_dump_others >$sysfile
 }
 
-write_script() {
+write_cache() {
     for var in ${!sym_*} ; do
 	eval "printf \"%s=%q\n\" \"$var\" \"\$$var\""
     done
@@ -792,13 +798,13 @@ read_dump() {
 	    progress=0
 	    command_info "processed $count symbols"
 	fi
-	if test -n "$junk" ; then
+	if test :"$junk" != : ; then
 	    command_warn "line $count junk on line $junk"
 	    continue
 	fi
 	case " $mod_names " in
 	    (*" $name "*) ;;
-	    (*) command_info "adding sys module name $name"
+	    (*) # command_info "adding sys module name $name"
 		mod_names="$mod_names${mod_names:+ }$name" ;;
 	esac
 	token=`echo "$name" | $modpost_tokenize`
@@ -806,12 +812,13 @@ read_dump() {
 	eval "mod_${token}_sym_${sym}_crc=\"$crc\""
 	eval "sym_${sym}_name=\"$name\""
 	eval "sym_${sym}_crc=\"$crc\""
+	cache_dirty=yes
     done
     command_info "processed $count symbols"
 }
 
 read_infiles() {
-    if test -n "$infile" ; then
+    if test :"$infile" != : ; then
 	command_info "processing input files"
 	for file in $infile ; do
 	    if test -f "$file" -a -r "$file" ; then
@@ -829,12 +836,7 @@ read_infiles() {
 read_map() {
     name=$1
     token=`echo "$name" | $modpost_tokenize`
-    test -n "$name" || { command_error "no module name" ; return 1 ; }
-    case " $mod_names " in
-	(*" $name "*) ;;
-	(*) command_info "adding sys module name $name"
-	    mod_names="$mod_names${mod_names:+ }$name" ;;
-    esac
+    test :"$name" != : || { command_error "no module name" ; return 1 ; }
     count=0
     progress=0
     while read crc flag expsym modname junk ; do
@@ -848,7 +850,7 @@ read_map() {
 	if test :$flag = :A -o :$flag = :w -o :$flag = :a -o :$flag = :t ; then
 	    $ECHO "$expsym" | egrep -q '^(_)?__crc_' &>/dev/null || { command_error "not crc sym $expsym" ; continue ; }
 	    sym=`$ECHO "$expsym" | sed -r -e 's|^(_)?__crc_||'`
-	    if test -n "$modname" ; then
+	    if test :"$modname" != : ; then
 		nam=`echo "$modname" | sed -e 's|[[]\(.*\)[]]|\1|'`
 		tok=`echo "$nam" | $modpost_tokenize`
 		case " $mod_names " in
@@ -864,6 +866,7 @@ read_map() {
 	    eval "mod_${tok}_sym_${sym}_crc=\"0x$crc\""
 	    eval "sym_${sym}_name=\"$nam\""
 	    eval "sym_${sym}_crc=\"0x$crc\""
+	    cache_dirty=yes
 	elif test :$crc = :U ; then
 	    undef="$flag"
 	    case "$undef" in
@@ -903,10 +906,15 @@ read_map() {
 # This one is for reading system map files (System.map).
 #
 read_sysmap() {
-    if test -n "$sysmap" ; then
+    if test :"$sysmap" != : ; then
 	command_info "processing system map files"
 	for map in $sysmap ; do
 	    if test -f "$map" -a -r "$map" ; then
+		case " $mod_names " in
+		    (*" vmlinux "*) ;;
+		    (*) # command_info "adding sys module name $name"
+			mod_names="$mod_names${mod_names:+ }vmlinux" ;;
+		esac
 		command_info "processing system map $map"
 		egrep '\<(_)?__crc_' $map >.tmp.$$.map
 		read_map vmlinux <.tmp.$$.map
@@ -924,9 +932,9 @@ read_sysmap() {
 #
 read_module() {
     filename="$1"
-    test -n "$filename" -a -f "$filename" || return 1
+    test :"filename" != : -a -f "$filename" || return 1
     name=`$ECHO "$filename" | sed -r -e 's|.*/||;s|(\.mod)?\.(k)?o(\.gz)?$||'`
-    test -n "$name" || return 1
+    test :"$name" != : || return 1
     if $ECHO "$filename" | grep -qc1 '\.gz$' ; then
 	# shoot, we have a .gz ending
 	file=".tmp.$$.$name.ko"
@@ -938,21 +946,21 @@ read_module() {
     fi
     case " $my_mod_names " in
 	(*" $name "*) ;;
-	(*) command_info "adding ext module name $name"
+	(*) # command_info "adding ext module name $name"
 	    my_mod_names="$my_mod_names${my_mod_names:+ }$name" ;;
     esac
     command_info "processing module $name in file $filename"
     nm -s $file | egrep '(\<A\>|\<U\>|\<(_)?init_module\>|\<(_)?cleanup_module\>|\<(_)?__this_module\>)' >.tmp.$$.map
     read_map "$name" <.tmp.$$.map
     rm -f -- .tmp.$$.map
-    test -n "$remv" && rm -f -- "$remv"
+    test :"$remv" != : && rm -f -- "$remv"
 }
 
 #
 # Read in all the modules
 #
 read_modules() {
-    if test -n "$modules" ; then
+    if test :"$modules" != : ; then
 	command_info "processing modules"
 	for filename in $modules ; do
 	    test -f "$filename" -a -r "$filename" || continue
@@ -983,6 +991,11 @@ read_kobject() {
 	file="$filename"
 	remv=
     fi
+    case " $mod_names " in
+	(*" $name "*) ;;
+	(*) # command_info "adding sys module name $name"
+	    mod_names="$mod_names${mod_names:+ }$name" ;;
+    esac
     base=`echo "$filename" | sed -e 's|^'$moddir/'||;s|^kernel/||'`
     command_info "processing module $name in file $base"
     nm -s $file | egrep '\<(_)?__crc_' >.tmp.$$.map
@@ -1003,24 +1016,31 @@ read_kobjects() {
 function process_command()
 {
     # .modpost is just a (quick) way of caching system maps and module maps
-    if test -f .modpost ; then
-	. .modpost
+    if test :"$cachefile" != : -a -f "$cachefile" ; then
+	command_info "processing cache file $cachefile"
+	. $cachefile
+	cache_dirty=no
     else
-	test -n "$infile"  && command_info "infiles= \`$infile'"
-	read_infiles
-	test -n "$sysmap"  && command_info "sysmaps= \`$sysmap'"
+	test :"$sysmap" != :  && command_info "sysmaps= \`$sysmap'"
 	read_sysmap
-	test -n "$moddir"  && command_info "moddir=  \`$moddir'"
+	test :"$moddir" != :  && command_info "moddir=  \`$moddir'"
 	read_kobjects
-	write_script >.modpost
+	test :"$infile" != : && command_info "infiles= \`$infile'"
+	read_infiles
     fi
-    test -n "$modules" && command_info "modules= \`$modules'"
-    read_modules
-    write_sources
-    test -n "$outfile" && command_info "outfile= \`$outfile'"
-    write_outfile
-    test -n "$sysfile" && command_info "sysfile= \`$sysfile'"
-    write_sysfile
+    if test :"$modules" != : ; then
+	test :"$modules" != : && command_info "modules= \`$modules'"
+	read_modules
+	write_sources
+	test :"$outfile" != : && command_info "outfile= \`$outfile'"
+	write_outfile
+	test :"$sysfile" != : && command_info "sysfile= \`$sysfile'"
+	write_sysfile
+    fi
+    if test :$cache_dirty = :yes -a :"$cachefile" != : ; then
+	command_info "writing cache file $cachefile"
+	write_cache >"$cachefile"
+    fi
 }
 
 #
@@ -1028,17 +1048,17 @@ function process_command()
 #
 function none_command()
 {
-    if test -n "$show_version$show_help$show_copying" ; then
+    if test ":$show_version$show_help$show_copying" != : ; then
 	if test ${verbose:-0} -gt 1 ; then
 	    $ECHO "Displaying information"
 	fi
-	if test ":$show_version" != ":" ; then
+	if test :"$show_version" != : ; then
 	    version
 	fi
-	if test ":$show_help" != ":" ; then
+	if test :"$show_help" != : ; then
 	    help
 	fi
-	if test ":$show_copying" != ":" ; then
+	if test :"$show_copying" != : ; then
 	    copying
 	fi
     fi

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/05 11:08:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+# Last Modified $Date: 2005/03/05 11:08:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -159,21 +159,61 @@ MODSYMS_MODDIR="$MODSYMS_MODDIR"
 # _KSYMS_OUTPUT_MODPOST_CONFIG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
-    AC_CACHE_CHECK([for modpost script], [MODPOST_SCRIPT], [MODPOST_SCRIPT="$ac_aux_dir/modpost.sh"])
-    AC_CACHE_CHECK([for modpost command], [MODPOST], [MODPOST="${CONFIG_SHELL:-$SHELL} $MODPOST_SCRIPT"])
-    AC_CACHE_CHECK([for modpost sys file], [MODPOST_SYSVER], [MODPOST_SYSVER="System.symver"])
-    AC_CACHE_CHECK([for modpost mod file], [MODPOST_MODVER], [MODPOST_MODVER="Modules.symver"])
-    AC_CACHE_CHECK([for modpost system map], [MODPOST_SYSMAP], [MODPOST_SYSMAP="$ksysmap"])
-    AC_CACHE_CHECK([for modpost module dir], [MODPOST_MODDIR], [MODPOST_MODDIR="$kmoduledir"])
-    AC_SUBST([MODPOST_SCRIPT])
-    AC_SUBST([MODPOST])
-    AC_SUBST([MODPOST_SYSVER])
-    AC_SUBST([MODPOST_MODVER])
-    AC_SUBST([MODPOST_SYSMAP])
-    AC_SUBST([MODPOST_MODDIR])
+    AC_CACHE_CHECK([for modpost script], [ksyms_cv_modpost_script], [dnl
+	ksyms_cv_modpost_script="$ac_aux_dir/modpost.sh"])
+    MODPOST_SCRIPT="$ksyms_cv_modpost_script"
+    AC_SUBST([MODPOST_SCRIPT])dnl
+    AC_CACHE_CHECK([for modpost command], [ksyms_cv_modpost_command], [dnl
+	ksyms_cv_modpost_command="${CONFIG_SHELL:-$SHELL} $MODPOST_SCRIPT"])
+    MODPOST="$ksyms_cv_modpost_command"
+    AC_SUBST([MODPOST])dnl
+    AC_CACHE_CHECK([for modpost sys file], [ksyms_cv_modpost_sysver], [dnl
+	ksyms_cv_modpost_sysver="System.symver"])
+    MODPOST_SYSVER="$ksyms_cv_modpost_sysver"
+    AC_SUBST([MODPOST_SYSVER])dnl
+    AC_CACHE_CHECK([for modpost mod file], [ksyms_cv_modpost_modver], [dnl
+	ksyms_cv_modpost_modver="Modules.symver"])
+    MODPOST_MODVER="$ksyms_cv_modpost_modver"
+    AC_SUBST([MODPOST_MODVER])dnl
+    AC_CACHE_CHECK([for modpost system map], [ksyms_cv_modpost_sysmap], [dnl
+	ksyms_cv_modpost_sysmap="$ksysmap"])
+    MODPOST_SYSMAP="$ksyms_cv_modpost_sysmap"
+    AC_SUBST([MODPOST_SYSMAP])dnl
+    AC_CACHE_CHECK([for modpost module dir], [ksyms_cv_modpost_moddir], [dnl
+	ksyms_cv_modpost_moddir="$kmoduledir"])
+    MODPOST_MODDIR="$ksyms_cv_modpost_moddir"
+    AC_SUBST([MODPOST_MODDIR])dnl
+    AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
+    test :"$MODPOST_CACHE" != : && unset ksyms_cv_modpost_cache
+    AC_CACHE_CHECK([for modpost cache file], [ksyms_cv_modpost_cache], [dnl
+	if test :$MODPOST_CACHE != : ; then
+	    ksyms_cv_modpost_cache="$MODPOST_CACHE"
+	else
+	    ksyms_cv_modpost_cache='modpost.cache'
+	fi
+    ])
+    MODPOST_CACHE="$ksyms_cv_modpost_cache"
+    AC_SUBST([MODPOST_CACHE])dnl
+    _LINUX_CHECK_KERNEL_CONFIG([for modpost -m option], [CONFIG_MODVERSIONS])
+    _LINUX_CHECK_KERNEL_CONFIG([for modpost -u option], [CONFIG_MODULE_UNLOAD])
+    _LINUX_CHECK_KERNEL_CONFIG([for modpost -a option], [CONFIG_MODULE_SRCVERSION_ALL])
+    AC_CACHE_CHECK([for modpost options], [ksyms_cv_modpost_options], [dnl
+	ksyms_cv_modpost_options=
+	if test :${linux_cv_CONFIG_MODVERSIONS:-no} = :yes ; then
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options}${ksyms_cv_modpost_options:+ }-m"
+	fi
+	if test :${linux_cv_CONFIG_MODULE_UNLOAD:-no} = :yes ; then
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options}${ksyms_cv_modpost_options:+ }-u"
+	fi
+	if test :${linux_cv_CONFIG_SRCVERSION_ALL:-no} = :yes ; then
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options}${ksyms_cv_modpost_options:+ }-a"
+	fi
+    ])
+    MODPOST_OPTIONS="$ksyms_cv_modpost_options"
+    AC_SUBST([MODPOST_OPTIONS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
 	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP and $MODPOST_MODDIR])
-	eval "$MODPOST${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR} -s $MODPOST_SYSVER"
+	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST -vv${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR} -s $MODPOST_SYSVER"
     ], [dnl
 rootdir="$rootdir"
 kversion="$kversion"
@@ -183,6 +223,8 @@ MODPOST_SYSVER="$MODPOST_SYSVER"
 MODPOST_MODVER="$MODPOST_MODVER"
 MODPOST_SYSMAP="$MODPOST_SYSMAP"
 MODPOST_MODDIR="$MODPOST_MODDIR"
+MODPOST_CACHE="$MODPOST_CACHE"
+MODPOST_OPTIONS="$MODPOST_OPTIONS"
     ])
 ])# _KSYMS_OUTPUT_MODPOST_CONFIG
 # =============================================================================

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/20 13:29:07 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/05 11:08:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 13:29:07 $ by $Author: brian $
+# Last Modified $Date: 2005/03/05 11:08:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -183,17 +183,17 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     AC_ARG_VAR([DPKG], [dpkg command])
     AC_PATH_TOOL([DPKG], [dpkg], [], [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG:-no}" = :no ; then
+    if test :"${DPKG:-no}" = :no -a :"$target_vendor" = :debian ; then
 	AC_MSG_WARN([Could not find dpkg program in PATH.])
     fi
     AC_ARG_VAR([DPKG_SOURCE], [dpkg-source command])
     AC_PATH_TOOL([DPKG_SOURCE], [dpkg-source], [], [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG_SOURCE:-no}" = :no ; then
+    if test :"${DPKG_SOURCE:-no}" = :no -a :"$target_vendor" = :debian ; then
 	AC_MSG_WARN([Could not find dpkg-source program in PATH.])
     fi
     AC_ARG_VAR([DPKG_BUILDPACKAGE], [dpkg-buildpackage command])
     AC_PATH_TOOL([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [], [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG_BUILDPACKAGE:-no}" = :no ; then
+    if test :"${DPKG_BUILDPACKAGE:-no}" = :no -a :"$target_vendor" = :debian ; then
 	AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
     fi
     AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
@@ -212,10 +212,11 @@ AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
 # _DEB_DPKG_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_OUTPUT], [dnl
-    if test :"${DPKG_SOURCE:-no}" != :no -a :"${DPKG_BUILDPACKAGE:-no}" != :no ; then
+dnl the conditional confuses automake forcing extra config.status runs.
+dnl if test :"${DPKG_SOURCE:-no}" != :no -a :"${DPKG_BUILDPACKAGE:-no}" != :no ; then
 	AC_CONFIG_FILES([debian/rules
 			 debian/control])
-    fi
+dnl fi
 ])# _DEB_DPKG_OUTPUT
 # =============================================================================
 

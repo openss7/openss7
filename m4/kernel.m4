@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/05 12:05:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+# Last Modified $Date: 2005/03/05 12:05:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -268,6 +268,8 @@ dnl pull out versions from release number
     AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_minor -eq 4])
     AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_minor -eq 6])
     AM_CONDITIONAL([WITH_KO_MODULES], [test :${linux_cv_k_ko_modules:-no} = :yes])
+    if test :${linux_cv_k_ko_modules:-no} = :yes ; then kext=".ko" ; else kext=".o" ; fi
+    AC_SUBST([kext])dnl
 ])# _LINUX_CHECK_KERNEL_RELEASE
 # =========================================================================
 
@@ -372,9 +374,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	    linux_cv_k_compress='unknown'
 	fi ])
     case $linux_cv_k_compress in
-	(yes)		COMPRESS_KERNEL_MODULES='gzip -9' ;;
-	(no)		COMPRESS_KERNEL_MODULES= ;;
-	(unknown|*)	COMPRESS_KERNEL_MODULES=
+	(yes)		COMPRESS_KERNEL_MODULES='gzip -9' ; kzip=".gz" ;;
+	(no)		COMPRESS_KERNEL_MODULES= ; kzip= ;;
+	(unknown|*)	COMPRESS_KERNEL_MODULES= ; kzip=
 		AC_MSG_WARN([
 **** 
 **** Strange, the modules directory is $linux_cv_k_modules_eval
@@ -384,6 +386,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	    ;;
     esac
     AC_SUBST([COMPRESS_KERNEL_MODULES])dnl
+    AC_SUBST([kzip])dnl
     kmoduledir="${linux_cv_k_modules}"
     AC_SUBST([kmoduledir])dnl
 ])# _LINUX_CHECK_KERNEL_MODULES
@@ -541,7 +544,14 @@ dnl
 	    then
 		case "$linux_cv_k_sysmap" in
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
-			AC_MSG_WARN([
+			case "$target_vendor" in
+			    (redhat|whitebox)
+dnl
+dnl				Unfortunately the redhat system map files are
+dnl				unreliable because the are not unique for each
+dnl				architecture.
+dnl
+				AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
 *** 
@@ -550,6 +560,12 @@ dnl
 *** This may cause problems later if you have mismatches between the target
 *** kernel and the kernel symbols contained in that file.
 *** ])
+				;;
+			    (mandrake)
+				;;
+			    (*)
+				;;
+			esac
 			;;
 		esac
 	    fi
@@ -692,6 +708,34 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
 # _LINUX_CHECK_KERNEL_MACHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
+    AC_CACHE_CHECK([for kernel machine base], [linux_cv_k_mach], [dnl
+	case "$karch" in
+	    (alpha*)		linux_cv_k_mach="alpha"	 ;;
+	    (arm*|sa110)	linux_cv_k_mach="arm"	  ;;
+	    (cris*)		linux_cv_k_mach="cris"	  ;;
+	    (i?86*|k6*|athlon*)	linux_cv_k_mach="i386"	  ;;
+	    (ia64)		linux_cv_k_mach="ia64"	  ;;
+	    (m68*)		linux_cv_k_mach="m68k"	  ;;
+	    (mips64*)		linux_cv_k_mach="mips64"  ;;
+	    (mips*)		linux_cv_k_mach="mips"	  ;;
+	    (hppa*)		linux_cv_k_mach="parisc"  ;;
+	    (ppc*|powerpc*)	linux_cv_k_mach="ppc"	  ;;
+	    (s390x*)		linux_cv_k_mach="s390x"	  ;;
+	    (s390*)		linux_cv_k_mach="s390"	  ;;
+	    (sh*)		linux_cv_k_mach="sh"	  ;;
+	    (sparc64*|sun4u)	linux_cv_k_mach="sparc64" ;;
+	    (sparc*)		linux_cv_k_mach="sparc"	  ;;
+	    (*)			linux_cv_k_mach="$karch"  ;;
+	esac
+    ])
+dnl
+dnl This sets up a local include2 directory with a symbolic link from asm to the
+dnl machine directory.  This is only for Linux 2.6 kbuild kernels so that we can
+dnl strip flags from the kernel makefiles.
+dnl
+    test -d include2 || mkdir include2
+    ln -snf "${kbuilddir}/include/asm-${linux_cv_k_mach}" include2/asm
+dnl
     AC_CACHE_CHECK([for kernel mach directory], [linux_cv_k_machdir], [dnl
 	AC_ARG_WITH([k-machdir],
 	    AS_HELP_STRING([--with-k-machdir=DIR],
@@ -703,24 +747,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
 	then
 	    linux_cv_k_machdir="$with_k_machdir"
 	else
-	    case "$karch" in
-		(alpha*)		linux_cv_k_mach="alpha"	 ;;
-		(arm*|sa110)		linux_cv_k_mach="arm"	  ;;
-		(cris*)			linux_cv_k_mach="cris"	  ;;
-		(i?86*|k6*|athlon*)	linux_cv_k_mach="i386"	  ;;
-		(ia64)			linux_cv_k_mach="ia64"	  ;;
-		(m68*)			linux_cv_k_mach="m68k"	  ;;
-		(mips64*)		linux_cv_k_mach="mips64"  ;;
-		(mips*)			linux_cv_k_mach="mips"	  ;;
-		(hppa*)			linux_cv_k_mach="parisc"  ;;
-		(ppc*|powerpc*)		linux_cv_k_mach="ppc"	  ;;
-		(s390x*)		linux_cv_k_mach="s390x"	  ;;
-		(s390*)			linux_cv_k_mach="s390"	  ;;
-		(sh*)			linux_cv_k_mach="sh"	  ;;
-		(sparc64*|sun4u)	linux_cv_k_mach="sparc64" ;;
-		(sparc*)		linux_cv_k_mach="sparc"	  ;;
-		(*)			linux_cv_k_mach="$karch"  ;;
-	    esac
 	    linux_cv_k_machdir="${kbuilddir}/arch/${linux_cv_k_mach}"
 	fi
 	if test :"${linux_cv_k_machdir:-no}" != :no -a \
@@ -735,9 +761,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
 *** configure before attempting again.
 *** ])
 	fi ])
-    test -d include2 || mkdir include2
-    ln -snf "${kbuilddir}/include/asm-${linux_cv_k_mach}" include2/asm
-    mkdir include2
     kmachdir="$linux_cv_k_machdir"
     AC_SUBST([kmachdir])dnl
 ])# _LINUX_CHECK_KERNEL_MACHDIR
@@ -889,16 +912,18 @@ dnl
 *** ])
 		fi
 	    else
+		case "$target_vendor" in
+		    (redhat|whitebox)
 dnl
-dnl		Unfortunately the redhat system map files are unreliable because
-dnl		the are not unique for each architecture.
+dnl			Unfortunately the redhat system map files are unreliable
+dnl			because the are not unique for each architecture.
 dnl
-		linux_opt=
-		test -n "${DESTDIR}" && linux_opt="--root ${DESTDIR}"
-		linux_arch=`rpm -q --whatprovides $linux_tmp --qf "%{ARCH}\n" 2>/dev/null`
-		if test "$linux_arch" != "$karch"
-		then
-		    AC_MSG_ERROR([
+			linux_opt=
+			test -n "${DESTDIR}" && linux_opt="--root ${DESTDIR}"
+			linux_arch=`rpm -q --whatprovides $linux_tmp --qf "%{ARCH}\n" 2>/dev/null`
+			if test "$linux_arch" != "$karch"
+			then
+			    AC_MSG_ERROR([
 *** 
 *** The system map file for "$dist_cv_host_distrib" "${kboot:-UP}" is
 *** 
@@ -908,7 +933,13 @@ dnl
 *** Reconfigure with "--target=${linux_arch}-${target_vendor}-${target_os}".
 *** 
 *** ])
-		fi
+			fi
+			;;
+		    (mandrake)
+			;;
+		    (*)
+			;;
+		esac
 	    fi
 	fi ])
     kboot=

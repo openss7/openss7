@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/02/25 10:56:40 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/03/05 11:08:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/25 10:56:40 $ by $Author: brian $
+# Last Modified $Date: 2005/03/05 11:08:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,6 +81,8 @@
 %global stitle @PACKAGE_SHORTTITLE@
 %global libname streams
 %global initfiles specfs strace streams strerr
+
+%global with_ko_modules %(if test `echo "%{_kversion}" | sed -e 's|^2\.||;s|\..*||'` -gt 4 ; then echo "1" ; else echo "0" ; fi)
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
@@ -425,63 +427,58 @@ fi
 %post %{core_name}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
-#   This is the end of a fresh install.
-#   Check that our line is in the modules.%{base} file
-    conf_old=/etc/modules.conf
-    if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
-        streams_dir=/%{_lib}/modules/%{kernel_version}/misc
-        streams_prf=/%{_lib}/modules/preferred/misc
-        streams_dfl=/%{_lib}/modules/default/misc
-        conf_new=%{_tmppath}/modules.conf.new.$$
-        cp -f $conf_old $conf_new
-#       if not, check for an old non-rpm LiS
-        if ( grep -q 'BEGIN LiS' $conf_old ) ; then
-            conf_tmp=%{_tmppath}/modules.conf.tmp.$$
+    # This is the end of a fresh install.
+%if %{!with_ko_modules}
+    # Check that our line is in the modules.%{base} file
+    if ( grep -q 'include.*modules.%{base}' /etc/modules.conf ) ; then :; else
+        cp -f /etc/modules.conf %{_tmppath}/modules.conf.new.$$
+        # if not, check for an old non-rpm LiS
+        if ( grep -q 'BEGIN LiS' /etc/modules.conf ) ; then
             list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o" -o -name "*.o.gz"`
             for p in $list ; do
                 f=$(basename $p)
                 m=$(basename $(basename $f .gz) .o)
-#               Remove references to our modules from old installation.
-                sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
-                mv -f $conf_tmp $conf_new
-#               Remove conflicting modules.
-                rm -f $streams_dir/boot/$f $streams_dir/$f
-                rm -f $streams_prf/boot/$f $streams_prf/$f
-                rm -f $streams_dfl/boot/$f $streams_dfl/$f
+                # Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' %{_tmppath}/modules.conf.new.$$ > %{_tmppath}/modules.conf.tmp.$$
+                mv -f %{_tmppath}/modules.conf.tmp.$$ %{_tmppath}/modules.conf.new.$$
+                # Remove conflicting modules.
+                rm -f /%{_lib}/modules/%{kernel_version}/misc/boot/$f /%{_lib}/modules/%{kernel_version}/misc/$f
+                rm -f /%{_lib}/modules/preferred/misc/boot/$f /%{_lib}/modules/preferred/misc/$f
+                rm -f /%{_lib}/modules/default/misc/boot/$f /%{_lib}/modules/default/misc/$f
             done
-            rmdir --ignore-fail-on-non-empty $streams_dir/boot $streams_dir
-            rmdir --ignore-fail-on-non-empty $streams_prf/boot $streams_prf
-            rmdir --ignore-fail-on-non-empty $streams_dfl/boot $streams_dfl
+            rmdir --ignore-fail-on-non-empty /%{_lib}/modules/%{kernel_version}/misc/boot /%{_lib}/modules/%{kernel_version}/misc
+            rmdir --ignore-fail-on-non-empty /%{_lib}/modules/preferred/misc/boot /%{_lib}/modules/preferred/misc
+            rmdir --ignore-fail-on-non-empty /%{_lib}/modules/default/misc/boot /%{_lib}/modules/default/misc
         fi
-        echo 'prune modules.%{base}' >> $conf_new
-        echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
-        echo 'include /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
-        echo 'endif' >> $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -fb --suffix=.rpmsave $conf_new $conf_old
-        rm -f $conf_new
+        echo 'prune modules.%{base}' >> %{_tmppath}/modules.conf.new.$$
+        echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> %{_tmppath}/modules.conf.new.$$
+        echo 'include /lib/modules/`uname -r`/modules.%{base}' >> %{_tmppath}/modules.conf.new.$$
+        echo 'endif' >> %{_tmppath}/modules.conf.new.$$
+        chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.new.$$
+        cp -fb --suffix=.rpmsave %{_tmppath}/modules.conf.new.$$ /etc/modules.conf
+        rm -f %{_tmppath}/modules.conf.new.$$
     fi
-    prel_old=/etc/modules
-    if [ -f $prel_old ] ; then
-        list=`find /%{_lib}/modules/%{kernel_version}/%{base}/boot -name "*.o" -o -name "*.o.gz"`
-        prel_new=%{_tmppath}/modules.new.$$
-        prel_tmp=%{_tmppath}/modules.tmp.$$
-        cp -f $prel_old $prel_new
-        for p in $list ; do
-            m=$(basename $(basename $p .gz) .o)
-            sed -e "/^$m\>/d" $prel_new > $prel_tmp
-            mv -f $prel_tmp $prel_new
+    preloads=modules
+%else
+    preloads=modprobe.preload
+%endif
+    if [ -f /etc/$preloads ] ; then
+        cp -f /etc/$preloads %{_tmppath}/$preloads.new.$$
+        list='@KERNEL_PRELOADS@' ; for p in $list ; do
+            m=`echo $p | sed -r -e 's|^.*/||;s|.(k)?o(.gz)?$||'`
+            sed -e "/^$m\>/d" %{_tmppath}/$preloads.new.$$ > %{_tmppath}/$preloads.tmp.$$
+            mv -f %{_tmppath}/$preloads.tmp.$$ %{_tmppath}/$preloads.new.$$
         done
-        chmod --reference=$prel_old $prel_new
-        cp -fb --suffix=.rpmsave $prel_new $prel_old
-        rm -f $prel_new
+        chmod --reference=/etc/$preloads %{_tmppath}/$preloads.new.$$
+        cp -fb --suffix=.rpmsave %{_tmppath}/$preloads.new.$$ /etc/$preloads
+        rm -f %{_tmppath}/$preloads.new.$$
     fi
 fi
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    # this is a running kernel, do a /sbin/depmod on the modules directory for
     /sbin/depmod -ae
 elif [ -r /boot/System.map-%{kernel_version} ] ; then
-#   non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
+    # non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
     /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
 fi
@@ -515,9 +512,10 @@ fi
 %postun %{core_name}
 # ---------------------------------------------------------------------------
 
+%if %{!with_ko_modules}
 if [ $1 = 0 ]; then
-#   this is the last stage of a removal we are going away: we need to see if
-#   we need to remove our line from modules.conf and remove our devices
+    # this is the last stage of a removal we are going away: we need to see if
+    # we need to remove our line from modules.conf and remove our devices
     remove_line=yes
     for file in /lib/modules/*/modules.%{base} ; do
         if [ -f $file ] ; then
@@ -532,11 +530,12 @@ if [ $1 = 0 ]; then
         rm -f %{_tmppath}/modules.conf.tmp.$$
     fi
 fi
+%endif
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
-#   this is a running kernel, do a /sbin/depmod on the modules directory for
+    # this is a running kernel, do a /sbin/depmod on the modules directory for
     /sbin/depmod -ae
 elif [ -r /boot/System.map-%{kernel_version} ] ; then
-#   non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
+    # non-running kernels a /sbin/depmod will be performed on boot but /sbin/depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
     /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
 fi
@@ -578,7 +577,9 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/%{base}
+%if %{!with_ko_modules}
 %attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
+%endif
 /%{_lib}/modules/%{kernel_version}/%{base}/*
 %endif
 
@@ -608,10 +609,12 @@ modules and kernel for which they were compiled.  This package applies to core
 kernel modules %{name}-%{core_name} for kernel version %{_kversion}.
 
 %if %{BUILD_modules}
+%if %{!with_ko_modules}
 %files %{info_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_includedir}/streams/%{kernel_version}/*
+%endif
 %endif
 
 # ===========================================================================
@@ -968,8 +971,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.76  2005/02/25 10:56:40  brian
-# - Don't specify build architecture.
+# Revision 0.9.2.77  2005/03/05 11:08:48  brian
+# - Now builds 2.6 rpms nicely.
+#
+# Revision 0.9.2.45  2005/03/05 11:08:48  brian
+# - Now builds 2.6 rpms nicely.
 #
 # Revision 0.9.2.44  2005/02/25 10:56:40  brian
 # - Don't specify build architecture.
