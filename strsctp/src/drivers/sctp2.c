@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 11:09:11 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/11/09 03:30:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 11:09:11 $ by $Author: brian $
+ Last Modified $Date: 2004/11/09 03:30:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 11:09:11 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/11/09 03:30:09 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 11:09:11 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/11/09 03:30:09 $";
 
 #include "compat.h"
 
@@ -119,7 +119,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 11:09:11 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/11/09 03:30:09 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -12127,10 +12127,10 @@ sctp_rsrv(queue_t *q)
 
 #ifdef LFS
 #define SCTP_N_DRV_ID	    CONFIG_STREAMS_SCTP_N_MODID
-#define SCTP_N_DRV_NAME	    CONFIG_STREAMS_SCCP_N_NAME
-#define SCTP_N_CMAJORS	    CONFIG_STREAMS_SCCP_N_NMAJORS
-#define SCTP_N_CMAJOR_0	    CONFIG_STREAMS_SCCP_N_MAJOR
-#define SCTP_N_UNITS	    CONFIG_STREAMS_SCCP_N_NMINORS
+#define SCTP_N_DRV_NAME	    CONFIG_STREAMS_SCTP_N_NAME
+#define SCTP_N_CMAJORS	    CONFIG_STREAMS_SCTP_N_NMAJORS
+#define SCTP_N_CMAJOR_0	    CONFIG_STREAMS_SCTP_N_MAJOR
+#define SCTP_N_UNITS	    CONFIG_STREAMS_SCTP_N_NMINORS
 #endif				/* LFS */
 
 /*
