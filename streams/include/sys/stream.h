@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.14 2004/05/14 08:00:02 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.15 2004/05/27 08:55:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/14 08:00:02 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/14 08:00:02 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/27 08:55:14 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -571,7 +571,6 @@ struct fmodsw {
 	uint f_flag;			/* module flags */
 	int f_regs;			/* number of registrations */
 	atomic_t f_count;		/* open count */
-	int f_modid;			/* module id */
 	struct dentry *f_dentry;	/* specfs directory entry */
 	int f_sqlvl;			/* q sychronization level */
 	struct syncq *f_syncq;		/* synchronization queue */
@@ -593,20 +592,19 @@ struct devnode {
 
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
-	struct list_head d_mod_hash;	/* list of module hashes in slot */
+	struct list_head d_hash;	/* list of module hashes in slot */
 	const char *d_name;		/* driver name */
 	struct streamtab *d_str;	/* pointer to streamtab for driver */
 	uint d_flag;			/* driver flags */
 	atomic_t d_count;		/* open count */
-	int d_major;			/* base major device number */
 	struct dentry *d_dentry;	/* specfs directory entry */
 	int d_sqlvl;			/* q sychronization level */
 	struct syncq *d_syncq;		/* synchronization queue */
 	struct module *d_kmod;		/* kernel module */
 	/* above must match fmodsw */
+	int d_major;			/* base major device number */
 	mode_t d_mode;			/* inode mode */
 	struct file_operations *d_fop;	/* file operations */
-	struct list_head d_hash;	/* list of device hashes in slot */
 	struct list_head d_majors;	/* major device nodes for this device */
 	struct list_head d_nodes;	/* minor device nodes */
 	struct list_head d_apush;	/* autopush list */

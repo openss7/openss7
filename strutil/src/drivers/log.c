@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -82,7 +82,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -111,8 +111,12 @@ MODULE_LICENSE(LOG_LICENSE);
 #error CONFIG_STREAMS_LOG_MODID must be defined.
 #endif
 
-static unsigned short major = CONFIG_STREAMS_LOG_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_LOG_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS-log driver.");
+
+major_t major = CONFIG_STREAMS_LOG_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-log driver.");
 
 static struct module_info log_minfo = {
@@ -335,6 +339,7 @@ static int __init log_init(void)
 #else
 	printk(KERN_INFO LOG_SPLASH);
 #endif
+	log_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&log_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

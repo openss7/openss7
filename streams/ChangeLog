@@ -1,10 +1,14 @@
 # $Log: ChangeLog,v $
-# Revision 0.9.2.5  2004/05/14 07:59:47  brian
-# - Updated xns, tli, inet, xnet and documentation.
+# Revision 0.9.2.6  2004/05/27 08:55:11  brian
+# - Stabilizing release.
 #
-# Revision 1.5  2004/05/14 07:59:47  brian
-# - Updated xns, tli, inet, xnet and documentation.
+# Revision 1.6  2004/05/27 08:55:11  brian
+# - Stabilizing release.
 #
+
+2004-05-14 Brian Bidulock <bidulock@openss7.org>
+	* (streams): Revision 1.5  2004/05/14 07:59:47  brian
+	- Updated xns, tli, inet, xnet and documentation.
 
 2004-05-14 Brian Bidulock <bidulock@openss7.org>
 	* (ChangeLog): (modified)

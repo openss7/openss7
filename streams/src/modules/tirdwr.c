@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/27 08:55:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/27 08:55:44 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/27 08:55:44 $";
 
 #if defined(_LIS_SOURCE) && !defined(MODULE)
 #   error ****
@@ -109,7 +109,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/27 08:55:44 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -150,7 +150,7 @@ MODULE_LICENSE(TIRDWR_LICENSE);
 #   endif
 #endif
 
-static modID_t modid = TIRDWR_MOD_ID;
+modID_t modid = TIRDWR_MOD_ID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for TIRDWR.");
 
@@ -863,6 +863,7 @@ static int
 tirdwr_register_module(void)
 {
 	int err;
+	tirdwr_minfo.mi_idnum = modid;
 	if ((err = register_strmod(&tirdwr_fmod)) < 0)
 		return (err);
 	if (modid == 0 && err > 0)
@@ -911,10 +912,10 @@ static int __init
 tirdwr_init(void)
 {
 	int err;
-#ifdef MODULE
-	cmn_err(CE_NOTE, TIRDWR_BANNER);	/* banner message */
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
+	printk(KERN_INFO TIRDWR_BANNER);	/* banner message */
 #else
-	cmn_err(CE_NOTE, TIRDWR_SLPASH);	/* console splash */
+	printk(KERN_INFO TIRDWR_SLPASH);	/* console splash */
 #endif
 	if ((err = tirdwr_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", TIRDWR_MOD_NAME, -err);

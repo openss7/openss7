@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:29 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:29 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:29 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:36 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:29 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:36 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -80,8 +80,8 @@ static char const ident[] =
 #include "sth.h"		/* for make_oflags */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLONE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:29 $"
+#define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:36 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -113,8 +113,12 @@ MODULE_LICENSE(CLONE_LICENSE);
 #error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_CLONE_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_CLONE_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for CLONE driver.");
+
+major_t major = CONFIG_STREAMS_CLONE_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for CLONE driver.");
 
 static struct module_info clone_minfo = {
@@ -203,6 +207,7 @@ static int __init clone_init(void)
 #else
 	printk(KERN_INFO CLONE_SPLASH);
 #endif
+	clone_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&clone_cdev, major)) < 0)
 		return (err);
 	if (major == 0 && err > 0)

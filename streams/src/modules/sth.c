@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $";
 
 //#define __NO_VERSION__
 
@@ -97,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/27 08:55:44 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -135,7 +135,7 @@ MODULE_LICENSE(STH_LICENSE);
 #error "CONFIG_STREAMS_STH_MODID must be defined."
 #endif
 
-static short modid = CONFIG_STREAMS_STH_MODID;
+modID_t modid = CONFIG_STREAMS_STH_MODID;
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module identification number for STH module.");
 
@@ -3587,11 +3587,12 @@ EXPORT_SYMBOL_GPL(unregister_strdev);
 /* Perhaps we should...  The stream head should be entered into the fmodsw table at position 0,
    with module id 0 */
 
+/* We actually register it a position 1 with module id 1 */
+
 static struct fmodsw sth_fmod = {
 	f_name:CONFIG_STREAMS_STH_NAME,
 	f_str:&str_info,
 	f_flag:D_MP,
-	f_modid:CONFIG_STREAMS_STH_MODID,
 	f_kmod:THIS_MODULE,
 };
 
@@ -3603,9 +3604,10 @@ int __init sth_init(void)
 #else
 	printk(KERN_INFO STH_SPLASH);
 #endif
+	str_minfo.mi_idnum = modid;
 	if ((err = register_strmod(&sth_fmod)) < 0)
 		return (err);
-	if (modid == -1 && err >= 0)
+	if (modid == 0 && err >= 0)
 		modid = err;
 	return (0);
 };

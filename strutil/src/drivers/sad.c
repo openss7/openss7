@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,8 +81,8 @@ static char const ident[] =
 #include "strsad.h"		/* for autopush functions */
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SAD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $"
+#define SAD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -111,8 +111,12 @@ MODULE_LICENSE(SAD_LICENSE);
 #error CONFIG_STREAMS_SAD_MODID must be defined.
 #endif
 
-static unsigned short major = CONFIG_STREAMS_SAD_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_SAD_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS-administrative driver.");
+
+major_t major = CONFIG_STREAMS_SAD_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-administrative driver.");
 
 static struct module_info sad_minfo = {
@@ -403,6 +407,7 @@ static int __init sad_init(void)
 #else
 	printk(KERN_INFO SAD_SPLASH);
 #endif
+	sad_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&sad_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

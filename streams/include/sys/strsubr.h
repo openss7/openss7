@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.9 2004/05/08 19:21:13 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.10 2004/05/27 08:55:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:13 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/08 19:21:13 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/27 08:55:14 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -471,23 +471,26 @@ struct apinfo {
 };
 
 struct devinfo {
-	struct list_head di_list;
+	struct list_head di_list;	/* list of devices for this switch table entry */
+	struct list_head di_hash;	/* list of major hashes in slot */
 	struct cdevsw *di_dev;		/* switch table entry */
 	struct module_info *di_info;	/* quick pointer to module info */
 	atomic_t di_refs;		/* structure references */
 	atomic_t di_count;		/* open count */
-	int major;			/* major device number */
-	int minor;			/* minor device number */
+	major_t major;			/* major device number */
+	minor_t minor;			/* minor device number */
 	struct devinfo *di_next;	/* Strinfo list linkage */
 	struct devinfo *di_prev;	/* Strinfo list linkage */
 };
 
 struct modinfo {
-	struct list_head mi_list;
+	struct list_head mi_list;	/* list of modules for this switch table entry */
+	struct list_head mi_hash;	/* list of modid hashes in slot */
 	struct fmodsw *mi_mod;		/* switch table entry */
 	struct module_info *mi_info;	/* quick pointer to module info */
 	atomic_t mi_refs;		/* structure references */
 	atomic_t mi_count;		/* open count */
+	modID_t modid;			/* module id number */
 	struct modinfo *mi_next;	/* Strinfo list linkage */
 	struct modinfo *mi_prev;	/* Strinfo list linkage */
 };

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,8 +85,8 @@ static char const ident[] =
 #include "strreg.h"
 
 #define XNET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define XNET_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#define XNET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define XNET_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 #define XNET_DEVICE	"SVR 4.2 Sockets Library NET4 Support"
 #define XNET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XNET_LICENSE	"GPL"
@@ -114,8 +114,12 @@ MODULE_LICENSE(XNET_LICENSE);
 //#error "CONFIG_STREAMS_XNET_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_XNET_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_XNET_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS NET4 driver (0 for allocation).");
+
+major_t major = CONFIG_STREAMS_XNET_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS NET4 driver (0 for allocation).");
 
 typedef struct xnet_protosw {
@@ -753,6 +757,7 @@ static int __init xnet_init(void)
 #else
 	printk(KERN_INFO XNET_SPLASH);
 #endif
+	xnet_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&xnet_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

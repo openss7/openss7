@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -82,8 +82,8 @@ static char const ident[] =
 #include "strdebug.h"
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CONNLD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $"
+#define CONNLD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -111,8 +111,8 @@ MODULE_LICENSE(CONNLD_LICENSE);
 #error "CONFIG_STREAMS_CONNLD_MODID must be defined."
 #endif
 
-static modID_t modid = CONFIG_STREAMS_CONNLD_MODID;
-MODULE_PARM(modid, "b");
+modID_t modid = CONFIG_STREAMS_CONNLD_MODID;
+MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for CONNLD.");
 
 static struct module_info connld_minfo = {

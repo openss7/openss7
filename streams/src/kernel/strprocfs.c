@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $";
 
 #define __NO_VERSION__
 
@@ -433,9 +433,9 @@ static int get_streams_fmodsw_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", f_str { ");
 	len += get_streams_streamtab_mod_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, f_flag");
-	len += snprintf(page + len, maxlen - len, ", f_kmod");
+	len += snprintf(page + len, maxlen - len, ", f_regs");
 	len += snprintf(page + len, maxlen - len, ", f_count");
-//      len += snprintf(page + len, maxlen - len, ", f_regs");
+	len += snprintf(page + len, maxlen - len, ", f_kmod");
 	return (len);
 }
 static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
@@ -448,9 +448,9 @@ static int get_streams_fmodsw(char *page, ssize_t maxlen, struct fmodsw *f)
 	len += snprintf(page + len, maxlen - len, ", %p { ", f->f_str);
 	len += get_streams_streamtab_mod(page + len, maxlen - len, f->f_str);
 	len += snprintf(page + len, maxlen - len, " }, %#04hx", f->f_flag);
+	len += snprintf(page + len, maxlen - len, ", %d", f->f_regs);
+	len += snprintf(page + len, maxlen - len, ", %d", atomic_read(&f->f_count));
 	len += snprintf(page + len, maxlen - len, ", %p", f->f_kmod);
-	len += snprintf(page + len, maxlen - len, ", %hu", atomic_read(&f->f_count));
-//      len += snprintf(page + len, maxlen - len, ", %hu", f->f_regs);
       done:
 	return (len);
 }

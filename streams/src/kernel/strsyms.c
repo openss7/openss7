@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 04:16:31 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/27 08:55:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 04:16:31 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/27 08:55:41 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 04:16:31 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/27 08:55:41 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -287,8 +287,8 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL_GPL(cdrv_get);	/* strreg.h */
 //EXPORT_SYMBOL_GPL(cdrv_put);	/* strreg.h */
 
+//EXPORT_SYMBOL_GPL(ap_alloc);		/* strsched.h */
 //EXPORT_SYMBOL_GPL(ap_get);		/* strsched.h */
-//EXPORT_SYMBOL_GPL(ap_grab);		/* strsched.h */
 //EXPORT_SYMBOL_GPL(ap_put);		/* strsched.h */
 
 //EXPORT_SYMBOL_GPL(alloclk);		/* strsched.h */

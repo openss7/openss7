@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: unix.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,8 +85,8 @@ static char const ident[] =
 #include "strreg.h"
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#define UNIX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"
@@ -114,8 +114,12 @@ MODULE_LICENSE(UNIX_LICENSE);
 //#error "CONFIG_STREAMS_UNIX_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_UNIX_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_UNIX_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for UNIX driver (0 for allocation).");
+
+major_t major = CONFIG_STREAMS_UNIX_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for UNIX driver (0 for allocation).");
 
 static int unix_do_ioctl(queue_t *q, mblk_t *mp)
@@ -377,6 +381,7 @@ static int __init unix_init(void)
 #else
 	printk(KERN_INFO UNIX_SPLASH);
 #endif
+	unix_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&unix_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

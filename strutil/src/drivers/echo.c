@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:29 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:29 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:29 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:29 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,8 +78,8 @@ static char const ident[] =
 #include "sys/config.h"
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ECHO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:29 $"
+#define ECHO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define ECHO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:36 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -108,8 +108,12 @@ MODULE_LICENSE(ECHO_LICENSE);
 #error CONFIG_STREAMS_ECHO_MAJOR must be defined.
 #endif
 
-static unsigned short major = CONFIG_STREAMS_ECHO_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_ECHO_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for ECHO driver. (0 for auto allocation)");
+
+major_t major = CONFIG_STREAMS_ECHO_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto allocation)");
 
 static struct module_info echo_minfo = {
@@ -282,6 +286,7 @@ static int __init echo_init(void)
 #else
 	printk(KERN_INFO ECHO_SPLASH);
 #endif
+	echo_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&echo_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

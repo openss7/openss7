@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -81,7 +81,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 04:16:30 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/27 08:55:37 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -110,8 +110,12 @@ MODULE_LICENSE(SPX_LICENSE);
 #error CONFIG_STREAMS_SPX_MODID must be defined.
 #endif
 
-static unsigned short major = CONFIG_STREAMS_SPX_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_SPX_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver.");
+
+major_t major = CONFIG_STREAMS_SPX_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver.");
 
 typedef struct spx {
@@ -334,6 +338,7 @@ static int __init spx_init(void)
 #else
 	printk(KERN_INFO SPX_SPLASH);
 #endif
+	spx_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&spx_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/24 04:16:31 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/27 08:55:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/24 04:16:31 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/27 08:55:41 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/24 04:16:31 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/27 08:55:41 $";
 
 #define __NO_VERSION__
 
@@ -2145,9 +2145,9 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux)
 		break;
 	case SQLVL_QUEUE:
 		/* allocate one syncq for each queue */
-		if (!(sqr = sq_get()))
+		if (!(sqr = sq_alloc()))
 			goto enomem;
-		if (!(sqw = sq_get())) {
+		if (!(sqw = sq_alloc())) {
 			sq_put(&sqr);
 			goto enomem;
 		}
@@ -2158,9 +2158,9 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux)
 		break;
 	case SQLVL_QUEUEPAIR:
 		/* allocate one syncq for the queue pair */
-		if (!(sqr = sq_get()))
+		if (!(sqr = sq_alloc()))
 			goto enomem;
-		sqw = sq_grab(sqr);
+		sqw = sq_get(sqr);
 		sqr->sq_level = fmod->f_sqlvl;
 		sqw->sq_level = fmod->f_sqlvl;
 		(q + 0)->q_syncq = sqr;
@@ -2171,16 +2171,16 @@ int setsq(queue_t *q, struct fmodsw *fmod, int mux)
 	case SQLVL_DEFAULT:
 	case SQLVL_MODULE:	/* default */
 		/* find the module and use its syncq */
-		(q + 0)->q_syncq = sq_grab(fmod->f_syncq);
-		(q + 1)->q_syncq = sq_grab(fmod->f_syncq);
+		(q + 0)->q_syncq = sq_get(fmod->f_syncq);
+		(q + 1)->q_syncq = sq_get(fmod->f_syncq);
 		break;
 	case SQLVL_ELSEWHERE:	/* not fully supported */
 		/* find the elsewhere syncq and use it */
 		break;
 	case SQLVL_GLOBAL:	/* for testing */
 		/* use the gloable syncq */
-		(q + 0)->q_syncq = sq_grab(&syncq_global);
-		(q + 1)->q_syncq = sq_grab(&syncq_global);
+		(q + 0)->q_syncq = sq_get(&syncq_global);
+		(q + 1)->q_syncq = sq_get(&syncq_global);
 		break;
 	}
 	if (fmod->f_str) {

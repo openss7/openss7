@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:40 $";
 
 #define __NO_VERSION__
 
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strsched.h"		/* for ap_get/ap_put */
+#include "strsched.h"		/* for ap_alloc/ap_put */
 #include "strsad.h"		/* extern verification */
 
 static spinlock_t apush_lock = SPIN_LOCK_UNLOCKED;
@@ -110,7 +110,7 @@ static int __autopush_add(struct cdevsw *cdev, struct strapush *sap)
 	if ((api = __autopush_find(cdev, sap->sap_minor)) != NULL)
 		goto error;
 	err = -ENOSR;
-	if ((api = ap_get(sap)) == NULL)
+	if ((api = ap_alloc(sap)) == NULL)
 		goto error;
 	list_add_tail(&api->api_list, &cdev->d_apush);
 	return (0);
@@ -143,7 +143,7 @@ struct strapush *autopush_find(dev_t dev)
 		goto notfound;
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
-		ap_grab(api);
+		ap_get(api);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	cdrv_put(cdev);
       notfound:

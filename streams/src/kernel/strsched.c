@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/24 04:16:31 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/27 08:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/24 04:16:31 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/27 08:55:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/05/24 04:16:31 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/27 08:55:40 $";
 
 #define __NO_VERSION__
 
@@ -106,6 +106,10 @@ static char const ident[] =
 
 struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
+
+#ifdef CONFIG_STREAMS_DEBUG
+EXPORT_SYMBOL(strthreads);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -374,7 +378,7 @@ static void apinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-struct apinfo *ap_get(struct strapush *sap)
+struct apinfo *ap_alloc(struct strapush *sap)
 {
 	struct apinfo *api;
 	struct strinfo *si = &Strinfo[DYN_STRAPUSH];
@@ -393,7 +397,7 @@ struct apinfo *ap_get(struct strapush *sap)
 	}
 	return (api);
 }
-struct apinfo *ap_grab(struct apinfo *api)
+struct apinfo *ap_get(struct apinfo *api)
 {
 	if (api) {
 		if (atomic_read(&api->api_refs) < 1)
@@ -441,12 +445,13 @@ static void devinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct devinfo *di = obj;
 		bzero(di, sizeof(*di));
 		INIT_LIST_HEAD(&di->di_list);
+		INIT_LIST_HEAD(&di->di_hash);
 #ifdef CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &di->di_next);
 #endif
 	}
 }
-struct devinfo *di_get(struct cdevsw *cdev)
+struct devinfo *di_alloc(struct cdevsw *cdev)
 {
 	struct devinfo *di;
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
@@ -467,7 +472,7 @@ struct devinfo *di_get(struct cdevsw *cdev)
 	}
 	return (di);
 }
-struct devinfo *di_grab(struct devinfo *di)
+struct devinfo *di_get(struct devinfo *di)
 {
 	if (di) {
 		if (atomic_read(&di->di_refs) < 1)
@@ -489,9 +494,11 @@ void di_put(struct devinfo *di)
 #endif
 			atomic_dec(&si->si_cnt);
 			list_del_init(&di->di_list);
+			list_del_init(&di->di_hash);
 			/* clean it up before putting it back in the cache */
 			bzero(di, sizeof(*di));
 			INIT_LIST_HEAD(&di->di_list);
+			INIT_LIST_HEAD(&di->di_hash);
 #ifdef CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &di->di_next);
 #endif
@@ -515,12 +522,13 @@ static void modinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		struct modinfo *mi = obj;
 		bzero(mi, sizeof(*mi));
 		INIT_LIST_HEAD(&mi->mi_list);
+		INIT_LIST_HEAD(&mi->mi_hash);
 #ifdef CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
 #endif
 	}
 }
-struct modinfo *mi_get(struct fmodsw *fmod)
+struct modinfo *mi_alloc(struct fmodsw *fmod)
 {
 	struct modinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
@@ -541,7 +549,7 @@ struct modinfo *mi_get(struct fmodsw *fmod)
 	}
 	return (mi);
 }
-struct modinfo *mi_grab(struct modinfo *mi)
+struct modinfo *mi_get(struct modinfo *mi)
 {
 	if (mi) {
 		if (atomic_read(&mi->mi_refs) < 1)
@@ -563,9 +571,11 @@ void mi_put(struct modinfo *mi)
 #endif
 			atomic_dec(&si->si_cnt);
 			list_del_init(&mi->mi_list);
+			list_del_init(&mi->mi_hash);
 			/* clean it up before putting it back in the cache */
 			bzero(mi, sizeof(*mi));
 			INIT_LIST_HEAD(&mi->mi_list);
+			INIT_LIST_HEAD(&mi->mi_hash);
 #ifdef CONFIG_STREAMS_DEBUG
 			INIT_LIST_HEAD((struct list_head *) &mi->mi_next);
 #endif
@@ -902,7 +912,7 @@ static void syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		INIT_LIST_HEAD((struct list_head *) &sq->sq_next);
 	}
 }
-struct syncq *sq_get(void)
+struct syncq *sq_alloc(void)
 {
 	struct syncq *sq;
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
@@ -918,7 +928,7 @@ struct syncq *sq_get(void)
 	}
 	return (sq);
 }
-struct syncq *sq_grab(struct syncq *sq)
+struct syncq *sq_get(struct syncq *sq)
 {
 	if (sq) {
 		if (atomic_read(&sq->sq_refs) < 1)
@@ -1951,7 +1961,7 @@ void sqsched(syncq_t *sq)
 	if (!sq->sq_link) {
 		struct strthread *t = this_thread;
 		/* put ourselves on the run list */
-		*xchg(&t->sqtail, &sq->sq_link) = sq_grab(sq);
+		*xchg(&t->sqtail, &sq->sq_link) = sq_get(sq);
 		if (test_and_set_bit(qsyncflag, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
 	}

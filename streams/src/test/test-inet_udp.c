@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/14 08:00:07 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/27 08:55:47 $
 
  -----------------------------------------------------------------------------
 
@@ -52,12 +52,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/14 08:00:07 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/05/27 08:55:47 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_udp.c,v $
- Revision 0.9.2.2  2004/05/14 08:00:07  brian
- - Updated xns, tli, inet, xnet and documentation.
+ Revision 0.9.2.3  2004/05/27 08:55:47  brian
+ - Stabilizing release.
+
+ Revision 1.3  2004/05/27 08:55:47  brian
+ - Stabilizing release.
 
  Revision 1.2  2004/05/14 08:00:07  brian
  - Updated xns, tli, inet, xnet and documentation.
@@ -106,9 +109,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/14 08:00:07 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/27 08:55:47 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/14 08:00:07 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/27 08:55:47 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -4065,7 +4068,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/07 07:18:14 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/27 08:55:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/07 07:18:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:41 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -79,20 +79,20 @@ extern struct stdata *sd_get(struct stdata *sd);
 extern void sd_put(struct stdata *sd);
 
 /* ctors and dtors for autopush entries */
-extern struct apinfo *ap_get(struct strapush *sap);
-extern struct apinfo *ap_grab(struct apinfo *api);
+extern struct apinfo *ap_alloc(struct strapush *sap);
+extern struct apinfo *ap_get(struct apinfo *api);
 extern void ap_put(struct apinfo *api);
 extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag,
 		    cred_t *crp);
 
 /* ctors and dtors for devinfo */
-extern struct devinfo *di_get(struct cdevsw *cdev);
-extern struct devinfo *di_grab(struct devinfo *di);
+extern struct devinfo *di_alloc(struct cdevsw *cdev);
+extern struct devinfo *di_get(struct devinfo *di);
 extern void di_put(struct devinfo *di);
 
 /* ctors and dtors for modinfo */
-extern struct modinfo *mi_get(struct fmodsw *fmod);
-extern struct modinfo *mi_grab(struct modinfo *mi);
+extern struct modinfo *mi_alloc(struct fmodsw *fmod);
+extern struct modinfo *mi_get(struct modinfo *mi);
 extern void mi_put(struct modinfo *mi);
 
 /* ctors and dtors for linkblk */
@@ -100,8 +100,8 @@ extern struct linkblk *alloclk(void);
 extern void freelk(struct linkblk *l);
 
 /* ctors and dtors for syncq */
-extern struct syncq *sq_get(void);
-extern struct syncq *sq_grab(struct syncq *sq);
+extern struct syncq *sq_alloc(void);
+extern struct syncq *sq_get(struct syncq *sq);
 extern void sq_put(struct syncq **sqp);
 
 /* freeing chains of message blocks */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -78,8 +78,8 @@ static char const ident[] =
 #include "sys/config.h"
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NULS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:30 $"
+#define NULS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define NULS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2004/05/27 08:55:37 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -108,8 +108,12 @@ MODULE_LICENSE(NULS_LICENSE);
 #error CONFIG_STREAMS_NULS_MAJOR must be defined.
 #endif
 
-static unsigned short major = CONFIG_STREAMS_NULS_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_NULS_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for NULS driver. (0 for auto allocation)");
+
+major_t major = CONFIG_STREAMS_NULS_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto allocation)");
 
 static struct module_info nuls_minfo = {
@@ -278,6 +282,7 @@ static int __init nuls_init(void)
 #else
 	printk(KERN_INFO NULS_SPLASH);
 #endif
+	nuls_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&nuls_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

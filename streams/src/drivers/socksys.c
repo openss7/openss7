@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,8 +85,8 @@ static char const ident[] =
 #include "strreg.h"
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SOCKSYS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Sockets Support"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -114,8 +114,12 @@ MODULE_LICENSE(SOCKSYS_LICENSE);
 //#error "CONFIG_STREAMS_SOCKSYS_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_SOCKSYS_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_SOCKSYS_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for SOCKSYS driver (0 for allocation).");
+
+major_t major = CONFIG_STREAMS_SOCKSYS_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for SOCKSYS driver (0 for allocation).");
 
 /* 
@@ -197,6 +201,7 @@ static int __init socksys_init(void)
 #else
 	printk(KERN_INFO SOCKSYS_SPLASH);
 #endif
+	socksys_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&socksys_cdev, major)) < 0)
 		return (err);
 	if (err > 0)

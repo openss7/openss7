@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/27 08:55:47 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/04 23:15:47 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/05/27 08:55:47 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/27 08:55:47 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/04 23:15:47 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/27 08:55:47 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -5060,7 +5060,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

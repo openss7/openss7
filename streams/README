@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: README,v 0.9.2.2 2004/03/04 23:15:46 brian Exp $
+# $Id: README,v 0.9.2.3 2004/05/27 08:55:11 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -45,7 +45,7 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2004/03/04 23:15:46 $ by $Author: brian $
+# Last Modified $Date: 2004/05/27 08:55:11 $ by $Author: brian $
 # 
 # *****************************************************************************
 
@@ -58,8 +58,8 @@ features in contrast to Linux Fast-STREAMS:
 
 Linux Fast-STREAMS			Linux STREAMS (LiS)
 ======================================  ======================================
-Provided and optimized for Linux only.  Maintain portability across Linux,    
-                                        User Space, QNX, DOS and other ports. 
+Provided and optimized for Linux.       Maintain portability across Linux,    
+Ports to other OSs (BSD?) possible.     User Space, QNX, DOS and other ports. 
 --------------------------------------  --------------------------------------
 
 --------------------------------------  --------------------------------------
@@ -100,8 +100,8 @@ filesystem support for debugging.
 --------------------------------------  --------------------------------------
 
 --------------------------------------  --------------------------------------
-Provides support for all SVR4.2 and     Provides a limited set of LiS only    
-utilities.                              Linux-derived utlities.               
+Provides support for SVR4.2 STREAMS     Provides a limited set of LiS only    
+and other utilities.                    Linux-derived utlities.               
 --------------------------------------  --------------------------------------
 
 --------------------------------------  --------------------------------------

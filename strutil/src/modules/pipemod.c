@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -86,8 +86,8 @@ static char const ident[] =
 #include "strdebug.h"
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:32 $"
+#define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/27 08:55:44 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -115,8 +115,8 @@ MODULE_LICENSE(PIPEMOD_LICENSE);
 #error "CONFIG_STREAMS_PIPEMOD_MODID must be defined."
 #endif
 
-static modID_t modid = CONFIG_STREAMS_PIPEMOD_MODID;
-MODULE_PARM(modid, "b");
+modID_t modid = CONFIG_STREAMS_PIPEMOD_MODID;
+MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for PIPEMOD.");
 
 static struct module_info pipemod_minfo = {

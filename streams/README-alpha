@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: README-alpha,v 0.9.2.2 2004/04/24 06:28:26 brian Exp $
+# $Id: README-alpha,v 0.9.2.3 2004/05/27 08:55:11 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -45,6 +45,13 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2004/04/24 06:28:26 $ by $Author: brian $
+# Last Modified $Date: 2004/05/27 08:55:11 $ by $Author: brian $
 # 
 # *****************************************************************************
+
+This is an alpha release of Linux Fast-STREAMS.  The purpose of this alpha
+release is to provide the techical community with detailed information on the
+status and development directions for Linux Fast-STREAMS.
+
+THIS CODE DOES NOT YET WORK.  LOADING OR EXECUTING CODE IN THIS RELEASE WILL
+CRASH YOUR MACHINE AND MAY INADVERTENTLY CAUSE DAMAGE.  THERE IS NO WARRANTY.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -84,8 +84,8 @@ static char const ident[] =
 #include "pipe.h"		/* extern verification */
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPE_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:30 $"
+#define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/27 08:55:37 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -117,8 +117,12 @@ MODULE_LICENSE(PIPE_LICENSE);
 #error "CONFIG_STREAMS_PIPE_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_PIPE_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_PIPE_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for STREAMS-based PIPEs (0 for allocation).");
+
+major_t major = CONFIG_STREAMS_PIPE_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allocation).");
 
 static struct module_info pipe_minfo = {
@@ -237,6 +241,7 @@ static int __init pipe_init(void)
 #else
 	printk(KERN_INFO PIPE_SPLASH);
 #endif
+	pipe_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&pipe_cdev, major)) < 0)
 		return (err);
 	if (major == 0 && err > 0)

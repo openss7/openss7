@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
+ Last Modified $Date: 2004/05/27 08:55:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -85,8 +85,8 @@ static char const ident[] =
 #include "sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 04:16:30 $"
+#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/27 08:55:37 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -118,8 +118,12 @@ MODULE_LICENSE(NSDEV_LICENSE);
 #error "CONFIG_STREAMS_NSDEV_MAJOR must be defined."
 #endif
 
-static unsigned short major = CONFIG_STREAMS_NSDEV_MAJOR;
-MODULE_PARM(major, "b");
+modID_t modid = CONFIG_STREAMS_NSDEV_MODID;
+MODULE_PARM(modid, "h");
+MODULE_PARM_DESC(modid, "Module id number for NSDEV driver.");
+
+major_t major = CONFIG_STREAMS_NSDEV_MAJOR;
+MODULE_PARM(major, "h");
 MODULE_PARM_DESC(major, "Major device number for NSDEV driver.");
 
 static struct module_info nsdev_minfo = {
@@ -212,6 +216,7 @@ static int __init nsdev_init(void)
 #else
 	printk(KERN_INFO NSDEV_SPLASH);
 #endif
+	nsdev_minfo.mi_idnum = modid;
 	if ((err = register_strdev(&nsdev_cdev, major)) < 0)
 		return (err);
 	if (major == 0 && err > 0)
