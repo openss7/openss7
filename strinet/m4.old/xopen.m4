@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/23 07:24:26 $
+# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/27 06:35:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:26 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 06:35:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,8 +57,8 @@
 # -----------------------------------------------------------------------------
 # Common things that need to be done to support XOPEN/XNS networking.
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN], [
-    AC_REQUIRE([_LINUX_KERNEL])
+AC_DEFUN([_XOPEN], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     _XOPEN_OPTIONS
     _XOPEN_SETUP
     _XOPEN_OUTPUT
@@ -68,7 +68,8 @@ AC_DEFUN([_XOPEN], [
 # =============================================================================
 # _XOPEN_OPTIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_OPTIONS], [
+AC_DEFUN([_XOPEN_OPTIONS], [dnl
+    _XOPEN_OPENSS7_SCTP
     _XOPEN_CHECK_SCTP
     _XOPEN_CHECK_XNS
     _XOPEN_CHECK_TLI
@@ -81,7 +82,7 @@ AC_DEFUN([_XOPEN_OPTIONS], [
 # =============================================================================
 # _XOPEN_CHECK_SCTP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_CHECK_SCTP], [
+AC_DEFUN([_XOPEN_CHECK_SCTP], [dnl
     AC_ARG_WITH([sctp],
         AS_HELP_STRING([--with-sctp],
             [include xopen sctp driver in build.  @<:@default=yes@:>@]),
@@ -98,7 +99,7 @@ AC_DEFUN([_XOPEN_CHECK_SCTP], [
 # =============================================================================
 # _XOPEN_CHECK_XNS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_CHECK_XNS], [
+AC_DEFUN([_XOPEN_CHECK_XNS], [dnl
     AC_ARG_WITH([xns],
         AS_HELP_STRING([--with-xns],
             [include xopen xns headers in install.  @<:@default=yes@:>@]),
@@ -110,7 +111,7 @@ AC_DEFUN([_XOPEN_CHECK_XNS], [
 # =============================================================================
 # _XOPEN_CHECK_TLI
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_CHECK_TLI], [
+AC_DEFUN([_XOPEN_CHECK_TLI], [dnl
     AC_ARG_WITH([tli],
         AS_HELP_STRING([--with-tli],
             [include xopen tli modules in build.  @<:@default=yes@:>@]),
@@ -122,7 +123,7 @@ AC_DEFUN([_XOPEN_CHECK_TLI], [
 # =============================================================================
 # _XOPEN_CHECK_INET
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_CHECK_INET], [
+AC_DEFUN([_XOPEN_CHECK_INET], [dnl
     AC_ARG_WITH([inet],
         AS_HELP_STRING([--with-inet],
             [include xopen inet driver in build.  @<:@default=yes@:>@]),
@@ -134,7 +135,7 @@ AC_DEFUN([_XOPEN_CHECK_INET], [
 # =============================================================================
 # _XOPEN_CHECK_XNET
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_CHECK_XNET], [
+AC_DEFUN([_XOPEN_CHECK_XNET], [dnl
     AC_ARG_WITH([xnet],
         AS_HELP_STRING([--with-xnet],
             [include xopen xnet library in build.  @<:@default=yes@:>@]),
@@ -146,7 +147,7 @@ AC_DEFUN([_XOPEN_CHECK_XNET], [
 # =============================================================================
 # _XOPEN_CHECK_SOCK
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_CHECK_SOCK], [
+AC_DEFUN([_XOPEN_CHECK_SOCK], [dnl
     AC_ARG_WITH([sock],
         AS_HELP_STRING([--with-sock],
             [include xopen sock library in build.  @<:@default=yes@:>@]),
@@ -158,7 +159,7 @@ AC_DEFUN([_XOPEN_CHECK_SOCK], [
 # =============================================================================
 # _XOPEN_SETUP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP], [
+AC_DEFUN([_XOPEN_SETUP], [dnl
     if test :"$with_sctp" = :yes ; then :;
         _XOPEN_SETUP_SCTP
     fi
@@ -195,9 +196,9 @@ AC_DEFUN([_XOPEN_SETUP], [
 # =============================================================================
 # _XOPEN_OPENSS7_SCTP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_OPENSS7_SCTP], [
-    AC_CACHE_CHECK([for OpenSS7 Kernel SCTP], [xopen_cv_openss7_sctp], [
-        _LINUX_KERNEL_ENV([
+AC_DEFUN([_XOPEN_OPENSS7_SCTP], [dnl
+    AC_CACHE_CHECK([for xopen sctp openss7 kernel], [xopen_cv_openss7_sctp], [dnl
+        _LINUX_KERNEL_ENV([dnl
             AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
 #include <linux/config.h>
 #include <linux/version.h>
@@ -206,18 +207,16 @@ AC_DEFUN([_XOPEN_OPENSS7_SCTP], [
 #ifdef SCTPCB_FLAG_CONF
     yes_we_have_openss7_kernel_sctp
 #endif
-            ], [xopen_cv_openss7_sctp=yes], [xopen_cv_openss7_sctp=no])
-        ])
-    ])
-    AM_CONDITIONAL([WITH_OPENSS7_SCTP], test :"${xopen_cv_openss7_sctp:-no}" = :yes)
+            ], [xopen_cv_openss7_sctp=yes], [xopen_cv_openss7_sctp=no]) ]) ])
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], test :"${xopen_cv_openss7_sctp:-no}" = :yes)dnl
 ])# _XOPEN_OPENSS7_SCTP
 # =============================================================================
 
 # =============================================================================
 # _XOPEN_SETUP_SCTP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP_SCTP], [
-    AC_REQUIRE([_XOPEN_OPENSS7_SCTP])
+AC_DEFUN([_XOPEN_SETUP_SCTP], [dnl
+    AC_REQUIRE([_XOPEN_OPENSS7_SCTP])dnl
     if test :"${xopen_cv_openss7_sctp:-no}" = :yes ; then
         with_sctp='no'
         with_sctp2='no'
@@ -231,14 +230,14 @@ AC_DEFUN([_XOPEN_SETUP_SCTP], [
 # =============================================================================
 # _XOPEN_SETUP_XNS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP_XNS], [
+AC_DEFUN([_XOPEN_SETUP_XNS], [dnl
 ])# _XOPEN_SETUP_XNS
 # =============================================================================
 
 # =============================================================================
 # _XOPEN_SETUP_TLI
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP_TLI], [
+AC_DEFUN([_XOPEN_SETUP_TLI], [dnl
 ])# _XOPEN_SETUP_TLI
 # =============================================================================
 
@@ -257,8 +256,8 @@ AC_DEFUN([_XOPEN_SETUP_TLI], [
 # tcp_write_xmit                <-- extern, declared in <net/tcp.h>
 # tcp_cwnd_application_limited  <-- extern, declared in <net/tcp.h>
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP_INET], [
-    AC_REQUIRE([_XOPEN_OPENSS7_SCTP])
+AC_DEFUN([_XOPEN_SETUP_INET], [dnl
+    AC_REQUIRE([_XOPEN_OPENSS7_SCTP])dnl
     if test :"${xopen_cv_openss7_sctp:-no}" = :yes ; then
         AC_DEFINE([HAVE_OPENSS7_SCTP], [1],
         [Define if your kernel supports the OpenSS7 Linux Kernel Sockets SCTP
@@ -289,11 +288,10 @@ AC_DEFUN([_XOPEN_SETUP_INET], [
         _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_default])
         _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_default])
         _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_tcp_fin_timeout])
-        _LINUX_KERNEL_ENV([
+        _LINUX_KERNEL_ENV([dnl
             AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
                 [xopen_cv_af_inet_ttl_member_name='ttl'],
-                [:],
-                [
+                [:], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -306,8 +304,7 @@ AC_DEFUN([_XOPEN_SETUP_INET], [
                 ])
             AC_CHECK_MEMBER([struct sock.protinfo.af_inet.uc_ttl],
                 [xopen_cv_af_inet_ttl_member_name='uc_ttl'],
-                [:],
-                [
+                [:], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -317,8 +314,7 @@ AC_DEFUN([_XOPEN_SETUP_INET], [
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-                ])
-            ])
+                ]) ])
         if test :"${xopen_cv_af_inet_ttl_member_name:+set}" = :set ; then
             AC_DEFINE_UNQUOTED([USING_AF_INET_TTL_MEMBER_NAME], [$xopen_cv_af_inet_ttl_member_name], [Most
             kernels call the time-to-live member of the af_inet structure ttl.  For some reason
@@ -337,14 +333,14 @@ AC_DEFUN([_XOPEN_SETUP_INET], [
 # =============================================================================
 # _XOPEN_SETUP_XNET
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP_XNET], [
+AC_DEFUN([_XOPEN_SETUP_XNET], [dnl
 ])# _XOPEN_SETUP_XNET
 # =============================================================================
 
 # =============================================================================
 # _XOPEN_SETUP_SOCK
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_SETUP_SOCK], [
+AC_DEFUN([_XOPEN_SETUP_SOCK], [dnl
     with_sock='no'
 ])# _XOPEN_SETUP_SOCK
 # =============================================================================
@@ -352,21 +348,21 @@ AC_DEFUN([_XOPEN_SETUP_SOCK], [
 # =============================================================================
 # _XOPEN_OUTPUT
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_OUTPUT], [
-    AM_CONDITIONAL([WITH_SCTP], test :"$with_sctp" = :yes )
-    AM_CONDITIONAL([WITH_SCTP2], test :"$with_sctp2" = :yes )
-    AM_CONDITIONAL([WITH_XNS], test :"$with_xns" = :yes )
-    AM_CONDITIONAL([WITH_TLI], test :"$with_tli" = :yes )
-    AM_CONDITIONAL([WITH_INET], test :"$with_inet" = :yes )
-    AM_CONDITIONAL([WITH_XNET], test :"$with_xnet" = :yes )
-    AM_CONDITIONAL([WITH_SOCK], test :"$with_sock" = :yes )
+AC_DEFUN([_XOPEN_OUTPUT], [dnl
+    AM_CONDITIONAL([WITH_SCTP], test :"$with_sctp" = :yes )dnl
+    AM_CONDITIONAL([WITH_SCTP2], test :"$with_sctp2" = :yes )dnl
+    AM_CONDITIONAL([WITH_XNS], test :"$with_xns" = :yes )dnl
+    AM_CONDITIONAL([WITH_TLI], test :"$with_tli" = :yes )dnl
+    AM_CONDITIONAL([WITH_INET], test :"$with_inet" = :yes )dnl
+    AM_CONDITIONAL([WITH_XNET], test :"$with_xnet" = :yes )dnl
+    AM_CONDITIONAL([WITH_SOCK], test :"$with_sock" = :yes )dnl
 ])# _XOPEN_OUTPUT
 # =============================================================================
 
 # =============================================================================
 # _XOPEN_
 # -----------------------------------------------------------------------------
-AC_DEFUN([_XOPEN_], [
+AC_DEFUN([_XOPEN_], [dnl
 ])# _XOPEN_
 # =============================================================================
 

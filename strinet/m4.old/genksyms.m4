@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/23 07:24:25 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/27 06:35:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,19 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:25 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 06:35:29 $ by $Author: brian $
 #
 # =============================================================================
 
 # =============================================================================
 # _GENKSYMS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_GENKSYMS], [
-    AC_REQUIRE([_LINUX_KERNEL])
+AC_DEFUN([_GENKSYMS], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
     _KSYMS_OPTIONS
-    _LINUX_KERNEL_ENV([
-        _KSYMS_SETUP
-    ])
+    _LINUX_KERNEL_ENV([_KSYMS_SETUP])
     _KSYMS_OUTPUT
 ])# _GENKSYMS
 # =============================================================================
@@ -68,11 +66,11 @@ AC_DEFUN([_GENKSYMS], [
 # =============================================================================
 # _KSYMS_OPTIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_KSYMS_OPTIONS], [
+AC_DEFUN([_KSYMS_OPTIONS], [dnl
 dnl AC_ARG_ENABLE([k-versions],
 dnl     AS_HELP_STRING([--enable-k-versions],
 dnl         [version all symbols @<:@default=automatic@:>@]),
-dnl     [enable_k_versions=$enableval],
+dnl     [enable_k_versions="$enableval"],
 dnl     [enable_k_versions=''])
 ])# _KSYMS_OPTIONS
 # =============================================================================
@@ -80,20 +78,28 @@ dnl     [enable_k_versions=''])
 # =============================================================================
 # _KSYMS_SETUP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_KSYMS_SETUP], [
-    AC_CACHE_CHECK([for SMP kernel], [ksyms_cv_smp], [
+AC_DEFUN([_KSYMS_SETUP], [dnl
+    AC_CACHE_CHECK([for genksyms smp kernel], [ksyms_cv_smp], [dnl
         AC_EGREP_CPP([\<yes_we_have_an_smp_kernel\>], [
 #include <linux/version.h>
 #include <linux/config.h>
 #ifdef CONFIG_SMP
     yes_we_have_an_smp_kernel
 #endif
-        ], [ksyms_cv_smp=yes], [ksyms_cv_smp=no])
-    ])
+        ], [ksyms_cv_smp=yes], [ksyms_cv_smp=no]) ])
     if test :"${ksyms_cv_smp:-no}" = :yes ; then
         GENKSYMS_SMP_PREFIX='-p smp_'
-    else
-        GENKSYMS_SMP_PREFIX=''
+    fi
+    AC_CACHE_CHECK([for genksyms SuSE production kernel], [ksyms_cv_regparm], [dnl
+        AC_EGREP_CPP([\<yes_we_have_a_regparm_kernel\>], [
+#include <linux/version.h>
+#include <linux/config.h>
+#ifdef CONFIG_REGPARM
+    yes_we_have_a_regparm_kernel
+#endif
+        ], [ksyms_cv_regparm=yes], [ksyms_cv_regparm=no]) ])
+    if test :"${ksyms_cv_regparm:-no}" = :yes ; then
+        GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
     AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
     AC_PATH_TOOL([GENKSYMS], [genksyms], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
@@ -106,15 +112,15 @@ AC_DEFUN([_KSYMS_SETUP], [
 # =============================================================================
 # _KSYMS_OUTPUT
 # -----------------------------------------------------------------------------
-AC_DEFUN([_KSYMS_OUTPUT], [
-    AC_SUBST([GENKSYMS_SMP_PREFIX])
+AC_DEFUN([_KSYMS_OUTPUT], [dnl
+    AC_SUBST([GENKSYMS_SMP_PREFIX])dnl
 ])# _KSYMS_OUTPUT
 # =============================================================================
 
 # =============================================================================
 # _KSYMS_
 # -----------------------------------------------------------------------------
-AC_DEFUN([_KSYMS_], [
+AC_DEFUN([_KSYMS_], [dnl
 ])# _KSYMS_
 # =============================================================================
 
