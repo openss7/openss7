@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 12:48:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/25 07:52:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:49 $ by $Author: brian $
+# Last Modified $Date: 2004/05/25 07:52:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1005,8 +1005,8 @@ endif
 
 endif
 
-INET_MKDEV			= $(auxdir)/inet_mkdev
-INET_RMDEV			= $(auxdir)/inet_rmdev
+INET_MKDEV			= scripts/inet_mkdev
+INET_RMDEV			= scripts/inet_rmdev
 
 EXPORT_SRCFILES =
 

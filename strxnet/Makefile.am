@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 12:48:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/25 07:52:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 12:48:47 $ by $Author: brian $
+# Last Modified $Date: 2004/05/25 07:52:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -350,8 +350,8 @@ if RPM_BUILD_KERNEL
 
 if WITH_INET
 
-INET_MKDEV			= $(auxdir)/inet_mkdev
-INET_RMDEV			= $(auxdir)/inet_rmdev
+INET_MKDEV			= scripts/inet_mkdev
+INET_RMDEV			= scripts/inet_rmdev
 
 install-devices: $(STRMAKENODES) $(INET_MKDEV)
 	$(STRMAKENODES)
