@@ -1,27 +1,17 @@
-#ident "@(#) LiS fdetach.c 2.5 9/9/03"
+#ident "@(#) LiS fdetach.c 2.6 11/10/03"
+
+#define _REENTRANT
+#define _THREAD_SAFE
+#define _XOPEN_SOURCE 500
 
 #include <errno.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <string.h>
 #include <fcntl.h>
 #include <stropts.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 
-#if defined(__NR_fdetach) && defined(USE_SYSCALLS)
-
-#define	__NR_sys_fdetach	__NR_fdetach
-
-static inline _syscall1(int,sys_fdetach,const char *,path);
-
-int fdetach( const char *path )
-{
-    return (sys_fdetach( path ));
-}
-
-#else  /* no __NR_fdetach */
 
 #define DUMMY_STREAM "/dev/fifo.0"    /* FIXME: /dev/stream,... */
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
@@ -43,5 +33,3 @@ int fdetach( const char *path )
     }
     return 0;
 }
-
-#endif  /* __NR_fdetach */

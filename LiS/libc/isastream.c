@@ -1,6 +1,5 @@
 
-#ident "@(#) LiS isastream.c 2.4 6/27/00"
-#include <errno.h>
+#ident "@(#) LiS isastream.c 2.5 11/10/03"
 #include <stropts.h>
 #include <sys/ioctl.h>
 

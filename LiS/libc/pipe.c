@@ -1,9 +1,11 @@
-#ident "@(#) LiS pipe.c 1.4 4/12/03"
+#ident "@(#) LiS pipe.c 1.5 11/10/03"
+
+#define _REENTRANT
+#define _THREAD_SAFE
+#define _XOPEN_SOURCE 500
 
 #include <errno.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <string.h>
 #include <fcntl.h>
 #include <stropts.h>
 #include <sys/types.h>
