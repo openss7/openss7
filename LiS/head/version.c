@@ -31,11 +31,11 @@
  * 
  */
 
-#ident "@(#) LiS version.c 2.16 3/10/03 17:33:40 "
+#ident "@(#) LiS version.c 2.18 10/12/04 16:25:34 "
 
 
-char	lis_version[] = "2.16.18" ;
-char	lis_date[]    = "1/12/04" ;
+char	lis_version[] = "2.18.0" ;
+char	lis_date[]    = "10/13/04" ;
 
 #if 0
 

@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.119 01/12/04 10:50:27 "
+#ident "@(#) LiS linux-mdep.c 2.160 10/13/04 11:07:36 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -51,6 +51,7 @@
 #include <sys/LiS/linux-mdep.h>
 #include <sys/lislocks.h>
 #include <linux/module.h>
+#include <sys/LiS/modcnt.h>		/* after linux-mdep.h & module.h */
 #include <linux/version.h>
 
 #include <linux/sched.h>
@@ -74,42 +75,29 @@
 #include <linux/mm.h>
 #include <linux/file.h>
 #include <linux/fs.h>		/* linux file sys externs */
+#include <linux/vfs.h>		/* linux file sys externs */
+#if defined(KERNEL_2_5)
+#include <linux/namei.h>	/* linux file sys externs */
+#include <linux/cdev.h>		/* cdev_put */
+#endif
 #include <linux/pipe_fs_i.h>
-#ifdef KERNEL_2_3
 #include <linux/mount.h>
 #if defined(FATTACH_VIA_MOUNT)
 #include <linux/capability.h>
 #endif
-#endif
 #include <linux/time.h>
-
-#if defined(MODULE) && !defined(KERNEL_2_3)		/* pre-2.4 kernel */
-#define THIS_MODULE	(&__this_module)
-#endif
-
-/*
- *  d_count is atomic in 2.4 kernels and int in earlier ones
- */
-#if defined(KERNEL_2_3)
-#define	D_COUNT(d)	( (d) ? atomic_read(&((d)->d_count)) : -1 )
-#else
-#define	D_COUNT(d)	( (d) ? ((d)->d_count) : -1 )
-#endif
-#define FILE_D_COUNT(f) D_COUNT((f)->f_dentry)
 
 /*  -------------------------------------------------------------------  */
 /*
  * S/390 2.4 kernels export smp_num_cpus
  * other 2.4 kernels export num_online_cpus()
  */
-#if defined(__s390__) || defined(__s390x__)
+#if ( defined(__s390__) || defined(__s390x__) ) && defined(KERNEL_2_4)
 #define NUM_CPUS		smp_num_cpus
 #elif defined(KERNEL_2_5)
 #define NUM_CPUS		num_online_cpus()
-#elif defined(KERNEL_2_3)
-#define NUM_CPUS		smp_num_cpus
 #else
-#define NUM_CPUS		1
+#define NUM_CPUS		smp_num_cpus
 #endif
 
 /*  -------------------------------------------------------------------  */
@@ -149,11 +137,7 @@ char	*lis_stropts_file =
 ************************************************************************/
 
 static int	lis_errnos[LIS_NR_CPUS] ;
-#ifdef KERNEL_2_3
 #define	errno	lis_errnos[smp_processor_id()]
-#else
-#define	errno	lis_errnos[0]
-#endif
 
 #define __NR_syscall_mknod	__NR_mknod
 #define __NR_syscall_unlink	__NR_unlink
@@ -164,11 +148,24 @@ static int	lis_errnos[LIS_NR_CPUS] ;
 #define __NR_syscall_umount2	__NR_umount2
 #endif
 
-static inline _syscall3(long,syscall_mknod,const char *,file,int,mode,int,dev)
-static inline _syscall1(long,syscall_unlink,const char *,file)
-static inline _syscall5(long,syscall_mount,char *,dev,char *,dir,
+/*
+ * For gcc 3.3.3 the combination of inlining these functions and the
+ * register passing conventions causes the parameters to the system
+ * call to get messed up.  Simply defeating the inlining takes care
+ * of the problem.  You won't see the problem unless you are working
+ * with a 2.6 based distribution.  I first noticed it in SuSE 9.1.
+ */
+#if defined(noinline)		/* kernel has this defined */
+#define _NI     noinline
+#else				/* no special meaning */
+#define	_NI	__attribute__((noinline))
+#endif
+
+static _NI _syscall3(long,syscall_mknod,const char *,file,int,mode,int,dev)
+static _NI _syscall1(long,syscall_unlink,const char *,file)
+static _NI _syscall5(long,syscall_mount,char *,dev,char *,dir,
 			char *,type,unsigned long,flg,void *,data)
-static inline _syscall2(long,syscall_umount2,char *,file,int,flags)
+static _NI _syscall2(long,syscall_umount2,char *,file,int,flags)
 
 /************************************************************************
 *                            lis_assert_fail                            *
@@ -180,8 +177,8 @@ static inline _syscall2(long,syscall_umount2,char *,file,int,flags)
 * else.                                                        		*
 *									*
 ************************************************************************/
-void lis_assert_fail(const char *expr, const char *objname,
-		     const char *file, unsigned int line)
+void _RP lis_assert_fail(const char *expr, const char *objname,
+		         const char *file, unsigned int line)
 {
         printk(KERN_CRIT "%s: assert(%s) failed in file %s, line %u\n",
 	       objname, expr, file, line);
@@ -191,12 +188,26 @@ void lis_assert_fail(const char *expr, const char *objname,
 /************************************************************************
 *                            Prototypes                                 *
 ************************************************************************/
-extern void do_gettimeofday(struct timeval *tv) ;	/* kernel fcn */
-extern void lis_print_trace_func(char *msg) ;	/* forward decl */
+extern void do_gettimeofday(struct timeval *tv) _RP;	/* kernel fcn */
 extern void lis_spl_init(void);			/* lislocks.c */
 extern int  lis_new_file_name_dev(struct file *f, const char *name, dev_t dev);
 static struct inode * lis_get_inode( mode_t mode, dev_t dev );
+void lis_print_dentry(struct dentry *d, char *comment) ;
 
+#ifdef _S390X_LIS_
+extern long sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
+extern int register_ioctl32_conversion(unsigned int fd, 
+                                       int (*handler)(unsigned int fd,
+                                                      unsigned int cmd,
+                                                      unsigned long arg));
+extern int unregister_ioctl32_conversion(unsigned int cmd);
+typedef struct strioctl32 {
+    int     ic_cmd;                 /* command */
+    int     ic_timout;              /* timeout value */
+    int     ic_len;                 /* length of data */
+    unsigned int ic_dp;             /* pointer to data */
+} strioctl32_t;
+#endif
 
 
 /************************************************************************
@@ -212,6 +223,15 @@ lis_atomic_t			lis_inode_cnt ;
 lis_atomic_t                    lis_mnt_cnt;   /* for lis_mnt only, for now */
 int                             lis_mnt_init_cnt;  /* initial/final value */
 lis_spin_lock_t			lis_task_lock ; /* for creds operations */
+/*
+ * The following for counting kmem_cache allocations
+ */
+lis_atomic_t                    lis_locks_cnt;
+lis_atomic_t                    lis_head_cnt;
+lis_atomic_t                    lis_qband_cnt;
+lis_atomic_t                    lis_queue_cnt;
+lis_atomic_t                    lis_qsync_cnt;
+lis_atomic_t                    lis_msgb_cnt;
 
 typedef struct lis_free_passfp_tg
 {
@@ -222,14 +242,16 @@ typedef struct lis_free_passfp_tg
 
 static lis_free_passfp_t free_passfp;
 
-#if defined(USE_LINUX_KMEM_CACHE)
-static kmem_cache_t *lis_msgb_cachep = NULL;
-static kmem_cache_t *lis_queue_cachep = NULL;
-static kmem_cache_t *lis_qband_cachep = NULL;
+#if defined(USE_KMEM_CACHE)
+kmem_cache_t *lis_msgb_cachep = NULL;
+kmem_cache_t *lis_queue_cachep = NULL;
+kmem_cache_t *lis_qsync_cachep = NULL;
+kmem_cache_t *lis_qband_cachep = NULL;
+kmem_cache_t *lis_head_cachep = NULL;
 #endif
 
-#if defined(USE_LINUX_KMEM_TIMER) 
-static kmem_cache_t *lis_timer_cachep = NULL;
+#if defined(USE_KMEM_TIMER) 
+kmem_cache_t *lis_timer_cachep = NULL;
 struct lis_timer {
       struct timer_list    lt;
       timo_fcn_t 	  *func;
@@ -290,30 +312,37 @@ extern lis_atomic_t		lis_putnext_flag ;
 extern lis_atomic_t	 	lis_runq_req_cnt ;
 extern lis_spin_lock_t	 	lis_qhead_lock ;
 
+extern void lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label);
 
 /*  -------------------------------------------------------------------  */
 
 /* This should be entry points from the kernel into LiS
  * kernel should be fixed to call them when appropriate.
  */
+#if defined(KERNEL_2_5)
+int lis_strflush(struct file *f);
+#endif
 
 /*
  * File operations
  */
 struct file_operations
 lis_streams_fops = {
+    owner:     THIS_MODULE,
     read:      lis_strread,		/* read    		*/
     write:     lis_strwrite,		/* write                */
     poll:      lis_poll_2_1,		/* poll  		*/
     ioctl:     lis_strioctl,		/* ioctl   		*/
     open:      lis_stropen,		/* open                 */
+#if defined(KERNEL_2_5)
+    flush:     lis_strflush,		/* flush		*/
+#endif
     release:   lis_strclose,		/* release 		*/
 };
 
 /*
  * Dentry operations
  */
-#if defined(KERNEL_2_3)
 extern int lis_dentry_delete(struct dentry *dentry) ;
 extern void lis_dentry_iput(struct dentry *dentry, struct inode *inode);
 
@@ -322,14 +351,6 @@ struct dentry_operations lis_dentry_ops =
     d_delete:   lis_dentry_delete,
     d_iput:     lis_dentry_iput
 };
-#else
-extern void lis_dentry_delete(struct dentry *dentry) ;
-
-struct dentry_operations lis_dentry_ops =
-{
-    d_delete:	lis_dentry_delete
-};
-#endif
 
 /*
  *  D_IS_LIS() is a predicate macro that identifies a dentry as
@@ -340,17 +361,41 @@ struct dentry_operations lis_dentry_ops =
 /*
  * Inode operations
  */
-#if defined(KERNEL_2_3)
-struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry);
-#endif
+# if defined(KERNEL_2_5)
+  struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry,
+	  			  struct nameidata *nd);
+# else
+  struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry);
+# endif
+
 struct inode_operations
 lis_streams_iops = {
-#if !defined(KERNEL_2_3)
-    default_file_ops:   &lis_streams_fops,
-#else
     lookup:		&lis_inode_lookup,
-#endif
 };
+
+/*
+ * LiS inode structure.
+ *
+ * We use the generic_ip to point back to the stream head.  We also need
+ * a place for the LiS dev_t.  In pre-2.6 kernels the i_rdev field is a
+ * "short" (16 bits).  We need 32 bits.  So for pre-2.6 kernels we define
+ * a structure that we overlay at the "u" field in the inode structure.
+ *
+ * The 2.6 kernel got rid of the big union, leaving just the generic_ip
+ * pointer -- so there is no room for a structure overlay.  This is OK
+ * because the 2.6 i_rdev is a 32-bit word, so we can use it directly.
+ *
+ * This all leads to some messiness of if-def-ing.
+ */
+#if !defined(KERNEL_2_5)
+typedef struct
+{
+    stdata_t	*hdp ;		/* to stream head structure */
+    dev_t	 dev ;		/* LiS device */
+
+} lis_inode_info_t ;
+
+#endif
 
 /*
  * File system operations
@@ -358,7 +403,7 @@ lis_streams_iops = {
 #if defined(KERNEL_2_5)
 struct super_block *lis_fs_get_sb(struct file_system_type *fs_type,
 				  int flags,
-				  char *dev_name,
+				  const char *dev_name,
 				  void *ptr) ;
 void lis_fs_kill_sb(struct super_block *);
 #else
@@ -377,81 +422,42 @@ lis_file_system_ops =
     get_sb:	lis_fs_get_sb,
     kill_sb:	lis_fs_kill_sb,
     owner:	NULL,
-#elif defined(KERNEL_2_3)
+#else
     read_super:	lis_fs_read_super,
     owner:	NULL,
+#endif
 #if defined(FATTACH_VIA_MOUNT)
     fs_flags:   0,
 #else
     fs_flags:	(FS_NOMOUNT | FS_SINGLE),
 #endif
-#else /* KERNEL_2_2 */
-    read_super:	lis_fs_read_super,
-#endif
 } ;
 #define	LIS_SB_MAGIC	( ('L' << 16) | ('i' << 8) | 'S' )
 
-#if !defined(KERNEL_2_3)		/* 2.2 kernels */
-static struct vfsmount	 dummy_mnt ;
-struct vfsmount		*lis_mnt = &dummy_mnt;
-#define MNT_COUNT(m)    0
-#define F_VFSMNT(f)	( (f) ? &dummy_mnt : (struct vfsmount *)NULL )
-#else
 struct vfsmount		*lis_mnt ;
-#define MNT_COUNT(m)    atomic_read(&((m)->mnt_count))
-#define F_VFSMNT(f)	( (f) ? (f)->f_vfsmnt : (struct vfsmount *)NULL )
-#endif
 int			 lis_initial_use_cnt ;
-#define LIS_SB		 sb		/* macro magic for lis_get_new_inode */
 
-#if defined(KERNEL_2_3)
 
-#if defined(CONFIG_DEV)
-static
-void lis_mnt_cnt_sync(const char *file, int line, const char *fn)
-#else
-static
-void lis_mnt_cnt_sync(void)
-#endif
+void lis_mnt_cnt_sync_fcn(const char *file, int line, const char *fn)
 {
-#if !defined(CONFIG_DEV)
-    static char *file = "head/linux-mdep.c" ;
-    static int   line = 0 ;
-    static char *fn   = "lis_mnt_cnt_sync";
-#endif
-    if (lis_mnt)
-	lis_atomic_set(&lis_mnt_cnt,MNT_COUNT(lis_mnt));
-#if 1
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_VCLOSE || LIS_DEBUG_ADDRS)
+    lis_mnt_cnt_sync();
+
+    if (LIS_DEBUG_REFCNTS)
 	printk("lis_mnt_cnt_sync() >> [%d] {%s@%d,%s()}\n",
-	       lis_atomic_read(&lis_mnt_cnt), file, line, fn);
-#endif
+	       K_ATOMIC_READ(&lis_mnt_cnt), file, line, fn);
 }
 
-#if defined(CONFIG_DEV)
-struct vfsmount *lis_mntget(struct vfsmount *m, 
-			    const char *file, int line, const char *fn)
-#else
-struct vfsmount *lis_mntget(struct vfsmount *m)
-#endif
+struct vfsmount *lis_mntget_fcn(struct vfsmount *m,
+				const char *file, int line, const char *fn)
 {
-#if !defined(CONFIG_DEV)
-    static char *file = "head/linux-mdep.c" ;
-    static int   line = 0 ;
-    static char *fn   = "lis_mntget";
-#endif
     struct vfsmount *mm = (m ? mntget(m) : NULL) ;
 
-#if defined(CONFIG_DEV)
-    lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__);
-#else
     lis_mnt_cnt_sync();
-#endif
 
-    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
+    if (LIS_DEBUG_REFCNTS)
     {
 	if (mm == NULL)
-	    printk("lis_mntget(NULL) {%s@%d%s,%s()}\n", file,line,fn) ;
+	    printk("lis_mntget(NULL) {%s@%d,%s()}\n", file,line,fn) ;
 	else
 	    printk("lis_mntget(m@0x%p/++%d) \"%s\"%s {%s@%d,%s()}\n",
 		   mm, MNT_COUNT(mm), mm->mnt_devname,
@@ -462,26 +468,17 @@ struct vfsmount *lis_mntget(struct vfsmount *m)
     return(mm) ;
 }
 
-#if defined(CONFIG_DEV)
-void lis_mntput(struct vfsmount *m, 
-		const char *file, int line, const char *fn)
-#else
-void lis_mntput(struct vfsmount *m)
-#endif
+void lis_mntput_fcn(struct vfsmount *m,
+		    const char *file, int line, const char *fn)
 {
-#if !defined(CONFIG_DEV)
-    static char *file = "head/linux-mdep.c" ;
-    static int   line = 0 ;
-    static char *fn   = "lis_mntput";
-#endif
     if (m == NULL)
     {
-	if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
+	if (LIS_DEBUG_REFCNTS)
 	    printk("lis_mntput(NULL) {%s@%d,%s()}\n", file,line,fn) ;
 	return ;
     }
 
-    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
+    if (LIS_DEBUG_REFCNTS)
 	printk("lis_mntput(m@0x%p/%d%s) \"%s\"%s {%s@%d,%s()}\n",
 	       m,
 	       MNT_COUNT(m), (MNT_COUNT(m)>0?"--":""), m->mnt_devname,
@@ -491,37 +488,20 @@ void lis_mntput(struct vfsmount *m)
     if (MNT_COUNT(m) > 0)
 	mntput(m) ;
 
-#if defined(CONFIG_DEV)
-    lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__);
-#else
-    lis_mnt_cnt_sync();
-#endif
+    lis_mnt_cnt_sync_fcn(file, line, fn) ;
 }
-
-#if defined(CONFIG_DEV)
-#define MNTSYNC()       lis_mnt_cnt_sync(__LIS_FILE__,__LINE__,__FUNCTION__)
-#define	MNTGET(m)	lis_mntget((m),__LIS_FILE__,__LINE__,__FUNCTION__)
-#define	MNTPUT(m)	lis_mntput((m),__LIS_FILE__,__LINE__,__FUNCTION__)
-#else
-#define MNTSYNC()       lis_mnt_cnt_sync()
-#define MNTGET(m)       lis_mntget((m))
-#define MNTPUT(m)       lis_mntput((m))
-#endif  /* CONFIG_DEV  */
-#else
-#define MNTSYNC()       do {} while (0)
-#define	MNTGET(m)	0
-#define	MNTPUT(m)	do {} while (0)
-#endif
 
 /*
  * Super block operations
  */
-#if defined(KERNEL_2_3)
-int lis_super_statfs(struct super_block *sb, struct statfs *stat) ;
+#if defined(KERNEL_2_5)
+int lis_super_statfs(struct super_block *sb, struct kstatfs *stat) ;
 #else
-int lis_super_statfs(struct super_block *sb, struct statfs *stat, int i) ;
+int lis_super_statfs(struct super_block *sb, struct statfs *stat) ;
 #endif
+
 void lis_super_put_inode(struct inode *) ;
+
 #if defined(KERNEL_2_5)
 void lis_drop_inode(struct inode *) ;
 #endif
@@ -545,7 +525,7 @@ struct super_operations lis_super_ops =
 
 #if defined(KERNEL_2_5)
 #define S_FS_INFO(s)    ((s)->s_fs_info)
-#elif defined(KERNEL_2_3)
+#else
 #define S_FS_INFO(s)    ((s)->u.generic_sbp)
 #endif
 
@@ -554,9 +534,103 @@ struct super_operations lis_super_ops =
  *  LiS-specific, i.e., allocated by LiS for LiS use only.
  */
 #define S_IS_LIS(s)     ( (s) ? ((s)->s_op == &lis_super_ops) : 0 )
-#if 1
 #define I_IS_LIS(i)     ( (i) ? ((i)->i_sb && S_IS_LIS((i)->i_sb)) : 0 )
+
+/***********************************************************************/
+
+/*
+ * Base name of a file
+ */
+#define	BFN(fname)	lis_basename(fname)
+
+
+/* MODCNT and lis_modcnt would be in <sys/LiS/modcnt.h>, except that I
+ * consider them dangerous - JB
+ */
+#define MODCNT()	lis_modcnt(THIS_MODULE)
+
+static inline
+long lis_modcnt( struct module *mod )
+{
+#if defined(THIS_MODULE)
+# if defined(KERNEL_2_5)
+#  ifdef CONFIG_MODULE_UNLOAD
+    return(module_refcount(mod)) ;
+#  else
+    return (0);			/* refcnts are very buried */
+#  endif
+# else
+    return (mod ? (long) atomic_read(&(mod->uc.usecount)) : 0);
+# endif
+#else
+    return 0
 #endif
+}
+
+
+
+#if defined(KERNEL_2_5)
+
+#define MODSYNC()	lis_modsync_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)
+
+static
+void lis_modsync_dbg(const char *file, int line, const char *fn)
+{
+#ifdef THIS_MODULE
+    long mod_cnt = lis_modcnt(THIS_MODULE);
+
+    if (LIS_DEBUG_REFCNTS)
+	if ((THIS_MODULE)->name) {
+	    printk("lis_modcnt_sync() <\"%s\"/%ld> {%s@%d,%s()}\n",
+		   (THIS_MODULE)->name, mod_cnt, BFN(file), line, fn);
+	}
+#endif
+}
+
+#else				/* defined(KERNEL_2_5) */
+
+#define MODSYNC()	do {} while (0)
+
+#endif				/* defined(KERNEL_2_5) */
+
+void _RP lis_modget_dbg(const char *file, int line, const char *fn)
+{
+#ifdef THIS_MODULE
+    if (LIS_DEBUG_REFCNTS)
+	printk("lis_modget() <\"%s\"/%ld>++ {%s@%d,%s()}\n",
+	       (THIS_MODULE)->name,
+	       lis_modcnt(THIS_MODULE),
+	       BFN(file), line, fn) ;
+
+    lis_modget_local(file, line, fn);
+#endif
+}
+
+void _RP lis_modput_dbg(const char *file, int line, const char *fn)
+{
+#ifdef THIS_MODULE
+    long cnt ;
+
+    if (LIS_DEBUG_REFCNTS)
+	printk("lis_modput() <\"%s\"/%ld>-- {%s@%d,%s()}\n",
+	       THIS_MODULE->name,
+	       lis_modcnt(THIS_MODULE),
+	       BFN(file), line, fn) ;
+
+#if !defined(KERNEL_2_5) || defined(CONFIG_MODULE_UNLOAD)
+    if ((cnt = lis_modcnt(THIS_MODULE)) <= 0)
+    {
+	printk("lis_modput() >> error -- count=%ld {%s@%d,%s()}\n",
+	       cnt, BFN(file), line, fn) ;
+	return ;
+    }
+#endif
+
+    lis_modput_local(file, line, fn);
+#endif
+}
+
+
 
 /* some kernel memory has been free'd 
  * tell STREAMS
@@ -602,44 +676,100 @@ lis_copyin_str(struct file *f, const char *ustr, char **kstr, int maxb)
 	return(0) ;
 }/*lis_copyin_str*/
 
+/************************************************************************
+*                    Major/Minor Device Number Handling                 *
+*************************************************************************
+*									*
+* These routines handle major/minor device numbers in LiS internal	*
+* format.								*
+*									*
+************************************************************************/
+
+#define LIS_MINOR_BITS          20
+#define LIS_MINOR_MASK          ( (1 << LIS_MINOR_BITS) - 1 )
+
+major_t _RP lis_getmajor(dev_t dev)
+{
+    return( dev >> LIS_MINOR_BITS ) ;
+}
+
+minor_t _RP lis_getminor(dev_t dev)
+{
+    return( dev & LIS_MINOR_MASK ) ;
+}
+
+dev_t _RP lis_makedevice(major_t majr, minor_t minr)
+{
+    return( (majr << LIS_MINOR_BITS) | (minr & LIS_MINOR_MASK) ) ;
+}
+
+/*
+ * dev is really a kernel dev_t structure
+ */
+dev_t lis_kern_to_lis_dev(dev_t dev)
+{
+    return( lis_makedevice(STR_KMAJOR(dev), STR_KMINOR(dev)) ) ;
+}
+
+
+/*
+ * Extract i_rdev from an inode.  If it's an LiS inode then not much
+ * needs to be done.  If it is still a kernel inode then we need to
+ * apply our translation routine to reconstruct the device id as an
+ * LiS style dev_t.
+ */
+dev_t lis_i_rdev(struct inode *i)
+{
+#if defined(KERNEL_2_5)
+    if (I_IS_LIS(i))
+	return(RDEV_TO_DEV(i->i_rdev)) ;
+
+    return(lis_kern_to_lis_dev(i->i_rdev)) ;
+#else
+    if (I_IS_LIS(i))
+    {
+	lis_inode_info_t *p = (lis_inode_info_t *) &i->u ;
+	return( p->dev ) ;
+    }
+
+    return(lis_kern_to_lis_dev(i->i_rdev)) ;
+#endif
+}
+
+
 /*  -------------------------------------------------------------------  */
 /*
  * lis_get_new_inode
  *
  * Depending upon kernel version and distribution this is either
- * get_empty_inode or new_inode.  The installation script has figured
- * out which it is and set a command line macro for it.
+ * get_empty_inode or new_inode.  The configuration script has figured
+ * out which it is and set the GET_EMPTY_INODE macro accordingly
  */
 static struct inode *lis_get_new_inode(struct super_block *sb)
 {
     struct inode *i = NULL;;
 
-#if defined(KERNEL_2_3)
     if (!sb)
     {
 	printk("lis_get_new_inode() - NULL super block pointer\n") ;
 	return(NULL) ;
     }
-#endif
 
-    i = GET_EMPTY_INODE;
+    i = GET_EMPTY_INODE(sb);
 
-#if defined(KERNEL_2_3)    
     /*
      *  mark this inode as a LiS inode, and count it
      */
     i->i_sb = sb;          /* ASSERT: sb is or will be lis_mnt->mnt_sb */
-    lis_atomic_inc(&lis_inode_cnt);
+    K_ATOMIC_INC(&lis_inode_cnt);
 
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	printk("lis_get_new_inode(s@0x%p)%s%s >> i@0x%p/%d%s\n",
 	       sb,
 	       (S_IS_LIS(sb)?" <LiS>":""),
 	       (lis_mnt && sb == lis_mnt->mnt_sb?" <lis_mnt>":""),
 	       i, (i?I_COUNT(i):0),
 	       (i&&I_IS_LIS(i)?" <LiS>":""));
-#endif
-
     return(i);
 }
 
@@ -676,7 +806,7 @@ lis_untmout( struct timer_list *tl)
 * target time is in the future.						*
 *									*
 ************************************************************************/
-long	lis_time_till(long target_time)
+long	_RP lis_time_till(long target_time)
 {
     return( target_time - jiffies*(1000/HZ) ) ;
 
@@ -691,7 +821,7 @@ long	lis_time_till(long target_time)
 * clock, jiffies, converted to milliseconds.				*
 *									*
 ************************************************************************/
-long	lis_target_time(long milli_sec)
+long	_RP lis_target_time(long milli_sec)
 {
     return( jiffies*(1000/HZ) + milli_sec ) ;
 
@@ -705,7 +835,7 @@ long	lis_target_time(long milli_sec)
 * timeout routines.							*
 *									*
 ************************************************************************/
-long	lis_milli_to_ticks(long milli_sec)
+long	_RP lis_milli_to_ticks(long milli_sec)
 {
     return(milli_sec/(1000/HZ)) ;
 }
@@ -754,24 +884,23 @@ void lis_set_file_str(struct file *f, struct stdata *s)
 
 struct stdata *lis_inode_str(struct inode *i)
 {
-#if defined(KERNEL_2_3)
+#if defined(KERNEL_2_5)
     return((struct stdata *)(i)->u.generic_ip) ;
 #else
-    /*
-     * for 2.1.x, we need to use inode.u as pipe_i for FIFOs and pipes, but
-     * we don't need base, since we don't use it for message buffers.  So,
-     * we have pipe_i.base available.  (I hate doing this...)
-     */
-    return((struct stdata *)(i)->u.pipe_i.base) ;
+    {
+	lis_inode_info_t *p = (lis_inode_info_t *) &i->u ;
+	return(p->hdp) ;
+    }
 #endif
 }
 
 void lis_set_inode_str(struct inode *i, struct stdata *s)
 {
-#if defined(KERNEL_2_3)
+#if defined(KERNEL_2_5)
     i->u.generic_ip = (void *) s ;
 #else
-    i->u.pipe_i.base = (void *) s ;
+    lis_inode_info_t *p = (lis_inode_info_t *) &i->u ;
+    p->hdp = s ;
 #endif
 }
 
@@ -781,9 +910,6 @@ struct dentry *lis_d_alloc_root(struct inode *i, int mode)
     struct dentry *d = NULL;
     struct qstr dname;
     int for_mount = (mode == LIS_D_ALLOC_ROOT_MOUNT);
-#if 0
-    int normal    = (mode == LIS_D_ALLOC_ROOT_NORMAL);
-#endif
 
     if (i) {
 	stdata_t *head = INODE_STR(i);
@@ -806,8 +932,14 @@ struct dentry *lis_d_alloc_root(struct inode *i, int mode)
 	    d->d_parent = d;
 	    d_instantiate(d, i);
 	}
-    } else
-      d = d_alloc(NULL, &(const struct qstr) {LIS_FS_NAME"/", 4, 0});
+    }
+    else
+    {
+	dname.name = LIS_FS_NAME"/";
+	dname.len  = strlen(dname.name);
+	dname.hash = full_name_hash(dname.name, dname.len);
+	d = d_alloc(NULL, &dname);
+    }
 
     /*
      *  The following also identifies the dentry as a LiS-allocated dentry.
@@ -817,11 +949,74 @@ struct dentry *lis_d_alloc_root(struct inode *i, int mode)
 
     return d;
 #else
-#if defined(KERNEL_2_3)
     return(d_alloc_root(i)) ;
-#else  /* KERNEL_2_1 */
-    return(d_alloc_root((i),NULL)) ;
 #endif
+}
+
+
+/*
+ * A 2.6 kernel-ism.
+ *
+ * This is called when a file open is about to succeed.  The premise is
+ * that we have replaced the dentry/inode that was originally passed to
+ * lis_stropen so we need to "put" the corresponding cdev entry, if it
+ * exists.
+ *
+ * The only way we have to get to the cdev entry is via the i_cdev field in
+ * the inode.  The cdev structure has a list of inodes using it threaded 
+ * through i_devices in the inode.
+ *
+ * It is extremely bad practice to dput the dentry/inode and have the inode
+ * deallocated while it is still in the cdev list.  So if we are about to do 
+ * that (d_count==1 and i_count==1) then we need to remove the inode from
+ * the cdev's list.  We can't do this any earlier since by doing so we would
+ * then lose our pointer back to the cdev structures, which would have
+ * ref-counts too high.
+ *
+ * Note that file close does this via __fput().  So if the open fails
+ * we don't call lis_cdev_put since there will be an __fput() done soon.
+ * Also, if we did not replace the inode we also don't do this because
+ * it will be done later at file close time.
+ *
+ * The spin lock that we use to protect this code takes care of the
+ * case of simultaneous opens to LiS.  We really should use the kernel's
+ * cdev_lock, but they did not export the symbol, so we can't.
+ */
+static void lis_cdev_put(struct dentry *d)
+{
+#if defined(KERNEL_2_5)
+    struct inode	*inode = d->d_inode ;
+    struct cdev		*cp ;
+    static spinlock_t	 lock = SPIN_LOCK_UNLOCKED ;
+
+
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+    {
+	printk("lis_cdev_put: d@0x%p/%d/\"%s\" i@0x%p/%d\n",
+		d, D_COUNT(d), d->d_name.name,
+		inode, inode ? I_COUNT(inode) : 0) ;
+	if (inode && inode->i_cdev)
+	    printk(">> i->i_cdev: c@0x%p/%d/%x \"%s\"\n",
+		inode->i_cdev,
+		K_ATOMIC_READ(&inode->i_cdev->kobj.refcount),
+		DEV_TO_INT(inode->i_cdev->dev),
+		(inode->i_cdev->owner ?
+		 inode->i_cdev->owner->name : "No-Owner")) ;
+    }
+
+    if (!inode || !(cp = inode->i_cdev))
+	return ;
+
+    spin_lock(&lock) ;
+    if (   D_COUNT(d) == 1 && I_COUNT(inode) == 1
+	&& !list_empty(&inode->i_devices))
+    {
+        inode->i_cdev = NULL ;
+	list_del_init(&inode->i_devices);
+    }
+
+    cdev_put(cp) ;
+    spin_unlock(&lock) ;
 #endif
 }
 
@@ -829,16 +1024,13 @@ void lis_dput(struct dentry *d)
 {
     struct super_block	*sb = NULL ;
 
-    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
-	printk("lis_dput(d@0x%p/%d%s)%s i@0x%p/%d \"%s\"\n", 
-	       d,
-	       D_COUNT(d), (D_COUNT(d)>0?"--":""),
-	       (D_IS_LIS(d)?" <LiS>":""),
-	       d->d_inode, (d->d_inode?I_COUNT(d->d_inode):0),
-	       d->d_name) ;
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+	lis_print_dentry(d, "lis_dput") ;
 
     if (d->d_inode)
+    {
 	sb = d->d_inode->i_sb ;		/* save before dput */
+    }
 
     /*
      *  don't dput() a dentry to a - ref cnt; if that is needed,
@@ -859,13 +1051,8 @@ struct dentry *lis_dget(struct dentry *d)
     
     d = dget(d);
 
-    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
-	printk("lis_dget(d@0x%p/%s%d)%s i@0x%p/%d%s \"%s\"\n", 
-	       d, (D_IS_LIS(d)?"++":""), D_COUNT(d),
-	       (D_IS_LIS(d)?" <LiS>":""),
-	       d->d_inode, (d->d_inode?I_COUNT(d->d_inode):0),
-	       (d->d_inode&&I_IS_LIS(d->d_inode)?" <LIS>":""),
-	       d->d_name);
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+	lis_print_dentry(d, "lis_dget") ;
 
     return(d) ;
 }
@@ -967,9 +1154,11 @@ void lis_show_inode_aliases( struct inode *i )
 #if defined(KERNEL_2_1)
     struct list_head *ent;
 
-    if (!LIS_DEBUG_ADDRS || list_empty(&(i->i_dentry)))  return;
+    if (!(LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) ||
+	list_empty(&(i->i_dentry)))
+	return;
 
-    printk("lis_show_inode_aliases(i@0x%p/%d.%d#%d)%s:\n",
+    printk("lis_show_inode_aliases(i@0x%p/%d.%d#%lu)%s:\n",
 	   i, I_COUNT(i), i->i_nlink, i->i_ino, (I_IS_LIS(i)?" <LiS>":""));
 
     /*
@@ -978,15 +1167,11 @@ void lis_show_inode_aliases( struct inode *i )
     for (ent = i->i_dentry.prev;  ent != &(i->i_dentry);  ent = ent->prev) {
 	struct dentry *d = list_entry( ent, struct dentry, d_alias );
 
-	printk("    <= d@%p/%d%s \"%s\"\n",
-	       d, D_COUNT(d),
-	       (D_IS_LIS(d)?" <LiS>":""),
-	       d->d_name.name );
+	lis_print_dentry(d, ">> dentry") ;
     }
 #endif
 }
 
-#if defined(KERNEL_2_3)
 /*
  *  kernel assistance to show a file's full path (using kernel's
  *  __d_path() routine)
@@ -999,11 +1184,17 @@ char *lis_alloc_file_path(void)
 char *lis_format_file_path(struct file *f, char *page)
 {
     if (page) {
+#if defined(KERNEL_2_5)
+	char *path =   d_path( f->f_dentry,
+			       FILE_MNT(f),
+			       page, PAGE_SIZE);
+#else
 	char *path = __d_path( f->f_dentry,
-			       F_VFSMNT(f),
-			       F_VFSMNT(f)->mnt_root,
+			       FILE_MNT(f),
+			       FILE_MNT(f)->mnt_root,
 			       NULL,
 			       page, PAGE_SIZE);
+#endif
 	return path;
     } else
 	return page;  /* which is NULL... */
@@ -1029,12 +1220,6 @@ void lis_print_file_path(struct file *f)
     }
 }
 
-#else
-void lis_print_file_path(struct file *f)
-{
-}
-
-#endif
 
 /*
  * lis_print_dentry
@@ -1047,7 +1232,7 @@ void lis_print_dentry(struct dentry *d, char *comment)
 
     if (d == NULL)
     {
-	printk("lis_print_dentry: %s NULL dentry pointer\n") ;
+	printk("%s  NULL dentry pointer\n", comment) ;
 	return ;
     }
 
@@ -1058,25 +1243,25 @@ void lis_print_dentry(struct dentry *d, char *comment)
     strncpy(dname, d->d_name.name, len) ;
     dname[len] = 0 ;
 
-#if 0
-    printk("%s: d_name=\"%s\" d_count=%d", comment, dname, D_COUNT(d)) ;
-    i = d->d_inode ;
-    if (inode != NULL)
-	printk(" i_ino=%d i_count=%d", inode->i_ino, I_COUNT(inode)) ;
-    printk("\n") ;
-#else
-    printk("%s d@0x%p/%d%s", comment,
-	   d, D_COUNT(d), (D_IS_LIS(d)?" <LiS>":""));
+    printk("%s: d@0x%p/%d%s m:%d", comment,
+	   d, D_COUNT(d), (D_IS_LIS(d)?" <LiS>":""),
+	       K_ATOMIC_READ(&lis_mnt_cnt));
     if (i)
+    {
 	printk(" i@0x%p/%d%s",
 	       i, I_COUNT(i), (I_IS_LIS(i)?" <LiS>":""));
+#if defined(KERNEL_2_5)
+	if (i->i_cdev)
+	    printk(" c@0x%p/%x\"%s\"", i->i_cdev, DEV_TO_INT(i->i_cdev->dev),
+		(i->i_cdev->owner ? i->i_cdev->owner->name : "No-Owner")) ;
+#endif
+    }
     if (*dname)
 	printk(" \"%s\"", dname );
     printk("\n");
-#endif
 
     if (d && d->d_parent != NULL && d->d_parent != d)
-	lis_print_dentry(d->d_parent, "   parent") ;
+	lis_print_dentry(d->d_parent, ">> parent") ;
 }
 
 /************************************************************************
@@ -1086,10 +1271,10 @@ void lis_print_dentry(struct dentry *d, char *comment)
 * Return file system stats.						*
 *									*
 ************************************************************************/
-#if defined(KERNEL_2_3)
-int lis_super_statfs(struct super_block *sb, struct statfs *stat)
+#if defined(KERNEL_2_5)
+int lis_super_statfs(struct super_block *sb, struct kstatfs *stat)
 #else
-int lis_super_statfs(struct super_block *sb, struct statfs *stat, int i)
+int lis_super_statfs(struct super_block *sb, struct statfs *stat)
 #endif
 {
     stat->f_type = LIS_SB_MAGIC ;
@@ -1121,16 +1306,16 @@ int lis_fs_fattach_sb( struct super_block *sb, void *ptr, int silent )
       lis_head_get(head);                  /* bumps refcnt */
       MNTSYNC();
 
-      if (LIS_DEBUG_FATTACH) {
+      if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) {
 	  printk("lis_fs_fattach_sb(s@0x%p,@0x%p,...) << [%d]"
 		 " f@0x%p/%d f_vfsmnt 0x%p/%d%s%s\n",
 		 sb, data,
-		 lis_atomic_read(&lis_mnt_cnt),
+		 K_ATOMIC_READ(&lis_mnt_cnt),
 		 file, (file?F_COUNT(file):0),
-		 F_VFSMNT(file),
-		 (F_VFSMNT(file)?MNT_COUNT(F_VFSMNT(file)):0),
+		 FILE_MNT(file),
+		 (FILE_MNT(file)?MNT_COUNT(FILE_MNT(file)):0),
 		 (S_IS_LIS(sb)?" <LiS>":""),
-		 (file&&F_VFSMNT(file)==lis_mnt?" <lis_mnt>":""));
+		 (file&&FILE_MNT(file)==lis_mnt?" <lis_mnt>":""));
       }
 
       LOCK_INO(i_mount);
@@ -1143,8 +1328,8 @@ int lis_fs_fattach_sb( struct super_block *sb, void *ptr, int silent )
 	  return(-ENOMEM) ;
       }
       S_FS_INFO(sb) = data;
-      if (F_VFSMNT(file))
-	  data->mount = MNTGET(F_VFSMNT(file));
+      if (FILE_MNT(file))
+	  data->mount = MNTGET(FILE_MNT(file));
       else 
 	  data->mount = file->f_vfsmnt = MNTGET(lis_mnt);
       data->sb      = sb;
@@ -1158,10 +1343,10 @@ int lis_fs_fattach_sb( struct super_block *sb, void *ptr, int silent )
        *  when the attaching file is closed - the file has to disappear, but
        *  the stream has to stay "open".
        */
-      lis_atomic_inc(&head->sd_opencnt);
+      K_ATOMIC_INC(&head->sd_opencnt);
 
       lis_spin_lock(&lis_fattaches_lock);
-      lis_atomic_inc(&head->sd_fattachcnt);
+      K_ATOMIC_INC(&head->sd_fattachcnt);
       SET_SD_FLAG(head,STRATTACH);
       lis_spin_unlock(&lis_fattaches_lock);
       
@@ -1174,14 +1359,15 @@ int lis_fs_fattach_sb( struct super_block *sb, void *ptr, int silent )
 
       ULOCK_INO(i_mount);
       
-      if (LIS_DEBUG_FATTACH && path) {
-	  kdev_t dev = i_mount->i_rdev;
+      if ((LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) &&
+	  path) {
+	  dev_t dev = GET_I_RDEV(i_mount);
           printk("lis_fs_fattach_sb(s@0x%p,@0x%p,%d) "
 		 ">> d@0x%p/%d i@0x%p/%d rdev (%d,%d)\n",
 		 sb, data, silent,
 		 d_mount, D_COUNT(d_mount),
 		 i_mount, I_COUNT(i_mount),
-		 STR_KMAJOR(dev), STR_KMINOR(dev) );
+		 getmajor(dev), getminor(dev) );
 	  printk("lis_fs_fattach_sb(s@0x%p,@0x%p,...)\n"
 		 "    >> f@0x%p/%d h@0x%p/%d/%d \"%s\""
 		 " sb@0x%p d@0x%p/%d (i@0x%p/%d)\n",
@@ -1195,16 +1381,17 @@ int lis_fs_fattach_sb( struct super_block *sb, void *ptr, int silent )
 	  lis_show_inode_aliases(i_mount);
       }
 
-      if (LIS_DEBUG_FATTACH && file) {
+      if ((LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) &&
+	  file) {
 	  printk("lis_fs_fattach_sb(s@0x%p,@0x%p,...) >> [%d]"
 		 " f@0x%p/%d f_vfsmnt 0x%p/%d%s%s\n",
 		 sb, data,
-		 lis_atomic_read(&lis_mnt_cnt),
+		 K_ATOMIC_READ(&lis_mnt_cnt),
 		 file, F_COUNT(file),
-		 F_VFSMNT(file),
-		 (F_VFSMNT(file)?MNT_COUNT(F_VFSMNT(file)):0),
+		 FILE_MNT(file),
+		 (FILE_MNT(file)?MNT_COUNT(FILE_MNT(file)):0),
 		 (S_IS_LIS(sb)?" <LiS>":""),
-		 (F_VFSMNT(file)==lis_mnt?" <lis_mnt>":""));
+		 (FILE_MNT(file)==lis_mnt?" <lis_mnt>":""));
       }
 
       MNTSYNC();
@@ -1232,20 +1419,28 @@ int lis_fs_kern_mount_sb( struct super_block *sb, void *ptr, int silent )
     isb->i_mtime = CURRENT_TIME ;
     isb->i_ctime = CURRENT_TIME ;
     isb->i_op    = &lis_streams_iops;
-    isb->i_dev   = MKDEV(lis_major, lis_major);
-    isb->i_rdev  = INT_TO_KDEV(MKDEV(lis_major, 0));
+#if defined(KERNEL_2_5)
+    isb->i_rdev  = makedevice(lis_major, 0);	/* LiS dev_t */
+#else
+    isb->i_rdev  = MKDEV(lis_major, 0);	/* kernel dev_t */
+    {
+	lis_inode_info_t *p = (lis_inode_info_t *) &isb->u ;
+	p->dev = makedevice(lis_major, 0) ;
+    }
+#endif
     
     sb->s_root = lis_d_alloc_root(isb,LIS_D_ALLOC_ROOT_MOUNT);
     if (sb->s_root == NULL)
         return(-ENOMEM) ;
 
-    if (LIS_DEBUG_VOPEN)
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	printk("lis_fs_kern_mount_sb(s@x%p,...)"
 	       " >> root d@0x%p/%d i@0x%p/%d rdev (%d,%d)\n",
 	       sb,
 	       sb->s_root, D_COUNT(sb->s_root),
 	       isb, I_COUNT(isb),
-	       major(isb->i_rdev), minor(isb->i_rdev) );
+	       getmajor(GET_I_RDEV(isb)),
+	       getminor(GET_I_RDEV(isb)) );
     
     return(0);
 }
@@ -1266,9 +1461,10 @@ int lis_fs_setup_sb(struct super_block *sb, void *ptr, int silent)
 #if defined(KERNEL_2_5)
 struct super_block *lis_fs_get_sb(struct file_system_type *fs_type,
 				  int flags,
-				  char *dev_name,
+				  const char *dev_name,
 				  void *ptr)
 {
+    struct super_block *sb;
   /*
    * Not sure which technique to use.  May need to use get_sb_single
    * in order to utilize sys_mount to implement fattach.  We'll see.
@@ -1276,17 +1472,18 @@ struct super_block *lis_fs_get_sb(struct file_system_type *fs_type,
    * 2002/11/18 - nodev is the right one for fattach... - JB
    */
 #if defined(FATTACH_VIA_MOUNT) && 1
-    return(get_sb_nodev(fs_type, flags, ptr, lis_fs_setup_sb)) ;
+    sb = get_sb_nodev(fs_type, flags, ptr, lis_fs_setup_sb);
 #else
-    return(get_sb_single(fs_type, flags, ptr, lis_fs_setup_sb)) ;
+    sb = get_sb_single(fs_type, flags, ptr, lis_fs_setup_sb);
 #endif
+    return sb;
 }
 
 void lis_fs_kill_sb(struct super_block *sb)
 {
     kill_anon_super(sb);
 }
-#else
+#else		/* 2.4 kernel */
 struct super_block *lis_fs_read_super(struct super_block *sb,
 				      void *ptr,
 				      int   silent)
@@ -1310,36 +1507,25 @@ struct super_block *lis_fs_read_super(struct super_block *sb,
 * message about dangling inodes.					*
 *									*
 ************************************************************************/
-#if defined(KERNEL_2_3)
 int lis_dentry_delete(struct dentry *d)
 {
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_VCLOSE)
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	printk("lis_dentry_delete(d@0x%p/%d) [%d]%s\n",
 	       d, D_COUNT(d),
-	       lis_atomic_read(&lis_mnt_cnt),
+	       K_ATOMIC_READ(&lis_mnt_cnt),
 	       (D_IS_LIS(d)?" d<LiS>":""));
 
-    return(1) ;
+    return(1);
 }
 
 void lis_dentry_iput( struct dentry *d, struct inode *i )
 {
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_VCLOSE)
-	printk("lis_dentry_iput(d@0x%p/%d,i@0x%p/%d%s) [%d]%s%s\n",
-	       d, D_COUNT(d),
-	       i, (i?I_COUNT(i):0),(i&&I_COUNT(i)>0?"--":""),
-	       lis_atomic_read(&lis_mnt_cnt),
-	       (D_IS_LIS(d)?" d<LiS>":""),
-	       (i&&I_IS_LIS(i)?" i<LiS>":""));
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+	lis_print_dentry(d, "lis_dentry_iput") ;
     
     if (i && I_COUNT(i) > 0)
-	iput(i);
+	lis_put_inode(i);
 }
-#else
-void lis_dentry_delete(struct dentry *dentry)
-{
-}
-#endif
 
 /************************************************************************
 *                        lis_super_put_inode                            *
@@ -1350,17 +1536,16 @@ void lis_dentry_delete(struct dentry *dentry)
 ************************************************************************/
 void lis_super_put_inode(struct inode *i)
 {
-#if defined(KERNEL_2_3)			/* linux >= 2.3.0 */
     MNTSYNC();
 
-    if (LIS_DEBUG_VOPEN)
+    if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
     {
 	printk("lis_super_put_inode(i@0x%p/%d)%s "
 	       "i_rdev=0x%x <[%d] %d LiS inode(s)>%s\n",
 	       i, I_COUNT(i), (I_IS_LIS(i)?" <LiS>":""),
-	       KDEV_TO_INT(i->i_rdev),
-	       lis_atomic_read(&lis_mnt_cnt),
-	       lis_atomic_read(&lis_inode_cnt),
+	       GET_I_RDEV(i),
+	       K_ATOMIC_READ(&lis_mnt_cnt),
+	       K_ATOMIC_READ(&lis_inode_cnt),
 	       (I_COUNT(i) == 1 ? "--" : ""));
     }
 
@@ -1370,20 +1555,16 @@ void lis_super_put_inode(struct inode *i)
 	    printk("lis_super_put_inode(i@0x%p/%d)%s i_rdev=0x%x UNUSED"
 		   " <[%d] %d LiS inode(s)>\n",
 		   i, I_COUNT(i), (I_IS_LIS(i)?" <LiS>":""),
-		   KDEV_TO_INT(i->i_rdev),
-		   lis_atomic_read(&lis_mnt_cnt),
-		   lis_atomic_read(&lis_inode_cnt));
+		   GET_I_RDEV(i),
+		   K_ATOMIC_READ(&lis_mnt_cnt),
+		   K_ATOMIC_READ(&lis_inode_cnt));
 	else
-	    lis_atomic_dec(&lis_inode_cnt) ;
+	    K_ATOMIC_DEC(&lis_inode_cnt) ;
 
 #if !defined(KERNEL_2_5)
 	force_delete(i) ;
 #endif
     }
-#endif
-#if 0
-    (void) i ;    /* Dave - why is this here? -JB */
-#endif
 }
 
 #if defined(FATTACH_VIA_MOUNT)
@@ -1425,7 +1606,7 @@ void lis_super_umount_begin( struct super_block *sb )
     if (data && head && d_umount && !i_umount && head->sd_inode)
 	i_umount = head->sd_inode;
 
-    if (LIS_DEBUG_FATTACH)
+    if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	printk("lis_super_umount_begin(s@0x%p) << data@0x%p:\n"
 	       "    f@0x%p m@0x%p/%d h@0x%p/%d/%d"
 	       " d@0x%p/%d (i@0x%p/%d)\n",
@@ -1456,8 +1637,8 @@ void lis_super_umount_begin( struct super_block *sb )
 	if (mount)
 	    MNTPUT(mount);
 
-	if (LIS_DEBUG_FATTACH) {
-	    printk("lis_super_umount_begin(x%x) [fdetach] "
+	if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) {
+	    printk("lis_super_umount_begin(%p) [fdetach] "
 		   "i@0x%p/%d d@0x%p/%d \"%s\"\n",
 		   sb,
 		   i_umount, I_COUNT(i_umount),
@@ -1476,8 +1657,8 @@ void lis_super_umount_begin( struct super_block *sb )
 	 *  clear the STRATTACH flag if no other fattaches for this stream
 	 */
 	lis_spin_lock(&lis_fattaches_lock);
-	lis_atomic_dec(&head->sd_fattachcnt);
-	if (lis_atomic_read(&head->sd_fattachcnt) <= 0)
+	K_ATOMIC_DEC(&head->sd_fattachcnt);
+	if (K_ATOMIC_READ(&head->sd_fattachcnt) <= 0)
 	    CLR_SD_FLAG(head,STRATTACH);
 	lis_spin_unlock(&lis_fattaches_lock);
 
@@ -1500,7 +1681,7 @@ void lis_super_umount_begin( struct super_block *sb )
 	data->file  = NULL;
 	data->head  = NULL;
 
-	if (LIS_DEBUG_FATTACH)
+	if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	    printk("lis_super_umount_begin(s@0x%p) [fdetach] "
 		   "d@0x%p/%d (i@0x%p/%d) after doclose\n",
 		   sb,
@@ -1537,7 +1718,7 @@ void lis_super_put_super( struct super_block *sb )
 	i_umount = (data && data->head ? data->head->sd_inode : NULL);
     }
     if (d_umount && i_umount) {
-	if (LIS_DEBUG_FATTACH)
+	if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	    printk("lis_super_put_super(s@0x%p) [fdetach] "
 		   "d@0x%p/%d (i@0x%p/%d)\n",
 		   sb,
@@ -1588,7 +1769,7 @@ int	lis_new_file_name(struct file *f, const char *name)
      */
     if (D_IS_LIS(f->f_dentry) &&
 	strcmp(name, f->f_dentry->d_name.name) == 0) {
-	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
+	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	    printk("lis_new_file_name(f@0x%p/%d,\"%s\")"
 		   " - same name, already <LiS> - ignoring call\n",
 		   f, F_COUNT(f), name);
@@ -1599,35 +1780,28 @@ int	lis_new_file_name(struct file *f, const char *name)
 
 int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
 {
-#ifdef KERNEL_2_3
     struct qstr     dname ;
     struct dentry  *new ;
-    struct dentry  *old = NULL;
+    struct dentry  *old = f->f_dentry;
     struct dentry  *lis_parent ;
     struct inode   *oldi = NULL;
-    struct vfsmount *oldmnt = F_VFSMNT(f);
+    struct vfsmount *oldmnt = FILE_MNT(f);
 
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) {
 	struct dentry *d = (f ? f->f_dentry : NULL);
-	struct inode *i  = (d ? d->d_inode : NULL);
 
 	printk("lis_new_file_name_dev(f@0x%p/%d,\"%s\",0x%x)%s",
 	       f, (f?F_COUNT(f):0), (name?name:""), dev,
-	       (F_VFSMNT(f)==lis_mnt?" <lis_mnt>":""));
-#if defined(KERNEL_2_3)
+	       (FILE_MNT(f)==lis_mnt?" <lis_mnt>":""));
 	printk(" \"");
-	if (F_VFSMNT(f))  lis_print_file_path(f);
-	printk("\"");
-#endif
-	printk("\n    << [%d] d@0x%p/%d%s i@0x%p/%d%s\n",
-	       lis_atomic_read(&lis_mnt_cnt),
-	       d, (d?D_COUNT(d):0), (d&&D_IS_LIS(d)?" <LiS>":""),
-	       i, (i?I_COUNT(i):0), (i&&I_IS_LIS(i)?" <LiS>":""));
+	if (FILE_MNT(f))  lis_print_file_path(f);
+	printk("\"\n");
+	lis_print_dentry(d, ">> dentry") ;
     }
     
     if (dev == 0)			/* must use old inode */
     {
-	if ((old = f->f_dentry) != NULL)
+	if (old != NULL)
 	    oldi = old->d_inode ;
 	else
 	    return(-EINVAL) ;
@@ -1647,22 +1821,8 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
     if (IS_ERR(new))			/* couldn't */
     {
 	if (dev != 0)
-	    iput(oldi) ;
+	    lis_put_inode(oldi) ;
 	return(PTR_ERR(new)) ;
-    }
-
-    if (LIS_DEBUG_VOPEN && 0)
-    {
-	if (old != NULL)
-	    lis_print_dentry(old, "lis_new_file_name(b4)") ;
-	if (F_VFSMNT(f) != NULL)
-	{
-	    lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint, "---mount point(b4)");
-	    lis_print_dentry(F_VFSMNT(f)->mnt_root, "---mount root(b4)") ;
-	    printk("---mnt_count=%d\n", F_VFSMNT(f)->mnt_count) ;
-	}
-	else
-	    printk("---mount point NULL\n") ;
     }
 
     /*
@@ -1670,11 +1830,10 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
      *  and no f_vfsmnt set.  In that case, there's nothing to put, and
      *  we will do the initial setting of f_vfsmnt here.
      */
-#if defined(KERNEL_2_3)
     f->f_vfsmnt = MNTGET(lis_mnt);	/* (re)mount on LiS */
-#endif
 
     new->d_op   = &lis_dentry_ops;
+
     if (dev == 0)
     {					/* using old inode */
 	d_add(new, igrab(oldi)) ;	/* old inode into new dentry */
@@ -1687,35 +1846,19 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
 
     f->f_dentry = new ;			/* d_alloc set count */
 
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS) {
 	struct dentry *d = (f ? f->f_dentry : NULL);
-	struct inode *i  = (d ? d->d_inode : NULL);
 
 	printk("lis_new_file_name_dev(f@0x%p/%d,\"%s\",0x%x)%s",
 	       f, (f?F_COUNT(f):0), (name?name:""), dev,
-	       (F_VFSMNT(f)==lis_mnt?" <lis_mnt>":""));
-#if defined(KERNEL_2_3)
+	       (FILE_MNT(f)==lis_mnt?" <lis_mnt>":""));
 	printk(" \"");
-	if (F_VFSMNT(f))  lis_print_file_path(f);
-	printk("\"");
-#endif
-	printk("\n    >> [%d] d@0x%p/%d%s i@0x%p/%d%s\n",
-	       lis_atomic_read(&lis_mnt_cnt),
-	       d, (d?D_COUNT(d):0), (d&&D_IS_LIS(d)?" <LiS>":""),
-	       i, (i?I_COUNT(i):0), (i&&I_IS_LIS(i)?" <LiS>":""));
+	if (FILE_MNT(f))  lis_print_file_path(f);
+	printk("\"\n");
+	lis_print_dentry(d, ">> dentry") ;
     }
 
-   if (LIS_DEBUG_VOPEN && 0)
-    {
-	lis_print_dentry(f->f_dentry, "lis_new_file_name") ;
-	lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint, "---mount point") ;
-	lis_print_dentry(F_VFSMNT(f)->mnt_root, "---mount root") ;
-	printk("---mnt_count=%d\n", F_VFSMNT(f)->mnt_count) ;
-    }
     return(0) ;
-#else
-    return(0) ;
-#endif
 }
 
 /*  -------------------------------------------------------------------  */
@@ -1725,11 +1868,13 @@ int	lis_new_file_name_dev(struct file *f, const char *name, dev_t dev)
  */
 void lis_new_stream_name(struct stdata *head, struct file *f)
 {
-    if (LIS_DEBUG_VOPEN)
-	printk("lis_new_stream_name(h@0x%p/%d/%d,f@0x%p/%d) << d@0x%p/%d\n",
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+    {
+	printk("lis_new_stream_name(h@0x%p/%d/%d,f@0x%p/%d)\n",
 	       head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
-	       f, F_COUNT(f),
-	       f->f_dentry, FILE_D_COUNT(f));
+	       f, F_COUNT(f)) ;
+	lis_print_dentry(f->f_dentry, ">> dentry") ;
+    }
 
     sprintf(head->sd_name, "%s%s",
 	    lis_strm_name(head), lis_maj_min_name(head));
@@ -1737,11 +1882,13 @@ void lis_new_stream_name(struct stdata *head, struct file *f)
     lis_mark_mem(head, head->sd_name, MEM_STRMHD) ;
     lis_new_file_name(f, head->sd_name) ;
 
-    if (LIS_DEBUG_VOPEN)
-	printk("lis_new_stream_name(h@0x%p/%d/%d,f@0x%p/%d) >> d@0x%p/%d\n",
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+    {
+	printk("lis_new_stream_name(h@0x%p/%d/%d,f@0x%p/%d)\n",
 	       head, LIS_SD_REFCNT(head), LIS_SD_OPENCNT(head),
-	       f, F_COUNT(f),
-	       f->f_dentry, FILE_D_COUNT(f));
+	       f, F_COUNT(f)) ;
+	lis_print_dentry(f->f_dentry, ">> dentry") ;
+    }
 }
 
 /************************************************************************
@@ -1774,16 +1921,14 @@ lis_new_inode( struct file *f, dev_t dev )
     stdata_t	 *hd = FILE_STR(f) ;
     struct dentry *oldd = f->f_dentry;
     struct dentry *newd = NULL;
-#ifdef KERNEL_2_3
     struct qstr    dname ;
-    struct vfsmount *oldmnt = F_VFSMNT(f);
-#endif
+    struct vfsmount *oldmnt = FILE_MNT(f);
 
     if (!old)
     {						/* param checking */
 	printk("lis_new_inode(f@0x%p/%d,d0x%x) - "
 	       "old inode must be non-NULL\n",
-	       f, DEV_TO_INT(dev));
+	       f, F_COUNT(f), DEV_TO_INT(dev));
 	return(NULL) ;				/* bad return */
     }
 
@@ -1791,37 +1936,28 @@ lis_new_inode( struct file *f, dev_t dev )
     {
 	printk("lis_new_inode(f@0x%p/%d,d0x%x) - "
 	       "LiS has been unmounted\n",
-	       f, DEV_TO_INT(dev));
+	       f, F_COUNT(f), DEV_TO_INT(dev));
 	return(NULL) ;				/* bad return */
     }
 
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
-	printk("lis_new_inode(f@0x%p/%d,d0x%x)%s%s",
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+    {
+	printk("lis_new_inode(f@0x%p/%d,dv0x%x) %s%s",
 	       f, F_COUNT(f), DEV_TO_INT(dev),
 	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
-#if defined(KERNEL_2_3)
-	       (F_VFSMNT(f)==lis_mnt?" <lis_mnt>":"")
-#else
-	       ""
-#endif
+	       (FILE_MNT(f)==lis_mnt?" <lis_mnt>":"")
 	      ) ;
-#if defined(KERNEL_2_3)
 	printk(" \"");
-	if (F_VFSMNT(f))  lis_print_file_path(f);
-	printk("\"");
-#endif
-	printk("\n    << [%d] d@0x%p/%d%s i@0x%p/%d%s h@0x%p/%d/%d\n",
-	       lis_atomic_read(&lis_mnt_cnt),
-	       oldd, D_COUNT(oldd), (D_IS_LIS(oldd)?" <LiS>":""),
-	       old, I_COUNT(old), (I_IS_LIS(old)?" <LiS>":""),
-	       hd, (hd?LIS_SD_REFCNT(hd):0), (hd?LIS_SD_OPENCNT(hd):0));
+	if (FILE_MNT(f))  lis_print_file_path(f);
+	printk("\"\n");
+	lis_print_dentry(oldd, ">> oldd") ;
     }
 
     if (hd == NULL)
     {
 	printk("lis_new_inode(f@0x%p/%d,d0x%x) - "
 	       "no STREAM head\n",
-	       f, DEV_TO_INT(dev));
+	       f, F_COUNT(f), DEV_TO_INT(dev));
 	return(NULL) ;				/* bad return */
     }
 
@@ -1829,27 +1965,13 @@ lis_new_inode( struct file *f, dev_t dev )
      *  we keep an old inode only if it's a LiS-only inode.  Otherwise,
      *  we'll replace a non-LiS inode here with one that is LiS-only
      */
-    if (   MAJOR(old->i_dev) == lis_major
-        && DEV_SAME(KDEV_TO_INT(old->i_rdev), dev)) {
+    if (I_IS_LIS(old) && DEV_SAME(GET_I_RDEV(old), dev))
 	return (old);
-    }
 
-    if ((new = lis_get_new_inode(lis_mnt->mnt_sb))) 
+    new = lis_get_inode( old->i_mode, dev ) ;
+    if (new != NULL)
     {						/* got a new inode */
-	/* new->i_op    = &lis_streams_iops; */
-#ifdef KERNEL_2_3
-	new->i_fop   = &lis_streams_fops;
-#endif
 	new->i_state = I_DIRTY;       /* keep it off the dirty list */
-	/*
-	 *  char devs are identified by the rdev field; dev identifies
-	 *  the hosting file system.  Here, we construct our own dev
-	 *  field, reflecting that this is a LiS-only inode which has
-	 *  no file system hosting it (other than LiS itself)
-	 */
-	new->i_rdev  = INT_TO_KDEV(dev);	/* set desired dev */
-	new->i_dev   = MKDEV( lis_major, MAJOR(dev) );
-	/**/
 	new->i_mode  = old->i_mode;		/* inherit mode */
 	/*
 	 * Set the user/group ids to the opener, set modification times
@@ -1858,38 +1980,6 @@ lis_new_inode( struct file *f, dev_t dev )
 	new->i_uid   = current->fsuid;
 	new->i_gid   = current->fsgid;
 	new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
-#if !defined(KERNEL_2_3)			/* 2.2 kernel */
-	/*
-	 *  this stuff is only used for FIFOs/pipes, but it's statically
-	 *  part of the inode, and we don't know yet if this is a
-	 *  FIFO/pipe inode.  It doesn't hurt to do this in any event...
-	 *
-	 *  note also that for 2.1.x/2.2.x, we are using PIPE_BASE as
-	 *  INODE_STR.  Since this is a new inode, we're OK here setting
-	 *  it to NULL.
-	 */
-	PIPE_BASE(*new) = NULL;
-	PIPE_WAIT(*new) = NULL;
-	PIPE_START(*new) = PIPE_LEN(*new) = 0;
-	PIPE_RD_OPENERS(*new) = PIPE_WR_OPENERS(*new) = 0;
-	PIPE_READERS(*new) = PIPE_WRITERS(*new) = 0;
-	PIPE_LOCK(*new) = 0;
-#endif
-#if defined(KERNEL_2_3)			/* linux >= 2.3.0 */
-	if (LIS_DEBUG_VOPEN && 0)
-	{
-	    printk("lis_new_inode: inode_cnt=%d i_rdev=0x%x i_count=%d\n",
-		   lis_atomic_read(&lis_inode_cnt), new->i_rdev, I_COUNT(new));
-	}
-
-	if (LIS_DEBUG_VOPEN && 0)
-	{
-	    lis_print_dentry(f->f_dentry, "lis_new_inode(b4)") ;
-	    lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint,
-						    "---mount point(b4)") ;
-	    lis_print_dentry(F_VFSMNT(f)->mnt_root, "---mount root(b4)") ;
-	    printk("---mnt_count=%d\n", F_VFSMNT(f)->mnt_count) ;
-	}
 	/*
 	 * It is difficult to detach an inode from a dentry without
 	 * dput-ing the whole dentry, what with alias lists and all.
@@ -1912,7 +2002,7 @@ lis_new_inode( struct file *f, dev_t dev )
 	newd = d_alloc(lis_mnt->mnt_sb->s_root, &dname) ;
 	if (newd == NULL)
 	{
-	    iput(new) ;				/* oops, couldn't */
+	    lis_put_inode(new) ;			/* oops, couldn't */
 	    return(NULL) ;
 	}
 
@@ -1921,9 +2011,7 @@ lis_new_inode( struct file *f, dev_t dev )
 	 *  and no f_vfsmnt set.  In that case, there's nothing to put, and
 	 *  we will do the initial setting of f_vfsmnt here.
 	 */
-#if defined(KERNEL_2_3)
 	f->f_vfsmnt = MNTGET(lis_mnt);		/* (re)mount on LiS */
-#endif
 	lis_dput(oldd) ;                        /* does mntput() if lis_mnt */
 	if (oldmnt && oldmnt != lis_mnt)
 	    MNTPUT(oldmnt) ;                    /* do it if not lis_mnt also */
@@ -1931,47 +2019,19 @@ lis_new_inode( struct file *f, dev_t dev )
 	newd->d_op = &lis_dentry_ops;
 	d_add(newd, new) ;			/* add inode to new dentry */
 	f->f_dentry = newd ;
-
-	if (LIS_DEBUG_VOPEN && 0)
-	{
-	    lis_print_dentry(f->f_dentry, "lis_new_inode") ;
-	    lis_print_dentry(F_VFSMNT(f)->mnt_mountpoint, "---mount point(b4)");
-	    lis_print_dentry(F_VFSMNT(f)->mnt_root, "---mount root(b4)") ;
-	    printk("---mnt_count=%d\n", F_VFSMNT(f)->mnt_count) ;
-	}
-#else						/* 2.2 kernel */
-	f->f_dentry = newd = lis_d_alloc_root(new, LIS_D_ALLOC_ROOT_NORMAL) ;
-	if (f->f_dentry == NULL)
-	{
-	    iput(new) ;
-	    return(NULL) ;
-	}
-
-	f->f_dentry->d_op = &lis_dentry_ops;
-	lis_dput(oldd);     			/* free old inode/dentry */
-#endif
     }
 
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS) {
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+    {
 	printk("lis_new_inode(f@0x%p/%d,d0x%x)%s%s",
 	       f, F_COUNT(f), DEV_TO_INT(dev),
 	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
-#if defined(KERNEL_2_3)
-	       (f&&F_VFSMNT(f)==lis_mnt?" <lis_mnt>":"")
-#else
-	       ""
-#endif
+	       (f&&FILE_MNT(f)==lis_mnt?" <lis_mnt>":"")
 	      ) ;
-#if defined(KERNEL_2_3)
 	printk(" \"");
-	if (f && F_VFSMNT(f))  lis_print_file_path(f);
-	printk("\"");
-#endif
-	printk("\n    >> [%d] d@0x%p/%d%s i@0x%p/%d%s h@0x%p/%d/%d\n",
-	       lis_atomic_read(&lis_mnt_cnt),
-	       newd, D_COUNT(newd), (D_IS_LIS(newd)?" <LiS>":""),
-	       new, I_COUNT(new), (I_IS_LIS(new)?" <LiS>":""),
-	       hd, (hd?LIS_SD_REFCNT(hd):0), (hd?LIS_SD_OPENCNT(hd):0));
+	if (f && FILE_MNT(f))  lis_print_file_path(f);
+	printk("\"\n");
+	lis_print_dentry(newd, ">> newd") ;
     }
 
     return(new) ;				/* use new inode */
@@ -1986,30 +2046,25 @@ lis_new_inode( struct file *f, dev_t dev )
  *  here for possible future use as much as anything (currently, only
  *  oldmnt_cnt is being used).
  */
-#if defined(KERNEL_2_1)
 void lis_cleanup_file_opening(struct file *f, stdata_t *head,
 			       int open_fail,
 			       struct dentry *oldd, int oldd_cnt,
 			       struct vfsmount *oldmnt, int oldmnt_cnt)
 {
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
     {
-        printk("lis_cleanup_file_opening(f@0x%p/%d,h@0x%p/%d/%d,%d,...)\n"
-	       "    << [%d]%s d@0x%p/%d%s i@0x%p/%d%s",
+        printk("lis_cleanup_file_opening(f@0x%p/%d,h@0x%p/%d/%d,%d) %s\n",
 	       f, (f?F_COUNT(f):0),
 	       head,
 	       (head?LIS_SD_REFCNT(head):0),
 	       (head?LIS_SD_OPENCNT(head):0),
 	       open_fail,
-	       lis_atomic_read(&lis_mnt_cnt),
-	       (F_VFSMNT(f)==lis_mnt?" <lis_mnt>":""),
-	       f->f_dentry, D_COUNT(f->f_dentry),
-	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
-	       FILE_INODE(f), I_COUNT(FILE_INODE(f)),
-	       (I_IS_LIS(FILE_INODE(f))?" <LiS>":""));
+	       (FILE_MNT(f)==lis_mnt?" <lis_mnt>":"")) ;
+
 	printk(" \"");
-	if (F_VFSMNT(f))  lis_print_file_path(f);
-	printk("\"");
+	if (FILE_MNT(f))  lis_print_file_path(f);
+	printk("\"\n");
+	lis_print_dentry(oldd, ">> dentry") ;
 	printk("\n");
     }
 
@@ -2018,21 +2073,24 @@ void lis_cleanup_file_opening(struct file *f, stdata_t *head,
 	 *  open_fail: sys_open has the old dentry and mnt, and will put
 	 *  them.  Synchronize accordingly...
 	 *
+	 *  When open fails chrdev_open does a cdev_put on the cdev
+	 *  dangling off of the inode, so we don't do it here.
+	 *
 	 *  If we're not hooked to the original dentry/inode, put the
 	 *  ones we're hooked to now, since sys_open() doesn't care
 	 *  about them and won't put them.
+	 *
 	 */
 	if (f->f_dentry != oldd)
 	    (void)lis_dput(f->f_dentry);
-#if 1
-	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
+
+	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
 	    printk("    error %d >> oldmnt@0x%p/%d %c oldmnt_cnt %d\n",
 		   open_fail,
 		   oldmnt, MNT_COUNT(oldmnt),
 		   (MNT_COUNT(oldmnt) < oldmnt_cnt ? '<' :
 		    MNT_COUNT(oldmnt) > oldmnt_cnt ? '>' : '='),
 		   oldmnt_cnt);
-#endif
 	if (MNT_COUNT(oldmnt) < oldmnt_cnt)
 	    (void)MNTGET(oldmnt);
 	else
@@ -2042,19 +2100,15 @@ void lis_cleanup_file_opening(struct file *f, stdata_t *head,
 	/*
 	 *  open OK - these are extra
 	 */
+	if (f->f_dentry != oldd)
+	    lis_cdev_put(oldd) ;
 	lis_dput(oldd);
 	MNTPUT(oldmnt);
     }
 }
-#else
-void lis_cleanup_file_opening(struct file *f, stdata_t *head, int open_fail)
-{
-}
-#endif
 
 void lis_cleanup_file_closing(struct file *f, stdata_t *head)
 {
-#if defined(KERNEL_2_3)
     /*
      *  close KLUDGE: if the file's dentry count is > 1, the kernel
      *  won't do anything but decrement the count.  Among other things
@@ -2063,11 +2117,10 @@ void lis_cleanup_file_closing(struct file *f, stdata_t *head)
      */
     struct dentry *d = (f ? f->f_dentry : NULL);
 
-    if (f && d && D_IS_LIS(d) && D_COUNT(d) > 1 && F_VFSMNT(f) == lis_mnt)
+    if (f && d && D_IS_LIS(d) && D_COUNT(d) > 1 && FILE_MNT(f) == lis_mnt)
 	MNTPUT(lis_mnt);
-#endif
 
-    if (LIS_DEBUG_VCLOSE || LIS_DEBUG_ADDRS)
+    if (LIS_DEBUG_VCLOSE || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
     {
         printk("lis_cleanup_file_closing(f@0x%p/%d,h@0x%p/%d/%d)"
 	       " [%d]%s%s",
@@ -2075,53 +2128,78 @@ void lis_cleanup_file_closing(struct file *f, stdata_t *head)
 	       head,
 	       (head?LIS_SD_REFCNT(head):0),
 	       (head?LIS_SD_OPENCNT(head):0),
-	       lis_atomic_read(&lis_mnt_cnt),
+	       K_ATOMIC_READ(&lis_mnt_cnt),
 	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
-#if defined(KERNEL_2_3)
-	       (F_VFSMNT(f)==lis_mnt?" <lis_mnt>":"")
-#else
-	       ""
-#endif
+	       (FILE_MNT(f)==lis_mnt?" <lis_mnt>":"")
 	      ) ;
-#if defined(KERNEL_2_3)
 	printk(" \"");
-	if (F_VFSMNT(f))  lis_print_file_path(f);
-	printk("\"");
-#endif
-	printk("\n");
+	if (FILE_MNT(f))  lis_print_file_path(f);
+	printk("\"\n");
+	lis_print_dentry(d, ">> dentry") ;
     }
 }
+
+#if defined(KERNEL_2_5)
+/*
+ * lis_strflush - see file_operations
+ */
+int
+lis_strflush( struct file *f )
+{
+    int err = 0;
+
+    if (LIS_DEBUG_VCLOSE || LIS_DEBUG_REFCNTS)
+	printk("lis_strflush(f@0x%p)\n", f);
+
+    MODSYNC();
+
+    return err;
+}
+#endif
 
 /*
  * lis_inode_lookup - must be present for namei on LiS mounted file system
  * to work properly.  Return of NULL should suffice.
  */
-#if defined(KERNEL_2_3)
-struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry)
+#if defined(KERNEL_2_5)
+
+struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry,
+				struct nameidata *nd)
 {
     return(NULL) ;
 }
-#endif
 
-#if defined(KERNEL_2_5)
 void lis_drop_inode(struct inode *inode)
 {
     generic_delete_inode(inode) ;
 }
+
+#else
+
+struct dentry *lis_inode_lookup(struct inode *dir, struct dentry *dentry)
+{
+    return(NULL) ;
+}
+
 #endif
 
 /*
  *  lis_get_filp() - get a LiS-ready file pointer, or set one up for LiS
  */
-struct file *
-lis_get_filp( struct file *f )
+static struct file *
+lis_get_filp( struct file_operations *f_op )
 {
-    if (!f && !(f = get_empty_filp()))  return NULL;
+    struct file *f = get_empty_filp();
+
+    if (!f)  return NULL;
 
     f->f_pos    = 0;
-    f->f_op     = &lis_streams_fops;
+    f->f_op     = fops_get(f_op);	/* bumps module ref count */
     f->f_flags  = O_RDWR;
     f->f_mode   = FMODE_READ|FMODE_WRITE;
+
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_REFCNTS)
+	printk("lis_get_filp(...) >> f@0x%p\n", f);
 
     return f;
 }
@@ -2137,7 +2215,7 @@ struct inode *lis_set_up_inode(struct file *f, struct inode *inode)
 
     if (inode == NULL) return(NULL) ;
 
-    new = lis_new_inode(f, KDEV_TO_INT(inode->i_rdev)) ;
+    new = lis_new_inode(f, GET_I_RDEV(inode)) ;
     if (new == NULL)
 	return(NULL) ;
 
@@ -2148,7 +2226,16 @@ struct inode *lis_set_up_inode(struct file *f, struct inode *inode)
     new->i_uid   = current->fsuid;
     new->i_gid   = current->fsgid;
     new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
+
     return(new) ;
+}
+
+/*
+ * lis_is_stream_inode
+ */
+int lis_is_stream_inode(struct inode *i)
+{
+    return(I_IS_LIS(i)) ;
 }
 
 /*
@@ -2166,16 +2253,38 @@ lis_get_inode( mode_t mode, dev_t dev )
 	 *  see the comment above (in lis_new_inode) about the use of
 	 *  the dev and rdev fields
 	 */
-	i->i_rdev  = INT_TO_KDEV(dev);
-	i->i_dev   = MKDEV( lis_major, MAJOR(dev) );
+	i->i_op    = &lis_streams_iops;
+/*
+ *  FIXME - generalize to use an fops per major, so modules can own
+ *  their open files.
+ */
+	i->i_fop   = &lis_streams_fops;
+	/*
+	 *  char devs are identified by the rdev field; dev identifies
+	 *  the hosting file system.  Here, we construct our own dev
+	 *  field, reflecting that this is a LiS-only inode which has
+	 *  no file system hosting it (other than LiS itself)
+	 */
+#if defined(KERNEL_2_5)
+	i->i_rdev  = DEV_TO_RDEV(dev);	/* set desired dev */
+#else
+	/*
+	 * i_rdev will show our minor device number modulo 256
+	 */
+	i->i_rdev       = MKDEV( getmajor(dev), getminor(dev) );
+	{
+	    lis_inode_info_t *p = (lis_inode_info_t *) &i->u ;
+	    p->dev = dev ;
+	}
+#endif
 
-	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
-	    printk("lis_get_inode(m0x%x,d0x%x) >> i@0x%p/%d"
+	if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+	    printk("lis_get_inode(m0x%x,dv0x%x) >> i@0x%p/%d"
 		   " <[%d] %d LiS inodes>\n",
 		   mode, dev,
 		   i, I_COUNT(i),
-		   lis_atomic_read(&lis_mnt_cnt),
-		   lis_atomic_read(&lis_inode_cnt));
+		   K_ATOMIC_READ(&lis_mnt_cnt),
+		   K_ATOMIC_READ(&lis_inode_cnt));
     }
 
     return i;
@@ -2189,9 +2298,8 @@ struct inode *
 lis_old_inode( struct file *f, struct inode *i )
 {
     struct dentry *oldd = f->f_dentry;
-#if defined KERNEL_2_3
-    struct vfsmount *oldmnt = F_VFSMNT(f);
-#endif
+    struct dentry *newd ;
+    struct vfsmount *oldmnt = FILE_MNT(f);
 
     if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
 	printk("lis_old_inode(f@0x%p/%d,i@0x%p/%d)%s << "
@@ -2201,35 +2309,35 @@ lis_old_inode( struct file *f, struct inode *i )
 	       (I_IS_LIS(FILE_INODE(f))?" <LiS>":""),
 	       FILE_INODE(f), I_COUNT(FILE_INODE(f)),
 	       (I_IS_LIS(i)?" <LiS>":""),
-	       KDEV_TO_INT(FILE_INODE(f)->i_rdev),
-	       KDEV_TO_INT(i->i_rdev));
+	       GET_I_RDEV(FILE_INODE(f)),
+	       GET_I_RDEV(i));
 
-    f->f_dentry = lis_d_alloc_root(igrab(i), LIS_D_ALLOC_ROOT_NORMAL);
+    newd = lis_d_alloc_root(igrab(i), LIS_D_ALLOC_ROOT_NORMAL);
+    if (IS_ERR(newd))
+    {
+       iput(i);
+       return NULL;
+    }
+    f->f_dentry = newd;
 
-#if defined(KERNEL_2_3)
     /*
      *  the caller may have created a new file pointer with no dentry
      *  or inode and no f_vfsmnt set.  In that case, we are doing the
      *  initial setting of f_vfsmnt here.
      */
     f->f_vfsmnt = MNTGET(lis_mnt);	/* (re)mount on LiS */
-#endif
     lis_dput(oldd);
-#if defined(KERNEL_2_3)
     if (oldmnt && oldmnt != lis_mnt)  /* lis_dput() does mntput() on lis_mnt */
 	MNTPUT(oldmnt);
-#endif
 
-    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS)
-	printk("lis_old_inode(f@0x%p/%d,i@0x%p/%d)%s >> "
-	       "d@0x%p/%d%s i@0x%p/%d%s\n",
+    if (LIS_DEBUG_VOPEN || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+    {
+	printk("lis_old_inode(f@0x%p/%d,i@0x%p/%d)%s\n",
 	       f, F_COUNT(f),
 	       i, I_COUNT(i),
-	       (I_IS_LIS(FILE_INODE(f))?" <LiS>":""),
-	       f->f_dentry, D_COUNT(f->f_dentry),
-	       (D_IS_LIS(f->f_dentry)?" <LiS>":""),
-	       FILE_INODE(f), I_COUNT(FILE_INODE(f)),
-	       (I_IS_LIS(i)?" <LiS>":""));
+	       (I_IS_LIS(FILE_INODE(f))?" <LiS>":""));
+	lis_print_dentry(newd, ">> dentry") ;
+    }
 
     return (FILE_INODE(f));
 }
@@ -2254,21 +2362,23 @@ void lis_put_inode(struct inode *ino)
  */
 int lis_get_fifo( struct file **f )
 {
-#if defined(KERNEL_2_3)
-    dev_t	dev = MKDEV( LIS_CLONE, LIS_FIFO );
+    dev_t	dev = makedevice( LIS_CLONE, LIS_FIFO );
     char	name[48] ;
     int		error;
 
     MNTSYNC();
 
-    if (!(*f = lis_get_filp(NULL)))
+    if (!(*f = lis_get_filp(&lis_streams_fops)))
 	return(-ENFILE) ;
 
     sprintf(name, "clone(%d,%d)", LIS_CLONE, LIS_FIFO) ;
+
     if ((error = lis_new_file_name_dev(*f, name, dev)) == 0)
     {
 	if ((error = lis_stropen( (*f)->f_dentry->d_inode, *f )) < 0)
 	{
+	    fops_put((*f)->f_op);
+	    (*f)->f_op->owner = NULL ;
 	    fput(*f) ;
 	    *f = NULL ;
 	}
@@ -2277,36 +2387,6 @@ int lis_get_fifo( struct file **f )
     MNTSYNC();
 
     return(error);
-
-#else
-    mode_t mode = S_IFCHR|S_IRUSR|S_IWUSR;
-    dev_t dev = MKDEV( LIS_CLONE, LIS_FIFO );
-    struct inode *inode = lis_get_inode( mode, dev );
-    int error;
-
-    error = -ENFILE;
-    if (!inode)  goto no_inode;
-
-    inode->i_mode &= ~current->fs->umask ;	/* umask considerations */
-
-    if (!(*f = lis_get_filp(NULL)))  goto no_file;
-
-    error = -ENOMEM;
-    if (!((*f)->f_dentry = lis_d_alloc_root(inode, LIS_D_ALLOC_ROOT_NORMAL)))
-	goto no_stream;
-
-    if ((error = lis_stropen( inode, *f )) < 0)  goto no_stream;
-
-    return 0;
-
-no_stream:
-    fput(*f);
-    *f = NULL;
-no_file:
-    iput(inode);
-no_inode:
-    return error;
-#endif
 }
 
 /*
@@ -2315,7 +2395,7 @@ no_inode:
  *  create a new unique pipe as two new unique file pointers and all
  *  lower "plumbing" from them (i.e., inodes, stream heads, queues).
  *
- *  the process is simply to create two new unique FIFOs, and "twist"
+ *  the process is simply to create two new unique FIFOs, and "twists"
  *  them.
  */
 int lis_get_pipe( struct file **f0, struct file **f1 )
@@ -2337,6 +2417,10 @@ int lis_get_pipe( struct file **f0, struct file **f1 )
     hd1 = FILE_STR(*f1);  wq1 = hd1->sd_wq;
     hd0->sd_peer = hd1;
     hd1->sd_peer = hd0;
+    lis_head_get(hd0) ;			/* balanced in lis_qdetach */
+    lis_head_get(hd1) ;
+    if (LIS_DEBUG_OPEN)
+	printk("lis_get_pipe: hd0:%s hd1:%s\n", hd0->sd_name, hd1->sd_name) ;
 
     /*
      *  twist the write queues to point to the peers' read queues
@@ -2426,7 +2510,6 @@ lis_ioc_pipe( unsigned int *fildes )
  *  the preliminary routines here are support for fifo_open_sync.
  */
 
-#if defined(KERNEL_2_3)
 static inline void lis_fifo_wait(struct inode * i)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -2473,13 +2556,12 @@ static struct inode* lis_fifo_info_new(struct inode* i)
 	return NULL;
     }
 }
-#endif /* KERNEL_2_3 */
 
 int
 lis_fifo_open_sync( struct inode *i, struct file *f )
 {
     stdata_t *head = INODE_STR(i);
-    long this_open = lis_atomic_read(&lis_open_cnt);
+    long this_open = K_ATOMIC_READ(&lis_open_cnt);
     int ret = 0;
 
     if (!i || !f) {
@@ -2490,14 +2572,13 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
 	return(-EINVAL);
     }
 
-    if (LIS_DEBUG_VOPEN && 0)
+    if (LIS_DEBUG_VOPEN)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" << mode 0%o flags 0%o\n",
 	       i, I_COUNT(i), f, F_COUNT(f),
-	       this_open, head->sd_name,
+	       this_open, head ? head->sd_name : "No-Strm",
 	       (int)f->f_mode, (int)f->f_flags );
 
-#if defined(KERNEL_2_3)
 
     ret = -ERESTARTSYS;
     if (lis_kernel_down(PIPE_SEM(*i)))
@@ -2510,8 +2591,8 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
     }
     f->f_version = 0;
 
-    switch (f->f_mode) {
-    case 1:
+    switch (f->f_mode & (FMODE_READ|FMODE_WRITE)) {
+    case FMODE_READ:
 	/*
 	 *  O_RDONLY
 	 *  POSIX.1 says that O_NONBLOCK means return with the FIFO
@@ -2534,7 +2615,7 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
 	}
 	break;
 	
-    case 2:
+    case FMODE_WRITE:
 	/*
 	 *  O_WRONLY
 	 *  POSIX.1 says that O_NONBLOCK means return -1 with
@@ -2555,7 +2636,7 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
 	}
 	break;
 	
-    case 3:
+    case FMODE_READ|FMODE_WRITE:
 	/*
 	 *  O_RDWR
 	 *  POSIX.1 leaves this case "undefined" when O_NONBLOCK is set.
@@ -2577,11 +2658,11 @@ lis_fifo_open_sync( struct inode *i, struct file *f )
 
     lis_kernel_up(PIPE_SEM(*i));
 
-    if (LIS_DEBUG_VOPEN && 0)
+    if (LIS_DEBUG_VOPEN)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" >> %d reader(s) %d writer(s)\n",
 	       i, I_COUNT(i), f, F_COUNT(f),
-	       this_open, head->sd_name,
+	       this_open, head ? head->sd_name : "No-Strm",
 	       PIPE_READERS(*i), PIPE_WRITERS(*i));
 
     return 0;
@@ -2608,119 +2689,28 @@ err_nocleanup:
     lis_kernel_up(PIPE_SEM(*i));
 
 err_nolock_nocleanup:
-    if (LIS_DEBUG_VOPEN && 0)
+    if (LIS_DEBUG_VOPEN)
 	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld \"%s\""
 	       " >> error(%d)\n",
 	       i, (i?I_COUNT(i):0),
 	       f, (f?F_COUNT(f):0),
-	       this_open, head->sd_name, ret );
+	       this_open, head->sd_name, ret) ;
 
     return ret;
-#else    /* !KERNEL_2_3 */
-
-    switch (f->f_mode) {
-    case 1:
-	/*
-	 *  O_RDONLY
-	 *  POSIX.1 says that O_NONBLOCK means return with the FIFO
-	 *  opened, even when there is no process writing the FIFO.
-	 */
-	if (!PIPE_READERS(*i)++)
-	    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	if (!(f->f_flags & O_NONBLOCK) && !PIPE_WRITERS(*i)) {
-	    PIPE_RD_OPENERS(*i)++;
-	    while (!PIPE_WRITERS(*i)) {
-		if (signal_pending(current)) {
-		    ret = -ERESTARTSYS;
-		    break;
-		}
-		lis_interruptible_sleep_on(&PIPE_WAIT(*i));
-	    }
-	    if (!--PIPE_RD_OPENERS(*i))
-		lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	}
-	while (PIPE_WR_OPENERS(*i))
-	    lis_interruptible_sleep_on(&PIPE_WAIT(*i));
-	if (ret && !--PIPE_READERS(*i))
-	    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	break;
-	
-    case 2:
-	/*
-	 *  O_WRONLY
-	 *  POSIX.1 says that O_NONBLOCK means return -1 with
-	 *  errno=ENXIO when there is no process reading the FIFO.
-	 */
-	if ((f->f_flags & O_NONBLOCK) && !PIPE_READERS(*i)) {
-	    ret = -ENXIO;
-	    break;
-	}
-	if (!PIPE_WRITERS(*i)++)
-	    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	if (!PIPE_READERS(*i)) {
-	    PIPE_WR_OPENERS(*i)++;
-	    while (!PIPE_READERS(*i)) {
-		if (signal_pending(current)) {
-		    ret = -ERESTARTSYS;
-		    break;
-		}
-		lis_interruptible_sleep_on(&PIPE_WAIT(*i));
-	    }
-	    if (!--PIPE_WR_OPENERS(*i))
-		lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	}
-	while (PIPE_RD_OPENERS(*i))
-	    lis_interruptible_sleep_on(&PIPE_WAIT(*i));
-	if (ret && !--PIPE_WRITERS(*i))
-	    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	break;
-	
-    case 3:
-	/*
-	 *  O_RDWR
-	 *  POSIX.1 leaves this case "undefined" when O_NONBLOCK is set.
-	 *  This implementation will NEVER block on a O_RDWR open, since
-	 *  the process can at least talk to itself.
-	 */
-	if (!PIPE_READERS(*i)++)
-	    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	while (PIPE_WR_OPENERS(*i))
-	    lis_interruptible_sleep_on(&PIPE_WAIT(*i));
-	if (!PIPE_WRITERS(*i)++)
-	    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-	while (PIPE_RD_OPENERS(*i))
-	    lis_interruptible_sleep_on(&PIPE_WAIT(*i));
-	break;
-	
-    default:
-	ret = -EINVAL;
-    }
-
-    if (LIS_DEBUG_VOPEN && 0)
-	printk("lis_fifo_open_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
-	       " \"%s\" >> %d reader(s) %d writer(s)\n",
-	       i, I_COUNT(i), f, F_COUNT(f),
-	       this_open, head->sd_name,
-	       PIPE_READERS(*i), PIPE_WRITERS(*i));
-
-    return ret;
-#endif   /* !KERNEL_2_3 */
 }
 
 void
 lis_fifo_close_sync( struct inode *i, struct file *f )
 {
     stdata_t *head = INODE_STR(i);
-    long this_close = lis_atomic_read(&lis_close_cnt);
+    long this_close = K_ATOMIC_READ(&lis_close_cnt);
 
-#if defined(KERNEL_2_3)
     lis_kernel_down(PIPE_SEM(*i));
-#endif
 
     PIPE_READERS(*i) -= (f && f->f_mode & FMODE_READ ? 1 : 0);
     PIPE_WRITERS(*i) -= (f && f->f_mode & FMODE_WRITE ? 1 : 0);
 
-    if (LIS_DEBUG_VCLOSE && 0)
+    if (LIS_DEBUG_VCLOSE)
 	printk("lis_fifo_close_sync(i@0x%p/%d,f@0x%p/%d)#%ld"
 	       " \"%s\" >> %d reader(s) %d writer(s)\n",
 	       i, I_COUNT(i), f, (f?F_COUNT(f):0),
@@ -2728,7 +2718,6 @@ lis_fifo_close_sync( struct inode *i, struct file *f )
 	       (head&&head->sd_name?head->sd_name:""),
 	       PIPE_READERS(*i), PIPE_WRITERS(*i));
 
-#if defined(KERNEL_2_3)
     if (!PIPE_READERS(*i) && !PIPE_WRITERS(*i)) {
 	kfree(i->i_pipe);
 	i->i_pipe = NULL;
@@ -2737,9 +2726,6 @@ lis_fifo_close_sync( struct inode *i, struct file *f )
     }
 
     lis_kernel_up(PIPE_SEM(*i));
-#else
-    lis_wake_up_interruptible(&PIPE_WAIT(*i));
-#endif
 }
 
 int
@@ -2828,14 +2814,16 @@ lis_fattach( struct file *f, const char *path )
 	} else {
 	    lis_fattach_insert(data);  /* OK! - add to fattaches list */
 
-	    if (LIS_DEBUG_FATTACH)
+	    if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
+	    {
 		printk("lis_fattach(...) data @ 0x%p:\n"
-		       "    >> f@0x%p/%d h@0x%p \"%s\" s@0x%p d@0x%p/%d\n",
+		       "    >> f@0x%p/%d h@0x%p \"%s\" s@0x%p\n",
 		       data,
 		       data->file, F_COUNT(data->file),
 		       data->head, data->path,
-		       data->sb,
-		       data->dentry, (data->dentry?D_COUNT(data->dentry):0));
+		       data->sb) ;
+		lis_print_dentry(data->dentry, ">> dentry") ;
+	    }
 	}
     } else
 	result = -EINVAL;  /* f must be a STREAM */
@@ -2926,15 +2914,15 @@ lis_fdetach_stream( stdata_t *head )
     int n = num_fattaches_listed;  /* just to make sure we terminate */
     int error;
 
-    if (!lis_atomic_read(&head->sd_fattachcnt))
+    if (!K_ATOMIC_READ(&head->sd_fattachcnt))
 	return;
 
-    if (LIS_DEBUG_FATTACH)
+    if (LIS_DEBUG_FATTACH || LIS_DEBUG_REFCNTS)
 	printk("lis_fdetach_stream(h@0x%p/%d/%d): %d fattaches active...\n",
 	       head,
 	       (head?LIS_SD_REFCNT(head):0),
 	       (head?LIS_SD_OPENCNT(head):0),
-	       lis_atomic_read(&head->sd_fattachcnt));
+	       K_ATOMIC_READ(&head->sd_fattachcnt));
 
     lis_spin_lock(&lis_fattaches_lock);
     while (n-- && !list_empty(&lis_fattaches)) {
@@ -2944,10 +2932,13 @@ lis_fdetach_stream( stdata_t *head )
 	if (data->head == head) {
 	    lis_spin_unlock(&lis_fattaches_lock);
 
-	    if (LIS_DEBUG_FATTACH)
+	    if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS)
+	    {
 		printk("    fdetaching: "
-		       "data 0x%p head@0x%p \"%s\" sb 0x%p d@0x%p ...\n",
-		       data, data->head, data->path, data->sb, data->dentry);
+		       "data 0x%p head@0x%p \"%s\" sb 0x%p\n",
+		       data, data->head, data->path, data->sb);
+		lis_print_dentry(data->dentry, ">> dentry") ;
+	    }
 
 	    if ((error = lis_fdetach(data->path)) < 0) {
 		if (LIS_DEBUG_FATTACH)
@@ -2955,7 +2946,7 @@ lis_fdetach_stream( stdata_t *head )
 			   data, error);
 	    }
 
-	    if (!lis_atomic_read(&head->sd_fattachcnt))
+	    if (!K_ATOMIC_READ(&head->sd_fattachcnt))
 		return;
 
 	    lis_spin_lock(&lis_fattaches_lock);
@@ -2982,7 +2973,7 @@ lis_fdetach_all(void)
 
     if (LIS_DEBUG_FATTACH)
 	printk("lis_fdetach_all() << %d fattach(s) active\n",
-	       lis_atomic_read(&num_fattaches_listed));
+	       K_ATOMIC_READ(&num_fattaches_listed));
 
     lis_spin_lock(&lis_fattaches_lock);
     while (n-- && !list_empty(&lis_fattaches)) {
@@ -2990,7 +2981,7 @@ lis_fdetach_all(void)
 	    list_entry( lis_fattaches.next, lis_fattach_t, list );
 	lis_spin_unlock(&lis_fattaches_lock);
 
-	if (LIS_DEBUG_FATTACH)
+	if (LIS_DEBUG_FATTACH || LIS_DEBUG_ADDRS)
 	    printk("    >> fdetaching data 0x%p head 0x%p sb 0x%p d 0x%p...\n",
 		   data, data->head, data->sb, data->dentry);
 
@@ -3076,18 +3067,18 @@ static lis_fattach_t *lis_fattach_new(struct file *f, const char *path)
 	} else
 	    data->path = tmp;  /* better than nothing */
 
-	lis_atomic_inc(&num_fattaches_allocd);
+	K_ATOMIC_INC(&num_fattaches_allocd);
     }
     else if (data) {
 	FREE(data);  data = NULL;
     }
 
-    if (LIS_DEBUG_FATTACH) {
+    if (LIS_DEBUG_FATTACH || LIS_DEBUG_REFCNTS) {
 	    printk("lis_fattach_new(f@0x%p/%d,\"%s\")"
 		   " => data@0x%p (%d/%d)\n",
 		   f, F_COUNT(f), path, data,
-		   lis_atomic_read(&num_fattaches_listed),
-		   lis_atomic_read(&num_fattaches_allocd) );
+		   K_ATOMIC_READ(&num_fattaches_listed),
+		   K_ATOMIC_READ(&num_fattaches_allocd) );
     }
 
     return data;
@@ -3096,13 +3087,13 @@ static lis_fattach_t *lis_fattach_new(struct file *f, const char *path)
 /* delete an fattach instance - assumed not in list */
 static void lis_fattach_delete(lis_fattach_t *data)
 {
-    lis_atomic_dec(&num_fattaches_allocd);
+    K_ATOMIC_DEC(&num_fattaches_allocd);
 
-    if (LIS_DEBUG_FATTACH) {
-	    printk("lis_fattach_delete(0x%x) (%d/%d)\n",
+    if (LIS_DEBUG_FATTACH || LIS_DEBUG_REFCNTS) {
+	    printk("lis_fattach_delete(%p) (%d/%d)\n",
 		   data,
-		   lis_atomic_read(&num_fattaches_listed),
-		   lis_atomic_read(&num_fattaches_allocd) );
+		   K_ATOMIC_READ(&num_fattaches_listed),
+		   K_ATOMIC_READ(&num_fattaches_allocd) );
     }
 
     if (data && data->path)
@@ -3119,13 +3110,13 @@ static void lis_fattach_insert(lis_fattach_t *data)
     list_add(&data->list, &lis_fattaches);
     lis_spin_unlock(&lis_fattaches_lock);
 
-    lis_atomic_inc(&num_fattaches_listed);
+    K_ATOMIC_INC(&num_fattaches_listed);
 
-    if (LIS_DEBUG_FATTACH) {
-	    printk("lis_fattach_insert(0x%x) (%d/%d)\n",
+    if (LIS_DEBUG_FATTACH || LIS_DEBUG_REFCNTS) {
+	    printk("lis_fattach_insert(%p) (%d/%d)\n",
 		   data,
-		   lis_atomic_read(&num_fattaches_listed),
-		   lis_atomic_read(&num_fattaches_allocd) );
+		   K_ATOMIC_READ(&num_fattaches_listed),
+		   K_ATOMIC_READ(&num_fattaches_allocd) );
     }
 }
 
@@ -3136,13 +3127,13 @@ static void lis_fattach_remove(lis_fattach_t *data)
     list_del(&data->list);
     lis_spin_unlock(&lis_fattaches_lock);
 
-    lis_atomic_dec(&num_fattaches_listed);
+    K_ATOMIC_DEC(&num_fattaches_listed);
 
-    if (LIS_DEBUG_FATTACH) {
-	    printk("lis_fattach_remove(0x%x) (%d/%d)\n",
+    if (LIS_DEBUG_FATTACH || LIS_DEBUG_REFCNTS) {
+	    printk("lis_fattach_remove(%p) (%d/%d)\n",
 		   data,
-		   lis_atomic_read(&num_fattaches_listed),
-		   lis_atomic_read(&num_fattaches_allocd) );
+		   K_ATOMIC_READ(&num_fattaches_listed),
+		   K_ATOMIC_READ(&num_fattaches_allocd) );
     }
 }
 
@@ -3172,6 +3163,8 @@ int lis_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
     if (!sendhd ||
 	!(sendhd->magic == STDATA_MAGIC) ||
 	!(recvhd = sendhd->sd_peer) ||
+	!(recvhd->magic == STDATA_MAGIC) ||
+	recvhd == sendhd ||
 	F_ISSET(sendhd->sd_flag, STRHUP))
 	goto not_fifo;
 
@@ -3205,7 +3198,7 @@ int lis_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
      *  used if it is the receiving file.
      */
     if (FILE_INODE(fp) == recvhd->sd_inode)  {
-	struct file *dfp = lis_get_filp(NULL);
+	struct file *dfp = lis_get_filp(&lis_streams_fops);
 	struct inode *i = FILE_INODE(fp);
 
 	LOCK_INO(i);
@@ -3216,14 +3209,14 @@ int lis_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
 	if (!(dfp->f_dentry = lis_d_alloc_root(igrab(i),
 					       LIS_D_ALLOC_ROOT_NORMAL))) {
 	    ULOCK_INO(i);
+	    fops_put(dfp->f_op);
+	    dfp->f_op->owner = NULL ;
 	    fput(dfp);
 	    fput(fp);
 	    goto bad_file;
 	}
-#if defined(KERNEL_2_3)
-	if (F_VFSMNT(fp))
-	    dfp->f_vfsmnt = MNTGET(F_VFSMNT(fp));
-#endif
+	if (FILE_MNT(fp))
+	    dfp->f_vfsmnt = MNTGET(FILE_MNT(fp));
 	if (F_ISSET(recvhd->sd_flag,STFIFO))
 	    lis_fifo_sendfd_sync( i, dfp );
 	SET_FILE_STR(dfp, FILE_STR(fp));
@@ -3250,7 +3243,7 @@ int lis_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
     (recvhd->sd_rfdcnt)++;
     lis_spin_unlock_irqrestore(&recvhd->sd_lock, &psw) ;
 
-    if (LIS_DEBUG_SNDFD | LIS_DEBUG_IOCTL) {
+    if (LIS_DEBUG_SNDFD || LIS_DEBUG_IOCTL || LIS_DEBUG_REFCNTS) {
 	printk("lis_sendfd(...,%d,f@0x%p/%d) from \"%s\" to \"%s\"",
 	       fd,
 	       oldfp, F_COUNT(oldfp),
@@ -3264,10 +3257,13 @@ int lis_sendfd( stdata_t *sendhd, unsigned int fd, struct file *fp )
     /*
      *  the following wakes up a receiver if needed
      */
-    lis_lockq(recvhd->sd_rq) ;
-    lis_strrput( recvhd->sd_rq, mp );
-    lis_unlockq(recvhd->sd_rq) ;
-    return 0 ;
+    if (!(error = lis_lockq(recvhd->sd_rq)))
+    {
+	lis_strrput( recvhd->sd_rq, mp );
+	lis_unlockq(recvhd->sd_rq) ;
+	return(0) ;
+    }
+    /* else discard the message and return the error code */
 
 bad_file:
     freemsg(mp);
@@ -3310,10 +3306,11 @@ void lis_tq_free_passfp( void *arg )
     {	
 	sent = (strrecvfd_t *) mp->b_rptr;
 
+/* FIXME - need a test not dependent on lis_streams_fops */
 	is_a_stream = (sent->f.fp->f_op == (&lis_streams_fops));
+/**/
 
-
-	if (LIS_DEBUG_SNDFD | LIS_DEBUG_VCLOSE) {
+	if (LIS_DEBUG_SNDFD || LIS_DEBUG_VCLOSE || LIS_DEBUG_REFCNTS) {
 	    struct file *f = sent->f.fp;
 
 	    printk("lis_tq_free_passfp(m@0x%p)"
@@ -3325,23 +3322,20 @@ void lis_tq_free_passfp( void *arg )
 	    if (f) {
 		struct dentry *d   = f->f_dentry;
 		struct inode *i    = FILE_INODE(f);
-#if defined(KERNEL_2_3)
-		struct vfsmount *m = F_VFSMNT(f);
-#endif
+		struct vfsmount *m = FILE_MNT(f);
 		printk("    << d@0x%p/%d%s i@0x%p/%d%s",
 		       d, (d?D_COUNT(d):0),
 		       (d&&D_IS_LIS(d)?" <LiS>":""),
 		       i, (i?I_COUNT(i):0),
 		       (i&&I_IS_LIS(i)?" <LiS>":""));
-#if defined(KERNEL_2_3)
 		printk(" m@0x%p/%d", m, (m?MNT_COUNT(m):0));
-#endif
 		printk("\n");
 	    }
 	}
-	if (is_a_stream && sent->r.fp)
+	if (is_a_stream && sent->r.fp) {
+	    fops_put(sent->f.fp->f_op);
 	    sent->f.fp->f_op = NULL;  /* (FIXME?) don't call strclose... */
-
+	}
 	fput(sent->f.fp);
     	lis_freemsg(mp);
     }	
@@ -3358,7 +3352,7 @@ void lis_free_passfp( mblk_t *mp )
 {
 #if defined(KERNEL_2_5)
     static DECLARE_TASKLET(lis_tq, lis_tq_free_passfp,0);
-#elif defined(KERNEL_2_3)
+#else
     static struct tq_struct	 lis_tq ;
 #endif
     int				 emptyq ;
@@ -3391,11 +3385,9 @@ void lis_free_passfp( mblk_t *mp )
     {
 #if defined(KERNEL_2_5)
 	tasklet_schedule(&lis_tq) ;
-#elif defined(KERNEL_2_3)
+#else
 	lis_tq.routine = lis_tq_free_passfp;	/* 2.4 kernel, do it later */
 	schedule_task(&lis_tq);
-#else
-	lis_tq_free_passfp(NULL) ;		/* 2.2 kernel, do it now */
 #endif
     }
     return;
@@ -3448,7 +3440,7 @@ int lis_recvfd( stdata_t *recvhd, strrecvfd_t *recv, struct file *fp )
     recv->gid = sent->gid;
 
     if (sent->r.fp && (sent->r.fp == fp)) {
-	if (LIS_DEBUG_SNDFD | LIS_DEBUG_IOCTL)
+	if (LIS_DEBUG_SNDFD | LIS_DEBUG_IOCTL || LIS_DEBUG_REFCNTS)
 	    printk("lis_recvfd(...,f@0x%p/%d) "
 		   "S==R, using fp@0x%p/%d, freeing f@0x%p\n",
 		   sent->f.fp, (sent->f.fp?F_COUNT(sent->f.fp):0),
@@ -3457,17 +3449,20 @@ int lis_recvfd( stdata_t *recvhd, strrecvfd_t *recv, struct file *fp )
 
 	fd_install( recv->f.fd, fp );
 	(void) fget(recv->f.fd);
+	fops_put(sent->f.fp->f_op);
 	sent->f.fp->f_op = NULL;  /* avoid calling strclose */
 	if (F_ISSET(recvhd->sd_flag,STFIFO))
 	    lis_fifo_close_sync( FILE_INODE(fp), fp );
 	fput(sent->f.fp);
+#if 0
 	if (LIS_DEBUG_IOCTL)
+#endif
 	    sent->f.fp = fp;
     } else {
 	fd_install( recv->f.fd, sent->f.fp );
     }
 
-    if (LIS_DEBUG_SNDFD | LIS_DEBUG_IOCTL) {
+    if (LIS_DEBUG_SNDFD || LIS_DEBUG_IOCTL || LIS_DEBUG_REFCNTS) {
 	printk("lis_recvfd(...,f@0x%p/%d) as fd %d at \"%s\"\n",
 	       sent->f.fp, (sent->f.fp?F_COUNT(sent->f.fp):0),
 	       recv->f.fd, recvhd->sd_name);
@@ -3479,7 +3474,7 @@ int lis_recvfd( stdata_t *recvhd, strrecvfd_t *recv, struct file *fp )
 
 no_fds:
 not_passfp:
-    putbq( recvhd->sd_rq, mp );   /* put the message back */
+    putbqf( recvhd->sd_rq, mp );   /* put the message back */
 no_msg:
 not_stream:
     return error;
@@ -3489,39 +3484,58 @@ not_stream:
 *                         Atomic Routines                               *
 ************************************************************************/
 
-void    lis_atomic_set(lis_atomic_t *atomic_addr, int valu)
+void    _RP lis_atomic_set(lis_atomic_t *atomic_addr, int valu)
 {
     atomic_set((atomic_t *)atomic_addr, valu) ;
 }
 
-int     lis_atomic_read(lis_atomic_t *atomic_addr)
+int     _RP lis_atomic_read(lis_atomic_t *atomic_addr)
 {
     return(atomic_read(((atomic_t *)atomic_addr))) ;
 }
 
-void    lis_atomic_add(lis_atomic_t *atomic_addr, int amt)
+void    _RP lis_atomic_add(lis_atomic_t *atomic_addr, int amt)
 {
     atomic_add((amt),((atomic_t *)atomic_addr)) ;
 }
 
-void    lis_atomic_sub(lis_atomic_t *atomic_addr, int amt)
+void    _RP lis_atomic_sub(lis_atomic_t *atomic_addr, int amt)
 {
     atomic_sub((amt),((atomic_t *)atomic_addr)) ;
 }
 
-void    lis_atomic_inc(lis_atomic_t *atomic_addr)
+void    _RP lis_atomic_inc(lis_atomic_t *atomic_addr)
 {
     atomic_inc(((atomic_t *)atomic_addr)) ;
 }
 
-void    lis_atomic_dec(lis_atomic_t *atomic_addr)
+void    _RP lis_atomic_dec(lis_atomic_t *atomic_addr)
 {
     atomic_dec(((atomic_t *)atomic_addr)) ;
 }
 
-int     lis_atomic_dec_and_test(lis_atomic_t *atomic_addr)
+int     _RP lis_atomic_dec_and_test(lis_atomic_t *atomic_addr)
 {
     return(atomic_dec_and_test(((atomic_t *)atomic_addr))) ;
+}
+
+/************************************************************************
+*                       lis_in_interrupt                                *
+*************************************************************************
+*									*
+* Returns true if the kernel is at interrupt level or holding spin	*
+* locks (2.6).  Basically, if this returns true then you need to make	*
+* memory allocator calls using the "atomic" rather then "kernel" forms	*
+* of the routines.							*
+*									*
+************************************************************************/
+int      _RP lis_in_interrupt(void)
+{
+#if defined(KERNEL_2_5)
+    return(in_atomic() || irqs_disabled()) ;
+#else
+    return(in_interrupt()) ;
+#endif
 }
 
 /************************************************************************
@@ -3533,12 +3547,12 @@ int     lis_atomic_dec_and_test(lis_atomic_t *atomic_addr)
 * occur in kernel structures, such as inodes.				*
 *									*
 ************************************************************************/
-int lis_kernel_down(struct semaphore *sem)
+int _RP lis_kernel_down(struct semaphore *sem)
 {
     return(down_interruptible(sem)) ;
 }
 
-void lis_kernel_up(struct semaphore *sem)
+void _RP lis_kernel_up(struct semaphore *sem)
 {
     up(sem) ;
 }
@@ -3575,7 +3589,7 @@ int lis_check_umem(struct file *fp, int rd_wr_fcn,
 * A slightly slower version of the kernel routine.			*
 *									*
 ************************************************************************/
-void lis_gettimeofday(struct timeval *tv)
+void _RP lis_gettimeofday(struct timeval *tv)
 {
     return(do_gettimeofday(tv));
 }
@@ -3607,21 +3621,96 @@ int lis_loadable_load(const char *name)
 }
 
 
-/*
- * The lis_can_unload module tells rmmod when it is OK to unload us.
- *
- * Return 1 if we cannot be unloaded, i.e., in use, and 0 if we can.
- */
-#ifdef MODULE
-int lis_can_unload(void)
+#ifdef _S390X_LIS_
+int lis_ioctl32_str (unsigned int fd, unsigned int cmd, unsigned long arg)
 {
-    if (THIS_MODULE == NULL)
-	return(0) ;			/* can unload */
+  strioctl_t par64;
+  strioctl32_t par32;
+  strioctl32_t * ptr32;
+  char * data32p;
+  mm_segment_t old_fs;
+  char * datap = NULL;
+  int rc;
 
-    return(atomic_read(&(THIS_MODULE->uc.usecount)) <= lis_initial_use_cnt) ;
+  ptr32 = (strioctl32_t*)arg;
+  if (copy_from_user((void*)&par32,(void*)ptr32,sizeof(strioctl32_t)))
+  {
+    printk("Unable to get parameter block for 32 bit ioctl I_STR (length %d)\n",
+           sizeof(strioctl32_t));
+    rc = -EFAULT;
+    goto ioctl32_end;
+  }
+  par64.ic_cmd    = par32.ic_cmd;
+  par64.ic_timout = par32.ic_timout;
+  par64.ic_len    = par32.ic_len;
+  data32p = (char*)par32.ic_dp;
+  if (par64.ic_len > 0)
+  {
+    datap = ALLOCF(par64.ic_len,"ioctl32 ");
+    if (datap == NULL)
+    {
+      printk("Unable to get memory to convert 32 bit ioctl I_STR (length %d)\n",
+             par64.ic_len);
+      rc = -ENOSR;
+      goto ioctl32_end;
+    }
+    if (copy_from_user((void*)datap,(void*)data32p,par64.ic_len))
+    {
+      printk("Unable to get data block for 32 bit ioctl I_STR (length %d)\n",
+             par64.ic_len);
+      rc = -EFAULT;
+      goto ioctl32_end;
+    }
+    par64.ic_dp = datap;
+  }
+  else
+  {
+    par64.ic_dp = NULL;
+  }
+  old_fs = get_fs();
+  set_fs(KERNEL_DS);
+  rc = sys_ioctl(fd,cmd,(unsigned long)&par64);
+  set_fs(old_fs);
+ 
+  if (copy_to_user((void*)&(ptr32->ic_cmd),(void*)&(par64.ic_cmd),sizeof(int)))
+  {
+    printk("Unable to return command parameter for 32 bit ioctl I_STR\n");
+    rc = -EFAULT;
+    goto ioctl32_end;
+  }
+  if (copy_to_user((void*)&(ptr32->ic_timout),(void*)&(par64.ic_timout),
+                   sizeof(int)))
+  {
+    printk("Unable to return timeout parameter for 32 bit ioctl I_STR\n");
+    rc = -EFAULT;
+    goto ioctl32_end;
+  }
+  if (copy_to_user((void*)&(ptr32->ic_len),(void*)&(par64.ic_len),sizeof(int)))
+  {
+    printk("Unable to return length parameter for 32 bit ioctl I_STR\n");
+    rc = -EFAULT;
+    goto ioctl32_end;
+  }
+  if ((par64.ic_len > 0) && (data32p != NULL) && (datap != NULL))
+  {
+    if (copy_to_user((void*)data32p,(void*)datap,par64.ic_len))
+    {
+      printk("Unable to return data block for 32 bit ioctl I_STR (length %d)\n",
+             par64.ic_len);
+      rc = -EFAULT;
+      goto ioctl32_end;
+    }
+  }
+
+ioctl32_end:
+  if (datap != NULL)
+  {
+    FREE(datap);
+  }
+ 
+  return(rc);
 }
 #endif
-
 
 int lis_init_module( void )
 {
@@ -3635,7 +3724,6 @@ int lis_init_module( void )
     current->fs->umask = 0 ;		/* can set any permissions */
 
     lis_mem_init() ;			/* in lismem.c */
-    lis_print_trace = lis_print_trace_func ;
     lis_major = register_chrdev(0,"streams",&lis_streams_fops);
     if	(lis_major < 0)
     {
@@ -3655,7 +3743,6 @@ int lis_init_module( void )
 #endif
     lis_init_head();
 
-#ifdef KERNEL_2_3
     {
 	int	 err ;
 
@@ -3667,29 +3754,15 @@ int lis_init_module( void )
 	    if (IS_ERR(lis_mnt))
 		unregister_filesystem(&lis_file_system_ops) ;
 	    else {
+#if defined(MODULE)
+		lis_file_system_ops.owner = THIS_MODULE;
+#endif
 		lis_mnt_init_cnt = MNT_COUNT(lis_mnt);
 		MNTSYNC();
 		err = 0 ;
 	    }
 	}
 
-#ifdef MODULE
-	if (err == 0)
-	{
-#if 0
-	    /*
-	     * There was a kernel version (I now don't remember which) that
-	     * had a bug that made this necessary.  As of 2.4.16 this bug
-	     * has been fixed.  It is now normal to have the usecount > 0
-	     * at this point and decrementing it leads to a later decrement
-	     * through zero and the inability to unload LiS.
-	     */
-	    lis_initial_use_cnt = atomic_read(&(THIS_MODULE->uc.usecount)) - 1;
-	    if (lis_initial_use_cnt > 0)
-		lis_dec_mod_cnt() ;
-#endif
-	}
-#endif
 	if (err != 0)
 	{
 	    printk(
@@ -3698,18 +3771,30 @@ int lis_init_module( void )
 	    return(err) ;
 	}
     }
-#endif
 
     lis_start_qsched() ;		/* ensure q running process going */
+
+#ifdef _S390X_LIS_
+    register_ioctl32_conversion(I_SETSIG,sys_ioctl);
+    register_ioctl32_conversion(I_SRDOPT,sys_ioctl);
+    register_ioctl32_conversion(I_PUSH,sys_ioctl);
+    register_ioctl32_conversion(I_LINK,sys_ioctl);
+    register_ioctl32_conversion(I_UNLINK,sys_ioctl);
+ 
+    register_ioctl32_conversion(I_STR,lis_ioctl32_str);
+#endif
+
     printk(
 	"Linux STREAMS Subsystem ready.\n"
-	"Copyright (c) 1997-2003 David Grothe, et al, http://www.gcom.com\n"
+	"Copyright (c) 1997-2004 David Grothe, et al, http://www.gcom.com\n"
 	"Major device number %d.\n"
 	"Version %s %s. Compiled for kernel version %s.\n"
 	"Using %s %s\n"
+	"Kernel register args %d, LiS register args %d\n"
 	"==================================================================\n",
 	lis_major, lis_version, lis_date, lis_kernel_version,
-	lis_poll_file, lis_stropts_file );
+	lis_poll_file, lis_stropts_file,
+	CCREGPARM, STREAMS_REGPARM);
 
     return(0);
 }
@@ -3719,7 +3804,11 @@ int lis_init_module( void )
 /*
  * Magic named routine called by kernel module support code.
  */
+#ifdef KERNEL_2_5
+int _lis_init_module( void )
+#else
 int init_module( void )
+#endif
 {
     return(lis_init_module()) ;
 }
@@ -3727,7 +3816,11 @@ int init_module( void )
 /*
  * Magic named routine called by kernel module support code.
  */
+#ifdef KERNEL_2_5
+void _lis_cleanup_module( void )
+#else
 void cleanup_module( void )
+#endif
 {
    extern void	lis_kill_qsched(void) ;
    extern void	lis_mem_terminate(void) ;
@@ -3766,7 +3859,6 @@ void cleanup_module( void )
 #endif          /* S390 or S390X */
 
     unregister_chrdev(lis_major,"streams");
-#if defined(KERNEL_2_3)			/* 2.4 */
     MNTSYNC();
     if (lis_mnt && MNT_COUNT(lis_mnt) > lis_mnt_init_cnt) {
 	printk("LiS mount count is %d, should be %d\n",
@@ -3774,37 +3866,45 @@ void cleanup_module( void )
     }
 
     if (lis_mnt != NULL)
-	kern_umount(lis_mnt) ;
+	MNTPUT(lis_mnt) ;
 
     unregister_filesystem(&lis_file_system_ops) ;
     {
 	int	n ;
 
-	if ((n = lis_atomic_read(&lis_inode_cnt)) != 0)
+	if ((n = K_ATOMIC_READ(&lis_inode_cnt)) != 0)
 	    printk("LiS inode count is %d, should be 0\n", n) ;
+    }
+
+#ifdef KERNEL_2_5
+    {
+	void lis_free_devid_list(void) ;	/* in osif.c */
+	lis_free_devid_list() ;
     }
 #endif
     lis_terminate_final() ;		/* LiS internal memory */
     lis_mem_terminate() ;		/* LiS use of slab allocator */
 
+#ifdef _S390X_LIS_
+    unregister_ioctl32_conversion(I_SETSIG);
+    unregister_ioctl32_conversion(I_SRDOPT);
+    unregister_ioctl32_conversion(I_PUSH);
+    unregister_ioctl32_conversion(I_LINK);
+    unregister_ioctl32_conversion(I_UNLINK);
+ 
+    unregister_ioctl32_conversion(I_STR);
+#endif
+
     printk ("Linux STREAMS Subsystem removed\n");
 }
 
+#ifdef KERNEL_2_5
+module_init(_lis_init_module) ;
+module_exit(_lis_cleanup_module) ;
 #endif
 
-/************************************************************************
-*                       lis_print_trace_func                            *
-*************************************************************************
-*									*
-* This function is pointed to by the lis_print_trace pointer.  It makes	*
-* cmn_err strings come out in the log. 					*
-*									*
-************************************************************************/
-void lis_print_trace_func(char *msg)
-{
-    printk("%s", msg) ;
+#endif
 
-} /* lis_print_trace_func */
 
 /************************************************************************
 *                          streams_init                                 *
@@ -3823,43 +3923,6 @@ void	streams_init(void)
 
 } /* streams_init */
 
-/************************************************************************
-*                        lis_inc_mod_cnt                                *
-*************************************************************************
-*									*
-* Increment the module counter for STREAMS.  This prevents us from	*
-* being unloaded while we have files open.				*
-*									*
-************************************************************************/
-void	lis_inc_mod_cnt_fcn(const char *file, int line)
-{
-    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
-	printk("lis_inc_mod_cnt() <\"%s\"/%d>++ {%s@%d}\n",
-	    THIS_MODULE->name,
-	    atomic_read(&(THIS_MODULE->uc.usecount)), file, line) ;
-
-    MOD_INC_USE_COUNT ;
-
-} /* lis_inc_mod_cnt */
-
-/************************************************************************
-*                          lis_dec_mod_cnt                              *
-*************************************************************************
-*									*
-* Decrement our module use count.					*
-*									*
-************************************************************************/
-void	lis_dec_mod_cnt_fcn(const char *file, int line)
-{
-    MOD_DEC_USE_COUNT ;
-
-    if (LIS_DEBUG_VOPEN | LIS_DEBUG_VCLOSE)
-	printk("lis_dec_mod_cnt() --<\"%s\"/%d> {%s@%d}\n",
-	    THIS_MODULE->name,
-	    atomic_read(&(THIS_MODULE->uc.usecount)), file, line) ;
-
-} /* lis_dec_mod_cnt */
-
 #endif /* LINUX */
 
 /************************************************************************
@@ -3876,33 +3939,14 @@ void	lis_dec_mod_cnt_fcn(const char *file, int line)
 * ally included when you include <sys/stream.h>.			*
 *									*
 ************************************************************************/
-/*
- * To lock or not to lock: only 2.2 SMP kernels need to lock
- */
-#if defined(__SMP__) && LINUX_VERSION_CODE >= KERNEL_VERSION(2,2,0) \
-		     && LINUX_VERSION_CODE <= KERNEL_VERSION(2,3,0)
-#include <linux/smp_lock.h>
-#define	Klock	lock_kernel()
-#define	Kunlock	unlock_kernel()
-#else
-#define	Klock	
-#define	Kunlock	
-#endif
 
 /*
  * Some defines for manipulating signals.
  */
-#if defined(KERNEL_2_3)
 #define	MY_SIGS		current->pending.signal
 #define	MY_SIG		MY_SIGS.sig[0]
 #define	MY_BLKS		current->blocked
 #define	MY_BLKD		MY_BLKS.sig[0]
-#else
-#define MY_SIGS		current->signal
-#define MY_SIG		current->signal
-#define MY_BLKS		current->blocked
-#define MY_BLKD		current->blocked
-#endif
 
 /*
  * This is the function that we start up.  It sheds user memory 
@@ -3926,43 +3970,23 @@ int	lis_thread_func(void *argp)
     int		       (*func)(void *) ;
     void		*func_arg ;
 
-    Klock; 				/* get the big kernel lock */
-
-#if defined(KERNEL_2_3)
-    daemonize() ;			/* make me a daemon */
-# if !defined(KERNEL_2_5)		/* 2.5 does the reparent for us */
-#  if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,16)
+#if defined(KERNEL_2_5)
+    daemonize("%s", arg->name) ;	/* make me a daemon */
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,16)
     reparent_to_init() ;		/* disown all parentage */
-#  endif
-# endif
-#else					/* earlier 2.2 kernel */
-    /*
-     * This stuff is pretty much subsumed in the daemonize routine
-     * of 2.4 and 2.5 kernels.
-     */
-    exit_files(current) ;		/* close all files */
-    exit_mm(current) ;			/* detach user pages */
-    dput(current->fs->pwd) ; 	        /* detach from current directory */
-    if (current->fs != NULL && current->fs->root != NULL)
-    {
-	current->fs->pwd = dget(current->fs->root) ; /* use "/" as pwd */
-    }
-    current->pgrp = 1 ;			/* detach from parent */
-    current->session = 1 ;		/* now owned by "init" */
-    current->tty = NULL ;		/* detach from any tty */
-    if (current->mm != NULL)
-	current->mm->arg_start = current->mm->arg_end = 0;
+#else
+    daemonize() ;			/* make me a daemon */
 #endif
 
     current->uid = 0 ;			/* become root */
     current->euid = 0 ;			/* become root */
+#if !defined(KERNEL_2_5)
     strcpy(current->comm, arg->name) ;
+#endif
 
     func = arg->func ;
     func_arg = arg->func_arg ;
     FREE(argp) ;			/* don't need args anymore */
-
-    Kunlock ;				/* release big kernel lock */
 
     return(func(func_arg)) ;		/* enter caller's function */
     					/* without holding big kernel lock */
@@ -3972,7 +3996,7 @@ int	lis_thread_func(void *argp)
  * Start the thread with "fcn(arg)" as the entry point.  Return the pid for the
  * new process, or < 0 for error.
  */
-pid_t	lis_thread_start(int (*fcn)(void *), void *arg, const char *name)
+pid_t	_RP lis_thread_start(int (*fcn)(void *), void *arg, const char *name)
 {
     arg_t	*argp ;
 
@@ -3991,7 +4015,7 @@ pid_t	lis_thread_start(int (*fcn)(void *), void *arg, const char *name)
     return(kernel_thread(lis_thread_func, (void *) argp, 0)) ;
 }
 
-int
+int _RP
 lis_thread_stop(pid_t pid)
 {
     return(kill_proc(pid, SIGTERM, 1));
@@ -4032,25 +4056,22 @@ int	lis_thread_runqueues(void *p)
     extern char		 lis_print_buffer[] ;
     extern char		*lis_nxt_print_ptr ;
 
-    Klock; 
-
     printk(KERN_INFO "LiS-RunQ-%s running on CPU %d pid=%d\n",
 	    lis_version, cpu_id, current->pid) ;
 
     current->fs->umask = 0 ;		/* can set any permissions */
     current->policy = SCHED_FIFO ;	/* real-time: run when ready */
     current->rt_priority = 50 ;		/* middle value real-time priority */
-    sigaddset(&MY_BLKS, SIGTERM) ;	/* inhibit SIGTERM */
-#if defined(KERNEL_2_5)
-# if defined(__SMP__)
-    set_cpus_allowed(current, 1 << cpu_id) ;
+    sigfillset(&MY_BLKS) ;		/* block all signals */
+    sigdelset(&MY_BLKS, SIGKILL) ;	/* enable KILL */
+#if defined(SET_CPUS_ALLOWED)
+# if defined(KERNEL_2_5)
+    set_cpus_allowed(current, cpumask_of_cpu(cpu_id)) ;
 # else
-    /* of course this symbol is not defined unless the kernel was built w/SMP */
+    set_cpus_allowed(current, 1 << cpu_id) ;
 # endif
-#elif defined(KERNEL_2_3)
-# if !defined(_PPC_LIS_)
-    current->cpus_allowed = (1 << cpu_id) ;	/* bind to a CPU */
-# endif
+#else
+    current->cpus_allowed = (1 << cpu_id) ;	/* older 2.4 kernels */
 #endif
 
 #if defined(KERNEL_2_5)
@@ -4072,10 +4093,8 @@ int	lis_thread_runqueues(void *p)
 	 */
 	if (lis_down(semp) < 0)			/* sleep */
 	{					/* interrupted */
-	    if (signal_pending(current)		/* killed */
-		&& (   sigismember(&MY_SIGS, SIGKILL)
-		    || sigismember(&MY_SIGS, SIGINT)
-		   )
+	    if (   signal_pending(current)	/* killed */
+		&& sigismember(&MY_SIGS, SIGKILL)
 	       )
 		break ;				/* process killed */
 
@@ -4091,16 +4110,20 @@ int	lis_thread_runqueues(void *p)
 	    sig_cnt = 0 ;
 
 	lis_runq_wakeups[cpu_id]++ ;
-#ifdef KERNEL_2_3
 	if (cpu_id != smp_processor_id())
 	{
 	    static int	msg_cnt ;
+	    char	buf[200] ;
 
-	    if (++msg_cnt < 5)
-		printk("%s woke up running on CPU %d\n",
-			current->comm, smp_processor_id()) ;
-	}
+#if defined(KERNEL_2_5)
+	    cpumask_scnprintf(buf, sizeof(buf), current->cpus_allowed) ;
+#else
+	    sprintf(buf, "0x%lx", current->cpus_allowed) ;
 #endif
+	    if (++msg_cnt < 5)
+		printk("%s woke up running on CPU %d -- cpu_id=%d mask=%s\n",
+			current->comm, smp_processor_id(), cpu_id, buf) ;
+	}
 	/*
 	 * If there are characters queued up in need of printing, print them if
 	 * some time has elapsed.
@@ -4122,7 +4145,7 @@ int	lis_thread_runqueues(void *p)
     lis_sem_destroy(&lis_runq_sems[cpu_id]) ;	/* de-init semaphore */
     lis_runq_pids[cpu_id] = 0 ;			/* process gone */
     lis_up(&lis_runq_kill_sems[cpu_id]) ;	/* OK, we're killed */
-    Kunlock ;
+
     return(0) ;
 }
 
@@ -4157,7 +4180,7 @@ void	lis_start_qsched(void)
 	    continue ;
 	}
 
-	lis_atomic_inc(&lis_runq_cnt) ;		/* one more running */
+	K_ATOMIC_INC(&lis_runq_cnt) ;		/* one more running */
     }
 }
 
@@ -4168,40 +4191,40 @@ void	lis_start_qsched(void)
  */
 void	lis_setqsched(int can_call)		/* kernel thread style */
 {
-    int		runq_cnt ;
     int		queues_running ;
     int		queue_load_thresh ;
     int		req_cnt ;
     int		in_intr = in_interrupt() ;
-#ifdef KERNEL_2_3
     int		my_cpu = smp_processor_id() ;
-#else
-    int		my_cpu = 0 ;
-#endif
+    int		cpu ;
+    static int	qsched_running ;
     lis_flags_t psw;
 
+#define WORK_INCR	13
+
     lis_spin_lock_irqsave(&lis_setqsched_lock, &psw) ;
-    lis_setqsched_cnts[my_cpu]++ ;	/* keep statistics */
+
+    lis_setqsched_cnts[my_cpu]++ ;		/* keep statistics */
     if (in_intr)
-    {
-	can_call = 0 ;			/* don't call out from intrs */
-	lis_setqsched_isr_cnts[my_cpu]++ ;
+	lis_setqsched_isr_cnts[my_cpu]++ ;	/* keep statistics */
+
+    if (qsched_running)
+    {						/* one of these is enough */
+	lis_spin_unlock_irqrestore(&lis_setqsched_lock, &psw) ;
+	return ;
     }
 
-    if (lis_atomic_read(&lis_runq_cnt) == 0)
+    qsched_running = 1 ;
+    lis_spin_unlock_irqrestore(&lis_setqsched_lock, &psw) ;
+
+    if (K_ATOMIC_READ(&lis_runq_cnt) == 0)
     {					/* no threads running */
 	static int	cnt ;
-	lis_spin_unlock_irqrestore(&lis_setqsched_lock, &psw) ;
+
 	if (cnt++ < 5)
 	    printk("lis_setqsched: No qrun process\n");
 
-	/*
-	 * If the runq process is dead we are probably on the way
-	 * down for a reboot.  Run the queues from here.
-	 */
-	if (can_call)
-	    lis_run_queues(my_cpu) ;		/* run the STREAMS queues */
-	return ;
+	goto return_point ;
     }
 
     /*
@@ -4209,7 +4232,7 @@ void	lis_setqsched(int can_call)		/* kernel thread style */
      * don't want more queue runners actually running than there are queues to
      * be run.
      *
-     * runq_cnt is the number of threads that we have started.
+     * lis_runq_cnt is the number of threads that we have started.
      *
      * lis_queues_running is the number of them that are awake and actively
      * processing streams queues.
@@ -4222,90 +4245,72 @@ void	lis_setqsched(int can_call)		/* kernel thread style */
      * another thread, so there should be enough work queued to make it worth
      * doing.
      *
-     * Queueing theory suggests that at 80% utilization the average queue
-     * length is expected to be 4.  With 60% utilization you would expect to
-     * see 5 or more items queued 5% of the time.  With 45% utilization you
-     * would expect to see 5 or more items queued 1% of the time.  So, once
-     * there are 5 items queued it is not a bad idea to add another CPU to the
-     * mix if one is available.
+     * Queueing theory suggests that between 90-95% utilization the average
+     * queue length is expected to be between 9 and 19.  With 80% utilization
+     * you would expect to see 12 or more items queued 5% of the time.
+     * With 70% utilization you would expect to see 12 or more items queued 1%
+     * of the time.
+     *
+     * The value of 13 was determined experimentally as seeming to keep the
+     * queue runners busy on a CPU or two in a high speed data passing test.
+     * There is some efficiency to be gained by not having the queue runner
+     * threads sleeping/waking up frequently.
      *
      * Once we decide to wake up threads, we do so until we have enough threads
-     * running to cover the items queued at 4 items per cpu, or until we have
+     * running to cover the items queued at 13 items per cpu, or until we have
      * awakened the queue runner threads on all available cpus.  This is
      * something of a heuristic so we don't care that some of these numbers
      * may be changing on other cpus while we execute this loop.
      *
      * Because the threads are running at real-time priority we will likely be
      * preempted as soon as we wake up the thread that is bound to the cpu that
-     * we are running on.  So we defer that wakeup until last when we have
-     * started up all the other cpus.  This also has the effect of waking up
-     * the other cpu first for a small number of scheduled queues (say 1).
-     *
-     * As an efficiency measure, if simply running the queues on our own CPU
-     * would suffice to handle the queued entries, then just call out to our
-     * own queue runner right from here.  Because of the setting of the
-     * "can_call" variable, this means, in effect, when one of the STREAMS
-     * system calls is about to exit back to the user.  We don't try to 
-     * do this when called from qenable.
-     *
-     * If we are called from interrupt context we will actually wake up the
-     * queue runner on our own CPU (as the last thing we do), but if we are
-     * called from background we will just call the run-queues procedure right
-     * from here.  This makes single CPU operations more efficient.  Note that
-     * if we are called from the queue runner process then the active flag for
-     * our CPU will be set and we will neither wake up the process nor call the
-     * queue-runner directly, but we might wake up a process on another CPU if
-     * it looks like we need more help.
+     * we are running on.  This routine is always called from a context in
+     * which the caller anticipates preemption, so we need not worry about
+     * this.
      */
-    runq_cnt = lis_atomic_read(&lis_runq_cnt) ;
-    queues_running = lis_atomic_read(&lis_queues_running) ;
-    queue_load_thresh = 4 * queues_running ;
-    req_cnt = lis_atomic_read(&lis_runq_req_cnt) ;
-    if (   req_cnt > queue_load_thresh
-	&& req_cnt <= queue_load_thresh + 4	/* one more would do it */
-	&& !lis_atomic_read(&lis_runq_active_flags[my_cpu])
+
+    queues_running = K_ATOMIC_READ(&lis_queues_running) ;
+    queue_load_thresh = WORK_INCR * queues_running ;
+    req_cnt = K_ATOMIC_READ(&lis_runq_req_cnt) ;
+
+    /*
+     * If the number of outstanding requests does not cross the upper
+     * threhold for needing more queue run threads running, or if they
+     * are all running already, just return.  There is nothing that we
+     * can do to improve things.
+     */
+    if (   req_cnt <= queue_load_thresh
+	|| queues_running == K_ATOMIC_READ(&lis_runq_cnt)
        )
-    {						/* maybe can handle it here */
-	lis_spin_unlock_irqrestore(&lis_setqsched_lock, &psw) ;
-	if (can_call)
-	    lis_run_queues(my_cpu) ;		/* run the queues from here */
-	else					/* can't call directly */
-	if (lis_atomic_read(&lis_in_syscall) == 0) /* not in a system call */
-	    lis_up(&lis_runq_sems[my_cpu]) ;	/* wake up thread on my cpu */
-	/* else let syscall exit come back here again */
-    }
-    else					/* need more help */
-    {
-	int		cpu ;
-	int		qthreshold = 4*queues_running ;
-	int		enough = 0 ;
+	goto return_point ;
 
-	for (cpu = 0; cpu < runq_cnt; cpu++)/* find a sleeping thread */
-	{
-	    if (   cpu != my_cpu		/* don't start on my cpu yet */
-		&& !lis_atomic_read(&lis_runq_active_flags[cpu]))
-	    {					/* sleeping thread */
-		lis_up(&lis_runq_sems[cpu]) ;	/* wake up a thread */
-		qthreshold += 4 ;			/* increase threshold */
-		if (lis_atomic_read(&lis_runq_req_cnt) <= qthreshold)
-		{
-		    enough = 1 ;		/* enough threads running */
-		    break ;
-		}
-	    }
+    /*
+     * We could benefit by having another queue run thread wake up
+     * and help with the queue processing.  Don't wake up my cpu
+     * until after loop completion since we don't want this loop
+     * to be preempted.
+     */
+    for (cpu = 0; cpu < K_ATOMIC_READ(&lis_runq_cnt); cpu++)
+    {					/* find a sleeping thread */
+	if (   cpu != my_cpu		/* don't start on my cpu yet */
+	    && !K_ATOMIC_READ(&lis_runq_active_flags[cpu]))
+	{					/* sleeping thread */
+	    lis_up(&lis_runq_sems[cpu]) ;	/* wake up a thread */
+	    queue_load_thresh += WORK_INCR ;	/* increase threshold */
+	    if (K_ATOMIC_READ(&lis_runq_req_cnt) <= queue_load_thresh)
+		goto return_point ;		/* enough threads running */
 	}
-
-	if (!enough && !lis_atomic_read(&lis_runq_active_flags[my_cpu]))
-	{
-	    lis_spin_unlock_irqrestore(&lis_setqsched_lock, &psw) ;
-	    if (!can_call)			/* can't just do it */
-		lis_up(&lis_runq_sems[my_cpu]) ;/* wake up thread on my cpu */
-	    else				/* just do it here */
-		lis_run_queues(my_cpu) ;	/* run the queues from here */
-	}
-	else
-	    lis_spin_unlock_irqrestore(&lis_setqsched_lock, &psw) ;
     }
+
+    /*
+     * If we get to here we still need another queue runner.  See if
+     * my_cpu is available.
+     */
+    if (!K_ATOMIC_READ(&lis_runq_active_flags[my_cpu]))
+	lis_up(&lis_runq_sems[my_cpu]) ;	/* wake up thread on my cpu */
+
+return_point:
+    qsched_running = 0 ;
 
 } /* lis_setqsched */
 
@@ -4322,7 +4327,7 @@ void	lis_kill_qsched(void)
 	{
 	    kill_proc(lis_runq_pids[cpu], SIGKILL, 1) ;
 	    lis_down(&lis_runq_kill_sems[cpu]) ;
-	    lis_atomic_dec(&lis_runq_cnt) ;		/* one fewer running */
+	    K_ATOMIC_DEC(&lis_runq_cnt) ;		/* one fewer running */
 	    lis_sem_destroy(&lis_runq_kill_sems[cpu]) ;	/* de-init semaphore */
 	}
     }
@@ -4353,63 +4358,34 @@ int      lis_kill_pg (int pgrp, int sig, int priv)
 * semaphore waits will all fail with EINTR.				*
 *									*
 ************************************************************************/
+
+#if defined(SIGMASKLOCK)
+#define LOCK_MASK    spin_lock_irq(&current->sigmask_lock)
+#define UNLOCK_MASK    recalc_sigpending(current); \
+		       spin_unlock_irq(&current->sigmask_lock)
+#else
+#define LOCK_MASK    spin_lock_irq(&current->sighand->siglock)
+#define UNLOCK_MASK    recalc_sigpending(); \
+		       spin_unlock_irq(&current->sighand->siglock)
+#endif
+
 void lis_clear_and_save_sigs(stdata_t *hd)
 {
     sigset_t	*hd_sigs = (sigset_t *) hd->sd_save_sigs ;
 
-#if defined(KERNEL_2_5)
-    *hd_sigs = current->pending.signal ;
-    sigemptyset(&current->pending.signal) ;	/* clear process signals */
-    recalc_sigpending() ;			/* now none pending */
-#elif defined(KERNEL_2_3)
-# if defined(SIGMASKLOCK)
-    spin_lock_irq(&current->sigmask_lock) ;
-# endif
-    *hd_sigs = current->pending.signal ;
-    sigemptyset(&current->pending.signal) ;	/* clear process signals */
-# if defined(RCVOID)
-    recalc_sigpending() ;			/* now none pending */
-# else
-    recalc_sigpending(current) ;		/* now none pending */
-# endif
-# if defined(SIGMASKLOCK)
-    spin_unlock_irq(&current->sigmask_lock) ;
-# endif
-#else
-    spin_lock_irq(&current->sigmask_lock) ;
-    *hd_sigs = current->signal ;
-    sigemptyset(&current->signal) ;		/* clear process signals */
-    recalc_sigpending(current) ;		/* now none pending */
-    spin_unlock_irq(&current->sigmask_lock) ;
-#endif
+    LOCK_MASK ;
+    *hd_sigs = current->blocked ;
+    sigfillset(&current->blocked) ;		/* block all signals */
+    UNLOCK_MASK ;
 }
 
 void lis_restore_sigs(stdata_t *hd)
 {
     sigset_t	*hd_sigs = (sigset_t *) hd->sd_save_sigs ;
 
-#if defined(KERNEL_2_5)
-    current->pending.signal = *hd_sigs ;
-    recalc_sigpending() ;			/* previous signals */
-#elif defined(KERNEL_2_3)
-# if defined(SIGMASKLOCK)
-    spin_lock_irq(&current->sigmask_lock) ;
-# endif
-    current->pending.signal = *hd_sigs ;
-# if defined(RCVOID)
-    recalc_sigpending() ;			/* now none pending */
-# else
-    recalc_sigpending(current) ;		/* now none pending */
-# endif
-# if defined(SIGMASKLOCK)
-    spin_unlock_irq(&current->sigmask_lock) ;
-# endif
-#else
-    spin_lock_irq(&current->sigmask_lock) ;
-    current->signal = *hd_sigs ;
-    recalc_sigpending(current) ;		/* now none pending */
-    spin_unlock_irq(&current->sigmask_lock) ;
-#endif
+    LOCK_MASK ;
+    current->blocked = *hd_sigs ;
+    UNLOCK_MASK ;
 }
 
 /************************************************************************
@@ -4418,9 +4394,18 @@ void lis_restore_sigs(stdata_t *hd)
 *									*
 * These routines copy credentials to/from the task structure.		*
 *									*
+* This is only needed in a single CPU environment in which we run the	*
+* queue schedule on top of a call from users.  In that case we need to	*
+* assume kernel credentials while running the queues, so these routines	*
+* need to actually do something.					*
+*									*
+* The lock here is high contention, so we avoid doing this work in a	*
+* multi-cpu environment.						*
+*									*
 ************************************************************************/
 void	lis_task_to_creds(lis_kcreds_t *cp)
 {
+#if 0
     int		i ;
     lis_flags_t psw;
 
@@ -4440,10 +4425,12 @@ void	lis_task_to_creds(lis_kcreds_t *cp)
     for (i = 0; i < current->ngroups; i++)
 	cp->groups[i] = current->groups[i] ;
     lis_spin_unlock_irqrestore(&lis_task_lock, &psw) ;
+#endif
 }
 
 void	lis_creds_to_task(lis_kcreds_t *cp)
 {
+#if 0
     int		i ;
     lis_flags_t psw;
 
@@ -4463,6 +4450,7 @@ void	lis_creds_to_task(lis_kcreds_t *cp)
     for (i = 0; i < cp->ngroups; i++)
 	current->groups[i] = cp->groups[i] ;
     lis_spin_unlock_irqrestore(&lis_task_lock, &psw) ;
+#endif
 }
 
 /************************************************************************
@@ -4473,7 +4461,7 @@ void	lis_creds_to_task(lis_kcreds_t *cp)
 * requested mode and device major/minor.				*
 *									*
 ************************************************************************/
-int	lis_mknod(char *name, int mode, dev_t dev)
+int	_RP lis_mknod(char *name, int mode, dev_t dev)
 {
     mm_segment_t	old_fs;
     int			ret;
@@ -4498,7 +4486,7 @@ int	lis_mknod(char *name, int mode, dev_t dev)
 * Remove a name from the directory structure.				*
 *									*
 ************************************************************************/
-int	lis_unlink(char *name)
+int	_RP lis_unlink(char *name)
 {
     mm_segment_t	old_fs;
     int			ret;
@@ -4534,7 +4522,7 @@ int mount_permission(char * path)
     /*
      *  Always grant permission to superuser; no need for further checks
      */
-    if (suser())  return 0;
+    if (capable(CAP_SYS_ADMIN))  return 0;
     
     /*
      *  Otherwise, we need to check the owner, and permissions, at the
@@ -4546,9 +4534,11 @@ int mount_permission(char * path)
 	struct dentry *dentry = nd.dentry;
 	struct inode *inode   = (dentry ? dentry->d_inode : NULL);
 
+#if !defined(KERNEL_2_5)
 	/* 2.4.x kernels do something like the following... */
 	if (inode && inode->i_op && inode->i_op->revalidate)
 	    error = inode->i_op->revalidate(dentry);
+#endif
 	
 	/* check process euid == inode uid */
 	if (!error && (current->euid != inode->i_uid))
@@ -4556,7 +4546,11 @@ int mount_permission(char * path)
 	
 	/* check permission(s) */
 	if (!error)
+#if defined(KERNEL_2_5)
+	    error = permission(inode, mask, &nd);
+#else
 	    error = permission(inode, mask);
+#endif
 	
 	path_release(&nd);
     }
@@ -4658,10 +4652,13 @@ int	lis_umount2(char *path, int flags)
 MODULE_LICENSE("GPL and additional rights");
 #endif
 #if defined(MODULE_AUTHOR)
-MODULE_AUTHOR("David Grothe");
+MODULE_AUTHOR("David Grothe <dave@gcom.com>");
 #endif
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("SVR4 STREAMS for Linux (LGPL Code)");
+#endif
+#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
+MODULE_INFO(vermagic, VERMAGIC_STRING);
 #endif
 
 /************************************************************************
@@ -4670,11 +4667,11 @@ MODULE_DESCRIPTION("SVR4 STREAMS for Linux (LGPL Code)");
 *             as a LiS performance improvement under Linux              *
 ************************************************************************/
 
-#if defined(USE_LINUX_KMEM_CACHE) 
+#if defined(USE_KMEM_CACHE) 
 void lis_init_msg(void)
 {
         lis_msgb_cachep =
-            kmem_cache_create("lis_msgb_cachep", sizeof(struct mdbblock),
+            kmem_cache_create("LiS-msgb", sizeof(struct mdbblock),
                                 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
         if (!lis_msgb_cachep) 
                 printk("lis_init_msg: lis_msgb_cachep is NULL. "
@@ -4685,6 +4682,7 @@ void lis_msgb_cache_freehdr(void *bp)
 {
       if (lis_msgb_cachep) {
               LisDownCount(HEADERS);
+	      K_ATOMIC_DEC(&lis_msgb_cnt) ;
               kmem_cache_free(lis_msgb_cachep, (struct mdbblock *) bp);
 	      if (LIS_DEBUG_CACHE)
 		printk("lis_msgb_cache_freehdr: freed %p\n", bp);
@@ -4694,22 +4692,33 @@ void lis_msgb_cache_freehdr(void *bp)
 
 struct mdbblock *lis_kmem_cache_allochdr(void)
 {
-extern lis_atomic_t  lis_strcount ;     /* # bytes allocated to msgs   */
-extern long          lis_max_msg_mem ;  /* maximum to allocate */
+      extern lis_atomic_t  lis_strcount ;     /* # bytes allocated to msgs   */
+      extern long          lis_max_msg_mem ;  /* maximum to allocate */
 
       struct mdbblock *md;
-      if (!lis_max_msg_mem || lis_atomic_read(&lis_strcount) < lis_max_msg_mem)       {
-              md = kmem_cache_alloc(lis_msgb_cachep, GFP_ATOMIC);
-              LisUpCount(HEADERS);
-	      if (LIS_DEBUG_CACHE)
-		  printk("lis_kmem_cache_allochdr: allocated %p\n", md);
-              md->msgblk.m_mblock.b_next = NULL;
-              return (md);
-      } else {
-	      printk("lis_kmem_cache_allochdr: msgb allocation failed\n");
-              LisUpFailCount(HEADERS);
-              return (NULL);
-      }
+
+      if (   (   !lis_max_msg_mem
+	      || K_ATOMIC_READ(&lis_strcount) < lis_max_msg_mem
+	     )
+	  && (md = kmem_cache_alloc(lis_msgb_cachep, GFP_ATOMIC))
+	 )
+      {
+	  LisUpCount(HEADERS);
+	  K_ATOMIC_INC(&lis_msgb_cnt) ;
+	  if (LIS_DEBUG_CACHE)
+	      printk("lis_kmem_cache_allochdr: allocated %p\n", md);
+	  md->msgblk.m_mblock.b_next = NULL;
+	  return (md);
+      } 
+      
+      printk("lis_kmem_cache_allochdr: msgb allocation failed\n");
+      LisUpFailCount(HEADERS);
+      return (NULL);
+}
+
+void lis_terminate_msg(void)
+{
+    lis_cache_destroy(lis_msgb_cachep, &lis_msgb_cnt, "LiS-msgb") ;
 }
 
 /************************************************************************
@@ -4718,156 +4727,104 @@ extern long          lis_max_msg_mem ;  /* maximum to allocate */
 *             as a LiS performance improvement under Linux              *
 ************************************************************************/
 
+void lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label)
+{
+    int		n = K_ATOMIC_READ(c);
+
+    if (n)
+    {
+	printk("lis_cache_destroy: "
+	       "Kernel cache \"%s\" has %d blocks still allocated\n"
+	       "                   "
+	       "Not destroying kernel cache.  You will probably have\n"
+	       "                   "
+	       "to reboot to clear this condition.\n",
+	       label, n) ;
+	return ;
+    }
+
+    kmem_cache_destroy(p);
+}
+
 void lis_init_queues(void)
 {
       lis_queue_cachep =
-          kmem_cache_create("lis_queue_cachep", sizeof(queue_t)*2, 0,
+          kmem_cache_create("LiS-queue", sizeof(queue_t)*2, 0,
+                            SLAB_HWCACHE_ALIGN, NULL, NULL);
+      lis_qsync_cachep =
+          kmem_cache_create("LiS-qsync", sizeof(lis_q_sync_t), 0,
                             SLAB_HWCACHE_ALIGN, NULL, NULL);
       lis_qband_cachep =
-          kmem_cache_create("lis_qband_cachep", sizeof(qband_t), 0,
+          kmem_cache_create("LiS-qband", sizeof(qband_t), 0,
+                            SLAB_HWCACHE_ALIGN, NULL, NULL);
+      lis_head_cachep =
+          kmem_cache_create("LiS-head", sizeof(stdata_t), 0,
                             SLAB_HWCACHE_ALIGN, NULL, NULL);
 }
 
 void lis_terminate_queues(void)
 {
-      kmem_cache_destroy(lis_qband_cachep);
-      kmem_cache_destroy(lis_queue_cachep);
+      lis_cache_destroy(lis_head_cachep, &lis_head_cnt, "LiS-head");
+      lis_cache_destroy(lis_qband_cachep, &lis_qband_cnt, "LiS-qband");
+      lis_cache_destroy(lis_queue_cachep, &lis_queue_cnt, "LiS-queue");
+      lis_cache_destroy(lis_qsync_cachep, &lis_qsync_cnt, "LiS-qsync");
 }
 #endif
 
-#if defined(USE_LINUX_KMEM_TIMER) 
 /************************************************************************
 *            LINUX kernel cache based SVR4 Compatible timeout           *
 *************************************************************************
 *                                                                       *
-* This implementation of SVR4 compatible timeout functions uses the     *
-* Linux timeout mechanism as the internals and LINUX cache memory for   *
-* the timer_list entries.						*
-*                                                                       *
-* The use of LINUX kernel cache memory for the individual timer_list    *
-* entries greatly simplifies the complexity of managing (allocating     *
-* and freeing) a linked list of individual timer_list elements.         *
-*                                                                       *
-* The 2.6 kernel is fussy about calling kernel routines that might	*
-* sleep while holding spin locks.  The cache alloc routines can be	*
-* called while holding a spin lock as long as the flags argument does	*
-* not say GFP_WAIT.  Since we use GFP_ALLOC we hold our lock until after*
-* the cache allocation calls are complete.				*
-*                                                                       *
-* It is OK to hold spin locks when calling the kernel timer functions	*
-* such as init_timer, add_timer and del_timer.				*
-*                                                                       *
-* I think there is a race in this code between lis_timeout,		*
-* lis_untimeout and lt_timeout.  The worrysome case is when these	*
-* routines are called in the order: lt_timeout, lis_timeout,		*
-* lis_untimeout.  Because the kernel cache allocators use a LIFO	*
-* discipline lt_timeout can free the timer entry, lis_timeout can	*
-* allocate the same entry as a new one and then lis_untimeout can	*
-* free this same entry again, because it appears valid when		*
-* lis_untimeout is called.						*
-*                                                                       *
-* We hold a global spin lock during all timer operations to eliminate	*
-* the simple race between lt_timeout and lis_untimeout.			*
+* Uses the kernel cache mechanism to speed allocations and keep timers	*
+* grouped together.							*
 *                                                                       *
 ************************************************************************/
 
-extern lis_spin_lock_t	  lis_tlist_lock ; /* dki.c */
+int lis_timer_size ;
 
-void lis_init_dki(void)
+void lis_init_timers(int size)
 {
-      lis_timer_cachep =
-          kmem_cache_create("lis_timer_cachep", 
-                             sizeof(struct lis_timer), 
-                             0, SLAB_HWCACHE_ALIGN, NULL, NULL);
-        if (!lis_timer_cachep) 
-                printk("lis_init_dki: lis_timer_cachep is NULL. "
+#if defined(USE_KMEM_TIMER) 
+    lis_timer_cachep = kmem_cache_create("lis_timer_cachep", 
+					 size, 
+					 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+    if (!lis_timer_cachep) 
+	printk("lis_init_dki: lis_timer_cachep is NULL. "
 			"kmem_cache_create failed\n");
-}
-
-static void lt_timeout(unsigned long data)
-{
-      struct lis_timer *t = (typeof(t)) data;
-      lis_flags_t  	psw;
-      timo_fcn_t       *fcn ;
-      caddr_t		uarg ;
-
-      if(!t) return;
-
-      /*
-       * The kernel code has delete the timer from the timer list
-       * prior to calling this routine.
-       */
-      lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-      if (t->handle == (toid_t) t && t->func != NULL)
-      {
-	  fcn        = t->func ;	/* save local copy */
-	  uarg       = t->arg ;
-	  t->func    = NULL ;
-	  t->handle  = NULL ;
-	  kmem_cache_free(lis_timer_cachep, t);
-	  lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-	  fcn(uarg) ;			/* call fcn while not holding lock */
-      }
-      else				/* stale timer, or lost race */
-	  lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-}
-
-toid_t lis_untimeout(toid_t id)
-{
-      struct lis_timer *t = (typeof(t)) id;
-      lis_flags_t       psw;
-
-      if (t)
-      {
-        lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-	if (t->handle == (toid_t) t)
-	{
-	    t->handle = NULL ;
-	    t->func = NULL ;
-	    del_timer(&t->lt);
-	    kmem_cache_free(lis_timer_cachep, t);
-	}			/* else lost the race */
-        lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-      }
-      return (0);
-}
-
-toid_t  lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-                    char *file_name, int line_nr)
-{
-      struct lis_timer *t;
-      lis_flags_t  	psw;
-
-      if (timo_fcn)
-      {
-	  if ((t = kmem_cache_alloc(lis_timer_cachep, GFP_ATOMIC)))
-	  {
-	      /*
-	       * If this routine is called just after lt_timeout and
-	       * just before lis_untimeout for the same timer then we
-	       * could have just allocated the same timer that lt_timeout
-	       * just freed.  That will make it look nice and valid for
-	       * lis_untimeout, which will free it even though we think
-	       * we have it running.  A later call on lis_untimeout will
-	       * likely come to no good.
-	       */
-	      lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-              bzero(t, sizeof(*t));
-              t->func = timo_fcn;
-              t->arg  = arg;
-	      t->handle = (toid_t) t ;
-              init_timer(&t->lt);
-              t->lt.function = &lt_timeout;
-              t->lt.data     = (unsigned long) t;
-              t->lt.expires  = jiffies + ticks;
-              add_timer(&t->lt);
-	      lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-	  }
-	  return (toid_t) t;
-      }
-   return (toid_t) NULL;
-}
-
 #endif
+    lis_timer_size = size ;
+}
+
+void lis_terminate_timers(void)
+{
+#if defined(USE_KMEM_TIMER) 
+    kmem_cache_destroy(lis_timer_cachep) ;
+#endif
+}
+
+void *lis_alloc_timer(char *file, int line)
+{
+    void	*t ;
+
+#if defined(CONFIG_DEV)
+    t = LISALLOC(lis_timer_size,file, line) ;
+#else
+    t = kmem_cache_alloc(lis_timer_cachep, GFP_ATOMIC) ;
+#endif
+
+    return(t) ;
+}
+
+void *lis_free_timer(void *timerp)
+{
+#if defined(CONFIG_DEV)
+    FREE(timerp) ;
+#else
+    kmem_cache_free(lis_timer_cachep, timerp);
+#endif
+    return(NULL) ;
+}
+
+
 
 /*  -------------------------------------------------------------------  */
