@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_soft_state_free.9.man,v 0.9.2.7 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: ddi_soft_state_free.9.man,v 0.9.2.8 2005/03/30 13:38:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_SOFT_STATE_FREE 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_SOFT_STATE_FREE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME

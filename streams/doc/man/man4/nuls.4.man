@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: nuls.4.man,v 0.9.2.10 2005/01/20 23:41:58 brian Exp $
+.\" @(#) $Id: nuls.4.man,v 0.9.2.11 2005/03/30 13:38:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/20 23:41:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:31 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NULS 4 "$Date: 2005/01/20 23:41:58 $" "$Name:  $" "Linux Fast-STREAMS Modules"
+.TH NULS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .\"
 .\"
 .SH NAME

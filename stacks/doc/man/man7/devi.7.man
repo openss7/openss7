@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: devi.7.man,v 0.9.2.3 2005/01/26 07:58:13 brian Exp $
+.\" @(#) $Id: devi.7.man,v 0.9.2.4 2005/03/30 13:39:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,9 +31,12 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/26 07:58:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:39:41 $ by $Author: brian $
 .\"
 .\" $Log: devi.7.man,v $
+.\" Revision 0.9.2.4  2005/03/30 13:39:41  brian
+.\" - Updated manual page headers.
+.\"
 .\" Revision 0.9.2.3  2005/01/26 07:58:13  brian
 .\" - Changed macro names and updated copyright headers.
 .\"
@@ -98,7 +101,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DEVI 7 "$Date: 2005/01/26 07:58:13 $" "SS7 Man Page" "Linux STREAMS Programmer's Manual" 
+.TH DEVI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITEL@ Device interface (DEVI)"
 .SH "NAME"
 devi \- Signalling System No. 7 Device (DEV) Interface
 .SH "SYNOPSIS"
@@ -147,7 +150,6 @@ a pointer to a \fBdev_ulong\fR which contains one of the following values:
 .TS
 tab(:);
 l l s s.
-.TH
 \fBDEV_TYPE_NONE\fR:T{
 There is no device type (default) or the device type is not meaningful.
 T}
@@ -193,7 +195,6 @@ contains one of the following values:
 .TS
 tab(:);
 l l s s.
-.TH
 \fBDEV_GTYPE_NONE\fR:T{
 There is no group type (default) or the group type is not meaningful (i.e.,
 there is no group but a single channel).
@@ -244,7 +245,6 @@ following values:
 .TS
 tab(:);
 l l s s.
-.TH
 \fBDEV_MODE_NONE\fR:T{
 The interface is modeless or the mode is unspecified.
 T}
@@ -300,7 +300,6 @@ one of the following values:
 .TS
 tab(:);
 l l s s.
-.TH
 \fBDEV_CLOCK_NONE\fR:T{
 No interface clock.
 T}
@@ -345,7 +344,6 @@ contains one of the following values:
 .TS
 tab(:);
 l l s s.
-.TH
 \fBDEV_CODING_NONE\fR:T{
 No coding.  Coding unspecified.
 T}
@@ -393,7 +391,6 @@ following bitmasks:
 .TS
 tab(:);
 l l s s.
-.TH
 \fBDEV_LEAD_DTR\fR:T{
 Data-Terminal-Ready
 T}

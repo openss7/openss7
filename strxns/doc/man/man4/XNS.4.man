@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: XNS.4.man,v 0.9.2.3 2005/01/22 15:29:53 brian Exp $
+.\" @(#) $Id: XNS.4.man,v 0.9.2.4 2005/03/30 13:38:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/22 15:29:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxns.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XNS 4 "$Date: 2005/01/22 15:29:53 $" "$Name:  $"
+.TH XNS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
 .B XNS
 \- OpenSS7 X/Open Networking Services (XNS)

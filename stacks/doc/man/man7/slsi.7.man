@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: slsi.7.man,v 0.9.2.3 2005/01/26 07:58:14 brian Exp $
+.\" @(#) $Id: slsi.7.man,v 0.9.2.4 2005/03/30 13:39:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,9 +31,12 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/01/26 07:58:14 $ by $Author: brian $
+.\" Modified $Date: 2005/03/30 13:39:42 $ by $Author: brian $
 .\"
 .\" $Log: slsi.7.man,v $
+.\" Revision 0.9.2.4  2005/03/30 13:39:42  brian
+.\" - Updated manual page headers.
+.\"
 .\" Revision 0.9.2.3  2005/01/26 07:58:14  brian
 .\" - Changed macro names and updated copyright headers.
 .\"
@@ -92,7 +95,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SLSI 7 "$Date: 2005/01/26 07:58:14 $" "OpenSS7 Man Page" "OpenSS7 Programmer's Manual"
+.TH SLSI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Signalling Link Set Interface (SLSI)"
 .SH "NAME"
 slsi \- Signalling System No. 7 Signalling Link Set (SLS) Interface
 .SH "SYNOPSIS"
@@ -413,7 +416,6 @@ of the following:
 .TS
 tab(:);
 lb 2 l.
-.TH
 SLS_FAIL_UNSPECIFIED:Unknown.
 SLS_FAIL_CONG_TIMEOUT:Timeout (T6).
 SLS_FAIL_ACK_TIMEOUT:Timeout (T7).
@@ -542,7 +544,6 @@ may be one of the following values:
 .TS
 tab(:);
 lbw(16) 2 l.
-.TH
 SS7_PVAR_ITUT_88:ITU-T Q.703 1988 (Blue Book)
 SS7_PVAR_ITUT_93:ITU-T Q.703 1993 (Grey Book)
 SS7_PVAR_ITUT_96:ITU-T Q.703 1996 (White Book)
@@ -569,7 +570,6 @@ may be a bitwise OR of any of the following values:
 .TS
 tab(:);
 lbw(16) 2 l.
-.TH
 SS7_POPT_MPLEV:Multi Priority/Cong Levels
 SS7_POPT_PCR:Preventative Cyclic Retrans
 SS7_POPT_HSL:High Speed Links
@@ -775,7 +775,6 @@ valid for all state variables):
 .TS
 tab(:);
 lb.
-.TH
 SLS_STATE_IDLE
 SLS_STATE_NORMAL
 SLS_STATE_POWER_OFF
@@ -1002,7 +1001,6 @@ values:
 .TS
 tab(:);
 lb 2 l.
-.TH
 SLS_EVT_FAIL_UNSPECIFIED:
 SLS_EVT_FAIL_CONG_TIMEOUT:Q.752 Table 1.6
 SLS_EVT_FAIL_ACK_TIMEOUT:Q.752 Table 1.4

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bind.3.man,v 0.9.2.1 2004/05/16 02:35:34 brian Exp $
+.\" @(#) $Id: bind.3.man,v 0.9.2.2 2005/03/30 13:39:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/16 02:35:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:39:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BIND 3 "$Date: 2004/05/16 02:35:34 $" "$Name:  $" "Linux Fast-STREAMS Sockets Library"
+.TH BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B bind
 \- bind a name to a socket

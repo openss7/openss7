@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: netperf_tcp_range.man,v 1.1.2.3 2005/01/25 03:41:17 brian Exp $
+.\" @(#) $Id: netperf_tcp_range.man,v 1.1.2.4 2005/03/30 13:38:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/25 03:41:17 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:29 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so netperf.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NETPERF_TCP_RANGE 1 "$Date: 2005/01/25 03:41:17 $" "$Name:  $" "User Commands"
+.TH NETPERF_TCP_RANGE 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
 .\"
 .\"
 .SH NAME

@@ -1,4 +1,4 @@
-.TH XXXX 8 "$Date: 2005/01/26 07:58:19 $" "$Name:  $" "Under Construction"
+.TH XXXX 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .SH NAME
 .B xxx
 \- incomplete man page

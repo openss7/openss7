@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LOCK.9.man,v 0.9.2.6 2004/08/22 06:17:44 brian Exp $
+.\" @(#) $Id: LOCK.9.man,v 0.9.2.7 2005/03/30 13:38:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:44 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LOCK 9 "$Date: 2004/08/22 06:17:44 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH LOCK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME

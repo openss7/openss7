@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sdt_ioctl.4.man,v 0.9.2.3 2005/01/26 07:57:45 brian Exp $
+.\" @(#) $Id: sdt_ioctl.4.man,v 0.9.2.4 2005/03/30 13:39:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/26 07:57:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:39:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SDT-IOCTL 4 "$Date: 2005/01/26 07:57:45 $" "$Name:  $" "SS7 SDT IO Controls"
+.TH SDT-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
 .B sdt_ioctl
 \- Signalling Data Terminal (SDT) 
@@ -493,9 +493,9 @@ There are no commands for
 .SH VERSIONS
 .PP
 .PP
-This manpage was updated $Date: 2005/01/26 07:57:45 $ for
+This manpage was updated $Date: 2005/03/30 13:39:21 $ for
 .BR strss7
-release $Name:  $($Revision: 0.9.2.3 $).
+release $Name:  $($Revision: 0.9.2.4 $).
 .PP
 The
 .B ACB56

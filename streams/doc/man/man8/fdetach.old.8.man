@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fdetach.old.8.man,v 0.9.2.6 2005/01/21 10:09:34 brian Exp $
+.\" @(#) $Id: fdetach.old.8.man,v 0.9.2.7 2005/03/30 13:38:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/21 10:09:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FDETACH 8 "$Date: 2005/01/21 10:09:34 $" "$Name:  $" "Linux STREAMS"
+.TH FDETACH 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .SH NAME
 .B fdetach
 \- detach \fISTREAMS\fR file(s) from path name(s) in the file system

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: weldq.9.man,v 0.9.2.10 2005/01/21 10:09:52 brian Exp $
+.\" @(#) $Id: weldq.9.man,v 0.9.2.11 2005/03/30 13:38:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/21 10:09:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH WELDQ 9 "$Date: 2005/01/21 10:09:52 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH WELDQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME

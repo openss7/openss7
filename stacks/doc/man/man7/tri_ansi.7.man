@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tri_ansi.7.man,v 0.9.2.2 2005/01/26 07:58:16 brian Exp $
+.\" @(#) $Id: tri_ansi.7.man,v 0.9.2.3 2005/03/30 13:39:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/01/26 07:58:16 $ by $Author: brian $
+.\" Modified $Date: 2005/03/30 13:39:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -49,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TRI-ANSI 7 "$Date: 2005/01/26 07:58:16 $" "$Name:  $" "Transaction Interface (TRI)"
+.TH TRI-ANSI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transaction Interface (TRI)"
 .SH NAME
 .PP
 .B TRI-ANSI

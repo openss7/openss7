@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: etoimajor.9.man,v 0.9.2.4 2004/08/22 06:17:45 brian Exp $
+.\" @(#) $Id: etoimajor.9.man,v 0.9.2.5 2005/03/30 13:38:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/22 06:17:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ETOIMAJOR 9 "$Date: 2004/08/22 06:17:45 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
+.TH ETOIMAJOR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME

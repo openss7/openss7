@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.1 2004/08/06 09:10:10 brian Exp $
+.\" @(#) $Id: tpi_udp.7.man,v 0.9.2.2 2005/03/30 13:39:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/06 09:10:10 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:39:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strinet.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI-UDP 7 "$Date: 2004/08/06 09:10:10 $" "$Name:  $" "Transport Provider Interface"
+.TH TPI-UDP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
 .SH NAME
 .B tpi_udp
 \- Transport Provider Interface (TPI) \- User Datagram Protocol (UDP) Corrigendum

@@ -1,6 +1,6 @@
 .\" -*- nroff -*-
 .\"
-.\" @(#) $Id: ss7dev.8.man,v 0.9.2.2 2005/01/26 07:58:19 brian Exp $
+.\" @(#) $Id: ss7dev.8.man,v 0.9.2.3 2005/03/30 13:39:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -30,10 +30,10 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/01/26 07:58:19 $ by $Author: brian $
+.\" Modified $Date: 2005/03/30 13:39:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.TH SS7DEV 8 "$Date: 2005/01/26 07:58:19 $" "OpenSS7 Man Page" "OpenSS7 Programmer's Manual"
+.TH SS7DEV 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .SH "NAME"
 ss7dev \- Signalling System No. 7 Devices
 .SH "SYNOPSIS"

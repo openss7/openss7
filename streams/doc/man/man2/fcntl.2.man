@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fcntl.2.man,v 0.9.2.5 2005/01/21 10:08:22 brian Exp $
+.\" @(#) $Id: fcntl.2.man,v 0.9.2.6 2005/03/30 13:38:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/21 10:08:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:29 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -103,7 +103,7 @@ sort-adjacent-labels
 .\" Modified Fri Dec 11 17:57:27 1998 by Jamie Lokier <jamie@imbolc.ucc.ie>
 .\" Applied correction by Christian Ehrhardt - aeb, 990712
 .\"
-.TH FCNTL 2 1999-07-12 Linux "Linux Programmer's Manual"
+.TH FCNTL 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
 .SH NAME
 .B fcntl
 \- manipulate file descriptor

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: _fini.9.man,v 0.9.2.8 2005/01/20 07:28:17 brian Exp $
+.\" @(#) $Id: _fini.9.man,v 0.9.2.9 2005/03/30 13:38:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/20 07:28:17 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH _FINI 9 "$Date: 2005/01/20 07:28:17 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH _FINI 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME

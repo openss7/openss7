@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: MX_DISABLE_CON.7.man,v 0.9.2.3 2005/01/26 07:58:03 brian Exp $
+.\" @(#) $Id: MX_DISABLE_CON.7.man,v 0.9.2.4 2005/03/30 13:39:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/01/26 07:58:03 $ by $Author: brian $
+.\" Modified $Date: 2005/03/30 13:39:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -49,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MX_DISABLE_CON 7 "$Name:  $" "$Date: 2005/01/26 07:58:03 $" "Multiplex Interface"
+.TH MX_DISABLE_CON 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Multiplex Interface (MXI)"
 .SH NAME
 .B MX_DISABLE_CON, MX_disable_con, MX_disable_con_t
 \- multiplex disable confirmation

@@ -56,7 +56,7 @@
 .\" Last Modified $Date: $ by $Author: $
 .\"
 .\" =========================================================================
-.TH netserver 8L ""
+.TH netserver 8L "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .SH NAME
 
 netserver \- a network performance benchmark server

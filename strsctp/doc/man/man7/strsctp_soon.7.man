@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strsctp_soon.7.man,v 0.9.2.1 2004/08/21 10:53:55 brian Exp $
+.\" @(#) $Id: strsctp_soon.7.man,v 0.9.2.2 2005/03/30 13:39:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/21 10:53:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:39:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strsctp.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXXX 7 "$Date: 2004/08/21 10:53:55 $" "$Name:  $" "Under Construction"
+.TH XXXX 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transport Provider Interface (TPI)"
 .\"
 .\"
 .SH NAME

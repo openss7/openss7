@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: sdl_udp.8.man,v 0.9.2.3 2005/01/26 07:58:19 brian Exp $
+.\" @(#) $Id: sdl_udp.8.man,v 0.9.2.4 2005/03/30 13:39:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/26 07:58:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:39:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
 .\" $Log: sdl_udp.8.man,v $
+.\" Revision 0.9.2.4  2005/03/30 13:39:44  brian
+.\" - Updated manual page headers.
+.\"
 .\" Revision 0.9.2.3  2005/01/26 07:58:19  brian
 .\" - Changed macro names and updated copyright headers.
 .\"
@@ -104,7 +107,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
-.TH SDL_UDP 8 "$Date: 2005/01/26 07:58:19 $" "OpenSS7 Man Page" "OpenSS7 Programmer's Manual"
+.TH SDL_UDP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .SH "NAME"
 sdl_udp \- SDL emulation using User Datagram Protocol (UDP)
 .\"

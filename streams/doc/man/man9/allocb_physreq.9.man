@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: allocb_physreq.9.man,v 0.9.2.10 2005/01/19 07:35:24 brian Exp $
+.\" @(#) $Id: allocb_physreq.9.man,v 0.9.2.11 2005/03/30 13:38:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/19 07:35:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ALLOCB_PHYSREQ 9 "$Date: 2005/01/19 07:35:24 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
+.TH ALLOCB_PHYSREQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
