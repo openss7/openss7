@@ -40,7 +40,7 @@
 #ifndef	_STRMDBG_H
 #define	_STRMDBG_H		1
 
-#ident "@(#) LiS strmdbg.h 2.17 01/12/04 10:50:27 "
+#ident "@(#) LiS strmdbg.h 2.25 09/07/04 11:11:22 "
 
 #ifndef _HEAD_H
 #include <sys/LiS/head.h>
@@ -53,7 +53,6 @@
  */
 extern unsigned long	lis_debug_mask ;
 extern unsigned long	lis_debug_mask2 ;
-
 
 /*
  * Bits in lis_debug_mask
@@ -103,10 +102,15 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_SNDFD_BIT		0x00000001L
 #define LIS_DEBUG_CP_BIT		0x00000002L	/* print code path */
 #define LIS_DEBUG_CACHE_BIT		0x00000004L	/* cache allocs */
+#define LIS_DEBUG_LOCK_CONTENTION_BIT	0x00000008L	/* lock contention */
+#define LIS_DEBUG_REFCNTS_BIT		0x00000010L
+#define LIS_DEBUG_SEMTIME_BIT		0x00000020L	/* sem wkup time */
 
 /*
  * Shorthand macros
  */
+
+#if 1
 
 #define LIS_DEBUG_OPEN		(lis_debug_mask & LIS_DEBUG_OPEN_BIT)
 #define LIS_DEBUG_CLOSE		(lis_debug_mask & LIS_DEBUG_CLOSE_BIT)
@@ -151,24 +155,81 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_SNDFD		(lis_debug_mask2 & LIS_DEBUG_SNDFD_BIT)
 #define LIS_DEBUG_CP		(lis_debug_mask2 & LIS_DEBUG_CP_BIT)
 #define LIS_DEBUG_CACHE		(lis_debug_mask2 & LIS_DEBUG_CACHE_BIT)
+#define LIS_DEBUG_LOCK_CONTENTION \
+			    (lis_debug_mask2 & LIS_DEBUG_LOCK_CONTENTION_BIT)
+#define LIS_DEBUG_REFCNTS	(lis_debug_mask2 & LIS_DEBUG_REFCNTS_BIT)
+#define LIS_DEBUG_SEMTIME	(lis_debug_mask2 & LIS_DEBUG_SEMTIME_BIT)
 
+#else /* !CONFIG_DEV */
+
+#define LIS_DEBUG_OPEN		0
+#define LIS_DEBUG_CLOSE		0
+#define LIS_DEBUG_READ		0
+#define LIS_DEBUG_WRITE		0
+
+#define LIS_DEBUG_IOCTL		0
+#define LIS_DEBUG_PUTNEXT	0
+#define LIS_DEBUG_STRRPUT	0
+#define LIS_DEBUG_SIG		0
+
+#define LIS_DEBUG_PUTMSG	0
+#define LIS_DEBUG_GETMSG	0
+#define LIS_DEBUG_POLL		0
+#define LIS_DEBUG_LINK		0
+
+#define LIS_DEBUG_MEAS_TIME	0
+#define LIS_DEBUG_MEM_LEAK	0
+#define LIS_DEBUG_FLUSH		0
+#define LIS_DEBUG_FATTACH	0
+
+#define LIS_DEBUG_SAFE		0
+#define LIS_DEBUG_TRCE_MSG	0
+#define LIS_DEBUG_CLEAN_MSG	0
+#define LIS_DEBUG_SPL_TRACE	0
+
+#define LIS_DEBUG_ALLOC 	0
+#define LIS_DEBUG_FREEMSG 	0
+#define LIS_DEBUG_MALLOC	0
+#define LIS_DEBUG_MONITOR_MEM	0
+
+#define LIS_DEBUG_DMP_QUEUE	0
+#define LIS_DEBUG_DMP_MBLK	0
+#define LIS_DEBUG_DMP_DBLK	0
+#define LIS_DEBUG_DMP_STRHD	0
+
+#define LIS_DEBUG_VOPEN		0
+#define LIS_DEBUG_VCLOSE	0
+#define LIS_DEBUG_ADDRS		0
+
+
+#define LIS_DEBUG_SNDFD		0
+#define LIS_DEBUG_CP		0
+#define LIS_DEBUG_CACHE		0
+#define LIS_DEBUG_LOCK_CONTENTION \
+			    (lis_debug_mask2 & LIS_DEBUG_LOCK_CONTENTION_BIT)
+#define LIS_DEBUG_SEMTIME	(lis_debug_mask2 & LIS_DEBUG_SEMTIME_BIT)
+
+#define LIS_DEBUG_REFCNTS	0
+
+#endif /* !CONFIG_DEV */
 
 /*
  * Some routines to assist in debug printing
  */
 #ifdef __KERNEL__
-void		 lis_print_block(void *ptr) ;
-void		 lis_print_mem(void) ;
-void		 lis_print_queue(queue_t * q) ;
-void		 lis_print_queues(void) ;
-void		 lis_print_stream(stdata_t *head) ;
-const char	*lis_strm_name(stdata_t *head) ;
-const char	*lis_queue_name(queue_t *q) ;
-const char	*lis_maj_min_name(stdata_t *head) ;
-const char	*lis_msg_type_name(mblk_t *mp) ;
-void		 lis_print_data(mblk_t *mp, int opt, int cont) ;
-void		 lis_print_msg(mblk_t *mp, const char *prefix, int opt) ;
-char		*lis_poll_events(short events) ;
+void		 lis_print_block(void *ptr) _RP;
+void		 lis_print_mem(void) _RP;
+void		 lis_print_queue(queue_t * q) _RP;
+void		 lis_print_queues(void) _RP;
+void		 lis_print_stream(stdata_t *head) _RP;
+const char	*lis_strm_name(stdata_t *head) _RP;
+const char      *lis_strm_name_from_queue(queue_t *q) _RP;
+const char	*lis_queue_name(queue_t *q) _RP;
+const char	*lis_maj_min_name(stdata_t *head) _RP;
+const char	*lis_msg_type_name(mblk_t *mp) _RP;
+void		 lis_print_data(mblk_t *mp, int opt, int cont) _RP;
+void		 lis_print_msg(mblk_t *mp, const char *prefix, int opt) _RP;
+char		*lis_poll_events(short events) _RP;
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
@@ -187,11 +248,12 @@ char		*lis_poll_events(short events) ;
  */
 #ifdef __KERNEL__
 void	*lis_malloc(int nbytes, int class, int use_cache, 
-			char *file_name, int line_nr) ;
-void	*lis_zmalloc(int nbytes, int class, char *file_name, int line_nr) ;
-void	 lis_free(void *ptr, char *file_name, int line_nr) ;
+			char *file_name, int line_nr) _RP;
+void	*lis_zmalloc(int nbytes, int class, char *file_name, int line_nr) _RP;
+void	 lis_free(void *ptr, char *file_name, int line_nr) _RP;
+void	 lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr) _RP;
 #if defined(CONFIG_DEV)
-void	 lis_mark_mem(void *ptr, const char *file_name, int line_nr) ;
+#define	lis_mark_mem	lis_mark_mem_fcn
 #else
 #define	lis_mark_mem(a, b, c)
 #endif
@@ -199,7 +261,19 @@ int      lis_check_guard(void *ptr, char *msg) ;
 int      lis_check_mem(void) ;
 void     lis_terminate_mem(void) ;
 
+#if defined(LINUX)
+static inline const char *lis_basename( const char *filename )
+{
+    char        *p ;
+
+    p = strrchr(filename, '/') ;
+    if (p == NULL)
+	return(filename) ;
+    return(p+1) ;
+}
+#else
 const char *lis_basename(const char *filename);
+#endif
 
 #define __LIS_FILE__  lis_basename(__FILE__)
 

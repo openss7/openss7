@@ -31,7 +31,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-#ident "@(#) LiS msgutl.c 2.13 9/24/03 16:59:57 "
+#ident "@(#) LiS msgutl.c 2.15 09/07/04 11:11:22 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -118,7 +118,7 @@ tmsgsize(mblk_t *mp, mblk_t **first)
 
 /* lis_msgsize - count sizes of blocks of message
  */
-int
+int _RP
 lis_msgsize(mblk_t *mp)
 {
     int rtn = 0;
@@ -132,7 +132,7 @@ lis_msgsize(mblk_t *mp)
 /*  -------------------------------------------------------------------  */
 /* lis_msgdsize - return number of data bytes in M_DATA blocks in message
  */
-int
+int _RP
 lis_msgdsize(mblk_t *mp)
 {
     int rtn = 0;
@@ -152,7 +152,7 @@ lis_msgdsize(mblk_t *mp)
 /* xmsgsize - count sizes of consecutive blocks of the same
  *	type as the first
  */
-int
+int _RP
 lis_xmsgsize(mblk_t *mp)
 {
     int rtn = 0;
@@ -178,7 +178,7 @@ lis_xmsgsize(mblk_t *mp)
  *	rptrs set to their wptrs.
  *	Returns 1 on success; 0 otherwise.
  */
-int
+int _RP
 lis_adjmsg(mblk_t *mp, int length)
 {
     if(mp == NULL) return 0;
@@ -234,7 +234,7 @@ lis_adjmsg(mblk_t *mp, int length)
 /*  -------------------------------------------------------------------  */
 /* lis_copyb - create and return a copy of a message block
  */
-mblk_t *
+mblk_t * _RP
 lis_copyb(mblk_t *mp)
 {
     mblk_t *bp;
@@ -251,13 +251,15 @@ lis_copyb(mblk_t *mp)
     MEMCPY(bp->b_wptr, mp->b_rptr, msglen);
     bp->b_wptr += msglen;
     bp->b_datap->db_type = mp->b_datap->db_type;
+    bp->b_band = mp->b_band ;
+    bp->b_flag = mp->b_flag ;
     return bp;
 }/*lis_copyb*/
 /*  -------------------------------------------------------------------  */
 
 /* lis_copymsg - create and return a copy of a message
  */
-mblk_t *
+mblk_t * _RP
 lis_copymsg(mblk_t *mp)
 {
     mblk_t *rtn, *bp;
@@ -282,7 +284,7 @@ lis_copymsg(mblk_t *mp)
  *	The data block and data buffer are reused.
  */
 
-mblk_t *
+mblk_t * _RP
 lis_dupb(mblk_t *mp)
 {
     if (mp)
@@ -306,7 +308,7 @@ lis_dupb(mblk_t *mp)
 /* lis_dupmsg - duplicate a message by duplicating the constituent
  *	data blocks.
  */
-mblk_t *
+mblk_t * _RP
 lis_dupmsg(mblk_t *mp)
 {
     mblk_t *bp, *rtn = lis_dupb(mp);
@@ -330,7 +332,7 @@ lis_dupmsg(mblk_t *mp)
 /* lis_linkb - concatenate mp1 and mp2.
  */
 
-void 
+void  _RP
 lis_linkb(mblk_t *mp1, mblk_t *mp2)
 {
     if (mp1 && mp2)
@@ -345,7 +347,7 @@ lis_linkb(mblk_t *mp1, mblk_t *mp2)
 /* unlinkb - remove first message block from a message. Return the
  *	next message block pointer, or NULL if no further blocks.
  */
-mblk_t *
+mblk_t * _RP
 lis_unlinkb(mblk_t *mp)
 {
     mblk_t *rtn;
@@ -365,7 +367,7 @@ lis_unlinkb(mblk_t *mp)
  *	Returns 1 on success; 0 otherwise.
  */
 #define ALIGN_MOD	(sizeof(char *) - 1)
-int 
+int  _RP
 lis_pullupmsg(mblk_t *mp, int length)
 {
     mblk_t *tmpbp, *newbp;
@@ -484,7 +486,7 @@ lis_pullupmsg(mblk_t *mp, int length)
  *
  * len of -1 means concatenate all bytes of the passed-in msg.
  */
-mblk_t	*lis_msgpullup(mblk_t *mp, int len)
+mblk_t	* _RP lis_msgpullup(mblk_t *mp, int len)
 {
     unsigned char	 msg_type ;
     int			 nbytes ;
@@ -578,7 +580,7 @@ mblk_t	*lis_msgpullup(mblk_t *mp, int len)
  *	pointer to the modified message, or NULL if bp was the
  *	only block, or -1 if bp wasn't in the message
  */
-mblk_t *
+mblk_t * _RP
 lis_rmvb(mblk_t *mp, mblk_t *bp)
 {
     mblk_t *rtn = mp;

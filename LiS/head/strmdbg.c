@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS strdbg.c 2.26 01/12/04 10:50:27 "
+#ident "@(#) LiS strdbg.c 2.37 09/07/04 11:11:22 "
 
 #include <sys/stream.h>
 #include <sys/poll.h>
@@ -59,6 +59,13 @@ typedef struct mem_link
 
 } mem_link_t ;
 
+typedef struct mem_link_space
+{
+    mem_link_t		ml ;
+    char		padding[LIS_CACHE_BYTES -
+				(sizeof(mem_link_t) % LIS_CACHE_BYTES)];
+} mem_link_space_t ;
+
 lis_spin_lock_t	 lis_mem_lock ;
 long		 lis_mem_alloced ;	/* keep track of allocated memory */
 long		 lis_max_mem ;		/* maximum to allocate */
@@ -69,9 +76,8 @@ mem_link_t	 lis_mem_head = {&lis_mem_head, &lis_mem_head} ;
  * Allocations larger than this allocate pages instead of calling
  * kmalloc.
  */
-#define	MAX_KMALLOC_SIZE	(120000 - sizeof(mem_link_t) - sizeof(long) \
-				        - sizeof(void *) \
-				)
+#define	MAX_KMALLOC_SIZE	(120000 - sizeof(mem_link_space_t) - \
+				          sizeof(long)  - sizeof(void *) )
 
 #if defined(CONFIG_DEV)
 #ifndef DEBUG_MASK
@@ -105,7 +111,7 @@ static int		 lock_initialized ;
 void	lis_bprintf(char *fmt, ...)
 {
     extern char	 lis_cmn_err_buf[];
-    extern int	 vsprintf (char *, const char *, va_list);
+    extern int	 _RP vsprintf (char *, const char *, va_list);
     va_list	 args;
     int		 nbytes ;
 
@@ -191,10 +197,11 @@ static void put_file_name(mem_link_t *p, const char *name)
 * Allocate nbytes of memory and return a pointer to it.			*
 *									*
 ************************************************************************/
-void	*lis_malloc(int nbytes, int class, int use_cache,
-		    char *file_name, int line_nr)
+void	* _RP lis_malloc(int nbytes, int class, int use_cache,
+		         char *file_name, int line_nr)
 {
     mem_link_t	*p ;
+    mem_link_space_t	*pp ;
     long	*lp ;				/* ptr to guard word */
     int		 abytes ;			/* # bytes to allocate */
     int		 tbytes ;			/* total # of bytes */
@@ -215,7 +222,7 @@ void	*lis_malloc(int nbytes, int class, int use_cache,
      * guard word at the end of the area.
      */
     abytes = (nbytes + 15) & ~0x0F ;
-    tbytes = abytes + sizeof(*p) + sizeof(long) ;
+    tbytes = abytes + sizeof(*pp) + sizeof(long) ;
 #if defined(LINUX)			/* Linux kernel version */
     if (abytes > MAX_KMALLOC_SIZE)
 	p = (mem_link_t *) lis_get_free_pages_fcn(tbytes, class,
@@ -231,35 +238,37 @@ void	*lis_malloc(int nbytes, int class, int use_cache,
 	return(NULL) ;
     }
 
+    pp = (mem_link_space_t *) p ;
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
 
     lis_mem_alloced += abytes ;			/* keep track of memory */
-    LisUpCounter(MEMALLOCD, abytes) ;		/* stats array */
-
     p->next	  = &lis_mem_head ;		/* we point fwd to head */
     p->prev	  = lis_mem_head.prev ;		/* we point back to old last */
     p->prev->next = p ;				/* elt b4 us points to us */
     lis_mem_head.prev = p ;			/* we are last elt in list */
 
+    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+
+    LisUpCounter(MEMALLOCD, abytes) ;		/* stats array */
+
     p->size	  = abytes ;			/* save # bytes */
     put_file_name(p, file_name) ;		/* copy in filename of caller */
     p->line_nr	  = line_nr;			/* line number called from */
 
-    lp = (long *) (((char *)p) + abytes + sizeof(*p)) ;	/* to guard word */
+    lp = (long *) (((char *)p) + abytes + sizeof(*pp)) ; /* to guard word */
     *lp = MEM_GUARD ;				/* plant guard word */
 
     if (LIS_DEBUG_MALLOC)			/* debugging allocations */
     {
 	printk("lis_malloc: ") ;
-	lis_print_block(p+1) ;
+	lis_print_block(pp+1) ;
     }
 
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
 
     if (LIS_DEBUG_MONITOR_MEM)
 	lis_check_mem() ;			/* check all mem areas */
 
-    return(p+1) ;				/* rtn area caller can use */
+    return(pp+1) ;				/* rtn area caller can use */
 
 } /* lis_malloc */
 
@@ -270,7 +279,7 @@ void	*lis_malloc(int nbytes, int class, int use_cache,
 * Like lis_malloc, only it zeros the memory before returning.		*
 *									*
 ************************************************************************/
-void	*lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
+void	* _RP lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 {
     void	*ptr = lis_malloc(nbytes, class, 0, file_name, line_nr) ;
 
@@ -294,14 +303,16 @@ void	*lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 ************************************************************************/
 int	lis_check_guard(void *ptr, char *msg)
 {
-    mem_link_t	*p ;
-    long	*lp ;
+    mem_link_t		*p ;
+    mem_link_space_t	*pp ;
+    long		*lp ;
 
     if (ptr == NULL) return(1) ;		/* "good" */
 
-    p = (mem_link_t *) ptr ;
-    p-- ;					/* go back to link structure */
-    lp = (long *) (((char *)p) + p->size + sizeof(*p)) ; /* to guard word */
+    pp = (mem_link_space_t *) ptr ;
+    pp-- ;					/* go back to link structure */
+    p = (mem_link_t *) pp ;
+    lp = (long *) (((char *)p) + p->size + sizeof(*pp)) ; /* to guard word */
 
     if (*lp == MEM_GUARD) return(1) ;		/* good guard word */
 
@@ -320,15 +331,15 @@ int	lis_check_guard(void *ptr, char *msg)
 * Free a block of memory allocated by lis_malloc.			*
 *									*
 ************************************************************************/
-void	lis_free(void *ptr, char *file_name, int line_nr)
+void	_RP lis_free(void *ptr, char *file_name, int line_nr)
 {
     mem_link_t	*p ;
+    mem_link_space_t	*pp ;
     lis_flags_t  psw;
     int		 rslt ;
 
     if (ptr == NULL) return ;
 
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
 
     LisUpCount(MEMFREES) ;			/* stats array */
     if (LIS_DEBUG_MONITOR_MEM)
@@ -341,27 +352,30 @@ void	lis_free(void *ptr, char *file_name, int line_nr)
 	LisUpFailCount(MEMFREES) ;		/* stats array */
 #endif
 
-    p = (mem_link_t *) ptr ;
-    p-- ;					/* go back to link structure */
+    pp = (mem_link_space_t *) ptr ;
+    pp-- ;					/* go back to link structure */
+    p = (mem_link_t *) pp ;
+
+    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
 
     lis_mem_alloced -= p->size ;		/* keep track of memory */
-    LisDownCounter(MEMALLOCD, p->size) ;	/* stats array */
-
     p->prev->next = p->next ;			/* prev elt links around us */
     p->next->prev = p->prev ;			/* next elt links around us */
     p->next	  = NULL ;			/* clobber our links */
     p->prev	  = NULL ;
 
+    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+
+    LisDownCounter(MEMALLOCD, p->size) ;	/* stats array */
     put_file_name(p, file_name) ;		/* copy in filename of caller */
     p->line_nr	  = line_nr;			/* line number called from */
 
     if (LIS_DEBUG_MALLOC)			/* debugging allocations */
     {
 	printk("lis_free: ") ;
-	lis_print_block(p+1) ;
+	lis_print_block(pp+1) ;
     }
 
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
 
 #if defined(LINUX)				/* Linux kernel version */
     if (p->size > MAX_KMALLOC_SIZE)
@@ -383,6 +397,7 @@ void	lis_free(void *ptr, char *file_name, int line_nr)
 void   lis_terminate_mem(void)
 {
     mem_link_t *p ;
+    mem_link_space_t *pp ;
     lis_flags_t psw;
     int		nbytes = 0 ;
 
@@ -390,16 +405,13 @@ void   lis_terminate_mem(void)
     while (lis_mem_head.next != &lis_mem_head)
     {
 	p = lis_mem_head.next ;
+	pp = (mem_link_space_t *) p ;
 	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
-#if 0
-        lis_mem_head.next = p->next ;
-        p->next->prev = &lis_mem_head ;
-#endif
         if (LIS_DEBUG_MEM_LEAK)
 	   printk("lis: %ld bytes (at %p) leaked from file %s, line %d\n",
-				      p->size, p+1, p->file_name, p->line_nr);
+				      p->size, pp+1, p->file_name, p->line_nr);
 	nbytes += p->size ;
-	lis_free(p+1, "lis_terminate_mem", __LINE__) ;
+	lis_free(pp+1, "lis_terminate_mem", __LINE__) ;
 	lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     }
     lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
@@ -423,13 +435,15 @@ void   lis_terminate_mem(void)
 int	lis_check_mem(void)
 {
     mem_link_t		*p ;
+    mem_link_space_t	*pp ;
     int			 rslt = 1 ;
     lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
     {
-	if (!lis_check_guard(p+1, "lis_check_mem")) rslt = 0 ;
+	pp = (mem_link_space_t *) p ;
+	if (!lis_check_guard(pp+1, "lis_check_mem")) rslt = 0 ;
     }
 
     lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
@@ -437,7 +451,6 @@ int	lis_check_mem(void)
 
 } /* lis_check_mem */
 
-#if defined(CONFIG_DEV)
 /************************************************************************
 *                          lis_mark_mem                                 *
 *************************************************************************
@@ -445,24 +458,28 @@ int	lis_check_mem(void)
 * Given a pointer as returned by lis_malloc, remark the owner of the	*
 * memory in the links.							*
 *									*
+* This function is only called if CONFIG_DEV is defined -- development	*
+* version.  But it is exported for STREAMS drivers to use in helping	*
+* to track down memory leaks.						*
+*									*
 ************************************************************************/
-void	lis_mark_mem(void *ptr, const char *file_name, int line_nr)
+void	_RP lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr)
 {
-    mem_link_t	*p ;
+#if defined(CONFIG_DEV)
+    mem_link_t		*p ;
+    mem_link_space_t	*pp ;
 
     if (ptr == NULL) return ;
 
-    p = (mem_link_t *) ptr ;
-    p-- ;					/* go back to link structure */
+    pp = (mem_link_space_t *) ptr ;
+    pp-- ;					/* go back to link structure */
+    p = (mem_link_t *) pp ;
     put_file_name(p, file_name) ;		/* copy in filename of caller */
     p->line_nr	  = line_nr;			/* line number called from */
 
+#endif			/* no memory links unless CONFIG_DEV defined */
+
 } /* lis_mark_mem */
-#else	/* production case - no memory marking */
-/*
- *	lis_mark_mem() is a null #define in include/sys/LiS
- */
-#endif
 
 /************************************************************************
 *                           lis_print_block                             *
@@ -473,11 +490,13 @@ void	lis_mark_mem(void *ptr, const char *file_name, int line_nr)
 * link field and print it out in decoded form.				*
 *									*
 ************************************************************************/
-void	lis_print_block(void *ptr)
+void	_RP lis_print_block(void *ptr)
 {
     mem_link_t		*p ;
+    mem_link_space_t	*pp ;
 
-    p = ((mem_link_t *) ptr) - 1 ;
+    pp = ((mem_link_space_t *) ptr) - 1 ;
+    p = (mem_link_t *) pp ;
 
     if (p->file_name != NULL)
     {
@@ -486,7 +505,7 @@ void	lis_print_block(void *ptr)
 	case MEM_QUEUE:
 	    if (LIS_DEBUG_DMP_QUEUE)
 	    {
-		queue_t		*q = (queue_t *) (p+1) ;
+		queue_t		*q = (queue_t *) (pp+1) ;
 
 		lis_print_queue(q) ;	/* the read queue */
 		lis_print_queue(q+1) ;	/* the write queue */
@@ -496,7 +515,7 @@ void	lis_print_block(void *ptr)
 	    break ;
 	case MEM_MSG:
 	    if (LIS_DEBUG_DMP_MBLK)
-		lis_print_msg((mblk_t *)(p+1), p->file_name,
+		lis_print_msg((mblk_t *)(pp+1), p->file_name,
 			      (LIS_DEBUG_DMP_DBLK) ? PRINT_DATA_ENTIRE : 0) ;
 	    else
 		printk("mblk: \"%s\", size=%ld\n", p->file_name, p->size);
@@ -539,16 +558,18 @@ void	lis_print_block(void *ptr)
 * Walk the memory link list and print out each element.			*
 *									*
 ************************************************************************/
-void	lis_print_mem(void)
+void	_RP lis_print_mem(void)
 {
     mem_link_t		*p ;
+    mem_link_space_t	*pp ;
     lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
     {
-	if (lis_check_guard(p+1, "lis_print_mem"))
-	    lis_print_block(p+1) ;
+	pp = (mem_link_space_t *) p ;
+	if (lis_check_guard(pp+1, "lis_print_mem"))
+	    lis_print_block(pp+1) ;
     }
     lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
 
@@ -561,20 +582,22 @@ void	lis_print_mem(void)
 * Find all the queues that are allocated and print them out.		*
 *									*
 ************************************************************************/
-void lis_print_queues(void)
+void  _RP lis_print_queues(void)
 {
     mem_link_t		*p ;
+    mem_link_space_t	*pp ;
     lis_flags_t  	 psw;
 
     lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
     for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
     {
-	if (   lis_check_guard(p+1, "lis_print_queues")
+	pp = (mem_link_space_t *) p ;
+	if (   lis_check_guard(pp+1, "lis_print_queues")
 	    && p->line_nr == MEM_QUEUE)
 	{
 	    if (LIS_DEBUG_DMP_QUEUE)
 	    {
-		queue_t		*q = (queue_t *) (p+1) ;
+		queue_t		*q = (queue_t *) (pp+1) ;
 
 		lis_print_queue(q) ;	/* the read queue */
 		lis_print_queue(q+1) ;	/* the write queue */
@@ -597,7 +620,7 @@ void lis_print_queues(void)
 *									*
 ************************************************************************/
 
-const char	*lis_strm_name(stdata_t *head)
+const char	* _RP lis_strm_name(stdata_t *head)
 {
     const char	*name ;
 
@@ -634,7 +657,7 @@ const char	*lis_strm_name(stdata_t *head)
 * Find the stream name associated with the queue.			*
 *									*
 ************************************************************************/
-const char	*lis_strm_name_from_queue(queue_t *q)
+const char	* _RP lis_strm_name_from_queue(queue_t *q)
 {
     if (q->q_str != NULL)
 	return(lis_strm_name((stdata_t *) q->q_str)) ;
@@ -653,7 +676,7 @@ const char	*lis_strm_name_from_queue(queue_t *q)
 *									*
 ************************************************************************/
 
-const char	*lis_queue_name(queue_t *q)
+const char	* _RP lis_queue_name(queue_t *q)
 {
     const char	*name ;
 
@@ -678,7 +701,7 @@ const char	*lis_queue_name(queue_t *q)
 *									*
 ************************************************************************/
 
-const char	*lis_msg_type_name(mblk_t *mp)
+const char	* _RP lis_msg_type_name(mblk_t *mp)
 {
     if (mp == NULL) return("NULL-MSG") ;
 
@@ -731,7 +754,7 @@ const char	*lis_msg_type_name(mblk_t *mp)
 *									*
 ************************************************************************/
 
-const char	*lis_maj_min_name(stdata_t *head)
+const char	* _RP lis_maj_min_name(stdata_t *head)
 {
     int			 inx ;
     static char		 name[8][32] ;
@@ -742,8 +765,8 @@ const char	*lis_maj_min_name(stdata_t *head)
 
     inx = index++ & 0x03 ;
     sprintf(name[inx], "(%ld,%ld)",
-			(long)STR_MAJOR(head->sd_dev),
-			(long)STR_MINOR(head->sd_dev)) ;
+			(long)getmajor(head->sd_dev),
+			(long)getminor(head->sd_dev)) ;
 
     return(name[inx]) ;
 
@@ -756,7 +779,7 @@ const char	*lis_maj_min_name(stdata_t *head)
 * Print out some of the interesting features about a queue.		*
 *									*
 ************************************************************************/
-void	lis_print_queue(queue_t *q)
+void	 _RP lis_print_queue(queue_t *q)
 {
     const char	*name ;
 
@@ -774,6 +797,7 @@ void	lis_print_queue(queue_t *q)
 
     printk(" q_flag 0x%lx%s ", q->q_flag, q->q_flag != 0 ? ":" : "") ;
     if (F_ISSET(q->q_flag,QENAB)) printk(" QENAB");
+    if (F_ISSET(q->q_flag,QWANTENAB)) printk(" QWANTENAB");
     if (F_ISSET(q->q_flag,QWANTR)) printk(" QWANTR");
     if (F_ISSET(q->q_flag,QWANTW)) printk(" QWANTW");
     if (F_ISSET(q->q_flag,QFULL)) printk(" QFULL");
@@ -785,6 +809,9 @@ void	lis_print_queue(queue_t *q)
     if (F_ISSET(q->q_flag,QSCAN)) printk(" QSCAN");
     if (F_ISSET(q->q_flag,QCLOSEWT)) printk(" QCLOSEWT");
     if (F_ISSET(q->q_flag,QCLOSING)) printk(" QCLOSING");
+    if (F_ISSET(q->q_flag,QOPENING)) printk(" QOPENING");
+    if (F_ISSET(q->q_flag,QDEFERRING)) printk(" QDEFERRING");
+    if (F_ISSET(q->q_flag,QFROZEN)) printk(" QFROZEN");
     if (F_ISSET(q->q_flag,QWASFULL)) printk(" QWASFULL");
     printk("\n") ;
 
@@ -830,7 +857,7 @@ static void strm_print(stdata_t *hd, int indent)
     if (hd->magic != STDATA_MAGIC)
     {
 	printk("STREAM head @0x%p: bad magic number 0x%lx, should be 0x%lx\n",
-		(long) hd, hd->magic, STDATA_MAGIC) ;
+		hd, hd->magic, STDATA_MAGIC) ;
 	return ;
     }
 
@@ -872,7 +899,7 @@ static void strm_print(stdata_t *hd, int indent)
 
 #undef prefix
 
-void	lis_print_stream(stdata_t *hd)
+void	 _RP lis_print_stream(stdata_t *hd)
 {
     strm_print(hd, 0) ;
 
@@ -886,7 +913,7 @@ void	lis_print_stream(stdata_t *hd)
 *									*
 ************************************************************************/
 
-void	lis_print_data(mblk_t *mp, int opt, int cont)
+void	 _RP lis_print_data(mblk_t *mp, int opt, int cont)
 {
     const unsigned char	*p ;
     unsigned char	*start ;
@@ -955,7 +982,7 @@ void	lis_print_data(mblk_t *mp, int opt, int cont)
 * 'opt' is the print format option, or zero for the short form.		*
 *									*
 ************************************************************************/
-void	lis_print_msg(mblk_t *mp, const char *prefix, int opt)
+void	 _RP lis_print_msg(mblk_t *mp, const char *prefix, int opt)
 {
     int		nbytes ;
     int		prnt_bfr ;
@@ -995,7 +1022,7 @@ void	lis_print_msg(mblk_t *mp, const char *prefix, int opt)
 * Return the ASCII decoding of a poll event mask.			*
 *									*
 ************************************************************************/
-char	*lis_poll_events(short events)
+char	* _RP lis_poll_events(short events)
 {
     static char		 event_names[8][150] ;
     static int		 index ;
@@ -1025,24 +1052,14 @@ char	*lis_poll_events(short events)
 
 } /* lis_poll_events */
 
-#if !defined(LIS_SRC)
-#define LIS_SRC "/usr/src/LiS"
-#endif
-
+#if !defined(LINUX)
 const char *lis_basename( const char *filename )
 {
-    int len = strlen(LIS_SRC);
+    char	*p ;
 
-    /*
-     *  poor man's basename() function - this really should be in the
-     *  kernel lib...
-     */
-    if (len && strncmp(LIS_SRC,filename,len) == 0) {
-	if (filename[len] == '/')
-	    return filename+len+1;
-	else
-	    return filename+len;
-    }
-    else
-	return filename;
+    p = strrchr(filename, '/') ;
+    if (p == NULL)
+	return(filename) ;
+    return(p+1) ;
 }
+#endif

@@ -25,7 +25,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lispci.c 1.12 6/4/03"
+#ident "@(#) LiS lispci.c 1.15 09/07/04"
 
 #include <sys/stream.h>		/* gets all the right LiS stuff included */
 #include <sys/lispci.h>		/* LiS PCI header file */
@@ -51,7 +51,7 @@ static lis_pci_dev_t 	*lis_pci_dev_list_end = NULL ;
 * kernel's structures, map theirs into ours.				*
 *									*
 ************************************************************************/
-void	lis_map_pci_device(lis_pci_dev_t *p, struct pci_dev *kp)
+void	_RP lis_map_pci_device(lis_pci_dev_t *p, struct pci_dev *kp)
 {
     int		i ;
 
@@ -67,7 +67,6 @@ void	lis_map_pci_device(lis_pci_dev_t *p, struct pci_dev *kp)
     p->hdr_type		= kp->hdr_type ;
     p->irq		= kp->irq ;
 
-#if defined(KERNEL_2_3)
 
     {
 	int	nn = LIS_PCI_MEM_CNT ;		/* LiS size */
@@ -81,21 +80,6 @@ void	lis_map_pci_device(lis_pci_dev_t *p, struct pci_dev *kp)
 	}
     }
 
-#elif defined(KERNEL_2_1)
-
-    for (i = 0; i < 6; i++)
-    {
-	p->mem_addrs[i] = kp->base_address[i] ;
-    }
-
-    p->mem_addrs[6] = kp->rom_address ;		/* just for fun */
-
-#else
-
-/* there have been plenty of syntax errors by now */
-
-#endif
-
 } /* lis_map_pci_device */
 
 /************************************************************************
@@ -106,7 +90,7 @@ void	lis_map_pci_device(lis_pci_dev_t *p, struct pci_dev *kp)
 * to a lis_pci_dev_t structure for it.					*
 *									*
 ************************************************************************/
-lis_pci_dev_t   *lis_pci_find_device(unsigned vendor, unsigned device,
+lis_pci_dev_t   * _RP lis_pci_find_device(unsigned vendor, unsigned device,
                                      lis_pci_dev_t *previous_struct)
 {
     lis_pci_dev_t	*p ;
@@ -165,7 +149,7 @@ lis_pci_dev_t   *lis_pci_find_device(unsigned vendor, unsigned device,
 * Find a class in a manner similar to finding devices.			*
 *									*
 ************************************************************************/
-lis_pci_dev_t   *lis_pci_find_class(unsigned class,
+lis_pci_dev_t   * _RP lis_pci_find_class(unsigned class,
                                      lis_pci_dev_t *previous_struct)
 {
     lis_pci_dev_t	*p ;
@@ -204,7 +188,7 @@ lis_pci_dev_t   *lis_pci_find_class(unsigned class,
 * Find the structure by slot number.					*
 *									*
 ************************************************************************/
-lis_pci_dev_t   *lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
+lis_pci_dev_t   * _RP lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 {
     lis_pci_dev_t	*p ;
     struct pci_dev	*kp ;
@@ -241,7 +225,7 @@ lis_pci_dev_t   *lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 * Read a byte from config space for the device.				*
 *									*
 ************************************************************************/
-int              lis_pci_read_config_byte(lis_pci_dev_t *dev,
+int               _RP lis_pci_read_config_byte(lis_pci_dev_t *dev,
                                           unsigned       index,
                                           unsigned char *rtn_val)
 {
@@ -257,7 +241,7 @@ int              lis_pci_read_config_byte(lis_pci_dev_t *dev,
 * Read a word from config space for the device.				*
 *									*
 ************************************************************************/
-int              lis_pci_read_config_word(lis_pci_dev_t  *dev,
+int               _RP lis_pci_read_config_word(lis_pci_dev_t  *dev,
                                           unsigned        index,
                                           unsigned short *rtn_val)
 {
@@ -273,7 +257,7 @@ int              lis_pci_read_config_word(lis_pci_dev_t  *dev,
 * Read a dword from config space for the device.			*
 *									*
 ************************************************************************/
-int              lis_pci_read_config_dword(lis_pci_dev_t *dev,
+int               _RP lis_pci_read_config_dword(lis_pci_dev_t *dev,
                                           unsigned       index,
                                           unsigned long *rtn_val)
 {
@@ -289,7 +273,7 @@ int              lis_pci_read_config_dword(lis_pci_dev_t *dev,
 * Write a byte from config space for the device.			*
 *									*
 ************************************************************************/
-int              lis_pci_write_config_byte(lis_pci_dev_t *dev,
+int               _RP lis_pci_write_config_byte(lis_pci_dev_t *dev,
                                           unsigned       index,
                                           unsigned char  val)
 {
@@ -305,7 +289,7 @@ int              lis_pci_write_config_byte(lis_pci_dev_t *dev,
 * Write a word from config space for the device.			*
 *									*
 ************************************************************************/
-int              lis_pci_write_config_word(lis_pci_dev_t  *dev,
+int               _RP lis_pci_write_config_word(lis_pci_dev_t  *dev,
                                           unsigned        index,
                                           unsigned short  val)
 {
@@ -321,7 +305,7 @@ int              lis_pci_write_config_word(lis_pci_dev_t  *dev,
 * Write a dword from config space for the device.			*
 *									*
 ************************************************************************/
-int              lis_pci_write_config_dword(lis_pci_dev_t *dev,
+int               _RP lis_pci_write_config_dword(lis_pci_dev_t *dev,
                                           unsigned        index,
                                           unsigned long    val)
 {
@@ -338,13 +322,9 @@ int              lis_pci_write_config_dword(lis_pci_dev_t *dev,
 * differences between different machines.				*
 *									*
 ************************************************************************/
-int lis_pci_enable_device (lis_pci_dev_t *dev)
+int  _RP lis_pci_enable_device (lis_pci_dev_t *dev)
 {
-#if LINUX_VERSION_CODE < 0x020300               /* 2.0 or 2.2 kernel */
-    return(0) ;					/* pretend success */
-#else
     return (pci_enable_device (dev->kern_ptr));
-#endif
 }
 
 /************************************************************************
@@ -354,13 +334,9 @@ int lis_pci_enable_device (lis_pci_dev_t *dev)
 * Disable the device.  Undoes what lis_pci_enable_device does.		*
 *									*
 ************************************************************************/
-void lis_pci_disable_device (lis_pci_dev_t *dev)
+void  _RP lis_pci_disable_device (lis_pci_dev_t *dev)
 {
-#if LINUX_VERSION_CODE < 0x020300               /* 2.0 or 2.2 kernel */
-    return ;					/* pretend success */
-#else
     pci_disable_device (dev->kern_ptr);
-#endif
 }
 
 /************************************************************************
@@ -370,7 +346,7 @@ void lis_pci_disable_device (lis_pci_dev_t *dev)
 * Set bus master capability for the device.				*
 *									*
 ************************************************************************/
-void             lis_pci_set_master(lis_pci_dev_t *dev)
+void              _RP lis_pci_set_master(lis_pci_dev_t *dev)
 {
     if (dev == NULL || dev->kern_ptr == NULL) return ;
     pci_set_master(dev->kern_ptr) ;
@@ -384,7 +360,7 @@ void             lis_pci_set_master(lis_pci_dev_t *dev)
 * Called at LiS module exit to deallocate structures.			*
 *									*
 ************************************************************************/
-void	lis_pci_cleanup(void)
+void	 lis_pci_cleanup(void)
 {
     lis_pci_dev_t	*p ;
     lis_pci_dev_t	*np ;
@@ -403,11 +379,10 @@ void	lis_pci_cleanup(void)
 *                         DMA Memory Allocation				*
 ************************************************************************/
 
-void    *lis_pci_alloc_consistent(lis_pci_dev_t  *dev,
+void    * _RP lis_pci_alloc_consistent(lis_pci_dev_t  *dev,
 				  size_t          size,
 				  lis_dma_addr_t *dma_handle)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     dma_addr_t	*dp = (dma_addr_t *) dma_handle->opaque ;
     void	*vaddr ;
     
@@ -417,26 +392,10 @@ void    *lis_pci_alloc_consistent(lis_pci_dev_t  *dev,
     dma_handle->vaddr = vaddr ;
 
     return(vaddr) ;
-#else						/* 2.2 kernel */
-    void	*vaddr ;
-    u32		*p = (u32 *) dma_handle->opaque ;
-
-    dma_handle->size = size ;
-    dma_handle->dev  = dev ;
-    vaddr = lis_get_free_pages_atomic(size) ;
-    dma_handle->vaddr = vaddr ;
-    p[0] = 0 ;
-    p[1] = 0 ;
-    if (vaddr != NULL)
-	*p = virt_to_phys(vaddr) ;
-
-    return(vaddr) ;
-#endif
 }
 
-void    *lis_pci_free_consistent(lis_dma_addr_t *dma_handle)
+void    * _RP lis_pci_free_consistent(lis_dma_addr_t *dma_handle)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     if (dma_handle->vaddr != NULL)
 	pci_free_consistent(dma_handle->dev->kern_ptr,
 			    dma_handle->size,
@@ -444,64 +403,47 @@ void    *lis_pci_free_consistent(lis_dma_addr_t *dma_handle)
 			    *((dma_addr_t *) dma_handle->opaque)) ;
     dma_handle->vaddr = NULL ;
     return(NULL) ;
-#else						/* 2.2 kernel */
-    u32		*p = (u32 *) dma_handle->opaque ;
-
-    if (dma_handle->vaddr != NULL)
-	lis_free_pages(dma_handle->vaddr) ;
-
-    p[0] = 0 ;
-    p[1] = 0 ;
-    dma_handle->vaddr = NULL ;
-    return(NULL) ;
-#endif
 }
 
-u32     lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle)
+u32      _RP lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle)
 {
     u32		*p = (u32 *) dma_handle->opaque ;
 
     return(*p) ;
 }
 
-u64     lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle)
+u64      _RP lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle)
 {
     u64		*p = (u64 *) dma_handle->opaque ;
 
     return(*p) ;
 }
 
-void    lis_pci_map_single(lis_pci_dev_t *dev,
+void     _RP lis_pci_map_single(lis_pci_dev_t *dev,
 			   void         *ptr,
 			   size_t        size,
 			   lis_dma_addr_t *dma_handle,
 			   int           direction)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     dma_addr_t	*dp = (dma_addr_t *) dma_handle->opaque ;
+
+    switch (direction)
+    {
+    case LIS_SYNC_FOR_CPU:	direction = PCI_DMA_FROMDEVICE ; break ;
+    case LIS_SYNC_FOR_DMA:	direction = PCI_DMA_TODEVICE ; break ;
+    case LIS_SYNC_FOR_BOTH:	direction = PCI_DMA_BIDIRECTIONAL ; break ;
+    default:			return ;
+    }
 
     dma_handle->size      = size ;
     dma_handle->dev       = dev ;
     dma_handle->vaddr     = ptr ;
     dma_handle->direction = direction ;
     *dp = pci_map_single(dev->kern_ptr, ptr, size, direction);
-#else						/* 2.2 kernel */
-    u32		*p = (u32 *) dma_handle->opaque ;
-
-    dma_handle->size      = size ;
-    dma_handle->dev       = dev ;
-    dma_handle->vaddr     = ptr ;
-    dma_handle->direction = direction ;
-    p[0] = 0 ;
-    p[1] = 0 ;
-    if (ptr != NULL)
-	*p = virt_to_phys(ptr) ;
-#endif
 }
 
-void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
+void * _RP lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     if (dma_handle->vaddr != NULL)
 	pci_unmap_single(dma_handle->dev->kern_ptr,
 			 *((dma_addr_t *) dma_handle->opaque),
@@ -510,14 +452,6 @@ void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
 
     dma_handle->vaddr = NULL ;
     return(NULL) ;
-#else						/* 2.2 kernel */
-    u32		*p = (u32 *) dma_handle->opaque ;
-
-    p[0] = 0 ;
-    p[1] = 0 ;
-    dma_handle->vaddr = NULL ;
-    return(NULL) ;
-#endif
 }
 
 /************************************************************************
@@ -527,11 +461,10 @@ void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)
 * Synchronize memory with DMA.						*
 *									*
 ************************************************************************/
-void lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
+void  _RP lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
 			     size_t              size,
 			     int                 direction)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     switch (direction)
     {
     case LIS_SYNC_FOR_CPU:	direction = PCI_DMA_FROMDEVICE ; break ;
@@ -547,31 +480,20 @@ void lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
 			*((dma_addr_t *) dma_handle->opaque),
 		        size,
 			direction);
-#else						/* 2.2 kernel */
-    /* nothing like this in 2.2 */
-#endif
 }
 
 /************************************************************************
 *                            Miscellaneous                              *
 ************************************************************************/
 
-int     lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask)
+int      _RP lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     return(pci_dma_supported(dev->kern_ptr, mask)) ;
-#else						/* 2.2 kernel */
-    return(0) ;
-#endif
 }
 
-int     lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
+int      _RP lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
 {
-#if LINUX_VERSION_CODE >= 0x020400              /* 2.4 kernel */
     return(pci_set_dma_mask(dev->kern_ptr, mask)) ;
-#else						/* 2.2 kernel */
-    return(0) ;
-#endif
 }
 
 
@@ -582,7 +504,7 @@ int     lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
 * Our own routine.  Kernel versioning takes care of differences.	*
 *									*
 ************************************************************************/
-void lis_membar(void)
+void  _RP lis_membar(void)
 {
     barrier();
     mb();

@@ -33,7 +33,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS msg.c 2.12 12/27/03 15:12:51 "
+#ident "@(#) LiS msg.c 2.19 09/07/04 11:11:22 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -99,7 +99,7 @@ long	     lis_max_msg_mem ;		  /* maximum to allocate */
  * Use DBLK_ALLOC to get the memory.  Since a header (mblk) also
  * contains a small data block it must be DMA-able memory.
  */
-#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+#if !(defined(LINUX) && defined(USE_KMEM_CACHE))
 #if defined(CONFIG_DEV)
 static struct mdbblock *
 allochdr(char *file_name, int line_nr)
@@ -120,7 +120,7 @@ static struct mdbblock * allochdr(void)
     {
 	lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 	if (   lis_max_msg_mem == 0
-	    || lis_atomic_read(&lis_strcount) < lis_max_msg_mem
+	    || K_ATOMIC_READ(&lis_strcount) < lis_max_msg_mem
 	   )
 	    rtn = (struct mdbblock *)
 		    DBLK_ALLOC(sizeof(struct mdbblock), file_name, line_nr, 0);
@@ -133,6 +133,7 @@ static struct mdbblock * allochdr(void)
 	{
 	    static int		msg_printed ;
 
+	    lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 	    rtn = (struct mdbblock *) NULL;
 	    if (!msg_printed++)
 	    {
@@ -148,10 +149,10 @@ static struct mdbblock * allochdr(void)
 	    lis_mdbfreelist = 
 		(struct mdbblock *)lis_mdbfreelist->msgblk.m_mblock.b_next;
 
+	    lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 	    LisDownCount(FREEHDRS);
 	    lis_mark_mem(rtn, file_name, line_nr) ;     /* under new ownership*/
 	}
-	lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
     }
 
     if (rtn)	/* update counts of header allocations */
@@ -169,7 +170,7 @@ static struct mdbblock * allochdr(void)
 }/*allochdr*/
 #else
 /*
- * This case (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE) is 
+ * This case (defined(LINUX) && defined(USE_KMEM_CACHE) is 
  * covered/handled in include/sys/LiS/linux-mdep.h as:
  *
  *  #if defined(CONFIG_DEV)
@@ -185,7 +186,7 @@ static struct mdbblock * allochdr(void)
 /* freehdr - return a header to the free list. For internal use.
  */
 
-#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+#if !(defined(LINUX) && defined(USE_KMEM_CACHE))
 static void
 freehdr(mblk_t *bp)
 {
@@ -193,15 +194,13 @@ freehdr(mblk_t *bp)
 
     LisDownCount(HEADERS);
 
-    if (lis_atomic_read(&lis_strstats[FREEHDRS][CURRENT]) >= MAX_MBLKS)
+    if (K_ATOMIC_READ(&lis_strstats[FREEHDRS][CURRENT]) >= MAX_MBLKS)
     {
 	FREE(bp);
 	return ;
     }
 
-    lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
     bp->b_cont = NULL ;
-    bp->b_next = (mblk_t *)lis_mdbfreelist;
     /*
      * If the data block ptr points to the data area of this same
      * mblk then leave it alone for port mortem debugging purposes.
@@ -217,17 +216,22 @@ freehdr(mblk_t *bp)
 	bp->b_wptr = NULL ;
     }
 
-    lis_mdbfreelist = (struct mdbblock *)bp;
     lis_mark_mem(bp, "free", MEM_MSG) ;		     /* under new ownership */
+
+    lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
+    bp->b_next = (mblk_t *)lis_mdbfreelist;
+    lis_mdbfreelist = (struct mdbblock *)bp;
     lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
+
     LisUpCount(FREEHDRS);
+
 }/*freehdr*/
-#else /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+#else /* !(defined(LINUX) && defined(USE_KMEM_CACHE)) */
 /*
- *  This case - LINUX and USE_LINUX_KMEM_CACHE - is handled/covered 
+ *  This case - LINUX and USE_KMEM_CACHE - is handled/covered 
  *  in linux-mdep.h via #define freehdr(a) lis_msgb_cache_freehdr((a))
  */
-#endif /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+#endif /* !(defined(LINUX) && defined(USE_KMEM_CACHE)) */
 
 
 /*  -------------------------------------------------------------------  */
@@ -235,7 +239,7 @@ freehdr(mblk_t *bp)
  *
  * This will clean up any memory leaks.					*
  */
-#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+#if !(defined(LINUX) && defined(USE_KMEM_CACHE))
 void
 lis_terminate_msg(void)
 {
@@ -249,12 +253,12 @@ lis_terminate_msg(void)
 	FREE(p);
     }
 }
-#else  /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+#else  /* !(defined(LINUX) && defined(USE_KMEM_CACHE)) */
 /*
- *  This case - LINUX and USE_LINUX_KMEM_CACHE - is handled/covered 
+ *  This case - LINUX and USE_KMEM_CACHE - is handled/covered 
  *  in linux-mdep.h via #define 
  */
-#endif  /* !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE)) */
+#endif  /* !(defined(LINUX) && defined(USE_KMEM_CACHE)) */
 
 
 /*  -------------------------------------------------------------------  */
@@ -278,19 +282,19 @@ allocdb(int size, int flags)
     char *rtn;
 
     if (   lis_max_msg_mem != 0
-	&& lis_atomic_read(&lis_strcount) >= lis_max_msg_mem)
+	&& K_ATOMIC_READ(&lis_strcount) >= lis_max_msg_mem)
     {
 	LisUpFailCount(DATABS);
 	return(NULL) ;
     }
 
-    ASSERT(size > FASTBUF);
+    LISASSERT(size > FASTBUF);
     rtn = (char *)DBLK_ALLOC(size, file_name, line_nr, flags);
     if (rtn == NULL)
 	LisUpFailCount(DATABS);
     else
     {
-	lis_atomic_add(&lis_strcount, size);	/* total allocated memory */
+	K_ATOMIC_ADD(&lis_strcount, size);	/* total allocated memory */
 	LisUpCount(DATABS);
 	LisUpCounter(DBLKMEM, size);
     }
@@ -359,7 +363,7 @@ initb(struct mdbblock *blk, char *buff, int size, struct free_rtn *frtn)
  *        To be completed later.
  */
 
-struct msgb *
+struct msgb * _RP
 lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr,
 			char *file_name, int line_nr)
 {
@@ -373,7 +377,7 @@ lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr,
  *	size. The priority is for compatibility only.
  */
 
-struct msgb *
+struct msgb * _RP
 lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 {
 #if defined(CONFIG_DEV)
@@ -428,7 +432,7 @@ lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)
 /* testb: see if an allocation can actually be done.
  */
 
-int
+int _RP
 lis_testb(int size, unsigned int priority)
 {
 #ifdef AVAIL
@@ -454,7 +458,7 @@ lis_testb(int size, unsigned int priority)
  * dblk to point to the user's buffer and to hold the freeinfo stuff.
  */
 
-mblk_t *
+mblk_t * _RP
 lis_esballoc(unsigned char *base, int size, int priority,
 	     frtn_t *freeinfo, char *file_name, int line_nr)
 {
@@ -494,22 +498,26 @@ lis_esballoc(unsigned char *base, int size, int priority,
 /* lis_freedb - Free the data block associated with a message and
  *              possibly the message header as well.
  */
-void
+void _RP
 lis_freedb(mblk_t *bp, int free_hdr)
 {
+
     if (bp)
     {
 	struct datab *dp = bp->b_datap;
 	dblk_t       *mydp = (dblk_t *) &((struct mdbblock *)bp)->datblk ;
 	char	     *db_base = NULL ;
+	int	      locked = 0 ;
 	lis_flags_t   psw;
 
     	if (dp)
 	{
-	    lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
+	    if ((locked = (dp->db_ref != 1)))
+		lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
 	    if (dp -> db_ref == 0)
 	    {
-		lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
+		if (locked)
+		    lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 		printk ("lis_freeb: mp 0x%lx ref count 0\n", (long) bp);
 		return;
 	    }
@@ -533,6 +541,8 @@ lis_freedb(mblk_t *bp, int free_hdr)
 	     */
 	    if (--dp->db_ref == 0)
             {
+		if (locked)
+		    lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 	    	if (dp->frtnp)
 		{
 		    if ( LIS_DEBUG_FREEMSG && LIS_DEBUG_ADDRS )
@@ -568,7 +578,7 @@ lis_freedb(mblk_t *bp, int free_hdr)
 			       (long) dp, (long) dp->db_base,
 			       (long) dp->db_lim, dp->db_size);
 
-	            lis_atomic_sub(&lis_strcount, dp->db_size);
+	            K_ATOMIC_SUB(&lis_strcount, dp->db_size);
 	            LisDownCount(DATABS);
 		    LisDownCounter(DBLKMEM, dp->db_size);
 		    db_base = dp->db_base ;	/* area to free */
@@ -625,13 +635,15 @@ lis_freedb(mblk_t *bp, int free_hdr)
 		    freehdr(bp); 	/* free the header */
 		}
 
-		lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 		if (db_base)		/* have saved data area to free */
 		    FREE(db_base);		/* free data area */
 		return ;
 	    }
 
+
 	    /* 
+	     * Note, still holding the msg_lock.
+	     *
 	     * If the ref count is non-zero then check to see if the
 	     * data block is in the same message as 'bp'.  If not then
 	     * it is safe to free 'bp' but not the msg block in which
@@ -642,36 +654,35 @@ lis_freedb(mblk_t *bp, int free_hdr)
 	    {
 		if (mydp->db_ref > 0 && --mydp->db_ref == 0)
 		{
+		    if (locked)
+			lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 		    if ( LIS_DEBUG_FREEMSG && LIS_DEBUG_ADDRS  )
 			printk("lis_freeb: (mblk) bp=0x%lx dp=0x%lx\n",
 				(long) bp, (long) bp->b_datap);
 
 		    freehdr(bp);
+		    return ;
 		}
 	    }
-	    else
+
 	    if (!free_hdr && dp == mydp)/* internal dblk */
 		dp->db_ref++ ;		/* hdr still in use */
 
-	    lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
+	    if (locked)
+		lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
 	    return ;
         }
 
         /* no data blk ptr, just free hdr */
-	lis_spin_lock_irqsave(&lis_msg_lock, &psw) ;
-	if (   free_hdr
-	    && mydp->db_ref > 0
-	    && --mydp->db_ref == 0
-	   )
+	if (free_hdr && mydp->db_ref == 1)
 	{
+	    mydp->db_ref-- ;
 	    if ( LIS_DEBUG_FREEMSG && LIS_DEBUG_ADDRS  )
 		printk("lis_freeb: (mblk/no-dblk) bp=0x%lx dp=NULL\n",
 			(long) bp);
 
 	    freehdr(bp);	 /* no data block; just free the header */
 	}
-
-	lis_spin_unlock_irqrestore(&lis_msg_lock, &psw) ;
     }
 
 }/*lis_freedb*/
@@ -681,7 +692,7 @@ lis_freedb(mblk_t *bp, int free_hdr)
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  */
-void
+void _RP
 lis_freeb(mblk_t *bp)
 {
     lis_freedb(bp, 1) ;			/* free both hdr and data blk */
@@ -691,7 +702,7 @@ lis_freeb(mblk_t *bp)
 /*  -------------------------------------------------------------------  */
 /* freemsg - free a whole message
  */
-void
+void _RP
 lis_freemsg(mblk_t *mp)
 {
     while (mp)
@@ -704,7 +715,7 @@ lis_freemsg(mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 /* extract values from a char pointer and advance the pointer */
-int lis_getint(unsigned char **p)
+int _RP lis_getint(unsigned char **p)
 {
     int result = *((int*)(*p));
     *p += sizeof(int);
@@ -712,7 +723,7 @@ int lis_getint(unsigned char **p)
 }
 
 /*  -------------------------------------------------------------------  */
-void lis_putbyte(unsigned char **p, unsigned char byte)
+void _RP lis_putbyte(unsigned char **p, unsigned char byte)
 {
     **p = byte;
     ++*p;

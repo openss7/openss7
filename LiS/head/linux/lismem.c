@@ -25,7 +25,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lismem.c 1.14 11/14/02"
+#ident "@(#) LiS lismem.c 1.17 09/07/04"
 
 #include <sys/stream.h>		/* gets all the right LiS stuff included */
 #include <sys/lismem.h>		/* LiS mem header file */
@@ -47,7 +47,6 @@
 *									*
 ************************************************************************/
 
-#if defined(KERNEL_2_3)
 
 typedef struct
 {
@@ -83,7 +82,6 @@ lis_slab_table_t lis_slab_table[] =
     {NULL,                NULL, 0,     0}
 } ;
 
-#endif
 
 /************************************************************************
 *                         lismem_init                                   *
@@ -102,7 +100,6 @@ void lis_mem_init(void)
 {
     lis_spin_lock_init(&contig_lock, "LiS-Page-Alloc");
 
-#if defined(KERNEL_2_3)
     {
 	lis_slab_table_t	*p ;
 
@@ -112,14 +109,12 @@ void lis_mem_init(void)
 				SLAB_HWCACHE_ALIGN | CACHE_OPTS, NULL,NULL);
 	}
     }
-#endif
 
     lismem_init_flag = 1 ;
 }
 
 void lis_mem_terminate(void)
 {
-#if defined(KERNEL_2_3)
     lis_slab_table_t	*p ;
 
     for (p = lis_slab_table; p->name != NULL; p++)
@@ -128,7 +123,6 @@ void lis_mem_terminate(void)
 	kmem_cache_destroy(p->cache_struct) ;
 	p->cache_struct = NULL ;
     }
-#endif
 }
 
 /************************************************************************
@@ -201,7 +195,7 @@ static contig_memlink_t *find_entry(void *addr)
     return(NULL) ;			/* could not find it */
 }
 
-void    *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
+void    * _RP lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 {
     void		*a ;
     int			 order ;
@@ -257,17 +251,17 @@ void    *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)
 
 } /* lis_get_free_pages_fcn */
 
-void    *lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line)
+void    * _RP lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line)
 {
     return(lis_get_free_pages_fcn(nbytes, GFP_ATOMIC, file, line)) ;
 }
 
-void    *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line)
+void    * _RP lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line)
 {
     return(lis_get_free_pages_fcn(nbytes, GFP_KERNEL, file, line)) ;
 }
 
-void     *lis_free_pages_fcn(void *ptr, char *file, int line)
+void     * _RP lis_free_pages_fcn(void *ptr, char *file, int line)
 {
     contig_memlink_t	*mp ;
     void		*addr ;
@@ -302,7 +296,7 @@ void     *lis_free_pages_fcn(void *ptr, char *file, int line)
 
 } /* lis_free_pages_fcn */
 
-void	lis_free_all_pages(void)
+void	 _RP lis_free_all_pages(void)
 {
     contig_memlink_t	*mp ;
     contig_memlink_t	*boundary_ptr = NULL ;
@@ -366,7 +360,6 @@ void	lis_free_all_pages(void)
 * either from an lis memory cache or from the general kmalloc.		*
 *									*
 ************************************************************************/
-#if defined(KERNEL_2_3)
 
 typedef struct
 {
@@ -374,13 +367,20 @@ typedef struct
 
 } mem_hdr_t ;
 
+typedef struct
+{
+    mem_hdr_t		 mh ;
+    char		 padding[LIS_CACHE_BYTES -
+	                                (sizeof(mem_hdr_t) % LIS_CACHE_BYTES)];
+} mem_hdr_space_t ;
+
 void *lis__kmalloc(int nbytes, int class, int use_cache)
 {
-    mem_hdr_t	  	*p ;
+    mem_hdr_space_t  	*p ;
     lis_slab_table_t	*tp ;
     kmem_cache_t	*cp = NULL ;
 
-    nbytes += sizeof(mem_hdr_t) ;
+    nbytes += sizeof(mem_hdr_space_t) ;
 
     if (!use_cache || nbytes > SIZE_MAX)
 	p = kmalloc(nbytes, class) ;
@@ -402,51 +402,27 @@ void *lis__kmalloc(int nbytes, int class, int use_cache)
 
     if (p == NULL) return(NULL) ;
 
-    p->slab_ptr = cp ;
+    p->mh.slab_ptr = cp ;
     return((void *)(p+1)) ;
 }
 
 void *lis__kfree(void *ptr)
 {
-    mem_hdr_t	 *p ;
+    mem_hdr_space_t	 *p ;
 
     if (ptr == NULL) return(NULL) ;
 
-    p = (mem_hdr_t *) ptr ;
+    p = (mem_hdr_space_t *) ptr ;
     p-- ;
 
-    if (p->slab_ptr == NULL)
+    if (p->mh.slab_ptr == NULL)
 	kfree(p) ;
     else
-	kmem_cache_free(p->slab_ptr, p) ;
+	kmem_cache_free(p->mh.slab_ptr, p) ;
 
     return(NULL) ;
 }
 
-#else					/* 2.2 kernel */
-
-/*
- * In the 2.2 kernel you can't actually free the slab allocator
- * cache structures.  You can only "shrink" them.  This leads to
- * leaving those structures allocated (somewhere) when LiS is
- * unloaded from memory.  Sometimes they seem to have been allocated
- * in memory that does not die with LiS, so that when LiS is loaded
- * again we get "dup entry" messages when registering the caches.
- *
- * The technique here is to just not use the dedicated caches.
- */
-void *lis__kmalloc(int nbytes, int class, int use_cache)
-{
-    return(kmalloc(nbytes, class)) ;
-}
-
-void *lis__kfree(void *ptr)
-{
-    kfree(ptr) ;
-    return(NULL) ;
-}
-
-#endif
 
 /************************************************************************
 *                       Calls to Kernel Routines                        *
@@ -457,22 +433,22 @@ void *lis__kfree(void *ptr)
 *									*
 ************************************************************************/
 
-void	*lis_alloc_atomic_fcn(int nbytes, char *file, int line)
+void	* _RP lis_alloc_atomic_fcn(int nbytes, char *file, int line)
 {
     return(lis_malloc(nbytes, GFP_ATOMIC, 0, file, line)) ;
 }
 
-void	*lis_alloc_kernel_fcn(int nbytes, char *file, int line)
+void	* _RP lis_alloc_kernel_fcn(int nbytes, char *file, int line)
 {
     return(lis_malloc(nbytes, GFP_KERNEL, 0, file, line)) ;
 }
 
-void	*lis_alloc_dma_fcn(int nbytes, char *file, int line)
+void	* _RP lis_alloc_dma_fcn(int nbytes, char *file, int line)
 {
     return(lis_malloc(nbytes, GFP_DMA, 0, file, line)) ;
 }
 
-void	*lis_free_mem_fcn(void *mem_area, char *file, int line)
+void	* _RP lis_free_mem_fcn(void *mem_area, char *file, int line)
 {
     lis_free(mem_area, file, line) ;
     return(NULL) ;

@@ -21,33 +21,35 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS lislocks.c 1.25 12/27/03"
+#ident "@(#) LiS lislocks.c 1.48 09/07/04"
 
-#include <sys/LiS/linux-mdep.h>
+#include <sys/stream.h>
 #include <sys/LiS/strmdbg.h>
 #include <sys/lislocks.h>
 #include <sys/lismem.h>
 #include <linux/sched.h>
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 #include <linux/spinlock.h>
-#elif defined(KERNEL_2_1)		/* 2.1 and 2.2 kernels */
-#include <asm/spinlock.h>
-#else					/* earlier kernels */
-					/* there will be syntax errors */
-#endif
 
 #if defined(KERNEL_2_5)
+
 #if defined(CONFIG_DEV)
 #define	SAVE_FLAGS(x)		local_save_flags(x)
 #else 
 #define	SAVE_FLAGS(x)
 #endif
-#else
+
+#else	/* KERNEL_2_5 */
+
 #if defined(CONFIG_DEV)
 #define	SAVE_FLAGS(x)		save_flags(x)
 #else 
 #define	SAVE_FLAGS(x)
 #endif
+
+#endif	/* KERNEL_2_5 */
+
+#if defined(USE_KMEM_CACHE)
+kmem_cache_t *lis_locks_cachep;
 #endif
 
 #define FL	char *file, int line
@@ -56,7 +58,7 @@
 #define SET_SPINNER				\
 	lock->spinner_file = file ;		\
 	lock->spinner_line = line ;		\
-	lock->spinner_cntr = ++lis_seq_cntr ; 
+	lock->spinner_cntr = ++lis_seq_cntr ;
 
 #define SET_OWNER 				\
 	lock->owner_file = file ; 		\
@@ -86,16 +88,51 @@
 	lsem->owner_file = file ;		\
 	lsem->owner_line = line ;		\
 	lsem->owner_cntr = ++lis_seq_cntr ;
+
 #else
+
 #define SET_SPINNER	(void) prev ;
-#define SET_OWNER      	(void) prev ;
 #define SET_SPIN_UNLOCK	(void) prev ;
 #define	SET_UPSEM
 #define	SET_DSEM
-#define	SET_SEMOWNER
 #define	SPIN_FILL	lis_spin_lock_fill(lock, name) 
 #define	RW_LOCK_FILL	lis_rw_lock_fill(lock, name) 
+
+#define SET_OWNER 				\
+	if (LIS_DEBUG_LOCK_CONTENTION)		\
+	{					\
+	    lock->owner_file = file ; 		\
+	    lock->owner_line = line ; 		\
+	    lock->owner_cntr = ++lis_seq_cntr ;	\
+	}
+
+#define	SET_SEMOWNER				\
+	if (LIS_DEBUG_LOCK_CONTENTION)		\
+	{					\
+	    lsem->owner_file = file ;		\
+	    lsem->owner_line = line ;		\
+	    lsem->owner_cntr = ++lis_seq_cntr ;	\
+	}
+
 #endif
+
+/*
+ * This is a separate mechanism conditioned on
+ * a debug bit.
+ */
+#define SET_LOCK_CONTENTION			\
+	{					\
+	    lock->contention_cnt++ ;		\
+	    if (LIS_DEBUG_LOCK_CONTENTION)	\
+		track_lock_contention(lock) ;	\
+	}
+#define SET_SEM_CONTENTION			\
+	{					\
+	    lsem->contention_cnt++ ;		\
+	    if (LIS_DEBUG_LOCK_CONTENTION &&	\
+		    lsem->taskp && lsem->taskp != current) \
+		track_sem_contention(lsem) ;	\
+	}
 
 /************************************************************************
 *                         Lock Contention                               *
@@ -107,6 +144,16 @@
 
 lis_atomic_t	lis_spin_lock_count ;
 lis_atomic_t	lis_spin_lock_contention_count ;
+spinlock_t	lis_contention_lock = SPIN_LOCK_UNLOCKED;
+
+#define	LOCK_CONTENTION_SIZE	4	/* # locks to keep track of */
+lis_spin_lock_t	*lis_lock_contention_table[LOCK_CONTENTION_SIZE] ;
+
+/*
+ * Same thing but for semaphores
+ */
+lis_atomic_t	 lis_sem_contention_count ;
+lis_semaphore_t	*lis_sem_contention_table[LOCK_CONTENTION_SIZE] ;
 
 
 /************************************************************************
@@ -122,13 +169,8 @@ lis_flags_t		lis_psw0 ;		/* base level psw value */
 #define	USE_SPINLOCK	0
 
 
-#if defined(KERNEL_2_3)			/* 2.4 kernel or later */
 #define	THELOCK		lock		/* use passed-in lock */
 #define DCL_r  	        rwlock_t *r = (rwlock_t *) lock->rw_lock_mem 
-#else					/* 2.2 kernel */
-#define	THELOCK		(&lis_spl_lock)	/* use global lock */
-#endif
-
 #define DCL_l  	     spinlock_t	*l = (spinlock_t *) THELOCK->spin_lock_mem 
 
 /************************************************************************
@@ -273,9 +315,395 @@ spinlock_t		lis_spl_track_lock = SPIN_LOCK_UNLOCKED ;
 *                         Prototypes                                    *
 ************************************************************************/
 
-extern unsigned long lis_hitime(void);  /* usec res; 64s cycle */
 extern int	     lis_seq_cntr ;
 
+
+/************************************************************************
+*                        Lock Contention Tracking                       *
+*************************************************************************
+*									*
+* Keep track of the few most contended for locks.			*
+*									*
+************************************************************************/
+static void track_lock_contention(lis_spin_lock_t *lock)
+{
+    lis_spin_lock_t	**p = lis_lock_contention_table ;
+    lis_spin_lock_t	**e = NULL;
+    lis_spin_lock_t	**r = NULL;
+    unsigned long	  psw ;
+
+    spin_lock_irqsave(&lis_contention_lock, psw) ;
+
+    for ( ; p != &lis_lock_contention_table[LOCK_CONTENTION_SIZE]; p++)
+    {
+	if ((*p) == lock)
+	{
+	    r = NULL ;			/* don't replace */
+	    e = NULL ;			/* don't plug empty slot */
+	    break ;
+	}
+
+	if ((*p) == NULL)
+	{
+	    if (e == NULL)
+		e = p ;			/* first empty slot */
+	    continue ;
+	}
+
+	if ((*p)->contention_cnt < lock->contention_cnt)
+	{
+	    e = NULL ;			/* don't plug empty slot */
+	    r = p ;
+	}
+    }
+
+    if (r != NULL)		/* entry to be replaced */
+	*r = lock ;
+    else
+    if (e != NULL)		/* empty slot, lock not in table */
+	*e = lock ;		/* enter it into the table */
+
+    spin_unlock_irqrestore(&lis_contention_lock, psw) ;
+}
+
+static void purge_lock_contention(lis_spin_lock_t *lock)
+{
+    lis_spin_lock_t	**p = lis_lock_contention_table ;
+    unsigned long	  psw ;
+
+    spin_lock_irqsave(&lis_contention_lock, psw) ;
+
+    for ( ; p != &lis_lock_contention_table[LOCK_CONTENTION_SIZE]; p++)
+    {
+	if ((*p) == lock)
+	    *p = NULL ;
+    }
+
+    spin_unlock_irqrestore(&lis_contention_lock, psw) ;
+}
+
+/*
+ * Return a message with the decode of the contention table in it.
+ */
+mblk_t *lis_lock_contention_msg(void)
+{
+    mblk_t		 *mp ;
+    lis_spin_lock_t	**p = lis_lock_contention_table ;
+    lis_spin_lock_t	**p2 ;
+    lis_spin_lock_t	 *t ;
+    unsigned long	  psw ;
+    unsigned		  tot_contention ;
+
+    mp = allocb(LOCK_CONTENTION_SIZE * 100 + 50, BPRI_MED) ;
+    if (mp == NULL)
+	return(NULL) ;
+
+
+    spin_lock_irqsave(&lis_contention_lock, psw) ;
+
+    /*
+     * Bubble sort the table in increasing lock contention order.
+     */
+    for ( ; p != &lis_lock_contention_table[LOCK_CONTENTION_SIZE-1]; p++)
+    {
+	if ((*p) == NULL)
+	    continue ;
+
+	for (p2 = p + 1;
+	     p2 != &lis_lock_contention_table[LOCK_CONTENTION_SIZE];
+	     p2++
+	    )
+	{
+	    if ((*p2) == NULL)
+		continue ;
+
+	    if ( (*p2)->contention_cnt < (*p)->contention_cnt )
+	    {
+		t   = *p;
+		*p  = *p2 ;
+		*p2 = t ;
+	    }
+	}
+    }
+
+
+    tot_contention = K_ATOMIC_READ(&lis_spin_lock_contention_count) ;
+    sprintf(mp->b_wptr, "Total Lock Contention: %u\n", tot_contention) ;
+    while (*mp->b_wptr) mp->b_wptr++;
+
+    for (p = lis_lock_contention_table;
+	 p != &lis_lock_contention_table[LOCK_CONTENTION_SIZE];
+	 p++
+	)
+    {
+	if ((*p) == NULL)
+	    continue ;
+
+	sprintf(mp->b_wptr, "%10u(%d%%): %s last-owner: %s %d\n",
+		(*p)->contention_cnt,
+		tot_contention ?  ((*p)->contention_cnt * 100) / tot_contention
+			       : 0,
+		(*p)->name ? (*p)->name : "Anonymous",
+		(*p)->owner_file ? (*p)->owner_file : "Unknown",
+		(*p)->owner_line) ;
+	while (*mp->b_wptr) mp->b_wptr++;
+    }
+
+    spin_unlock_irqrestore(&lis_contention_lock, psw) ;
+
+    return(mp) ;
+}
+
+/************************************************************************
+*                    Semaphore Contention Tracking                      *
+*************************************************************************
+*									*
+* Keep track of the few most contended for semaphores.			*
+*									*
+************************************************************************/
+static void track_sem_contention(lis_semaphore_t *lsem)
+{
+    lis_semaphore_t	**p = lis_sem_contention_table ;
+    lis_semaphore_t	**e = NULL;
+    lis_semaphore_t	**r = NULL;
+    unsigned long	  psw ;
+
+    spin_lock_irqsave(&lis_contention_lock, psw) ;
+
+    for ( ; p != &lis_sem_contention_table[LOCK_CONTENTION_SIZE]; p++)
+    {
+	if ((*p) == lsem)
+	{
+	    r = NULL ;			/* don't replace */
+	    e = NULL ;			/* don't plug empty slot */
+	    break ;
+	}
+
+	if ((*p) == NULL)
+	{
+	    if (e == NULL)
+		e = p ;			/* first empty slot */
+	    continue ;
+	}
+
+	if ((*p)->contention_cnt < lsem->contention_cnt)
+	{
+	    e = NULL ;			/* don't plug empty slot */
+	    r = p ;
+	}
+    }
+
+    if (r != NULL)		/* entry to be replaced */
+	*r = lsem ;
+    else
+    if (e != NULL)		/* empty slot, lock not in table */
+	*e = lsem ;		/* enter it into the table */
+
+    spin_unlock_irqrestore(&lis_contention_lock, psw) ;
+}
+
+static void purge_sem_contention(lis_semaphore_t *lsem)
+{
+    lis_semaphore_t	**p = lis_sem_contention_table ;
+    unsigned long	  psw ;
+
+    spin_lock_irqsave(&lis_contention_lock, psw) ;
+
+    for ( ; p != &lis_sem_contention_table[LOCK_CONTENTION_SIZE]; p++)
+    {
+	if ((*p) == lsem)
+	    *p = NULL ;
+    }
+
+    spin_unlock_irqrestore(&lis_contention_lock, psw) ;
+}
+
+/*
+ * Return a message with the decode of the contention table in it.
+ */
+mblk_t *lis_sem_contention_msg(void)
+{
+    mblk_t		 *mp ;
+    lis_semaphore_t	**p = lis_sem_contention_table ;
+    lis_semaphore_t	**p2 ;
+    lis_semaphore_t	 *t ;
+    unsigned long	  psw ;
+    unsigned		  tot_contention ;
+
+    mp = allocb(LOCK_CONTENTION_SIZE * 100 + 50, BPRI_MED) ;
+    if (mp == NULL)
+	return(NULL) ;
+
+
+    spin_lock_irqsave(&lis_contention_lock, psw) ;
+
+    /*
+     * Bubble sort the table in increasing lock contention order.
+     */
+    for ( ; p != &lis_sem_contention_table[LOCK_CONTENTION_SIZE-1]; p++)
+    {
+	if ((*p) == NULL)
+	    continue ;
+
+	for (p2 = p + 1;
+	     p2 != &lis_sem_contention_table[LOCK_CONTENTION_SIZE];
+	     p2++
+	    )
+	{
+	    if ((*p2) == NULL)
+		continue ;
+
+	    if ( (*p2)->contention_cnt < (*p)->contention_cnt )
+	    {
+		t   = *p;
+		*p  = *p2 ;
+		*p2 = t ;
+	    }
+	}
+    }
+
+
+    tot_contention = K_ATOMIC_READ(&lis_sem_contention_count) ;
+    sprintf(mp->b_wptr, "Total Semaphore Contention: %u\n", tot_contention) ;
+    while (*mp->b_wptr) mp->b_wptr++;
+
+    for (p = lis_sem_contention_table;
+	 p != &lis_sem_contention_table[LOCK_CONTENTION_SIZE];
+	 p++
+	)
+    {
+	if ((*p) == NULL)
+	    continue ;
+
+	sprintf(mp->b_wptr, "%10u(%d%%): last-owner: %s %d\n",
+		(*p)->contention_cnt,
+		tot_contention ?  ((*p)->contention_cnt * 100) / tot_contention
+			       : 0,
+		(*p)->owner_file ? (*p)->owner_file : "Unknown",
+		(*p)->owner_line) ;
+	while (*mp->b_wptr) mp->b_wptr++;
+    }
+
+    spin_unlock_irqrestore(&lis_contention_lock, psw) ;
+
+    return(mp) ;
+}
+
+/************************************************************************
+*                    Semaphore Wakeup Time Tracking                     *
+*************************************************************************
+*									*
+* This is code to build a histogram of wakeup times for semaphores.	*
+*									*
+************************************************************************/
+typedef struct
+{
+    int		micro_secs ;
+    unsigned	counter ;
+
+} histogram_bucket_t ;
+
+histogram_bucket_t	lis_sem_hist[] =
+			{
+			    {1, 0},
+			    {2, 0},
+			    {3, 0},
+			    {4, 0},
+			    {5, 0},
+			    {6, 0},
+			    {7, 0},
+			    {8, 0},
+			    {9, 0},
+			    {10, 0},
+			    {20, 0},
+			    {30, 0},
+			    {40, 0},
+			    {50, 0},
+			    {60, 0},
+			    {70, 0},
+			    {80, 0},
+			    {90, 0},
+			    {100, 0},
+			    {200, 0},
+			    {300, 0},
+			    {400, 0},
+			    {500, 0},
+			    {600, 0},
+			    {700, 0},
+			    {800, 0},
+			    {900, 0},
+			    {1000, 0},
+			    {2000, 0},
+			    {3000, 0},
+			    {4000, 0},
+			    {5000, 0},
+			    {6000, 0},
+			    {7000, 0},
+			    {8000, 0},
+			    {9000, 0},
+			    {10000, 0},
+			    {20000, 0},
+			    {30000, 0},
+			    {40000, 0},
+			    {50000, 0},
+			    {60000, 0},
+			    {70000, 0},
+			    {80000, 0},
+			    {90000, 0},
+			    {100000, 0},
+			    {200000, 0},
+			    {300000, 0},
+			    {400000, 0},
+			    {500000, 0},
+			    {600000, 0},
+			    {700000, 0},
+			    {800000, 0},
+			    {900000, 0},
+			    {1000000, 0},
+			    {2000000, 0},
+			    {3000000, 0},
+			    {4000000, 0},
+			    {5000000, 0},
+			    {6000000, 0},
+			    {7000000, 0},
+			    {8000000, 0},
+			    {9000000, 0},
+
+			    {0, 0}
+			} ;
+
+
+static void track_wakup_time(lis_semaphore_t *lsem)
+{
+    histogram_bucket_t *h = lis_sem_hist ;
+    int		   interval ;		/* in micro seconds */
+    struct timeval x ;
+
+    do_gettimeofday(&x) ;
+    interval =  (x.tv_sec * 1000000 + x.tv_usec) -
+		(lsem->up_time.tv_sec * 1000000 + lsem->up_time.tv_usec) ;
+
+    for ( ; h->micro_secs != 0; h++)
+    {
+	if (interval <= h->micro_secs)
+	    break ;
+    }
+
+    h->counter++ ;
+}
+
+mblk_t *lis_get_sem_hist_msg(void)
+{
+    mblk_t	*mp ;
+
+    mp = allocb(sizeof(lis_sem_hist), BPRI_MED) ;
+    if (mp == NULL) return(NULL) ;
+
+    memcpy(mp->b_wptr, lis_sem_hist, sizeof(lis_sem_hist)) ;
+    mp->b_wptr += sizeof(lis_sem_hist) ;
+
+    return(mp) ;
+}
 
 /************************************************************************
 *                         lis_print_spl_track                           *
@@ -284,7 +712,7 @@ extern int	     lis_seq_cntr ;
 * Print out the spl tracking table.					*
 *									*
 ************************************************************************/
-void	lis_print_spl_track(void)
+void	 _RP lis_print_spl_track(void)
 {
     spl_track_t		*p ;
     char		*typep ;
@@ -309,7 +737,7 @@ void	lis_print_spl_track(void)
 	    }
 
 	    printk("%u:%s State=%d "
-#ifdef INT_PSW
+#if defined(INT_PSW) && !defined(KERNEL_2_5)
 		    "Flgs=%03x "
 #else
 		    "Flgs=%03lx "
@@ -337,7 +765,7 @@ void	lis_print_spl_track(void)
 * Disable interrupts, return the previous state.			*
 *									*
 ************************************************************************/
-lis_flags_t	lis_splstr_fcn(char *file, int line)
+lis_flags_t	 _RP lis_splstr_fcn(char *file, int line)
 {
     lis_flags_t	 prev ;
 
@@ -353,7 +781,7 @@ lis_flags_t	lis_splstr_fcn(char *file, int line)
 * Restore state.							*
 *									*
 ************************************************************************/
-void	lis_splx_fcn(lis_flags_t x, char *file, int line)
+void	 _RP lis_splx_fcn(lis_flags_t x, char *file, int line)
 {
     lis_spin_unlock_irqrestore_fcn(&lis_spl_lock, &x, file, line) ;
 
@@ -366,7 +794,7 @@ void	lis_splx_fcn(lis_flags_t x, char *file, int line)
 * Go all the way back to base level.					*
 *									*
 ************************************************************************/
-void	lis_spl0_fcn(char *file, int line)
+void	 _RP lis_spl0_fcn(char *file, int line)
 {
     while (lis_own_spl())
 	lis_spin_unlock_irqrestore_fcn(&lis_spl_lock, &lis_psw0, file, line) ;
@@ -394,7 +822,7 @@ void	lis_spl_init(void)
 * Return true if this task owns the global lis_spin_lock.		*
 *									*
 ************************************************************************/
-int	lis_own_spl(void)
+int	 _RP lis_own_spl(void)
 {
     return (lis_spin_is_locked(&lis_spl_lock) && lis_spl_lock.taskp == current);
 }
@@ -420,132 +848,121 @@ int	lis_own_spl(void)
 *									*
 ************************************************************************/
 
-int	lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
+int	 _RP lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
 {
     DCL_l ;
 
     (void) file; (void) line ;
     (void) l ;				/* compiler happiness in 2.2 */
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
-# if defined(_PPC_LIS_)
+#if defined(_PPC_LIS_)
     return(0) ;				/* PPC does not define this, odd */
-# else
+#else
     return(spin_is_locked(l)) ;
-# endif
-#elif defined(KERNEL_2_1)		/* 2.1 and 2.2 kernels */
-# if defined (__SMP__)
-    return((*((volatile int *) (&l->lock))) == 1) ; /* lock state exists */
-# else
-    return(0) ;				/* lock state not tracked */
-# endif
-#else					/* earlier kernels */
-    return(0) ;				/* LOL with 2.0 kernels */
 #endif
 }
 
-void    lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
+void     _RP lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t	 prev ;
+    void 	*tp ;
     DCL_l ;
 
     (void) l ;				/* suppress compiler warning */
-    lis_atomic_inc(&lis_spin_lock_count) ;
+    K_ATOMIC_INC(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev);
     SET_SPINNER
-    if ((void *) current != lock->taskp)
+    if ((tp = (void *) current) != lock->taskp)
     {
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	if (spin_is_locked(l))
-	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
+	{
+	    K_ATOMIC_INC(&lis_spin_lock_contention_count) ;
+	    SET_LOCK_CONTENTION
+	}
 	spin_lock(l) ;
-#endif
-	lock->taskp = (void *) current ;
+	lock->taskp = tp ;
 	SET_OWNER
     }
-    lis_atomic_inc(&lock->nest) ;
+    K_ATOMIC_INC(&lock->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
+void     _RP lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
 {
-    int		 prev ;
+    lis_flags_t		 prev ;
     DCL_l ;
 
     (void) l ;				/* avoid warning in non-SMP case */
     SAVE_FLAGS(prev) ;
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
-    if (lis_atomic_read(&lock->nest) > 0)
+    if (K_ATOMIC_READ(&lock->nest) > 0)
     {
-	lis_atomic_dec(&lock->nest) ;
-	if (lis_atomic_read(&lock->nest) == 0)
+	K_ATOMIC_DEC(&lock->nest) ;
+	if (K_ATOMIC_READ(&lock->nest) == 0)
 	{
 	    lock->taskp = NULL ;
 	    SET_SPIN_UNLOCK
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	    spin_unlock(l) ;
-#endif
 	}
     }
 }
 
-int     lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
+int      _RP lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 {
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
     int		ret ;
     lis_flags_t	prev ;
+    void 	*tp ;
     DCL_l ;
 
     (void) l ;				/* avoid warning in non-SMP case */
     (void) prev ;
-    lis_atomic_inc(&lis_spin_lock_count) ;
+    K_ATOMIC_INC(&lis_spin_lock_count) ;
     SET_SPINNER
-    if ((void *) current != lock->taskp)
+    if ((tp = (void *) current) != lock->taskp)
     {
 	if ((ret = spin_trylock(l)) != 0)
 	{
-	    lis_atomic_inc(&lock->nest) ;
-	    lock->taskp = (void *) current ;
+	    K_ATOMIC_INC(&lock->nest) ;
+	    lock->taskp = tp ;
 	    SET_OWNER
 	}
 	else
-	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
+	{
+	    K_ATOMIC_INC(&lis_spin_lock_contention_count) ;
+	    SET_LOCK_CONTENTION
+	}
 	return(ret) ;
     }
     return(1) ;				/* already held */
-#else					/* 2.2 kernel */
-    lis_spin_lock_fcn(lock, file, line) ;
-    return(1) ;				/* always succeeds */
-#endif
 }
 
-void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
+void     _RP lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
+    void 	*tp ;
     DCL_l ;
 
     (void) l ;				/* compiler happiness in 2.2 */
-    lis_atomic_inc(&lis_spin_lock_count) ;
+    K_ATOMIC_INC(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
 
     SET_SPINNER
-    if ((void *) current != THELOCK->taskp)
+    if ((tp = (void *) current) != THELOCK->taskp)
     {
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	if (spin_is_locked(l))
-	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
+	{
+	    K_ATOMIC_INC(&lis_spin_lock_contention_count) ;
+	    SET_LOCK_CONTENTION
+	}
 	spin_lock_irq(l) ;
-#else					/* 2.2 kernel */
-	cli() ;				/* global cli */
-#endif
-	THELOCK->taskp = (void *) current ;
+	THELOCK->taskp = tp ;
 	SET_OWNER
     }
-    lis_atomic_inc(&THELOCK->nest) ;
+    K_ATOMIC_INC(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
+void     _RP lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_l ;
@@ -554,53 +971,45 @@ void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
     SAVE_FLAGS(prev) ;
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
-    if (lis_atomic_read(&THELOCK->nest) > 0)
+    if (K_ATOMIC_READ(&THELOCK->nest) > 0)
     {
-	lis_atomic_dec(&THELOCK->nest) ;
-	if (lis_atomic_read(&THELOCK->nest) == 0)
+	K_ATOMIC_DEC(&THELOCK->nest) ;
+	if (K_ATOMIC_READ(&THELOCK->nest) == 0)
 	{
 	    THELOCK->taskp = NULL ;
 	    SET_SPIN_UNLOCK
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	    spin_unlock_irq(l) ;
-#else					/* 2.2 kernel */
-	    sti() ;			/* global sti */
-#endif
 	}
     }
 }
 
-void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
+void     _RP lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
 {
     lis_flags_t	 prev ;
+    void 	*tp ;
     DCL_l ;
 
     (void) l ;				/* compiler happiness in 2.2 */
-    lis_atomic_inc(&lis_spin_lock_count) ;
+    K_ATOMIC_INC(&lis_spin_lock_count) ;
     SAVE_FLAGS(prev) ;
 
     SET_SPINNER
-    if ((void *) current != THELOCK->taskp)
+    if ((tp = (void *) current) != THELOCK->taskp)
     {
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	if (spin_is_locked(l))
-	    lis_atomic_inc(&lis_spin_lock_contention_count) ;
+	{
+	    K_ATOMIC_INC(&lis_spin_lock_contention_count) ;
+	    SET_LOCK_CONTENTION
+	}
 	spin_lock_irqsave(l, (*flags)) ;
-#else					/* 2.2 kernel */
-	cli() ;				/* global cli */
-	if (lis_atomic_read(&THELOCK->nest) == 0)
-	    *flags = prev ;
-	else
-	    *flags = 0xff ;		/* invalid */
-#endif
-	THELOCK->taskp = (void *) current ;
+	THELOCK->taskp = tp ;
 	SET_OWNER
     }
-    lis_atomic_inc(&THELOCK->nest) ;
+    K_ATOMIC_INC(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
+void     _RP lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
 				       lis_flags_t *flags, FL)
 {
     lis_flags_t	 prev ;
@@ -610,19 +1019,14 @@ void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
     SAVE_FLAGS(prev) ;
 
     LOCK_EXIT(lock,TRACK_UNLOCK,file,line,prev)
-    if (lis_atomic_read(&THELOCK->nest) > 0)
+    if (K_ATOMIC_READ(&THELOCK->nest) > 0)
     {
-	lis_atomic_dec(&THELOCK->nest) ;
-	if (lis_atomic_read(&THELOCK->nest) == 0)
+	K_ATOMIC_DEC(&THELOCK->nest) ;
+	if (K_ATOMIC_READ(&THELOCK->nest) == 0)
 	{
 	    THELOCK->taskp = NULL ;
 	    SET_SPIN_UNLOCK
-#if defined(KERNEL_2_3)			/* 2.3 kernel or later */
 	    spin_unlock_irqrestore(l, (*flags)) ;
-#else					/* 2.2 kernel */
-	    if (*flags != 0xff)
-		restore_flags(*flags) ;
-#endif
 	}
     }
 }
@@ -646,13 +1050,13 @@ static void lis_spin_lock_fill(lis_spin_lock_t *lock, const char *name)
     spin_lock_init(l) ;			/* kernel's init function */
 }
 
-void    lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL)
+void     _RP lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL)
 {
     memset((void *)lock, 0, sizeof(*lock)) ;
     SPIN_FILL;
 }
 
-lis_spin_lock_t *
+lis_spin_lock_t * _RP
 lis_spin_lock_alloc_fcn(const char *name, FL)
 {
     lis_spin_lock_t	*lock ;
@@ -660,7 +1064,7 @@ lis_spin_lock_alloc_fcn(const char *name, FL)
 
     lock_size = sizeof(*lock) - sizeof(lock->spin_lock_mem) +
 						    sizeof(spinlock_t) ;
-    lock = (lis_spin_lock_t *) lis_alloc_kernel_fcn(lock_size, file, line);
+    lock = (lis_spin_lock_t *) LIS_LOCK_ALLOC(lock_size, "Spin-Lock ");
     if (lock == NULL) return(NULL) ;
 
     memset((void *)lock, 0, lock_size) ;
@@ -669,11 +1073,15 @@ lis_spin_lock_alloc_fcn(const char *name, FL)
     return(lock) ;
 }
 
-lis_spin_lock_t *
+lis_spin_lock_t * _RP
 lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL)
 {
+    if (lock == NULL)
+	return(NULL) ;
+
+    purge_lock_contention(lock) ;
     if (lock->allocated)
-	lis_free_mem_fcn((void *)lock, file, line) ;
+	LIS_LOCK_FREE((void *)lock) ;
     return(NULL) ;
 }
 
@@ -694,9 +1102,8 @@ lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL)
 *									*
 ************************************************************************/
 
-#if defined(KERNEL_2_3)
 
-void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -710,7 +1117,7 @@ void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -724,7 +1131,7 @@ void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -738,7 +1145,7 @@ void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
     read_unlock(r) ;
 }
 
-void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -752,7 +1159,7 @@ void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
     write_unlock(r) ;
 }
 
-void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -767,7 +1174,7 @@ void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -782,7 +1189,7 @@ void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -796,7 +1203,7 @@ void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
     read_unlock_irq(r) ;
 }
 
-void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
+void    _RP lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
     lis_flags_t	 prev ;
     DCL_r ;
@@ -810,7 +1217,7 @@ void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
     write_unlock_irq(r) ;
 }
 
-void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
+void    _RP lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
 				     lis_flags_t *flags, FL)
 {
     lis_flags_t	 prev ;
@@ -823,11 +1230,10 @@ void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
     read_lock_irqsave(r, (*flags)) ;
     THELOCK->taskp = (void *) current ;
     SET_OWNER
-    lis_atomic_inc(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
+void    _RP lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
 				      lis_flags_t *flags, FL)
 {
     lis_flags_t	 prev ;
@@ -840,11 +1246,10 @@ void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
     write_lock_irqsave(r, (*flags)) ;
     THELOCK->taskp = (void *) current ;
     SET_OWNER
-    lis_atomic_inc(&THELOCK->nest) ;
     LOCK_ENTRY(lock,TRACK_LOCK,file,line,prev)
 }
 
-void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+void    _RP lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
 					  lis_flags_t *flags, FL)
 {
     lis_flags_t	 prev ;
@@ -859,7 +1264,7 @@ void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
     read_unlock_irqrestore(r, (*flags)) ;
 }
 
-void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
+void    _RP lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
 					   lis_flags_t *flags, FL)
 {
     lis_flags_t	 prev ;
@@ -893,89 +1298,14 @@ static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name)
     rwlock_init(r) ;			/* kernel's init function */
 }
 
-#else			/* KERNEL_2_3 */
 
-/*
- * For 2.2 kernel, just use the "noop" spin lock routines.
- */
-void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_lock_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_lock_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_unlock_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_unlock_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_lock_irq_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_lock_irq_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_unlock_irq_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
-{
-    lis_spin_unlock_irq_fcn((lis_spin_lock_t *)lock, file, line) ;
-}
-
-void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
-				     lis_flags_t *flags, FL)
-{
-    lis_spin_lock_irqsave_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
-}
-
-void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
-				      lis_flags_t *flags, FL)
-{
-    lis_spin_lock_irqsave_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
-}
-
-void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
-					  lis_flags_t *flags, FL)
-{
-    lis_spin_unlock_irqrestore_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
-}
-
-void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
-					   lis_flags_t *flags, FL)
-{
-    lis_spin_unlock_irqrestore_fcn((lis_spin_lock_t *)lock, flags, file, line) ;
-}
-
-static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name, FL)
-{
-    lis_spin_lock_fill((lis_spin_lock_t *)lock, name, file, line) ;
-}
-
-#endif			/* KERNEL_2_3 */
-
-void    lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
+void    _RP lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
 {
     memset((void *)lock, 0, sizeof(*lock)) ;
     RW_LOCK_FILL;
 }
 
-lis_rw_lock_t *
+lis_rw_lock_t * _RP
 lis_rw_lock_alloc_fcn(const char *name, FL)
 {
     lis_rw_lock_t	*lock ;
@@ -983,7 +1313,7 @@ lis_rw_lock_alloc_fcn(const char *name, FL)
 
     lock_size = sizeof(*lock) - sizeof(lock->rw_lock_mem) +
 						    sizeof(rwlock_t) ;
-    lock = (lis_rw_lock_t *) lis_alloc_kernel_fcn(lock_size, file, line);
+    lock = (lis_rw_lock_t *) LIS_LOCK_ALLOC(lock_size, "RW-Lock ");
     if (lock == NULL) return(NULL) ;
 
     memset((void *)lock, 0, lock_size) ;
@@ -992,11 +1322,11 @@ lis_rw_lock_alloc_fcn(const char *name, FL)
     return(lock) ;
 }
 
-lis_rw_lock_t *
+lis_rw_lock_t * _RP
 lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 {
     if (lock->allocated)
-	lis_free_mem_fcn((void *)lock, file, line) ;
+	LIS_LOCK_FREE((void *)lock) ;
     return(NULL) ;
 }
 
@@ -1021,25 +1351,46 @@ lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 # endif
 #endif
 
-void	lis_up_fcn(lis_semaphore_t *lsem, FL)
+void	_RP lis_up_fcn(lis_semaphore_t *lsem, FL)
 {
     struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
 
     SEM_EXIT(lsem,TRACK_UP,file,line,0) ;
     SET_UPSEM                           /* most recent "up" */
     lsem->taskp      = NULL ;
+    if (LIS_DEBUG_SEMTIME)
+	do_gettimeofday(&lsem->up_time) ;
     up(sem) ;
 }
 
-int	lis_down_fcn(lis_semaphore_t *lsem, FL)
+int	_RP lis_down_fcn(lis_semaphore_t *lsem, FL)
 {
     struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
     int			 ret ;
+    int			 had_to_wait = 0 ;
 
     SET_DSEM                            /* most recent "down" */
-    ret = down_interruptible(sem) ;
+
+    if (!lsem->allocated)
+    {
+	printk("lis_down(sem=%p %s %d) uninitialized semaphore\n",
+		lsem, file, line) ;
+	return(-EINVAL) ;
+    }
+
+    if ((ret = down_trylock(sem)))
+    {
+	had_to_wait = 1 ;
+	K_ATOMIC_INC(&lis_sem_contention_count) ;
+	SET_SEM_CONTENTION
+	ret = down_interruptible(sem) ;
+    }
+
     if (ret == 0)
     {
+	if (had_to_wait && LIS_DEBUG_SEMTIME)
+	    track_wakup_time(lsem) ;
+
 	SEM_ENTRY(lsem,TRACK_DOWN,file,line,0) ;
 	lsem->taskp = (void *) current ;
 	SET_SEMOWNER                    /* current owner */
@@ -1055,6 +1406,38 @@ int	lis_down_fcn(lis_semaphore_t *lsem, FL)
     return(ret) ;
 }
 
+/*
+ * Do a down on a semaphore disallowing signals.  Use carefully.
+ *
+ * Useful for semaphores that must be used during close processing.
+ * Chances are the process has been signalled at that time.
+ */
+#if defined(SIGMASKLOCK)
+#define LOCK_MASK    spin_lock_irq(&current->sigmask_lock)
+#define UNLOCK_MASK    recalc_sigpending(current); \
+		       spin_unlock_irq(&current->sigmask_lock)
+#else
+#define LOCK_MASK    spin_lock_irq(&current->sighand->siglock)
+#define UNLOCK_MASK    recalc_sigpending(); \
+		       spin_unlock_irq(&current->sighand->siglock)
+#endif
+
+void	_RP lis_down_nosig_fcn(lis_semaphore_t *lsem, FL)
+{
+    sigset_t	save_sigs ;
+
+    LOCK_MASK ;
+    save_sigs = current->blocked ;
+    sigfillset(&current->blocked) ;		/* block all signals */
+    UNLOCK_MASK ;
+
+    while (lis_down_fcn(lsem, file, line) < 0) ;
+
+    LOCK_MASK ;
+    current->blocked = save_sigs ;
+    UNLOCK_MASK ;
+}
+
 static void lis_sem_fill(lis_semaphore_t *lsem, int count)
 {
     struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
@@ -1064,42 +1447,82 @@ static void lis_sem_fill(lis_semaphore_t *lsem, int count)
     lsem->owner_cntr = ++lis_seq_cntr ;
 }
 
-void	lis_sem_init(lis_semaphore_t *lsem, int count)
+void	_RP lis_sem_init(lis_semaphore_t *lsem, int count)
 {
     static lis_semaphore_t lis_sem_template ;	/* blank semaphore */
 
     *lsem = lis_sem_template ;			/* blank semaphore */
     lis_sem_fill(lsem, count) ;
+    lsem->allocated = 2 ;			/* initialized static */
 }
 
 
-lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem)
+lis_semaphore_t * _RP lis_sem_destroy(lis_semaphore_t *lsem)
 {
-    if (lsem->allocated)
-	lis_free_mem(lsem) ;
+    int		allocated ;
+
+    if (lsem == NULL)
+	return(NULL) ;
+
+    purge_sem_contention(lsem) ;
+    lsem->owner_file = "De-Initialized" ;
+    lsem->owner_cntr = ++lis_seq_cntr ;
+    allocated = lsem->allocated ;
+    lsem->allocated = 0 ;
+    if (allocated == 1)
+	LIS_LOCK_FREE(lsem) ;
     else
     {
 	static lis_semaphore_t lis_sem_template ;	/* blank semaphore */
 	*lsem = lis_sem_template ;			/* blank semaphore */
-	lsem->owner_file = "De-Initialized" ;
-	lsem->owner_cntr = ++lis_seq_cntr ;
     }
 
     return(NULL) ;
 }
 
-lis_semaphore_t *lis_sem_alloc(int count)
+lis_semaphore_t * _RP lis_sem_alloc(int count)
 {
     lis_semaphore_t *lsem ;
     int		     sem_size ;
 
     sem_size = sizeof(*lsem) - sizeof(lsem->sem_mem) + sizeof(struct semaphore);
-    lsem     = (lis_semaphore_t *) lis_alloc_kernel(sem_size);
+    lsem     = (lis_semaphore_t *) LIS_LOCK_ALLOC(sem_size, "Semaphore ");
 
     if (lsem == NULL) return(NULL) ;
 
     memset(lsem, 0, sem_size) ;
     lis_sem_fill(lsem, count) ;
-    lsem->allocated = 1 ;
+    lsem->allocated = 1 ;			/* initialized dynamic alloc */
     return(lsem) ;
 }
+
+/************************************************************************
+*                       Lock Initializaiton                             *
+*************************************************************************
+*									*
+* This is code for the case of allocating locks in kernel cache.	*
+*									*
+************************************************************************/
+#if defined(USE_KMEM_CACHE)
+void lis_init_locks(void)
+{
+    lis_semaphore_t *lsem ;
+    lis_spin_lock_t *llock ;
+    int		     sem_size ;
+    int		     spin_size ;
+    int		     size ;
+
+    sem_size = sizeof(*lsem) - sizeof(lsem->sem_mem) + sizeof(struct semaphore);
+    spin_size = sizeof(*llock) - sizeof(llock->spin_lock_mem) +
+						    sizeof(spinlock_t);
+    size = sem_size > spin_size ? sem_size : spin_size ;
+    lis_locks_cachep =
+          kmem_cache_create("lis_locks_cache", size, 0,
+                            SLAB_HWCACHE_ALIGN, NULL, NULL);
+}
+
+void lis_terminate_locks(void)
+{
+      lis_cache_destroy(lis_locks_cachep, &lis_locks_cnt, "lis_locks_cache");
+}
+#endif

@@ -30,7 +30,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS poll.c 2.10 12/17/02 21:16:32 "
+#ident "@(#) LiS poll.c 2.12 09/07/04 11:11:22 "
 
 #include <sys/stream.h>
 #ifdef LINUX_POLL
@@ -84,7 +84,7 @@ extern int	select_check(int flag, select_table *wait, struct file *file) ;
 /*
  * Routines elsewhere in STREAMS
  */
-extern char	*lis_poll_events(short events) ;
+extern char	*lis_poll_events(short events) _RP ;
 extern unsigned	 lis_poll_bits(stdata_t *hd) ;
 
 
@@ -310,7 +310,9 @@ int	lis_poll(struct pollfd *fds, int nfds, int time_out)
 
 	    pdat_ptr->pd_events = pfd_ptr->events ;
 	    fp = current->files->fd[pfd_ptr->fd] ;
+/* FIXME - use a test not dependent on lis_streams_fops */
 	    is_stream = fp->f_op == &lis_streams_fops ;
+/**/
 	    if (is_stream)
 	    {
 		if ( (pfd_ptr->revents =

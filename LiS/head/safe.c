@@ -32,7 +32,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) LiS safe.c 2.11 12/27/03 15:34:34 "
+#ident "@(#) LiS safe.c 2.16 09/07/04 11:11:22 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -51,12 +51,13 @@
 #define	LOG(fil, line, msg)	printk("%s: called from file %s #%d\n",  \
 					msg, fil, line)
 
+
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
 
 
-void lis_safe_noenable(queue_t *q, char *f, int l)
+void _RP lis_safe_noenable(queue_t *q, char *f, int l)
 {
     lis_flags_t     psw;
     if (!LIS_QMAGIC(q,f,l)) return ;
@@ -65,7 +66,7 @@ void lis_safe_noenable(queue_t *q, char *f, int l)
     LIS_QISRUNLOCK(q, &psw) ;
 }
 
-void lis_safe_enableok(queue_t *q, char *f, int l)
+void _RP lis_safe_enableok(queue_t *q, char *f, int l)
 {
     lis_flags_t     psw;
     if (!LIS_QMAGIC(q,f,l)) return ;
@@ -74,7 +75,7 @@ void lis_safe_enableok(queue_t *q, char *f, int l)
     LIS_QISRUNLOCK(q, &psw) ;
 }
 
-int lis_safe_canenable(queue_t *q, char *f, int l)
+int _RP lis_safe_canenable(queue_t *q, char *f, int l)
 {
     if (LIS_QMAGIC(q,f,l))
 	return !(q->q_flag & QNOENB);
@@ -82,7 +83,7 @@ int lis_safe_canenable(queue_t *q, char *f, int l)
     return 0;
 }
 
-queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l)
+queue_t * _RP lis_safe_OTHERQ(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
@@ -96,7 +97,7 @@ queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l)
     return NULL;
 }
 
-queue_t *lis_safe_RD(queue_t *q, char *f, int l)
+queue_t * _RP lis_safe_RD(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
@@ -114,7 +115,7 @@ queue_t *lis_safe_RD(queue_t *q, char *f, int l)
     return NULL;
 }
 
-queue_t *lis_safe_WR(queue_t *q, char *f, int l)
+queue_t * _RP lis_safe_WR(queue_t *q, char *f, int l)
 {
     queue_t	*oq = NULL ;
 
@@ -132,7 +133,7 @@ queue_t *lis_safe_WR(queue_t *q, char *f, int l)
     return NULL;
 }
 
-int lis_safe_SAMESTR(queue_t *q, char *f, int l)
+int  _RP lis_safe_SAMESTR(queue_t *q, char *f, int l)
 {
     if (   LIS_QMAGIC(q,f,l)
 	&& q->q_next != NULL
@@ -143,8 +144,16 @@ int lis_safe_SAMESTR(queue_t *q, char *f, int l)
     return 0;
 }
 
-void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
+
+
+int lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry,
+		       char *f, int l)
 {
+    lis_flags_t     psw;
+
+    qflg |= QOPENING ;
+
+try_again:
     if (   mp == NULL
 	|| !LIS_QMAGIC(q,f,l)
 	|| q->q_qinfo == NULL
@@ -153,24 +162,53 @@ void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
     {
 	LOG(f, l, "NULL q, mp, q_qinfo or qi_putp in putmsg");
 	freemsg(mp) ;
-	return ;
+	return(1) ;		/* message consumed */
     }
 
-    lis_lockqf(q, f,l) ;
-    if (q->q_flag & QPROCSOFF)
+    LIS_QISRLOCK(q, &psw) ;
+    if (q->q_flag & (QPROCSOFF | QFROZEN))
     {
-	if ( LIS_DEBUG_CLOSE )
-	    printk("lis_safe_putmsg: message on closing stream: %s #%d\n",
-		    f, l);
-	freemsg(mp) ;
+	if ((q->q_flag & QPROCSOFF) && SAMESTR(q))   /* there is a next queue */
+	{					/* pass to next queue */
+	    LIS_QISRUNLOCK(q, &psw) ;
+	    q = q->q_next ;
+	    goto try_again ;
+	}
+
+	lis_defer_msg(q, mp, retry, &psw) ;	/* put in deferred msg list */
+	LIS_QISRUNLOCK(q, &psw) ;
+	return(0) ;		/* msg deferred */
     }
-    else
-	(*(q->q_qinfo->qi_putp))(q, mp);
+
+    if ((q->q_flag & qflg) || q->q_defer_head != NULL)
+    {
+	lis_defer_msg(q, mp, retry, &psw) ;
+	LIS_QISRUNLOCK(q, &psw) ;
+	return(0) ;		/* msg deferred */
+    }
+    LIS_QISRUNLOCK(q, &psw) ;
+
+    /*
+     * Now we are going to call the put procedure
+     */
+    if (lis_lockqf(q, f,l) < 0)
+    {
+	freemsg(mp) ;		/* busted */
+	return(1) ;
+    }
+
+    (*(q->q_qinfo->qi_putp))(q, mp);
 
     lis_unlockqf(q, f,l) ;
+    return(1) ;			/* msg consumed */
 }
 
-void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
+void _RP lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
+{
+    lis_safe_do_putmsg(q, mp, (QDEFERRING | QOPENING), 0, f, l) ;
+}
+
+void  _RP lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
 {
     queue_t    *qnxt = NULL ;
 
@@ -203,7 +241,7 @@ void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
     lis_safe_putmsg(qnxt, mp, f, l) ;
 }
 
-void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
+void  _RP lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
 {
     if (mp == NULL)
     {
