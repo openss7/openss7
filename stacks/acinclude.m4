@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.10 2004/05/23 07:24:23 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.11 2004/05/24 12:48:49 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/23 07:24:23 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/24 12:48:49 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -70,7 +70,7 @@ m4_include([m4/strconf.m4])
 # =========================================================================
 # AC_SS7
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_SS7], [
+AC_DEFUN([AC_SS7], [dnl
     ac_default_prefix='/usr'
     _SS7_OPTIONS
     _MAN_CONVERSION
@@ -92,42 +92,42 @@ AC_DEFUN([AC_SS7], [
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])
-    AC_SUBST([USER_CFLAGS])
-    AC_SUBST([SS7_INCLUDES])
+    AC_SUBST([USER_CPPFLAGS])dnl
+    AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([SS7_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
     _SS7_SETUP
-    _SS7_OUTPUT
+    _SS7_OUTPUT dnl
 ])# AC_SS7
 # =========================================================================
 
 # =========================================================================
 # _SS7_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_OPTIONS], [
+AC_DEFUN([_SS7_OPTIONS], [dnl
 ])# _SS7_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _SS7_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_SETUP], [
+AC_DEFUN([_SS7_SETUP], [dnl
 ])# _SS7_SETUP
 # =========================================================================
 
 # =========================================================================
 # _SS7_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_OUTPUT], [
-    _SS7_STRCONF
+AC_DEFUN([_SS7_OUTPUT], [dnl
+    _SS7_STRCONF dnl
 ])# _SS7_OUTPUT
 # =========================================================================
 
 # =========================================================================
 # _SS7_STRCONF
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_STRCONF], [
+AC_DEFUN([_SS7_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
 dnl strconf_cv_input='Config.master'
     strconf_cv_majbase=180
@@ -136,17 +136,17 @@ dnl strconf_cv_input='Config.master'
 dnl strconf_cv_drvconf='drvconf.mk'
 dnl strconf_cv_confmod='conf.modules'
 dnl strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes='ss7makenodes.c'
+    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
 dnl strconf_cv_stsetup='strsetup.conf'
 dnl strconf_cv_strload='strload.conf'
-    _STRCONF
+    _STRCONF dnl
 ])# _SS7_STRCONF
 # =========================================================================
 
 # =========================================================================
 # _SS7_
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_], [
+AC_DEFUN([_SS7_], [dnl
 ])# _SS7_
 # =========================================================================
 

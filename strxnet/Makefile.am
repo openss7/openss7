@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/05/17 22:23:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/05/24 12:48:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/17 22:23:56 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 12:48:47 $ by $Author: brian $
 #
 # =============================================================================
 
 lib_LTLIBRARIES			= 
 
 if PUBLIC_RELEASE
+
+if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			= \
 				  test-inet_raw \
@@ -144,6 +146,10 @@ libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
 endif
 
+endif
+
+if RPM_BUILD_KERNEL
+
 noinst_LIBRARIES		= libXNETmods.a libXNETdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= 
 
@@ -177,7 +183,11 @@ libXNETdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
+endif
+
 else
+
+if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			= \
 				  test-inet_raw \
@@ -264,6 +274,10 @@ libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= 
 endif
 
+endif
+
+if RPM_BUILD_KERNEL
+
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= 
 
@@ -299,6 +313,8 @@ EXTRA_KERNEL_MODULES		=
 
 endif
 
+endif
+
 xnet_source_FILES		= $(mods_source_FILES) $(drvs_source_FILES)
 
 EXTRA_DIST			= $(xnet_source_FILES)
@@ -317,7 +333,7 @@ EXPORT_SRCFILES =
 
 EXPORT_VERFILES =
 
-PKGINCL = include/sys/strxnet
+PKGINCL = include/sys/$(PACKAGE_NAME)
 
 GENKSYMS_CPPFLAGS = \
 	-I./src/modules -I$(srcdir)/src/modules \
@@ -329,6 +345,8 @@ include am/genksyms.am
 STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
+
+if RPM_BUILD_KERNEL
 
 if WITH_INET
 
@@ -353,6 +371,8 @@ install-devices: $(STRMAKENODES)
 
 uninstall-devices: $(STRMAKENODES)
 	$(STRMAKENODES) --remove
+
+endif
 
 endif
 

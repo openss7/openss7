@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/23 08:06:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 12:48:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 08:06:46 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 12:48:49 $ by $Author: brian $
 #
 # =============================================================================
 
 if PUBLIC_RELEASE
+
+if RPM_BUILD_USER
 
 libexec_PROGRAMS		= \
 				  test-m2pa \
@@ -103,13 +105,13 @@ EXTRA_PROGRAMS			= \
 				  test-xnet_thr
 
 sbin_PROGRAMS			= \
-				  ss7makenodes
+				  @PACKAGE_TARNAME@_mknod
 
-ss7makenodes_SOURCES		= ss7makenodes.c
-ss7makenodes_DEPENDENCIES	= strconf.h
-ss7makenodes_LDDADD		=
-ss7makenodes_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-ss7makenodes_CFLAGS		= $(USER_CFLAGS)
+@PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDFLAGS		= -lLiS
@@ -230,6 +232,10 @@ test_x400p_CFLAGS		= $(USER_CFLAGS)
 #test_x400p_sl_LDFLAGS		= -lLiS
 #test_x400p_sl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 #test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
+
+endif
+
+if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSS7sctp.a
 ADDON_OBJS			= streams-sctp.o
@@ -369,7 +375,11 @@ streams-sctp.o: $(libSS7sctp_a_OBJECTS)
 KERNEL_MODULES			= $(libSS7mods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
+endif
+
 else
+
+if RPM_BUILD_USER
 
 libexec_PROGRAMS		= \
 				  perftest \
@@ -433,13 +443,13 @@ EXTRA_PROGRAMS			= \
 				  test-xnet_thr
 
 sbin_PROGRAMS			= \
-				  ss7makenodes
+				  @PACKAGE_TARNAME@_mknod
 
-ss7makenodes_SOURCES		= ss7makenodes.c
-ss7makenodes_DEPENDENCIES	= strconf.h
-ss7makenodes_LDDADD		=
-ss7makenodes_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
-ss7makenodes_CFLAGS		= $(USER_CFLAGS)
+@PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= strconf.h
+@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(SS7_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDFLAGS		= -lLiS
@@ -560,6 +570,10 @@ test_x400p_sl_SOURCES		= src/test/x400p-ss7/test-x400p-sl.c
 test_x400p_sl_LDFLAGS		= -lLiS
 test_x400p_sl_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
 test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
+
+endif
+
+if RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSS7sctp.a
 ADDON_OBJS			= streams-sctp.o
@@ -846,6 +860,10 @@ EXTRA_KERNEL_MODULES		= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua
 
 endif
 
+endif
+
+if RPM_BUILD_USER
+
 test_timod_SOURCES		= src/test/tli/test-timod.c
 test_timod_LDFLAGS		= -lLiS -lxnet
 test_timod_CPPFLAGS		= $(SS7_INCLUDES) $(USER_CPPFLAGS)
@@ -860,11 +878,6 @@ if WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-timod \
 				  test-tirdwr
-nodist_libSS7mods_a_SOURCES	+= \
-				  src/modules/ti/timod.c \
-				  src/include/timod.h \
-				  src/modules/ti/tirdwr.c \
-				  src/include/tirdwr.h
 endif
 
 test_inet_raw_SOURCES		= src/test/inet/test-inet_raw.c
@@ -897,8 +910,25 @@ libexec_PROGRAMS		+= \
 				  test-inet_raw \
 				  test-inet_tcp \
 				  test-inet_udp
+endif
+
+endif
+
+if RPM_BUILD_KERNEL
+
+if WITH_TLI
+nodist_libSS7mods_a_SOURCES	+= \
+				  src/modules/ti/timod.c \
+				  src/include/timod.h \
+				  src/modules/ti/tirdwr.c \
+				  src/include/tirdwr.h
+endif
+
+if WITH_INET
 nodist_libSS7mods_a_SOURCES	+= \
 				  src/modules/inet/inet.c
+endif
+
 endif
 
 ss7_source_FILES		= $(mods_source_FILES) \
@@ -959,6 +989,8 @@ include am/kernel.am
 
 include am/libraries.am
 
+if RPM_BUILD_USER
+
 if WITH_XNET
 lib_LTLIBRARIES			= libxnet.la
 libexec_PROGRAMS		+= \
@@ -971,9 +1003,23 @@ libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= -lLiS
 endif
 
-STRMAKENODES			= ./ss7makenodes
+endif
+
 INET_MKDEV			= $(auxdir)/inet_mkdev
 INET_RMDEV			= $(auxdir)/inet_rmdev
+
+EXPORT_SRCFILES =
+
+EXPORT_VERFILES =
+
+PKGINCL = include/sys/$(PACKAGE_NAME)
+
+GENSYMS_CPPFLAGS = \
+	$(SS7_INCLUDES) $(KERNEL_CPPFLAGS)
+
+include am/genksyms.am
+
+STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
 

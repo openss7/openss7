@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.6 2004/05/23 07:24:22 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.7 2004/05/24 12:48:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/23 07:24:22 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/24 12:48:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -70,7 +70,7 @@ m4_include([m4/strconf.m4])
 # =========================================================================
 # AC_XNET
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_XNET], [
+AC_DEFUN([AC_XNET], [dnl
     _XNET_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
@@ -91,61 +91,61 @@ AC_DEFUN([AC_XNET], [
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])
-    AC_SUBST([USER_CFLAGS])
-    AC_SUBST([XNET_INCLUDES])
+    AC_SUBST([USER_CPPFLAGS])dnl
+    AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([XNET_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
     _XNET_SETUP
-    _XNET_OUTPUT
+    _XNET_OUTPUT dnl
 ])# AC_XNET
 # =========================================================================
 
 # =========================================================================
 # _XNET_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNET_OPTIONS], [
+AC_DEFUN([_XNET_OPTIONS], [dnl
 ])# _XNET_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _XNET_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNET_SETUP], [
+AC_DEFUN([_XNET_SETUP], [dnl
 ])# _XNET_SETUP
 # =========================================================================
 
 # =========================================================================
 # _XNET_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNET_OUTPUT], [
-    _XNET_STRCONF
+AC_DEFUN([_XNET_OUTPUT], [dnl
+    _XNET_STRCONF dnl
 ])# _XNET_OUTPUT
 # =========================================================================
 
 # =========================================================================
 # _XNET_STRCONF
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNET_STRCONF], [
+AC_DEFUN([_XNET_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
 dnl strconf_cv_input='Config.master'
     strconf_cv_majbase=245
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='confg.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes='strxnet_mknod.c'
+dnl strconf_cv_drvconf='drvconf.mk'
+dnl strconf_cv_confmod='conf.modules'
+dnl strconf_cv_makedev='devices.lst'
+    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
     strconf_cv_strsetup='xnetsetup.conf'
     strconf_cv_strload='xnetload.conf'
-    _STRCONF
+    _STRCONF dnl
 ])# _XNET_STRCONF
 # =========================================================================
 
 # =========================================================================
 # _XNET_
 # -------------------------------------------------------------------------
-AC_DEFUN([_XNET_], [
+AC_DEFUN([_XNET_], [dnl
 ])# _XNET_
 # =========================================================================
 

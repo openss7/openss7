@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9.2.1 2004/05/15 07:35:18 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.2 2004/05/24 12:48:48 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,14 +53,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/15 07:35:18 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/24 12:48:48 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # =========================================================================
 # _STRCONF
 # -------------------------------------------------------------------------
-AC_DEFUN([_STRCONF], [
+AC_DEFUN([_STRCONF], [dnl
 dnl AC_MSG_NOTICE([------------------------------])
 dnl AC_MSG_NOTICE([starting STREAMS configuration])
 dnl AC_MSG_NOTICE([------------------------------])
@@ -76,14 +76,14 @@ dnl AC_MSG_NOTICE([------------------------------])
 # =========================================================================
 # _STRCONF_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_STRCONF_OPTIONS], [
+AC_DEFUN([_STRCONF_OPTIONS], [dnl
 ])# _STRCONF_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _STRCONF_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_STRCONF_SETUP], [
+AC_DEFUN([_STRCONF_SETUP], [dnl
     AC_MSG_CHECKING([for strconf stem file name])
     STRCONF_STEM="${strconf_cv_stem:-Config}"
     AC_MSG_RESULT([$STRCONF_STEM])
@@ -117,7 +117,7 @@ AC_DEFUN([_STRCONF_SETUP], [
         AS_HELP_STRING([--with-base-major=MAJOR],
             [specify the base major device number from which to start
             numbering major devices @<:@default=230@:>@]),
-        [with_base_major=$withval],
+        [with_base_major="$withval"],
         [with_base_major=''])
     AC_MSG_CHECKING([for strconf base major device number])
     if test :"${with_base_major:-no}" != :no ; then
@@ -159,7 +159,7 @@ AC_DEFUN([_STRCONF_SETUP], [
 # generate configuration files as output from autoconf before using the
 # strconf script to generate the output files.
 # -------------------------------------------------------------------------
-AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [
+AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     AC_MSG_NOTICE([searching for $STRCONF_INPUT input files in  $ac_srcdir and $ac_builddir])
     strconf_configs=
     ac_abs_srcdir=`( cd $ac_srcdir ; pwd )`
@@ -212,7 +212,7 @@ dnl     fi
 # =========================================================================
 # _STRCONF_OUTPUT_CONFIG
 # -------------------------------------------------------------------------
-AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [
+AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [dnl
     AC_CONFIG_COMMANDS([strconf],
         [_STRCONF_OUTPUT_CONFIG_COMMANDS],
         [ac_aux_dir="$ac_aux_dir" \
@@ -228,29 +228,28 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [
         STRCONF_CONFMOD="$STRCONF_CONFMOD" \
         STRCONF_MAKEDEV="$STRCONF_MAKEDEV" \
         STRCONF_STSETUP="$STRCONF_STSETUP" \
-        STRCONF_STRLOAD="$STRCONF_STRLOAD" \
-        ])
+        STRCONF_STRLOAD="$STRCONF_STRLOAD" ])
 ])# _STRCONF_OUTPUT_CONFIG
 # =========================================================================
 
 # =========================================================================
 # _STRCONF_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_STRCONF_OUTPUT], [
-        AC_SUBST([STRCONF])
-        AC_SUBST([STRCONF_STEM])
-        AC_SUBST([STRCONF_SCRIPT])
-        AC_SUBST([STRCONF_INPUT])
-        AC_SUBST([STRCONF_CONFIGS])
-        AC_SUBST([STRCONF_MAJBASE])
-        AC_SUBST([STRCONF_CONFIG])
-        AC_SUBST([STRCONF_MODCONF])
-        AC_SUBST([STRCONF_MKNODES])
-        AC_SUBST([STRCONF_DRVCONF])
-        AC_SUBST([STRCONF_CONFMOD])
-        AC_SUBST([STRCONF_MAKEDEV])
-        AC_SUBST([STRCONF_STSETUP])
-        AC_SUBST([STRCONF_STRLOAD])
+AC_DEFUN([_STRCONF_OUTPUT], [dnl
+        AC_SUBST([STRCONF])dnl
+        AC_SUBST([STRCONF_STEM])dnl
+        AC_SUBST([STRCONF_SCRIPT])dnl
+        AC_SUBST([STRCONF_INPUT])dnl
+        AC_SUBST([STRCONF_CONFIGS])dnl
+        AC_SUBST([STRCONF_MAJBASE])dnl
+        AC_SUBST([STRCONF_CONFIG])dnl
+        AC_SUBST([STRCONF_MODCONF])dnl
+        AC_SUBST([STRCONF_MKNODES])dnl
+        AC_SUBST([STRCONF_DRVCONF])dnl
+        AC_SUBST([STRCONF_CONFMOD])dnl
+        AC_SUBST([STRCONF_MAKEDEV])dnl
+        AC_SUBST([STRCONF_STSETUP])dnl
+        AC_SUBST([STRCONF_STRLOAD])dnl
         _STRCONF_OUTPUT_CONFIG
 ])# _STRCONF_OUTPUT
 # =========================================================================

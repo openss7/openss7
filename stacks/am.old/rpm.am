@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/23 22:26:27 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/24 12:48:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 22:26:27 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 12:48:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,8 +79,8 @@ RPMBOPTS = -vv \
 
 RPMSOPTS = -vv \
 	--define "_signature gpg" \
-	--define "_gpg_path $(GPGHOME)" \
-	--define "_gpg_name $(GPGUSER)" \
+	--define "_gpg_path $(GNUPGHOME)" \
+	--define "_gpg_name $(GNUPGUSER)" \
 	--define "_gpgbin $(GPG)"
 
 RPMTARGET = $(target)
@@ -108,60 +108,107 @@ rpms: srpm
 		$(RPMBUILD) --rebuild $(RPMOPTS) $(RPMFLAGS) $(AM_RPMFLAGS) --target $$t -- SRPMS/$(rpmdir).src.rpm; \
 	done
 
-sign: srpm
+sign:
 	@for f in $(RPM_ARCHIVES) ; do \
-		if test -r $$f ; then \
-			if test -n "$(GPGUSER)" ; then \
-				echo "$(GPG) -ba -u $(GPGUSER) -- $$f" ; \
-				$(GPG) -ba -u $(GPGUSER) -- $$f ; \
-			else \
-				echo "$(GPG) -ba -- $$f" ; \
-				$(GPG) -ba -- $$f ; \
-			fi ; \
+		if test ! -f $$f ; then \
+			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+			break ; \
 		fi ; \
 	done ; \
-	if test -r SRPMS/$(rpmdir).src.rpm ; then \
+	if test ! -f SRPMS/$(rpmdir).src.rpm ; then \
+		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+	fi ; \
+	for f in $(RPM_ARCHIVES) ; do \
+		if test -f $$f ; then \
+			rm -f $$f.asc ; \
+			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
+			home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+			echo "$(GPG) -ba$$user$$home -- $$f" ; \
+			$(GPG) -ba$$user$$home -- $$f ; \
+		fi ; \
+	done ; \
+	if test -f SRPMS/$(rpmdir).src.rpm ; then \
 		echo "$(RPM) --resign $(RPMSOPTS) -- SRPMS/$(rpmdir).src.rpm" ; \
 		$(RPM) --resign $(RPMSOPTS) -- SRPMS/$(rpmdir).src.rpm ; \
 	fi
 
 rebuild:
-	@if test -f SRPMS/$(rpmdir).src.rpm ; then :; else \
+	@if test ! -f SRPMS/$(rpmdir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
 	kernels=`find $(DESTDIR)/lib/modules -type d -name "2\.4\.*"` ; \
 	targets="$(AM_RPMTARGETS)" ; \
 	for t in $$targets ; do \
-		tools= ; \
+		echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+		$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without modules --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) $$tools --define \"_kversion $$k\" --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
-				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) $$tools --define "_kversion $$k" --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
-				tools='--without tools' ; \
+				echo "$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define \"_kversion $$k\" --target $$t -- SRPMS/$(rpmdir).src.rpm" ; \
+				$(RPMBUILD) $(RPMFLAGS) $(AM_RPMFLAGS) $(RPMBOPTS) --without tools --define "_kversion $$k" --target $$t -- SRPMS/$(rpmdir).src.rpm ; \
 			fi ; \
 		done ; \
 	done
 
-distclean-rpms:
-	rm -fr BUILD RPMS SOURCES SPECS SRPMS
+resign: sign
+	@if test -n "$(AM_RPMTARGETS)" ; then \
+		@list=`find RPMS -name '$(PACKAGE_NAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).*.rpm'` ; \
+		if test -z "$$list" ; then \
+			$(MAKE) $(AM_MAKEFLAGS) rebuild ; \
+			list=`find RPMS -name '$(PACKAGE_NAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).*.rpm'` ; \
+			if test -z "$$list" ; then \
+				exit 1 ; \
+			fi ; \
+		fi ; \
+		echo "$(RPM) --resign $(RPMSOPTS) -- $$list" ; \
+		$(RPM) --resign $(RPMSOPTS) -- $$list ; \
+	fi
+
+EXTRA_DIST += .rpmepoch .rpmrelease
 
 else
 
-sign: dist
+srpm:
+	$(MAKE) $(AM_MAKEFLAGS) distdir='$(rpmdir)' dist
+
+rpms: srpm
+
+sign:
 	@for f in $(RPM_ARCHIVES) ; do \
-		if test -r $$f ; then \
-			if test -n "$(GPGUSER)" ; then \
-				echo "$(GPG) -ba -u $(GPGUSER) -- $$f" ; \
-				$(GPG) -ba -u $(GPGUSER) -- $$f ; \
-			else \
-				echo "$(GPG) -ba -- $$f" ; \
-				$(GPG) -ba -- $$f ; \
-			fi ; \
+		if test ! -f $$f ; then \
+			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+			break ; \
+		fi ; \
+	done ; \
+	@for f in $(RPM_ARCHIVES) ; do \
+		if test -f $$f ; then \
+			rm -f $$f.asc ; \
+			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
+			home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+			echo "$(GPG) -ba$$user$$home -- $$f" ; \
+			$(GPG) -ba$$user$$home -- $$f ; \
 		fi ; \
 	done
 
+rebuild:
+	@for f in $(RPM_ARCHIVES) ; do \
+		if test ! -f $$f ; then \
+			$(MAKE) $(AM_MAKEFLAGS) srpm ; \
+			break ; \
+		fi ; \
+	done
+
+resign: sign
+
 endif
+
+distclean-rpms:
+	rm -f openss7-logo-small.gif
+	rm -fr BUILD RPMS SOURCES SPECS SRPMS
+	@for f in $(RPM_ARCHIVES) ; do \
+		echo "rm -f $$f" ; \
+		rm -f $$f ; \
+	done
 
 distclean-sign:
 	@for f in $(RPM_ARCHIVES) ; do \
@@ -171,6 +218,6 @@ distclean-sign:
 
 distclean-local: distclean-rpms distclean-sign
 
-#.PHONY: srpm rpms sign
+.PHONY: srpm rpms sign rebuild resign distclean-rpms distclean-sign
 
 # vim: ft=automake

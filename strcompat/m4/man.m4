@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 0.9.2.1 2004/05/15 07:35:18 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.2 2004/05/24 12:48:48 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,15 +54,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/15 07:35:18 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/24 12:48:48 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # =========================================================================
 # _MAN_CONVERSION
 # -------------------------------------------------------------------------
-AC_DEFUN([_MAN_CONVERSION],
-[
+AC_DEFUN([_MAN_CONVERSION], [dnl
     _MAN_CONVERSION_OPTIONS
     _MAN_CONVERSION_SETUP
     _MAN_CONVERSION_OUTPUT
@@ -72,21 +71,19 @@ AC_DEFUN([_MAN_CONVERSION],
 # =========================================================================
 # _MAN_CONVERSION_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_MAN_CONVERSION_OPTIONS],
-[
+AC_DEFUN([_MAN_CONVERSION_OPTIONS], [dnl
 ])# _MAN_CONVERSION_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _MAN_CONVERSION_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_MAN_CONVERSION_SETUP],
-[
+AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_ARG_WITH([cooked-manpages],
         AS_HELP_STRING([--with-cooked-manpages],
             [convert manual pages to remove macro dependencies and grefer
             references.  @<:@default=no@:>@]),
-        [with_cooked_manpages=$withval],
+        [with_cooked_manpages="$withval"],
         [with_cooked_manpages='no'])
     AC_MSG_CHECKING([for manpage conversion])
     if test :"${with_cooked_manpages:-no}" != :no ; then
@@ -106,7 +103,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP],
         AS_HELP_STRING([--disable-compress-manpages],
             [compress manpges with gzip -9 or leave them uncompressed.
             @<:@default=yes@:>@]),
-        [enable_compress_manpages=$enableval],
+        [enable_compress_manpages="$enableval"],
         [enable_compress_manpages='yes'])
     AC_MSG_CHECKING([for manpage compression])
     if test :"${enable_compress_manpages:-yes}" != :yes ; then
@@ -122,10 +119,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP],
 # =========================================================================
 # _MAN_CONVERSION_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_MAN_CONVERSION_OUTPUT],
-[
-    AM_CONDITIONAL([COOKED_MANPAGES], test :"${with_cooked_manpages:-no}" != :no )
-    AM_CONDITIONAL([COMPRESS_MANPAGES], test :"${enable_compress_manpages:-yes}" = :yes )
+AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
+    AM_CONDITIONAL([COOKED_MANPAGES], test :"${with_cooked_manpages:-no}" != :no)dnl
+    AM_CONDITIONAL([COMPRESS_MANPAGES], test :"${enable_compress_manpages:-yes}" = :yes)dnl
 ])# _MAN_CONVERSION_OUTPUT
 # =========================================================================
 

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2004/05/22 01:31:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2004/05/24 12:48:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/22 01:31:55 $ by $Author: brian $
+# Last Modified $Date: 2004/05/24 12:48:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -269,8 +269,6 @@ EXTRA_DIST =
 dist_noinst_SCRIPTS =
 EXTRA_SCRIPTS =
 
-if RPM_BUILD_KERNEL
-
 KERNEL_MODULES			= streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= streams
@@ -278,27 +276,7 @@ KMODCONF_EXT			= streams
 
 include am/kernel.am
 
-endif
-
 include am/libraries.am
-
-if RPM_BUILD_KERNEL
-if RPM_BUILD_USER
-install-exec-hook: post-modules post-libraries
-uninstall-hook: postun-modules postun-libraries
-else
-install-exec-hook: post-modules
-uninstall-hook: postun-modules
-endif
-else
-if RPM_BUILD_USER
-install-exec-hook: post-libraries
-uninstall-hook: postun-libraries
-else
-install-exec-hook:
-uninstall-hook:
-endif
-endif
 
 if RPM_BUILD_USER
 
@@ -441,7 +419,7 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c include/sys/config.h
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= include/sys/config.h
 @PACKAGE_TARNAME@_mknod_LDADD		=
-@PACKAGE_TARNAME@_mknod_CPPFLAGS		= $(LFS_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(LFS_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 if WITH_INET
@@ -493,8 +471,6 @@ endif
 
 endif
 
-if RPM_BUILD_KERNEL
-
 EXPORT_SRCFILES = \
 	src/compat/aix/aixcompat.c \
 	src/compat/hpux/hpuxcompat.c \
@@ -531,7 +507,7 @@ EXPORT_VERFILES = \
 	include/sys/streams/versions/strsyms.ver \
 	include/sys/streams/versions/sth.ver
 
-PKGINCL = include/sys/streams
+PKGINCL = include/sys/$(PACKAGE_NAME)
 
 GENKSYMS_CPPFLAGS = \
 	-I./src/compat -I$(srcdir)/src/compat \
@@ -545,6 +521,8 @@ include am/genksyms.am
 STRMAKENODES			= @PACKAGE_TARNAME@_mknod
 
 include am/strconf.am
+
+if RPM_BUILD_KERNEL
 
 if WITH_INET
 
