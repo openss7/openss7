@@ -1,0 +1,9 @@
+                                                                                
+                              |                  |  * = N_BIND_REQ              
+   REQ/RES Primitive* ----\   |                  |      N_UNBIND_REQ            
+                           \->|                  |      N_OPTMGMT_REQ           
+                              |                  |      N_CONN_REQ              
+                           /--|                  |      N_CONN_RES              
+          N_ERROR_ACK <---/   |                  |      N_DISCON_REQ            
+                              |                  |                              
+                                                                                

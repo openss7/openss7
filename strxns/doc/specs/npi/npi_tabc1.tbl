@@ -1,0 +1,67 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+r|c|c|c|c|c|c|c|c|c|c|c|c|c
+l|c|c|c|c|c|c|c|c|c|c|c|c|c.
+PRIM X:R1:R2:R3:R4:R5:R6:R7:R8:R9:R10:R11:R12:R13
+PRIM Y on queue
+=
+R1 n_conn_req:::4
+_
+R2 n_conn_res:::3:1
+_
+R3 n_discon_req:1
+_
+R4 n_data_req:::5:1:2::::::3::2
+_
+R5 n_exdata_req:::5:1:1::::::3::2
+_
+R6 n_bind_req
+_
+R7 n_unbind_req
+_
+R8 n_info_req
+_
+R9 n_unitdata_req:::::::::1
+_
+R10 n_optmgmt_req
+_
+R11 n_reset_req:::3
+_
+R12 n_reset_res:::3:1:::::::1
+_
+R13 n_datack_req:::5:1:2::::::3::1
+.TE
+
+.TS
+tab(:);
+ll.
+Blank:not applicable - queue should be empty.
+
+1:X has no precedence over Y.
+
+2:X has precedence over Y.
+
+3:X has precedence over Y and Y must be removed.
+
+4:X has precedence over Y and both X and Y must be removed.
+
+5:X may have precedence over Y (choice of user). It it does then it is the same as 3.
+
+.TE

@@ -1,0 +1,48 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+c|c|l.
+SERVICE:PRIMITIVE:PARAMETERS
+=
+T{
+.hy 0
+.ad c
+NC Establishment
+T}:N_CONN_REQ:T{
+.hy 0
+.ad l
+(Called Address, Receipt Confirmation Selection, Expedited Data Selection, QOS Parameter Set, NS User-Data)
+T}
+:N_CONN_IND:T{
+.hy 0
+.ad l
+(Called Address, Calling Address, Receipt Confirmation Selection, Expedited Data Selection, QOS Parameter Set, NS User-Data)
+T}
+:N_CONN_RES:T{
+.hy 0
+.ad l
+(Responding Address, Receipt Confirmation Selection, Expedited Data Selection, QOS Parameter Set, NS User-Data)
+T}
+:N_CONN_CON:T{
+.hy 0
+.ad l
+(Responding Address, Receipt Confirmation Selection, Expedited Data Selection, QOS Parameter Set, NS User-Data)
+T}
+.TE

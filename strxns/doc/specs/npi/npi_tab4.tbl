@@ -1,0 +1,54 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+r|c|c|c
+l|c|c|c.
+Object X:OBJECTS OF NORMAL:EXPEDITED:DATA
+Object Y:DATA/:DATA:ACKNOWLEDGEMENT
+=
+T{
+.hy 0
+.ad l
+Objects of Normal Data
+T}:Yes:Yes:No
+_
+T{
+.hy 0
+.ad l
+Expedited Data
+T}:No:Yes:No
+_
+T{
+.hy 0
+.ad l
+Data Acknowledgement
+T}:No:No:No
+.TE
+
+.TS
+center tab(:);
+lw(0.3in)lw(4.7in).
+Yes:T{
+The addition of Object X may prevent further addition of Object Y.
+T}
+
+No:T{
+The addition of Object X may not prevent the addition of Object Y.
+T}
+.TE

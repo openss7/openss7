@@ -1,0 +1,49 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+l|l|l.
+EVENT:DESCRIPTION:SERVICE TYPE
+=
+info_req:information request:CONS, CLNS
+_
+bind_req:bind request:CONS, CLNS
+_
+unbind_req:unbind request:CONS, CLNS
+_
+optmgmt_req:options mgmt request:CONS, CLNS
+_
+conn_req:connection request:CONS
+_
+conn_res:connection response:CONS
+_
+discon_req:disconnect request:CONS
+_
+data_req:data request:CONS
+_
+exdata_req:expedited data request:CONS
+_
+datack_req:data ack request:CONS
+_
+reset_req:reset request:CONS
+_
+reset_res:reset response:CONS
+_
+unitdata_req:unitdata request:CLNS
+.TE

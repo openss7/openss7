@@ -1,0 +1,101 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+l|l|l.
+STATE:SERVICE:PRIMITIVES
+=
+T{
+.hy 0
+.ad l
+Local Management
+T}:T{
+.hy 0
+.ad l
+Information Reporting
+T}:T{
+.hy 0
+.ad l
+N_INFO_REQ, N_INFO_ACK, N_ERROR_ACK
+T}
+:_:_
+:Bind:T{
+.hy 0
+.ad l
+N_BIND_REQ, N_BIND_ACK, N_UNBIND_REQ, N_OK_ACK, N_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Options Management
+T}:T{
+.hy 0
+.ad l
+N_OPTMGMT_REQ, N_OK_ACK, N_ERROR_ACK
+T}
+=
+T{
+.hy 0
+.ad l
+Connection Establishment
+T}:T{
+.hy 0
+.ad l
+Connection Establishment
+T}:T{
+.hy 0
+.ad l
+N_CONN_REQ, N_CONN_IND, N_CONN_REQ, N_CONN_CON, N_TOKEN_REQ, N_TOKEN_ACK, N_OK_ACK, N_ERROR_ACK
+T}
+=
+T{
+.hy 0
+.ad l
+Connection Mode Data Transfer
+T}:T{
+.hy 0
+.ad l
+Data Transfer
+T}:T{
+.hy 0
+.ad l
+N_DATA_REQ, N_DATA_IND, N_EXDATA_REQ, N_EXDATA_IND, N_DATACK_REQ, N_DATACK_IND
+T}
+:_:_
+:Reset:T{
+.hy 0
+.ad l
+N_RESET_REQ, N_RESET_IND, N_RESET_RES, N_RESET_CON
+T}
+=
+T{
+.hy 0
+.ad l
+Connection Release
+T}:T{
+.hy 0
+.ad l
+Connection Release
+T}:T{
+.hy 0
+.ad l
+N_DISCON_REQ, N_DISCON_IND, N_OK_ACK, N_ERROR_ACK
+T}
+.TE

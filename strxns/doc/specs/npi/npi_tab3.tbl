@@ -1,0 +1,57 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+r|c|c|c|c|c|c
+l|c|c|c|c|c|c.
+Object X:CONNECT:NORMAL:EXP.:DATA:RESET:DISC
+Object Y::DATA:NSDU:ACK::
+=
+CONNECT:N/A:\-:\-:\-:\-:DES
+_
+NORMAL DATA:N/A:\-:AA:AA:DES:DES
+_
+EXP. NSDU:N/A:\-:\-:AA:DES:DES
+_
+DATA ACK:N/A:\-:AA:\-:DES:DES
+_
+RESET:N/A:\-:\-:\-:\-:DES
+_
+DISC:N/A:N/A:N/A:N/A:\-
+.TE
+
+.TS
+center tab(:);
+lw(0.3in)lw(4.7in).
+AA:T{
+Indicates that Object X is defined to be able to advance ahead of preceding Object Y.
+T}
+
+DES:T{
+Indicates that Object X is defined to be destructive with respect to the preceiding Object Y.
+T}
+
+\-:T{
+Indicates that Object X is neither destructive with respect to Object Y, nor able to advance ahead
+of Object Y.
+T}
+
+N/A:T{
+Indicates that Object X will not occur in a position succeeding Object Y in a valid state of a queue.
+T}
+.TE

@@ -1,0 +1,69 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+c|c|l.
+SERVICE:PRIMITIVE:PARAMETERS
+=
+T{
+.hy 0
+.ad l
+Normal Data Transfer
+T}:N_DATA_REQ:T{
+.hy 0
+.ad l
+(NS User-Data, Confirmation Request)
+T}
+:N_DATA_IND:T{
+.hy 0
+.ad l
+(NS User-DATA, Confirmation Request)
+T}
+:N_UNITDATA_REQ:T{
+.hy 0
+.ad l
+(Called Address, NS User-Data)
+T}
+:N_UNITDATA_IND:T{
+.hy 0
+.ad l
+(Called Address, Calling Address, NS User-Data)
+T}
+_
+T{
+.hy 0
+.ad l
+Receipt Confirmation
+T}:N_DATACK_REQ:\-
+:N_DATACK_IND:\-
+_
+T{
+.hy 0
+.ad l
+Expedited Data Transfer
+T}:N_EXDATA_REQ:(NS User-Data)
+:N_EXDATA_IND:(NS User-Data)
+_
+Reset:N_RESET_REQ:(Reason)
+:N_RESET_IND:(Originator, Reason)
+:N_RESET_RES:\-
+:N_RESET_CON:\-
+.TE
+
+Note: \- No parameters specified with primitive.

@@ -1,0 +1,33 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c
+c|l.
+OUTPUT:DESCRIPTION
+=
+[1]:outcnt = 0
+_
+[2]:outcnt = outcnt + 1
+_
+[3]:outcnt = outcnt - 1
+_
+[4]:T{
+pass connection to stream as indicated by the token in the N_CONN_RES primitive.
+T}
+.TE

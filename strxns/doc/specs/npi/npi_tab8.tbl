@@ -1,0 +1,98 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|c
+l|l|l.
+PARAMETER:SERVICE MODE:NEGOTIATION
+=
+T{
+.hy 0
+.ad l
+NC Establishment Delay
+T}:CONS:Local
+_
+T{
+.hy 0
+.ad l
+NC Establishment Failure Probability
+T}:CONS:Local
+_
+T{
+.hy 0
+.ad l
+Throughput
+T}:CONS:End-to_End
+_
+T{
+.hy 0
+.ad l
+Transit Delay
+T}:CONS, CLNS:End-to-End (for CONS)
+::Local (for CLNS)
+_
+T{
+.hy 0
+.ad l
+Residual Error Rate
+T}:CONS, CLNS:Local
+_
+T{
+.hy 0
+.ad l
+NC Resilience
+T}:CONS:Local
+_
+T{
+.hy 0
+.ad l
+Transfer Failure Probability
+T}:CONS:Local
+_
+T{
+.hy 0
+.ad l
+NC Release Delay
+T}:CONS:Local
+_
+T{
+.hy 0
+.ad l
+NC Release Failure Probability
+T}:CONS:Local
+_
+T{
+.hy 0
+.ad l
+Protection
+T}:CONS, CLNS:End-to-End (for CONS)
+::Local (for CLNS)
+_
+T{
+.hy 0
+.ad l
+Priority
+T}:CONS, CLNS:End-to-End (for CONS)
+::Local (for CLNS)
+_
+T{
+.hy 0
+.ad l
+Maximum Acceptable Cost
+T}:CONS, CLNS:Local
+.TE

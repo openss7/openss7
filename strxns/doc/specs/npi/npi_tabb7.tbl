@@ -1,0 +1,36 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+r|c|c|c|c|c
+l|c|c|c|c|c.
+STATE:sta_0:sta_1:sta_2:sta_3:sta_4:
+EVENT::::
+=
+bind_req:sta_1::::
+_
+unbind_req::::sta_2:
+_
+optmgmt_req::::sta_4:
+_
+bind_ack::sta_3 [1]:::
+_
+error_ack::sta_0:sta_3::sta_3
+_
+ok_ack1:::sta_0::sta_3
+.TE

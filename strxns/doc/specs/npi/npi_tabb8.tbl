@@ -1,0 +1,83 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+r|c|c|c|c|c|c|c|c|c|c|c|c|c
+l|c|c|c|c|c|c|c|c|c|c|c|c|c.
+STATE:3:5:6:7:8:9:10:11:12:13:14:15:16
+EVENT
+=
+conn_req:6
+_
+conn_ind:7:::7
+:[2]:::[2]
+_
+conn_res::::8
+_
+conn_con:::9
+_
+discon_req:::12:13::14:15:16
+_
+data_req::::::9
+_
+exdata_req::::::9
+_
+reset_req::::::10
+_
+reset_res::::::::5
+_
+data_ind::::::9
+_
+exdata_ind::::::9
+_
+datack_req::::::9
+_
+datack_ind::::::9
+_
+reset_ind::::::11
+_
+reset_con:::::::9
+_
+discon_ind1:::3:::3:3:3
+_
+discon_ind2::::3
+::::[3]
+_
+discon_ind3::::7
+::::[3]
+_
+error_ack::11:3::7::9::6:7:9:10:11
+_
+ok_ack1::9:::::::3::3:3:3
+_
+ok_ack2:::::9:::::3
+:::::[3]:::::[3]
+_
+ok_ack3:::::3:::::3
+:::::[3,4]:::::[3]
+_
+ok_ack4:::::7:::::7
+:::::[3,4]:::::[3]
+_
+pass_conn:9
+.TE
+
+NOTE: The column headings and box entries are state (sta_) numbers as described in Table B-1.
+Refer to Table B-3 for the interpretation of the bracketed numbers.
+
+

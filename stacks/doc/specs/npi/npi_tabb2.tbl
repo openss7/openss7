@@ -1,0 +1,36 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c
+c|l.
+VARIABLE:DESCRIPTION
+=
+token:T{
+is a value contained in the N_CONN_RES primitive that is used to identify
+the stream on which the NC is to be established. When its value is zero, it
+indicates that the NC is to be established on the stream on which the N_CONN_IND
+arrived. When its value is non-zero, it identifies another stream on which the
+NS provider is to accept the NC.
+T}
+_
+outcnt:T{
+counter for the number of outstanding connection indications not responded to by
+the network user entity.
+T}
+.TE

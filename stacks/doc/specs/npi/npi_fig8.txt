@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+           N_BIND_REQ ----\   |                  |                              
+   with TOKEN_REQUEST set  \->|                  |                              
+                              |                  |                              
+                           /--|                  |                              
+           N_BIND_ACK <---/   |                  |                              
+       with TOKEN_value       |                  |                              
+                              |                  |                              
+                                                                                

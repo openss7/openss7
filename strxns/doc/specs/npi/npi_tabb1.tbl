@@ -1,0 +1,181 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+c|c|cs|c
+l|l|ls|l.
+STATE:ABBREVIATION:DESCRIPTION:SERVICE TYPE
+=
+sta_0:unbnd:T{
+.hy 0
+.ad l
+unbound
+T}:CONS, CLNS
+_
+sta_1:T{
+.hy 0
+.ad l
+w_ack, b_req
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_BIND_REQ
+T}:CONS, CLNS
+_
+sta_2:T{
+.hy 0
+.ad l
+w_ack, u_req
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_UNBIND_REQ
+T}:CONS, CLNS
+_
+sta_3:idle:T{
+.hy 0
+.ad l
+idle-no connection
+T}:CONS, CLNS
+_
+sta_4:T{
+.hy 0
+.ad l
+w_ack, op_req
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_OPTMGMT_REQ
+T}:CONS, CLNS
+_
+sta_5:T{
+.hy 0
+.ad l
+w_ack, r_res
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_RESET_RES
+T}:CONS
+_
+sta_6:T{
+.hy 0
+.ad l
+w_con, c_req
+T}:T{
+.hy 0
+.ad l
+awaiting confirmation of N_CONN_REQ
+T}:CONS
+_
+sta_7:T{
+.hy 0
+.ad l
+w_res, c_ind
+T}:T{
+.hy 0
+.ad l
+awaiting response of N_CONN_IND
+T}:CONS
+_
+sta_8:T{
+.hy 0
+.ad l
+w_ack, c_res
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_CONN_RES
+T}:CONS
+_
+sta_9:data_t:T{
+.hy 0
+.ad l
+data transfer
+T}:CONS
+_
+sta_10:T{
+.hy 0
+.ad l
+w_con, r_req
+T}:T{
+.hy 0
+.ad l
+awaiting confirmation of N_RESET_REQ
+T}:CONS
+_
+sta_11:T{
+.hy 0
+.ad l
+w_res, r_ind
+T}:T{
+.hy 0
+.ad l
+awaiting response of N_RESET_IND
+T}:CONS
+_
+sta_12:T{
+.hy 0
+.ad l
+w_ack, dreq6
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_DISCON_REQ
+T}:CONS
+_
+sta_13:T{
+.hy 0
+.ad l
+w_ack, dreq7
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_DISCON_REQ
+T}:CONS
+_
+sta_14:T{
+.hy 0
+.ad l
+w_ack, dreq9
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_DISCON_REQ
+T}:CONS
+_
+sta_15:T{
+.hy 0
+.ad l
+w_ack, dreq10
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_DISCON_REQ
+T}:CONS
+_
+sta_16:T{
+.hy 0
+.ad l
+w_ack, dreq11
+T}:T{
+.hy 0
+.ad l
+awaiting acknowledgement of N_DISCON_REQ
+T}:CONS
+.TE

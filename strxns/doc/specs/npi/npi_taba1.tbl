@@ -1,0 +1,80 @@
+.ie '\*(.T'ps' \{\
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+
+.TS
+box center tab(:);
+lll.
+NETWORK:STREAMS:OSI NETWORK
+PRIMITIVE:MESSAGE TYPE:PRIMITIVE
+=
+N_CONN_REQ:M_PROTO:N-CONNECT request
+_
+N_CONN_IND:M_PROTO:N-CONNECT indication
+_
+N_CONN_RES:M_PROTO:N-CONNECT response
+_
+N_CONN_CON:M_PROTO:N-CONNECT confirm
+_
+N_DATA_REQ:M_PROTO:N-DATA request
+_
+N_DATA_IND:M_PROTO:N-DATA indication
+_
+N_EXDATA_REQ:M_PROTO:N-EXPEDITED-DATA request
+_
+N_EXDATA_IND:M_PROTO:N-EXPEDITED-DATA indication
+_
+N_DATACK_REQ:M_PROTO:N-DATA-ACKNOWLEDGE request
+_
+N_DATACK_IND:M_PROTO:N-DATA-ACKNOWLEDGE indication
+_
+N_RESET_REQ:M_PROTO:N-RESET request
+_
+N_RESET_IND:M_PROTO:N-RESET indication
+_
+N_RESET_RES:M_PROTO:N-RESET response
+_
+N_RESET_CON:M_PROTO:N-RESET confirm
+_
+N_DISCON_REQ:M_PROTO:N-DISCONNECT request
+_
+N_DISCON_IND:M_PROTO:N-DISCONNECT indication
+_
+N_UNITDATA_REQ:M_PROTO:N-UNITDATA request
+_
+N_UNITDATA_IND:M_PROTO:N-UNITDATA indication
+_
+N_BIND_REQ:M_PROTO:##
+_
+N_BIND_ACK:M_PCPROTO:##
+_
+N_UNBIND_REQ:M_PROTO:##
+_
+N_OK_ACK:M_PCPROTO:##
+_
+N_ERROR_ACK:M_PCPROTO:##
+_
+N_INFO_REQ:M_PCPROTO:##
+_
+N_INFO_ACK:M_PCPROTO:##
+_
+N_UDERROR_IND:M_PROTO:##
+_
+N_OPTMGMT_REQ:M_PROTO:##
+_
+.TE
+
+## \- Local Management issue, not defined in ISO 8348 and CCITT X.213.
