@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.10 2005/03/09 10:33:16 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.11 2005/03/13 11:27:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 10:33:16 $ by $Author: brian $
+ Last Modified $Date: 2005/03/13 11:27:52 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -119,6 +119,13 @@ typedef int tid_t;
 #define NMINORS		((1UL<<8)-1)	/* be conservative for others */
 #endif
 
+#ifdef INLINE
+#undef INLINE
+#endif
+#ifdef STATIC
+#undef STATIC
+#endif
+
 #include "os7/debug.h"		/* generic debugging macros */
 #include "os7/bufq.h"		/* generic buffer queues */
 #include "os7/priv.h"		/* generic data structures */
@@ -126,6 +133,16 @@ typedef int tid_t;
 #include "os7/queue.h"		/* generic put and srv routines */
 #include "os7/allocb.h"		/* generic buffer allocation routines */
 #include "os7/timer.h"		/* generic timer handling */
+
+#ifdef LISASSERT
+#undef LISASSERT
+#define LISASSERT(__assertion) assert((__assertion))
+#undef ASSERT
+#endif
+
+#ifndef ASSERT
+#define ASSERT(__assertion) assert((__assertion))
+#endif
 
 //#ifdef LINUX
 //#include <linux/interrupt.h>
