@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/21 00:20:07 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/01/24 12:27:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 00:20:07 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -126,8 +126,8 @@ post-modules:
 					m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\\.o$$||'`" ; \
 					sed -e "/$$m/d" $$conf_new > $$conf_tmp ; \
 					mv -f $$conf_tmp $$conf_new ; \
-					echo "rm -f $$k/misc/$$m.o$$kext" ; \
-					rm -f "$$k/misc/$$m.o$$kext" ; \
+					echo "rm -f -- $$k/misc/$$m.o$$kext" ; \
+					rm -f -- "$$k/misc/$$m.o$$kext" ; \
 				done ; \
 				echo "rmdir --ignore-fail-on-non-empty $$k/misc" ; \
 				rmdir --ignore-fail-on-non-empty $$k/misc ; \
@@ -145,8 +145,8 @@ post-modules:
 								sed -e "/$$m/d" $$modl_new > $$modl_tmp ; \
 								mv -f $$modl_tmp $$modl_new ; \
 								for dir in misc lis streams ; do \
-									echo "rm -f $$k/$$dir/$$m.o$$kext" ; \
-									rm -f "$$k/$$dir/$$m.o$$kext" ; \
+									echo "rm -f -- $$k/$$dir/$$m.o$$kext" ; \
+									rm -f -- "$$k/$$dir/$$m.o$$kext" ; \
 								done ; \
 							done ; \
 							for dir in misc lis streams ; do \
@@ -162,7 +162,7 @@ post-modules:
 			echo 'endif' >> $$conf_new ; \
 			chmod --reference=$$conf_fil $$conf_new ; \
 			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
-			rm -f "$$conf_new" ; \
+			rm -f -- "$$conf_new" ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
 			s='$(DESTDIR)$(ksysmap)' ; \
@@ -176,8 +176,8 @@ post-modules:
 		if test -d $$u ; then \
 			p="$$u/$(PACKAGE_TARNAME)" ; \
 			d=`(cd $(srcdir); pwd)` ; \
-			echo "rm -f $$p" ; \
-			rm -f "$$p" ; \
+			echo "rm -f -- $$p" ; \
+			rm -f -- "$$p" ; \
 			echo "$(LN_S) -f $$d $$p" ; \
 			$(LN_S) -f "$$d" "$$p" ; \
 		fi ; \
@@ -199,13 +199,13 @@ uninstall-modules:
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		p="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|'`" ; \
 		p="$$p$$kext" ; \
-		echo "$(LIBTOOL) --mode=uninstall rm -f $$d/$$p" ; \
-		$(LIBTOOL) --mode=uninstall rm -f "$$d/$$p" ; \
+		echo "$(LIBTOOL) --mode=uninstall rm -f -- $$d/$$p" ; \
+		$(LIBTOOL) --mode=uninstall rm -f -- "$$d/$$p" ; \
 	done ; \
 	echo "rmdir --ignore-fail-on-non-empty $$d" ; \
 	rmdir --ignore-fail-on-non-empty "$$d" ; \
-	echo "rm -f $$k/modules.$(KMODCONF_EXT)" ; \
-	rm -f "$$k/modules.$(KMODCONF_EXT)"
+	echo "rm -f -- $$k/modules.$(KMODCONF_EXT)" ; \
+	rm -f -- "$$k/modules.$(KMODCONF_EXT)"
 
 UNINSTALL_LOCAL += uninstall-modules
 
@@ -240,7 +240,7 @@ postun-modules:
 			sed -e '/prune modules.$(KMODCONF_EXT)/,/endif/d' $$conf_fil > $$conf_new ; \
 			chmod --reference=$$conf_fil $$conf_new ; \
 			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
-			rm -f $$conf_new ; \
+			rm -f -- $$conf_new ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
 			s='$(DESTDIR)$(ksysmap)' ; \
@@ -251,8 +251,8 @@ postun-modules:
 		fi ; \
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
 		p="$$r/usr/src/$(PACKAGE_TARNAME)" ; \
-		echo "rm -f $$p" ; \
-		rm -f "$$p" ; \
+		echo "rm -f -- $$p" ; \
+		rm -f -- "$$p" ; \
 	fi
 
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/21 10:11:33 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/24 12:27:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 10:11:33 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,15 +84,15 @@ EXTRA_DIST += $(STRCONF_CONFIGS)
 clean-strconf:
 
 distclean-strconf:
-	rm -f $(STRCONF_INPUT)
-	rm -f $(STRCONF_CONFIG)
-	rm -f $(STRCONF_MODCONF)
-	rm -f $(STRCONF_MKNODES)
-	rm -f $(STRCONF_DRVCONF)
-	rm -f $(STRCONF_CONFMOD)
-	rm -f $(STRCONF_MAKEDEV)
-	rm -f $(STRCONF_STSETUP)
-#	rm -f $(STRCONF_STRLOAD)
+	rm -f -- $(STRCONF_INPUT)
+	rm -f -- $(STRCONF_CONFIG)
+	rm -f -- $(STRCONF_MODCONF)
+	rm -f -- $(STRCONF_MKNODES)
+	rm -f -- $(STRCONF_DRVCONF)
+	rm -f -- $(STRCONF_CONFMOD)
+	rm -f -- $(STRCONF_MAKEDEV)
+	rm -f -- $(STRCONF_STSETUP)
+#	rm -f -- $(STRCONF_STRLOAD)
 
 maintainer-clean-strconf:
 

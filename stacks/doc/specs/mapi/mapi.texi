@@ -53,14 +53,8 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @c @defindex ps
 
 @ifnottex
-@ifinfo
 @node Top
 @top Mobile Application Part Interface
-@end ifinfo
-@ifnotinfo
-@node Top
-@top
-@end ifnotinfo
 @end ifnottex
 
 @iftex

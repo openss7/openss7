@@ -1,11 +1,12 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.7 2004/11/06 10:24:35 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.8 2005/01/24 11:57:57 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -53,36 +54,38 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/11/06 10:24:35 $ by $Author: brian $
+% Last Modified $Date: 2005/01/24 11:57:57 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename SPG.info
-@settitle Linux Fast-STREAMS Programmer's Guide
-@setchapternewpage odd
+@include texi/args.texi
+@set MANUAL_TITLE Linux Fast-STREAMS
+@set MANUAL_TYPE STREAMS Programmer's Guide
+@settitle @value{MANUAL_TITLE}
 
 @dircategory STREAMS
 @direntry
 * SPG: (SPG).                   STREAMS Programmer's Guide
 @end direntry
 
-@set xref-automatic-section-title
-
-@set EDITION 0.9.1
-@set VERSION 0.9.1
-@set UPDATED 2004-03-12
-
 @defindex op
 
+@include texi/args.texi
+@set MANUAL_TITLE Linux Fast-STREAMS
+@set MANUAL_TYPE STREAMS Programmer's Guide
+
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file provides the STREAMS Programmer's Guide for Linux Fast-STREAMS.
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
-This is Edition @value{EDITION}, last updated @value{UPDATED}, of
-@cite{The STREAMS Programmer's Guide for Linux Fast-STREAMS}, for Version
-@value{VERSION}.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
 
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
 
@@ -94,11 +97,11 @@ copies.
 Permission is granted to process this file through Tex and print the results,
 provided the printed document carries copying permission notice identical to
 this one except for the removal of this paragraph (this paragraph not being
-relevant ot the printed manual).
+relevant to the printed manual).
 
 @end ignore
 Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided that the entire resulting
+under the conditions for verbatim copying, provided the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
@@ -106,45 +109,71 @@ Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
 
-@iftex
-@shorttitlepage STREAMS Programmer's Guide
-@end iftex
+@include texi/args.texi
+@set MANUAL_TITLE Linux Fast-STREAMS
+@set MANUAL_TYPE STREAMS Programmer's Guide
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
 @titlepage
-@title STREAMS Programmer's Guide
-@subtitle Edition @value{EDITION} for Linux-Fast STREAMS version @value{VERSION}
-@subtitle @value{UPDATED}
-@author Brian Bidulock  @cite{@email{bidulock@@openss7.org}}
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{PACKAGE_VERSION}-@value{PACKAGE_RELEASE}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation @url{http://www.openss7.com} @*
-Copyright @copyright{} 1997-2000  Brian F. G. Bidulock @*
+Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
+@noindent
 Published by OpenSS7 Corporation @*
 1469 Jefferys Crescent @*
 Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
 
+@noindent
 Permission is granted to copy and distribute modified versions of this manual
 under the conditions for verbatim copying, provided that the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
+@noindent
 Permission is granted to copy and distribute translations of this manual into
 another language, under the same conditions as for modified versions.
+
+@vskip 0pt
 @end titlepage
 @page
 
+@ifnottex
 @node Top
-@top Main Menu
-This is Edition @value{EDITION}, last updated @value{UPDATED}, of
-@cite{STREAMS Programmer's Guide for Linux Fast-STREAMS}, for Version
-@value{VERSION} of Linux Fast-STREAMS.
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
 
 @menu
 * Acknowledgements::

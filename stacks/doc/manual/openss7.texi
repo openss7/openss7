@@ -1,11 +1,12 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.3 2004/10/13 08:18:16 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.4 2005/01/24 11:57:53 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
 %
@@ -53,36 +54,41 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/10/13 08:18:16 $ by $Author: brian $
+% Last Modified $Date: 2005/01/24 11:57:53 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
 @setfilename openss7.info
-@settitle OpenSS7
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+@settitle @value{MANUAL_TITLE}
 
 @dircategory OpenSS7
 @direntry
-* OpenSS7: (openss7).		An open SS7, SIGTRAN, ISDN, VoIP package.
+* OpenSS7 SS7: (openss7).	An open SS7, SIGTRAN, ISDN, VoIP package.
 @end direntry
-
-@include texi/args.texi
 
 @defindex op
 
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file document the @value{PACKAGE_TITLE} package.
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
-@cite{@value{PACKAGE_TITLE}} package, for Version @value{PACKAGE_VERSION}
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2004 @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000 @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
-All Rights Reserved. @*
+All Rights Reserved.
 
-@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
@@ -94,24 +100,26 @@ this one except for the removal of this paragraph (this paragraph not being
 relevant to the printed manual).
 
 @end ignore
-@noindent
 Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copyring, provided the entire resulting
+under the conditions for verbatim copying, provided the entire resulting
 derived work is distributed under the terms of a permission notice identical
 to this one.
 
-@noindent
 Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
 
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
 @ignore
-@shorttitlepage @value{PACKAGE_TITLE} Installation and Reference Manual
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @end ignore
 @titlepage
-@titlefont{@value{PACKAGE_TITLE}}
-@sp 0.2
-@title Installation and Reference Manual
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
@@ -122,7 +130,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -133,6 +141,13 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
 copies.
@@ -140,7 +155,7 @@ copies.
 @noindent
 Permission is granted to copy and distribute modified versions of this manual
 under the conditions for verbatim copying, provided that the entire resulting
-derived work is distribtued under the terms of a permission notice identical
+derived work is distributed under the terms of a permission notice identical
 to this one.
 
 @noindent
@@ -156,21 +171,15 @@ another language, under the same conditions as for modified versions.
 @everyheading @thistitle @| @| @thischaptername
 @everyfooting Version @value{PACKAGE_VERSION} @| @emph{Released under the GFDL} @| @thispage
 @end iftex
+
 @ifnottex
-@ifinfo
 @node Top
-@top @value{PACKAGE_TITLE}
-@end ifinfo
-@ifnotinfo
-@node Top
-@end ifnotinfo
-@end ifnottex
-@c
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @unnumbered About This Manual
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of
-@cite{The @value{PACKAGE_TITLE} Installation and Reference Manual}, for
-Version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
-@value{PACKAGE_TITLE} package.
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
 
 @menu
 * Acknowledgements::		Sponsors and Contributors

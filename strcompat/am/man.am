@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/01/21 10:11:33 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/24 12:27:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 10:11:33 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -189,13 +189,13 @@ install-manmacros: $(man_MACROS)
 
 uninstall-manmacros:
 	@$(NORMAL_UNINSTALL)
-	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
-	rm -f $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
+	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
+	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
 
 clean-manmacros:
 	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
-		echo "rm -f $$macro" ;  \
-		rm -f $$macro ; \
+		echo "rm -f -- $$macro" ;  \
+		rm -f -- $$macro ; \
 	done
 
 distclean-manmacros:
@@ -219,44 +219,44 @@ uninstall-manpages:
 
 clean-manpages:
 	@if test -n "$(man_MANS)" ; then \
-		echo "rm -f $(man_MANS)" ; \
-		rm -f $(man_MANS) ; \
+		echo "rm -f -- $(man_MANS)" ; \
+		rm -f -- $(man_MANS) ; \
 	fi ; \
 	if test -n "$(man1_MANS)" ; then \
-		echo "rm -f $(man1_MANS)" ; \
-		rm -f $(man1_MANS) ; \
+		echo "rm -f -- $(man1_MANS)" ; \
+		rm -f -- $(man1_MANS) ; \
 	fi ; \
 	if test -n "$(man2_MANS)" ; then \
-		echo "rm -f $(man2_MANS)" ; \
-		rm -f $(man2_MANS) ; \
+		echo "rm -f -- $(man2_MANS)" ; \
+		rm -f -- $(man2_MANS) ; \
 	fi ; \
 	if test -n "$(man3_MANS)" ; then \
-		echo "rm -f $(man3_MANS)" ; \
-		rm -f $(man3_MANS) ; \
+		echo "rm -f -- $(man3_MANS)" ; \
+		rm -f -- $(man3_MANS) ; \
 	fi ; \
 	if test -n "$(man4_MANS)" ; then \
-		echo "rm -f $(man4_MANS)" ; \
-		rm -f $(man4_MANS) ; \
+		echo "rm -f -- $(man4_MANS)" ; \
+		rm -f -- $(man4_MANS) ; \
 	fi ; \
 	if test -n "$(man5_MANS)" ; then \
-		echo "rm -f $(man5_MANS)" ; \
-		rm -f $(man5_MANS) ; \
+		echo "rm -f -- $(man5_MANS)" ; \
+		rm -f -- $(man5_MANS) ; \
 	fi ; \
 	if test -n "$(man6_MANS)" ; then \
-		echo "rm -f $(man6_MANS)" ; \
-		rm -f $(man6_MANS) ; \
+		echo "rm -f -- $(man6_MANS)" ; \
+		rm -f -- $(man6_MANS) ; \
 	fi ; \
 	if test -n "$(man7_MANS)" ; then \
-		echo "rm -f $(man7_MANS)" ; \
-		rm -f $(man7_MANS) ; \
+		echo "rm -f -- $(man7_MANS)" ; \
+		rm -f -- $(man7_MANS) ; \
 	fi ; \
 	if test -n "$(man8_MANS)" ; then \
-		echo "rm -f $(man8_MANS)" ; \
-		rm -f $(man8_MANS) ; \
+		echo "rm -f -- $(man8_MANS)" ; \
+		rm -f -- $(man8_MANS) ; \
 	fi ; \
 	if test -n "$(man9_MANS)" ; then \
-		echo "rm -f $(man9_MANS)" ; \
-		rm -f $(man9_MANS) ; \
+		echo "rm -f -- $(man9_MANS)" ; \
+		rm -f -- $(man9_MANS) ; \
 	fi ;
 
 distclean-manpages:
@@ -380,62 +380,62 @@ postun-manpages:
 			if test -n "$$COMPRESS" ; then \
 				list="$(man_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man1_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man1/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man1/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man1/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man1/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man1/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man2_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man2/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man2/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man2/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man2/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man2/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man3_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man3/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man3/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man3/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man3/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man3/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man4_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man4/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man4/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man4/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man4/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man4/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man5_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man5/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man5/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man5/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man5/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man5/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man6_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man6/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man6/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man6/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man6/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man6/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man7_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man7/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man7/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man7/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man7/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man7/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man8_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man8/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man8/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man8/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man8/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man8/$$f$$ext ; \
 					fi ; \
 				done ; \
 				list="$(man9_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/man9/$$f$$ext ; then \
-						echo "rm -f $(DESTDIR)$(mandir)/man9/$$f$$ext" ; \
-						rm -f $(DESTDIR)$(mandir)/man9/$$f$$ext ; \
+						echo "rm -f -- $(DESTDIR)$(mandir)/man9/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man9/$$f$$ext ; \
 					fi ; \
 				done ; \
 			fi ; \

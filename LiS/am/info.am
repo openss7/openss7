@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/21 12:17:25 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/01/24 12:27:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/21 12:17:25 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,14 +79,14 @@ sgml: sgml-am
 
 clean-txt:
 	if test -n "$(TXTS)" ; then \
-		echo "rm -f $(TXTS)" ; \
-		rm -f $(TXTS) ; \
+		echo "rm -f -- $(TXTS)" ; \
+		rm -f -- $(TXTS) ; \
 	fi
 
 clean-sgml:
 	if test -n "$(SGMLS)" ; then \
-		echo "rm -f $(SGMLS)" ; \
-		rm -f $(SGMLS) ; \
+		echo "rm -f -- $(SGMLS)" ; \
+		rm -f -- $(SGMLS) ; \
 	fi
 
 FIG_PSS  = $(FIG_FIGS:%.fig=%.ps)
@@ -218,35 +218,35 @@ texi/args.texi:
 clean-figs:
 	@ figs="$(FIG_FIGS)" ; for i in $$figs ; do \
 		d=`echo $$i | sed -e 's|\.fig||'` ; \
-		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
-		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+		echo "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
 	done
 
 clean-tbls:
 	@ tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
 		d=`echo $$i | sed -e 's|\.tbl||'` ; \
-		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
-		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+		echo "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
 	done
 
 clean-pngs:
 	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
 		d=`echo $$i | sed -e 's|\.png||'` ; \
-		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
-		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+		echo "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
 	done
 
 clean-pss:
 	@ pss="$(PS_PSS)" ; for i in $$pss ; do \
 		d=`echo $$i | sed -e 's|\.ps||'` ; \
-		echo "rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
-		rm -f $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
+		echo "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
+		rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf ; \
 	done
 
 clean-texi:
 	@ if test -L texi ; then \
-		echo "rm -f texi" ; \
-		rm -f texi ; \
+		echo "rm -f -- texi" ; \
+		rm -f -- texi ; \
 	fi
 
 distclean-figs:
@@ -262,29 +262,29 @@ distclean-texi:
 maintainer-clean-figs:
 	@figs="$(FIG_FIGS)" ; for i in $$figs ; do \
 		f=`echo "$(srcdir)/$$i" | sed -e 's|\.fig$$||'` ; \
-		echo "rm -f $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
-		rm -f $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
+		echo "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
+		rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
 	done
 
 maintainer-clean-tbls:
 	@tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
 		f=`echo "$(srcdir)/$$i" | sed -e 's|\.tbl$$||'` ; \
-		echo "rm -f $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
-		rm -f $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
+		echo "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
+		rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
 	done
 
 maintainer-clean-pngs:
 	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
 		f=`echo "$(srcdir)$$i" | sed -e 's|\.png$$||'` ; \
-		echo "rm -f $$f.ps $$f.eps $$f.jpg $$f.pdf" ; \
-		rm -f $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
+		echo "rm -f -- $$f.ps $$f.eps $$f.jpg $$f.pdf" ; \
+		rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf ; \
 	done
 
 maintainer-clean-pss:
 	@pss="$(PS_PSS)" ; for i in $$pss ; do \
 		f=`echo "$(srcdir)/$$i" | sed -e 's|\.ps$$||'` ; \
-		echo "rm -f $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
-		rm -f $$f.eps $$f.png $$f.jpg $$f.pdf ; \
+		echo "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
+		rm -f -- $$f.eps $$f.png $$f.jpg $$f.pdf ; \
 	done
 
 maintainer-clean-texi:

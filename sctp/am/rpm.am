@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/01/22 09:09:49 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/24 12:27:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/22 09:09:49 $ by $Author: brian $
+# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -175,7 +175,7 @@ sign:
 	fi ; \
 	for f in $$archives ; do \
 		if test -f $$f ; then \
-			rm -f $$f.asc ; \
+			rm -f -- $$f.asc ; \
 			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 			home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
 			echo "$(GPG) -ba$$user$$home -- $$f" ; \
@@ -264,7 +264,7 @@ sign:
 	done ; \
 	for f in $$archives ; do \
 		if test -f $$f ; then \
-			rm -f $$f.asc ; \
+			rm -f -- $$f.asc ; \
 			user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 			home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
 			echo "$(GPG) -ba$$user$$home -- $$f" ; \
@@ -295,14 +295,14 @@ clean-sign:
 
 distclean-lsms:
 	@if test -n "$(LSM)" ; then \
-		echo "rm -f $(LSM)" ; \
-		rm -f $(LSM) ; \
+		echo "rm -f -- $(LSM)" ; \
+		rm -f -- $(LSM) ; \
 	fi
 
 distclean-archives:
 	@if test -n "$(DIST_ARCHIVES)" ; then \
-		echo "rm -f $(DIST_ARCHIVES)" ; \
-		rm -f $(DIST_ARCHIVES) ; \
+		echo "rm -f -- $(DIST_ARCHIVES)" ; \
+		rm -f -- $(DIST_ARCHIVES) ; \
 	fi
 
 distclean-rpms:
@@ -310,20 +310,20 @@ distclean-rpms:
 		topdir="$(PACKAGE_RPMTOPDIR)/" ; \
 	else \
 		topdir="./" ; \
-		echo "rm -fr BUILD RPMS SOURCES" ; \
-		rm -fr BUILD RPMS SOURCES ; \
+		echo "rm -fr -- BUILD RPMS SOURCES" ; \
+		rm -fr -- BUILD RPMS SOURCES ; \
 	fi ; \
 	if test -d $${topdir}RPMS ; then \
 		list="`find $${topdir}RPMS -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 		for f in $$list ; do \
-			echo " rm -f $$f" ; \
-			rm -f $$f ; \
+			echo " rm -f -- $$f" ; \
+			rm -f -- $$f ; \
 		done ; \
 	fi
 	@archives="$(RPM_ARCHIVES)" ; \
 	for f in $$archives ; do \
-		echo " rm -f $$f" ; \
-		rm -f $$f ; \
+		echo " rm -f -- $$f" ; \
+		rm -f -- $$f ; \
 	done
 
 distclean-srpm:
@@ -331,50 +331,50 @@ distclean-srpm:
 		topdir="$(PACKAGE_RPMTOPDIR)/" ; \
 	else \
 		topdir="./" ; \
-		echo "rm -fr SPECS SRPMS" ; \
-		rm -fr SPECS SRPMS ; \
+		echo "rm -fr -- SPECS SRPMS" ; \
+		rm -fr -- SPECS SRPMS ; \
 	fi
-	rm -f $(PACKAGE_TARNAME).gif
-	rm -f $(PACKAGE_TARNAME).xpm
+	rm -f -- $(PACKAGE_TARNAME).gif
+	rm -f -- $(PACKAGE_TARNAME).xpm
 
 distclean-sign:
 	@archives="$(RPM_ARCHIVES)" ; \
 	for f in $$archives ; do \
-		echo " rm -f $$f.asc" ; \
-		rm -f $$f.asc ; \
+		echo " rm -f -- $$f.asc" ; \
+		rm -f -- $$f.asc ; \
 	done
 
 maintainer-clean-lsms:
 	@if test -n "$(srcdir)/$(LSM)" ; then \
-		echo " rm -f $(srcdir)/$(LSM)" ; \
-		rm -f $(srcdir)/$(LSM) ; \
+		echo " rm -f -- $(srcdir)/$(LSM)" ; \
+		rm -f -- $(srcdir)/$(LSM) ; \
 	fi
 
 maintainer-clean-archives:
-	rm -f *.gz *.bz2
+	rm -f -- *.gz *.bz2
 
 maintainer-clean-rpms:
-	rm -rf BUILD RPMS SOURCES
+	rm -rf -- BUILD RPMS SOURCES
 
 maintainer-clean-srpm:
-	rm -rf SPECS SRPMS
+	rm -rf -- SPECS SRPMS
 	@if test -n "$(PACKAGE_RPMTOPDIR)" ; then \
 		topdir="$(PACKAGE_RPMTOPDIR)/" ; \
 	else \
 		topdir="./" ; \
-		echo "rm -fr SPECS SRPMS" ; \
-		rm -fr SPECS SRPMS ; \
+		echo "rm -fr -- SPECS SRPMS" ; \
+		rm -fr -- SPECS SRPMS ; \
 	fi ; \
 	if test -d $${topdir}SRPMS ; then \
 		list="`find $${topdir}SRPMS -name '$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE).src.rpm' 2>/dev/null`" ; \
 		for f in $$list ; do \
-			echo " rm -f $$f" ; \
-			rm -f $$f ; \
+			echo " rm -f -- $$f" ; \
+			rm -f -- $$f ; \
 		done ; \
 	fi
 
 maintainer-clean-sign:
-	rm -f *.asc
+	rm -f -- *.asc
 
 CLEAN_LOCAL += clean-lsms clean-archives clean-rpms clean-sign
 

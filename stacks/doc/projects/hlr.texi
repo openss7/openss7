@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: hlr.texi,v 0.9.2.1 2004/11/05 00:40:54 brian Exp $
+% @(#) $Id: hlr.texi,v 0.9.2.2 2005/01/24 11:57:53 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/11/05 00:40:54 $ by $Author: brian $
+% Last Modified $Date: 2005/01/24 11:57:53 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -72,21 +72,16 @@
 @include texi/args.texi
 
 @ifinfo
-@noindent
 This file documents the OpenSS7 Home Location Register.
 
-@noindent
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
 
-@noindent
 Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
-@noindent
 All Rights Reserved.
 
-@noindent
 Permission to use, copy and distribute this documentation without modification, for any purpose and
 without fee or royalty is hereby granted, provided that both the above copyright notice and this
 permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
@@ -96,13 +91,11 @@ suitability of this documentation for any purpose.  It is provided ``as is'' wit
 implied warranty.
 
 @ignore
-@noindent
 Permission is granted to process this file through Tex and print the results, provided the printed
 document carries copying permission notice identical to this one except for the removal of this
 paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-@noindent
 OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
 warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
 the contents of the document are suitable for any purpose, or that the implementation of such
@@ -112,13 +105,14 @@ damages or any damages whatsoever resulting from loss of use, data or profits, w
 of contract, negligence or other tortious action, arising out of or in connection with any use of
 this document or the performance or implementation of the contents thereof.
 
-@noindent
 OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
 including but not limited to, conformity with standards promulgated by various agencies, utilization
 of advances in the state of the technical arts, or the reflection of changes in the design of any
 techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
 no obligation to provide any feature listed herein.
 @end ifinfo
+
+@include texi/args.texi
 
 @titlepage
 @title High Performance HLR
@@ -203,14 +197,8 @@ no obligation to provide any feature listed herein.
 
 
 @ifnottex
-@ifinfo
 @node Top
 @top High Performance GSM/UMTS GPRS HLR
-@end ifinfo
-@ifnotinfo
-@node Top
-@top
-@end ifnotinfo
 @end ifnottex
 
 @macro tabfig {image, number, caption}
@@ -438,6 +426,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: hlr.texi,v $
+Revision 0.9.2.2  2005/01/24 11:57:53  brian
+- Updated texinfo headers.
+
 Revision 0.9.2.1  2004/11/05 00:40:54  brian
 - Added HLR and VoIP HLDs and Applications Notes.
 
