@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.19 2004/12/18 11:13:03 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.20 2004/12/31 04:01:43 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/18 11:13:03 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/31 04:01:43 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -141,15 +141,15 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [
     AC_MSG_CHECKING([for streams added configure arguments])
     case "$streams_cv_package" in
         LiS)
-            if test -z "$with_lis" ; then
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lis"
+            if test -z "$with_lis" ; then :;
+dnl             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define '_with_lis --with-lis'"
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
             fi
             AC_MSG_RESULT([--with-lis])
             ;;
         LfS)
-            if test -z "$with_lfs" ; then
-                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lfs"
+            if test -z "$with_lfs" ; then :;
+dnl             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define '_with_lfs --with-lfs'"
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
             fi
             AC_MSG_RESULT([--with-lfs])
@@ -188,8 +188,8 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
     for streams_include in $streams_cv_includes ; do
         STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
     done
-    AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_package:-LiS}" = :LiS])
-    AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_package:-LiS}" = :LfS])
+    AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_lis_includes:-no}" != :no])
+    AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_lfs_includes:-no}" != :no])
 ])# _LINUX_STREAMS_SETUP
 # =========================================================================
 

@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/12/29 08:55:29 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/12/31 04:01:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/29 08:55:29 $ by $Author: brian $
+# Last Modified $Date: 2004/12/31 04:01:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -131,12 +131,36 @@ srpm:
 #   to build rpms for the current target, we also build any defined
 #   AM_RPMTARGETS
 #
-rpms: srpm
+am-rpms: srpm
 	@targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
 	for t in $$targets ; do \
 		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t --" SRPMS/$(tardir).src.rpm; \
 		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --target $$t -- SRPMS/$(tardir).src.rpm; \
 	done
+
+lis-rpms:
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' am-rpms
+
+lfs-rpms:
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' am-rpms
+
+AM_RPMSMAKETARGETS =
+
+if WITH_LIS
+AM_RPMSMAKETARGETS += lis-rpms
+endif
+if WITH_LFS
+AM_RPMSMAKETARGETS += lfs-rpms
+endif
+if WITH_LIS
+else
+if WITH_LFS
+else
+AM_RPMSMAKETARGETS += am-rpms
+endif
+endif
+
+rpms: $(AM_RPMSMAKETARGETS)
 
 sign:
 	@archives="$(RPM_ARCHIVES)" ; \
@@ -167,7 +191,7 @@ sign:
 #   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
 #   --without popt syntax, so we have to expand them to --defines.
 #
-rebuild:
+am-rebuild:
 	@if test ! -f SRPMS/$(tardir).src.rpm ; then \
 		$(MAKE) $(AM_MAKEFLAGS) srpm ; \
 	fi ; \
@@ -184,6 +208,30 @@ rebuild:
 		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define \"_without_modules --without-modules\" --define \"_kversion $$k\" --target $$t -- SRPMS/$(tardir).src.rpm" ; \
 		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define "_without_modules --without-modules" --define "_kversion $$k" --target $$t -- SRPMS/$(tardir).src.rpm ; \
 	done
+
+lis-rebuild:
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' am-rebuild
+
+lfs-rebuild:
+	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' am-rebuild
+
+AM_REBUILDMAKETARGETS =
+
+if WITH_LIS
+AM_REBUILDMAKETARGETS += lis-rebuild
+endif
+if WITH_LFS
+AM_REBUILDMAKETARGETS += lfs-rebuild
+endif
+if WITH_LIS
+else
+if WITH_LFS
+else
+AM_REBUILDMAKETARGETS += am-rebuild
+endif
+endif
+
+rebuild: $(AM_REBUILDMAKETARGETS)
 
 resign: sign
 	@list="`find RPMS -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm'`" ; \
@@ -268,6 +316,6 @@ distclean-sign:
 
 DISTCLEAN_LOCAL += distclean-lsms distclean-archives distclean-rpms distclean-sign
 
-.PHONY: srpm rpms sign rebuild resign distclean-lsms distclean-archives distclean-rpms distclean-sign
+.PHONY: srpm rpms am-rpms lis-rpms lfs-rpms sign rebuild am-rebuild lis-rebuild lfs-rebuild resign distclean-lsms distclean-archives distclean-rpms distclean-sign
 
 # vim: ft=automake

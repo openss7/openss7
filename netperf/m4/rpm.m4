@@ -468,7 +468,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
                 AC_MSG_CHECKING([for rpm argument '$arg'])
                 if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
                     nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
-                    arg="--define '${nam} ${arg}'"
+                    arg="--define \"${nam} ${arg}\""
                     PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
                     AC_MSG_RESULT([yes])
                 else
@@ -486,7 +486,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
         AC_MSG_CHECKING([for rpm argument '$arg'])
         if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
             nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
-            arg="--define '${nam} ${arg}'"
+            arg="--define \"${nam} ${arg}\""
             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }$arg"
             AC_MSG_RESULT([yes])
         else
