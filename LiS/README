@@ -14,11 +14,11 @@ INSTALLATION
 We recommend unpacking the tar archive in the directory /usr/src.
 While logged in as root, use the following command:
 
-    tar xzf LiS-2.7.tgz
+    tar xzf LiS-2.x.tgz  ('x' is the specific LiS version extension)
 
 It will make a subdirectory named LiS-2.7
 
-Change directories to LiS-2.7 and type in "make".  The LiS package
+Change directories to LiS-2.x and type in "make".  The LiS package
 will install itself.  After the make completes, type in "make install"
 and LiS will install all the modules and utility programs in the
 proper places on your system.
@@ -26,14 +26,14 @@ proper places on your system.
 
 KERNEL COMPATIBILITY
 
-This version of LiS will install in any kernel version from 2.0.24 
-onward (through about 2.3.35).  We do not recommend using kernels
-older than 2.0.36, and prefer kernels in the 2.2.x series.
+This version of LiS will install in any kernel version from 2.2.x
+onward (through 2.4.x).  LiS no longer supports 2.0.x kernels.
+It is best when used with 2.4.x kernels.
 
-The LiS software resides outside the kernel source tree.  It can be configured
-to run as a loadable module or be linked directly in with the kernel.
+The LiS software resides outside the kernel source tree.  It runs
+as a loadable module.
 
-SPARC PORT OF LIS
+SPARC PORT OF LIS (Could be obsolete)
 
 This is compliments of Jürgen Magin <juergen.magin@octogon.de>
 
