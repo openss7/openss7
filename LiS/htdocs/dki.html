@@ -291,7 +291,7 @@ function MM_swapImage() { //v3.0
         </tr>
         <tr> 
           <td> 
-            <blockquote>
+            <blockquote> 
               <p><a href="#majorminordev_t">Major/Minor Device Numbering (dev_t)</a></p>
             </blockquote>
           </td>
@@ -345,6 +345,13 @@ function MM_swapImage() { //v3.0
             <blockquote> 
               <p><a href="#LiS PCI Configuration Space Routines">LiS PCI Configuration 
                 Space Routines</a></p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote> 
+              <p><a href="#LiSPCIDMARoutines">LiS PCI DMA Routines</a></p>
             </blockquote>
           </td>
         </tr>
@@ -1175,7 +1182,70 @@ ptr = lis_free_mem(ptr) ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
            <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned long&nbsp;&nbsp;&nbsp; val);</tt> </pre>
         <pre><tt>void&nbsp;&nbsp;&nbsp;lis_pci_set_master(lis_pci_dev_t *dev);</tt> </pre>
       </blockquote>
-      <a href="#Contents">Back to Contents</a> 
+      <p><a href="#Contents">Back to Contents</a> </p>
+      <hr size=1 width="60%">
+      <h3><a name="LiSPCIDMARoutines"></a>LiS PCI DMA Routines</h3>
+      <p>These routines are used to allocate memory suitable for use with PCI 
+        bus master DMA devices or to map page-allocated memory for those purposes.</p>
+      <p>In order to understand what these routines do, please refer to the file 
+        /usr/src/linux/Documentation/DMA-mapping.txt in a fairly recent 2.4 kernel 
+        source tree. The kernel provides more functionality than is provided in 
+        LiS, so there are more routines documented there than are found in this 
+        interface.</p>
+      <p>You can use these routines in 2.2 kernels but the functions perfomed 
+        are simply approximations of the 2.4 semantics and may not work in all 
+        cases.</p>
+      <p>Note that the LiS routines have simplified the kernel interface involving 
+        &quot;DMA handles&quot; in such a way as to make these constructs easier 
+        to use and less error prone.</p>
+      <p>The following routines are used to allocate memory which the hardware 
+        keeps consistent between CPU access and DMA access.</p>
+      <pre><font face="Courier New, Courier, mono"><tt>void *lis_pci_alloc_consistent(lis_pci_dev_t  *dev, 
+                               size_t          size, 
+                               lis_dma_addr_t *dma_handle);</tt></font></pre>
+      <pre><tt><font face="Courier New, Courier, mono">void *lis_pci_free_consistent(lis_dma_addr_t *dma_handle);
+</font></tt></pre>
+      <p>The following routines are used to obtain a DMA address from a returned 
+        DMA handle. You need to know whether or not your hardware environment 
+        is using 32-bit or 64-bit DMA addresses.<tt><font face="Courier New, Courier, mono"> 
+        <br>
+        </font></tt></p>
+      <pre><tt><font face="Courier New, Courier, mono">u32 lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle);</font></tt></pre>
+      <pre><tt><font face="Courier New, Courier, mono">u64 lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle); </font></tt></pre>
+      <p>The following routines are usd to map page-allocated memory for DMA purposes. 
+        The direction indicator of LIS_SYNC_FOR_CPU means that you intend to use 
+        the memory for DMA transfers into memory. The direction indicator of LIS_SYNC_FOR_DMA 
+        means that you intend to use the memory for DMA transfers out of memory. 
+        If the DMA operation goes both ways then use LIS_SYNC_FOR_BOTH.</p>
+      <pre>void lis_pci_map_single(lis_pci_dev_t  *dev,
+                        void           *ptr,
+                        size_t          size,
+                        lis_dma_addr_t *dma_handle,
+                        int             direction);
+
+void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle);
+</pre>
+      <p>The direction indicators are as follows:</p>
+      <blockquote>
+        <pre>LIS_SYNC_FOR_CPU
+LIS_SYNC_FOR_DMA
+LIS_SYNC_FOR_BOTH
+</pre>
+      </blockquote>
+      <p>With mapped memory, i.e., non-consistent memory, you need to synchronize 
+        the memory whenever the CPU writes into it and the DMA needs to read it, 
+        or when the DMA has written into it and the CPU needs to read it. The 
+        following routine is used for that purpose.</p>
+      <pre>void lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
+                             size_t              size,
+                             int                 direction);
+</pre>
+      <p>The following routines can be used at driver initialization time to discover 
+        and control the addressing boundary restrictions of a device.</p>
+      <pre>int lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
+int lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
+</pre>
+      <p><a href="#Contents">Back to Contents</a> </p>
       <p> 
       <hr width="100%">
       <h2> <a name="LiS Atomic Functions"></a>LiS Atomic Functions</h2>
@@ -1297,13 +1367,13 @@ ptr = lis_free_mem(ptr) ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
         immune from changes in kernel version regarding the size of a spin lock 
         since your driver only has to store a pointer to the allocated lock. The 
         allocation and deallocation routines are as follows. 
-      <blockquote>
+      <blockquote> 
         <pre>lis_spin_lock_t *lis_spin_lock_alloc(const char *name);
 lis_spin_lock_t *lis_spin_lock_free(lis_spin_lock_t *lock, const char *name);</pre>
       </blockquote>
       <p>The allocation function returns a pointer to the spin lock, or NULL if 
         the memory could not be allocated. The free function returns a NULL pointer 
-        for the convenience of the caller.
+        for the convenience of the caller. 
       <p>For further information on spin locks, see the section on <a href="#Debugging_Spin_Locks">debugging 
         spin locks</a>. 
       <p><a href="#Contents">Back to Contents</a> 
@@ -1579,18 +1649,18 @@ lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
         routine will deallocate it for you. The advantage of using this routine 
         is that your STREAMS driver only has to have a pointer to the semaphore, 
         not a semaphore structure itself. This adds an extra level of protection 
-        of your driver from kernel version considerations.
+        of your driver from kernel version considerations. 
       <p>You can use the semaphore value to manage a pool of resources by initializing 
         a semaphore to the number of items in the resource and having a driver 
         open routine perform a "down" operation on the semaphore.&nbsp; This causes 
-        the open operations to be queued until the resource is available.
+        the open operations to be queued until the resource is available. 
       <p>LiS semaphores should be explicitly destroyed when they are no longer 
         needed, typically from your STREAMS driver close routine. This operation 
-        is accomplished via the following routine.
+        is accomplished via the following routine. 
       <blockquote> 
         <pre><tt>lis_semaphore_t&nbsp;&nbsp;&nbsp;&nbsp; *lis_sem_destroy(lis_semaphore_t *,int);</tt></pre>
       </blockquote>
-      <p>This routine returns a NULL pointer for the convenience of the caller.
+      <p>This routine returns a NULL pointer for the convenience of the caller. 
       <p>For further information on semaphores, see the section on <a href="#Debugging_Semaphores">debugging 
         semaphores</a>. 
       <p><a href="#Contents">Back to Contents</a> 
