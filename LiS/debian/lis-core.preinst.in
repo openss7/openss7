@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.preinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: lis-core.preinst.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/26 22:21:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 22:21:06 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -116,19 +116,19 @@ function upgrade_core_preinst() {
     return 0
 }
 
-#
-# Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to install their
-# modconf files in a similar fashion to ours and in a similar location.  It even uses the prune
-# modules line that we normally use, however, on Debian their modules.conf edits will be lost
-# because the modules.conf file is generated from the modules/conf.d directory.
-#
-function preinst_modconf() {
-    for ext in LiS lis STREAMS streams ; do
-	eval "d=\"$kmoduledir\""
-	test -f $d/modules.$ext || continue
-	rm -f -- $d/modules.$ext
-    done
-}
+##
+## Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to install their
+## modconf files in a similar fashion to ours and in a similar location.  It even uses the prune
+## modules line that we normally use, however, on Debian their modules.conf edits will be lost
+## because the modules.conf file is generated from the modules/conf.d directory.
+##
+#function preinst_modconf() {
+#    for ext in LiS lis STREAMS streams ; do
+#	eval "d=\"$kmoduledir\""
+#	test -f $d/modules.$ext || continue
+#	rm -f -- $d/modules.$ext
+#    done
+#}
 
 subpkg=core
 
@@ -137,6 +137,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: lis-core.preinst.in,v $
+# Revision 1.1.2.3  2005/03/26 22:21:06  brian
+# - working up debian maint scripts
+#
 # Revision 1.1.2.2  2005/03/26 03:11:22  brian
 # - Reworking maintainance scripts
 #

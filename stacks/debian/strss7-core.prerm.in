@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/24 02:09:14 $
+# @(#) $RCSfile: strss7-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 22:35:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,24 +48,10 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:09:14 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 22:35:29 $ by $Author: brian $
 #
 # =============================================================================
-set -e
-
-rootdir=@rootdir@
-kversion=@kversion@
-kmoduledir=@kmoduledir@
-sysconfdir=@sysconfdir@
-STRCONF_CONFMOD=@STRCONF_CONFMOD@
-STRCONF_MAJBASE=@STRCONF_MAJBASE@
-KERNEL_PRELOADS="specfs streams streams-sth streams-clone"
-KERNEL_MODULES="specfs streams streams-clone streams-fifo streams-sad streams-nsdev streams-echo streams-nuls streams-pipe streams-log streams-sth streams-pipemod streams-connld streams-sc streams-svr4compat streams-suncompat streams-uw7compat streams-osfcompat streams-aixcompat streams-hpuxcompat streams-liscompat"
-KERNEL_MODCONF=@STRCONF_CONFMOD@
-KERNEL_SUBDIR=@PACKAGE_LCNAME@
-KMODCONF_EXT=@PACKAGE_LCNAME@
-base=@PACKAGE_LCNAME@
-tmppath=/var/tmp
+@mscript_header@
 
 #
 # If we are upgrading and the upgrade is for the running kernel, or we are installing new on the
@@ -110,63 +96,56 @@ function prerm_oldmods() {
 }
 
 function prerm_preload() {
-    @WITH_KO_MODULES_FALSE@preloads=modules
-    @WITH_KO_MODULES_TRUE@preloads=modprobe.preload
-    if [ -f $sysconfdir/$preloads ] ; then
-	cp -f $sysconfdir/$preloads $tmppath/$preloads.new.$$
+    prel_old=$sysconfdir/$preload
+    if [ -f $prel_old ] ; then
+	prel_new=$tmppath/$preload.new.$$
+	prel_tmp=$tmppath/$preload.tmp.$$
+	cp -f $prel_old $prel_new
 	for m in $KERNEL_PRELOADS ; do
-	    sed -e "/^$m\>/d" $tmppath/$preloads.new.$$ > $tmppath/$preloads.tmp.$$
-	    mv -f $tmppath/$preloads.tmp.$$ $tmppath/$preloads.new.$$
+	    sed -e "/^$m\>/d" $prel_new > $prel_tmp
+	    mv -f $prel_tmp $prel_new
 	done
-	chmod --reference=$sysconfdir/$preloads $tmppath/$preloads.new.$$
-	cp -fb --suffix=.rpmsave $tmppath/$preloads.new.$$ $sysconfdir/$preloads
-	rm -f $tmppath/$preloads.new.$$
+	chmod --reference=$prel_old $prel_new
+	cp -fb --suffix=.dpkg-save $prel_new $prel_old
+	rm -f $prel_new
     fi
 }
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+function remove_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-case "$1" in
+function conflict_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-    (remove)
-	# remove-prerm remove
-	# conflict-prerm remove in-favour package new-version
-	prerm_modules
-	prerm_preload
-	;;
+function upgrade_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-    (upgrade)
-	# old-prerm upgrade new-version
-	prerm_modules
-	prerm_preload
-	;;
+function failed_upgrade_core_prerm() { :
+    prerm_oldmods
+    prerm_preload
+}
 
-    (failed-upgrade)
-	# old-prerm upgrade new-version ... failed
-	# new-prerm failed-upgrade old-version
-	prerm_oldmods
-	prerm_preload
-	;;
+function deconfigure_core_prerm() { :
+    prerm_modules
+    prerm_preload
+}
 
-    (deconfigure)
-	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
-	prerm_modules
-	prerm_preload
-	;;
+subpkg=core
 
-esac
-
-# =============================================================================
-#
-# The following are debhelper script fragments under separate copyright:
-#
-# =============================================================================
-
-#DEBHELPER#
+@mscript_prerm@
 
 # =============================================================================
 #
 # $Log: strss7-core.prerm.in,v $
+# Revision 0.9.2.2  2005/03/26 22:35:29  brian
+# - working up debian maint scripts
+#
 # Revision 0.9.2.1  2005/03/24 02:09:14  brian
 # - improved debian build
 #

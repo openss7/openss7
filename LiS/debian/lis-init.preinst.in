@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-init.preinst.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/03/26 03:11:22 $
+# @(#) $RCSfile: lis-init.preinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/03/26 22:21:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:22 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 22:21:06 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -174,7 +174,7 @@ function install_init_preinst() { :
             rm -f -- $conf_new
         fi
     done
-    eval "prel_old=\"@preload@\""
+    prel_old="@preload@"
     if [ -f $prel_old ] ; then
         prel_tmp=$tmppath/modprobe.preload.tmp.$$
         prel_new=$tmppath/modprobe.preload.new.$$
@@ -215,6 +215,9 @@ subpkg=init
 # =============================================================================
 #
 # $Log: lis-init.preinst.in,v $
+# Revision 1.1.2.2  2005/03/26 22:21:06  brian
+# - working up debian maint scripts
+#
 # Revision 1.1.2.1  2005/03/26 03:11:22  brian
 # - Reworking maintainance scripts
 #

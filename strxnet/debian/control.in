@@ -11,8 +11,9 @@ Package: @PACKAGE_LCNAME@-lis-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@
-Conflicts: streams-core, @PACKAGE_LCNAME@-streams-core
+Provides: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
+Conflicts: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
+Replaces: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@), lis-core-@kversion@-@krelease@ (>= 2.18.1-0)
@@ -27,8 +28,9 @@ Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@
-Conflicts: lis-core, @PACKAGE_LCNAME@-lis-core
+Provides: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
+Conflicts: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
+Replaces: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Depends: kernel-image-@kversion@ (= @krelease@), streams-core-@kversion@-@krelease@ (>= 0.7a.3-0),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@), streams-core-@kversion@-@krelease@ (>= 0.7a.3-0)
@@ -44,7 +46,8 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lib
-Conflicts: @PACKAGE_LCNAME@-streams-lib
+Conflicts: @PACKAGE_LCNAME@-lib
+Replaces: @PACKAGE_LCNAME@-lib
 Depends: ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Shared libraries for @PACKAGE_TITLE@ for LiS
@@ -56,7 +59,8 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lib
-Conflicts: @PACKAGE_LCNAME@-lis-lib
+Conflicts: @PACKAGE_LCNAME@-lib
+Replaces: @PACKAGE_LCNAME@-lib
 Depends: ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Shared libraries for @PACKAGE_TITLE@ for STREAMS
@@ -68,8 +72,9 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-util
-Conflicts: @PACKAGE_LCNAME@-streams-util
-Depends: lis-lib (>= 2.18.1-0), @PACKAGE_LCNAME@-lis-lib (= @VERSION@-@PACKAGE_DEBRELEASE@), ${shlibs:Depends}
+Conflicts: @PACKAGE_LCNAME@-util
+Replaces: @PACKAGE_LCNAME@-util
+Depends: lis-lib (>= 2.18.1-0), ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and LiS
  Adminstration and configuration test utilities and commands for
@@ -80,8 +85,9 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-util
-Conflicts: @PACKAGE_LCNAME@-lis-util
-Depends: streams-lib (>= 0.7a.3-0), @PACKAGE_LCNAME@-streams-lib (= @VERSION@-@PACKAGE_DEBRELEASE@), ${shlibs:Depends}
+Conflicts: @PACKAGE_LCNAME@-util
+Replaces: @PACKAGE_LCNAME@-util
+Depends: streams-lib (>= 0.7a.3-0), ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@ and STREAMS
  Adminstration and configuration test utilities and commands for

@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_header.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 12:55:38 $
+# @(#) $RCSfile: mscript_header.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/26 22:21:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 12:55:38 $ by $Author: brian $
+## Last Modified $Date: 2005/03/26 22:21:32 $ by $Author: brian $
 ##
 ## =============================================================================
 set -e
@@ -80,11 +80,10 @@ ksubdir=@PACKAGE_LCNAME@
 STRCONF_CONFMOD=@STRCONF_CONFMOD@
 STRCONF_MAJBASE=@STRCONF_MAJBASE@
 
-libraries=
 modules="streams-ip_strm_mod streams-ip_to_dlpi streams-ldl"
-#
-# FIXME: need streams tools not just LiS tools
-#
+preloads=
+libraries=
 tools="strxns_mknod ldlconfig ldltest"
 infofiles="$name"
+initfiles=
 

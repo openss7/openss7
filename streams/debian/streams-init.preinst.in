@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-init.preinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/26 03:11:24 $
+# @(#) $RCSfile: streams-init.preinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 22:21:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 03:11:24 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 22:21:19 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -62,7 +62,7 @@ function remove_depmods() {
     [ $# -gt 0 ] || return 0
     echo "$*"
     for t in $@ ; do
-        remove_depmods eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`"
+	remove_depmods eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`"
     done
 }
 
@@ -78,122 +78,124 @@ function install_init_preinst() { :
     # postrm actions.
     #
     for dir in /lib/modules/2.[456]\.* /lib/modules/preferred /lib/modules/default /lib/modules/boot ; do
-        [ -d $dir ] || continue
-        strm_mods="`find $dir \
-            \( -name 'streams.o'     -o -name 'streams.ko'    \
-            -o -name 'streams.o.gz'  -o -name 'streams.ko.gz' \) 2>/dev/null`"
-        [ -n "$strm_mods" ] || continue
-        if [ -f $dir/modules.dep ] ; then
-            #
-            # First we can build a dependency tree from every dependency expression that can be
-            # found in the modules.dep file.
-            #
-            dep=
-            while read line ; do
-                case $line in
-                    *\) line="`echo $line | sed -e 's|\\$||'`"
-                        dep="${dep:+$dep }$line"
-                        continue
-                        ;;
-                    *)  dep="${dep:+$dep }$line"
-                        ;;
-                esac
-                set dummy $dep
-                if [ "${2+set}" = "set" ] ; then
-                    t=$1
-                    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                    shift
-                    for p in $@ ; do
-                        prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                        eval "$prereq=\"\${$prereq:+\$$prereq }$t"
-                        eval "$target=\"\${$target:+\$$target }$p"
-                    done
-                fi
-                dep=
-                continue
-            done < $dir/modules.dep
-            #
-            # All modules that ultimately depends on the "streams" module must go.
-            #
-            strm_deps="`remove_depmods $prereq_streams`"
-        else
-            #
-            # We cannot figure out a dependency tree, so just remove any module that even starts
-            # with "streams"
-            #
-            strm_deps="`find $dir \
-                \( -name 'streams-*.o'     -o -name 'streams-*.ko'    \
-                -o -name 'streams-*.o.gz'  -o -name 'streams-*.ko.gz' \) 2>/dev/null`"
-        fi
-        if [ -n "$strm_mods" -o -n "$strm_deps" ] ; then
-            rm -f -- $strm_mods $strm_deps
-        fi
-        conf_old=$sysconfdir/modules.conf
-        if [ -f $conf_old ] ; then
-            conf_new=$tmppath/modules.conf.new.$$
-            conf_tmp=$tmppath/modules.conf.tmp.$$
-            cp -f -- $conf_old $conf_new
-            #
-            # Unfortunately davem starting copying our install procedure, so we need to root out all
-            # kinds of things from the modules.conf file, all prune statements, any if include
-            # statements
-            #
-            for suffix in $name LiS lis streams STREAMS strxns strxnet strinet strsctp strss7 ; do
-                #
-                # This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
-                #
-                if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
-                    sed -e '/BEGIN '$suffix'/,/END '$suffix'/d'              $conf_new > $conf_tmp
-                    mv -f -- $conf_tmp $conf_new
-                fi
-                #
-                # This is my newer technique with a prune and an if statement in the modules.conf
-                # file that was also used by davem in LiS-2.18.0.
-                #
-                if [ -f $dir/modules.$suffix ] ; then
-                    rm -f -- $dir/modules.$suffix
-                    sed -e '/^prune[[:space:]].*modules.'$suffix'/d'         $conf_new > $conf_tmp
-                    sed -e '/^if[[:space:]].*modules.'$suffix'/,/^endif/d'   $conf_tmp > $conf_new
-                    sed -e '/^include[[:space:]].*modules.'$suffix'/d'       $conf_new > $conf_tmp
-                    mv -f -- $conf_tmp $conf_new
-                fi
-                #
-                # This is my newer latest technique with only an include statement in modules.conf
-                # and a modules.conf fragment in the debian update-modules directory _modutildir
-                # that includes the prune and if statements.  That works both for RH-style and
-                # Debian-style modules.conf.
-                #
-                if [ -f $modutildir/$suffix ] ; then
-                    rm -f -- $modutildir/$suffix
-                    sed -e '/^include[[:space:]].*'"$modutildir"'\/'$suffix'/d' $conf_new > $conf_tmp
-                    mv -f -- $conf_tmp $conf_new
-                fi
-            done
-            chmod --reference=$conf_old -- $conf_new
-            cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-            rm -f -- $conf_new
-        fi
+	[ -d $dir ] || continue
+	strm_mods="`find $dir \
+	    \( -name 'streams.o'     -o -name 'streams.ko'    \
+	    -o -name 'streams.o.gz'  -o -name 'streams.ko.gz' \) 2>/dev/null`"
+	[ -n "$strm_mods" ] || continue
+	if [ -f $dir/modules.dep ] ; then
+	    #
+	    # First we can build a dependency tree from every dependency expression that can be
+	    # found in the modules.dep file.
+	    #
+	    dep=
+	    while read line ; do
+		case $line in
+		    *\) line="`echo $line | sed -e 's|\\$||'`"
+			dep="${dep:+$dep }$line"
+			continue
+			;;
+		    *)  dep="${dep:+$dep }$line"
+			;;
+		esac
+		set dummy $dep
+		if [ "${2+set}" = "set" ] ; then
+		    t=$1
+		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+		    shift
+		    for p in $@ ; do
+			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+			eval "$prereq=\"\${$prereq:+\$$prereq }$t"
+			eval "$target=\"\${$target:+\$$target }$p"
+		    done
+		fi
+		dep=
+		continue
+	    done < $dir/modules.dep
+	    #
+	    # All modules that ultimately depends on the "streams" module must go.
+	    #
+	    strm_deps="`remove_depmods $prereq_streams`"
+	else
+	    #
+	    # We cannot figure out a dependency tree, so just remove any module that even starts
+	    # with "streams"
+	    #
+	    strm_deps="`find $dir \
+		\( -name 'streams-*.o'     -o -name 'streams-*.ko'    \
+		-o -name 'streams-*.o.gz'  -o -name 'streams-*.ko.gz' \) 2>/dev/null`"
+	fi
+	if [ -n "$strm_mods" -o -n "$strm_deps" ] ; then
+	    rm -f -- $strm_mods $strm_deps
+	fi
+	conf_old=$sysconfdir/modules.conf
+	if [ -f $conf_old ] ; then
+	    conf_new=$tmppath/modules.conf.new.$$
+	    conf_tmp=$tmppath/modules.conf.tmp.$$
+	    cp -f -- $conf_old $conf_new
+	    #
+	    # Unfortunately davem starting copying our install procedure, so we need to root out all
+	    # kinds of things from the modules.conf file, all prune statements, any if include
+	    # statements
+	    #
+	    for suffix in $name LiS lis streams STREAMS strxns strxnet strinet strsctp strss7 ; do
+		#
+		# This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
+		#
+		if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
+		    sed -e '/BEGIN '$suffix'/,/END '$suffix'/d'              $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+		#
+		# This is my newer technique with a prune and an if statement in the modules.conf
+		# file that was also used by davem in LiS-2.18.0.
+		#
+		if [ -f $dir/modules.$suffix ] ; then
+		    rm -f -- $dir/modules.$suffix
+		    sed -e '/^prune[[:space:]].*modules.'$suffix'/d'         $conf_new > $conf_tmp
+		    sed -e '/^if[[:space:]].*modules.'$suffix'/,/^endif/d'   $conf_tmp > $conf_new
+		    sed -e '/^include[[:space:]].*modules.'$suffix'/d'       $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+	    done
+	    for suffix in $name LiS lis streams STREAMS strxns strxnet strinet strsctp strss7 ; do
+		#
+		# This is my newer latest technique with only an include statement in modules.conf
+		# and a modules.conf fragment in the debian update-modules directory _modutildir
+		# that includes the prune and if statements.  That works both for RH-style and
+		# Debian-style modules.conf.
+		#
+		if [ -f $modutildir/$suffix ] ; then
+		    rm -f -- $modutildir/$suffix
+		    sed -e '/^include[[:space:]].*'"$modutildir"'\/'$suffix'/d' $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+	    done
+	    chmod --reference=$conf_old -- $conf_new
+	    cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
+	    rm -f -- $conf_new
+	fi
     done
-    eval "prel_old=\"@preload@\""
+    prel_old="@preload@"
     if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        sed -e '/^[[:space:]]*streams/d' $prel_new > $prel_tmp
-        mv -f -- $prel_tmp $prel_new
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
+	prel_tmp=$tmppath/modprobe.preload.tmp.$$
+	prel_new=$tmppath/modprobe.preload.new.$$
+	cp -f -- $prel_old $prel_new
+	sed -e '/^[[:space:]]*streams/d' $prel_new > $prel_tmp
+	mv -f -- $prel_tmp $prel_new
+	chmod --reference=$prel_old -- $prel_new
+	cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+	rm -f -- $prel_new
     fi
     #
     # Fresh install, go looking for non-rpm initscripts and remove them.
     #
     if [ -x /sbin/chkconfig ] ; then
-        for i in specfs streams strerr strace strms_up strms_dn ; do
-            if [ -f $initrddir/$i ] ; then
-                /sbin/chkconfig --del $i || :
-            fi
-        done
+	for i in specfs streams strerr strace strms_up strms_dn ; do
+	    if [ -f $initrddir/$i ] ; then
+		/sbin/chkconfig --del $i || :
+	    fi
+	done
     fi
 }
 
@@ -215,6 +217,9 @@ subpkg=init
 # =============================================================================
 #
 # $Log: streams-init.preinst.in,v $
+# Revision 0.9.2.2  2005/03/26 22:21:19  brian
+# - working up debian maint scripts
+#
 # Revision 0.9.2.1  2005/03/26 03:11:24  brian
 # - Reworking maintainance scripts
 #

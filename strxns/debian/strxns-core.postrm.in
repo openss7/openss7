@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 12:55:38 $
+# @(#) $RCSfile: strxns-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/26 22:21:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,23 +48,46 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 12:55:38 $ by $Author: brian $
+# Last Modified $Date: 2005/03/26 22:21:32 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
 
+function postrm_modconf() {
+    local last_core_package='yes'
+    for file in /lib/modules/*/modules.$base ; do
+	if [ -f $file ] ; then
+	    last_core_package='no'
+	    break
+	fi
+    done
+    if [ ":$last_core_package" = ":no" ] ; then
+	return 0
+    fi
+    conf_old=$sysconfdir/modules.conf
+    if grep -q 'include[^#]*'$modutildir/$base $conf_old ; then
+	conf_tmp=$tmppath/modules.conf.tmp.$$
+	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
+	chmod --reference=$conf_old $conf_tmp
+	cp -fb --suffix=.old $conf_tmp $conf_old
+	rm -f $conf_tmp
+    fi
+    rm -f -- "$modutildir/$base"
+}
+
 function postrm_preload() {
-    @WITH_KO_MODULES_FALSE@preloads=modules
-    @WITH_KO_MODULES_TRUE@preloads=modprobe.preload
-    if [ -f $sysconfdir/$preloads ] ; then
-	cp -f $sysconfdir/$preloads $tmppath/$preloads.new.$$
+    prel_old=$sysconfdir/$preload
+    if [ -f $prel_old ] ; then
+	prel_new=$tmppath/$preload.new.$$
+	prel_tmp=$tmppath/$preload.tmp.$$
+	cp -f -- $prel_old $prel_new
 	for m in $KERNEL_PRELOADS ; do
-	    sed -e "/^$m\>/d" $tmppath/$preloads.new.$$ > $tmppath/$preloads.tmp.$$
-	    mv -f $tmppath/$preloads.tmp.$$ $tmppath/$preloads.new.$$
+	    sed -e "/^$m\>/d" $prel_new > $prel_tmp
+	    mv -f -- $prel_new $prel_tmp
 	done
-	chmod --reference=$sysconfdir/$preloads $tmppath/$preloads.new.$$
-	cp -fb --suffix=.rpmsave $tmppath/$preloads.new.$$ $sysconfdir/$preloads
-	rm -f $tmppath/$preloads.new.$$
+	chmod --reference=$prel_old -- $prel_new
+	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
+	rm -f -- $prel_new
     fi
 }
 
@@ -79,63 +102,34 @@ function postrm_depmod() {
     fi
 }
 
-echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+function remove_core_postrm() { :
+    @WITH_KO_MODULES_FALSE@postrm_modconf
+    postrm_preload
+    postrm_depmod
+}
 
-case "$1" in
+function purge_core_postrm() { :
+}
 
-    (remove)
-	# remove-postrm remove
-	@WITH_KO_MODULES_FALSE@postrm_modconf
-	postrm_preload
-	postrm_depmod
-	;;
+function upgrade_core_postrm() { :
+}
 
-    (purge)
-	# remove-postrm purge
-	:
-	;;
+function failed_upgrade_core_postrm() { :
+}
 
-    (upgrade)
-	# old-postrm upgrade new-version
-	:
-	;;
+function disappear_core_postrm() { :
+}
 
-    (failed-upgrade)
-	# old-postrm upgrade new-version ... failed
-	# new-postrm failed-upgrade old-version
-	:
-	;;
+subpkg=core
 
-    (abort-install)
-	# new-preinst install [old-version] ... failed
-	# new-postrm abort-install [old-version]
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
-	;;
-
-    (abort-upgrade)
-	# new-preinst upgrade old-version ... failed
-	# new-postrm abort-upgrade old-version
-	echo "@PACKAGE@-core(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." > &2
-	;;
-
-    (disappear)
-	# disappear-postrm disappear overwriter overwriter-version
-	:
-	;;
-
-esac
-
-# =============================================================================
-#
-# The following are debhelper script fragments under separate copyright:
-#
-# =============================================================================
-
-#DEBHELPER#
+@mscript_postrm@
 
 # =============================================================================
 #
 # $Log: strxns-core.postrm.in,v $
+# Revision 0.9.2.3  2005/03/26 22:21:32  brian
+# - working up debian maint scripts
+#
 # Revision 0.9.2.2  2005/03/26 12:55:38  brian
 # - working up debian scripts
 #

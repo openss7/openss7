@@ -2,7 +2,7 @@
 ## @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: mscript_header.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/26 03:11:23 $
+# @(#) $RCSfile: mscript_header.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/26 22:21:12 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/26 03:11:23 $ by $Author: brian $
+## Last Modified $Date: 2005/03/26 22:21:12 $ by $Author: brian $
 ##
 ## =============================================================================
 set -e
@@ -70,8 +70,8 @@ initrddir="@initrddir@"
 modutildir="@modutildir@"
 
 KERNEL_MODCONF=@STRCONF_CONFMOD@
-KERNEL_MODULES="streams streams-clone streams-pipemod streams-sad streams-liskmod streams-connld streams-mtdrv"
-KERNEL_PRELOADS="streams streams-liskmod streams-mtdrv streams-pipemod"
+KERNEL_MODULES="sctp"
+KERNEL_PRELOADS="sctp"
 KERNEL_SUBDIR=@PACKAGE_LCNAME@
 KMODCONF_EXT=@PACKAGE_LCNAME@
 kmodext=@PACKAGE_LCNAME@
@@ -80,10 +80,10 @@ ksubdir=@PACKAGE_LCNAME@
 STRCONF_CONFMOD=@STRCONF_CONFMOD@
 STRCONF_MAJBASE=@STRCONF_MAJBASE@
 
+modules="sctp"
+preloads="sctp"
 libraries="LiS pLiS"
-modules="streams streams-pipemod streams-sad streams-liskmod streams-connld streams-mtdrv"
-#
-# FIXME: need streams tools not just LiS tools
-#
-tools="ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2"
+tools="test-sctpc test-sctp-dc test-sctp-ds test-sctps test-sctp-sc test-sctp-ss test-sctp-tc test-sctp-ts test-tcpc test-tcp-dc test-tcp-ds test-tcps test-tcp-tc test-tcp-ts test-udpc test-udps"
+infofiles="$name"
+initfiles=
 

@@ -11,8 +11,9 @@ Package: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: STREAMS-core, @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
-Conflicts: lis-core, lis-core-@kversion@, lis-core-@kversion@-@krelease@
+Provides: STREAMS-core-@kversion@-@krelease@
+Conflicts: STREAMS-core-@kversion@-@krelease@
+Replaces: STREAMS-core-@kversion@-@krelease@
 Depends: kernel-image-@kversion@ (= @krelease@),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: kernel-image-@kversion@ (= @krelease@)
@@ -40,7 +41,8 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: STREAMS-lib
-Conflicts: lis-lib
+Conflicts: STREAMS-lib
+Replaces: STREAMS-lib
 Depends: ${shlibs:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Shared libraries for @PACKAGE_TITLE@
@@ -52,7 +54,8 @@ Architecture: any
 Section: base
 Priority: optional
 Provides: STREAMS-util
-Conflicts: lis-util
+Conflicts: STREAMS-util
+Replaces: STREAMS-util
 Depends: @PACKAGE_LCNAME@-lib (= @VERSION@-@PACKAGE_DEBRELEASE@), ${shlib:Depends}
 Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Description: Utitlity and test programs for @PACKAGE_TITLE@
@@ -76,7 +79,8 @@ Architecture: all
 Section: base
 Priority: optional
 Provides: STREAMS-init
-Conflicts: lis-init
+Conflicts: STREAMS-init
+Replaces: STREAMS-init
 Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
 Description: Init scripts and config files for @PACKAGE_TITLE@
  SysV init scripts and configuration files for @PACKAGE_TITLE@
@@ -87,7 +91,8 @@ Architecture: all
 Section: base
 Priority: optional
 Provides: STREAMS-dev
-Conflicts: lis-dev
+Conflicts: STREAMS-dev
+Replaces: STREAMS-dev
 Description: Character devices for @PACKAGE_TITLE@
  Character special device definitions necessary to run applications programs and
  utilities developed for @PACKAGE_TITLE@.
@@ -97,7 +102,8 @@ Architecture: all
 Section: doc
 Priority: optional
 Provides: STREAMS-doc
-Conflicts: lis-doc
+Conflicts: STREAMS-doc
+Replaces: STREAMS-doc
 Description: Documentation and man pages for @PACKAGE_TITLE@
  Pdf and html documentation for installation and the development of
  @PACKAGE_TITLE@ applications, modules and drivers.
