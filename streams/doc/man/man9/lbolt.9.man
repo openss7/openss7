@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lbolt.9.man,v 0.9.2.5 2004/04/21 17:51:11 brian Exp $
+.\" @(#) $Id: lbolt.9.man,v 0.9.2.6 2004/05/11 02:20:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/21 17:51:11 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/11 02:20:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LBOLT 9 "$Date: 2004/04/21 17:51:11 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
+.TH LBOLT 9 "$Date: 2004/05/11 02:20:43 $" "$Name:  $" "Linux Fast-STREAMS SVR4 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -87,9 +87,21 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-.BI "extern time_t lbolt;"
-.HP
 .BI "extern clock_t lbolt;"
+.PP
+.B #define _OSF_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "extern time_t lbolt;"
+.PP
+.B #define _SUX_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/ddi.h>
 .HP
 .BI "time_t lbolt(" void );
 .\"
@@ -120,7 +132,7 @@ is always successful.
 .SH CONTEXT
 .PP
 .B lbolt
-can be called from any context.
+can be referenced (called) from any context.
 .\"
 .\"
 .SH MP-STREAMS
@@ -132,6 +144,8 @@ is MP-safe.
 .SH NOTICES
 .PP
 .B lbolt
+of type
+.B clock_t
 is a
 .IR "SVR 4.2" -specific
 function:
@@ -141,6 +155,30 @@ must be defined before including DDI/DKI include files to expose this symbol.
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SVR4
 defined.
+.PP
+.B lbolt
+of type
+.B time_t
+is an
+.IR OSF/1 \(rg-specific
+function:
+.B _OSF_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_OSF
+.PP
+.BR lbolt ()
+of type
+.B time_t
+is a
+.IR SUPER-UX \(rg-specific
+function:
+.B _SUX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUX
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -185,12 +223,14 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 Accessing
 .B lbolt
-directly has many issues.  We recommend the
+directly has many compatibility and portability issues and should not be used
+directly by portable
+.I STREAMS
+drivers and modules.
+The more common
 .I SVR 4.2
 .BR drv_getparm (9)
-function or accessing
-.BR jiffies (9)
-directly.
+function should be used in its stead.
 .IP \(em
 .IR Solaris \(rg
 uses the SUNDDI function
@@ -241,6 +281,8 @@ to be
 .BR clock_t .
 .IP \(em
 .B lbolt
+of type
+.B clock_t
 is provided for source level compatibility with
 .IR "SVR 4.2"
 for the purpose of porting
@@ -257,6 +299,8 @@ differ from that of
 binaries are incompatible.
 .IP \(em
 .B lbolt
+of type
+.B clock_t
 only provides functionality comparable to
 .IR "SVR 4.2"
 for use by
@@ -264,6 +308,70 @@ for use by
 drivers and modules.
 Any and all functionality provided by
 .B lbolt
+of type
+.B clock_t
+in support of
+.RI non- STREAMS
+devices are not supported.
+.IP \(em
+.B lbolt
+of type
+.B time_t
+is provided for source level compatibility with
+.IR OSF/1 \(rg
+for the purpose of porting
+.IR OSF/1 \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR OSF/1 \(rg
+binaries are incompatible.
+.IP \(em
+.B lbolt
+of type
+.B time_t
+only provides functionality comparable to
+.IR OSF/1 \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.B lbolt
+of type
+.B time_t
+in support of
+.RI non- STREAMS
+devices are not supported.
+.IP \(em
+.BR lbolt ()
+is provided for source level compatibility with
+.IR SUPER-UX \(rg
+for the purpose of porting
+.IR SUPER-UX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR SUPER-UX \(rg
+binaries are incompatible.
+.IP \(em
+.BR lbolt ()
+only provides functionality comparable to
+.IR SUPER-UX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR lbolt ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -273,11 +381,6 @@ does not document this kernel variable.
 .IP \(em
 .I LiS
 does not provide this kernel variable.
-.IP \(em
-New
-.B Linux
-programs should use
-.BR jiffies (9).
 .PP
 See
 .BR STREAMS (9)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.5 2004/04/21 17:51:10 brian Exp $
+.\" @(#) $Id: ddi_create_minor_node.9.man,v 0.9.2.6 2004/05/11 02:20:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/21 17:51:10 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/11 02:20:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/04/21 17:51:10 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DDI_CREATE_MINOR_NODE 9 "$Date: 2004/05/11 02:20:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -108,7 +108,7 @@ The name to assign to the minor device node.
 .I type
 The type of device.  This can be one of the following:
 .RS
-.TP
+.TP \w'S_IFCHR\(em'u
 .B S_IFCHR
 Character minor device.
 .TP
@@ -133,7 +133,7 @@ devices are supported by
 lfs
 .]
 .RS
-.TP
+.TP \w'S_IFCHR\(em'u
 .B DDI_PSEUDO
 A pseudo device.
 .RE
@@ -197,11 +197,23 @@ structures for this device node.
 .SH CONTEXT
 .PP
 .BR ddi_create_minor_node ()
-can only be called from User Context.
+can only be called from User Context and the user requires appropriate
+privileve to create the necessary filesystem entries.  This normally means for
+.B Linux Fast-STREAMS
+drivers and modules that the call will succeed when called from within n
+module's
+.BR _init (9)
+procedure, but will normally fail when calle from within a module's
+.BR qopen (9)
+or
+.BR qclose (9)
+procedures.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR ddi_create_minor_node ()
+is MP-safe when call from an apporpriate context.
 .\"
 .\"
 .SH NOTICES
@@ -216,6 +228,20 @@ must be defined before including DDI/DKI include files to expose this symbol.
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SUN
 defined.
+.PP
+.BR ddi_create_minor_node ()
+is a
+.IR Solaris \(rg-specific
+function and should not be used by portable
+.I STREAMS
+driver and modules.  However, there is no common replacement for this
+function.
+.I LiS
+provides the
+.BR lis_mknod (9)
+wrapper for an in-kernel system call to
+.BR mknod (2),
+but that approach is equally non-portable.
 .PP
 .BR ddi_create_minor_node ()
 creates a minor node in the shadow special device file system.  Symbolic links
@@ -251,24 +277,6 @@ has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
-.PP
-.BR ddi_create_minor_node ()
-is provided for source level compatibility with
-.IR Solaris \(rg
-for the purpose of porting
-.IR Solaris \(rg
-drivers to
-.BR Linux .
-Because the
-.B dev_info
-structure for
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-differs from that of
-.IR Solaris \(rg,
-binaries are incompatible.
 .PP
 .BR ddi_create_minor_node ()
 is compatible with
@@ -317,11 +325,39 @@ device nodes are referenced from within the
 directory as usual.
 .IP \(em
 .BR ddi_create_minor_node ()
-does not support any of the clustering considerations provided by
-.IR Solaris \(rg.
-.IP ""
-.B Linux
-is alway treated as a non-clustered system.
+is a
+.IR Solaris \(rg-specific
+function that should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR ddi_create_minor_node ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.IP \(em
+.BR ddi_create_minor_node ()
+only provides functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR ddi_create_minor_node ()
+in support of
+.RI non- STREAMS
+devices are not supported.
 .PP
 See
 .BR STREAMS (9)

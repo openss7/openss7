@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xxxuw7.9.man,v 0.9.2.3 2004/04/19 12:03:45 brian Exp $
+.\" @(#) $Id: xxxuw7.9.man,v 0.9.2.4 2004/05/11 02:20:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 12:03:45 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/11 02:20:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH XXX 9 "$Date: 2004/04/19 12:03:45 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
+.TH XXX 9 "$Date: 2004/05/11 02:20:44 $" "$Name:  $" "Linux Fast-STREAMS UW7 DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -153,6 +153,7 @@ defined.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR uw7compat (9),
 .BR STREAMS (9).
 .\"
 .\"
@@ -174,6 +175,15 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IP \(em
 .IP \(em
+.BR xxx ()
+is an
+.IR UnixWare \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR zzz ()
+function should be used in its stead.
 .IP \(em
 .BR xxx ()
 is provided for source level compatibility with
@@ -204,6 +214,8 @@ in support of
 devices are not supported.
 .PP
 See
+.BR uw7compat (9)
+and
 .BR STREAMS (9)
 for more compatibility information.
 .\"

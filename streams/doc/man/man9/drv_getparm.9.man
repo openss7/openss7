@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.8 2004/04/19 12:03:41 brian Exp $
+.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.9 2004/05/11 02:20:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/19 12:03:41 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/11 02:20:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DRV_GETPARM 9 "$Date: 2004/04/19 12:03:41 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH DRV_GETPARM 9 "$Date: 2004/05/11 02:20:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -100,7 +100,6 @@ is a pointer to the area to place the returned value.
 .PP
 .BR drv_getparm ()
 returns the parameter requested by
-.PP
 .I parm
 into the area pointed to by
 .IR valp .
@@ -141,6 +140,18 @@ Returns the OEM provider string, in this case
 .BR drv_getparm ()
 provides an architecture independent means of accessing these system
 values.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR drv_getparm ()
+is a machine, architecture and implementation independent way of obtaining
+access to kernel variables and structures.
+For portable
+.I STREAMS
+drivers and modules,
+.BR drv_getparm ()
+is the preferred method of accessing these primary variables.
 .\"
 .\"
 .SH CONTEXT
@@ -216,28 +227,32 @@ is source-level compatible with
 usldk
 .]
 and implementations based on
-.I "SVR 4.2"
+.IR "SVR 4.2" ,
 .[
 svr42
 .]
-including
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR "SVR 4.2 MP" ,
 .IR HP-UX \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg
 and
 .IR UXP/V \(rg,
-with the following exceptions:
-.IP \(em \w'\(em\(em'u
+document
+.BR drv_getparm ().
+.IP \(em
 .IR Solaris \(rg
-provides these functions but there are replaced with sunddi functions.
-The functions
+provides
+.BR drv_getparm (),
+but it is also replaced with 
+.IR Solaris \(rg
+DDI functions
 .BR ddi_get_lbolt (9),
 .BR ddi_get_pid (9),
 .BR ddi_get_time (9),
 and
-.BR ddi_get_cred (9)
-are provided for source level compatibility with
-.IR Solaris \(rg.
+.BR ddi_get_cred (9).
 .IP \(em
 .BR drv_getparm ()
 provides parameters
@@ -252,14 +267,18 @@ however,
 .BR drv_getparm ()
 always returns minus one (1) for these symbols.
 .IP \(em
-Binary compatibility is not guaranteed.
-.IP \(em
 .IR AIX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg
 and
 .IR SUPER-UX \(rg
-do not document this function.
+do not document
+.BR drv_getparm ().
+.IP \(em
+.I LiS
+does not provide
+.BR drv_getparm ().
+.IP \(em
+Binary compatibility is not guaranteed.
 .PP
 See
 .BR STREAMS (9)

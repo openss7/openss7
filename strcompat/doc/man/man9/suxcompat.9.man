@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_next_ptr.9.man,v 0.9.2.10 2004/05/11 02:20:43 brian Exp $
+.\" @(#) $Id: suxcompat.9.man,v 0.9 2004/05/11 02:20:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/11 02:20:43 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/11 02:20:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,178 +71,110 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MI_NEXT_PTR 9 "$Date: 2004/05/11 02:20:43 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH XXX 9 "$Date: 2004/05/11 02:20:44 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B mi_next_ptr
-\- \fISTREAMS\fP minor device list traversal
+.B xxx
+\-
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _AIX_SOURCE
-.br
-.B #include <sys/stream.h>
+.B #define _SUX_SOURCE
 .br
 .B #include <sys/ddi.h>
+.br
+.B #include <sys/suxddi.h>
 .HP
-caddr_t \fBmi_next_ptr\fR(caddr_t \fIstate\fR);
+int \fBxxx\fR(int \fIyyy\fR);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I state
-The state pointer to the current list item.
+.I yyy
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR mi_next_ptr ()
-is used to traverse module's list of open streams.  The
-.I state
-argument specifies the address of a per-instance list item, and the return
-value indicates the address of the next item.  The first time
-.BR mi_next_ptr ()
-is called, the
-.I state
-argument should be initialized with the value of the static pointer that was
-passed to the
-.BR mi_open_comm (9)
-utility.
-Subsequent calls to
-.BR mi_next_ptr ()
-should pass the address which was returned by the previous call, until a
-.B NULL
-address is returned, indicating that the end of the list has been reached.
+.BR xxx ()
+.\"
+.\"
+.SH USAGE
+.PP
 .\"
 .\"
 .SH RETURN
 .PP
 When
-.BR mi_next_ptr ()
-succeeds, it returns a pointer to the next state;
+.BR xxx ()
+succeeds, it returns 
+.BR DDI_SUCCESS ;
 when it fails, it returns
-.BR NULL .
+.BR DDI_FAILURE .
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR mi_next_ptr ()
-fails when it hits the end of the list.
+.BR xxx ()
+fails when 
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR mi_next_ptr ()
-can be called from any context.
+.BR xxx ()
+can be called from
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-.BR mi_next_ptr ()
-is not safe from deletions.  A separate mutex or semaphore is required by the
-caller to protect the list from deletions between calls to
-.BR mi_next_ptr ().
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR mi_next_ptr ()
+.BR xxx ()
 is a
-.IR AIX \(rg-specific
+.IR SUPER-UX \(rg-specific
 function:
-.B _AIX_SOURCE
+.B _SUX_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_AIX
+.B CONFIG_STREAMS_COMPAT_SUX
 defined.
 .\"
 .\"
-.SH EXAMPLE
+.SH IMPLEMENTATION
 .PP
-Following is an example of an MP-safe use of
-.BR mi_next_ptr ():
-.PP
-.nf
-\fC\s-1
-static caddr_t xxx_state = NULL;
-
-spin_lock_t xxx_state_spinlock = SPIN_LOCK_UNLOCKED;
-
-int
-list_some_data(void)
-{
-    caddr_t item;
-    unsigned long flags;
-
-    spin_lock_irqsave(&xxx_state_spinlock, &flags);
-
-    for (item = xxx_state; item; item = mi_next_ptr(item)) {
-	xxx_priv_t *priv = (xxx_priv_t *) item;
-	cmd_err(CE_NOTE, "some_data is %ld", priv->some_data);
-    }
-
-    spin_unlock_irqrestore(&xxx_state_spinlock, &flags);
-
-    return (0);
-}
-\s+1\fP
-.fi
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR mi_prev_ptr (9),
-.BR mi_open_comm (9),
-.BR mi_close_comm (9),
-.BR ddi_get_soft_state (9),
 .BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
-.BR mi_next_ptr ()
+.BR xxx ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR mi_next_ptr ()
+.BR xxx ()
 is compatible with
-.IR AIX \(rg
+.IR SUPER-UX \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR mi_next_ptr ()
-is an
-.IR AIX \(rg-specific
-function and it should not be used by portable
-.I STREAMS
-drivers and modules.
 .IP \(em
-Use of
-.BR mi_next_ptr ()
-requires different include file sequences on
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-than on
-.IR AIX \(rg.
-.IR AIX \(rg
-includes
-.B <pse/mi.h>
-and
-.B <sys/stream.h>
-only.
 .IP \(em
-.BR mi_next_ptr ()
+.IP \(em
+.BR xxx ()
 is provided for source level compatibility with
-.IR AIX \(rg
+.IR SUPER-UX \(rg
 for the purpose of porting
-.IR AIX \(rg
+.IR SUPER-UX \(rg
 drivers to
 .BR Linux .
 Because internal structures and definitions for
@@ -251,43 +183,43 @@ Because internal structures and definitions for
 lfs
 .]
 differ from that of
-.IR AIX \(rg,
+.IR SUPER-UX \(rg,
 binaries are incompatible.
 .IP \(em
-.BR mi_next_ptr ()
+.BR xxx ()
 only provides functionality comparable to
-.IR AIX \(rg
+.IR SUPER-UX \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR mi_next_ptr ()
+.BR xxx ()
 in support of
 .RI non- STREAMS
 devices are not supported.
 .PP
 See
-.BR aixcompat (9)
-for additional compatibility information.
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR AIX \(rg
+.IR SUPER-UX \(rg
 DDI documentation.
 .[
-aixdoc
+suxdoc
 .]
 .[
-aixspg
+suxspg
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
-.BR mi_next_ptr ()
+.BR xxx ()
 first appeared in
-.IR AIX \(rg.
+.IR SUPER-UX \(rg.
 .\"
 .\"
 .[

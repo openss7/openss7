@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: hpuxddi.h,v 0.9.2.5 2004/05/09 07:22:32 brian Exp $
+ @(#) $Id: hpuxddi.h,v 0.9.2.6 2004/05/11 02:20:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/09 07:22:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/11 02:20:45 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUXDDI_H__
 #define __SYS_HPUXDDI_H__
 
-#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/09 07:22:32 $"
+#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/11 02:20:45 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -70,7 +70,12 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
 
-extern spinlock_t *get_sleep_lock(void);
+#ifndef _SVR4_SOURCE
+#define _SVR4_SOURCE
+#endif
+#include <sys/svr4ddi.h>	/* for lock_t */
+
+extern lock_t *get_sleep_lock(caddr_t event);
 
 typedef void (*streams_put_t) (void *, mblk_t *);
 /**
