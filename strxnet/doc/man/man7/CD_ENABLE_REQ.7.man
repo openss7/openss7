@@ -1,0 +1,273 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: CD_ENABLE_REQ.7.man,v 0.9.2.1 2004/04/05 23:29:02 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/05 23:29:02 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CD_ENABLE_REQ 7 "$Date: 2004/04/05 23:29:02 $" "$Name:  $" "Linux STREAMS"
+.SH NAME
+.B CD_ENABLE_REQ
+\- prepare a device
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    cd_ulong cd_primitive;
+    cd_ulong cd_dial_type;
+    cd_ulong cd_dial_length;
+    cd_ulong cd_dial_offset;
+} cd_enable_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+This user originated primitive requests that the communications device be
+prepared for service and enabled.
+.PP
+A CDI stream that is in the
+.B CD_DISABLED
+state is not yet ready for transmission.  Before the stream can be used for
+transmission, it must be successfully enabled with the
+.B CD_ENABLE_REQ
+primitive.
+Successful processing of the
+.B CD_ENABLE_REQ
+primitive moves the stream to the
+.B CD_ENABLED
+state.
+.PP
+If the communications device returns the
+.B CD_CANDIAL
+flag in the
+.I cd_features
+field of the
+.BR CD_INFO_ACK (7),
+the device is capable of dialing and a dial string can be provided,
+specified by the
+.I cd_dial_length
+and
+.I cd_dial_offset
+fields.
+The specification of the dial string is provider- and device-specific.
+.PP
+In the
+.B CD_ENABLED
+state, the stream is able to transmit but have not yet necessarily been
+allowed for input.
+If the stream returns
+.B CD_AUTOALLOW
+in the
+.I cd_features
+field of the
+.BR CD_INFO_ACK (7),
+the communications device will be allowed for both transmission and reception
+upon successful completion of the
+.BR CD_ENABLE_REQ ;
+however, if the
+.B CD_AUTOALOW
+flag is not returned, the CD user must first call
+.BR CD_ALLOW_INPUT_REQ (7)
+before reception can begin.
+.SS Parameters
+This primitive contains the following parameters:
+.TP
+.I cd_primitive
+Specifies the primitives type.
+.TP
+.I cd_dial_type
+Specifies the type of the provided dial string.  The type can be set to a
+provider- or device-specific type, or can be set as follows:
+.RS
+.TP
+.B CD_NODIAL
+Specifies that there is no dial string associated with the
+.BR CD_ENABLE_REQ .
+.RE
+.TP
+.I cd_dial_length
+Specifies the length of the dial string.
+Specification of dial strings is only allowed when the provider returns
+.B CD_CANDIAL
+in the
+.I cd_features
+field of the
+.CD CD_INFO_ACK (7).
+When no dial string is specified by
+the user,
+or
+.I cd_dial_type
+is set to
+.BR CD_NODIAL ,
+this field is set to zero (0).
+.TP
+.I cd_dial_offset
+Specifies the offset of the dial string from the beginning of the
+.B M_PROTO
+message block.
+When
+.I cd_dial_length
+is zero (0), this field is ignored.
+.SS State
+This primitive is valid in state
+.BR CD_DISABLED .
+The new state is
+.B CD_ENABLED
+for streams that do not return
+.B CD_AUTOALLOW
+in the
+.I cd_features
+field of the
+.BR CD_INFO_ACK (7),
+or the new state is
+.B CD_INPUT_ALLOWED
+for those streams that do return
+.B CD_AUTOALLOW
+in the
+.I cd_features
+field of the
+.BR CD_INFO_ACK (7).
+.SH RESPONSE
+This primitive requires that the provider acknowledge the receipt of the
+primitive as follows:
+.PP
+.B "Successful:"
+Upon success, the provider confirms that the device is enabled with the
+.BR CD_ENABLE_CON (7)
+primitive.
+.PP
+.B "Unsuccessful (non-fatal errors):"
+Upon failure, the provider acknowledges the receipt of the primitive with the
+.BR CD_ERROR_ACK (7)
+primitive indicating the error.
+.SH ERRORS
+.B "Non-Fatal Errors:"
+appropriate non-fatal errors are as follows:
+.\".TP
+.\".RB [ CD_BADADDRESS ]
+.\"Address was invalid.
+.\".TP
+.\".RB [ CD_BADADDRTYPE ]
+.\"Invalid address type.
+.TP
+.RB [ CD_BADDIAL ]
+Dial information was invalid.
+.TP
+.RB [ CD_BADDIALTYPE ]
+Invalid dial information type.
+.\".TP
+.\".RB [ CD_BADDISPOSAL ]
+.\"Invalid disposal parameter.
+.\".TP
+.\".RB [ CD_BADFRAME ]
+.\"Defective SDU received.
+.\".TP
+.\".RB [ CD_BADPPA ]
+.\"Invalid PPA identifier.
+.TP
+.RB [ CD_BADPRIM ]
+Unrecognized primitive.
+.\".TP
+.\".RB [ CD_DISC ]
+.\"Disconnected.
+.TP
+.RB [ CD_EVENT ]
+Protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+Device has become unusable.
+.TP
+.RB [ CD_INITFAILED ]
+Line initialization failed.
+.TP
+.RB [ CD_NOTSUPP ]
+Primitive not supported by this device.
+.TP
+.RB [ CD_OUTSTATE ]
+Primitive was issued from an invalid state.
+.TP
+.RB [ CD_PROTOSHORT ]
+M_PROTO block too short.
+.\".TP
+.\".RB [ CD_READTIMEOUT ]
+.\"Read request timed out before data arrived.
+.TP
+.RB [ CD_SYSERR ]
+UNIX system error.
+.\".TP
+.\".RB [ CD_WRITEFAIL ]
+.\"Unitdata request failed.
+.SH FILES
+<sys/cdi.h>
+.SH "SEE ALSO"
+.BR CD_ATTACH_REQ (7),
+.BR CD_DISABLE_REQ (7),
+.BR CD_ENABLE_CON (7),
+.BR CD_ERROR_ACK (7).
+.SH HISTORY
+.PP
+The Communications Device Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to CDI with Gcom extensions.
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.TI

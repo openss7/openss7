@@ -1,7 +1,7 @@
 '\" rt
-.\" -*- nroff -*-
+.\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: T_CAPABILITY_ACK.7.man,v 0.9 2004/04/04 00:12:51 brian Exp $
+.\" @(#) $Id: T_CAPABILITY_ACK.7.man,v 0.9.2.2 2004/04/05 23:29:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2004/04/04 00:12:51 $ by $Author: brian $
+.\" Modified $Date: 2004/04/05 23:29:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -49,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH T_CAPABILITY_ACK 7 "$Date: 2004/04/04 00:12:51 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.TH T_CAPABILITY_ACK 7 "$Date: 2004/04/05 23:29:02 $" "$Name:  $" "Transport Provider Interface (TPI)"
 .SH NAME
 .B T_CAPABILITY_ACK
 \- protocol capability acknowledgment
@@ -165,25 +165,19 @@ Both connection-mode and connectionless-mode.
 Transport provider.
 .SH "SEE ALSO"
 .BR T_CAPABILITY_REQ (7).
-.SH VERSIONS
+.SH HISTORY
 .PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.br
 The Transport Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.br
+.SH CONFORMANCE
+.PP
 This interface conforms to TPI Version 2, Draft 2.
-.XX
 .[
 TPI Revision 2.0.0
 .]
+.XX
 .[
 magic
 .]

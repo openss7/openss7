@@ -1,0 +1,123 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: DL_DETACH_REQ.7.man,v 0.9.2.1 2004/04/05 23:29:02 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/05 23:29:02 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DL_DETACH_REQ 7 "$Date: 2004/04/05 23:29:02 $" "$Name:  $" "Linux STREAMS"
+.SH NAME
+.B DL_DETACH_REQ (dl_detach_req_t)
+\- for style 2 DLS providers, this requests the DLS provider detach a
+physical point of attachment (PPA) from a stream.
+.SH DESCRIPTION
+For style 2 DLS providers, this requests the DLS provider detach a
+physical point of attachment (PPA) from a stream.  The request may not be
+issued to a style 1 DLS provider; doing so may cause errors.
+.SH SYNOPSIS
+The message consists of one
+.B M_PROTO
+message block, which contains the following structure.
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    t_uscalar_t  dl_primitive;
+} dl_detach_req_t;
+\fR\s+1
+.fi
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_DETACH_REQ .
+.SH STATE
+The message is valid in state
+.BR DL_UNBOUND .
+.SH "NEW STATE"
+The resulting state is
+.BR DL_DETACH_PENDING .
+.SH RESPONSE
+If the detach request is successful,
+.BR DL_OK_ACK (7)
+is sent to the DLS user resulting in state
+.BR DL_UNATTACHED .
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting state is unchanged.
+.SH ERRORS
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in
+the
+.BR DL_ERROR_ACK (7).
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

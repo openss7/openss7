@@ -1,0 +1,1258 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: dlpi.7.man,v 0.9.2.1 2004/04/05 23:29:03 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/05 23:29:03 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DLPI 7 "$Date: 2004/04/05 23:29:03 $" "$Name:  $" "Linux STREAMS"
+.\"
+.\"
+.SH NAME
+.B DLPI
+\- Data Link Provider Interface
+.\"
+.\"
+.SH SYNOPSIS
+.B #include <sys/dlpi.h>
+.\"
+.\"
+.SH DESCRIPTION
+.\"
+.\"
+.\"
+.\"
+The data link layer (layer 2 in the OSI Reference Model) is responsible for
+the transmission and error-free delivery of bits of information over a physical
+communications medium.
+.\"
+.\"
+.PP
+The model of the data link layer is presented here to describe concepts that
+are used throughout the specification of
+.BR DLPI .
+It is described in terms of an
+interface architecture, as well as addressing concepts needed to identify
+different components of that architecture.  The description of the model
+assumes familiarity with the OSI Reference Model.
+.\"
+.\"
+.PP
+Each layer of the OSI Reference Model has two standards:
+.\"
+.\"
+.IP \(bu 3
+one that defines the services provided by the layer, and
+.\"
+.\"
+.IP \(bu 3
+one that defines the protocol through which layer services are provided.
+.\"
+.\"
+.PP
+.B DLPI
+is an implementation of the first type of standard.  It specifies an
+interface to the services of the data link layer.
+.\"
+.\"
+.PP
+The data link interface is the boundary between the network and data link
+layers of the OSI Reference Model.  The network layer entity is the user of
+the services of the data link interface (DLS user), and the data link layer
+entity is the provider of those services (DLS provider).  This interface
+consists of a set of primitives that provide access to the data link layer
+services, plus the rules for using those primitives (state transition rules).
+A data link interface service primitive might request a particular service or
+indicate a pending event.
+.\"
+.\"
+.PP
+To provide uniformity among the various UNIX system networking products, an
+effort is underway to develop service interfaces that map to the OSI Reference
+Model.  A set of kernel-level interfaces, based on the
+.IR STREAMS (4)
+development environment, constitute a major portion of this effort.  The
+service primitives that make up these interfaces are defined as
+.IR STREAMS (4)
+messages that are transferred between the user and provider of the service.
+.B DLPI
+is one such kernel-level interface, and is targeted for
+.IR STREAMS (4)
+protocol modules that either use or provide data link services.  In addition,
+user programs that wish to access a
+.IR STREAMS (4)-based
+data link provider directly may do so using the
+.BR putmsg(2) " and " getmsg (2)
+system calls.
+The DLS provider is configured as a
+.IR STREAMS (4)
+driver,and the DLS user accesses the provider using
+.BR open (2)
+to establish a stream to the DLS provider.  The stream acts as a communication
+endpoint between a DLS user and the DLS provider.  After the stream is
+created, the DLS user and DLS provider communicate via the messages presented
+later in this specification.
+.B DLPI
+is intended to free data link users from specific knowledge of the
+characteristics of the data link provider.  Specifically, the definition of
+.B DLPI
+hopes to achieve the goal of allowing a DLS user to be implemented independent
+of a specific communications medium.  Any data link provider (supporting any
+communications medium) that conforms to the
+.B DLPI
+specification may be substituted beneath the DLS user to provide the data link
+services.  Support of a new DLS provider should not require any changes to the
+implementation of the DLS user.
+.\"
+.\"
+.PP
+.\"
+.\"
+.SS "MODES OF COMMUNICATION"
+The data link provider interface supports three modes of communication:
+connection, connectionless and acknowledged connectionless.
+.\"
+.\"
+.PP
+The connection mode is circuit-oriented and enables data to be transferred
+over a pre-established connection in a sequenced manner.  Data may be lost or
+corrupted in this service mode, however, due to provider-initiated
+resynchronization or connection aborts.
+.\"
+.\"
+.PP
+The connectionless mode is message-oriented and supports data transfer in
+self-contained units with no logical relationship required between units.
+Because there is no acknowledgment of each data unit transmission, this
+service mode can be unreliable in the most general case.  However, a specific
+DLS provider can provide assurance that messages will not be lost, duplicated,
+or reordered.
+.\"
+.\"
+.PP
+The acknowledged connectionless mode provides the means by which a data link
+user can send data and request the return of data at the same time.  Although
+the exchange service is connectionless, in-sequence delivery is guaranteed for
+data sent by the initiating station.  The data unit transfer is
+point-to-point.
+.\"
+.\"
+.PP
+.B CONNECTION-MODE SERVICE
+.\"
+.\"
+.PP
+The connection-mode service is characterized by four phases of communication:
+local management,connection establishment, data transfer, and connection
+release.
+.\"
+.\"
+.TP
+.B Local Management
+This phase enables a DLS user to initialize a stream for use in communication
+and establish an identity with the DLS provider.
+.\"
+.\"
+.TP
+.B Connection Establishment
+This phase enables two DLS users to establish a data link connection between
+them to exchange data.  One user (the calling DLS user) initiates the
+connection establishment procedures, while another user (the called DLS user)
+waits for incoming connect requests.  The called DLS user is identified by an
+address associated with its stream (as will be discussed shortly).
+.sp
+A called DLS user may either accept or deny a request for a data link
+connection.  If the request is accepted, a connection is established between
+the DLS users and they enter the data transfer phase.  For both the calling
+and called DLS users, only one connection may be established per stream.
+Thus, the stream is the communication endpoint for a data link connection.
+The called DLS user may choose to accept a connection on the stream where it
+received the connect request, or it may open a new stream to the DLS provider
+and accept the connection on this new, responding stream.  By accepting the
+connection on a separate stream, the initial stream can be designated as a
+listening stream through which all connect requests will be processed.  As
+each request arrives, a new stream (communication endpoint) can be opened to
+handle the connection, enabling subsequent requests to be queued on a single
+stream until they can be processed.
+.\"
+.\"
+.TP
+.B Data Transfer
+In this phase, the DLS users are considered peers and may exchange data
+simultaneously in both directions over an established data link connection.
+Either DLS user may send data to its peer DLS user at any time.  Data sent by
+a DLS user is guaranteed to be delivered to the remote user in the order in
+which it was sent.
+.\"
+.\"
+.TP
+.B Connection Release
+This phase enables either the DLS user, or the DLS provider, to break an
+established connection.  The release procedure is considered abortive, so any
+data that has not reached the destination user when the connection is released
+may be discarded by the DLS provider.
+.\"
+.\"
+.PP
+.B CONNECTIONLESS-MODE SERVICE
+.\"
+.\"
+.PP
+The connectionless mode service does not use the connection establishment and
+release phases of the connection-mode service.  The local management phase is
+still required to initialize a stream.  Once initialized, however, the
+connectionless data transfer phase is immediately entered.  Because there is
+no established connection, however, the connectionless data transfer phase
+requires the DLS user to identify the destination of each data unit to be
+transferred.  The destination DLS user is identified by the address associated
+with that user (as will be discussed shortly).
+.\"
+.\"
+.PP
+Connectionless data transfer does not guarantee that data units will be
+delivered to the destination user in the order in which they were sent.
+Furthermore, it does not guarantee that a given data unit will reach the
+destination DLS user, although a given DLS provider may provide assurance that
+data will not be lost.
+.\"
+.\"
+.PP
+.B ACKNOWLEDGED CONNECTIONLESS-MODE SERVICE
+.\"
+.\"
+.PP
+The acknowledged connectionless mode service also does not use the connection
+establishment and release phases of the connection-mode service.  The local
+management phase is still required to initialize a stream.  Once initialized,
+the acknowledged connectionless data transfer phase is immediately entered.
+Acknowledged connectionless data transfer guarantees that data units will be
+delivered to the destination user in the order in which they were sent.  A
+data link user entity can send a data unit to the destination DLS User,
+request a previously prepared data unit from the destination DLS User, or
+exchange data units.
+.\"
+.\"
+.SS "DLPI ADDRESSING"
+Each user of
+.B DLPI
+must establish an identity to communicate with other data link users.  This
+identity consists of two pieces.  First, the DLS user must somehow identify
+the physical medium over which it will communicate.  This is particularly
+evident on systems that are attached to multiple physical media.  Second, the
+DLS user must register itself with the DLS provider so that the provider can
+deliver protocol data units destined for that user.
+.\"
+.\"
+.PP
+.B PHYSICAL ATTACHMENT IDENTIFICATION
+.\"
+.\"
+.PP
+The physical point of attachment (PPA) is the point at which a system attaches
+itself to a physical communications medium.  All communication on that
+physical medium funnels through the PPA.
+.\"
+.\"
+.PP
+On systems where a DLS provider supports more than one physical medium, the
+DLS user must identify which medium it will communicate through.  A PPA is
+identified by a unique PPA identifier.  For media that support physical layer
+multiplexing of multiple channels over a single physical medium (such as the B
+and D channels of ISDN), the PPA identifier must identify the specific channel
+over which communication will occur.
+.\"
+.\"
+.PP
+Two styles of DLS provider are defined by
+.BR DLPI ,
+distinguished by the way they enable a DLS user to choose a particular PPA.
+The style 1 provider assigns a PPA based on the major/minor device the DLS
+user opened.  One possible implementation of a style 1 driver would reserve a
+major device for each PPA the data link driver would support.  This would
+allow the
+.IR STREAMS (4)
+clone open feature to be used for each PPA configured.  This style of provider
+is appropriate when few PPAs will be supported.
+.\"
+.\"
+.PP
+If the number of PPAs a DLS provider will support is large, a style 2 provider
+implementation is more suitable.  The style 2 provider requires a DLS user to
+explicitly identify the desired PPA using a special attach service primitive.
+For a style 2 driver, the open(2) creates a stream between the DLS user and
+DLS provider, and the attach primitive then associates a particular PPA with
+that stream.  The format of the PPA identifier is specific to the DLS
+provider, and should be described in the provider-specific addendum
+documentation. 
+.B DLPI
+provides a mechanism to get and/or modify the physical address.  The
+primitives to handle these functions are described in Appendix A.  The
+physical address value can be modified in a post-attached state.  This would
+modify the value for all streams for that provider for a particular PPA.  The
+physical address cannot be modified if even a single stream for that PPA is in
+the bound state.
+.\"
+.\"
+.PP
+The DLS User uses the supported primitives
+.RB ( DL_ATTACH_REQ (7),
+.BR DL_BIND_REQ (7),
+.BR DL_ENABMULTI_REQ (7),
+.BR DL_PROMISCON_REQ (7))
+to define a set of enabled physical and SAP address components on a per Stream
+basis.  It is invalid for a DLS Provider to ever send upstream a data message
+for which the DLS User on that stream has not requested.  The burden is on the
+provider to enforce by any means that it chooses, the isolation of SAP and
+physical address space effects on a per-stream basis.
+.\"
+.\"
+.PP
+.B DATA LINK USER IDENTIFICATION
+.\"
+.\"
+.PP
+A data link user's identity is established by associating it with a data link
+service access point (DLSAP),which is the point through which the user will
+communicate with the data link provider.  A DLSAP is identified by a DLSAP
+address.  The DLSAP address identifies a particular data link service access
+point that is associated with a stream(communication endpoint).  A bind
+service primitive enables a DLS user to either choose a specific DLSAP by
+specifying its DLSAP address, or to determine the DLSAP associated with a
+stream by retrieving the bound DLSAP address.  This DLSAP address can then be
+used by other DLS users to access a specific DLS user.  The format of the
+DLSAP address is specific to the DLS provider, and should be described in the
+provider-specific addendum documentation.  However,
+.B DLPI
+provides a mechanism for decomposing the DLSAP address into component pieces.
+The
+.BR DL_INFO_ACK (7)
+primitive returns the length of the SAP component of the DLSAP address, along
+with the total length of the DLSAP address.  Certain DLS Providers require the
+capability of binding on multiple DLSAP addresses.  This can be achieved
+through subsequent binding of DLSAP addresses.
+.B DLPI
+supports peer and hierarchical binding of DLSAPs.  When the User requests peer
+addressing, the DLSAP specified in a subsequent bind may be used in lieu of
+the DLSAP bound in the
+.BR DL_BIND_REQ (7).
+This will allow for a choice to be made between a number of DLSAPs on a stream
+when determining traffic based on DLSAP values.  An example of this would be
+to specify various ether_type values as DLSAPs.  The
+.BR DL_BIND_REQ (7),
+for example, could be issued with ether_type value of IP, and a subsequent
+bind could be issued with ether type value of ARP.  The Provider may now
+multiplex off of the ether_type field and allow for either IP or ARP traffic
+to be sent up this stream.  When the DLS User requests hierarchical binding,
+the subsequent bind will specify a DLSAP that will be used in addition to the
+DLSAP bound using a
+.BR DL_BIND_REQ (7).
+This will allow additional information to be specified, that will be used in a
+header or used for de-multiplexing.  An example of this would be to use
+hierarchical bind to specify the OUI (Organizationally Unique Identifier) to
+be used by SNAP.
+.\"
+.\"
+.SS "THE CONNECTION MANAGEMENT STREAM"
+The earlier description of the connection-mode service assumed that a DLS user
+bound a DLSAP to the stream it would use to receive connect requests.  In some
+instances, however, it is expected that a given service may be accessed
+through any one of several DLSAPs.  To handle this scenario, a separate stream
+would be required for each possible destination DLSAP, regardless of whether
+any DLS user actually requested a connection to that DLSAP.  Obvious resource
+problems can result in this scenario.  To obviate the need for tying up system
+resources for all possible destination DLSAPs, a "connection management
+stream" utility is defined in
+.BR DLPI .
+A connection management stream is one that receives any connect requests that
+are not destined for currently bound DLSAPs capable of receiving connect
+indications.  With this mechanism, a special listener can handle incoming
+connect requests intended for a set of DLSAPs by opening a connection
+management stream to the DLS provider that will retrieve all connect requests
+arriving through a particular PPA.  In the model, then, there may be a
+connection management stream per PPA.
+.\"
+.\"
+.SS "DLPI SERVICES"
+The various features of the
+.B DLPI
+interface are defined in terms of the services provided by the DLS provider,
+and the individual primitives that may flow between the DLS user and DLS
+provider.
+.\"
+.\"
+.PP
+The data link provider interface supports three modes of service: connection,
+connectionless and acknowledged connectionless.  The connection mode is
+circuit-oriented and enables data to be transferred over an established
+connection in a sequenced manner.  The connectionless mode is message-oriented
+and supports data transfer in self-contained units with no logical
+relationship required between units.  The acknowledged connectionless mode is
+message-oriented and guarantees that data units will be delivered to the
+destination user in the order in which they were sent.  This specification
+also defines a set of local management functions that apply to all modes of
+service.  The XID and TEST services that are supported by
+.B DLPI
+are listed below.  The DLS User can issue an XID or TEST request to the DLS
+Provider.  The Provider will transmit an XID or TEST frame to the peer DLS
+Provider.  On receiving a response, the DLS Provider sends a confirmation
+primitive to the DLS User.  On receiving an XID or TEST frame from the peer
+DLS Provider, the local DLS Provider sends up an XID or TEST indication
+primitive to the DLS User.  The User must respond with an XID or TEST response
+frame to the Provider.
+.\"
+.\"
+.\"
+.\"
+.\"
+.SS "Local Management Services"
+.PP
+The local management services apply to the connection, connectionless and
+acknowledged connectionless modes of transmission.  These services, which fall
+outside the scope of standards specifications, define the method for
+initializing a stream that is connected to a DLS provider.  DLS provider
+information reporting services are also supported by the local management
+facilities.
+.PP
+.B Information Reporting Service
+.RS 4
+This service provides information about the
+.B DLPI
+stream to the DLS user.  The
+message
+.BR DL_INFO_REQ (7)
+requests the DLS provider to return operating information about the stream.
+The DLS provider returns the information in a
+.BR DL_INFO_ACK (7)
+message.
+.RE
+.PP
+.B Attach Service
+.RS 4
+The attach service assigns a physical point of attachment (PPA) to a stream.
+This service is required for style 2 DLS providers (see section 2.3.1,
+Physical Attachment Identification) to specify the physical medium over which
+communication will occur.  The DLS provider indicates success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+A PPA may be disassociated with a stream using the
+.BR DL_DETACH_REQ (7).
+.RE
+.PP
+.B Bind Service
+.RS 4
+The bind service associates a data link service access point (DLSAP) with a
+stream.  The DLSAP is identified by a DLSAP address. 
+.BR DL_BIND_REQ (7)
+requests that the DLS provider bind a DLSAP to a stream.  It also notifies the
+DLS provider to make the stream active with respect to the DLSAP for
+processing connectionless and acknowledged connectionless data transfer and
+connection establishment requests.  Protocol-specifications taken during
+activation should be described in DLS provider-specific addenda.  The DLS
+provider indicates success with a
+.BR DL_BIND_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+Certain DLS providers require the capability of binding on multiple DLSAP
+addresses. 
+.BR DL_SUBS_BIND_REQ (7)
+provides that added capability.  The DLS provider indicates success with a
+.BR DL_SUBS_BIND_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+.BR DL_UNBIND_REQ (7)
+requests the DLS provider to unbind all DLSAP(s) from a stream.  The
+.BR DL_UNBIND_REQ (7)
+also unbinds all the subsequently bound DLSAPs that have not been unbound.
+The DLS provider indicates success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+.BR DL_SUBS_UNBIND_REQ
+requests the DLS Provider to unbind the subsequently bound DLSAP.  The DLS
+Provider indicates success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+.BR DL_ENABMULTI_REQ
+requests the DLS Provider to enable specific multicast addresses on a per
+stream basis.  The Provider indicates success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+.BR DL_DISABMULTI_REQ
+requests the DLS Provider to disable specific multicast addresses on a per
+Stream basis.  The Provider indicates success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+.BR DL_PROMISCON_REQ
+requests the DLS Provider to enable promiscuous mode on a per Stream basis,
+either at the physical level or at the SAP level.  The Provider indicates
+success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.PP
+.BR DL_PROMISCOFF_REQ
+requests the DLS Provider to disable promiscuous mode on a per Stream
+basis,either at the physical level or at the SAP level.  The Provider
+indicates success with a
+.BR DL_OK_ACK (7);
+failure with a
+.BR DL_ERROR_ACK (7).
+.RE
+.SS "Connection-mode Services"
+.PP
+The connection-mode services enable a DLS user to establish a data link
+connection, transfer data over that connection, reset the link, and release
+the connection when the conversation has terminated.
+.PP
+.B Connection Establishment Service
+.RS 4
+The connection establishment service establishes a data link connection
+between a local DLS user and a remote DLS user for the purpose of sending
+data.  Only one data link connection is allowed on each stream.
+.PP
+.B Normal Connection Establishment
+.PP
+In the connection establishment model, the calling DLS user initiates
+connection establishment, while the called DLS user waits for incoming
+requests. 
+.BR DL_CONNECT_REQ (7)
+requests that the DLS provider establish a connection. 
+.BR DL_CONNECT_IND (7)
+informs the called DLS user of the request, which
+may be accepted using
+.BR DL_CONNECT_RES (7).
+.BR DL_CONNECT_CON (7)
+informs the calling DLS user that the connection has been established.
+.PP
+Once the connection is established, the DLS users may exchange user data using
+.BR DL_DATA_REQ (7)
+and
+.BR DL_DATA_IND (7).
+.PP
+The DLS user may accept an incoming connect request on either the stream where
+the connect indication arrived or an alternate, responding stream.  The
+responding stream is indicated by a token in the
+.BR DL_CONNECT_RES (7).
+This token is a value associated with the responding stream, and is obtained
+by issuing a
+.BR DL_TOKEN_REQ (7)
+on that stream.  The DLS provider responds to this request by generating a
+token for the stream and returning it to the DLS user in a
+.BR DL_TOKEN_ACK (7).
+.PP
+In the typical connection establishment scenario, the called DLS user
+processes one connect indication at a time, accepting the connection on
+another stream.  Once the user responds to the current connect indication, the
+next connect indication (if any) can be processed.
+.B DLPI
+also enables the called DLS user to multi-thread incoming connect indications.
+The user can receive multiple connect indications before responding to any of
+them.  This enables the DLS user to establish priority schemes on incoming
+connect requests.
+.PP
+.B Connection Establishment Rejections
+.PP
+In certain situations, the connection establishment request cannot be
+completed.  The following paragraphs describe the occasions under which
+.BR DL_DISCONNECT_REQ (7)
+and
+.BR DL_DISCONNECT_IND (7)
+primitives will flow during connection establishment, causing the connect
+request to be aborted.
+.PP
+Where the DLS provider rejects a connect request for lack of resources or
+other reason, the DLS provider sends
+.BR DL_DISCONNECT_IND (7)
+in response to
+.BR DL_CONNECT_REQ (7).
+.PP
+Where the calling DLS user chooses to abort a previous connection attempt, the
+DLS user issues
+.BR DL_DISCONNECT_REQ (7)
+at some point following a
+.BR DL_CONNECT_REQ (7).
+The resulting sequence of primitives depends on the relative timing of the
+primitives involved.
+.RE
+.PP
+.B Data Transfer Service
+.RS 4
+The connection-mode data transfer service provides for the exchange of user
+data in either direction or inboth directions simultaneously between DLS
+users.  Data is transmitted in logical groups called data link service data
+units (DLSDUs).  The DLS provider preserves both the sequence and boundaries
+of DLSDUs as they are transmitted.
+.PP
+Normal data transfer is neither acknowledged nor confirmed.  It is up to the
+DLS users, if they so choose,to implement a confirmation protocol.  Each
+.BR DL_DATA_REQ (7)
+primitive conveys a DLSDU from the local DLS user to the DLS provider.
+Similarly, each
+.BR DL_DATA_IND (7)
+primitive conveys a DLSDU from the DLS provider to the remote DLS user.
+.RE
+.PP
+.B Connection Release Service
+.RS 4
+The connection release service provides for the DLS users or the DLS provider
+to initiate the connection release.  Connection release is an abortive
+operation, and any data in transit (has not been delivered to the DLS user)
+may be discarded.
+.BR DL_DISCONNECT_REQ (7)
+requests that a connection be released.
+.BR DL_DISCONNECT_IND (7)
+informs the DLS user that a connection has been released.  Normally, one DLS
+user requests disconnection and the DLS provider issues an indication of the
+ensuing release to the other DLS user.
+.RE
+.PP
+.B Reset Service
+.RS 4
+The reset service may be used by the DLS user to resynchronize the use of a
+data link connection, or by the DLS provider to report detected loss of data
+unrecoverable within the data link service.
+.PP
+Invocation of the reset service will unblock the flow of DLSDUs if the data
+link connection is congested;DLSDUs may be discarded by the DLS provider.  The
+DLS user or users that did not invoke the reset will be notified that a reset
+has occurred.  A reset may require a recovery procedure to be performed by the
+DLS users.
+.PP
+The interaction between each DLS user and the DLS provider will be one of the
+following:
+.IP \(em 4
+a
+.BR DL_RESET_REQ (7)
+from the DLS user, followed by a
+.BR DL_RESET_CON (7)
+from the DLS
+provider;
+.IP \(em 4
+a
+.BR DL_RESET_IND (7)
+from the DLS provider, followed by a
+.BR DL_RESET_RES (7)
+from the
+DLS user.  The
+.BR DL_RESET_REQ (7)
+acts as a synchronization mark in the stream of
+DLSDUs that are transmitted by the issuing DLS user;
+.IP \(em 4
+the
+.BR DL_RESET_IND (7)
+acts as a synchronization mark in the stream of DLSDUs that are received by
+the peer DLS user.  Similarly, the
+.BR DL_RESET_RES (7)
+acts as a synchronization mark in the stream of DLSDUs that are transmitted by
+the responding DLS user; the
+.BR DL_RESET_CON (7)
+acts as a synchronization mark in the stream of DLSDUs that are received by
+the DLS user which originally issued the reset.
+.PP
+The resynchronizing properties of the reset service are that:
+.IP \(em 4
+No DLSDU transmitted by the DLS user before the synchronization mark in that
+transmitted stream will be delivered to the other DLS user after the
+synchronization mark in that received stream.
+.IP \(em 4
+The DLS provider will discard all DLSDUs submitted before the issuing of the
+.BR DL_RESET_REQ (7)
+that have not been delivered to the peer DLS user when the DLS provider issues
+the
+.BR DL_RESET_IND (7).
+.IP \(em 4
+The DLS provider will discard all DLSDUs submitted before the issuing of the
+.BR DL_RESET_RES (7)
+that have not been delivered to the initiator of the
+.BR DL_RESET_REQ (7)
+when the DLS provider issues the
+.BR DL_RESET_CON (7).
+.IP \(em 4
+No DLSDU transmitted by a DLS user after the synchronization mark in that
+transmitted stream will be delivered to the other DLS user before the
+synchronization mark in that received stream.
+.PP
+The complete message flow depends on the origin of the reset, which may be the
+DLS provider or either DLS user.
+.RE
+.SS "Connectionless-mode Services"
+The connectionless-mode services enable a DLS user to transfer units of data
+to peer DLS users without incurring the overhead of establishing and releasing
+a connection.  The connectionless service does not, however, guarantee
+reliable delivery of data units between peer DLS users (e.g. lack of flow
+control may cause buffer resource shortages that result in data being
+discarded).
+.PP
+Once a stream has been initialized via the local management services, it may
+be used to send and receive connectionless data units.
+.PP
+.B Connectionless Data Transfer Service
+.RS 4
+The connectionless data transfer service provides for the exchange of user
+data (DLSDUs) in either direction or in both directions simultaneously without
+having to establish a data link connection.  Data transfer is neither
+acknowledged nor confirmed, and there is no end-to-end flow control provided.
+As such, the connectionless data transfer service cannot guarantee reliable
+delivery of data.  However, a specific DLS provider can provide assurance that
+messages will not be lost, duplicated, or reordered. 
+.BR DL_UNITDATA_REQ (7)
+conveys one DLSDU to the DLS provider.
+.BR DL_UNITDATA_IND (7)
+conveys one DLSDU to the DLS user.
+.RE
+.PP
+.B QOS Management Service
+.RS 4
+The QOS (Quality of Service) management service enables a DLS user to specify
+the quality of service it can expect for each invocation of the connectionless
+data transfer service.  The
+.BR DL_UDQOS_REQ (7)
+directs the DLS provider to set the QOS parameters to the specified values.
+.RE
+.PP
+.B Error Reporting Service
+.RS 4
+The connectionless-mode error reporting service may be used to notify a DLS
+user that a previously sent data unit either produced an error or could not be
+delivered.  This service does not, however, guarantee that an error indication
+will be issued for every undeliverable data unit.
+.RE
+.PP
+.B XID and TEST Service
+.RS 4
+The XID and TEST service enables the DLS User to issue an XID or TEST request
+to the DLS Provider.  On receiving a response for the XID or TEST frame
+transmitted to the peer DLS Provider, the DLS Provider sends up an XID or TEST
+confirmation primitive to the DLS User.  On receiving an XID or TEST frame
+from the peer DLS Provider, the local DLS Provider sends up an XID or TEST
+indication respectively to the DLS User.  The DLS User must respond with an
+XID or TEST response primitive.  If the DLS User requested automatic handling
+of the XID or TEST response, at bind time, the DLS Provider will send up an
+error acknowledgment on receiving an XID or TEST request.  Also, no
+indications will be generated to the DLS User on receiving XID or TEST frames
+from the remote side.
+.RE
+.SS "Acknowledged Connectionless-mode Services"
+The acknowledged connectionless-mode services are designed for general use for
+the reliable transfer of informations between peer DLS Users.  These services
+are intended for applications that require acknowledgment of cross-LAN data
+unit transfer, but wish to avoid the complexity that is viewed as being
+associated with the connection-mode services.  Although the exchange service
+is connectionless, in sequence delivery is guaranteed for data sent by the
+initiating station.
+.PP
+.B Acknowledged Connectionless-mode Data Transfer Services
+.RS 4
+The acknowledged connectionless-mode data transfer services provide the means
+by which the DLS Users can exchange DLSDUs which are acknowledged at the LLC
+sublayer, without the establishment of a Data Link connection.  The services
+provide a means by which a local DLS User can send a data unit to the peer DLS
+User, request a previously prepared data unit, or exchange data units with the
+peer DLS User.
+.RE
+.PP
+.B QOS Management Service
+.RS 4
+The Quality of Service (QOS) management service enables a DLS User to specify
+the quality of service it can expect for each invocation of the acknowledged
+connectionless data transfer service.  The
+.BR DL_UDQOS_REQ (7)
+directs the DLS provider to set the QOS parameters to the specified values.
+The normal flow of messages is illustrated in section 3.3.2, (Connectionless
+mode services).
+.RE
+.PP
+.B Error Reporting Service
+.RS 4
+The acknowledged connectionless mode error reporting service is the same as
+the unacknowledged connectionless-mode error reporting service.  For the
+message flow, refer to section 3.3.3.
+.RE
+.\"
+.\"
+.\"
+.\"
+.\"
+.SS "Local Management"
+.\"
+.\"
+.PP
+Local management provides the following services:
+.PP
+.B Information Service
+.RS 4
+.TP
+.BR DL_INFO_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_INFO_ACK (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Token Service
+.RS 4
+.TP
+.BR DL_TOKEN_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_TOKEN_ACK (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Attach Service
+.RS 4
+.TP
+.BR DL_ATTACH_REQ (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Detach Service
+.RS 4
+.TP
+.BR DL_DETACH_REQ (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Bind Service
+.RS 4
+.TP
+.BR DL_BIND_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_BIND_ACK (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Unbind Service
+.RS 4
+.TP
+.BR DL_UNBIND_REQ (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Subsequent Bind Service
+.RS 4
+.TP
+.BR DL_SUBS_BIND_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_SUBS_BIND_ACK (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Subsequent Unbind Service
+.RS 4
+.TP
+.BR DL_SUBS_UNBIND_REQ (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Receipt Acknowledgment Service
+.RS 4
+.TP
+.BR DL_OK_ACK (7)\(em
+.\"
+.\"
+.TP
+.BR DL_ERROR_ACK (7)\(em
+.RE
+.\"
+.\"
+.SS "Connection Establishment Phase"
+.PP
+The connection establishment phase consists of the following services:
+.\"
+.\"
+.PP
+.B Connection Service
+.RS 4
+.TP
+.BR DL_CONNECT_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_CONNECT_CON (7)\(em
+.\"
+.\"
+.TP
+.BR DL_CONNECT_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_CONNECT_RES (7)\(em
+.RE
+.\"
+.\"
+.SS "Connection Data Transfer Phase"
+.PP
+The connection data transfer phase consists of the following services:
+.\"
+.\"
+.PP
+.B Data Transfer Service
+.RS 4
+.TP
+.BR DL_DATA_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_DATA_IND (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Reset Service
+.RS 4
+.TP
+.BR DL_RESET_CON (7)\(em
+.\"
+.\"
+.TP
+.BR DL_RESET_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_RESET_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_RESET_RES (7)\(em
+.RE
+.\"
+.\"
+.SS "Connection Release Phase"
+.PP
+The connection release phase consists of the following services:
+.\"
+.\"
+.PP
+.B Release Service
+.RS 4
+.TP
+.BR DL_DISCONNECT_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_DISCONNECT_REQ (7)\(em
+.RE
+.\"
+.\"
+.SS "Connectionless Data Transfer Phase"
+.PP
+The connectionless data transfer phase consists of the following services:
+.\"
+.\"
+.PP
+.B Data Transfer Service
+.RS 4
+.TP
+.BR DL_UNITDATA_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_UNITDATA_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_UDQOS_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_UDERROR_IND (7)\(em
+.RE
+.\"
+.\"
+.SS "Acknowledged Connectionless Data Transfer Phase"
+.PP
+The acknowledged connectionless data transfer phase consists of the following
+services:
+.\"
+.\"
+.PP
+.B Acknowledged Data Transfer Service
+.RS 4
+.TP
+.BR DL_DATA_ACK_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_DATA_ACK_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_DATA_ACK_STATUS_IND (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Data Transaction Service
+.RS 4
+.TP
+.BR DL_REPLY_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_REPLY_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_REPLY_STATUS_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_REPLY_UPDATE_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_REPLY_UPDATE_STATUS_IND (7)\(em
+.RE
+.\"
+.\"
+.SS "XID and Test"
+.PP
+The XID and Test functions consist of the following services:
+.\"
+.\"
+.PP
+.B XID Service
+.RS 4
+.TP
+.BR DL_XID_CON (7)\(em
+.\"
+.\"
+.TP
+.BR DL_XID_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_XID_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_XID_RES (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B TEST Service
+.RS 4
+.TP
+.BR DL_TEST_CON (7)\(em
+.\"
+.\"
+.TP
+.BR DL_TEST_IND (7)\(em
+.\"
+.\"
+.TP
+.BR DL_TEST_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_TEST_RES (7)\(em
+.RE
+.\"
+.\"
+.SS "Miscelaneous Management"
+.PP
+The miscellaneous management functions consist of the following services:
+.\"
+.\"
+.PP
+.B Physical Address Service
+.RS 4
+.TP
+.BR DL_SET_PHYS_ADDR_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_PHYS_ADDR_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_PHYS_ADDR_ACK (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Promiscuous Monitoring Service
+.RS 4
+.TP
+.BR DL_PROMISCOFF_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_PROMISCON_REQ (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Multicast Address Service
+.RS 4
+.TP
+.BR DL_ENABMULTI_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_DISABMULTI_REQ (7)\(em
+.RE
+.\"
+.\"
+.PP
+.B Statistics Service
+.RS 4
+.TP
+.BR DL_GET_STATISTICS_REQ (7)\(em
+.\"
+.\"
+.TP
+.BR DL_GET_STATISTICS_ACK (7)\(em
+.RE
+.\"
+.\"
+.SH "SEE ALSO"
+.BR DL_ATTACH_REQ (7),
+.BR DL_BIND_ACK (7),
+.BR DL_BIND_REQ (7),
+.BR DL_CONNECT_CON (7),
+.BR DL_CONNECT_IND (7),
+.BR DL_CONNECT_REQ (7),
+.BR DL_CONNECT_RES (7),
+.BR DL_DATA_ACK_IND (7),
+.BR DL_DATA_ACK_REQ (7),
+.BR DL_DATA_ACK_STATUS_IND (7),
+.BR DL_DETACH_REQ (7),
+.BR DL_DISABMULTI_REQ (7),
+.BR DL_DISCONNECT_IND (7),
+.BR DL_DISCONNECT_REQ (7),
+.BR DL_ENABMULTI_REQ (7),
+.BR DL_ERROR_ACK (7),
+.BR DL_GET_STATISTICS_ACK (7),
+.BR DL_GET_STATISTICS_REQ (7),
+.BR DL_INFO_ACK (7),
+.BR DL_INFO_REQ (7),
+.BR DL_OK_ACK (7),
+.BR DL_PHYS_ADDR_ACK (7),
+.BR DL_PHYS_ADDR_REQ (7),
+.BR DL_PROMISCOFF_REQ (7),
+.BR DL_PROMISCON_REQ (7),
+.BR DL_REPLY_IND (7),
+.BR DL_REPLY_REQ (7),
+.BR DL_REPLY_STATUS_IND (7),
+.BR DL_REPLY_UPDATE_REQ (7),
+.BR DL_REPLY_UPDATE_STATUS_IND (7),
+.BR DL_RESET_CON (7),
+.BR DL_RESET_IND (7),
+.BR DL_RESET_REQ (7),
+.BR DL_RESET_RES (7),
+.BR DL_SET_PHYS_ADDR_REQ (7),
+.BR DL_SUBS_BIND_ACK (7),
+.BR DL_SUBS_BIND_REQ (7),
+.BR DL_SUBS_UNBIND_REQ (7),
+.BR DL_TEST_CON (7),
+.BR DL_TEST_IND (7),
+.BR DL_TEST_REQ (7),
+.BR DL_TEST_RES (7),
+.BR DL_TOKEN_ACK (7),
+.BR DL_TOKEN_REQ (7),
+.BR DL_UDERROR_IND (7),
+.BR DL_UDQOS_REQ (7),
+.BR DL_UNBIND_REQ (7),
+.BR DL_UNITDATA_IND (7),
+.BR DL_UNITDATA_REQ (7),
+.BR DL_XID_CON (7),
+.BR DL_XID_IND (7),
+.BR DL_XID_REQ (7),
+.BR DL_XID_RES (7).
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi
+.]
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

@@ -1,0 +1,3 @@
+.so N_DATACK_IND.7.man
+
+
