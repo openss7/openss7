@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/02 17:41:27 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/27 06:36:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+## Last Modified $Date: 2005/03/27 06:36:37 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -208,11 +208,18 @@ uninstall-manmacros:
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
 
+##
+# We only need to clean the manmacros files from the build directory when the
+# build directory is different from the source directory, so, we check whether
+# the srcdir and the builddir are different before removing.
+##
 clean-manmacros:
-	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
-		$(ECHO) "rm -f -- $$macro" ;  \
-		rm -f -- $$macro ; \
-	done
+	@if test "`(cd $(srcdir); pwd)`" != "`pwd`" ; then \
+		macros='$(man_MACROS)' ; for macro in $$macros ; do \
+			$(ECHO) "rm -f -- $$macro" ;  \
+			rm -f -- $$macro ; \
+		done ; \
+	fi
 
 distclean-manmacros:
 
