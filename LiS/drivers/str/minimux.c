@@ -29,7 +29,7 @@
  * 
  */
 
-#ident "@(#) LiS minimux.c 2.6 10/11/02 20:51:17 "
+#ident "@(#) LiS minimux.c 2.10 09/13/04 10:12:31 "
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>
@@ -118,21 +118,15 @@ static struct module_info mux_minfo =
 /*
  * Driver entry points -- upper
  */
-static int   mux_open  (queue_t *,dev_t*,int,int, cred_t *);
-static int   mux_close (queue_t *, int, cred_t *);
-static int   mux_wput  (queue_t *, mblk_t *);
-#if 0
-static void  mux_wsrv  (queue_t *);
-#endif
-static int   mux_rsrv  (queue_t *);
+static int   _RP mux_open  (queue_t *,dev_t*,int,int, cred_t *);
+static int   _RP mux_close (queue_t *, int, cred_t *);
+static int   _RP mux_wput  (queue_t *, mblk_t *);
+static int   _RP mux_rsrv  (queue_t *);
 /*
  * Driver entry points -- lower
  */
-static int   mux_lrput (queue_t *, mblk_t *);
-static int   mux_lwsrv (queue_t *);
-#if 0
-static void  mux_lrsrv (queue_t *);
-#endif
+static int   _RP mux_lrput (queue_t *, mblk_t *);
+static int   _RP mux_lwsrv (queue_t *);
 
 /*
  * qinit structures (rd and wr side, upper) 
@@ -235,7 +229,7 @@ new_mux(void)
 * Open routine for the multiplexor.					*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
     mux_tbl_t	*muxp;
@@ -256,7 +250,7 @@ mux_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 	return (OPENFAIL);
 
     mux_minors[dev] = 1 ;			/* minor in use */
-    *devp = MKDEV(MAJOR(*devp), dev) ;
+    *devp = makedevice(getmajor(*devp), dev) ;
 
     if (q->q_ptr != NULL)			/* already open */
 	return(0);				/* success (2nd open) */
@@ -447,7 +441,7 @@ void	mux_ioctl(mux_tbl_t *muxp, mblk_t *mp)
 * Upper wput routine.							*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_wput (queue_t *q, mblk_t *mp)
 {
     queue_t	*fwdq ;
@@ -473,7 +467,7 @@ mux_wput (queue_t *q, mblk_t *mp)
 	if (canputnext(fwdq))		/* check flow control */
 	    putnext(fwdq, mp) ;
 	else
-	    putq(fwdq, mp) ;
+	    putqf(fwdq, mp) ;
 	break ;
 
     case M_IOCTL:
@@ -529,7 +523,7 @@ mux_messenger_service(queue_t *q)
 	    && !canputnext(q)
 	   )
 	{
-	  putbq(q, mp);
+	  putbqf(q, mp);
 	  break;
 	}
 
@@ -546,7 +540,7 @@ mux_messenger_service(queue_t *q)
 * Upper write service routine.	Unused.					*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_wsrv (queue_t *q)
 {
     return(0) ;
@@ -561,7 +555,7 @@ mux_wsrv (queue_t *q)
 * Upper read service procedure.						*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_rsrv (queue_t *q)
 {
     mux_messenger_service(q) ;
@@ -577,7 +571,7 @@ mux_rsrv (queue_t *q)
 * Close routine.							*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_close (queue_t *q, int dummy, cred_t *credp)
 {
     mux_tbl_t	*muxp ;
@@ -626,7 +620,7 @@ mux_close (queue_t *q, int dummy, cred_t *credp)
 * Lower read put procedure.  Receives messages from driver below.	*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_lrput (queue_t *q, mblk_t *mp)
 {
     queue_t	*fwdq ;
@@ -652,7 +646,7 @@ mux_lrput (queue_t *q, mblk_t *mp)
 	if (canputnext(fwdq))		/* check flow control */
 	    putnext(fwdq, mp) ;
 	else
-	    putq(fwdq, mp) ;
+	    putqf(fwdq, mp) ;
 	break ;
 
     case M_IOCTL:
@@ -696,7 +690,7 @@ mux_lrput (queue_t *q, mblk_t *mp)
 * Lower write service routine.						*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_lwsrv (queue_t *q)
 {
     mux_messenger_service(q) ;
@@ -713,7 +707,7 @@ mux_lwsrv (queue_t *q)
 * Lower read service procedure.  Unused.				*
 *									*
 ************************************************************************/
-static int
+static int _RP
 mux_lrsrv (queue_t *q)
 {
     return(0) ;

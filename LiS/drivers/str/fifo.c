@@ -37,25 +37,9 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS fifo.c 1.10 12/15/02"
+#ident "@(#) LiS fifo.c 1.19 09/13/04"
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#else
-#  define MOD_INC_USE_COUNT  do {} while (0)
-#  define MOD_DEC_USE_COUNT  do {} while (0)
-#endif
+#include <sys/LiS/module.h>			/* must be VERY first include */
 
 #include <sys/LiS/config.h>
 
@@ -88,6 +72,8 @@
 #ifndef FIFO__UNITS
 #define FIFO__UNITS 256
 #endif
+
+#define FIFO_MAX_MINOR ((FIFO__UNITS/FIFO__CMAJORS) - 1)
 
 #define  MOD_ID   FIFO__ID
 #define  MOD_NAME "fifo"
@@ -124,8 +110,8 @@ static int fifo_initialized = 0;
 /*
  *  function prototypes
  */
-static int  fifo_open(queue_t *, dev_t*, int, int, cred_t *);
-static int  fifo_close(queue_t *, int, cred_t *);
+static int  _RP fifo_open(queue_t *, dev_t*, int, int, cred_t *);
+static int  _RP fifo_close(queue_t *, int, cred_t *);
 
 /*
  *  module structure
@@ -182,13 +168,13 @@ static inline int fifo_major_index( int maj )
 
 static inline int fifo_unit_index( dev_t dev )
 {
-    int idx = fifo_major_index(MAJOR(dev));
-    dev_t maxminor_dev = MKDEV(0,0x0000ffff) ;
+    int idx = fifo_major_index(getmajor(dev));
+    int maxminors = FIFO_MAX_MINOR+1;
 
     if (idx < 0)
 	return(idx);
 
-    idx = idx * (MINOR(maxminor_dev)+1) + MINOR(dev) ;
+    idx = (idx * maxminors) + getminor(dev);
 
     if (idx >= fifo_units)
 	return(-ENXIO);
@@ -196,13 +182,12 @@ static inline int fifo_unit_index( dev_t dev )
     return(idx);
 }
 
-static dev_t fifo_mkdev(int dev_major, int unit_index)
+static dev_t fifo_mkdev(int unit_index)
 {
-    dev_t maxminor_dev = MKDEV(0,0x0000ffff) ;
-    int   maxminor = MINOR(maxminor_dev)+1 ;
+    int maxminors = FIFO_MAX_MINOR+1;
 
-    return(MKDEV(dev_major + (unit_index / maxminor),
-					    unit_index % maxminor)) ;
+    return(makedevice(fifo__0_majors[(unit_index / maxminors)],
+		      unit_index % maxminors));
 }
 
 
@@ -255,12 +240,11 @@ static void fifo_free( int idx )
 /*
  *  open
  */
-static int fifo_open( queue_t *q, dev_t *devp,
+static int _RP fifo_open( queue_t *q, dev_t *devp,
 		      int flag, int sflag,
 		      cred_t *credp )
 {
     int m;
-    int dev_major ;
 
 #ifdef FIFO_DEBUG
     cmn_err( CE_CONT,
@@ -274,7 +258,6 @@ static int fifo_open( queue_t *q, dev_t *devp,
      *  we allow a clone open both ways: 0 minors are clonables
      */
     m = (sflag == CLONEOPEN ? 0 : fifo_unit_index(*devp));
-    dev_major = MAJOR(*devp) ;
 
     if (m < 0) {
 	lis_up(&fifo_sem);
@@ -312,10 +295,10 @@ static int fifo_open( queue_t *q, dev_t *devp,
 
 	qprocson(q);
 
-	MOD_INC_USE_COUNT;
+	MODGET();
     }
 
-    *devp = fifo_mkdev(dev_major, m) ;
+    *devp = fifo_mkdev(m);
 
     lis_up(&fifo_sem);
 
@@ -330,41 +313,32 @@ static int fifo_open( queue_t *q, dev_t *devp,
 
 /*
  *  close
+ *
+ *  Pipe linkage is disassembled by lis_qdetach.
  */
-static int fifo_close( queue_t *q, int flag, cred_t *credp )
+static int _RP fifo_close( queue_t *q, int flag, cred_t *credp )
 {
     fifo_dev_t *fdp = (fifo_dev_t *) q->q_ptr;
 
 #ifdef FIFO_DEBUG
     cmn_err( CE_CONT,
 	     "%s_close( 0x%p, 0x%x, ... ) unit %d\n",
-	     MOD_NAME, q, flag, fdp->index );
+	     MOD_NAME, q, flag, fdp ? fdp->index : 0 );
 #endif
+
+    if (fdp == NULL)		/* probably an open error */
+	return(0) ;
 
     lis_down(&fifo_sem);
     fifo_free( fdp->index );
 
-    /*
-     *  undo FIFO/pipe queue linkage
-     */
-    if (WR(q)->q_next) {
-	if (!SAMESTR(WR(q)) && (WR(WR(q)->q_next)->q_next == RD(q))) {
-	    /*
-	     *  pipe linkage - unlink other side - we need to do this
-	     *  so that SAMESTR works on the second stream after the
-	     *  first stream's queues are deallocated
-	     */
-	    WR(WR(q)->q_next)->q_next = NULL;
-	}
-	WR(q)->q_next = NULL;
-    }
     RD(q)->q_ptr = WR(q)->q_ptr = NULL;
 
     lis_up(&fifo_sem);
 
     qprocsoff(q);
 
-    MOD_DEC_USE_COUNT;
+    MODPUT();
 
     return 0;	/* success */
 }
@@ -472,11 +446,10 @@ static void fifo_rsrv( queue_t *q )
  *   . otherwise, specify "initialize" and "terminate" in Config
  */
 
-void fifo_init(void)
+void _RP fifo_init(void)
 {
     int i;
-    dev_t maxminor_dev = MKDEV(0,0x0000ffff) ;
-    int   maxminor = MINOR(maxminor_dev)+1 ;
+    int maxminors = FIFO_MAX_MINOR+1;
 
 #ifdef FIFO_DEBUG
     cmn_err( CE_CONT, "%s_init() #%d\n", MOD_NAME, fifo_initialized );
@@ -501,7 +474,7 @@ void fifo_init(void)
 	 *  bits are major.
 	 */
 	fdp->index = i;
-	if ((i % maxminor) != 0) {
+	if ((i % maxminors) != 0) {
 	    fdp->flags = 0;
 	    list_add( &(fdp->list), free_fifos.prev );
 	    num_free_fifos++;
@@ -512,7 +485,7 @@ void fifo_init(void)
 	     *  indicate that this is a FIFO pseudo device that allows
 	     *  minors to reopen
 	     */
-	    LIS_DEVFLAGS(fifo__0_majors[i/maxminor]) |=
+	    LIS_DEVFLAGS(fifo__0_majors[i/maxminors]) |=
 		LIS_MODFLG_FIFO | LIS_MODFLG_REOPEN;
 	}
     }
@@ -524,7 +497,7 @@ void fifo_init(void)
     lis_sem_init( &fifo_sem, 1 );
 }
 
-void fifo_term(void)
+void _RP fifo_term(void)
 {
 #ifdef FIFO_DEBUG
     cmn_err( CE_CONT, "%s_term() #%d\n", MOD_NAME, fifo_initialized );
@@ -542,7 +515,11 @@ void fifo_term(void)
  *  Linux loadable module interface
  */
 
+#ifdef KERNEL_2_5
+int fifo_mod_init(void)
+#else
 int init_module(void)
+#endif
 {
     int ret = lis_register_strdev( FIFO__CMAJOR_0, &fifo_info,
 				   fifo_units, MOD_NAME );
@@ -558,7 +535,11 @@ int init_module(void)
     return 0;
 }
 
+#ifdef KERNEL_2_5
+void fifo_mod_cleanup(void)
+#else
 void cleanup_module(void)
+#endif
 {
     fifo_term();
 
@@ -569,5 +550,22 @@ void cleanup_module(void)
     return;
 }
 
+#ifdef KERNEL_2_5
+module_init(fifo_mod_init) ;
+module_exit(fifo_mod_cleanup) ;
 #endif
+#if defined(MODULE_LICENSE)
+MODULE_LICENSE("GPL and additional rights");
+#endif
+#if defined(MODULE_AUTHOR)
+MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
+#endif
+#if defined(MODULE_DESCRIPTION)
+MODULE_DESCRIPTION("STREAMS-based FIFO pseudo-driver");
+#endif
+#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
+MODULE_INFO(vermagic, VERMAGIC_STRING);
+#endif
+
+#endif				/* MODULE */
 #endif

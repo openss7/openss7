@@ -46,16 +46,9 @@
  *     that it has received.  This step is specific to that driver.
  */
 
-#define __NO_VERSION__ /* don't define kernel_verion in module.h */
-#include <linux/modversions.h>
-#include <linux/module.h>
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
-#if defined module_info 
-#undef module_info
-#endif
-#define module_info lis_module_info
-#define module_info_t lis_module_info_t
-
+#include <sys/stream.h>
 
 #include <asm/param.h>
 #include <linux/version.h>
@@ -72,7 +65,6 @@
 #include <linux/if_arp.h>
 #include <net/arp.h>
 
-#include <sys/stream.h>
 #include <sys/dlpi.h>
 #include <sys/lismem.h>
 #include <sys/lislocks.h>
@@ -158,12 +150,12 @@ extern struct net_device ip2xinet_devs[];
 
 int ip2xinetdevflag = 0;
 
-int ip2xinetopen(queue_t *, dev_t *, int, int, cred_t *);
-int ip2xinetclose(queue_t *, int, cred_t *);
-int ip2xinetuwput(queue_t* q, mblk_t* mp);
-int ip2xinetlrput(queue_t* q, mblk_t* mp);
-int ip2xinetursrv(queue_t *q);
-int ip2xinetlwsrv(queue_t *q);
+int _RP ip2xinetopen(queue_t *, dev_t *, int, int, cred_t *);
+int _RP ip2xinetclose(queue_t *, int, cred_t *);
+int _RP ip2xinetuwput(queue_t* q, mblk_t* mp);
+int _RP ip2xinetlrput(queue_t* q, mblk_t* mp);
+int _RP ip2xinetursrv(queue_t *q);
+int _RP ip2xinetlwsrv(queue_t *q);
 void ip2xinet_rx(struct net_device *dev, struct sk_buff *skb);
 int ip2xinet_send_down_bind(queue_t *q);
 int init_linuxip(void);
@@ -239,7 +231,7 @@ int ip2xinetinit(void)
  *
  ************************************************************************/
 
-int ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+int _RP ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
     mblk_t *bp;
     minor_t minor;
@@ -295,7 +287,7 @@ int ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
     putnext(q, bp);
 
 
-    MOD_INC_USE_COUNT;
+    MODGET();
 
     *devp = makedevice(getmajor(*devp), 0);
     return 0;
@@ -317,7 +309,7 @@ int ip2xinetopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
  *
  ************************************************************************/
 
-int ip2xinetclose(queue_t *q, int flag, cred_t *credp)
+int _RP ip2xinetclose(queue_t *q, int flag, cred_t *credp)
 {
     lis_flags_t oldpl;
 
@@ -333,7 +325,7 @@ int ip2xinetclose(queue_t *q, int flag, cred_t *credp)
     q->q_ptr = NULL;
     WR(q)->q_ptr = NULL;
  
-    MOD_DEC_USE_COUNT;
+    MODPUT();
     lis_spin_unlock_irqrestore(ip2xinet_lock, &oldpl);
 
     return (0);
@@ -357,7 +349,7 @@ int ip2xinetclose(queue_t *q, int flag, cred_t *credp)
  *
  ************************************************************************/
 
-int ip2xinetuwput(queue_t *q, mblk_t *mp)
+int _RP ip2xinetuwput(queue_t *q, mblk_t *mp)
 {
 
     int i;
@@ -377,7 +369,7 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
 	if (*mp->b_rptr & FLUSHR)
 	{
 	    flushq(RD(q), FLUSHALL);
-	    putq(RD(q), mp);
+	    putqf(RD(q), mp);
 	}
 	else
 	    freemsg(mp);
@@ -434,7 +426,7 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
 		{
 		    iocp->ioc_error = ENOSR;
 		    mp->b_datap->db_type = M_IOCNAK;
-		    putq(RD(q), mp);
+		    putqf(RD(q), mp);
 		    lis_spin_unlock_irqrestore(ip2xinet_lock, &oldpl);
 		    printk("pktioctl: I_LINK failed: allocb failed");
 		    return (0);
@@ -455,11 +447,11 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
 		* be enabled so that the service routine will be run.
 		*/
 		qenable(ip2xinet_status.lowerq);
-		putq(ip2xinet_status.lowerq, nmp);
+		putqf(ip2xinet_status.lowerq, nmp);
 
 		/* all went well */
 		mp->b_datap->db_type = M_IOCACK;
-		putq(RD(q), mp);
+		putqf(RD(q), mp);
 		break;
 
 	    case I_UNLINK:
@@ -491,7 +483,7 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
 		    ip2xinet_status.readq = NULL;
 		    ip2xinet_status.lowerq = NULL;
 		    mp->b_datap->db_type = M_IOCACK;
-		    putq(RD(q), mp);
+		    putqf(RD(q), mp);
 
 		    break;
 		}
@@ -499,7 +491,7 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
 	    default:
 		iocp->ioc_error = EINVAL;
 		mp->b_datap->db_type = M_IOCNAK;
-		putq(RD(q), mp);
+		putqf(RD(q), mp);
 		break;
 	    }
 
@@ -530,7 +522,7 @@ int ip2xinetuwput(queue_t *q, mblk_t *mp)
  *      instead.
  *
  ************************************************************************/
-int ip2xinetursrv(queue_t *q)
+int _RP ip2xinetursrv(queue_t *q)
 {
     mblk_t *mp;
 
@@ -552,7 +544,7 @@ int ip2xinetursrv(queue_t *q)
  *      devices from sending us stuff.
  *
  ************************************************************************/
-int ip2xinetlwsrv(queue_t *q)
+int _RP ip2xinetlwsrv(queue_t *q)
 {
     mblk_t *mp;
     int allsent = 1;
@@ -576,7 +568,7 @@ int ip2xinetlwsrv(queue_t *q)
 	    else
 	    {
 		noenable(q);
-		putbq(q, mp);
+		putbqf(q, mp);
 		enableok(q);
 		allsent = 0;
 		break;
@@ -633,7 +625,7 @@ int ip2xinetlwsrv(queue_t *q)
  *
  ************************************************************************/
 
-int ip2xinetlrput(queue_t *q, mblk_t *mp)
+int _RP ip2xinetlrput(queue_t *q, mblk_t *mp)
 {
     struct iocblk *iocp;
     union DL_primitives *dp;
@@ -898,7 +890,7 @@ int ip2xinetlrput(queue_t *q, mblk_t *mp)
 	    *mp->b_rptr &= ~FLUSHR;
 	    flushq(WR(q), FLUSHALL);
 	    qenable(WR(q));
-	    putq(WR(q), mp);
+	    putqf(WR(q), mp);
 	}
 	else
 	    freemsg(mp);
@@ -906,7 +898,7 @@ int ip2xinetlrput(queue_t *q, mblk_t *mp)
 
     case M_HANGUP:
 	/* send it to the guy that linked us up, what he does is his problem. */
-	putq(ip2xinet_status.readq, mp);
+	putqf(ip2xinet_status.readq, mp);
 	break;
 
     case M_IOCACK:
@@ -919,7 +911,7 @@ int ip2xinetlrput(queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	    }
 	    else
-		putq(ip2xinet_status.readq, mp);
+		putqf(ip2xinet_status.readq, mp);
 	    break;
 
     case M_IOCNAK:
@@ -934,7 +926,7 @@ int ip2xinetlrput(queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	    }
 	    else
-		putq(ip2xinet_status.readq, mp);
+		putqf(ip2xinet_status.readq, mp);
 	    break;
 
     default:
@@ -956,7 +948,11 @@ int ip2xinetlrput(queue_t *q, mblk_t *mp)
  *      StrReg - major number registered or error number
  *
  ************************************************************************/
+#ifdef KERNEL_2_5
+int ipdlpi_init_module(void)
+#else
 int init_module(void)
+#endif
 {
     int ip2_m_number, clonemajor;
 
@@ -990,7 +986,7 @@ int init_module(void)
 
     if ((ip2_m_number = lis_mknod("/dev/ip2xinet",
 		0666 | S_IFCHR,
-		MKDEV(clonemajor, ip2_m_number))) < 0)
+		UMKDEV(clonemajor, ip2_m_number))) < 0)
     {
 	ip2xinet_lock = lis_free_mem((void *)ip2xinet_lock);
 	return ip2_m_number;
@@ -1007,7 +1003,11 @@ int init_module(void)
  *      none
  *
  ************************************************************************/
+#ifdef KERNEL_2_5
+void ipdlpi_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
     /* Before you unload this module, unregister all of the network
      * devices.
@@ -1068,7 +1068,7 @@ int ip2xinet_send_down_bind(queue_t *q)
     bindmp = (dl_bind_req_t *) mp->b_rptr;
     bindmp->dl_primitive = DL_BIND_REQ;
     bindmp->dl_sap = IP_SAP;
-    putq(q, mp);
+    putqf(q, mp);
     return 0;
 }
 
@@ -1124,7 +1124,7 @@ int ip2xinet_open(struct net_device *dev)
     else
 	netif_stop_queue(dev);  /* wait until DL_IDLE, then kernel can tx */
 
-    MOD_INC_USE_COUNT;
+    MODGET();
     lis_spin_unlock_irqrestore(ip2xinet_lock, &oldpl);
     return 0;
 }
@@ -1139,7 +1139,7 @@ int ip2xinet_release(struct net_device *dev)
     lis_spin_lock_irqsave(ip2xinet_lock, &oldpl);
     privp->state = 0;
     netif_stop_queue(dev); /* can't transmit any more */
-    MOD_DEC_USE_COUNT;
+    MODPUT();
     ip2xinet_num_ip_opened--;
     /* BEFORE ANYTHING CHECK THAT we're in IDLE */
     if (ip2xinet_status.ip2x_dlstate != DL_IDLE)
@@ -1171,7 +1171,7 @@ int ip2xinet_release(struct net_device *dev)
 	    mp->b_wptr += DL_UNBIND_REQ_SIZE;
 	    unbindmp = (dl_unbind_req_t *) mp->b_rptr;
 	    unbindmp->dl_primitive = DL_UNBIND_REQ;
-	    putq(q, mp);
+	    putqf(q, mp);
 	}
     }
     lis_spin_unlock_irqrestore(ip2xinet_lock, &oldpl);
@@ -1349,7 +1349,7 @@ void ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
     linkb(mp, nmp);
     bcopy( buf+sizeof(struct ethhdr), nmp->b_rptr, mylen);
     nmp->b_wptr += mylen;
-    putq(q, mp);
+    putqf(q, mp);
     privp->stats.tx_packets++;
 }
 
@@ -1533,7 +1533,9 @@ int ip2xinet_init(struct net_device *dev)
     if (dev->priv == NULL)
         return -ENOMEM;
     memset(dev->priv, 0, sizeof(struct ip2xinet_priv));
+#if !defined(KERNEL_2_5)
     dev_init_buffers(dev);
+#endif
     ip2xinet_status.ip2x_dlstate = UNLINKED;
     return 0;
 }

@@ -25,25 +25,9 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS pipemod.c 1.7 09/24/03"
+#ident "@(#) LiS pipemod.c 1.14 09/13/04"
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#else
-#  define MOD_INC_USE_COUNT  do {} while (0)
-#  define MOD_DEC_USE_COUNT  do {} while (0)
-#endif
+#include <sys/LiS/module.h>	/* should be first */
 
 #include <sys/LiS/config.h>
 
@@ -70,9 +54,9 @@
 /*
  *  function prototypes
  */
-static int  pipemod_open(queue_t *, dev_t*, int, int, cred_t *);
-static int  pipemod_close(queue_t *, int, cred_t *);
-static int  pipemod_put(queue_t *, mblk_t *);
+static int  _RP pipemod_open(queue_t *, dev_t*, int, int, cred_t *);
+static int  _RP pipemod_close(queue_t *, int, cred_t *);
+static int  _RP pipemod_put(queue_t *, mblk_t *);
 
 static void flush_module(queue_t *, mblk_t *);
 
@@ -120,20 +104,23 @@ struct streamtab pipemod_info =
 /*
  *  open
  */
-static int pipemod_open( q, devp, flag, sflag, credp )
+static int _RP pipemod_open( q, devp, flag, sflag, credp )
 queue_t *q;
 dev_t *devp;
 int flag, sflag;
 cred_t *credp;
 {
+    queue_t	*rq = RD(q);
+    char	*cp = rq->q_ptr ;
 #ifdef PIPE_DEBUG
     cmn_err( CE_CONT,
 	     "%s_open( 0x%p, 0x%x, 0x%x, 0x%x, ... )\n",
 	     MOD_NAME, q, *devp, flag, sflag );
 #endif
 
-    if (!(((char *)RD(q)->q_ptr)++))  MOD_INC_USE_COUNT;
-    WR(q)->q_ptr = RD(q)->q_ptr;
+    if (rq->q_ptr == NULL) MODGET() ;
+    rq->q_ptr = (void *) ++cp ;
+    WR(q)->q_ptr = rq->q_ptr;
 
     qprocson(q);
 
@@ -143,7 +130,7 @@ cred_t *credp;
 /*
  *  close
  */
-static int pipemod_close( q, flag, credp )
+static int _RP pipemod_close( q, flag, credp )
 queue_t *q;
 int flag;
 cred_t *credp;
@@ -154,7 +141,7 @@ cred_t *credp;
 #endif
     
     RD(q)->q_ptr = WR(q)->q_ptr = NULL;
-    MOD_DEC_USE_COUNT;
+    MODPUT();
     qprocsoff(q);
 
     return 0;	/* success */
@@ -197,7 +184,7 @@ mblk_t *mp;
 /*
  *  put
  */
-static int pipemod_put( q, mp )
+static int _RP pipemod_put( q, mp )
 queue_t *q;
 mblk_t *mp;
 {
@@ -223,7 +210,11 @@ mblk_t *mp;
  *  Linux loadable module interface
  */
 
+#ifdef KERNEL_2_5
+int pipemod_init_module(void)
+#else
 int init_module(void)
+#endif
 {
     int ret = lis_register_strmod( &pipemod_info, MOD_NAME );
     if (ret < 0) {
@@ -236,7 +227,11 @@ int init_module(void)
     return 0;
 }
 
+#ifdef KERNEL_2_5
+void pipemod_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
     if (lis_unregister_strmod(&pipemod_info) < 0)
 	cmn_err( CE_CONT,
@@ -245,16 +240,30 @@ void cleanup_module(void)
     return;
 }
 
+#ifdef KERNEL_2_5
+module_init(pipemod_init_module) ;
+module_exit(pipemod_cleanup_module) ;
 #endif
 
 #if defined(LINUX)			/* linux kernel */
+
+#ifdef __attribute_used__
+#undef __attribute_used__
+#endif
+#define __attribute_used__
+
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL and additional rights");
 #endif
 #if defined(MODULE_AUTHOR)
-MODULE_AUTHOR("John A. Boyd Jr");
+MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
 #endif
 #if defined(MODULE_DESCRIPTION)
-MODULE_DESCRIPTION("STREAMS Pipe Module");
+MODULE_DESCRIPTION("STREAMS 'pipemod' pipe flushing module");
 #endif
+#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
+MODULE_INFO(vermagic, VERMAGIC_STRING);
 #endif
+
+#endif					/* LINUX */
+#endif					/* MODULE */

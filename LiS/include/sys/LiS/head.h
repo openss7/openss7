@@ -36,7 +36,7 @@
 #ifndef _HEAD_H
 #define _HEAD_H 1
 
-#ident "@(#) LiS head.h 2.26 12/27/03 15:12:51 "
+#ident "@(#) LiS head.h 2.34 09/13/04 10:13:51 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -102,7 +102,7 @@
 #define	STCONNLD	0x00000004L /* 'connld' pushed? */
 #define	IOCWAIT		0x00000008L /* someone wants to do ioctl */
 #define	STRCLOSE	0x00000010L /* stream is being closed */
-#define	STRPLUMB	0x00000020L /*!push/pop pending */
+#define	STROSEM_HELD	0x00000020L /* sd_opening semaphore is held */
 #define STRHOLD		0x00000040L /* use stream hold on write feature */
 #define STRATTACH       0x00000080L /* stream has been fattach'ed */
 #define STREOPEN        0x00000100L /* stream can be reopened (uses sd_from) */
@@ -122,6 +122,7 @@
 #define STIOCTMR	0x01000000L /* ioctl timer in progress */
 #define STRCLOSEWT	0x02000000L /* waiting on sd_close_wt sem */
 #define STRFLUSHWT	0x04000000L /* waiting on sd_close_wt sem for flush */
+#define STRFROZEN	0x08000000L /* successful freezestr() performed */
 
 /*  -------------------------------------------------------------------  */
 
@@ -194,11 +195,13 @@ typedef struct
     gid_t	egid ;
     gid_t	sgid ;
     gid_t	fsgid ;
+#if 0
     int		ngroups ;
     gid_t	groups[NGROUPS] ;
     kernel_cap_t cap_effective ;
     kernel_cap_t cap_inheritable ;
     kernel_cap_t cap_permitted ;
+#endif
 
 } lis_kcreds_t ;
 
@@ -215,65 +218,74 @@ typedef struct
 typedef
 struct stdata
 {
+    	/*
+	 * Frequently used fields are gathered at the beginning
+	 * of the structure.
+	 */
         long              magic; 	/* should be always STDATA_MAGIC */
+	lis_atomic_t      sd_refcnt;	/* reference count */
+	lis_spin_lock_t	  sd_lock ;	/* get exclusive use of strm head */
+        struct queue     *sd_wq;        /* write queue */
+	struct queue	 *sd_rq ;	/* RD(sd_wq) */
+        volatile long	  sd_flag;      /* state/flags */
+	mblk_t		 *sd_rput_hd;	/* head of msgs from strrput */
+	mblk_t		 *sd_rput_tl;	/* tail of that list */
+	mblk_t           *sd_wmsg;      /* buff for write msg */
+        int		  sd_sigflags;  /* logical OR of all siglist events */
+        int		  sd_events;    /* logical OR of all eventlist events*/
+        int		  sd_rdopt;	/* read options */
+        int		  sd_wropt;	/* write options */
+        int		  sd_rerror;    /* read error to set u.u_error */
+        int		  sd_werror;    /* write error to set u.u_error */
+        long		  sd_maxpsz;    /* max pkt size --should be a cache*/
+        long		  sd_minpsz;    /* min pkt size   of below module's */
+	unsigned short    sd_wroff;	/* write offset for downstream data */
+	lis_atomic_t	  sd_rdcnt ;	/* # users sleeping on read */
+	lis_atomic_t	  sd_rdsemcnt ;	/* # users sleeping on read_sem */
+	lis_atomic_t	  sd_wrcnt ;	/* # users sleeping on write */
+        lis_semaphore_t   sd_wwrite;	/* wait to room for write */
+        lis_semaphore_t   sd_write_sem;	/* single thread semaphore */
+        lis_semaphore_t   sd_wread;	/* wait for msg to arrive */
+        lis_semaphore_t   sd_read_sem;	/* single thread semaphore */
+
+	/* End of frequently used fields */
+
 	struct stdata	 *sd_next ;	/* all stdatas are linked together */
 	struct stdata	 *sd_prev ;
         struct streamtab *sd_strtab;    /* pointer to streamtab for stream */
-        struct queue     *sd_wq;        /* write queue */
         struct stdata    *sd_peer;      /* other FIFO in a pipe */
 	struct inode     *sd_inode;     /* corresponding inode */
-#if defined(LINUX) && defined(KERNEL_2_3)
+#if defined(LINUX)
         struct dentry    *sd_from;      /* dentry->inode FIFO opened from */
 #else
         struct inode     *sd_from;      /* inode a FIFO was opened from */
 #endif
 	struct file      *sd_file;      /* file being opened */
-	mblk_t           *sd_wmsg;      /* buff for write msg */
 	mblk_t           *sd_iocblk; 	/* data block for ioctl */
-	mblk_t		 *sd_rput_hd;	/* head of msgs from strrput */
-	mblk_t		 *sd_rput_tl;	/* tail of that list */
-	int  sd_open_flags ;		/* flags that opened stream */
-	toid_t sd_scantimer;		/* scanq timer handle */
-	int  sd_iocseq;			/* ioc seq # */
-        int  sd_session;                /* controlling session id */
-        int  sd_pgrp;                   /* controlling process group id */
-        volatile long sd_flag;          /* state/flags */
-        int  sd_sigflags;               /* logical OR of all siglist events */
-        int  sd_events;                 /* logical OR of all eventlist events*/
-        int  sd_rdopt;			/* read options */
-        int  sd_wropt;			/* write options */
-        int  sd_closetime;              /* time to wait to drain q in close */
-        toid_t sd_close_timer;		/* timer handle for close timer */
-        int  sd_rerror;                 /* read error to set u.u_error */
-        int  sd_werror;                 /* write error to set u.u_error */
-	int  sd_maxpushcnt;	        /* currently there's no limit in 
-					 * # of pushed mods, but let's set up
-					 * an artificial one to aid debugging*/
-        long sd_maxpsz;                 /* max pkt size --should be a cache*/
-        long sd_minpsz;                 /* min pkt size   of below module's */
-	unsigned short     sd_wroff;	/* write offset for downstream data */
+	int		  sd_open_flags ;/* flags that opened stream */
+	toid_t		  sd_scantimer;	/* scanq timer handle */
+	int		  sd_iocseq;	/* ioc seq # */
+        int		  sd_session;   /* controlling session id */
+        int		  sd_pgrp;      /* controlling process group id */
+        int		  sd_closetime; /* time to wait to drain q in close */
+        toid_t		  sd_close_timer;/* timer handle for close timer */
+	int		  sd_maxpushcnt; /* currently there's no limit in 
+					  * # of pushed mods, but let's set up
+					  * an artificial one to aid debugging
+					  */
 	struct strevent   *sd_siglist;  /* processes to be sent SIGPOLL */
 #if defined(PORTABLE_POLL)
 	struct pollhead    sd_polllist;	/* polling processes*/
 #elif defined(LINUX_POLL)
-# if defined(KERNEL_2_3)
 	wait_queue_head_t  sd_task_list;/* tasks waiting on poll */
-# else
-	struct wait_queue *sd_task_list;/* tasks waiting on poll */
-# endif
 #else
 #error "Either PORTABLE_POLL or LINUX_POLL must be defined"
 #endif
 	lis_semaphore_t	   sd_opening;	/* stream is opening */
 	lis_semaphore_t    sd_close_wt;	/* Waiting for close to complete*/
-        lis_semaphore_t    sd_wwrite;   /* wait to room for write */
-        lis_semaphore_t    sd_write_sem;/* single thread semaphore */
-        lis_semaphore_t    sd_wread;    /* wait for msg to arrive */
-        lis_semaphore_t    sd_read_sem; /* single thread semaphore */
         lis_semaphore_t    sd_wioc;     /* wait for ioctl */
 	lis_semaphore_t    sd_wiocing;  /* wait for iocl response */
 	lis_semaphore_t    sd_closing;	/* waiting to close */
-	lis_atomic_t       sd_refcnt;	/* reference count */
 	lis_atomic_t       sd_opencnt;	/* # of files open to this stream */
 	unsigned short     sd_linkcnt;	/* # of I_PLINKs done via stream */
         unsigned short     sd_pushcnt;  /* number of pushes done on stream */
@@ -285,11 +297,6 @@ struct stdata
 	lis_select_t	   sd_select ;	/* abstract select structure */
 					/* see *-mdep.h */
 #endif
-	lis_atomic_t	   sd_rdcnt ;	/* # users sleeping on read */
-	lis_atomic_t	   sd_rdsemcnt ;/* # users sleeping on read_sem */
-	lis_atomic_t	   sd_wrcnt ;	/* # users sleeping on write */
-	lis_spin_lock_t	   sd_lock ;	/* get exclusive use of strm head */
-	struct queue	  *sd_rq ;	/* RD(sd_wq) */
 	unsigned long	   sd_save_sigs[8] ;	/* opaque mem area */
 	char		   sd_name[32] ;	/* name of stream */
 	lis_kcreds_t	   sd_kcreds ;	/* creds of stream opener */
@@ -298,8 +305,8 @@ struct stdata
         lis_atomic_t       sd_fattachcnt; /* number of fattaches */
 } stdata_t;
 
-#define	LIS_SD_REFCNT(hd)  lis_atomic_read(&(hd)->sd_refcnt)
-#define	LIS_SD_OPENCNT(hd) lis_atomic_read(&(hd)->sd_opencnt)
+#define	LIS_SD_REFCNT(hd)  K_ATOMIC_READ(&(hd)->sd_refcnt)
+#define	LIS_SD_OPENCNT(hd) K_ATOMIC_READ(&(hd)->sd_opencnt)
 
 #define SET_SD_FLAG(hd,msk)						\
 		do {							\
@@ -413,11 +420,11 @@ extern void lis_run_queues(int cpu);
 /*
  *  for stream head qinit structures
  */
-extern int
+extern int _RP
 lis_strrput(queue_t *, mblk_t *);
-extern int
+extern int _RP
 lis_strwsrv(queue_t *);
-extern int
+extern int _RP
 lis_strrsrv(queue_t *);
 
 /*
@@ -451,19 +458,23 @@ extern void lis_restore_sigs(stdata_t *hd);
  * Return the major device number of the LiS clone device.  Useful for
  * dynamically loading drivers to synthesis clone major/minors.
  */
-extern int lis_clone_major(void) ;
+extern int lis_clone_major(void) _RP;
 
+/*
+ * Set an errno in the stream head and wake up relevant processes
+ */
+void	lis_stream_error(stdata_t *shead, int rderr, int wrerr) ;
 
 #endif				/* __KERNEL__ */
 
 /*
  *  timing functions - these are available outside the kernel also
  */
-extern unsigned long lis_hitime(void);  /* usec res; 64s cycle */
-extern unsigned long lis_usecs(void);   /* usec res; ulong cycle */
-extern unsigned long lis_msecs(void);   /* msec res; ulong cycle */
-extern unsigned long lis_dsecs(void);   /* 1/10sec res; ulong cycle */
-extern unsigned long lis_secs(void);    /* sec res; ulong cycle */
+extern unsigned long lis_hitime(void)_RP;  /* usec res; 64s cycle */
+extern unsigned long lis_usecs(void)_RP;   /* usec res; ulong cycle */
+extern unsigned long lis_msecs(void)_RP;   /* msec res; ulong cycle */
+extern unsigned long lis_dsecs(void)_RP;   /* 1/10sec res; ulong cycle */
+extern unsigned long lis_secs(void)_RP;    /* sec res; ulong cycle */
 
 /*  -------------------------------------------------------------------  */
 #endif /*!_HEAD_H*/

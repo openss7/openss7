@@ -40,7 +40,7 @@
  * 
  */
 
-#ident "@(#) LiS clone.c 2.6 10/11/02 20:51:17 "
+#ident "@(#) LiS clone.c 2.8 09/13/04 10:12:30 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
@@ -55,8 +55,8 @@ static struct module_info clone_minfo =
   0				/* low water mark */
 };
 
-static int   clone_open  (queue_t *, dev_t*, int, int, cred_t *);
-static int   clone_close (queue_t *, int, cred_t *);
+static int   _RP clone_open  (queue_t *, dev_t*, int, int, cred_t *);
+static int   _RP clone_close (queue_t *, int, cred_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -93,7 +93,7 @@ struct streamtab clone_info =
 };
 
 
-static int
+static int _RP
 clone_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
     int		 major_dev ;
@@ -105,11 +105,11 @@ clone_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
     /*
      * Minor passed to us functions as major for the target driver
      */
-    major_dev = MINOR (*devp);
+    major_dev = getminor (*devp);
     st = lis_find_strdev(major_dev) ;
     if (st == NULL) return(ENOENT) ;		/* no such driver */
 
-    *devp = MKDEV(major_dev, 0) ;		/* construct new major */
+    *devp = makedevice(major_dev, 0) ;		/* construct new major */
 
     if (st->st_rdinit->qi_qopen == NULL) return(OPENFAIL) ;
     lis_setq(q, st->st_rdinit, st->st_wrinit) ;	/* xfer queue params */
@@ -121,7 +121,7 @@ clone_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 } /* clone_open */
 
 
-static int
+static int _RP
 clone_close (queue_t *q, int dummy, cred_t *credp)
 {
     (void) q ;					/* compiler happiness */
@@ -131,7 +131,7 @@ clone_close (queue_t *q, int dummy, cred_t *credp)
     return(0) ;
 }
 
-void clone_init(void)
+void _RP clone_init(void)
 {
     /*
      *  indicate that this is a CLONE pseudo device

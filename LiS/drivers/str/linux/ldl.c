@@ -65,36 +65,20 @@
  * 
  */
 
-#ifdef DEBUG
 #undef DEBUG			/* unused symbol that causes a warning */
-#endif
 
+#include <sys/LiS/module.h>	/* must be VERY first include */
 #include <linux/version.h>
 
 #ifndef KERNEL_VERSION
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
-#define	KERNEL_2_0
-#else
-#define	KERNEL_2_1
-# if LINUX_VERSION_CODE > KERNEL_VERSION(2,3,0)
-# define KERNEL_2_3
-# endif
+
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+# define KERNEL_2_5
 #endif
 
-#ifdef MODVERSIONS
-# ifdef LISMODVERS
-#  include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-# else
-#  include <linux/modversions.h>
-# endif
-#endif
-#ifdef MODULE
-#include <linux/module.h>	/* after modversions so get name mangling */
-#endif
-
-#include <sys/stream.h>		/* stream.h comes first */
+#include <sys/stream.h>
 #include <sys/stropts.h>
 
  /*
@@ -136,22 +120,10 @@ void qdisc_reset(struct Qdisc *qdisc);
 #include <sys/LiS/config.h>
 #include <sys/osif.h>
 
-#if defined(KERNEL_2_3)
-
 #define ldldev		net_device
 #define driver_started(dev)	 1
 #define	START_BH_ATOMIC(dev)	spin_lock_bh(&(dev)->queue_lock)
 #define	END_BH_ATOMIC(dev)	spin_unlock_bh(&(dev)->queue_lock)
-
-#else
-
-#define ldldev		device
-#define netif_queue_stopped(dev) ((dev)->tbusy)
-#define driver_started(dev)	 ((dev)->start)
-#define	START_BH_ATOMIC(dev)	start_bh_atomic()
-#define	END_BH_ATOMIC(dev)	end_bh_atomic()
-
-#endif
 
 #if defined(ARPHRD_IEEE802_TR)
 #define	IS_ARPHRD_IEEE802_TR(dev) (dev)->type == ARPHRD_IEEE802_TR
@@ -386,11 +358,11 @@ STATIC int sap_n_alloc = 0;
 STATIC int ndev_n_alloc = 0;
 
 STATIC char *ldl_pkt_type(unsigned saptype) ;
-STATIC int dl_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int dl_close(queue_t *, int, cred_t *);
-STATIC int dl_rsrv(queue_t *);
-STATIC int dl_wput(queue_t *, mblk_t *);
-STATIC int dl_wsrv(queue_t *);
+STATIC int _RP dl_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int _RP dl_close(queue_t *, int, cred_t *);
+STATIC int _RP dl_rsrv(queue_t *);
+STATIC int _RP dl_wput(queue_t *, mblk_t *);
+STATIC int _RP dl_wsrv(queue_t *);
 
 STATIC int rcv_func(struct sk_buff *skb,
 		    struct ldldev *dev, struct packet_type *pt);
@@ -606,9 +578,9 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 	struct pt *pt, *npt;
 	struct sap *sap;
 
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(dl->ndev != NULL);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(dl->ndev != NULL);
 
 	saptype = htons(saptype);
 
@@ -663,7 +635,7 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 
 	if (pt->listen == NULL) {
 		/* New, unused packet_type */
-		ASSERT(pt->magic == 0);
+		LISASSERT(pt->magic == 0);
 		/* No need to synchronize with rcv_func() */ 
 		sap->next_listen = pt->listen;
 		pt->listen = sap;
@@ -672,15 +644,17 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		pt->pt.type = saptype;
 		pt->pt.dev = dl->ndev->dev;
 		pt->pt.func = rcv_func;
+#if !defined(KERNEL_2_5)
 		pt->pt.data = NULL;
 		pt->pt.next = NULL;
+#endif
 		lis_spin_unlock(&first_pt_lock);
 		dev_add_pack(&pt->pt);
 	} else {
 		/* Re-use of packet_type */
-		ASSERT(pt->magic == PT_MAGIC);
-		ASSERT(pt->pt.type == saptype);
-		ASSERT(pt->pt.func == rcv_func);
+		LISASSERT(pt->magic == PT_MAGIC);
+		LISASSERT(pt->pt.type == saptype);
+		LISASSERT(pt->pt.func == rcv_func);
 
 		lis_rw_write_lock(&pt->lock);
 		sap->next_listen = pt->listen;
@@ -703,15 +677,15 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 	struct pt *pt, *opt;
 	struct sap **sapp_dl, **sapp_pt;
 
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(sap != NULL);
-	ASSERT(sap->magic == SAP_MAGIC);
-	ASSERT(dl->subs != NULL || sap == dl->sap);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(sap != NULL);
+	LISASSERT(sap->magic == SAP_MAGIC);
+	LISASSERT(dl->subs != NULL || sap == dl->sap);
 
 	pt = sap->pt;
-	ASSERT(pt != NULL);
-	ASSERT(pt->magic == PT_MAGIC);
+	LISASSERT(pt != NULL);
+	LISASSERT(pt->magic == PT_MAGIC);
 
 	SPLSTR(psw);
 	lis_spin_lock(&first_pt_lock);
@@ -737,7 +711,7 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 		lis_spin_unlock(&first_pt_lock);
 		sapp_pt = &pt->listen;
 		for (;;) {
-			ASSERT(*sapp_pt != NULL);
+			LISASSERT(*sapp_pt != NULL);
 			if (*sapp_pt == NULL) {
 				/*
 				 * Not found, but it should be there:
@@ -756,12 +730,12 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 	}
 
 	if (dl->sap == sap) {
-		ASSERT(dl->subs == NULL);
+		LISASSERT(dl->subs == NULL);
 		dl->sap = NULL;
 	} else {
 		sapp_dl = &dl->subs;
 		for(;;) {
-			ASSERT(*sapp_dl != NULL);
+			LISASSERT(*sapp_dl != NULL);
 			if (*sapp_dl == NULL) {
 				/*
 				 * Not found, but it should be there:
@@ -770,8 +744,8 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 				SPLX(psw);
 				return -1;
 			}
-			ASSERT((*sapp_dl)->magic == SAP_MAGIC);
-			ASSERT((*sapp_dl)->dl == dl);
+			LISASSERT((*sapp_dl)->magic == SAP_MAGIC);
+			LISASSERT((*sapp_dl)->dl == dl);
 			if (*sapp_dl == sap)
 				break;
 			sapp_dl = &(*sapp_dl)->next_sap;
@@ -796,19 +770,19 @@ STATIC void sap_destroy_all(struct dl *dl)
 {
 	int ret;
 
-	ASSERT(dl != NULL);
+	LISASSERT(dl != NULL);
 
 	while (dl->subs) {
-		ASSERT(dl->subs->pt != NULL);
+		LISASSERT(dl->subs->pt != NULL);
 		ret = sap_destroy(dl, dl->subs);
-		ASSERT(ret == 0);
+		LISASSERT(ret == 0);
 		if (ret != 0)
 			return; /* Emergency brake */
 	}
 	if (dl->sap) {
-		ASSERT(dl->sap->pt != NULL);
+		LISASSERT(dl->sap->pt != NULL);
 		ret = sap_destroy(dl, dl->sap);
-		ASSERT(ret == 0);
+		LISASSERT(ret == 0);
 	}
 }
 
@@ -830,18 +804,18 @@ STATIC INLINE void hangup_set(struct dl *dl)
 		/*
 		 *  A hangup should never happen on an unattached device.
 		 */
-		ASSERT(dl->dlstate != DL_UNATTACHED);
+		LISASSERT(dl->dlstate != DL_UNATTACHED);
 
 		/*
 		 *  The hangup has not already been done.
 		 */
-		ASSERT((dl->flags & LDLFLAG_HANGUP_DONE) != 0);
+		LISASSERT((dl->flags & LDLFLAG_HANGUP_DONE) != 0);
 
 		/*
 		 *  This endpoint should already have been disassociated
 		 *  from the netdevice.
 		 */
-		ASSERT(dl->ndev == NULL);
+		LISASSERT(dl->ndev == NULL);
 
 		dl->flags |= LDLFLAG_HANGUP;	/* Set flag		*/
 		++n_hangup;			/* Update count		*/
@@ -857,7 +831,7 @@ STATIC INLINE void hangup_do(struct dl *dl)
 
 	SPLSTR(psw);
 
-	ASSERT((dl->flags & LDLFLAG_HANGUP) != 0);
+	LISASSERT((dl->flags & LDLFLAG_HANGUP) != 0);
 
 	/* Has the hangup been done already? */
 	if ((dl->flags & LDLFLAG_HANGUP_DONE) != 0) {
@@ -865,7 +839,7 @@ STATIC INLINE void hangup_do(struct dl *dl)
 		return;
 	}
 
-	ASSERT(n_hangup > 0);
+	LISASSERT(n_hangup > 0);
 
 	/*
 	 *  In the transient states a hangup cannot easily be done.
@@ -896,7 +870,7 @@ STATIC INLINE void hangup_do(struct dl *dl)
 		dl->ndev = NULL;
 		dl->dlstate = DL_UNATTACHED;
 	}
-	ASSERT(dl->dlstate == DL_UNATTACHED);
+	LISASSERT(dl->dlstate == DL_UNATTACHED);
 
 	SPLX(psw);
 	
@@ -952,7 +926,7 @@ STATIC struct ndev *ndev_get(dl_ulong ppa)
 
 	if (dev == NULL)
 		return NULL;
-	ASSERT(ppa == i);
+	LISASSERT(ppa == i);
 
 	if ((ndev = ndev_find(dev)) == NULL) {
 		if ((ndev = ALLOC(sizeof *ndev)) == NULL)
@@ -975,12 +949,12 @@ STATIC struct ndev *ndev_get(dl_ulong ppa)
  */
 STATIC void ndev_attach(struct ndev *ndev, struct dl *dl)
 {
-	ASSERT(ndev != NULL);
-	ASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev != NULL);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
 
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(dl->ndev == NULL);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(dl->ndev == NULL);
 
 	dl->ndev = ndev;
 	dl->next_ndev = ndev->endpoints;
@@ -994,9 +968,9 @@ STATIC void ndev_attach(struct ndev *ndev, struct dl *dl)
  */
 STATIC void ndev_free(struct ndev *ndev)
 {
-	ASSERT(ndev != NULL);
-	ASSERT(ndev->magic == NDEV_MAGIC);
-	ASSERT(ndev->dev == NULL);
+	LISASSERT(ndev != NULL);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->dev == NULL);
 
 	if (atomic_read(&ndev->wr_cur) > 0 || ndev->endpoints != NULL)
 		return; /* Have to wait to free */
@@ -1021,15 +995,15 @@ STATIC void ndev_release(struct dl *dl)
 	struct ndev *ndev = dl->ndev;
 	struct dl **dlp;
 
-	ASSERT(ndev != NULL);
-	ASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev != NULL);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
 	for (dlp = &ndev->endpoints; *dlp; dlp = &(*dlp)->next_ndev) {
-		ASSERT((*dlp)->magic == DL_MAGIC);
-		ASSERT((*dlp)->ndev == ndev);
+		LISASSERT((*dlp)->magic == DL_MAGIC);
+		LISASSERT((*dlp)->ndev == ndev);
 		if (*dlp == dl)
 			break;
 	}
-	ASSERT(*dlp == dl);
+	LISASSERT(*dlp == dl);
 	*dlp = dl->next_ndev;
 	dl->ndev = NULL;
 	if (ndev->endpoints == NULL) {
@@ -1065,12 +1039,12 @@ STATIC void ndev_down(struct ndev *ndev, int hard)
 {
 	struct dl *dl;
 
-	ASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
 
 	if (hard)
 		ndev->dev = NULL;
 	for (dl = ndev->endpoints; dl; dl = dl->next_ndev) {
-		ASSERT(dl->magic == DL_MAGIC);
+		LISASSERT(dl->magic == DL_MAGIC);
 
 		if (hard || (dl->flags & LDLFLAG_SET_ADDR) == 0) {
 			ndev_release(dl);
@@ -1088,11 +1062,11 @@ STATIC void ndev_wr_wakeup_endp(struct ndev *ndev)
 {
 	struct dl *dl;
 
-	ASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
 
 	for (dl = ndev->endpoints; dl; dl = dl->next_ndev) {
-		ASSERT(dl->magic == DL_MAGIC);
-		ASSERT(dl->ndev == ndev);
+		LISASSERT(dl->magic == DL_MAGIC);
+		LISASSERT(dl->ndev == ndev);
 
 		qenable(WR(dl->rq));
 	}
@@ -1105,8 +1079,8 @@ STATIC void ndev_wr_wakeup_endp(struct ndev *ndev)
  */
 STATIC void ndev_wr_wakeup(struct ndev *ndev)
 {
-	ASSERT(ndev->magic == NDEV_MAGIC);
-	ASSERT(ndev->sleeping);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->sleeping);
 
 	if (ndev->tx_congest_timer) {
 		untimeout(ndev->tx_congest_timer); /* Drop old timer */
@@ -1119,14 +1093,14 @@ STATIC void ndev_wr_wakeup(struct ndev *ndev)
 
 #ifndef KERNEL_2_1		/* old 2.0 kernel, not supported anymore */
 
-STATIC void tx_congestion_timeout(caddr_t dp)
+STATIC void _RP tx_congestion_timeout(caddr_t dp)
 {
 	int psw;
 	struct ndev *ndev = (struct ndev *)dp;
 
 	SPLSTR(psw);
 
-	ASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
 	if (ndev->tx_congest_timer != 0) {
 		ndev->tx_congest_timer = 0;
 		ndev_wr_wakeup_endp(ndev);
@@ -1142,7 +1116,7 @@ STATIC void tx_congestion_timeout(caddr_t dp)
  */
 STATIC void ndev_wr_sleep(struct ndev *ndev)
 {
-	ASSERT(!ndev->sleeping);
+	LISASSERT(!ndev->sleeping);
 
 	if (!ndev->tx_congest_timer)
 		ndev->tx_congest_timer = timeout(tx_congestion_timeout,
@@ -1164,7 +1138,7 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 {
 	struct ndev *ndev;
 
-	ASSERT(skb != NULL);
+	LISASSERT(skb != NULL);
 
 #ifdef KERNEL_2_1
 	if (skb_cloned(skb))
@@ -1176,10 +1150,10 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 
 	ndev = (struct ndev *)skb->sk;
 	skb->sk = NULL;
-	ASSERT(ndev != NULL);
-	ASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev != NULL);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
 
-	ASSERT(atomic_read(&ndev->wr_cur) >= skb->truesize);
+	LISASSERT(atomic_read(&ndev->wr_cur) >= skb->truesize);
 
 	if (ndev->dev != NULL) {
 		if (atomic_read(&ndev->wr_cur) <= ndev->wr_min) {
@@ -1188,7 +1162,7 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 			atomic_sub(skb->truesize, &ndev->wr_cur);
 		}
 	} else {
-		ASSERT(ndev->endpoints == NULL);
+		LISASSERT(ndev->endpoints == NULL);
 
 		atomic_sub(skb->truesize, &ndev->wr_cur);
 		if (atomic_read(&ndev->wr_cur) == 0)
@@ -1200,15 +1174,15 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 
 STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 {
-	ASSERT(skb != NULL);
-	ASSERT(ndev != NULL);
-	ASSERT(ndev->magic == NDEV_MAGIC);
-	ASSERT(ndev->dev != NULL);
+	LISASSERT(skb != NULL);
+	LISASSERT(ndev != NULL);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->dev != NULL);
 
 	skb->mac.raw = skb->data;
 	skb->dev = ndev->dev;
 	atomic_add(skb->truesize, &ndev->wr_cur);
-	(struct ndev *)skb->sk = ndev;
+	skb->sk = (typeof(skb->sk)) ndev;
 	skb->destructor = ndev_skb_destruct;
 	dev_queue_xmit(skb);
 	return DONE;
@@ -1221,10 +1195,10 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	int psw;
 	struct ldldev *dev;
 
-	ASSERT(skb != NULL);
-	ASSERT(ndev != NULL);
-	ASSERT(ndev->magic == NDEV_MAGIC);
-	ASSERT(ndev->dev != NULL);
+	LISASSERT(skb != NULL);
+	LISASSERT(ndev != NULL);
+	LISASSERT(ndev->magic == NDEV_MAGIC);
+	LISASSERT(ndev->dev != NULL);
 
 	skb->mac.raw = skb->data;
 	skb->dev = dev = ndev->dev;
@@ -1237,7 +1211,7 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 
 		START_BH_ATOMIC(dev);
 		q = dev->qdisc;
-		ASSERT(q != NULL);
+		LISASSERT(q != NULL);
 		if (q->enqueue) {
 			int ret;
 
@@ -1347,12 +1321,12 @@ STATIC INLINE int notifier_unregister(void)
 /*                                                                          */
 /****************************************************************************/
 
-STATIC void dl_bufcallback(long idx)
+STATIC void _RP dl_bufcallback(long idx)
 {
 	struct dl *dl = &dl_dl[idx];
 
-	ASSERT(dl->rq != NULL);
-	ASSERT(dl->bufwait);
+	LISASSERT(dl->rq != NULL);
+	LISASSERT(dl->bufwait);
 
 	dl->bufwait = 0;
 	qenable(WR(dl->rq));
@@ -1360,7 +1334,7 @@ STATIC void dl_bufcallback(long idx)
 
 STATIC int dl_bufcall(struct dl *dl, mblk_t *mp, int size)
 {
-	ASSERT(!dl->bufwait);
+	LISASSERT(!dl->bufwait);
 	if ((dl->bufwait = bufcall(size, BPRI_HI, dl_bufcallback, dl-dl_dl)) == 0) {
 		printk("ldl: bufcall failed\n");
 		freemsg(mp);
@@ -1381,8 +1355,8 @@ STATIC int dl_bufcall(struct dl *dl, mblk_t *mp, int size)
  */
 STATIC INLINE int pri_dlpi2netdevice(dl_ulong pri)
 {
-	ASSERT(pri >= 0);
-	ASSERT(pri <= 100);
+	LISASSERT(pri >= 0);
+	LISASSERT(pri <= 100);
 
 	return (pri < 33) ? LDLPRI_HI :
 			    (pri < 66) ? LDLPRI_MED : LDLPRI_LO;
@@ -1400,8 +1374,8 @@ STATIC INLINE int reuse_msg(msgb_t *mp, dl_ushort size)
 {
 	msgb_t *bp;
 
-	ASSERT(mp != NULL);
-	ASSERT(mp->b_datap != NULL);
+	LISASSERT(mp != NULL);
+	LISASSERT(mp->b_datap != NULL);
 
 	if (mp->b_datap->db_lim - mp->b_datap->db_base < size);
 		return 0;
@@ -1422,7 +1396,7 @@ STATIC INLINE void make_dl_ok_ack(msgb_t *mp, dl_ulong primitive)
 {
 	dl_ok_ack_t *ackp;
 
-	/* ASSERT(reuse_msg(mp, DL_OK_ACK_SIZE)); */
+	/* LISASSERT(reuse_msg(mp, DL_OK_ACK_SIZE)); */
 
 	mp->b_datap->db_type = M_PCPROTO;
 	ackp = (dl_ok_ack_t *)mp->b_datap->db_base;
@@ -1439,7 +1413,7 @@ STATIC INLINE void make_dl_error_ack(msgb_t *mp, dl_ulong primitive,
 {
 	dl_error_ack_t *ackp;
 
-	/* ASSERT(reuse_msg(mp, DL_ERROR_ACK_SIZE)); */
+	/* LISASSERT(reuse_msg(mp, DL_ERROR_ACK_SIZE)); */
 
 	mp->b_datap->db_type = M_PCPROTO;
 	ackp = (dl_error_ack_t *)mp->b_datap->db_base;
@@ -1546,7 +1520,7 @@ STATIC int reply_error_ack(struct dl *dl, msgb_t *mp, dl_ulong primitive,
 
 STATIC int eth_ii_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(dl->sap_len == 2);
+	LISASSERT(dl->sap_len == 2);
 	if (len < 14)
 		return 0;
 	if (*(short *)(fr + 12) != *(short *)dl->sap->sap.sap) {
@@ -1572,8 +1546,8 @@ STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 	dl_unitdata_ind_t *ud;
 	unsigned short dsap = ntohs(*(unsigned short *)(dp->b_rptr + 12));
 
-	ASSERT(dl->sap_len == 2);
-	ASSERT(dl->addr_len == 6);
+	LISASSERT(dl->sap_len == 2);
+	LISASSERT(dl->addr_len == 6);
 
 	if ((bp = allocb(DL_UNITDATA_IND_SIZE + 16, BPRI_LO)) == NULL) {
 		freeb(dp);
@@ -1634,7 +1608,7 @@ STATIC int eth_ii_mkhdr(struct dl *dl, unsigned char *dst,
  */
 STATIC int eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(dl->sap_len == 1);
+	LISASSERT(dl->sap_len == 1);
 
 	/*
 	 * The LDLFLAG_RAW check will disappear when we
@@ -1692,8 +1666,8 @@ STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 	dl_unitdata_ind_t *ud;
 	unsigned short len;
 
-	ASSERT(dl->sap_len == 1);
-	ASSERT(dl->addr_len == 6);
+	LISASSERT(dl->sap_len == 1);
+	LISASSERT(dl->addr_len == 6);
 
 	if ((bp = allocb(DL_UNITDATA_IND_SIZE + 14, BPRI_LO)) == NULL) {
 		freeb(dp);
@@ -1758,7 +1732,7 @@ STATIC int eth_8022_mkhdr(struct dl *dl, unsigned char *dst,
  */
 STATIC int eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(dl->sap_len == 1);
+	LISASSERT(dl->sap_len == 1);
 
 	if (len < 17 || ntohs(*(unsigned short *)(fr + 12)) < 3)
 		return 0;
@@ -1788,8 +1762,8 @@ STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 	dl_unitdata_ind_t *ud;
 	unsigned short len;
 
-	ASSERT(dl->sap_len == 1);
-	ASSERT(dl->addr_len == 6);
+	LISASSERT(dl->sap_len == 1);
+	LISASSERT(dl->addr_len == 6);
 
 	if ((bp = allocb(DL_UNITDATA_IND_SIZE + 14, BPRI_LO)) == NULL) {
 		freeb(dp);
@@ -1843,7 +1817,7 @@ STATIC int eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst,
 
 STATIC int eth_snap_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(dl->sap_len == 2);
+	LISASSERT(dl->sap_len == 2);
 	if (len < 22 ||
 	    ntohs(*(unsigned short *)(fr + 12)) < 8 ||
 	    *(unsigned short *)(fr + 14) != 0xAAAA ||
@@ -1877,8 +1851,8 @@ STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 	unsigned short len;
 	unsigned short dsap = ntohs(*(unsigned short *)(dp->b_rptr + 17));
 
-	ASSERT(dl->sap_len == 2);
-	ASSERT(dl->addr_len == 6);
+	LISASSERT(dl->sap_len == 2);
+	LISASSERT(dl->addr_len == 6);
 
 	if ((bp = allocb(DL_UNITDATA_IND_SIZE + 22, BPRI_LO)) == NULL) {
 		freeb(dp);
@@ -1950,7 +1924,7 @@ STATIC int eth_snap_mkhdr(struct dl *dl, unsigned char *dst,
 
 STATIC int ipx_8023_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(dl->sap_len == 0);
+	LISASSERT(dl->sap_len == 0);
 	/* Must have a complete IPX header */
 	if (len < 44 || ntohs(*(unsigned short *)(fr + 12)) < 30)
 		return 0;
@@ -1969,8 +1943,8 @@ STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 	dl_unitdata_ind_t *ud;
 	unsigned short len;
 
-	ASSERT(dl->sap_len == 0);
-	ASSERT(dl->addr_len == 6);
+	LISASSERT(dl->sap_len == 0);
+	LISASSERT(dl->addr_len == 6);
 
 	if ((bp = allocb(DL_UNITDATA_IND_SIZE + 12, BPRI_LO)) == NULL) {
 		freeb(dp);
@@ -2089,7 +2063,7 @@ STATIC int tr_8022_want(struct dl *dl, unsigned char *fr, int len)
 #endif
 
     trp = (tr_hdr_t *) fr ;
-    ASSERT(dl->sap_len == 1);
+    LISASSERT(dl->sap_len == 1);
     if (len < sizeof(tr_hdr_t)-2 + sizeof(tr_llc_frm_hdr_t))
 	    return 0;
     /*
@@ -2164,8 +2138,8 @@ STATIC mblk_t *tr_8022_rcvind(struct dl *dl, mblk_t *dp)
     tr_llc_frm_hdr_t	*llcp ;
     int			 rtelgth = 0 ;
 
-    ASSERT(dl->sap_len == 1);
-    ASSERT(dl->addr_len == 6);
+    LISASSERT(dl->sap_len == 1);
+    LISASSERT(dl->addr_len == 6);
 
     trp = (tr_hdr_t *) dp->b_rptr ;
     if (trp->src_addr[0] & SADDR_0_RTE_PRES)
@@ -2291,20 +2265,20 @@ STATIC int hdlc_raw_mkhdr(struct dl *dl, unsigned char *dst,
 
 STATIC int fddi_8022_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(0);
+	LISASSERT(0);
 	return 0;
 }
 
 STATIC mblk_t *fddi_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
-	ASSERT(0);
+	LISASSERT(0);
 	return NULL;
 }
 
 STATIC int fddi_8022_mkhdr(struct dl *dl, unsigned char *dst,
 			   int datalen, struct sk_buff *skb)
 {
-	ASSERT(0);
+	LISASSERT(0);
 	return 0;
 }
 
@@ -2314,20 +2288,20 @@ STATIC int fddi_8022_mkhdr(struct dl *dl, unsigned char *dst,
 
 STATIC int fddi_snap_want(struct dl *dl, unsigned char *fr, int len)
 {
-	ASSERT(0);
+	LISASSERT(0);
 	return 0;
 }
 
 STATIC mblk_t *fddi_snap_rcvind(struct dl *dl, mblk_t *dp)
 {
-	ASSERT(0);
+	LISASSERT(0);
 	return NULL;
 }
 
 STATIC int fddi_snap_mkhdr(struct dl *dl, unsigned char *dst,
 			   int datalen, struct sk_buff *skb)
 {
-	ASSERT(0);
+	LISASSERT(0);
 	return 0;
 }
 
@@ -2373,7 +2347,7 @@ STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 	 * service routine.  Do not do putnexts from interrupt level.
 	 */
 	if (canput(dl->rq)) {
-		putq(dl->rq, mp);
+		putqf(dl->rq, mp);
 		ginc(unitdata_q_cnt) ;
 	} else {
 		freemsg(mp);
@@ -2388,7 +2362,7 @@ STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 		putnext(dl->rq, mp);
 		ginc(unitdata_ind_cnt) ;
 	} else if (canput(dl->rq)) {
-		putq(dl->rq, mp);
+		putqf(dl->rq, mp);
 		ginc(unitdata_q_cnt) ;
 	} else {
 		freemsg(mp);
@@ -2431,7 +2405,7 @@ STATIC int rcv_func(struct sk_buff *skb,
 	unsigned char *fr_ptr, fr_buf[LDL_MAX_HDR_LEN];
 	int fr_len;
 
-	ASSERT(dev->type == ARPHRD_ETHER || dev->type == ARPHRD_LOOPBACK
+	LISASSERT(dev->type == ARPHRD_ETHER || dev->type == ARPHRD_LOOPBACK
 	       || dev->type == ARPHRD_IEEE802 || IS_ARPHRD_IEEE802_TR(dev)
 	       || dev->type == ARPHRD_HDLC);
 		/*	ARPHRD_FDDI	*/
@@ -2453,7 +2427,7 @@ STATIC int rcv_func(struct sk_buff *skb,
 	} else { /* We still need the frame type for correct drop stats */
 		fr_ptr = &fr_buf[0];
 		fr_len = lis_min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
-		ASSERT(fr_len > 0);
+		LISASSERT(fr_len > 0);
 		memcpy(fr_buf, skb->mac.raw, fr_len);
 	}
 
@@ -2472,15 +2446,15 @@ STATIC int rcv_func(struct sk_buff *skb,
 			 ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
 
 	lis_rw_read_lock(&((struct pt *)pt)->lock);
-	ASSERT(((struct pt *)pt)->magic == PT_MAGIC);
+	LISASSERT(((struct pt *)pt)->magic == PT_MAGIC);
 
 	for (sap = ((struct pt *)pt)->listen;
 	     sap != NULL; sap = sap->next_listen) {
 		dl = sap->dl;
-		ASSERT(dl != NULL);
-		ASSERT(dl->magic == DL_MAGIC);
-		ASSERT(dl->rq != NULL);
-		ASSERT(dl->ndev->dev == dev);
+		LISASSERT(dl != NULL);
+		LISASSERT(dl->magic == DL_MAGIC);
+		LISASSERT(dl->rq != NULL);
+		LISASSERT(dl->ndev->dev == dev);
 		if (dl->wantsframe(dl, fr_ptr, fr_len)) {
 			if (last != NULL)
 				dl_rcv_put(dp, last, 1);
@@ -2568,7 +2542,7 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
 	if (mp->b_datap->db_type == M_DATA)	/* not a unitdata req */
 		reqp = &dummy ;
 	else
-		ASSERT(reqp->dl_primitive == DL_UNITDATA_REQ);
+		LISASSERT(reqp->dl_primitive == DL_UNITDATA_REQ);
 
 	switch (err) {
 	    case TXE_OUTSTATE:
@@ -2593,7 +2567,7 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
 			     reqp->dl_dest_addr_length, DL_UNSUPPORTED, 0);
 		break;
 	    default:
-		ASSERT(0);
+		LISASSERT(0);
 	}
 
 	freemsg(mp);
@@ -2684,9 +2658,9 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 	int pri, dlen;
 
 	ginc(unitdata_req_cnt) ;
-	ASSERT(mp->b_datap->db_type == M_PROTO ||
+	LISASSERT(mp->b_datap->db_type == M_PROTO ||
 	       mp->b_datap->db_type == M_PCPROTO);
-	ASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(dl->magic == DL_MAGIC);
 
 	if (ldl_debug_mask & LDL_DEBUG_UDREQ)
 	    ldl_mp_data_dump("ldl_unitdata_req", mp,
@@ -2696,12 +2670,12 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 		return tx_failed(dl, mp, TXE_OUTSTATE);
 
 	reqp = (dl_unitdata_req_t *)mp->b_rptr;
-	ASSERT(reqp->dl_primitive == DL_UNITDATA_REQ);
+	LISASSERT(reqp->dl_primitive == DL_UNITDATA_REQ);
 
 	if ((dl->flags & LDLFLAG_RAW) != 0) {	/* raw means don't chk addrs */
 	    int		rslt ;
 	    dmp = mp->b_cont;
-	    ASSERT(dmp != NULL);		/* needs data buffer */
+	    LISASSERT(dmp != NULL);		/* needs data buffer */
 	    if (dmp == NULL)
 		return tx_failed(dl, mp, TXE_NULL);
 	    rslt = tx_func_raw(dl, dmp) ;	/* send raw pkt */
@@ -2717,7 +2691,7 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 		return tx_failed(dl, mp, TXE_BADADDR);
 
 	if ((dmp = mp->b_cont) != NULL) {
-		ASSERT(dmp->b_datap->db_type == M_DATA);
+		LISASSERT(dmp->b_datap->db_type == M_DATA);
 		dlen = msgdsize(dmp);
 		if (dlen > dl->mtu)
 			return tx_failed(dl, mp, TXE_BADMTU);
@@ -2733,7 +2707,7 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 	skb->free = 1;
 #endif
 
-	ASSERT(dlen == 0 || dmp != NULL);
+	LISASSERT(dlen == 0 || dmp != NULL);
 
 	/*
 	 *  Fill in the MAC header
@@ -2759,16 +2733,16 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 		void *p;
 		int dlen;
 
-		ASSERT(dmp->b_datap->db_type == M_DATA); 
+		LISASSERT(dmp->b_datap->db_type == M_DATA); 
 
 		dlen = dmp->b_wptr - dmp->b_rptr;
-		ASSERT(dlen > 0);
+		LISASSERT(dlen > 0);
 		p = skb_put(skb, dlen);
-		ASSERT(p != NULL);
+		LISASSERT(p != NULL);
 		memcpy(p, dmp->b_rptr, dlen);
 		dmp = dmp->b_cont;
 	}
-	ASSERT(skb->len == dlen + dl->machdr_len);
+	LISASSERT(skb->len == dlen + dl->machdr_len);
 
 
 	if (ldl_debug_mask & LDL_DEBUG_TX)
@@ -2802,9 +2776,9 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 	struct sk_buff *skb;
 	int pri, dlen;
 
-	ASSERT(mp->b_datap->db_type == M_DATA);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT((dl->flags & LDLFLAG_RAW) != 0);
+	LISASSERT(mp->b_datap->db_type == M_DATA);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT((dl->flags & LDLFLAG_RAW) != 0);
 
 	if (   dl->dlstate != DL_IDLE
 	    || !driver_started(dl->ndev->dev)
@@ -2830,16 +2804,16 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 		void *p;
 		int dlen;
 
-		ASSERT(mp->b_datap->db_type == M_DATA); 
+		LISASSERT(mp->b_datap->db_type == M_DATA); 
 
 		dlen = mp->b_wptr - mp->b_rptr;
-		ASSERT(dlen > 0);
+		LISASSERT(dlen > 0);
 		p = skb_put(skb, dlen);
-		ASSERT(p != NULL);
+		LISASSERT(p != NULL);
 		memcpy(p, mp->b_rptr, dlen);
 		mp = mp->b_cont;
 	}
-	ASSERT(skb->len == dlen);
+	LISASSERT(skb->len == dlen);
 
 	if (ldl_debug_mask & LDL_DEBUG_TX)
 	    ldl_bfr_dump("ldl_tx_func", skb->data, skb->len,
@@ -2934,8 +2908,8 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 	if (dl->dlstate != DL_UNATTACHED) {
 		int ofs = DL_INFO_ACK_SIZE + sizeof(dl_qos_cl_sel1_t) + sizeof(dl_qos_cl_range1_t);
 
-		ASSERT(dl->ndev != NULL);
-		ASSERT(dl->ndev->dev != NULL);
+		LISASSERT(dl->ndev != NULL);
+		LISASSERT(dl->ndev->dev != NULL);
 
 		ackp->dl_sap_length = -dl->sap_len;
 		ackp->dl_max_sdu = dl->ndev->dev->mtu;
@@ -2970,7 +2944,7 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 		mp->b_wptr += dl->addr_len;
 
 		if (dl->dlstate == DL_IDLE) {
-			ASSERT(dl->sap != NULL);
+			LISASSERT(dl->sap != NULL);
 			ofs += dl->addr_len;
 			ackp->dl_addr_offset = ofs;
 			ackp->dl_addr_length = dl->addr_len + dl->sap_len;
@@ -3047,6 +3021,7 @@ STATIC INLINE int ws_phys_addr(struct dl *dl, mblk_t *mp)
 	}
 }
 
+#if 0			/* remove if routine is ever used */
 STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 {
 	dl_set_phys_addr_req_t *reqp;
@@ -3073,7 +3048,7 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 	 *  our (ok or error) ack.
 	 *  So we allocate a buffer for the ack now.
 	 */
-	ASSERT(DL_ERROR_ACK_SIZE >= DL_OK_ACK_SIZE);
+	LISASSERT(DL_ERROR_ACK_SIZE >= DL_OK_ACK_SIZE);
 	if ((ack_mp = allocb(DL_ERROR_ACK_SIZE, BPRI_HI)) == NULL)
 		return dl_bufcall(dl, ack_mp, DL_ERROR_ACK_SIZE);
 
@@ -3103,8 +3078,8 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 		hangup_do(dl);
 		return DONE;
 	}
-	ASSERT((dl->ndev->dev->flags & IFF_UP) != 0);
-	ASSERT((dl->ndev->dev->flags & IFF_RUNNING) != 0);
+	LISASSERT((dl->ndev->dev->flags & IFF_UP) != 0);
+	LISASSERT((dl->ndev->dev->flags & IFF_RUNNING) != 0);
 
 	make_dl_ok_ack(ack_mp, DL_SET_PHYS_ADDR_REQ);
 	putnext(dl->rq, ack_mp);
@@ -3112,6 +3087,7 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 
 	return DONE;
 }
+#endif
 
 STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 {
@@ -3143,7 +3119,7 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 		return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 	}
 	dev = ndev->dev;
-	ASSERT(dev != NULL);
+	LISASSERT(dev != NULL);
 
 	switch (dev->type) {
 	    case ARPHRD_ETHER:
@@ -3285,7 +3261,7 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 
 		case ARPHRD_FDDI:
 			/* Not implemented */
-			ASSERT(0);
+			LISASSERT(0);
 			SPLX(psw);
 			return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 		case ARPHRD_HDLC:
@@ -3321,7 +3297,7 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 		dl->mkhdr = ipx_8023_mkhdr;
 		break;
 	    default:
-		ASSERT(0);
+		LISASSERT(0);
 		SPLX(psw);
 		return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 	}
@@ -3356,7 +3332,7 @@ STATIC INLINE int ws_detach(struct dl *dl, mblk_t *mp)
 		return DONE; /* Bogus, bufcall failed */
 
 	SPLSTR(psw);
-	ASSERT(dl->dlstate == DL_UNBOUND);
+	LISASSERT(dl->dlstate == DL_UNBOUND);
 	dl->dlstate = DL_UNATTACHED;
 	dl->addr_len = 0;
 	ndev_release(dl);
@@ -3436,7 +3412,7 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 				return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
 			}
 		default:
-			ASSERT(0);
+			LISASSERT(0);
 			return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
 	}
 
@@ -3519,7 +3495,7 @@ STATIC INLINE int ws_unbind(struct dl *dl, mblk_t *mp)
 
 	/* Change state */
 	SPLSTR(psw);
-	ASSERT(dl->dlstate == DL_UNBIND_PENDING);
+	LISASSERT(dl->dlstate == DL_UNBIND_PENDING);
 	dl->dlstate = DL_UNBOUND;
 	if ((dl->flags & LDLFLAG_HANGUP) != 0) {
 		SPLX(psw);
@@ -3566,7 +3542,7 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 			SPLX(psw);
 			return reply_error_ack(dl, mp, DL_SUBS_BIND_REQ, DL_BADADDR, 0);
 		}
-		ASSERT(dl->sap_len == 2);
+		LISASSERT(dl->sap_len == 2);
 		memcpy(oui, mp->b_rptr + reqp->dl_subs_sap_offset, 3);
 
 		len = DL_SUBS_BIND_ACK_SIZE + 3;
@@ -3632,7 +3608,7 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 			break;
 		    case LDL_FRAME_802_3:
 		    default:
-			ASSERT(0);
+			LISASSERT(0);
 			freemsg(mp);
 			return DONE;
 		}
@@ -3699,14 +3675,14 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 	switch (dl->framing) {
 	    case LDL_FRAME_EII:
 	    case LDL_FRAME_SNAP:
-		ASSERT(dl->sap_len == 2);
+		LISASSERT(dl->sap_len == 2);
 		if (saplen != 2)
 			return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
 		*(unsigned short *)&dlsap.sap[0] = htons(*(unsigned short *)sapptr);
 		break;
 	    case LDL_FRAME_802_2:
 	    case LDL_FRAME_RAW_LLC:
-		ASSERT(dl->sap_len == 1);
+		LISASSERT(dl->sap_len == 1);
 		if (saplen != 1)
 			return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
 		dlsap.sap[0] = *sapptr;
@@ -3724,9 +3700,9 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 	if (sap == NULL)
 		return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
 
-	ASSERT(!memcmp(dlsap.sap, sap->sap.sap, dl->sap_len));
-	ASSERT(sap->magic == SAP_MAGIC);
-	ASSERT(sap->dl == dl);
+	LISASSERT(!memcmp(dlsap.sap, sap->sap.sap, dl->sap_len));
+	LISASSERT(sap->magic == SAP_MAGIC);
+	LISASSERT(sap->dl == dl);
 
 	/* Change state */
 	SPLSTR(psw);
@@ -3749,7 +3725,7 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 
 	/* Change state */
 	SPLSTR(psw);
-	ASSERT(dl->dlstate == DL_SUBS_UNBIND_PND);
+	LISASSERT(dl->dlstate == DL_SUBS_UNBIND_PND);
 	dl->dlstate = DL_IDLE;
 	if ((dl->flags & LDLFLAG_HANGUP) != 0) {
 		hangup_set(dl);
@@ -3960,14 +3936,14 @@ STATIC INLINE int ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	mblk_t *dp;
 	int psw;
 
-	ASSERT(iocp->ioc_cmd == LDL_SETFLAGS);
+	LISASSERT(iocp->ioc_cmd == LDL_SETFLAGS);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp); /* No M_DATA block for flags */
 	if (iocp->ioc_count != sizeof(struct ldl_flags_ioctl))
 		return ioc_nak(dl, mp); /* Bad data size */
 	dp = mp->b_cont;
-	ASSERT(dp->b_wptr - dp->b_rptr >= sizeof(struct ldl_flags_ioctl));
+	LISASSERT(dp->b_wptr - dp->b_rptr >= sizeof(struct ldl_flags_ioctl));
 	flg = (struct ldl_flags_ioctl *)dp->b_rptr;
 	flg->mask &= ~LDLFLAG_PRIVATE; /* Cannot set private flags */
 	SPLSTR(psw);
@@ -3989,7 +3965,7 @@ STATIC INLINE int ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	dl_ulong ppa;
 	mblk_t *dp;
 
-	ASSERT(iocp->ioc_cmd == LDL_FINDPPA);
+	LISASSERT(iocp->ioc_cmd == LDL_FINDPPA);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp); /* No M_DATA block for name */
@@ -4023,13 +3999,13 @@ STATIC INLINE int ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	mblk_t *dp;
 	int len;
 
-	ASSERT(iocp->ioc_cmd == LDL_GETNAME);
+	LISASSERT(iocp->ioc_cmd == LDL_GETNAME);
 
 	if (dl->dlstate == DL_UNATTACHED)
 		return ioc_nak(dl, mp); /* Not attached to a device */
 
-	ASSERT(dl->ndev != NULL);
-	ASSERT(dl->ndev->dev != NULL);
+	LISASSERT(dl->ndev != NULL);
+	LISASSERT(dl->ndev->dev != NULL);
 
 	len = strlen(dl->ndev->dev->name) + 1;
 	if ((dp = allocb(len, BPRI_HI)) == NULL)
@@ -4053,7 +4029,7 @@ STATIC INLINE int ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
 
-	ASSERT(iocp->ioc_cmd == LDL_GETGSTATS);
+	LISASSERT(iocp->ioc_cmd == LDL_GETGSTATS);
 	if (iocp->ioc_count != sizeof(ldl_gstats))
 		return ioc_nak(dl, mp);		/* wrong size struct */
 
@@ -4080,14 +4056,14 @@ STATIC INLINE int ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t 
 	mblk_t *dp;
 	unsigned long	*lp ;
 
-	ASSERT(iocp->ioc_cmd == LDL_SETDEBUG);
+	LISASSERT(iocp->ioc_cmd == LDL_SETDEBUG);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp); /* No M_DATA block for flags */
 	if (iocp->ioc_count != sizeof(ldl_debug_mask))
 		return ioc_nak(dl, mp); /* Bad data size */
 	dp = mp->b_cont;
-	ASSERT(dp->b_wptr - dp->b_rptr >= sizeof(ldl_debug_mask));
+	LISASSERT(dp->b_wptr - dp->b_rptr >= sizeof(ldl_debug_mask));
 	lp = (unsigned long *)dp->b_rptr;
 	ldl_debug_mask = *lp ;
 
@@ -4103,7 +4079,7 @@ STATIC INLINE int ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t 
 /* End of: IOCTL routine helpers.                                           */
 /****************************************************************************/
 
-STATIC int dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int _RP dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	dev_t i;
 
@@ -4112,7 +4088,7 @@ STATIC int dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (!initialized)
 		ldl_init();
 
-	ASSERT(initialized);
+	LISASSERT(initialized);
 
 	lis_spin_lock(&first_open_lock);
 
@@ -4131,14 +4107,14 @@ STATIC int dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 	}
 	/* *devp = makedevice(major(*devp), i); */
-	*devp = MKDEV(MAJOR(*devp), i);
+	*devp = makedevice(getmajor(*devp), i);
 
 	if (q->q_ptr != NULL) {
 		lis_spin_unlock(&first_open_lock);
 		return 0;
 	}
 
-	ASSERT(dl_dl[i].magic == 0);
+	LISASSERT(dl_dl[i].magic == 0);
 	dl_dl[i].magic = DL_MAGIC;
 	dl_dl[i].rq = q;
 	dl_dl[i].lost_rcv = dl_dl[i].lost_send = 0;
@@ -4159,20 +4135,19 @@ STATIC int dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	} else
 		lis_spin_unlock(&first_open_lock);
 
-#ifdef MODULE
-        MOD_INC_USE_COUNT;
-#endif
+        MODGET();
+
 	return 0;
 }
 
-STATIC int dl_close(queue_t *q, int flag, cred_t *crp)
+STATIC int _RP dl_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct dl **dlp, *dl = (struct dl *)q->q_ptr;
 	int psw;
 
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(dl->rq == q);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(dl->rq == q);
 
 	SPLSTR(psw);
 
@@ -4214,9 +4189,9 @@ STATIC int dl_close(queue_t *q, int flag, cred_t *crp)
 	} else
 		lis_spin_unlock(&first_open_lock);
 
-#ifdef MODULE
-        MOD_DEC_USE_COUNT;
-#endif
+
+        MODPUT();
+
 /* printk("After close: pt_n_alloc=%d sap_n_alloc=%d ndev_n_alloc=%d\n",
 	pt_n_alloc, sap_n_alloc, ndev_n_alloc); */
 	return 0;
@@ -4224,15 +4199,15 @@ STATIC int dl_close(queue_t *q, int flag, cred_t *crp)
 
 STATIC int write_service_raw(struct dl *dl, mblk_t *mp)
 {
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(!dl->bufwait);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(!dl->bufwait);
 
-	ASSERT(mp != NULL);
-	ASSERT(mp->b_datap != NULL);
-	ASSERT(mp->b_rptr != NULL);
+	LISASSERT(mp != NULL);
+	LISASSERT(mp->b_datap != NULL);
+	LISASSERT(mp->b_rptr != NULL);
 
-	ASSERT(mp->b_datap->db_type == M_DATA);
+	LISASSERT(mp->b_datap->db_type == M_DATA);
 
 	if ((dl->flags & LDLFLAG_RAW) != 0)
 	{
@@ -4253,15 +4228,15 @@ STATIC int write_service(struct dl *dl, mblk_t *mp)
 {
 	dl_ulong primitive;
 
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(!dl->bufwait);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(!dl->bufwait);
 
-	ASSERT(mp != NULL);
-	ASSERT(mp->b_datap != NULL);
-	ASSERT(mp->b_rptr != NULL);
+	LISASSERT(mp != NULL);
+	LISASSERT(mp->b_datap != NULL);
+	LISASSERT(mp->b_rptr != NULL);
 
-	ASSERT(mp->b_datap->db_type == M_PROTO ||
+	LISASSERT(mp->b_datap->db_type == M_PROTO ||
 	       mp->b_datap->db_type == M_PCPROTO);
 
 	primitive = ((union DL_primitives *)mp->b_rptr)->dl_primitive;
@@ -4321,10 +4296,10 @@ STATIC int do_ioctl(struct dl *dl, mblk_t *mp)
 	struct iocblk *iocp;
 
 	ginc(ioctl_cnt) ;
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(mp != NULL);
-	ASSERT(mp->b_datap->db_type == M_IOCTL);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(mp != NULL);
+	LISASSERT(mp->b_datap->db_type == M_IOCTL);
 
 	iocp = (struct iocblk *)mp->b_rptr;
 
@@ -4347,7 +4322,7 @@ STATIC int do_ioctl(struct dl *dl, mblk_t *mp)
 /*
  *  Write queue put routine
  */
-STATIC int dl_wput(queue_t *q, mblk_t *mp)
+STATIC int _RP dl_wput(queue_t *q, mblk_t *mp)
 {
 	unsigned char msg_type = mp->b_datap->db_type;
 	dl_ulong      primitive;
@@ -4357,7 +4332,7 @@ STATIC int dl_wput(queue_t *q, mblk_t *mp)
 		primitive = ((union DL_primitives *)mp->b_rptr)->dl_primitive;
 		if (primitive == DL_UNITDATA_REQ && q->q_count != 0)
 		{				/* keep msgs FIFO */
-		    putq(q, mp) ;
+		    putqf(q, mp) ;
 		    ginc(unitdata_req_q_cnt) ;
 		    return(0) ;
 		}
@@ -4373,7 +4348,7 @@ STATIC int dl_wput(queue_t *q, mblk_t *mp)
 		case M_DATA:
 			if (q->q_count != 0)
 			{			/* keep msgs FIFO */
-			    putq(q, mp) ;
+			    putqf(q, mp) ;
 			    return(0) ;
 			}
 			if (write_service_raw((struct dl *)q->q_ptr, mp) == DONE)
@@ -4399,35 +4374,35 @@ STATIC int dl_wput(queue_t *q, mblk_t *mp)
 			return(0) ;
 	    }
 	}
-	putq(q, mp);
+	putqf(q, mp);
 	return(0) ;
 }
 
 /*
  *  Write queue service routine
  */
-STATIC int dl_wsrv(queue_t *q)
+STATIC int _RP dl_wsrv(queue_t *q)
 {
 	mblk_t *mp;
 	struct dl *dl = (struct dl *)q->q_ptr;
 
-	ASSERT(q != NULL);
-	ASSERT(dl != NULL);
-	ASSERT(dl->magic == DL_MAGIC);
-	ASSERT(!dl->bufwait);
+	LISASSERT(q != NULL);
+	LISASSERT(dl != NULL);
+	LISASSERT(dl->magic == DL_MAGIC);
+	LISASSERT(!dl->bufwait);
 
 	while ((mp = getq(q)) != NULL)
 	{
 		if (mp->b_datap->db_type != M_DATA) {
-			ASSERT(mp->b_datap->db_type == M_PROTO || 
+			LISASSERT(mp->b_datap->db_type == M_PROTO || 
 			       mp->b_datap->db_type == M_PCPROTO);
 
 			if (write_service(dl, mp) == RETRY) {
-				putbq(q, mp);
+				putbqf(q, mp);
 				return(0) ;
 			}
 		} else if (write_service_raw(dl, mp) == RETRY) {
-			putbq(q, mp);
+			putbqf(q, mp);
 			return(0) ;
 		}
 	}
@@ -4437,7 +4412,7 @@ STATIC int dl_wsrv(queue_t *q)
 /*
  *  Read queue service routine
  */
-STATIC int dl_rsrv(queue_t *q)
+STATIC int _RP dl_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 	while (canputnext(q)) {
@@ -4455,7 +4430,11 @@ STATIC int dl_rsrv(queue_t *q)
 
 #ifdef MODULE
 
+#ifdef KERNEL_2_5
+int ldl_init_module(void)
+#else
 int init_module(void)
+#endif
 {
         int ret = lis_register_strdev(LDL__CMAJOR_0, &ldl_info,
 				      LDL_N_MINOR, "ldl");
@@ -4463,24 +4442,29 @@ int init_module(void)
                 printk("ldl.init_module: Unable to register module.\n");
                 return ret;
         }
-#if defined(KERNEL_2_3)		/* make ldl_init visible */
 	inter_module_register("ldl_init", THIS_MODULE, ldl_init) ;
-#endif
 	ldl_init();
         return 0;
 }
 
+#ifdef KERNEL_2_5
+void ldl_cleanup_module(void)
+#else
 void cleanup_module(void)
-{
-#if defined(KERNEL_2_3)		/* make ldl_init invisible */
-	inter_module_unregister("ldl_init") ;
 #endif
+{
+	inter_module_unregister("ldl_init") ;
         if (lis_unregister_strdev(LDL__CMAJOR_0) < 0)
                 printk("ldl.cleanup_module: Unable to unregister module.\n");
         else
                 printk("ldl.cleanup_module: Unregistered, ready to be unloaded.\n");
         return;
 }
+
+#ifdef KERNEL_2_5
+module_init(ldl_init_module) ;
+module_exit(ldl_cleanup_module) ;
+#endif
 
 #endif
 

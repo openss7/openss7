@@ -33,7 +33,7 @@
  * 
  */
 
-#ident "@(#) LiS putst.c 1.4 11/5/02"
+#ident "@(#) LiS putst.c 1.5 09/13/04"
 
 #include <sys/stream.h>
 #include <sys/cmn_err.h>
@@ -54,9 +54,9 @@ static struct module_info putst_minfo =
   0				/* low water mark */
 };
 
-static int   putst_open  (queue_t *, dev_t*, int, int, cred_t *);
-static int   putst_close (queue_t *, int, cred_t *);
-static int   putst_test (void) ;
+static int   _RP putst_open  (queue_t *, dev_t*, int, int, cred_t *);
+static int   _RP putst_close (queue_t *, int, cred_t *);
+static int       putst_test (void) ;
 
 /* qinit structures (rd and wr side) 
  */
@@ -96,7 +96,7 @@ struct streamtab putst_info =
 /*
  * Open routine grants all opens
  */
-static int
+static int _RP
 putst_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
     (void) q ;					/* compiler happiness */
@@ -110,7 +110,7 @@ putst_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 } /* putst_open */
 
 
-static int
+static int _RP
 putst_close (queue_t *q, int dummy, cred_t *credp)
 {
     (void) q ;					/* compiler happiness */
@@ -131,7 +131,7 @@ static char	*txt1 = "abcdefg" ;
 static char	*txt2 = "hijklmnop" ;
 static char	*txt3 = "qrstuvwxyz" ;
 static char	 mybuf[50] ;
-static void esb_free(char *buf)
+static void _RP esb_free(char *buf)
 {
     if (buf == mybuf)
 	cmn_err(CE_CONT, "esb_free: passed correct buffer\n") ;

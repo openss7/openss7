@@ -32,7 +32,7 @@
  * 
  */
 
-#ident "@(#) LiS printk.c 2.3 3/19/01 22:03:39 "
+#ident "@(#) LiS printk.c 2.5 09/13/04 10:12:31 "
 
 #include <sys/stream.h>
 #include <sys/osif.h>
@@ -42,14 +42,14 @@ static struct module_info printk_minfo =
   0,				/* id */
   "printk",			/* name */
   0,				/* min packet size accepted */
-  0,				/* max packet size accepted */
-  0,				/* high water mark */
-  0				/* low water mark */
+  INFPSZ,			/* max packet size accepted */
+  50000,			/* high water mark */
+  40000				/* low water mark */
 };
 
-static int   printk_open  (queue_t *, dev_t*, int, int, cred_t *);
-static int   printk_close (queue_t *, int, cred_t *);
-static int   printk_wput (queue_t *, mblk_t *);
+static int   _RP printk_open  (queue_t *, dev_t*, int, int, cred_t *);
+static int   _RP printk_close (queue_t *, int, cred_t *);
+static int   _RP printk_wput (queue_t *, mblk_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -89,7 +89,7 @@ struct streamtab printk_info =
 /*
  * Open routine grants all opens
  */
-static int
+static int _RP
 printk_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
     (void) q ;					/* compiler happiness */
@@ -103,7 +103,7 @@ printk_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 } /* printk_open */
 
 
-static int
+static int _RP
 printk_close (queue_t *q, int dummy, cred_t *credp)
 {
     (void) q ;					/* compiler happiness */
@@ -113,7 +113,7 @@ printk_close (queue_t *q, int dummy, cred_t *credp)
     return(0) ;
 }
 
-static int 
+static int  _RP
 printk_wput (queue_t *q, mblk_t *msg)
 {
     mblk_t	*mp ;

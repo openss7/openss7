@@ -61,7 +61,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS ip_strm_mod.c 2.21 10/09/02 22:08:57 "
+#ident "@(#) LiS ip_strm_mod.c 2.27 09/13/04 10:12:45 "
 
 #define SAFE
 
@@ -167,22 +167,22 @@ extern int	ip_strm_init(struct ism_dev *dev) ;
 *									*
 ************************************************************************/
 
-extern  int		ip_to_streams_open(queue_t *,dev_t *,int ,int, cred_t *);
+extern  int	_RP ip_to_streams_open(queue_t *,dev_t *,int ,int, cred_t *);
 
-extern  int		ip_to_streams_close(queue_t *, int, cred_t *);
-extern  int		ip_to_streams_wput(queue_t *,mblk_t *);
-extern  int		ip_to_streams_wsrv(queue_t *);
-extern  int		ip_to_streams_rput(queue_t *,mblk_t *);
-extern  int	        ip_to_streams_rsrv(queue_t *);
-extern  int		ip_to_streams_conn_req(ip_to_streams_minor_t *minor_ptr,
+extern  int	_RP ip_to_streams_close(queue_t *, int, cred_t *);
+extern  int	_RP ip_to_streams_wput(queue_t *,mblk_t *);
+extern  int	_RP ip_to_streams_wsrv(queue_t *);
+extern  int	_RP ip_to_streams_rput(queue_t *,mblk_t *);
+extern  int     _RP ip_to_streams_rsrv(queue_t *);
+extern  int	ip_to_streams_conn_req(ip_to_streams_minor_t *minor_ptr,
 				      mblk_t *mp, int retry) ;
-extern int		ip_to_streams_proto(ip_to_streams_minor_t *, mblk_t *,
+extern int	ip_to_streams_proto(ip_to_streams_minor_t *, mblk_t *,
 					int );
 
 #ifdef GCOM
-extern  void		netman_hex_mp (mblk_t *, char *);
-extern  void    	Rsys_print_traced_token (char *bufp) ;
-extern	void		Rsys_hex_print(char *, unsigned char *, int);
+extern  void	netman_hex_mp (mblk_t *, char *);
+extern  void   	Rsys_print_traced_token (char *bufp) ;
+extern	void	Rsys_hex_print(char *, unsigned char *, int);
 #endif
 
 /************************************************************************
@@ -242,7 +242,7 @@ unsigned long		 ip_to_streams_debug_mask = 0;
 * The streams open routine. Called when this is pushed on to the stack	*
 *									*
 ************************************************************************/
-int
+int _RP
 ip_to_streams_open( queue_t *rdq,
 	   dev_t   *devp,
 	   int      flag,
@@ -270,11 +270,7 @@ ip_to_streams_open( queue_t *rdq,
     minor_ptr->dl_err_prim = -1 ;		/* ensure no retry */
 
     strcpy(minor_ptr->myname, "is") ;		/* initial name Ip/Streams */
-#if defined(KERNEL_2_3)
     strcpy(minor_ptr->mydev.name, "is") ;	/* initial name Ip/Streams */
-#else
-    minor_ptr->mydev.name = minor_ptr->myname ;
-#endif
     minor_ptr->mydev.init = ip_strm_init ;
     minor_ptr->mydev.priv = minor_ptr ;
 
@@ -293,7 +289,7 @@ ip_to_streams_open( queue_t *rdq,
 *									*
 ************************************************************************/
 
-int ip_to_streams_close(queue_t *q, int dummy, cred_t *credp)
+int _RP ip_to_streams_close(queue_t *q, int dummy, cred_t *credp)
 {
     ip_to_streams_minor_t	*minor_ptr ;
 
@@ -365,11 +361,7 @@ int ip_to_streams_ioctl(queue_t *q, mblk_t  *mp)
 	if (xmp != NULL && *xmp->b_rptr != 0)		/* name specified */
 	{
 	    strncpy(minor_ptr->myname, xmp->b_rptr, sizeof(minor_ptr->myname)) ;
-#if defined(KERNEL_2_3)
 	    strcpy(minor_ptr->mydev.name, minor_ptr->myname) ;
-#else
-	    minor_ptr->mydev.name = minor_ptr->myname ;
-#endif
 	    if ((result = register_netdev(&minor_ptr->mydev)) != 0)
 		printk("ip_to_streams_ioctl: "
 		       "register_netdev(%s) failed: %d\n",
@@ -432,7 +424,7 @@ int ip_to_streams_ioctl(queue_t *q, mblk_t  *mp)
 *									*
 ************************************************************************/
 
-int ip_to_streams_wput(queue_t *q, mblk_t  *mp)
+int _RP ip_to_streams_wput(queue_t *q, mblk_t  *mp)
 {
     ip_to_streams_minor_t	*minor_ptr ;
 
@@ -459,7 +451,7 @@ int ip_to_streams_wput(queue_t *q, mblk_t  *mp)
 	if ( canputnext(q) )		/* data uses flow control */
 	    putnext(q, mp);
 	else
-	    putq(q, mp);
+	    putqf(q, mp);
 	break;
 
     case M_PROTO:
@@ -481,7 +473,7 @@ int ip_to_streams_wput(queue_t *q, mblk_t  *mp)
 		if ( canputnext(q) )		/* data uses flow control */
 		    putnext(q, mp);
 		else
-		    putq(q, mp);
+		    putqf(q, mp);
 		return(0) ;
 	    }
 
@@ -848,7 +840,7 @@ ip_to_streams_ok_ack(ip_to_streams_minor_t *minor_ptr,
 *									*
 ************************************************************************/
 
-int ip_to_streams_rsrv(queue_t *q)
+int _RP ip_to_streams_rsrv(queue_t *q)
 {
     ip_to_streams_minor_t	*minor_ptr ;
     int			 done ;
@@ -911,7 +903,7 @@ int ip_to_streams_rsrv(queue_t *q)
 *									*
 ************************************************************************/
 
-int ip_to_streams_wsrv(queue_t *q)
+int _RP ip_to_streams_wsrv(queue_t *q)
 {
     ip_to_streams_minor_t	*minor_ptr ;
     mblk_t			*mp ;
@@ -957,7 +949,7 @@ int ip_to_streams_wsrv(queue_t *q)
 	    else
 	    {
 		netif_stop_queue(dev) ;
-		putbq(q, mp);
+		putbqf(q, mp);
 		return(0);			/* quit */
 	    }
 	    minor_ptr->stats.tx_packets++;
@@ -1015,7 +1007,7 @@ ip_to_streams_proto(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int retry)
 	    return(1) ;
 	}
 
-	putq(q, mp);
+	putqf(q, mp);
 
 	break ;
 
@@ -1026,7 +1018,7 @@ ip_to_streams_proto(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int retry)
 	    return(1) ;
 	}
 
-	putq(q, mp);
+	putqf(q, mp);
 	break ;
     }
 
@@ -1041,7 +1033,7 @@ ip_to_streams_proto(ip_to_streams_minor_t *minor_ptr, mblk_t *mp, int retry)
 * Handle a message from below.						*
 *									*
 ************************************************************************/
-int ip_to_streams_rput(queue_t *q, mblk_t  *mp)
+int _RP ip_to_streams_rput(queue_t *q, mblk_t  *mp)
 {
     ip_to_streams_minor_t      *minor_ptr = q->q_ptr;
     struct ism_dev *dev ;
@@ -1100,7 +1092,7 @@ int ip_to_streams_rput(queue_t *q, mblk_t  *mp)
 		if ( canputnext(q) )
 		    putnext(q, mp);
 		else
-		    putq(q, mp);
+		    putqf(q, mp);
 	    }
 	    break;
 	}
@@ -1147,7 +1139,7 @@ int ip_to_streams_rput(queue_t *q, mblk_t  *mp)
 		    if ( canputnext(q) )
 			putnext(q, mp);
 		    else
-			putq(q, mp);
+			putqf(q, mp);
 		}
 		break;
 
@@ -1155,7 +1147,7 @@ int ip_to_streams_rput(queue_t *q, mblk_t  *mp)
 		if ( canputnext(q) )
 		    putnext(q, mp);
 		else
-		    putq(q, mp);
+		    putqf(q, mp);
 		break;
 
 	    }
@@ -1397,7 +1389,7 @@ static int ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
     else
     {
 	netif_stop_queue(dev) ;
-        putq(ipptr->dl_wrq, mpt);
+        putqf(ipptr->dl_wrq, mpt);
     }
 
     if ( ip_to_streams_debug_mask & DBG_PUT )

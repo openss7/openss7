@@ -33,25 +33,9 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS connld.c 1.10 09/24/03"
+#ident "@(#) LiS connld.c 1.19 09/13/04"
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#else
-#  define MOD_INC_USE_COUNT  do {} while (0)
-#  define MOD_DEC_USE_COUNT  do {} while (0)
-#endif
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
 #include <sys/LiS/config.h>
 
@@ -80,10 +64,10 @@
 /*
  *  function prototypes
  */
-static int  connld_open(queue_t *, dev_t*, int, int, cred_t *);
-static int  connld_close(queue_t *, int, cred_t *);
-static int  connld_wput( queue_t *q, mblk_t *mp );
-static int  connld_rput( queue_t *q, mblk_t *mp );
+static int  _RP connld_open(queue_t *, dev_t*, int, int, cred_t *);
+static int  _RP connld_close(queue_t *, int, cred_t *);
+static int  _RP connld_wput( queue_t *q, mblk_t *mp );
+static int  _RP connld_rput( queue_t *q, mblk_t *mp );
 
 /*
  *  module structure
@@ -129,11 +113,9 @@ struct streamtab connld_info =
 /*
  *  open
  */
-static int connld_open( q, devp, flag, sflag, credp )
-queue_t *q;
-dev_t *devp;
-int flag, sflag;
-cred_t *credp;
+static int _RP connld_open( queue_t *q, dev_t *devp,
+			    int flag, int sflag,
+			    cred_t *credp )
 {
     stdata_t *head = q->q_str;
 
@@ -153,7 +135,7 @@ cred_t *credp;
 	return -EPIPE;
     }
 
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
     cmn_err(
 	CE_CONT,
 	"connld_open(q@0x%p, 0x%x, 0x%x,0x%x, ...)#%d "
@@ -175,7 +157,7 @@ cred_t *credp;
 	    return -EINVAL;
 	}
 
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
 	cmn_err( CE_CONT,
 		 "connld_open(): opening file@0x%p/%d - creating pipe...\n",
 		 oldf,
@@ -188,14 +170,14 @@ cred_t *credp;
 	    return error;
 	}
 
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
 	cmn_err( CE_CONT,
 		 "connld_open(...)"
 		 " >> pipe 0x%x(h@0x%p/%d/%d) <=X=> 0x%x(h@0x%p/%d/%d)\n",
-		 FILE_INODE(f0)->i_rdev,
+		 GET_I_RDEV(FILE_INODE(f0)),
 		 FILE_STR(f0),
 		 LIS_SD_REFCNT(FILE_STR(f0)), LIS_SD_OPENCNT(FILE_STR(f0)),
-		 FILE_INODE(f1)->i_rdev,
+		 GET_I_RDEV(FILE_INODE(f1)),
 		 FILE_STR(f1),
 		 LIS_SD_REFCNT(FILE_STR(f1)), LIS_SD_OPENCNT(FILE_STR(f1))
 		 );
@@ -239,21 +221,21 @@ cred_t *credp;
 	{
 	    struct stdata *oldhead = head;
 
-	    *devp = KDEV_TO_INT(FILE_INODE(f0)->i_rdev);
+	    *devp = GET_I_RDEV(FILE_INODE(f0));
 
-	    lis_atomic_dec(&oldhead->sd_refcnt);
+	    K_ATOMIC_DEC(&oldhead->sd_refcnt);
 	    head = FILE_STR(f0);
 	    SET_FILE_STR(oldf, head);
 	    lis_up(&oldhead->sd_opening);        /* release this before fput */
 
-	    lis_atomic_inc(&head->sd_refcnt);
-	    lis_atomic_inc(&head->sd_opencnt);   /* prevent opencnt->0 */
+	    K_ATOMIC_INC(&head->sd_refcnt);
+	    K_ATOMIC_INC(&head->sd_opencnt);   	 /* prevent opencnt->0 */
 	    fput(f0);                            /* calls strclose */
 
-	    lis_atomic_dec(&head->sd_opencnt);
+	    K_ATOMIC_DEC(&head->sd_opencnt);
 	    lis_down(&head->sd_opening);
 
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
 	    cmn_err( CE_CONT,
 		     "connld_open(...)"
 		     " >> replaced h@0x%p/--%d/%d -> h@0x%p/%d/--%d\n",
@@ -264,7 +246,7 @@ cred_t *credp;
 #endif
 	}
 
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
 	cmn_err(
 	    CE_CONT,
 	    "connld_open(q@0x%xp, 0x%x, 0x%x,0x%x, ...)#%d "
@@ -288,9 +270,13 @@ cred_t *credp;
 	/*
 	 *  set q_ptr as an open count flag
 	 */
-	((char *)q->q_ptr)++;
+	{
+	    char	*cp = (char *)q->q_ptr ;
 
-	MOD_INC_USE_COUNT;
+	    q->q_ptr = (void *) ++cp ;
+	}
+
+	MODGET();
     
 	return 0;
     }
@@ -299,23 +285,20 @@ cred_t *credp;
 /*
  *  close
  */
-static int connld_close( q, flag, credp )
-queue_t *q;
-int flag;
-cred_t *credp;
+static int _RP connld_close( queue_t *q, int flag, cred_t *credp)
 {
     stdata_t *head = q->q_str;
 
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
     cmn_err( CE_CONT,
 	     "connld_close(q@0x%p, 0x%x, ...) head 0x%p\n",
 	     q, flag, head );
 #endif
 
     q->q_ptr = NULL;
-#ifdef MODULE
-    MOD_DEC_USE_COUNT;
-#endif
+
+    MODPUT();
+
     qprocsoff(q);
 	
     if (!head || head->magic != STDATA_MAGIC) {
@@ -331,7 +314,7 @@ cred_t *credp;
 /*
  *  wput
  */
-static int connld_wput( queue_t *q, mblk_t *mp )
+static int _RP connld_wput( queue_t *q, mblk_t *mp )
 {
     /*
      *  connld is a module, but will at the bottom of a STREAM,
@@ -352,7 +335,7 @@ static int connld_wput( queue_t *q, mblk_t *mp )
 	}
 	break;
     default:
-#ifdef DEBUG
+#if 0 && defined(DEBUG)
 	cmn_err( CE_CONT,
 		 "connld_wput(q@0x%p,m@0x%p) message discarded\n",
 		 q, mp );
@@ -366,7 +349,7 @@ static int connld_wput( queue_t *q, mblk_t *mp )
 /*
  *  rput
  */
-static int connld_rput( queue_t *q, mblk_t *mp )
+static int _RP connld_rput( queue_t *q, mblk_t *mp )
 {
     putnext( q, mp );
 
@@ -379,7 +362,11 @@ static int connld_rput( queue_t *q, mblk_t *mp )
  *  Linux loadable module interface
  */
 
+#ifdef KERNEL_2_5
+int connld_init_module(void)
+#else
 int init_module(void)
+#endif
 {
     int ret = lis_register_strmod( &connld_info, MOD_NAME );
     if (ret < 0) {
@@ -392,7 +379,11 @@ int init_module(void)
     return 0;
 }
 
+#ifdef KERNEL_2_5
+void connld_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
     if (lis_unregister_strmod(&connld_info) < 0)
 	cmn_err( CE_CONT,
@@ -401,17 +392,30 @@ void cleanup_module(void)
     return;
 }
 
+#ifdef KERNEL_2_5
+module_init(connld_init_module) ;
+module_exit(connld_cleanup_module) ;
 #endif
 
 #if defined(LINUX)			/* linux kernel */
+
+#ifdef __attribute_used__
+#undef __attribute_used__
+#endif
+#define __attribute_used__
+
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL and additional rights");
 #endif
 #if defined(MODULE_AUTHOR)
-MODULE_AUTHOR("John A. Boyd Jr");
+MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
 #endif
 #if defined(MODULE_DESCRIPTION)
-MODULE_DESCRIPTION("STREAMS unique pipe generator");
+MODULE_DESCRIPTION("STREAMS unique pipe generator pseudo-module");
 #endif
+#if defined(MODULE_INFO) && defined(VERMAGIC_STRING)
+MODULE_INFO(vermagic, VERMAGIC_STRING);
 #endif
 
+#endif					/* LINUX */
+#endif					/* MODULE */

@@ -36,7 +36,7 @@
 #ifndef _MSG_H
 #define _MSG_H 1
 
-#ident "@(#) LiS msg.h 2.5 12/27/03 15:12:52 "
+#ident "@(#) LiS msg.h 2.8 09/13/04 10:13:51 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -54,6 +54,7 @@
 #ifndef _LIS_CONFIG_H
 #include <sys/strconfig.h>	/* config definitions */
 #endif
+#include <sys/LiS/genconf.h>
 
 
 
@@ -161,7 +162,7 @@ typedef msgb_t mblk_t;
 typedef
 struct free_rtn {
   SHARE
-        void (*free_func)(char *);      /* the free() function */
+        void _RP (*free_func)(char *);      /* the free() function */
         char *free_arg;                 /* argument */
 } frtn_t;
 
@@ -226,7 +227,7 @@ extern void lis_init_msg(void);
 
 /*  lis_terminate_msg - do the final shutdown of the msg memory subsystem
  */
-#if !(defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
+#if !(defined(LINUX) && defined(USE_KMEM_CACHE))
 extern void
 lis_terminate_msg(void);
 #endif
@@ -238,16 +239,16 @@ lis_terminate_msg(void);
  *      physical characteristics.
  */
 struct msgb *
-lis_allocb(int size, unsigned int priority, char *file_name, int line_nr);
+lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)_RP;
 struct msgb *
 lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr,
-		   char *file_name, int line_nr);
+		   char *file_name, int line_nr)_RP;
 
 /* testb: see if an allocation can actually be done.
  *
  */
 extern int
-lis_testb(int size, unsigned int priority);
+lis_testb(int size, unsigned int priority)_RP;
 
 /*
  * esballoc: allocate a message block, using a user-provided data buffer
@@ -255,20 +256,20 @@ lis_testb(int size, unsigned int priority);
  */
 extern mblk_t *
 lis_esballoc(unsigned char *base, int size, int priority,
-	     frtn_t *freeinfo, char *file_name, int line_nr);
+	     frtn_t *freeinfo, char *file_name, int line_nr)_RP;
 
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  *
  */
-extern void lis_freeb(mblk_t *bp);
-extern void lis_freedb(mblk_t *bp, int free_hdr);
+extern void lis_freeb(mblk_t *bp)_RP;
+extern void lis_freedb(mblk_t *bp, int free_hdr)_RP;
 
 /* freemsg - free a whole message
  *
  */
 void
-lis_freemsg(mblk_t *mp);
+lis_freemsg(mblk_t *mp)_RP;
 
 #endif				/* __KERNEL__ */
 

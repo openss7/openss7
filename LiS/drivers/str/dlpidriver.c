@@ -18,7 +18,7 @@
  * 
  */
 
-#ident "@(#) LiS dlpidriver.c 2.2 3/19/01 22:03:39 "
+#ident "@(#) LiS dlpidriver.c 2.6 09/13/04 10:12:30 "
 
 #include <linux/types.h>
 #include <linux/stream.h>
@@ -52,11 +52,11 @@ typedef enum retval
 }
 retval_t;
 
-STATIC int fropen(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int frclose(queue_t *q, int cred_t *);
-STATIC int frrsrv(queue_t *);
-STATIC int frwput(queue_t *, mblk_t *);
-STATIC int frwsrv(queue_t *);
+STATIC int _RP fropen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int _RP frclose(queue_t *q, int cred_t *);
+STATIC int _RP frrsrv(queue_t *);
+STATIC int _RP frwput(queue_t *, mblk_t *);
+STATIC int _RP frwsrv(queue_t *);
 
 STATIC retval_t fr_info(struct fr *);
 STATIC retval_t fr_bind(struct fr *, mblk_t *);
@@ -100,7 +100,7 @@ void frinit()
 }
 
 
-STATIC int fropen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t
+STATIC int _RP fropen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t
 		  *crp)
 {
     int i;
@@ -131,7 +131,7 @@ STATIC int fropen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t
     return 0;
 }
 
-STATIC int frclose(queue_t *q, int flag, cred_t *crp)
+STATIC int _RP frclose(queue_t *q, int flag, cred_t *crp)
 {
     struct fr *fr = (struct fr *)q->q_ptr;
     if (fr->idtype==TIME_ID)
@@ -145,7 +145,7 @@ STATIC int frclose(queue_t *q, int flag, cred_t *crp)
     return 0;
 }
 
-STATIC int frwput(queue_t *q, mblk_t *mp)
+STATIC int _RP frwput(queue_t *q, mblk_t *mp)
 {
     switch (mp->b_datap->db_type)
     {
@@ -167,7 +167,7 @@ STATIC int frwput(queue_t *q, mblk_t *mp)
 	break;
     case M_PROTO:
     case M_PCPROTO:
-	putq(q, mp);
+	putqf(q, mp);
 	break;
     default:
 	freemsg(mp);
@@ -176,7 +176,7 @@ STATIC int frwput(queue_t *q, mblk_t *mp)
     return 0;
 }
 
-STATIC int frwsrv(queue_t *q)
+STATIC int _RP frwsrv(queue_t *q)
 {
     mblk_t *mp;
     struct fr *fr;
@@ -188,7 +188,7 @@ STATIC int frwsrv(queue_t *q)
 	return 0;
     while ((mp = getq(q)) != NULL)
     {
-	ASSERT(mp->b_datap->db_type == M_PROTO || 
+	LISASSERT(mp->b_datap->db_type == M_PROTO || 
 	       mp->b_datap->db_type == M_PCPROTO);
 	err = 0;
 	dlp = (union DL_primitives *)mp->b_rptr;
@@ -198,7 +198,7 @@ STATIC int frwsrv(queue_t *q)
 	case DL_UNITDATA_REQ:
 	    s = splstr();
 	    if (frsndbusy)
-		putbq(q, mp);
+		putbqf(q, mp);
 	    else
 		fr_send(fr, mp);
 	    splx(s);
@@ -212,14 +212,14 @@ STATIC int frwsrv(queue_t *q)
 	case DL_BIND_REQ:
 	    if (fr_bind(fr, mp) == RETRY)
 	    {
-		putbq(q, mp);
+		putbqf(q, mp);
 		return 0;
 	    }
 	    break;
 	case DL_UNBIND_REQ:
 	    if (fr_unbind(fr, mp) == RETRY)
 	    {
-		putbq(q, mp);
+		putbqf(q, mp);
 		return 0;
 	    }
 	    break;
@@ -250,7 +250,7 @@ STATIC int frwsrv(queue_t *q)
 	    {
 		if (mp->b_datap->db_type < QPCTL)
 		{
-		    putbq(q, mp);
+		    putbqf(q, mp);
 		    return 0;
 		}
 		cmn_err(CE_WARN, "fr: can't generate DL_ERROR_ACK (%d)", prim);
@@ -262,19 +262,19 @@ STATIC int frwsrv(queue_t *q)
     return 0;
 }
 
-STATIC int frrsrv(queue_t *q)
+STATIC int _RP frrsrv(queue_t *q)
 {
     mblk_t *mp;
     while ((mp = getq(q)) != NULL)
     {
-	ASSERT(mp->b_datap->db_type == M_PROTO);
+	LISASSERT(mp->b_datap->db_type == M_PROTO);
 	if (canput(q->q_next)) 
 	{
 	    putnext(q, mp);
 	}
 	else
 	{
-	    putbq(q, mp);
+	    putbqf(q, mp);
 	    break;
 	}
     }
@@ -487,7 +487,7 @@ STATIC void fr_wsched(struct fr *fr, int size)
 }
 
 
-STATIC void fr_wcont(struct fr *fr)
+STATIC void _RP fr_wcont(struct fr *fr)
 {
     if (fr->rq != NULL)
     {
@@ -610,7 +610,7 @@ void frint(int vec)
 	    {
 		if (canput(fr[i].rq))
 		{
-		    putq(fr[i].rq, mp);
+		    putqf(fr[i].rq, mp);
 		    frrcvbusy = 1;
 		    return;
 		}

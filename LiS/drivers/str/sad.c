@@ -24,20 +24,9 @@
  * 
  */
 
-#ifdef MODVERSIONS
-# ifdef LISMODVERS
-#  include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-# else
-#  include <linux/modversions.h>
-# endif
-#endif
-#ifdef MODULE
-#include <linux/module.h>
-#include <linux/version.h>
-#endif
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
 #include <sys/stream.h>
-#include <sys/LiS/mod.h>
 
 #include <sys/sad.h>
 
@@ -72,9 +61,9 @@
 #endif
 
 
-STATIC int sad_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int sad_close(queue_t *, int, cred_t *);
-STATIC int sad_wput(queue_t *, mblk_t *);
+STATIC int _RP sad_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int _RP sad_close(queue_t *, int, cred_t *);
+STATIC int _RP sad_wput(queue_t *, mblk_t *);
 
 
 STATIC struct module_info sad_minfo = 
@@ -162,7 +151,7 @@ STATIC void sad_copyio(struct priv *p, mblk_t *mp, int type,
 
 	mp->b_datap->db_type = type;
 	mp->b_wptr = mp->b_rptr + sizeof(*req);
-	ASSERT(mp->b_wptr <= mp->b_datap->db_lim);
+	LISASSERT(mp->b_wptr <= mp->b_datap->db_lim);
 
 	req = (struct copyreq *)mp->b_rptr;
 	req->cq_addr = uaddr;
@@ -186,13 +175,13 @@ STATIC void sad_iocdata(struct priv *p, mblk_t *mp)
 		goto ioctl_done;
 	}
 
-	ASSERT(bp != NULL);
-	ASSERT(bp->b_datap->db_type == M_DATA);
+	LISASSERT(bp != NULL);
+	LISASSERT(bp->b_datap->db_type == M_DATA);
 
 	switch (p->ioc_state) {
 	   case ST_SAP_IN:
 		p->ioc_state = ST_NONE;
-		ASSERT(res->cp_cmd == SAD_SAP);
+		LISASSERT(res->cp_cmd == SAD_SAP);
 		if (res->cp_rval != 0) {
 			err = -EFAULT;
 			ret = -1;
@@ -213,7 +202,7 @@ ioctl_done:	iocp = (struct iocblk *)mp->b_rptr;
 
 	   case ST_GAP_IN:
 		p->ioc_state = ST_GAP_OUT;
-		ASSERT(res->cp_cmd == SAD_GAP);
+		LISASSERT(res->cp_cmd == SAD_GAP);
 		if (res->cp_rval != 0) {
 			err = -EFAULT;
 			ret = -1;
@@ -232,7 +221,7 @@ ioctl_done:	iocp = (struct iocblk *)mp->b_rptr;
 
 	   case ST_GAP_OUT:
 		p->ioc_state = ST_NONE;
-		ASSERT(res->cp_cmd == SAD_GAP);
+		LISASSERT(res->cp_cmd == SAD_GAP);
 		if (res->cp_rval != 0) {
 			err = -EFAULT;
 			ret = -1;
@@ -240,7 +229,7 @@ ioctl_done:	iocp = (struct iocblk *)mp->b_rptr;
 		goto ioctl_done;
 
 	   case ST_VML_IN1:
-		ASSERT(res->cp_cmd == SAD_VML);
+		LISASSERT(res->cp_cmd == SAD_VML);
 		sl = (str_list_t *)bp->b_rptr;
 		if (bp->b_wptr - bp->b_rptr != sizeof(str_list_t) ||
 		    (p->vml.sl_nmods = sl->sl_nmods) <= 0) {
@@ -255,7 +244,7 @@ ioctl_done:	iocp = (struct iocblk *)mp->b_rptr;
 		return;
 	   case ST_VML_IN2:
 		p->ioc_state = ST_NONE;
-		ASSERT(res->cp_cmd == SAD_VML);
+		LISASSERT(res->cp_cmd == SAD_VML);
 		if (res->cp_rval != 0) {
 			err = -EFAULT;
 			ret = -1;
@@ -289,16 +278,16 @@ STATIC INLINE void sad_do_ioctl(struct priv *p, mblk_t *mp)
 	mblk_t *dp;
 	int err;
 
-	ASSERT(p != NULL);
+	LISASSERT(p != NULL);
 
-	ASSERT(mp != NULL);
-	ASSERT(mp->b_datap->db_type == M_IOCTL);
-	ASSERT(mp->b_wptr - mp->b_rptr >= sizeof(struct iocblk));
+	LISASSERT(mp != NULL);
+	LISASSERT(mp->b_datap->db_type == M_IOCTL);
+	LISASSERT(mp->b_wptr - mp->b_rptr >= sizeof(struct iocblk));
 
 	dp = mp->b_cont;
-	ASSERT(dp != NULL);
-	ASSERT(dp->b_datap->db_type == M_DATA);
-	ASSERT(mp->b_wptr - mp->b_rptr >= sizeof(void *));
+	LISASSERT(dp != NULL);
+	LISASSERT(dp->b_datap->db_type == M_DATA);
+	LISASSERT(mp->b_wptr - mp->b_rptr >= sizeof(void *));
 
 	iocp = (struct iocblk *)mp->b_rptr;
 	if (iocp->ioc_count != TRANSPARENT) {
@@ -346,7 +335,7 @@ nak_it:		mp->b_datap->db_type = M_IOCNAK;
 /*                                                                          */
 /****************************************************************************/
 
-STATIC int sad_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int _RP sad_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	dev_t i;
 
@@ -360,41 +349,39 @@ STATIC int sad_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		if ((i = getminor(*devp)) >= SAD_N_MINOR)
 			return EBUSY;
 	}
-	*devp = MKDEV(MAJOR(*devp), i);
+	*devp = makedevice(getmajor(*devp), i);
 
 	q->q_ptr = WR(q)->q_ptr = &sad_sad[i];
 	sad_sad[i].rq = q;
 	sad_sad[i].ioc_state = ST_NONE;
 
-#ifdef MODULE
-        MOD_INC_USE_COUNT;
-#endif
+        MODGET();
+
 	return 0;
 }
 
-STATIC int sad_close(queue_t *q, int flag, cred_t *crp)
+STATIC int _RP sad_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct priv *p = q->q_ptr;
 
-	ASSERT(p != NULL);
+	LISASSERT(p != NULL);
 
 	p->rq = q->q_ptr = WR(q)->q_ptr = NULL;
 
-#ifdef MODULE
-        MOD_DEC_USE_COUNT;
-#endif
+        MODPUT();
+
 	return 0;
 }
 
-STATIC int sad_wput(queue_t *q, mblk_t *mp)
+STATIC int _RP sad_wput(queue_t *q, mblk_t *mp)
 {
 	struct priv *p;
 
-	ASSERT(q != NULL);
-	ASSERT(mp != NULL);
+	LISASSERT(q != NULL);
+	LISASSERT(mp != NULL);
 
 	p = q->q_ptr;
-	ASSERT(p != NULL);
+	LISASSERT(p != NULL);
 
 	switch (mp->b_datap->db_type)
 	{
@@ -431,7 +418,11 @@ STATIC int sad_wput(queue_t *q, mblk_t *mp)
 
 #ifdef MODULE
 
+#ifdef KERNEL_2_5
+int sad_init_module(void)
+#else
 int init_module(void)
+#endif
 {
         int ret = lis_register_strdev(SAD__CMAJOR_0, &sad_info,
 				      SAD_N_MINOR, LIS_OBJNAME_STR);
@@ -444,7 +435,11 @@ int init_module(void)
         return 0;
 }
 
+#ifdef KERNEL_2_5
+void sad_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
 	int err = lis_unregister_strdev(SAD__CMAJOR_0);
         if (err < 0)
@@ -456,7 +451,12 @@ void cleanup_module(void)
         return;
 }
 
+#ifdef KERNEL_2_5
+module_init(sad_init_module) ;
+module_exit(sad_cleanup_module) ;
 #endif
+
+#endif					/* MODULE */
 
 #if defined(LINUX)			/* linux kernel */
 #if defined(MODULE_LICENSE)

@@ -26,28 +26,11 @@
  * 
  */
 
-#ident "@(#) LiS mtdrv.c 1.2 05/14/03"
+#ident "@(#) LiS mtdrv.c 1.9 09/13/04"
 
 /*  -------------------------------------------------------------------  */
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#  include <sys/LiS/config.h>
-#else
-#  define MOD_INC_USE_COUNT
-#  define MOD_DEC_USE_COUNT
-#endif
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -55,7 +38,6 @@
 #include <sys/osif.h>
 
 #include <sys/LiS/mtdrv.h>
-
 
 /************************************************************************
 *                        Module Definition Structs                      *
@@ -73,11 +55,11 @@ static struct module_info mtdrv_minfo = {
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int mtdrv_open(queue_t *, dev_t *, int, int, cred_t *);
-static int mtdrv_close(queue_t *, int, cred_t *);
-static int mtdrv_wput(queue_t *, mblk_t *);
-static int mtdrv_wsrv(queue_t *);
-static int mtdrv_rsrv(queue_t *);
+static int _RP mtdrv_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP mtdrv_close(queue_t *, int, cred_t *);
+static int _RP mtdrv_wput(queue_t *, mblk_t *);
+static int _RP mtdrv_wsrv(queue_t *);
+static int _RP mtdrv_rsrv(queue_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -127,7 +109,7 @@ static char		 devs[N_DEVS] ;
 *                           Prototypes                                  *
 ************************************************************************/
 
-static void mtdrv_timeout(caddr_t arg) ;
+static void _RP mtdrv_timeout(caddr_t arg) ;
 
 /************************************************************************
 *                          Functions                                    *
@@ -150,14 +132,14 @@ static void make_node(char *name, int maj, int mnr)
 	return ;
     }
 
-    rtn = lis_mknod(name, 0666 | S_IFCHR, MKDEV(maj, mnr));
+    rtn = lis_mknod(name, 0666 | S_IFCHR, UMKDEV(maj, mnr));
     if (rtn == 0)
 	printk("mknod %s: OK\n", name);
     else
 	printk("mknod %s: error %d\n", name, rtn);
 }
 
-void mtdrv_init(int maj)
+void _RP mtdrv_init(int maj)
 {
     make_node("/dev/mtdrv_clone", CLONE__CMAJOR_0, maj);
     make_node("/dev/mtdrv.1", maj, 1);
@@ -169,7 +151,7 @@ void mtdrv_init(int maj)
 
 }				/* mtdrv_init */
 
-void mtdrv_term(void)
+void _RP mtdrv_term(void)
 {
     open_sleep_sem = lis_sem_destroy(open_sleep_sem) ;
     open_sem = lis_sem_destroy(open_sem) ;
@@ -184,7 +166,7 @@ void mtdrv_term(void)
 /*  -------------------------------------------------------------------  */
 
 
-static int
+static int _RP
 mtdrv_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * credp)
 {
     int          dev;
@@ -217,14 +199,22 @@ mtdrv_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * credp)
 	}
     }
     else
-	dev = MINOR(*devp);
+	dev = getminor(*devp);
 
-    MOD_INC_USE_COUNT;
+    MODGET();
     devs[dev]++ ;		/* must be protected by semaphore */
-    lis_up(open_sem) ;
 
-    q->q_ptr = (void *) &devs[dev] ;
-    *devp = MKDEV(MAJOR(*devp), dev);
+    /*
+     * Note: we may be forced by an ioctl to "select" an already open
+     * dev as a clone device to test an error condition.  In that case
+     * we do not want to set the q_ptr to the devs array if that dev
+     * is already in use.  We will get a close call for the erroneous
+     * open and we want the pointer to be NULL when close is called.
+     */
+    if (devs[dev] == 1)		/* first open */
+	q->q_ptr = (void *) &devs[dev] ;
+    lis_up(open_sem) ;
+    *devp = makedevice(getmajor(*devp), dev);
 
     printk("mtdrv_open: dev=%d\n", dev) ;
     if (open_sleep_time > 0)
@@ -239,7 +229,7 @@ mtdrv_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * credp)
 
 /*  -------------------------------------------------------------------  */
 
-static void mtdrv_timeout(caddr_t arg)
+static void _RP mtdrv_timeout(caddr_t arg)
 {
     lis_up(open_sleep_sem) ;
 }				/* mtdrv_timeout */
@@ -314,7 +304,7 @@ static void mtdrv_ioctl(queue_t * q, mblk_t * mp)
 /*  -------------------------------------------------------------------  */
 
 
-static int mtdrv_wput(queue_t * q, mblk_t * mp)
+static int _RP mtdrv_wput(queue_t * q, mblk_t * mp)
 {
 
     switch (mp->b_datap->db_type)
@@ -346,27 +336,27 @@ static int mtdrv_wput(queue_t * q, mblk_t * mp)
 
 /*  -------------------------------------------------------------------  */
 
-static int mtdrv_wsrv(queue_t * q)
+static int _RP mtdrv_wsrv(queue_t * q)
 {
     return (0);
 }
 
 /*  -------------------------------------------------------------------  */
 
-static int mtdrv_rsrv(queue_t * q)
+static int _RP mtdrv_rsrv(queue_t * q)
 {
     return (0);
 }
 
 /*  -------------------------------------------------------------------  */
 
-static int mtdrv_close(queue_t * q, int dummy, cred_t * credp)
+static int _RP mtdrv_close(queue_t * q, int dummy, cred_t * credp)
 {
     char	*devp = (char *) q->q_ptr ;
 
     while (devp != NULL && *devp)
     {
-	MOD_DEC_USE_COUNT;
+	MODPUT();
 	(*devp)-- ;
     }
     return (0);
@@ -375,7 +365,11 @@ static int mtdrv_close(queue_t * q, int dummy, cred_t * credp)
 
 #ifdef MODULE
 
+#ifdef KERNEL_2_5
+int mtdrv_init_module(void)
+#else
 int init_module(void)
+#endif
 {
     int ret = lis_register_strdev(0, &mtdrv_info, 10, "mtdrv");
     if (ret < 0)
@@ -388,7 +382,11 @@ int init_module(void)
     return 0;
 }
 
+#ifdef KERNEL_2_5
+void mtdrv_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
     mtdrv_term() ;
     if (lis_unregister_strdev(mtdrv_major) < 0)
@@ -397,6 +395,11 @@ void cleanup_module(void)
 	printk("mtdrv.cleanup_module: Unregistered, ready to be unloaded.\n");
     return;
 }
+
+#ifdef KERNEL_2_5
+module_init(mtdrv_init_module) ;
+module_exit(mtdrv_cleanup_module) ;
+#endif
 
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL and additional rights");

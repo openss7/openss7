@@ -23,25 +23,9 @@
  *
  */
 
-#ident "@(#) LiS timod.c 2.8 11/07/02 19:58:55 "
+#ident "@(#) LiS timod.c 2.14 09/13/04 10:12:31 "
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#else
-#  define MOD_INC_USE_COUNT
-#  define MOD_DEC_USE_COUNT
-#endif
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
 #include <stdarg.h>
 
@@ -60,10 +44,10 @@ typedef struct {
 	int verbose;
 } timod_priv_t;
 
-STATIC int timod_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int timod_close(queue_t *, int, cred_t *);
-STATIC int timod_rput(queue_t *, mblk_t *);
-STATIC int timod_wput(queue_t *, mblk_t *);
+STATIC int _RP timod_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int _RP timod_close(queue_t *, int, cred_t *);
+STATIC int _RP timod_rput(queue_t *, mblk_t *);
+STATIC int _RP timod_wput(queue_t *, mblk_t *);
 
 
 STATIC struct module_info timod_minfo = 
@@ -172,7 +156,7 @@ do_ioctl_getinfo(queue_t *q, mblk_t *mp,
 	struct T_info_req *req;
 
 	FUNC_ENTER(q);
-	ASSERT(bp != NULL);
+	LISASSERT(bp != NULL);
 	req = (struct T_info_req *)bp->b_rptr;
 	if (bp == NULL ||
 	    bp->b_wptr - bp->b_rptr < sizeof(struct T_info_req) ||
@@ -200,7 +184,7 @@ do_ioctl_optmgmt(queue_t *q, mblk_t *mp,
 	struct T_optmgmt_req *req;
 
 	FUNC_ENTER(q);
-	ASSERT(bp != NULL);
+	LISASSERT(bp != NULL);
 	req = (struct T_optmgmt_req *)bp->b_rptr;
 	if (bp == NULL ||
 	    bp->b_wptr - bp->b_rptr < sizeof(struct T_optmgmt_req) ||
@@ -228,7 +212,7 @@ do_ioctl_bind(queue_t *q, mblk_t *mp,
 	struct T_bind_req *req;
 
 	FUNC_ENTER(q);
-	ASSERT(bp != NULL);
+	LISASSERT(bp != NULL);
 	req = (struct T_bind_req *)bp->b_rptr;
 	if (bp == NULL ||
 	    bp->b_wptr - bp->b_rptr < sizeof(struct T_bind_req) ||
@@ -256,7 +240,7 @@ do_ioctl_unbind(queue_t *q, mblk_t *mp,
 	struct T_unbind_req *req;
 
 	FUNC_ENTER(q);
-	ASSERT(bp != NULL);
+	LISASSERT(bp != NULL);
 	req = (struct T_unbind_req *)bp->b_rptr;
 	if (bp == NULL ||
 	    bp->b_wptr - bp->b_rptr < sizeof(struct T_unbind_req) ||
@@ -292,7 +276,7 @@ STATIC void do_ioctl(queue_t *q, mblk_t *mp)
 	}
 
 	priv = (timod_priv_t *)q->q_ptr;
-	ASSERT(priv != NULL);
+	LISASSERT(priv != NULL);
 
 	if (priv->ioc_mp != NULL) {
 		/* We are already processing an IOCTL, nak it */
@@ -326,7 +310,7 @@ STATIC void do_ioctl(queue_t *q, mblk_t *mp)
 		FUNC_EXIT(q);
 		return;
 	    default:
-		ASSERT(0);
+		LISASSERT(0);
 		FUNC_EXIT(q);
 		return;
 	}
@@ -350,7 +334,7 @@ STATIC void do_ioctl_rput(queue_t *q, mblk_t *mp)
 	struct T_error_ack *error_ack;
 
 	FUNC_ENTER(q);
-	ASSERT(mp->b_datap->db_type == M_PROTO ||
+	LISASSERT(mp->b_datap->db_type == M_PROTO ||
 	       mp->b_datap->db_type == M_PCPROTO);
 
 	if (mp->b_wptr - mp->b_rptr < sizeof(t_scalar_t)) {
@@ -473,7 +457,7 @@ send_iocack:	mp->b_datap->db_type = M_DATA;
 }
 
 
-STATIC int timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int _RP timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	timod_priv_t *priv;
 
@@ -486,24 +470,24 @@ STATIC int timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	priv->ioc_mp = NULL;
 	priv->verbose = TIMOD_TRACE;
 	q->q_ptr = WR(q)->q_ptr = priv;
-	MOD_INC_USE_COUNT;
+	MODGET();
 	return 0;
 }
 
-STATIC int timod_close(queue_t *q, int flag, cred_t *crp)
+STATIC int _RP timod_close(queue_t *q, int flag, cred_t *crp)
 {
 	timod_priv_t *priv = (timod_priv_t *)q->q_ptr;
 
-	ASSERT(priv != NULL);
-	ASSERT(q->q_ptr == WR(q)->q_ptr);
+	LISASSERT(priv != NULL);
+	LISASSERT(q->q_ptr == WR(q)->q_ptr);
 
 	FREE(priv);
 	q->q_ptr = WR(q)->q_ptr = NULL;
-	MOD_DEC_USE_COUNT;
+	MODPUT();
 	return 0;
 }
 
-STATIC int timod_rput(queue_t *q, mblk_t *mp)
+STATIC int _RP timod_rput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 	if (((timod_priv_t *)q->q_ptr)->ioc_mp != NULL &&
@@ -525,7 +509,7 @@ STATIC int timod_rput(queue_t *q, mblk_t *mp)
 	return(0) ;
 }
 
-STATIC int timod_wput(queue_t *q, mblk_t *mp)
+STATIC int _RP timod_wput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 	if (mp->b_datap->db_type != M_IOCTL) {
@@ -543,7 +527,11 @@ STATIC int timod_wput(queue_t *q, mblk_t *mp)
 
 #ifdef MODULE
 
+#ifdef KERNEL_2_5
+int timod_init_module(void)
+#else
 int init_module(void)
+#endif
 {
 	int ret = lis_register_strmod(&timod_info, "timod");
 	if (ret < 0) {
@@ -553,7 +541,11 @@ int init_module(void)
 	return 0;
 }
 
+#ifdef KERNEL_2_5
+void timod_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
 	if (lis_unregister_strmod(&timod_info) < 0)
 		printk("timod.cleanup_module: Unable to unregister module.\n");
@@ -562,6 +554,10 @@ void cleanup_module(void)
 	return;
 }
 
+#ifdef KERNEL_2_5
+module_init(timod_init_module) ;
+module_exit(timod_cleanup_module) ;
+#endif
 
 #if defined(LINUX)			/* linux kernel */
 #if defined(MODULE_LICENSE)

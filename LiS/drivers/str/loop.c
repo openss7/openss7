@@ -32,28 +32,11 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ident "@(#) LiS loop.c 2.23 10/23/03 21:23:58 "
+#ident "@(#) LiS loop.c 2.26 01/23/04 15:48:09 "
 
 /*  -------------------------------------------------------------------  */
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#  include <sys/LiS/config.h>
-#else
-#  define MOD_INC_USE_COUNT
-#  define MOD_DEC_USE_COUNT
-#endif
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
 #include <sys/stream.h>
 #include <sys/stropts.h>
@@ -72,17 +55,17 @@ static struct module_info loop_minfo = {
     0,				/* min packet size accepted */
     INFPSZ,			/* max packet size accepted */
     10240L,			/* high water mark */
-    512L			/* low water mark */
+    4096L			/* low water mark */
 };
 
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int loop_open(queue_t *, dev_t *, int, int, cred_t *);
-static int loop_close(queue_t *, int, cred_t *);
-static int loop_wput(queue_t *, mblk_t *);
-static int loop_wsrv(queue_t *);
-static int loop_rsrv(queue_t *);
+static int _RP loop_open(queue_t *, dev_t *, int, int, cred_t *);
+static int _RP loop_close(queue_t *, int, cred_t *);
+static int _RP loop_wput(queue_t *, mblk_t *);
+static int _RP loop_wsrv(queue_t *);
+static int _RP loop_rsrv(queue_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -171,7 +154,7 @@ static void make_node(char *name, int maj, int mnr)
 	return ;
     }
 
-    rtn = lis_mknod(name, 0666 | S_IFCHR, MKDEV(maj, mnr));
+    rtn = lis_mknod(name, 0666 | S_IFCHR, UMKDEV(maj, mnr));
     if (rtn == 0)
 	printk("mknod %s: OK\n", name);
     else
@@ -201,9 +184,10 @@ void sloop_term(void)
 /*  -------------------------------------------------------------------  */
 
 
-static int
+static int _RP
 loop_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * credp)
 {
+    static struct loop  z ;
     struct loop *loop;
     int          dev;
 
@@ -222,27 +206,29 @@ loop_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * credp)
 	return -ENODEV;
 
     loop = &loop_loop[dev];
-    *devp = MKDEV(MAJOR(*devp), dev);
+    *devp = makedevice(getmajor(*devp), dev);
     if (q->q_ptr)		/* already open */
     {
 	if (loop->deny_2nd_open)
 	    return -EBUSY;
 	return 0;		/* success */
     }
+    else			/* first open */
+	*loop = z ;		/* clear structure */
 
     WR(q)->q_ptr = (char *) loop;
     q->q_ptr = (char *) loop;
     loop->qptr = WR(q);
     loop->minor_nr = dev;
 
-    MOD_INC_USE_COUNT;
+    MODGET();
 
     return 0;			/* success */
 }
 
 /*  -------------------------------------------------------------------  */
 
-static void loop_timeout(caddr_t arg)
+static void _RP loop_timeout(caddr_t arg)
 {
     struct loop *loop = (struct loop *) arg;
 
@@ -263,7 +249,7 @@ static void loop_timeout(caddr_t arg)
  *
  * The argument is a pointer to a queue to enable.
  */
-static void loop_bufcall(long q_ptr)
+static void _RP loop_bufcall(long q_ptr)
 {
     enableok((queue_t *) q_ptr);	/* allow qenable to work */
     qenable((queue_t *) q_ptr);
@@ -480,7 +466,7 @@ int loop_iocdata(queue_t * wq, mblk_t * mp)
 
 /*  -------------------------------------------------------------------  */
 
-static int loop_wput(queue_t * q, mblk_t * mp)
+static int _RP loop_wput(queue_t * q, mblk_t * mp)
 {
     struct loop *loop;
     int rtn_count = 0;
@@ -791,7 +777,7 @@ static int loop_wput(queue_t * q, mblk_t * mp)
 	else if (loop->use_bufcall)
 	{
 	    noenable(q);	/* prevent queue enable */
-	    putq(q, mp);
+	    putqf(q, mp);
 	    bufcall(0, 0, loop_bufcall, (long) q);
 	}
 	else
@@ -805,7 +791,7 @@ static int loop_wput(queue_t * q, mblk_t * mp)
 		loop->timr_hndl =
 		    timeout(loop_timeout, (caddr_t) loop, loop->timr);
 
-	    putq(q, mp);
+	    putqf(q, mp);
 	    if (loop->timr_hndl == 0 && loop->msgcnt > loop->msglvl)
 		qenable(q);
 	}
@@ -818,7 +804,7 @@ static int loop_wput(queue_t * q, mblk_t * mp)
 
 /*  -------------------------------------------------------------------  */
 
-static int loop_wsrv(queue_t * q)
+static int _RP loop_wsrv(queue_t * q)
 {
     mblk_t *mp;
     register struct loop *loop;
@@ -845,7 +831,7 @@ static int loop_wsrv(queue_t * q)
 	if (mp->b_datap->db_type <= QPCTL &&
 	    !bcanputnext(loop->oqptr, mp->b_band))
 	{
-	    putbq(q, mp);
+	    putbqf(q, mp);
 	    if (loop->use_bufcall)
 		bufcall(0, 0, loop_bufcall, (long) q);
 	    break;
@@ -864,7 +850,7 @@ static int loop_wsrv(queue_t * q)
 
 /*  -------------------------------------------------------------------  */
 
-static int loop_rsrv(queue_t * q)
+static int _RP loop_rsrv(queue_t * q)
 {
     struct loop *loop;
 
@@ -878,9 +864,10 @@ static int loop_rsrv(queue_t * q)
 
 /*  -------------------------------------------------------------------  */
 
-static int loop_close(queue_t * q, int dummy, cred_t * credp)
+static int _RP loop_close(queue_t * q, int dummy, cred_t * credp)
 {
     struct loop *loop;
+    static struct loop z ;
 
     loop = (struct loop *) q->q_ptr;
     loop->qptr = NULL;
@@ -912,24 +899,20 @@ static int loop_close(queue_t * q, int dummy, cred_t * credp)
 	loop->copy_buf = NULL;
     }
 
-    loop->use_putnext = 0;
-    loop->use_bufcall = 0;
-    loop->msglvl = 0;
-    loop->msgcnt = 0;
-    loop->timr = 0;
-    loop->mark = 0;
-    loop->copy_bfr = 0;
-    loop->minor_nr = 0;
-    loop->catlvl = 0;
-    loop->deny_2nd_open = 0;
-    MOD_DEC_USE_COUNT;
+    *loop = z ;				/* clear structure */
+
+    MODPUT();
     return (0);
 }
 
 
 #ifdef MODULE
 
+#ifdef KERNEL_2_5
+int loop_init_module(void)
+#else
 int init_module(void)
+#endif
 {
     int ret = lis_register_strdev(SLOOP__CMAJOR_0, &sloop_info,
 				  NLOOP, "loop");
@@ -941,7 +924,11 @@ int init_module(void)
     return 0;
 }
 
+#ifdef KERNEL_2_5
+void loop_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
     if (lis_unregister_strdev(SLOOP__CMAJOR_0) < 0)
 	printk("loop.cleanup_module: Unable to unregister driver.\n");
@@ -950,4 +937,15 @@ void cleanup_module(void)
     return;
 }
 
+#ifdef KERNEL_2_5
+module_init(loop_init_module) ;
+module_exit(loop_cleanup_module) ;
 #endif
+#if defined(MODULE_LICENSE)
+MODULE_LICENSE("GPL and additional rights");
+#endif
+
+#endif			/* MODULE */
+
+
+

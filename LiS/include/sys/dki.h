@@ -31,7 +31,7 @@
 #ifndef	DKI_H
 #define	DKI_H		1
 
-#ident "@(#) LiS dki.h 2.9 12/27/03 15:12:52 "
+#ident "@(#) LiS dki.h 2.13 09/13/04 10:13:51 "
 
 #ifndef _SYS_TYPES_H
 #include <sys/types.h>
@@ -62,33 +62,27 @@
 
 #ifdef __KERNEL__
 
-typedef void	timo_fcn_t(caddr_t arg) ;
-#if defined(LINUX) && defined(USE_LINUX_KMEM_TIMER)
-typedef void 		*toid_t ;		/* SVR4 */
-typedef void	 	*timeout_id_t ;		/* Solaris */
-#else
+typedef void	_RP timo_fcn_t(caddr_t arg) ;
 typedef unsigned long	 toid_t ;		/* SVR4 */
 typedef unsigned long	 timeout_id_t ;		/* Solaris */
-#endif
 
 #define	timeout(fcn,arg,ticks)	lis_timeout_fcn(fcn,arg,ticks,__FILE__, __LINE__)
 #define	untimeout		lis_untimeout
 
 extern toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-			    char *file_name, int line_nr) ;
-extern toid_t	lis_untimeout(toid_t id) ;
+			    char *file_name, int line_nr) _RP;
+extern toid_t	lis_untimeout(toid_t id) _RP;
 
-#if (defined(LINUX) && defined(USE_LINUX_KMEM_CACHE))
-/* 
- * alternate construction in include/sys/LiS/linux-mdep.h
- * for USE_LINUX_KMEM_CACHE 
+/*
+ * The following are internal routines not exported
  */
-extern void lis_init_dki(void); 
-#endif
-#if !defined(USE_LINUX_KMEM_TIMER)
-/* lis_terminate_dki is a #define when USE_LINUX_KMEM_TIMER */
-extern void lis_terminate_dki(void);
-#endif
+void lis_initialize_dki(void) ;			/* dki.c */
+void lis_terminate_dki(void) ;			/* dki.c */
+
+void *lis_alloc_timer(char *file, int line) ;	/* mdep rouitine */
+void *lis_free_timer(void *timerp) ;		/* mdep rouitine */
+void lis_init_timers(int size) ;		/* mdep routine */
+void lis_terminate_timers(void) ;		/* mdep rouitine */
 
 #endif				/* __KERNEL__ */
 
@@ -104,7 +98,7 @@ extern void lis_terminate_dki(void);
  *
  * The routine is located in osif.c.
  */
-unsigned lis_usectohz(unsigned usec) ;
+unsigned lis_usectohz(unsigned usec) _RP;
 
 /************************************************************************
 *                        Creating Nodes                                 *
@@ -124,8 +118,8 @@ unsigned lis_usectohz(unsigned usec) ;
 *									*
 ************************************************************************/
 
-extern int	lis_mknod(char *name, int mode, dev_t dev) ;
-extern int	lis_unlink(char *name) ;
+extern int	lis_mknod(char *name, int mode, dev_t dev) _RP;
+extern int	lis_unlink(char *name) _RP;
 extern int	lis_mount(char *dev_name,
 			  char *dir_name,
 			  char *fstype,

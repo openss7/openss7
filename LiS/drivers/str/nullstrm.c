@@ -30,7 +30,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ident "@(#) LiS nullstrm.c 2.2 3/19/01 22:03:39 "
+#ident "@(#) LiS nullstrm.c 2.3 09/13/04 10:12:31 "
 
 /*  -------------------------------------------------------------------  */
 
@@ -67,10 +67,10 @@ static struct module_info null_minfo =
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int   null_open  (queue_t *,dev_t*,int,int, cred_t *);
-static int   null_close (queue_t *, int, cred_t *);
-static int   null_wput  (queue_t *, mblk_t *);
-static int   null_rsrv  (queue_t *);
+static int   _RP null_open  (queue_t *,dev_t*,int,int, cred_t *);
+static int   _RP null_close (queue_t *, int, cred_t *);
+static int   _RP null_wput  (queue_t *, mblk_t *);
+static int   _RP null_rsrv  (queue_t *);
 
 /* qinit structures (rd and wr side) 
  */
@@ -132,7 +132,7 @@ static int null_cnt = NDEVS;
 /*  -------------------------------------------------------------------  */
 
 
-static int
+static int _RP
 null_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
   struct null *null;
@@ -171,7 +171,7 @@ null_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 
 /*  -------------------------------------------------------------------  */
 
-int	null_timeout(caddr_t arg)
+int	_RP null_timeout(caddr_t arg)
 {
     struct null		*null = (struct null *) arg ;
 
@@ -192,7 +192,7 @@ int	null_timeout(caddr_t arg)
  *
  * The argument is a pointer to a queue to enable.
  */
-void null_bufcall(long q_ptr)
+void _RP null_bufcall(long q_ptr)
 {
     enableok((queue_t *) q_ptr) ;	/* allow qenable to work */
     qenable((queue_t *) q_ptr) ;
@@ -202,7 +202,7 @@ void null_bufcall(long q_ptr)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static int _RP
 null_wput (queue_t *q, mblk_t *mp)
 {
   struct null *null;
@@ -284,7 +284,7 @@ null_wput (queue_t *q, mblk_t *mp)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static int _RP
 null_rsrv (queue_t *q)
 {
     struct null *null;
@@ -306,7 +306,7 @@ null_rsrv (queue_t *q)
 
 /*  -------------------------------------------------------------------  */
 
-static int
+static int _RP
 null_close (queue_t *q, int dummy, cred_t *credp)
 {
   struct null *null;

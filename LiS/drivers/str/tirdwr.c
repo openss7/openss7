@@ -25,23 +25,7 @@
  *  This is about as simple as a STREAMS module can be.
  */
 
-#ifdef MODULE
-#  if defined(LINUX) && defined(__KERNEL__)
-#    ifdef MODVERSIONS
-#     ifdef LISMODVERS
-#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
-#     else
-#      include <linux/modversions.h>
-#     endif
-#    endif
-#    include <linux/module.h>
-#  else
-#    error This can only be a module in the Linux kernel environment
-#  endif
-#else
-#  define MOD_INC_USE_COUNT
-#  define MOD_DEC_USE_COUNT
-#endif
+#include <sys/LiS/module.h>	/* must be VERY first include */
 
 #include <stdarg.h>
 
@@ -66,10 +50,10 @@ typedef struct {
 #endif
 } tirdwr_priv_t;
 
-STATIC int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int tirdwr_close(queue_t *, int, cred_t *);
-STATIC int tirdwr_rput(queue_t *, mblk_t *);
-STATIC int tirdwr_wput(queue_t *, mblk_t *);
+STATIC int _RP tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int _RP tirdwr_close(queue_t *, int, cred_t *);
+STATIC int _RP tirdwr_rput(queue_t *, mblk_t *);
+STATIC int _RP tirdwr_wput(queue_t *, mblk_t *);
 
 
 STATIC struct module_info tirdwr_minfo = 
@@ -167,7 +151,7 @@ STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 #endif
 
 
-STATIC int tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int _RP tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	tirdwr_priv_t *priv;
 	lis_flags_t    psw;
@@ -191,7 +175,7 @@ STATIC int tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp
 	 */
 	hq = q->q_next;
 	LIS_QISRLOCK(hq, &psw) ;
-	ASSERT(hq != NULL);
+	LISASSERT(hq != NULL);
 	for (mp = hq->q_first; mp; mp = mp->b_next) {
 		if (mp->b_datap->db_type == M_PROTO ||
 		    mp->b_datap->db_type == M_PCPROTO) {
@@ -203,16 +187,16 @@ STATIC int tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp
 	}
 	LIS_QISRUNLOCK(hq, &psw) ;
 
-	MOD_INC_USE_COUNT;
+	MODGET();
 	return 0;
 }
 
-STATIC int tirdwr_close(queue_t *q, int flag, cred_t *crp)
+STATIC int _RP tirdwr_close(queue_t *q, int flag, cred_t *crp)
 {
 	tirdwr_priv_t *priv = (tirdwr_priv_t *)q->q_ptr;
 
-	ASSERT(priv != NULL);
-	ASSERT(q->q_ptr == WR(q)->q_ptr);
+	LISASSERT(priv != NULL);
+	LISASSERT(q->q_ptr == WR(q)->q_ptr);
 
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	if (priv->got_ordrel) {
@@ -231,11 +215,11 @@ STATIC int tirdwr_close(queue_t *q, int flag, cred_t *crp)
 		}
 	}
 	FREE(priv);
-	MOD_DEC_USE_COUNT;
+	MODPUT();
 	return 0;
 }
 
-STATIC int tirdwr_rput(queue_t *q, mblk_t *mp)
+STATIC int _RP tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 
@@ -287,7 +271,7 @@ quit:	FUNC_EXIT(q);
 	return(0) ;
 }
 
-STATIC int tirdwr_wput(queue_t *q, mblk_t *mp)
+STATIC int _RP tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 	if (mp->b_datap->db_type == M_DATA) {
@@ -313,7 +297,11 @@ STATIC int tirdwr_wput(queue_t *q, mblk_t *mp)
 
 #ifdef MODULE
 
+#ifdef KERNEL_2_5
+int tirdwr_init_module(void)
+#else
 int init_module(void)
+#endif
 {
 	int ret = lis_register_strmod(&tirdwr_info, "tirdwr");
 	if (ret < 0) {
@@ -324,7 +312,11 @@ int init_module(void)
 	return 0;
 }
 
+#ifdef KERNEL_2_5
+void tirdwr_cleanup_module(void)
+#else
 void cleanup_module(void)
+#endif
 {
 	if (lis_unregister_strmod(&tirdwr_info) < 0)
 		printk("Unable to unregister tirdwr module.\n");
@@ -333,6 +325,10 @@ void cleanup_module(void)
 	return;
 }
 
+#ifdef KERNEL_2_5
+module_init(tirdwr_init_module) ;
+module_exit(tirdwr_cleanup_module) ;
+#endif
 
 #if defined(LINUX)			/* linux kernel */
 #if defined(MODULE_LICENSE)

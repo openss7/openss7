@@ -17,7 +17,7 @@
  * 
  */
 
-#ident "@(#) LiS module-skeleton.c 2.2 3/19/01 22:03:39 "
+#ident "@(#) LiS module-skeleton.c 2.3 09/13/04 10:12:31 "
 
 #ifdef LINUX
 

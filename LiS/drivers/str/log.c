@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS log.c 2.2 3/19/01 22:03:39 "
+#ident "@(#) LiS log.c 2.3 09/13/04 10:12:31 "
 
 /* Streams logging module */
 
@@ -38,8 +38,8 @@ static struct module_info log_minfo =
 		0, "strlog", 0, INFPSZ, 0, 0
 };
 
-static int log_open (), log_close ();
-static int log_wput (), log_rput ();
+static int _RP log_open (), _RP log_close ();
+static int _RP log_wput (), _RP log_rput ();
 
 static struct qinit log_rinit =
 {
@@ -63,7 +63,7 @@ static struct log {
 static int log_cnt = NLOG;
 
 
-static int
+static int _RP
 log_open (queue_t * q, int dev, int flag, int sflag
 #ifdef DO_ADDERROR
 		,int *err
@@ -333,7 +333,7 @@ log_printmsg (struct log *log, const char *text, mblk_t * mp)
 	splx (ms);
 }
 
-static int
+static int _RP
 log_wput (queue_t * q, mblk_t * mp)
 {
 	register struct log *log;
@@ -360,7 +360,7 @@ log_wput (queue_t * q, mblk_t * mp)
 	return 0;
 }
 
-static int
+static int _RP
 log_rput (queue_t * q, mblk_t * mp)
 {
 	register struct log *log;
@@ -383,7 +383,7 @@ log_rput (queue_t * q, mblk_t * mp)
 }
 
 
-static int
+static int _RP
 log_close (queue_t * q)
 {
 	struct log *log;

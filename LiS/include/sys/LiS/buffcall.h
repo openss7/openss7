@@ -36,7 +36,7 @@
 #ifndef _BUFFCALL_H
 #define _BUFFCALL_H 1
 
-#ident "@(#) LiS buffcall.h 2.3 2/4/03 17:47:36 "
+#ident "@(#) LiS buffcall.h 2.5 09/13/04 10:13:51 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -61,7 +61,7 @@ typedef struct bcinfo
     unsigned	   size;	/* size for this node */
     int		   id ;		/* identifier for user */
     volatile int   state ;	/* state of entry */
-    void	 (*usr_f)(long);/* user callback */
+    void	 _RP (*usr_f)(long);/* user callback */
     long	   usr_arg;	/* arg for user callback */
 } bcinfo_t;
 
@@ -110,7 +110,7 @@ extern volatile char lis_strbcflag;	/* the bufcall functions must be run */
  */
 #ifdef __KERNEL__
 extern int 
-lis_bufcall(unsigned size, int priority, void (*function)(long), long arg);
+lis_bufcall(unsigned size, int priority, void _RP (*function)(long), long arg)_RP;
 #endif				/* __KERNEL__ */
 
 /* esbbcall - like bufcall, but for lis_esballoc. The function
@@ -118,13 +118,13 @@ lis_bufcall(unsigned size, int priority, void (*function)(long), long arg);
  *	lis_esballoc will succeed.
  */
 #ifdef __KERNEL__
-extern int lis_esbbcall(int priority, void (*function)(long), long arg);
+extern int lis_esbbcall(int priority, void _RP (*function)(long), long arg)_RP;
 #endif				/* __KERNEL__ */
 
 /* unbufcall - cancels a bufcall/esbbcall
  */
 #ifdef __KERNEL__
-extern void lis_unbufcall(int bcid);
+extern void lis_unbufcall(int bcid)_RP;
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
