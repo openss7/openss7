@@ -87,6 +87,7 @@ AC_DEFUN([_RPM_SPEC_SETUP], [dnl
     _RPM_SPEC_SETUP_DATE
     _RPM_SPEC_SETUP_TOOLS
     _RPM_SPEC_SETUP_MODULES
+    _RPM_SPEC_SETUP_TOPDIR
     _RPM_SPEC_SETUP_OPTIONS
     _RPM_SPEC_SETUP_BUILD
     _RPM_SPEC_SETUP_SIGN
@@ -234,7 +235,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                     ;;
                 *Mandrake*)
                     rpm_cv_dist_vendor=mandrake
-                    rpm_cv_dist_flavor="Mandrake Linux"
+                    rpm_cv_dist_topdir='/usr/src/RPM'
                     ;;
                 *Red?Hat*)
                     rpm_cv_dist_vendor=redhat
@@ -357,6 +358,31 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                 ;;
         esac
     ])
+    AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
+        case "$rpm_cv_dist_flavor" in
+            *White?Box*)
+                rpm_cv_dist_topdir='/usr/src/redhat'
+                ;;
+            *Fedora?Core*)
+                rpm_cv_dist_topdir='/usr/src/redhat'
+                ;;
+            *Mandrake*)
+                rpm_cv_dist_topdir='/usr/src/RPM'
+                ;;
+            *Red?Hat*)
+                rpm_cv_dist_topdir='/usr/src/redhat'
+                ;;
+            *SuSE*)
+                rpm_cv_dist_topdir='/usr/src/SuSE'
+                ;;
+            *Debian*)
+                rpm_cv_dist_topdir="$ac_abs_top_buiddir"
+                ;;
+            *)
+                rpm_cv_dist_topdir="$ac_abs_top_buiddir"
+                ;;
+        esac
+    ])
     PACKAGE_RPMDIST="${rpm_cv_dist_flavor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
     AC_SUBST([PACKAGE_RPMDIST])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
@@ -449,6 +475,35 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
     AC_MSG_RESULT([${enable_modules:-yes}])
     AM_CONDITIONAL([RPM_BUILD_KERNEL], [test :"${enable_modules:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_MODULES
+# =========================================================================
+
+# =========================================================================
+# _RPM_SPEC_SETUP_TOPDIR
+# -------------------------------------------------------------------------
+AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
+    rpm_tmp=`(cd . ; pwd)`
+    AC_ARG_WITH([topdir],
+        AS_HELP_STRING([--with-topdir=TOPDIR],
+            [specify the rpm top directory.  @<:@default=$rpm_tmp@:>@]),
+        [with_topdir="$withval"],
+        [with_topdir="$rpm_tmp"])
+    AC_MSG_WARN([Absolute top build directory is $rpm_tmp.])
+    AC_CACHE_CHECK([for rpm top build directory], [rpm_cv_topdir], [dnl
+        case :"$with_topdir" in
+            :no | :NO)
+                rpm_cv_topdir="$rpm_tmp"
+                ;;
+            :yes | :YES | :default | :DEFAULT)
+                rpm_cv_topdir="$rpm_cv_dist_topdir"
+                ;;
+            *)
+                rpm_cv_topdir="$with_topdir"
+                ;;
+        esac
+    ])
+    PACKAGE_RPMTOPDIR="$rpm_cv_topdir"
+    AC_SUBST([PACKAGE_RPMTOPDIR])dnl
+])# _RPM_SPEC_SETUP_TOPDIR
 # =========================================================================
 
 # =========================================================================
