@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 10:22:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 12:23:52 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 10:22:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 10:22:08 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 10:22:08 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/09/02 12:23:52 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/07 10:22:08 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -941,9 +941,7 @@ timod_pop(queue_t *q)
 static int
 timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int err;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
-	err = 0;
+	int err = 0;
 	if (q->q_ptr != NULL)
 		goto quit;	/* already open */
 	err = ENXIO;
@@ -955,7 +953,6 @@ timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	qprocson(q);
 	return (0);
       quit:
-	MOD_DEC_USE_COUNT;
 	return (err);
 }
 
@@ -981,7 +978,6 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
       skip_pop:
 	qprocsoff(q);
 	timod_free_priv(q);
-	MOD_DEC_USE_COUNT;
 	goto quit;
       quit:
 	return (0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/09/02 12:23:52 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/07 10:22:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 12:23:52 $ by $Author: brian $
+ Last Modified $Date: 2005/03/07 10:22:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/09/02 12:23:52 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/07 10:22:08 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/09/02 12:23:52 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/07 10:22:08 $";
 
 #include "compat.h"
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/09/02 12:23:52 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/07 10:22:08 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -737,9 +737,7 @@ tirdwr_pop(queue_t *q)
 static int
 tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
-	int err;
-	MOD_INC_USE_COUNT;	/* keep module from unloading */
-	err = 0;
+	int err = 0;
 	if (q->q_ptr != NULL)
 		goto quit;	/* already open */
 	err = ENXIO;
@@ -753,7 +751,6 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	qprocson(q);
 	return (0);
       quit:
-	MOD_DEC_USE_COUNT;
 	return (err);
 }
 
@@ -780,7 +777,6 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
       skip_pop:
 	qprocsoff(q);
 	tirdwr_free_priv(q);
-	MOD_DEC_USE_COUNT;
 	goto quit;
       quit:
 	return (0);
