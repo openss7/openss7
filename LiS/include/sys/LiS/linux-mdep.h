@@ -40,7 +40,6 @@
 #ident "@(#) LiS linux-mdep.h 2.78 09/16/04 11:41:59 "
 
 #ifdef __KERNEL__
-#define dev_t	kernel_dev_t	/* we are going to redefine this */
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
@@ -57,13 +56,6 @@
 /*				 Dependencies                            */
 
 #ifdef __KERNEL__
-
-/*
- * We want to discard the kernel's definition of dev_t
- */
-#ifndef dev_t
-#define dev_t	kernel_dev_t	/* we are going to redefine this */
-#endif
 
 /*
  * We want to discard the kernel's definition of module_info since
@@ -191,7 +183,9 @@
 #undef dev_t
 #endif
 
-typedef unsigned int		dev_t ;
+typedef unsigned int		lis_dev_t ;
+
+#define dev_t lis_dev_t
 
 /*
  * If some kernel include did a #define on module_info, undo it

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/14 01:20:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,124 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:35 $ by $Author: brian $
+ Last Modified $Date: 2005/03/14 01:20:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/14 01:20:42 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/14 01:20:42 $";
 
-#include "os7/compat.h"
-
-#undef sctp_addr
-#define sctp_addr n_sctp_addr
-#undef sctp_addr_t
-#define sctp_addr_t n_sctp_addr_t
-#include <sys/npi.h>
-#include <sys/npi_sctp.h>
-#undef sctp_addr
-
-#if defined HAVE_TIHDR_H
-#   include <tihdr.h>
-#else
-#   include <sys/tihdr.h>
-#endif
-
-#include <sys/xti.h>
-#include <sys/xti_xti.h>
-#include <sys/xti_ip.h>
-#include <sys/xti_inet.h>
-#include <sys/xti_sctp.h>
-
-#define T_ALLLEVELS -1UL
-
-#ifdef LINUX
-#include <linux/interrupt.h>	/* for local_irq functions */
-#if HAVE_KINC_ASM_SOFTIRQ_H
-#include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
-#endif
-#include <linux/random.h>	/* for secure_tcp_sequence_number */
-#endif				/* LINUX */
-
-#define sctp_addr	        sctp_addr__
-#define sctp_daddr		sctp_daddr__
-#define sctp_saddr		sctp_saddr__
-#define sctp_strm		sctp_strm__
-#define sctp_dup		sctp_dup__
-#define sctp_bind_bucket	sctp_bind_bucket__
-#define sctp_mib		sctp_mib__
-#define sctphdr			sctphdr__
-#define sctp_cookie		sctp_cookie__
-#define sctp_chunk		sctp_chunk__
-
-#ifdef ASSERT
-#undef ASSERT
-#endif
-
-#include <linux/bitops.h>
-
-#define sctp_tst_bit(nr,addr)	test_bit(nr,addr)
-#define sctp_set_bit(nr,addr)	__set_bit(nr,addr)
-#define sctp_clr_bit(nr,addr)	__clear_bit(nr,addr)
-
-#include <net/ip.h>
-#include <net/icmp.h>
-#include <net/route.h>
-#include <net/inet_ecn.h>
-
-#undef sctp_addr
-#undef sctp_daddr
-#undef sctp_saddr
-#undef sctp_strm
-#undef sctp_dup
-#undef sctp_bind_bucket
-#undef sctp_mib
-#undef sctphdr
-#undef sctp_cookie
-#undef sctp_chunk
-
-#ifdef ASSERT
-#undef ASSERT
-#endif
-
-#if defined HAVE_OPENSS7_SCTP
-#   undef sctp_bind_bucket
-#   undef sctp_dup
-#   undef sctp_strm
-#   undef sctp_saddr
-#   undef sctp_daddr
-#   undef sctp_protolist
-#endif
-
-#if defined HAVE_LKSCTP_SCTP
-#undef sctp_bind_bucket
-#undef sctp_mib
-#undef sctphdr
-#undef sctp_cookie
-#undef sctp_chunk
-#endif
-
-#ifdef SCTP_CONFIG_MODULE
-#define __SCTP_STATIC STATIC
-#define __SCTP_INIT
-#else
-#define __SCTP_STATIC
-#define __SCTP_INIT __init
-#endif
-
-#ifdef LINUX
-#include <linux/skbuff.h>
-#include <linux/netfilter.h>
-#include <linux/netfilter_ipv4.h>
-#endif				/* LINUX */
-
+#include "sctp_compat.h"
 #include "sctp_hooks.h"
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/09 08:03:35 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/14 01:20:42 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

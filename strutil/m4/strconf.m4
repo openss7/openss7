@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/11 22:19:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/14 01:17:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 01:17:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -177,8 +177,13 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
     done
     if test -n "${strconf_configs}" -a -n "${STRCONF_INPUT}"; then
-	AC_MSG_NOTICE([creating $STRCONF_INPUT from $strconf_configs])
-	cat $strconf_configs > $STRCONF_INPUT
+	AC_MSG_NOTICE([creating $STRCONF_INPUT])
+	cat /dev/null > $STRCONF_INPUT
+	for file in $strconf_configs
+	do
+	    AC_MSG_NOTICE([appending $file to  $STRCONF_INPUT])
+	    ( echo "#" ; echo "# included from $file `date`" ; echo "#" ; cat $file ) | sed -e '/^##/d' | cat -s >> $STRCONF_INPUT
+	done
 	if test :"${STRCONF_CONFIG:+set}" = :set; then
 	    AC_MSG_NOTICE([creating $STRCONF_CONFIG from $STRCONF_INPUT])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -b${STRCONF_MAJBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT" 2>&1 | \

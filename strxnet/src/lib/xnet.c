@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/16 14:42:26 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/14 01:21:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/16 14:42:26 $ by $Author: brian $
+ Last Modified $Date: 2005/03/14 01:21:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/16 14:42:26 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/14 01:21:39 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/16 14:42:26 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/14 01:21:39 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -92,6 +92,9 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.9 $
 #include "gettext.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#if HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 #include <sys/stropts.h>
 #include <sys/poll.h>
 #include <fcntl.h>
@@ -5891,10 +5894,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.9 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.10 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.9 $)
- * @date \$Date: 2005/02/16 14:42:26 $
+ * @version \$Name:  $(\$Revision: 0.9.2.10 $)
+ * @date \$Date: 2005/03/14 01:21:39 $
  *
  * @}
  */

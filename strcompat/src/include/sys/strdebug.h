@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.3 2004/08/23 11:45:15 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.4 2005/03/14 01:20:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/23 11:45:15 $ by $Author: brian $
+ Last Modified $Date: 2005/03/14 01:20:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 11:45:15 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/14 01:20:06 $"
 
 #undef  __never
 #define __never() \
@@ -164,7 +164,9 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC
+#undef INLINE
 #define INLINE
 
 #elif defined(CONFIG_STREAMS_TEST)
@@ -189,8 +191,16 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC static
+#undef INLINE
+#if defined __inline
+#define INLINE __inline
+#elif defined __inline__
+#define INLINE __inline__
+#else
 #define INLINE inline
+#endif
 
 #elif defined(CONFIG_STREAMS_SAFE)
 
@@ -214,8 +224,16 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC static
+#undef INLINE
+#if defined __inline
+#define INLINE __inline
+#elif defined __inline__
+#define INLINE __inline__
+#else
 #define INLINE inline
+#endif
 
 #else
 
@@ -239,8 +257,16 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC static
+#undef INLINE
+#if defined __inline
+#define INLINE __inline
+#elif defined __inline__
+#define INLINE __inline__
+#else
 #define INLINE inline
+#endif
 
 #endif
 

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.1 $) $Date: 2005/03/09 23:13:43 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/14 01:22:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 23:13:43 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 01:22:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,7 +85,7 @@
 %global libraries   LiS
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
 %global infofiles   %{name}
-#global initfiles
+%global initfiles   strace streams strerr
 
 %global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56].*$|0|;s|^2\.4.*$|1|')
 %global have_initfiles %{?initfiles:1}%{!?initfiles:0}
@@ -1040,6 +1040,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.2  2005/03/14 01:22:12  brian
+# - Added init scripts.
+#
 # Revision 1.1.6.1  2005/03/09 23:13:43  brian
 # - First stab at autoconf'ed 2.18.0.  Results of merge.
 #

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.1 2005/03/09 23:14:15 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.2 2005/03/14 01:25:36 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/09 23:14:15 $ by $Author: brian $
+% Last Modified $Date: 2005/03/14 01:25:36 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -873,6 +873,171 @@ for LiS and are not applicable to this release.
 
 @node Kernel Compatibility Issues
 @section Kernel Compatibility Issues Concerning LiS
+
+@subsection LiS-2.18 Kernel and Driver Compatibility
+
+LiS-2.18 contains a number of changes from LiS-2.16.  LiS-2.17 was pretty much
+and experimental version.  Documented here are the principles of change between
+2.16 and 2.18.
+
+Note: STREAMS drivers must be recompiled against LiS-2.18 header files to
+utilize LiS-2.18.  Do not attempt to install LiS-2.18 underneath drivers
+compiled against LiS-2.16 or LiS-2.17.
+
+Here are the principal changes.  I am not documenting all the little bug fixes,
+just the main changes that users may find visible.
+
+@itemize @bullet
+@item
+OpenSS7 inet driver in, then out, then in, then out of LiS distribution.
+Currently out.  Download separately from openss7.org.
+
+@item
+Discontinue support for 2.2 kernels.
+
+@item
+More sophisticated choosing of version of C compiler to use when building LiS.
+
+@item
+Several interations of timeout/untimeout implementation ending with a blend of
+the original, plush hash table for lookup speed, plus use of kernel cache blocks
+to allocate structures.
+
+@item
+Orgianize so as not to hold any spin locks when entering STREAMS driver
+functions.  This means that queue locking now uses a semaphore instead of a spin
+lock.  This means, in turn that you really cannot call putnext() from interrupt
+context.
+
+@item
+Some contributions for LiS on S/390, PPC, IA64 and SPARC.
+
+@item
+Eliminate poll() routine from libLiS.  You should be using the standard libc
+version.
+
+@item
+Some contributed fixes for fattach, pipes and fifos.
+
+@item
+Reworking of open routine for races involving open vs. open and open vs. close.
+
+@item
+Eliminate use of special LiS system calls to kernel.  getpmsg uses the read
+function and putpmsg uses the write function.
+
+@item
+Some contributions to make rpm building easier.
+
+@item
+A contribution for performance enhancement mainly involving use of kernel
+caches.
+
+@item
+More performance enhancements involving minimizing of lock contention, and an
+LiS mechanism to track lock contention.
+
+@item
+Tracking code for queue contention to assist users in optimizing.
+
+@item
+Code to build a histogram of semaphore wakeup latency and print out the table.
+
+@item
+Compatibility with 2.6 kernel.
+
+@item
+Revision of internal LiS definition of dev_t to incorporate 12 bits of major
+device number and 20 bits of minor device number.
+
+@item
+A contribution for quieter makes with 2.6 style progress messages.  Use "make
+V=1" for verbose make output.
+
+@item
+A new file <sys/LiS/module.h> for loadable drivers to include as the first
+include file to get include file ordering involving <linux/module.h> correct
+portably for both 2.4 and 2.6 kernels.
+
+@item
+Improved queue scheduling, which is responsible for more performance
+improvements, especially on multiple CPU systems.
+
+@item
+A contribution to renumber message types for compatibility with other STREAMS
+implementations.
+
+@item
+Queues are no longer run on user threads.  They are only run from the LiS queue
+scheduler threads.
+
+@item
+Add lis_down_nosig() function to do a "down" with signals blocked.  Useful in
+close routines that must sleep.
+
+@item
+Streams command option "-L" to print out lock contention tracking.
+
+@item
+Qlock command for strconf to control queue locking style.
+
+@item
+Qlock registration routine for loadable modules to specify their queue locking
+style.
+
+@item
+putnext() et all no longer free the message upon failure as per SVR4 specs.
+
+@item
+Improved errno reporting in strtst.
+
+@item
+Implement a message deferred list in each queue and use it for puts to queues
+that are in a "qprocsoff" state.
+
+@item
+Implement freezestr() and defer message processing while stream is frozen.
+
+@item
+Use of freezestr() and defer message processing while stream is frozen.
+
+@item
+Greatly reduce the number of exported symbols.
+@end itemize
+
+@subsubsection Compatibility of LiS-2.18 with 2.6 Kernel
+
+There are several issues that needed to be addressed for compatibility with the
+2.6 Linux kernel.  You are encouraged to follow the links in the paragraphs
+below to see more detailed information on each of these topics.
+
+@enumerate
+@item
+The 2.6 kernel redefined the size of the dev_t structure.  LiS has extended its
+internal dev_t structure to be compatible with the 2.6 method for some time.
+For more information FIXME.
+
+@item
+The 2.6 kernel changed the approach to building and installing kernel modules.
+This affects LiS as a whole and also affects how you install separate loadable
+STREAMS drivers.  LiS provides a mechanism that allows STREAMS drivers and
+moduels to be easily installed.
+
+@item
+The 2.6 kernel offers an option to compile the kernel using machine registers to
+pass parameters to functions.  LiS takes this into account.
+
+@item
+The 2.6 kernel needs GCC version 3.3.3 to be compiled properly.  LiS needs to be
+compiled using the same version of the compiler when running with the 2.6
+kernel.
+
+@item
+You may have to edit the file /etc/rc.d/rc.sysinit to get demand loadable
+modules to work correctly.  This is especially true when hosting a 2.6 kernel on
+a 2.4 distribution.
+
+@end enumerate
 
 @subsection LiS-2.16 Kernel and Driver Compatibility
 
@@ -2551,6 +2716,71 @@ level debugging then you will likely want LiS to be compiled using the -g
 option.  Configure asks you about this so that you can control whether to
 compile using -g or not.
 
+@subsubheading Parameter Passing Conventions
+
+The 2.6 Linux kernel can be compiled in a manner that causes parameters to
+subroutines to be passed in registers instead of the stack.  Some distributions
+build around 2.6 are compiled this way by default.
+
+If your driver calls kernel routines directly it must be compiled in the same
+manner as the kernel, either register parameters or stack parameters.  A
+mismatch will almost certainly lead to system crashes.
+
+When the kernel is compiled for register passing the C compiler command line
+option "-mregparm=3" is included by the kernel makefiles.  Omitting this option
+yields the default stack passing code.
+
+When the LiS Configure script is run, usually implicitly via the internal
+@command{make}, it senses how the kernel was compiled and sets upt the LiS
+compilation to include the @samp{regparm} option, or not.
+
+To preserve STREAMS driver interface compatibility across different versions of
+the Linux kernel, LiS declares all functions that are called across the
+LiS/driver interface to use either stack parameter passing (the default) or
+register passing (see below) regardless of the conventions used by the kernel.
+
+Thus, to take the default case, the kernel can use register parameters but LiS
+will have all of its driver interface routines compiled so as to use stack
+parameters.  This means that your STREAMS driver can be compiled to stack
+passing and can run with either convention in the kernel, without recompiling
+your driver.
+
+You can use register passing conentions in your driver as well, if you like.  As
+of this writing this feature is untested.  To do so, run the Configure script
+and pass the following options:
+@example
+Configure --regparm=3
+@end example
+
+This sets the LiS/STREAMS-driver parameter passing interface independently of
+that used by the kernel.  If you do this, be sure to compile your STREAMS driver
+using @samp{-mregparm=3}.
+
+The STREAMS driver instance routines that are called by LIS are:
+
+@itemize @bullet
+@item open, close, put and service routines called using the queue structures
+@item timeout and bufcall call-back routines
+@item driver initialization and termination routines
+@item driver interrupt service routines registered using LiS
+@end itemize
+
+The functions in LiS that are called by STREAMS drivers, and which also conform
+to the selected parameter passing conventions, are all enumerated in the LiS
+file @file{exports.c}.
+
+@subsubheading Choice of Compiler
+
+The LiS @command{Configure} script checks to see which compiler version was used
+to compile your kernel.  It then attempts to locate a C compiler of the same
+version to use for compiling LiS.  The script will print a message if it cannot
+find such a compiler.
+
+A common situation, during the transition to the 2.6 kernel, is to run a 2.6
+kernel on top of a 2.4 distribution such as Red Hat 9.  The 2.6 kernel needs
+@command{gcc} version 3.3.3 to compile it and that compiler is not part of the
+RH9 distribution.  Thus, to properly compile the 2.6 kernel, you also need to
+download the correct C compiler, compile and install it on your system.
 
 
 @node Removal of LiS
@@ -2782,6 +3012,10 @@ The "make install" target of LiS runs strmakenodes automatically and is the
 recommended method of making the @file{/dev} entries.
 @pgindex /dev
 
+It is now possible for STREAMS drivers to make their own device nodes by calling
+the routine @command{lis_mknod()}.
+@findex lis_mknod
+This useful for loadable STREAMS drivers.
 
 
 @node Coding LiS Drivers
@@ -2923,6 +3157,7 @@ This chapter describes this process and the strconf program itself.
 * Loadable Specification::		Loadable module specification.
 * Autopush Specification::		Autopush specification.
 * Tunable Parameter Specification::	Tunable parameters.
+* Queue Locking Specification::		Queue locking.
 * The Space.c File::			The optional Space.c file.
 * A Simple Example::			Examples.
 * Installing Your Driver::		Installation.
@@ -3694,6 +3929,57 @@ Generates the following in the output file:
 #define MAX_PORTS 16
 @end example
 
+@node Queue Locking Specification
+@section Queue Locking Specification
+
+@kindex qlock
+@pgindex config.h
+
+This statement specifies the locking style to be used for the named driver or
+module (pushable).  There are four different styles of locking specified
+numerically from 0 through 3.
+
+The locking that is performed involves the acquisition of a sempahore prior to
+calling the driver's put or service procedure.  Thus, it controls entry into the
+driver.
+
+The locking styles are as follows:
+
+@table @code
+@item 0 (LIS_QLOCK_NONE)
+No locking is performed.  If the driver needs protection from multiple
+simultaneous entries of its put and service procedures it must provide the
+protection itself.
+
+@item 1 (LIS_QLOCK_QUEUE)
+The read and write halves of the queue are locked separately.  Thus a read
+function (put/srv) can be entered simultaneously with a write function
+(put/srv).  This is the default and is the way that LiS operated prior to the
+introduction of this option.
+
+@item 2 (LIS_QLOCK_QUEUE_PAIR)
+The read and write halves of the queue are locked together.  Thus only one of
+the read/write put/srv procedures can be entered at a time.
+
+@item 3 (LIS_QLOCK_GLOBAL)
+A global sempahore is used to lock both halves of the queue.  The same global
+lock is used for all drivers and all streams.  Thus any collection of drivers
+using this style of locking will be mutually single threaded.
+@end table
+
+The utility of using locking style 0 has to do with acheiving higher throughput
+in multiple CPU environments.  If all put and service procedures can be entered
+simultaneously, then the put procedure can be calling putq() on one CPU while
+the service procedure is calling getq() and processing messages on another,
+setting up a pipeline execution effect.  Experiments have shown significant
+throughput improvements when this style of locking can be used.
+
+In such a circumstance the driver service procedure needs to maintain some kind
+of running flag, manipulated under a spin lock control, to assure single
+threaded execution of the messages removed from the queue.  Such flag
+manipulation is good practice even though LiS will not naturally tend to enter a
+driver's service procedure for the same queue on multiple CPUs simultaneously.
+
 @node The Space.c File
 @section The Space.c File
 
@@ -3908,6 +4194,19 @@ The convention for LiS kernel loadable object files is:
 @pgindex /lib/modules/@var{<kver>}/misc/
 @end itemize
 
+@section Kernel Version Differences
+
+For 2.4 kernels you can install your loadable module simply by copying the "o"
+file for our module to the directory @file{/lib/modules/@value{_kversion}/misc/}.
+
+For 2.6 the procedure involves an additional step.  Loadable modules in 2.6 are
+@samp{.ko} files instead of @samp{.o} files.  The mechanism to turn a
+@file{driver.o} into a @file{driver.ko} is non-trivial.  To do this, copy your
+@file{driver.o} file to @file{/usr/src/LiS/modules}.  Then do @samp{make install}
+in the LiS directory.  LiS will turn all @samp{.o} files in its modules
+subdirectory into @samp{.ko} files and copy the resultant files to the proper
+subdirectory of @file{/lib/modules}.
+
 @section Unconfigured drivers and modules
 
 An unconfigured driver or module is a driver or module that LiS does not have
@@ -4052,6 +4351,28 @@ used in the close routines.
 @ignore
 For a complete example, see the [18]ldl driver in drivers/str/linux/ldl.c.
 @end ignore
+
+@section Queue Locking in Loadable Modules
+
+Declared modules can use the @command{strconf} @samp{qlock} option to control
+the locking style for entering the driver's put and service procedures.  A
+loadable module can call one of the following routines, most likely at module
+load time.
+@example
+int lis_register_driver_qlock_option(major_t major, int qlock_option);
+int lis_register_module_qlock_option(modID_t id, int qlock_option);
+@end example
+
+The parameters @samp{major} and @samp{id} are obtained from the driver and
+module registration functions described above.
+
+The @samp{qlock_option} parameter is one of the following:
+@example
+LIS_QLOCK_NONE
+LIS_QLOCK_QUEUE
+LIS_QLOCK_QUEUE_PAIR
+LIS_QLOCK_GLOBAL
+@end example
 
 @node Installing Pre-Compiled Drivers
 @chapter Installing Pre-Compiled Drivers
@@ -5126,6 +5447,10 @@ Set an additional debug mask for LiS.  See below for details.
 @item -s
 Print STREAMS memory usage statistics.
 
+@item -L
+Print out lock contention statistics.  Use debug bit
+@code{DEBUG_LOCK_CONTENTION} to enable the lock contention statistics gathering.
+
 @item -m
 Print STREAMS memory allocation to the system messages file (from kernel).
 This option should be used only for debugging and only when LiS is in a
@@ -5142,9 +5467,16 @@ option should be used only for debugging and only when LiS is in a quiescent
 state.  Unpredictable results can occur if this option is used while LiS queue
 allocations are changing dynamically.
 
+@item -S
+Print out STREAMS queue-runner thread statistics.
+
 @item -t
 Print STREAMS timing statistics.  Used inconjunction with the
 @code{DEBUG_MEAS_TIME} debug option.
+
+@item -T
+Print the LiS semaphore latency histogram.  Use debug bit @code{DEBUG_SEMTIME}
+to enable the statistics collection.
 
 @item -h
 Print a command synopsis.
@@ -5161,40 +5493,45 @@ following single bit options.
 @table @asis
 @item -d @var{Options}
 @smallexample
-DEBUG_OPEN        0x00000001
-DEBUG_CLOSE       0x00000002
-DEBUG_READ        0x00000004
-DEBUG_WRITE       0x00000008
-DEBUG_IOCTL       0x00000010
-DEBUG_PUTNEXT     0x00000020
-DEBUG_STRRPUT     0x00000040
-DEBUG_SIG         0x00000080
-DEBUG_PUTMSG      0x00000100
-DEBUG_GETMSG      0x00000200
-DEBUG_POLL        0x00000400
-DEBUG_LINK        0x00000800
-DEBUG_MEAS_TIME   0x00001000
-DEBUG_MEM_LEAK    0x00002000
-DEBUG_FLUSH       0x00004000
-DEBUG_FATTACH     0x00008000
-DEBUG_SAFE        0x00010000
-DEBUG_TRCE_MSG    0x00020000
-DEBUG_CLEAN_MSG   0x00040000
-DEBUG_SPL_TRACE   0x00080000
-DEBUG_MP_ALLOC    0x00100000
-DEBUG_MP_FREEMSG  0x00200000
-DEBUG_MALLOC      0x00400000
-DEBUG_MONITOR_MEM 0x00800000
-DEBUG_DMP_QUEUE   0x01000000
-DEBUG_DMP_MBLK    0x02000000
-DEBUG_DMP_DBLK    0x04000000
-DEBUG_DMP_STRHD   0x08000000
-DEBUG_ADDRS       0x80000000
+DEBUG_OPEN             0x00000001
+DEBUG_CLOSE            0x00000002
+DEBUG_READ             0x00000004
+DEBUG_WRITE            0x00000008
+DEBUG_IOCTL            0x00000010
+DEBUG_PUTNEXT          0x00000020
+DEBUG_STRRPUT          0x00000040
+DEBUG_SIG              0x00000080
+DEBUG_PUTMSG           0x00000100
+DEBUG_GETMSG           0x00000200
+DEBUG_POLL             0x00000400
+DEBUG_LINK             0x00000800
+DEBUG_MEAS_TIME        0x00001000
+DEBUG_MEM_LEAK         0x00002000
+DEBUG_FLUSH            0x00004000
+DEBUG_FATTACH          0x00008000
+DEBUG_SAFE             0x00010000
+DEBUG_TRCE_MSG         0x00020000
+DEBUG_CLEAN_MSG        0x00040000
+DEBUG_SPL_TRACE        0x00080000
+DEBUG_MP_ALLOC         0x00100000
+DEBUG_MP_FREEMSG       0x00200000
+DEBUG_MALLOC           0x00400000
+DEBUG_MONITOR_MEM      0x00800000
+DEBUG_DMP_QUEUE        0x01000000
+DEBUG_DMP_MBLK         0x02000000
+DEBUG_DMP_DBLK         0x04000000
+DEBUG_DMP_STRHD        0x08000000
+DEBUG_ADDRS            0x80000000
 @end smallexample
 
 @item -D @var{Options}
 @smallexample
-DEBUG_SNDFD       0x00000001
+DEBUG_SNDFD            0x00000001
+DEBUG_CP	       0x00000002
+DEBUG_CACHE	       0x00000004
+DEBUG_LOCK_CONTENTION  0x00000008
+DEBUG_REFCNTS          0x00000010
+DEBUG_SEMTIME          0x00000020
 @end smallexample
 @end table
 
@@ -5412,9 +5749,11 @@ not have to be sensitive to differences in kernel versions.
 * LiS Interrupt Enable/Disable::	LiS interrupt functions.
 * LiS Semaphores::			LiS semaphores.
 * Debugging Spin Locks::		Debugging locks.
+* Lock Semaphore and Queue Contention::	Lock contention.
 * Debugging Semaphores::		Debugging sempahores.
 * STREAMS Utility Routines::		STREAMS utility functions.
 * Flushing Queue Bands::		Flushing queues.
+* Freezing Streams::			Freezing streams.
 * Utility Prototypes::			STREAMS utility prototypes.
 * System Calls from within the Kernel::	Linux system calls.
 @end menu
@@ -5558,6 +5897,7 @@ void vfree(void *ptr);
 
 These are the routines that are used to allocate a main-board old-style DMA
 channel for use by your driver.  These are not much used anymore.
+See below for a more elaborate abstraction of DMA routines.
 
 @smallexample
 int request_dma(unsigned int dma_nr, const char *device_id);
@@ -5708,13 +6048,21 @@ success or a negative error number for failure.
 @node Major/Minor Device Numbering
 @section Major/Minor Device Numbering
 
+Please note that LiS-2.17 changed the internal representation of the major and
+minor device numbers within the 32 bit @code{dev_t} structure.  The following
+documents the new format and usage conventions.
+@tpindex dev_t
+
 In STREAMS the dev_t structure is used to combine a major device number and a
 minor device number into a single integer length quantity.  The Linux kernel
 restricts these numbers to the range 0 to 255 (8-bit values).
 
 @tpindex dev_t
-LiS provides a typedef for dev_t that results in an unsigned integer quantity.
+LiS provides a typedef for @code{dev_t} that results in an unsigned integer
+quantity.  Internal to LiS the high order 12 bits are used for major device
+number and the low order 20 bits are used for minor device number.
 
+@ignore
 The Linux kernel, on the other hand, defines a structure of type kdev_t that it
 uses internally for this same purpose.  The kdev_t type is an actual structure,
 and not an integer.  Furthermore, the kernel defines a routine named makedevice
@@ -5751,9 +6099,48 @@ True if the two devices are the same
 @item int DEV_TO_INT(dev_t dev);
 Converts dev_t to an int
 @end table
+@end ignore
+
+STREAMS drivers include the file @file{<sys/stream.h>} that causes the view of
+@code{dev_t}
+@tpindex dev_t
+to change from the kernel's 8/8 view to the LiS 12/20 view.  To ensure proper
+operation, STREAMS drivers should use the following functions to manipulate
+@code{dev_t} variables.  These functions are SVR4 compatible.
+
+@table @code
+@findex getmajor
+@item int getmajor(dev_t dev);
+Extracts the major device number
+
+@findex getminor
+@item int getminor(dev_t dev);
+Extracts the minor device number
+
+@findex makedevice
+@item dev_t makedevice(int maj, int min);
+Combines a major and minor device number into a dev_t
+
+@findex DEV_SAME
+@item int DEV_SAME(dev_t d1, dev_t d2);
+True if the two devices are the same
+
+@findex DEV_TO_INT
+@item int DEV_TO_INT(dev_t dev);
+Converts dev_t to an int
+@end table
 
 The sample drivers that come with LiS now use these constructs to manipulate
 device structures and can serve as examples for their usage.
+
+Within a STREAMS driver it is occasionally necessary to make a @code{dev_t}
+@tpindex dev_t
+value in the external 8/8 format.  This is required, for example, when a driver
+is using the @command{lis_mknod()}
+@findex lis_mknode
+function to create a device node at driver initialization time.  LiS provides
+the function @command{UMKDEV(major, minor)} for this purpose.
+@findex UMKDEV
 
 @node LiS Memory Allocation
 @section LiS Memory Allocation
@@ -6099,6 +6486,10 @@ of memory.  If the DMA operation goes both ways then use LIS_SYNC_FOR_BOTH.
 void lis_pci_map_single(lis_pci_dev_t *dev, void *ptr, size_t size,
                         lis_dma_addr_t * dma_handle, int direction);
 void *lis_pci_unmap_single(lis_dma_addr_t * dma_handle);
+int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+			int nents, int direction);
+void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+			int nents, int direction);
 @end smallexample
 
 The direction indicators are as follows:
@@ -6117,6 +6508,9 @@ used for that purpose.
 @smallexample
 void lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size,
                              int direction);
+void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
+			      struct scatterlist *sg,
+			      int nelems, int direction);
 @end smallexample
 
 The following routines can be used at driver initialization time to discover and
@@ -6126,6 +6520,9 @@ control the addressing boundary restrictions of a device.
 int lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
 int lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
 @end smallexample
+
+Please consult the file @file{<sys/osif.h>} for additional routines that may be
+present for DMA support.
 
 @node LiS Atomic Functions
 @section LiS Atomic Functions
@@ -6201,6 +6598,8 @@ procedures get executed simultaneously since there are two different locks in
 the STREAMS queues, one in the read queue and one in the write queue.  In this
 case, the STREAMS driver code would need to use spin locks to protect data
 structures shared between the read and write "put" or "service" procedures.
+See the @samp{qlock} option for @command{strconf} for more information about LiS
+implicit use of locks to protect put and service procedure entries.
 
 @node LiS Spin Locks
 @section LiS Spin Locks
@@ -6590,16 +6989,29 @@ The following two routines are used to acquire and release a semaphore.
 
 @smallexample
 int lis_down(lis_semaphore_t *sem);
+void lis_down_nosig(lis_semaphore_t *lsem);
 void lis_up(lis_semaphore_t *sem);
 @end smallexample
 
-The routine lis_down returns 0 for success and a negative error code for
-failure.  The caller has not acquired the semaphore unless the routine returns
-zero.
+The routine @command{lis_down}
+@findex lis_down
+returns 0 for success and a negative error code for failure.  The caller has not
+acquired the semaphore unless the routine returns zero.
 
 One reason for a negative return could be that the calling task was signalled
 while waiting for the semaphore to become available.  If this has occurred the
-        return code will be set to -EINTR.
+return code will be set to -EINTR.
+
+The function @command{lis_down_nosig}
+@findex lis_down_nosig
+waits for the sempahore with signals blocked.  It is useful in driver close
+routines that must use a semaphore to control access to the structures that need
+to be deallocated.  It is common for the driver close routine to be called from
+a process that has been signalled -- for example a process that was killed with
+a @key{Ctrl-C} from the keyboard.  In this case, @command{lis_down} will return
+immediately with @code{-EINTR}, an undesirable situation.  using
+@command{lis_down_nosig} in this situation blocks signals so that the close
+routine can wait on the semaphore even if the process has been signalled.
 
 Semaphores cannot be used in nested fashion.  Care must be exercised that a
 single thread only performs one "down" operation on a given semaphore.
@@ -6769,6 +7181,25 @@ when you need this information so you end up printing it from within the
 debugger.
 @pgindex /var/log/messages
 
+@node Lock Semaphore and Queue Contention
+@section Lock Semaphore and Queue Contention
+
+The @command{streams} command can be used to enable the tracking of contetion
+for locks, semaphores and STREAMS queues.  Use the command @samp{streams -D0x08}
+to enable the contention tracking.  The command @samp{streams -L} then causes
+the contention tables to be printed out.
+
+Locks and semaphores are in contention when a thread goes to spin on a lock or
+perform a @command{down} function on a sempahore, and the thread has to wait
+because the lock or semaphore is owned by another thread.  LiS counts such
+occurences on a per-lock basis and reports the results with the @samp{streams -L}
+command.
+
+Queues are in contention when the semaphore that controls access to the queue is
+in contention.  However, there are options that affect which semaphore is used
+to control access to a queue and these options will also have an effect on the
+reporting of queue contention.
+
 @node Debugging Semaphores
 @section Debugging Semaphores
 
@@ -6830,6 +7261,90 @@ they do in SVR4 STREAMS.
 These routines are presented here in alphabetical order with no description.
 Please refer to the [109]AT&T SVR4 STREAMS documentation for the descriptions of
 these routines.
+
+@node Freezing Streams
+@section Freezing Streams
+
+There are two sets of routines that can be used to @samp{freeze} a stream.  They
+are used in slightly different ways and have slightly different semantics.  One
+set uses the routines
+@command{freezestr()}
+@findex freezestr
+and @command{unfreezestr()};
+@findex unfreezestr
+the other set uses the routines
+@command{qprocesoff()}
+@findex qprocesoff
+and @command{qprocson()}.
+@findex qprocson
+
+@subsection Freezestr and Unfreezestr
+
+@example
+void freezestr(queue_t *q);
+void unfreezestr(queue_t *q);
+@end example
+
+These routines operate on the entire stream of which the queue is a member.  The
+stream is found by traversing the chain of queues in both directions until
+encountering a queue that is not linked to another queue.  As a simple example
+it includes all queues from the stream head down through any pushed modules to
+the driver queue in which one of those queues is the one passed as the parameter
+to either of these routines.
+
+The process of freezing the stream is to place it into a state such that
+messages will not flow up and down the stream.  That is @command{put} and
+@command{service} procedures will not be called.  It @command{putnext()}
+@findex putnext
+is called on a queue within a frozen stream the passed message is placed into a
+special deferred message list.  Messages are removed from this list and passed
+to the @command{put} procedure when the stream is later unfrozen.
+
+Drivers that have frozen a stream should refrain from performing queuing
+operations on queues within the stream, such as @command{getq} and
+@command{putq}.  LiS does not enforce this so one must exercise some care when
+using these routines.
+
+SVR4 STREAMS specification says that the driver's close routine will not be
+called if the stream is frozen.  LiS does not implement this rule and will close
+a frozen stream.
+
+LiS uses these routines internally at stream close time to stop message flow
+when the stream is being dismantled.  It also uses them during @code{I_PUSH} and
+@code{I_POP} processing to inhibit message flow while replumbing the stream.
+
+Drivers should use these routines with some caution.  Because the stream is
+frozen the driver cannot receive any messages from above or below, including
+@code{M_IOCTL}.  This may make it tricky deciding when to unfreeze a stream.
+
+@subsection Qprocsoff and Qprocson
+
+@example
+void qprocson(queue_t *rdq);
+void qprocsoff(queue_t *rdq);
+@end example
+
+These routines are conventionally used in a driver open (@command{qprocson}) and
+close (@command{qprocsoff}) routine.  In some STREAMS implementations
+@command{qprocson} must be called to enable messages to flow into the queue once
+open processing has completed.  This is not necessary in LiS.
+
+In LiS it does no harm to call @command{qprocson} in the driver open routine and
+@command{qprocsoff} in the driver close routine, though it is not necessary to
+do so.
+
+The effect of @command{qprocsoff} is similar to that of @command{freezestr}
+except that it applies just to the single queue rather than to the entire
+stream.  Once significant difference is that if a pushable modules is in a
+@samp{qprocsoff} condition and a message flows into the module, STREAMS will
+route the message to the next module or driver in the chain of queues, looking
+for one that is enabled.  If no such module or driver exists, the messag will be
+placed into the deferred message list of the queue at the far end of the chain
+of queues.  The messages will be presented to the driver put routine when
+@command{qprocon} is called.
+
+It is best to use these routines only at open and close time since that seems to
+have been the intent of the STREAMS designers.
 
 @node Flushing Queue Bands
 @section Flushing Queue Bands
@@ -6934,10 +7449,12 @@ mblk_t *esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo);
 int esbbcall(int priority, void (*function) (long), long arg);
 __________________________________________
 
-void[117] flushband(queue_t *q, unsigned char band, int flag);
-void[118] flushq(queue_t *q, int flag);
+void flushband(queue_t *q, unsigned char band, int flag);
+void flushq(queue_t *q, int flag);
 void freeb(mblk_t *bp);
 void freemsg(mblk_t *mp);
+void freezestr(queue_t *q);
+void unfreezestr(queue_t *q);
 __________________________________________
 
 int getmajor(dev_t dev);
