@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.7 2004/08/20 21:14:13 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.9 2004/08/21 23:11:58 brian Exp $
 %
 % =========================================================================
 %
@@ -54,12 +54,12 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2004/08/20 21:14:13 $ by $Author: brian $
+% Last Modified $Date: 2004/08/21 23:11:58 $ by $Author: brian $
 %
 % =========================================================================
 
 \input texinfo
-@setfilename @value{PACKAGE}.info
+@setfilename strxns.info
 @settitle @value{PACKAGE_TITLE}
 @setchapternewpage odd
 @footnotestyle separate
@@ -71,7 +71,7 @@
 
 @set xref-automatic-section-title
 
-@include args.texi
+@include texi/args.texi
 
 @defindex op
 
@@ -180,7 +180,7 @@ another language, under the same conditions as for modified versions.
 @c @syncodeindex tr cp
 @c @syncodeindex cm cp
 
-@itnottex
+@ifnottex
 @node Top, , (dir), (dir)
 @top @value{PACKAGE_TITLE}
 @end ifnottex
@@ -551,7 +551,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @chapter Installation
 @cindex installation
 
-@include install.texi
+@include texi/install.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -562,7 +562,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
-@include gpl.texi
+@include texi/gpl.texi
 
 @node LGPL, FDL, GPL, Top
 @appendix LGPL
@@ -570,7 +570,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
-@include lesser.texi
+@include texi/lesser.texi
 
 @node FDL, Indices, LGPL, Top
 @appendix FDL
@@ -578,7 +578,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
-@include fdl.texi
+@include texi/fdl.texi
 
 @node Indices, , FDL, Top
 @appendix Indices
@@ -621,7 +621,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @printindex op
 
 @node Author Index, , Option Index, Indices
-@unnumbered Author Index
+@appendixsec Index of Authors
 @printindex au
 
 @c ----------------------------------------------------------------------------
