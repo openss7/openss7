@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/10/12 03:03:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2004/10/12 03:03:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/10/12 03:03:11 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/08/22 06:17:54 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/10/12 03:03:11 $";
 
 #define __NO_VERSION__
 
@@ -235,7 +235,7 @@ static int get_streams_module_stat_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, ", ms_ocnt");
 	len += snprintf(page + len, maxlen - len, ", ms_ccnt");
 	len += snprintf(page + len, maxlen - len, ", ms_acnt");
-	len += snprintf(page + len, maxlen - len, ", ms_xprt");
+	len += snprintf(page + len, maxlen - len, ", ms_xptr");
 	len += snprintf(page + len, maxlen - len, ", ms_xsize");
 	len += snprintf(page + len, maxlen - len, ", ms_flags");
 	return (len);
@@ -251,7 +251,7 @@ static int get_streams_module_stat(char *page, ssize_t maxlen, struct module_sta
 	len += snprintf(page + len, maxlen - len, ", %ld", ms->ms_ocnt);
 	len += snprintf(page + len, maxlen - len, ", %ld", ms->ms_ccnt);
 	len += snprintf(page + len, maxlen - len, ", %ld", ms->ms_acnt);
-	len += snprintf(page + len, maxlen - len, ", %p", ms->ms_xprt);
+	len += snprintf(page + len, maxlen - len, ", %p", ms->ms_xptr);
 	len += snprintf(page + len, maxlen - len, ", %hd", ms->ms_xsize);
 	len += snprintf(page + len, maxlen - len, ", %#08x", ms->ms_flags);
       done:

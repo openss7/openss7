@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.4 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.5 2004/10/12 03:03:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2004/10/12 03:03:11 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SC_H__
 #define __SYS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/10/12 03:03:11 $"
 
 #define SC_IOC_MAGIC 'C'
 #define SC_IOC_LIST ((SC_IOC_MAGIC << 8) | 0x01)
@@ -86,7 +86,7 @@ typedef struct module_stat {
 	long ms_ocnt;			/* calls to qi_qopen() */
 	long ms_ccnt;			/* calls to qi_qclose() */
 	long ms_acnt;			/* calls to qi_qadmin() */
-	void *ms_xprt;			/* module private stats */
+	void *ms_xptr;			/* module private stats */
 	short ms_xsize;			/* len of private stats */
 	uint ms_flags;			/* bool stats -- for future use */
 } module_stat_t;
