@@ -1,0 +1,8 @@
+# $Log: ChangeLog,v $
+# Revision 0.9.2.1  2004/06/27 08:15:37  brian
+# - Building strinet release.
+#
+
+2004-06-27 brian <bidulock@openss7.org>
+	* (strinet):
+	- built up initial release of this package

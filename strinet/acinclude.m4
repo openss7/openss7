@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/05/23 07:24:25 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.3 2004/06/27 10:08:31 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,72 +53,111 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/23 07:24:25 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/27 10:08:31 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/kernel.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/genksyms.m4])
-m4_include([m4/xopen.m4])
+m4_include([m4/xti.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
-m4_include([m4/libraries.m4])
+#m4_include([m4/libraries.m4])
 m4_include([m4/strconf.m4])
 
 # =========================================================================
 # AC_INET
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_INET], [
+AC_DEFUN([AC_INET], [dnl
     _INET_OPTIONS
     _MAN_CONVERSION
     _PUBLIC_RELEASE
     _RPM_SPEC
-    _LDCONFIG
+#    _LDCONFIG
     # user CPPFLAGS and CFLAGS
     USER_CPPFLAGS="${CPPFLAGS}"
     USER_CFLAGS="${CFLAGS}"
     _LINUX_KERNEL
     _LINUX_STREAMS
-    _XOPEN
-    INET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    _XTI
+    INET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}${xti_cv_includes:+ -I}${xti_cv_includes}"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $XNET_INCLUDES])
+    AC_MSG_NOTICE([final user    INCLUDES  = $INET_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
     AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])
-    AC_SUBST([USER_CFLAGS])
-    AC_SUBST([INET_INCLUDES])
+    AC_SUBST([USER_CPPFLAGS])dnl
+    AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([INET_INCLUDES])dnl
     CPPFLAGS=
     CFLAGS=
     _INET_SETUP
-    _INET_OUTPUT
+    _INET_OUTPUT dnl
 ])# AC_INET
 # =========================================================================
 
 # =========================================================================
 # _INET_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_OPTIONS], [
+AC_DEFUN([_INET_OPTIONS], [dnl
 ])# _INET_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _INET_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_SETUP], [
+AC_DEFUN([_INET_SETUP], [dnl
+    AC_CACHE_CHECK([for sctp openss7 kernel], [inet_cv_openss7_sctp], [dnl
+        _LINUX_KERNEL_ENV([dnl
+            AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/sctp.h>
+#ifdef SCTPCB_FLAG_CONF
+    yes_we_have_openss7_kernel_sctp
+#endif
+            ], [inet_cv_openss7_sctp=yes], [inet_cv_openss7_sctp=no]) ]) ])
+    AM_CONDITIONAL([WITH_OPENSS7_SCTP], test :"${inet_cv_openss7_sctp:-no}" = :yes)dnl
 ])# _INET_SETUP
+# =========================================================================
+
+# =========================================================================
+# _INET_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_INET_OUTPUT], [dnl
+    _INET_STRCONF dnl
+])# _INET_OUTPUT
+# =========================================================================
+
+# =========================================================================
+# _INET_STRCONF
+# -------------------------------------------------------------------------
+AC_DEFUN([_INET_STRCONF], [dnl
+    strconf_cv_stem='lis.conf'
+dnl strconf_cv_input='Config.master'
+    strconf_cv_majbase=245
+    strconf_cv_config='strconf.h'
+    strconf_cv_modconf='modconf.h'
+dnl strconf_cv_drvconf='drvconf.mk'
+dnl strconf_cv_confmod='conf.modules'
+dnl strconf_cv_makedev='devices.lst'
+    strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
+    strconf_cv_strsetup='inetsetup.conf'
+    strconf_cv_strload='inetload.conf'
+    _STRCONF dnl
+])# _INET_STRCONF
 # =========================================================================
 
 # =========================================================================
 # _INET_
 # -------------------------------------------------------------------------
-AC_DEFUN([_INET_], [
+AC_DEFUN([_INET_], [dnl
 ])# _INET_
 # =========================================================================
 

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.1 2004/05/23 04:18:08 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/06/27 10:08:31 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/23 04:18:08 $ by $Author: brian $
+dnl Last Modified $Date: 2004/06/27 10:08:31 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -73,9 +73,6 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
 
-auxdir="$ac_aux_dir"
-AC_SUBST(auxdir)
-
 AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
@@ -91,7 +88,7 @@ AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_CC_C_O
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_ARG_VAR([LD], [Linker loader command])
@@ -101,7 +98,6 @@ AC_PROG_MAKE_SET
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION(0.14.1)
 
 #
 # Checks for libraries.
@@ -109,8 +105,10 @@ AM_GNU_GETTEXT_VERSION(0.14.1)
 inet_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([LiS], [putpmsg])
-AC_CHECK_LIB([streams], [putpmsg])
+AC_CHECK_LIB([LiS], [fattach])
+AC_CHECK_LIB([streams], [fattach])
+AC_CHECK_LIB([xnet], [t_open])
+AC_CHECK_LIB([socket], [socket])
 LIBS="$inet_save_LIBS"
 
 #
@@ -144,7 +142,6 @@ AC_CHECK_TYPES([ptrdiff_t])
 # 
 # Checks for library functions.
 # 
-AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
@@ -160,12 +157,14 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRNLEN
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero])
+AC_CHECK_FUNCS([bzero gettimeofday memset strerror strtol])
 
 AC_INET
 
 AC_CONFIG_FILES([Makefile
 		 doc/Makefile
-		 doc/manual/Makefile])
+		 doc/man/Makefile
+		 doc/manual/Makefile
+		 src/drivers/lis.conf])
 
 AC_OUTPUT

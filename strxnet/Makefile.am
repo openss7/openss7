@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/06/07 17:43:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/27 08:39:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/07 17:43:12 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 08:39:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,9 +57,6 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			= \
-				  test-inet_raw \
-				  test-inet_tcp \
-				  test-inet_udp \
 				  test-tirdwr \
 				  test-timod \
 				  test-xnet \
@@ -70,12 +67,6 @@ if WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-tirdwr \
 				  test-timod
-endif
-if WITH_INET
-libexec_PROGRAMS		+= \
-				  test-inet_raw \
-				  test-inet_tcp \
-				  test-inet_udp
 endif
 if WITH_XNET
 libexec_PROGRAMS		+= \
@@ -104,23 +95,6 @@ test_timod_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 endif
 
-if WITH_INET
-test_inet_raw_SOURCES		= src/test/test-inet_raw.c
-test_inet_raw_LDADD		= $(STREAMS_LDADD)
-test_inet_raw_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
-test_inet_raw_CFLAGS		= $(USER_CFLAGS)
-
-test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
-test_inet_tcp_LDADD		= $(STREAMS_LDADD)
-test_inet_tcp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
-test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
-
-test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDADD		= $(STREAMS_LDADD)
-test_inet_udp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
-test_inet_udp_CFLAGS		= $(USER_CFLAGS)
-endif
-
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
@@ -131,12 +105,7 @@ test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
 test_xnet_thr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
-endif
 
-ADDON_LIBS			= 
-ADDON_OBJS			= 
-
-if WITH_XNET
 lib_LTLIBRARIES			+= libxnet.la
 
 libxnet_la_SOURCES		= src/lib/xnet.c gettext.h
@@ -150,12 +119,16 @@ endif
 
 if RPM_BUILD_KERNEL
 
-noinst_LIBRARIES		= libXNETmods.a libXNETdrvs.a $(ADDON_LIBS)
+ADDON_LIBS			= 
+ADDON_OBJS			= 
+
+noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= 
 
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
 				  src/modules/timod.c \
+				  src/modules/debug.h \
 				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
@@ -166,21 +139,7 @@ libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
 libXNETmods_a_CPPFLAGS		= -I./src/modules -I$(srcdir)/src/modules -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-nodist_EXTRA_libXNETdrvs_a_SOURCES = \
-				  src/drivers/inet.c \
-				  src/drivers/bufq.h \
-				  src/drivers/debug.h \
-				  ./config.h ./strconf.h
-
-drvs_source_FILES		= $(nodist_EXTRA_libXNETdrvs_a_SOURCES)
-
-nodist_libXNETdrvs_a_SOURCES	= $(drvs_source_FILES)
-
-libXNETdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I$(srcdir)/src/drivers -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
-libXNETdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
-
-KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
 endif
@@ -190,9 +149,6 @@ else
 if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			= \
-				  test-inet_raw \
-				  test-inet_tcp \
-				  test-inet_udp \
 				  test-tirdwr \
 				  test-timod \
 				  test-xnet \
@@ -203,12 +159,6 @@ if WITH_TLI
 libexec_PROGRAMS		+= \
 				  test-tirdwr \
 				  test-timod
-endif
-if WITH_INET
-libexec_PROGRAMS		+= \
-				  test-inet_raw \
-				  test-inet_tcp \
-				  test-inet_udp
 endif
 if WITH_XNET
 libexec_PROGRAMS		+= \
@@ -227,44 +177,27 @@ sbin_PROGRAMS			= \
 
 if WITH_TLI
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
+test_tirdwr_LDADD		= $(STREAMS_LDADD)
 test_tirdwr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 
 test_timod_SOURCES		= src/test/test-timod.c
+test_timod_LDADD		= $(STREAMS_LDADD)
 test_timod_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
 test_timod_CFLAGS		= $(USER_CFLAGS)
 endif
 
-if WITH_INET
-test_inet_raw_SOURCES		= src/test/test-inet_raw.c
-test_inet_raw_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
-test_inet_raw_CFLAGS		= $(USER_CFLAGS)
-
-test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
-test_inet_tcp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
-test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
-
-test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
-test_inet_udp_CFLAGS		= $(USER_CFLAGS)
-endif
-
 if WITH_XNET
 test_xnet_SOURCES		= src/test/test-xnet.c
-test_xnet_LDADD			= libxnet.la
+test_xnet_LDADD			= libxnet.la $(STREAMS_LDADD)
 test_xnet_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS)
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
-test_xnet_thr_LDADD		= libxnet.la -lpthread
+test_xnet_thr_LDADD		= libxnet.la $(STREAMS_LDADD) -lpthread
 test_xnet_thr_CPPFLAGS		= $(XNET_INCLUDES) $(USER_CPPFLAGS) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
-endif
 
-ADDON_LIBS			= 
-ADDON_OBJS			= 
-
-if WITH_XNET
 lib_LTLIBRARIES			+= libxnet.la
 
 libxnet_la_SOURCES		= src/lib/xnet.c gettext.h
@@ -278,12 +211,16 @@ endif
 
 if RPM_BUILD_KERNEL
 
+ADDON_LIBS			= 
+ADDON_OBJS			= 
+
 noinst_LIBRARIES		= libXNETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			= 
 
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
 				  src/modules/timod.c \
+				  src/modules/debug.h \
 				  ./config.h ./strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
@@ -294,28 +231,14 @@ libXNETmods_a_DEPENDENCIES	= ./config.h ./strconf.h
 libXNETmods_a_CPPFLAGS		= -I./src/modules -I$(srcdir)/src/modules -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
 libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-nodist_EXTRA_libXNETdrvs_a_SOURCES = \
-				  src/drivers/inet.c \
-				  src/drivers/bufq.h \
-				  src/drivers/debug.h \
-				  ./config.h ./strconf.h
-
-drvs_source_FILES		= $(nodist_EXTRA_libXNETdrvs_a_SOURCES)
-
-nodist_libXNETdrvs_a_SOURCES	= $(drvs_source_FILES)
-
-libXNETdrvs_a_DEPENDENCIES	= ./config.h ./strconf.h
-libXNETdrvs_a_CPPFLAGS		= -I./src/drivers -I$(srcdir)/src/drivers -imacros ./strconf.h $(XNET_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS)
-libXNETdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
-
-KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(libXNETdrvs_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libXNETmods_a_OBJECTS) $(ADDON_OBJS)
 EXTRA_KERNEL_MODULES		= 
 
 endif
 
 endif
 
-xnet_source_FILES		= $(mods_source_FILES) $(drvs_source_FILES)
+xnet_source_FILES		= $(mods_source_FILES)
 
 EXTRA_DIST			= $(xnet_source_FILES)
 dist_noinst_SCRIPTS		=
@@ -348,31 +271,11 @@ include am/strconf.am
 
 if RPM_BUILD_KERNEL
 
-if WITH_INET
-
-INET_MKDEV			= scripts/inet_mkdev
-INET_RMDEV			= scripts/inet_rmdev
-
-install-devices: $(STRMAKENODES) $(INET_MKDEV)
-	./$(STRMAKENODES)
-	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)
-
-uninstall-devices: $(STRMAKENODES) $(INET_RMDEV)
-	./$(STRMAKENODES) --remove
-	DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)
-
-else
-
 install-devices: $(STRMAKENODES)
 	./$(STRMAKENODES)
 
 uninstall-devices: $(STRMAKENODES)
 	./$(STRMAKENODES) --remove
-
-endif
-
-dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 endif
 

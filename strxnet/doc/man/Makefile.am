@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/22 19:46:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/27 08:39:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/22 19:46:34 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 08:39:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -341,28 +341,6 @@ tli_man_MANS	= \
 	man7/T_UNITDATA_REQ.7 \
 	man7/T_unitdata_req.7
 
-inet_man_MANS	= \
-	man4/egp.4 \
-	man4/eth.4 \
-	man4/ggp.4 \
-	man4/icmp.4 \
-	man4/idp.4 \
-	man4/ifnet.4 \
-	man4/INET.4 \
-	man4/inet.4 \
-	man4/ip.4 \
-	man4/ipip.4 \
-	man4/pup.4 \
-	man4/rawip.4 \
-	man4/tcp.4 \
-	man4/tcp_ioctl.4 \
-	man4/ticlts.4 \
-	man4/ticots.4 \
-	man4/ticotsord.4 \
-	man4/udp.4 \
-	man4/udp_ioctl.4 \
-	man4/xtios.4
-
 xnet_man_MANS	= \
 	man3/t_accept.3 \
 	man3/t_addleaf.3 \
@@ -445,9 +423,6 @@ endif
 if WITH_TLI
 man_MANS	+= $(tli_man_MANS)
 sctp_man_MANS	+= man7/tpi_sctp.7
-endif
-if WITH_INET
-man_MANS	+= $(inet_man_MANS)
 endif
 if WITH_XNET
 man_MANS	+= $(xnet_man_MANS)
@@ -749,28 +724,6 @@ tli_dist_noinst_MANS	= \
 	man7/T_UNITDATA_REQ.7.man \
 	man7/T_unitdata_req.7.man
 
-inet_dist_noinst_MANS	= \
-	man4/egp.4.man \
-	man4/eth.4.man \
-	man4/ggp.4.man \
-	man4/icmp.4.man \
-	man4/idp.4.man \
-	man4/ifnet.4.man \
-	man4/INET.4.man \
-	man4/inet.4.man \
-	man4/ip.4.man \
-	man4/ipip.4.man \
-	man4/pup.4.man \
-	man4/rawip.4.man \
-	man4/tcp.4.man \
-	man4/tcp_ioctl.4.man \
-	man4/ticlts.4.man \
-	man4/ticots.4.man \
-	man4/ticotsord.4.man \
-	man4/udp.4.man \
-	man4/udp_ioctl.4.man \
-	man4/xtios.4.man
-
 xnet_dist_noinst_MANS	= \
 	man3/t_accept.3.man \
 	man3/t_addleaf.3.man \
@@ -851,7 +804,6 @@ dist_noinst_MANS	= \
 	$(xti_dist_noinst_MANS) \
 	$(xns_dist_noinst_MANS) \
 	$(tli_dist_noinst_MANS) \
-	$(inet_dist_noinst_MANS) \
 	$(xnet_dist_noinst_MANS) \
 	$(sock_dist_noinst_MANS) \
 	$(sctp_dist_noinst_MANS)

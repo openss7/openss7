@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/20 18:21:43 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/27 10:08:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,17 +47,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/20 18:21:43 $ by $Author: brian $
+# Last Modified $Date: 2004/06/27 10:08:31 $ by $Author: brian $
 #
 # =============================================================================
-
-%define base_release @PACKAGE_RELEASE@
 
 # default is to build kernel modules and tools
 # conditional builds of binary rpms relies on the sneaky spec trick that
 # rpmbuild will not build a binary rpm when it has no %files section
 %define BUILD_modules 1
 %define BUILD_tools   1
+%define BUILD_lis     1
+%define BUILD_lfs     0
 
 #
 # there are three ways to pass kernel version to the build process:
@@ -74,18 +74,41 @@
 %define kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %define kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
 %define core_name core-%{_kversion}
+%define epoch @PACKAGE_EPOCH@
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
 %{?_without_modules: %{expand: %%define BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%define BUILD_tools   0}}
+%{?_without_lis:     %{expand: %%define BUILD_lis     0}}
+%{?_without_lis:     %{expand: %%define BUILD_lfs     1}}
+%{?_without_lfs:     %{expand: %%define BUILD_lfs     0}}
+%{?_without_lfs:     %{expand: %%define BUILD_lis     1}}
+
 %{?_with_modules:    %{expand: %%define BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%define BUILD_tools   1}}
+%{?_with_lis:        %{expand: %%define BUILD_lis     1}}
+%{?_with_lis:        %{expand: %%define BUILD_lfs     0}}
+%{?_with_lfs:        %{expand: %%define BUILD_lfs     1}}
+%{?_with_lfs:        %{expand: %%define BUILD_lis     0}}
+
+%define _streams lis
+%define _ksubdir lis
+%if %{BUILD_lfs}
+%define _STREAMS LfS
+%define _streams streams
+%define _ksubdir streams
+%endif
+%if %{BUILD_lis}
+%define _STREAMS LiS
+%define _streams LiS
+%define _ksubdir lis
+%endif
 
 # we have some more options that control configure for the build
 
-Summary:        OpenSS7 STREAMS INET for Linux
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET for Linux
 Name:           @PACKAGE_TARNAME@
 Epoch:          @PACKAGE_EPOCH@
 Version:        @PACKAGE_VERSION@
@@ -112,7 +135,12 @@ Obsoletes:      INET
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires:       kernel >= 2.4.7
 Requires:       kernel < 2.5
-Requires:       LiS >= 2.16.18-10
+%if %{BUILD_lfs}
+Requires:       streams >= 0.7a
+%endif
+%if %{BUILD_lis}
+Requires:       LiS >= 2:2.16.18
+%endif
 Provides:       INET
 BuildRequires:  kernel-source >= 2.4
 %ifarch s390 s390x
@@ -125,17 +153,24 @@ BuildRequires:  gcc >= 2.96-98
 %endif
 %endif
 BuildRequires:  gcc >= 2.96
-BuildRequires:  LiS-devel >= 2.16.18-10
+%if %{BUILD_lfs}
+BuildRequires:  streams-devel >= 0.7a
+%endif
+%if %{BUILD_lis}
+BuildRequires:  LiS-devel >= 2:2.16.18
+%endif
+BuildRequires:  strxnet-devel >= %{epoch}:%{version}
 Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package includes kernel modules, STREAMS drivers, modules,
-libraries, utilities, test programs, daemons, and development environment for
-the development and execution of Internet Protocols (INET) protocol stack
-components and applications for the STREAMS environment.  This distribution is
-only currently applicable to 2.4 kernels and was targetted at ix86 and ppc
-architectures, but should build and install for other architectures as well.
+The %{name} package includes kernel modules, %{_STREAMS} STREAMS drivers,
+modules, libraries, utilities, test programs, daemons, and development
+environment for the development and execution of Internet Protocols (INET)
+protocol stack components and applications for the %{_STREAMS} STREAMS
+environment.  This distribution is only currently applicable to 2.4 kernels
+and was targetted at ix86 and ppc architectures, but should build and install
+for other architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -205,8 +240,23 @@ preferred_cflags="-freorder-blocks"
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
     --with-k-modules=/%{_lib}/modules/%{kernel_version} \
-    %{?_with_public:        --enable-public} \
-    %{?_without_public:     --disable-public}
+    --with-rpm-epoch=%{epoch} \
+    --with-rpm-release=%{release} \
+    --with-base-major=@STRCONF_MAJBASE@ \
+    %{?_with_cooked_manpages:    %{_with_cooked_manpages}} \
+    %{?_without_cooked_manpages: %{_without_cooked_manpages}} \
+    %{?_with_public:              --enable-public} \
+    %{?_without_public:           --disable-public} \
+    %{?_with_k_debug:             --enable-k-debug} \
+    %{?_without_k_debug:          --disable-k-debug} \
+    %{?_with_k_test:              --enable-k-test} \
+    %{?_without_k_test:           --disable-k-test} \
+    %{?_with_k_safe:              --enable-k-safe} \
+    %{?_without_k_safe:           --disable-k-safe} \
+    %{?_with_k_inline:            --enable-k-inline} \
+    %{?_without_k_inline:         --disable-k-inline} \
+    %{?_with_lis:                %{_with_lis}} \
+    %{?_with_lfs:                %{_with_lfs}}
 
 make
 
@@ -230,22 +280,30 @@ mkdir -p $RPM_BUILD_ROOT/dev/inet
 # Note: RH9 assembles debug information while stripping, so we install
 # unstripped if the __debug_package macro is defined
 %if %__debug_package
-(cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" install)
+(cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install)
 %else
-(cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" install-strip)
+(cd build-%{_target_cpu}; make DESTDIR="$RPM_BUILD_ROOT" DOCDIR="$RPM_DOC_DIR" install-strip)
 %endif
 
 # get the installed info directory out of the build root
 [ -e "$RPM_BUILD_ROOT/%{_infodir}/dir" ] && rm -f "$RPM_BUILD_ROOT/%{_infodir}/dir"
 
 # create a device list
-sh scripts/strconf-sh -b190 --strmknods=devices.lst build-%{_target_cpu}/Config.master
+#sh scripts/strconf-sh -b@STRCONF_MAJBASE@ --strmknods=devices.lst build-%{_target_cpu}/Config.master
+
+# copy up device list
+[ -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ ] && cp -f build-%{_target_cpu}/@STRCONF_MAKEDEV@ .
 
 rm -rf build-%{_target_cpu}
+
+%if %{BUILD_tools}
+# punch rpm release to Custom
+echo 'Custom' > .rpmrelease
 
 # tar and move the sources for source release
 tar cf - . | tar xf - -C $RPM_BUILD_ROOT%{_usrsrc}/%{name}-%{version}-%{release}
 ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
+%endif
 
 %clean
 # ---------------------------------------------------------------------------
@@ -254,28 +312,33 @@ ln -sf %{name}-%{version}-%{release} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 
 
 # ===========================================================================
-%package %{core_name}
+%package %{_streams}-%{core_name}
 
-Summary:        OpenSS7 STREAMS INET core kernel modules.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET core kernel modules.
 Group:          System Environment/Kernel
 Requires:       kernel = %{kernel_version}
-Requires:       LiS-core-%{kernel_version} >= 2.16.18-10
+%if %{BUILD_lis}
+Requires:       LiS-%{core_name} >= 2:2.16.18
+%endif
+%if %{BUILD_lfs}
+Requires:       streams-%{core_name} >= 0.7a
+%endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
 %endif
 
 # ---------------------------------------------------------------------------
-%description %{core_name}
-The %{name}-%{core_name} package contains the kernel modules that provide the
-Linux kernel INET STREAMS drivers and modules.  This also includes assorted
-drivers and modules for additional protocol stacks such as SCTP.  This package
-is heavily tied to the kernel for which it and the LiS STREAMS facility was
-compiled.  This package applies to kernel version %{kernel_version} and
-requires an LiS 2.16.18-10 (or better) STREAMS package compiled for the same
-kernel.
+%description %{_streams}-%{core_name}
+The %{name}-%{_streams}-%{core_name} package contains the kernel modules that
+provide the Linux kernel INET %{_STREAMS} STREAMS drivers and modules.  This
+also includes assorted drivers and modules for additional protocol stacks such
+as SCTP.  This package is heavily tied to the kernel for which it and the LiS
+%{_STREAMS} STREAMS facility was compiled.  This package applies to kernel
+version %{kernel_version} and requires an LiS 2.16.18-10 (or better)
+%{_STREAMS} STREAMS package compiled for the same kernel.
 
-%pre %{core_name}
+%pre %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   if we are upgrading and the upgrade is for the running kernel, or we are
@@ -291,7 +354,7 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
     lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge 230 ]; then
+            if [ $major -ge @STRCONF_MAJBASE@ ]; then
                 eval "kill -HUP $tokens[1]"
             fi
         fi
@@ -302,39 +365,71 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
     exit 1
 fi
 
-%post %{core_name}
+%post %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
-#   Check that our line is in the modules.inet file
-    if ( grep -q 'include.*modules.inet' /etc/modules.conf ) ; then
-        :
-    else
-#       if not, check for an old non-rpm OpenSS7
-        if ( grep -q 'BEGIN LiS' /etc/modules.conf ) ; then
-            sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
-        else
-            cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
+#   Check that our line is in the modules.%{name} file
+    conf_old=/etc/modules.conf
+    if ( grep -q 'include.*modules.%{name}' $conf_old ) ; then :; else
+        streams_dir=/%{_lib}/modules/%{kernel_version}/%{_ksubdir}
+        streams_prf=/%{_lib}/modules/preferred/%{_ksubdir}
+        conf_new=%{_tmppath}/modules.conf.new.$$
+        cp -f $conf_old $conf_new
+#       if not, check for an old non-rpm LiS
+        if ( grep -q 'BEGIN LiS' $conf_old ) ; then
+            conf_tmp=%{_tmppath}/modules.conf.tmp.$$
+            list=`find /%{_lib}/modules/%{kernel_version}/%{name} -name "*.o"`
+            for p in $list ; do
+                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
+                mv -f $conf_tmp $conf_new
+#               Remove conflicting modules.
+                rm -f $streams_dir/$m.o
+                rm -f $streams_prf/$m.o
+            done
         fi
-        echo 'prune modules.inet' >> /etc/modules.conf.tmp.$$
-        echo 'if -f /lib/modules/`uname -r`/modules.inet' >> /etc/modules.conf.tmp.$$
-        echo 'include /lib/modules/`uname -r`/modules.inet' >> /etc/modules.conf.tmp.$$
-        echo 'endif' >> /etc/modules.conf.tmp.$$
-        chmod --referenc=/etc/modules.conf /etc/modules.conf.tmp.$$
-        cp -fb --suffix=.rpmsave /etc/modules.conf.tmp.$$ /etc/modules.conf
-        rm -f /etc/modules.conf.tmp.$$
-    fi
-    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-#   this is a running kernel, do a depmod on the modules directory for
-        depmod -ae
-    else
-#   non-running kernels a depmod will be performed on boot by depmod anyway
-        UNAME_MACHINE=%{_target_cpu} \
-        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+#       check for forced over installs of older LiS or LfS rpm installations
+#       or installs over older LiS or LfS autoconf installations
+        streams_old=/%{_lib}/modules/%{kernel_version}/modules.streams
+        if [ -d $streams_dir -a -f $streams_old ] ; then
+            streams_new=%{_tmppath}/modules.streams.new.$$
+            streams_tmp=%{_tmppath}/modules.streams.tmp.$$
+            cp -f $streams_old $streams_new
+            list=`find /%{_lib}/modules/%{kernel_version}/%{name} -name "*.o"`
+            for p in $list ; do
+                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
+#               Remove references to our modules from old installation.
+                sed -e '/alias.*\<'$m'\>/d' $streams_new > $streams_tmp
+                mv -f $streams_tmp $streams_new
+#               Remove conflicting modules.
+                rm -f $streams_dir/$m.o
+                rm -f $streams_prf/$m.o
+            done
+            chmod --reference=$streams_old $streams_new
+            cp -fb --suffix=.rpmsave $streams_new $streams_old
+            rm -f $streams_new
+        fi
+        echo 'prune modules.%{name}' >> $conf_new
+        echo 'if -f /lib/modules/`uname -r`/modules.%{name}' >> $conf_new
+        echo 'include /lib/modules/`uname -r`/modules.%{name}' >> $conf_new
+        echo 'endif' >> $conf_new
+        chmod --reference=$conf_old $conf_new
+        cp -fb --suffix=.rpmsave $conf_new $conf_old
+        rm -f $conf_new
     fi
 fi
+if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+#   this is a running kernel, do a depmod on the modules directory for
+    depmod -ae
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
+#   non-running kernels a depmod will be performed on boot by depmod anyway
+    UNAME_MACHINE=%{_target_cpu} \
+    depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+fi
 
-%preun %{core_name}
+%preun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   We are about to uninstall for good on a running kernel then we have to
@@ -349,7 +444,7 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
     lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge 230 ]; then
+            if [ $major -ge @STRCONF_MAJBASE@ ]; then
                 eval "kill -KILL $tokens[1]"
             fi
         fi
@@ -360,30 +455,30 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
     exit 1
 fi
 
-%postun %{core_name}
+%postun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 
 if [ $1 = 0 ]; then
 #   this is the last stage of a removal we are going away: we need to see if
 #   we need to remove our line from modules.conf and remove our devices
     remove_line=yes
-    for file in /lib/modules/*/modules.inet ; do
+    for file in /lib/modules/*/modules.%{name} ; do
         if [ -f $file ] ; then
             remove_line=no
             break
         fi
     done
     if [ ":$remove_line" = :yes ] ; then
-        sed -e '/prune modules.inet/,/endif/d' /etc/modules.conf > /etc/modules.conf.tmp.$$
-        chmod --reference=/etc/modules.conf /etc/modules.conf.tmp.$$
-        cp -fb --suffix=.rpmorig /etc/modules.conf.tmp.$$ /etc/modules.conf
-        rm -f /etc/modules.conf.tmp.$$
+        sed -e '/prune modules.%{name}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
+        chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
+        cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
+        rm -f %{_tmppath}/modules.conf.tmp.$$
     fi
 fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   this is a running kernel, do a depmod on the modules directory for
     depmod -ae
-else
+elif [ -r /boot/System.map-%{kernel_version} ] ; then
 #   non-running kernels a depmod will be performed on boot but depmod anyway
     UNAME_MACHINE=%{_target_cpu} \
     depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
@@ -402,7 +497,7 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
     lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge 230 ]; then
+            if [ $major -ge @STRCONF_MAJBASE@ ]; then
                 if [ $1 = 0 ] ; then
 #                   extreme prejudice for removal
                     eval "kill -KILL $tokens[1]"
@@ -422,18 +517,18 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 fi
 
 %if %{BUILD_modules}
-%files %{core_name}
+%files %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/inet
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.inet
-/%{_lib}/modules/%{kernel_version}/inet/*
+%dir /%{_lib}/modules/%{kernel_version}/%{name}
+%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{name}
+/%{_lib}/modules/%{kernel_version}/%{name}/*
 %endif
 
 # ===========================================================================
 %package dev
 
-Summary:        OpenSS7 STREAMS INET devices.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET devices.
 Group:          System Environment/Base
 Requires:       dev >= 3.3
 Autoreq:        true
@@ -444,7 +539,8 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description dev
 The %{name}-dev package contains the device definitions necessary to run
-applications programs and utilities developed for OpenSS7 STREAMS INET.
+applications programs and utilities developed for OpenSS7 %{_STREAMS} STREAMS
+INET.
 
 %if %{BUILD_tools}
 # ---------------------------------------------------------------------------
@@ -453,21 +549,30 @@ applications programs and utilities developed for OpenSS7 STREAMS INET.
 %endif
 
 # ===========================================================================
-%package lib
+%package %{_streams}-lib
 
-Summary:        OpenSS7 STREAMS INET run-time libraries.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET run-time libraries.
 Group:          System Environment/Libraries
+Prefix:         %{_libdir}
+Prefix:         %{_datadir}/locale
+%if %{BUILD_lis}
+Requires:       LiS-lib >= 2:2.16.18
+%endif
+%if %{BUILD_lfs}
+Requires:       streams-lib >= 0.7a
+%endif
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
 %endif
 
 # ---------------------------------------------------------------------------
-%description lib
-The %{name}-lib package contains the run-time shared libraries necessary to
-run applications programs and utilities developed for OpenSS7 STREAMS INET.
+%description %{_streams}-lib
+The %{name}-%{_streams}-lib package contains the run-time shared libraries
+necessary to run applications programs and utilities developed for OpenSS7
+%{_STREAMS} STREAMS INET.
 
-%pre lib
+%pre %{_streams}-lib
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then
 #   this is supposed to be a fresh install
@@ -483,7 +588,7 @@ else
 #   upgrade, let RPM do its job
 fi
 
-%post lib
+%post %{_streams}-lib
 # ---------------------------------------------------------------------------
 # do a load config
 if [ $1 = 0 ] ; then
@@ -494,17 +599,18 @@ else
 #   upgrade, wait for old postun
 fi
 
-%preun lib
+%preun %{_streams}-lib
 # ---------------------------------------------------------------------------
 # noting really
 
-%postun lib
+%postun %{_streams}-lib
 # ---------------------------------------------------------------------------
 # whether complete removal or upgrade, do a load config
 ldconfig
 
-%if %{BUILD_tools}
-%files lib
+#%if %{BUILD_tools}
+%if 0
+%files %{_streams}-lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #%{_libdir}/*.so*
@@ -515,11 +621,13 @@ ldconfig
 # ===========================================================================
 %package doc
 
-Summary:        OpenSS7 STREAMS INET manpages and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET manpages and doc.
 Group:          Documentation
 Conflicts:      texinfo < 3.11
+Requires:       strxnet-doc >= %{epoch}:%{version}
 Prereq:         /sbin/install-info
 Prefix:         %{_docdir}
+Prefix:         %{_infodir}
 Autoreq:        true
 %if %{?_icon: 1}%{!?_icon: 0}
 Icon:           %{_icon}
@@ -528,7 +636,7 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description doc
 The %{name}-doc package contains html documentation for the development of
-OpenSS7 STREAMS INET applications, modules and drivers.
+OpenSS7 %{_STREAMS} STREAMS INET applications, modules and drivers.
 
 %pre doc
 # ---------------------------------------------------------------------------
@@ -538,22 +646,26 @@ OpenSS7 STREAMS INET applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/%{name}.info ; then
-        /sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir
-    elif test -f %{_infodir}/%{name}.info.gz ; then
-        /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
-    fi
+    for n in %{name} ; do
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        fi
+    done
 fi
 
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/%{name}.info ; then
-        /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir
-    elif test -f %{_infodir}/%{name}.info.gz ; then
-        /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
-    fi
+    for n in %{name} ; do
+        if [ -f %{_infodir}/$n.info ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+        elif [ -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        fi
+    done
 fi
 
 %postun doc
@@ -565,21 +677,25 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
-%doc doc/manual/*.texi
-%doc doc/drafts/*/*.txt
-%doc doc/drafts/*/*.pdf
-%{_datadir}/doc/%{name}-%{version}/*
+%doc doc/manual
 %{_infodir}/*
 %endif
 
 # ===========================================================================
 %package devel
 
-Summary:        OpenSS7 STREAMS INET headers, lib and doc.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET headers, lib and doc.
 Group:          Development/System
-Requires:       %{name}-lib = %{version}-%{base_release}
-Requires:       %{name}-doc = %{version}-%{base_release}
-Requires:       LiS-devel >= 2.16.16
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{release}
+Requires:       %{name}-doc = %{epoch}:%{version}-%{release}
+Requires:       strxnet-%{_streams}-lib >= %{epoch}:%{version}
+Requires:       strxnet-doc >= %{epoch}:%{version}
+%if %{BUILD_lis}
+Requires:       LiS-devel >= 2:2.16.18
+%endif
+%if %{BUILD_lfs}
+Requires:       streams-devel >= 0.7a
+%endif
 Prefix:         %{_libdir}
 Prefix:         %{_includedir}
 Prefix:         %{_mandir}
@@ -591,10 +707,11 @@ Icon:           %{_icon}
 # ---------------------------------------------------------------------------
 %description devel
 The %{name}-devel package contains library archives for static compilation,
-and headers files to develop OpenSS7 STREAMS INET applications.  This also
-includes the header files and static libraries required to compile OpenSS7
-STREAMS INET applications programs.  In addition it contains all of the manual
-pages necessary for developing OpenSS7 STREAMS INET application programs.
+and headers files to develop OpenSS7 %{_STREAMS} STREAMS INET applications.
+This also includes the header files and static libraries required to compile
+OpenSS7 %{_STREAMS} STREAMS INET applications programs.  In addition it
+contains all of the manual pages necessary for developing OpenSS7 %{_STREAMS}
+STREAMS INET application programs.
 
 %pre devel
 # ---------------------------------------------------------------------------
@@ -617,14 +734,14 @@ pages necessary for developing OpenSS7 STREAMS INET application programs.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #%{_libdir}/*.a
-%{_includedir}/*
-%{_mandir}/%{name}.refs
-%{_mandir}/%{name}.macros
+#%{_includedir}/*
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 #%{_mandir}/man2/*
-%{_mandir}/man3/*
+#%{_mandir}/man3/*
 %{_mandir}/man4/*
-%{_mandir}/man5/*
-%{_mandir}/man7/*
+#%{_mandir}/man5/*
+#%{_mandir}/man7/*
 #%{_mandir}/man9/*
 %endif
 
@@ -632,7 +749,7 @@ pages necessary for developing OpenSS7 STREAMS INET application programs.
 # ===========================================================================
 %package source
 
-Summary:        OpenSS7 STREAMS INET source package.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
@@ -666,16 +783,16 @@ necessary to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_usrsrc}/%{name}-%{version}-%{release}
+#%dir %{_usrsrc}/%{name}-%{version}-%{release}
 %{_usrsrc}/*
 %endif
 
 # ===========================================================================
-%package util
+%package %{_streams}-util
 
-Summary:        OpenSS7 STREAMS INET admin utilities.
+Summary:        OpenSS7 %{_STREAMS} STREAMS INET admin utilities.
 Group:          System Environment/Base
-Requires:       %{name}-lib = %{version}-%{base_release}
+Requires:       %{name}-%{_streams}-lib = %{version}-%{release}
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_mandir}
@@ -685,49 +802,59 @@ Icon:           %{_icon}
 %endif
 
 # ---------------------------------------------------------------------------
-%description util
-The %{name}-util package provides adminstrative and configuration test
-utilities and commands associated with the OpenSS7 STREAMS INET package.
+%description %{_streams}-util
+The %{name}-%{_streams}-util package provides adminstrative and configuration
+test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
+INET package.
 
-%pre util
+%pre %{_streams}-util
 # ---------------------------------------------------------------------------
 # let rpm do its job
 
-%post util
+%post %{_streams}-util
 # ---------------------------------------------------------------------------
 # let rpm do its job
 
-%preun util
+%preun %{_streams}-util
 # ---------------------------------------------------------------------------
 # let rpm do its job
 
-%postun util
+%postun %{_streams}-util
 # ---------------------------------------------------------------------------
 # let rpm do its job
 
 %if %{BUILD_tools}
-%files util
+%files %{_streams}-util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #%{_bindir}/*
-#%{_sbindir}/*
+%{_sbindir}/*
 %{_libexecdir}/*
-%{_mandir}/%{name}.refs
-%{_mandir}/%{name}.macros
+#@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.refs
+#@COOKED_MANPAGES_FALSE@%{_mandir}/%{name}.macros
 #%{_mandir}/man1/*
-%{_mandir}/man8/*
+#%{_mandir}/man8/*
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.1  2004/05/20 18:21:43  brian
-# - make before DESTDIR on install
+# Revision 0.9.2.3  2004/06/27 10:08:31  brian
+# - Built up separate inet release.
 #
-# Revision 0.9  2004/04/03 12:44:16  brian
-# - Initial cut of new strinet package.
+# Revision 0.9.2.2  2004/06/27 08:15:38  brian
+# - Building strinet release.
 #
+
+* Thu May 20 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.1  2004/05/20 18:21:43  brian
+- make before DESTDIR on install
+
+* Sat Apr  3 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9  2004/04/03 12:44:16  brian
+- Initial cut of new strinet package.
+
 * Sun Feb 22 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.5  2004/02/22 07:30:09  brian
 - Added documentation.
