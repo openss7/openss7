@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/24 20:49:27 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/25 06:52:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 20:49:27 $ by $Author: brian $
+# Last Modified $Date: 2004/05/25 06:52:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -720,7 +720,7 @@ necessary to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_usrsrc}/%{name}-%{version}-%{release}
+#%dir %{_usrsrc}/%{name}-%{version}-%{release}
 %{_usrsrc}/*
 %endif
 %endif
@@ -777,9 +777,13 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.20  2004/05/24 20:49:27  brian
-# - Don't copy sources if source package not built.
+# Revision 0.9.2.21  2004/05/25 06:52:50  brian
+# - Removed double listing on source directory.
 #
+
+* Mon May 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.20  2004/05/24 20:49:27  brian
+- Don't copy sources if source package not built.
 
 * Mon May 24 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.19  2004/05/24 12:48:49  brian

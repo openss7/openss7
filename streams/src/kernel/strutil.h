@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/25 06:48:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
+ Last Modified $Date: 2004/05/25 06:48:34 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -361,7 +361,11 @@ static __inline__ int shared_tryentersq(queue_t *q)
 		unsigned long flags;
 		int result = 0;
 		spin_lock_irqsave(&sq->sq_lock, flags);
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		if (sq->sq_count >= 0) {
+			sq->sq_count++;
+			result = 1;
+		}
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 		return (result);
 	}
 	return (1);
@@ -377,7 +381,7 @@ static __inline__ int exclus_tryentersq(queue_t *q)
 			sq->sq_count = -1;
 			result = 1;
 		}
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 		return (result);
 	}
 	return (1);
@@ -414,7 +418,7 @@ static __inline__ void shared_leavesq(queue_t *q)
 #endif
 			sq->sq_count = 0;
 		}
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 		return;
 	}
 }
@@ -445,7 +449,7 @@ static __inline__ void exclus_leavesq(queue_t *q)
 			wake_up_all(&sq->sq_waitq);
 #endif
 		sq->sq_count = 0;
-		spin_unlock_irqrestore(&sq->q_lock, flags);
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
 	}
 }
 

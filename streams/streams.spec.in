@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/05/24 20:49:16 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/05/25 06:52:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/24 20:49:16 $ by $Author: brian $
+# Last Modified $Date: 2004/05/25 06:52:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -707,7 +707,7 @@ necessary to create and distribute this rpm.
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_usrsrc}/%{name}-%{version}-%{release}
+#%dir %{_usrsrc}/%{name}-%{version}-%{release}
 %{_usrsrc}/*
 %endif
 
@@ -796,12 +796,16 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.22  2004/05/24 20:49:16  brian
-# - Don't copy sources if source package not built.
+# Revision 0.9.2.23  2004/05/25 06:52:50  brian
+# - Removed double listing on source directory.
 #
-# Revision 1.22  2004/05/24 20:49:16  brian
-# - Don't copy sources if source package not built.
+# Revision 1.23  2004/05/25 06:52:50  brian
+# - Removed double listing on source directory.
 #
+
+* Mon May 24 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.22  2004/05/24 20:49:16  brian
+- Don't copy sources if source package not built.
 
 * Mon May 24 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.21  2004/05/24 12:48:45  brian
