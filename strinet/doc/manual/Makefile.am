@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 21:53:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/17 03:57:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/16 21:53:18 $ by $Author: brian $
+# Last Modified $Date: 2004/08/17 03:57:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,15 +60,18 @@ EXTRA_info_TEXINFOS	= \
 			  lesser.texi \
 			  fdl.texi
 
-AM_MAKEINFOFLAGS	= --force --footnote-style=separate
-AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
+AM_MAKEINFOFLAGS	= --force --footnote-style=separate --commands-in-node-names
+AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections --commands-in-node-names
 
 EXTRA_DIST		= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS)
 
 #
-# This breaks distcheck (I think it's the INFO_DEPS dependency.
+# This breaks distcheck (I think it's the INFO_DEPS dependency;
+# however, distcheck is not run in maintainer mode
 #
-# $(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
+if MAINTAINER_MODE
+$(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
+endif
 
 all-local: info ps pdf html
 
