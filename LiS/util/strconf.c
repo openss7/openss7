@@ -34,7 +34,7 @@
  * 
  */
 
-#ident "@(#) LiS strconf.c 2.11 10/23/03"
+#ident "@(#) LiS strconf.c 2.15 09/13/04"
 
 #include <limits.h>
 #include <stdio.h>
@@ -75,6 +75,7 @@ typedef struct mi
     int              id ;
     int              units ;
     object_info_t   *obj ;
+    int		     qlock_option ;
 
 } module_info_t ;
 
@@ -106,6 +107,7 @@ typedef struct di
     autopush_info_t *ap ;
     int		     ndev ;		/* # of devices declared */
     int		     inst_nr ;		/* instance nr for this prefix */
+    int		     qlock_option ;	/* qlock option -1 or 0 - 3 */
 
 } driver_info_t ;
 
@@ -326,6 +328,7 @@ driver_info_t	*mk_driver(char *name, char *prefix,
     p->init = 0 ;		/* default is no init routine */
     p->obj = NULL ;		/* default object */
     p->inst_nr = driver_instance(prefix) ;
+    p->qlock_option = -1 ;	/* none specified */
 
     link_on_end((lookup_struct_t **) &driver_head, (lookup_struct_t *) p) ;
 
@@ -356,6 +359,7 @@ module_info_t	*mk_module(char *name, char *prefix, int units)
     p->units = units;
     p->obj = NULL ;		/* default object */
     p->id = 0 ;			/* not yet known */
+    p->qlock_option = -1 ;	/* none specified */
 
     link_on_end((lookup_struct_t **) &module_head, (lookup_struct_t *) p) ;
 
@@ -839,7 +843,7 @@ void	process_line(void)
 	int	 	 type ;			/* I_IFCHR, etc */
 	int	 	 major;
 	int	 	 minor ;
-	driver_info_t	*dp ;
+	driver_info_t	*dp, *major_dp = NULL ;
 
 	if (get_next() != IDENT)
 	{
@@ -908,7 +912,7 @@ void	process_line(void)
 	switch (get_next())
 	{
 	case IDENT:
-	    dp = find_driver(token) ;
+	    major_dp = dp = find_driver(token) ;
 	    if (dp == NULL)
 	    {
 		err("Invalid node driver name: %s\n", token) ;
@@ -957,6 +961,26 @@ void	process_line(void)
 	default:
 	    err("Invalid node minor specifier: %s\n", token) ;
 	    return ;
+	}
+
+	switch (get_next())
+	{
+	case NUMBER:
+	    if (!major_dp)
+	    {
+		err("Use of major index requires driver name\n");
+		return ;
+	    }
+	    else if (value < 0 || value >= major_dp->nmajors)
+	    {
+	    	err("Invalid node major index specifier: %s\n", token) ;
+	    	return ;
+	    }
+	    major = major_dp->major[value] ;
+	    break ;
+	case EOL:
+	default:
+	    break ;
 	}
 
 	mk_node(name, type, major, minor) ;
@@ -1142,6 +1166,82 @@ void	process_line(void)
 
 	mk_device(&dev) ;
 	dev.drvr->ndev++ ;		/* count devices for driver */
+    }
+    else
+    if (strcmp(token, "qlock") == 0)
+    {
+	if (get_next() != IDENT)
+	{
+	    err("Qlock type must be \"driver\" or \"module\": %s\n", token) ;
+	    return ;
+	}
+
+	if (strcmp(token, "driver") == 0)
+	{
+	    driver_info_t *dp ;
+
+	    if (get_next() != IDENT)
+	    {
+	        err("Driver name must be identifier: %s\n", token) ;
+	        return ;
+	    }
+
+	    if ((dp = find_driver(token)) == NULL)
+	    {
+	        err("Driver name \"%s\" not found\n", token) ;
+	        return ;
+	    }
+
+	    if (get_next() != NUMBER)
+	    {
+	        err("Qlock option must be a number: %s\n", token) ;
+	        return ;
+	    }
+
+	    if (value < 0 || value > 3)
+	    {
+	        err("Qlock option must be in range 0 - 3: %s\n", token) ;
+	        return ;
+	    }
+
+	    dp->qlock_option = value ;
+	}
+	else
+	if (strcmp(token, "module") == 0)
+	{
+	    module_info_t *mp ;
+
+	    if (get_next() != IDENT)
+	    {
+	        err("Module name must be identifier: %s\n", token) ;
+	        return ;
+	    }
+
+	    if ((mp = find_module(token)) == NULL)
+	    {
+	        err("Module name \"%s\" not found\n", token) ;
+	        return ;
+	    }
+
+	    if (get_next() != NUMBER)
+	    {
+	        err("Qlock option must be a number: %s\n", token) ;
+	        return ;
+	    }
+
+	    if (value < 0 || value > 3)
+	    {
+	        err("Qlock option must be in range 0 - 3: %s\n", token) ;
+	        return ;
+	    }
+
+	    mp->qlock_option = value ;
+	}
+	else
+	{
+	    err("Qlock type must be \"driver\" or \"module\": %s\n", token) ;
+	    return ;
+	}
     }
     else
     if (strcmp(token, "initialize") == 0)
@@ -1607,8 +1707,8 @@ void	build_modconf(void)
 #define	p1(f,y)		fprintf(outfile, f,y)
 #define	p2(f,y,z)	fprintf(outfile, f,y,z)
 
-    p0("/* WARNING:  THIS FILE IS PROGRAMATICALLY GENERATED. */\n");
-    p0("/*           DO NOT MODIFY BY HAND.                  */\n");
+    p0("/* WARNING:  THIS FILE WAS GENERATED. "
+       " MANUAL CHANGES MAY BE LOST. */\n");
     p0("\n") ;
     p0("\n") ;
 
@@ -1619,20 +1719,25 @@ void	build_modconf(void)
 
 	p1("extern struct streamtab %sinfo ;\n", dp->prefix) ;
 	if (dp->init)
-	    p1("extern void"
+	    p1("extern void _RP"
 	       " %sinit(void) ;\n", dp->prefix) ;
 	if (dp->term)
-	    p1("extern void"
+	    p1("extern void _RP"
 	       " %sterm(void) ;\n", dp->prefix) ;
 	if (dp->intr)
 	{
-	    p1("extern void"
+	    p1("extern void _RP"
 	       " %sintr(void) ;\n", dp->prefix) ;
-	    p1("\nvoid "
+	    p1("\nint _RP"
 	       "__%sintr(int vect,void *dev,struct pt_regs *reg)\n",
 	       dp->prefix);
 	    p0("{\n");
-	    p1("    %sintr\(vect); \n", dp->prefix);
+	    p0("#if defined(KERNEL_2_5)\n");
+	    p1("    return(%sintr\(vect,dev,reg)); \n", dp->prefix);
+	    p0("#else\n");
+	    p1("    %sintr\(vect,dev,reg); \n", dp->prefix);
+	    p0("    return(lis_irqreturn_handled);\n");
+	    p0("#endif\n");
 	    p0("}\n");
 	}
 
@@ -1674,9 +1779,10 @@ void	build_modconf(void)
 	else
 	    p0(" NULL,") ;
 	if (dp->term)
-	    p1(" %sterm},\n", dp->prefix) ;
+	    p1(" %sterm,", dp->prefix) ;
 	else
-	    p0(" NULL},\n") ;
+	    p0(" NULL,") ;
+	p1(" %d},\n", dp->qlock_option) ;
     }
     p0("} ;\n") ;
     p0("\n") ;
@@ -1726,12 +1832,13 @@ void	build_modconf(void)
 	p1("	{\"%s\",", mp->name) ;
 	if (mp->obj->loadable)
 	{				/* no streamtab, incl obj name */
-	    p1(" NULL, \"%s\"},\n", mp->obj->name) ;
+	    p1(" NULL, \"%s\", ", mp->obj->name) ;
+	    p1("%d},\n", mp->qlock_option) ;
 	}
 	else
 	{				/* streamtab, no obj name */
 	    p1(" &%sinfo,", mp->prefix) ;
-	    p0(" \"\"},\n") ;
+	    p1(" \"\", %d},\n", mp->qlock_option) ;
 	}
     }
     p0("} ;\n") ;
@@ -1807,8 +1914,8 @@ void	build_mknods(void)
 #define	p0(f)	fprintf(mkfile, f)
 #define	p1(f,y)	fprintf(mkfile, f,y)
 
-    p0("/* WARNING:  THIS FILE IS PROGRAMATICALLY GENERATED. */\n");
-    p0("/*           DO NOT MODIFY BY HAND.                  */\n");
+    p0("/* WARNING:  THIS FILE WAS GENERATED. "
+       " MANUAL CHANGES MAY BE LOST. */\n");
     p0("\n") ;
     p0("#if defined(LINUX)\n") ;
     p0("#  include <sys/types.h>\n") ;
@@ -1932,8 +2039,8 @@ char	*raise(char *p)
 
 void	start_config(void)
 {
-    p0("/* WARNING:  THIS FILE IS PROGRAMATICALLY GENERATED. */\n");
-    p0("/*           DO NOT MODIFY BY HAND.                  */\n");
+    p0("/* WARNING:  THIS FILE WAS GENERATED. "
+       " MANUAL CHANGES MAY BE LOST. */\n");
     p0("\n") ;
 
 } /* start_config */
@@ -2055,8 +2162,8 @@ void build_drvrconf(void)
 		perror(drvr_name);
 		exit(1) ;
 	}
-	fprintf(f, "# WARNING:  THIS FILE IS PROGRAMATICALLY GENERATED.\n");
-	fprintf(f, "#           DO NOT MODIFY BY HAND.\n\n");
+	fprintf(f, "# WARNING:  THIS FILE WAS GENERATED. "
+		" MANUAL CHANGES MAY BE LOST.\n\n");
 
 	fprintf(f, "MODCONF_LINKS =");
 	for (mp = module_head; mp != NULL; mp = mp->link)
@@ -2117,8 +2224,8 @@ void build_confmod(void)
 		perror(confmod_name);
 		exit(1) ;
 	}
-	fprintf(f, "# WARNING:  THIS FILE IS PROGRAMATICALLY GENERATED.\n");
-	fprintf(f, "#           DO NOT MODIFY BY HAND.\n\n");
+	fprintf(f, "# WARNING:  THIS FILE WAS GENERATED. "
+		" MANUAL CHANGES MAY BE LOST.\n\n");
 
 	for (dp = driver_head; dp != NULL; dp = dp->link)
 	{
