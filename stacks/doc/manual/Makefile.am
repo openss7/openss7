@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/16 11:44:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/16 21:53:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/16 11:44:48 $ by $Author: brian $
+# Last Modified $Date: 2004/08/16 21:53:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,7 +65,10 @@ AM_MAKEINFOHTMLFLAGS	= --no-split --no-headers --number-sections
 
 EXTRA_DIST		= $(EXTRA_info_TEXINFOS) $(PSS) $(PDFS) $(HTMLS)
 
-$(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
+#
+# This breaks distcheck (I think it's the INFO_DEPS dependency.
+#
+# $(INFO_DEPS) $(PSS) $(PDFS) $(HTMLS): $(EXTRA_info_TEXINFOS) $(info_TEXINFOS)
 
 all-local: info ps pdf html
 
