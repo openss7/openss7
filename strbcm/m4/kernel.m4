@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/03/08 11:54:30 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/03/11 22:19:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 11:54:30 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1140,248 +1140,44 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	    linux_cflags="$linux_cflags${linux_cflags:+ }-Winline -finline-functions"
 	fi
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude\>| -I${kbuilddir}/include|g"`
-	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9]]* | $linux_cflags |"` ])
-    CFLAGS="$linux_cv_k_cflags"
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9]]* | $linux_cflags |"`
+dnl
+dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
+dnl	to CFLAGS instead of CPPFLAGS, which is just plain wrong, but that's
+dnl	fine, we will strip them out and append them to CPPFLAGS instead.
+dnl
+	linux_cflags=
+	linux_cppflags=
+	set dummy $linux_cv_k_cflags
+	shift 1
+	while test [$]# -gt 0 ; do
+	    case ":[$]1" in
+		:-I|:-D)   linux_cppflags="${linux_cppflags}${linux_cppflags:+ }[$]1 [$]2" ; shift 2 ;;
+		:-I*|:-D*) linux_cppflags="${linux_cppflags}${linux_cppflags:+ }[$]1"    ; shift 1 ;;
+		:*)          linux_cflags="${linux_cflags}${linux_cflags:+ }[$]1"        ; shift 1 ;;
+	    esac
+	done
+	linux_cv_k_cflags="$linux_cflags"
+	linux_cv_k_more_cppflags="$linux_cppflags"
+    ])
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} cppflag-check`"
-dnl	linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
-dnl	linux_cv_k_cppflags="${linux_tmp:+-nostdinc -I${linux_tmp} }-DLINUX $linux_cv_k_cppflags"
-	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags" ])
-	# need to adjust 2.6.3 kernel stupid include includes to add the absolute location of the
-	# source directory
-	# include2 on the otherhand is properly set up for the asm directory
+	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
+dnl
+dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
+dnl	location of the source directory.  include2 on the otherhand is properly
+dnl	set up for the asm directory.
+dnl
+	linux_cv_k_cppflags="$linux_cv_k_cppflags $linux_cv_k_more_cppflags"
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude\>| -I${kbuilddir}/include|g"`
-    CPPFLAGS="$linux_cv_k_cppflags"
+    ])
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
 	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${kbuilddir} TOPDIR=${kbuilddir} KBUILD_SRC=${kbuilddir} -I${kbuilddir} modflag-check`" ])
+    CFLAGS="$linux_cv_k_cflags"
+    CPPFLAGS="$linux_cv_k_cppflags"
     KERNEL_MODFLAGS="$linux_cv_k_modflags"
     AC_SUBST([KERNEL_MODFLAGS])dnl
 ])# _LINUX_SETUP_KERNEL_CFLAGS
-# =========================================================================
-
-# =========================================================================
-# _LINUX_SETUP_KERNEL_CFLAGS_OLD
-# -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS_OLD], [dnl
-dnl
-dnl FIXME: we need to check what is in CFLAGS before we go adding stuff to
-dnl CFLAGS, that way the user can override these settings for better tuning.
-dnl	
-dnl CFLAGS="-Wall -Wstrict-prototypes -Wno-trigraphs -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common"
-    CFLAGS="-Wall -Wno-trigraphs"
-    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-    then
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-system-headers"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wundef"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wno-endif-labels"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wbad-function-cast"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-qual"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wcast-align"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wwrite-strings"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wconversion"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wsign-compare"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Waggregate-return"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wstrict-prototypes"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-prototypes"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-declarations"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-noreturn"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wmissing-format-attribute"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpacked"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wpadded"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wredundant-decls"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wnested-externs"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wunreachable-code"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Winline"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wdisabled-optimization"
-	CFLAGS="${CFLAGS}${CFLAGS:+ }-Werror"
-    fi
-    AC_ARG_ENABLE([k-inline],
-	AS_HELP_STRING([--enable-k-inline],
-	    [enable kernel inline functions.  @<:@default=no@:>@]),
-	[enable_k_inline="$enableval"],
-	[enable_k_inline='no'])
-    if test :"${enable_k_inline:-no}" != :no 
-    then
-	CFLAGS="$CFLAGS${CFLAGS:+ }-Winline -finline-functions"
-    fi
-    AC_ARG_WITH([k-optimize],
-	AS_HELP_STRING([--with-k-optimize=HOW],
-	    [specify optimization, normal, size, speed or quick.
-	    @<:@default=normal@:>@]),
-	[with_k_optimize="$withval"],
-	[with_k_optimize='normal'])
-    case "${with_k_optimize:-normal}" in
-	(size)   CFLAGS="$CFLAGS${CFLAGS:+ }-Os" ;;
-	(speed)  CFLAGS="$CFLAGS${CFLAGS:+ }-O3" ;;
-	(quick)  CFLAGS="$CFLAGS${CFLAGS:+ }-O0" ;;
-	(*)      CFLAGS="$CFLAGS${CFLAGS:+ }-O2" ;;
-    esac
-    CFLAGS="$CFLAGS${CFLAGS:+ }-fomit-frame-pointer -fno-strict-aliasing -fno-common"
-    if test :"${enable_k_inline:-no}" != :no 
-    then
-	CFLAGS="$CFLAGS${CFLAGS:+ }-finline-functions"
-    fi
-    linux_k_defs='-D__KERNEL__ -DLINUX'
-    case "$kmarch" in
-	(alpha*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -mno-fp-regs -ffixed=8"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=`echo $kmarch | sed -e 's|^alpha||'` -Wa,-mev6"
-	    ;;
-	(arm*)
-	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fno-common||'`
-	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-fno-common -pipe -fomit-frame-pointer"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
-	    AC_MSG_WARN([*** you need to set -mapcs and -mtune yourself in CFLAGS= ***])
-	    ;;
-	(cris*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mlinux -pipe"
-	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
-	    ;;
-	(i?86*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe"
-	    if (`eval $CC $CFLAGS -mpreferred-stack-boundary=2 -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-mpreferred-stack-boundary=2"
-	    fi
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
-	    ;;
-	(k6*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe"
-	    if (`eval $CC $CFLAGS -mpreferred-stack-boundary=2 -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-mpreferred-stack-boundary=2"
-	    fi
-	    if (`eval $CC $CFLAGS -march=$kmarch -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
-	    else
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=i586"
-	    fi
-	    ;;
-	(athlon*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe"
-	    if (`eval $CC $CFLAGS -mpreferred-stack-boundary=2 -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-mpreferred-stack-boundary=2"
-	    fi
-	    if (`eval $CC $CFLAGS -march=$kmarch -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1;
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=$kmarch"
-	    else
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=i686 -malign-functions=4"
-	    fi
-	    ;;
-	(ia64)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -ffixed-r13 -mfixed-range=f10-f15,f32-f127 -falign-functions=32"
-	    case `eval $CC --version` in
-		(3.*) CFLAGS="${CFLAGS}${CFLAGS:+ }-frename-registers --param max-inline-insns=400" ;;
-	    esac
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mconstant-gp"
-	    ;;
-	(m68*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -ffixed-a2"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-m${kmarch}"
-	    CFLAGS=`echo "$CFLAGS" | sed -e'| -fomit-frame-pointer||'`
-	    ;;
-	(mips64*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-mabi=64 -G 0 -mno-abicalls -fno-pic -Wa,--trap --pipe"
-	    case "$kmarch" in
-		(*r4300*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4300 -mips3" ;;
-		(*r4?00*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips3" ;;
-		(*r5000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips4" ;;
-		(*r8000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips4" ;;
-		(*r10000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips4" ;;
-		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r8000 -mips3 -mmad" ;;
-dnl		guess nevada
-	    esac
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-Wa,-32"
-	    ;;
-	(mips*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-G 0 -mno-abicalls -fno-pic"
-	    case "$kmarch" in
-		(*r3000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r3000 -mips1" ;;
-		(*r6000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r6000 -mips2" ;;
-		(*r4300*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4300 -mips2" ;;
-		(*r4600*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips2" ;;
-		(*vr41??*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips2" ;;
-		(*r4?00*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips2" ;;
-		(mips64*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips2" ;;
-		(mips32*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips2" ;;
-		(*r5000*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r5000 -mips2" ;;
-		(*r5432*)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r5000 -mips2" ;;
-		(*sb1 | *sb1el)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r5000 -mips2" ;;
-		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-mcpu=r4600 -mips2" # guess
-		AC_MSG_WARN([*** guessing cpu at r4600 mips2 ***])
-		;;
-	    esac
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-Wa,--trap -pipe"
-	    ;;
-	(hppa*)
-	    linux_k_defs="${linux_k_defs}${linux_k_defs:+ }-D__linux__"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce -mno-space-regs -mfast-indirect-calls -mdisable-fpregs"
-	    case "$kmarch" in
-		(*1.1*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=1.1" ;;
-		(*2.0*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-march=2.0 -mschedule=8000" ;;
-		(*64*)		: ;;
-		(*)		: ;;
-	    esac
-	    ;;
-	(ppc*|powerpc*)
-	    linux_k_defs="${linux_k_defs}${linux_k_defs:+ }-D__powerpc__"
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-fsigned-char -msoft-float -pipe -ffixed-r2 -Wno-uninitialized -mmultiple -mstring"
-	    ;;
-	(s390x*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce"
-	    ;;
-	(s390*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -fno-strength-reduce"
-	    ;;
-	(sh*)
-	    case "$kmarch" in
-		(*el|shl)	CFLAGS="${CFLAGS}${CFLAGS:+ }-ml" ;;
-		(*eb|sh)	CFLAGS="${CFLAGS}${CFLAGS:+ }-mb" ;;
-		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-mb"
-		AC_MSG_WARN([*** going big endian ***])
-		;;
-	    esac
-	    case "$kmarch" in
-		(sh3*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-m3" ;;
-		(sh4*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-m4 -mno-implicit-fp" ;;
-		(*)		CFLAGS="${CFLAGS}${CFLAGS:+ }-m4 -mno-implicit-fp"
-		AC_MSG_WARN([*** going sh4 ***])
-		;;
-	    esac
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe"
-	    ;;
-	(sparc64*)
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -mno-fpu"
-	    if (`eval $CC -m64 -mcmodel=medlow -S -o /dev/null -xc /dev/null`) >/dev/null 2>&1
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-m64 -mcpu=ultrasparc -mcmodel=medlow"
-	    else
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-mtune=ultrasparc -mmedlow"
-	    fi
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-ffixed-g4 -fcall-used-g5 -fcall-used-g7 -Wno-sign-compare"
-	    if (`eval $CC -c -x assembler /dev/null -Wa,--help` | grep undeclared-regs) >/dev/null 2>&1
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-Wa,--undeclared-regs"
-	    fi
-	    ;;
-	(sparc*)
-	    if (`eval $CC -m32 -S -o /dev/null -xc /dev/null`)>/dev/null 2>&1
-	    then
-		CFLAGS="${CFLAGS}${CFLAGS:+ }-m32"
-	    fi
-	    CFLAGS="${CFLAGS}${CFLAGS:+ }-pipe -mno-fpu -fcall-used-g5 -fcall-used-g7"
-	    ;;
-	(*)
-	    :
-	    ;;
-    esac
-    linux_tmp=`eval $CC -print-libgcc-file-name | sed -e 's|libgcc.a|include|'`
-    CPPFLAGS="${linux_k_defs}${linux_tmp:+ -nostdinc} -I${kincludedir}${linux_tmp:+ -I}${linux_tmp}${CPPFLAGS:+ }${CPPFLAGS}"][dnl
-])# _LINUX_SETUP_KERNEL_CFLAGS_OLD
 # =========================================================================
 
 # =========================================================================

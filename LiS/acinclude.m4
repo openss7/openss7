@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:38 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/03/11 22:19:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 01:39:38 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,6 +122,7 @@ AC_DEFUN([_LIS_OPTIONS], [dnl
 # _LIS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SETUP], [dnl
+    AC_DEFINE([LIS_2_18], [1], [Always define this for an LIS_2_18 distribution.])
     AC_ARG_ENABLE([user-mode],
 	AS_HELP_STRING([--enable-user-mode],
 	    [enable user mode build.  @<:@default=no@:>@]),

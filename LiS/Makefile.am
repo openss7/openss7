@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.2 $) $Date: 2005/03/11 01:39:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/03/11 22:19:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/11 01:39:38 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 22:19:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -359,7 +359,7 @@ EXPORT_SRCFILES			= \
 EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/exports.ver
 
-GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) \
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) \
 				  -DLIS_OBJNAME=`echo $* | sed -e ''s/^.*-//''`
 
 include am/genksyms.am

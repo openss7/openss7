@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/09 02:56:17 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/11 22:19:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 02:56:17 $ by $Author: brian $
+# Last Modified $Date: 2005/03/11 22:19:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -229,7 +229,11 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     AC_SUBST([MODPOST_INPUTS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
 	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_MODDIR and $MODPOST_INPUTS])
-	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST -vv${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_INPUTS:+ -i '$MODPOST_INPUTS'} -s $MODPOST_SYSVER"
+	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST -vv${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_INPUTS:+ -i '$MODPOST_INPUTS'} -s $MODPOST_SYSVER" 2>&1 | \
+	while read line ; do
+	    echo "$as_me:$LINENO: $line" >&5
+	    echo "$as_me: $line" >&2
+	done
     ], [dnl
 rootdir="$rootdir"
 kversion="$kversion"
