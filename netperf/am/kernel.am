@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/07 08:57:08 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/03/23 09:17:20 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/07 08:57:08 $ by $Author: brian $
+## Last Modified $Date: 2005/03/23 09:17:20 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -261,10 +261,27 @@ install-modconf:
 # least on Mandrakelinux we need to place them in /etc/modprobe.preload for the same effect.
 ##
 if WITH_KO_MODULES
-INSTALL_EXEC_LOCAL += install-modules
+INSTALL_EXEC_LOCAL += pre-modules install-modules
 else
-INSTALL_EXEC_LOCAL += install-modules install-preloads install-modconf
+INSTALL_EXEC_LOCAL += pre-modules install-modules install-preloads pre-modconf install-modconf
 endif
+
+##
+# Unfortunately some recent non-autoconf/rpm releases have been mimicing our locations for placing
+# kernel modules, so they could be anywhere.  This pre-installation scriptlet searches for any
+# kernel modules by the same name as ours and simply removes them.
+##
+pre-modules:
+	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; \
+	for dir in $(DESTDIR)$(kmoduledir)/ $(DESTDIR)$(kmoduledir)/../preferred $(DESTDIR)$(kmoduledir)/../default $(DESTDIR)$(kmoduledir)/../boot ; do \
+		test -d $$dir || continue ; \
+		for m in `find $$dir \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do \
+			b=`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'` ; \
+			case " $$list " in (*" $$b "*) $(ECHO) "rm -f -- $$m" ; rm -f -- $$m ;; esac ; \
+		done ; \
+	done
+
+pre-modconf:
 
 ##
 # The post-modconf target checks for a fully configured install directory by checking for the
