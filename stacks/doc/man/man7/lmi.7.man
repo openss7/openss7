@@ -1,0 +1,824 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: lmi.7.man,v 0.9.2.2 2004/04/17 23:05:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997-2001  Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 23:05:34 $ by $Author: brian $
+.\"
+.\" $Log: lmi.7.man,v $
+.\" Revision 0.9.2.2  2004/04/17 23:05:34  brian
+.\" - Updating manual pages.
+.\"
+.\" Revision 0.9.2.1  2004/04/17 21:17:44  brian
+.\" - Converted to cooked manpages.
+.\"
+.\" Revision 0.9  2004/01/17 08:01:27  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.5  2003/07/31 11:09:13  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.4  2003/07/30 05:04:49  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.3  2003/07/29 22:22:12  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.2  2003/07/20 21:45:18  brian
+.\" Minor formatting.
+.\"
+.\" Revision 0.8.2.1  2003/07/18 20:38:43  brian
+.\" A lot of minor embellishments.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:37  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7.8.1  2001/12/11 13:16:08  brian
+.\" Branched for new development.
+.\"
+.\" Revision 0.7.6.1  2001/02/18 12:11:14  brian
+.\" New working branch for next release.
+.\"
+.\" Revision 0.7.4.1  2001/02/18 09:44:48  brian
+.\" Added new working branch.
+.\"
+.\" Revision 0.7.2.7  2001/01/17 03:04:12  brian
+.\" Removed interface lists from lmi.
+.\"
+.\" Revision 0.7.2.6  2001/01/17 00:29:10  brian
+.\" Working on man pages.
+.\"
+.\" Revision 0.7.2.5  2001/01/16 03:19:47  brian
+.\" Updated man pages.
+.\"
+.\" Revision 0.7.2.4  2001/01/15 03:55:48  brian
+.\" Completed LMI man page.
+.\"
+.\" Revision 0.7.2.3  2001/01/14 23:29:12  brian
+.\" Changed copyright notice.
+.\"
+.\" Revision 0.7.2.2  2001/01/14 11:07:53  brian
+.\" Changed headers back to GPL.
+.\"
+.\" Revision 0.7.2.1  2001/01/09 07:13:09  brian
+.\" Changes to man pages.
+.\"
+.\" Revision 0.7  2001/01/08 09:17:48  brian
+.\" Added LMI man page.
+.\"
+.\" Revision 0.7  2000/11/29 02:09:56  brian
+.\" Added man pages for interfaces.
+.\"
+.\" Revision 0.7  2000/11/19 00:25:57  brian
+.\" Added man pages for streams drivers.
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LMI 7 "$Date: 2004/04/17 23:05:34 $" "SS7 STREAMS Man Page" "Linux STREAMS Programmer's Manual" 
+.SH "NAME"
+lmi \- Signalling System No. 7 - Local Management Interface (LMI)
+.SH "SYNOPSIS"
+.PP
+.B B#include <ss7/lmi.h>
+.br
+.B B#include <ss7/lmi_ioctl.h>
+.HP
+.BI "int " fd " = open(" /dev/module ", " flags );
+.HP
+.BI "int " ret " = ioctl( fd ", " cmd ", ... /* " arg " */ );"
+.fi
+.SH "DESCRIPTION"
+This man page describes the STREAMS interface which is used to manage and
+configure SS7 modules and drivers conforming to the \fIOpenSS7\fR Local
+Management Interface (LMI) specification.
+
+LMI is the common interface to \fIOpenSS7\fR modules and drivers configured by
+the SS7 Configuration Daemon \fBss7d\fR(8) using \fBstreamio\fR(2)
+\fBI_PUSH\fR and \fBI_LINK\fR ioctls.  This interface is also available for
+the development of special purposes management entities (e.g. SNMP, TMN) for
+management of the \fIOpenSS7\fR stack.  All SS7 drivers, modules and
+multiplexors in the \fIOpenSS7\fR stack provide for LMI management.
+
+The LMI consists of two subcomponents:
+.TP
+.I "LOCAL MANAGEMENT INTERFACE"
+LMI provides a local management interface which utilizes \fBM_PROTO\fR and
+\fBM_PCPROTO\fR messages which can be exchanged with the interface using
+\fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls on the stream head once the
+interface is opened.  The local management interface controls local management
+(STREAMS configuration functions) which are normally used by the SS7
+Configuration Daemon \fBss7d\fR(8) on the driver interface or the control
+channel of a multiplexor before pushing a module on the stream head or linking
+a stream under the multiplexor.  The local management interface is described
+in detail in the the section "LOCAL MANAGEMENT INTERFACE".
+.TP
+.I "PROTOCOL MANAGEMENT INTERFACE"
+LMI provides a protocol management interface which utilizes \fBM_PROTO\fR and
+\fBM_PCPROTO\fR messages which can be exchanged with \fBputmsg\fR(2) and
+\fBgetmsg\fR(2) system calls on the stream head or control stream once the
+interface is opened, or \fBM_CTL\fR messages between modules.  The protoocl
+management interface supports general and layer-specific configuration, state
+inquiry, event and statistics control (SNMP functions) which are normally used
+by the SS7 Configuration Daemon \fBss7d\fR(8) on the driver interface or
+multiplexor control channel before or after the SS7 protocol stack has been
+configured.
+.TP
+.I "INPUT OUTPUT CONTROL INTERFACE"
+LMI provides a control interface which utilizes \fBioctl\fR(2) transparent
+calls, pass-through calls, or \fBI_STR\fR ioctl calls using \fBstreamio\fR(2)
+from a stream head or a multiplexor control stream.  The control interface
+provides for the control of layer-specific and device-specific aspects which
+are outside the scope of the SS7 protocol proper, such as interface
+configuration and is normally used by the SS7 Configuration Daemon
+\fBss7d\fR(8) or upstream modules during stack operation.
+
+.SH "LOCAL MANAGEMENT INTERFACE"
+.SS "PPA STYLE"
+.PP
+From the local management view, most low-level LMI providers can support two
+style for Point of Physical Address (PPA) selection.  These sytles are as
+follows:
+.TP
+.B LMI_STYLE1
+A \fIStyle 1\fR driver is a driver whose Point of Physical Address (PPA) is
+associated with the stream at open time.  These drivers do not really
+do anything in response to the \fBLMI_ATTACH_REQ\fR, but still require the
+primitive to move the interface from the \fBLMI_UNATTACHED\fR state to the
+\fBLMI_DISABLED\fR state.  \fIStyle 1\fR drivers do not require PPA addresses.
+.TP
+.B LMI_STYLE2
+A \fIStyle 2\fR driver is a driver whose Point of Physical Appearance (PPA)
+must be attached to the stream after open.  These drivers open in the
+\fBLMI_UNATTACHED\fR state and must be attached with a \fBLMI_ATTACH_REQ\fR
+local management primitive to associate them with a PPA before they can be
+enabled for use.  \fIStyle 2\fR drivers require a PPA (Physical Point of
+Attachment) address to indicate the physical transmission channel to which the
+stream is to be attached.  The PPA Address is an opaque address which is
+meaningful only to a specific driver implementation.
+
+.SS "LOCAL MANAGEMENT STATES"
+.PP
+From the perspective of local management, the LMI provider can be in a number
+of management states.  Some local management primitives are applicable only in
+specific states.  The LMI provider can be moved through the states with local
+management primitives.
+.PP
+The management states of the LMI provider are as follows:
+.TP
+.B LMI_UNATTACHED
+The LMI driver or module is not attached to a PPA.  This state is only
+meaningful to \fIStyle 2\fR drivers which must be explicitly attached to a
+specific transmission channel.  Both \fIStype 1\fR and \fIStyle 2\fR drivers
+open in this state.
+.TP
+.B LMI_UNUSABLE
+The LMI driver or module is unusable.  This state occurs when the STREAMS
+module or driver is no longer able to perform local management actions on the
+LMI provider.  This may be due to the failure, removal, or failure to
+communicate with, some component in the system.  The LMI provider cannot be
+moved to this state with a local management primitive: this state only results
+from internal events.
+.TP
+.B LMI_DISABLED
+The LMI driver or module is attached but has not yet been enabled for use.
+The driver must be enabled with a \fBLMI_ENABLE_REQ\fR local management
+primitive before data or protocol primtives may be exchanged with the driver
+or module.
+.TP
+.B LMI_ENABLE_PENDING
+The LMI driver or module has accepted a \fBLMI_ENABLE_REQ\fR request on the
+interface, but the provider must wait until some event occurs before the
+provider can be considered to be enabled.  The provider will respond with a
+\fBLMI_ENABLE_CON\fR confirmation once the enabling is successful, or a
+\fBLMI_ERROR_ACK\fR if unsuccessful.
+
+Most drivers use the \fBLMI_ENABLE_REQ\fR primitive and this state to peform
+initialization on the device and preparations necessary for data exchange such
+as assignment and activation of interrupt service routines.  Because this
+initialization may entail communications with independent interface
+processors, a pending state is provided.
+.TP
+.B LMI_ENABLED
+The LMI driver or module is enabled and ready for use (to provide protocol
+services).
+.TP
+.B LMI_DISABLE_PENDING
+The LMI driver or module has accepted a \fBLMI_DISABLE_REQ\fR request on the
+interface, but the provider must wait until some event occurs before the
+provider can be considered disabled.  The provider will respond with a
+\fBLMI_DISABLE_CON\fR confirmation once the disabling is successful, or a
+\fBLMI_ERROR_ACK\fR if unsuccessful.
+
+Most drivers use the \fBLMI_DISABLE_REQ\fR primitive and this state to perform
+deactivation of the device and actions necessary to shut down data exchange
+such as removal and deactivation of interrupt service routines.  Because this
+deactivation may entail communications with independent interface processors,
+a pending state is provided.
+
+.SS "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+Local management primitives can be exchanged with the device driver as
+\fBM_PROTO\fR or \fBM_PCPROTO\fR primitives using the \fBputmsg\fR(2) or
+\fBgetmsg\fR(2) system calls on the stream head after opening the device.
+This interface is normally used only by the SS7 Configuration Daemon
+\fBss7d\fR(8) during STREAMS configuration, or by the upstream protocol
+modules during \fBstreamio\fR(2) \fBI_PUSH\fR and \fBI_POP\fR operations.  It
+is possible, however, for a user-level program to use this interface directly
+on an open driver or module stream head for special purposes and testing.
+.PP
+Only \fBM_PROTO\fR local management primitives will be deferred during
+congestion or overload of the driver or module.  Local management primitives
+sent as \fBM_PCPROTO\fR will be discarded and return a \fBLMI_ERROR_ACK\fR in
+repsonse should it not be possible to execute them immediately.
+.PP
+Local management primitives provided by the LMI are as follows:
+.PP
+.B LMI_INFO_REQ, LMI_INFO_ACK, LMI_ERROR_ACK
+.PP
+Invoked by the LMI user to request and return information about the LMI
+provider which is of interest to local configuration management.  These
+requests are normally performed by the SS7 Configuration Daemon \fBss7d\fR(8)
+on the stream head.
+.TP
+.B LMI_INFO_REQ
+\fBLMI_INFO_REQ\fR uses a \fBlmi_info_req_t\fR structure which contains the
+request primitive, \fIlmi_primitive\fR, as its only member
+.TP
+.B LMI_INFO_ACK
+\fBLMI_INFO_ACK\fR uses \fBlmi_info_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    lmi_ulong   lmi_primitive;  /* LMI_INFO_ACK */
+    lmi_ulong   lmi_version;
+    lmi_ulong   lmi_state;
+    lmi_ulong   lmi_max_sdu;
+    lmi_ulong   lmi_min_sdu;
+    lmi_ulong   lmi_ppa_style;
+    lmi_ulong   lmi_ppa_addr[0];
+} lmi_info_ack_t;
+.fi
+.TP
+.I lmi_primitive
+The primitive number which is set to \fBLMI_INFO_ACK\fR.
+.TP
+.I lmi_version
+The version of the LMI interface specification to which the device conforms
+with one byte per version umber in host order.  The current (and only) version
+of the LMI is \fI1.0.0.0\fR or \fI0x10000000\fR.
+.TP
+.I lmi_state
+The current local management state of the LMI interface.
+.TP
+.I lmi_max_sdu
+The minimum data unit size which may be transferred to and from the
+transmission channel.  From some devices this may be zero.
+.TP
+.I lmi_min_sdu
+The maximum data unit size which may be transferred to and from the
+transmission channel.  For some devices this size may be unlimited, in which
+case the value returned here is \fI0xffffffff\fR.
+.TP
+.I lmi_ppa_style
+The style of the driver which may be one of the following:
+.RS
+.TP
+.B LMI_STYLE1
+A \fIStyle 1\fR device which is implicitly associated with a transmission
+channel at the time that the device is opened.  These devices do not require a
+PPA address in the \fBLMI_ATTACH_REQ\fR.
+.TP
+.B LMI_STYLE2
+A \fIStyle 2\fR device which is explicitly associated with a transmission
+channel identified by a \fIlmi_ppa_addr\fR in an \fBLMI_ATTACH_REQ\fR
+local management primitive after opening.  These devices open in the
+\fBLMI_UNATTACHED\fR state.
+.RE
+.TP
+.I lmi_ppa_addr
+The PPA address that a \fIStyle 2\fR device is attached to.  If the device is
+a \fIStyle 1\fR device or an unattached \fIStyle 2\fR device, this member will
+return all zeros.
+.RE
+.TP
+.B LMI_ERROR_ACK
+\fBLMI_ERROR_ACK\fR containing the error number in \fIlmi_errno\fR and an
+error explanation in \fIlmi_reason\fR will be returned by the LMI provider in
+the rare event that an error occurs while attempting to retreive the
+information requested by a \fBLMI_INFO_REQ\fR.
+.PP
+.B LMI_ATTACH_REQ, LMI_OK_ACK, LMI_ERROR_ACK
+.PP
+Invoked by the LMI user to attach a \fIStyle 2\fR LMI driver or module to a
+PPA using a PPA Address.  This primitive is normally used by the SS7
+Configuration Daemon \fBss7d\fR(8) when assembling the SS7 protocol stack.
+The PPA address is obtained by the daemon from configuration files.
+.TP
+.B LMI_ATTACH_REQ
+Request that the LMI driver or module attach to the PPA address specified in
+the request.  The \fBLMI_ATTACH_REQ\fR primitive is only valid from the
+\fBLMI_UNATTACHED\fR state for a \fIStyle 1\fR or \fIStyle 2\fR interface.
+\fBLMI_ATTACH_REQ\fR uses the \fBlmi_attach_req_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    lmi_ulong   lmi_primitive;  /* LMI_ATTACH_REQ */
+    lmi_ulong   lmi_ppa[0];
+} lmi_attach_req_t;
+.fi
+.TP
+.I lmi_primitive
+The primitive number which is set to \fBLMI_ATTACH_REQ\fR.
+.TP
+.I lmi_ppa_addr
+Specifies the PPA (Physical Point of Appearance) of the transmision channel to
+which the LMI driver should attach.  This is an opaque address to the
+interface and is only meaningful to a specific driver implementation.
+.RE
+.TP
+.B LMI_OK_ACK
+Returned if the attach request is successful.
+.TP
+.B LMI_ERROR_ACK
+Returned with the error number and explanation set if the attach request
+fails.
+.PP
+.B LMI_DETACH_REQ, LMI_OK_ACK, LMI_ERROR_ACK
+.PP
+Invoked by the LMI user to detach a \fIStyle 2\fR LMI driver from its PPA.
+This primitive is normally used by the SS7 Configuration Daemon \fBss7d\fR(8)
+when disassembling or reconfiguring the SS7 protocol stack.
+.TP
+.B LMI_DETACH_REQ
+Requests that the LMI driver detach itself from the current attached PPA.
+\fBLMI_DETACH_REQ\fR is only valid for \fBStyle 1\fR or \fBStyle 2\fR drivers
+in the \fBLMI_DISABLED\fR state.  The \fBLMI_DETACH_REQ\fR uses the
+\fBlmi_detach_req_t\fR structure which contains only the \fIlmi_primitive\fR
+which is set to \fBLMI_DETACH_REQ\fR.
+.TP
+.B LMI_OK_ACK
+Returned if the detach request was successful.
+.TP
+.B LMI_ERROR_ACK
+Returned with the error number and explanation set if the detach request
+fails.
+.PP
+.B LMI_ENABLE_REQ, LMI_ENABLE_CON, LMI_ERROR_ACK
+.PP
+Invoked by the LMI on a \fIStyle 1\fR or \fIStyle 2\fR LMI provider to enable
+it for data transfer and protocol operations.  This primitive is normaly used
+by the SS7 Configuration Daemon \fBss7d\fR(8) when enabling an assembled or
+reconfigured SS7 protocol stack.
+.TP
+.B LMI_ENABLE_REQ
+Requests that the LMI provider enable itself for data transfer and protocol
+operations.  \fBLMI_ENABLE_REQ\fR is valid for both \fIStyle 1\fR and
+\fIStyle 2\fR LMI providers in the \fBLMI_DISABLED\fR state.  The
+\fBLMI_ENABLE_REQ\fR uses the \fBlmi_enable_req_t\fR structure which contains
+only the \fIlmi_primitive\fR which is set to \fBLMI_ENABLE_REQ\fR.
+.TP
+.B LMI_ENABLE_CON
+Returned once the enable request is successful.  For some \fIStyle 2\fR LMI
+providers, this may take some time and is not necessarily returned in
+immediate response to the enable request.
+.TP
+.B LMI_ERROR_ACK
+Returned with the error number and explanation set if the enable request
+fails.
+.PP
+.B LMI_DISABLE_REQ, LMI_DISABLE_CON, LMI_ERROR_ACK
+.PP
+Invoked by the LMI user on a \fIStyle 1\fR or \fIStyle 2\fR LMI provider to
+disable the provider from further data transfer and protocol operations.  This
+primitive is normally used by the SS7 Configuration Daemon \fBss7d\fR(8) when
+disabling an SS7 protocol stack for disassembly or reconfiguration.
+.TP
+.B LMI_DISABLE_REQ
+Requests that the LMI provider disable itself from further data transfer and
+protocol operations.  \fBLMI_DISABLE_REQ\fR is valid for both \fIStyle 1\fR
+and \fIStyle 2\fR LMI providers in the \fBLMI_ENABLED\fR state.  The
+\fBLMI_DISABLE_REQ\fR uses the \fBlmi_disable_req_t\fR structure which
+contains only the \fIlmi_primitive\fR which is set to \fBLMI_DISABLE_REQ\fR.
+.TP
+.B LMI_DISABLE_CON
+Returned once the disable request is successful.  For some \fIStyle 2\fR LMI
+providers, this may take some time and is not necessarily returned in
+immediate response to the disable request.
+.TP
+.B LMI_ERROR_ACK
+Returned with the error number and explanation set if the disable request
+fails.
+
+.SS "ERROR HANDLING"
+.TP
+.B LMI_OK_ACK
+Upon success, the layer service provider will return a \fBLMI_OK_ACK\fR to
+confirm a successful request.  The provider may attach a \fBM_DATA\fR block
+which contains a request-specific structure with the results of the request.
+This primitive uses the \fBsmi_ok_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong  smi_primitive; /* LMI_OK_ACK */
+    smi_ulong  smi_state;
+    smi_ulong  smi_correct_primitive;
+} smi_ok_ack_t;
+.fi
+.TP
+.I smi_state
+Contains the management state of the interface.
+.TP
+.I smi_correct_primitive
+Contains the request primitive which this response is acknowledging.
+.RE
+.TP
+.B LMI_ERROR_ACK
+Upon failure, the layer service provider will return a \fBLMI_ERROR_ACK\fR to
+reject the request due to an error.  The provider may attach a \fBM_DATA\fR
+block which contains a request-specific structure which indicates the elements
+of the request which are in error.  This primitive uses the
+\fBsmi_error_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong  smi_primitive; /* LMI_ERROR_ACK */
+    smi_ulong  smi_state;
+    smi_ulong  smi_error_primitive;
+    smi_ulong  smi_errno;
+    smi_ulong  smi_reason;
+} smi_error_ack_t;
+.fi
+.TP
+.I smi_state
+Contains the management state of the interface.
+.TP
+.I smi_error_primitive
+Contains the request primitive which this response is acknowledging.
+.TP
+.I smi_errno
+The error number indicating which error occured.  This error number
+corresponds to the UNIX\(rg\ \fIerrno\fR (see \fBstrerror\fR(3)) if applicable.
+.TP
+.I smi_reason
+An additional error reason code.
+.RE
+.TP
+.B ERRORS
+Error numbers which are specific to a configuration request rejection are as
+follows:
+.sp
+.RS
+.TS
+tab(:);
+lb 2 l.
+LMI_UNSPEC:Unknown or unspecified
+LMI_BADADDRESS:Address was invalid
+LMI_BADADDRTYPE:Invalid address type
+LMI_BADDIAL:(not used)
+LMI_BADDIALTYPE:(not used)
+LMI_BADDISPOSAL:Invalid disposal parameter
+LMI_BADFRAME:Defective SDU received
+LMI_BADPPA:Invalid PPA identifier
+LMI_BADPRIM:Unregognized primitive
+LMI_DISC:Disconnected
+LMI_EVENT:Protocol-specific event ocurred
+LMI_FATALERR:Device has become unusable
+LMI_INITFAILED:Link initialization failed
+LMI_NOTSUPP:Primitive not supported by this device
+LMI_OUTSTATE:Primitive was issued from invalid state
+LMI_PROTOSHORT:M_PROTO block too short
+LMI_SYSERR:UNIX system error
+LMI_WRITEFAIL:Unitdata request failed
+LMI_CRCERR:CRC or FCS error
+LMI_DLE_EOT:DLE EOT detected
+LMI_FORMAT:Format error detected
+LMI_HDLC_ABORT:Aborted frame detected
+LMI_OVERRUN:Input overrun
+LMI_TOOSHORT:Frame too short
+LMI_INCOMPLETE:Partial frame received
+LMI_BUSY:Telephone was busy
+LMI_NOANSWER:Connection went unanswered
+LMI_CALLREJECT:Connection rejected
+LMI_HDLC_IDLE:HDLC line went idle
+LMI_HDLC_NOTIDLE:HDLC link no longer idle
+LMI_QUIESCENT:Line being reassigned
+LMI_RESUMED:Line has been reassigned
+LMI_DSRTIMEOUT:Did not see DSR in time
+LMI_LAN_COLLISIONS:LAN excessive collisions
+LMI_LAN_REFUSED:LAN message refused
+LMI_LAN_NOSTATION:LAN no such station
+LMI_LOSTCTS:Lost Clear to Send signal
+LMI_DEVERR:Start of device-specific error codes
+.TE
+.RE
+
+.SH "INPUT OUTPUT CONTROL INTERFACE"
+.PP
+All device drivers or modules which provide a Local Management Interface (LMI)
+provide a set of IOCTLs which are used to configure and change the
+characteristics of the operation of the driver or module.  Each driver or
+module named \fIxxx\fR provides IOCTLs of the form
+\fIxxx\fB_IOC\fIfunction\fR.  For the particulars of datastructures and
+specific control commands see the \fIxxx\fR man page (e.g, \fBsdli\fR(7))
+for the \fIxxx\fR protocol level driver.
+
+Controls which should be provided by all drivers are as follows:
+
+.TP
+\fIxxx\fB_IOCGOPTIONS, \fIxxx\fB_IOCSOPTIONS
+Used to get or set the options associated with the protocol for a specific
+LMI driver.  The two common fields for all protocol drivers and modules are
+contained in the \fBlmi_option_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct lmi_option {
+    lmi_ulong   pvar;
+    lmi_ulong   popt;
+} lmi_option_t;
+.fi
+.TP
+.I pvar
+Contains a protocol variant number which defaults to \fBSS7_PVAR_ITUT_88\fR.
+The protocol variant number is one of the following values:
+.RE
+.RS
+.IP
+.TS
+tab(:);
+lb 2 l.
+SS7_PVAR_ITUT_88:ITU-T 1988 (Blue Book)
+SS7_PVAR_ITUT_93:ITU-T 1993 (White Book)
+SS7_PVAR_ITUT_96:ITU-T 1996 (Grey Book)
+SS7_PVAR_ITUT_00:ITU-T 2000 (? Book)
+SS7_PVAR_ANSI_88:ANSI T1.111-1988
+SS7_PVAR_ANSI_92:ANSI T1.111-1992
+SS7_PVAR_ETSI_88:ETSI ETS 300 008 1988
+SS7_PVAR_ETSI_93:ETSI ETS 300 008 1993
+SS7_PVAR_ETSI_96:ETSI ETS 300 008 1996
+SS7_PVAR_ETSI_00:ETSI ETS 300 008 2000
+SS7_PVAR_JTTC_94:JTTC JQ.700-Series 1994
+.TE
+.RE
+.RS
+.TP
+.I popt
+Contains a bit vector which contains a bitwise OR of the following flags.
+When the resepective bit is set it indicates that the option is in effect.
+.RE
+.RS
+.IP
+.TS
+tab(:);
+lb 2 l.
+SS7_POPT_MPLEV:Multiple prio/cong levels
+SS7_POPT_PCR:Preventative cyclic retrans
+SS7_POPT_HSL:High speed links
+SS7_POPT_XSN:Extended sequence numbers
+SS7_POPT_ALL:All options
+.TE
+.RE
+.RE
+.TP
+\fIxxx\fR\fB_IOCGCONFIG\fR, \fIxxx\fR\fB_IOCSCONFIG\fR
+Used to get or set the configuration variables associated with the protocol
+for a specific LMI driver or module.  There are no common configuration
+fields.  See the specific driver man page for details.
+.TP
+\fIxxx\fR\fB_IOCTCONFIG\fR, \fIxxx\fR\fB_IOCCCONFIG\fR
+Used to test and commit a configuration using SNMP setup/commit semantics for
+a specific LMI driver or module.  There are no common configuration fields.
+See the specific driver man page for details.
+.TP
+\fIxxx\fR\fB_IOCGSTATEM\fR
+Get state machine state variables, flags, timer-values and other protocol
+state machine attributes for a particular protocol driver or module.  There
+are no common state machine fields.  See the specific driver man page for
+details.
+.TP
+\fIxxx\fR\fB_IOCCMRESET\fR
+Perform a master reset on the state machine.  This returns the state machine
+to Power-On conditions.  This control returns the same information as a
+\fIxxx\fR\fB_IOCGSTATEM\fR call.  There are no common state machine fields.
+See the specific driver man page for details.
+.TP
+\fIxxx\fR\fB_IOCGSTATSP\fR, \fIxxx\fR\fB_IOCSSTATSP\fR
+Used to get or set the statistics collection interval for the collection of
+statistics from the LMI driver or module.  The three common fields form a
+common header for all statistics period information and are contains in the
+\fBlmi_sta_t\fR structure as follows:
+.sp
+.RS
+.nf
+typedef struct lmi_sta {
+    lmi_ulong   object_id;  /* object id for stats      */
+    lmi_ulong   colperiod;  /* collection period        */
+    lmi_ulong   timestamp;  /* timestamp end of period  */
+} lmi_sta_t;
+.fi
+.TP
+.I object_id
+Contains the object id of the statistics.
+.TP
+.I colperiod
+Contains the collection period which is being set for specified statistics.
+The collection period is in jiffies (1/HZ seconds) and indicates the
+aggregation period for specified statistics.
+.TP
+.I timestamp
+Contains a timestamp (secconds since epoch) which indicates the time boundary
+at which at least on collection period occured in the past.  This value can be
+used to determine the system clock time at which the next collection interval
+is to occur.
+.RE
+.TP
+\fIxxx\fR\fB_IOCGSTATS\fR, \fIxxx\fR\fB_IOCSSTATS\fR
+Gets or sets statistics which have been collected for the LMI driver or module
+in the current (or just previous but not notified) collection interval.  The
+common field of all statistics structures is the \fIheader\fR field which
+contains the timestamp of the collection interval for which the current
+statistics apply.
+.TP
+\fIxxx\fR\fB_IOCGNOTIFY\fR, \fIxxx\fR\fB_IOCSNOTIFY\fR, \fIxxx\fR\fB_IOCCNOTIFY\fR
+Gets, sets or clears notifications from the LMI driver or module.  There are
+no common notification fileds.  See the specific driver man page for more
+details.
+
+.\" .SH "CONFIGURATION"
+.\" .SH "ERROR HANDLING"
+.SH "SEE ALSO"
+.BR isupi (7),
+.BR mtpi (7),
+.BR sccpi (7),
+.BR sdli (7),
+.BR sdti (7),
+.BR sli (7),
+.BR slsi (7),
+.BR tcapi (7),
+.BR acb56 (4),
+.BR isup (4),
+.BR iua (4),
+.BR m2pa (4),
+.BR m2tp (4),
+.BR m2ua (4),
+.BR m3pa (4),
+.BR m3tp (4),
+.BR m3ua (4),
+.BR mtp (4),
+.BR sccp (4),
+.BR sdl_eth (4),
+.BR sdl_ip (4),
+.BR sdl_rtp (4),
+.BR sdl_sctp (4),
+.BR sdl_tcp (4),
+.BR sdl_udp (4),
+.BR sdt (4),
+.BR sl (4),
+.BR soip (8),
+.BR ss7d (8),
+.BR sua (8),
+.BR tcap (8).
+.SH "BUGS"
+Too many to mention.
+.SH "AUTHOR"
+.PP
+Brian F. G. Bidulock,
+.IR "" < bidulock@openss7.org >.
+.SH "HISTORY"
+This STREAMS interface for SS7 is an orignal part of the \fIOpenSS7\fR
+package.
+.XX
+.[
+q702
+.]
+.[
+q703
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+.[
+t1.112
+.]
+.[
+q761
+.]
+.[
+q762
+.]
+.[
+q763
+.]
+.[
+q764
+.]
+.[
+q766
+.]
+.[
+q767
+.]
+.[
+t1.113
+.]
+.[
+isupv4-1
+.]
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+.[
+t1.114
+.]
+.[
+q751-1
+.]
+.[
+q751-2
+.]
+.[
+q752
+.]
+.[
+t1.116
+.]
+.[
+$LIST$
+.]
+.TI

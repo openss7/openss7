@@ -1,0 +1,1 @@
+.so MX_DETACH_REQ.7.man

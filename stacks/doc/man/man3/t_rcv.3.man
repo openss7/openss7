@@ -1,0 +1,293 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: t_rcv.3.man,v 0.9.2.1 2004/04/17 21:26:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 21:26:00 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.\"
+.\"
+.TH T_RCV 3 "$Date: 2004/04/17 21:26:00 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.\"
+.\"
+.SH NAME
+.B t_rcv
+\- received transport data
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "int t_rcv(int " fd ", char *" buf ", unsigned int " nbytes ", int *" flags );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the transport endpoint upon which to receive data.
+.TP
+.I buf
+a pointer to a buffer to contain the received data.
+.TP
+.I nbytes
+the maximum number of bytes in the caller supplied buffer.
+.TP
+.I flags
+a pointer to an
+.B int
+to contain the returned data flags.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR t_rcv ()
+receives connection oriented transport data arriving on the local transport
+endpoint identified by
+.I fd .
+.PP
+.I fd
+specifies the local transport endpoint upon which the connection oriented data
+is expected to arrive.
+.PP
+.I buf
+points to a buffer to contain the received data on return.
+.PP
+.I nbytes
+specifies the size of the buffer
+.IR buf .
+.PP
+.I flags
+provides information about the received data on return.  Flags returned by
+.BR t_rcv ()
+can be a bitwise OR of any of the following flags:
+.TP
+.B T_MORE
+indicates on return that a subsequent receive operation is necessary to
+receive the remainder of the data belonging to the same transport service data
+unit.
+.TP
+.B T_EXPEDITED
+indicates on return that the received data was expedited data.
+.\"
+.\"
+.SH CAVEATS
+.PP
+.BR t_rcv ()
+is only valid in the
+.BR T_DATAXFER " or " T_OUTREL
+states.
+.PP
+In synchronous mode,
+.BR t_rcv ()
+will block awaiting the arrival of data or an asynchronous event.  In
+asynchronous mode,
+.BR t_rcv ()
+if there is no data immediately available,
+.BR t_rcv ()
+will fail, return -1 and set
+.IR t_errno (3)
+to
+.BR TNODATA .
+.PP
+Portions of a transport service data unit can be interleaved with portions of
+an expedited transport service data unit.
+.PP
+If the
+.I tsdu
+field of the
+.B t_info
+structure returned by
+.BR t_open "(3) or " t_getinfo (3)
+is
+.BR T_INVALID ,
+then the flag
+.B T_MORE
+has no meaning for normal data received with
+.BR t_rcv ().
+If the
+.I etsdu
+field of the
+.B t_info
+structure returned by
+.BR t_open "(3) or " t_getinfo (3)
+is
+.BR T_INVALID ,
+then the flag
+.B T_MORE
+has no meaning for expedited data received with
+.BR t_rcv ().
+.PP
+.BR t_rcv ()
+is functionally equivalent to
+.BR read (2),
+and the two functions can be used interchangeably; however,
+.BR read (2)
+does not maintain
+.IR t_errno (3).
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_rcv ()
+returns zero (0) or a positive integer indicating the number of bytes that was
+received and placed in the caller supplied buffer
+.IR buf .
+In addition, on success,
+.BR t_rcv ()
+returns flags associated with the received data in the area pointed to by
+.IR flags .
+Upon failure,
+.BR t_rcv ()
+returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR t_rcv ()
+fails, it returns -1 and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP
+.RB [ TLOOK ]
+An asynchronous event occured before the call could complete.  See \fBt_look\fR(3) for more information.
+.TP
+.RB [ TNODATA ]
+An attempt was made to read data but no data indication was available.
+.TP
+.RB [ TNOTSUPPORT ]
+The call requires the use of a TPI primitive not supported by the underlying transport provider.
+.TP
+.RB [ TOUTSTATE ]
+The call was issued with the interface in an incorrect state.
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR errno (3),
+.BR read (2),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR t_look (3),
+.BR t_open (3),
+.BR t_rcvudata (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_rcv ()
+has no known bugs.
+.BR t_rcv ()
+has been tested for the described behavior using the
+.I /usr/bin/test-xnet
+conformance test program.
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+XTI/TLI,
+.[
+XTI
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

@@ -1,0 +1,1 @@
+.so MG_JOIN_CON.7.man

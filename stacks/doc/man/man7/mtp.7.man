@@ -1,0 +1,142 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: mtp.7.man,v 0.9.2.2 2004/04/17 23:05:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corp. <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.Dd April 22, 2003
+.Os Linux 2.4.18
+.Dt MTP 7 PRM
+.Sh NAME
+.Nm MTP
+.Nd "Message Transfer Part (MTP)"
+.Sh SYNOPSIS
+.Fd "#include <ss7/mtpi.h>"
+.Fd "#include <ss7/mtpi_ioctl.h>"
+.Fo "mtp_stream = open"
+.Fa \(lq/dev/mtp\(rq
+.Fa flags
+.Fc
+.Sh DESCRIPTION
+.Nm
+is an implementation of the Signalling System No. 7 (SS7) Message Transfer
+Part (MTP) defined in Q.704 and ANSI T1.111.4.
+.Nm
+provides reliable sequenced or unsequenced delivery of packets over a
+connectionless transport between two
+.Nm
+stream.
+.Nm
+provides strong assurances that the data arrives in order on a stream, if
+requested, and maintains sequencing of packets in the face of most network
+failures.  It generates and checks a per-packet checksum to catch transmission
+errors.
+.Pp
+.Nm
+provides the following stream types:
+.Bl -hang
+.It Pa /dev/mtp
+.It Pa /dev/mtp-npi
+.It Pa /dev/mtp-tpi
+.El
+.\".TP
+.\"\fB\)MTPI\fR \fI\)"/dev/mtp"\fR
+.\"This is a stream supporting the MTP Interface. See
+.\".BR mtpi (7).
+.\"This interface provides the protocol service primitive interface of Q.704 and
+.\"T1.111.4.  This is the interface that is used internally when
+.\".B MTP
+.\"is used with
+.\".BR sccp (4)
+.\"or
+.\".BR isup (4).
+.\".TP
+.\"\fB\)NPI\fR \fI\)"/dev/mtp-npi"\fR
+.\"This is a stream supportingn the NPI interface.  See
+.\".BR npi (7).
+.\"This interface provides the MTP protocol service interface using the
+.\"N-primitives of the NPI interface.  This interface is intended solely for use
+.\"by use programs or protocol modules requiring an NPI service provider
+.\"interface.
+.\".TP
+.\"\fB\)TLI\fR \fI\)"/dev/mtp-tpi"\fR
+.\"This is a stream supportingn the TLI interface.  See
+.\".BR tli (7).
+.\"This interface provides the MTP protocol service interface using the
+.\"T-primitives of the TLI interface.  This interface is intended solely for use
+.\"by user programs (and the XNS/TLI sockets library) or protocol modules
+.\"requiring a TLI serivce provider interface.
+.\".SS "ADDRESS FORMATS"
+.\".SS "LOCAL MANAGEMENT INTERFACE"
+.\".SS "DRIVER CONTROL INTERFACE"
+.\".SS "PROTOCOL SERVICE INTERFACE"
+.\".SH "OPTIONS"
+.\".SH "IOCTLS"
+.\".SH "ERROR HANDLING"
+.\".SH "NOTES"
+.\".SH "ERRORS"
+.\".SH "STATISTICS"
+.\".SH "CAVEATS"
+.\".SH "AUTHOR"
+.\".SH "VERSIONS"
+.\".SH "SEE ALSO"
+.\".BR streamio (2)
+.\".BR putmsg (2)
+.\".BR getmsg (2)
+.\".SH "REFERENCES"
+.\".SH "COPYRIGHT NOTICE"
+.\".PP
+.\"\f(HRCopyright \(co 1997-2003 OpenSS7 Corporation.  All Rights Reserved.
+.\".PP
+.\".ce 1
+.\"\f(HRPERMISSION NOTICE\fR
+.\".PP
+.\"\f(HRPermission is granted to make and distribute verbatim copies of this manual provided that
+.\"the copyright notice and this permission notice are preserved on all copies.
+.\".PP
+.\"\f(HRPermission is grated to copy and distribute modified version of this manual under the
+.\"conditions for verbatim copying, provided that the entire resulting derived work is distributed
+.\"under the terms of a permission notice identical to this one.
+.\".PP
+.\"\f(HRSince the Linux kernel and libraries are constantly changing, this manual may be incorrect
+.\"or out-of-date.  The author(s) and copyright holder(s) assume no responsibility whatsoever for
+.\"errors or omissions, or for damage resulting from the use of the information contained herein.
+.\"The author(s) and copyright holder(s) may not have taken the same level of care in the
+.\"production of this manual, which is licensed free of charge, as they might when working
+.\"professionally.
+.\".PP
+.\"\f(HRFormated or processed versions of this manual, if unaccompanied by the source, must
+.\"acknowledge the copyright and authors of this work.
+.\"
+.\"
+

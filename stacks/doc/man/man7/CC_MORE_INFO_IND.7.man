@@ -1,0 +1,209 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CC_MORE_INFO_IND.7.man,v 0.9.2.2 2004/04/17 23:05:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:05 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_MORE_INFO_IND 7 "$Date: 2004/04/17 23:05:05 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_MORE_INFO_IND
+\- more information indication
+.\"
+.\"
+.SH SYNOPSIS
+The format of this message is on
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_more_info_ind {
+    ulong cc_primitive;         /* always CC_MORE_INFO_IND */
+    ulong cc_user_ref;          /* user call reference */
+    ulong cc_opt_length;        /* optional parameter length */
+    ulong cc_opt_offset;        /* optional parameter offset */
+} CC_more_info_ind_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This message indicates that the calling CCS user needs to provide additional
+information (called party address digits) to complete call processing.  The
+CCS user should generate
+.BR CC_INFORMATION_REQ (7)
+primitives, if possible.  This is also an indication that overlap receiving is
+in effect.  Appropriate protocol timers will be started.
+.\"
+.\"
+.PP
+In contrast to the the
+.BR CC_INFORMATION_REQ (7)
+primitive(s) which are sent by the CCS user in response to this message, the
+.B CC_MORE_INFO_IND
+message is normally only issued once per call setup.
+.\"
+.\"
+.SS Parameters
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+indicates the primitive type.  Always
+.BR CC_MORE_INFO_IND .
+.TP
+.I cc_user_ref
+Indicates the user call reference of the
+.B CC_MORE_INFO_IND
+message.  It is used by the CCS user to associate the
+.B CC_MORE_INFO_IND
+message with an outstanding
+.BR CC_SETUP_REQ (7)
+message.
+.TP
+.I cc_opt_length
+Indicates the length of the optional parameters associated with the more
+information indication.  If no optional parameters are associated with the
+more information indications, this parameter must be coded zero by the CCS
+provider.
+.TP
+.I cc_opt_offset
+Indicates the offset of the optional parameters from the start of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.\" .SS Rules
+.\"
+.\"
+.SS State
+This primitive is valid in state
+.BR CCS_WIND_MORE .
+The new state is
+.BR CCS_WREQ_INFO .
+.\"
+.\"
+.SS Modes
+This primitive is valid in UNI (Network and User) mode, and for compatibility in NNI mode.
+.\"
+.\"
+.SS Originator
+This primitive is originated by the CC User.
+.\"
+.\"
+.SH NOTES
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

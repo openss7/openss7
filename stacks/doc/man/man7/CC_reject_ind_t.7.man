@@ -1,0 +1,1 @@
+.so CC_REJECT_IND.7.man

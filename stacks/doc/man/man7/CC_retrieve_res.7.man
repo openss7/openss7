@@ -1,0 +1,1 @@
+.so CC_RETRIEVE_RES.7.man

@@ -1,0 +1,395 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: x400p.4.man,v 0.9.2.2 2004/04/17 21:38:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 21:38:41 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH X400P 4 "$Date: 2004/04/17 21:38:41 $" "$Name:  $" "OpenSS7 Devices"
+.SH NAME
+.B x400p
+\- T400P-SS7 and E400P-SS7 Card Drivers
+.SH SYNOPSIS
+.PP
+.B #incldue <ss7/lmi.h>
+.br
+.B #incldue <ss7/lmi_ioctl.h>
+.br
+.B #incldue <ss7/sdli.h>
+.br
+.B #incldue <ss7/sdli_ioctl.h>
+.br
+.B #incldue <ss7/sdti.h>
+.br
+.B #incldue <ss7/sdti_ioctl.h>
+.br
+.B #incldue <ss7/sli.h>
+.br
+.B #incldue <ss7/sli_ioctl.h>
+.br
+.B #incldue <ss7/chi.h>
+.br
+.B #incldue <ss7/chi_ioctl.h>
+.br
+.B #incldue <ss7/mxi.h>
+.br
+.B #incldue <ss7/mxi_ioctl.h>
+.HP
+.BI "int " x400p_stream " = open(" x400p_device ", " flags );
+.SH DESCRIPTION
+.PP
+.B X400P
+is a device driver for the Digium T400P and X400P 4-span T1/E1 PCI cards.
+.PP
+.B X400P
+is implemented as a
+.IR STREAMS (4)
+device driver that provides the Signalling Data Link Interface,
+.BR sdli (7),
+Signalling Data Terminal Interface,
+.BR sdti (7),
+Signalling Link Interface,
+.BR sli (7),
+Channel Interface,
+.BR chi (7),
+and
+Multiplex Interface,
+.BR mxi (7).
+The
+.BR sdli (7),
+.BR sdti (7),
+and
+.BR sli (7),
+interface can be used directly, or the
+.BR sdl (4),
+.BR sdt (4),
+and
+.BR sl (4),
+modules can be pushed over a Channel Interface,
+.BR chi (7).
+.PP
+.B X400P
+provides the several devices that are directly compatible with a number of
+stream types and interface protocols.  To select a stream type,
+.I x400p_device
+can be selected from the following devices:
+.\"
+.\"
+.\"
+.TP
+.I /dev/x400p-ss7
+This device provides an
+.BR SDL ,
+.BR SDT ,
+and
+.BR SL ,
+protocol service interface using SDL-, SDT- and SL-primitives of the
+.BR sdli (7),
+.BR sdti (7),
+or
+.BR sli (7).
+This interface is suitable to be usde directly as an
+.BR sdli (7)
+device, or have an
+.BR sdt (4),
+or
+.BR sl (4),
+module pushed over the
+.BR sdli (7)
+or
+.BR sdti (7)
+interfaces.  At the
+.BR sli (7)
+interface level, this device is suitable to be linked under an
+.BR mtp (4)
+or
+.BR m2ua (4)
+mulitplexor.
+The only bearer channel access that this device provides is using the
+.BR sdli (4)
+interface.
+.TP
+.I /dev/x400p-ch
+This device provides a
+.BR CH " and " MX
+protocol service interface using
+CH- and MX-primitives of the
+.BR chi (7)
+and
+.BR mxi (7).
+The
+.BR mxi (7).
+interface to this device is suitable to be linked under a Media Gateway
+.BR mg (4),
+multiplexor for complete bearer channel switching and control.
+The
+.BR chi (7)
+interface to this device is suitable to have
+.BR sdl (4),
+.BR sdt (4)
+and
+.BR sl (4)
+modules pushed over the channel to provide a
+Signalling Link Interface,
+.BR sli (7)
+stream that can be then linked under a
+.BR mtp (4)
+or
+.BR m2ua (4)
+multiplexor for
+.BR SS7 (4)
+support.
+.PP
+The
+.IR /dev/x400p-ss7 " and " /dev/x400p-ch
+drivers are separate loadable modules and cannot be loaded at the same time.
+.I /dev/x400p-sss7
+is the older vintage driver that supported SS7 with meager support for bearer
+channel access.
+.I /dev/x400p-ch
+is the newer vintage channel driver that provides complete support for bearer
+channel access and uses pushable modules over a Channel Interface,
+.BR chi (7),
+to support SS7.  These modules are the
+.BR sdl (4),
+.BR sdt (4),
+and
+.BR sl (4)
+modules.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of Local Management Interface IO controls,
+.BR lmi_ioctl (4),
+using the
+.BR ioctl (2)
+and
+.I I_STR
+command to the
+.BR streamio (2)
+system call on the
+.IR x400p_stream
+file descriptor.
+The
+.I /dev/x400p-ss7
+device supports the SS7 Local Management Interface IO controls at the
+.BR sdl_ioctl (4),
+.BR sdt_ioctl (4),
+and
+.BR sl_ioctl (4),
+levels.
+The
+.I /dev/x400p-ch
+devices supports the MG Local Management Interface IO controls at the
+.BR ch_ioctl (4),
+and
+.BR mx_ioctl (4),
+levels.
+This driver uses the
+.BR sdl (4),
+.BR sdt (4),
+and
+.BR sl (4)
+modules to support the SS7 Local Management Interface IO controls.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B X400P
+.I /dev/x400p-ss7
+device supports all of the management IO controls described in
+.BR sdl_ioctl (4),
+.BR sdt_ioctl (4)
+and
+.BR sl_ioctl (4),
+with the following exceptions:
+.IP \(em 4
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+The
+.B X400P
+.I /dev/x400p-ch
+device supports all of the management IO controls described in
+.BR ch_ioctl (4),
+and
+.BR mx_ioctl (4),
+with the following exceptions:
+.IP \(em 4
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.I /dev/x400p-ss7
+device driver is deprecated.  For new applications use the
+.I /dev/x400p-ch
+driver and push the
+.BR sdl (4),
+.BR sdt (4),
+and
+.BR sl (4),
+modules.
+.\"
+.\"
+.SH BUGS
+.PP
+Two drivers is confusing and the deprecated driver must be removed.
+.\"
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SS7 (4),
+.BR ISDN (4),
+.BR MG (4),
+.BR ss7confd (8),
+.BR sdli (7),
+.BR sdti (7),
+.BR sli (7),
+.BR chi (7),
+.BR mxi (7),
+.BR sdl_ioctl (4),
+.BR sdt_ioctl (4),
+.BR sl_ioctl (4),
+.BR ch_ioctl (4),
+.BR mx_ioctl (4),
+.BR sdl (4),
+.BR sdt (4),
+.BR sl (4),
+.BR mg (4),
+.BR mtp (4),
+.BR m2ua (4).
+.SH "FILES"
+.PP
+.BR <ss7/lmi.h> ,
+.BR <ss7/lmi_ioctl.h> ,
+.BR <ss7/sdli.h> ,
+.BR <ss7/sdli_ioctl.h> ,
+.BR <ss7/sdti.h> ,
+.BR <ss7/sdti_ioctl.h> ,
+.BR <ss7/sli.h> ,
+.BR <ss7/sli_ioctl.h> ,
+.BR <ss7/chi.h> ,
+.BR <ss7/chi_ioctl.h> ,
+.BR <ss7/mxi.h> ,
+.BR <ss7/mxi_ioctl.h> .
+.SH VERSIONS
+.PP
+This manpage was updated $Date: 2004/04/17 21:38:41 $ for
+.B strss7
+release $Name:  $($Revision: 0.9.2.2 $).
+.PP
+The
+.B X400P
+driver is specific to the
+.B OpenSS7
+.BR SS7 (4)
+and
+.BR ISDN (4)
+stacks.
+The
+.B X400P
+driver will first appear in
+.BR strss7-0.8.4 .
+At that time, the deprecated
+.I /dev/x400p-ss7
+driver will be removed.
+.\"
+.\"
+.XX
+.[
+q700
+.]
+.[
+q701
+.]
+.[
+q702
+.]
+.[
+q703
+.]
+.[
+t1.111
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

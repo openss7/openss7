@@ -1,0 +1,156 @@
+'\" t
+.\" -*- nroff -*-
+.\"
+.\" @(#) $Id: sdl_xxx.8.man,v 0.9.2.1 2004/04/17 21:18:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997-2001  Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 21:18:08 $ by $Author: brian $
+.\"
+.\" $Log: sdl_xxx.8.man,v $
+.\" Revision 0.9.2.1  2004/04/17 21:18:08  brian
+.\" - Converted to cooked manpages.
+.\"
+.\" Revision 0.9  2004/01/17 08:02:21  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:38  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7  2001/01/17 03:04:52  brian
+.\" Added new man pages.
+.\"
+.\" Revision 0.7  2001/01/17 00:28:38  brian
+.\" Added sdl_udp man page.
+.\"
+.\" Revision 0.7.2.1  2001/01/14 11:07:55  brian
+.\" Changed headers back to GPL.
+.\"
+.\" Revision 0.7  2000/11/29 02:11:01  brian
+.\" Added man pages for drivers.
+.\"
+.\" =========================================================================
+.TH SDL_xxx 8 "$Date: 2004/04/17 21:18:08 $" "OpenSS7 Man Page" "OpenSS7 Programmer's Manual"
+.SH "NAME"
+sdl_xxx \- SDL emulation using \fIsome communications mechanism\fR
+.SH "SYNOPSIS"
+.nf
+.B #include <sys/streams.h>
+.B #include <ss7/sdli.h>
+.B #include <ss7/sdli_ioctl.h>
+.sp
+\fIfd\fB = open("\fI/dev/ss7-sdl\fRxxx\fI0\fB", \fIflags\fB);
+\fIret\fB = ioctl(\fIfd\fB, \fIcmd\fB, ... /* \fIarg\fB */ );
+.fi
+.SH "DESCRIPTION"
+.PP
+SDL_xxx emulates a Signalling Data Link using a Linux kernel PACKET socket to
+emulate the physical communications channel.
+.PP
+.I This SDL driver has not yet been written.
+
+.\" .SH "ERROR HANDLING"
+
+.\" .SH "CAVEATS"
+.\" .PP
+.\" SDL_UDP was never intended to be used as, or in conjunction with, a real SS7
+.\" signalling network.  It is intended for laboratory use and experimentation
+.\" only.  SDL_UDP makes no attempt to perform all of the Level 2 functions of
+.\" SS7.  It is mostly intended as a simple way of providing a large number of
+.\" L2 links for testing upper level protocol modules (such as MTP).
+
+.SH "SEE ALSO"
+.PP
+.BR devi (7),
+.BR getmsg (2),
+.BR ioctl (2),
+.BR lmi (7),
+.BR mtpi (7),
+.BR putmsg (2),
+.BR read (2),
+.BR sdl (8),
+.BR sdli (8),
+.BR sdt (8),
+.BR sdti (7),
+.BR sl (8),
+.BR sli (7),
+.BR slsi (7),
+.BR ss7d (8),
+.BR streamio (2),
+.BR write (2)
+
+.\" .SH "BUGS"
+.\" .PP
+.\" No known bugs.
+
+.SH "AUTHOR"
+.PP
+Brian F. G. Bidulock, <bidulock@openss7.org>
+
+.SH "HISTORY"
+.PP
+This STREAMS interface for SS7 is an original part of the \fIOpenSS7\fR package.
+
+.SH "REFERENCES"
+.PP
+.TS
+tab(:);
+l 1 li.
+.TH
+[Q702]:ITU-T Rec. Q.702 Signalling Data Link
+[Q703]:ITU-T Rec. Q.703 Signalling Link
+[Q704]:ITU-T Rec. Q.704 Message Transfer Part
+.TE
+
+.SH "COPYRIGHT NOTICE"
+.PP
+Copyright \(co 1997-2001  Brian Bidulock.  All Rights Reserved.
+.sp
+.ce 1
+PERMISSION NOTICE
+.PP
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+.PP
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copyring, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+.PP
+Since the Linux kernel and libraries are constantly changing, this manual page
+may be incorrect or out-of-date.  The author(s) assume no responsibility for
+errors or omissions, or for damage resulting from the use of the information
+contained herein.  The author(s) may not have taken the same level of care in
+the production of this manual, which is licensed free of charge, as they might
+when working professionally.
+.PP
+Formatted or processed versions of this manual, if unaccompanied by the
+source, must acknowledge the copyright and authors of this work.
+

@@ -1,0 +1,125 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CH_OK_ACK.7.man,v 0.9.2.2 2004/04/17 23:05:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CH_OK_ACK 7 "$Date: 2004/04/17 23:05:11 $" "$Name:  $" "Channel Interface"
+.SH NAME
+.B CH_OK_ACK, CH_ok_ack, CH_ok_ack_t
+\- success acknowledgment
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PCPROTO
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CH_ok_ack {
+    ch_ulong ch_primitive;      /* always CH_OK_ACK */
+    ch_ulong ch_correct_prim;   /* correct primitive */
+    ch_ulong ch_state;          /* resulting state */
+} CH_ok_ack_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Provides local acknowlegment of receipt and processing of a primitive that
+requires local acknowledgment and has no other means of acknowledgment.
+.SH PARAMETERS
+This primitive contains the following parameters:
+.TP
+.I ch_primitive
+indicates the primitive type.  Always
+.BR CH_OK_ACK .
+.TP
+.I ch_correct_prim
+indicates the primitive that was received and processed correctly.  This field
+can be one of the following values:
+.sp
+.TS
+tab(:);
+ll.
+\fBCH_INFO_REQ\fR(7):information request
+\fBCH_OPTMGMT_REQ\fR(7):options management request
+\fBCH_ATTACH_REQ\fR(7):attach channel request
+\fBCH_DETACH_REQ\fR(7):detach channel request
+\fBCH_ENABLE_REQ\fR(7):enable channel request
+\fBCH_DISABLE_REQ\fR(7):disable channel request
+\fBCH_CONNECT_REQ\fR(7):channel connection request
+\fBCH_DISCONNECT_REQ\fR(7):channel disconnection request
+.TE
+.TP
+.I ch_state
+indicates the resulting state of the channel service provider.  This is the
+state to which the correct primitive moves the state machine.
+.SH ORIGINATOR
+Channel Service Provider.
+.SH STATE
+This primitive is issued in any state when a local acknowledgment is
+outstanding.  The resulting state is the state to which the state machine
+moves for the correct primitive as indicated in field
+.IR ch_state .
+.SH "SEE ALSO"
+.BR CH_INFO_REQ (7),
+.BR CH_OPTMGMT_REQ (7),
+.BR CH_ATTACH_REQ (7),
+.BR CH_DETACH_REQ (7),
+.BR CH_ENABLE_REQ (7),
+.BR CH_DISABLE_REQ (7),
+.BR CH_CONNECT_REQ (7),
+.BR CH_DISCONNECT_REQ (7).
+.SH VERSIONS
+This manpage was written for CHI Version 1.
+.XX
+.[
+chi
+.]
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,367 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CC_BIND_REQ.7.man,v 0.9.2.2 2004/04/17 23:05:04 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:04 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_BIND_REQ 7 "$Date: 2004/04/17 23:05:04 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_BIND_REQ
+\- bind protocol address request
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The format of the message is one
+.B M_PROTO
+message block and its structure is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_bind_req {
+    ulong cc_primitive;         /* always CC_BIND_REQ */
+    ulong cc_addr_length;       /* length of address */
+    ulong cc_addr_offset;       /* offset of address */
+    ulong cc_setup_ind;         /* req # of setup inds to be queued */
+    ulong cc_bind_flags;        /* bind options flags */
+} CC_bind_req_t;
+
+/* Flags associated with CC_BIND_REQ */
+#define CC_DEFAULT_LISTENER             0x000000001UL
+#define CC_TOKEN_REQUEST                0x000000002UL
+#define CC_MANAGEMENT                   0x000000004UL
+#define CC_TEST                         0x000000008UL
+#define CC_MAINTENANCE                  0x000000010UL
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive requests that the CCS provider bind a CCS user entity to a call
+control address (circuit, circuit group) and negotiate the number of setup
+indications allowed to be outstanding by the CCS provider for the specified
+CCS user entity being bound.
+.\"
+.\"
+.SS Parameters
+.PP
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+specifies the primitive type.  Always
+.BR CC_BIND_REQ .
+.TP
+.I cc_addr_length
+Is the length in bytes of the call control (circuit, circuit group) address to be bound to the stream.
+.TP
+.I cc_addr_offset
+Is the offset from the beginning of the
+.B M_PROTO
+block where the call control (circuit, circuit group) address begins.
+.TP
+.I cc_setup_ind
+Is the requested number of setup indications (simultaneous incoming calls)
+allowed to be outstanding by the CCS provider for the specified protocol
+address.  (If the number of outstanding setup indications equals
+.I cc_setup_ind,
+the CCS provider need not discard further incoming setup indications, but may
+choose to queue them internally until the number of outstanding setup
+indications drops below the
+.I cc_setup_ind
+number.) Only one stream per call control address is allowed to have a
+.I cc_setup_ind
+number value greater than zero.  This indicates to the CCS provider that this
+stream is the listener stream for the CCS user.  This stream will be used by
+the CCS provider for setup indications for that call control address.
+.sp
+If a stream is bound as a listener stream, it is still able to initiate outgoing call setup requests.
+.TP
+.I cc_bind_flags
+See
+.IR \*(lqFlags\*(rq ,
+below.
+.\"
+.\"
+.SS Flags
+.PP
+.\"
+.\"
+.PP
+The
+.I cc_bind_flags
+field is a bitwise OR of zero or more of the following flags:
+.\"
+.\"
+.TP 16
+.B CC_DEFAULT_LISTENER
+When set, this flag specifies that this stream is the "default listener
+stream."  This stream is used to pass setup indications (or continuity check
+requests) for all incoming calls that contain protocol identifiers that are
+not bound to any other listener, or when a listener stream with
+.I cc_setup_ind
+value of greater than zero is not found.  Also, the default listener will
+receive all incoming call indications that contain no user data (i.e., test
+calls) and all maintenance indications (i.e.,
+.BR CC_MAINT_IND (7)).
+Only one default listener stream is allowed per occurrence of CCI.  An attempt
+to bind a default listener stream when one is already bound should result in
+an error (of type
+.RB [ CCADDRBUSY ]).
+.TP
+.B CC_TOKEN_REQUEST
+When set, this flag specifies to the CCS provider that the CCS user has
+requested that a "token" be assigned to the stream (to be used in the call
+response message), and the token value be returned to the CCS user via the
+.BR CC_BIND_ACK (7)
+primitive.  The token assigned by the CCS provider can then be used by the CCS
+user in a subsequent
+.BR CC_SETUP_RES (7)
+primitive to identify the stream on which the call is to be established.
+.TP
+.B CC_MANAGEMENT
+When set, this flag specifies to the CCS provider that this stream is to be
+used for circuit management indications for the specified addresses.
+.TP
+.B CC_TEST
+When set, this flag specifies to the CCS provider that this stream is to be
+used for continuity and test call indications for the specified addresses.
+.TP
+.B CC_MAINTENANCE
+When set, this flag specifies to the CCS provider that this stream is to be
+used for maintenance indications for the specified addresses.
+.\"
+.\"
+.SS Rules
+.PP
+.\"
+.\"
+.IP (1) 4
+Only one of
+.BR CC_DEFAULT_LISTENER ,
+.BR CC_MANAGMENT ,
+.BR CC_TEST " and "
+.B CC_MAINTENANCE
+may be set.
+.\"
+.\"
+.IP (2)
+If the number of setup indications,
+.IR cc_setup_ind ,
+is non-zero, the stream is bound as a listening stream.  Listening streams
+will receive all calls, test call, continuity test indications, management
+indications and maintenance indications that are incoming to the address
+bound.
+.\"
+.\"
+.IP (3)
+The
+.B CC_DEFAULT_LISTENER
+will receive all incoming calls, test calls, continuity test indications,
+management indications and maintenance indications that have no other
+listening stream.  There can only be one stream bound with
+.B CC_DEFAULT_LISTENER
+set for any given call control address scope.
+.\"
+.\"
+.IP (4)
+Streams bound with the
+.BR CC_MANAGEMENT
+flag set will receive only management indications and will not receive any
+calls;
+.BR CC_TEST ,
+continuity test indications and test calls; and
+.BR CC_MAINTENANCE ,
+only maintenance indications.
+.\"
+.\"
+.SS State
+.PP
+This primitive is valid in state
+.B CCS_UNBND
+(see Appendix B).
+The new state is
+.BR CCS_WACK_BREQ .
+.\"
+.\"
+.SS Modes
+.PP
+This primitive is valid in all modes.
+.\"
+.\"
+.SS Originator
+.PP
+This primitive is originated by the CC User.
+.\"
+.\"
+.SH ACKNOWLEDGMENTS
+.PP
+The CCS provider will generate one of the following acknowledgments upon
+receipt of the
+.BR CC_BIND_REQ (7)
+primitive:
+.HP
+.IR "Successful" :
+Correct acknowledgment of the primitive is indicated via the
+.BR CC_BIND_ACK (7)
+primitive.
+.HP
+.IR "Non-fatal errors" :
+These errors will be indicated via the
+.BR CC_ERROR_ACK (7)
+primitive.
+.\"
+.\"
+.SH ERRORS
+.PP
+The applicable non-fatal errors are as follows:
+.\"
+.\"
+.TP 16
+.RB [ CCSYSERR ]
+A system error occurred and the UNIX system error is indicated in the
+primitive.
+.TP
+.RB [ CCOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ CCBADADDR ]
+The call control address was in an incorrect format or the address contained
+illegal information.  It is not intended to indicate protocol errors.
+.TP
+.RB [ CCNOADDR ]
+The CCS user did not provide a call control address and the CCS provider could
+not allocate an address to the user.
+.TP
+.RB [ CCADDRBUSY ]
+The CCS user attempted to bind a second stream to a call control address with
+the
+.I cc_setup_ind
+number set to a non-zero value, or attempted to bind a second stream with the
+.B CC_DEFAULT_LISTENER
+flag value set to non-zero.
+.TP
+.RB [ CCBADFLAG ]
+The flags were invalid or unsupported, or the combination of flags was
+invalid.  This error is returned if more than one of
+.BR CC_TEST ", " CC_MANAGEMENT ", or " CC_MAINTENANCE
+flags are set.
+.TP
+.RB [ CCBADPRIM ]
+The primitive format was incorrect (i.e. too short).
+.TP
+.RB [ CCACCESS ]
+The user did not have proper permissions.
+.\"
+.\"
+.SH NOTES
+.PP
+.IP \(em 4
+The call control address bound can be an address of any scope valid for the
+protocol.
+See the protocol specific documentation for formats and rules governing call
+control addresses.
+.\"
+.\"
+.IP \(em
+Streams bound at one scope take precedence over a stream bound at another
+scope as specified in the protocol specific documentation.
+.\"
+.\"
+.IP \(em
+The bind flag,
+.BR CC_TEST ,
+is only used for protocols supporting test calls, of which ISUP is the only
+current protocol.  For all other protocols the
+.B CC_TEST
+bind flag is invalid if set.
+.\"
+.\"
+.IP \(em
+For protocols supporting call references, any setup indications arriving for
+the global or dummy call reference will be delivered to a listening stream
+bound with the management flag,
+.BR CC_MANAGEMENT ,
+set, or the default listener bound with the
+.B CC_DEFAULT_LISTENER
+flag set.
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,206 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CH_DISCONNECT_REQ.7.man,v 0.9.2.2 2004/04/17 23:05:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CH_DISCONNECT_REQ 7 "$Date: 2004/04/17 23:05:11 $" "$Name:  $" "Channel Interface"
+.SH NAME
+.B CH_DISCONNECT_REQ, CH_disconnect_req, CH_disconnect_req_t
+\- channel disconnection request
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CH_disconnect_req {
+    ch_ulong ch_primitive;      /* always CH_DISCONNECT_REQ */
+    ch_ulong ch_conn_flags;     /* direction to disconnect */
+    ch_ulong ch_slot;           /* slot within channel */
+} CH_disconnect_req_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Requests that the channel service provider disconnect the channel associated
+with the stream upon which the primitive is issued, for the directions
+specified and the multiple slot channel slot specified.
+.PP
+Disconnection may be peformed locally by the channel service provider, or may
+require interaction with the transmission peer.
+.SH PARAMETERS
+This primitive contains the following parameters:
+.TP
+.I ch_primitive
+specifies the primitive type.  Always
+.BR CH_DISCONNECT_REQ .
+.TP
+.I ch_conn_flags
+specifies the disconnection flags.  See
+.IR \*(lqFLAGS\*(rq ,
+below.
+.TP
+.I ch_slot
+specifies the slot within a multiple slot channel to disconnect.  If the
+channel is not a multiple slot channel (i.e, it is monophonic), then this
+field is coded zero (0) by the channel service user and ignored by the
+channels service provider.
+.SH FLAGS
+The
+.I ch_conn_flags
+field contains a bitwise OR of one or more of the following disconnection
+direction flags:
+.TP
+.B CHF_RX_DIR
+specifies that the disconnect is requested in the receive direction.
+.TP
+.B CHF_TX_DIR
+specifies that the disconnect is requested in the transmit direction.
+.TP
+.B CHF_BOTH_DIR
+specifies that the disconnect is requested in both directions.
+.SH ORIGINATOR
+Channel Service User.
+.SH STATE
+This primitive is valid in state
+.B CHS_CONNECTED
+for the directions specified.
+The resulting state is
+.B CHS_ENABLED
+for the directions specified.
+.SH RULES
+These primitives require the channel service provider to generate one of the
+following acknowledgments on receipt of the the primitive, and the channel
+service user must wait for the acknowledgment before issuing any other
+primitives:
+.TP
+.B Successful
+Correct acknowledgment of the primitive is indicated with the
+.BR CH_OK_ACK (7)
+primitive.  In this case, the resulting state is
+.B CHS_ENABLED
+for the directions specified.
+.TP
+.B Non-fatal errors
+These errors will be indicated with the
+.BR CH_ERROR_ACK (7)
+primitive.  In this case, the resulting state is unchanged and remains the
+stame as the state in which the primitive was issued.
+.SH ERRORS
+The allowable errors are as follows:
+.TP
+.RB [ CHSYSERR ]
+UNIX system error.
+A UNIX system error occured while executing the primitive and the UNIX error
+number,
+.IR errno (3),
+is indicated in the
+.I ch_unix_error
+field of the
+.BR CH_ERROR_ACK (7)
+primitive.
+.\".TP
+.\".RB [ CHBADADDR ]
+.\"Bad address format or content.
+.TP
+.RB [ CHOUTSTATE ]
+Interface out of state.
+The primitive would place the interface out of state.  The
+.B CH_DISCONNECT_REQ
+primitive is only valid in state
+.B CHS_CONNECTED
+for the specified directions.
+.\".TP
+.\".RB [ CHBADOPT ]
+.\"Bad options format or content.
+.\".TP
+.\".RB [ CHBADPARM ]
+.\"Bad parameter format or content.
+.\".TP
+.\".RB [ CHBADPARMTYPE ]
+.\"Bad paramater structure type.
+.TP
+.RB [ CHBADFLAG ]
+Bad flag.
+The flags specified in
+.I ch_conn_flags
+are invalid or the direction specified does is not supported on the requesting
+stream or by the channel service provider.
+.TP
+.RB [ CHBADPRIM ]
+Bad primitive.
+The primitive type is unrecognized, or the primitive contained in the
+.B M_PROTO
+message block is poorly formatted.
+.TP
+.RB [ CHNOTSUPP ]
+Primitive not supported.
+The primitive type is recognized, but is not supported on the requesting
+stream or by the channel service provider.
+.\".TP
+.\".RB [ CHNOADDR ]
+.\"Address could not be assigned.
+.\".TP
+.\".RB [ CHADDRBUSY ]
+.\"Address is busy.
+.SH "SEE ALSO"
+.BR CH_DISCONNECT_CON (7),
+.BR CH_DISCONNECT_IND (7),
+.BR CH_OK_ACK (7),
+.BR CH_ERROR_ACK (7).
+.SH VERSIONS
+This manpage was written for CHI Version 1.
+.XX
+.[
+chi
+.]
+.[
+$LIST$
+.]
+.TI

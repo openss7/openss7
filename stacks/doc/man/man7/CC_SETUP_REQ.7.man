@@ -1,0 +1,726 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CC_SETUP_REQ.7.man,v 0.9.2.2 2004/04/17 23:05:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:07 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_SETUP_REQ 7 "$Date: 2004/04/17 23:05:07 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_SETUP_REQ
+\- call setup request
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The format of the message is one
+.B M_PROTO
+message block.  The structure of the
+.B M_PROTO
+message block is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_setup_req {
+    ulong cc_primitive;         /* always CC_SETUP_REQ */
+    ulong cc_user_ref;          /* user call reference */
+    ulong cc_call_type;         /* call type */
+    ulong cc_call_flags;        /* call flags */
+    ulong cc_cdpn_length;       /* called party number length */
+    ulong cc_cdpn_offset;       /* called party number offset */
+    ulong cc_opt_length;        /* optional parameters length */
+    ulong cc_opt_offset;        /* optional parameters offset */
+    ulong cc_addr_length;       /* connect to address length */
+    ulong cc_addr_offset;       /* connect to address offset */
+} CC_setup_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive requests that the CCS provider make a call to the specified
+destination.
+.\"
+.\"
+.SS Parameters
+.PP
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+specifies the primitive type.  Always
+.BR CC_SETUP_REQ .
+.TP
+.I cc_user_ref
+Specifies a reference number known to the CCS user that uniquely identifies
+the current setup request.  When this value is non-zero, it permits the CCS
+User to have multiple outstanding setup requests pending on the same stream.
+Responses made by the CCS provider to the
+.B CC_SETUP_REQ
+primitive will contain this CCS user call attempt reference.
+.TP
+.I cc_call_type
+Specifies the type of call to be set up.  Call types supported are dependent
+upon the CCS provider and protocol, see
+.IR \*(lqNOTES\*(rq ", below, "
+for call types for specific protocols.
+.TP
+.I cc_call_flags
+Specifies a bit field of call options.  Call flags supported are dependent
+upon the CCS provider and protocol, see
+.IR \*(lqNOTES\*(rq ", below, "
+call flags for specific protocols.
+.TP
+.I cc_cdpn_length
+Specifies the length of the called party number parameter that conveys an
+address identifying the CCS user to which the call is to be established.  This
+field will accommodate variable length numbers within a range supported by the
+CCS provider.  If no called party number is provided by the CCS user, this
+field must be coded to zero.  The coding of the called party number is
+protocol and provider-specific.
+.TP
+.I cc_cdpn_offset
+Is the offset of the called party number from the beginning of the
+.B M_PROTO
+message block.
+.TP
+.I cc_opt_length
+Specifies the length of optional parameters to be conveyed in the call setup.
+This field will accomodate variable length addresses within a range supported
+by the CCS provider.  If no optional parameters are provided by the CCS user,
+this field must be coded to zero.  The format of optional parameters are
+protocol and provider-specific, see
+.IR \*(lqNOTES\*(rq ", below, "
+the format of optional parameters for specific protocols.
+.TP
+.I cc_opt_offset
+Specifies the offset of the optional parameters from the beginning of the
+.B M_PROTO
+message block.
+.TP
+.I cc_addr_length
+Specifies the length of the call control address parameter that conveys the
+call control address (circuit, circuit group) of the CCS user entity to which
+the call is to be established.  The semantics of the values in the
+.B CC_SETUP_REQ
+is identical to the values in the
+.BR CC_BIND_REQ .
+.TP
+.I cc_addr_offset
+Specifies the offset of the call control address from the beginning of the
+.B M_PROTO
+message block.
+.\"
+.\"
+.SS Rules
+.PP
+The following rules apply to the setup of calls to the specified addresses:
+.\"
+.\"
+.IP \(em 4
+If the
+.I cc_cdpn_length
+field in the
+.B CC_SETUP_REQ
+primitive is zero, then the CCS provider is to
+select a called party number for the call.  If the CCS provider cannot select
+a called party number for the call, the CCS provider responds with a
+.BR CC_ERROR_ACK (7)
+primitive with error
+.RB [ CCNOADDR ].
+.\"
+.\"
+.IP \(em
+If the
+.I cc_cdpn_length
+field in the
+.B CC_SETUP_REQ
+primitive is non-zero, the CCS provider is to setup
+the call to the specified number.  If the CCS provider cannot setup a call of
+the specified call type to the specified number the call will fail and the CCS
+provider will return a
+.BR CC_ERROR_ACK (7)
+with the appropriate error value (e.g.,
+.RB [ CCBADADDR ]).
+.\"
+.\"
+.PP
+The following rules apply to the call control addresses (trunk groups and
+circuit identifiers):
+.\"
+.\"
+.IP \(em 4
+If the CCS user does not specify a call control address (i.e.
+.I cc_addr_length
+is set to zero), then the CCS provider may attempt to assign a call control
+address, assign it a call reference and associate it with the stream for the
+duration of the call.
+.\"
+.\"
+.PP
+The following rules apply to the CCS user call attempt reference:
+.\"
+.\"
+.IP \(em 4
+If the CCS user does not specify a call attempt reference (i.e. the
+.I cc_user_ref
+is set to zero), then the CCS provider can only support one outstanding
+outgoing call attempt for the stream.
+.\"
+.\"
+.IP \(em
+If the CCS user wishes to setup multiple outgoing calls on the same stream,
+the CCS user associates a user call reference with each of the setup requests
+so that the indication, confirmation and acknolwedgement primitives can be
+associated with the specific call setup request.
+.\"
+.\"
+.IP \(em
+If the CCS user specifies a call
+attempt reference, all replies made by the CCS provider to this
+.B CC_SETUP_REQ
+primitive will contain the CCS user specified call attempt reference until
+either the call fails or is released, or after the CCS provider sends a
+.BR CC_SETUP_CON (7)
+primitive.
+.\"
+.\"
+.IP \(em
+User call references are only necessary if multiple outgoing calls are to be
+setup at the same time.
+.\"
+.\"
+.IP \(em
+User call references only need by valid until a setup confirmation,  call
+reattempt indication, release indication or call failure indication has been
+received in response to the setup request.  A setup confirmation will contain
+a CCS provider call reference which can be used to distinguish the call from
+other calls to the CCS provider after setup confirmation.
+.\"
+.\"
+.SS State
+.PP
+This primitive is valid in state
+.BR CCS_IDLE .
+The new state depends upon the information provided in the
+.B CC_SETUP_REQ
+message as follows:
+.\"
+.\"
+.IP \(em 4
+If the setup request specifies that a continuity check was performed on a
+previous circuit, the new state is
+.B CCS_WREQ_CCREP
+(awaiting report of the result of continuity test performed on the previous
+circuit).
+.\"
+.\"
+.IP \(em
+If the setup request specifies that a continuity check is required on the
+circuit, the new state is
+.B CCS_WIND_CTEST
+(awaiting indication of remote loop back on the circuit).
+.\"
+.\"
+.IP \(em
+If the setup request specifies that no continuity test is required on this or
+a previous circuit and that the called party number contains partial
+information, the new state is
+.B CCS_WIND_MORE
+(awaiting the indication that more information is required).
+.\"
+.\"
+.IP \(em
+If the setup request specifies that no continuity test is required on this or
+a previous circuit and that the called party number contains complete
+information, the new state is
+.B CCS_WCON_SREQ
+(awaiting confirmation of the setup request).
+.\"
+.\"
+.SS Modes
+.PP
+This primitive is valid in all modes.
+.\"
+.\"
+.SS Originator
+.PP
+This primitive is originated by the CC User.
+.\"
+.\"
+.SH ACKNOWLEDGMENTS
+.PP
+The following acknowledgments are valid for this primitive:
+.HP
+.IR "Successful Call Establishment" :
+This is indicated via the
+.BR CC_SETUP_CON (7)
+primitive.  This results in the Call Establishment state.  For
+.B CC_SETUP_REQ
+primitives where
+.B ISUP_NCI_CONT_CHECK_REQUIRED
+is set, or where the CCS provider otherwise determines that a continuity check
+is required on the circuit, success is still indicated via the
+.BR CC_SETUP_CON (7)
+primitive.  In this case, the
+.BR CC_SETUP_CON (7)
+primitive is not sent by the CCS provider unless the continuity check is
+successful.  For
+.B CCS_SETUP primitives where
+.B ISUP_NCI_CONT_CHECK_PREVIOUS
+is set, the
+.BR CC_SETUP_CON (7)
+primitive is not sent by the CCS provider until the CCS user sends a
+.BR CC_CONT_REPORT_REQ (7)
+primitive indicating that continuity check on the previous circuit has been
+successful.  Receipt of the
+.BR CC_SETUP_CON (7)
+primitive always results in the Call Establishment state.
+.HP
+.IR "Unsuccessful Call Establishment" :
+This is indicated via the
+.BR CC_CALL_REATTEMPT_IND "(7), " CC_CALL_FAILURE_IND "(7) or " CC_RELEASE_IND (7)
+primitives.  For example, a call may be rejected because either the called CCS
+user cannot be reached, or the CCS provider and/or the called CCS user did not
+agree on the specified call type or options.  This results in the Idle state.
+Where the
+.BR CC_CALL_REATTEMPT_IND "(7) or " CC_RELEASE_IND (7)
+primitives are sent before the
+.BR CC_SETUP_CON (7)
+primitive, the
+.BR CC_CALL_REATTEMPT_IND "(7) or " CC_RELEASE_IND (7)
+primitives will contain the CCS user specified call attempt reference.
+.HP
+.IR "Non-fatal errors" :
+These are indicated via the CC_ERROR_ACK primitive.
+.\"
+.\"
+.SH ERRORS
+.PP
+The applicable non-fatal errors are defined as follows:
+.\"
+.\"
+.TP 16
+.RB [ CCSYSERR ]
+A system error has occurred and the UNIX system eror is indicated in the
+.BR CC_ERROR_ACK (7)
+primitive.
+.TP
+.RB [ CCOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ CCBADADDR ]
+The call control address as specified in the primitive was in an incorrect
+format, or the address contained illegal information.
+.TP
+.RB [ CCBADDIGS ]
+The called party number was in the incorrect format, or contained illegal
+information.  This is used only to handle coding errors of the number and is
+not intended to provide for protocol errors.  Protocol errors should be
+conveyed in the
+.BR CC_CALL_REATTEMPT_IND "(7), " CC_CALL_FAILURE_IND "(7) or " CC_RELEASE_IND (7)
+primitives.
+.TP
+.RB [ CCBADOPT ]
+The optional parameters were in an incorrect format, or contained illegal
+information.
+.TP
+.RB [ CCNOADDR ]
+The user did not provide a called party number field and one was required by
+the call type.  The CCS provider could not select a called party number.
+.TP
+.RB [ CCADDRBUSY ]
+The CCS provider could not use the specified address because the specified
+address is already in use.
+.TP
+.RB [ CCBADCLR ]
+The call reference specified in the primitive was incorrect or illegal (not
+unique).
+.TP
+.RB [ CCBADPRIM ]
+The primitive was of an incorrect format (i.e. too small, or an offset is out
+of range).
+.TP
+.RB [ CCACCESS ]
+The user did not have proper permissions for the use of the requested address
+or options.
+.\"
+.\"
+.SH NOTES
+.PP
+.sp
+.\"
+.\"
+.PP
+.B "Corrigendum for Q.764 and ANSI T1.113 conformance:"
+.PP
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address and options format and
+.BR isup (4))
+.\"
+.\"
+.IP \(em 4
+The called party number, specified by
+.IR cc_cdpn_length " and " cc_cdpn_offset ,
+is formatted as specified in Q.763, ANSI T1.113,
+without the parameter type or length octets.
+.\"
+.\"
+.IP \(em
+The call type, specified in
+.IR cc_call_type ,
+can be one of the following call types:
+.\"
+.\"
+.RS
+.TP
+.B ISUP_CALL_TYPE_SPEECH
+.TP
+.B ISUP_CALL_TYPE_64KBS_UNRESTRICTED
+.TP
+.B ISUP_CALL_TYPE_3_1kHZ_AUDIO
+.TP
+.B ISUP_CALL_TYPE_64KBS_PREFERRED
+.TP
+.B ISUP_CALL_TYPE_2x64KBS_UNRESTRICTED
+.TP
+.B ISUP_CALL_TYPE_384KBS_UNRESTRICTED
+.TP
+.B ISUP_CALL_TYPE_1536KBS_UNRESTRICTED
+.TP
+.B ISUP_CALL_TYPE_1920KBS_UNRESTRICTED
+.RE
+.\"
+.\"
+.IP \(em
+Q.764 conforming CCS providers must support the following minimal set of call types:
+.sp
+.B ISUP_CALL_TYPE_SPEECH
+.br
+.B ISUP_CALL_TYPE_64KBS_UNRESTRICTED
+.br
+.B ISUP_CALL_TYPE_3_1kHZ_AUDIO
+.br
+.B ISUP_CALL_TYPE_64KBS_PREFERRED
+.\"
+.\"
+.IP \(em
+The call flags, specified in
+.IR cc_call_flags ,
+can be one of the following flags:
+.\"
+.RS
+.\"
+.\"
+.PP
+The following flags correspond to bits in the
+.I Nature of Connection Indicators
+parameter of Q.763:
+.\"
+.\"
+.TP
+.BR ISUP_NCI_ONE_SATELLITE_CCT ", " ISUP_NCI_TWO_SATELLITE_CCT
+When one of these flags is set it specifies that either one or two satellite
+circuits are present in the connection.  Otherwise, it specifies that no
+satellite circuits are present in the connection.
+Only one of these two flags may be set.
+.\"
+.\"
+.TP
+.BR ISUP_NCI_CONT_CHECK_REQUIRED ", " ISUP_NCI_CONT_CHECK_PREVIOUS
+When one of these flags is set, it specifies that either a continuity check is
+required on the connection leg, or that a continuity check is peformed on a
+previous connnection leg.  Otherwise, it specifies that a continuity check is
+not required on the connection leg.
+Only one of these two flags may be set.
+.\"
+.\"
+.TP
+.B ISUP_NCI_OG_ECHO_CONTROL_DEVICE
+When set, indicates that an outgoing half echo control device is included on
+the connection.  Otherwise, that no outgoing half echo control device is
+included.
+.\"
+.\"
+.PP
+The following flags correspond to bits in the
+.I Forward Call Indicators
+parameter of Q.763
+.\"
+.\"
+.TP
+.B "ISUP_FCI_INTERNATIONAL_CALL"
+When this flag is set, the call is to be treated as an international call.
+Otherwise, the call is to be treated as a national call.
+.\"
+.\"
+.TP
+.BR ISUP_FCI_PASS_ALONG_E2E_METHOD_AVAILABLE ", " ISUP_FCI_SCCP_E2E_METHOD_AVAILABLE
+When one of these flags is set, either the pass along end-to-end method is
+available or the SCCP end-to-end method is available.  Otherwise, no
+end-to-end method is available and only link-by-link method is available.
+Only one of these two flags may be set.
+.\"
+.\"
+.TP
+.B "ISUP_FCI_INTERWORKING_ENCOUNTERED"
+When this flag is set, interworking has been encountered on the call.
+Otherwise, no interworking has been encountered on the call.
+.\"
+.\"
+.TP
+.B "ISUP_FCI_E2E_INFORMATION_AVAILABLE"
+When this flag is set, end-to-end information is now available.  Otherwise, no
+end-to-end information is available.
+.\"
+.\"
+.TP
+.B "ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY"
+When this flag is set, ISDN User Part has been used all the way on the call.
+Otherwise, ISDN User Part has not been used all the way.
+.\"
+.\"
+.TP
+.B "ISUP_FCI_ORIGINATING_ACCESS_ISDN"
+When this flag is set, the originating access is ISDN.  Otherwise, the
+originating access is non-ISDN.
+.\"
+.\"
+.TP
+.BR ISUP_FCI_SCCP_CLNS_METHOD_AVAILABLE ", " ISUP_FCI_SCCP_CONS_METHOD_AVAILABLE ", " ISUP_FCI_SCCP_ALL_METHODS_AVAILABLE
+When one of these flags is set, either the connectionless SCCP method is
+available, the connection oriented SCCP method is available, or both methods
+are available.  Otherwise, no SCCP method is indicated as available.
+Only one of these three flags may be set.
+.\"
+.RE
+.\"
+.\"
+.IP \(em
+The call control address, specified in
+.IR cc_addr_length " and " cc_addr_offset ,
+can be any ISUP address at
+.I scope
+.BR ISUP_SCOPE_CT ,
+to place an outgoing call on a specific circuit; or,
+.BR ISUP_SCOPE_TG ,
+to automatically select a circuit from a trunk group for the outgoing call.
+.\"
+.\"
+.\"
+.PP
+.B "Corrigendum for Q.931/932 conformance:"
+.PP
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address and options format and
+.BR isdn (4))
+.\"
+.\"
+.IP \(em 4
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.PP
+.B "Corrigendum for H.225.0 conformance:"
+.PP
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address and options format and
+.BR h225 (4))
+.\"
+.\"
+.IP \(em 4
+The called party number, specified in
+.IR cc_cdpn_length " and " cc_cdpn_offset ,
+is formatted as specified in H.225.0 for the
+.I Called Party Number
+information element, without the Information Element tag or length octets.
+.\"
+.\"
+.IP \(em
+The call type, specified in
+.IR cc_call_type ,
+can be one of the following call types:
+.\"
+.RS
+.\"
+.\"
+.TP
+.B H225_CALL_TYPE_SPEECH
+.TP
+.B H225_CALL_TYPE_64KBPS_UNRESTRICTED
+.TP
+.B H225_CALL_TYPE_3_1kHZ_AUDIO
+.TP
+.B H225_CALL_TYPE_64KBPS_PREFERRED
+.TP
+.B H225_CALL_TYPE_2x64KBS_UNRESTRICTED
+.TP
+.B H225_CALL_TYPE_384KBPS_UNRESTRICTED
+.TP
+.B H225_CALL_TYPE_1536KBPS_UNRESTRICTED
+.TP
+.B H225_CALL_TYPE_1920KBPS_UNRESTRICTED
+.\"
+.\"
+.RE
+.\"
+.IP \(em
+H.225.0 conforming CCS providers must support the following minimal set of
+call types:
+.sp
+.B H225_CALL_TYPE_SPEECH
+.br
+.B H225_CALL_TYPE_64KBPS_UNRESTRICTED
+.br
+.B H225_CALL_TYPE_3_1kHZ_AUDIO
+.br
+.B H225_CALL_TYPE_64KBPS_PREFERRED
+.\"
+.\"
+.IP \(em
+The call flags, specified in
+.IR cc_call_flags ,
+can be a bitwise OR or zero or more of the following flags:
+.\"
+.\"
+.IP \(em
+The call control address, specified in
+.IR cc_addr_length " and " cc_addr_offset ,
+can be any H225 address at
+.I scope
+.BR H225_SCOPE_TP ,
+to place an outgoing call to a specific H.225.0 transport address;
+.BR H225_SCOPE_EP ,
+to a specific H.323 endpoint (terminal or gatekeeper); or
+.BR H225_SCOPE_ZN ,
+to a specific H.323 GK/GW zone.
+.\"
+.\"
+.SS "Corrigendum for BSSAP conformance:"
+.PP
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address and options format and
+.BR bssap (4))
+.\"
+.\"
+.IP \(em 4
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.IP \(em
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,1 @@
+.so CC_RELEASE_REQ.7.man

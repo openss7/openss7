@@ -1,0 +1,886 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: smi.7.man,v 0.9.2.2 2004/04/17 23:05:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" This manpage is Copyright (C) 1997-2001  Brian Bidulock.
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 23:05:35 $ by $Author: brian $
+.\"
+.\" $Log: smi.7.man,v $
+.\" Revision 0.9.2.2  2004/04/17 23:05:35  brian
+.\" - Updating manual pages.
+.\"
+.\" Revision 0.9.2.1  2004/04/17 21:17:47  brian
+.\" - Converted to cooked manpages.
+.\"
+.\" Revision 0.9  2004/01/17 08:01:29  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.5  2003/07/31 11:09:16  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.4  2003/07/30 05:04:50  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.3  2003/07/29 22:22:13  brian
+.\" Corrections.
+.\"
+.\" Revision 0.8.2.2  2003/07/20 21:45:19  brian
+.\" Minor formatting.
+.\"
+.\" Revision 0.8.2.1  2003/07/18 20:38:45  brian
+.\" A lot of minor embellishments.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:37  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7.8.1  2001/12/11 13:16:08  brian
+.\" Branched for new development.
+.\"
+.\" Revision 0.7.6.1  2001/02/18 12:11:14  brian
+.\" New working branch for next release.
+.\"
+.\" Revision 0.7.4.1  2001/02/18 09:44:48  brian
+.\" Added new working branch.
+.\"
+.\" Revision 0.7.2.4  2001/01/17 00:29:10  brian
+.\" Working on man pages.
+.\"
+.\" Revision 0.7.2.3  2001/01/14 23:29:12  brian
+.\" Changed copyright notice.
+.\"
+.\" Revision 0.7.2.2  2001/01/14 11:07:53  brian
+.\" Changed headers back to GPL.
+.\"
+.\" Revision 0.7.2.1  2001/01/08 09:17:23  brian
+.\" Updated man pages somewhat.
+.\"
+.\" Revision 0.7  2000/11/29 02:09:56  brian
+.\" Added man pages for interfaces.
+.\"
+.\" Revision 0.7  2000/11/19 00:25:57  brian
+.\" Added man pages for streams drivers.
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SS7 7 "$Date: 2004/04/17 23:05:35 $" "SS7 STREAMS Man Page" "Linux STREAMS Programmer's Manual" 
+.SH "NAME"
+smi \- Signalling System No. 7 - SS7 Management Interface (SMI)
+.SH "SYNOPSIS"
+.B #include <ss7/smi.h>
+.HP
+.BI "int " fd " = open(" /dev/module ", " flags );
+.HP
+.BI "int " ret " = ioctl(" fd ", " cmd ", ... /* " arg " */ );"
+.fi
+.SH "DESCRIPTION"
+This man page describes the STREAMS interface which is used to manage and
+configure SS7 modules and drivers conforming to the \fIOpenSS7\fR SS7
+Management Interface (SMI) specification.
+
+SMI is the common interface to \fIOpenSS7\fR modules and drivers configured by
+the SS7 Configuration Daemon \fBss7d\fR(8) using \fBstreamio\fR(2)
+\fBI_PUSH\fR and \fBI_LINK\fR ioctls.  This interface is also available for
+the development of special purposes management entities (e.g. SNMP, TMN) for
+management of the \fIOpenSS7\fR stack.  All SS7 drivers, modules and
+multiplexors in the \fIOpenSS7\fR stack provide the SMI for management.
+
+The SMI consists of two subcomponents:
+.TP
+.I "PROTOCOL MANAGEMENT INTERFACE"
+SMI provides a protoocl management interface which utilizes \fBM_PROTO\fR and
+\fBM_PCPROTO\fR messages which can be exchanged with \fBputmsg\fR(2) and
+\fBgetmsg\fR(2) system calls on the stream head or control stream once the
+interface is opened, or \fBM_CTL\fR messages between modules.  The protoocl
+management interface supports general and layer-specific configuration, state
+inquiry, event and statistics control (SNMP functions) which are normally used
+by the SS7 Configuration Daemon \fBss7d\fR(8) on the driver interface or
+multiplexor control channel before or after the SS7 protocol stack has been
+configured.
+.TP
+.I "INPUT OUTPUT CONTROL INTERFACE"
+SMI provides a control interface which utilizes \fBioctl\fR(2) transparent
+calls, pass-through calls, or \fBI_STR\fR ioctl calls using \fBstreamio\fR(2)
+from a stream head or a multiplexor control stream.  The control interface
+provides for the control of layer-specific and device-specific aspects which
+are outside the scope of the SS7 protocol proper, such as interface
+configuration and is normally used by the SS7 Configuration Daemon
+\fBss7d\fR(8) or upstream modules during stack operation.
+
+.SH "PROTOCOL MANAGEMENT INTERFACE"
+Protocol management primitives are provided to allow for
+protocol-layer-specific configuration, state examination, statistical and
+event retporting.  These primitives use a layer-specific  configuration structure
+\fImodname\fR\fB_config_t\fR, state machine structure \fImodname\fR\fB_statem_t\fR,
+statistics structure \fImodname\fR\fB_stats_t\fR and event categories.
+
+Protocol management primitives are exchanged using \fBM_PROTO\fR and
+\fBM_PCPROTO\fR messages in the same manner as protocol primitives, using
+\fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls at the stream head or using
+the pass through mechanism provided by the control stream of an open
+multiplexor (see \fBsls\fR(4) and \fBmtp\fR(8)).  These primitivies are
+normally only used by the \fBss7d\fR(8) during configuration and operation,
+but may be used for testing and special purposes by user-level programs from
+the stream head.
+
+To avoid define clashes, protocol modules will also accept \fBM_CTL\fR
+messages with these primitives for inter-module communications, and many of
+the primitive functions are also supported using the \fBioctl\fR(2) interface
+described in the next section.
+
+.SS Protocol Configuration
+.PP
+Protocol management primitives are invoked by stack and layer management to
+configure or request configuration information from the layer service
+provider.  Any \fBM_DATA\fR block attached to the primitives contains a
+\fImodname\fR\fB_config_t\fR structure (see below) which represents the
+configuration parameters.  Configuration requests should normally be sent as
+\fBM_PCPROTO\fR or \fBM_CTL\fR messages.
+.PP
+Each \fIOpenSS7\fR module defines a configuration structure
+\fImodname\fR\fB_config_t\fR which contains the following two members:
+.RS
+.sp
+.nf
+typedef struct \fImodname\fR_config {
+    ss7_ulong   pvar;   /* protocol variant */
+    ss7_ulong   popt;   /* protocol options */
+    \fI...\fR
+    \fI/* additional level specific options */\fR
+    \fI...\fR
+} \fImodname\fR_config_t;
+.fi
+.RE
+.TP
+.I pvar
+The \fIOpenSS7\fR stack provides the capability to run many SS7 protocol
+variants simultaneously.  Therefore, all \fIOpenSS7\fR stack modules contain a
+\fIpvar\fR configuration parameter which contains the selected protocol
+variant.  Currently defined protocol variants are as follows:
+.IP
+.B SS7_PVAR_ITUT_88
+ITU-T Q.700 Series Blue Book
+.br
+.B SS7_PVAR_ITUT_93
+ITU-T Q.700 Series White Book
+.br
+.B SS7_PVAR_ITUT_96
+ITU-T Q.700 Series Grey Book
+.br
+.B SS7_PVAR_ITUT_00
+ITU-T Q.700 Series Black Book
+.br
+.B SS7_PVAR_ETSI_88
+ETSI ETS 300 Series (based on Blue Book)
+.br
+.B SS7_PVAR_ETSI_93
+ETSI ETS 300 Series (based on White Book)
+.br
+.B SS7_PVAR_ETSI_96
+ETSI ETS 300 Series (based on Grey Book)
+.br
+.B SS7_PVAR_ETSI_00
+ETSI ETS 300 Series (based on Black Book)
+.br
+.B SS7_PVAR_ANSI_88
+ANSI T1.111-1988
+.br
+.B SS7_PVAR_ANSI_92
+ANSI T1.111-1992
+.br
+.B SS7_PVAR_ANSI_96
+ANSI T1.111-1996
+.br
+.B SS7_PVAR_ANSI_00
+ANSI T1.111-2000
+.br
+.B SS7_PVAR_JTTC_94
+Japan TTC JQ.700 Series (based on Blue Book)
+.IP
+These protocol variant parameters are defined in such a way that they can be
+tested against the following to find the major variant:
+.IP
+.B SS7_PVAR_ITUT
+ITU-T Q.700 Series
+.br
+.B SS7_PVAR_ETSI
+ETSI ETS 300 Series (based on ITU-T)
+.br
+.B SS7_PVAR_ANSI
+ANSI T1.111
+.br
+.B SS7_PVAR_JTTC
+TTC JQ.700 Series
+.TP
+.I popt
+In addition, each \fIOpenSS7\fR module can enable or disable a number of major options
+which are described in the standards specifications.  Each \fIOpenSS7\fR module has a
+\fIpopt\fR configuration parameter which contains a bit vector of the enabled
+protocol options for that module.  For a definition of the options at each
+level, see the man page for the specific interface.
+.TP
+.I ...
+Additional configuration members are layer-specific and are defined by the
+corresponding layer interface specifications.  See section "SS7 STREAMS
+INTERFACES" for more information.
+.PP
+Each \fIOpenSS7\fR module recognizes protocol management primitives for
+configuration.  These primitives are invoked by protocol layer management to
+configure or request configuration information from the layer service
+provider.  Any \fBM_DATA\fR block attached to the primitives contains a
+\fImodname\fR\fB_config_t\fR structure (see above) which represents the configuration
+parameters.  Configuration request should normally be sent as \fBM_PCPROTO\fR
+messages.
+.TP
+.B SMI_CONFIG_SETUP
+Test if the configuration parameters provided in the attached \fBM_DATA\fR
+block are settable and correct.  Any values set to \fI0xffffffff\fR in the
+configuration parameters should not be tested for change by the layer service
+provider.  When successful, this request also write locks the configuration
+until a successful \fBSMI_CONFIG_COMMIT\fR is executed.
+This primitive contains only the \fIsmi_primitive\fR member.
+.TP
+.B SMI_CONFIG_COMMIT
+Commits the changes of a previous successful \fBSMI_CONFIG_TEST\fR operation.
+No configuration data is associated with this request and any attached
+\fBM_DATA\fR is ignored.  When successful, this request also releases the
+write locks on the configuration.
+This primitive contains only the \fIsmi_primitive\fR member.
+.TP
+.B SMI_CONFIG_SET
+Sets the configuration parameters to the values provided in the attached
+\fBM_DATA\fR block.  This request will fail if the configuration is write
+locked.
+This primitive contains only the \fIsmi_primitive\fR member.
+.TP
+.B SMI_CONFIG_GET
+Get the configuration parameters.  Any attached \fBM_DATA\fR is ignored.  If
+the configuration is write locked, this request will only return the values
+which have been setup for a commit and not necessarily the current values.
+This primitive contains only the \fIsmi_primitive\fR member.
+.TP
+\fBERRORS\fR (see also "ERROR HANDLING")
+
+Upon success, the layer service provider will return a \fBSMI_OK_ACK\fR to
+confirm a successful configuration request.  The provider attached a
+\fBM_DATA\fR block which contains the \fImodname\fR\fB_config_t\fR structure with
+the results of the configuration request.
+
+Upon failure, the layer service provider will return a \fBSMI_ERROR_ACK\fR to
+reject the configuration request due to an error.  The provider attaches a
+\fBM_DATA\fR block which contains a \fImodname\fR\fB_config_t\fR structure with
+\fI0xffffffff\fR in any values which are in error.
+
+Error numbers \fIsmi_errno\fR which are specific to a configuration request
+rejection are as follows:
+.RS
+.TP 16
+.B SMI_CONFLOCKED
+The request attempted to perform an illegal operation on a locked
+configuration.
+.TP
+.B SMI_NOCONFDATA
+The request was missing configuration data (i.e. missing \fBM_DATA\fR block or
+\fBM_DATA\fR block too short.
+.TP
+.B SMI_BADCONFDATA
+Some configuration data was invalid.  The attached \fBM_DATA\fR block contains
+\fI0xffffffff\fR in the data elements which are considered invalid.
+.RE
+
+.SS "Protocol State"
+
+Each \fIOpenSS7\fR module defines a state structure
+\fImodname\fR\fB_statem_t\fR which contains primary state machine variables
+and flags.
+These structures may be included in \fBM_DATA\fR blocks and attached to
+protocol management primitives affecting or indicating state.  The
+\fImodname\fR\fB_statem_t\fR structure is formatted as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong   \fIsm_mod1\fR_state;
+    smi_ulong   \fIsm_mod2\fR_state;
+    smi_ulong       \fIsm_mod2_flag1\fR;
+    smi_ulong       \fIsm_mod2_flag2\fR;
+    smi_ulong   \fIsm_mod3\fR_state;
+    smi_ulong       \fIsm_mod3_flag1\fR;
+    smi_ulong   \fIsm_mod4\fR_state;
+} \fImodname\fR_statem_t;
+.fi
+.RE
+.TP
+\fIsm_modX\fR_state
+
+.TP
+\fIsm_modX_flagY\fR
+
+.PP
+Protocol management primitives may be invoked by stack or layer management to
+request and return state information about the layer service provider.  This
+may be useful for resynchronization between protocol modules as well as for
+testing and diagnostic purposes.  Any \fBM_DATA\fR block attached to the
+primitive or acknowledgement contains a layer-specific
+\fImodname\fR\fB_statem_t\fR structure (see above) which represents the
+current state of the layer protocol state machines.  State requests may be
+sent as \fBM_PROTO\fR or \fBM_PCPROTO\fR messages depending on their urgency.
+Upstream modules may send a \fBM_CTL\fR message if desired.
+
+.TP
+.B SMI_STATE_REQ
+Requests that the layer service provider return the current state variables
+associated with the layer state machines.  This primitive uses the
+\fBsmi_state_req_t\fR structure which contains only the \fIsmi_primitive\fR.
+.TP
+\fBERRORS\fR (see also "ERROR HANDLING")
+
+Upon success, the layer service provider will return a \fBSMI_OK_ACK\fR to
+confirm the successful state request.  The provider attaches a \fBM_DATA\fR
+block which contains the \fImodname\fR\fB_statem_t\fR structure containing the
+layer-specific state variables.
+
+Upon failure, the layer service provider will return a \fBSMI_ERROR_ACK\fR to
+reject the state request.  Normally a request is successful and only the
+general error codes (see "ERROR HANDLING") will be returned.
+
+.SS "Protocol Statistics"
+
+Protocol management primitives may be invoked by the stack or layer management
+to request and return statistical information collected during the operation
+of the layer service provider.  Any \fBM_DATA\fR block attached to the
+primitive or acknowledgement contains a layer-specific
+\fImodname\fR\fB_stats_t\fR structure (see above) which represents current
+collection periods and the statistics collected during the collection
+interval by the provider.  Statistics requests should be sent as low priority
+band \fBM_PROTO\fR or \fBM_CTL\fR messages.  The provider will respond with
+low priority band \fBM_PROTO\fR or \fBM_CTL\fR messages for all but error
+conditions, which are sent as \fBM_PCPROTO\fR.  \fBSMI_STATS_IND\fR messages
+will all be sent as low priority band \fBM_PROTO\fR or \fRM_CTL\fR messages.
+This avoids congestion resulting from synchronized data collection intervals
+across a number of managed objects in the stack.
+.TP
+.B SMI_STATS_SET
+Sets the statistics collection and aggregation parameters as well clearing any
+counts marked as \fI0xffffffff\fR provided in the attached \fBM_DATA\fR block
+containing a \fImodname\fR\fB_stats_t\fR structure.
+This primitives uses the \fBsmi_stats_set_t\fR structure which contains the
+\fIsmi_primitive\fR as its only member.
+.TP
+.B SMI_STATS_GET
+Gets the statistics collection and aggregation parameters as well as the
+counts for the current collection interval.
+This primitives uses the \fBsmi_stats_get_t\fR structure which contains the
+\fIsmi_primitive\fR as its only member.
+.TP
+.B SMI_STATS_IND
+Delivers an indication of the aggregated statistics for a collection interval.
+An attached \fBM_DATA\fR block contains the aggregated statistics for the
+collection interval.
+This primitives uses the \fBsmi_stats_ind_t\fR struct which contains the
+following members:
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong   smi_primitive;  /* SMI_STATS_IND */
+    smi_ulong   smi_interval;
+    smi_ulong   smi_timestamp;
+} smi_stats_ind_t;
+.fi
+.TP
+.I smi_interval
+The interval for which this indication corresponds (in jiffies).  This could
+normally be 5 minutes, 15 minutes, 30 minutes, 60 minutes.
+.TP
+.I smi_timestamp
+The UNIX timestamp (seconds since epoch) corresponding to the beginning of the
+interval for which statistics have been collected.
+.RE
+.TP
+\fBERRORS\fR (see also "ERROR HANDLING")
+
+Upon success, the layer service provider will return a \fBSMI_OK_ACK\fR to
+confirm the successful statistics request.  The provider attaches a
+\fBM_DATA\fR block which contians the \fImodname\fR\fB_stats_t\fR structure
+containing the layer-specific statistics parameters and counts.
+
+Upon failure, the layer specific provider will return a \fBSDM_ERROR_ACK\fR to
+reject the state request.  The provider attaches a \fBM_DATA\fR block which
+contains a \fImodname\fR\fB_stats_t\fR structure with \fI0xffffffff\fR in any
+values which are in error.
+
+If the layer service provider fails in an attempt to generate a statistics
+indications, it will instead deliver a \fBSDM_ERROR_IND\fR to indicate the
+failure to provide the statistics indication.  The provider may provide a
+partial indication using an attached \fBM_DATA\fR block which contains a
+\fImodname\fR\fB_stats_t\fR structure with \fI0xffffffff\fR in any values
+which are in error.
+
+Error numbers in \fIsmi_errno\fR which are specific to a statistics request
+rejection and indication failure are as follows:
+.RS
+.TP 16
+.B SMI_STATSOOM
+Statistic collection has run out of memory.
+.TP
+.B SMI_STATSSUS
+Statistics collection is congested and has been temporarily suspended.
+.TP
+.B SMI_STATSRES
+Statistics collection congestion has cleared and has been resumed.
+.RE
+
+.SS "Protocol Events"
+
+.sp
+.nf
+typedef \fImodname\fR_event {
+} \fImodname\fR_event_t;
+.fi
+.PP
+Protocol management primitives may be delivered by the layer service provider
+to the stack or layer management to indicate the occurence of a protocol event
+which is of interest.  Any \fBM_DATA\fR block attached to the primitive
+contains a layer-specific \fImodname\fR\fB_event_t\fR structure (see above)
+which represents detailed layer-specific event information.  Event indications
+are delivered as low priority \fBM_PROTO\fR, \fBM_EVENT\fR or \fBM_CTL\fR
+messages.  This allows data exchange and configuration to take precedence over
+event reporting.  Event reporting, however takes precedence over statistics
+reporting.
+.TP
+.B SMI_EVENT_IND
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong   smi_primitive;  /* SMI_EVENT_IND */
+    smi_utime   smi_timestamp;
+    smi_ulong   smi_severity;
+    smi_caddr   smi_module_name;
+    smi_caddr   smi_clli;
+} \fImodname\fR_event_t;
+.fi
+.RE
+.TP
+\fBERRORS\fR (see also "ERROR HANDLING")
+
+
+.SH "ERROR HANDLING"
+.TP
+.B SMI_OK_ACK
+Upon success, the layer service provider will return a \fBSMI_OK_ACK\fR to
+confirm a successful request.  The provider may attach a \fBM_DATA\fR block
+which contains a request-specific structure with the results of the request.
+This primitive uses the \fBsmi_ok_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong  smi_primitive; /* SMI_OK_ACK */
+    smi_ulong  smi_state;
+    smi_ulong  smi_correct_primitive;
+} smi_ok_ack_t;
+.fi
+.TP
+.I smi_state
+Contains the management state of the interface.
+.TP
+.I smi_correct_primitive
+Contains the request primitive which this response is acknowledging.
+.RE
+.TP
+.B SMI_ERROR_ACK
+Upon failure, the layer service provider will return a \fBSMI_ERROR_ACK\fR to
+reject the request due to an error.  The provider may attach a \fBM_DATA\fR
+block which contains a request-specific structure which indicates the elements
+of the request which are in error.  This primitive uses the
+\fBsmi_error_ack_t\fR structure as follows:
+.RS
+.sp
+.nf
+typedef struct {
+    smi_ulong  smi_primitive; /* SMI_ERROR_ACK */
+    smi_ulong  smi_state;
+    smi_ulong  smi_error_primitive;
+    smi_ulong  smi_errno;
+    smi_ulong  smi_reason;
+} smi_error_ack_t;
+.fi
+.TP
+.I smi_state
+Contains the management state of the interface.
+.TP
+.I smi_error_primitive
+Contains the request primitive which this response is acknowledging.
+.TP
+.I smi_errno
+The error number indicating which error occured.
+.TP
+.I smi_reason
+An additional error reason code.
+.RE
+.SS "ERRORS"
+.IP
+Error numbers which are specific to a configuration request rejection are as
+follows:
+.RS
+.TP
+.B SMI_CONFLOCKED
+The request attempted to perform an illegal operation on a locked
+configuration.
+.TP
+.B SMI_NOCONFDATA
+The request was missing configuration data (i.e. missing \fBM_DATA\fR block or
+\fBM_DATA\fR block too short.
+.TP
+.B SMI_BADCONFDATA
+Some configuration data was invalid.  The attached \fBM_DATA\fR block contains
+\fI0xffffffff\fR in the data elements which are considered invalid.
+.RE
+
+
+.SH "SS7 STREAMS INTERFACES"
+
+The \fIOpenSS7\fR stack provides drivers and modules at all levels of the SS7
+stack below ISUP and TCAP.  That is, it provides SS7 Level 2 (Link), SS7 Level
+3 (Network), and SCCP (Signalling Connection Control Part) functionality.
+These protocol components have been broken into a number of sublevels,
+starting from the bottom-most, as follows:
+.TP 8
+.BR sdli (7)
+The \fISignalling Data Link Interface (SDLI)\fR implements SS7 Level 1 [Q702].
+SDLI allows real and emulated transmission channels to be implemented for use
+under the
+.BR sdt (8)
+module.  It provides access to the DAEDT and DAEDR
+functions of the SS7 Signalling Link [Q703].  Header file \fI<sys/sdli.h>\fR
+provides definitions for the interface.  \fIOpenSS7\fR drivers planned or
+released at this interface include:
+.RS
+.TP 12
+.BR sdl_eth (4)
+SDL emulation using raw Ethernet (IEEE 802.2/802.3).
+.TP
+.BR sdl_ip (4)
+SDL emulation using raw Internet Protocol (IP).
+.TP
+.BR sdl_udp (4)
+SDL emulation using User Datagram Protocol (UDP).
+.TP
+.BR sdl_tcp (4)
+SDL emulation using Transmission Control Protocol (TCP).
+.TP
+.BR sdl_rtp (4)
+SDL emulation using Real-Time Transport Protocol (RTP).
+.TP
+.BR sdl_sctp (4)
+SDL emulation using Strean Control Transport Protocol (SCTP).
+.RE
+.TP
+.BR sdti (7)
+The \fISignalling Data Terminal Interface (SDTI)\fR implements partial SS7
+Level 2 [Q703].  SDTI allows real and emulated data terminals to be
+implemented for use under the
+.BR sl (8)
+module.  It provides access to the
+AERM, SUERM, EIM, DAEDR and DAEDT functions of the SS7 Signalling Link [Q703].
+Header file \fI<sys/sdti.h>\fR provides definitions for the interface.
+\fIOpenSS7\fR drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR sdt (8)
+SDT module for use with SDLI compliant streams.
+.TP
+.BR acb56t (8)
+SDT driver for the SeaLevel ACB56 ISA card.
+.TP
+.BR m2tp (8)
+SDT driver for the MTP Level 2 Tunneling Protocol (M2TP).
+.TP
+.BR soip (8)
+SDT driver for SS7 over IP.
+.RE
+.TP
+.BR sli (7)
+The \fISignalling Link Interface (SLI)\fR implements complete SS7 Level 2
+[Q703].  SLI allows real and emulated signalling links to be implemented for
+use under the
+.BR sls (4)
+module.  It provides access to all SS7 Level 2
+state machine functions of the SS7 Signalling Link [Q703].  Header file
+\fI<sys/sli.h>\fR provides definitions for the interface.  \fIOpenSS7\fR
+drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR sl (8)
+SL module for use with SDTI compliant streams.
+.TP
+.BR acb56 (4)
+SL driver for the SeaLevel ACB56 ISA card.
+.TP
+.BR m2pa (4)
+SL driver for the MTP Level 2 Peer Adaptation (M2PA).
+.TP
+.BR m2ua (4)
+SL driver for the MTP Level User Adaptation (M2UA).
+.RE
+.TP
+.BR slsi (7)
+The \fISignalling Link Set Interface (SLSI)\fR implements partial SS7 Level 3
+[Q704].  SLSI allows real and emulated signalling link sets to be implemented
+for use under the
+.BR mtp (8)
+multipexor.  It provides access to SS7 Level 3
+Link Set state machine functions of the SS7 Message Transfer Part [Q704].
+Header file \fI<sys/slsi.h>\fR provides definitions for the interface.
+\fIOpenSS7\fR drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR sls (4)
+SLS multiplexor for use with SLI compliant streams.
+.TP
+.BR m3tp (4)
+SLS driver for the MTP Level 3 Tunelling Protocol (M3TP).
+.RE
+.TP
+.BR mtpi (7)
+The \fIMessage Transfer Part Interface (MTPI)\fR implements complete SS7 Level
+3 [Q704].  MTPI allows real and virtual signalling points and signalling
+transfer points to be implemented for use under the
+.BR sccp (4)
+and
+.BR tcap (4)
+modules.  It provides access to all SS7 Level 3 state machines
+and functions of SS7 Message Transfer Part [Q704].  Header file
+\fI<sys/mtpi.h>\fR provides definitions for the interface.  \fIOpenSS7\fR
+drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR mtp (4)
+MTP multiplexor for use with SLSI compliant streams.
+.TP
+.BR m3pa (4)
+MTP module for the MTP Level 3 Peer Adaptation (M3PA).
+.TP
+.BR m3ua (4)
+MTP module for the MTP Level 3 User Adaptation (M3UA).
+.RE
+.TP
+.BR sccpi (7)
+The \fISignalling Connection Control Part Interface (SCCPI)\fR implements
+complete SS7 Level 4 [Q711].  SCCPI allows real and virtual subsystems and
+global title translations to be implemented for use under the
+.BR tcap (4)
+module.  It provides access to all SS7 Level 4 state machines of the SS7
+Signalling Connnection Control Part [Q711].  Header file \fI<sys/sccpi.h>\fR
+provides definitions for the interface.  \fIOpenSS7\fR drivers planned or
+released at this interface include:
+.RS
+.TP 12
+.BR sccp (4)
+SCCP module for use with MTPI compliant streams.
+.TP
+.BR sua (4)
+SCCP module for the SCCP User Adaptation (SUA).
+.RE
+.TP
+.BR isupi (7)
+The \fIIntegrated Services Digital Network (ISDN) User Part Interface (ISUPI)\fR
+implements partial SS7 ISUP [Q767].  ISUPI allows call processing agents to
+attach to specific PC-PC-CIC ranges in control of trunk groups.  It provides
+some basis low-level ISUP state machines (e.g. Unequipped CIC) of the SS7
+ISUP [Q767].  Header file \fI<sys/isupi.h>\fR provides definitions for the
+interface.  \fIOpenSS7\fR drivers planned or released at this interface
+include:
+.RS
+.TP 12
+.BR isup (4)
+ISUP module for use with MTPI compliant streams.
+.TP
+.BR iua (4)
+ISUP module for the ISDN User Adaptation (IUA).
+.RE
+.TP
+.BR tcapi (7)
+The \fITransaction Capabilities Application Part Interface (TCAPI)\fR
+implements partion SS7 TCAP [Q7??].  TCAPI allows transaction processing
+agents to attach to specific subsystem instances in control of database
+queries.  It provides the TC state machines of the SS7 TCAP [Q???].  Header
+file \fI<sys/tcapi.h>\fR provides definitions for the interface.
+\fIOpenSS7\fR drivers planned or released at this interface include:
+.RS
+.TP 12
+.BR tcap (4)
+TCAP module for use with SCCPI compliant streams.
+.RE
+.\" .SH "CONFIGURATION"
+.\" .SH "ERROR HANDLING"
+.SH "SEE ALSO"
+.BR isupi (7),
+.BR mtpi (7),
+.BR sccpi (7),
+.BR sdli (7),
+.BR sdti (7),
+.BR sli (7),
+.BR slsi (7),
+.BR tcapi (7),
+.BR acb56 (4),
+.BR isup (4),
+.BR iua (4),
+.BR m2pa (4),
+.BR m2tp (4),
+.BR m2ua (4),
+.BR m3pa (4),
+.BR m3tp (4),
+.BR m3ua (4),
+.BR mtp (4),
+.BR sccp (4),
+.BR sdl_eth (4),
+.BR sdl_ip (4),
+.BR sdl_rtp (4),
+.BR sdl_sctp (4),
+.BR sdl_tcp (4),
+.BR sdl_udp (4),
+.BR sdt (4),
+.BR sl (4),
+.BR sls (4),
+.BR soip (8),
+.BR ss7d (8),
+.BR sua (4),
+.BR tcap (4).
+.SH "BUGS"
+Too many to mention.
+.SH "HISTORY"
+This STREAMS interface for SS7 is an orignal part of the \fIOpenSS7\fR
+package.
+.XX
+.[
+q702
+.]
+.[
+q703
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+.[
+t1.112
+.]
+.[
+q761
+.]
+.[
+q762
+.]
+.[
+q763
+.]
+.[
+q764
+.]
+.[
+q766
+.]
+.[
+q767
+.]
+.[
+t1.113
+.]
+.[
+isupv4-1
+.]
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+.[
+t1.114
+.]
+.[
+q751-1
+.]
+.[
+q751-2
+.]
+.[
+q752
+.]
+.[
+t1.116
+.]
+.[
+$LIST$
+.]
+.TI

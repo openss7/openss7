@@ -1,0 +1,1 @@
+.so MG_LEAVE_IND.7.man

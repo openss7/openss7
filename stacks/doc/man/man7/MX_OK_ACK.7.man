@@ -1,0 +1,126 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: MX_OK_ACK.7.man,v 0.9.2.2 2004/04/17 23:05:19 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:19 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MX_OK_ACK 7 "$Name:  $" "$Date: 2004/04/17 23:05:19 $" "Multiplex Interface"
+.SH NAME
+.B MX_OK_ACK, MX_ok_ack, MX_ok_ack_t
+\- success acknowledgment
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PCPROTO
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MX_ok_ack {
+    ulong mx_primitive;         /* always MX_OK_ACK */
+    ulong mx_correct_prim;      /* correct primitive */
+    ulong mx_state;             /* resulting state */
+} MX_ok_ack_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Provides local acknowledgment of receipt and processing of a primitive that
+requires local acknowledgment and has no other means of acknowledgment.
+.SH PARAMETERS
+This primitive contains the following parameters:
+.TP
+.I mx_primitive
+indicates the primitive type.  Always
+.BR MX_OK_ACK .
+.TP
+.I mx_correct_prim
+indicates the primitive that was received and processed successfully.  This
+field can be one of the following values:
+.sp
+.TS
+tab(:);
+ll.
+\fBMX_INFO_REQ\fR(7):information request
+\fBMX_OPTMGMT_REQ\fR(7):options management request
+\fBMX_ATTACH_REQ\fR(7):attach request
+\fBMX_DETACH_REQ\fR(7):detach request
+\fBMX_ENABLE_REQ\fR(7):enable request
+\fBMX_DISABLE_REQ\fR(7):disable request
+\fBMX_CONNECT_REQ\fR(7):connect request
+\fBMX_DISCONNECT_REQ\fR(7):disconnect request
+.TE
+.TP
+.I mx_state
+indicates the resulting state of the multiplex service provider.  This is the
+state to which the correct primitive moves the multiplex service provider
+state machine.
+.SH ORIGINATOR
+Multiplex Service Provider.
+.SH STATES
+This primitive is issued in any state when a local acknowledgment is
+outstanding.  The resulting state is the state to which the state machine
+moves for the correct primitive as indicated in field
+.IR mx_state .
+.SH "SEE ALSO"
+.BR MX_INFO_REQ (7),
+.BR MX_OPTMGMT_REQ (7),
+.BR MX_ATTACH_REQ (7),
+.BR MX_DETACH_REQ (7),
+.BR MX_ENABLE_REQ (7),
+.BR MX_DISABLE_REQ (7),
+.BR MX_CONNECT_REQ (7),
+.BR MX_DISCONNECT_REQ (7).
+.SH VERSIONS
+This manpage was written for MXI Version 1.
+.XX
+.[
+mxi
+.]
+.[
+$LIST$
+.]
+.TI

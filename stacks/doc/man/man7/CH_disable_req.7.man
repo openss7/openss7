@@ -1,0 +1,1 @@
+.so CH_DISABLE_REQ.7.man

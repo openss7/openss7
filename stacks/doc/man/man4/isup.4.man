@@ -1,0 +1,334 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: isup.4.man,v 0.9.2.2 2004/04/17 21:38:37 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 21:38:37 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH ISUP 4 "$Date: 2004/04/17 21:38:37 $" "$Name:  $" "OpenSS7 SS7 Devices"
+.\"
+.\"
+.SH NAME
+.B isup
+\- SS7 Integrated Services Digital Network (ISDN) User Part (ISUP)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/isupi.h>
+.br
+.B #include <ss7/isupi_ioctl.h>
+.\"
+.\"
+.HP
+.BI "int " isup_stream " = open(" isup_device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ISUP
+is an implementation of the Signalling System No. 7 (SS7) Integrated Services
+Digital Network (ISDN) User Part (ISUP) defined in ITU-T Recommendation Q.761,
+.[
+q761
+.]
+.[
+q762
+.]
+.[
+q763
+.]
+.[
+q764
+.]
+.[
+q766
+.]
+.[
+q767
+.]
+ETSI ISUP Version 4,
+.[
+isupv4
+.]
+and ANSI T1.113.
+.[
+t1.113
+.]
+.B ISUP
+provides call control of telephone calls over the ISDN.
+.B ISUP
+uses the services of the Message Transfer Part,
+.BR mtp (4),
+MTP3 User Adaptation Layer,
+.BR m3ua (4),
+or Tekelec's Transport Adaptation Layer Interface,
+.BR tali (4),
+to transfer packets.
+.\"
+.\"
+.PP
+.B ISUP
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver.
+.BR mtp "(4), " m3ua "(4), " tali (4)
+or other stream conforming to the Message Transfer Part Interface,
+.BR mtpi (3),
+are linked under
+.B ISUP
+using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide Message Transfer Part (MTP) services
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.[
+jtq704
+.]
+to
+.BR ISUP .
+Once linked, the streams must be configured using
+.BR isup_ioctl (4)
+IO controls.
+This function is normally performed by the SS7 configuration daemon,
+.BR ss7confd (8).
+See also,
+.BR isup (8).
+.\"
+.\"
+.PP
+.B ISUP
+provides the following stream types.  To select one of the stream type,
+the
+.I isup_device
+argument to the
+.BR open (2)
+call can be one of the following:
+.\"
+.\"
+.TP
+.I /dev/isup
+This device provides the
+.B ISUP
+protocol services interface using the
+.I CC-primitives
+of the Call Control Interface (CCI)
+.[
+cci
+.]
+described in
+.BR cci (7),
+as interpreted for use with
+.B ISUP
+as described in
+.BR cci_isup (7).
+This interface is suitable both for use with other SS7 modules and drivers, as
+well as with the the
+.BR cframe (3)
+library using the
+.BR OpenSwitch (n)
+call framework.
+.\"
+.\"
+.PP
+Unlike other SS7 protocol modules and drivers,
+.B ISUP
+does not provide a
+.BR sockets (3)
+interface.  This is because the special needs of call control are divorced
+from the sockets paradigm.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management IO controls using
+.BR ioctl (2)
+system calls on the
+.I isup_stream 
+file descriptor.
+These management controls are documented in
+.BR isup_ioctl (4).
+.\"
+.\"
+.SH FEATURES
+.PP
+The
+.B OpenSS7
+.B ISUP
+implementation has the following features:
+.IP \(bu 4
+.B ISUP
+implements all protocol variants and protocol options in a single state
+machine executive and loadable kernel module.  All protocol variants and all
+protocol options are simultaneously available to all ISUP users.
+.IP \(bu
+.B ISUP
+is implemented using a call-half call control model.  This means that ISUP is
+only in control of one end of a call leg.  Circuit switching, circuit release,
+billing, operational measurements, digit translations, trunk group selection,
+and other switching functions, such as continuity test tone generation and
+detection, are performed by the Call Control User.
+.RS 4
+.PP
+This separation of call control for media control permits
+.B ISUP
+to be used in soft-switch environments with a decomposed call framework (where
+Media Gateway control is separated from call control).
+(Because of the power of this approach, only minor modifications were
+necessary to cause the ISUP implementation to function as a BICC
+implementation.)
+.RE
+.IP \(bu
+.B ISUP
+only performs minimal message and parmeter compatibility functions.  Instead,
+.B ISUP
+passes optional messages and parameters transparently to the Call Control
+User.  This empowers the Call Control User to perform message and parameter
+compatibility, backwards compatibility, interworking, and other higher level
+functions.
+.IP \(bu
+.B ISUP
+performs automatic procedures applicable to the call leg (such as echo control
+and call history functions), but does not become involved in end-to-end
+procedures (such as Access Transport).  End-to-end procedures are accomplished
+by the Call Control User through the transparent passing of optional
+parameters.
+.IP \(bu
+.B ISUP
+permits multiple signalling point definitions in multiple signalling newtorks
+and can behave in multiple switching roles on a trunk group basis.  This
+permits the
+.B OpenSS7
+call framework,
+.BR cframe (3),
+to act as a single gateway switch or multiple swiches in multiple networks
+simultaneously.
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/isup .
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> ,
+.BR <ss7/isupi.h> ,
+.BR <ss7/isupi_ioctl.h> ,
+.BR <ss7/cframe_isup.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR OpenSS7 (4),
+.BR STREAMS (4),
+.BR cci (7),
+.BR cci_isup (7),
+.BR cframe (3),
+.BR ioctl (2),
+.BR isup (8),
+.BR isup_ioctl (4),
+.BR isupi (7),
+.BR m3ua (4),
+.BR mtp (4),
+.BR mtpi (3),
+.BR open (2),
+.BR sockets (3),
+.BR ss7confd (8),
+.BR streamio (7),
+.BR tali (4).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B ISUP
+interface is specific to the
+.BR OpenSS7 (4)
+SS7 stack.  This is Version 2 of the interface.
+.PP
+CCI interfaces are consistent with CCI Revision 0.8.2.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

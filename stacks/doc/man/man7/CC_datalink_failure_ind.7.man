@@ -1,0 +1,1 @@
+.so CC_DATALINK_FAILURE_IND.7.man

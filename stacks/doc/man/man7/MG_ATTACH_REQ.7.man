@@ -1,0 +1,130 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: MG_ATTACH_REQ.7.man,v 0.9.2.2 2004/04/17 23:05:16 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:16 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MG_ATTACH_REQ 7 "$Date: 2004/04/17 23:05:16 $" "$Name:  $" "Media Gateway Interface"
+.SH NAME
+.B MG_ATTACH_REQ, MG_attach_req, MG_attach_req_t
+\- attach channel request
+.SH SYNOPSIS
+This primitive is one
+.BR M_PROTO
+message block structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MG_attach_req {
+    ulong mg_primitive;         /* always MG_ATTACH_REQ */
+    ulong mg_mx_id;             /* multiplex id (or 0 for requesting stream) */
+    ulong mg_mx_slot;           /* multiplex slot number */
+    ulong mg_ch_id;             /* channel id (or 0 for provider assignment) */
+    ulong mg_ch_type;           /* type of channel */
+} MG_attach_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+Requests that the specified slot on the requesting stream
+.RI ( "mg_mx_id " "== 0)"
+or specified multiplex
+.RI ( "mg_mx_id " "!= 0)"
+be associated with a newly created channel with specified
+.RI ( "mg_ch_id " "!= 0)"
+or provider assigned
+.RI ( "mg_ch_id " "== 0)"
+channel id.
+.PP
+This primitive is acknowledged with the
+.BR MG_ATTACH_ACK (7).
+.PP
+If the requesting stream is closed, all channels attached to the requesting
+stream will be detached.  Only channels that are associated with the
+requesting stream need be assigned in this fashion.
+.SH PARAMETERS
+This primitive has the following parameters:
+.TP
+.I mg_primitive
+specifies the primitive type.  Always
+.BR MG_ATTACH_REQ .
+.TP
+.I mg_mx_id
+specifies the identifier of the multiplex from which to attach a channel.  If
+the identifier is zero (0), it specifies the requesting stream as the
+multiplex.
+.TP
+.I mg_mx_slot
+specifies the slot within the specified multiplex to attach as a channel.
+.TP
+.I mg_ch_id
+specifies the channel id to assign to the attached multiplex slot.  When zero
+(0), it specifies that the MG provider is to assign a unique channel
+identifier.
+.TP
+.I mg_ch_type
+specifies the type of the channel.
+.SH ORIGINATOR
+Media gateway controller.
+.SH "SEE ALSO"
+.BR MG_ATTACH_ACK (7).
+.SH VERSIONS
+This manpage was written for MGI Version 1.
+.XX
+.[
+mgi
+.]
+.[
+rfc3435
+.]
+.[
+h248.1
+.]
+.[
+$LIST$
+.]
+.TI

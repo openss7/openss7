@@ -1,0 +1,254 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: sdt.4.man,v 0.9.2.2 2004/04/17 21:38:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 21:38:39 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SDT 4 "$Date: 2004/04/17 21:38:39 $" "$Name:  $" "OpenSS7 SS7 Devices"
+.\"
+.\"
+.SH NAME
+.B sdt
+\- SS7 Q.702 Signalling Data Terminal
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sdti.h>
+.br
+.B #include <ss7/sdti_ioctl.h>
+.HP
+.BI "int " ch_stream " = open(" ch_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ch_stream ", " \fRI_PUSH\fI ", " \fR\*(lqsdl\*(rq\fI );
+.HP
+.BI "int " retval " = ioctl(" ch_stream ", " \fRI_PUSH\fI ", " \fR\*(lqsdt\*(rq\fI );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B SDT
+is an implementation of the Signalling System No. 7 (SS7) Signalling Terminal
+(SDT) as specified in ITU-T Recommendation Q.702.
+.PP
+.B SDT
+is implemented as a pushable
+.IR STREAMS (4)
+module.  The
+.B SDT
+module can be pushed over streams conforming to the Signalling Data Link
+Interface (SDLI) as described in
+.BR sdli (7),
+such as channels upon which the
+.BR sdl (4)
+module has been pushed.
+The
+.B SDT
+module provides data terminal access to the bit stream from the signalling
+data link provided by the
+.BR sdli (7)
+stream below it, by performing SS7 HDLC on the raw bit stream.  The
+.B SDT
+also provides AERM, SUERM and EIM functions directly.  The upper interface
+provided by the
+.B SDT
+module is the Signalling Data Terminal Interface (SDTI) as decribed in
+.BR sdti (7).
+.PP
+.B SDT
+streams can have
+.BR sl (4)
+modules pushed to provide a complete SS7 Signalling Link that can then be
+linked under an
+.BR mtp (4)
+or
+.BR m2ua (4)
+driver using the
+.IR I_LINK " or " I_PLINK
+commands of
+.BR streamio (7),
+to provide signalling link services to the Level 3 protocol.  This is normally
+performed, as required, by the SS7 Configuration Daemon,
+.BR ss7confd (8).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B SDT
+has been implemented as a pushable module to ease the development of SS7
+Signalling Link drivers for various cards.  All that is required is for the
+card to provide a Channel Interface (CHI),
+.BR chi (7),
+and push the
+.BR sdl (4),
+.BR sdt (4)
+and
+.BR sl (4)
+modules to provide a complete and compliant SS7 Signalling Link.
+.\"
+.\"
+.PP
+.B SDT
+is implemented internally as a soft-HDLC with SS7 considerations using
+host-table lookups.  While this is fairly efficient, devices that are capable
+of performing this function in hardware should provide the Signalling Data
+Terminal Interface (SDTI),
+.BR sdti (7),
+directly.  An example of a device that does include HLDC is the
+.BR x400p (4)
+driver.  An example of one that does, is the
+.BR acb56 (4)
+driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B SDT
+modules are not normally pushed or accessed directly by user-level programs.
+The
+.BR SDT
+module is used directly by some test and monitoring programs.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B SDT
+module responds to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+IO controls as interpreted for
+.B SDT
+operation as described in
+.BR sdti_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sdti.h> ,
+.BR <ss7/sdti_ioctl.h> .
+.\"
+.\"
+.SH MODULES
+.PP
+.RI streams- sdt .o
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SS7 (4),
+.BR chi (7),
+.BR sdl (4),
+.BR sl (4),
+.BR sdti (7),
+.BR sdti_ioctl (4),
+.BR ss7confd (8).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B SDT
+module conforms to the SDTI Specification, Revsion 0.8.2.
+.PP
+The
+.B SDT
+module first appeared in
+.B strss7
+release 0.7.8.
+.PP
+In earlier releases of
+.BR strss7 ,
+the
+.B SDT
+module only provided AERM, SUERM and EIM functions over an
+.B SDL
+module that conformed roughly to the CDI sepcification (see
+.BR cdi (7)).
+Earlier release specifications and approaches are incompatible with the
+current
+.BR strss7
+release 0.8.4 approach.  This only impacts driver development.
+.\"
+.\"
+.XX
+.[
+q702
+.]
+.[
+t1.111
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

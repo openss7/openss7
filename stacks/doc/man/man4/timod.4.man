@@ -1,0 +1,492 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: timod.4.man,v 0.9.2.1 2004/04/17 21:38:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 21:38:40 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TIMOD 4 "$Date: 2004/04/17 21:38:40 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.\"
+.\"
+.SH NAME
+.B timod
+\- a STREAMS XTI/TLI compatability interface
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/tihdr.h>
+.br
+.B #include <sys/timod.h>
+.HP 8
+.BI "" t " = open(" /dev/tcp , 0 );
+.HP 8
+.BI ioctl( t , I_PUSH , \*(lqtimod\*(rq );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.PP
+.B timod
+is a XTI/TLI library compatability module for the STREAMS Transport Provider
+Interface
+.BR tpi (7).
+It translates a set of
+.B timod
+.BR ioctl (2)
+commands into TLI primitives.  These
+.B timod
+.BR ioctl (2)
+commands are intended to be used by the XTI/TLI library.
+.B timod
+does not alter any messages passed with
+.BR putmsg "(2) or " putpmsg (2),
+or received with
+.BR getmsg "(2) or " getpmsg (2).
+.B timod
+simply intercepts responses to its own primitives sent downstream as a result
+of an
+.BR ioctl (2)
+command.
+.PP
+Unlike the
+.BR sockmod (4)
+module,
+.B timod
+makes no adjustments to the stream head for
+.BR read (2)
+options (see
+.B I_SETRDOPT
+under
+.BR streamio (7)).
+.\"
+.\"
+.SH IOCTLS
+.PP
+.PP
+The following subsections detail the
+.BR ioctl (2)
+commands that are made available by pushing the
+.B timod
+module.
+For additional information on the
+.B T_primitive
+structures, see
+.BR tpi (7).
+.SS TI_GETINFO (('T' << 8) + 140)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_info_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_info_req {
+    long PRIM_type;             /* always T_INFO_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_info_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_info_ack {
+    long PRIM_type;             /* always T_INFO_ACK */
+    long TSDU_size;             /* max TSDU size */
+    long ETSDU_size;            /* max ETSDU size */
+    long CDATA_size;            /* Connect data size */
+    long DDATA_size;            /* Discon data size */
+    long ADDR_size;             /* TSAP size */
+    long OPT_size;              /* options size */
+    long TIDU_size;             /* TIDU size */
+    long SERV_type;             /* service type */
+    long CURRENT_state;         /* current state */
+    long PROVIDER_flag;         /* provider flags */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_OPTMGMT (('T' << 8) + 141)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_optmgmt_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_optmgmt_req {
+    long PRIM_type;             /* always T_OPTMGMT_REQ */
+    long OPT_length;            /* options length */
+    long OPT_offset;            /* options offset */
+    long MGMT_flags;            /* flags */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_optmgmt_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_optmgmt_ack {
+    long PRIM_type;             /* always T_OPTMGMT_ACK */
+    long OPT_length;            /* options length */
+    long OPT_offset;            /* options offset */
+    long MGMT_flags;            /* flags */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_BIND (('T' << 8) + 142)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_bind_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_bind_req {
+    long PRIM_type;             /* always T_BIND_REQ */
+    long ADDR_length;           /* length of address */
+    long ADDR_offset;           /* offset of address */
+    t_uscalar_t CONIND_number;  /* requested number of connect
+                                   indications to be queued */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_bind_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_bind_ack {
+    long PRIM_type;             /* always T_BIND_ACK */
+    long ADDR_length;           /* length of address */
+    long ADDR_offset;           /* offset of address */
+    t_uscalar_t CONIND_number;  /* connect indications to be
+                                   queued */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_UNBIND (('T' << 8) + 143)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_unbind_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_unbind_req {
+    long PRIM_type;             /* always T_UNBIND_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_ok_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_ok_ack {
+    long PRIM_type;             /* always T_OK_ACK */
+    long CORRECT_prim;          /* primitive */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_GETMYNAME (('T' << 8) + 144)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_addr_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_req {
+    long PRIM_type;             /* always T_ADDR_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_addr_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_ack {
+    long PRIM_type;             /* always T_ADDR_ACK */
+    long LOCADDR_length;        /* length of local address */
+    long LOCADDR_offset;        /* offset of local address */
+    long REMADDR_length;        /* length of remote address */
+    long REMADDR_offset;        /* offset of remote address */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_GETPEERNAME (('T' << 8) + 145)
+.PP
+.I arg
+is a pointer to a buffer passing in a
+.B T_addr_req
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_req {
+    long PRIM_type;             /* always T_ADDR_REQ */
+};
+\fR\s+1
+.fi
+.PP
+and returning a
+.B T_addr_ack
+structure, formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct T_addr_ack {
+    long PRIM_type;             /* always T_ADDR_ACK */
+    long LOCADDR_length;        /* length of local address */
+    long LOCADDR_offset;        /* offset of local address */
+    long REMADDR_length;        /* length of remote address */
+    long REMADDR_offset;        /* offset of remote address */
+};
+\fR\s+1
+.fi
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_SETMYNAME (('T' << 8) + 146)
+.PP
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.SS TI_SETPEERNAME (('T' << 8) + 147)
+.PP
+.PP
+or an error return value.  See
+.I \*(lqRETURN VALUES,\*(rq
+below.
+.\"
+.\"
+.SH "RETURN VALUES"
+.PP
+.PP
+When
+.B timod
+ioctls succeed, they return zero and the returned TLI message in the area
+pointed to by
+.IR arg .
+When
+.B timod
+ioctls fail due to a
+.B T_ERROR_ACK
+being returned from the underlying TLI driver,
+.B timod
+returns a concatentation of the UNIX_error and the TLI_error as follows:
+.BR "((p->UNIX_error << 8) + p->TLI_error)" .
+When the ioctl fails, 
+.B timod
+returns -1 and sets
+.BI errno (3)
+to an appropriate error number.
+See
+.BR streamio (7)
+for a list of error numbers returned by the
+.B I_STR
+command.
+.\"
+.\"
+.SH ERRORS
+.PP
+.PP
+When
+.B timod
+ioctl calls fail,
+.B timod
+returns -1 and sets the
+.BI errno (3)
+to an appropriate error number.
+See
+.BR streamio (7)
+for a list of error numbers returned by the
+.B I_STR
+command.
+.\"
+.\"
+.SH MODULES
+.PP
+.RB \*(lq timod \*(rq
+.I STREAMS
+module.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (2),
+.BR streamio (7),
+.BR tpi (7),
+.BR sockmod (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B timod
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B timod
+is compatible with
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.BR LiS ,
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(em 4
+.B timod
+supports the IOCTLs
+.BR TI_GETMYNAME ", " TI_GETPEERNAME ", " TI_SETMYNAME " and " TI_SETPEERNAME .
+.IR Solaris \(rg ,
+.IR UnixWare \(rg
+and
+.B LiS
+do not.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B timod
+first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

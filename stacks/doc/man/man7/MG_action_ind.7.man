@@ -1,0 +1,1 @@
+.so MG_ACTION_IND.7.man

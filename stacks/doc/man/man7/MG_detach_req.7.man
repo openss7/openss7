@@ -1,0 +1,1 @@
+.so MG_DETACH_REQ.7.man

@@ -1,0 +1,200 @@
+'\" rt
+.\" Don't change the line above. it tells man that tbl is needed.
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: sdli_2.7.man,v 0.9.2.2 2004/04/17 23:05:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\"  Copyright (C) 2000  Brian Bidulock.  All Rights Reserved.
+.\"
+.\"
+.\"                               PUBLIC LICENSE
+.\"
+.\"  This license is provided without fee, provided that the above copy-
+.\"  right notice and this public license must be retained on all copies,
+.\"  extracts, compilations and derivative works.  Use or distribution of
+.\"  this work in a manner that restricts its use except as provided here
+.\"  will render this license void.
+.\"
+.\"  The author(s) hereby waive any and all other restrictions in respect
+.\"  of their copyright in this software and its associated documentation.
+.\"  The authors(s) of this software place in the public domain any novel
+.\"  methods or processes which are embodied in this software.
+.\"
+.\"  The author(s) undertook to write it for the sake of the advancement
+.\"  of the Arts and Sciences, but it is provided as is, and the author(s)
+.\"  will not take any responsibility in it.
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2004/04/17 23:05:35 $ by $Author: brian $
+.\"
+.\" $Log: sdli_2.7.man,v $
+.\" Revision 0.9.2.2  2004/04/17 23:05:35  brian
+.\" - Updating manual pages.
+.\"
+.\" Revision 0.9.2.1  2004/04/17 21:17:46  brian
+.\" - Converted to cooked manpages.
+.\"
+.\" Revision 0.9  2004/01/17 08:01:29  brian
+.\" - Added files for 0.9 baseline autoconf release.
+.\"
+.\" Revision 0.8.2.1  2003/07/18 20:38:44  brian
+.\" A lot of minor embellishments.
+.\"
+.\" Revision 0.8  2002/04/02 08:22:37  brian
+.\" Started Linux 2.4 development branch.
+.\"
+.\" Revision 0.7  2000/11/29 02:09:56  brian
+.\" Added man pages for interfaces.
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SDLI 7 "$Date: 2004/04/17 23:05:35 $" "SS7 Man Page" "Linux STREAMS Programmer's Manual" 
+
+.SH "NAME"
+
+.SH "DESCRIPTION"
+
+.SS "ADDRESS FORMATS"
+
+.SS "DATA STRUCTURES"
+
+SDLI defines four datastructures for protocol configuration, state, statistics
+and event management.
+.PP
+.B "Protocol Configuration"
+
+.RS
+.sp
+.nf
+typedef struct sdl_config {
+    sdl_ulong   pvar;
+    sdl_ulong   popt;
+    sdl_ulong   N;
+} sdl_config_t;
+.fi
+.RE
+.TP
+.I pvar
+.TP
+.I popt
+.TP
+.I N
+
+.PP
+.B "Protocol State"
+
+.RS
+.sp
+.nf
+typedef struct sdl_statem {
+    sdl_ulong   daedt_state;
+    sdl_ulong   daedr_state;
+    sdl_ulong   octet_counting_mode;
+} sdl_statem_t;
+.fi
+.RE
+.TP
+.I daedt_state
+.TP
+.I daedr_state
+.TP
+.I octet_counting_mode
+
+
+.PP
+.B "Protocol Statistics"
+
+.RS
+.sp
+.nf
+typedef struct sdl_stats {
+    sdl_ulong   bytes_transmitted;
+    sdl_ulong   bytes_received;
+} sdl_stats_t;
+.fi
+.RE
+.TP
+.I bytes_transmitting
+.TP
+.I bytes_received
+
+.PP
+.B "Protocol Events"
+
+.RS
+.sp
+.nf
+typedef struct sdl_events {
+    sdl_ulong   notifications;
+} sdl_events_t;
+.fi
+.RE
+.TP
+.I notifications
+
+
+
+.SH "SYSCTLS"
+
+The following sysctls can be accessed by the
+\fB/proc/sys/ss7/conf/sdl/\fIlinkname\fB/\fR files or with the \fBsysctl\fR(8)
+interface by prefixing \fBss7.conf.sdl.\fR\fIlinkname\fR to the sysctl name.
+The \fBsysctl\fR(2) system call can also be used to affect these values with
+the integer vector prefix \fI{ CTL_SS7, SS7_CONF, SS7_SDL }\fR.
+
+Default values are really only default-default values, and can be changed by
+changing the value in the \fB/proc/sys/ss7/conf/sdl/default/\fR files.
+Default values will have an effect on all subsequently added SS7 signalling
+data links; existing signalilng data links will be unaffected.  These default
+values may also be changed with \fBsysctl\fR(8) by prefixing
+\fBss7.conf.sdl.default\fR to the sysctl name.
+The \fBsysctl\fR(2) system call can also be used to affect these values with
+the integer vector prefix \fI{ CTL_SS7, SS7_CONF, SS7_SDL, SS7_DFLT }\fR.
+
+.SH "STREAMS IO"
+
+.SS "Local Management Primitives"
+
+.SS "Protocol Service Primitives"
+
+.SS "Protocol Management Primitives"
+
+.SH "IOCTLS"
+
+.SH "ERROR HANDLING"
+
+.SH "ERRORS"
+
+.SH "SEE ALSO"
+
+.SH "CAVEATS"
+
+.SH "BUGS"
+
+.SH "RESTRICTIONS"
+
+.SH "AUTHOR"
+
+.SH "HISTORY"
+
+.[
+$LIST$
+.]
+.TI

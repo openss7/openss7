@@ -1,0 +1,149 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CH_DATA_REQ.7.man,v 0.9.2.2 2004/04/17 23:05:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:10 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CH_DATA_REQ 7 "$Date: 2004/04/17 23:05:10 $" "$Name:  $" "Channel Interface"
+.SH NAME
+.B CH_DATA_REQ, CH_data_req, CH_data_req_t
+\- media data request
+.SH SYNOPSIS
+This primitive is one optional
+.B M_PROTO
+message block followed by one or more
+.B M_DATA
+message blocks containing one or more bytes of media data.  The optional
+.B M_PROTO
+message block is structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CH_data_req {
+    ch_ulong ch_primitive;      /* always CH_DATA_REQ */
+    ch_ulong ch_slot;           /* slot within channel */
+} CH_data_req_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Conveys media data for transmission from the channel service user to the
+channel service provider.
+.PP
+The optional
+.B M_PROTO
+message block permits the result of a
+.BR write (2)
+operation to be passed directly to the CHI conforming provider.
+.SH PARAMETERS
+The primitive optionally contains the following parameters:
+.TP
+.I ch_primitive
+specifies the primitive type.  Always
+.BR CH_DATA_REQ .
+.TP
+.I ch_slot
+specifies the slot to which the data belongs.  This is only valid for explicit
+multipel slot channels (e.g, separated stereo or quadraphonic) and is
+otherwise coded zero (0) by the channel service user and ignored by the
+channel service provider.  When the
+.I ch_slot
+is insignificant, the optional
+.B M_PROTO
+message block does not need to be included by the channel service user, and
+only the
+.B M_DATA
+message blocks need be specified.  Whenever the optional
+.B M_PROTO
+message block is not included,
+.I ch_slot
+is assumed to be zero (0).
+.SH ORIGINATOR
+Channel Service User.
+.SH STATES
+This primitive is valid in state
+.BR CHS_CONNECTED
+for the transmit direction.  The resulting state is unchanged.
+.SH RULES
+The following rules apply to the data included in the associated
+.B M_DATA
+message blocks:
+.IP \(em 4
+The data included in the associated
+.B M_DATA
+message blocks must contain at least one byte of data.  If there are no
+associated
+.B M_DATA
+message blocks, or the associated blocks contain no data, the provider returns
+the fatal error
+.RB [ EPROTO ].
+.PP
+This primitive requires no acknowledgment but may return a fatal error.
+.SH ERRORS
+Fatal errors are as follows:
+.TP
+.RB [ EPROTO ]
+The amount of data specified in the associated
+.B M_DATA
+message blocks is invalid.  That is, the amount of data is zero (0) or is too
+large for the channel service provider.  The channel service provider is
+allows to return this error if the data is larger than the channel block size
+indicated in the
+.BR CH_OPTMGMT_ACK (7)
+primitive.
+.SH "SEE ALSO"
+.BR CH_DATA_IND (7).
+.SH VERSIONS
+This manpage was written for CHI Version 1.
+.XX
+.[
+chi
+.]
+.[
+$LIST$
+.]
+.TI

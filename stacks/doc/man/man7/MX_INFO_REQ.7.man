@@ -1,0 +1,90 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: MX_INFO_REQ.7.man,v 0.9.2.2 2004/04/17 23:05:19 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:19 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MX_INFO_REQ 7 "$Date: 2004/04/17 23:05:19 $" "$Name:  $" "Multiplex Interface"
+.SH NAME
+.B MX_INFO_REQ, MX_info_req, MX_info_req_t
+\- information request
+.SH SYNOPSIS
+This primitive consists of one
+.B M_PROTO
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MX_info_req {
+    ulong mx_primitive;         /* always MX_INFO_REQ */
+} MX_info_req_t;
+\s+1\fR
+.fi
+.SH DESCRIPTION
+Requests information about the MX stream including its current channel
+configuration.
+.SH PARAMETERS
+This primitive contains the following parameters:
+.TP
+.I mx_primitive
+specifies the primitive type.  Always
+.BR MX_INFO_REQ .
+.SH ORIGINATOR
+Multiplex Service User.
+.SH "SEE ALSO"
+.BR MX_INFO_REQ (7).
+.SH VERSIONS
+This manpage was written for MXI Version 1.
+.XX
+.[
+mxi
+.]
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,252 @@
+'\" rt
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: CC_ERROR_ACK.7.man,v 0.9.2.2 2004/04/17 23:05:05 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/17 23:05:05 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so openss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH CC_ERROR_ACK 7 "$Date: 2004/04/17 23:05:05 $" "$Name:  $" "Call Control Interface"
+.\"
+.\"
+.SH NAME
+.B CC_ERROR_ACK
+\- error acknowledgment
+.\"
+.\"
+.SH SYNOPSIS
+The format of the mssage is one
+.B M_PCPROTO
+message block, and its structure is as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct CC_error_ack {
+    ulong cc_primitive;         /* always CC_ERROR_ACK */
+    ulong cc_error_primitive;   /* primitive in error */
+    ulong cc_error_type;        /* CCI error code */
+    ulong cc_unix_error;        /* UNIX system error code */
+    ulong cc_state;             /* current state */
+    ulong cc_call_ref;          /* call reference */
+} CC_error_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This primitive indicates to the CCS user that a non-fatal error has occurred
+in the last CCS user originated primitive.  This may only be initiated as an
+acknowledgment for those primitives that require one.  It also indicates to
+the user that no action was taken on the primitive that caused the error.
+.\"
+.\"
+.SS Parameters
+This primitive contains the following parameters:
+.\"
+.\"
+.TP 16
+.I cc_primitive
+indicates the primitive type.  Always
+.BR CC_ERROR_ACK .
+.TP
+.I cc_error_primitive
+Identifies the primitive type that cause the error.
+.TP
+.I cc_error_type
+Contains the Call Control Interface error code.
+.TP
+.I cc_unix_error
+Contains the UNIX system error code.  This may only be non-zero if the
+.I cc_error_type
+is equal to
+.RB [ CCSYSERR ].
+.TP
+.I cc_state
+Identifies the state of the interface at the time that the
+.B CC_ERROR_ACK
+primitive was issued by the CCS provider.
+.TP
+.I cc_call_ref
+Identifies the CCS provider or CCS user call reference associated with the
+request or response primitive that was in error.  If no call reference is
+associated with the request or response primitive that caused the error, this
+field is coded zero (0) by the CCS provider.
+.\"
+.\"
+.\".SS Rules
+.\"
+.\"
+.SS State
+This primitive is valid in all states that have a pending acknowledgment or
+confirmation.  The new state is the same as the one from which the
+acknowledged request or response was issued.
+.\"
+.\"
+.SS Modes
+This primitive is issued in all modes.
+.\"
+.\"
+.SS Originator
+This primitive is issued by the CC Provider.
+.\"
+.\"
+.SH ERRORS
+The following error codes are allows to be returned:
+.\"
+.\"
+.TP 16
+.RB [ CCSYSERR ]
+A system error has occurred and the UNIX system error is indicated in the
+primitive.
+.TP
+.RB [ CCOUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ CCBADADDR ]
+The call control address as specified in the primitive was in an incorrect
+format, or the address contained illegal information.
+.TP
+.RB [ CCBADDIGS ]
+The digits provided in the called party number or subsequent number specified
+in the primitive are of an incorrect format or are invalid.
+.TP
+.RB [ CCBADOPT ]
+The options values as specified in the primitive were in an incorrect format,
+or they contained illegal information.
+.TP
+.RB [ CCNOADDR ]
+The CCS provider could not allocate an address.
+.TP
+.RB [ CCADDRBUSY ]
+The CCS provider could not use the specified address because the specified
+address is already in use.
+.TP
+.RB [ CCBADCLR ]
+The call reference specified in the primitive was incorrect or illegal.
+.TP
+.RB [ CCBADTOK ]
+Token used is not associated with an open stream.
+.TP
+.RB [ CCBADFLAG ]
+The flags specified in the primitive were incorrect or illegal.
+.TP
+.RB [ CCNOTSUPP ]
+Specified primitive type is not known to the CCS provider.
+.TP
+.RB [ CCBADPRIM ]
+The primitive was of an incorrect format (i.e. too small, or an offset is out
+of range).
+.TP
+.RB [ CCACCESS ]
+The user did not have proper permissions.
+.\"
+.\"
+.SH NOTES
+.sp
+.\"
+.\"
+.SS "Considerations for Q.764 and ANSI T1.113 conformance:"
+CCS providers conforming to Q.764 or ANS T1.113 adhere to the following
+additional rules:
+(See also
+.BR cci_isup (7)
+for address format and
+.BR isup (4))
+.\"
+.\"
+.SS "Considerations for Q.931/932 conformance:"
+CCS providers conforming to Q.931/932 adhere to the following
+additional rules:
+(See also
+.BR cci_isdn (7)
+for address format and
+.BR isdn (4))
+.\"
+.\"
+.SS "Considerations for H.225.0 conformance:"
+CCS providers conforming to H.225.0 adhere to the following
+additional rules:
+(See also
+.BR cci_h225 (7)
+for address format and
+.BR h225 (4))
+.\"
+.\"
+.SS "Considerations for BSSAP conformance:"
+CCS providers conforming to BSSAP adhere to the following
+additional rules:
+(See also
+.BR cci_bssap (7)
+for address format and
+.BR bssap (4))
+.\"
+.\"
+.SH FILES
+.BR <ss7/cci.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR cci (7).
+.\"
+.\"
+.SH VERSIONS
+This manpage was written for
+.BR strss7-0.8.4 .
+.br
+The Call Control Interface (CCI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.4 .
+.br
+This is Version 0.8.4 of the CCI interface.
+.XX
+.[
+cci
+.]
+.[
+$LIST$
+.]
+.TI
