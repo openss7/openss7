@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 11:09:17 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 11:04:34 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/09/02 11:09:17 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 11:09:17 $"
 
-static char const ident[] =
-    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:34 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 11:09:17 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -910,6 +909,7 @@ void print_addr(char *add_ptr, size_t add_len)
 	fflush(stdout);
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
+
 char *addr_string(char *add_ptr, size_t add_len)
 {
 	static char buf[128];
@@ -922,7 +922,9 @@ char *addr_string(char *add_ptr, size_t add_len)
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
 		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
 		for (i = 0; i < anum; i++) {
-			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+			len +=
+			    snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff,
+				     (a->addr[i] >> 24) & 0xff);
 		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
@@ -950,6 +952,7 @@ void print_addr(char *add_ptr, size_t add_len)
 	fflush(stdout);
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
+
 char *addr_string(char *add_ptr, size_t add_len)
 {
 	static char buf[128];
@@ -2613,14 +2616,17 @@ int test_case_1_1(int fd, void *add_ptr, size_t add_len, int coninds)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_1_1_conn(int fd)
 {
 	return test_case_1_1(fd, &addr1, sizeof(addr1), 0);
 }
+
 int test_case_1_1_list(int fd)
 {
 	return test_case_1_1(fd, NULL, 0, 0);
 }
+
 int test_case_1_1_resp(int fd)
 {
 	return test_case_1_1(fd, NULL, 0, 0);
@@ -2660,14 +2666,17 @@ int test_case_1_2(int fd, void *add_ptr, size_t add_len, int coninds)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_1_2_conn(int fd)
 {
 	return test_case_1_2(fd, &addr1, sizeof(addr1), 0);
 }
+
 int test_case_1_2_list(int fd)
 {
 	return test_case_1_2(fd, &addr2, sizeof(addr2), 5);
 }
+
 int test_case_1_2_resp(int fd)
 {
 	return test_case_1_2(fd, &addr2, sizeof(addr3), 0);
@@ -2726,10 +2735,12 @@ int test_case_2_1_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_2_1_list(int fd)
 {
 	return (__RESULT_SUCCESS);
 }
+
 int test_case_2_1_resp(int fd)
 {
 	return (__RESULT_SUCCESS);
@@ -2768,6 +2779,7 @@ int test_case_2_2_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_2_2_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -2780,6 +2792,7 @@ int test_case_2_2_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_2_2_resp(int fd)
 {
 	return (__RESULT_SUCCESS);
@@ -2816,6 +2829,7 @@ int test_case_3_1_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_3_1_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -2831,6 +2845,7 @@ int test_case_3_1_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_3_1_resp(int fd)
 {
 	return (__RESULT_SUCCESS);
@@ -2872,6 +2887,7 @@ int test_case_3_2_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_3_2_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -2889,6 +2905,7 @@ int test_case_3_2_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_3_2_resp(int fd)
 {
 	return (__RESULT_SUCCESS);
@@ -2929,6 +2946,7 @@ int test_case_4_1_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_4_1_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -2944,6 +2962,7 @@ int test_case_4_1_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_4_1_resp(int fd)
 {
 	test_sleep(fd, 2);
@@ -2996,6 +3015,7 @@ int test_case_4_2_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_4_2_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -3013,6 +3033,7 @@ int test_case_4_2_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_4_2_resp(int fd)
 {
 	test_sleep(fd, 4);
@@ -3064,6 +3085,7 @@ int test_case_5_1_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_5_1_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -3079,6 +3101,7 @@ int test_case_5_1_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_5_1_resp(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
@@ -3125,6 +3148,7 @@ int test_case_5_2_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_5_2_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -3140,6 +3164,7 @@ int test_case_5_2_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_5_2_resp(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
@@ -3186,6 +3211,7 @@ int test_case_5_3_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_5_3_list(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_CONN_IND) != __RESULT_SUCCESS)
@@ -3201,6 +3227,7 @@ int test_case_5_3_list(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_5_3_resp(int fd)
 {
 	if (expect(fd, LONGER_WAIT, __EVENT_DISCON_IND) != __RESULT_SUCCESS)
@@ -3249,10 +3276,12 @@ int test_case_6_1_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_6_1_list(int fd)
 {
 	return (__RESULT_SUCCESS);
 }
+
 int test_case_6_1_resp(int fd)
 {
 	int i;
@@ -3322,10 +3351,12 @@ int test_case_6_2_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_6_2_list(int fd)
 {
 	return (__RESULT_SUCCESS);
 }
+
 int test_case_6_2_resp(int fd)
 {
 	if (expect(fd, NORMAL_WAIT, __EVENT_DATA_IND) != __RESULT_SUCCESS)
@@ -3532,10 +3563,12 @@ int test_case_7_1_conn(int fd)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int test_case_7_1_list(int fd)
 {
 	return (__RESULT_SUCCESS);
 }
+
 int test_case_7_1_resp(int fd)
 {
 	size_t len = 0;
@@ -3610,10 +3643,12 @@ int test_case_7_2_conn(int fd)
 	print_more();
 	return (__RESULT_FAILURE);
 }
+
 int test_case_7_2_list(int fd)
 {
 	return (__RESULT_SUCCESS);
 }
+
 int test_case_7_2_resp(int fd)
 {
 	int r = 0;
@@ -4422,10 +4457,12 @@ int test_case_10_2_conn(int fd)
 	show = 1;
 	return (__RESULT_FAILURE);
 }
+
 int test_case_10_2_list(int fd)
 {
 	return (__RESULT_SUCCESS);
 }
+
 int test_case_10_2_resp(int fd)
 {
 	int i, j;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.2 2004/08/26 23:37:42 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.3 2004/09/02 11:09:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 11:09:17 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -95,8 +95,7 @@ ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 			spin_unlock(&h->lock);
 		} else
 			printd(("%s: %p: %s timeout collision at %lu\n", mod, h, timer, jiffies));
-		/* 
-		   back off timer two ticks */
+		/* back off timer two ticks */
 		*timeo = timeout(exp_func, data, 2);
 	}
 }

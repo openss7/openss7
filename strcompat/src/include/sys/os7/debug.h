@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.3 2004/08/27 07:31:29 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.4 2004/09/02 11:09:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:29 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 11:09:17 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_DEBUG_H__
 #define __OS7_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:29 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 11:09:17 $"
 
-#ifdef LFS
+#if defined LFS
 
 #if	defined _DEBUG
 #define CONFIG_STREAMS_DEBUG
+#elif	defined _TEST
+#define CONFIG_STREAMS_TEST
 #elif	defined _SAFE
 #define CONFIG_STREAMS_SAFE
 #else
@@ -67,22 +69,22 @@
 #include <sys/strdebug.h>
 #include <sys/debug.h>
 
-#else
+#else				/* defined LFS */
 
 #if 1
 #define DDTRACE          do { printk("%s [%s %d] trace\n",__FUNCTION__,__FILE__, __LINE__); } while(0)
 #define DDPRINT(n,args)  do { printk args; } while(0)
 
-#ifdef  _DEBUG
+#if	defined _DEBUG
 #define DTRACE           do { if ( DEBUG_LEVEL ) { printk("%s [%s %d] trace\n",__FUNCTION__,__FILE__, __LINE__); } } while(0)
 #define DPRINT(n,args)   do { if (DEBUG_LEVEL>n) { printk args; } } while(0)
 #define DBLOCK(n,block)     { if (DEBUG_LEVEL>n) { block } }
-#else
+#else				/* defined _DEBUG */
 #define DTRACE
 #define DPRINT(n,args)
 #define DBLOCK(n,block)
-#endif
-#endif
+#endif				/* defined _DEBUG */
+#endif				/* 1 */
 
 #define __never() \
 do { printk(KERN_EMERG "%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); *(int *)0 = 0; } while(0)
@@ -132,86 +134,134 @@ do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LI
 #define __pswerr(__pkspec) \
 do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
-#ifdef _DEBUG
+#define    _never()		do { } while(0)
+#define     _rare()		do { } while(0)
+#define   _seldom()		do { } while(0)
+#define    _usual(__exp)	do { } while(0)
+#define  _unusual(__exp)	do { } while(0)
+#define   _normal(__exp)	do { } while(0)
+#define _abnormal(__exp)	do { } while(0)
+#define   _assert(__exp)	do { } while(0)
+#define   _assure(__exp)	do { } while(0)
+#define   _ensure(__exp,__sta)	do { } while(0)
+#define   _unless(__exp,__sta)	do { } while(0)
+#define    _trace()		do { } while(0)
+#define   _ptrace(__pks)	do { } while(0)
+#define   _ctrace(__fnc)	(__fnc)
+#define    _fixme(__pks)	do { } while(0)
+#define     _todo(__pks)	do { } while(0)
+#define   _printd(__pks)	do { } while(0)
+#define    _swerr()		do { } while(0)
+#define   _pswerr(__pks)	do { } while(0)
 
-#define   never()		__never()
-#define    rare()		__rare()
-#define  seldom()		__seldom()
-#define   usual(__exp)		__usual(__exp)
-#define unusual(__exp)		__usual(!(__exp))
-#define  normal(__exp)		__normal(__exp)
+#if	defined _DEBUG
+
+#define    never()		__never()
+#define     rare()		__rare()
+#define   seldom()		__seldom()
+#define    usual(__exp)		__usual(__exp)
+#define  unusual(__exp)		__usual(!(__exp))
+#define   normal(__exp)		__normal(__exp)
 #define abnormal(__exp)		__normal(!(__exp))
-#define  assert(__exp)		__assert(__exp)
-#define  assure(__exp)		__assure(__exp)
-#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__ensure(!(__exp),__sta)
-#define   trace()		__trace()
-#define  ptrace(__pks)		__ptrace(__pks)
-#define  ctrace(__fnc)		__ctrace(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		__todo(__pks)
-#define  printd(__pks)		__printd(__pks)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
+#define   assert(__exp)		__assert(__exp)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		__trace()
+#define   ptrace(__pks)		__ptrace(__pks)
+#define   ctrace(__fnc)		__ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		__printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
 
 #define STATIC
 #define INLINE
 
-#else
-#ifdef _SAFE
+#else				/* defined _DEBUG */
+#if	defined _TEST
 
-#define   never()		do { *(int *)0 = 0; } while(0)
-#define    rare()		do { } while(0)
-#define  seldom()		do { } while(0)
-#define   usual(__exp)		do { } while(0)
-#define unusual(__exp)		do { } while(0)
-#define  normal(__exp)		do { } while(0)
-#define abnormal(__exp)		do { } while(0)
-#define  assert(__exp)		{ if (!(__exp)) *(int *)0 = 0; } while(0)
-#define  assure(__exp)		__assure(__exp)
-#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__ensure(!(__exp),__sta)
-#define   trace()		do { } while(0)
-#define  ptrace(__pks)		do { } while(0)
-#define  ctrace(__fnc)		(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		__todo(__pks)
-#define  printd(__pks)		do { } while(0)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
-
-#define STATIC static
-#define INLINE inline
-
-#else
-
-#define   never()		do { } while(0)
-#define	   rare()		do { } while(0)
-#define	 seldom()		do { } while(0)
-#define   usual(__exp)		do { } while(0)
-#define unusual(__exp)		do { } while(0)
-#define  normal(__exp)		do { } while(0)
-#define abnormal(__exp)		do { } while(0)
-#define  assert(__exp)		do { } while(0)
-#define  assure(__exp)		do { } while(0)
-#define  ensure(__exp,__sta)	do { } while(0)
-#define  unless(__exp,__sta)	do { } while(0)
-#define  trace()		do { } while(0)
-#define  ptrace(__pks)		do { } while(0)
-#define  ctrace(__fnc)		(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		do { } while(0)
-#define  printd(__pks)		do { } while(0)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
+#define    never()		__never()
+#define     rare()		__rare()
+#define   seldom()		__seldom()
+#define    usual(__exp)		__usual(__exp)
+#define  unusual(__exp)		__usual(!(__exp))
+#define   normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__normal(!(__exp))
+#define   assert(__exp)		__assert(__exp)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
 
 #define STATIC static
 #define INLINE inline
 
-#endif
+#else				/* defined _TEST */
+#if	defined _SAFE
 
-#endif
+#define    never()		do { *(int *)0 = 0; } while(0)
+#define     rare()		_rare()
+#define   seldom()		_seldom()
+#define    usual(__exp)		_usual(__exp)
+#define  unusual(__exp)		_unusual(__exp)
+#define   normal(__exp)		_normal(__exp)
+#define abnormal(__exp)		_abnormal(__exp)
+#define   assert(__exp)		{ if (!(__exp)) *(int *)0 = 0; } while(0)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
 
-#endif				/* LFS */
+#define STATIC static
+#define INLINE inline
+
+#else				/* defined _SAFE */
+
+#define    never()		_never()
+#define     rare()		_rare()
+#define   seldom()		_seldom()
+#define    usual(__exp)		_usual(__exp)
+#define  unusual(__exp)		_unusual(__exp)
+#define   normal(__exp)		_normal(__exp)
+#define abnormal(__exp)		_abnormal(__exp)
+#define   assert(__exp)		_assert(__exp)
+#define   assure(__exp)		_assure(__exp)
+#define   ensure(__exp,__sta)	_ensure(__exp,__sta)
+#define   unless(__exp,__sta)	_unless(__exp,__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		_todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
+#define STATIC static
+#define INLINE inline
+
+#endif				/* defined _SAFE */
+
+#endif				/* defined _TEST */
+
+#endif				/* defined _DEBUG */
+
+#endif				/* defined LFS */
 
 #endif				/* __OS7_DEBUG_H__ */

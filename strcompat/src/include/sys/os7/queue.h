@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.3 2004/08/29 20:25:05 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.4 2004/09/02 11:09:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:05 $ by $Author: brian $
+ Last Modified $Date: 2004/09/02 11:09:17 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -269,7 +269,7 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 					putbq(q, mp);
 					break;
 				}
-				/* 
+				/*
 				 *  Be careful not to put a priority
 				 *  message back on the queue.
 				 */
@@ -289,8 +289,7 @@ ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t 
 			}
 			break;
 		}
-		/* 
-		   perform wakeups */
+		/* perform wakeups */
 		if (wakeup)
 			wakeup(q);
 		ss7_unlockq(q);
