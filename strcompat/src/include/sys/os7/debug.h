@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.4 2004/09/02 11:09:17 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.5 2005/03/13 23:49:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 11:09:17 $ by $Author: brian $
+ Last Modified $Date: 2005/03/13 23:49:44 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_DEBUG_H__
 #define __OS7_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/09/02 11:09:17 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/13 23:49:44 $"
 
 #if defined LFS
 
@@ -86,51 +86,71 @@
 #endif				/* defined _DEBUG */
 #endif				/* 1 */
 
+#undef  __never
 #define __never() \
-do { printk(KERN_EMERG "%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); *(int *)0 = 0; } while(0)
+do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __rare
 #define __rare() \
 do { printk(KERN_NOTICE "%s: rare() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __seldom
 #define __seldom() \
 do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __usual
 #define __usual(__exp) \
 do { if (!(__exp)) printk(KERN_WARNING "%s: usual(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
 
+#undef  __normal
 #define __normal(__exp) \
 do { if (!(__exp)) printk(KERN_WARNING "%s: normal(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
 
+#undef  __assert
 #define __assert(__exp) \
 do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); *(int *)0 = 0; } } while(0)
 
+#undef  __assure
 #define __assure(__exp) \
 do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
 
+#undef  __ensure
 #define __ensure(__exp,__sta) \
 do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
 
+#undef  __unless
+#define __unless(__exp,__sta) \
+__ensure(!(__exp),__sta)
+
+#undef  __trace
 #define __trace() \
 do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __ptrace
 #define __ptrace(__pkspec) \
 do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#undef  __fixme
 #define __fixme(__pkspec) \
 do { printk(KERN_INFO "%s: fixme() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#undef  __todo
 #define __todo(__pkspec) \
 do { printk(KERN_INFO "%s: todo() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#undef  __ctrace
 #define __ctrace(__fnc) \
 ({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
 
+#undef  __printd
 #define __printd(__pkspec) \
 do { printk __pkspec; } while(0)
 
+#undef  __swerr
 #define __swerr() \
 do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
+#undef  __pswerr
 #define __pswerr(__pkspec) \
 do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
@@ -176,7 +196,9 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC
+#undef INLINE
 #define INLINE
 
 #else				/* defined _DEBUG */
@@ -202,8 +224,16 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC static
+#undef INLINE
+#if defined __inline
 #define INLINE inline
+#elif defined __inline__
+#define INLINE __inline__
+#else
+#define INLINE inline
+#endif
 
 #else				/* defined _TEST */
 #if	defined _SAFE
@@ -228,8 +258,16 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC static
+#undef INLINE
+#if defined __inline
+#define INLINE __inline
+#elif defined __inline__
+#define INLINE __inline__
+#else
 #define INLINE inline
+#endif
 
 #else				/* defined _SAFE */
 
@@ -253,8 +291,16 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
+#undef STATIC
 #define STATIC static
+#undef INLINE
+#if defined __inline
+#define INLINE __inline
+#elif defined __inline__
+#define INLINE __inline__
+#else
 #define INLINE inline
+#endif
 
 #endif				/* defined _SAFE */
 

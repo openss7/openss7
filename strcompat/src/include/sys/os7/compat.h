@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.11 2005/03/13 11:27:52 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.12 2005/03/13 23:49:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/13 11:27:52 $ by $Author: brian $
+ Last Modified $Date: 2005/03/13 23:49:44 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -117,13 +117,6 @@ typedef int tid_t;
 #define NMINORS		((1UL<<16)-1)	/* really big for LFS */
 #else
 #define NMINORS		((1UL<<8)-1)	/* be conservative for others */
-#endif
-
-#ifdef INLINE
-#undef INLINE
-#endif
-#ifdef STATIC
-#undef STATIC
 #endif
 
 #include "os7/debug.h"		/* generic debugging macros */
