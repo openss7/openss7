@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:21:59 $ by $Author: brian $
+ Last Modified $Date: 2004/01/19 22:59:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:54 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:21:59 $";
+static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:59:54 $";
 
 #define __NO_VERSION__
 
@@ -83,16 +83,7 @@ static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9 $) 
 
 #include "sctp_t.h"
 
-#ifndef SCTP_T_CMAJOR
-#define SCTP_T_CMAJOR 241
-#endif
-#define SCTP_NMINOR 255
-
-#ifndef INT
-#define INT int
-#endif
-
-typedef void (*bufcall_fnc_t) (long);
+#define SCTP_T_CMINORS 255
 
 #undef min
 #define min lis_min
@@ -120,8 +111,8 @@ STATIC struct module_info sctp_t_minfo = {
 STATIC int sctp_t_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int sctp_t_close(queue_t *, int, cred_t *);
 
-STATIC INT sctp_t_rput(queue_t *, mblk_t *);
-STATIC INT sctp_t_rsrv(queue_t *);
+STATIC int sctp_t_rput(queue_t *, mblk_t *);
+STATIC int sctp_t_rsrv(queue_t *);
 
 STATIC struct qinit sctp_t_rinit = {
 	qi_putp:sctp_t_rput,		/* Read put (msg from below) */
@@ -131,8 +122,8 @@ STATIC struct qinit sctp_t_rinit = {
 	qi_minfo:&sctp_t_minfo,		/* Information */
 };
 
-STATIC INT sctp_t_wput(queue_t *, mblk_t *);
-STATIC INT sctp_t_wsrv(queue_t *);
+STATIC int sctp_t_wput(queue_t *, mblk_t *);
+STATIC int sctp_t_wsrv(queue_t *);
 
 STATIC struct qinit sctp_t_winit = {
 	qi_putp:sctp_t_wput,		/* Write put (msg from above) */
@@ -2222,8 +2213,10 @@ t_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 			break;
 		}
 		case TS_WACK_DREQ7:
-			if (seq)
+			if (seq) {
 				bufq_unlink(&sp->conq, (mblk_t *) seq);
+				freemsg((mblk_t *) seq);
+			}
 		case TS_WACK_DREQ6:
 		case TS_WACK_DREQ9:
 		case TS_WACK_DREQ10:
@@ -3734,7 +3727,7 @@ sctp_t_w_other(queue_t *q, mblk_t *mp)
 /*
  *  TPI Write Message
  */
-STATIC INLINE INT
+STATIC INLINE int
 sctp_t_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -3753,7 +3746,7 @@ sctp_t_w_prim(queue_t *q, mblk_t *mp)
 /*
  *  IP Read Message
  */
-STATIC INLINE INT
+STATIC INLINE int
 sctp_t_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -3898,28 +3891,28 @@ sctp_t_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	return (-EAGAIN);
 }
 
-STATIC INT
+STATIC int
 sctp_t_rput(queue_t *q, mblk_t *mp)
 {
-	return (INT) sctp_t_putq(q, mp, &sctp_t_r_prim);
+	return (int) sctp_t_putq(q, mp, &sctp_t_r_prim);
 }
 
-STATIC INT
+STATIC int
 sctp_t_rsrv(queue_t *q)
 {
-	return (INT) sctp_t_srvq(q, &sctp_t_r_prim);
+	return (int) sctp_t_srvq(q, &sctp_t_r_prim);
 }
 
-STATIC INT
+STATIC int
 sctp_t_wput(queue_t *q, mblk_t *mp)
 {
-	return (INT) sctp_t_putq(q, mp, &sctp_t_w_prim);
+	return (int) sctp_t_putq(q, mp, &sctp_t_w_prim);
 }
 
-STATIC INT
+STATIC int
 sctp_t_wsrv(queue_t *q)
 {
-	return (INT) sctp_t_srvq(q, &sctp_t_w_prim);
+	return (int) sctp_t_srvq(q, &sctp_t_w_prim);
 }
 
 /*
@@ -3949,7 +3942,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 		cminor = 1;
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
-	for (; *spp && cminor <= SCTP_NMINOR; spp = &(*spp)->next) {
+	for (; *spp && cminor <= SCTP_T_CMINORS; spp = &(*spp)->next) {
 		ushort dminor = (*spp)->cminor;
 		if (cminor < dminor)
 			break;
@@ -3961,7 +3954,7 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			cminor++;
 		}
 	}
-	if (cminor > SCTP_NMINOR) {
+	if (cminor > SCTP_T_CMINORS) {
 		rare();
 		return (ENXIO);
 	}
@@ -3993,7 +3986,7 @@ sctp_t_init(void)
 {
 	int cmajor;
 	if ((cmajor =
-	     lis_register_strdev(SCTP_T_CMAJOR, &sctp_t_info, SCTP_NMINOR,
+	     lis_register_strdev(SCTP_T_CMAJOR_0, &sctp_t_info, SCTP_T_CMINORS,
 				 sctp_t_minfo.mi_idname)) < 0) {
 		sctp_t_minfo.mi_idnum = 0;
 		rare();

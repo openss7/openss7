@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:30 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:53:24 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:26:30 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/01/19 22:53:24 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:30 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:53:24 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:30 $";
+    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/19 22:53:24 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -81,6 +81,10 @@ static char const ident[] =
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
 #if 0
 #include "../include/sys/npi.h"
 #include "../include/sys/npi_sctp.h"
@@ -88,6 +92,11 @@ static char const ident[] =
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
 #endif
+
+static int verbose = 1;
+static int summary = 0;
+static int timer_scale = 1;
+static int show_msg = 0;
 
 #define BUFSIZE 5*4096
 #define FFLUSH(stream)
@@ -2283,7 +2292,7 @@ int test_case_1b(void)
  *  Attempt a connection with no listener.
  */
 #define desc_case_2 "\
-Test Case 2:\n\
+Test Case 2(a):\n\
 Attempts a connection with no listener.  The connection attempt\n\
 should time out."
 int test_case_2(void)
@@ -2338,11 +2347,11 @@ int test_case_2(void)
 /*
  *  Attempt and withdraw a connection request.
  */
-#define desc_case_2a "\
+#define desc_case_2b "\
 Test Case 2(a):\n\
 Attempts and then withdraws a connection request.  The connection\n\
 should disconnect at both ends."
-int test_case_2a(void)
+int test_case_2b(void)
 {
 	state = 0;
 	for (;;) {
@@ -2374,7 +2383,7 @@ int test_case_2a(void)
  *  Attempt and refuse a connection request.
  */
 #define desc_case_3 "\
-Test Case 3:\n\
+Test Case 3(a):\n\
 Attempts a connection which is refused by the receiving end.\n\
 The connection should disconnect at the attempting end."
 int test_case_3(void)
@@ -2451,7 +2460,7 @@ int test_case_3b(void)
  *  Accept a connection.
  */
 #define desc_case_4 "\
-Test Case 4:\n\
+Test Case 4(a):\n\
 Accept a connection and then disconnect.  This connection attempt\n\
 should be successful."
 int test_case_4(void)
@@ -2548,7 +2557,7 @@ int test_case_4b(void)
  *  Accept a connection.
  */
 #define desc_case_5 "\
-Test Case 5:\n\
+Test Case 5(a):\n\
 Attempt and accept a connection.  This should be successful.  The\n\
 accepting stream uses the SCTP_HMAC_NONE signature on its cookie."
 int test_case_5(void)
@@ -2680,7 +2689,7 @@ int test_case_5c(void)
  *  Connect with data.
  */
 #define desc_case_6 "\
-Test Case 6:\n\
+Test Case 6(a):\n\
 Attempt and accept a connection where data is also passed in the\n\
 connection request and the connection response.  This should result\n\
 in DATA chunks being bundled with the COOKIE-ECHO and COOKIE-ACK\n\
@@ -3043,7 +3052,7 @@ int test_case_7b(void)
  *  Connect with data.
  */
 #define desc_case_8 "\
-Test Case 8:\n\
+Test Case 8(a):\n\
 Connect with data in the connection request and response, and\n\
 send data with receipt confirmation set.  Check that the data\n\
 returns an acknowledgement when it is SACK'ed by the other end."
@@ -3821,131 +3830,406 @@ int test_case_10b(void)
 }
 
 struct test_case {
-	const char *name;
-	int (*preamble) (void);
-	int (*testcase) (void);
-	int (*postamble) (void);
+	const char *numb;		/* test case number */
+	const char *name;		/* test case name */
+	int (*preamble) (void);		/* test case preamble */
+	int (*testcase) (void);		/* test case proper */
+	int (*postamble) (void);	/* test case postamble */
+	int run;			/* whether to run this test */
+	int result;			/* results of test */
 } tests[] = {
 	{
-	desc_case_1, &preamble_0, &test_case_1, &postamble_0}
-	, {
-	desc_case_1b, &preamble_0, &test_case_1b, &postamble_0}
-	, {
-	desc_case_2, &preamble_0, &test_case_2, &postamble_0}
-	, {
-	desc_case_2a, &preamble_1, &test_case_2a, &postamble_1}
-	, {
-	desc_case_3, &preamble_1, &test_case_3, &postamble_1}
-	, {
-	desc_case_3b, &preamble_1, &test_case_3b, &postamble_1}
-	, {
-	desc_case_4, &preamble_1, &test_case_4, &postamble_1}
-	, {
-	desc_case_4b, &preamble_1, &test_case_4b, &postamble_1}
-	, {
-	desc_case_5, &preamble_1, &test_case_5, &postamble_1}
-	, {
-	desc_case_5b, &preamble_8, &test_case_5b, &postamble_1}
-	, {
-	desc_case_5c, &preamble_7, &test_case_5c, &postamble_1}
-	, {
-	desc_case_6, &preamble_2b, &test_case_6, &postamble_2}
-	, {
-	desc_case_6b, &preamble_2, &test_case_6b, &postamble_2}
-	, {
-	desc_case_6c, &preamble_3b, &test_case_6c, &postamble_2}
-	, {
-	desc_case_7, &preamble_2, &test_case_7, &postamble_2}
-	, {
-	desc_case_7b, &preamble_2, &test_case_7b, &postamble_2}
-	, {
-	desc_case_8, &preamble_2b, &test_case_8, &postamble_2}
-	, {
-	desc_case_8b, &preamble_2c, &test_case_8b, &postamble_2}
-	, {
-	desc_case_9a, &preamble_4, &test_case_9a, &postamble_2}
-	, {
-	desc_case_9b, &preamble_4, &test_case_9b, &postamble_2}
-	, {
-	desc_case_9c, &preamble_6, &test_case_9c, &postamble_2}
-	, {
-	desc_case_9d, &preamble_6, &test_case_9d, &postamble_2}
-	, {
-	desc_case_10a, &preamble_5, &test_case_10a, &postamble_2}
-	, {
-	desc_case_10b, &preamble_5, &test_case_10b, &postamble_2}
+	"1(a)", desc_case_1, &preamble_0, &test_case_1, &postamble_0, 0, 0}, {
+	"1(b)", desc_case_1b, &preamble_0, &test_case_1b, &postamble_0, 0, 0}, {
+	"2(a)", desc_case_2, &preamble_0, &test_case_2, &postamble_0, 0, 0}, {
+	"2(b)", desc_case_2b, &preamble_1, &test_case_2b, &postamble_1, 0, 0}, {
+	"3(a)", desc_case_3, &preamble_1, &test_case_3, &postamble_1, 0, 0}, {
+	"3(b)", desc_case_3b, &preamble_1, &test_case_3b, &postamble_1, 0, 0}, {
+	"4(a)", desc_case_4, &preamble_1, &test_case_4, &postamble_1, 0, 0}, {
+	"4(b)", desc_case_4b, &preamble_1, &test_case_4b, &postamble_1, 0, 0}, {
+	"5(a)", desc_case_5, &preamble_1, &test_case_5, &postamble_1, 0, 0}, {
+	"5(b)", desc_case_5b, &preamble_8, &test_case_5b, &postamble_1, 0, 0}, {
+	"5(c)", desc_case_5c, &preamble_7, &test_case_5c, &postamble_1, 0, 0}, {
+	"6(a)", desc_case_6, &preamble_2b, &test_case_6, &postamble_2, 0, 0}, {
+	"6(b)", desc_case_6b, &preamble_2, &test_case_6b, &postamble_2, 0, 0}, {
+	"6(c)", desc_case_6c, &preamble_3b, &test_case_6c, &postamble_2, 0, 0}, {
+	"7(a)", desc_case_7, &preamble_2, &test_case_7, &postamble_2, 0, 0}, {
+	"7(b)", desc_case_7b, &preamble_2, &test_case_7b, &postamble_2, 0, 0}, {
+	"8(a)", desc_case_8, &preamble_2b, &test_case_8, &postamble_2, 0, 0}, {
+	"8(b)", desc_case_8b, &preamble_2c, &test_case_8b, &postamble_2, 0, 0}, {
+	"9(a)", desc_case_9a, &preamble_4, &test_case_9a, &postamble_2, 0, 0}, {
+	"9(b)", desc_case_9b, &preamble_4, &test_case_9b, &postamble_2, 0, 0}, {
+	"9(c)", desc_case_9c, &preamble_6, &test_case_9c, &postamble_2, 0, 0}, {
+	"9(d)", desc_case_9d, &preamble_6, &test_case_9d, &postamble_2, 0, 0}, {
+	"10(a)", desc_case_10a, &preamble_5, &test_case_10a, &postamble_2, 0, 0}, {
+	"10(b)", desc_case_10b, &preamble_5, &test_case_10b, &postamble_2, 0, 0}, {
+	NULL,}
 };
 
-int main()
+int
+do_tests(void)
 {
 	int i;
 	int result = INCONCLUSIVE;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
-	printf("Simple test program for streams-sctp driver.\n");
+	int num_exit;
+	if (verbose) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "\n\nRFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Program.\n");
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
 	if (begin_tests() == SUCCESS) {
-		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)); i++) {
-			printf("\n%s\n", tests[i].name);
-			printf
-			    ("---------------------------------Preamble-----------------------------------\n");
-			if (tests[i].preamble() != SUCCESS) {
-				printf
-				    ("                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-				     state);
+		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+			if (tests[i].result)
+				continue;
+			if (!tests[i].run) {
+				tests[i].result = INCONCLUSIVE;
+				continue;
+			}
+			if (verbose) {
+				lockf(fileno(stdout), F_LOCK, 0);
+				fprintf(stdout, "\nTest Case SCTP NPI:%s:\n%s\n", tests[i].numb, tests[i].name);
+				fflush(stdout);
+				lockf(fileno(stdout), F_ULOCK, 0);
+			}
+			fprintf(stdout, "---------------------------------Preamble-----------------------------------\n");
+			if (tests[i].preamble && tests[i].preamble() != SUCCESS) {
+				fprintf(stdout, "                    |???????? INCONCLUSIVE %2d ??????|??|                    \n", state);
 				result = INCONCLUSIVE;
 			} else {
-				printf
-				    ("--------------------|--------------Test-------------|--|--------------------\n");
-				if (tests[i].testcase() == FAILURE) {
-					printf
-					    ("                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    \n");
+				fprintf(stdout, "--------------------|--------------Test-------------|--|--------------------\n");
+				if (tests[i].testcase && tests[i].testcase() == FAILURE) {
+					fprintf(stdout, "                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    \n");
 					result = FAILURE;
 				} else {
-					printf
-					    ("                    |************ PASSED ***********|**|                    \n");
+					fprintf(stdout, "                    |************ PASSED ***********|**|                    \n");
 					result = SUCCESS;
 				}
 			}
-			printf
-			    ("--------------------|------------Postamble----------|--|--------------------\n");
-			if (tests[i].postamble() != SUCCESS) {
-				printf
-				    ("                    |???????? INCONCLUSIVE %2d ??????|??|                    \n",
-				     state);
+			fprintf(stdout, "--------------------|------------Postamble----------|--|--------------------\n");
+			if (tests[i].postamble && tests[i].postamble() != SUCCESS) {
+				fprintf(stdout, "                    |???????? INCONCLUSIVE %2d ??????|??|                    \n", state);
 				if (result == SUCCESS)
 					result = INCONCLUSIVE;
 			}
-			printf
-			    ("----------------------------------------------------------------------------\n");
+			fprintf(stdout, "----------------------------------------------------------------------------\n");
 			switch (result) {
 			case SUCCESS:
 				successes++;
-				printf("*********\n");
-				printf("********* Test Case SUCCESSFUL\n");
-				printf("*********\n\n");
+				fprintf(stdout, "*********\n");
+				fprintf(stdout, "********* Test Case SUCCESSFUL\n");
+				fprintf(stdout, "*********\n\n");
 				break;
 			case FAILURE:
 				failures++;
-				printf("XXXXXXXXX\n");
-				printf("XXXXXXXXX Test Case FAILED\n");
-				printf("XXXXXXXXX\n\n");
+				fprintf(stdout, "XXXXXXXXX\n");
+				fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+				fprintf(stdout, "XXXXXXXXX\n\n");
 				break;
 			default:
 			case INCONCLUSIVE:
 				inconclusive++;
-				printf("?????????\n");
-				printf("????????? Test Case INCONCLUSIVE\n");
-				printf("?????????\n\n");
+				fprintf(stdout, "?????????\n");
+				fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
+				fprintf(stdout, "?????????\n\n");
 				break;
 			}
+			tests[i].result = result;
 		}
 	} else
-		printf("Test setup failed!\n");
+		fprintf(stdout, "Test setup failed!\n");
 	end_tests();
-	printf("Done.\n\n");
-	printf("========= %2d successes   \n", successes);
-	printf("========= %2d failures    \n", failures);
-	printf("========= %2d inconclusive\n", inconclusive);
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (summary && verbose) {
+		fprintf(stdout, "\n\n");
+		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+			if (tests[i].run) {
+				fprintf(stdout, "Test Case SCTP NPI:%-10s  ", tests[i].numb);
+				switch (tests[i].result) {
+				case SUCCESS:
+					fprintf(stdout, "SUCCESS\n");
+					break;
+				case FAILURE:
+					fprintf(stdout, "FAILURE\n");
+					break;
+				default:
+				case INCONCLUSIVE:
+					fprintf(stdout, "INCONCLUSIVE\n");
+					break;
+				}
+			}
+		}
+		fflush(stdout);
+	}
+	fprintf(stdout, "Done.\n\n");
+	fprintf(stdout, "========= %2d successes   \n", successes);
+	fprintf(stdout, "========= %2d failures    \n", failures);
+	fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
+	lockf(fileno(stdout), F_ULOCK, 0);
 	return (0);
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -f, --fast [SCALE]\n\
+        Increase speed of tests by scaling timers [default: 50]\n\
+    -s, --summary\n\
+        Print a test case summary at end of testing [default: off]\n\
+    -o, --onetest [TESTCASE]\n\
+        Run a single test case.\n\
+    -t, --tests [RANGE]\n\
+        Run a range of test cases.\n\
+    -m, --messages\n\
+        Display messages. [default: off]\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	size_t l, n;
+	int range = 0;
+	struct test_case *t;
+	int tests_to_run = 0;
+	for (t = tests; t->numb; t++) {
+		if (!t->result) {
+			t->run = 1;
+			tests_to_run++;
+		}
+	}
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"fast",	optional_argument,	NULL, 'f'},
+			{"summary",	no_argument,		NULL, 's'},
+			{"onetest",	required_argument,	NULL, 'o'},
+			{"tests",	required_argument,	NULL, 't'},
+			{"messages",	no_argument,		NULL, 'm'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "f::so:t:mqvhV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'f':
+			if (optarg)
+				timer_scale = atoi(optarg);
+			else
+				timer_scale = 50;
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			break;
+		case 's':
+			summary = 1;
+			break;
+		case 'o':
+			if (!range) {
+				for (t = tests; t->numb; t++)
+					t->run = 0;
+				tests_to_run = 0;
+			}
+			range = 1;
+			for (n = 0, t = tests; t->numb; t++)
+				if (!strncmp(t->numb, optarg, 16)) {
+					if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+					}
+				}
+			if (!n) {
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+				fflush(stderr);
+				goto bad_option;
+			}
+			break;
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 't':
+			l = strnlen(optarg, 16);
+			if (!range) {
+				for (t = tests; t->numb; t++)
+					t->run = 0;
+				tests_to_run = 0;
+			}
+			range = 1;
+			for (n = 0, t = tests; t->numb; t++)
+				if (!strncmp(t->numb, optarg, l)) {
+					if (!t->result) {
+						t->run = 1;
+						n++;
+						tests_to_run++;
+					}
+				}
+			if (!n) {
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+				fflush(stderr);
+				goto bad_option;
+			}
+			break;
+		case 'm':
+			show_msg = 1;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/*
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	if (!tests_to_run) {
+		if (verbose) {
+			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
+			fflush(stderr);
+		}
+		exit(2);
+	}
+	splash(argc, argv);
+	do_tests();
+	exit(0);
 }
