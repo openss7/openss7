@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2005/01/20 00:51:51 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2005/01/21 08:39:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/20 00:51:51 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 08:39:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -267,6 +267,9 @@ make -C %{mybuilddir} distclean
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
 
+# stupid mandrake spec-helper will compress our macros files otherwise
+@COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+
 %clean
 # ---------------------------------------------------------------------------
 
@@ -293,6 +296,9 @@ cd %{_builddir}/%{name}-%{version}-%{fullrelease}
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.11  2005/01/21 08:39:29  brian
+# - Work around mandrake spec-helper for uncooked manpages.
+#
 # Revision 1.1.2.10  2005/01/20 00:51:51  brian
 # - Go back to quick no dependencies compile.
 #
