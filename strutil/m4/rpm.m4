@@ -116,6 +116,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
         #    DISTRIB_DESCRIPTION="SuSE Linux 8.0 (i386)"   # the distribution line
         #
         # first check for a release file
+        if test -z "$rpm_cv_dist_vendor" -a -r /etc/whitebox-release
+        then
+            rpm_cv_dist_vendor=whitebox
+            rpm_cv_dist_flavor="White Box Enterprise Linux"
+        fi
         if test -z "$rpm_cv_dist_vendor" -a -r /etc/fedora-release
         then
             rpm_cv_dist_vendor=redhat
@@ -141,7 +146,12 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
         then
             . /etc/lsb-release
             rpm_tmp="$DISTRIB_DESCRIPTION"
-            case $rpm_tmp in
+            case "$rpm_tmp" in
+                *White?Box*)
+                    rpm_cv_dist_vendor=whitebox
+                    rpm_cv_dist_flavor="$DISTRIB_ID"
+                    rpm_cv_dist_release="$DISTRIB_RELEASE"
+                    ;;
                 *Fedora?Core*)
                     rpm_cv_dist_vendor=redhat
                     rpm_cv_dist_flavor="$DISTRIB_ID"
@@ -168,7 +178,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                     rpm_cv_dist_release="$DISTRIB_RELEASE"
                     ;;
                 *)
-                    rpm_cv_dist_vendor=unknown
+                    rpm_cv_dist_vendor="${DISTRIB_DESCRIPTION:+unknown}"
                     rpm_cv_dist_flavor="${DISTRIB_ID:-Unknown} Linux"
                     rpm_cv_dist_release="$DISTRIB_RELEASE"
                     ;;
@@ -178,7 +188,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
         if test -z "$rpm_cv_dist_vendor" -a -r /etc/issue
         then
             rpm_tmp=`cat /etc/issue | grep 'Linux\|Fedora' | head -1`
-            case $rpm_tmp in
+            case "$rpm_tmp" in
+                *White?Box*)
+                    rpm_cv_dist_vendor=whitebox
+                    rpm_cv_dist_flavor="White Box Enterprise Linux"
+                    ;;
                 *Fedora?Core*)
                     rpm_cv_dist_vendor=redhat
                     rpm_cv_dist_flavor="Fedora Core"
@@ -205,7 +219,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
         if test -z "$rpm_cv_dist_vendor"
         then
             rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
-            case $rpm_tmp in
+            case "$rpm_tmp" in
+                *White?Box*)
+                    rpm_cv_dist_vendor=whitebox
+                    rpm_cv_dist_flavor="White Box Enterprise Linux"
+                    ;;
                 *Fedora?Core*)
                     rpm_cv_dist_vendor=redhat
                     rpm_cv_dist_flavor="Fedora Core"
