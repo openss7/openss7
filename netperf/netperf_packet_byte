@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/11 12:08:11 $
+# @(#) $RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2004/08/11 19:45:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/11 12:08:11 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/11 19:45:29 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_packet_byte,v $
+# Revision 1.1.2.3  2004/08/11 19:45:29  brian
+# - Add verbose and debugging capability.
+#
 # Revision 1.1.2.2  2004/08/11 12:08:11  brian
 # - A few corrections to scripts.
 #
@@ -103,7 +106,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.2 $)'
+ident='$RCSfile: netperf_packet_byte,v $ $Name:  $($Revision: 1.1.2.3 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -822,6 +825,14 @@ function run_command()
     netperf_copying
     netperf_options
     netperf_find
+    if test "${verbose:-1}" -gt 1 ; then
+	((verb=$verbose-1))
+	verb="-v $verb"
+    fi
+    if test "${debug:-0}" -gt 0 ; then
+	debg="-d"
+    fi
+    netperf="$netperf $verb $debg"
     netperf_test
 }
 

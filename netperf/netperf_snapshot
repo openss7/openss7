@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2004/08/11 12:08:11 $
+# @(#) $RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2004/08/12 01:05:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -53,10 +53,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/11 12:08:11 $ by <bidulock@openss7.org>
+# Last Modified $Date: 2004/08/12 01:05:54 $ by <bidulock@openss7.org>
 #
 # -----------------------------------------------------------------------------
 # $Log: netperf_snapshot,v $
+# Revision 1.1.2.8  2004/08/12 01:05:54  brian
+# - Added benchmark scripts and documentation.
+#
+# Revision 1.1.2.7  2004/08/11 19:45:30  brian
+# - Add verbose and debugging capability.
+#
 # Revision 1.1.2.6  2004/08/11 12:08:11  brian
 # - A few corrections to scripts.
 #
@@ -100,7 +106,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.6 $)'
+ident='$RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 1.1.2.8 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -221,7 +227,7 @@ Options:
     -H, --hostname=HOSTNAME
         name or address of netserver host [Default: $default_hostname]
     -p, --port=PORTNUM
-        netserver port number [Default: ${{default_port:-12865}:-12865}]
+        netserver port number [Default: ${default_port:-12865}]
     -t, --testtime=SECONDS
 	duration of each test in seconds [Default: $default_testtime]
     -w, --warmtime=SECONDS
@@ -254,7 +260,7 @@ Environment:
     NETPERF_TIME
 	default test case duration [Default: $default_testtime]
     NETPERF_PORT
-	default netserver port number [Default: ${{default_port:-12865}:-12865}]
+	default netserver port number [Default: ${default_port:-12865}]
     NETPERF_STATS
 	default statistics options [Default: \`$default_stats']
 EOF
@@ -981,6 +987,14 @@ function run_command()
     netperf_copying
     netperf_options
     netperf_find
+    if test "${verbose:-1}" -gt 1 ; then
+	((verb=$verbose-1))
+	verb="-v $verb"
+    fi
+    if test "${debug:-0}" -gt 0 ; then
+	debg="-d"
+    fi
+    netperf="$netperf $verb $debg"
     netperf_test
 }
 
