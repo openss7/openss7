@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/02/19 12:06:52 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/02/21 23:25:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 12:06:52 $ by $Author: brian $
+# Last Modified $Date: 2005/02/21 23:25:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -107,8 +107,9 @@
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
-%global fullrelease @PACKAGE_RELEASE@%{extrarelease}
-%global _builddir %{_builddir}/%{extrarelease}
+%{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RELEASE@%%{extrarelease}}}
+%{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RELEASE@}}
+%{?extrarelease:  %{expand: %%global _builddir %{_builddir}/%%{extrarelease}}}
 
 Summary:        %{title} (SVR 4.2 MP STREAMS)
 %if %{?_without_public: 0}%{!?_without_public: 1}
@@ -969,9 +970,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.73  2005/02/19 12:06:52  brian
-# - rpm-epoch to pkg-epoch, rpm-release to pkg-release
-# - proper quotation of configure options
+# Revision 0.9.2.74  2005/02/21 23:25:56  brian
+# - Working up new makefile fragments.
+#
+# Revision 0.9.2.42  2005/02/21 23:25:56  brian
+# - Working up new makefile fragments.
 #
 # Revision 0.9.2.41  2005/02/19 12:06:52  brian
 # - rpm-epoch to pkg-epoch, rpm-release to pkg-release

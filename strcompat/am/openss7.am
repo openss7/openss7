@@ -1,63 +1,63 @@
-# vim: ft=automake
-# =============================================================================
-# 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/02/20 08:06:31 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2005/02/20 08:06:31 $ by $Author: brian $
-#
-# =============================================================================
+## vim: ft=automake
+## =============================================================================
+## 
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/21 23:25:57 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+##
+## =============================================================================
 
 AUTOMAKE_OPTIONS = gnits 1.8 dist-bzip2 std-options -Wall
 
 ACLOCAL_AMFLAGS = -I m4
 
-#
+##
 # Accumulate these 'till the end
-#
+##
 ALL_LOCAL		=
 INSTALL_DATA_LOCAL	=
 INSTALL_DATA_HOOK	=
@@ -73,18 +73,20 @@ DIST_HOOK		=
 CHECK_LOCAL		=
 INSTALLCHECK_LOCAL	=
 DISTCHECK_HOOK		=
+RELEASE_CLEAN_LOCAL	=
 
-#
+##
 # In case we only need the files version:
-#
+##
 MOSTLYCLEANFILES	=
 CLEANFILES		=
 DISTCLEANFILES		=
 MAINTAINERCLEANFILES	=
+RELEASECLEANFILES	=
 
-#
-# Accumulate extras until the end
-#
+##
+# Accumulate extras until the end.
+##
 EXTRA_DIST		=
 EXTRA_SCRIPTS		=
 EXTRA_PROGRAMS		=
@@ -93,16 +95,47 @@ EXTRA_KERNEL_MODULES	=
 EXTRA_DOCS		=
 EXTRA_TEX		=
 
+##
+# Accumlate special targets until the end.
+##
+MY_SUFFIXES		=
+MY_PHONY		=
+
 dist_noinst_SCRIPTS	=
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
 
 RELEASE			=
 RELEASE_SIGN		=
+RELEASE_DIRECTORIES	=
 
-release: $(RELEASE)
+FORCED_TARGETS		=
+FORCE			=
 
-release-sign: $(RELEASE_SIGN)
+$(FORCED_TARGETS): FORCE = force
+$(FORCED_TARGETS): forced-% : %
+
+MY_PHONY		+= $(FORCED_TARGETS)
+
+$(RELEASE_DIRECTORIES):
+	@test -d $@ || { echo " $(mkinstalldirs) $@" ; $(mkinstalldirs) $@ ; }
+	
+release: $(RELEASE_DIRECTORIES) $(RELEASE)
+
+release-clean-local:
+	targets="$(RELEASE_CLEAN)" ; for target in $$targets ; do \
+		$(MAKE) $(AM_MAKEFLAGS) $$target ; \
+	done
+
+release-clean: release-clean-local
+	@if test -n "$(RELEASECLEANFILES)" ; then \
+		echo "rm -f -- $(RELEASECLEANFILES)" ; \
+		rm -f -- $(RELEASECLEANFILES) ; \
+	fi
+
+MY_PHONY	+= release $(RELEASE)
+MY_PHONY	+= release-clean $(RELEASE_CLEAN)
+FORCED_TARGETS	+= forced-release
 
 if MAINTAINER_MODE
 MAINTAINER_MODE = yes
@@ -130,6 +163,8 @@ $(MY_RECURSIVE_TARGETS):
 		$(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1 ; \
 	fi ; test -z "$$fail"
 
+MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
+
 ALL_EXPORT_OPTS =
 
 ALL_RECURSIVE_TARGETS =
@@ -142,6 +177,8 @@ $(ALL_RECURSIVE_TARGETS):
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
 	done ; test -z "$$fail"
+
+MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
 
 if PERFORM_CHECKS
 dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
@@ -173,30 +210,32 @@ sgml: sgml-recursive
 
 sgml-am:
 
-.PHONY: txt txt-am sgml sgml-am
+MY_PHONY	+= txt txt-am sgml sgml-am
 
-#
+##
 # Have the makefile regenerate libtool if necessary
-#
+##
 $(OBJECTS): libtool
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
-#
+##
 # I use vim, not emacs.  The following triggers Automake 1.8 to include
 # targets for making vim tags files along with emacs TAGS files.
-#
+##
 CTAGSFLAGS = --language-force=C --c-types=+px -I __initdata,__exitdata,EXPORT_SYMBOL,EXPORT_SYMBOL_NOVERS,EXPORT_SYMBOL_GPL
 
 # if MAINTAINER_MODE
 # ALL_LOCAL += TAGS CTAGS
 # endif
 
-#
+##
 # A rule to generate an ifnames.log file
-#
+##
 ifnames:
 	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
+
+MY_PHONY	+= ifnames
 
 CLEANFILES += check_commands.log
 
@@ -234,9 +273,14 @@ installcheck-local: $(INSTALLCHECK_LOCAL)
 
 distcheck-hook: $(DISTCHECK_HOOK)
 
-#
-# Collected phonys from other automake fragments.
-#
-.PHONY: ifnames $(MY_RECURSIVE_TARGETS) $(ALL_RECURSIVE_TARGETS)
+##
+# Collected suffixes from other automake fragments to avoid problems with automake conditionals.
+##
+SUFFIXES = $(MY_SUFFIXES)
 
-# vim: ft=automake
+##
+# Collected phonys from other automake fragments to avoid problems with automake conditionals.
+##
+.PHONY: $(MY_PHONY)
+
+## vim: ft=automake

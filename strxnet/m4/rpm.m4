@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/20 04:45:17 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/02/21 23:25:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/20 04:45:17 $ by $Author: brian $
+# Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -211,6 +211,19 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # =============================================================================
 # _RPM_SPEC_SETUP_TOPDIR
 # -----------------------------------------------------------------------------
+# This is setting up the RPM topdir and the SOURCES BUILD RPMS SRPMS and SPECS
+# directories.  We override rpm settings to acheive several objectives:  We do
+# not want to move the tarballs (sources) from the tarball distribution
+# directory, but use them in place.  Therefore we want to override the SOURCES
+# and SPECS directories.  Because topdir is on an NFS mount when we build, but
+# we want to speed builds as much as possible, we override the BUILD directory
+# to be in our autoconf build directory which should be on a local filesystem.
+# The remaining two, RPMS and SRPMS are left in the distribution directory under
+# topdir.  The am/rpm.am makefile fragment will override rpm macros with these
+# values.  Note that the names stay nicely out of the way of autoconf directory
+# names, but all nicely end in dir so we will define them in the same way.
+# (Yes, autoconf does not define `builddir' because it is always `.'.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     rpm_tmp='$(PACKAGE_DISTDIR)/rpms'
@@ -232,8 +245,22 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 		;;
 	esac
     ])
-    PACKAGE_RPMTOPDIR="$rpm_cv_topdir"
-    AC_SUBST([PACKAGE_RPMTOPDIR])dnl
+    topdir="$rpm_cv_topdir"
+    # set defaults for the rest
+    sourcedir='$(PACKAGE_DISTDIR)'
+    # builddir needs to be absolute
+    builddir="`(cd $ac_top_builddir; `pwd`)`"
+dnl builddir='$(top_builddir)'
+    rpmdir='$(topdir)/RPMS'
+    srcrpmdir='$(topdir)/SRPMS'
+    specdir='$(PACKAGE_DISTDIR)'
+    # tell automake about them
+    AC_SUBST([topdir])dnl
+    AC_SUBST([sourcedir])dnl
+    AC_SUBST([builddir])dnl
+    AC_SUBST([rpmdir])dnl
+    AC_SUBST([srcrpmdir])dnl
+    AC_SUBST([specdir])dnl
 ])# _RPM_SPEC_SETUP_TOPDIR
 # =============================================================================
 

@@ -1,56 +1,56 @@
-# =============================================================================
-# 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/17 08:04:13 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2005/02/17 08:04:13 $ by $Author: brian $
-#
-# =============================================================================
+## =============================================================================
+## 
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/02/21 23:25:57 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+##
+## =============================================================================
 
-#
+##
 # This is a makefile fragment for installing sctp kernel modules for the Linux Native SCTP
 # implementation.  It is different from am/kernel.am in that the later only installs STREAMS modules
 # for use with STREAMS.  In addition, this fragment needs to check for redundant lksctp modules and
@@ -61,7 +61,7 @@
 # modules.conf file (yet).  Perhaps later with udev we will have to do something there.
 # KERNEL_SUBDIR is our kernel module subdirectory (which is going to be kernel/net, although we have
 # to look for redundant lksctp modules in kernel/net/sctp.
-#
+##
 
 if RPM_BUILD_KERNEL
 
@@ -72,12 +72,12 @@ all-kernel: $(KERNEL_MODULES) Modules.map
 
 STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 
-#
+##
 # This is equivalent to the source rpm %install scriptlet, and is in fact invoked by that scriptlet.
 # This is performed both for the install as well as the install-strip targets.  This simply installs
 # and strips if required.  We use libtool to install even though these are not .la libraries but
 # just objects.  We set kernel module stripping as above.
-#
+##
 install-modules: $(KERNEL_MODULES)
 	@$(NORMAL_INSTALL)
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
@@ -121,29 +121,29 @@ install-modules: $(KERNEL_MODULES)
 
 INSTALL_EXEC_LOCAL += install-modules
 
-#
+##
 # This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
 # installs.  It is only executed when the install directory is fully configured for kernel modules.
 # That is, this does not run when building an rpm because the binaries are installed in a temporary,
 # unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
 # target with install-exec-hook that runs after install-exec has completed.
-#
+##
 # The post-modules target checks for a fully configured install directory by checking for
 # modules.dep in the kernel modules directory $(DESTDIR)$(rootdir)$(kmoduledir).
-#
+##
 # If modules.dep does not exist, we simply exit.
-#
+##
 # If modules.dep exists, then we are doing a non-rpm (autoconf) install and need to configure the
 # target directory.  First we check if there is a deprecated lksctp kernel module in the
 # kernel/net/sctp subdirectory.  If one exists, we move it out of the way to a file named
 # sctp_deprecated.o.  We only move it so that it can be replaced if we uninstall later.
-#
+##
 # If we have a usable system map file and an executable depmod, we perform the depmod.
-#
+##
 # The last thing that we do on an installed system is check is create a symbolic link from
 # /usr/src/$(PACKAGE_TARNAME} to the location of the untarred source.  This has the same effect as
 # installing the source package under rpm.
-#
+##
 post-modules:
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
@@ -186,20 +186,20 @@ post-source:
 		$(LN_S) -f "$$d" "$$p" ; \
 	fi
 
-#
+##
 # This is equivalent to the kernel modules package rpm %post scriptlet for non-rpm (autoconf)
 # installs.  It is only executed when the install directory is fully configured for kernel modules.
 # That is, this does not run when building an rpm because the binaries are installed in a temporary,
 # unconfigured directory.  Autoconf has no post-install targets, so we hook this into the install
 # target with install-exec-hook that runs after install-exec has completed.
-#
+##
 INSTALL_EXEC_HOOK += post-modules post-source
 
-#
+##
 # There is no rpm equivalent for this target.  This simply removes kernel modules.  It is not
 # invoked by rpm but is only used from the tarball uninstall.  We simply remove our modules (and
 # possibly the directory that they are in).
-#
+##
 uninstall-modules:
 	@$(NORMAL_UNINSTALL)
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
@@ -222,24 +222,24 @@ uninstall-modules:
 
 UNINSTALL_LOCAL += uninstall-modules
 
-#
+##
 # This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when
 # the uninstall directory is fully configured for kernel modules.  That is, this does not run when
 # building an rpm because the binaries are not uninstalled (they are usually just removed
 # wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
 # runs after uninstall has completed.
-#
+##
 # The postun-modules target checks for a fully configured uninstall directory by checking for the
 # existence of the modules.dep file in the target uninstall directory $(DESTDIR)$(kmoduledir).  It
 # it exists, then we are doing a non-rpm (autoconf) uninstall and need to replace the deprecated
 # lksctp kernel module if it exists.
-#
+##
 # If we have a usable system map file and an executable depmod, we perform the depmod.
-#
+##
 # Lastly we break the symlink in /usr/src/$(PACKAGE_TARNAME).  (We should probably check if the
 # symbolic links points to us first.)  This has the same effect as erasing the source rpm package
 # under rpm.
-#
+##
 postun-modules:
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
@@ -279,13 +279,13 @@ postun-modules:
 postun-source:
 	rm -f -- "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)"
 
-#
+##
 # This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when
 # the uninstall directory is fully configured for kernel modules.  That is, this does not run when
 # building an rpm because the binaries are not uninstalled (they are usually just removed
 # wholesale).  Autoconf has no post-uninstall targets, so we hook this into the uninstall-hook that
 # runs after uninstall has completed.
-#
+##
 UNINSTALL_HOOK += postun-modules postun-source
 
 if PERFORM_CHECKS
@@ -310,4 +310,4 @@ CLEANFILES += Modules.map
 
 .PHONY: all-kernel install-modules post-modules uninstall-modules postun-modules
 
-# vim: ft=automake
+## vim: ft=automake

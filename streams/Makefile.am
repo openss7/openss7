@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2005/02/19 11:58:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2005/02/21 23:25:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/19 11:58:16 $ by $Author: brian $
+# Last Modified $Date: 2005/02/21 23:25:56 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-# General rules
-#
+##
+## General rules
+##
 include am/openss7.am
 
 dist_sysconf_DATA =
@@ -653,29 +653,32 @@ dist_sysconf_DATA		+= \
 
 endif
 
+##
+## Rules for init scripts
+##
 include am/init.am
 
-#
-# Rules for lsms
-#
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-# Rules for making rpms
-#
+##
+## Rules for making rpms
+##
 AM_RPMFLAGS 			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS 			=
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
 
 MAINTAINERCLEANFILES	+= \

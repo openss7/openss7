@@ -1,54 +1,54 @@
-# =============================================================================
-# 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/02/17 11:38:46 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2005/02/17 11:38:46 $ by $Author: brian $
-#
-# =============================================================================
+## =============================================================================
+## 
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/02/21 23:25:57 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+##
+## =============================================================================
 
 AM_INFOINCLUDES		= -I $(top_srcdir)/scripts -I $(top_builddir)/scripts -I $(srcdir)
 AM_MAKEINFOHTMLFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names --number-sections --no-split --no-validate --no-headers
@@ -93,7 +93,7 @@ FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
 FIG_JPGS = $(FIG_FIGS:%.fig=%.jpg)
 FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
 
-SUFFIXES = .fig .eps .pdf .png .jpg .ps .txt
+MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
 
 $(FIG_PSS) : %.ps  : %.fig ; fig2dev -L  ps $< $@
 $(FIG_EPSS): %.eps : %.fig ; fig2dev -L eps $< $@
@@ -177,11 +177,11 @@ IMG_PNGS = $(FIG_PNGS) $(TBL_PNGS) $(PNG_PNGS) $(PS_PNGS)
 IMG_TXTS = $(FIG_TXTS) $(TBL_TXTS) $(PNG_TXTS) $(PS_TXTS)
 IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
 
-#
+##
 # I know this is ugly and GNU make specified, but...  If you are using autoconf we
 # pretty much assume you have some GNU tools around...
 # also, automake misses dependencies for ps files
-#
+##
 
 $(DVIS)      : %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
 $(PSS)       : %.ps   : %.dvi  $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
@@ -190,18 +190,18 @@ $(HTMLS)     : %.html : %.texi $(IMG_PNGS) $(EXTRA_info_TEXINFOS)
 $(TXTS)	     : %.txt  : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
 $(SGMLS)     : %.sgml : %.texi $(IMG_JPGS) $(EXTRA_info_TEXINFOS)
 
-#
+##
 # Don't distribute .ps manuals, they are way too big
-#
+##
 EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(FIG_FIGS) $(FIG_TXTS) $(TBL_TBLS) $(PNG_PNGS) $(PS_PSS)
 EXTRA_DIST	+= $(PDFS)
 EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
 
-#
+##
 # distcheck is not run in maintainer mode, and we need this, otherwise distcheck
 # breaks because it otherwise attempts to place the info files into the source
 # directory for some arcane reason
-#
+##
 if MAINTAINER_MODE
 $(INFO_DEPS) : %.info : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
 endif
@@ -286,10 +286,10 @@ maintainer-clean-pss:
 
 maintainer-clean-texi:
 
-#
+##
 # Note that maintainer-clean-aminfo generated by automake will clean the info
 # files out of the source directory.
-#
+##
 
 .PHONY: txts-am pngs-am \
 	clean-txt clean-sgml clean-figs clean-tbls clean-pngs clean-pss clean-texi \
@@ -304,11 +304,11 @@ MAINTAINER_CLEAN_LOCAL += maintainer-clean-figs maintainer-clean-tbls maintainer
 
 if MAINTAINER_MODE
 
-#
+##
 # Only build docs in maintainer mode.
-#
+##
 ALL_LOCAL += info html ps pdf txt # sgml
 
 endif
 
-# vim: ft=automake
+## vim: ft=automake

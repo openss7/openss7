@@ -1,58 +1,59 @@
-# =============================================================================
-# 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/01/24 12:27:20 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2005/01/24 12:27:20 $ by $Author: brian $
-#
-# =============================================================================
+## =============================================================================
+## 
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/21 23:25:57 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+##
+## =============================================================================
 
-# This automake file fragment includes rules for generating symbol versions.
-# This is only necessary (and permissible) if the kernel supports versioned
-# symbols.
+##
+## This automake file fragment includes rules for generating symbol versions.  This is only necessary
+## (and permissible) if the kernel supports versioned symbols.
+##
 
 if RPM_BUILD_KERNEL
 
@@ -62,7 +63,7 @@ if AMDEP
 sinclude ./$(DEPDIR)/modversions.Ph
 endif
 
-SUFFIXES = .c .ver
+MY_SUFFIXES		+= .c .ver
 
 if am__fastdepCC
 .c.ver:
@@ -201,9 +202,9 @@ endif
 
 clean-ksyms:
 
-#
+##
 # Remove the stamp file autoconf doesn't know about.
-#
+##
 distclean-ksyms:
 	@if test -n "$(AUTOCONFIG_H)" ; then \
 		p=`echo "$(AUTOCONFIG_H)" | sed -e 's|[^/]*$$||'` ; \
@@ -272,21 +273,21 @@ maintainer-clean-ksyms:
 
 endif
 
-INSTALL_DATA_LOCAL += install-ksyms
+INSTALL_DATA_LOCAL	+= install-ksyms
 
-INSTALL_DATA_HOOK += post-ksyms
+INSTALL_DATA_HOOK	+= post-ksyms
 
-UNINSTALL_LOCAL += uninstall-ksyms
+UNINSTALL_LOCAL		+= uninstall-ksyms
 
-UNINSTALL_HOOK += postun-ksyms
+UNINSTALL_HOOK		+= postun-ksyms
 
-ALL_LOCAL += ksyms-all
+ALL_LOCAL		+= ksyms-all
 
-CLEAN_LOCAL += clean-ksyms
+CLEAN_LOCAL		+= clean-ksyms
 
-DISTCLEAN_LOCAL += distclean-ksyms
+DISTCLEAN_LOCAL		+= distclean-ksyms
 
-MAINTAINER_CLEAN_LOCAL += maintainer-clean-ksyms
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-ksyms
 
 .PHONY: ksyms-all install-ksyms post-ksyms uninstall-ksyms postun-ksyms clean-ksyms distclean-ksyms maintainer-clean-ksyms
 

@@ -1,198 +1,261 @@
-# vim: ft=automake
-# =============================================================================
-# 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/02/20 15:37:51 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2005/02/20 15:37:51 $ by $Author: brian $
-#
-# =============================================================================
+## vim: ft=automake
+## =============================================================================
+## 
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/02/21 23:25:57 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/02/21 23:25:57 $ by $Author: brian $
+##
+## =============================================================================
+
+##
+## These are some rules that I use for generating source and binary RPMs using automake.  I need to
+## package releases using RPM.  The following rules accomplish that for most packages.
+##
+
+if MAINTAINER_MODE
+
+##
+## For better speed when building package binaries, we skip these rules to invoke package building.
+## There is not (yet) a need to build packages when building packages...  We use maintainer mode to
+## distinguish whether these rules are necessary or not.
+##
 
 if BUILD_RPMS
 
-#
-#   These are some rules that I use for generating source and binary RPMs
-#   using automake.  I need to package releases using RPM.  The following
-#   rules accomplish that for most packages.
-#
+##
+## When packaging for debian builds, it became a little obvious that we have probably been misusing
+## RPM release numbers.  Because we *are* the upstream package provider, we should probably be
+## incrementing the upstream version number with each release rather than the RPM version number.
+## For debian, we are leaving the debian version number at 0 to make this terribly clear.  We should
+## probably only release with RPM release number 1 and increment a patch number instead.
+##
 
-RPMFLAGS  = -vv
-SRPMFLAGS = $(RPMFLAGS) --nodeps
+##
+# In the automake tradition, we print gobs of information.
+##
+RPMFLAGS	= -vv
+SRPMFLAGS	= $(RPMFLAGS) --nodeps
 
-RPMICONS = \
-	--define "_gif_icon $(PACKAGE_TARNAME).gif" \
-	--define "_xpm_icon $(PACKAGE_TARNAME).xpm"
+##
+# These are general rpm options that we always include in all rpm commands.  The top directory and
+# subdirectories is applicable to all commands.
+##
+## NOTE: These options override anything in the ~/.rpmmacros file.  See notes in m4/rpm.m4.  We used
+## to have source and binary payload defines in here before, but, now you can select your favorite
+## (or use the site default) from the /usr/lib/rpm/macros or ~/.rpmmacros file.  We bzip source and
+## payload to try to crunch 'em down more.
+##
+RPMOPTS		= \
+		$(PACKAGE_RPMOPTIONS) \
+		--define "_topdir $(topdir)" \
+		--define "_sourcedir $(sourcedir)" \
+		--define "_builddir $(builddir)" \
+		--define "_rpmdir $(rpmdir)" \
+		--define "_srcrpmdir $(srcrpmdir)" \
+		--define "_specdir $(specdir)"
 
-RPMOPTS = \
-	--define "__source_payload w9.bzdio" \
-	--define "__binary_payload w9.bzdio" \
-	--define "_topdir $(PACKAGE_RPMTOPDIR)" \
-	$(PACKAGE_RPMOPTIONS)
+##
+# Note that we created the usual rpm directories as well.  This is because rpm sometimes complains
+# if directories do not exist directly under topdir.
+##
+rpm_directories	= \
+		$(topdir)/SOURCES $(sourcedir) \
+		$(topdir)/BUILD   $(builddir) \
+		$(topdir)/RPMS    $(rpmdir) \
+		$(topdir)/SRPMS   $(srcrpmdir) \
+		$(topdir)/SPECS   $(specdir) \
+		$(builddir)/$(PACKAGE_RPMEXTRA)
 
-RPMBOPTS = \
-	--define "extrarelease $(PACKAGE_RPMEXTRA)" \
-	--define "distribution $(PACKAGE_RPMDIST) (contrib)" \
-	--define "_gif $(PACKAGE_TARNAME).gif" \
-	--define "_xpm $(PACKAGE_TARNAME).xpm" \
-	$(RPMOPTS)
+##
+# These are the same directories as rpm_directories with common archive directories stripped out.
+##
+RELEASE_DIRECTORIES += \
+		$(topdir)/SOURCES \
+		$(topdir)/BUILD \
+		$(topdir)/RPMS \
+		$(topdir)/SRPMS \
+		$(topdir)/SPECS \
+		$(builddir)/$(PACKAGE_RPMEXTRA)
 
+##
+# Options for building source rpms.  We have separate fig and xpm macros from the binary rpms to
+# avoid warnings about the files being multiply included.  Another approach would be to name the
+# icons according to the individual package neames and avoid specific macros for them.
+##
+RPMSOPTS	= \
+		$(RPMOPTS) \
+		--define "_gif_icon $(PACKAGE)-$(VERSION).gif" \
+		--define "_xpm_icon $(PACKAGE)-$(VERSION).xpm"
 
-RPMSOPTS = \
-	--define "_signature gpg" \
-	--define "_gpg_path $(GNUPGHOME)" \
-	--define "_gpg_name $(GNUPGUSER)" \
-	--define "_gpgbin $(GPG)" \
-	$(RPMOPTS)
+##
+# Options for building binary rpms.  We have separate fig an xpm macros from the source rpms to
+# avoid warnings about the fiest being multiply included.  Another approach would be to name the
+# icons according to the individual package neames and avoid specific macros for them.
+##
+# For binary packages we define the extrarelease suffix on the rpm version and distribution name so
+# that a distribution specific binary rpm is generated.  The distribution suffix and name are not
+# included for the source rpm because the source rpm is applicable to all binary packages and
+# distributions. (Wow! -- that took some effort!)
+##
+RPMBOPTS	= \
+		$(RPMOPTS) \
+		--define "extrarelease $(PACKAGE_RPMEXTRA)" \
+		--define "distribution $(PACKAGE_RPMDIST) (contrib)" \
+		--define "_gif $(PACKAGE)-$(VERSION).gif" \
+		--define "_xpm $(PACKAGE)-$(VERSION).xpm"
 
-RPMXOPTS =
+##
+# Options for signing packages.  These can be combined with the source or binary options above.
+##
+## We used to uses the autoconf variables to set the signature specific macros for rpm, but that
+## turned out to be a bad idea.  What we used to do was as follows:
+##
+##RPMKOPTS	= $(RPMOPTS) \
+##		--define "_signature gpg" \
+##		--define "_gpg_path $(GNUPGHOME)" \
+##		--define "_gpg_name $(GNUPGUSER)" \
+##		--define "_gpgbin $(GPG)" \
+##		--define "__gpg $(GPG)"
+##
+## As it turns out, it is a better idea not to manipulate these here at all, because they override
+## more sane settings in /usr/lib/rpm/macros and ~/.rpmmacros.  Define the appropriate macros in your
+## /usr/lib/rpm/macros file or ~/.rpmmacros instead.  Examples of my ~/.rpmmacros file are included
+## in the documentation.
+##
+RPMKOPTS	= $(RPMOPTS)
 
-RPMTARGET = $(target)
+##
+# For the master build package it is sometime necessary to pass extra options down to configured
+# subdirectories for a master build.  These options will contain the passed down options from the
+# environment in that case.  See the recursive build targets below.
+##
+RPMXOPTS	=
 
-rpm_topdir	= $(PACKAGE_RPMTOPDIR)
-rpm_sourcedir	= $(rpm_topdir)/SOURCES
-rpm_builddir	= $(rpm_topdir)/BUILD
-rpm_rpmdir	= $(rpm_topdir)/RPMS
-rpm_srcrpmdir	= $(rpm_topdir)/SRPMS
-rpm_specdir	= $(rpm_topdir)/SPECS
+RPMTARGET	= $(target)
 
-#
-#   This builds an SRPM for the current target.
-#
-#   Note: the icons need to be in the SOURCES directory, but the spec file needs to be in the
-#   current directory.
-#   
-#   We use the -bs flag to rpmbuild instead of the -ts flag because our tarball could contain
-#   multiple spec files and rpmbuild otherwise uses the first one in the tar listing.  We should
-#   probably make sure that the tar has the required spec file listed first because then one can use
-#   the -ts command on the resulting spec file.  -bs also leaves the sources in place, which is what
-#   we want for distribution.
-#
-$(rpm_sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2:
-	@f=`echo "$@" | sed -e 's|$(rpm_sourcedir)|.|'` ; \
-	if test ! -e "$@" -a ! -e "$$f" ; then \
-		$(MAKE) $(AM_MAKEFLAGS) $$f ; \
-	fi ; \
-	if test ! -e "$@" -o "$$f" -nt "$@" ; then \
-		if test ! -d $(rpm_sourcedir) ; then \
-			echo " $(mkinstalldirs) $(rpm_sourcedir)" ; \
-			$(mkinstalldirs) $(rpm_sourcedir) ; \
-		fi ; \
-		echo " cp -f $$f $@" ; \
-		cp -f $$f $@ ; \
-	fi
+rpm_source_files = \
+		$(sourcedir)/$(PACKAGE)-$(VERSION).spec \
+		$(sourcedir)/$(PACKAGE)-$(VERSION).gif \
+		$(sourcedir)/$(PACKAGE)-$(VERSION).xpm \
+		$(sourcedir)/$(PACKAGE)-$(VERSION).tar.gz \
+		$(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
 
-$(rpm_sourcedir)/$(PACKAGE_TARNAME).gif \
-$(rpm_sourcedir)/$(PACKAGE_TARNAME).xpm:
-	@f=`echo "$@" | sed -e 's|$(rpm_sourcedir)|$(srcdir)|'` ; \
-	if test ! -e "$@" -a ! -e "$$f" ; then \
-		$(MAKE) $(AM_MAKEFLAGS) $$f ; \
-	fi ; \
-	if test ! -e "$@" ; then \
-		if test ! -d $(rpm_sourcedir) ; then \
-			echo " $(mkinstalldirs) $(rpm_sourcedir)" ; \
-			$(mkinstalldirs) $(rpm_sourcedir) ; \
-		fi ; \
-		echo " cp -f $$f $@" ; \
-		cp -f $$f $@ ; \
-	fi
+####
+### Note that normally sourcedir and PACKAGE_DISTDIR are the same directory, because that is where we
+### distribute tarballs.  Therefore, this target should never run unless these make variables were
+### overridden.
+####
+##$(rpm_source_files): $(sourcedir)
+##	@f=`echo "$@" | sed -e 's|$(sourcedir)|$(PACKAGE_DISTDIR)|'` ; \
+##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
+##	test -f "$@" -a ":$(FORCE)" != :force || cp -fauv -- $$f $$@
 
-$(rpm_specdir)/$(PACKAGE_TARNAME).spec:
-	@f=`echo "$@" | sed -e 's|$(rpm_specdir)|.|'` ; \
-	if test ! -e "$@" -a ! -e "$$f" ; then \
-		$(MAKE) $(AM_MAKEFLAGS) $$f ; \
-	fi ; \
-	if test ! -e "$@" ; then \
-		if test ! -d $(rpm_specdir) ; then \
-			echo " $(mkinstalldirs) $(rpm_specdir)" ; \
-			$(mkinstalldirs) $(rpm_specdir) ; \
-		fi ; \
-		echo " cp -f $$f $@" ; \
-		cp -f $$f $@ ; \
-	fi
+rpm_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
+rpm_gif_file	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif
+rpm_xpm_file	= $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 
-$(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm: \
-	$(rpm_specdir)/$(PACKAGE_TARNAME).spec \
-	$(rpm_sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2 \
-	$(rpm_sourcedir)/$(PACKAGE_TARNAME).gif \
-	$(rpm_sourcedir)/$(PACKAGE_TARNAME).xpm
-	@for d in BUILD BUILD/$(PACKAGE_RPMEXTRA) RPMS SOURCES SPECS SRPMS ; do \
-		if test ! -d $(rpm_topdir)/$$d ; then \
-			echo " $(mkinstalldirs) $(rpm_topdir)/$$d" ; \
-			$(mkinstalldirs) $(rpm_topdir)/$$d ; \
-		fi ; \
-	done
-	$(RPMBUILD) -bs $(SRPMFLAGS) $(AM_SRPMFLAGS) $(RPMOPTS) $(RPMICONS) --target $(target) -- $<
+$(rpm_spec_file) $(rpm_gif_file) $(rpm_xpm_file):
+	@f=`echo "$@" | sed -e 's|.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
+	if test ! -f $$f ; then d= ; else d='$(srcdir)/' ; fi ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$d$$f" \) || { d= ; $(MAKE) $(AM_MAKEFLAGES) -- $$f ; } \
+	test ":$(FORCE)" != :force -a \( -f "$@" \) || cp -fauv -- $$d$$f $$@
 
-srpm: $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
+####
+### Note that normally sourcedir and specdir are the same directory (and both the same as
+### PACKAGE_DISTDIR), because we place specs and sources in the same place.  Therefore this target
+### should never run unless these make variables were overridden.
+####
+##$(rpm_spec_file): $(specdir)
+##	@f=`echo "$@" | sed -e 's|$(specdir)|$(sourcedir)|'` ; \
+##	test -f "$@" -o -f "$$f" || $(MAKE) $(AM_MAKEFLAGES) -- $$f ; \
+##	test -f "$@" -a ":$(FORCE)" != :force || cp -fauv -- $$f $$@
 
-RELEASE += srpm
+##
+# This builds an SRPM for the current target.
+##
+# Note: the icons need to be in the sourcedir, but the spec file needs to be in the current
+# directory or the specdir or anywhere that we can find it.
+##
+# We use the -bs flag to rpmbuild instead of the -ts flag because our tarball could contain multiple
+# spec files and rpmbuild otherwise uses the first one in the tar listing.  We should probably make
+# sure that the tar has the required spec file listed first because then one can use the -ts command
+# on the resulting spec file.  -bs also leaves the sources in place, which is what we want for
+# distribution.
+##
 
-#
-#   This is the type of thing that needs to be included in the master makefile
-#   to build rpms for the current target, we also build any defined
-#   AM_RPMTARGETS
-#
-one-rpm: \
-	$(rpm_specdir)/$(PACKAGE_TARNAME).spec \
-	$(rpm_sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2 \
-	$(rpm_sourcedir)/$(PACKAGE_TARNAME).gif \
-	$(rpm_sourcedir)/$(PACKAGE_TARNAME).xpm
-	@for d in BUILD BUILD/$(PACKAGE_RPMEXTRA) RPMS SOURCES SPECS SRPMS ; do \
-		if test ! -d $(rpm_topdir)/$$d ; then \
-			echo " $(mkinstalldirs) $(rpm_topdir)/$$d" ; \
-			$(mkinstalldirs) $(rpm_topdir)/$$d ; \
-		fi ; \
-	done
-	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
+srpm		= $(srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
 
-lis-rpm:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' one-rpm
+$(srpm): $(rpm_spec_file) $(rpm_source_files) $(rpm_directories)
+	$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<
 
-lfs-rpm:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' one-rpm
+srpm: $(srpm)
+
+RELEASE		+= srpm
+
+##
+# This is the type of thing that needs to be included in the master makefile to build rpms for the
+# current target, we also build any defined AM_RPMTARGETS
+##
+one-rpm: $(rpm_spec_file) $(rpm_source_files) $(rpm_directories)
+	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) --target $(RPMTARGET) -- $<
+
+##
+# This below is pretty obfuscated, but it is what we need to rebujild and rpm once for LiS and
+# another time for Linux Fast-STREAMS.  When we drop LiS support, this can be cleaned out.  This
+# uses the sneaky GNU make trick that per-target variables can be defined for the target and its
+# dependents, in our case the single build target.  Packages that do not build for STREAMS should
+# define conditionals WITH_LIS and WITH_LFS to be false and the plain rule above will be used
+# instead.
+##
+lis-rpm: AM_RPMBOPTS = --define "_with_lis --with-lis"
+lis-rpm: one-rpm
+
+lfs-rpm: AM_RPMBOPTS = --define "_with_lfs --with-lfs"
+lis-rpm: one-rpm
 
 AM_RPMSMAKETARGETS =
 
@@ -210,24 +273,25 @@ AM_RPMSMAKETARGETS += one-rpm
 endif
 endif
 
+# Another sneaky trick
 all-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 
 rpms: $(AM_RPMSMAKETARGETS)
 
-sign srpm-sign: $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
+sign srpm-sign: $(srpm)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
-		echo "$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $<" ; \
-		$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $< || : ; \
+		echo "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
+		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
 	fi
 
-RELEASE_SIGN += srpm-sign
+RELEASE_SIGN	+= srpm-sign
 
-#
+##
 #   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
 #   --without popt syntax, so we have to expand them to --defines.
-#
+##
 
-rebuild all-rebuild:
+rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
 	rpmtarg=`echo $@ | sed -e 's|rebuild|rpms|'` ; \
@@ -244,10 +308,10 @@ rebuild all-rebuild:
 	done
 
 resign: sign
-	@rpms="`find $(rpm_rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(MAKE) $(AM_MAKEFLAGS) rebuild ; \
-		rpms="`find $(rpm_rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
+		rpms="`find $(rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -261,36 +325,41 @@ resign: sign
 		fi ; \
 	done ; \
 	if test :$$unsigned_rpms != : ; then \
-		echo "$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $$unsigned_rpms" ; \
-		$(RPM) --addsign $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMSOPTS) -- $$unsigned_rpms ; \
+		echo "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms" ; \
+		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
 
+##
+# Because the build directory is in the autoconf top build directory on the local machine, it needs
+# to be cleaned when a distclean is performed.  We use rpm to do this for us, and rpm will complain
+# if the directory does not exist, so we ignore errors.  The rpm spec file must still exist for use
+# to do this too.  The same is true for build files.
+##
 distclean-rpm:
-	rm -rf RPMS BUILD SRPMS SOURCES SPECS
+	$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
 
-maintainer-clean-rpm:
-	@rpms="`find $(rpm_rpmdir) -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
-	for f in $$rpms ; do \
-		echo "rm -f -- $$f" ; \
-		rm -f -- $$f ; \
-	done
-	rm -f -- $(rpm_srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
-	rm -f -- $(rpm_builddir)/$(PACKAGE_RPMEXTRA)/*config.cache
-	rm -f -- $(rpm_builddir)/$(PACKAGE_RPMEXTRA)/*config.site
-	rm -f -- $(rpm_builddir)/$(PACKAGE_RPMEXTRA)/$(PACKAGE_TARNAME)
-	@if test -d "$(rpm_builddir)/$(PACKAGE_RPMEXTRA)" ; then \
-		echo "$(RPMBUILD) --nodeps --clean --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || :" ; \
-		$(RPMBUILD) --nodeps --clean --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || : ; \
-	else \
-		echo "$(RPMBUILD) --nodeps --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || :" ; \
-		$(RPMBUILD) --nodeps --rmsource --rmspec $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(rpm_specdir)/$(PACKAGE_TARNAME).spec || : ; \
-	fi
+DISTCLEAN_LOCAL	+= distclean-rpm
 
-DISTCLEAN_LOCAL += distclean-rpm
+DISTCLEANFILES	+= \
+		$(builddir)/$(PACKAGE_RPMEXTRA)/*config.cache \
+		$(builddir)/$(PACKAGE_RPMEXTRA)/*config.site \
+		$(builddir)/$(PACKAGE_RPMEXTRA)/$(PACKAGE_TARNAME)
 
-MAINTAINER_CLEAN_LOCAL += maintainer-clean-rpm
+##
+# Removing the sources and the spec file is removing from the distribution directory which, if
+# different from the autoconf top build directory, is the main distribution directory.  We only want
+# to remove these under exceptional circumstances (i.e. we are repeating a build during the release
+# cycle).  Therefore we provide a special set of release targets for this purpose.
+##
+release-clean-rpm:
+	$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) --target $(RPMTARGET) -- $(rpm_spec_file) || :
 
-endif
+RELEASECLEANFILES += \
+		$(srpm) \
+		$(rpmdir)/*/$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+
+RELEASE_CLEAN_LOCAL += \
+		release-clean-rpm
 
 EXTRA_DIST	+= \
 		$(PACKAGE_TARNAME).spec \
@@ -299,9 +368,12 @@ EXTRA_DIST	+= \
 		.pkgepoch \
 		.pkgrelease
 
-ALL_RECURSIVE_TARGETS += all-srpm all-rpms all-sign all-resign
+ALL_RECURSIVE_TARGETS += all-srpm all-rpms all-sign all-rebuild all-resign
 
-.PHONY: srpm rpms one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign all-srpm all-rpms all-sign \
-	all-rebuild all-resign distclean-rpm maintainer-clean-rpm
+endif
 
-# vim: ft=automake
+endif
+
+.PHONY: srpm rpms one-rpm lis-rpm lfs-rpm sign srpm-sign rebuild resign release-clean-rpm
+
+## vim: ft=automake
