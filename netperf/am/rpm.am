@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/02/01 18:58:59 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/02/02 11:36:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/01 18:58:59 $ by $Author: brian $
+# Last Modified $Date: 2005/02/02 11:36:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -112,6 +112,8 @@ RPMSOPTS = \
 	--define "_gpg_name $(GNUPGUSER)" \
 	--define "_gpgbin $(GPG)" \
 	$(RPMOPTS)
+
+RPMXOPTS =
 
 RPMTARGET = $(target)
 
@@ -183,10 +185,10 @@ all-rpms: \
 	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
 lis-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="$(RPMXOPTS)" kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
 
 lfs-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' all-rpms
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="$(RPMXOPTS)" kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' all-rpms
 
 AM_RPMSMAKETARGETS =
 
@@ -308,6 +310,14 @@ clean-lsms:
 clean-archives:
 
 clean-rpms:
+	@if test -e $(PACKAGE_TARNAME).spec \
+		-a -e $(PACKAGE_RPMTOPDIR)/SOURCES/$(distdir).tar.gz \
+		-a -e $(PACKAGE_RPMTOPDIR)/SOURCES/$(distdir).tar.bz2 \
+		-a -e $(PACKAGE_RPMTOPDIR)/SOURCES/$(PACKAGE_TARNAME).gif \
+		-a -e $(PACKAGE_RPMTOPDIR)/SOURCES/$(PACKAGE_TARNAME).xpm ; then \
+		echo "$(RPMBUILD) --nodeps --clean $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(PACKAGE_TARNAME).spec" ; \
+		$(RPMBUILD) --nodeps --clean $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $(PACKAGE_TARNAME).spec ; \
+	fi
 
 clean-sign:
 
