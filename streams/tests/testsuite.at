@@ -1,0 +1,40 @@
+# vim: ft=config
+
+m4_include([atconfig])
+m4_include([atlocal.m4])
+
+AT_INIT([testsuite])
+
+# AT_TESTED([test-timod test-tirdwr test-xnet test-xnet_thr test-inet_udp test-inet_raw test-inet_tcp])
+
+AT_SETUP([dummy test])
+AT_KEYWORDS([dummy])
+AT_CHECK([exit 0], [], [ignore])
+AT_XFAIL_IF(false)
+echo "This is a dummy test"
+exit 0
+AT_CLEANUP
+
+AT_SETUP([dummy test2])
+AT_KEYWORDS([dummy])
+AT_CHECK([exit 1], [], [ignore])
+AT_XFAIL_IF(true)
+echo "This is another dummy test"
+exit 1
+AT_CLEANUP
+
+AT_SETUP([dummy test3])
+AT_KEYWORDS([dummy])
+AT_CHECK([exit 1], [], [ignore])
+AT_XFAIL_IF(false)
+echo "This is another dummy test"
+exit 0
+AT_CLEANUP
+
+AT_SETUP([dummy test4])
+AT_KEYWORDS([dummy])
+AT_CHECK([exit 0], [], [ignore])
+AT_XFAIL_IF(true)
+echo "This is another dummy test"
+exit 1
+AT_CLEANUP
