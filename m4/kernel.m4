@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/01/10 09:03:11 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/01/13 12:19:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/10 09:03:11 $ by $Author: brian $
+# Last Modified $Date: 2005/01/13 12:19:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -713,12 +713,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FLAVOR], [dnl
 AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
     AC_MSG_ERROR([
 *** 
-*** Build is for $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernel but the
-*** machine architecture is $linux_cv_march.  $linux_cv_k_flavor
-*** $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march
-*** machine architecture.  If you are automatically building with the rebuild
-*** make target this error is to be expected on a couple of kernel
-*** permutations.
+*** Build is for $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernel but the machine architecture is
+*** $linux_cv_march.  $linux_cv_k_flavor $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march machine
+*** architecture.  If you are automatically building with the rebuild make
+*** target this error is to be expected on a couple of kernel permutations.
 *** ])
 ])# _LINUX_BAD_KERNEL_RHBOOT
 # =========================================================================
@@ -769,59 +767,119 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
         AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for RedHat/Mandrake kernel.])
         case "${linux_cv_rh_boot_kernel:-no}" in
             BOOT)
-                AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for RedHat/Mandrake BOOT kernel.])
-                case "$linux_cv_march" in
-                    i586 | i686 | k6 | athlon)
-                        _LINUX_BAD_KERNEL_RHBOOT ;;
-                esac
-                ;;
+                AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for RedHat BOOT kernel.])
+                case "$target_vendor" in
+                    redhat)
+                        case "$linux_cv_march" in
+                            i386 | alpha | sparc | sparc64 | ia64) ;;
+                            *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             smp)
                 AC_DEFINE([__BOOT_KERNEL_SMP], [1], [Define for RedHat/Mandrake SMP kernel.])
-                case "$linux_cv_march" in
-                    i386)
-                        _LINUX_BAD_KERNEL_RHBOOT ;;
-                esac
-                ;;
+                case "$target_vendor" in
+                    redhat)
+                        case "$linux_cv_march" in
+                            i386 | alpha | sparc | sparc64 | i686 | i586 | ia64 | athlon | x86_64) ;;
+                            *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    mandrake)
+                        case "$linux_cv_march" in
+                            i586) ;;
+                            *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                esac ;;
             bigmem)
-                AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for RedHat/Mandrake BIGMEM kernel.])
-                case "$linux_cv_march" in
-                    i386 | i586 | k6 | athlon)
-                        _LINUX_BAD_KERNEL_RHBOOT ;;
-                esac
-                ;;
+                AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for RedHat BIGMEM kernel.])
+                case "$target_vendor" in
+                    redhat)
+                        case "$linux_cv_march" in
+                            i686) ;;
+                            *) _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             hugemem)
-                AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for RedHat/Mandrake HUGEMEM kernel.])
-                case "$linux_cv_march" in
-                    i386 | i586 | k6 | athlon)
-                        _LINUX_BAD_KERNEL_RHBOOT ;;
-                esac
-                ;;
+                AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for RedHat HUGEMEM kernel.])
+                case "$target_vendor" in
+                    redhat)
+                        case "$linux_cv_march" in
+                            i686) ;;
+                            *) _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             debug)
-                AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for RedHat/Mandrake DEBUG kernel.])
-                ;;
+                AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for RedHat DEBUG kernel.])
+                case "$target_vendor" in
+                    redhat) ;;
+                    *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             enterprise)
                 AC_DEFINE([__BOOT_KERNEL_ENTERPRISE], [1], [Define for RedHat/Mandrake ENTERPRISE kernel.])
-                ;;
+                case "$target_vendor" in
+                    redhat) ;;
+                    mandrake)
+                        case "$linux_cv_march" in
+                            i686) ;;
+                            i586 | k6)
+                                linux_cv_march=i686
+                                target_cpu=i686
+                                target="${target_cpu}-${target_vendor}-${target_os}"
+                                ;;
+                            *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             secure)
                 AC_DEFINE([__BOOT_KERNEL_SECURE], [1], [Define for RedHat/Mandrake SECURE kernel.])
+                _LINUX_BAD_KERNEL_RHBOOT
                 ;;
             i686-up-4GB)
                 AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for Mandrake I686_UP_4GB kernel.])
-                case "$linux_cv_march" in
-                    i386 | i586 | k6 | athlon)
-                        _LINUX_BAD_KERNEL_RHBOOT ;;
-                esac
-                ;;
+                case "$target_vendor" in
+                    mandrake)
+                        case "$linux_cv_march" in
+                            i686) ;;
+                            i586 | k6)
+                                linux_cv_march=i686
+                                target_cpu=i686
+                                target="${target_cpu}-${target_vendor}-${target_os}"
+                                ;;
+                            *) _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    *) _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             p3-smp-64GB)
                 AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for Mandrake P3_SMP_64GB  kernel.])
-                case "$linux_cv_march" in
-                    i386 | i586 | k6 | athlon)
-                        _LINUX_BAD_KERNEL_RHBOOT ;;
-                esac
-                ;;
+                case "$target_vendor" in
+                    mandrake)
+                        case "$linux_cv_march" in
+                            i686) ;;
+                            i586 | k6)
+                                linux_cv_march=i686
+                                target_cpu=i686
+                                target="${target_cpu}-${target_vendor}-${target_os}"
+                                ;;
+                            *) _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    *) _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac ;;
             UP)
                 AC_DEFINE([__BOOT_KERNEL_UP], [1], [Define for RedHat/Mandrake UP kernel.])
-                ;;
+                case "$target_vendor" in
+                    redhat)
+                        case "$linux_cv_march" in
+                            i386 | alpha | sparc | sparc64 | i686 | i586 | ia64 | athlon | x86_64) ;;
+                            *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                    mandrake)
+                        case "$linux_cv_march" in
+                            i586) ;;
+                            *)  _LINUX_BAD_KERNEL_RHBOOT ;;
+                        esac ;;
+                esac ;;
         esac
         case "$linux_cv_march" in
             i586)
