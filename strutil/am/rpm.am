@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/02/02 11:36:47 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/02/03 00:09:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/02 11:36:47 $ by $Author: brian $
+# Last Modified $Date: 2005/02/03 00:09:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -185,10 +185,10 @@ all-rpms: \
 	$(RPMBUILD) -bb $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
 
 lis-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="$(RPMXOPTS)" kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lis --with-lis"' all-rpms
 
 lfs-rpms:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS="$(RPMXOPTS)" kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' all-rpms
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" AM_RPMBOPTS='$(AM_RPMBOPTS) --define "_with_lfs --with-lfs"' all-rpms
 
 AM_RPMSMAKETARGETS =
 
@@ -228,44 +228,21 @@ sign: \
 #   Note that older rpms (particularly those used by SuSE) are too stupid to handle the --with and
 #   --without popt syntax, so we have to expand them to --defines.
 #
-all-rebuild: $(PACKAGE_RPMTOPDIR)/SRPMS/$(distdir).src.rpm
+
+rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
-	for t in $$targets ; do \
+	for t in $$targets ;  do \
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
-			if test -e $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define \"_without_tools --without-tools\" --define \"_kversion $$k\" --target $$t -- $(PACKAGE_RPMTOPDIR)/SRPMS/$(distdir).src.rpm" ; \
-				$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define "_without_tools --without-tools" --define "_kversion $$k" --target $$t -- $(PACKAGE_RPMTOPDIR)/SRPMS/$(distdir).src.rpm || :; \
+			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
+				echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" rpms || :; \
 			fi ; \
 		done ; \
-		echo "$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define \"_without_modules --without-modules\" --define \"_kversion $$k\" --target $$t -- $(PACKAGE_RPMTOPDIR)/SRPMS/$(distdir).src.rpm" ; \
-		$(RPMBUILD) --rebuild $(RPMFLAGS) $(AM_SRPMFLAGS) $(RPMBOPTS) --define "_without_modules --without-modules" --define "_kversion $$k" --target $$t -- $(PACKAGE_RPMTOPDIR)/SRPMS/$(distdir).src.rpm || :; \
+		echo "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" rpms" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='--define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" rpms || :; \
 	done
-
-lis-rebuild:
-	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lis --with-lis"' all-rebuild || :
-
-lfs-rebuild:
-	$(MAKE) $(AM_MAKEFLAGS) RPMBOPTS='$(RPMBOPTS) --define "_with_lfs --with-lfs"' all-rebuild || :
-
-AM_REBUILDMAKETARGETS =
-
-if WITH_LIS
-AM_REBUILDMAKETARGETS += lis-rebuild
-endif
-if WITH_LFS
-AM_REBUILDMAKETARGETS += lfs-rebuild
-endif
-if WITH_LIS
-else
-if WITH_LFS
-else
-AM_REBUILDMAKETARGETS += all-rebuild
-endif
-endif
-
-rebuild: $(AM_REBUILDMAKETARGETS)
 
 resign: sign
 	@list="`find $(PACKAGE_RPMTOPDIR)/RPMS -name '$(PACKAGE_TARNAME)-*-$(PACKAGE_VERSION)-$(PACKAGE_RELEASE)$(PACKAGE_RPMEXTRA).*.rpm' 2>/dev/null`" ; \
@@ -406,7 +383,7 @@ DISTCLEAN_LOCAL += distclean-lsms distclean-archives distclean-srpm distclean-rp
 MAINTAINER_CLEAN_LOCAL += maintainer-clean-lsms maintainer-clean-archives maintainer-clean-srpm \
 	maintainer-clean-rpms maintainer-clean-sign
 
-.PHONY: srpm rpms all-rpms lis-rpms lfs-rpms sign rebuild all-rebuild lis-rebuild lfs-rebuild resign \
+.PHONY: srpm rpms all-rpms lis-rpms lfs-rpms sign rebuild resign \
 	clean-lsms clean-archives clean-rpms clean-sign distclean-lsms distclean-archives \
 	distclean-srpm distclean-rpms distclean-sign maintainer-clean-lsms \
 	maintainer-clean-archives maintainer-clean-srpm maintainer-clean-rpms maintainer-clean-sign
