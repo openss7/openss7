@@ -1,0 +1,2124 @@
+Internet Engineering Task Force                               R. Stewart
+INTERNET DRAFT                                             Cisco Systems
+                                                                  L. Ong
+                                                           Ciena Systems
+                                                      I. Arias-Rodriguez
+                                                                   Nokia
+                                                                 K. Poon
+                                                        Sun Microsystems
+  					              Armando L Caro Jr.
+                                                  University Of Delaware
+
+expires in six months                                        May 12 2002
+
+
+     Stream Control Transmission Protocol (SCTP) Implementers Guide
+                <draft-ietf-tsvwg-sctpimpguide-05.txt>
+
+Status of this Memo
+
+   This document is an Internet-Draft and is subject to all provisions
+   of Section 10 of RFC2026.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups. Note that
+   other groups may also distribute working documents as
+   Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time. It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/1id-abstracts.html
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html
+
+
+
+
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2001). All Rights Reserved.
+
+Abstract
+
+   This document contains a compilation of all defects found up until
+   January 2002 for the Stream Control Transmission Protocol (SCTP)
+   [RFC2960]. These defects may be of an editorial or technical nature.
+   This document may be thought of as a companion document to be used in
+   the implementation of SCTP to clarify errors in the original SCTP
+   document.
+
+
+Stewart et.al.                                                  [Page 1]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   This document updates RFC2960 and text within this document
+   supersedes the text found in RFC2960.
+
+Table of Contents
+
+   1. Introduction......................................... 2
+    1.1 Conventions........................................ 3
+   2. Corrections to RFC2960............................... 3
+    2.1 Incorrect error type during chunk processing....... 3
+    2.2 Parameter processing issue......................... 3
+    2.3 Padding issues..................................... 4
+    2.4 Parameter types across all chunk types............. 5
+    2.5 Stream parameter clarification..................... 7
+    2.6 Restarting association security issue.............. 8
+    2.7 Implicit ability to exceed cwnd by PMTU-1 bytes....12 
+    2.8 Issues with Fast Retransmit........................13
+    2.9 Missing statement about partial_bytes_acked update.16
+    2.10 Issues with Heartbeating and failure detection....17
+    2.11 Security interactions with firewalls..............20
+    2.12 Shutdown ambiguity................................21
+    2.13 Inconsistency in ABORT processing.................23
+    2.14 Cwnd gated by its full use........................24
+    2.15 Window probes in SCTP.............................26
+    2.16 Fragmentation and Path MTU issues.................28
+    2.17 Initial value of the cumulative TSN ACK...........29
+    2.18 Handling of address parameters within the INIT or
+         INIT-ACK..........................................30
+    2.19 Handling of stream shortages......................31
+    2.20 Indefinite postponement...........................32
+
+   3. Acknowledgments......................................33
+   4. Authors' Addresses...................................34
+   5. References...........................................35
+
+
+1. Introduction
+
+   This document contains a compilation of all defects found up until
+   January 2002 for the Stream Control Transmission Protocol (SCTP)
+   [RFC2960]. These defects may be of an editorial or technical nature.
+   This document may be thought of as a companion document to be used in
+   the implementation of SCTP to clarify errors in the original SCTP
+   document.
+
+   This document updates RFC2960 and text within this document, where
+   noted, supersedes the text found in RFC2960. Each error will be
+   detailed within this document in the form of:
+
+   - The problem description,
+
+   - The text quoted from RFC2960,
+
+   - The replacement text,
+
+
+Stewart et.al.                                                  [Page 2]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   - A description of the solution.
+
+1.1 Conventions
+
+   The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+   SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL, when
+   they appear in this document, are to be interpreted as described in
+   [RFC2119].
+
+
+2. Corrections to RFC2960
+
+2.1 Incorrect error type during chunk processing.
+
+2.1.1 Description of the problem
+
+   A typo was discovered in [RFC2960] that incorrectly specifies an
+   action to be taken when processing chunks of unknown identity.
+
+2.1.2 Text changes to the document
+
+   ---------
+   Old text: (Section 3.2)
+   ---------
+
+   01 - Stop processing this SCTP packet and discard it, do not process
+        any further chunks within it, and report the unrecognized
+        parameter in an 'Unrecognized Parameter Type' (in either an
+        ERROR or in the INIT ACK).
+
+   ---------
+   New text: (Section 3.2)
+   ---------
+
+   01 - Stop processing this SCTP packet and discard it, do not process
+        any further chunks within it, and report the unrecognized
+        chunk in an 'Unrecognized Chunk Type'.
+
+2.1.3 Solution description
+
+   The receiver of an unrecognized Chunk should not send a 'parameter'
+   error but instead the appropriate chunk error as described above.
+
+
+2.2 Parameter processing issue
+
+2.2.1 Description of the problem
+
+   A typographical error was introduced through an improper cut
+   and paste in the use of the upper two bits to describe proper
+   handling of unknown parameters.
+
+2.2.2 Text changes to the document
+
+
+Stewart et.al.                                                  [Page 3]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   ---------
+   Old text: (Section 3.2.1)
+   ---------
+
+   00 - Stop processing this SCTP packet and discard it, do not process
+        any further chunks within it.
+
+   01 - Stop processing this SCTP packet and discard it, do not process
+        any further chunks within it, and report the unrecognized
+        parameter in an 'Unrecognized Parameter Type' (in either an
+        ERROR or in the INIT ACK).
+
+   ---------
+   New text: (Section 3.2.1)
+   ---------
+
+   00 - Stop processing this SCTP chunk and discard it, do not process
+        any further parameters within this chunk.
+
+   01 - Stop processing this SCTP chunk and discard it, do not process
+        any further parameters within this chunk, and report the
+        unrecognized parameter in an 'Unrecognized Parameter Type' (in
+        either an ERROR or in the INIT ACK).
+
+2.2.3 Solution description
+
+   It was always the intent to stop processing at the level one was at
+   in an unknown chunk or parameter with the upper bit set to 0. Thus if
+   you are processing a chunk, you should drop the packet. If you are
+   processing a parameter, you should drop the chunk.
+
+
+2.3 Padding issues
+
+2.3.1 Description of the problem
+
+   A problem was found in that when a Chunk terminated in a TLV
+   parameter. If this last TLV was not on a 32 bit boundary (as
+   required), there was confusion as to if the last padding was included
+   in the chunk length.
+
+2.3.2 Text changes to the document
+
+   ---------
+   Old text: (Section 3.2)
+   ---------
+
+   Chunk Length: 16 bits (unsigned integer)
+
+      This value represents the size of the chunk in bytes including the
+      Chunk Type, Chunk Flags, Chunk Length, and Chunk Value fields.
+      Therefore, if the Chunk Value field is zero-length, the Length
+      field will be set to 4.  The Chunk Length field does not count any
+      padding.
+
+Stewart et.al.                                                  [Page 4]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   Chunk Value: variable length
+
+      The Chunk Value field contains the actual information to be
+      transferred in the chunk.  The usage and format of this field is
+      dependent on the Chunk Type.
+
+   The total length of a chunk (including Type, Length and Value fields)
+   MUST be a multiple of 4 bytes.  If the length of the chunk is not a
+   multiple of 4 bytes, the sender MUST pad the chunk with all zero
+   bytes and this padding is not included in the chunk length field.
+   The sender should never pad with more than 3 bytes.  The receiver
+   MUST ignore the padding bytes.
+
+   ---------
+   New text: (Section 3.2)
+   ---------
+
+   Chunk Length: 16 bits (unsigned integer)
+
+      This value represents the size of the chunk in bytes including the
+      Chunk Type, Chunk Flags, Chunk Length, and Chunk Value fields.
+      Therefore, if the Chunk Value field is zero-length, the Length
+      field will be set to 4. The Chunk Length field does not count any
+      chunk padding.
+
+      Chunks (including Type, Length and Value fields) are padded out by
+      the sender with all zero bytes to be a multiple of 4 bytes long.
+      This padding MUST NOT be more than 3 bytes in total. The Chunk
+      Length value does not include terminating padding of the Chunk.
+      However, it does include padding of any variable length parameter
+      except the last parameter in the Chunk. The receiver MUST ignore
+      the padding.
+
+      Note: A robust implementation should accept the Chunk whether
+      or not the final padding has been included in the Chunk Length.
+
+   Chunk Value: variable length
+
+      The Chunk Value field contains the actual information to be
+      transferred in the chunk. The usage and format of this field is
+      dependent on the Chunk Type.
+
+2.3.3 Solution description
+
+   The above text makes clear that the padding of the last parameter is
+   not included in the Chunk Length field. It also clarifies that the
+   padding of parameters that are not the last one must be counted in
+   the Chunk Length field.
+
+
+2.4 Parameter types across all chunk types
+
+2.4.1 Description of the problem
+
+Stewart et.al.                                                  [Page 5]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   A problem was noted when multiple errors are needed to be sent
+   regarding unknown or unrecognized parameters. Since often times the
+   error type does not hold the chunk type field, it may become
+   difficult to tell which error was associated with which chunk.
+
+2.4.2 Text changes to the document
+
+   ---------
+   Old text: (Section 3.2.1)
+   ---------
+
+   The actual SCTP parameters are defined in the specific SCTP chunk
+   sections.  The rules for IETF-defined parameter extensions are
+   defined in Section 13.2.
+
+   ---------
+   New text: (Section 3.2.1)
+   ---------
+
+   The actual SCTP parameters are defined in the specific SCTP chunk
+   sections. The rules for IETF-defined parameter extensions are
+   defined in Section 13.2. Note that a parameter type MUST be unique
+   across all chunks. For example, the parameter type '5' is used to
+   represent an IPv4 address (see section 3.3.2). The value '5' then is
+   reserved across all chunks to represent an IPv4 address and MUST NOT
+   be reused with a different meaning in any other chunk.
+
+   ---------
+   Old text: (Section 13.2)
+   ---------
+
+   13.2 IETF-defined Chunk Parameter Extension
+
+   The assignment of new chunk parameter type codes is done through an
+   IETF Consensus action as defined in [RFC2434].  Documentation of the
+   chunk parameter MUST contain the following information:
+
+   a) Name of the parameter type.
+
+   b) Detailed description of the structure of the parameter field.
+      This structure MUST conform to the general type-length-value
+      format described in Section 3.2.1.
+
+   c) Detailed definition of each component of the parameter type.
+
+   d) Detailed description of the intended use of this parameter type,
+      and an indication of whether and under what circumstances multiple
+      instances of this parameter type may be found within the same
+      chunk.
+
+   ---------
+   New text: (Section 13.2)
+   ---------
+
+Stewart et.al.                                                  [Page 6]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   13.2 IETF-defined Chunk Parameter Extension
+
+   The assignment of new chunk parameter type codes is done through an
+   IETF Consensus action as defined in [RFC2434]. Documentation of the
+   chunk parameter MUST contain the following information:
+
+   a) Name of the parameter type.
+
+   b) Detailed description of the structure of the parameter field. This
+      structure MUST conform to the general type-length-value format
+      described in Section 3.2.1.
+
+   c) Detailed definition of each component of the parameter type.
+
+   d) Detailed description of the intended use of this parameter type,
+      and an indication of whether and under what circumstances multiple
+      instances of this parameter type may be found within the same
+      chunk.
+
+   e) Each parameter type MUST be unique across all chunks.
+
+2.4.3 Solution description
+
+   By having all parameters unique across all chunk assignments (the
+   current assignment policy) no ambiguity exists as to what a parameter
+   means based on context. The trade off for this is a smaller parameter
+   space i.e. 65,536 parameters versus 65,536 * Number-of-chunks.
+
+
+2.5 Stream parameter clarification
+
+2.5.1 Description of the problem
+
+   A problem was found where the specification is unclear on the
+   legality of an endpoint asking for more stream resources than were
+   allowed in the MIS value of the INIT. In particular the value in the
+   INIT ACK requested in its OS value was larger than the MIS value
+   received in the INIT chunk. This behavior is illegal yet it was
+   unspecified in [RFC2960].
+
+2.5.2 Text changes to the document
+
+   ---------
+   Old text: (Section 3.3.3)
+   ---------
+
+   Number of Outbound Streams (OS):  16 bits (unsigned integer)
+
+      Defines the number of outbound streams the sender of this INIT ACK
+      chunk wishes to create in this association.  The value of 0 MUST
+      NOT be used.
+
+      Note: A receiver of an INIT ACK  with the OS value set to 0 SHOULD
+
+Stewart et.al.                                                  [Page 7]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      destroy the association discarding its TCB.
+
+   ---------
+   New text: (Section 3.3.3)
+   ---------
+
+   Number of Outbound Streams (OS): 16 bits (unsigned integer)
+
+      Defines the number of outbound streams the sender of this INIT ACK
+      chunk wishes to create in this association. The value of 0 MUST
+      NOT be used and the value MUST NOT be greater than the MIS value
+      sent in the INIT chunk.
+
+      Note: A receiver of an INIT ACK with the OS value set to 0 SHOULD
+      destroy the association discarding its TCB.
+
+2.5.3 Solution description
+
+   The change in wording, above, changes it so that a responder to an
+   INIT chunk does not specify more streams in its OS value than was
+   represented to it in the MIS value i.e. its maximum.
+
+
+2.6 Restarting association security issue
+
+2.6.1 Description of the problem
+
+   A security problem was found when a restart occurs. It is possible
+   for an intruder to send an INIT to an endpoint of an existing
+   association. In the INIT the intruder would list one or more of
+   the current addresses of an association and its own. The normal restart
+   procedures would then occur and the intruder would have hi-jacked an
+   association.
+
+2.6.2 Text changes to the document
+
+   ---------
+   Old text: (Section 3.3.10)
+   ---------
+
+      Cause Code
+      Value           Cause Code
+      ---------      ----------------
+       1              Invalid Stream Identifier
+       2              Missing Mandatory Parameter
+       3              Stale Cookie Error
+       4              Out of Resource
+       5              Unresolvable Address
+       6              Unrecognized Chunk Type
+       7              Invalid Mandatory Parameter
+       8              Unrecognized Parameters
+       9              No User Data
+      10              Cookie Received While Shutting Down
+
+
+Stewart et.al.                                                  [Page 8]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   Cause Length: 16 bits (unsigned integer)
+
+      Set to the size of the parameter in bytes, including the Cause
+      Code, Cause Length, and Cause-Specific Information fields
+
+   Cause-specific Information: variable length
+
+      This field carries the details of the error condition.
+
+   Sections 3.3.10.1 - 3.3.10.10 define error causes for SCTP.
+   Guidelines for the IETF to define new error cause values are
+   discussed in Section 13.3.
+
+   ---------
+   New text: (Section 3.3.10)
+   ---------
+
+      Cause Code
+      Value           Cause Code
+      ---------      ----------------
+       1              Invalid Stream Identifier
+       2              Missing Mandatory Parameter
+       3              Stale Cookie Error
+       4              Out of Resource
+       5              Unresolvable Address
+       6              Unrecognized Chunk Type
+       7              Invalid Mandatory Parameter
+       8              Unrecognized Parameters
+       9              No User Data
+      10              Cookie Received While Shutting Down
+      11              Restart of an association with new addresses
+
+   Cause Length: 16 bits (unsigned integer)
+
+      Set to the size of the parameter in bytes, including the Cause
+      Code, Cause Length, and Cause-Specific Information fields
+
+   Cause-specific Information: variable length
+
+      This field carries the details of the error condition.
+
+   Sections 3.3.10.1 - 3.3.10.11 define error causes for SCTP.
+   Guidelines for the IETF to define new error cause values are
+   discussed in Section 13.3.
+
+   ---------
+   New text: (Note no old text, new error added in section 3.3.10)
+   ---------
+
+   3.3.10.11 Restart of an association with new addresses (11)
+
+    Cause of error
+    --------------
+    Restart of an association with new addresses: An INIT was received
+
+Stewart et.al.                                                  [Page 9]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+    on an existing association. But the INIT added addresses to the
+    association that were previously NOT part of the association. The
+    New addresses are listed in the error code. This ERROR is normally
+    sent as part of an ABORT refusing the INIT (see section 5.2).
+
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |         Cause Code=11         |      Cause Length=Variable    |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      /                       New Address TLVs                        /
+      \                                                               \
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   ---------
+   Old text: (Section 5.2.1)
+   ---------
+
+   Upon receipt of an INIT in the COOKIE-WAIT or COOKIE-ECHOED state, an
+   endpoint MUST respond with an INIT ACK using the same parameters it
+   sent in its original INIT chunk (including its Initiation Tag,
+   unchanged).  These original parameters are combined with those from
+   the newly received INIT chunk.  The endpoint shall also generate a
+   State Cookie with the INIT ACK.  The endpoint uses the parameters
+   sent in its INIT to calculate the State Cookie.
+
+   ---------
+   New text: (Section 5.2.1)
+   ---------
+
+   Upon receipt of an INIT in the COOKIE-WAIT state, an endpoint MUST
+   respond with an INIT ACK using the same parameters it sent in its
+   original INIT chunk (including its Initiation Tag, unchanged). When
+   responding the endpoint MUST send the INIT ACK back to the same
+   address that the original INIT (sent by this endpoint) was sent to.
+
+   Upon receipt of an INIT in the COOKIE-ECHOED state, an endpoint MUST
+   respond with an INIT ACK using the same parameters it sent in its
+   original INIT chunk (including its Initiation Tag, unchanged)
+   provided that no NEW address have been added to the forming
+   association. If the INIT message indicates that a new address(es)
+   have been added to the association, then the entire INIT MUST be
+   discarded and NO changes should be made to the existing association.
+   An ABORT MUST be sent in response that SHOULD include the error
+   'Restart of an association with new addresses'. The error SHOULD list
+   the addresses that were added to the restarting association.
+
+   When responding in either state (COOKIE-WAIT or COOKIE-ECHOED) with
+   an INIT ACK the original parameters are combined with those from the
+   newly received INIT chunk. The endpoint shall also generate a State
+   Cookie with the INIT ACK. The endpoint uses the parameters sent in
+   its INIT to calculate the State Cookie.
+
+   ---------
+   Old text: (Section 5.2.2)
+   ---------
+
+Stewart et.al.                                                 [Page 10]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   5.2.2 Unexpected INIT in States Other than CLOSED, COOKIE-ECHOED,
+         COOKIE-WAIT and SHUTDOWN-ACK-SENT
+
+   Unless otherwise stated, upon reception of an unexpected INIT for
+   this association, the endpoint shall generate an INIT ACK with a
+   State Cookie.  In the outbound INIT ACK the endpoint MUST copy its
+   current Verification Tag and peer's Verification Tag into a reserved
+   place within the state cookie.  We shall refer to these locations as
+   the Peer's-Tie-Tag and the Local-Tie-Tag.  The outbound SCTP packet
+   containing this INIT ACK MUST carry a Verification Tag value equal to
+   the Initiation Tag found in the unexpected INIT.  And the INIT ACK
+   MUST contain a new Initiation Tag (randomly generated see Section
+   5.3.1).  Other parameters for the endpoint SHOULD be copied from the
+   existing parameters of the association (e.g. number of outbound
+   streams) into the INIT ACK and cookie.
+
+   After sending out the INIT ACK, the endpoint shall take no further
+   actions, i.e., the existing association, including its current state,
+   and the corresponding TCB MUST NOT be changed.
+
+   Note: Only when a TCB exists and the association is not in a COOKIE-
+   WAIT state are the Tie-Tags populated.  For a normal association INIT
+   (i.e. the endpoint is in a COOKIE-WAIT state), the Tie-Tags MUST be
+   set to 0 (indicating that no previous TCB existed).  The INIT ACK and
+   State Cookie are populated as specified in section 5.2.1.
+
+   ---------
+   New text: (Section 5.2.2)
+   ---------
+
+   5.2.2 Unexpected INIT in States Other than CLOSED, COOKIE-ECHOED,
+         COOKIE-WAIT and SHUTDOWN-ACK-SENT
+
+   Unless otherwise stated, upon reception of an unexpected INIT for
+   this association, the endpoint shall generate an INIT ACK with a
+   State Cookie. Before responding the endpoint MUST check to see if the
+   unexpected INIT adds new addresses to the association. If new
+   addresses are added to the association, the endpoint MUST respond
+   with an ABORT copying the 'Initiation Tag' of the unexpected INIT
+   into the 'Verification Tag' of the outbound packet carrying the ABORT. 
+   In the ABORT response the cause of error SHOULD be set to 'restart 
+   of an association with new addresses'. The error SHOULD list the 
+   addresses that were added to the restarting association.
+
+   If no new addresses are added, when responding to the INIT in the
+   outbound INIT ACK the endpoint MUST copy its current Verification Tag
+   and peer's Verification Tag into a reserved place within the state
+   cookie. We shall refer to these locations as the Peer's-Tie-Tag and
+   the Local-Tie-Tag. The outbound SCTP packet containing this INIT ACK
+   MUST carry a Verification Tag value equal to the Initiation Tag found
+   in the unexpected INIT. And the INIT ACK MUST contain a new
+   Initiation Tag (randomly generated see Section 5.3.1). Other
+   parameters for the endpoint SHOULD be copied from the existing
+
+Stewart et.al.                                                 [Page 11]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   parameters of the association (e.g. number of outbound streams) into
+   the INIT ACK and cookie.
+
+   After sending out the INIT ACK or ABORT, the endpoint shall take no
+   further actions, i.e., the existing association, including its
+   current state, and the corresponding TCB MUST NOT be changed.
+
+   Note: Only when a TCB exists and the association is not in a COOKIE-
+   WAIT, COOKIE-ECHOED or SHUTDOWN-ACK-SENT state are the Tie-Tags
+   populated with a value other than 0. For a normal association INIT
+   (i.e. the endpoint is in the CLOSED state), the Tie-Tags MUST be set
+   to 0 (indicating that no previous TCB existed).
+
+2.6.3 Solution description
+
+   A new error code is being added and specific instructions to send
+   back an ABORT to a new association in a restart case or collision
+   case, where new addresses have been added. The error code can be used
+   by a legitimate restart to inform the endpoint that it has made a
+   software error in adding a new address. The endpoint then can choose
+   to wait until the OOTB ABORT tears down the old association, or
+   restart without the new address.
+
+   Also the Note at the end of section 5.2.2 explaining the use of the
+   Tie-Tags was modified to properly explain the states in which the
+   Tie-Tags should be set to a value different than 0.
+
+
+2.7 Implicit ability to exceed cwnd by PMTU-1 bytes
+
+2.7.1 Description of the problem
+
+   Some implementations were having difficulty growing their cwnd. This
+   was due to an improper enforcement of the congestion control rules.
+   The rules, as written, provided for a slop over of the cwnd value.
+   Without this slop over the sender would appear to NOT be using its
+   full cwnd value and thus never increase it.
+
+2.7.2 Text changes to the document
+
+   ---------
+   Old text: (Section 6.1)
+   ---------
+
+   B) At any given time, the sender MUST NOT transmit new data to a
+      given transport address if it has cwnd or more bytes of data
+      outstanding to that transport address.
+
+   ---------
+   New text: (Section 6.1)
+   ---------
+
+   B) At any given time, the sender MUST NOT transmit new data to a
+      given transport address if it has cwnd or more bytes of data
+
+Stewart et.al.                                                 [Page 12]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      outstanding to that transport address. The sender may exceed cwnd
+      by up to (PMTU-1) bytes on a new transmission if the cwnd is not
+      currently exceeded.
+
+2.7.3 Solution description
+
+   The text changes make clear the ability to go over the cwnd value by
+   no more than (PMTU-1) bytes.
+
+
+2.8 Issues with Fast Retransmit
+
+2.8.1 Description of the problem
+
+   A problem was found in the current specification of fast retransmit.
+   In particular in a high bandwidth * delay network. The current
+   wording did not require GAP ACK blocks to be sent, even though they
+   are essential to the workings of SCTP's congestion control. Also the
+   specification left unclear how to handle the fast retransmit cycle,
+   having the implementation to wait on the cwnd to retransmit a TSN
+   that was marked for fast retransmit. Also no limit was placed on how
+   many times a TSN could be fast retransmitted.
+
+2.8.2 Text changes to the document
+
+   ---------
+   Old text: (Section 6.2)
+   ---------
+
+   Acknowledgments MUST be sent in SACK chunks unless shutdown was
+   requested by the ULP in which case an endpoint MAY send an
+   acknowledgment in the SHUTDOWN chunk.  A SACK chunk can acknowledge
+   the reception of multiple DATA chunks.  See Section 3.3.4 for SACK
+   chunk format.  In particular, the SCTP endpoint MUST fill in the
+   Cumulative TSN Ack field to indicate the latest sequential TSN (of a
+   valid DATA chunk) it has received.  Any received DATA chunks with TSN
+   greater than the value in the Cumulative TSN Ack field SHOULD also be
+   reported in the Gap Ack Block fields.
+
+   ---------
+   New text: (Section 6.2)
+   ---------
+
+   Acknowledgments MUST be sent in SACK chunks unless shutdown was
+   requested by the ULP in which case an endpoint MAY send an
+   acknowledgment in the SHUTDOWN chunk. A SACK chunk can acknowledge
+   the reception of multiple DATA chunks. See Section 3.3.4 for SACK
+   chunk format. In particular, the SCTP endpoint MUST fill in the
+   Cumulative TSN Ack field to indicate the latest sequential TSN (of a
+   valid DATA chunk) it has received. Any received DATA chunks with TSN
+   greater than the value in the Cumulative TSN Ack field MUST also be
+   reported in the Gap Ack Block fields.
+
+   ---------
+
+Stewart et.al.                                                 [Page 13]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   Old text: (Section 7.2.4)
+   ---------
+
+   When the TSN(s) is reported as missing in the fourth consecutive
+   SACK, the data sender shall:
+
+   1) Mark the missing DATA chunk(s) for retransmission,
+
+   2) Adjust the ssthresh and cwnd of the destination address(es) to
+      which the missing DATA chunks were last sent, according to the
+      formula described in Section 7.2.3.
+
+   3) Determine how many of the earliest (i.e., lowest TSN) DATA chunks
+      marked for retransmission will fit into a single packet, subject
+      to constraint of the path MTU of the destination transport address
+      to which the packet is being sent.  Call this value K. Retransmit
+      those K DATA chunks in a single packet.
+
+   4) Restart T3-rtx timer only if the last SACK acknowledged the lowest
+      outstanding TSN number sent to that address, or the endpoint is
+      retransmitting the first outstanding DATA chunk sent to that
+      address.
+
+   Note: Before the above adjustments, if the received SACK also
+   acknowledges new DATA chunks and advances the Cumulative TSN Ack
+   Point, the cwnd adjustment rules defined in Sections 7.2.1 and 7.2.2
+   must be applied first.
+
+   A straightforward implementation of the above keeps a counter for
+   each TSN hole reported by a SACK. The counter increments for each
+   consecutive SACK reporting the TSN hole.  After reaching 4 and
+   starting the fast retransmit procedure, the counter resets to 0.
+   Because cwnd in SCTP indirectly bounds the number of outstanding
+   TSN's, the effect of TCP fast-recovery is achieved automatically with
+   no adjustment to the congestion control window size.
+
+   ---------
+   New text: (Section 7.2.4)
+   ---------
+
+   When the TSN(s) is reported as missing in the fourth consecutive
+   SACK, the data sender shall:
+
+   1) Mark the missing DATA chunk(s) for retransmission as described
+      below in M1-M3,
+
+   2) Adjust the ssthresh and cwnd of the destination address(es) to
+      which the missing DATA chunks were last sent, according to the
+      formula described in Section 7.2.3.
+
+   3) Determine how many of the earliest (i.e., lowest TSN) DATA chunks
+      marked for retransmission will fit into a single packet, subject
+      to constraint of the path MTU of the destination transport address
+      to which the packet is being sent. Call this value K. Retransmit
+
+Stewart et.al.                                                 [Page 14]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      those K DATA chunks in a single packet. When a Fast Retransmit is
+      being performed the sender SHOULD ignore the value of cwnd and
+      SHOULD NOT delay retransmission.
+
+   4) Restart T3-rtx timer only if the last SACK acknowledged the lowest
+      outstanding TSN number sent to that address, or the endpoint is
+      retransmitting the first outstanding DATA chunk sent to that
+      address.
+
+   5) Mark the DATA chunk(s) as being fast retransmitted and thus
+      ineligible for a subsequent fast retransmit. Those TSNs marked 
+      for retransmission due to the Fast Retransmit algorithm that 
+      did not fit in the sent datagram carrying K other TSNs are also 
+      marked as ineligible for a subsequent fast retransmit. However, 
+      as they are marked for retransmission they will be retransmitted 
+      later on as soon as cwnd allows.
+
+   Note: Before the above adjustments, if the received SACK also
+   acknowledges new DATA chunks and advances the Cumulative TSN Ack
+   Point, the cwnd adjustment rules defined in Sections 7.2.1 and 7.2.2
+   must be applied first.
+
+   A straightforward implementation of the above is as follows:
+
+   M1) Each time a new DATA chunk is transmitted set the
+       'TSN.Missing.Report' count for that TSN to 0. The
+       'TSN.Missing.Report' count will be used to determine missing
+       chunks and when to fast retransmit.
+
+   M2) Each time a SACK arrives reporting 'Stray DATA chunk(s)' record
+       the highest TSN reported as newly acknowledged, call this
+       value 'HighestTSNinSack'. A newly acknowledged DATA chunk is one
+       not previously acknowledged in a SACK.
+
+       When the SCTP sender of data receives a SACK chunk that
+       acknowledges, for the first time, the receipt of a DATA chunk,
+       all the still unacknowledged DATA chunks whose TSN is older than
+       that newly acknowledged DATA chunk, are qualified as
+       'Stray DATA chunks'.
+
+   M3) Examine all 'Unacknowledged TSN's', if the TSN number of an
+       'Unacknowledged TSN' is smaller than the 'HighestTSNinSack'
+       value, increment the 'TSN.Missing.Report' count on that chunk if
+       it has NOT been fast retransmitted or marked for fast retransmit
+       already.
+
+   M4) If any DATA chunk is found to have a 'TSN.Missing.Report' value
+       larger than or equal to 4, mark that chunk for retransmission and
+       start the fast retransmit procedure (steps 2-5 above).
+
+   M5) If a T3-rtx timer expires, the 'TSN.Missing.Report' of all
+       affected TSNs is set to 0.
+
+   Because cwnd in SCTP indirectly bounds the number of outstanding
+
+Stewart et.al.                                                 [Page 15]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   TSN's, the effect of TCP fast-recovery is achieved automatically with
+   no adjustment to the congestion control window size.
+
+2.8.3 Solution description
+
+   The effect of the above wording changes are as follows:
+
+   - It requires with a MUST the sending of GAP Ack blocks instead of
+     the current [RFC2960] SHOULD.
+
+   - It allows a TSN being Fast Retransmitted (FR) to be sent only once
+     via FR.
+
+   - It ends the delay in awaiting for the flight size to drop when a
+     TSN is identified ready to FR.
+
+   - It changes the way chunks are marked during fast retransmit, so
+     that only new reports are counted (using M1-M4 above).
+
+   These changes will effectively allow SCTP to follow a similar model
+   as TCP+SACK in the handling of Fast Retransmit.
+
+
+2.9 Missing statement about partial_bytes_acked update
+
+2.9.1 Description of the problem
+
+   SCTP uses four control variables to regulate its transmission rate:
+   rwnd, cwnd, ssthresh and partial_bytes_acked. Upon detection of
+   packet losses from SACK or when the T3-rtx timer expires on an
+   address cwnd and ssthresh should be updated as stated in section
+   7.2.3. However, that section should also clarify that
+   partial_bytes_acked must be updated as well, having to be reset to 0.
+
+2.9.2 Text changes to the document
+
+   ---------
+   Old text: (Section 7.2.3)
+   ---------
+
+   7.2.3 Congestion Control
+
+   Upon detection of packet losses from SACK  (see Section 7.2.4), An
+   endpoint should do the following:
+
+      ssthresh = max(cwnd/2, 2*MTU)
+      cwnd = ssthresh
+
+   Basically, a packet loss causes cwnd to be cut in half.
+
+   When the T3-rtx timer expires on an address, SCTP should perform slow
+   start by:
+
+      ssthresh = max(cwnd/2, 2*MTU)
+
+Stewart et.al.                                                 [Page 16]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      cwnd = 1*MTU
+
+   ---------
+   New text: (Section 7.2.3)
+   ---------
+
+   7.2.3 Congestion Control
+
+   Upon detection of packet losses from SACK (see Section 7.2.4), an
+   endpoint should do the following:
+
+      ssthresh = max(cwnd/2, 2*MTU)
+      cwnd = ssthresh
+      partial_bytes_acked = 0
+
+   Basically, a packet loss causes cwnd to be cut in half.
+
+   When the T3-rtx timer expires on an address, SCTP should perform slow
+   start by:
+
+      ssthresh = max(cwnd/2, 2*MTU)
+      cwnd = 1*MTU
+      partial_bytes_acked = 0
+
+2.9.3 Solution description
+
+   The missing text added solves the doubts about what to do with
+   partial_bytes_acked in the situations stated in section 7.2.3, making
+   clear that along with ssthresh and cwnd, partial_bytes_acked should
+   also be updated, having to be reset to 0.
+
+
+2.10 Issues with Heartbeating and failure detection
+
+2.10.1 Description of the problem
+
+   Five basic problems have been discovered with the current heartbeat
+   procedures:
+
+   - The current specification does not specify that you should count a
+     failed heartbeat as an error against the overall association.
+
+   - The current specification is un-specific as to when you start
+     sending heartbeats and when you should stop.
+
+   - The current specification is un-specific as to when you should
+     respond to heartbeats.
+
+   - When responding to a Heartbeat it is unclear what to do if more
+     than a single TLV is present.
+
+   - The jitter applied to a heartbeat was meant to be a small 
+     variance of the RTO and is currently a wide variance due to the
+     default delay time and incorrect wording within the RFC.
+
+Stewart et.al.                                                 [Page 17]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+2.10.2 Text changes to the document
+
+   ---------
+   Old text: (Section 8.1)
+   ---------
+
+   8.1 Endpoint Failure Detection
+
+   An endpoint shall keep a counter on the total number of consecutive
+   retransmissions to its peer (including retransmissions to all the
+   destination transport addresses of the peer if it is multi-homed).
+   If the value of this counter exceeds the limit indicated in the
+   protocol parameter 'Association.Max.Retrans', the endpoint shall
+   consider the peer endpoint unreachable and shall stop transmitting
+   any more data to it (and thus the association enters the CLOSED
+   state).  In addition, the endpoint shall report the failure to the
+   upper layer, and optionally report back all outstanding user data
+   remaining in its outbound queue. The association is automatically
+   closed when the peer endpoint becomes unreachable.
+
+   The counter shall be reset each time a DATA chunk sent to that peer
+   endpoint is acknowledged (by the reception of a SACK), or a
+   HEARTBEAT-ACK is received from the peer endpoint.
+
+   ---------
+   New text: (Section 8.1)
+   ---------
+
+   8.1 Endpoint Failure Detection
+
+   An endpoint shall keep a counter on the total number of consecutive
+   retransmissions to its peer (this includes retransmissions to all the
+   destination transport addresses of the peer if it is multi-homed),
+   including unacknowledged HEARTBEAT Chunks. If the value of this
+   counter exceeds the limit indicated in the protocol parameter
+   'Association.Max.Retrans', the endpoint shall consider the peer
+   endpoint unreachable and shall stop transmitting any more data to it
+   (and thus the association enters the CLOSED state). In addition, the
+   endpoint shall report the failure to the upper layer, and optionally
+   report back all outstanding user data remaining in its outbound
+   queue. The association is automatically closed when the peer
+   endpoint becomes unreachable.
+
+   The counter shall be reset each time a DATA chunk sent to that peer
+   endpoint is acknowledged (by the reception of a SACK), or a
+   HEARTBEAT-ACK is received from the peer endpoint.
+
+   ---------
+   Old text: (Section 8.3)
+   ---------
+
+   8.3 Path Heartbeat
+
+
+Stewart et.al.                                                 [Page 18]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   By default, an SCTP endpoint shall monitor the reachability of the
+   idle destination transport address(es) of its peer by sending a
+   HEARTBEAT chunk periodically to the destination transport
+   address(es).
+
+   ---------
+   New text: (Section 8.3)
+   ---------
+
+   8.3 Path Heartbeat
+
+   By default, an SCTP endpoint shall monitor the reachability of the
+   idle destination transport address(es) of its peer by sending a
+   HEARTBEAT chunk periodically to the destination transport
+   address(es). HEARTBEAT sending MAY begin upon reaching the
+   ESTABLISHED state, and is discontinued after sending either SHUTDOWN
+   or SHUTDOWN-ACK. A receiver of a HEARTBEAT MUST respond to a
+   HEARTBEAT with a HEARTBEAT-ACK after entering the COOKIE-ECHOED state
+   (INIT sender) or the ESTABLISHED state (INIT receiver), up until
+   reaching the SHUTDOWN-SENT state (SHUTDOWN sender) or the
+   SHUTDOWN-ACK-SENT state (SHUTDOWN receiver).
+
+   ---------
+   Old text: (Section 8.3)
+   ---------
+
+   The receiver of the HEARTBEAT should immediately respond with a
+   HEARTBEAT ACK that contains the Heartbeat Information field copied
+   from the received HEARTBEAT chunk.
+
+   ---------
+   New text: (Section 8.3)
+   ---------
+
+   The receiver of the HEARTBEAT should immediately respond with a
+   HEARTBEAT ACK that contains the Heartbeat Information TLV, together
+   with any other received TLVs, copied unchanged from the received
+   HEARTBEAT chunk.
+
+
+   ---------
+   Old text: (Section 8.3)
+   ---------
+
+   On an idle destination address that is allowed to heartbeat, a
+   HEARTBEAT chunk is RECOMMENDED to be sent once per RTO of that
+   destination address plus the protocol parameter 'HB.interval' , with
+   jittering of +/- 50%, and exponential back-off of the RTO if the
+   previous HEARTBEAT is unanswered.
+
+   ---------
+   New text: (Section 8.3)
+   ---------
+
+
+Stewart et.al.                                                 [Page 19]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   On an idle destination address that is allowed to heartbeat, a
+   HEARTBEAT chunk is RECOMMENDED to be sent once per RTO of that
+   destination address plus the protocol parameter 'HB.interval' , with
+   jittering of +/- 50% of the RTO value, and exponential back-off 
+   of the RTO if the previous HEARTBEAT is unanswered.
+ 
+
+2.10.3 Solution description
+
+   The above text provides guidance as to how to respond to the five
+   issues mentioned in 2.10.1. In particular the wording changes provide
+   guidance as to when to start and stop heartbeating, how to respond to
+   a heartbeat with extra parameters, and clarifies the error counting
+   procedures for the association.
+
+
+2.11 Security interactions with firewalls
+
+2.11.1 Description of the problem
+
+   When dealing with firewalls it is advantageous to the firewall to be
+   able to properly determine the initial startup sequence of a reliable
+   transport protocol. With this in mind the following text is to be
+   added to SCTP's security section.
+
+2.11.2 Text changes to the document
+
+   ---------
+   New text: (no old text, new section added)
+   ---------
+
+   11.4 SCTP interactions with firewalls
+
+   Per [RFC1858], it is helpful for some firewalls if they can inspect
+   just the first fragment of a fragmented SCTP packet and unambiguously
+   determine whether it corresponds to an INIT chunk. Accordingly, we
+   stress the requirements stated in 3.1 that (1) an INIT chunk MUST NOT
+   be bundled with any other chunk in a packet, and (2) a packet
+   containing an INIT chunk MUST have a zero Verification Tag.
+   Furthermore, we require that the receiver of an INIT chunk MUST
+   enforce these rules by silently discarding an arriving packet with an
+   INIT chunk that is bundled with other chunks.
+
+   ---------
+   Old text: (Section 17)
+   ---------
+
+   17. References
+
+   [RFC768]   Postel, J. (ed.), "User Datagram Protocol", STD 6, RFC
+              768, August 1980.
+
+   [RFC793]   Postel, J. (ed.), "Transmission Control Protocol", STD 7,
+              RFC 793, September 1981.
+
+Stewart et.al.                                                 [Page 20]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   [RFC1123]  Braden, R., "Requirements for Internet hosts - application
+              and support", STD 3, RFC 1123, October 1989.
+
+   [RFC1191]  Mogul, J. and S. Deering, "Path MTU Discovery", RFC 1191,
+              November 1990.
+
+   [RFC1700]  Reynolds, J. and J. Postel, "Assigned Numbers", STD 2, RFC
+              1700, October 1994.
+
+   [RFC1981]  McCann, J., Deering, S. and J. Mogul, "Path MTU Discovery
+              for IP version 6", RFC 1981, August 1996.
+
+   ---------
+   New text: (Section 17)
+   ---------
+
+   17. References
+
+   [RFC768]   Postel, J. (ed.), "User Datagram Protocol", STD 6, RFC
+              768, August 1980.
+
+   [RFC793]   Postel, J. (ed.), "Transmission Control Protocol", STD 7,
+              RFC 793, September 1981.
+
+   [RFC1123]  Braden, R., "Requirements for Internet hosts - application
+              and support", STD 3, RFC 1123, October 1989.
+
+   [RFC1191]  Mogul, J. and S. Deering, "Path MTU Discovery", RFC 1191,
+              November 1990.
+
+   [RFC1700]  Reynolds, J. and J. Postel, "Assigned Numbers", STD 2, RFC
+              1700, October 1994.
+
+   [RFC1858]  Ziemba, G., Reed, D. and Traina P., "Security
+              Considerations for IP Fragment Filtering", RFC 1858,
+              October 1995.
+
+   [RFC1981]  McCann, J., Deering, S. and J. Mogul, "Path MTU Discovery
+              for IP version 6", RFC 1981, August 1996.
+
+2.11.3 Solution description
+
+   The above text adding a new subsection to the Security Considerations
+   section of RFC 2960 makes clear that, to make easier the interaction
+   with firewalls, an INIT chunk must not be bundled in any case with
+   any other chunk, being this rule enforced by the packet receiver,
+   that will silently discard the packets that do not follow this rule.
+
+
+2.12 Shutdown ambiguity
+
+2.12.1 Description of the problem
+
+
+Stewart et.al.                                                 [Page 21]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   Currently there is an ambiguity between the statements in section 6.2
+   and section 9.2. Section 6.2 allows the sending of a SHUTDOWN chunk
+   in place of a SACK when the sender is in the process of shutting
+   down, while section 9.2 requires both a SHUTDOWN chunk and a SACK
+   chunk to be sent.
+
+   Along with this ambiguity there is a problem where in an errant
+   SHUTDOWN receiver may fail to stop accepting user data.
+
+2.12.2 Text changes to the document
+
+   ---------
+   Old text: (Section 9.2)
+   ---------
+
+   If there are still outstanding DATA chunks left, the SHUTDOWN
+   receiver shall continue to follow normal data transmission procedures
+   defined in Section 6 until all outstanding DATA chunks are
+   acknowledged; however, the SHUTDOWN receiver MUST NOT accept new data
+   from its SCTP user.
+
+   While in SHUTDOWN-SENT state, the SHUTDOWN sender MUST immediately
+   respond to each received packet containing one or more DATA chunk(s)
+   with a SACK, a SHUTDOWN chunk, and restart the T2-shutdown timer. If
+   it has no more outstanding DATA chunks, the SHUTDOWN receiver shall
+   send a SHUTDOWN ACK and start a T2-shutdown timer of its own,
+   entering the SHUTDOWN-ACK-SENT state.  If the timer expires, the
+   endpoint must re-send the SHUTDOWN ACK.
+
+   ---------
+   New text: (Section 9.2)
+   ---------
+
+   If there are still outstanding DATA chunks left, the SHUTDOWN
+   receiver shall continue to follow normal data transmission procedures
+   defined in Section 6 until all outstanding DATA chunks are
+   acknowledged; however, the SHUTDOWN receiver MUST NOT accept new data
+   from its SCTP user.
+
+   While in SHUTDOWN-SENT state, the SHUTDOWN sender MUST immediately
+   respond to each received packet containing one or more DATA chunk(s)
+   with a SHUTDOWN chunk, and restart the T2-shutdown timer. If a
+   SHUTDOWN chunk by itself cannot acknowledge all of the received DATA
+   chunks (i.e. there are TSN's that can be acknowledged that are larger
+   than the cumulative TSN and thus gaps exist in the TSN sequence) then
+   a SACK chunk MUST also be sent.
+
+   The sender of the SHUTDOWN MAY also start an overall guard timer
+   'T5-shutdown-guard' to bound the overall time for shutdown sequence.
+   At the expiration of this timer the sender SHOULD abort the
+   association by sending an ABORT chunk. If the 'T5-shutdown-guard'
+   timer is used, it SHOULD be set to the recommended value of 5 times
+   'RTO.Max'.
+
+
+Stewart et.al.                                                 [Page 22]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   If the receiver of the SHUTDOWN has no more outstanding DATA chunks,
+   the SHUTDOWN receiver shall send a SHUTDOWN ACK and start a
+   T2-shutdown timer of its own, entering the SHUTDOWN-ACK-SENT state.
+   If the timer expires, the endpoint must re-send the SHUTDOWN ACK.
+
+2.12.3 Solution description
+
+   The above text clarifies the use of a SACK in conjunction with a
+   SHUTDOWN chunk. It also adds a guard timer to the SCTP shutdown
+   sequence to protect against errant receivers of SHUTDOWN chunks.
+
+
+2.13 Inconsistency in ABORT processing
+
+2.13.1 Description of the problem
+
+   It was noted that the wording in section 8.5.1 did not give proper
+   directions in the use of the 'T bit' with the verification tags.
+
+2.13.2 Text changes to the document
+
+   ---------
+   Old text: (Section 8.5.1)
+   ---------
+
+   B) Rules for packet carrying ABORT:
+
+      -  The endpoint shall always fill in the Verification Tag field of
+         the outbound packet with the destination endpoint's tag value
+         if it is known.
+
+      -  If the ABORT is sent in response to an OOTB packet, the
+         endpoint MUST follow the procedure described in Section 8.4.
+
+      -  The receiver MUST accept the packet if the Verification Tag
+         matches either its own tag, OR the tag of its peer.  Otherwise,
+         the receiver MUST silently discard the packet and take no
+         further action.
+
+   ---------
+   New text: (Section 8.5.1)
+   ---------
+
+   B) Rules for packet carrying ABORT:
+
+      -  The endpoint shall always fill in the Verification Tag field of
+         the outbound packet with the destination endpoint's tag value
+         if it is known.
+
+      -  If the ABORT is sent in response to an OOTB packet, the
+         endpoint MUST follow the procedure described in Section 8.4.
+
+      -  The receiver of a ABORT shall accept the packet if the
+         Verification Tag field of the packet matches its own tag OR it
+
+Stewart et.al.                                                 [Page 23]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+         is set to its peer's tag and the T bit is set in the Chunk
+         Flags. Otherwise, the receiver MUST silently discard the packet
+         and take no further action.
+
+2.13.3 Solution description
+
+   The above text change clarifies that the T bit must be set before an
+   implementation looks for the peers tag.
+
+
+2.14 Cwnd gated by its full use
+
+2.14.1 Description of the problem
+
+   A problem was found with the current specification of the growth and
+   decay of cwnd. The cwnd should only be increased if it is being fully
+   utilized, and after periods of under utilization, the cwnd should be
+   decreased. In some sections, the current wording is weak and is not
+   clearly defined. Also, the current specification unnecessarily
+   introduces the need for special case code to ensure cwnd degradation.
+       
+2.14.2 Text changes to the document
+
+   ---------
+   Old text: (Section 6.1)
+   ---------
+
+   D) Then, the sender can send out as many new DATA chunks as Rule A
+      and Rule B above allow.
+
+   ---------
+   New text: (Section 6.1)
+   ---------
+
+   D) When the time comes for the sender to transmit new DATA chunks, the
+      protocol parameter Max.Burst MUST first be applied to limit how many
+      new DATA chunks may be sent.  The limit is applied by adjusting cwnd
+      as follows:
+
+      if((flightsize + Max.Burst*MTU) < cwnd)
+	 cwnd = flightsize + Max.Burst*MTU
+
+   E) Then, the sender can send out as many new DATA chunks as Rule A
+      and Rule B above allow.
+
+   ---------
+   Old text: (Section 7.2.1)
+   ---------
+
+   o  When cwnd is less than or equal to ssthresh an SCTP endpoint MUST
+      use the slow start algorithm to increase cwnd (assuming the
+      current congestion window is being fully utilized).  If an
+      incoming SACK advances the Cumulative TSN Ack Point, cwnd MUST be
+      increased by at most the lesser of 1) the total size of the
+
+Stewart et.al.                                                 [Page 24]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      previously outstanding DATA chunk(s) acknowledged, and 2) the
+      destination's path MTU. This protects against the ACK-Splitting
+      attack outlined in [SAVAGE99].
+
+   ---------
+   New text: (Section 7.2.1)
+   ---------
+
+   o  When cwnd is less than or equal to ssthresh an SCTP endpoint MUST
+      use the slow start algorithm to increase cwnd only if the
+      current congestion window is being fully utilized and an
+      incoming SACK advances the Cumulative TSN Ack Point. Only when
+      these two conditions are met can the cwnd be increased otherwise
+      the cwnd MUST not be increased. If these conditions are met then
+      cwnd MUST be increased by at most the lesser of 1) the total 
+      size of the previously outstanding DATA chunk(s) acknowledged, 
+      and 2) the destination's path MTU. This protects against the 
+      ACK-Splitting attack outlined in [SAVAGE99].
+
+   ---------
+   Old text: (Section 7.2.1)
+   ---------
+
+   o  When the endpoint does not transmit data on a given transport
+      address, the cwnd of the transport address should be adjusted to
+      max(cwnd/2, 2*MTU) per RTO.
+
+   ---------
+   New text: (Section 7.2.1)
+   ---------
+
+   o  When the association does not transmit data on a given transport address
+      within an RTO, the cwnd of the transport address MUST be adjusted to
+      2*MTU.
+
+   ---------
+   Old text: (Section 7.2.2)
+   ---------
+
+   o  Same as in the slow start, when the sender does not transmit DATA
+      on a given transport address, the cwnd of the transport address
+      should be adjusted to max(cwnd / 2, 2*MTU) per RTO.
+
+   ---------
+   New text: (Section 7.2.2)
+   ---------
+
+   o  Same as in the slow start, when the sender does not transmit DATA on
+      a given transport address within an RTO, the cwnd of the transport
+      address should be adjusted to 2*MTU.
+
+   ---------
+   Old text: (Section 14)
+   ---------
+
+Stewart et.al.                                                 [Page 25]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   14. Suggested SCTP Protocol Parameter Values
+
+   The following protocol parameters are RECOMMENDED:
+
+   RTO.Initial              - 3  seconds
+   RTO.Min                  - 1  second
+   RTO.Max                 -  60 seconds
+   RTO.Alpha                - 1/8
+   RTO.Beta                 - 1/4
+   Valid.Cookie.Life        - 60  seconds
+   Association.Max.Retrans  - 10 attempts
+   Path.Max.Retrans         - 5  attempts (per destination address)
+   Max.Init.Retransmits     - 8  attempts
+   HB.interval              - 30 seconds
+
+   ---------
+   New text: (Section 14)
+   ---------
+
+   14. Suggested SCTP Protocol Parameter Values
+
+   The following protocol parameters are RECOMMENDED:
+
+   RTO.Initial              - 3  seconds
+   RTO.Min                  - 1  second
+   RTO.Max                  - 60 seconds
+   Max.Burst                - 4
+   RTO.Alpha                - 1/8
+   RTO.Beta                 - 1/4
+   Valid.Cookie.Life        - 60 seconds
+   Association.Max.Retrans  - 10 attempts
+   Path.Max.Retrans         - 5  attempts (per destination address)
+   Max.Init.Retransmits     - 8  attempts
+   HB.Interval              - 30 seconds
+
+2.14.3 Solution description
+
+   The above changes strengthens the rules and makes it much more apparent
+   as to the need to block cwnd growth when the full cwnd is not being
+   utilized. The changes also applies cwnd degradation without introducing
+   the need for complex special case code.
+
+
+2.15 Window probes in SCTP
+
+
+2.15.1 Description of the problem
+
+
+   When a receiver clamps its rwnd to 0 to flow control the peer,
+   the specification implies that one must continue to accept
+   data from the remote peer. This is incorrect and needs 
+   clarification.
+
+Stewart et.al.                                                 [Page 26]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+2.15.2 Text changes to the document
+
+
+   ---------
+   Old text: (Section 6.2)
+   ---------
+
+   The SCTP endpoint MUST always acknowledge the reception of each valid
+   DATA chunk.
+
+   ---------
+   New text: (Section 6.2)
+   ---------
+
+   The SCTP endpoint MUST always acknowledge the reception of each 
+   valid DATA chunk when the DATA chunk received is inside its receive
+   window.
+
+    When the receiver's advertised window is 0, the receiver MUST drop
+    all new incoming DATA chunk and immediately send back a SACK with
+    the current receive window showing only DATA chunks received and
+    accepted so far.  The dropped DATA chunk MUST NOT be included in the
+    SACK as they were not accepted.  The receiver MUST also have an
+    algorithm for advertising its receive window to avoid receiver silly
+    window syndrome (SWS) as described in RFC 813.  The algorithm can be
+    similar to the one described in Section 4.2.3.3 of RFC 1122.
+    Because of receiver SWS avoidance, even when the receiver's internal
+    buffer is not full anymore, as long as the advertised window is
+    still 0, the receiver MUST still drop all new incoming DATA chunk.
+
+   ---------
+   Old text: (Section 6.1)
+   ---------
+
+   A) At any given time, the data sender MUST NOT transmit new data to
+      any destination transport address if its peer's rwnd indicates
+      that the peer has no buffer space (i.e. rwnd is 0, see Section
+      6.2.1).  However, regardless of the value of rwnd (including if it
+      is 0), the data sender can always have one DATA chunk in flight to
+      the receiver if allowed by cwnd (see rule B below).  This rule
+      allows the sender to probe for a change in rwnd that the sender
+      missed due to the SACK having been lost in transit from the data
+      receiver to the data sender.
+
+
+   ---------
+   New text: (Section 6.1)
+   ---------
+
+   A) At any given time, the data sender MUST NOT transmit new data to
+      any destination transport address if its peer's rwnd indicates
+      that the peer has no buffer space (i.e. rwnd is 0, see Section
+      6.2.1).  However, regardless of the value of rwnd (including if it
+
+Stewart et.al.                                                 [Page 27]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      is 0), the data sender can always have one DATA chunk in flight to
+      the receiver if allowed by cwnd (see rule B below).  This rule
+      allows the sender to probe for a change in rwnd that the sender
+      missed due to the SACK having been lost in transit from the data
+      receiver to the data sender.  
+
+      When the receiver's advertised window is zero, this probe is called 
+      a zero window probe.  Note that zero window probe SHOULD only be sent
+      when all outstanding DATA chunks have been cumulatively acknowledged 
+      and no DATA chunk(s) are in flight.  Zero window probing MUST
+      be supported.
+
+      When a sender is doing zero window probing, it should not time
+      out the association if it continues to receive new packets from
+      the receiver.  The reason is that the receiver MAY keep its window
+      closed for an indefinite time.  Refer to Section 6.2 on the receiver
+      behavior when it advertises a zero window.  The sender SHOULD
+      send the first zero window probe after 1 RTO when it detects that
+      the receiver has closed its window, and SHOULD increase the probe
+      interval exponentially afterwards.  Also note that the cwnd SHOULD
+      be adjusted according to Section 7.2.1.  Zero window probing does
+      not affect the calculation of cwnd.
+
+      The sender MUST also have algorithm in sending new DATA chunks to
+      avoid silly window syndrome (SWS) as described in RFC 813.  The
+      algorithm can be similar to the one described in Section 4.2.3.4 
+      of RFC 1122.
+
+
+2.15.3 Solution description
+
+   The above allows a receiver to drop new data that arrives
+   and yet still requires the receiver to send a SACK showing
+   the conditions unchanged (with the possible exception of
+   a new a_rwnd) and the dropped chunk as missing. This will
+   allow the association to continue until the rwnd condition
+   clears.
+
+2.16 Fragmentation and Path MTU issues
+
+2.16.1 Description of the problem
+
+   The current wording of the Fragmentation and Reassembly forces
+   an implementation that supports fragmentation to always
+   fragment. This prohibits an implementation from offering its
+   users an option to disable sends that exceed the SCTP
+   fragmentation point. 
+
+   The restriction in [RFC2960] section 6.9 was never meant
+   to restrict an implementations API from this behavior.
+
+2.16.2 Text changes to the document
+
+   ---------
+
+Stewart et.al.                                                 [Page 28]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   Old text: (Section 6.1)
+   ---------
+
+6.9 Fragmentation and Reassembly
+
+   An endpoint MAY support fragmentation when sending DATA chunks, but
+   MUST support reassembly when receiving DATA chunks.  If an endpoint
+   supports fragmentation, it MUST fragment a user message if the size
+   of the user message to be sent causes the outbound SCTP packet size
+   to exceed the current MTU.  If an implementation does not support
+   fragmentation of outbound user messages, the endpoint must return an
+   error to its upper layer and not attempt to send the user message.
+
+   IMPLEMENTATION NOTE:  In this error case, the Send primitive
+   discussed in Section 10.1 would need to return an error to the upper
+   layer.
+
+
+   ---------
+   New text: (Section 6.1)
+   ---------
+
+6.9 Fragmentation and Reassembly
+
+   An endpoint MAY support fragmentation when sending DATA chunks, but
+   MUST support reassembly when receiving DATA chunks.  If an endpoint
+   supports fragmentation, it MUST fragment a user message if the size
+   of the user message to be sent causes the outbound SCTP packet size
+   to exceed the current MTU.  If an implementation does not support
+   fragmentation of outbound user messages, the endpoint must return an
+   error to its upper layer and not attempt to send the user message.
+
+   Note: If an implementation that supports fragmentation makes
+   available to its upper layer a mechanism to turn off fragmentation
+   it may do so. However in so doing, it MUST react just like an
+   implementation that does NOT support fragmentation i.e. it MUST
+   reject sends that exceed the current P-MTU.
+
+   IMPLEMENTATION NOTE:  In this error case, the Send primitive
+   discussed in Section 10.1 would need to return an error to the upper
+   layer.
+
+
+2.16.3 Solution description
+
+   The above wording will allow an implementation to offer the
+   option of rejecting sends that exceed the P-MTU size even
+   when the implementation supports fragmentation. 
+
+2.17 Initial value of the cumulative TSN Ack
+
+2.17.1 Description of the problem
+
+   The current description of the SACK chunk within the RFC does not
+
+Stewart et.al.                                                 [Page 29]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   clearly state the value that would be put within a
+   SACK when no DATA chunk has been received.
+
+
+2.17.2 Text changes to the document
+
+
+   ---------
+   Old text: (Section 3.3.4)
+   ---------
+
+   Cumulative TSN Ack: 32 bits (unsigned integer)
+
+      This parameter contains the TSN of the last DATA chunk received in
+      sequence before a gap.
+
+   ---------
+   New text: (Section 3.3.4)
+   ---------
+
+   Cumulative TSN Ack: 32 bits (unsigned integer)
+
+      This parameter contains the TSN of the last DATA chunk received in
+      sequence before a gap. In the case where no DATA chunk has
+      been received, this value is set to the peers Initial TSN minus
+      one.
+
+
+2.17.3 Solution description
+
+    This change clearly states what the initial value will be for a
+    SACK sender.
+
+2.18 Handling of address parameters within the INIT or INIT-ACK
+
+2.18.1 Description of the problem
+
+    The current description on handling address parameters contained
+    within the INIT and INIT-ACK do not fully describe a requirement
+    for their handling.
+    
+
+2.18.2 Text changes to the document
+
+   ---------
+   Old text: (Section 5.1.2)
+   ---------
+
+   C) If there are only IPv4/IPv6 addresses present in the received INIT
+      or INIT ACK chunk, the receiver shall derive and record all the
+      transport address(es) from the received chunk AND the source IP
+      address that sent the INIT or INIT ACK.  The transport address(es)
+      are derived by the combination of SCTP source port (from the
+      common header) and the IP address parameter(s) carried in the INIT
+
+Stewart et.al.                                                 [Page 30]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+      or INIT ACK chunk and the source IP address of the IP datagram.
+      The receiver should use only these transport addresses as
+      destination transport addresses when sending subsequent packets to
+      its peer.
+
+   ---------
+   New text: (Section 5.1.2)
+   ---------
+
+
+   C) If there are only IPv4/IPv6 addresses present in the received INIT
+      or INIT ACK chunk, the receiver shall derive and record all the
+      transport address(es) from the received chunk AND the source IP
+      address that sent the INIT or INIT ACK.  The transport address(es)
+      are derived by the combination of SCTP source port (from the
+      common header) and the IP address parameter(s) carried in the INIT
+      or INIT ACK chunk and the source IP address of the IP datagram.
+      The receiver should use only these transport addresses as
+      destination transport addresses when sending subsequent packets to
+      its peer.
+
+   D) When searching for a matching TCB upon reception of an INIT
+      or INIT-ACK chunk the receiver SHOULD use not only the
+      source address of the packet (containing the INIT or
+      INIT-ACK) but the receiver SHOULD also use all valid
+      address parameters contained within the chunk.
+
+2.18.3 Solution description
+
+   This new text clearly specifies to an implementor the need
+   to look within the INIT or INIT-ACK. Any implementation that
+   does not do this, may not be able to establish associations
+   in certain circumstances.
+
+2.19 Handling of stream shortages
+
+2.19.1 Description of the problem
+
+   The current wording in the RFC places the choice of sending
+   an ABORT upon the SCTP stack when a stream shortage occurs.
+   This decision should really be made by the upper layer 
+   not the SCTP stack.
+
+
+2.19.2 Text changes to the document
+
+   ---------
+   Old text: 
+   ---------
+
+5.1.1 Handle Stream Parameters
+
+   In the INIT and INIT ACK chunks, the sender of the chunk shall
+   indicate the number of outbound streams (OS) it wishes to have in the
+
+Stewart et.al.                                                 [Page 31]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   association, as well as the maximum inbound streams (MIS) it will
+   accept from the other endpoint.
+
+   After receiving the stream configuration information from the other
+   side, each endpoint shall perform the following check:  If the peer's
+   MIS is less than the endpoint's OS, meaning that the peer is
+   incapable of supporting all the outbound streams the endpoint wants
+   to configure, the endpoint MUST either use MIS outbound streams, or
+   abort the association and report to its upper layer the resources
+   shortage at its peer.
+
+   ---------
+   New text: (Section 5.1.2)
+   ---------
+
+
+5.1.1 Handle Stream Parameters
+
+   In the INIT and INIT ACK chunks, the sender of the chunk shall
+   indicate the number of outbound streams (OS) it wishes to have in the
+   association, as well as the maximum inbound streams (MIS) it will
+   accept from the other endpoint.
+
+   After receiving the stream configuration information from the other
+   side, each endpoint shall perform the following check:  If the peer's
+   MIS is less than the endpoint's OS, meaning that the peer is
+   incapable of supporting all the outbound streams the endpoint wants
+   to configure, the endpoint MUST use MIS outbound streams and MAY
+   report any shortage to the upper layer. The upper layer can then
+   choose to abort the association if the resource shortage 
+   is unacceptable.
+
+
+2.19.3 Solution description
+
+   The above changes take the decision to ABORT out of the
+   realm of the SCTP stack and places it into the users
+   hands.
+
+2.20 Indefinite postponement
+
+2.20.1 Description of the problem
+
+   The current RFC does not provide any guidance on the assignment
+   of TSN sequence numbers to outbound message nor reception of
+   these message. This could lead to a possible indefinite postponement.
+
+ 
+2.20.2 Text changes to the document
+
+   --------- 
+   Old text: (Section 6.1)
+   ---------
+
+
+Stewart et.al.                                                 [Page 32]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   Note: The data sender SHOULD NOT use a TSN that is more than 2**31 -
+   1 above the beginning TSN of the current send window.
+
+6.2  Acknowledgment on Reception of DATA Chunks
+
+   ---------
+   New text: (Section 6.1)
+   ---------
+
+   Note: The data sender SHOULD NOT use a TSN that is more than 2**31 -
+   1 above the beginning TSN of the current send window.
+
+    The algorithm by which an implementation assigns sequential TSNs to
+    messages on a particular association MUST ensure that no user
+    message that has been accepted by SCTP is indefinitely postponed
+    from being assigned a TSN. Acceptable algorithms for assigning TSNs
+    include
+
+    (a) assigning TSNs in round-robin order over all streams with
+        pending data
+
+    (b) preserving the linear order in which the user messages were
+        submitted to the SCTP association.
+
+    When an upper layer requests to read data on an SCTP association,
+    the SCTP receiver SHOULD choose the message with the lowest TSN from
+    among all deliverable messages. In SCTP implementations that allow a
+    user to request data on a specific stream, this operation SHOULD NOT
+    block if data is not available, since this can lead to a deadlock
+    under certain conditions.
+
+6.2  Acknowledgment on Reception of DATA Chunks
+
+2.20.3 Solution description
+
+   The above wording clarifies how TSNs SHOULD be assigned by
+   the sender.
+
+3. Acknowledgments
+
+   The authors would like to thank the following people that have
+   provided comments and input for this document:
+
+   A special thanks to Mark Allman, who should actually be a co-author
+   for his work on the max-burst, but managed to wiggle out due to
+   a technicality.
+
+   For their comments on the list, Atsushi Fukumoto, David Lehmann.
+
+   For their participation in the RTP Bakeoff number 2 and all of their
+   input, Heinz Prantner, Jan Rovins, Renee Revis, Steven Furniss, Manoj
+   Solanki, Mike Turner, Jonathan Lee, Peter Butler, Laurent Glaude, Jon
+   Berger, Jon Grim, Dan Harrison, Sabina Torrente, Tomas Orti Martin, 
+   Jeff Waskow, Robby Benedyk, Steve Dimig, Joe Keller, Ben Robinson, 
+
+Stewart et.al.                                                 [Page 33]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   David Lehmann, John Hebert, Sanjay Rao, Kausar Hassan, Melissa Campbell,
+   Sujith Radhakrishnan, Michael Tuexen, Andreas Jungmaier, Mitch Miers,
+   Fred Hasle, Oliver Mayor, Cliff Thomas, Jonathan Wood, Kacheong Poon,
+   Sverre Slotte, Wang Xiaopeng, John Townsend, Harsh Bhondwe, Sandeep
+   Mahajan, RCMonee, Ken FUJITA, Yuji SUZUKI, Mutsuya IRIE, Sandeep
+   Balani, Biren Patel, Qiaobing Xie, Karl Knutson, La Monte Yarroll,
+   Gareth Keily, Ian Periam, Nathalie Mouellic, and Stan McClellan.
+
+   For their comments on the list and his detailed analysis and
+   simulations of SCTP, Rob Brennan and Thomas Curran.
+
+
+4. Authors' Addresses
+
+   Randall R. Stewart
+   Cisco Systems Inc.
+   24 Burning Bush Trail.
+   Crystal Lake, IL 60012
+   USA
+
+   EMail: rrs@cisco.com
+
+
+   Lyndon Ong
+   Ciena Systems
+   10480 Ridgeview Ct
+   Cupertino, CA 95014
+   USA
+
+   EMail: lyong@ciena.com
+
+
+   Ivan Arias-Rodriguez
+   Nokia Research Center
+   PO Box 407
+   FIN-00045 Nokia Group
+   Finland
+
+   EMail: ivan.arias-rodriguez@nokia.com
+
+   Kacheong Poon
+   Sun Microsystems, Inc.
+   901 San Antonio Road
+   Palo Alto, CA 94303
+   USA
+
+   Email: kacheong.poon@sun.com
+
+
+   Armando L. Caro Jr.
+   Department of Computer & Information Sciences
+   University of Delaware
+   103 Smith Hall
+   Newark, DE 19716, USA
+
+Stewart et.al.                                                 [Page 34]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+
+   Email: acaro@cis.udel.edu
+
+
+
+
+5. References
+
+   [RFC1858]  Ziemba, G., Reed, D. and Traina P., "Security
+              Considerations for IP Fragment Filtering", RFC 1858,
+              October 1995.
+
+   [RFC2026]  Bradner, S., "The Internet Standards Process -- Revision
+              3", BCP 9, RFC 2026, October 1996.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC2434]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
+              IANA Considerations Section in RFCs", BCP 26, RFC 2434,
+              October 1998.
+
+   [RFC2960]  R. R. Stewart, Q. Xie, K. Morneault, C. Sharp, H. J.
+              Schwarzbauer, T. Taylor, I. Rytina, M. Kalla, L. Zhang,
+              and V. Paxson, "Stream Control Transmission Protocol,"
+              RFC 2960, October 2000.
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2001). All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works. However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+
+Stewart et.al.                                                 [Page 35]
+
+Internet Draft             SCTP Implementers Guide              May 2002
+
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgment
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart et.al.                                                 [Page 36]
+
+

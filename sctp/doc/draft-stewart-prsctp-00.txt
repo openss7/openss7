@@ -1,0 +1,1402 @@
+
+
+
+Network Working Group                                         R. Stewart
+Internet-Draft                                                M. Ramalho
+Expires: November 5, 2002                            Cisco Systems, Inc.
+                                                                  Q. Xie
+                                                          Motorola, Inc.
+                                                               M. Tuexen
+                                                              Siemens AG
+                                                               P. Conrad
+                                                       Temple University
+                                                             May 7, 2002
+
+
+                   SCTP Partial Reliability Extension
+                      draft-stewart-prsctp-00.txt
+
+Status of this Memo
+
+   This document is an Internet-Draft and is in full conformance with
+   all provisions of Section 10 of RFC2026.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at http://
+   www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on November 5, 2002.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2002).  All Rights Reserved.
+
+Abstract
+
+   This memo describes an extension to the Stream Control Transmission
+   Protocol (SCTP) RFC2960 [4] that allows an SCTP endpoint to signal to
+   its peer that it should move the cumulative ack point forward.  When
+   both sides of an SCTP association support this extension, it can be
+   used by an SCTP implementation to provide partially reliable data
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 1]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   transmission service to an upper layer protocol.  This memo describes
+   (1) the protocol extensions, which consist of a new parameter for
+   INIT and INIT ACK, and a new FORWARD TSN chunk type (2) one example
+   partially reliable service that can be provided to the upper layer
+   via this mechanism.
+
+Table of Contents
+
+   1.    Introduction . . . . . . . . . . . . . . . . . . . . . . . .  4
+   1.1   Overview of Protocol Extensions  . . . . . . . . . . . . . .  4
+   1.2   Overview of New Services Provided to the Upper Layer . . . .  4
+   1.3   Benefits of PR-SCTP  . . . . . . . . . . . . . . . . . . . .  5
+   2.    Conventions  . . . . . . . . . . . . . . . . . . . . . . . .  7
+   3.    Protocol Changes to support PR-SCTP  . . . . . . . . . . . .  8
+   3.1   Forward-TSN-Supported Parameter For INIT and INIT ACK  . . .  8
+   3.2   Forward Cumulative TSN Chunk Definition (FORWARD TSN)  . . .  8
+   3.3   Negotiation of Forward-TSN-Supported parameter . . . . . . .  9
+   3.3.1 Sending Forward-TSN-Supported param in INIT  . . . . . . . .  9
+   3.3.2 Receipt of Forward-TSN-Supported param in INIT . . . . . . .  9
+   3.3.3 Receipt of Op. Error for Forward-TSN-Supported Param . . . . 10
+   3.4   Definition of "dropped" in the context of PR-SCTP  . . . . . 10
+   3.5   Sender Side Implementation of PR-SCTP  . . . . . . . . . . . 11
+   3.6   Receiver Side Implementation of PR-SCTP  . . . . . . . . . . 13
+   4.    Services provided by PR-SCTP to the upper layer  . . . . . . 15
+   4.1   PR-SCTP Service Definition for "timed reliability" . . . . . 15
+   4.2   PR-SCTP Association Establishment  . . . . . . . . . . . . . 17
+   4.3   Guidelines for defining other PR-SCTP Services . . . . . . . 18
+   4.4   Usage Notes  . . . . . . . . . . . . . . . . . . . . . . . . 20
+   5.    Acknowledgments  . . . . . . . . . . . . . . . . . . . . . . 21
+   6.    Security Considerations  . . . . . . . . . . . . . . . . . . 22
+   7.    IANA Considerations  . . . . . . . . . . . . . . . . . . . . 23
+         References . . . . . . . . . . . . . . . . . . . . . . . . . 24
+         Authors' Addresses . . . . . . . . . . . . . . . . . . . . . 24
+         Full Copyright Statement . . . . . . . . . . . . . . . . . . 26
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 2]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+1. Introduction
+
+   This memo describes an extension to the Stream Control Transmission
+   Protocol (SCTP) RFC2960 [4] that allows an SCTP sender to signal to
+   its peer that it should no longer expect to receive one or more Data
+   chunks.
+
+1.1 Overview of Protocol Extensions
+
+   The protocol extension described in this document consists of two new
+   elements:
+
+   1.  a single new parameter in the INIT/INIT-ACK exchange that
+       indicates whether the endpoint supports the extension
+
+   2.  a single new chunk type, FORWARD TSN, that indicates that the
+       receiver should move its cumulative ack point forward (possibly
+       skipping past one or more Data chunks that may not yet have been
+       received and/or acknowledged.)
+
+
+1.2 Overview of New Services Provided to the Upper Layer
+
+   When this extension is supported by both sides of an SCTP
+   association, it can be used to provide partially reliable transport
+   service over an SCTP association.  We define partially reliable
+   transport service as a service that allows the user to specify, on a
+   per message basis, the rules governing how persistent the transport
+   service should be in attempting to send the message to receiver.
+
+   One example of partially reliable service is specified in this
+   document, namely a "timed reliability" service.  This service allows
+   the service user to indicate a limit on the duration of time that the
+   sender should try to transmit/retransmit the message (this is a
+   natural extension of the "lifetime" parameter already in the base
+   protocol).
+
+   In addition to this example, we will also show that defining the
+   semantics of a particular partially reliable service involves two
+   elements, namely:
+
+   1.  how the service user indicates the level of reliability required
+       for a particular message, and
+
+   2.  how the sender side implementation uses that reliability level to
+       determine when to give up on further retransmissions of that
+       message.
+
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 3]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   Note that other than the fact that the FORWARD-TSN chunk is required,
+   neither of these two elements impacts the "on-the-wire" protocol;
+   only the API, and the sender side implementation is affected by the
+   way in which the service is defined to the upper layer.  Therefore,
+   in principle, it is feasible to implement many varieties of partially
+   reliable services in a particular SCTP implementation without
+   changing the on-the-wire protocol.  Also, the SCTP receiver does not
+   necessarily need to know which semantics of partially reliable
+   service are being used by the sender, since the receiver's only role
+   is to correctly interpret FORWARD TSN chunks, thereby skipping past
+   messages that the sender has decided to no longer transmit (or
+   retransmit).
+
+   Nevertheless, it is recommended that a limited number of standard
+   definitions of partially reliable services be standardized by the
+   IETF so that that the designers of IETF application layer protocols
+   can match the requirements of their upper layer protocols to standard
+   service definitions provided by a particular SCTP implementation.
+   One such definition, "timed reliability" is included in this
+   document.  Given the extensions proposed in this document, other
+   definitions may be standardized as the need arises without further
+   changes to the on-the-wire protocol.
+
+1.3 Benefits of PR-SCTP
+
+   Hereafter, we use the notation "PR-SCTP" to refer to the SCTP
+   protocol extended as defined in this document.
+
+   The following are some of the advantages for integrating partially
+   reliable data service into SCTP, i.e., benefits of PR-SCTP:
+
+   1.  Some application layer protocols may benefit from being able to
+       use a single SCTP association to carry both reliable content, --
+       such as text pages, billing and accounting information, setup
+       signaling -- and unreliable content, e.g.  state that is highly
+       sensitive to timeliness, where generating a new packet is more
+       advantageous than transmitting an old one [1].
+
+   2.  Partially reliable data traffic carried by PR-SCTP will enjoy the
+       same communication failure detection and protection capabilities
+       as the normal reliable SCTP data traffic does.  This includes the
+       ability to: - quickly detect a failed destination address; -
+       fail-over to an alternate destination address, and; - be notified
+       if the data receiver becomes unreachable.
+
+   3.  In addition to providing unordered unreliable data transfer as
+       UDP does, PR-SCTP can provide ordered unreliable data transfer
+       service.
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 4]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   4.  PR-SCTP employs the same congestion control and congestion
+       avoidance for all data traffic, whether reliable or partially
+       reliable  - this is very desirable since SCTP enforces TCP-
+       friendliness (unlike UDP.)
+
+   5.  Because of the chunk bundling function of SCTP, reliable and
+       unreliable messages can be multiplexed over a single PR-SCTP
+       association.  Therefore, the number of IP datagrams (and hence
+       the network overhead) can be reduced versus having to send these
+       different types of data using separate protocols.  Additionally,
+       this multiplexing allows for port savings versus using different
+       ports for reliable and unreliable connections.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 5]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+2. Conventions
+
+   The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+   SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL, when
+   they appear in this document, are to be interpreted as described in
+   RFC2119 [3].
+
+   Comparisons and arithmetic on TSNs are governed by the rules in
+   Section 1.6 of RFC2960 [4].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 6]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+3. Protocol Changes to support PR-SCTP
+
+3.1 Forward-TSN-Supported Parameter For INIT and INIT ACK
+
+   The following new OPTIONAL parameter is added to the INIT and INIT
+   ACK chunks.
+
+       Parameter Name                       Status     Type Value
+       -------------------------------------------------------------
+       Forward-TSN-Supported                OPTIONAL    0xC000
+
+   At the initialization of the association, the sender of the INIT or
+   INIT ACK chunk shall include this OPTIONAL parameter to inform its
+   peer that it is able to support the Forward TSN chunk.  The format of
+   this parameter is defined as follows:
+
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |    Parameter Type = 0xC000    |  Parameter Length = 4         |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+       Type: 16 bit u_int
+
+          0xC000, indicating Unreliable Streams parameter
+
+       Length: 16 bit u_int
+
+          Indicate the size of the parameter i.e. 4.
+
+
+3.2 Forward Cumulative TSN Chunk Definition (FORWARD TSN)
+
+   The following new chunk type is defined:
+
+       Chunk Type    Chunk Name
+       ------------------------------------------------------
+       11000000      Forward Cumulative TSN (FORWARD TSN)
+
+   This chunk shall be used by the data sender to inform the data
+   receiver to adjust its cumulative received TSN point forward because
+   some missing TSNs are associated with data chunks that SHOULD NOT be
+   transmitted or retransmitted by the sender.
+
+   Forward Cumulative TSN chunk has the following format:
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 7]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+         0                   1                   2                   3
+         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |1 1 0 0 0 0 0 0|  Chunk Flags  |0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0|
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                      New Cumulative TSN                       |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+        Chunk Flags:
+
+          Set to all zeros on transmit and ignored on receipt.
+
+        New Cumulative TSN: 32 bit u_int
+
+         This indicates the new cumulative TSN to the data receiver. Upon
+         the reception of this value, the data receiver MUST consider
+         any missing TSNs earlier than or equal to this value as received
+         and stop reporting them as gaps in any subsequent SACKs.
+
+
+3.3 Negotiation of Forward-TSN-Supported parameter
+
+3.3.1 Sending Forward-TSN-Supported param in INIT
+
+   If an SCTP endpoint supports the FORWARD TSN chunk, then any time it
+   sends an INIT during association establishment, it SHOULD include the
+   Forward-TSN-supported parameter in the INIT chunk to indicate this
+   fact to its peer.
+
+3.3.2 Receipt of Forward-TSN-Supported param in INIT
+
+   When a receiver of an INIT detects a Forward-TSN-Supported parameter,
+   and does not support the Forward-TSN chunk type, the receiver SHOULD
+   treat this chunk type as an invalid or unrecognized parameter and
+   respond to the data sender with an operational error, following the
+   rules defined in Section 5.1 of RFC2960 [4].
+
+   When a receiver of an INIT detects a Forward-TSN-Supported parameter,
+   and does support the Forward-TSN chunk type, the receiver SHOULD
+   respond with a Forward-TSN-supported parameter in the INIT-ACK chunk.
+
+   When an endpoint that supports the FORWARD TSN chunk receives an INIT
+   that does not contain the Forward-TSN-Supported Parameter, that
+   endpoint:
+
+   o  MAY include the Forward-TSN-Supported parameter in the INIT-ACK,
+
+   o  SHOULD record the fact that the peer does not support the FORWARD
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 8]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+      TSN chunk,
+
+   o  MUST NOT send a FORWARD TSN chunk at any time during the
+      associations life,
+
+   o  SHOULD inform the upper layer, if the upper layer has requested
+      such notification.
+
+
+3.3.3 Receipt of Op. Error for Forward-TSN-Supported Param
+
+   When an SCTP endpoint that desires to use the FORWARD TSN chunk
+   feature for partially reliable data transfer receives an operational
+   error from the remote endpoint, indicating that the remote endpoint
+   does not recognize the Forward-TSN-Supported parameter, the local
+   endpoint SHOULD inform its upper layer of the remote endpoint's
+   inability to support partially reliable data transfer.
+
+   The local endpoint may then choose to either:
+
+      1) end the initiation process, in consideration of the peer's
+      inability to supply the requested features for the new
+      association, or
+
+      2) continue the initiation process, but with the understanding
+      that partially reliable data transmission is not supported.  In
+      this case, the endpoint receiving the operational error SHOULD
+      note that the FORWARD TSN chunk is not supported, and MUST NOT
+      transmit a FORWARD TSN chunk at any time during the life of the
+      association.
+
+
+3.4 Definition of "dropped" in the context of PR-SCTP
+
+   At some point, a sending PR-SCTP implementation MAY determine that a
+   particular data chunk SHOULD NOT be transmitted or retransmitted
+   further, in accordance with the rules governing some particular PR-
+   SCTP service definition (such as the definition of "timed
+   reliability" in Section 4.1.) For purposes of this document, we
+   define the term "dropped" to refer to any data chunk about which the
+   SCTP sender has made this determination.
+
+   Each PR-SCTP service defines the rules for determining when a TSN is
+   "dropped", and accordingly, the rules that govern how, whether, and
+   when to "drop" a TSN may vary from one service definition to another.
+   However, the rules governing the actions taken when a TSN is
+   "dropped" do NOT vary between service definitions; these rules are
+   included in Section 3.5.
+
+
+
+Stewart, et al.         Expires November 5, 2002                [Page 9]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+3.5 Sender Side Implementation of PR-SCTP
+
+   The sender side implementation of PR-SCTP is identical to that of the
+   base SCTP protocol, except for:
+
+   o  actions a sending side PR-SCTP implementation must take when a TSN
+      is "dropped" (as per the rules of whatever PR-SCTP service
+      definition is in effect)
+
+   o  special actions that a PR-SCTP implementation must take upon
+      receipt of SACK
+
+   o  rules governing generation of FORWARD TSN chunks.
+
+   In detail, these exceptions are as follows:
+
+   A1) The sender maintains an "Advanced.Peer.Ack.Point" for each peer
+      to track a theoretical cumulative TSN point of the peer (Note,
+      this is a _new_ protocol variable and its value is NOT necessarily
+      the same as the SCTP "Cumulative TSN Ack Point" as defined in
+      Section 1.4 of RFC2960 [4]) and discussed throughout that
+      document.
+
+   A2) From time to time, as governed by the rules of a particular PR-
+      SCTP service definition (see Section 4), the SCTP data sender may
+      make a determination that a particular data chunk that has already
+      been assigned a TSN SHOULD be "dropped".
+
+      When a data chunk is "dropped", the sender MUST treat the data
+      chunk as being finally acked and no longer outstanding.
+
+      Moreover, the sender MUST stop the T3-rtx timer if there are no
+      other data chunks outstanding.
+
+      However, the sender MUST NOT credit a "dropped" data chunk to the
+      partial_bytes_acked as defined in Section 7.2.2 of RFC2960 [4],
+      and the MUST NOT advance the cwnd based on this "dropped" data
+      chunk.
+
+   A3) Whenever the data sender receives a SACK from the data receiver,
+      it MUST first process the SACK using the normal procedures as
+      defined in Section 6.2.1 of RFC2960 [4].
+
+      The data sender MUST then perform the following additional steps :
+
+      C1) Let SackCumAck be the Cumulative TSN ACK carried in the
+         received SACK.
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 10]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+         If (Advanced.Peer.Ack.Point < SackCumAck), then update
+         Advanced.Peer.Ack.Point to be equal to SackCumAck.
+
+      C2) Try to further advance the "Advanced.Peer.Ack.Point" locally,
+         that is, to move "Advanced.Peer.Ack.Point" up as long as the
+         chunk next in the out-queue space is marked as acknowledged
+         (possibly by a gap ack, or possibly because that TSN was
+         "dropped") as shown by the following example:
+
+
+            Assuming that a SACK arrived with the Cumulative TSN ACK =
+            102 and the Advanced.Peer.Ack.Point is updated to this
+            value:
+
+
+            out-queue at the end of  ==>   out-queue after Adv.Ack.Point
+            normal SACK processing           local advancement
+
+
+                         ...                            ...
+            Adv.Ack.Pt-> 102 acked                      102 acked
+                         103 dropped                    103 dropped
+                         104 dropped       Adv.Ack.Pt-> 104 dropped
+                         105                            105
+                         106 acked                      106 acked
+                         ...                            ...
+
+
+            In this example, the data sender successfully advanced the
+            "Advanced.Peer.Ack.Point" from 102 to 104 locally.
+
+      C3) If, after step C1 and C2, the "Advanced.Peer.Ack.Point" is
+         greater than the Cumulative TSN ACK carried in the received
+         SACK, the data sender MUST send the data receiver a FORWARD TSN
+         chunk containing the latest value of the
+         "Advanced.Peer.Ack.Point".
+
+   The following additional rules govern the generation of FORWARD TSN
+   chunks:
+
+   F1) An endpoint MUST NOT use the FORWARD TSN for any purposes other
+      than circumstances described in this document.
+
+   F2) The data sender SHOULD always attempt to bundle an outgoing
+      FORWARD TSN with outbound DATA chunks for efficiency.
+
+      A sender MAY even choose to delay the sending of the FORWARD TSN
+      in the hope of bundling it with an outbound DATA chunk.
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 11]
+
+
+      IMPLEMENTATION NOTE: An implementation may allow the maximum delay
+      for generating a forward TSN to be configured either statically or
+      dynamically in order to meet the specific timing requirements of
+      the protocol being carried, but see the next rule:
+
+   F3) Any delay applied to the sending of FORWARD TSN chunk SHOULD NOT
+      exceed 200ms and MUST NOT exceed 500ms.  In other words an
+      implementation MAY lower this value below 500ms but MUST NOT raise
+      it above 500ms.
+
+      NOTE: Delaying the sending of FORWARD TSN chunks may cause delays
+      in the receiver's ability to deliver earlier unreliable data being
+      held at the receiver for re-ordering.
+
+   F4) The detection criterion for out-of-order SACKs MUST remain the
+      same as stated in RFC2960, that is, a SACK is only considered out-
+      of-order if the Cumulative TSN ACK carried in the SACK is earlier
+      than that of the previous received SACK (i.e., the comparison MUST
+      NOT be made against "Advanced.Peer.Ack.Point").
+
+
+3.6 Receiver Side Implementation of PR-SCTP
+
+   The receiver side implementation of PR-SCTP at an SCTP endpoint A is
+   capable of supporting any PR-SCTP service definition used by the
+   sender at end point B, even if that service definition is not
+   supported by the sending side functionality of host A.  All that is
+   necessary is that the receiving side correctly handle the Forward-
+   TSN-Supported parameter as specified in Section 3.3, and correctly
+   handle the receipt of FORWARD ACK chunks as specified below.
+
+   DATA chunk arrival at a PR-SCTP receiver proceeds exactly as for DATA
+   chunk arrival at a base protocol SCTP receiver---that is, the
+   receiver MUST perform the same TSN handling including duplicate
+   detection, gap detection, SACK generation, cumulative TSN
+   advancement, etc.  as defined in RFC2960 [4]---with the following
+   exceptions and additions.
+
+   When a FORWARD TSN chunk arrives, the data receiver MUST first update
+   its cumulative TSN point to the value carried in the FORWARD TSN
+   chunk, and then MUST further advance its cumulative TSN point locally
+   if possible, as shown by the following example:
+
+
+      Assuming that the new cumulative TSN carried in the arrived
+      FORWARD TSN is 103:
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 12]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+       in-queue before processing      in-queue after processing the
+            the FORWARD TSN      ==>   the FORWARD TSN and further
+                                                advancement
+
+
+       cum.TSN.Pt-> 102 received                   102 --
+                    103 missing                    103 --
+                    104 received                   104 --
+                    105 received      cum.TSN.Pt-> 105 received
+                    106 missing                    106 missing
+                    107 received                   107 received
+                    ...                            ...
+
+
+      In this example, the receiver's cumulative TSN point is first
+      updated to 103 and then further advanced to 105.
+
+   After the above processing, the data receiver MUST stop reporting any
+   missing TSNs earlier than or equal to the new cumulative TSN point.
+
+   Note, if the "New Cumulative TSN" value carried in the arrived
+   FORWARD TSN chunk is found to be behind the current cumulative TSN
+   point, the data receiver MUST treat this FORWARD TSN as out-of-date
+   and silently discard it.
+
+   Whenever an unreliable DATA chunk arrives with the 'U' bit set to '0'
+   (indicating ordered delivery) and is out of order, the receiver must
+   hold the chunk for reordering.  Since it is possible with PR-SCTP
+   that a DATA chunk being waited upon will not be retransmitted,
+   special actions will need to be taken upon the arrival of a FORWARD
+   TSN.
+
+   In particular, after receiving and processing a FORWARD TSN, the
+   receiver MUST examine all of its stream reordering queues, and
+   immediately make available for delivery any messages that carry a TSN
+   earlier than or equal to the new cumulative TSN point.
+
+   Likewise, after receiving and processing a FORWARD TSN, the data
+   receiver MUST take cautions in updating its re-assembly queue.  The
+   receiver MUST remove any partially reassembled message which is still
+   missing one or more TSNs earlier than or equal to the new cumulative
+   TSN point.  In the event that the receiver has invoked the partial
+   delivery API a notification SHOULD also be generated to inform the
+   upper layer API that the message being partially delivered will NOT
+   be completed.
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 13]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+4. Services provided by PR-SCTP to the upper layer
+
+   As described in Section 1.2, it is feasible to implement a variety of
+   partially reliable transport services using the new protocol
+   mechanisms introduced in Section 3; introducing these new services
+   requires making changes only at the sending side API, and the sending
+   side protocol implementation.  Thus, there may be a temptation to
+   standardize only the protocol, and leave the service definition as
+   "implementation specific" or leave it to be defined in
+   "informational" documents.
+
+   However, for those who may wish to write IETF standards for upper
+   layer protocols implemented over PR-SCTP, it is important to be able
+   to refer to a standard definition of services provided.  Therefore,
+   this section provides an example definitions of one such service,
+   while also providing guidelines for the definition of additional
+   services as required.  Each such service may be proposed as a
+   separate new standard.
+
+   Section 4 is organized as follows:
+
+      Section 4.1 provides the definition of one specific PR-SCTP
+      service: timed reliability.
+
+      Section 4.2 describes how a particular PR-SCTP service definition
+      is requested by the upper layer during association establishment,
+      and how the upper layer is notified if that request cannot be
+      satisfied.
+
+      Section 4.3 then provides guidelines for the specification of PR-
+      SCTP services other then the one defined in this memo.
+
+      Finally, Section 4.4 describes some additional usage notes that
+      upper layer protocol designers and implementers may find helpful.
+
+
+4.1 PR-SCTP Service Definition for "timed reliability"
+
+   The "timed reliability" service is a natural extension of the
+   "lifetime" concept already present in the base SCTP protocol.
+
+   When this service is requested for an SCTP association, it changes
+   the meaning of the lifetime parameter specified in the SEND primitive
+   (see Section 10.1, part (E) of RFC2960 [4]; note that the parameter
+   is spelled "life time" in that document.)
+
+   In the base SCTP protocol, the lifetime parameter is used to avoid
+   sending stale data.  When a lifetime value is indicated for a
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 14]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   particular message, SCTP cancels the sending of this message, and
+   notifies the ULP if the first transmission of the data does not take
+   place (because of rwnd or cwnd limitations, or for any other reason)
+   before the lifetime expires.  However, in the base protocol, if SCTP
+   has sent the first transmission before the lifetime expires, then the
+   message MUST be sent as a normal reliable message.  During episodes
+   of congestion this is particularly unfortunate, as retransmission
+   wastes bandwidth that could have been used for other (non-lifetime
+   expired) messages.
+
+   When the "timed reliability" service is invoked, this latter
+   restriction is removed.  Specifically, when the "timed reliability"
+   service is in effect, the following rules govern all messages that
+   are sent with a lifetime parameter:
+
+   TR1) If the lifetime parameter of a message is zero (or unspecified)
+      that message is treated as a normal reliable SCTP message, just as
+      in the base SCTP protocol.   The value zero is also represented by
+      the constant SCTP_LIFETIME_RELIABLE.
+
+   TR2) If the lifetime parameter of a message is the maximum value that
+      can be stored in an unsigned 32-bit integer, (represented by the
+      constant SCTP_LIFETIME_SEND_EXACTLY_ONCE) that message is treated
+      as a message that SHOULD be sent exactly once, and SHOULD NOT be
+      retransmitted.
+
+      This SHOULD be implemented as follows:
+
+      E1) The SCTP sender SHOULD keep track of whether each message that
+         has been assigned a TSN has been sent at least once or not (for
+         example, with a bit, a Boolean flag, or with an integer that
+         counts the number of times the message has been transmitted).
+
+      E2) The SCTP sender SHOULD treat "send exactly once" messages in
+         the same way that reliable messages are treated in the base
+         protocol until such time as the message is acknowledged by a
+         SACK, or until such time as the message needs to be
+         retransmitted due to retransmission timer expiration or fast
+         retransmission procedure.
+
+         If and when the rules of the base reliable protocol call for
+         retransmission of a "send exactly once" that message SHOULD NOT
+         be retransmitted, and instead SHOULD be "dropped" as per the
+         rules specified in Section 3.5.
+
+      E3) A send exactly once" message  SHOULD NOT be "dropped" unless
+         and until it would be eligible for retransmission under the
+         rules of the base SCTP protocol.
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 15]
+
+
+         NOTE: Rules (E1), (E2) and (E3) are designed to ensure that a
+         FORWARD TSN for a "send exactly once" message does not get sent
+         prematurely, causing the receiver to skip past a message that
+         may still be in transit (for example, because of a packet
+         reordering in the network.)  This gives the message a
+         reasonable chance to arrive at the receiver.
+
+   TR3) If the lifetime parameter is not equal to zero or
+      SCTP_LIFETIME_SEND_EXACTLY_ONCE, then the SCTP sender MUST treat
+      the message just as if it were a normal reliable SCTP message as
+      long as the lifetime (expressed in milliseconds) has not yet
+      expired.
+
+   TR4) Before assigning a TSN to any message, the SCTP sender MUST
+      evaluate the lifetime of that message.  If it is expired, the SCTP
+      sender MUST NOT assign a TSN to that message, but instead, SHOULD
+      issue a notification to the upper layer and drop the message.
+
+   TR5) Before transmitting or retransmitting a message for which a TSN
+      is already assigned, the SCTP sender MUST evaluate the lifetime of
+      the message.  If the lifetime of the message is expired, the SCTP
+      sender MUST "drop" the message, as per the rules specified in
+      Section 3.5.
+
+   TR6) The sender MAY evaluate the lifetime of messages at anytime.
+      Expired messages that have not been assigned a TSN MAY be handled
+      as per rule TR4.  Expired messages that HAVE been assigned a TSN
+      MAY be handled as per rule TR5.
+
+   Implementation Note: Rules TR3, TR4, and TR5 are designed to avoid
+   requiring the implementer to maintain a separate timer for each
+   message.  Instead, the lifetime need only be evaluated at points in
+   the life of the message where actions are already being taken, such
+   as TSN assignment, transmission, or expiration of a retransmission
+   timeout.  Rule TR6 is intended to give the implementer flexibility to
+   evaluate lifetime at any other convenient opportunity, WITHOUT
+   requiring that lifetime be evaluated immediately at the point in time
+   where it expires.
+
+4.2 PR-SCTP Association Establishment
+
+   An upper layer protocol (ULP) that uses PR-SCTP may need to know
+   whether PR-SCTP can be supported on a given association.  Therefore,
+   the ULP needs to have some indication of whether the FORWARD-TSN
+   chunk is supported by its peer.
+
+   Section 10.1 of RFC2960 [4] describes abstract primitives for the
+   ULP-to-SCTP interface, while noting that "individual implementations
+   must define their own exact format, and may provide combinations or
+   subsets of the basic functions in single calls."
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 16]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   In this section, we describe one additional return value that may be
+   added to the ASSOCIATE primitive to allow an SCTP service user to
+   indicate whether the FORWARD-TSN chunk is supported by its peer.
+
+   RFC2960 indicates that the associate primitive "allows the upper
+   layer to initiate an association to a specific peer endpoint".  It is
+   structured as follows:
+
+        Format: ASSOCIATE(local SCTP instance name, destination transport addr,
+              outbound stream count)
+        -> association id [,destination transport addr list]
+           [,outbound stream count]
+
+   This extension adds one new OPTIONAL return value, such that the new
+   primitive reads as follows:
+
+        Format: ASSOCIATE(local SCTP instance name, destination transport addr,
+              outbound stream count )
+        -> association id [,destination transport addr list]
+           [,outbound stream count] [,forward tsn supported]
+
+   NOTE: As per RFC2960, if [the] ASSOCIATE primitive is implemented as
+   a non-blocking call, the new OPTIONAL return value shall be passed
+   with the association parameters using the COMMUNICATION UP
+   notification.
+
+   The new OPTIONAL parameter "forward tsn supported" is a Boolean flag:
+
+   (0) false [default] indicates that FORWARD TSN is not supported by
+      the peer.
+
+   (1) true indicates that FORWARD TSN is supported by the peer.
+
+
+4.3 Guidelines for defining other PR-SCTP Services
+
+   Other PR-SCTP services may be defined and implemented as dictated by
+   the needs of upper layer protocols.  If such upper layer protocols
+   are to be standardized and require some particular PR-SCTP service
+   other than the one defined in this document (i.e.  "timed
+   reliability") than those additional PR-SCTP services should also be
+   specified and standardized.
+
+   It is suggested that any such additional service definitions be
+   modeled after the contents of Section 4.1 .  In particular, the
+   service definition should provide:
+
+   1.  A description of how the service user specifies any parameters
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 17]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+       that need to be associated with a particular message (and/or any
+       other communication that takes place between the application and
+       the SCTP transport sender) that provides the SCTP transport
+       sender with the information needed to determine when to give up
+       on transmission of a particular message.
+
+       Preferably this description should reference the primitives in
+       the abstract API provided in Section 10 of RFC2960 [4],
+       indicating any:
+
+       *  changes to the interpretation of the existing parameters of
+          existing primitives,
+
+       *  additional parameters to be added to existing primitives
+          (these should be OPTIONAL, and default values should be
+          indicated),
+
+       *  additional primitives that may be needed.
+
+   2.  A description of the rules used by the sender side implementation
+       to determine when to give up on messages that have not yet been
+       assigned a TSN.  This description should also indicate what
+       protocol events trigger the evaluation, and what actions to take
+       (e.g.  notifications.)
+
+   3.  A description of the rules used by the sender side implementation
+       to determine when to give up on the transmission or
+       retransmission of messages that have already been assigned a TSN,
+       and may have been transmitted and possibly retransmitted zero or
+       more times.
+
+   Note that in any PR-SCTP service, the following rule MUST be
+   specified to avoid a protocol deadlock:
+
+   (G1) When the sender side implementation gives up on transmitting a
+      message that has been assigned a TSN (i.e., when that message is
+      "dropped", as defined in Section 3.4) the sender side MUST mark
+      that TSN as eligible for forward TSN, and the rules in Section 3.5
+      regarding the sending of FORWARD TSN chunks MUST be followed.
+
+   Items (2) and (3) in the list above should also indicate what
+   protocol events trigger the evaluation of the rules specified, as
+   well as what actions to take if the determination is made that the
+   sender should give up on transmitting the message, other than
+   "dropping" the message (for example, any notifications to the ULP.)
+
+   Finally, a PR-SCTP service definition should specify a "canonical
+   service name" to uniquely identify the service, and distinguish it
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 18]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   from other PR-SCTP services.  This name can then be used in upper
+   layer protocol standards, to indicate which PR-SCTP service
+   definition is required by that upper layer protocol.  It can also be
+   used in the documentation of APIs of PR-SCTP implementations to
+   indicate how an upper layer indicates which definition of PR-SCTP
+   service should apply.  The canonical service name for the PR-SCTP
+   service defined in Section 4.1 is "timed reliability".
+
+4.4 Usage Notes
+
+   Detecting missing data in a PR-SCTP stream is useful for some
+   applications (e.g.  Fiber channel or SCSI over IP).  With PR-SCTP
+   this becomes possible - the upper layer simply needs to examine the
+   stream sequence number of the arrived user messages of that stream to
+   detect any missing data.  Note, this detection only works when all
+   the messages on that stream are sent in order, i.e.  the "U" bit is
+   not set.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 19]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+5. Acknowledgments
+
+   The authors would like to thank Scott Bradner, Jon Berger, Armando L.
+   Caro Jr., John Loughney, Ivan Arias Rodriguez, Ian Rytina, Chip
+   Sharp, and others for their comments.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 20]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+6. Security Considerations
+
+   [Open Issue TBD: Security issues are not discussed in this memo at
+   this time, but will be added in a later version of this draft.]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 21]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+7. IANA Considerations
+
+   No IANA considerations are raised by the standards proposed in this
+   memo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 22]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+References
+
+   [1]  Clark, D. and D. Tennenhouse, "Architectural Considerations for
+        a New Generation of Protocols", SIGCOMM 1990 pp. 200-208,
+        September 1990.
+
+   [2]  Bradner, S., "The Internet Standards Process -- Revision 3", BCP
+        9, RFC 2026, October 1996.
+
+   [3]  Bradner, S., "Key words for use in RFCs to Indicate Requirement
+        Levels", BCP 14, RFC 2119, March 1997.
+
+   [4]  Stewart, R., Xie, Q., Morneault, K., Sharp, C., Schwarzbauer,
+        H., Taylor, T., Rytina, I., Kalla, M., Zhang, L. and V. Paxson,
+        "Stream Control Transmission Protocol", RFC 2960, October 2000.
+
+
+Authors' Addresses
+
+   Randall R. Stewart
+   Cisco Systems, Inc.
+   8725 West Higgins Road
+   Suite 300
+   Chicago, IL  60631
+   USA
+
+   Phone: +1-815-477-2127
+   EMail: rrs@cisco.com
+
+
+   Michael A. Ramalho
+   Cisco Systems, Inc.
+   1802 Rue de la Porte
+   Wall Township, NJ  07719-3784
+   USA
+
+   Phone: +1.732.449.5762
+   EMail: mramalho@cisco.com
+
+
+   Qiaobing Xie
+   Motorola, Inc.
+   1501 W. Shure Drive, #2309
+   Arlington Heights, IL  60004
+   USA
+
+   Phone: +1-847-632-3028
+   EMail: qxie1@email.mot.com
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 23]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+   Michael Tuexen
+   Siemens AG
+   ICN WN CS SE 5
+   D-81359 Munich
+   Germany
+
+   Phone: +49 89 722 47210
+   EMail: Michael.Tuexen@icn.siemens.de
+
+
+   Phillip T. Conrad
+   Temple University
+   CIS Department
+   Room 303, Computer Building (038-24)
+   1805 N. Broad St.
+   Philadelphia, PA  19122
+   US
+
+   Phone: +1 215 204 7910
+   EMail: conrad@acm.org
+   URI:   http://www.cis.temple.edu/~conrad
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 24]
+
+Internet-Draft     SCTP Partial Reliability Extension           May 2002
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2002).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stewart, et al.         Expires November 5, 2002               [Page 25]
+
+

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/05/20 05:04:18 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/06/01 20:13:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -41,7 +41,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2002/05/20 05:04:18 $ by $Author: brian $
+# Last Modified $Date: 2002/06/01 20:13:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,15 +59,16 @@ PIC = $(FIG:.fig=.pic)
 GIF = $(FIG:.fig=.gif)
 EPS = $(FIG:.fig=.eps)
 
-all:: $(PIC) $(TXT) $(PSS) $(PDF) $(HT) $(GT) $(PS) $(EPS) $(GIF) $(HT) $(GI)
+all:: $(PIC) $(TXT) $(PSS) $(PDF) $(HT) $(EPS) $(GIF) $(GI)
 
 gifs:: $(GI) $(GIF)
-ps:: $(PS) $(EPS)
+ps:: $(PSS) $(EPS)
 html:: $(HTML) $(GIF)
+txt:: $(TXT)
 
-$(TXT) : %.txt : %.me ../idrefs ; groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
-$(PSS) : %.ps  : %.me ../idrefs ; groff -R -s -p -t -e -Tps    -me $< > $@
-$(PDF) : %.pdf : %.ps ../idrefs ; ps2pdf $< $@
+$(TXT) : %.txt : %.me idrefs ; groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
+$(PSS) : %.ps  : %.me idrefs ; groff -R -s -p -t -e -Tps    -me $< > $@
+$(PDF) : %.pdf : %.ps ; ps2pdf $< $@
 
 $(PIC) : %.pic : %.fig ; fig2dev -L pic -p allps $< $@
 $(GIF) : %.gif : %.fig ; fig2dev -L gif $< $@
@@ -77,7 +78,6 @@ $(GI)  : %.gif : %.ag ; applix -quiet -add -call gifexport $< $@
 $(PN)  : %.png : %.ag ; applix -quiet -add -call pngexport $< $@
 $(HT)  : %_001.html : %.aw ; ../aw2h $<
 
-txt:: $(TXT)
 
 clean::
 	rm -f *.bak $(TXT) $(PSS) $(PDF) $(PIC) $(GIF) $(EPS) $(GI) $(HT) \

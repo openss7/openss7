@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: linuxsctp_ug.me,v 0.9.2.1 2002/05/20 05:04:18 brian Exp $
+.\" @(#) $Id: linuxsctp_ug.me,v 0.9.2.2 2002/06/01 20:13:37 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,7 +47,7 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2002/05/20 05:04:18 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2002/06/01 20:13:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .R1
@@ -184,7 +184,7 @@ be made prior to products conforming to the interfaces being made available.
 .lp
 UNIX \(rg is a trademark.
 .)z
-.fo '$Revision: 0.9.2.1 $'Page \\\\n%'\\\\*(td'
+.fo '$Revision: 0.9.2.2 $'Page \\\\n%'\\\\*(td'
 .pn 1
 .++ AB 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
 .+c Abstract
@@ -232,29 +232,11 @@ documentation at http://www.openss7.org/.
 
 .(l I
 $Log: linuxsctp_ug.me,v $
-Revision 0.9.2.1  2002/05/20 05:04:18  brian
-Added documentation.
+Revision 0.9.2.2  2002/06/01 20:13:37  brian
+Updated SCTP drafts.
 
-Revision 1.1  2002/05/20 05:04:18  brian
-Added documentation.
-
-Revision 0.8  2002/04/02 08:10:53  brian
-Started Linux 2.4 development branch.
-
-Revision 0.7.8.1  2002/01/11 00:57:10  brian
-Checkin.
-
-Revision 0.7  2001/12/20 21:14:09  brian
-Working on datamodel document.
-
-Revision 0.7.8.1  2001/12/11 13:14:59  brian
-Branched for new development.
-
-Revision 0.7.6.1  2001/12/11 11:06:00  brian
-Corrected PS output.
-
-Revision 0.7  2001/12/11 03:22:53  brian
-Added doc files.
+Revision 1.2  2002/06/01 20:13:37  brian
+Updated SCTP drafts.
 
 .)l
 .de $0
@@ -278,7 +260,7 @@ Added doc files.
 \\$2 \\$3
 .)x \\n(ch-\\n%
 ..
-.fo '$Revision: 0.9.2.1 $'Page \\\\*(&c-\\\\n%'\\\\*(td'
+.fo '$Revision: 0.9.2.2 $'Page \\\\*(&c-\\\\n%'\\\\*(td'
 .pn 1
 .++ C 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
 .+c Introduction
@@ -321,17 +303,551 @@ This is an endnote.
 .nr $1 0
 
 .sh 1 "Overview"
-.sh 2 "Overview"
+.pp
+Linux SCTP was written by Brian Bidulock of OpenSS7 Corporation under funding
+from Lockheed Martin.  Linux SCTP has the following features:
+
+.sh 2 "Features"
+.bu
+RFC 2960 compliant implementation.
+.bu
+SCTP Implementors Guide enhancements.
+.bu
+Standards support for socket type \fISOCK_SEQPACKET\fR.
+.bu
+A TCP-compatible mode for sockets of type \fISOCK_STREAM\fR.
+.bu
+Supports partial packet delivery interface on all packes for all socket types.
+\fBMSG_TRUNC\fR set when receiving a \fISOCK_SEQPACKET\fR packet does not
+discard the remainder of the packet but permits subsequent reads to read the
+remainder of the packet.
+.bu
+Silly Window Syndrome (SWS) avoidance per RFC 1122 Section 4.2.3 with delayed
+ACK modifications presented by Minshall in draft-minshall-tsvwg-nagle-01.txt.
+.bu
+Message disposition and retrieval on connection shutdown or abort in support
+of fail-over between associations and hosts for SIGTRAN protocols.
+.bu
+Support for both Adler 32 and CRC-32c checksums with optional autodetection of
+checksum on receive.
+.bu
+Support for multiple HMAC types: \fISCTP_MAC_MD5\fR, \fISCTP_MAC_SHA_1\fR and
+\fISCTP_MAC_NONE\fR.  Additional HMAC types for higher or lower security
+mechanisms are easily added.
+.bu
+For enhanced security of HMACs, Linux SCTP includes a rekeying algorithm for
+secret keys which rapidly rotates secret keys after the key's first cookie
+lifetime for maximum security for HMACs.
+.bu
+Support for the ADD-IP extensions to SCTP.
+.bu
+Support for the PR-SCTP extensions to SCTP.
+.bu
+High performance routing algorithm alters multi-homed route selection on a
+per-packet basis.
+.bu
+Wide range of settings for SCTP timers and protocol parameters permitting
+average 5ms failover between failed destinations on high-speed networks.
+.bu
+Standards compliance for \fISOCK_SEQPACKET\fR sockets.
+.bu
+Full support for hardware checksum and scatter/gather capable NICs.
+.bu
+Supports full partial checksum and copy to user (Van Jacobson) approach for
+NICs not supporting hardware checksum.
+.bu
+Complete socket semantic support.  All SOL_SOCKET and SOL_IP sysctls and
+socket options are supported.
+.bu
+Performance rivalling Linux TCP.
+.bu
+Full transparent support for multi-homed hosts.
 
 
 
+.+c "Sequenced Packet"
+.nr $1 0
+.sh 1 "Overview"
+.sh 1 "Sequenced Packet Socket API"
+.sh 2 "Socket Calls"
+.sh 3 "\fBgetsockname\fR(2)"
+.sh 3 "\fBgetpeername\fR(2)"
+.sh 3 "\fBsocket\fR(2)"
+.sh 3 "\fBbind\fR(2)"
+.sh 3 "\fBlisten\fR(2)"
+.sh 3 "\fBconnect\fR(2)"
+.sh 3 "\fBaccept\fR(2)"
+.sh 3 "\fBsendmsg\fR(2)"
+.sh 3 "\fBrecvmsg\fR(2)"
+.sh 3 "\fBshutdown\fR(2)"
+.sh 3 "\fBclose\fR(2)"
+.sh 2 "System Controls"
+.ip \fBsctp_max_istreams\fR
+Defines the default maximum number of inbound SCTP streams that will be
+requested when forming or receiving connections on an SCTP socket.
+Valid values are in the range from 1 to 65,535 streams.
+This is a system-wide default value that is applicable to all new SCTP
+sockets.  The actual value used by a socket for both outgoing and incoming
+connections can be changed with the \fISOL_SCTP\fR socket option
+\fISCTP_ISTREAMS\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2).
+
+Usable default values of \fIsctp_max_istreams\fR is highly dependent upon the
+SCTP applications that are intended to be used.  \fISIGTRAN\fR UAs, for
+example, seldomly need more than 257 inbound or outbound streams.
+The default value is set to thirty-three (33) streams for \f(CBSOCK_SEQPACKET\fR
+sockets and one (1) stream for \f(CBSOCK_STREAM\fR sockets.
+.ip \fBsctp_req_ostreams\fR
+Defines the default requested number of outbound SCTP streams that will be
+requested when forming or receiving connections on an SCTP socket.
+Valid values are in the range from 1 to 65,535 streams.
+This is a system-wide default value that is applicable to all new SCTP
+sockets.  The actual value used by a socket for both outgoing and incoming
+connections can be changed with the \fISOL_SCTP\fR socket option
+\fISCTP_OSTREAMS\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2).
+
+Usable default values of \fIsctp_max_istreams\fR is highly dependent upon the
+SCTP applications that are intended to be used.  \fISIGTRAN\fR UAs, for
+example, seldomly need more than 257 inbound or outbound streams.
+The default value is set to one (1) stream for both \f(CBSOCK_SEQPACKET\fR
+and \f(CBSOCK_STREAM\fR sockets.
+.ip \fBsctp_rto_min\fR
+Defines the default time interval (in milliseconds) that  will be used as a
+minimum RTO (Retransmission Time Out) value when sending packets to a
+destination.  Valid values are zero or greater and must be less than or equal
+to both \fIsctp_rto_initial\fR and \fIsctp_rto_max\fR.
+In general, \fIsctp_rto_min\fR should not be less than \fIsctp_max_sack_delay\fR.
+The default value is the value recommended in RFC 2960 (1,000 milliseconds).
+This is a system-wide default minimum that will be applied to new SCTP
+sockets.  The actual value used can be changed with the \fISOL_SCTP\fR socket
+option \fISCTP_RTO_MIN\fR before a call to \fBconnect\fR(2) or
+\fBaccept\fR(2).  After an SCTP socket is connected, the destination-specific
+value can be changed using the \fISOL_SCTP\fR socket option \fISCTP_RTO\fR.
+.ip \fBsctp_rto_initial\fR
+Defines the default time interval (in milliseconds) that will be used as an
+initial RTO (Retransmission Time Out) value when sending packets to a
+destination for the first time, or after the destination has been idle for
+some time.  Valid values are zero or greater and must be within the range from
+\fIsctp_rto_min\fR to \fIsctp_rto_max\fR.
+In general, \fIsctp_rto_min\fR should not be less than \fIsctp_max_sack_delay\fR.
+The default value is the value recommended in RFC 2960 (3,000 milliseconds).
+This is a system-wide default value that will be applied to new SCTP sockets.
+The actual value used can be change with the \fISOL_SCTP\fR socket option
+\fISCTP_RTO_INITIAL\fR before a call to \fBconnect\fR(2) or \fBaccept\fR(2).
+After an SCTP socket is connected, the destination-specific value can be
+changed using the \fISOL_SCTP\fR socket option \fISCTP_RTO\fR.
+.ip \fBsctp_rto_max\fR
+Defines the default time interval (in milliseconds) that  will be used as a
+maximum RTO (Retransmission Time Out) value when sending packets to a
+destination.  Valid values are zero or greater and must be greater than or
+equal to both \fIsctp_rto_min\fR and \fIsctp_rto_initial\fR.
+In general, \fIsctp_rto_min\fR should not be less than \fIsctp_max_sack_delay\fR.
+The default value is the value recommended in RFC 2960 (60,000 milliseconds).
+This is a system-wide default maximum that will be applied to new SCTP
+sockets.  The actual value used can be changed with the \fISOL_SCTP\fR socket
+option \fISCTP_RTO_MAX\fR before a call to \fBconnect\fR(2) or
+\fBaccept\fR(2).  After an SCTP socket is connected, the destination-specific
+value can be changed using the \fISOL_SCTP\fR socket option \fISCTP_RTO\fR.
+.ip \fBsctp_valid_cookie_life\fR
+Defines the time interval (in milliseconds) beyond which a COOKIE-ECHO with a
+cookie sent in an INIT-ACK will no longer be accepted.  Valid values are in
+the range from 1 to MAX_INT milliseconds.  The default value is the value
+recommended in RFC 2960 (60,000 milliseconds).  This is a system-wide default
+that will be applied to new SCTP sockets.  The actual value used can be
+changed with the \fISOL_SCTP\fR socket option \fISCTP_COOKIE_LIFE\fR before a
+call to \fBlisten\fR(2).
+.ip \fBsctp_max_sack_delay\fR
+Defines the time interval (in milliseconds) maximum that the sending endpoint
+is permitted to delay an acknowledgement of received data.  Valid values are
+int he range from 1 to MAX_INT milliseconds, even though RFC 2960 forbids
+setting this value larger than 500 milliseconds.  In general, this value
+should never be more than \fIsctp_rto_min\fR, \fIsctp_rto_initial\fR or
+\fIsctp_rto_max\fR.  Otherwise, excessive retransmissions will occur while
+waiting for an acknowledgement. The default value is the value recommended in
+RFC 2960 (200 milliseconds).  The actual value used for a given socket can be
+controlled with the \fISOL_SCTP\fR socket option \fISCTP_SACK_DELAY\fR at
+any time during the lifespan of a socket.
+.ip \fBsctp_path_max_retrans\fR
+Defines the number of times that the sending SCTP endpoint will attempt
+retransmitting a packet to a destination transport address before it considers
+the destination transport address inactive.  Valid values are from zero (0) to
+MAX_INT.  In general, the product of the number of destinations and the value
+of \fIsctp_path_max_retrans\fR should be greater than the value of
+\fIsctp_assoc_max_retrans\fR so that the association fails before all
+destinations are deemed inactive.  The default value is the value recommended
+in RFC 2960 (5 retries).  This is a system-wide default value which will be
+applied to new SCTP sockets and assigned to new destinations.  The actual
+value used for a given socket can be controlled with \fISOL_SCTP\fR socket
+option \fISCTP_PATH_MAX_RETRANS\fR before a call to \fBconnect\fR(2) of
+\fBaccept\fR(2) or the addition of a destination transport address with the
+socket option \fISCTP_ADD_IP\fR.  After an SCTP socket is connected, the
+destination-specific value can be changed using the \fISOL_SCTP\fR socket
+option \fISCTP_RTO\fR.
+.ip \fBsctp_assoc_max_retrans\fR
+Defines the numebr of time that the sending SCTP endpoint will attempt
+retransmitting a packet on an association before it aborts the association.
+Valid values are from zero (0) to MAX_INT.  In general,
+where `N' is the number of destination transport addresses,
+\fIsctp_assoc_max_retrans\fR should be in the range from (N-1) x
+\fIsctp_path_max_retrans\fR to (N) x \fIsctp_path_max_retrans\fR so that the
+association fails before all destinations are deemd inactive, but does not
+fail when one destination remains active.
+The default values is the value recommended in RFC 2960 (8 retries).  This is
+a system-wide default value that will be applied to new SCTP scoekts.  The
+actual value used for a given socket can be controlled with the \fISOL_SCTP\fR
+socket option \fISCTP_ASSOC_MAX_RETRANS\fR at any time during the lifespan of
+the SCTP socket.
+.ip \fBsctp_max_init_retries\fR
+.ip \fBsctp_heartbeat_itvl\fR
+.ip \fBsctp_mac_type\fR
+.ip \fBsctp_cookie_inc\fR
+.ip \fBsctp_throttle_itvl\fR
+.ip \fBsctp_checksum_algorithm\fR
+.ip \fBsctp_wmem\fR
+.ip \fBsctp_rmem\fR
+.sh 2 "Socket Options"
+.sh 3 "SOL_SOCKET"
+.ip SO_KEEPALIVE
+.ip SO_OOBINLINE
+.ip SO_BINDTODEVICE
+.ip SO_REUSEADDR
+.ip SO_RCVLOWAT
+.ip SO_SNDLOWAT
+.ip SO_RCVTIMEO
+.ip SO_SNDTIMEO
+.ip SO_DEBUG
+.ip SO_TYPE
+.ip SO_DONTROUTE
+.ip SO_SNDBUF
+.ip SO_RCVBUF
+.ip SO_LINGER
+.ip SO_PRIORITY
+.ip SO_ERROR
+.sh 3 "SOL_IP"
+.ip IP_OPTIONS
+.ip IP_PKTINFO
+.ip IP_RCVTOS
+.ip IP_RCVTTL
+.ip IP_RECVOPTS
+.ip IP_RETOPTS
+.ip IP_TOS
+.ip IP_TTL
+.ip IP_MTU
+.ip IP_RECVERR
+.ip IP_PMTU_DISCOVER
+.sh 3 "SOL_SCTP"
+.ip "SCTP_NODELAY (TCP_NODELAY)"
+.ip "SCTP_MAXSEG (TCP_MAXSEG)"
+.ip "SCTP_CORK (TCP_CORK)"
+.ip SCTP_SID
+When used with \fBsetsockopt\fR(2) and \fBgetsockopt\fR(2), this option sets
+or gets the default stream identifier to be used on the next and subsequent
+write operations where \fBSCTP_SID\fR is not specified.  When used with
+\fBsendmsg\fR(2), this option sets the stream identifier that indicates the
+stream upon which the written data is to be sent.  When returned by
+\fBrecvmsg\fR(2) in an ancilliary message, this option indicates the stream
+identifier upon which the read data was received.  See also the option
+\fBSCTP_RECVSID\fR.  The default stream identifier, unless otherwise
+specified, is always stream identifier zero (0).
+.ip SCTP_PPI
+When used with \fBsetsockopt\fR(2) and \fBgetsockopt\fR(2), this option sets
+or gets the default payload protocol identifier to be used on the next and
+subsequent write operations where \fBSCTP_PPI\fR is not specified.  When used
+with \fBsendmsg\fR(2), this option sets the payload protocol identifier to be
+included when the written data is sent.  When returned by \fBrecvmsg\fR(2) in
+an ancilliary message, this option indicates the payload protocol identifier
+with which the read data was received.  See also the option
+\fBSCTP_RECVPPI\fR.  The default payload protocol identifier, unless otherwise
+specified, is always payload protocol identifier zero (0).
+.ip SCTP_RECVSID
+Sets or gets a flag which indicates whether the socket should provide
+\fISCTP_SID\fR ancilliary messages with received data read with
+\fBrecvmsg\fR(2) to indicate the stream identifier (SID) upon which the packet
+was received.  Expects an integer value which when zero indicates that no
+\fISCTP_SID\fR ancilliary messages will be included with data received with
+\fBrecvmsg\fR(2); when non-zero, indicates that \fISCTP_SID\fR ancilliary
+messages will be included with all data received using \fBrecvmsg\fR(2).
+
+This socket option is only valid with \fBsetsockopt\fR(2) and
+\fBgetsockopt\fR(2).  This flag can be written or read at any time.  When the
+setting is changed, the new setting applies to the next and subsequent calls
+to \fBrecvmsg\fR(2).
+.ip SCTP_RECVPPI
+Sets or gets a flag which indicates whether the socket should provide
+\fISCTP_PPI\fR ancilliary messages with received data read with
+\fBrecvmsg\fR(2) to indicate the payload protocol identifier (PPI) which was
+contained in the received packet.  Expects an integer calue which when zero
+indicates that no \fISCTP_PPI\fR ancilliary message will be included with daa
+received with \fBrecvmsg\fR(2); when non-zero, indicates that \fISCTP_PPI\fR
+ancilliary messages will be included with all data received using
+\fBrecvmsg\fR(2).
+
+This socket option is only valid with \fBsetsockopt\fR(2) and
+\fBgetsockopt\fR(2).  This flag can be written or read at any time.  When the
+setting is changed, the new setting applies to the next and subsequent calls
+to \fBrecvmsg\fR(2).
+.ip SCTP_HB
+.ip SCTP_RTO
+.ip SCTP_COOKIE_LIFE
+.ip SCTP_SACK_DELAY
+.ip SCTP_PATH_MAX_RETRANS
+.ip SCTP_ASSOC_MAX_RETRANS
+.ip SCTP_MAX_INIT_RETRIES
+.ip SCTP_HEARTBEAT_ITVL
+.ip SCTP_RTO_INITIAL
+.ip SCTP_RTO_MIN
+.ip SCTP_RTO_MAX
+.ip SCTP_OSTREAMS
+.ip SCTP_ISTREAMS
+.ip SCTP_COOKIE_INC
+.ip SCTP_THROTTLE_ITVL
+.ip SCTP_MAC_TYPE
+.ip SCTP_CKSUM_TYPE
+.ip SCTP_DEBUG_OPTIONS
+.ip SCTP_STATUS
+.ip SCTP_DISPOSITION
+.ip SCTP_ADD_IP
+.ip SCTP_DEL_IP
+.sh 2 "Input Output Controls"
+.sh 2 "/proc Filesystem"
+.sh 1 "Advanced Features"
+.sh 1 "Examples"
+
+.+c "TCP-Compatible Stream Socket API"
+.nr $1 0
+.sh 1 "Overview"
+.sh 1 "Stream Socket API"
+.sh 2 "Socket Calls"
+.sh 3 "\fBgetsockname\fR(2)"
+.sh 3 "\fBgetpeername\fR(2)"
+.sh 3 "\fBsocket\fR(2)"
+.sh 3 "\fBbind\fR(2)"
+.sh 3 "\fBlisten\fR(2)"
+.sh 3 "\fBconnect\fR(2)"
+.sh 3 "\fBaccept\fR(2)"
+.sh 3 "\fBsendmsg\fR(2)"
+.sh 3 "\fBrecvmsg\fR(2)"
+.sh 3 "\fBshutdown\fR(2)"
+.sh 3 "\fBclose\fR(2)"
+.sh 2 "System Controls"
+.sh 2 "Socket Options"
+.sh 2 "Input Output Controls"
+.sh 2 "/proc Filesystem"
+.sh 1 "Advanced Features"
+.sh 1 "Examples"
 
 .#e
 .pn 1
 .++ A 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
-.+c "An\ Appendix"
+.+c "Man Pages"
 .nr $1 0
-.sh 1 "The Appendix"
+.sh 1 "Socket API"
+.sh 2 socket(2)
+.uh "SYNOPSIS"
+.(l
+.sz -1
+.nf
+\f(CB#include <sys/socket.h>\f(CR
+
+\f(CRint \f(CBsocket(\f(CRint \f(CIdomain\f(CB, \f(CRint \f(CItype\f(CB, \f(CRint \f(CIprotocol\f(CB);
+.)l
+.uh "DESCRIPTION"
+.lp
+The \fBsocket\fR(2) function creates an inbound socket in a communications
+domain, and returns a file descriptor that can be used in later function calls
+that operate on sockets.
+
+The function takes the following arguments:
+.(b
+.ip \fIdomain\fR
+Specifies the communications domain in which a socket is to be created.
+.ip \fItype\fR
+Specifies the type of socket to be created.
+.ip \fIprotocol\fR
+Specifies a particular protocol to be used with the socket.  Specifying a
+\fIprotocol\fR of 0 causes \fBsocket\fR(2) to use an unspecified default
+protocol approprate for the requested socket \fItype\fR in the specified
+\fIdomain\fR.
+.)b
+.lp
+The \fIdomain\fR argument specifies the address family used in the
+communications domain.  The address families supported by the system are
+implementation-dependent.
+
+Symbolic constants that can be used for the domain argument are defined in the
+\fB<sys/socket.h>\fR header.
+
+The \fItype\fR agrument specifies the socket type, which determines the
+semantics of ocmmunication over the socket.  The socket types supported by the
+system are implementation-dependent.  Possible socket types include:
+.ip SOCK_STREAM
+Provies sequenced, reliable, bidirectional, connection-mode byte streams, and
+may provide a transmission mechanism for out-of-band data.
+.ip SOCK_DGRAM
+Provides datagrams, which are connectionless-mode, unreliable messages of
+fixed maximum length.
+.ip SOCK_SEQPACKET
+Provides sequenced, reliable, bidirectional, connection-mode transmission path
+for records.  A record can be sent using one or more output operations and
+received using one or more input operations, but a single operation
+never transfers part of more than one record.  Record boundaries are
+visible to the receiver via the \fIMSG_EOR\fR flag.
+.lp
+If the \fIprotocol\fR argument is non-zero, it must specify a protocol that is
+supported by the address family.  The protocols supported by the system are
+implementation-dependent.
+
+The process may need to have appropriate priviledges to use the \fBsocket\fR(2)
+function or to create some sockets.
+.uh "RETURN VALUE"
+.lp
+Upon successful completion, \fBsocket\fR(2) returns a nonnegative integer, the
+socket file descriptor.  Otherwise a value of -1 is returned and \fIerrno\fR
+is set to indicate the error.
+.uh "ERRORS"
+.lp
+The \fBsocket\fR(2) function will fail if:
+.ip EAFNOSUPPORT
+The implementation does not support the specified address family.
+.ip EMFILE
+No more file descriptors are available for this process.
+.ip ENFILE
+No more file descriptors are available for the system.
+.ip EPROTONOSUPPORT
+The protocol is not supported by the address family, or the protocl is not
+supported by the implementation.
+.ip EPROTOTYPE
+The socket type is not supported by the protocol.
+.lp
+The \fBsocket\fR(2) function may fail if:
+.ip EACCES
+The process does not have appropriate priviledges.
+.ip ENOBUFS
+Insufficient resources were available in the system to perform the operation.
+.ip ENOMEM
+Insufficient memory was available to fulfill the request.
+.ip ENOSR
+There were insufficient STREAMS resources available for the operation to
+complete.
+.uh "APPLICATION USAGE"
+.lp
+The documentation for specific address families specify which protocols each
+address family supports.  The documentation for specific protocols specify
+which socket types each protocol supports.
+
+The application can determine if an address family is supported by trying to
+create a socket with \fIdomain\fR set to the protocol in question.
+.uh "CONFORMING TO"
+.lp
+OpenGroup XNS 5.2
+.uh "SEE ALSO"
+.bp
+.sh 2 bind(2)
+.ip "bind \-"
+bind a name to a socket
+.uh "SYNOPSIS"
+.(l
+.nf
+.sz -1
+\f(CB#include <sys/socket.h>\f(CR
+
+\f(CRint\f(CB bind(\f(CRint\f(CI socket\f(CB, \f(CRstruct sockaddr *\f(CIaddress\f(CB, \f(CRsocklen_t\f(CI address_len\f(CB);
+.)l
+.uh "DESCRIPTION"
+.lp
+The \fBbind\fR(2) function assigns an \fIaddress\fR to an unnamed socket.
+Sockets created with the \fBsocket\fR(2) function are initially unnamed; they
+are identified only by their address family.
+.lp
+The function takes the following arguments:
+.ip "\fIsocket\fR"
+Specifies the file descriptor of the socket to be bound.
+.ip "\fIaddress\fR"
+Points to a \fBsockaddr\fR structure containing the address to be bound to the
+socket.  The length and format of the address depend on the address family of
+the socket.
+.ip "\fIaddress_len\fR"
+Specifies the length of the \fBsockaddr\fR structure pointed to by the
+\fIaddress\fR argument.
+.uh "RETURN VALUE"
+.lp
+Upon successful completion, \fBbind\fR(2) returns 0.  Otherwise, -1 is
+returned and \fIerrno\fR is set to indicate the error.
+.uh "ERRORS"
+.lp
+The \fBbind\fR(2) function will fail if:
+.ip "\fBEADDRINUSE\fR"
+The specified address is already in use.
+.ip "\fBEADDRNOTAVAIL\fR"
+The specified address is not available from the local machine.
+.ip "\fBEAFNOSUPPORT\fR"
+The specified address is not a valid address for the address family of the
+specified socket.
+.ip "\fBEBADF\fR"
+The \fIsocket\fR argument is not a valid file descriptor.
+.ip "\fBEFAULT\fR"
+The \fIaddress\fR argument can not be accessed.
+.ip "\fBEINVAL\fR"
+The socket is already bound to an address, and the protocol does not support
+binding to a new address; or the socket has been shut down.
+.ip "\fBENOTSOCK\fR"
+The \fIsocket\fR argument does not refer to a socket.
+.ip "\fBEOPNOTSUPP\fR"
+The socket type of the specified socket does not support binding to an
+address.
+.lp
+If the address family of the socket is \fIAF_UNIX\fR, then \fBbind\fR(2) will
+fail if:
+.ip "\fBEACCES\fR"
+A componet of the path prefix denies search permission, or the requested name
+requires writing in a directory with a node that denies write permission.
+.ip "\fBEDESTADDRREQ\fR or \fBEISDIR\fR"
+The \fIaddres\fR agrument is a null pointer.
+.ip "\fBEIO\fR"
+An I/O error occured.
+.ip "\fBELOOP\fR"
+Too many symbolic links were encountered in translating the pathname in
+\fIaddress\fR.
+.ip "\fBENAMETOOLONG\fR"
+A component of a pathname exceeded \fINAME_MAX\fR characters, or an entire
+pathname exceeded \fIPATH_MAX\fR characters.
+.ip "\fBENOENT\fR"
+A compoennt of a pathname does not name an existing file or the pathname is an
+empty string.
+.ip "\fBENOTDIR\fR"
+A component of the path prefix of the pathname in \fIaddress\fR is not a
+directory.
+.ip "\fBEROFS\fR"
+The name would reside on a read-only filesystem.
+.lp
+The \fBbind\fR(2) function may fail if:
+.ip "\fBEACCES\fR"
+The specified address is protected and the current user does not have
+permission to bind to it.
+.ip "\fBEINVAL\fR"
+The \fIaddress_len\fR argument is not a valid length for the address family.
+.ip "\fBEISCONN\fR"
+The socket is already connected.
+.ip "\fBENAMETOOLONG\fR"
+Pathname resolution of a symbolic link produced an intermediate result whose
+length exceeds \fIPATH_MAX\fR.
+.ip "\fBENOBUFS\fR"
+Insufficient resources were available to complete the call.
+.ip "\fBENOSR\fR"
+There wre insufficient STREAMS resources to complete the call.
+.uh "APPLICATION USAGE"
+.lp
+An application program can retrieve the assigned socket name with the
+\fBgetsockname\fR(2) function.
+.uh "CONFORMING TO"
+.lp
+OpenGroup XNS 5.2
+.uh "SEE ALSO"
+.lp
+\fBconnect\fR(2),
+\fBgetsockname\fR(2),
+\fBlisten\fR(2),
+\fBsocket\fR(2),
+\fB<sys/socket.h>\fR(5)
 
 .(z C
 .(c
@@ -346,7 +862,7 @@ This is an endnote.
 .#e
 .pn 1
 .++ B 'Linux\ SCTP\ User\'s\ Guide''OpenSS7\ Corporation'
-.fo '$Revision: 0.9.2.1 $'Page \\\\n%'\\\\*(td'
+.fo '$Revision: 0.9.2.2 $'Page \\\\n%'\\\\*(td'
 .af % I
 .de ]<
 .nr % 1

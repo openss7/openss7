@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2002/05/24 22:09:45 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/06/01 20:14:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2002/05/24 22:09:45 $ by $Author: brian $
+# Last Modified $Date: 2002/06/01 20:14:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,8 +63,8 @@ pdf:: $(PDFS)
 txt:: $(TXTS)
 html:: $(HTML)
 
-$(TXTS) : %.txt : %.7 ; groff -R -s -p -t -e -Tlatin1 -mandoc $< > $@
-$(PSSS) : %.ps  : %.7 ; groff -R -s -p -t -e -Tps     -mandoc $< > $@
+$(TXTS) : %.txt : %.7 ; ( echo ".ll 78n"; echo ".lt 78n"; cat $< ) | groff -R -s -p -t -e -Tascii -man > $@
+$(PSSS) : %.ps  : %.7 ; groff -R -s -p -t -e -Tps -man $< > $@
 $(PDFS) : %.pdf : %.ps ; ps2pdf $< $@
 $(HTML) : %.html : %.7 ; cat $< | man2html > $@
 
