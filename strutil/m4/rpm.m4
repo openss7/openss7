@@ -105,7 +105,6 @@ AC_DEFUN([_RPM_SPEC_SETUP], [
     AC_SUBST(PACKAGE_RELEASE)
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The RPM
         Release. This defaults to Custom.])
-    PACKAGE_OPTIONS=
     for arg in $ac_configure_args ; do
         if (echo "$arg" | grep -v '[[= ]]' >/dev/null 2>&1) ; then
             eval "arg=$arg"
