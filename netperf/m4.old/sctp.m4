@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: sctp.m4,v 1.1.2.1 2004/08/06 12:44:08 brian Exp $
+dnl @(#) $Id: sctp.m4,v 1.1.2.2 2004/08/06 19:37:37 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/06 12:44:08 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 19:37:37 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -162,6 +162,10 @@ AC_DEFUN([_SCTP_SETUP], [dnl
 #*** SCTP include directories with option --with-sctp to configure and try again.
 #***
 #        ])
+    else
+        if test -z "$with_sctp" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with sctp"
+        fi
     fi
 ])# _SCTP_SETUP
 # =========================================================================

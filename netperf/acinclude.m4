@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.4 2004/08/06 12:43:59 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.5 2004/08/06 19:37:35 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/06 12:43:59 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 19:37:35 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -76,12 +76,71 @@ AC_DEFUN([AC_NETPERF], [dnl
     _MAN_CONVERSION
     _RPM_SPEC
     _STREAMS
-    if test :"${streams_cv_package:-no}" != :no ; then
+    if test :"${streams_cv_package:-no}" = :no ; then
+        if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" != :no ; then
+            AC_MSG_ERROR([
+****
+**** You have specified --with-lis or --with-lfs, yet I cannot find your
+**** STREAMS include directories.  STREAMS include directories are necessary
+**** to compile the package when --with-lis or --with-lfs is specified.
+**** Try specifying the include directories with --with-lis=DIRECTORY or
+**** --with-lfs=DIRECTORY and try again.
+****
+            ])
+        fi
+    else
         _XNS
+        if test :"${xns_cv_includes:-no}" = :no ; then
+            if test  :"${with_xns:-no}" != :no ; then
+                AC_MSG_ERROR([
+****
+**** You have specified --with-xns, yet I cannot find your XNS include
+**** directories.  XNS include directories are necessary to compile the
+**** package when --with-xns is specified.  Try specifying the include
+**** directory with --with-xns=DIRECTORY and try again.
+****
+                ])
+            fi
+        fi
         _XTI
-        if test :"${xti_cv_includes:-no}" != :no ; then
+        if test :"${xti_cv_includes:-no}" = :no ; then
+            if test :"${with_xti:-no}" != :no ; then
+                AC_MSG_ERROR([
+**** 
+**** You have specified --with-xti, yet I cannot find your XTI include
+**** directories.  XTI include directories are necessary to compile the
+**** package when --with-xti is specified.  Try specifying the include
+**** directory with --with-xti=DIRECTORY and try again.
+**** 
+                ])
+            fi
+        else
             _INET
+            if test :"${inet_cv_includes:-no}" = :no ; then
+                if test :"${with_inet:-no}" != :no ; then
+                    AC_MSG_ERROR([
+**** 
+**** You have specified --with-inet, yet I cannot find your INET include
+**** directories.  INET include directories are necessary to compile the
+**** package when --with-inet is specified.  Try specifying the include
+**** directory with --with-inet=DIRECTORY and try again.
+**** 
+                    ])
+                fi
+            fi
             _SCTP
+            if test :"${sctp_cv_includes:-no}" = :no ; then
+                if test :"${with_sctp:-no}" != :no ; then
+                    AC_MSG_ERROR([
+**** 
+**** You have specified --with-sctp, yet I cannot find your SCTP include
+**** directories.  SCTP include directories are necessary to compile the
+**** package when --with-sctp is specified.  Try specifying the include
+**** directory with --with-sctp=DIRECTORY and try again.
+**** 
+                    ])
+                fi
+            fi
         fi
     fi
     CPPFLAGS="-I- -imacros ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"

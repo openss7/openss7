@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: inet.m4,v 1.1.2.2 2004/08/06 12:44:08 brian Exp $
+dnl @(#) $Id: inet.m4,v 1.1.2.3 2004/08/06 19:37:37 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/06 12:44:08 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 19:37:37 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -152,6 +152,10 @@ AC_DEFUN([_INET_SETUP], [dnl
 #*** INET include directories with option --with-inet to configure and try again.
 #***
 #        ])
+    else
+        if test -z "$with_inet" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with inet"
+        fi
     fi
 ])# _INET_SETUP
 # =========================================================================

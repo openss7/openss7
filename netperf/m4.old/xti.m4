@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xti.m4,v 1.1.2.3 2004/08/06 12:44:08 brian Exp $
+dnl @(#) $Id: xti.m4,v 1.1.2.4 2004/08/06 19:37:37 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/06 12:44:08 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/06 19:37:37 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -138,6 +138,9 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
             Define for SuSv3.  This is necessary for LiS and LFS and strxnet
             for that matter.
             ])
+        if test -z "$with_xti" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with xti"
+        fi
     fi
 ])# _XTI_CHECK_HEADERS
 # =========================================================================
