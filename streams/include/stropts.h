@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.4 2004/08/22 06:17:50 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.5 2005/01/14 21:52:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:50 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:52:48 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004  Open SS7 Corporation"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -63,6 +63,52 @@ __BEGIN_DECLS
 #endif
 
 #include <sys/stropts.h>
+
+/* Test whether FILDES is associated with a STREAM-based file.  */
+extern int isastream (int __fildes) __THROW;
+
+/* Receive next message from a STREAMS file.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern int getmsg (int __fildes, struct strbuf *__restrict __ctlptr,
+		   struct strbuf *__restrict __dataptr,
+		   int *__restrict __flagsp);
+
+/* Receive next message from a STREAMS file, with *FLAGSP allowing to
+   control which message.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern int getpmsg (int __fildes, struct strbuf *__restrict __ctlptr,
+		    struct strbuf *__restrict __dataptr,
+		    int *__restrict __bandp, int *__restrict __flagsp);
+
+/* Perform the I/O control operation specified by REQUEST on FD.
+   One argument may follow; its presence and type depend on REQUEST.
+   Return value depends on REQUEST.  Usually -1 indicates error.  */
+extern int ioctl (int __fd, unsigned long int __request, ...) __THROW;
+
+/* Send a message on a STREAM.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern int putmsg (int __fildes, __const struct strbuf *__ctlptr,
+		   __const struct strbuf *__dataptr, int __flags);
+
+/* Send a message on a STREAM to the BAND.
+
+   This function is a cancellation point and therefore not marked with
+   __THROW.  */
+extern int putpmsg (int __fildes, __const struct strbuf *__ctlptr,
+		    __const struct strbuf *__dataptr, int __band, int __flags);
+
+/* Attach a STREAMS-based file descriptor FILDES to a file PATH in the
+   file system name space.  */
+extern int fattach (int __fildes, __const char *__path) __THROW;
+
+/* Detach a name PATH from a STREAMS-based file descriptor.  */
+extern int fdetach (__const char *__path) __THROW;
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:51 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/14 21:52:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:52:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/14 21:52:51 $"
 
-static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:51 $";
+static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/14 21:52:51 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -95,7 +95,7 @@ pthread_testcancel(void)
  * protection is not required.
  */
 static int
-__putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+__putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	struct strpmsg args;
 	args.ctlbuf = ctlptr ? *ctlptr : ((struct strbuf) { -1, -1, NULL});
@@ -106,7 +106,7 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 }
 
 int
-putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int flags)
+putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
 {
 	int ret;
 

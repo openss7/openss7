@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $
+ @(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/14 21:52:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/01/14 21:52:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/14 21:52:51 $"
 
-static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $";
+static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/14 21:52:51 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -68,7 +68,7 @@ static char const ident[] = "$RCSfile: putmsg.c,v $ $Name:  $($Revision: 0.9.2.3
  * This function is a thread cancellation point.
  */
 int
-putmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int flags)
+putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags)
 {
 	return putpmsg(fd, ctlptr, datptr, -1, flags);
 }
