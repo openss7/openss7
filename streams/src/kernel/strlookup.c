@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/02 12:09:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:38 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/02 12:09:39 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/01 12:04:38 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/02 12:09:39 $";
 
 #define __NO_VERSION__
 
@@ -905,6 +905,27 @@ struct devnode *node_find(const struct cdevsw *cdev, const char *name)
 }
 
 EXPORT_SYMBOL_GPL(node_find);
+
+/**
+ *  cdev_minor: - get extended minor number from kernel device type
+ *  @cdev: the cdevsw table entry for the device
+ *  @major: the external major device number
+ *  @minor: the external minor device number
+ */
+minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor)
+{
+	struct list_head *pos;
+	ensure(!cdev->d_majors.next || list_empty(&cdev->d_majors), return (minor));
+	list_for_each(pos, &cdev->d_majors) {
+		struct devinfo *devi = list_entry(pos, struct devinfo, di_list);
+		if (major == devi->major)
+			break;
+		minor += (1U << MINORBITS);
+	}
+	return (minor);
+}
+
+EXPORT_SYMBOL_GPL(cdev_minor);
 
 /*
  *  spec_dir_alloc: - allocate a specfs directory entry

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/02 05:55:09 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/02 12:09:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 05:55:09 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/02 05:55:09 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/02 12:09:39 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2004/06/02 05:55:09 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2004/06/02 12:09:39 $";
 
 #define __NO_VERSION__
 
@@ -89,6 +89,7 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
+#include "strargs.h"		/* for struct str_args */
 #include "sth.h"		/* for stream operations */
 #include "strsched.h"		/* for di_alloc and di_put */
 #include "strlookup.h"		/* cdevsw_list, etc. */
@@ -647,13 +648,13 @@ STATIC INLINE struct file *dentry_open2(struct dentry *dentry, struct vfsmount *
 }
 
 /**
- *  strm_open:	- open a stream from an external character special device,
+ *  spec_open:	- open a stream from an external character special device,
  *		fifo, or socket.  This is also used for nesting clone calls.
  *  @ext_inode:	external (or chaining) filesystem inode
  *  @ext_file:	external (or chaining) filesystem file pointer (user file pointer)
  *  @argp:	arguments to qopen
  */
-int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *argp)
+int spec_open(struct inode *ext_inode, struct file *ext_file)
 {
 	struct dentry *parent, *dentry = NULL;
 	struct file *file;		/* next file pointer to use */
@@ -661,6 +662,7 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
 	int err;
 	struct cdevsw *cdev;
 	struct devnode *node;
+	struct str_args *argp = file->private_data;
 	err = ENXIO;
 	if (!(cdev = cdrv_get(getmajor(argp->dev))))
 		goto exit;
@@ -717,5 +719,5 @@ int strm_open(struct inode *ext_inode, struct file *ext_file, struct str_args *a
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || CONFIG_STREAMS_CLONE_MODULE || CONFIG_STREAMS_NSDEV_MODULE
-EXPORT_SYMBOL_GPL(strm_open);
+EXPORT_SYMBOL_GPL(spec_open);
 #endif

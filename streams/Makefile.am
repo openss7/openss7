@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2004/06/01 12:03:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2004/06/02 12:09:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/01 12:03:53 $ by $Author: brian $
+# Last Modified $Date: 2004/06/02 12:09:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -184,7 +184,6 @@ libLfSdrivers_a_SOURCES		= \
 				src/drivers/clone.c \
 				src/drivers/fifo.c \
 				src/drivers/fifo.h \
-				src/drivers/nsdev.c \
 				src/drivers/pipe.c \
 				src/drivers/pipe.h \
 				include/log.h \
@@ -193,6 +192,7 @@ libLfSdrivers_a_SOURCES		= \
 				include/sys/strlog.h \
 				src/drivers/log.h \
 				src/drivers/log.c
+#				src/drivers/nsdev.c
 #				src/drivers/sfx.c
 #				src/drivers/spx.c
 
@@ -503,6 +503,7 @@ EXPORT_SRCFILES = \
 	src/compat/sun/suncompat.c \
 	src/compat/svr4/svr4compat.c \
 	src/compat/uw7/uw7compat.c \
+	src/drivers/clone.c \
 	src/kernel/strattach.c \
 	src/kernel/strlookup.c \
 	src/kernel/strpipe.c \
@@ -523,6 +524,7 @@ EXPORT_VERFILES = \
 	include/sys/streams/versions/suncompat.ver \
 	include/sys/streams/versions/svr4compat.ver \
 	include/sys/streams/versions/uw7compat.ver \
+	include/sys/streams/versions/clone.ver \
 	include/sys/streams/versions/strattach.ver \
 	include/sys/streams/versions/strlookup.ver \
 	include/sys/streams/versions/strpipe.ver \

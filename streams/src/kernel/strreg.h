@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/06/02 12:09:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,15 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRREG_H__
 #define __LOCAL_STRREG_H__
 
-#include "strargs.h"
-
-extern int strm_open(struct inode *i, struct file *f, struct str_args *argp);
+extern int spec_open(struct inode *i, struct file *f);
 
 #endif				/* __LOCAL_STRREG_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/02 05:55:10 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $";
 
 //#define __NO_VERSION__
 
@@ -87,7 +87,8 @@ static char const ident[] =
 #include "strdebug.h"
 #include "strsched.h"		/* for allocsd */
 #include "strargs.h"		/* for str_args */
-#include "strreg.h"		/* for strm_open() */
+#include "strreg.h"		/* for spec_open() */
+#include "strlookup.h"		/* for node_search() */
 #include "sth.h"		/* extern verification */
 #include "strsysctl.h"		/* for sysctls */
 #include "strsad.h"		/* for autopush */
@@ -97,7 +98,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/06/02 05:55:10 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/06/02 12:09:42 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -172,6 +173,8 @@ struct streamtab str_info = {
 };
 
 #define stri_lookup(__f) ((struct stdata *)(__f)->private_data)
+
+STATIC struct vfsmount *specfs = NULL;
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1914,7 +1917,7 @@ int strmmap(struct file *file, struct vm_area_struct *vma)
  *  @inode: shadow special filesystem device inode
  *  @file: shadow special filesystem file pointer
  *
- *  stropen() can be called by strm_open() which was called on an extenal filesystem inode, or by
+ *  stropen() can be called by spec_open() which was called on an extenal filesystem inode, or by
  *  spec_dev_open() which was called on the internal shadow special filesystem inode.  Either way,
  *  the @file and @inode represented here are internal shadow special filesystem generated file and
  *  inode pointers.
@@ -2850,7 +2853,7 @@ static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd,
  */
 static int strpipe(int fds[2])
 {
-	return do_spipe(fds, specfs_mnt);	/* see strpipe.c */
+	return do_spipe(fds, specfs);	/* see strpipe.c */
 }
 
 /**
@@ -3419,45 +3422,69 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 STATIC int cdev_open(struct inode *inode, struct file *file)
 {
 	struct cdevsw *cdev = NULL;
-	int dflag, err;
+	struct devnode *node = NULL;
+	int err, inplace, sflag;
 	dev_t dev;
 	err = -ENXIO;
 	switch (inode->i_mode & S_IFMT) {
-		struct list_head *pos;
-		struct devnode *node;
 		major_t major;
 		minor_t minor;
 	case S_IFCHR:
 		major = MAJOR(kdev_t_to_nr(inode->i_rdev));
+		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 		if (!(cdev = cdev_get(major)))
 			goto exit;
-		minor = MINOR(kdev_t_to_nr(inode->i_rdev));
-		/* calculate internal minor device number */
-		ensure(!cdev->d_majors.next || list_empty(&cdev->d_majors), goto exit);
-		list_for_each(pos, &cdev->d_majors) {
-			struct devinfo *devi = list_entry(pos, struct devinfo, di_list);
-			if (major == devi->major)
-				break;
-			minor += (1U << MINORBITS);
-		}
-		dflag = cdev->d_flag;
+		minor = cdev_minor(cdev, major, minor);
 		/* if we have a specified minor, use its device flags */
 		/* this is what allows us to mark minor device nodes as clone nodes */
-		if ((node = node_search(cdev, minor)))
-			dflag = node->n_flag;
+		sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+		if ((node = node_get(cdev, minor)))
+			sflag = (node->n_flag & D_CLONE) ? CLONEOPEN : sflag;
 		dev = makedevice(cdev->d_modid, minor);
+		switch (cdev->d_modid) {
+#if defined CONFIG_STREAMS_FIFO_MODID || defined CONFIG_STREAMS_SOCK_MODID
+#ifdef CONFIG_STREAMS_FIFO_MODID
+		case CONFIG_STREAMS_FIFO_MODID:
+#endif
+#ifdef CONFIG_STREAMS_SOCK_MODID
+		case CONFIG_STREAMS_SOCK_MODID:
+#endif
+			inplace = 1;
+			break;
+#endif
+#ifdef CONFIG_STREAMS_CLONE_MODID
+		case CONFIG_STREAMS_CLONE_MODID:
+		{
+			struct cdevsw *c;
+			/* One additional thing that needs to be done for a clone character device
+			   is to convert the device minor number (treated as an external characeter
+			   device major number, into an internal module id */
+			err = -ENXIO;
+			if (!(c = cdev_get(getminor(dev))))
+				goto cput_exit;
+			dev = makedevice(cdev->d_modid, c->d_modid);
+			inplace = 0;
+			break;
+		}
+#endif
+		default:
+			inplace = 0;
+			break;
+		}
 		break;
 	case S_IFIFO:
 		if (!(cdev = cdev_find("fifo")))
 			goto exit;
-		dflag = cdev->d_flag | D_CLONE;	/* in case driver forgot to set */
 		dev = makedevice(cdev->d_modid, 0);
+		sflag = CLONEOPEN;
+		inplace = 1;
 		break;
 	case S_IFSOCK:
 		if (!(cdev = cdev_find("sock")))
 			goto exit;
-		dflag = cdev->d_flag | D_CLONE;	/* in case driver forgot to set */
 		dev = makedevice(cdev->d_modid, 0);
+		sflag = CLONEOPEN;
+		inplace = 1;
 		break;
 	default:
 		goto exit;
@@ -3465,18 +3492,37 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	err = -EIO;
 	if (cdev->d_fop && cdev->d_fop->open) {
 		struct str_args args;
-		args.mnt = specfs_mnt;
 		args.inode = inode;
 		args.file = file;
 		args.dev = dev;
-		args.name.name = args.buf;
-		args.name.len = snprintf(args.buf, sizeof(args.buf), "%lu", args.dev);
-		args.name.hash = args.dev;
 		args.oflag = make_oflag(file);
-		args.sflag = (dflag & D_CLONE) ? CLONEOPEN : DRVOPEN;
+		args.sflag = sflag;
 		args.crp = current_creds;
-		err = strm_open(inode, file, &args);
+		if (inplace) {
+			/* fifo, sock and clone nodes are opened in place in the external
+			   filesystem */
+			void *old_data = file->private_data;
+			args.mnt = file->f_vfsmnt;
+			args.name.name = file->f_dentry->d_name.name;
+			args.name.len = file->f_dentry->d_name.len;
+			args.name.hash = file->f_dentry->d_name.hash;
+			fops_put(xchg(&file->f_op, fops_get(cdev->d_fop)));
+			file->private_data = &args;
+			err = file->f_op->open(inode, file);
+			file->private_data = old_data;
+		} else {
+			/* this is an out of place open */
+			void *old_data = file->private_data;
+			args.mnt = specfs;
+			args.name.name = args.buf;
+			args.name.len = snprintf(args.buf, sizeof(args.buf), "%lu", args.dev);
+			args.name.hash = args.dev;
+			file->private_data = &args;
+			err = spec_open(inode, file);
+			file->private_data = old_data;
+		}
 	}
+      cput_exit:
 	cdev_put(cdev);
       exit:
 	return (err);
@@ -3531,27 +3577,27 @@ STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
  */
 int register_strdev(struct cdevsw *cdev, major_t major)
 {
-	int result;
+	int err;
 	struct devinfo *devi;
-	if ((result = register_strdrv(cdev, specfs_mnt)) < 0 && result != -EBUSY)
+	if ((err = register_strdrv(cdev, specfs)) < 0 && err != -EBUSY)
 		goto no_strdrv;
 	if (!(devi = di_alloc(cdev))) {
-		result = -ENOMEM;
+		err = -ENOMEM;
 		goto no_devi;
 	}
 	if (!cdev->d_fop)
 		cdev->d_fop = &strm_f_ops;
 	if (!(cdev->d_mode & S_IFMT))
 		cdev->d_mode = (cdev->d_mode & ~S_IFMT) | S_IFCHR;
-	if ((result = register_cmajor(cdev, devi, major, &cdev_f_ops)) < 0)
+	if ((err = register_cmajor(cdev, devi, major, &cdev_f_ops)) < 0)
 		goto no_cmajor;
-	return (result);
+	return (err);
       no_cmajor:
 	di_put(devi);
       no_devi:
-	unregister_strdrv(cdev, specfs_mnt);
+	unregister_strdrv(cdev, specfs);
       no_strdrv:
-	return (result);
+	return (err);
 }
 
 EXPORT_SYMBOL_GPL(register_strdev);
@@ -3596,7 +3642,7 @@ int unregister_strdev(struct cdevsw *cdev, major_t major)
 	if ((err = unregister_cmajor(cdev, devi, major)) < 0)
 		return (err);
 	di_put(devi);
-	if ((err = unregister_strdrv(cdev, specfs_mnt)) < 0 && err != -EBUSY)
+	if ((err = unregister_strdrv(cdev, specfs)) < 0 && err != -EBUSY)
 		return (err);
 	return (0);
 }
@@ -3625,8 +3671,6 @@ static struct fmodsw sth_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-struct vfsmount *specfs_mnt = NULL;
-
 /* bleedin' mercy! */
 static inline void put_filesystem(struct file_system_type *fs)
 {
@@ -3652,8 +3696,8 @@ int __init sth_init(void)
 		result = -ENODEV;
 		goto no_fstype;
 	}
-	if (IS_ERR(specfs_mnt = kern_mount(fstype))) {
-		result = PTR_ERR(specfs_mnt);
+	if (IS_ERR(specfs = kern_mount(fstype))) {
+		result = PTR_ERR(specfs);
 		goto no_mount;
 	}
 	put_filesystem(fstype);
@@ -3668,7 +3712,7 @@ int __init sth_init(void)
 
 void __exit sth_exit(void)
 {
-	kern_umount(specfs_mnt);
+	kern_umount(specfs);
 	unregister_strmod(&sth_fmod);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/06/01 12:04:43 $
+ @(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/06/02 12:09:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:43 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:42 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -82,8 +82,6 @@ extern struct smodule_info str_minfo;	/* for strsysctl.c */
 
 extern int strrput(queue_t *q, mblk_t *mp);
 extern int strwsrv(queue_t *q);
-
-extern struct vfsmount *specfs_mnt;
 
 extern int sth_init(void);
 extern void sth_exit(void);

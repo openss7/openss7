@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:34 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -79,12 +79,13 @@ static char const ident[] =
 
 #include "sys/config.h"
 #include "strdebug.h"
-#include "strreg.h"	    /* for strm_open() */
+#include "strargs.h"	    /* for struct str_args */
+#include "strreg.h"	    /* for spec_open() */
 #include "sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/06/01 12:04:34 $"
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/02 12:09:37 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -154,7 +155,7 @@ static struct streamtab nsdev_info = {
  *  @file:	shadow special filesystem file pointer to open
  *
  *  This is rather simple.  We are going to do a redirected open on the a new device with the major
- *  device number mapped according to name.  We do this by nesting another strm_open() inside the
+ *  device number mapped according to name.  We do this by nesting another spec_open() inside the
  *  first one with an adjusted device number. It helps that the orginal file pointer is stored with
  *  the args passed as private_data attached to the current file pointer.  We use this to find the
  *  original file pointer and dentry and get the name of the opened file.
@@ -182,7 +183,7 @@ static int nsdevopen(struct inode *inode, struct file *file)
 	// argp->sflag = argp->sflag;
 	// argp->crp = argp->crp;
 	cdev_put(cdev);
-	return strm_open(inode, file, argp);
+	return spec_open(inode, file);
 }
 
 struct file_operations nsdev_f_ops ____cacheline_aligned = {

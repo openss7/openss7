@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/01 12:04:39 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/02 12:09:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/01 12:04:39 $ by $Author: brian $
+ Last Modified $Date: 2004/06/02 12:09:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/01 12:04:39 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/02 12:09:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/06/01 12:04:39 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/06/02 12:09:39 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -264,7 +264,7 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);	/* strsysctl.h */
 
 //EXPORT_SYMBOL_GPL(specfs_mnt);	/* strspecfs.h */
-//EXPORT_SYMBOL_GPL(strm_open);	/* strspecfs.h */
+//EXPORT_SYMBOL_GPL(spec_open);	/* strspecfs.h */
 
 #if	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
 	defined(CONFIG_STREAMS_SC_MODULE)
