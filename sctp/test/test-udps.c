@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/24 08:00:50 $
+ @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/18 04:34:32 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/24 08:00:50 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/18 04:34:32 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/24 08:00:50 $"
+#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/18 04:34:32 $"
 
 static char const ident[] =
-    "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/12/24 08:00:50 $";
+    "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/18 04:34:32 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -307,6 +307,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -320,6 +321,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -343,6 +345,8 @@ Options:\n\
         Prints this usage message and exists\n\
     -V, --version\n\
         Prints the version and exits\n\
+    -C, --copying\n\
+	Prints copyright and copying information and exits\n\
 ", argv[0], MSG_LEN);
 }
 
@@ -373,13 +377,14 @@ main(int argc, char **argv)
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l:r:p:t:qvhV?");
+		c = getopt(argc, argv, "l:r:p:t:qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -419,6 +424,9 @@ main(int argc, char **argv)
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			splash(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -431,7 +439,6 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}

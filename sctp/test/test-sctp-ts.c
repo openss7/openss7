@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/12/24 08:00:50 $
+ @(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/18 04:34:31 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/24 08:00:50 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/18 04:34:31 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/12/24 08:00:50 $"
+#ident "@(#) $RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/18 04:34:31 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/12/24 08:00:50 $";
+    "$RCSfile: test-sctp-ts.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/18 04:34:31 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -122,7 +122,6 @@ start_timer(void)
 }
 
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
-static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
 int len = MSG_LEN;
 
@@ -336,6 +335,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -349,6 +349,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -372,6 +373,8 @@ Options:\n\
         Prints this usage message and exists\n\
     -V, --version\n\
         Prints the version and exits\n\
+    -C, --copying\n\
+	Prints copyright and copying information and exits\n\
 ", argv[0], MSG_LEN);
 }
 
@@ -380,7 +383,6 @@ main(int argc, char **argv)
 {
 	char *hostl = "0.0.0.0";
 	char hostbufl[HOST_BUF_LEN];
-	char hostbufr[HOST_BUF_LEN];
 	char **hostlp = &hostl;
 	short port = 10000;
 	int time;
@@ -400,13 +402,14 @@ main(int argc, char **argv)
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
 			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l:r:t:hp:w:n", long_options, &option_index);
+		c = getopt_long(argc, argv, "l:r:t:p:w:nqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l:r:p:t:qvhV?");
+		c = getopt(argc, argv, "l:r:p:t:qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -449,6 +452,9 @@ main(int argc, char **argv)
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			splash(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -461,7 +467,6 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
