@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/03/14 01:22:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2005/03/16 05:47:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/14 01:22:30 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 05:47:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -379,23 +379,17 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
-				util/init/strace.sh \
-				util/init/streams.sh \
-				util/init/strerr.sh
+				util/init/streams.sh
 
 else
 
 dist_initrd_SCRIPTS		= \
-				util/init/strace \
-				util/init/streams \
-				util/init/strerr
+				util/init/streams
 
 endif
 
 dist_config_DATA		= \
-				util/sysconfig/strace \
-				util/sysconfig/streams \
-				util/sysconfig/strerr
+				util/sysconfig/streams
 
 dist_sysconf_DATA		+= \
 				util/sysconfig/streams.conf

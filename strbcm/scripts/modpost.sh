@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/05 11:08:50 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/16 05:47:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/05 11:08:50 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 05:47:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/05 11:08:50 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/16 05:47:24 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -899,6 +899,17 @@ read_map() {
 	    esac
 	fi
     done
+    #
+    # trick for adding struct_module version (get rid of tainting)
+    #
+    undef='struct_module'
+    eval "mod_${token}_undefs=\"\$mod_${token}_undefs $undef\""
+    case " $(eval '$ECHO "$undef_'${undef}'_names"') " in
+	(*" $name "*) ;;
+	(*) eval "undef_${undef}_names=\"\$undef_${undef}_names $name\"" ;;
+    esac
+    eval "((undef_${token}_count++))"
+    eval "((undef_count++))"
     command_info "processed $count symbols"
 }
 

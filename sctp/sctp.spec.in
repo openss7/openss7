@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/03/15 10:41:50 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/03/16 11:58:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/15 10:41:50 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:58:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,22 +98,12 @@
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%global BUILD_tools   1}}
 
-%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
-
 %if %{BUILD_tools}
 %global BUILD_libs    0
-%global BUILD_devs    %newrpm
-%global MAKE_devs     %oldrpm
 %else
 %global BUILD_libs    0
-%global BUILD_devs    0
-%global MAKE_devs     0
 %endif
 
-%global _streams lis
-%global _ksubdir lis
-%global _kmodext lis
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
@@ -124,7 +114,7 @@
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
 
-Summary:        %{title}
+Summary:        %{title} for Linux
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
@@ -143,7 +133,7 @@ Icon:           %{_gif_icon}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
-Source:         ftp://ftp.openss7.org/pub/linux/src/%{name}/%{name}-%{version}.tar.bz2
+Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      sctp
@@ -859,7 +849,7 @@ if [ $1 = 1 ] ; then
 #   this is the end of a fresh install, add init scripts if we have chkconfig
     if which chkconfig >/dev/null 2>&1 ; then
         list='%{initfiles}' ; for i in $list ; do
-            chkconfig -add $i || :
+            chkconfig --add $i || :
         done
     fi
 fi
@@ -870,7 +860,7 @@ if [ $1 = 0 ] ; then
 #   uninstalling for good, remove init scripts if we have chkconfig
     if which chkconfig >/dev/null 2>&1 ; then
         list='%{initfiles}' ; for i in $list ; do
-            chkconfig -del $i || :
+            chkconfig --del $i || :
         done
     fi
 fi
@@ -892,12 +882,24 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.36  2005/03/15 10:41:50  brian
-# - Updated changelog and a few inconsistencies.
+# Revision 0.9.2.39  2005/03/16 11:58:33  brian
+# - enhance devfs support
 #
-# Revision 1.36  2005/03/15 10:41:50  brian
-# - Updated changelog and a few inconsistencies.
+# Revision 1.39  2005/03/16 11:58:33  brian
+# - enhance devfs support
 #
+
+* Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.38  2005/03/16 10:48:42  brian
+- straighten out devfs and get source urls correct
+
+* Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.37  2005/03/16 05:46:35  brian
+- correction to chkconfig arguments
+
+* Tue Mar 15 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.36  2005/03/15 10:41:50  brian
+- Updated changelog and a few inconsistencies.
 
 * Wed Mar  9 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.35  2005/03/09 12:14:21  brian

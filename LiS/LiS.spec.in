@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.3 $) $Date: 2005/03/15 10:41:49 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2005/03/16 11:58:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/15 10:41:49 $ by $Author: brian $
+# Last Modified $Date: 2005/03/16 11:58:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,11 +92,21 @@
 %global have_libraries %{?libraries:1}%{!?libraries:0}
 %global have_preloads %{?preloads:1}%{!?preloads:0}
 
+%if %{without_ko_modules}
+# assume devs for older kernels
+%global NEED_devs     1
+%else
+# assume no devs for newer kernels
+%global NEED_devs     0
+%endif
+
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
+%{?_without_devfs:   %{expand: %%global NEED_devs     1}}
 %{?_without_modules: %{expand: %%global BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%global BUILD_tools   0}}
+%{?_with_devfs:      %{expand: %%global NEED_devs     0}}
 %{?_with_modules:    %{expand: %%global BUILD_modules 1}}
 %{?_with_tools:      %{expand: %%global BUILD_tools   1}}
 
@@ -105,8 +115,13 @@
 
 %if %{BUILD_tools}
 %global BUILD_libs    1
+%if %{NEED_devs}
 %global BUILD_devs    %newrpm
 %global MAKE_devs     %oldrpm
+%else
+%global BUILD_devs    0
+%global MAKE_devs     0
+%endif
 %else
 %global BUILD_libs    0
 %global BUILD_devs    0
@@ -294,6 +309,8 @@ fi
     %{?_without_k_safe:          '%disable %_without_k_safe'} \
     %{?_with_k_inline:           '%enable %_with_k_inline'} \
     %{?_without_k_inline:        '%disable %_without_k_inline'} \
+    %{?_with_devfs:              '%enable %_with_devfs'} \
+    %{?_without_devfs:           '%disable %_without_devfs'} \
     %{?_with_tools:              '%enable %_with_tools'} \
     %{?_without_tools:           '%disable %_without_tools'} \
     %{?_with_modules:            '%enable %_with_modules'} \
@@ -630,14 +647,20 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 fi
 
 %if %{BUILD_modules}
+%if %{without_ko_modules}
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir /%{_lib}/modules/%{kernel_version}/%{base}
-%if %{without_ko_modules}
 %attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
-%endif
 /%{_lib}/modules/%{kernel_version}/%{base}/*
+%else
+%files %{core_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir /%{_lib}/modules/%{kernel_version}/%{base}
+/%{_lib}/modules/%{kernel_version}/%{base}/*
+%endif
 %endif
 
 # ===========================================================================
@@ -696,21 +719,23 @@ Release:        %{fullrelease}
 %description dev
 The %{name}-dev package contains the device definitions necessary to run
 applications programs and utilities developed for %{title}.
-The package is optional, particularly for devfsd based systems.
+The package is not required for devfs based systems.
 
 %if %{MAKE_devs}
 %post dev
-#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing
-#   rootless builds because they have no %%dev macro, so in that case we just run the makenodes
-#   program that was generated in the build to create devices.
+#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of
+#   doing rootless builds because they have no %%dev macro, so in that case we
+#   just run the makenodes program that was generated in the build to create
+#   devices.
 if [ $1 = 0 ] ; then
     /usr/sbin/@STRMAKENODES@
 fi
 
 %preun dev
-#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing
-#   rootless builds because they have no %%dev macro, so in that case we just run the makenodes
-#   program that was generated in the build to create devices.
+#   older rpm versions < 4.0 (such as those used by SuSE) are not capable of
+#   doing rootless builds because they have no %%dev macro, so in that case we
+#   just run the makenodes program that was generated in the build to create
+#   devices.
 if [ $1 = 0 ] ; then
     /usr/sbin/@STRMAKENODES@ --remove
 fi
@@ -1005,7 +1030,7 @@ if [ $1 = 1 ] ; then
 #   this is the end of a fresh install, add init scripts if we have chkconfig
     if which chkconfig >/dev/null 2>&1 ; then
         list='%{initfiles}' ; for i in $list ; do
-            chkconfig -add $i || :
+            chkconfig --add $i || :
         done
     fi
 fi
@@ -1016,7 +1041,7 @@ if [ $1 = 0 ] ; then
 #   uninstalling for good, remove init scripts if we have chkconfig
     if which chkconfig >/dev/null 2>&1 ; then
         list='%{initfiles}' ; for i in $list ; do
-            chkconfig -del $i || :
+            chkconfig --del $i || :
         done
     fi
 fi
@@ -1039,9 +1064,21 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.3  2005/03/15 10:41:49  brian
-# - Updated changelog and a few inconsistencies.
+# Revision 1.1.6.6  2005/03/16 11:58:23  brian
+# - enhance devfs support
 #
+
+* Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.5  2005/03/16 10:48:37  brian
+- straighten out devfs and get source urls correct
+
+* Wed Mar 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.4  2005/03/16 05:46:55  brian
+- correction to chkconfig arguments
+
+* Tue Mar 15 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.3  2005/03/15 10:41:49  brian
+- Updated changelog and a few inconsistencies.
 
 * Mon Mar 14 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.2  2005/03/14 01:22:12  brian
