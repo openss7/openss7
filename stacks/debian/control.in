@@ -1,0 +1,105 @@
+Source: @PACKAGE@-@PACKAGE_VERSION@.@PACKAGE_RELEASE@
+Section: devel
+Priority: optional
+Maintainer: Brian Bidulock <bidulock@openss7.org>
+Standards-Version: 3.5.6.1
+
+Package: @PACKAGE@-LiS-core-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-LiS-core @PACKAGE@-LiS-core-@VERSION@
+Conflicts: streams-core @PACKAGE@-streams-core
+Description: This package contains the kernel modules that provide the Linux kernel @PACKAGE_STITLE@
+ LiS STREAMS drivers and modules.  This also includes assorted drivers and modules for additional
+ protocol stacks such as INET.
+ .
+ This package is heavily tied to the kernel for which it and the LiS STREAMS facility was compiled.
+ This package applies to kernel version @PACKAGE_KVERSION@ and requires an LiS STREAMS package
+ compiled for the same kernel.
+
+Package: @PACKAGE@-streams-core-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-streams-core @PACKAGE@-streams-core-@VERSION@
+Conflicts: LiS-core @PACKAGE@-LiS-core
+Description: This package contains the kernel modules that provide the Linux kernel @PACKAGE_STITLE@
+ LfS STREAMS drivers and modules.  This also includes assorted drivers and modules for additional
+ protocol stacks such as INET.
+ .
+ This package is heavily tied to the kernel for which it and the LfS STREAMS facility was compiled.
+ This package applies to kernel version @PACKAGE_KVERSION@ and requires an LfS STREAMS package
+ compiled for the same kernel.
+
+Package: @PACKAGE@-LiS-lib-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-lib
+Description: This package contains the run-time shared libraries necessary to run applications
+ programs and utilities developed for OpenSS7 LiS STREAMS @PACKAGE_STITLE@.
+
+Package: @PACKAGE@-streams-lib-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-lib
+Description: This package contains the run-time shared libraries necessary to run applications
+ programs and utilities developed for OpenSS7 LfS STREAMS @PACKAGE_STITLE@.
+
+Package: @PACKAGE@-LiS-util-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-LiS-util
+Conflicts: @PACKAGE@-streams-util
+Description: This package provides adminstrative and configuration test utilities and commands
+ associated with the OpenSS7 LiS STREAMS @PACKAGE_STITLE@ package.  It also includes necessary init
+ scripts and configuration files.
+
+Package: @PACKAGE@-streams-util-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-streams-util
+Conflicts: @PACKAGE@-LiS-util
+Description: This package provides adminstrative and configuration test utilities and commands
+ associated with the OpenSS7 LfS STREAMS @PACKAGE_STITLE@ package.  It also includes necessary init
+ scripts and configuration files.
+
+Package: @PACKAGE@-devel-@VERSION@
+Architecture: any
+Section: devel
+Priority: optional
+Provides: @PACKAGE@-devel
+Description: This package contains library archives for static compilation, and headers files to
+ develop OpenSS7 LiS or LfS STREAMS @PACKAGE_STITLE@ modules and drivers.  This also includes the
+ header files and static libraries required to compile OpenSS7 LiS or LfS STREAMS @PACKAGE_STITLE@
+ applications programs.  In addition it contains all of the manual pages necessary for developing
+ OpenSS7 LiS or LfS STREAMS @PACKAGE_STITLE@ application programs.
+
+Package: @PACKAGE@-dev-@VERSION@
+Architecture: all
+Section: base
+Priority: optional
+Provides: @PACKAGE@-dev
+Description: This package contains the device definitions necessary to run applications programs and
+ utilities developed for OpenSS7 LiS or LfS STREAMS @PACKAGE_STITLE@.
+
+Package: @PACKAGE@-doc-@VERSION@
+Architecture: all
+Section: doc
+Priority: optional
+Provides: @PACKAGE@-doc
+Description: This package contains html documentation for the development of OpenSS7 LiS or LfS
+ STREAMS @PACKAGE_STITLE@ applications, modules and drivers.
+
+Package: @PACKAGE@-source-@VERSION@
+Architecture: all
+Section: devel
+Priority: optional
+Provides: @PACKAGE@-source
+Description: This package contains the source code necessary for building the @PACKAGE@ release.  It
+ includes the autoconf configuration utilities necessary to create and distribute this dpkg.
+

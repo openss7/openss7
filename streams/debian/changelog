@@ -1,4 +1,4 @@
-streams-0.7a (3) experimental; urgency=low
+streams-0.7a.3 (0) experimental; urgency=low
 
   * Initial stab at debian build system.
 

@@ -1,0 +1,50 @@
+Source: @PACKAGE@-@PACKAGE_VERSION@.@PACKAGE_RELEASE@
+Section: devel
+Priority: optional
+Maintainer: Brian Bidulock <bidulock@openss7.org>
+Standards-Version: 3.5.6.1
+
+Package: @PACKAGE@-core-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-core, @PACKAGE@-core-@VERSION@
+Description: This package contains the kernel modules that provide the Linux kernel @PACKAGE_STITLE@
+ Linux/BSD NET4 protocol modules.  This package is heavily tied to the kernel for which it was
+ compiled.  This package applies to kernel version @PACKAGE_KVERSION@.
+
+Package: @PACKAGE@-util-@VERSION@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE@-util
+Description: This package provides adminstrative and configuration test utilities and commands
+ associated with the @PACKAGE_TITLE@ package.  It also includes necessary init scripts and
+ configuration files.
+
+Package: @PACKAGE@-devel-@VERSION@
+Architecture: any
+Section: devel
+Priority: optional
+Provides: @PACKAGE@-devel
+Description: This package contains library archives for static compilation, and headers files to
+ develop @PACKAGE_TITLE@ applications.  This also includes the header files and static libraries
+ required to compile @PACKAGE_TITLE@ applications programs.  In addition it contains all of the
+ manual pages necessary for developing @PACKAGE_TITLE@ application programs.
+
+Package: @PACKAGE@-doc-@VERSION@
+Architecture: all
+Section: doc
+Priority: optional
+Provides: @PACKAGE@-doc
+Description: This package contains html documentation for the development of @PACKAGE@ applications,
+ modules and drivers.
+
+Package: @PACKAGE@-source-@VERSION@
+Architecture: all
+Section: devel
+Priority: optional
+Provides: @PACKAGE@-source
+Description: This package contains the source code necessary for building the @PACKAGE@ release.  It
+ includes the autoconf configuration utilities necessary to create and distribute this dpkg.
+

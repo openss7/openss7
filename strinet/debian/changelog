@@ -1,4 +1,4 @@
-sctp-0.2.20.1 (0) experimental; urgency=low
+strinet-0.9.2.1 (0) experimental; urgency=low
 
   * Initial stab at debian build system.
 

@@ -1,0 +1,25 @@
+Source: @PACKAGE@-@PACKAGE_VERSION@.@PACKAGE_RELEASE@
+Section: devel
+Priority: optional
+Maintainer: Brian Bidulock <bidulock@openss7.org>
+Standards-Version: 3.5.6.1
+
+Package: @PACKAGE@-openss7-@VERSION@
+Architecture: any
+Section: devel
+Priority: optional
+Provides: @PACKAGE@-openss7, @PACKAGE@-openss7-@VERSION@
+Suggests: sctp-0.2.20-2
+Description: This package includes @PACKAGE@ test programs optioned and compiled for use with
+ OpenSS7 Linux Native SCTP sockets interface as well as OpenSS7 STREAMS socket library and socket
+ drivers.  The purpose of this package is to be able to perform comparison tests against TCP and
+ SCTP.  This distribution is currently only applicable to Linux release and was targetted at ix86
+ and ppc architectures, but should build and install for other architectures as well.
+
+Package: @PACKAGE@-doc-@VERSION@
+Architecture: all
+Section: doc
+Priority: optional
+Provides: @PACKAGE@-doc
+Description: This package contains html documentation for the development of @PACKAGE@ applications,
+ modules and drivers.
