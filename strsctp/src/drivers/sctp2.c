@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:32 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 11:44:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 11:04:32 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 11:44:03 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:32 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 11:44:03 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:32 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 11:44:03 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
 #endif
 
 #if !defined _LIS_SOURCE && !defined _LFS_SOURCE
@@ -136,11 +140,13 @@ struct sockaddr_storage {
 #include <sys/stream.h>
 #include <sys/dki.h>
 
-#ifdef LFS_SOURCE
+#ifdef LFS
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
 #endif
+#include <sys/ddi.h>
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
@@ -157,16 +163,13 @@ struct sockaddr_storage {
 
 #define T_ALLLEVELS -1UL
 
+#ifndef LFS
 #include "debug.h"
+#endif
 #include "bufq.h"
 
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
-
-#undef min			/* LiS should not have defined these */
-#define min lis_min
-#undef max			/* LiS should not have defined these */
-#define max lis_min
 
 #define sctp_daddr sctp_daddr__
 #define sctp_saddr sctp_saddr__
@@ -204,7 +207,7 @@ struct sockaddr_storage {
 
 #define SCTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/21 11:04:32 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 11:44:03 $"
 #define SCTP_DEVICE	"SVR 4.2 STREAMS (NPI/TPI) SCTP Driver (SCTP)"
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -1982,19 +1985,19 @@ STATIC void sctp_term_caches(void)
 {
 	if (sctp_sctp_cachep)
 		if (kmem_cache_destroy(sctp_sctp_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy sctp_sctp_cachep");
+			cmn_err(CE_WARN, "%s: did not destroy sctp_sctp_cachep", __FUNCTION__);
 	if (sctp_bind_cachep)
 		if (kmem_cache_destroy(sctp_bind_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy sctp_bind_cachep");
+			cmn_err(CE_WARN, "%s: did not destroy sctp_bind_cachep", __FUNCTION__);
 	if (sctp_dest_cachep)
 		if (kmem_cache_destroy(sctp_dest_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy sctp_dest_cachep");
+			cmn_err(CE_WARN, "%s: did not destroy sctp_dest_cachep", __FUNCTION__);
 	if (sctp_srce_cachep)
 		if (kmem_cache_destroy(sctp_srce_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy sctp_srce_cachep");
+			cmn_err(CE_WARN, "%s: did not destroy sctp_srce_cachep", __FUNCTION__);
 	if (sctp_strm_cachep)
 		if (kmem_cache_destroy(sctp_strm_cachep))
-			cmn_err(CE_WARN, "%s: did not destroy sctp_strm_cachep");
+			cmn_err(CE_WARN, "%s: did not destroy sctp_strm_cachep", __FUNCTION__);
 	return;
 }
 
@@ -11992,22 +11995,30 @@ STATIC int sctp_rsrv(queue_t *q)
  */
 
 #ifndef SCTP_N_DRV_NAME
-#   ifdef STREAMS_CONFIG_SCTP_N_NAME
-#	define SCTP_N_DRV_NAME STREAMS_CONFIG_SCTP_N_NAME
+#   ifdef CONFIG_STREAMS_SCTP_N_NAME
+#	define SCTP_N_DRV_NAME CONFIG_STREAMS_SCTP_N_NAME
 #   else
 #	define SCTP_N_DRV_NAME "sctp_n"
 #   endif
 #endif
 
-#ifndef SCTP_N_CMAJOR
-#   ifdef STREAMS_CONFIG_SCTP_N_MAJOR
-#	define SCTP_N_CMAJOR STREAMS_CONFIG_SCTP_N_MAJOR
+#ifndef SCTP_N_DRV_ID
+#   ifdef CONFIG_STREAMS_SCTP_N_MODID
+#	define SCTP_N_DRV_ID CONFIG_STREAMS_SCTP_N_MODID
 #   else
-#	define SCTP_N_CMAJOR 240
+#	define SCTP_N_DRV_ID 0
 #   endif
 #endif
 
-unsigned short n_major = SCTP_N_CMAJOR;
+#ifndef SCTP_N_CMAJOR_0
+#   ifdef CONFIG_STREAMS_SCTP_N_MAJOR
+#	define SCTP_N_CMAJOR_0 CONFIG_STREAMS_SCTP_N_MAJOR
+#   else
+#	define SCTP_N_CMAJOR_0 240
+#   endif
+#endif
+
+unsigned short n_major = SCTP_N_CMAJOR_0;
 MODULE_PARM(n_major, "h");
 MODULE_PARM_DESC(n_major, "Major device number for STREAMS SCTP NPI driver (0 for allocation).");
 
@@ -13730,7 +13741,7 @@ STATIC int sctp_n_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
-#ifdef _LFS_SOURCE
+#ifdef LFS
 /* 
  *  =========================================================================
  *
@@ -13747,7 +13758,7 @@ STATIC struct cdevsw sctp_n_cdev = {
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
-STATIC void sctp_t_init(void)
+STATIC int sctp_n_init(void)
 {
 	int err;
 	if ((err = register_strdev(&sctp_n_cdev, n_major)) < 0)
@@ -13759,9 +13770,9 @@ STATIC void sctp_n_term(void)
 {
 	unregister_strdev(&sctp_n_cdev, n_major);
 }
-#endif				/* _LFS_SOURCE */
+#endif				/* LFS */
 
-#ifdef _LIS_SOURCE
+#ifdef LIS
 /* 
  *  =========================================================================
  *
@@ -13787,7 +13798,7 @@ STATIC void sctp_n_term(void)
 		cmn_err(CE_PANIC, "%s: cannot unregister driver!\n", SCTP_N_DRV_NAME);
 	}
 }
-#endif				/* _LIS_SOURCE */
+#endif				/* LIS */
 
 /* 
  *  =========================================================================
@@ -13798,16 +13809,24 @@ STATIC void sctp_n_term(void)
  */
 
 #ifndef SCTP_T_DRV_NAME
-#   ifdef STREAMS_CONFIG_SCTP_T_NAME
-#	define SCTP_T_DRV_NAME STREAMS_CONFIG_SCTP_T_NAME
+#   ifdef CONFIG_STREAMS_SCTP_T_NAME
+#	define SCTP_T_DRV_NAME CONFIG_STREAMS_SCTP_T_NAME
 #   else
 #	define SCTP_T_DRV_NAME "sctp_t"
 #   endif
 #endif
 
+#ifndef SCTP_T_DRV_ID
+#   ifdef CONFIG_STREAMS_SCTP_T_MODID
+#	define SCTP_T_DRV_ID CONFIG_STREAMS_SCTP_T_MODID
+#   else
+#	define SCTP_T_DRV_ID 0
+#   endif
+#endif
+
 #ifndef SCTP_T_CMAJOR_0
-#   ifdef STREAMS_CONFIG_SCTP_T_MAJOR
-#	define SCTP_T_CMAJOR_0 STREAMS_CONFIG_SCTP_T_MAJOR
+#   ifdef CONFIG_STREAMS_SCTP_T_MAJOR
+#	define SCTP_T_CMAJOR_0 CONFIG_STREAMS_SCTP_T_MAJOR
 #   else
 #	define SCTP_T_CMAJOR_0 241
 #   endif
@@ -17556,7 +17575,7 @@ STATIC int sctp_t_close(queue_t *q, int flag, cred_t *crp)
 	return (0);
 }
 
-#ifdef _LFS_SOURCE
+#ifdef LFS
 /* 
  *  =========================================================================
  *
@@ -17565,14 +17584,14 @@ STATIC int sctp_t_close(queue_t *q, int flag, cred_t *crp)
  *  =========================================================================
  */
 STATIC struct cdevsw sctp_cdev = {
-	.d_name = SCTP_T_DRV_NAME;
-	.d_str = &sctp_info;
-	.d_flag = 0;
-	.d_fop = NULL;
-	.d_mode = S_IFCHR;
-	.d_kmod = THIS_MODULE;
+	.d_name = SCTP_T_DRV_NAME,
+	.d_str = &sctp_t_info,
+	.d_flag = 0,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
+	.d_kmod = THIS_MODULE,
 };
-STATIC void sctp_t_init(void)
+STATIC int sctp_t_init(void)
 {
 	int err;
 	if ((err = register_strdev(&sctp_cdev, SCTP_T_CMAJOR_0)) < 0)
@@ -17583,9 +17602,9 @@ STATIC void sctp_t_term(void)
 {
 	unregister_strdev(&sctp_cdev, SCTP_T_CMAJOR_0);
 }
-#endif				/* _LFS_SOURCE */
+#endif				/* LFS */
 
-#ifdef _LIS_SOURCE
+#ifdef LIS
 /* 
  *  =========================================================================
  *
@@ -17611,7 +17630,7 @@ STATIC void sctp_t_term(void)
 		cmn_err(CE_PANIC, "%s: cannot unregister driver!\n", SCTP_T_DRV_NAME);
 	}
 };
-#endif				/* _LIS_SOURCE */
+#endif				/* LIS */
 
 /* 
  *  =========================================================================

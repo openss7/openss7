@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.2 2004/08/22 22:08:21 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.3 2004/08/23 11:45:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 22:08:21 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 11:45:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/22 22:08:21 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 11:45:15 $"
 
 #undef  __never
 #define __never() \
@@ -122,105 +122,125 @@ do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LI
 #define __pswerr(__pkspec) \
 do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
+#define    _never()		do { } while(0)
+#define     _rare()		do { } while(0)
+#define   _seldom()		do { } while(0)
+#define    _usual(__exp)	do { } while(0)
+#define  _unusual(__exp)	do { } while(0)
+#define   _normal(__exp)	do { } while(0)
+#define _abnormal(__exp)	do { } while(0)
+#define   _assert(__exp)	do { } while(0)
+#define   _assure(__exp)	do { } while(0)
+#define   _ensure(__exp,__sta)	do { } while(0)
+#define   _unless(__exp,__sta)	do { } while(0)
+#define    _trace()		do { } while(0)
+#define   _ptrace(__pks)	do { } while(0)
+#define   _ctrace(__fnc)	(__fnc)
+#define    _fixme(__pks)	do { } while(0)
+#define     _todo(__pks)	do { } while(0)
+#define   _printd(__pks)	do { } while(0)
+#define    _swerr()		do { } while(0)
+#define   _pswerr(__pks)	do { } while(0)
+
 #if defined(CONFIG_STREAMS_DEBUG)
+
+#define    never()		__never()
+#define     rare()		__rare()
+#define   seldom()		__seldom()
+#define    usual(__exp)		__usual(__exp)
+#define  unusual(__exp)		__usual(!(__exp))
+#define   normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__normal(!(__exp))
+#define   assert(__exp)		__assert(__exp)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		__trace()
+#define   ptrace(__pks)		__ptrace(__pks)
+#define   ctrace(__fnc)		__ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		__printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
 
 #define STATIC
 #define INLINE
 
-#define   never()		__never()
-#define    rare()		__rare()
-#define  seldom()		__seldom()
-#define   usual(__exp)		__usual(__exp)
-#define unusual(__exp)		__usual(!(__exp))
-#define  normal(__exp)		__normal(__exp)
-#define abnormal(__exp)		__normal(!(__exp))
-#define  assert(__exp)		__assert(__exp)
-#define  assure(__exp)		__assure(__exp)
-#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__unless(__exp,__sta)
-#define   trace()		__trace()
-#define  ptrace(__pks)		__ptrace(__pks)
-#define  ctrace(__fnc)		__ctrace(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		__todo(__pks)
-#define  printd(__pks)		__printd(__pks)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
-
 #elif defined(CONFIG_STREAMS_TEST)
+
+#define    never()		__never()
+#define     rare()		__rare()
+#define   seldom()		__seldom()
+#define    usual(__exp)		__usual(__exp)
+#define  unusual(__exp)		__usual(!(__exp))
+#define   normal(__exp)		__normal(__exp)
+#define abnormal(__exp)		__normal(!(__exp))
+#define   assert(__exp)		__assert(__exp)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
 
 #define STATIC static
 #define INLINE inline
-
-#define   never()		__never()
-#define    rare()		__rare()
-#define  seldom()		__seldom()
-#define   usual(__exp)		__usual(__exp)
-#define unusual(__exp)		__usual(!(__exp))
-#define  normal(__exp)		__normal(__exp)
-#define abnormal(__exp)		__noemal(!(__exp))
-#define  assert(__exp)		__assert(__exp)
-#define  assure(__exp)		__assure(__exp)
-#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__unless(__exp,__sta)
-#define   trace()		do { } while(0)
-#define  ptrace(__pks)		do { } while(0)
-#define  ctrace(__fnc)		(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		__todo(__pks)
-#define  printd(__pks)		do { } while(0)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__pswerr(__pks)
 
 #elif defined(CONFIG_STREAMS_SAFE)
 
+#define    never()		do { *(int *)0 = 0; } while(0)
+#define     rare()		_rare()
+#define   seldom()		_seldom()
+#define    usual(__exp)		_usual(__exp)
+#define  unusual(__exp)		_unusual(__exp)
+#define   normal(__exp)		_normal(__exp)
+#define abnormal(__exp)		_abnormal(__exp)
+#define   assert(__exp)		{ if (!(__exp)) *(int *)0 = 0; } while(0)
+#define   assure(__exp)		__assure(__exp)
+#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
+#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		__todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
 #define STATIC static
 #define INLINE inline
-
-#define   never()		__never()
-#define    rare()		do { } while(0)
-#define  seldom()		do { } while(0)
-#define   usual(__exp)		do { } while(0)
-#define unusual(__exp)		do { } while(0)
-#define  normal(__exp)		do { } while(0)
-#define abnormal(__exp)		do { } while(0)
-#define  assert(__exp)		__assert(__exp)
-#define  assure(__exp)		__assure(__exp)
-#define  ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define  unless(__exp,__sta)	__unless(__exp,__sta)
-#define   trace()		do { } while(0)
-#define  ptrace(__pks)		do { } while(0)
-#define  ctrace(__fnc)		(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		__todo(__pks)
-#define  printd(__pks)		do { } while(0)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__swerr()
 
 #else
 
+#define    never()		_never()
+#define     rare()		_rare()
+#define   seldom()		_seldom()
+#define    usual(__exp)		_usual(__exp)
+#define  unusual(__exp)		_unusual(__exp)
+#define   normal(__exp)		_normal(__exp)
+#define abnormal(__exp)		_abnormal(__exp)
+#define   assert(__exp)		_assert(__exp)
+#define   assure(__exp)		_assure(__exp)
+#define   ensure(__exp,__sta)	_ensure(__exp,__sta)
+#define   unless(__exp,__sta)	_unless(__exp,__sta)
+#define    trace()		_trace()
+#define   ptrace(__pks)		_ptrace(__pks)
+#define   ctrace(__fnc)		_ctrace(__fnc)
+#define    fixme(__pks)		__fixme(__pks)
+#define     todo(__pks)		_todo(__pks)
+#define   printd(__pks)		_printd(__pks)
+#define    swerr()		__swerr()
+#define   pswerr(__pks)		__pswerr(__pks)
+
 #define STATIC static
 #define INLINE inline
-
-#define   never()		do { } while(0)
-#define	   rare()		do { } while(0)
-#define	 seldom()		do { } while(0)
-#define   usual(__exp)		do { } while(0)
-#define unusual(__exp)		do { } while(0)
-#define  normal(__exp)		do { } while(0)
-#define abnormal(__exp)		do { } while(0)
-#define  assert(__exp)		do { } while(0)
-#define  assure(__exp)		do { } while(0)
-#define  ensure(__exp,__sta)	do { } while(0)
-#define  unless(__exp,__sta)	do { } while(0)
-#define  trace()		do { } while(0)
-#define  ptrace(__pks)		do { } while(0)
-#define  ctrace(__fnc)		(__fnc)
-#define   fixme(__pks)		__fixme(__pks)
-#define    todo(__pks)		do { } while(0)
-#define  printd(__pks)		do { } while(0)
-#define   swerr()		__swerr()
-#define  pswerr(__pks)		__swerr()
 
 #endif
 

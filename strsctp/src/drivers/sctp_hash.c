@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:57 $
+ @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/23 11:44:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,28 +46,112 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:53:57 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 11:44:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:57 $"
+#ident "@(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/23 11:44:04 $"
 
-static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:57 $";
+static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/23 11:44:04 $";
 
 #define __NO_VERSION__
 
-#include <linux/config.h>
-#include <linux/version.h>
-#ifdef MODVERSIONS
-#include <linux/modversions.h>
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
 #endif
-#include <linux/module.h>
 
-#include <sys/stream.h>
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
+#   error ****
+#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error **** to compile the sctp driver.
+#   error ****
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	ifdef MODVERSIONS
+#	    include <linux/modversions.h>
+#	endif
+#	include <linux/module.h>
+#	include <linux/modversions.h>
+#	ifndef __GENKSYMS__
+#	    if defined HAVE_SYS_LIS_MODVERSIONS_H
+#		include <sys/LiS/modversions.h>
+#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#		include <sys/streams/modversions.h>
+#	    endif
+#	endif
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
+#	undef HAVE_OPENSS7_SCTP
+#   endif
+#endif
+
+#if defined HAVE_OPENSS7_SCTP
+#   define sctp_bind_bucket __sctp_bind_bucket
+#   define sctp_dup __sctp_dup
+#   define sctp_strm __sctp_strm
+#   define sctp_saddr __sctp_saddr
+#   define sctp_daddr __sctp_daddr
+#   define sctp_protolist __sctp_protolist
+#endif
+
+#if !defined HAVE_OPENSS7_SCTP
+#   undef sctp_addr
+#   define sctp_addr stupid_sctp_addr_in_the_wrong_place
+#endif
+
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+
+#if defined HAVE_OPENSS7_SCTP
+#   undef STATIC
+#   undef INLINE
+#   include <net/sctp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
+#define _SS_MAXSIZE     128
+#define _SS_ALIGNSIZE   (__alignof__ (struct sockaddr *))
+struct sockaddr_storage {
+        sa_family_t     ss_family;
+        char            __data[_SS_MAXSIZE - sizeof(sa_family_t)];
+} __attribute__ ((aligned(_SS_ALIGNSIZE)));
+#endif
+
+#include <sys/kmem.h>
 #include <sys/cmn_err.h>
+#include <sys/stream.h>
 #include <sys/dki.h>
 
+#ifdef LFS_SOURCE
+#include <sys/strconf.h>
+#include <sys/strsubr.h>
+#include <sys/strdebug.h>
+#include <sys/debug.h>
+#endif
+#include <sys/ddi.h>
+
+#ifndef LFS
 #include "debug.h"
+#endif
 #include "bufq.h"
 
 #include "sctp.h"
