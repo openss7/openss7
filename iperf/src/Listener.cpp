@@ -77,8 +77,10 @@
 #include "Listener.hpp" 
 #include "Server.hpp" 
 #include "Locale.hpp" 
-#include "Settings.hpp" 
-#include "PerfSocket.hpp" 
+#include "Audience.hpp"
+#include "List.h"
+#include "Speaker.hpp"
+#include "Client.hpp"
 #include "util.h" 
 
 
@@ -86,23 +88,16 @@
  * Stores local hostname and socket info. 
  * ------------------------------------------------------------------- */ 
 
-using namespace std; 
-vector<iperf_sockaddr> clients;
-Mutex clients_mutex; 
-
-Listener::Listener( short inPort, bool inUDP, const char *inLocalhost ) 
-: PerfSocket( inPort, inUDP ), 
+Listener::Listener( ext_Settings *inSettings ) 
+: PerfSocket( inSettings ), 
 Thread() {
-    mLocalhost = NULL; 
 
-    if ( inLocalhost != NULL ) {
-        mLocalhost = new char[ strlen( inLocalhost ) + 1 ]; 
-        strcpy( mLocalhost, inLocalhost ); 
-    }
+    mCount = ( inSettings->mThreads != 0 );
+    mClients = inSettings->mThreads;
 
     // open listening socket 
-    Listen( mLocalhost, gSettings->GetDomain() ); 
-    ReportServerSettings( inLocalhost ); 
+    Listen( inSettings->mLocalhost, mSettings->mDomain ); 
+    ReportServerSettings( inSettings->mLocalhost ); 
 
 } // end Listener 
 
@@ -110,22 +105,37 @@ Thread() {
  * Delete memory (hostname string). 
  * ------------------------------------------------------------------- */ 
 Listener::~Listener() {
-    DELETE_PTR( mLocalhost  ); 
+    DELETE_ARRAY( mSettings->mHost      );
+    DELETE_ARRAY( mSettings->mLocalhost );
+    DELETE_ARRAY( mSettings->mFileName  );
+    DELETE_ARRAY( mSettings->mOutputFileName );
+    DELETE_PTR( mSettings );
 } // end ~Listener 
 
 /* ------------------------------------------------------------------- 
  * Listens for connections and starts Servers to handle data. 
  * For TCP, each accepted connection spawns a Server thread. 
- * For UDP, handle all data in this thread. 
+ * For UDP, handle all data in this thread for Win32 Only, otherwise
+ *          spawn a new Server thread. 
  * ------------------------------------------------------------------- */ 
 void Listener::Run( void ) {
+    extern Mutex clients_mutex;
+    extern Iperf_ListEntry *clients;
 
-    struct UDP_datagram* mBuf_UDP  = (struct UDP_datagram*) mBuf; 
+    Audience *theAudience=NULL;
+    SocketAddr     *client = NULL;
+    if ( mSettings->mHost != NULL ) {
+        client = new SocketAddr( mSettings->mHost, mSettings->mPort, mSettings->mDomain );
+    }
+    ext_Settings *tempSettings = NULL;
+    iperf_sockaddr peer;
+    Iperf_ListEntry *exist, *listtemp;
+
     if ( mUDP ) {
+        struct UDP_datagram* mBuf_UDP  = (struct UDP_datagram*) mBuf;
+        client_hdr* hdr = (client_hdr*) (mBuf_UDP + 1);
         // UDP uses listening socket 
         // The server will now run as a multi-threaded server 
-        Server *theServer=NULL;
-        iperf_sockaddr peer; 
 
         // Accept each packet, 
         // If there is no existing client, then start  
@@ -134,60 +144,226 @@ void Listener::Run( void ) {
         // Thread per client model is followed 
         do {
             peer = Accept_UDP(); 
-
-            (clients_mutex).Lock(); 
-            bool exist = present(peer); 
-            (clients_mutex).Unlock(); 
+            if ( client != NULL ) {
+                if ( !SocketAddr::Hostare_Equal( client->get_sockaddr(), 
+                                                 (sockaddr*) &peer ) ) {
+                    continue;
+                }
+            }
+#ifdef HAVE_THREAD
+            clients_mutex.Lock(); 
+            exist = Iperf_present( &peer, clients); 
+            clients_mutex.Unlock(); 
             int32_t datagramID = ntohl( mBuf_UDP->id ); 
-            if ( !exist && datagramID >= 0 ) {
-                int rc = connect( mSock, (struct sockaddr*) &peer 
-                                  ,sizeof(peer)); 
+            if ( exist == NULL && datagramID >= 0 ) {
+                int rc = connect( mSock, (struct sockaddr*) &peer,
+                                  // Some OSes do not like the size of sockaddr_storage so we
+                                  // get more exact here..
+#ifndef IPV6
+                                  sizeof(sockaddr_in));
+#else
+                                  (((struct sockaddr*)&peer)->sa_family == AF_INET ? 
+                                   sizeof(sockaddr_in) : sizeof(sockaddr_in6)));
+#endif // IPV6
                 FAIL_errno( rc == SOCKET_ERROR, "connect UDP" );       
 #ifndef WIN32
-                (clients_mutex).Lock(); 
-                (clients).push_back(peer); 
-                (clients_mutex).Unlock(); 
-                theServer = new Server(mPort, mUDP, mSock); 
-                theServer->DeleteSelfAfterRun(); 
-                theServer->Start(); 
-                theServer = NULL; 
-                mSock = -1; 
-                Listen(mLocalhost, gSettings->GetDomain()); 
-            }
-#else /* WIN32 */ 
-                // WIN 32 Does not handle multiple UDP stream hosts.
-                theServer = new Server(mPort, mUDP, mSock); 
-                theServer->Run(); 
-                DELETE_PTR( theServer ); 
+                listtemp = new Iperf_ListEntry;
+                memcpy(listtemp, &peer, sizeof(peer));
+                listtemp->next = NULL;
+                clients_mutex.Lock(); 
+                exist = Iperf_hostpresent( &peer, clients); 
 
+                if ( exist != NULL ) {
+                    listtemp->holder = exist->holder;
+                    exist->holder->AddSocket(mSock);
+                } else {
+                    clients_mutex.Unlock();
+                    tempSettings = NULL;
+                    if ( !mSettings->mCompat ) {
+                        Settings::GenerateSpeakerSettings( mSettings, &tempSettings, 
+                                                           hdr, (sockaddr*) &peer );
+                    }
+
+                    theAudience = new Audience( mSettings, mSock ); 
+
+                    if ( tempSettings != NULL ) {
+                        Speaker *theSpeaker = new Speaker( tempSettings );
+                        theSpeaker->OwnSettings();
+                        theSpeaker->DeleteSelfAfterRun();
+                        if ( tempSettings->mMode == kTest_DualTest ) {
+                            theSpeaker->Start();
+                        } else {
+                            theAudience->StartWhenDone( theSpeaker );
+                        }
+                    }
+
+                    listtemp->holder = theAudience;
+
+                    // startup the server thread, then forget about it 
+                    theAudience->DeleteSelfAfterRun(); 
+                    theAudience->Start(); 
+                    theAudience = NULL; 
+                    clients_mutex.Lock(); 
+                }
+                Iperf_pushback( listtemp, &clients ); 
+                clients_mutex.Unlock(); 
+#else /* WIN32 */ 
+                tempSettings = NULL;
+                if ( !mSettings->mCompat ) {
+                    Settings::GenerateSpeakerSettings( mSettings, &tempSettings, 
+                                                       hdr, (sockaddr*) &peer );
+                }
+
+                bool startLate = false;
+                Speaker *theSpeaker = NULL;
+                if ( tempSettings != NULL ) {
+                    theSpeaker = new Speaker( tempSettings );
+                    theSpeaker->OwnSettings();
+                    theSpeaker->DeleteSelfAfterRun();
+                    if ( tempSettings->mMode == kTest_DualTest ) {
+                        theSpeaker->Start();
+                    } else {
+                        startLate = true;
+                    }
+                }
+                // WIN 32 Does not handle multiple UDP stream hosts.
+                Server *theServer=NULL;
+                theServer = new Server(mSettings, mSock); 
+                theServer->Run(); 
+                DELETE_PTR( theServer );
+                if ( startLate && theSpeaker != NULL ) {
+                    theSpeaker->Start();
+                    theSpeaker = NULL;
+                }
+
+#endif /* WIN32 */
+#else // HAVE_THREAD
+            {
+                tempSettings = NULL;
+                int rc = connect( mSock, (struct sockaddr*) &peer,
+                                  // Some OSes do not like the size of sockaddr_storage so we
+                                  // get more exact here..
+#ifndef IPV6
+                                  sizeof(sockaddr_in));
+#else
+                                  (((struct sockaddr*)&peer)->sa_family == AF_INET ? 
+                                   sizeof(sockaddr_in) : sizeof(sockaddr_in6)));
+#endif // IPV6
+                FAIL_errno( rc == SOCKET_ERROR, "connect UDP" );       
+                if ( !mSettings->mCompat ) {
+                    Settings::GenerateSpeakerSettings( mSettings, &tempSettings, 
+                                                        hdr, (sockaddr*) &peer );
+                }
+                Server *theServer=NULL;
+                
+                theServer = new Server(mSettings, mSock);
+                theServer->DeleteSelfAfterRun();
+                theServer->Start();
+    
+                if ( tempSettings != NULL ) {
+                    Client *theClient = NULL;
+                    theClient = new Client( tempSettings );
+                    theClient->DeleteSelfAfterRun();
+                    theClient->Start();
+                    theClient = NULL;
+                    DELETE_PTR( tempSettings );
+                }
+#endif // HAVE_THREAD
                 // create a new socket 
                 mSock = -1; 
-                Listen( mLocalhost, gSettings->GetDomain() ); 
+                Listen( mSettings->mLocalhost, mSettings->mDomain );
+                mClients--; 
             }
-#endif /* WIN32 */ 
-        } while ( true ); 
+        } while ( !mCount || ( mCount && mClients > 0 ) ); 
     } else {
         // TCP uses sockets returned from Accept 
+        client_hdr buf;
         int connected_sock; 
         do {
             connected_sock = Accept(); 
             if ( connected_sock >= 0 ) {
-                // startup the server thread, then forget about it 
-                Server* theServer = new Server( mPort, mUDP, connected_sock ); 
+                Socklen_t temp = sizeof( peer );
+                getpeername( connected_sock, (sockaddr*)&peer, &temp );
+                if ( client != NULL ) {
+                    if ( !SocketAddr::Hostare_Equal( client->get_sockaddr(), 
+                                                     (sockaddr*) &peer ) ) {
+                        close( connected_sock );
+                        continue;
+                    }
+                }
+                tempSettings = NULL;
+#ifdef HAVE_THREAD
+                clients_mutex.Lock(); 
+                exist = Iperf_hostpresent( &peer, clients); 
+                listtemp = new Iperf_ListEntry;
+                memcpy(listtemp, &peer, sizeof(peer));
+                listtemp->next = NULL;
 
-                theServer->DeleteSelfAfterRun(); 
-                theServer->Start(); 
+                if ( exist != NULL ) {
+                    listtemp->holder = exist->holder;
+                    exist->holder->AddSocket(connected_sock);
+                } else {
+                    clients_mutex.Unlock(); 
+                    if ( !mSettings->mCompat ) {
+                        if ( recv( connected_sock, (char*)&buf, sizeof(buf), 0) > 0 ) {
+                            Settings::GenerateSpeakerSettings( mSettings, &tempSettings, 
+                                                               &buf, (sockaddr*) &peer );
+                        }
+                    }
 
-                theServer = NULL; 
+                    theAudience = new Audience( mSettings, connected_sock ); 
+
+                    if ( tempSettings != NULL ) {
+                        Speaker *theSpeaker = new Speaker( tempSettings );
+                        theSpeaker->OwnSettings();
+                        theSpeaker->DeleteSelfAfterRun();
+                        if ( tempSettings->mMode == kTest_DualTest ) {
+                            theSpeaker->Start();
+                        } else {
+                            theAudience->StartWhenDone( theSpeaker );
+                        }
+                    }
+
+                    listtemp->holder = theAudience;
+
+                    // startup the server thread, then forget about it 
+                    theAudience->DeleteSelfAfterRun(); 
+                    theAudience->Start(); 
+                    theAudience = NULL; 
+                    clients_mutex.Lock(); 
+                }
+                Iperf_pushback( listtemp, &clients ); 
+                clients_mutex.Unlock();
+#else
+                if ( !mSettings->mCompat ) {
+                    if ( recv( connected_sock, (char*)&buf, sizeof(buf), 0 ) > 0 ) {
+                        Settings::GenerateSpeakerSettings( mSettings, &tempSettings, 
+                                                           &buf, (sockaddr*) &peer );
+                    }
+                }
+
+                Server* theServer = new Server( mSettings, connected_sock );
+                theServer->DeleteSelfAfterRun();
+                theServer->Start();
+                
+                if ( tempSettings != NULL ) {
+                    Client *theClient = new Client( tempSettings );
+                    theClient->DeleteSelfAfterRun();
+                    theClient->Start();
+                    DELETE_PTR( tempSettings );
+                }
+#endif
+                mClients--; 
             }
-        } while ( connected_sock != INVALID_SOCKET ); 
-    } 
+        } while ( !mCount || ( mCount && mClients > 0 ) ); 
+    }
 } // end Run 
 
 
 /**-------------------------------------------------------------------- 
  * Run the server as a daemon  
  * --------------------------------------------------------------------*/ 
+
 void Listener::runAsDaemon(const char *pname, int facility) {
 #ifndef WIN32 
     pid_t pid; 
@@ -230,21 +406,3 @@ void Listener::runAsDaemon(const char *pname, int facility) {
 #endif  
 
 } 
-
-
-/** 
- * Function which checks whether there is an existing connection 
- * from the client which sent the most recent packet 
- */ 
-bool Listener::present(iperf_sockaddr peer) {
-    struct sockaddr *sap = (struct sockaddr *)&peer;
-    struct sockaddr *sac;
-    for ( int i=0; i < (int)clients.size(); i++ ) {
-        sac = (struct sockaddr *)&clients[i];
-        if ( SocketAddr::are_Equal(sap,sac) ) {
-            return true;
-        }
-    }
-    return false;
-}
-

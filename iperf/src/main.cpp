@@ -65,8 +65,10 @@
 #include "Client.hpp"
 #include "Settings.hpp"
 #include "Listener.hpp"
+#include "Speaker.hpp"
 #include "Locale.hpp"
 #include "Condition.hpp"
+#include "List.h"
 #include "util.h"
 
 #ifdef WIN32
@@ -90,8 +92,6 @@ void cleanup( void );
 
 Condition gQuit_cond;
 
-Settings* gSettings = NULL;
-
 /* -------------------------------------------------------------------
  * sets up signal handlers
  * parses settings from environment and command line
@@ -110,6 +110,7 @@ int main( int argc, char **argv ) {
 #endif
 
     Listener *theListener = NULL;
+    Speaker  *theSpeaker  = NULL;
 
     // signal handlers quietly exit on ^C and kill
     // these are usually remapped later by the client or server
@@ -129,18 +130,19 @@ int main( int argc, char **argv ) {
     // perform any cleanup when quitting Iperf
     atexit( cleanup );
 
+    ext_Settings* ext_gSettings = new ext_Settings;
+    Settings* gSettings = NULL;
+
     // read settings from environment variables and command-line interface
-    gSettings = new Settings();
+    gSettings = new Settings( ext_gSettings );
     gSettings->ParseEnvironment();
     gSettings->ParseCommandLine( argc, argv );
 
     // start up client or server (listener)
     if ( gSettings->GetServerMode() == kMode_Server ) {
         // start up a listener
-        theListener = new Listener( gSettings->GetPort(),
-                                    gSettings->GetProtocolMode() == kMode_UDP,
-                                    gSettings->GetLocalhost() );
-
+        theListener = new Listener( ext_gSettings );
+        theListener->DeleteSelfAfterRun();
 
         // Start the server as a daemon
         if ( gSettings->GetDaemonMode() == true ) {
@@ -153,8 +155,9 @@ int main( int argc, char **argv ) {
 #else
             theListener->runAsDaemon(argv[0],LOG_DAEMON);
 #endif
+        }
 #ifdef WIN32
-        } else {
+          else {
             if ( gSettings->GetRemoveService() == true ) {
                 // remove the service and continue to run as a normal process
                 if ( CmdRemoveService() ) {
@@ -174,38 +177,46 @@ int main( int argc, char **argv ) {
                     DELETE_PTR( gSettings );
 
                     return 0;
-                } else {
-
                 }
             }
-#endif
-
         }
+#endif
 
         theListener->Start();
-        theListener->SetDaemon();
 
-        // the listener keeps going; we terminate on user input only
-        waitUntilQuit();
+        if ( ext_gSettings->mThreads == 0 ) {
+            theListener->SetDaemon();
+
+            // the listener keeps going; we terminate on user input only
+            waitUntilQuit();
 #ifdef HAVE_THREAD
-        if ( Thread::NumUserThreads() > 0 ) {
-            printf( wait_server_threads );
-            fflush( 0 );
+            if ( Thread::NumUserThreads() > 0 ) {
+                printf( wait_server_threads );
+                fflush( 0 );
+            }
+#endif
+        }
+    } else if ( gSettings->GetServerMode() == kMode_Client ) {
+#ifdef HAVE_THREAD
+        theSpeaker = new Speaker(ext_gSettings);
+        theSpeaker->OwnSettings();
+        theSpeaker->DeleteSelfAfterRun();
+        theSpeaker->Start();
+#else
+        // If we need to start up a listener do it now
+        ext_Settings *temp = NULL;
+        Settings::GenerateListenerSettings( ext_gSettings, &temp );
+        if ( temp != NULL ) {
+            theListener = new Listener( temp );
+            theListener->DeleteSelfAfterRun();
+        }
+        Client* theClient = new Client( ext_gSettings );
+        theClient->InitiateServer();
+        theClient->Start();
+        if ( theListener != NULL ) {
+            theListener->Start();
         }
 #endif
-    } else if ( gSettings->GetServerMode() == kMode_Client ) {
-        Client::SetNumThreads( gSettings->GetClientThreads());
-        for ( int i = 0; i < gSettings->GetClientThreads(); i++ ) {
-            // start up a client
-            Client* theClient =
-            new Client( gSettings->GetPort(),
-                        gSettings->GetProtocolMode() == kMode_UDP,
-                        gSettings->GetHost(),
-                        gSettings->GetLocalhost(),
-                        i == 0 );
-            theClient->DeleteSelfAfterRun();
-            theClient->Start();
-        }
     } else {
         // neither server nor client mode was specified
         // print usage and exit
@@ -224,9 +235,7 @@ int main( int argc, char **argv ) {
 
     // wait for other (client, server) threads to complete
     Thread::Joinall();
-    DELETE_PTR( theListener );
     DELETE_PTR( gSettings );  // modified by qfeng
-
     // all done!
     return 0;
 } // end main
@@ -299,6 +308,9 @@ void cleanup( void ) {
 #ifdef WIN32
     WSACleanup();
 #endif
+    extern Iperf_ListEntry *clients;
+    Iperf_destroy ( &clients );
+
 } // end cleanup
 
 #ifdef WIN32
@@ -321,8 +333,11 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
                              3000) )                 // wait hint
         goto clean;
 
+    ext_Settings* ext_gSettings = new ext_Settings;
+    Settings *gSettings;
+
     // read settings from passing by StartService
-    gSettings = new Settings();
+    gSettings = new Settings( ext_gSettings );
     gSettings->ParseEnvironment();
     gSettings->ParseCommandLine( dwArgc, lpszArgv );
 
@@ -347,9 +362,7 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
                              3000) )                 // wait hint
         goto clean;
 
-    theListener = new Listener( gSettings->GetPort(),
-                                gSettings->GetProtocolMode() == kMode_UDP,
-                                gSettings->GetLocalhost() );
+    theListener = new Listener( ext_gSettings );
 
     theListener->Start();
     theListener->SetDaemon();
@@ -377,6 +390,7 @@ VOID ServiceStart (DWORD dwArgc, LPTSTR *lpszArgv) {
     Thread::Joinall();
     DELETE_PTR( theListener );
     DELETE_PTR( gSettings );  // modified by qfeng
+    DELETE_PTR( ext_gSettings );  // modified by qfeng
 }
 
 
