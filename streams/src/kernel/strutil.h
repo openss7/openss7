@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/19 20:25:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/19 20:25:48 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -58,7 +58,8 @@
 /* queue structure read/write locks */
 static __inline__ void qrlock(queue_t *q, ulong *flagp)
 {
-	local_irq_save(flagp);
+	if (flagsp)
+		local_irq_save(flagp);
 	if (q->q_owner != current)
 		read_lock(&q->q_rwlock);
 	else {
@@ -75,12 +76,14 @@ static __inline__ void qrunlock(queue_t *q, ulong *flagp)
 		assure(!in_interrupt() || in_streams());
 		q->q_nest--;
 	}
-	local_irq_restore(flagp);
+	if (flagsp)
+		local_irq_restore(flagp);
 	return;
 }
 static __inline__ void qwlock(queue_t *q, ulong *flagp)
 {
-	local_irq_save(flagp);
+	if (flagsp)
+		local_irq_save(flagp);
 	if (q->q_owner != current) {
 		write_lock(&q->q_rwlock);
 		q->q_owner = current;
@@ -102,7 +105,8 @@ static __inline__ void qwunlock(queue_t *q, ulong *flagp)
 			assure(!in_interrupt() || in_streams());
 			q->q_nest--;
 		}
-		local_irq_restore(flagp);
+		if (flagsp)
+			local_irq_restore(flagp);
 		return;
 	}
 	swerr();

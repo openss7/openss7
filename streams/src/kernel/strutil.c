@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/15 22:11:07 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/19 20:25:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/15 22:11:07 $ by $Author: brian $
+ Last Modified $Date: 2004/04/19 20:25:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/15 22:11:07 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/19 20:25:48 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/15 22:11:07 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/19 20:25:48 $";
 
 #define __NO_VERSION__
 
@@ -996,9 +996,8 @@ unsigned long freezestr(queue_t *q)
 {
 	unsigned long flags;
 	hwlock(q, &flags);
-	write_lock(&q->q_rwlock);
-	q->q_iflags = flags;
-	return (flags);
+	qwlock(q, NULL);
+	return ((q->q_iflags = flags));
 }
 
 /* 
@@ -1688,8 +1687,8 @@ void qprocsoff(queue_t *q)
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
 		set_bit(QHLIST_BIT, &wq->q_flag);
-		set_bit(QNOENB_BIT, &rq->q_flag);
-		set_bit(QNOENB_BIT, &wq->q_flag);
+		set_bit(QNOENB_BIT, &rq->q_flag); /* XXX */
+		set_bit(QNOENB_BIT, &wq->q_flag); /* XXX */
 		/* spin here until put or srv procedures exit */
 		hwlock(rq, &flags);
 		/* bypass this module: works for FIFOs and PIPEs too */
@@ -1735,8 +1734,8 @@ void qprocson(queue_t *q)
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
 		clear_bit(QHLIST_BIT, &wq->q_flag);
-		clear_bit(QNOENB_BIT, &rq->q_flag);
-		clear_bit(QNOENB_BIT, &wq->q_flag);
+		clear_bit(QNOENB_BIT, &rq->q_flag); /* XXX */
+		clear_bit(QNOENB_BIT, &wq->q_flag); /* XXX */
 		hwlock(rq, &flags);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
@@ -2192,7 +2191,7 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 void unfreezestr(queue_t *q, unsigned long flags)
 {
 	flags = q->q_iflags;
-	write_unlock(&q->q_rwlock);
+	qwunlock(q, NULL);
 	hwunlock(q, &flags);
 }
 
