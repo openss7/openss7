@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $
+ @(#) $RCSfile: m3ua_ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:30:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $"
+#ident "@(#) $RCSfile: m3ua_ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:30:11 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:57 $";
+    "$RCSfile: m3ua_ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:30:11 $";
 
 #define __NO_VERSION__
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #include "m3ua.h"
 #include "m3ua_data.h"

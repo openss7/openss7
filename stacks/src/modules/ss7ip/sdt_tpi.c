@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:43 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:43 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -72,7 +72,7 @@ static char const ident[] =
  *  can be used for SCTP transport, a standard way to use SCTP for SS7
  *  signallign link transport would be M2PA instead of this module.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <tihdr.h>
 // #include <xti.h>
@@ -87,7 +87,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:57 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:43 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:10 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 04:23:10 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:10 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:48 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:10 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:48 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
@@ -162,9 +162,9 @@ struct sockaddr_storage {
 #include <sys/ddi.h>
 
 #ifndef LFS
-#include "debug.h"
+#include "os7/debug.h"
 #endif
-#include "bufq.h"
+#include "os7/bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -177,7 +177,7 @@ struct sockaddr_storage {
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:10 $"
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:48 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

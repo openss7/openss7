@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:52 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:16 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:16 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -61,7 +61,7 @@ static char const ident[] =
  *  This module is intended to be used by application programs or by upper
  *  modules that expect an NPI connectionless service provider.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <sys/npi_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:52 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:16 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

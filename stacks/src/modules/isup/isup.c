@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:44 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -66,7 +66,7 @@ static char const ident[] =
  *  Subsequent binds are permitted to bind additional CIC ranges to the stream.  After binding, the connectionless
  *  data transfer mechanisms of the MTP are used.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 // #undef INLINE
 // #define INLINE
@@ -80,7 +80,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:44 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:54 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

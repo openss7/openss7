@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/02/28 13:46:46 $"
+#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -92,10 +92,10 @@ MODULE_LICENSE(STREAMS_LICENSE);
 #include <sys/ddi.h>
 
 #include "strprocfs.h"
-#include "sth.h"		/* for str_minfo */
-#include "strsysctl.h"
-#include "strsched.h"
-#include "strreg.h"
+#include "src/modules/sth.h"		/* for str_minfo */
+#include "src/kernel/strsysctl.h"
+#include "src/kernel/strsched.h"
+#include "src/kernel/strreg.h"
 
 /* 
  *  We put all our heavily used globals handy.  Hopefully by placing these all

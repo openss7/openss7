@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lower.c,v 0.9.2.3 2004/08/31 07:19:59 brian Exp $
+ @(#) $Id: sua_lower.c,v 0.9.2.4 2005/03/08 19:30:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,9 +24,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:59 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:55 $ by $Author: brian $
 
  $Log: sua_lower.c,v $
+ Revision 0.9.2.4  2005/03/08 19:30:55  brian
+ - Changes for new build compile.
+
  Revision 0.9.2.3  2004/08/31 07:19:59  brian
  - Changes to compile against LiS again.
 
@@ -53,11 +56,11 @@
 
  *****************************************************************************/
 
-#ident "@(#) $Id: sua_lower.c,v 0.9.2.3 2004/08/31 07:19:59 brian Exp $"
+#ident "@(#) $Id: sua_lower.c,v 0.9.2.4 2005/03/08 19:30:55 brian Exp $"
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:55 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #include "sua.h"
 #include "sua_data.h"

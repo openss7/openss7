@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 10:54:41 $
+ @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 10:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 10:54:41 $"
+#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:58 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 10:54:41 $";
+static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:58 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
@@ -162,9 +162,9 @@ struct sockaddr_storage {
 #include <sys/ddi.h>
 
 #ifndef LFS
-#include "debug.h"
+#include "os7/debug.h"
 #endif
-#include "bufq.h"
+#include "os7/bufq.h"
 
 #include "sctp_md5.h"
 #include "sctp_hmac_md5.h"

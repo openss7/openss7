@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/02 17:41:28 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/08 19:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/02 17:41:28 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/08 19:31:38 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/02 17:41:28 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/08 19:31:38 $";
 
 #define __NO_VERSION__
 
@@ -84,10 +84,10 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "sth.h"		/* for stream operations */
-#include "strlookup.h"		/* cdevsw_list, etc. */
-#include "strspecfs.h"		/* for specfs_get and specfs_put */
-#include "strreg.h"		/* extern verification */
+#include "src/modules/sth.h"	/* for stream operations */
+#include "src/kernel/strlookup.h"	/* cdevsw_list, etc. */
+#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
+#include "src/kernel/strreg.h"	/* extern verification */
 /* 
  *  -------------------------------------------------------------------------
  *

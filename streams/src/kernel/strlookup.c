@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:28 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:31:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:28 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:31:36 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/03/02 17:41:28 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 19:31:36 $";
 
 #define __NO_VERSION__
 
@@ -87,9 +87,9 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.
 #endif
 
 #include "sys/config.h"
-#include "sth.h"		/* for stream operations */
-#include "strspecfs.h"		/* for specfs_get and specfs_put */
-#include "strlookup.h"		/* extern verification */
+#include "src/modules/sth.h"	/* for stream operations */
+#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
+#include "src/kernel/strlookup.h"	/* extern verification */
 
 /* we want macro versions of these */
 

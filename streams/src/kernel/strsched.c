@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/05 13:07:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/08 19:31:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/05 13:07:50 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/05 13:07:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/08 19:31:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/03/05 13:07:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/03/08 19:31:39 $";
 
 #define __NO_VERSION__
 
@@ -90,11 +90,11 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "sth.h"		/* for str_minfo */
-#include "strsysctl.h"		/* for sysctl_str_ defs */
-#include "strsched.h"		/* for in_stream */
-#include "strutil.h"		/* for q locking and puts and gets */
-#include "strsched.h"		/* verification of externs */
+#include "src/modules/sth.h"	/* for str_minfo */
+#include "src/kernel/strsysctl.h"	/* for sysctl_str_ defs */
+#include "src/kernel/strsched.h"	/* for in_stream */
+#include "src/kernel/strutil.h"	/* for q locking and puts and gets */
+#include "src/kernel/strsched.h"	/* verification of externs */
 
 struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:40 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/02/28 13:46:47 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:40 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -112,9 +112,9 @@ static char const ident[] =
 #include "sys/config.h"
 #include "strsched.h"
 #include "strreg.h"
-#include "sth.h"		/* for str_minfo */
+#include "src/modules/sth.h"		/* for str_minfo */
 #include "strsysctl.h"
-#include "fifo.h"
+#include "src/drivers/fifo.h"
 #include "strattach.h"
 
 //EXPORT_SYMBOL(adjmsg);                /* stream.h */

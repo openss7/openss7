@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 00:22:37 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/08 19:29:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 00:22:37 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 00:22:37 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/08 19:29:40 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 00:22:37 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/08 19:29:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -157,14 +157,14 @@ static char const ident[] =
 #undef NET_SCTP_PRESERVE_ENABLE
 #undef NET_SCTP_MAX_BURST
 
-#include "linux/sysctl.h"
+#include "include/linux/sysctl.h"
 #include "sctp_debug.h"
-#include "linux/hooks.h"
-#include "netinet/sctp.h"
+#include "include/linux/hooks.h"
+#include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.24 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.25 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 00:22:37 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/03/08 19:29:40 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hash.h,v 0.9.2.1 2004/08/21 10:53:57 brian Exp $
+ @(#) $Id: sctp_hash.h,v 0.9.2.2 2005/03/08 19:38:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:53:57 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:38:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_HASH_H__
 #define __SCTP_HASH_H__
 
-#ident "@(#) $RCSfile: sctp_hash.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:53:57 $"
+#ident "@(#) $RCSfile: sctp_hash.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/08 19:38:36 $"
 
+#include <linux/interrupt.h>	/* for local_irq functions */
+#if HAVE_KINC_ASM_SOFTIRQ_H
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
+#endif
 
 /*
  *  Hashing Functions

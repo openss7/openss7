@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:42 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:21 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -58,7 +58,7 @@ static char const ident[] =
 
 #define X400P_DOWNLOAD_FIRMWARE
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define MX_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linx Fast-STREAMS."
-#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2004/08/30 21:52:42 $"
+#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:21 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:40 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:40 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:42 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

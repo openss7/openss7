@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:38 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:38 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:38 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:38 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -61,7 +61,7 @@ static char const ident[] =
  *  interface to the SDT driver kernel module.
  */
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #ifdef LINUX
 #include <linux/errno.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/31 07:19:38 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

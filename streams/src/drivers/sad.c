@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/03 10:28:05 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 19:31:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/03 10:28:05 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 19:31:35 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/03 10:28:05 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 19:31:35 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,12 +67,12 @@ static char const ident[] =
 #include <sys/sad.h>
 
 #include "sys/config.h"
-//#include "strreg.h"
-#include "strsad.h"		/* for autopush functions */
+//#include "src/kernel/strreg.h"
+#include "src/kernel/strsad.h"		/* for autopush functions */
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/03/03 10:28:05 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/08 19:31:35 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"

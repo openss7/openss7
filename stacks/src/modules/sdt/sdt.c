@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:38 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -65,7 +65,7 @@ static char const ident[] =
  *  between the packet interface of the SDT and the bit-stream interface of
  *  the SDL is performed using soft-HDLC.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:38 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:37 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

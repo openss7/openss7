@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/16 10:33:37 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -64,7 +64,7 @@ static char const ident[] =
  *  bottom side of the multiplexor.  A binding operation is performed to bind
  *  an upper stream to a lower stream.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <sys/dlpi.h>
 #include <sys/dlpi_mtp2.h>
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/02/16 10:33:37 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:30:35 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

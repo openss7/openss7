@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:46 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -109,15 +109,15 @@ static char const ident[] =
 #include <sys/sunddi.h>
 
 #include "sys/config.h"
-#include "strsched.h"
-#include "strutil.h"
-#include "sth.h"
-#include "strreg.h"
-#include "strsad.h"
+#include "src/kernel/strsched.h"
+#include "src/kernel/strutil.h"
+#include "src/modules/sth.h"
+#include "src/kernel/strreg.h"
+#include "src/kernel/strsad.h"
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/02/28 13:46:46 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:31:28 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

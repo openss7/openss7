@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:42 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:53 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:53 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -62,7 +62,7 @@ static char const ident[] =
  *  this state machine to be rigorously conformance tested once for all
  *  D-channel drivers.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/08/31 07:19:42 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:29:53 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

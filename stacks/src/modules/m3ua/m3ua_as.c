@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as.c,v 0.9.2.3 2004/08/29 20:25:21 brian Exp $
+ @(#) $Id: m3ua_as.c,v 0.9.2.4 2005/03/08 19:30:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2004/08/29 20:25:21 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.4  2005/03/08 19:30:03  brian
+ - Changes for new build compile.
+
  Revision 0.9.2.3  2004/08/29 20:25:21  brian
  - Updates to driver registration for Linux Fast-STREAMS.
 
@@ -56,9 +59,9 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/29 20:25:21 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:03 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/m3ua.h>
 #include <ss7/m3ua_ioctl.h>

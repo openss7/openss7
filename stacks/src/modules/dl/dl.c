@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/27 06:24:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:48 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:48 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 #include <linux/kmod.h>
 /*
  *  It is not necessary to use this module for Linux Fast-STREAMS.  Linux
@@ -63,8 +63,8 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.5 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/27 06:24:28 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.6 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:48 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

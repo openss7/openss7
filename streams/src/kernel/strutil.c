@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 19:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 19:31:42 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:46:47 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 19:31:42 $";
 
 #define __NO_VERSION__
 
@@ -81,7 +81,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "sth.h"		/* for str_minfo */
+#include "src/modules/sth.h"	/* for str_minfo */
 #include "strsysctl.h"		/* for sysctl_str_ defs */
 #include "strsched.h"		/* for current_context() */
 #include "strutil.h"		/* for q locking and puts and gets */

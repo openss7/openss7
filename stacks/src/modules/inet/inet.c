@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:04 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:29:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/04 08:56:04 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:04 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:29:52 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:04 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:29:52 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
    provider (NPI).  It provides a STREAMS-based encapsulation of the Linux IP stack. 
  */
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #if defined HAVE_OPENSS7_SCTP
 #if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
@@ -211,7 +211,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/02/04 08:56:04 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/08 19:29:52 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

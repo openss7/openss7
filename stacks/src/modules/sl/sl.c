@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:39 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/27 07:31:39 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:39 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:39 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:39 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:39 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -61,7 +61,7 @@ static char const ident[] =
  *  Having the SL state machines separate permits live upgrade and allows this
  *  state machine to be rigorously conformance tested only once.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/27 07:31:39 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:39 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/08 19:31:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/08 19:31:34 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/08 19:31:34 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -66,15 +66,15 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strreg.h"
-#include "strsched.h"
-#include "strsad.h"		/* for autopush */
-#include "sth.h"
+#include "src/kernel/strreg.h"
+#include "src/kernel/strsched.h"
+#include "src/kernel/strsad.h"		/* for autopush */
+#include "src/modules/sth.h"
 #include "pipe.h"		/* extern verification */
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/03 10:28:05 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/03/08 19:31:34 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

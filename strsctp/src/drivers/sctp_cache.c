@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:25 $
+ @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 04:23:25 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:25 $"
+#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:54 $"
 
-static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/11 04:23:25 $";
+static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:54 $";
 
 #define __NO_VERSION__
 
@@ -164,9 +164,9 @@ struct sockaddr_storage {
 #include <sys/ddi.h>
 
 #ifndef LFS
-#include "debug.h"
+#include "os7/debug.h"
 #endif
-#include "bufq.h"
+#include "os7/bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"

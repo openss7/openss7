@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $
+ @(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:31:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:38:13 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $"
+#ident "@(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:31:00 $"
 
 static char const ident[] =
-    "$RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:38:13 $";
+    "$RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:31:00 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #include "tali.h"
 #include "tali_data.h"

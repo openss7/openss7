@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_ip.c,v 0.9.2.3 2004/08/31 07:19:58 brian Exp $
+ @(#) $Id: sscop_ip.c,v 0.9.2.4 2005/03/08 19:30:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,18 +24,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:58 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:58 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:49 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
  *  Q.2111.  It uses only the IP network provider mode of SSCOP-MCE.
  */
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #define SSCOP_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."

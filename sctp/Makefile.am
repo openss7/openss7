@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/03/08 11:55:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/08 19:29:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 11:55:52 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 19:29:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -210,10 +210,14 @@ libSCTPmodl_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPmodl_a_OBJECTS: $(libSCTPmodl_a_DEPENDENCIES)
 
-sctp.o: stamp-verobjs
-	@list=`$(ECHO) " $(libSCTPmodl_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
-	$(ECHO) "$(LD) -r -o $@ $$list" ; \
-	$(LD) -r -o $@ $$list
+combined-sctp.o: stamp-verobjs
+	@list=`$(ECHO) " $(libSCTPmodl_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| |g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list && cp -f -- $@ sctp.o" ; \
+	$(LD) -r -o $@ $$list && cp -f -- $@ sctp.o
+
+sctp.o: combined-sctp.o
+
+CLEANFILES += combined-sctp.o
 
 endif
 

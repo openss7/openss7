@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/29 20:25:07 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:29:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:47 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:47 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -68,7 +68,7 @@ static char const ident[] =
  *  accessed by LAPD and LAPF modules that are subsequently pushed under IDSN
  *  and Frame Relay drivers.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <sys/cdi.h>
 #include <sys/cdi_hdlc.h>
@@ -81,7 +81,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/29 20:25:07 $"
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:29:47 $"
 #define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

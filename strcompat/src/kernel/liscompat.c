@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/07 09:48:44 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/07 09:48:44 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/07 09:48:44 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/07 09:48:44 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -109,12 +109,12 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "sth.h"
-#include "strsad.h"
+#include "src/modules/sth.h"
+#include "src/kernel/strsad.h"
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/07 09:48:44 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:31:26 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:59 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:51 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/31 07:19:59 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:51 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #define SSCOP_DESCRIP	"SSCOP/UDP STREAMS DRIVER."
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:58 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:44 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/31 07:19:58 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/08 19:30:44 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
  *  cam be pushed over a TLI transport to effect an OpenSS7 Signalling Link or
  *  Signalling Data Terminal.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <tihdr.h>
 // #include <xti.h>

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/03/08 11:55:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2005/03/08 19:31:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 11:55:53 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 19:31:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -325,12 +325,12 @@ libLfS_compat_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLfS_compat_a_OBJECTS): $(libLfS_compat_a_DEPENDENCIES)
 
 specfs.o: stamp-verobjs
-	@list=`$(ECHO) " $(libLfS_specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
+	@list=`$(ECHO) " $(libLfS_specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
 streams.o: stamp-verobjs
-	@list=`$(ECHO) " $(libLfS_streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| streams-|g'` ; \
+	@list=`$(ECHO) " $(libLfS_streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
@@ -568,7 +568,7 @@ PKGINCL				= include/sys/$(PACKAGE_NAME)
 
 AUTOCONFIG_H			= include/sys/config.h
 
-EXTRA_DIST			+= $(AUTOCONFIG_H).in
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 EXPORT_SRCFILES			= \
 				src/compat/aix/aixcompat.c \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:47 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:46:47 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:47 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:41 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/02/28 13:46:47 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/03/08 19:31:41 $";
 
 #define __NO_VERSION__
 
@@ -71,7 +71,7 @@ static char const ident[] =
 #include <sys/strsubr.h>
 
 #include "sys/config.h"
-#include "sth.h"		/* for str_minfo */
+#include "src/modules/sth.h"		/* for str_minfo */
 #include "strsysctl.h"		/* extern verification */
 
 int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */

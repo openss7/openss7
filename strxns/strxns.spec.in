@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/08 10:52:59 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/03/08 19:32:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 10:52:59 $ by $Author: brian $
+# Last Modified $Date: 2005/03/08 19:32:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,7 +89,7 @@
 %global infofiles   %{name}
 #global initfiles
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56].*$|0|;s|^2\.4.*$|1|')
+%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
 %global have_initfiles %{?initfiles:1}%{!?initfiles:0}
 %global have_libraries %{?libraries:1}%{!?libraries:0}
 %global have_preloads %{?preloads:1}%{!?preloads:0}
@@ -1019,6 +1019,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.48  2005/03/08 19:32:13  brian
+# - Changes for new build compile.
+#
 # Revision 0.9.2.47  2005/03/08 10:52:59  brian
 # - Correction to modules and tools in spec files.
 #

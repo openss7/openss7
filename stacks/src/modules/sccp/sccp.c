@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/27 06:24:28 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:30:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -61,7 +61,7 @@ static char const ident[] =
  *  underneath it to form a complete Signalling Connection Control Part
  *  protocol layer for SS7.
  */
-#include "compat.h"
+#include "os7/compat.h"
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/27 06:24:28 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 19:30:19 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/03 10:28:05 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:31:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $";
 
 //#define __NO_VERSION__
 
@@ -79,20 +79,20 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "strsched.h"		/* for allocsd */
-#include "strreg.h"		/* for spec_open() */
-#include "strlookup.h"		/* for cmin_get() */
+#include "src/kernel/strsched.h"	/* for allocsd */
+#include "src/kernel/strreg.h"	/* for spec_open() */
+#include "src/kernel/strlookup.h"	/* for cmin_get() */
 #include "sth.h"		/* extern verification */
-#include "strsysctl.h"		/* for sysctls */
-#include "strsad.h"		/* for autopush */
-#include "strutil.h"		/* for q locking and puts and gets */
-#include "strattach.h"		/* for do_fattach/do_fdetach */
-#include "strpipe.h"		/* for do_spipe */
-#include "clone.h"		/* for (un)register_clone() */
+#include "src/kernel/strsysctl.h"	/* for sysctls */
+#include "src/kernel/strsad.h"	/* for autopush */
+#include "src/kernel/strutil.h"	/* for q locking and puts and gets */
+#include "src/kernel/strattach.h"	/* for do_fattach/do_fdetach */
+#include "src/kernel/strpipe.h"	/* for do_spipe */
+#include "src/drivers/clone.h"	/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/03 10:28:05 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/03/08 19:31:44 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

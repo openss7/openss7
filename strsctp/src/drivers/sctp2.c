@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 10:54:39 $ by $Author: brian $
+ Last Modified $Date: 2005/03/08 19:38:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $";
 
-#include "compat.h"
+#include "os7/compat.h"
 
 #undef sctp_addr
 #define sctp_addr n_sctp_addr
@@ -80,7 +80,10 @@ static char const ident[] =
 #define T_ALLLEVELS -1UL
 
 #ifdef LINUX
+#include <linux/interrupt.h>	/* for local_irq functions */
+#if HAVE_KINC_ASM_SOFTIRQ_H
 #include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
+#endif
 #include <linux/random.h>	/* for secure_tcp_sequence_number */
 #endif				/* LINUX */
 
@@ -160,7 +163,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/03/08 10:54:39 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/08 19:38:34 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
