@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/12/30 08:05:37 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/30 21:22:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 08:05:37 $ by $Author: brian $
+# Last Modified $Date: 2004/12/30 21:22:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -513,6 +513,8 @@ if [ -x /sbin/install-info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -526,6 +528,8 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -637,8 +641,11 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.10  2004/12/30 08:05:37  brian
-# - Fix globbing on source package.
+# Revision 0.9.2.11  2004/12/30 21:22:21  brian
+# - Mandrake compresses info files with bzip2.
+#
+# Revision 1.11  2004/12/30 21:22:21  brian
+# - Mandrake compresses info files with bzip2.
 #
 # Revision 1.10  2004/12/30 08:05:37  brian
 # - Fix globbing on source package.

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/12/30 08:07:03 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/12/30 21:22:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 08:07:03 $ by $Author: brian $
+# Last Modified $Date: 2004/12/30 21:22:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -789,6 +789,8 @@ if [ -x /sbin/install-info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -802,6 +804,8 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -933,6 +937,9 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
+# Revision 0.9.2.18  2004/12/30 21:22:32  brian
+# - Mandrake compresses info files with bzip2.
+#
 # Revision 0.9.2.17  2004/12/30 08:07:03  brian
 # - Fix globbing on source package.
 #

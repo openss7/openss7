@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/12/30 08:07:49 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/12/31 04:02:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 08:07:49 $ by $Author: brian $
+# Last Modified $Date: 2004/12/31 04:02:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -749,6 +749,8 @@ if [ -x /sbin/install-info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -762,6 +764,8 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -770,12 +774,9 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
-%doc ABOUT-NLS
-%endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual
-#%{_infodir}/*
+%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 %{_mandir}/man*/*
@@ -881,14 +882,20 @@ test utilities and commands associated with the OpenSS7 %{_STREAMS} STREAMS
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #%{_bindir}/*
-#%{_sbindir}/*
-#%{_libexecdir}/*
+%{_sbindir}/*
+%{_libexecdir}/*
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
+# Revision 0.9.2.24  2004/12/31 04:02:30  brian
+# - Add upackaged installs.
+#
+# Revision 0.9.2.23  2004/12/30 21:22:42  brian
+# - Mandrake compresses info files with bzip2.
+#
 # Revision 0.9.2.22  2004/12/30 08:07:49  brian
 # - Fix globbing on source package.
 #

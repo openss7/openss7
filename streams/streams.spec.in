@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2004/12/30 08:06:20 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2004/12/30 21:22:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/30 08:06:20 $ by $Author: brian $
+# Last Modified $Date: 2004/12/30 21:22:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -701,6 +701,8 @@ if [ -x /sbin/install-info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -714,6 +716,8 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
         elif [ -f %{_infodir}/$n.info.gz ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
         fi
     done
 fi
@@ -722,9 +726,6 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
-%doc ABOUT-NLS
-%endif
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual
 %{_infodir}/*
@@ -875,8 +876,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.50  2004/12/30 08:06:20  brian
-# - Fix globbing on source package.
+# Revision 0.9.2.51  2004/12/30 21:22:27  brian
+# - Mandrake compresses info files with bzip2.
+#
+# Revision 0.9.2.19  2004/12/30 21:22:27  brian
+# - Mandrake compresses info files with bzip2.
 #
 # Revision 0.9.2.18  2004/12/30 08:06:20  brian
 # - Fix globbing on source package.
