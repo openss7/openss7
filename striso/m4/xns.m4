@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: xns.m4,v 0.9.2.9 2005/01/24 07:33:00 brian Exp $
+dnl @(#) $Id: xns.m4,v 0.9.2.11 2005/01/27 04:36:08 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/27 04:36:08 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -186,16 +186,25 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
             done
         fi
     ])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
+dnl properly, so we use defines.
     if test :"${xns_cv_includes:-no}" = :no ; then :
-        AC_MSG_WARN([
+        if test :"$with_xns" = :no ; then
+            AC_MSG_ERROR([
 ***
 *** Could not find XNS include directories.  This package requires the
 *** presence of XNS include directories to compile.  Specify the location of
 *** XNS include directories with option --with-xns to configure and try again.
 *** ])
+        fi
+        if test -z "$with_xns" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_with_xns --with-xns\""
+        fi
     else
         if test -z "$with_xns" ; then
-            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with xns"
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_without_xns --without-xns\""
         fi
     fi
 ])# _XNS_CHECK_HEADERS

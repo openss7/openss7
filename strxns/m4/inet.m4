@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: inet.m4,v 0.9.2.6 2005/01/24 07:33:00 brian Exp $
+dnl @(#) $Id: inet.m4,v 0.9.2.8 2005/01/27 04:36:08 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -52,7 +52,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/27 04:36:08 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -167,17 +167,25 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
             done
         fi
     ])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
+dnl properly, so we use defines.
     if test :"${inet_cv_includes:-no}" = :no ; then :
-        AC_MSG_WARN([
+        if test :"$with_inet" = :no ; then
+            AC_MSG_ERROR([
 ***
 *** Could not find INET include directories.  This package requires the
 *** presence of INET include directories to compile.  Specify the location of
 *** INET include directories with option --with-inet to configure and try again.
-***
-        ])
+*** ])
+        fi
+        if test -z "$with_inet" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_with_inet --with-inet\""
+        fi
     else
         if test -z "$with_inet" ; then
-            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with inet"
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_without_inet --without-inet\""
         fi
     fi
 ])# _INET_CHECK_HEADERS

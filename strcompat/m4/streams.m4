@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.32 2005/01/24 23:02:36 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.33 2005/01/27 04:33:24 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 23:02:36 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/27 04:33:24 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -149,11 +149,15 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [dnl
     ])
     # need to add arguments for LiS or LfS so they will be passed to rpm
     AC_MSG_CHECKING([for streams added configure arguments])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
+dnl properly, so we use defines.
     case "$streams_cv_package" in
         LiS)
             if test -z "$with_lis" 
             then :;
-dnl             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define '_with_lis --with-lis'"
+dnl             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_with_lis --with-lis\""
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
             fi
             AC_MSG_RESULT([--with-lis])
@@ -161,7 +165,7 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
         LfS)
             if test -z "$with_lfs" 
             then :;
-dnl             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define '_with_lfs --with-lfs'"
+dnl             PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_with_lfs --with-lfs\""
 dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
             fi
             AC_MSG_RESULT([--with-lfs])

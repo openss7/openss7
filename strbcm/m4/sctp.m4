@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/24 07:33:00 $
+dnl @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/27 04:36:08 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/24 07:33:00 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/27 04:36:08 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -173,17 +173,25 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
             done
         fi
     ])
+dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
+dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
+dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
+dnl properly, so we use defines.
     if test :"${sctp_cv_includes:-no}" = :no ; then :
-        AC_MSG_WARN([
+        if test :"$with_sctp" = :no ; then
+            AC_MSG_ERROR([
 ***
 *** Could not find SCTP include directories.  This package requires the
 *** presence of SCTP include directories to compile.  Specify the location of
 *** SCTP include directories with option --with-sctp to configure and try again.
-***
-        ])
+*** ])
+        fi
+        if test -z "$with_sctp" ; then
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_with_sctp --with-sctp\""
+        fi
     else
         if test -z "$with_sctp" ; then
-            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with sctp"
+            PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--define \"_without_sctp --without-sctp\""
         fi
     fi
 ])# _SCTP_CHECK_HEADERS
