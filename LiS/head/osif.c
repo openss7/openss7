@@ -28,7 +28,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) LiS osif.c 1.44 9/24/03"
+#ident "@(#) LiS osif.c 1.53 10/11/04"
 
 #include <sys/stream.h>
 #include <linux/autoconf.h>		/* Linux config defines */
@@ -87,7 +87,7 @@
 #endif
 
 
-int lis_pcibios_present(void)
+int _RP lis_pcibios_present(void)
 {
 #if defined(HAS_PCIBIOS)
     return(pcibios_present()) ;
@@ -100,11 +100,11 @@ int lis_pcibios_present(void)
  * PCO BIOS init routine is not an exported symbol, but we define it
  * anyway in case some driver was calling it.
  */
-void lis_pcibios_init(void)
+void _RP lis_pcibios_init(void)
 {
 }
 
-int lis_pcibios_find_class(unsigned int   class_code,
+int _RP lis_pcibios_find_class(unsigned int   class_code,
 			    unsigned short index,
                             unsigned char *bus,
 			    unsigned char *dev_fn)
@@ -116,7 +116,7 @@ int lis_pcibios_find_class(unsigned int   class_code,
 #endif
 }
 
-int lis_pcibios_find_device(unsigned short vendor,
+int _RP lis_pcibios_find_device(unsigned short vendor,
 			     unsigned short dev_id,
 			     unsigned short index,
 			     unsigned char *bus,
@@ -129,7 +129,7 @@ int lis_pcibios_find_device(unsigned short vendor,
 #endif
 }
 
-int lis_pcibios_read_config_byte(unsigned char  bus,
+int _RP lis_pcibios_read_config_byte(unsigned char  bus,
 				  unsigned char  dev_fn,
 				  unsigned char  where,
 				  unsigned char *val)
@@ -152,7 +152,7 @@ int lis_pcibios_read_config_byte(unsigned char  bus,
 #endif
 }
 
-int lis_pcibios_read_config_word(unsigned char   bus,
+int _RP lis_pcibios_read_config_word(unsigned char   bus,
 				  unsigned char   dev_fn,
 				  unsigned char   where,
 				  unsigned short *val)
@@ -164,7 +164,7 @@ int lis_pcibios_read_config_word(unsigned char   bus,
 #endif
 }
 
-int lis_pcibios_read_config_dword(unsigned char  bus,
+int _RP lis_pcibios_read_config_dword(unsigned char  bus,
 				   unsigned char  dev_fn,
 				   unsigned char  where,
 				   unsigned int  *val)
@@ -176,7 +176,7 @@ int lis_pcibios_read_config_dword(unsigned char  bus,
 #endif
 }
 
-int lis_pcibios_write_config_byte(unsigned char  bus,
+int _RP lis_pcibios_write_config_byte(unsigned char  bus,
 				   unsigned char  dev_fn,
 				   unsigned char  where,
 				   unsigned char  val)
@@ -188,7 +188,7 @@ int lis_pcibios_write_config_byte(unsigned char  bus,
 #endif
 }
 
-int lis_pcibios_write_config_word(unsigned char   bus,
+int _RP lis_pcibios_write_config_word(unsigned char   bus,
 				   unsigned char   dev_fn,
 				   unsigned char   where,
 				   unsigned short  val)
@@ -200,7 +200,7 @@ int lis_pcibios_write_config_word(unsigned char   bus,
 #endif
 }
 
-int lis_pcibios_write_config_dword(unsigned char  bus,
+int _RP lis_pcibios_write_config_dword(unsigned char  bus,
 				    unsigned char  dev_fn,
 				    unsigned char  where,
 				    unsigned int   val)
@@ -212,7 +212,7 @@ int lis_pcibios_write_config_dword(unsigned char  bus,
 #endif
 }
 
-const char *lis_pcibios_strerror(int error)
+const char * _RP lis_pcibios_strerror(int error)
 {
 #if defined(HAS_PCIBIOS)
     switch (error)
@@ -242,60 +242,60 @@ const char *lis_pcibios_strerror(int error)
 
 
 
-struct pci_dev  *lis_osif_pci_find_device(unsigned int vendor,
+struct pci_dev  * _RP lis_osif_pci_find_device(unsigned int vendor,
 				 unsigned int device,
                                  struct pci_dev *from)
 {
     return(pci_find_device(vendor, device, from)) ;
 }
 
-struct pci_dev  *lis_osif_pci_find_class(unsigned int class,
+struct pci_dev  * _RP lis_osif_pci_find_class(unsigned int class,
 					 struct pci_dev *from)
 {
     return(pci_find_class(class, from)) ;
 }
 
-struct pci_dev  *lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
+struct pci_dev  * _RP lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 {
     return(pci_find_slot(bus, devfn)) ;
 }
 
-int     lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 *val)
+int      _RP lis_osif_pci_read_config_byte(struct pci_dev *dev, u8 where, u8 *val)
 {
     return(pci_read_config_byte(dev, where, val)) ;
 }
 
-int     lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 *val)
+int      _RP lis_osif_pci_read_config_word(struct pci_dev *dev, u8 where, u16 *val)
 {
     return(pci_read_config_word(dev, where, val)) ;
 }
 
-int     lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 *val)
+int      _RP lis_osif_pci_read_config_dword(struct pci_dev *dev, u8 where, u32 *val)
 {
     return(pci_read_config_dword(dev, where, val)) ;
 }
 
-int     lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val)
+int      _RP lis_osif_pci_write_config_byte(struct pci_dev *dev, u8 where, u8 val)
 {
     return(pci_write_config_byte(dev, where, val)) ;
 }
 
-int     lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val)
+int      _RP lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val)
 {
     return(pci_write_config_word(dev, where, val)) ;
 }
 
-int     lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val)
+int      _RP lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 val)
 {
     return(pci_write_config_dword(dev, where, val)) ;
 }
 
-void    lis_osif_pci_set_master(struct pci_dev *dev)
+void     _RP lis_osif_pci_set_master(struct pci_dev *dev)
 {
     pci_set_master(dev) ;
 }
 
-int lis_osif_pci_enable_device (struct pci_dev *dev)
+int  _RP lis_osif_pci_enable_device (struct pci_dev *dev)
 {
 #if LINUX_VERSION_CODE < 0x020300               /* 2.0 or 2.2 kernel */
     return(0) ;					/* pretend success */
@@ -304,7 +304,7 @@ int lis_osif_pci_enable_device (struct pci_dev *dev)
 #endif
 }
 
-void lis_osif_pci_disable_device (struct pci_dev *dev)
+void  _RP lis_osif_pci_disable_device (struct pci_dev *dev)
 {
 #if LINUX_VERSION_CODE < 0x020300               /* 2.0 or 2.2 kernel */
     return ;					/* pretend success */
@@ -314,21 +314,21 @@ void lis_osif_pci_disable_device (struct pci_dev *dev)
 }
 
 #if LINUX_VERSION_CODE < 0x020300               /* 2.0 or 2.2 kernel */
-int lis_osif_pci_module_init( void *p )
+int  _RP lis_osif_pci_module_init( void *p )
 {
     return ( 0 );
 }
 
-void lis_osif_pci_unregister_driver( void *p )
+void  _RP lis_osif_pci_unregister_driver( void *p )
 {
 }
 #else						/* 2.4 kernel */
-int lis_osif_pci_module_init( struct pci_driver *p )
+int  _RP lis_osif_pci_module_init( struct pci_driver *p )
 {
     return pci_module_init( p );
 }
 
-void lis_osif_pci_unregister_driver( struct pci_driver *p )
+void  _RP lis_osif_pci_unregister_driver( struct pci_driver *p )
 {
     pci_unregister_driver( p );
 }
@@ -341,7 +341,7 @@ void lis_osif_pci_unregister_driver( struct pci_driver *p )
 	 *        PCI DMA Mapping Fcns		*
 	 ***************************************/
 
-void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
+void * _RP lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 	                                  dma_addr_t *dma_handle)
 {
 #ifdef CONFIG_PCI
@@ -351,7 +351,7 @@ void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
 #endif
 }
 
-void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size,
+void  _RP lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size,
 	                                void *vaddr, dma_addr_t dma_handle)
 {
 #ifdef CONFIG_PCI
@@ -361,112 +361,114 @@ void lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size,
 #endif
 }
 
-dma_addr_t lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr,
+dma_addr_t  _RP lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr,
 	                                        size_t size, int direction)
 {
     return(pci_map_single(hwdev, ptr, size, direction)) ;
 }
 
-void lis_osif_pci_unmap_single(struct pci_dev *hwdev,
+void  _RP lis_osif_pci_unmap_single(struct pci_dev *hwdev,
 			    dma_addr_t dma_addr, size_t size, int direction)
 {
     pci_unmap_single(hwdev, dma_addr, size, direction) ;
 }
 
-int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+int  _RP lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
 	                             int nents, int direction)
 {
     return(pci_map_sg(hwdev, sg, nents, direction)) ;
 }
 
-void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+void  _RP lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
 	                                int nents, int direction)
 {
     pci_unmap_sg(hwdev, sg, nents, direction) ;
 }
 
-void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev,
+void  _RP lis_osif_pci_dma_sync_single(struct pci_dev *hwdev,
 			   dma_addr_t dma_handle, size_t size, int direction)
 {
     pci_dma_sync_single(hwdev, dma_handle, size, direction) ;
 }
 
-void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
+void  _RP lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
 			   struct scatterlist *sg, int nelems, int direction)
 {
     pci_dma_sync_sg(hwdev, sg, nelems, direction) ;
 }
 
-int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
+int  _RP lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
     return(pci_dma_supported(hwdev, mask)) ;
 }
 
-int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)
+int  _RP lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
     return(pci_set_dma_mask(hwdev, mask)) ;
 }
 
-dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg)
+dma_addr_t  _RP lis_osif_sg_dma_address(struct scatterlist *sg)
 {
     return(sg_dma_address(sg)) ;
 }
 
-size_t lis_osif_sg_dma_len(struct scatterlist *sg)
+size_t  _RP lis_osif_sg_dma_len(struct scatterlist *sg)
 {
     return(sg_dma_len(sg)) ;
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)      /* 2.4.13 or later */
 
-void lis_osif_pci_unmap_page(struct pci_dev *hwdev,
+void  _RP lis_osif_pci_unmap_page(struct pci_dev *hwdev,
 				dma_addr_t dma_address, size_t size,
 				int direction)
 {
     pci_unmap_page(hwdev, dma_address, size, direction) ;
 }
 
-int lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
+int  _RP lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
     return(pci_dac_set_dma_mask(hwdev, mask)) ;
 }
 
-dma_addr_t lis_osif_pci_map_page(struct pci_dev *hwdev,
+dma_addr_t  _RP lis_osif_pci_map_page(struct pci_dev *hwdev,
 				struct page *page, unsigned long offset,
 				size_t size, int direction)
 {
     return(pci_map_page(hwdev, page, offset, size, direction)) ;
 }
 
-int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
+int  _RP lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
     return(pci_dac_dma_supported(hwdev, mask)) ;
 }
 
 
-dma64_addr_t lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev,
+dma64_addr_t  _RP lis_osif_pci_dac_page_to_dma(struct pci_dev *pdev,
 			struct page *page, unsigned long offset,
 			int direction)
 {
     return(pci_dac_page_to_dma(pdev, page, offset, direction)) ;
 }
 
-struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev,
+struct page * _RP lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev,
 					dma64_addr_t dma_addr)
 {
     return(pci_dac_dma_to_page(pdev, dma_addr)) ;
 }
 
-unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
+unsigned long  _RP lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
 					dma64_addr_t dma_addr)
 {
     return(pci_dac_dma_to_offset(pdev, dma_addr)) ;
 }
 
-void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
+void  _RP lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 			    dma64_addr_t dma_addr, size_t len, int direction)
 {
+#if defined(KERNEL_2_6)
     pci_dac_dma_sync_single(pdev, dma_addr, len, direction) ;
+#endif
 }
 
 #endif                                  /* 2.4.13 */
@@ -479,35 +481,165 @@ void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 *                        IRQ Routines                                   *
 ************************************************************************/
 
-int lis_request_irq(unsigned int  irq,
-	             void        (*handler)(int, void *, struct pt_regs *),
+#if defined (KERNEL_2_5)
+/*
+ * Because of the register parameter passing in the 2.6 kernel we need
+ * an irq routine that is compiled with the kernel's register style to
+ * pass to the kernel's request_irq function.  This routine then calls
+ * the LiS style irq handler using the LiS parameter passing convention.
+ *
+ * So we construct a "deice id" as the pointer to one of these structures
+ * in which we save the user's original dev_id parameter which we then
+ * pass back to the user's interrupt handler.  We are going to appropriate
+ * the lis_incr_lock spin lock for our list protection.
+ *
+ * We make a list of these structures that can be cleaned up at LiS
+ * termination time.
+ */
+typedef struct lis_devid
+{
+    struct lis_devid	*link ;
+    lis_int_handler	 handler ;
+    void		*dev_id ;		/* user's dev_id param */
+    int			 irq ;
+} lis_devid_t ;
+
+extern lis_spin_lock_t  lis_incr_lock ;
+
+lis_devid_t	*lis_devid_list ;
+
+/*
+ * This routine is compiled with the kernel's parameter passing convention.
+ * It calls the STREAMS driver's handler using LiS parameter passing
+ * convention.
+ */
+static irqreturn_t lis_khandler(int irq, void *dev_id, struct pt_regs *regs)
+{
+    lis_devid_t		*dv = (lis_devid_t *) dev_id ;
+
+    return(dv->handler(irq, dv->dev_id, regs)) ;
+}
+
+/*
+ * Called at LiS termination time to clean up the list
+ */
+void lis_free_devid_list(void)
+{
+    lis_devid_t		*dv = lis_devid_list ;
+    lis_devid_t		*nxt ;
+
+    lis_devid_list = NULL ;
+
+    while (dv != NULL)
+    {
+	nxt = dv->link ;
+	if (dv->handler && dv->dev_id && dv->irq)
+	{
+	    printk("LiS freeing IRQ%u\n", dv->irq) ;
+	    free_irq(dv->irq, dv) ;
+	}
+	FREE(dv) ;
+	dv = nxt ;
+    }
+}
+
+#endif
+
+#if defined (KERNEL_2_5)
+
+int      lis_irqreturn_handled = IRQ_HANDLED;
+int      lis_irqreturn_not_handled = IRQ_NONE;
+
+#else
+
+int      lis_irqreturn_handled = 1;
+int      lis_irqreturn_not_handled = 0;
+
+#endif
+
+int  _RP lis_request_irq(unsigned int  irq,
+		     lis_int_handler handler,
 	             unsigned long flags,
 		     const char   *device,
 		     void         *dev_id)
 {
-    return(request_irq(irq, handler, flags, device, dev_id)) ;
+#if !defined(__s390__)
+#if defined (KERNEL_2_5)
+    int			  ret ;
+    lis_devid_t		 *dv ;
+    lis_flags_t		  psw ;
+
+    dv = ALLOC(sizeof(*dv)) ;
+    if (dv == NULL)
+	return(-ENOMEM) ;
+
+    dv->handler = handler ;
+    dv->dev_id  = dev_id ;
+    dv->irq     = irq ;
+
+    ret = request_irq(irq, lis_khandler, flags, device, dv) ;
+    if (ret == 0)
+    {
+	lis_spin_lock_irqsave(&lis_incr_lock, &psw) ;
+	dv->link = lis_devid_list ;
+	lis_devid_list = dv ;
+	lis_spin_unlock_irqrestore(&lis_incr_lock, &psw) ;
+    }
+    else
+	FREE(dv) ;
+
+    return(ret) ;
+#else
+    typedef void	(*khandler) (int, void *, struct pt_regs *) ;
+    khandler	kparam = (khandler) handler ;
+
+    return(request_irq(irq, kparam, flags, device, dev_id)) ;
+#endif
+#endif
 }
 
-void lis_free_irq(unsigned int irq, void *dev_id)
+void  _RP lis_free_irq(unsigned int irq, void *dev_id)
 {
+#if !defined(__s390__)
+#if defined (KERNEL_2_5)
+    lis_devid_t		*dv = lis_devid_list ;
+    lis_flags_t		 psw ;
+
+    lis_spin_lock_irqsave(&lis_incr_lock, &psw) ;
+    for (; dv != NULL; dv = dv->link)
+    {
+	if (dv->dev_id == dev_id)
+	{
+	    dv->handler = NULL ;
+	    dv->dev_id  = NULL ;
+	    dv->irq     = 0 ;
+	    lis_spin_unlock_irqrestore(&lis_incr_lock, &psw) ;
+	    free_irq(irq, dv) ;
+	    return ;
+	}
+    }
+    lis_spin_unlock_irqrestore(&lis_incr_lock, &psw) ;
+#else
     free_irq(irq, dev_id) ;
+#endif
+#endif
 }
 
-void lis_enable_irq(unsigned int irq)
+void  _RP lis_enable_irq(unsigned int irq)
 {
 #if !defined(__s390__)
     enable_irq(irq) ;
 #endif
 }
 
-void lis_disable_irq(unsigned int irq)
+void  _RP lis_disable_irq(unsigned int irq)
 {
 #if !defined(__s390__)
     disable_irq(irq) ;
 #endif
 }
 
-void lis_osif_cli( void )
+void  _RP lis_osif_cli( void )
 {
 #if defined(KERNEL_2_5)
     lis_splstr() ;
@@ -516,7 +648,7 @@ void lis_osif_cli( void )
 #endif
 
 }
-void lis_osif_sti( void )
+void  _RP lis_osif_sti( void )
 {
 #if defined(KERNEL_2_5)
     lis_spl0() ;
@@ -540,7 +672,7 @@ void lis_osif_sti( void )
 *									*
 ************************************************************************/
 
-void *lis_ioremap(unsigned long offset, unsigned long size)
+void * _RP lis_ioremap(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100               /* 2.0 kernel */
     return(vremap(offset, size)) ;
@@ -551,7 +683,7 @@ void *lis_ioremap(unsigned long offset, unsigned long size)
 #endif
 }
 
-void *lis_ioremap_nocache(unsigned long offset, unsigned long size)
+void * _RP lis_ioremap_nocache(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100               /* 2.0 kernel */
     return(vremap(offset, size)) ;
@@ -562,7 +694,7 @@ void *lis_ioremap_nocache(unsigned long offset, unsigned long size)
 #endif
 }
 
-void lis_iounmap(void *ptr)
+void _RP lis_iounmap(void *ptr)
 {
 #if LINUX_VERSION_CODE < 0x020100               /* 2.0 kernel */
     vfree(ptr) ;
@@ -571,7 +703,7 @@ void lis_iounmap(void *ptr)
 #endif
 }
 
-void *lis_vremap(unsigned long offset, unsigned long size)
+void * _RP lis_vremap(unsigned long offset, unsigned long size)
 {
 #if LINUX_VERSION_CODE < 0x020100               /* 2.0 kernel */
     return(vremap(offset, size)) ;
@@ -582,12 +714,12 @@ void *lis_vremap(unsigned long offset, unsigned long size)
 #endif
 }
 
-unsigned long lis_virt_to_phys(volatile void *addr)
+unsigned long  _RP lis_virt_to_phys(volatile void *addr)
 {
     return(virt_to_phys(addr)) ;
 }
 
-void *lis_phys_to_virt(unsigned long addr)
+void * _RP lis_phys_to_virt(unsigned long addr)
 {
     return(phys_to_virt(addr)) ;
 }
@@ -597,19 +729,28 @@ void *lis_phys_to_virt(unsigned long addr)
 *                       I/O Ports Routines                              *
 ************************************************************************/
 
-int lis_check_region(unsigned int from, unsigned int extent)
+int  _RP lis_check_region(unsigned int from, unsigned int extent)
 {
+#if defined(KERNEL_2_5)
+    if (request_region(from,extent,"LiS-checking"))
+    {
+	release_region(from,extent) ;
+	return(0) ;
+    }
+    return(-EBUSY) ;
+#else
     return(check_region(from, extent)) ;
+#endif
 }
 
-void lis_request_region(unsigned int from,
+void  _RP lis_request_region(unsigned int from,
 			 unsigned int extent,
 			 const char  *name)
 {
     request_region(from, extent, name) ;
 }
 
-void lis_release_region(unsigned int from, unsigned int extent)
+void  _RP lis_release_region(unsigned int from, unsigned int extent)
 {
     release_region(from, extent) ;
 }
@@ -618,22 +759,22 @@ void lis_release_region(unsigned int from, unsigned int extent)
 *                    Memory Allocation Routines                         *
 ************************************************************************/
 
-void *lis_kmalloc(size_t nbytes, int type)
+void * _RP lis_kmalloc(size_t nbytes, int type)
 {
     return(kmalloc(nbytes, type)) ;
 }
 
-void  lis_kfree(const void *ptr)
+void   _RP lis_kfree(const void *ptr)
 {
     kfree((void *)ptr) ;
 }
 
-void *lis_vmalloc(unsigned long size)
+void * _RP lis_vmalloc(unsigned long size)
 {
     return(vmalloc(size)) ;
 }
 
-void  lis_vfree(void *ptr)
+void   _RP lis_vfree(void *ptr)
 {
     vfree(ptr) ;
 }
@@ -642,7 +783,7 @@ void  lis_vfree(void *ptr)
 *                        DMA Routines                                   *
 ************************************************************************/
 
-int  lis_request_dma(unsigned int dma_nr, const char *device_id)
+int   _RP lis_request_dma(unsigned int dma_nr, const char *device_id)
 {
 #if defined(MAX_DMA_CHANNELS)
     return(request_dma(dma_nr, device_id)) ;
@@ -651,7 +792,7 @@ int  lis_request_dma(unsigned int dma_nr, const char *device_id)
 #endif
 }
 
-void lis_free_dma(unsigned int dma_nr)
+void  _RP lis_free_dma(unsigned int dma_nr)
 {
 #if defined(MAX_DMA_CHANNELS)
     free_dma(dma_nr) ;
@@ -662,12 +803,12 @@ void lis_free_dma(unsigned int dma_nr)
 *                         Delay Routines                                *
 ************************************************************************/
 
-void lis_udelay(long micro_secs)
+void  _RP lis_udelay(long micro_secs)
 {
     udelay(micro_secs) ;
 }
 
-unsigned long lis_jiffies(void)
+unsigned long  _RP lis_jiffies(void)
 {
     return(jiffies) ;
 }
@@ -675,15 +816,26 @@ unsigned long lis_jiffies(void)
 /************************************************************************
 *                         Time Routines                                 *
 ************************************************************************/
-void lis_osif_do_gettimeofday( struct timeval *tp )
+void  _RP lis_osif_do_gettimeofday( struct timeval *tp )
 {
     do_gettimeofday(tp) ;
 }
 
-void lis_osif_do_settimeofday( struct timeval *tp )
+void  _RP lis_osif_do_settimeofday( struct timeval *tp )
 {
-#if LINUX_VERSION_CODE >= 0x020300		/* 2.4 kernel */
+#if defined(KERNEL_2_5)		/* yes, of course we have to change a
+				   standard system routine interface call...
+			         */
+    struct timespec	ts ;
+
+    ts.tv_sec = tp->tv_sec ;
+    ts.tv_nsec = tp->tv_usec * 1000 ;
+    do_settimeofday(&ts) ;
+
+#elif LINUX_VERSION_CODE >= 0x020300		/* 2.4 kernel */
+
     do_settimeofday(tp) ;
+
 #endif						/* not in earlier kernels */
 }
 
@@ -691,7 +843,7 @@ void lis_osif_do_settimeofday( struct timeval *tp )
 /************************************************************************
 *                         Printing Routines                             *
 ************************************************************************/
-int lis_printk(const char *fmt, ...)
+int  _RP lis_printk(const char *fmt, ...)
 {
     extern char	    lis_cmn_err_buf[];
     va_list	    args;
@@ -705,7 +857,7 @@ int lis_printk(const char *fmt, ...)
     return(ret) ;
 }
 
-int lis_sprintf(char *bfr, const char *fmt, ...)
+int  _RP lis_sprintf(char *bfr, const char *fmt, ...)
 {
     va_list	    args;
     int		    ret ;
@@ -717,7 +869,7 @@ int lis_sprintf(char *bfr, const char *fmt, ...)
     return(ret) ;
 }
 
-int lis_vsprintf(char *bfr, const char *fmt, va_list args)
+int  _RP lis_vsprintf(char *bfr, const char *fmt, va_list args)
 {
     return(vsprintf (bfr, fmt, args));
 }
@@ -725,22 +877,42 @@ int lis_vsprintf(char *bfr, const char *fmt, va_list args)
 /************************************************************************
 *                      Sleep/Wakeup Routines                            *
 ************************************************************************/
-void lis_sleep_on(OSIF_WAIT_Q_ARG)
+void  _RP lis_sleep_on(OSIF_WAIT_Q_ARG)
 {
     sleep_on(wq) ;
 }
 
-void lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
+void  _RP lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG)
 {
     interruptible_sleep_on(wq) ;
 }
 
-void lis_wake_up(OSIF_WAIT_Q_ARG)
+void  _RP lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
+{
+    sleep_on_timeout(wq, timeout) ;
+}
+
+void  _RP lis_interruptible_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout)
+{
+    interruptible_sleep_on_timeout(wq, timeout) ;
+}
+
+void  _RP lis_wait_event(OSIF_WAIT_E_ARG, int condition)
+{
+    wait_event(wq, condition) ;
+}
+
+void  _RP lis_wait_event_interruptible(OSIF_WAIT_E_ARG, int condition)
+{
+    wait_event_interruptible(wq, condition) ;
+}
+
+void  _RP lis_wake_up(OSIF_WAIT_Q_ARG)
 {
     wake_up(wq) ;
 }
 
-void lis_wake_up_interruptible(OSIF_WAIT_Q_ARG)
+void  _RP lis_wake_up_interruptible(OSIF_WAIT_Q_ARG)
 {
     wake_up_interruptible(wq) ;
 }
@@ -748,13 +920,13 @@ void lis_wake_up_interruptible(OSIF_WAIT_Q_ARG)
 /************************************************************************
 *                             Timer Routines                            *
 ************************************************************************/
-void 
+void _RP
 lis_add_timer(struct timer_list * timer)
 {
     add_timer(timer);
 }
 
-int  
+int  _RP
 lis_del_timer(struct timer_list * timer)
 {
     return del_timer(timer);
@@ -763,7 +935,131 @@ lis_del_timer(struct timer_list * timer)
 /*
  * Prototype in dki.h (with other timer stuff), not osif.h
  */
-unsigned lis_usectohz(unsigned usec)
+unsigned _RP lis_usectohz(unsigned usec)
 {
     return( usec / (1000000/HZ) ) ;
 }
+
+/************************************************************************
+*                        Wrapped Functions                              *
+************************************************************************/
+
+#define __real_strcpy	strcpy
+#define __real_strncpy	strncpy
+#define __real_strcat	strcat
+#define __real_strncat	strncat
+#define __real_strcmp	strcmp
+#define __real_strncmp	strncmp
+#define __real_strnicmp	strnicmp
+#define __real_strchr	strchr
+#define __real_strrchr	strrchr
+#define __real_strstr	strstr
+#define __real_strlen	strlen
+#define __real_memset	memset
+#define __real_memcpy	memcpy
+#define __real_memcmp	memcmp
+
+char * _RP __wrap_strcpy(char *d,const char *s)
+{
+    return(__real_strcpy(d,s));
+}
+
+char * _RP __wrap_strncpy(char *d,const char *s, __kernel_size_t l)
+{
+    return(__real_strncpy(d,s,l));
+}
+
+char * _RP __wrap_strcat(char *d, const char *s)
+{
+    return(__real_strcat(d,s));
+}
+
+char * _RP __wrap_strncat(char *d, const char *s, __kernel_size_t l)
+{
+    return(__real_strncat(d,s,l));
+}
+
+int _RP __wrap_strcmp(const char *a,const char *b)
+{
+    return(__real_strcmp(a,b));
+}
+
+int _RP __wrap_strncmp(const char *a,const char *b,__kernel_size_t l)
+{
+    return(__real_strncmp(a,b,l));
+}
+
+int _RP __wrap_strnicmp(const char *a, const char *b, __kernel_size_t l)
+{
+    return(__real_strnicmp(a,b,l));
+}
+
+char * _RP __wrap_strchr(const char *s,int c)
+{
+    return(__real_strchr(s,c));
+}
+
+char * _RP __wrap_strrchr(const char *s,int c)
+{
+    return(__real_strrchr(s,c));
+}
+
+char * _RP __wrap_strstr(const char *a,const char *b)
+{
+    return(__real_strstr(a,b));
+}
+
+__kernel_size_t _RP __wrap_strlen(const char *s)
+{
+    return(__real_strlen(s));
+}
+
+void * _RP __wrap_memset(void *d,int v,__kernel_size_t l)
+{
+    return(__real_memset(d,v,l));
+}
+
+void * _RP __wrap_memcpy(void *d,const void *s,__kernel_size_t l)
+{
+    return(__real_memcpy(d,s,l));
+}
+
+int _RP __wrap_memcmp(const void *a,const void *b,__kernel_size_t l)
+{
+    return(__real_memcmp(a,b,l));
+}
+
+
+int _RP __wrap_sprintf(char *p, const char *fmt, ...)
+{
+    va_list	 args;
+    int		 ret ;
+
+    va_start (args, fmt);
+    ret = vsprintf (p, fmt, args);
+    va_end (args);
+    return(ret) ;
+}
+
+int _RP __wrap_snprintf(char *p, size_t len, const char *fmt, ...)
+{
+    va_list	 args;
+    int		 ret ;
+
+    va_start (args, fmt);
+    ret = vsnprintf (p, len, fmt, args);
+    va_end (args);
+    return(ret) ;
+}
+
+int _RP __wrap_vsprintf(char *p, const char *fmt, va_list args)
+{
+    return(vsprintf (p, fmt, args));
+}
+
+int _RP __wrap_vsnprintf(char *p, size_t len, const char *fmt, va_list args)
+{
+    return(vsnprintf (p, len, fmt, args));
+}
+
+
