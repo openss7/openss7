@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/01/18 20:24:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/01/21 12:17:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/18 20:24:13 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 12:17:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -539,5 +539,20 @@ AM_RPMFLAGS = --define "_kversion $(PACKAGE_KVERSION)"
 AM_SRPMFLAGS =
 
 include am/rpm.am
+
+MAINTAINERCLEANFILES	+= \
+			$(top_srcdir)/aclocal.m4 \
+			$(top_srcdir)/config.h.in \
+			$(top_srcdir)/configure \
+			$(top_srcdir)/COPYING \
+			$(top_srcdir)/INSTALL \
+			$(top_srcdir)/scripts/compile \
+			$(top_srcdir)/scripts/config.guess \
+			$(top_srcdir)/scripts/config.sub \
+			$(top_srcdir)/scripts/depcomp \
+			$(top_srcdir)/scripts/install-sh \
+			$(top_srcdir)/scripts/ltmain.sh \
+			$(top_srcdir)/scripts/missing \
+			$(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake

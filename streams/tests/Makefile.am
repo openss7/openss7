@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/15 19:35:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/21 12:16:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,9 +47,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/15 19:35:01 $ by $Author: brian $
+# Last Modified $Date: 2005/01/21 12:16:44 $ by $Author: brian $
 #
 # =============================================================================
+
+include ../am/openss7.am
 
 #
 # This automake file is used to specify the autotest definitions and targets
@@ -59,7 +61,7 @@
 # pre-install checks.
 #
 
-TESTSUITE		= $(srcdir)/testsuite
+TESTSUITE		= testsuite
 
 $(srcdir)/package.m4: $(top_srcdir)/configure
 	@( \
@@ -71,14 +73,14 @@ $(srcdir)/package.m4: $(top_srcdir)/configure
 	) > $@
 
 TESTSUITE_DEPS		= \
-			$(srcdir)/testsuite.at \
-			$(srcdir)/dummy1.m4 \
-			$(srcdir)/dummy2.m4 \
-			$(srcdir)/dummy3.m4 \
-			$(srcdir)/dummy4.m4 \
-			$(srcdir)/package.m4
+			testsuite.at \
+			dummy1.m4 \
+			dummy2.m4 \
+			dummy3.m4 \
+			dummy4.m4 \
+			package.m4
 
-$(TESTSUITE): $(TESTSUITE_DEPS)
+$(srcdir)/$(TESTSUITE): $(TESTSUITE_DEPS)
 	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
 	mv -f $@.tmp $@
 
@@ -90,13 +92,10 @@ atconfig: $(top_builddir)/config.status
 #atlocal: $(srcdir)/atlocal.in $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
-EXTRA_DIST		= testsuite testsuite.at \
-			  dummy1.m4 \
-			  dummy2.m4 \
-			  dummy3.m4 \
-			  dummy4.m4 \
-			  package.m4
-dist_noinst_SCRIPTS	= testsuite
+EXTRA_DIST		= $(TESTSUITE) $(TESTSUITE_DEPS)
+dist_noinst_SCRIPTS	= $(TESTSUITE)
+
+all-testsuite: $(srcdir)/$(TESTSUITE)
 
 if PERFORM_TESTING
 
@@ -112,50 +111,43 @@ installcheck-tirdwr:
 
 installcheck-inet:
 
-installcheck-test:
-	$(SHELL) $(TESTSUITE) -x -v
+installcheck-test: $(srcdir)/$(TESTSUITE)
+	$(SHELL) $< -x -v
 
-installcheck-hook: installcheck-specfs
-
-installcheck-hook: installcheck-streams
-
-installcheck-hook: installcheck-xnet
-
-installcheck-hook: installcheck-timod
-
-installcheck-hook: installcheck-tirdwr
-
-installcheck-hook: installcheck-inet
-
-installcheck-hook: installcheck-test
-
-installcheck-hook: atconfig atlocal $(TESTSUITE)
+installcheck-testsuite: $(TESTSUITE) atconfig atlocal \
+	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod \
+	installcheck-tirdwr installcheck-inet installcheck-test
 
 else
 
-installcheck-hook: atconfig atlocal $(TESTSUITE)
+installcheck-testsuite: $(srcdir)/$(TESTSUITE) atconfig atlocal
 
 endif
 
-installcheck-local:
-	$(MAKE) $(AM_MAKEFLAGS) DESTDIR="$(DESTDIR)" installcheck-hook
-
-clean-local:
-	@if test -r "$(TESTSUITE)" ; then \
-		echo "$(SHELL) $(TESTSUITE) --clean" ; \
-		$(SHELL) $(TESTSUITE) --clean ; \
+clean-testsuite: $(srcdir)/$(TESTSUITE)
+	@if test -r "$<" ; then \
+		echo "$(SHELL) $< --clean" ; \
+		$(SHELL) $< --clean ; \
 	fi
 
-distclean-local:
-	rm -f atconfig atlocal
+CLEANFILES		+= \
+			$(TESTSUITE) \
+			atconfig \
+			atlocal
 
-.PHONY: installcheck-hook \
-	installcheck-specfs \
-	installcheck-streams \
-	installcheck-xnet \
-	installcheck-timod \
-	installcheck-tirdwr \
-	installcheck-inet \
-	installcheck-test
+MAINTAINERCLEANFILES	+= \
+			$(srcdir)/$(TESTSUITE) \
+			$(srcdir)/atconfig \
+			$(srcdir)/atlocal
+
+ALL_LOCAL += all-testsuite
+
+INSTALLCHECK_LOCAL += installcheck-testsuite
+
+CLEAN_LOCAL += clean-testsuite
+
+.PHONY: all-testsuite installcheck-testsuite clean-testsuite \
+	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod
+	installcheck-tirdwr installcheck-inet installcheck-test
 
 # vim: ft=automake
