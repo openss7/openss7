@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: T_EXDATA_REQ.7.man,v 0.9.2.2 2004/05/14 07:59:57 brian Exp $
+.\" @(#) $Id: T_EXDATA_REQ.7.man,v 0.9.2.3 2004/05/30 09:40:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/14 07:59:57 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/30 09:40:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,9 +71,9 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH T_EXDATA_REQ 7 "$Date: 2004/05/14 07:59:57 $" "$Name:  $" "Transport Provider Interface (TPI)"
+.TH T_EXDATA_REQ 7 "$Date: 2004/05/30 09:40:55 $" "$Name:  $" "Transport Provider Interface (TPI)"
 .SH NAME
-.B T_EXDATA_REQ
+.B T_EXDATA_REQ, T_exdata_req
 \- Expedited Data Request
 .SH SYNOPSIS
 This  message consists of one

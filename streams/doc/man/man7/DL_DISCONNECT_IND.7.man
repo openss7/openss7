@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DL_DISCONNECT_IND.7.man,v 0.9.2.2 2004/05/14 07:59:54 brian Exp $
+.\" @(#) $Id: DL_DISCONNECT_IND.7.man,v 0.9.2.3 2004/05/30 09:40:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/14 07:59:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/30 09:40:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,9 +71,9 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DL_DISCONNECT_IND 7 "$Date: 2004/05/14 07:59:54 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
+.TH DL_DISCONNECT_IND 7 "$Date: 2004/05/30 09:40:53 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
 .SH NAME
-.B DL_DISCONNECT_IND (dl_disconnect_ind_t)
+.B DL_DISCONNECT_IND, dl_disconnect_ind_t
 \- informs the DLS user that the data link connection on this stream has
 been disconnected, or that apending connection (either
 .BR DL_CONNECT_REQ (7)

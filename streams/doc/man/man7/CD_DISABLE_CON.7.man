@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: CD_DISABLE_CON.7.man,v 0.9.2.2 2004/05/14 07:59:53 brian Exp $
+.\" @(#) $Id: CD_DISABLE_CON.7.man,v 0.9.2.3 2004/05/30 09:40:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/14 07:59:53 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/30 09:40:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,9 +71,9 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CD_DISABLE_CON 7 "$Date: 2004/05/14 07:59:53 $" "$Name:  $" "Communications Device Interface (CDI)"
+.TH CD_DISABLE_CON 7 "$Date: 2004/05/30 09:40:52 $" "$Name:  $" "Communications Device Interface (CDI)"
 .SH NAME
-.B CD_DISABLE_CON
+.B CD_DISABLE_CON, cd_disable_con_t
 \- disable confirmation
 .SH SYNOPSIS
 This primitive consists of one

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: CD_MODEM_SIG_REQ.7.man,v 0.9.2.2 2004/05/14 07:59:54 brian Exp $
+.\" @(#) $Id: CD_MODEM_SIG_REQ.7.man,v 0.9.2.3 2004/05/30 09:40:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/14 07:59:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/30 09:40:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,9 +71,9 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CD_MODEM_SIG_REQ 7 "$Date: 2004/05/14 07:59:54 $" "$Name:  $" "Communications Device Interface (CDI)"
+.TH CD_MODEM_SIG_REQ 7 "$Date: 2004/05/30 09:40:52 $" "$Name:  $" "Communications Device Interface (CDI)"
 .SH NAME
-.B CD_MODEM_SIG_REQ
+.B CD_MODEM_SIG_REQ, cd_modem_sig_req_t
 \- assert modem signals
 .SH SYNOPSIS
 This primitive consists of one
