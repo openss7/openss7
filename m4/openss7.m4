@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/12/21 12:22:06 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/10 10:24:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,10 +48,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/21 12:22:06 $ by $Author: brian $
+# Last Modified $Date: 2005/01/10 10:24:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 # $Log: openss7.m4,v $
+# Revision 0.9.2.4  2005/01/10 10:24:53  brian
+# - Correct genksyms cache clash.
+#
 # Revision 0.9.2.3  2004/12/21 12:22:06  brian
 # - Added automatic caching to all packages.
 #
@@ -99,7 +102,7 @@ AC_DEFUN([_OPENSS7_CACHE], [
             do
                 if test -w "$config_site" -o ! -e "$config_site"
                 then
-                    cat "$cache_file" | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|sctp_cv_|xns_cv_|lis_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_)' > "$config_site" 2>/dev/null
+                    cat "$cache_file" | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|ksyms_cv_|strconf_cv_|sctp_cv_|xns_cv_|lis_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_)' > "$config_site" 2>/dev/null
                 fi
             done
         fi], [cache_file="$cache_file" ; CONFIG_SITE="$CONFIG_SITE"])

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 01:04:42 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/10 10:24:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/07/04 01:04:42 $ by $Author: brian $
+# Last Modified $Date: 2005/01/10 10:24:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,26 +79,12 @@ dnl     [enable_k_versions=''])
 # _KSYMS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_SETUP], [dnl
-    AC_CACHE_CHECK([for genksyms smp kernel], [ksyms_cv_smp], [dnl
-        AC_EGREP_CPP([\<yes_we_have_an_smp_kernel\>], [
-#include <linux/version.h>
-#include <linux/config.h>
-#ifdef CONFIG_SMP
-    yes_we_have_an_smp_kernel
-#endif
-        ], [ksyms_cv_smp=yes], [ksyms_cv_smp=no]) ])
-    if test :"${ksyms_cv_smp:-no}" = :yes ; then
+    _LINUX_CHECK_KERNEL_CONFIG([for genksyms smp kernel], [CONFIG_SMP])
+    if test :"${linux_cv_CONFIG_SMP:-no}" = :yes ; then
         GENKSYMS_SMP_PREFIX='-p smp_'
     fi
-    AC_CACHE_CHECK([for genksyms SuSE production kernel], [ksyms_cv_regparm], [dnl
-        AC_EGREP_CPP([\<yes_we_have_a_regparm_kernel\>], [
-#include <linux/version.h>
-#include <linux/config.h>
-#ifdef CONFIG_REGPARM
-    yes_we_have_a_regparm_kernel
-#endif
-        ], [ksyms_cv_regparm=yes], [ksyms_cv_regparm=no]) ])
-    if test :"${ksyms_cv_regparm:-no}" = :yes ; then
+    _LINUX_CHECK_KERNEL_CONFIG([for genksyms SuSE production kernel], [CONFIG_REGPARM])
+    if test :"${linux_cv_CONFIG_REGPARM:-no}" = :yes ; then
         GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
     AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
