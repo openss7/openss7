@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/05 10:50:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/05 20:28:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/05 10:50:05 $ by $Author: brian $
+# Last Modified $Date: 2004/08/05 20:28:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,6 +100,10 @@ netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
 EXTRA_DIST			=
 
+man1_MANS			= netperf.1
+dist_noinst_MANS		= netperf.man
+
+include am/man.am
 
 #
 #   Rules for making rpms

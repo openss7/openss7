@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.1 2004/08/05 10:50:05 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.2 2004/08/05 20:29:01 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/05 10:50:05 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/05 20:29:01 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -76,8 +76,8 @@ AC_DEFUN([AC_NETPERF], [dnl
     _STREAMS
     _XNS
     _XTI
-    INCLUDES="-I- -imacros ./config.h${xns_cv_includes:+ -I}${xns_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    AC_SUBST([INCLUDES])
+    AM_CPPFLAGS="-I- -imacros ./config.h${xns_cv_includes:+ -I}${xns_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    AC_SUBST([AM_CPPFLAGS])
     _NETPERF_OUTPUT
 ])# AC_NETPERF
 # =========================================================================
