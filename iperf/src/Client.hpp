@@ -56,20 +56,23 @@
 
 #include "PerfSocket.hpp"
 #include "Thread.hpp"
-#include "Condition.hpp"
+#include "Notify.hpp"
+#include "Settings.hpp"
 
 /* ------------------------------------------------------------------- */
 class Client : public PerfSocket, public Thread {
 public:
     // stores server hostname, port, UDP/TCP mode, and UDP rate
-    Client( short inPort,  bool inUDP, const char *inHostname,
-            const char *inLocalhost = NULL, bool inPrintSettings = true );
+    Client( ext_Settings *inSettings, bool inPrintSettings = true,
+            Notify* toNotify = NULL );
 
     // destroy the client object
     ~Client();
 
     // connects and sends data
     virtual void Run( void );
+
+    void InitiateServer();
 
     virtual int set_tcp_windowsize( int a, int b ) {
         return setsock_tcp_windowsize( a, b, 1 );
@@ -78,14 +81,8 @@ public:
         return getsock_tcp_windowsize( a, 1 );
     };
 
-    // number of threads to wait for in start barrier
-    static void SetNumThreads( int mNumThreads ) {
-        sNumThreads = mNumThreads;
-    }
 
 protected:
-    static int sNumThreads;
-    static Condition sNum_cond;
 
 }; // end class Client
 

@@ -22,13 +22,17 @@ DIST_CLEAN_FILES = $(CLEAN_FILES)
 # files
 
 OBJS = Client.o          \
-       Extractor.o	 \
+       Extractor.o       \
        Listener.o        \
        PerfSocket.o      \
        PerfSocket_TCP.o  \
        PerfSocket_UDP.o  \
        Server.o          \
        Settings.o        \
+       Speaker.o         \
+       Notify.o          \
+       Audience.o        \
+       List.o            \
        main.o
 
 INCS = -I$(TOP)/lib -I$(TOP)/cfg

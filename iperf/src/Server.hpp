@@ -55,15 +55,17 @@
 #define SERVER_H
 
 
-
+#include "Settings.hpp"
 #include "PerfSocket.hpp"
 #include "Thread.hpp"
+#include "Notify.hpp"
 
 /* ------------------------------------------------------------------- */
 class Server : public PerfSocket, public Thread {
 public:
     // stores server socket, port and TCP/UDP mode
-    Server( short inPort, bool inUDP, int inSock );
+    Server( ext_Settings *inSettings, int inSock,
+            Notify* toNotify = NULL );
 
     // destroy the server object
     ~Server();

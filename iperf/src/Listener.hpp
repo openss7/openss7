@@ -57,12 +57,12 @@
 
 #include "PerfSocket.hpp"
 #include "Thread.hpp"
-#include <vector>
+#include "Settings.hpp"
 
 class Listener : public PerfSocket, public Thread {
 public:
     // stores server port and TCP/UDP mode
-    Listener( short inPort, bool inUDP, const char *inLocalhost = NULL );
+    Listener( ext_Settings *inSettings );
 
     // destroy the server object
     ~Listener();
@@ -80,13 +80,9 @@ public:
         return getsock_tcp_windowsize( a, 0 );
     };
 
-    // Checks if the client has already joined, used
-    // only for multicast
-    bool present( iperf_sockaddr );
-
-
 protected:
-    char *mLocalhost;
+    int mClients;
+    bool mCount;
 }; // end class Listener
 
 #endif // LISTENER_H

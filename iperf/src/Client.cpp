@@ -59,31 +59,27 @@
 #define HEADERS()
 
 #include "headers.h"
-
 #include "Client.hpp"
-#include "Locale.hpp"
 #include "Settings.hpp"
-
 #include "util.h"
-
-int Client::sNumThreads = 1;
-Condition Client::sNum_cond;
 
 /* -------------------------------------------------------------------
  * Store server hostname, optionally local hostname, and socket info.
  * ------------------------------------------------------------------- */
 
-Client::Client( short inPort, bool inUDP, const char *inHostname,
-                const char *inLocalhost, bool inPrintSettings )
-: PerfSocket( inPort, inUDP ),
+Client::Client( ext_Settings *inSettings, bool inPrintSettings,
+                Notify* toNotify )
+: PerfSocket( inSettings, toNotify ),
 Thread() {
-    const char *theHost = ((inHostname == NULL) ? "localhost" : inHostname);
+    mSettings = inSettings;
+
     // connect
-    Connect( theHost, inLocalhost );
+    Connect( mSettings->mHost, mSettings->mLocalhost );
 
     if ( inPrintSettings ) {
-        ReportClientSettings( theHost, inLocalhost );
+        ReportClientSettings( mSettings->mHost, mSettings->mLocalhost );
     }
+
 } // end Client
 
 /* -------------------------------------------------------------------
@@ -102,13 +98,9 @@ void Client::Run( void ) {
 
     // Barrier
     // wait until the number of anticipated threads have reached this point
-    sNum_cond.Lock();
-    sNumThreads--;
-    sNum_cond.Broadcast();
-    while ( sNumThreads > 0 ) {
-        sNum_cond.Wait();
+    if ( ptr_parent ) {
+        ptr_parent->WaitThreadsRunning();
     }
-    sNum_cond.Unlock();
 #endif
 
     // send data
@@ -117,4 +109,28 @@ void Client::Run( void ) {
     } else {
         Send_TCP();
     }
+
+    if ( ptr_parent != NULL ) {
+        ptr_parent->ThreadFinished(mEndTime, mTotalLen);
+    }
 } // end Run
+
+void Client::InitiateServer() {
+    if ( !mSettings->mCompat ) {
+        int currLen;
+        client_hdr* temp_hdr;
+        if ( mUDP ) {
+            UDP_datagram *UDPhdr = (UDP_datagram *)mBuf;
+            temp_hdr = (client_hdr*)(UDPhdr + 1);
+        } else {
+            temp_hdr = (client_hdr*)mBuf;
+        }
+        Settings::GenerateClientHdr( mSettings, temp_hdr );
+        if ( !mUDP ) {
+            currLen = send( mSock, mBuf, sizeof(client_hdr), 0 );
+            if ( currLen < 0 ) {
+                WARN_errno( currLen < 0, "write" );
+            }
+        }
+    }
+}

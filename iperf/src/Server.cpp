@@ -57,13 +57,13 @@
 
 #include "Server.hpp"
 #include "Listener.hpp"
-#include "Settings.hpp"
 /* -------------------------------------------------------------------
  * Stores connected socket and socket info.
  * ------------------------------------------------------------------- */
 
-Server::Server( short inPort, bool inUDP, int inSock )
-: PerfSocket( inPort, inUDP ),
+Server::Server( ext_Settings *inSettings, int inSock, 
+                Notify* toNotify )
+: PerfSocket( inSettings, toNotify ),
 Thread() {
     mSock = inSock;
 }
@@ -85,5 +85,7 @@ void Server::Run( void ) {
     } else {
         Recv_TCP();
     }
+    if ( ptr_parent != NULL ) {
+        ptr_parent->ThreadFinished( mEndTime, mTotalLen );
+    }
 }
-
