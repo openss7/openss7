@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/06/07 17:34:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/06/20 23:56:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/07 17:34:33 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 23:56:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,7 +85,8 @@ $(TESTSUITE): $(TESTSUITE_DEPS)
 atconfig: $(top_builddir)/config.status
 	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
-EXTRA_DIST		= testsuite.at testsuite package.m4
+EXTRA_DIST		= testsuite.at testsuite package.m4 \
+			  dummy1.m4 dummy2.m4 dummy3.m4 dummy4.m4
 dist_noinst_SCRIPTS	= testsuite
 
 if PERFORM_TESTING

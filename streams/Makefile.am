@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2004/06/09 08:32:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2004/06/20 23:55:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/09 08:32:44 $ by $Author: brian $
+# Last Modified $Date: 2004/06/20 23:55:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -149,8 +149,7 @@ libLfSspecfs_a_SOURCES		= \
 				src/kernel/strattach.h \
 				src/kernel/strpipe.c \
 				src/kernel/strpipe.h \
-				src/kernel/strargs.h \
-				src/kernel/strdebug.h
+				src/kernel/strargs.h
 
 libLfSspecfs_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
 libLfSspecfs_a_CPPFLAGS		= \
@@ -176,8 +175,7 @@ libLfSkernel_a_SOURCES		= \
 				src/kernel/strutil.h \
 				src/kernel/strsad.c \
 				src/kernel/strsad.h \
-				src/kernel/strargs.h \
-				src/kernel/strdebug.h
+				src/kernel/strargs.h
 
 libLfSkernel_a_DEPENDENCIES	= $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(MODVERSIONS_H)
 libLfSkernel_a_CPPFLAGS		= \
