@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/02/10 12:56:43 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/02/11 04:20:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/02/10 12:56:43 $ by $Author: brian $
+# Last Modified $Date: 2005/02/11 04:20:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -456,10 +456,13 @@ if [ $1 = 1 ] ; then
                 sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
                 mv -f $conf_tmp $conf_new
 #               Remove conflicting modules.
-                rm -f $streams_dir/$f
-                rm -f $streams_prf/$f
-                rm -f $streams_dfl/$f
+                rm -f $streams_dir/boot/$f $streams_dir/$f
+                rm -f $streams_prf/boot/$f $streams_prf/$f
+                rm -f $streams_dfl/boot/$f $streams_dfl/$f
             done
+            rmdir --ignore-fail-on-non-empty $streams_dir/boot $streams_dir
+            rmdir --ignore-fail-on-non-empty $streams_prf/boot $streams_prf
+            rmdir --ignore-fail-on-non-empty $streams_dfl/boot $streams_dfl
         fi
 #       check for forced over installs of older LiS or LfS rpm installations
 #       or installs over older LiS or LfS autoconf installations
@@ -479,10 +482,13 @@ if [ $1 = 1 ] ; then
                 sed -e '/alias.*\<'$m'\>/d' $streams_new > $streams_tmp
                 mv -f $streams_tmp $streams_new
 #               Remove conflicting modules.
-                rm -f $streams_dir/$f
-                rm -f $streams_prf/$f
-                rm -f $streams_dfl/$f
+                rm -f $streams_dir/boot/$f $streams_dir/$f
+                rm -f $streams_prf/boot/$f $streams_prf/$f
+                rm -f $streams_dfl/boot/$f $streams_dfl/$f
             done
+            rmdir --ignore-fail-on-non-empty $streams_dir/boot $streams_dir
+            rmdir --ignore-fail-on-non-empty $streams_prf/boot $streams_prf
+            rmdir --ignore-fail-on-non-empty $streams_dfl/boot $streams_dfl
 #           can't make backups in modules directory
             chmod --reference=$streams_old $streams_new
             cp -f $streams_new $streams_old
@@ -933,6 +939,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
+# Revision 0.9.2.62  2005/02/11 04:20:43  brian
+# - Added boot directory.
+#
 # Revision 0.9.2.61  2005/02/10 12:56:43  brian
 # - Minor adjustments for compressed modules.
 #
