@@ -33,7 +33,7 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS connld.c 1.10 9/24/03"
+#ident "@(#) LiS connld.c 1.10 09/24/03"
 
 #ifdef MODULE
 #  if defined(LINUX) && defined(__KERNEL__)

@@ -25,7 +25,7 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) LiS pipemod.c 1.7 9/24/03"
+#ident "@(#) LiS pipemod.c 1.7 09/24/03"
 
 #ifdef MODULE
 #  if defined(LINUX) && defined(__KERNEL__)

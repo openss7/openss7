@@ -34,7 +34,7 @@
 #ifndef _LIS_CONFIG_H
 #define _LIS_CONFIG_H 1
 
-#ident "@(#) LiS strconfig.h 2.3 2/8/01 21:24:53 "
+#ident "@(#) LiS strconfig.h 2.3 02/08/01 21:24:53 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */

@@ -1,4 +1,4 @@
-Makefile_ident="@(#) LiS Makefile 2.32 11/23/03"
+Makefile_ident="@(#) LiS Makefile 2.33 12/27/03"
 #
 # Makefile for the kernel STREAMS device drivers.
 #
@@ -81,7 +81,7 @@ else
 # as described above.
 #
 ifndef LIS_MAJOR_BASE
-LIS_MAJOR_BASE=230
+LIS_MAJOR_BASE=220
 endif
 STRCONF_XOPTS = -b$(LIS_MAJOR_BASE)
 

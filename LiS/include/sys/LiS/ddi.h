@@ -37,7 +37,7 @@
 #ifndef _DDI_H
 #define _DDI_H 1
 
-#ident "@(#) LiS ddi.h 2.1 4/4/99 11:34:27 "
+#ident "@(#) LiS ddi.h 2.1 04/04/99 11:34:27 "
 
 /* This file has to be updated with the Linux counterpart of SVR4 <sys/ddi.h>
  * header file. 
