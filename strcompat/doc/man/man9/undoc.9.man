@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: undoc.9.man,v 0.9.2.2 2005/01/26 13:03:51 brian Exp $
+.\" @(#) $Id: undoc.9.man,v 0.9.2.3 2005/02/10 04:30:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/26 13:03:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/02/10 04:30:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNDOCUMENTED 9 "$Date: 2005/01/26 13:03:51 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
+.TH UNDOCUMENTED 9 "$Date: 2005/02/10 04:30:34 $" "$Name:  $" "Linux Fast-STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -79,7 +79,7 @@ sort-adjacent-labels
 .B di_put, do_fattach, do_fdetach, do_spipe, freelk, kmem_alloc_node, kmem_zalloc_node, mapinit,
 .B mknod, mod_strmops, mount, msgscgth, nochpoll, nodev,
 .B nulldev, pipe, printf, qpop, qpush, register_clone, register_cmajor, register_strdrv,
-.B register_strnod, sd_get, sd_put, setqsched, spec_open,
+.B register_strnod, sd_get, sd_put, setqsched, spec_dentry, spec_open,
 .B strgetpmsg, strioccall, strm_f_ops, strputpmsg, strrput, str_uninstall,
 .B strwsrv, sysctl_str_strctlsz, sysctl_str_strmsgsz, __timeout, udelay, unregister_clone,
 .B unregister_cmajor, unregister_strdrv, unregister_strnod, vcmn_err, vtop, wakeup, lis_umount

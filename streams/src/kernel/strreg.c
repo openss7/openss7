@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/24 07:44:26 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/10 04:36:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/24 07:44:26 $ by $Author: brian $
+ Last Modified $Date: 2005/02/10 04:36:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/24 07:44:26 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/10 04:36:17 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/01/24 07:44:26 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/02/10 04:36:17 $";
 
 #define __NO_VERSION__
 
@@ -675,49 +675,45 @@ STATIC INLINE void file_swap_put(struct file *f1, struct file *f2)
 #endif
 
 /**
- *  spec_open:	- chain open to an internal special device.
- *  @i:	external (or chaining) filesystem inode
- *  @f:	external (or chaining) filesystem file pointer (user file pointer)
- *
- *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
+ *  spec_dentry: - find a dentry in the specfs to open.
+ *  @dev: device for which to find a dentry
+ *  @sflagp: flags to modify (if any)
  */
-int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
+struct dentry *spec_dentry(dev_t dev, int *sflagp)
 {
-	struct dentry *parent, *dentry = NULL;
-	struct file *file;		/* new file pointer to use */
-	struct inode *inode;		/* parent inode */
 	int err;
+	struct dentry *parent, *dentry = NULL;
+	struct inode *inode;
 	struct cdevsw *cdev;
 	struct devnode *cmin;
-	struct vfsmount *mnt;
-	ptrace(("%s: performing special open\n", __FUNCTION__));
-	err = ENXIO;
+	ptrace(("%s: finding dentry for major %hu minor %hu\n", __FUNCTION__, getmajor(dev),
+		getminor(dev)));
+	err = -ENXIO;
 	if (!(cdev = cdrv_get(getmajor(dev))))
-		goto exit;
+		goto no_cdev;
 	printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
-	printd(("%s: open of driver %s\n", __FUNCTION__, cdev->d_name));
-	err = ENOENT;
+	err = -ENOENT;
 	if (!(parent = dget(cdev->d_dentry)))
-		goto cput_exit;
+		goto no_parent;
 	printd(("%s: parent dentry %s\n", __FUNCTION__, parent->d_name.name));
 	err = -ENOMEM;
 	if (!(inode = parent->d_inode))
-		goto pput_exit;
+		goto no_inode;
 	printd(("%s: parent inode %ld\n", __FUNCTION__, inode->i_ino));
 	err = -ENODEV;
 	if (is_bad_inode(inode))
-		goto pput_exit;
+		goto no_inode;
 	/* lock the parent */
 	if ((err = down_interruptible(&inode->i_sem)) < 0)
-		goto pput_exit;
-	if (cdev->d_flag & D_CLONE)
-		sflag = CLONEOPEN;
+		goto no_lock;
+	if (sflagp && cdev->d_flag & D_CLONE)
+		*sflagp = CLONEOPEN;
 	printd(("%s: looking for minor device %hu\n", __FUNCTION__, getminor(dev)));
 	if ((cmin = cmin_get(cdev, getminor(dev)))) {
 		printd(("%s: found minor device %hu\n", __FUNCTION__, getminor(dev)));
 		dentry = dget(cmin->n_dentry);
-		if (cmin->n_flag & D_CLONE)
-			sflag = CLONEOPEN;
+		if (sflagp && cmin->n_flag & D_CLONE)
+			*sflagp = CLONEOPEN;
 	} else {
 		char buf[32];
 		struct qstr name;
@@ -732,59 +728,90 @@ int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 	err = -ENOENT;		/* XXX */
 	if (!dentry) {
 		ptrace(("%s: dentry lookup is NULL\n", __FUNCTION__));
-		goto up_exit;
+		goto no_dentry;
 	}
 	err = PTR_ERR(dentry);
 	if (IS_ERR(dentry)) {
 		ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__, -err));
-		goto up_exit;
+		goto no_dentry;
 	}
 	/* we only fail to get an inode when memory allocation fails */
 	err = -ENOMEM;
 	if (!dentry->d_inode) {
 		ptrace(("%s: negative dentry on lookup\n", __FUNCTION__));
-		goto dput_exit;
+		goto bad_dentry;
 	}
 	/* we only get a bad inode when there is no device entry */
 	err = -ENODEV;
 	if (is_bad_inode(dentry->d_inode)) {
 		ptrace(("%s: bad inode on lookup\n", __FUNCTION__));
-		goto dput_exit;
+		goto bad_dentry;
 	}
 	/* unlock the parent */
 	up(&inode->i_sem);
 	inode = NULL;
+	err = 0;
+	dget(dentry);
+      bad_dentry:
+	dput(dentry);
+      no_dentry:
+	if (inode)
+		up(&inode->i_sem);
+      no_lock:
+      no_inode:
+	dput(parent);
+      no_parent:
+	cdrv_put(cdev);
+      no_cdev:
+	if (err != 0)
+		dentry = ERR_PTR(err);
+	return dentry;
+}
+
+#if defined CONFIG_STREAMS_STH_MODULE
+EXPORT_SYMBOL_GPL(spec_dentry);
+#endif
+
+/**
+ *  spec_open:	- chain open to an internal special device.
+ *  @i:	external (or chaining) filesystem inode
+ *  @f:	external (or chaining) filesystem file pointer (user file pointer)
+ *
+ *  The f->f_flags has the O_CLONE flags set if CLONEOPEN was set by a previous operation.
+ */
+int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
+{
+	int err;
+	struct file *file;		/* new file pointer to use */
+	struct dentry *dentry;
+	struct vfsmount *mnt;
+	ptrace(("%s: performing special open\n", __FUNCTION__));
+	dentry = spec_dentry(dev, &sflag);
+	err = PTR_ERR(dentry);
+	if (IS_ERR(dentry)) {
+		goto exit;
+	}
 	err = -ENODEV;
 	if (!(mnt = specfs_get())) {
 		ptrace(("%s: could not find specfs mount point\n", __FUNCTION__));
 		goto dput_exit;
 	}
-	printd(("%s: opening dentry %p\n", __FUNCTION__, dentry));
+	printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode,
+		dentry->d_inode->i_ino));
 	file = dentry_open(dentry, mntget(mnt), f->f_flags | ((sflag == CLONEOPEN) ? O_CLONE : 0));
 	specfs_put();
 	err = PTR_ERR(file);
 	if (IS_ERR(file)) {
 		ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__, -err));
-		goto pput_exit;
+		goto exit;
 	}
 	printd(("%s: swapping file pointers\n", __FUNCTION__));
 	file_swap_put(f, file);
 	err = 0;
-	goto cput_exit;
+	goto exit;
       dput_exit:
 	printd(("%s: putting dentry\n", __FUNCTION__));
 	dput(dentry);
-      up_exit:
-	if (inode) {
-		printd(("%s: releasing inode semaphore\n", __FUNCTION__));
-		up(&inode->i_sem);
-	}
-      pput_exit:
-	printd(("%s: putting parent dentry\n", __FUNCTION__));
-	dput(parent);
-      cput_exit:
-	printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	cdrv_put(cdev);
       exit:
 	return (err);
 }

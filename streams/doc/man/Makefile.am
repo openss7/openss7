@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/26 22:12:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/02/10 04:30:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:24 $ by $Author: brian $
+# Last Modified $Date: 2005/02/10 04:30:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -734,6 +734,7 @@ man_MANS = \
 	man9/SLEEP_TRYLOCK.9 \
 	man9/SLEEP_UNLOCK.9 \
 	man9/__smod_search.9 \
+	man9/spec_dentry.9 \
 	man9/spec_open.9 \
 	man9/SPG.9 \
 	man9/spl0.9 \
@@ -772,6 +773,8 @@ man_MANS = \
 	man9/strqget.9 \
 	man9/strqset.9 \
 	man9/strrput.9 \
+	man9/strthread.9 \
+	man9/strthreads.9 \
 	man9/str_uninstall.9 \
 	man9/strwsrv.9 \
 	man9/SV_ALLOC.9 \
@@ -1495,6 +1498,7 @@ dist_noinst_MANS = \
 	man9/SLEEP_TRYLOCK.9.man \
 	man9/SLEEP_UNLOCK.9.man \
 	man9/__smod_search.9.man \
+	man9/spec_dentry.9.man \
 	man9/spec_open.9.man \
 	man9/SPG.9.man \
 	man9/spl0.9.man \
@@ -1533,6 +1537,8 @@ dist_noinst_MANS = \
 	man9/strqget.9.man \
 	man9/strqset.9.man \
 	man9/strrput.9.man \
+	man9/strthread.9.man \
+	man9/strthreads.9.man \
 	man9/str_uninstall.9.man \
 	man9/strwsrv.9.man \
 	man9/SV_ALLOC.9.man \

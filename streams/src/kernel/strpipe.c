@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 04:34:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/02/10 04:34:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 04:34:09 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:54 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/02/10 04:34:09 $";
 
 #define __NO_VERSION__
 
@@ -172,7 +172,7 @@ STATIC struct file *pipe_file_open(void)
 		ptrace(("%s: could not find specfs mount point\n", __FUNCTION__));
 		goto dput_exit;
 	}
-	printd(("%s: opening dentry %p\n", __FUNCTION__, dentry));
+	printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode, dentry->d_inode->i_ino));
 	file = dentry_open(dentry, mntget(mnt), O_CLONE | 0x3);
 	specfs_put();
 	if (IS_ERR(file)) {

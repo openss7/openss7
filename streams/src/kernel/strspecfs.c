@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/10 04:35:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 06:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/02/10 04:35:01 $ by $Author: brian $
 
  *****************************************************************************/
 
- #ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $"
+ #ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/10 04:35:01 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/10 04:35:01 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -91,7 +91,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/01/22 06:42:27 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/02/10 04:35:01 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1281,7 +1281,7 @@ STATIC void spec_put_inode(struct inode *inode)
  */
 STATIC void spec_delete_inode(struct inode *inode)
 {
-	ptrace(("%s: deleting inode %p (%ld), geenric %p\n", __FUNCTION__, inode, inode->i_ino,
+	ptrace(("%s: deleting inode %p (%ld), generic %p\n", __FUNCTION__, inode, inode->i_ino,
 		inode->u.generic_ip));
 	switch (inode->i_mode & S_IFMT) {
 		struct cdevsw *cdev;
