@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.4 2005/03/31 11:32:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/31 11:32:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -244,6 +244,10 @@ These are undocumented LiS symbols:
 .BR lis_osif_pci_dac_dma_supported ,
 .TP
 .BR lis_osif_pci_dac_dma_sync_single ,
+.TP
+.BR lis_osif_pci_dac_dma_sync_single_for_cpu ,
+.TP
+.BR lis_osif_pci_dac_dma_sync_single_for_device ,
 .TP
 .BR lis_osif_pci_dac_dma_to_offset ,
 .TP
