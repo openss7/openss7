@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/08 19:21:16 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/08 19:21:16 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/08 19:21:16 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $";
 
 //#define __NO_VERSION__
 
@@ -64,6 +64,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <linux/kernel.h>	/* for FASTCALL() */
 #include <linux/sched.h>	/* for send_sig_info() */
@@ -96,7 +97,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/08 19:21:16 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:16 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:16 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:31 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/08 19:21:16 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/24 04:16:31 $";
 
 #define __NO_VERSION__
 
@@ -64,6 +64,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/init.h>
 
 #ifdef CONFIG_PROC_FS
 #include <linux/proc_fs.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/08 19:21:15 $
+ @(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/24 04:16:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:15 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/08 19:21:15 $"
+#ident "@(#) $RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/24 04:16:30 $"
 
 static char const ident[] =
-    "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/08 19:21:15 $";
+    "$RCSfile: strunix.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/24 04:16:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -62,6 +62,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <linux/smp_lock.h>
 #include <linux/slab.h>
@@ -85,7 +86,7 @@ static char const ident[] =
 
 #define UNIX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UNIX_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/05/08 19:21:15 $"
+#define UNIX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2004/05/24 04:16:30 $"
 #define UNIX_DEVICE	"SVR 4.2 Sockets Library UNIX Support"
 #define UNIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UNIX_LICENSE	"GPL"

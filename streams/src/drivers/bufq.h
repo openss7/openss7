@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.1 2004/05/14 08:00:05 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.2 2004/05/24 04:16:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/14 08:00:05 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/14 08:00:05 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 04:16:29 $"
 
 typedef struct bufq {
 	spinlock_t q_lock;
@@ -74,12 +74,12 @@ bufq_init(bufq_t * q)
 static inline void
 bufq_lock(bufq_t * q, unsigned long *flags)
 {
-	spin_lock_irqsave(&q->q_lock, flags);
+	spin_lock_irqsave(&q->q_lock, *flags);
 }
 static inline void
 bufq_unlock(bufq_t * q, unsigned long *flags)
 {
-	spin_unlock_irqrestore(&q->q_lock, flags);
+	spin_unlock_irqrestore(&q->q_lock, *flags);
 }
 
 static inline size_t

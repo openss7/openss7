@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/08 19:21:14 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:14 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/08 19:21:14 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:29 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/08 19:21:14 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:29 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -62,6 +62,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <asm/semaphore.h>
 
@@ -84,7 +85,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/05/08 19:21:14 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/24 04:16:29 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL and additional rights"

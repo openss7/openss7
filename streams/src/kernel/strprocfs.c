@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:15 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:15 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:15 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/08 19:21:15 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/24 04:16:31 $";
 
 #define __NO_VERSION__
 
@@ -64,6 +64,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/init.h>
 
 #include <linux/proc_fs.h>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/14 08:00:06 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $";
 
 #if defined(_LIS_SOURCE) && !defined(MODULE)
 #   error ****
@@ -71,6 +71,7 @@ static char const ident[] =
 #   endif
 #   include <linux/module.h>
 #   include <linux/modversions.h>
+#   include <linux/init.h>
 #   ifndef __GENKSYMS__
 #	ifdef LIS
 #	    include <sys/LiS/modversions.h>
@@ -108,7 +109,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2004/05/14 08:00:06 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/24 04:16:32 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

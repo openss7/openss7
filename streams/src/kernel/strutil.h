@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/08 19:21:16 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/24 04:16:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:32 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -59,7 +59,7 @@
 static __inline__ void qrlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
-		local_irq_save(flagsp);
+		local_irq_save(*flagsp);
 	if (q->q_owner != current)
 		read_lock(&q->q_rwlock);
 	else {
@@ -77,13 +77,13 @@ static __inline__ void qrunlock(queue_t *q, ulong *flagsp)
 		q->q_nest--;
 	}
 	if (flagsp)
-		local_irq_restore(flagsp);
+		local_irq_restore(*flagsp);
 	return;
 }
 static __inline__ void qwlock(queue_t *q, ulong *flagsp)
 {
 	if (flagsp)
-		local_irq_save(flagsp);
+		local_irq_save(*flagsp);
 	if (q->q_owner != current) {
 		write_lock(&q->q_rwlock);
 		q->q_owner = current;
@@ -106,7 +106,7 @@ static __inline__ void qwunlock(queue_t *q, ulong *flagsp)
 			q->q_nest--;
 		}
 		if (flagsp)
-			local_irq_restore(flagsp);
+			local_irq_restore(*flagsp);
 		return;
 	}
 	swerr();
@@ -226,7 +226,7 @@ static __inline__ void swlock(struct stdata *sd, unsigned long *flagsp)
 			sd->sd_nest++;
 			return;
 		}
-		write_lock_irqsave(&sd->sd_qlock, flagsp);
+		write_lock_irqsave(&sd->sd_qlock, *flagsp);
 		sd->sd_nest = 0;
 		sd->sd_owner = current;
 		return;
@@ -243,7 +243,7 @@ static __inline__ void swunlock(struct stdata *sd, unsigned long *flagsp)
 		}
 		sd->sd_owner = NULL;
 		sd->sd_nest = 0;
-		write_unlock_irqrestore(&sd->sd_qlock, flagsp);
+		write_unlock_irqrestore(&sd->sd_qlock, *flagsp);
 		return;
 	}
 	swerr();

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/08 19:21:16 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 04:16:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/08 19:21:16 $ by $Author: brian $
+ Last Modified $Date: 2004/05/24 04:16:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/08 19:21:16 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 04:16:31 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/05/08 19:21:16 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2004/05/24 04:16:31 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -65,6 +65,7 @@ static char const ident[] =
 #endif
 #include <linux/module.h>
 #include <linux/modversions.h>
+#include <linux/init.h>
 
 #ifndef __GENKSYMS__
 #include <sys/streams/modversions.h>
