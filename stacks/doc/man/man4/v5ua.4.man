@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: v5ua.4.man,v 0.9.2.2 2004/04/17 21:38:41 brian Exp $
+.\" @(#) $Id: v5ua.4.man,v 0.9.2.3 2005/01/25 22:37:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:38:41 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/25 22:37:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +71,45 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH V5UA 4 "$Date: 2004/04/17 21:38:41 $" "$Name:  $" "OpenSS7 ISDN Devices"
+.TH V5UA 4 "$Date: 2005/01/25 22:37:52 $" "$Name:  $" "OpenSS7 ISDN Devices"
+.SH NAME
+.B v5ua, dl-v5ua
+\- V5.2 User Adatpation Layer (V5UA)
+.SH SYNOPSIS
+.HP
+.B #include <sys/stropts.h>
+.PD 0
+.HP
+.B #include <sys/dlpi.h>
+.HP
+.B #include <sys/dlpi_v5ua.h>
+.HP
+.B #include <sys/v5ua_ioctl.h>
+.PD
+.HP
+.BI "int " v5ua_stream " = open(" v5ua_device ", " flags );
+.SH DESCRIPTION
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/v5ua .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
 .\"
 .XX
 .[

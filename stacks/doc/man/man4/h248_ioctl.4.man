@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: h248_ioctl.4.man,v 0.9.2.2 2004/04/17 21:38:36 brian Exp $
+.\" @(#) $Id: h248_ioctl.4.man,v 0.9.2.3 2005/01/25 22:37:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:38:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/25 22:37:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +71,13 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH H248-IOCTL 4 "$Date: 2004/04/17 21:38:36 $" "$Name:  $" "OpenSS7 Devices \- IO Controls"
+.TH H248-IOCTL 4 "$Date: 2005/01/25 22:37:52 $" "$Name:  $" "OpenSS7 Devices \- IO Controls"
+.SH NAME
+.B h248_ioctl
+\- common IO controls for H.248/MEGACO devices
+.SH SYNOPSIS
+.SH DESCRIPTION
+.SH IOCTLS
 .\"
 .XX
 .[

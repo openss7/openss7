@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/11/08 06:55:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/01/25 22:37:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/08 06:55:48 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 22:37:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -967,7 +967,6 @@ ss7_man_MANS = \
 	man8/sl.8 \
 	man8/sls.8 \
 	man8/soip.8 \
-	man8/soon.8 \
 	man8/ss7.8 \
 	man8/ss7confd.8 \
 	man8/ss7d.8 \
@@ -977,7 +976,8 @@ ss7_man_MANS = \
 	man8/tcap.8 \
 	man8/tua.8 \
 	man8/uaconfd.8 \
-	man8/voipconfd.8
+	man8/voipconfd.8 \
+	man8/undoc.8
 
 xnet_man_MANS = \
 	man3/t_accept.3 \
@@ -2282,7 +2282,6 @@ ss7_dist_noinst_MANS = \
 	man8/sl.8.man \
 	man8/sls.8.man \
 	man8/soip.8.man \
-	man8/soon.8.man \
 	man8/ss7.8.man \
 	man8/ss7confd.8.man \
 	man8/ss7d.8.man \
@@ -2292,7 +2291,8 @@ ss7_dist_noinst_MANS = \
 	man8/tcap.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
-	man8/voipconfd.8.man
+	man8/voipconfd.8.man \
+	man8/undoc.8.man
 
 xnet_dist_noinst_MANS = \
 	man3/t_accept.3.man \

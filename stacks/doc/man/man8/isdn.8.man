@@ -1,1 +1,1 @@
-.so isdn.8.man
+.so undoc.8.man

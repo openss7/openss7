@@ -1,10 +1,10 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
 <book>
-<title>OpenSS7 SCTP</title>
+<title>OpenSS7 SCTP Book 1</title>
 <bookinfo>
 <corpauthor>OpenSS7 Corporation</corpauthor>
 </bookinfo>
-<chapter label="1" id="chap1">
+<chapter label="1" id="chap1-1">
 <title>Chapter number uno</title>
 <epigraph>
 <attribution>William Safire</attribution>

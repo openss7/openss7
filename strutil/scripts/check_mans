@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: check_mans,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/01/25 03:41:19 $
+# @(#) $RCSfile: check_mans,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/01/25 22:39:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/25 03:41:19 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 22:39:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -155,7 +155,7 @@ man3_required_options="
 man4_required_sections="
 NAME
 DESCRIPTION
-FILES|DEVICES|MODULES
+FILES|DEVICES|MODULES|IOCTLS
 IDENTIFICATION|AUTHOR|COPYRIGHT
 "
 man4_recommended_sections="

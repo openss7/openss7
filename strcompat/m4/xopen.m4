@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 07:11:04 $
+dnl @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 22:39:18 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/22 07:11:04 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/25 22:39:18 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -86,7 +86,7 @@ AC_DEFUN([_XOPEN_CHECK_SCTP], [dnl
         AS_HELP_STRING([--with-sctp],
             [include xopen sctp driver in build.  @<:@default=yes@:>@]),
         [with_sctp="$withval"],
-        [with_sctp='yes'])
+        [with_sctp='no'])
     AC_ARG_WITH([sctp2],
         AS_HELP_STRING([--with-sctp2],
             [include xopen sctp version 2 driver in build.  @<:@default=no@:>@]),
@@ -103,7 +103,7 @@ AC_DEFUN([_XOPEN_CHECK_XNS], [dnl
         AS_HELP_STRING([--with-xns],
             [include xopen xns headers in install.  @<:@default=yes@:>@]),
         [with_xns="$withval"],
-        [with_xns='yes'])
+        [with_xns='no'])
 ])# _XOPEN_CHECK_XNS
 # =============================================================================
 
@@ -115,7 +115,7 @@ AC_DEFUN([_XOPEN_CHECK_TLI], [dnl
         AS_HELP_STRING([--with-tli],
             [include xopen tli modules in build.  @<:@default=yes@:>@]),
         [with_tli="$withval"],
-        [with_tli='yes'])
+        [with_tli='no'])
 ])# _XOPEN_CHECK_TLI
 # =============================================================================
 
@@ -127,7 +127,7 @@ AC_DEFUN([_XOPEN_CHECK_INET], [dnl
         AS_HELP_STRING([--with-inet],
             [include xopen inet driver in build.  @<:@default=yes@:>@]),
         [with_inet="$withval"],
-        [with_inet='yes'])
+        [with_inet='no'])
 ])# _XOPEN_CHECK_INET
 # =============================================================================
 
@@ -139,7 +139,7 @@ AC_DEFUN([_XOPEN_CHECK_XNET], [dnl
         AS_HELP_STRING([--with-xnet],
             [include xopen xnet library in build.  @<:@default=yes@:>@]),
         [with_xnet="$withval"],
-        [with_xnet='yes'])
+        [with_xnet='no'])
 ])# _XOPEN_CHECK_XNET
 # =============================================================================
 
@@ -151,7 +151,7 @@ AC_DEFUN([_XOPEN_CHECK_SOCK], [dnl
         AS_HELP_STRING([--with-sock],
             [include xopen sock library in build.  @<:@default=yes@:>@]),
         [with_sock="$withval"],
-        [with_sock='yes'])
+        [with_sock='no'])
 ])# _XOPEN_CHECK_SOCK
 # =============================================================================
 
