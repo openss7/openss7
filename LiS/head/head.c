@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.110 3/9/03 22:22:17 "
+#ident "@(#) LiS head.c 2.111 4/14/03 14:38:46 "
 
 /* BEWARE: should check:
  * tty stuff
@@ -2452,7 +2452,6 @@ void lis_head_flush(stdata_t *shead, queue_t *q, mblk_t *mp)
 void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 {
     int		typ ;
-    int		psw ;
 
     CP(shead,mp) ;
     typ = lis_btype(mp);
@@ -2496,17 +2495,9 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 	    goto return_point;
 	case M_IOCNAK: 
 	case M_IOCACK: 
-	    LIS_QISRLOCK(q, &psw) ;
-	    if (q->q_flag & (QCLOSING | QPROCSOFF))
-	    {
-		LIS_QISRUNLOCK(q, &psw) ;
-		CP(q,mp) ;
-		mp->b_next = NULL ;
-		freemsg(mp) ;
-		goto return_point;
-	    }
-	    LIS_QISRUNLOCK(q, &psw) ;
-	    /* q not closing yet, go ahead and process IOCACKs */
+	    printk("lis_process_rput: closing: M_IOCNAK or M_IOCACK "
+		    "should have been handled by lis_strrput\n") ;
+	    goto return_point;
 	    break ;
 	}
     }
@@ -2694,17 +2685,8 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
 	break;
     case M_IOCNAK: 
     case M_IOCACK: 
-	CP(mp,0) ;
-	if (!F_ISSET(shead->sd_flag,IOCWAIT)|| 
-	    F_ISSET(shead->sd_flag,(STWRERR|STRDERR)) ||
-	    bad_ioc_seq(mp,shead)
-	   )
-	    lis_freemsg(mp);
-	else {			/* everything's ok: now we process it */
-	    CP(mp,0) ;
-	    shead->sd_iocblk=mp;
-	    lis_wake_up_wiocing(shead); /* this is not an unlock! */
-	}
+	printk("lis_process_rput: M_IOCNAK or M_IOCACK "
+		"should have been handled by lis_strrput\n") ;
 	break ;
     case M_COPYIN: 
 	CP(mp,0) ;
@@ -2879,6 +2861,8 @@ lis_strrput(queue_t *q, mblk_t *mp)
      *
      * Flush logic must be performed immediately so as not to flush messages
      * that arrive AFTER the M_FLUSH.
+     *
+     * Handle ioctl ack/nak here so they do not get caught in flushes.
      */
     switch (mp->b_datap->db_type)
     {
@@ -2905,6 +2889,29 @@ lis_strrput(queue_t *q, mblk_t *mp)
 	CP(q,mp) ;
 	lis_head_flush(hd, q, mp) ;		/* flush immediately */
 	return(0) ;				/* done */
+
+    case M_IOCNAK: 
+    case M_IOCACK: 
+	LIS_QISRLOCK(q, &psw) ;
+	if (!F_ISSET(hd->sd_flag,IOCWAIT)|| 
+	    hd->sd_iocblk != NULL ||
+	    (q->q_flag & QCLOSING) ||
+	    F_ISSET(hd->sd_flag,(STWRERR|STRDERR)) ||
+	    bad_ioc_seq(mp,hd)
+	   )
+	{
+	    LIS_QISRUNLOCK(q, &psw) ;
+	    CP(q,mp) ;
+	    lis_freemsg(mp);
+	}
+	else
+	{				/* everything's ok: now we process it */
+	    LIS_QISRUNLOCK(q, &psw) ;
+	    CP(q,mp) ;
+	    hd->sd_iocblk=mp;
+	    lis_wake_up_wiocing(hd);	/* this is not an unlock! */
+	}
+	return(0) ;
     }
 
     lis_put_rput_q(hd, mp) ;			/* put into sd_rput queue */
