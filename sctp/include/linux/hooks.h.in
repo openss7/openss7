@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: hooks.h.in,v 0.9.2.9 2004/12/29 07:22:19 brian Exp $
+ @(#) $Id: hooks.h.in,v 0.9.2.10 2005/01/01 11:17:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/29 07:22:19 $ by $Author: brian $
+ Last Modified $Date: 2005/01/01 11:17:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_LINUX_HOOKS_H__
 #define __LOCAL_LINUX_HOOKS_H__
+
+#ident "@(#) $RCSfile: hooks.h.in,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that

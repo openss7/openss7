@@ -145,6 +145,7 @@ int sysctl_sctp_throttle_itvl = 50 * HZ / 1000;
 int sysctl_sctp_mem[3];
 int sysctl_sctp_rmem[3] = { 4 * 1024, 87380, 87380 * 2 };
 int sysctl_sctp_wmem[3] = { 4 * 1024, 16 * 1024, 128 * 1024 };
+
 #ifdef CONFIG_INET_ECN
 int sysctl_sctp_ecn = 1;
 #else

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.18 2004/12/30 07:40:35 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.19 2005/01/01 11:16:52 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/30 07:40:35 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/01 11:16:52 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -96,6 +96,8 @@ AC_DEFUN([AC_SCTP], [dnl
     CFLAGS=
 dnl _AUTOTEST
     _SCTP_OUTPUT dnl
+    AM_CONDITIONAL(WITH_LFS, false)dnl
+    AM_CONDITIONAL(WITH_LIS, false)dnl
 ])# AC_SCTP
 # =========================================================================
 
@@ -176,7 +178,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
         AC_MSG_ERROR([
 **** 
 **** Configure has detected a kernel with the deprecated lksctp compiled in.
-**** Ths is NOT a recommended situation.  Installing OpenSS7 SCTP on such a
+**** This is NOT a recommended situation.  Installing OpenSS7 SCTP on such a
 **** bastadized kernel will most likely result in an unstable situation.  Try
 **** a different kernel, or try recompiling your kernel with lksctp set to no.
 **** ])
