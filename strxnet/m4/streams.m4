@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/03/21 11:17:33 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/03/22 00:11:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/21 11:17:33 $ by $Author: brian $
+# Last Modified $Date: 2005/03/22 00:11:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,12 +94,12 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS], [dnl
     AC_ARG_WITH([lis],
 	AS_HELP_STRING([--with-lis=HEADERS],
 	    [specify the LiS header file directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
-	[with_lis="$withval"],
+	[with_lis="$withval" ; for s in ${!streams_cv_*} ; do eval "unset $s" ; done],
 	[with_lis=''])
     AC_ARG_WITH([lfs],
 	AS_HELP_STRING([--with-lfs=HEADERS],
 	    [specify the LfS header file directory.  @<:@default=INCLUDEDIR/LfS@:>@]),
-	[with_lfs="$withval"],
+	[with_lfs="$withval" ; for s in ${!streams_cv_*} ; do eval "unset $s" ; done],
 	[with_lfs=''])
 ])# _LINUX_STREAMS_OPTIONS
 # =============================================================================
