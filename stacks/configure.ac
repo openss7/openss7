@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9 2004/01/17 07:50:03 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.1 2004/02/22 07:28:47 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,14 +51,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/01/17 07:50:03 $ by $Author: brian $
+dnl Last Modified $Date: 2004/02/22 07:28:47 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([openss7],[0.9],[bugs@openss7.org])
+AC_INIT([openss7],[0.9.1],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/ss7ip/sdt_tpi.c])
 AC_CONFIG_HEADER([config.h])
 

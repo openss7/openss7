@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/28 18:15:22 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/28 18:15:22 $ by $Author: brian $
+ Last Modified $Date: 2004/02/22 07:24:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/28 18:15:22 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $"
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/28 18:15:22 $";
+static char const ident[] =
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -118,7 +119,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.1 
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/01/28 18:15:22 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/02/22 07:24:51 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1551,7 +1552,8 @@ __sctp_daddr_alloc(sp, daddr, errp)
 {
 	struct sctp_daddr *sd;
 	assert(errp);
-	ensure(sp, *errp = -EFAULT; return (NULL));
+	ensure(sp, *errp = -EFAULT;
+	       return (NULL));
 	if (!daddr)
 		return (NULL);
 	if (!(daddr & 0xff000000)) {	/* zeronet is illegal */
@@ -1599,8 +1601,7 @@ sctp_daddr_include(sp, daddr, errp)
 {
 	struct sctp_daddr *sd;
 	assert(errp);
-	ensure(sp, *errp = -EFAULT;
-	       return (NULL));
+	ensure(sp, *errp = -EFAULT; return (NULL));
 	SCTPHASH_WLOCK();
 	if (!(sd = sctp_find_daddr(sp, daddr)))
 		sd = __sctp_daddr_alloc(sp, daddr, errp);
@@ -1718,8 +1719,7 @@ __sctp_saddr_alloc(sp, saddr, errp)
 {
 	struct sctp_saddr *ss;
 	assert(errp);
-	ensure(sp, *errp = -EFAULT;
-	       return (NULL));
+	ensure(sp, *errp = -EFAULT; return (NULL));
 	if (!saddr) {
 		rare();
 		return (NULL);
@@ -1752,8 +1752,7 @@ sctp_saddr_include(sp, saddr, errp)
 {
 	struct sctp_saddr *ss;
 	assert(errp);
-	ensure(sp, *errp = -EFAULT;
-	       return (NULL));
+	ensure(sp, *errp = -EFAULT; return (NULL));
 	SCTPHASH_WLOCK();
 	if (!(ss = sctp_find_saddr(sp, saddr)))
 		ss = __sctp_saddr_alloc(sp, saddr, errp);
@@ -2970,11 +2969,14 @@ sctp_lookup_cookie_echo(ck, v_tag, sport, dport, saddr, daddr)
 	} else {
 		rare();
 		if (ck->v_tag != v_tag)
-			printd(("INFO: cookie v_tag = %08X, header v_tag = %08X\n", ck->v_tag, v_tag));
+			printd(("INFO: cookie v_tag = %08X, header v_tag = %08X\n", ck->v_tag,
+				v_tag));
 		if (ck->sport != sport)
-			printd(("INFO: cookie sport = %08X, header sport = %08X\n", ck->sport, sport));
+			printd(("INFO: cookie sport = %08X, header sport = %08X\n", ck->sport,
+				sport));
 		if (ck->dport != dport)
-			printd(("INFO: cookie dport = %08X, header dport = %08X\n", ck->dport, dport));
+			printd(("INFO: cookie dport = %08X, header dport = %08X\n", ck->dport,
+				dport));
 	}
 	seldom();
 	return (NULL);
@@ -2997,7 +2999,7 @@ sctp_lookup_cookie_echo(ck, v_tag, sport, dport, saddr, daddr)
  *  Note: SCTP IG 2.18 is unnecessary.
  */
 sctp_t *
-sctp_lookup(struct sctphdr *sh, uint32_t daddr, uint32_t saddr)
+sctp_lookup(struct sctphdr * sh, uint32_t daddr, uint32_t saddr)
 {
 	sctp_t *sp = NULL;
 	struct sctpchdr *ch = (struct sctpchdr *) (sh + 1);
@@ -4384,7 +4386,8 @@ sctp_send_msg(sp, sd, mp)
 							normal(blen > 0);
 							if (blen > 0) {
 								ensure(head + plen >= data + blen,
-								       kfree_skb(skb); return);
+								       kfree_skb(skb);
+								       return);
 								bcopy(db->b_rptr, data, blen);
 								data += blen;
 								clen += blen;
@@ -4903,9 +4906,13 @@ sctp_frag_chunk(bq, mp, mps)
 		{
 			int ret;
 			ret = trimhead(mp, dlen);	/* trim originai */
-			ensure(ret, freemsg(dp); return;);
+			ensure(ret, freemsg(dp);
+			       return;
+			    );
 			ret = trimtail(dp, dlen);	/* trim fragment */
-			ensure(ret, freemsg(dp); return;);
+			ensure(ret, freemsg(dp);
+			       return;
+			    );
 		}
 #else
 		fixme(("Should consider multiple mblks\n"));
@@ -6457,18 +6464,21 @@ sctp_send_data(sp, st, flags, dp)
 						ensure(dlen > sizeof(struct sctp_data), freemsg(bp);
 						       return (-EFAULT));
 						dlen -= sizeof(struct sctp_data);
-						ensure(dlen < mlen, freemsg(bp); return (-EFAULT));
+						ensure(dlen < mlen, freemsg(bp);
+						       return (-EFAULT));
 #if 1
 						{
 							int ret;
 							ret = trimhead(dp, dlen);	/* trim
 											   original 
 											 */
-							unless(ret, freemsg(bp); return (-EFAULT));
+							unless(ret, freemsg(bp);
+							       return (-EFAULT));
 							ret = trimtail(bp, dlen);	/* trim
 											   fragment 
 											 */
-							unless(ret, freemsg(bp); return (-EFAULT));
+							unless(ret, freemsg(bp);
+							       return (-EFAULT));
 						}
 #else
 						fixme(("Should consider multiple mblks\n"));
@@ -6762,10 +6772,10 @@ sctp_send_init_ack(sp, daddr, sh, ck)
 	    + PADC(sizeof(*ec))
 #endif
 #ifdef SCTP_CONFIG_ADD_IP || SCTP_CONFIG_ADAPTATION_LAYER_INFO
-	    + (sp->l_caps & SCTP_CAPS_ALI) ? PADC(sizeof(*ai)) : 0
+	    + ((sp->l_caps & SCTP_CAPS_ALI) ? PADC(sizeof(*ai)) : 0)
 #endif
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
-	    + (sp->l_caps & SCTP_CAPS_PR) ? PADC(sizeof(*pr)) : 0
+	    + ((sp->l_caps & SCTP_CAPS_PR) ? PADC(sizeof(*pr)) : 0)
 #endif
 	;
 	int arem, alen;
@@ -8101,8 +8111,8 @@ sctp_rtt_calc(sd, time)
 	sctp_reset_idle(sd);
 }
 
-#ifndef SCTP_DESTF_DROP
-#define SCTP_DESTF_DROP 0x10000000	/* destination is dropping packets */
+#ifndef SCTP_DESTF_DROPPING
+#define SCTP_DESTF_DROPPING 0x10000000	/* destination is dropping packets */
 #endif
 /* 
  *  DEST CALC
@@ -8137,8 +8147,16 @@ sctp_dest_calc(sp)
 					sd->cwnd += accum < sd->mtu ? accum : sd->mtu;
 			} else {
 				/* RFC 2960 7.2.2 */
+#ifdef SCTP_IG_UPDATES
+				sd->partial_ack += accum;
+				if (sd->in_flight >= sd->cwnd && sd->partial_ack >= sd->cwnd) {
+					sd->cwnd += sd->mtu;
+					sd->partial_ack -= sd->cwnd;
+				}
+#else				/* SCTP_IG_UPDATES */
 				if (sd->in_flight > sd->cwnd)
 					sd->cwnd += sd->mtu;
+#endif				/* SCTP_IG_UPDATES */
 			}
 			/* credit of destination (accum) */
 			normal(sd->in_flight >= accum);
@@ -8148,16 +8166,25 @@ sctp_dest_calc(sp)
 				untimeout(xchg(&sd->timer_retrans, 0));
 			sd->ack_accum = 0;
 		}
-		if (sd->flags & SCTP_DESTF_DROP) {
+		if (sd->flags & SCTP_DESTF_DROPPING) {
 			/* RFC 2960 7.2.4 (2), 7.2.3 */
 			sd->ssthresh = sd->cwnd >> 1 > sd->mtu << 1 ? sd->cwnd >> 1 : sd->mtu << 1;
 			sd->cwnd = sd->ssthresh;
-			sd->flags &= ~SCTP_DESTF_DROP;
+#ifdef SCTP_IG_UPDATES
+			/* SCTP IG Section 2.9 */
+			sd->partial_ack = 0;
+#endif				/* SCTP_IG_UPDATES */
+			sd->flags &= ~SCTP_DESTF_DROPPING;
 		}
 		/* RFC 2960 6.3.2 (R2) */
-		if (!sd->in_flight && sd->timer_retrans)
-			untimeout(xchg(&sd->timer_retrans, 0));
-		if (sd->in_flight && !sd->timer_retrans)
+		if (!sd->in_flight) {
+			if (sd->timer_retrans)
+				untimeout(xchg(&sd->timer_retrans, 0));
+#ifdef SCTP_CONFIG_ADD_IP
+			if (sd->flags & SCTP_DESTF_UNUSABLE)
+				sctp_del_daddr(sd);
+#endif				/* SCTP_CONFIG_ADD_IP */
+		} else if (!sd->timer_retrans)
 			set_timeout(sp, &sd->timer_retrans, &sctp_retrans_timeout, sd, sd->rto);
 	}
 }
@@ -8656,7 +8683,7 @@ sctp_recv_data(sp, mp)
 		sp->sackf |= SCTP_SACKF_DUP;
 		if (sd && !(sp->sackf & SCTP_SACKF_NEW)) {
 			sd->dups += sp->ndups;
-			if (!sd->in_flight) {
+			if (!sd->in_flight && !sd->timer_heartbeat)
 				if (sd->timer_idle)
 					untimeout(xchg(&sd->timer_idle, 0));
 				sctp_send_heartbeat(sp, sd);
@@ -8853,6 +8880,7 @@ sctp_recv_sack(sp, mp)
 			}
 		}
 	} else {
+		int growth = 0;
 		{
 			struct sctp_daddr *sd;
 			/* We skip gap analysis if we are running ultra-fast destinations with data 
@@ -8894,7 +8922,11 @@ sctp_recv_sack(sp, mp)
 			/* msg is inside gapack block */
 			if (cb->flags & SCTPCB_FLAG_ACK) {
 				cb->flags &= ~SCTPCB_FLAG_ACK;
-				cb->flags &= ~SCTPCB_FLAG_NACK;
+				if (cb->flags & SCTPCB_FLAG_NACK) {
+					cb->flags &= ~SCTPCB_FLAG_NACK;
+					if (cb->sacks < SCTP_FR_COUNT)
+						growth = 1;
+				}
 				if (!(cb->flags & SCTPCB_FLAG_SACKED)) {
 					struct sctp_daddr *sd = cb->daddr;
 					cb->flags |= SCTPCB_FLAG_SACKED;
@@ -8928,7 +8960,7 @@ sctp_recv_sack(sp, mp)
 			if (cb->flags & SCTPCB_FLAG_NACK) {
 				cb->flags &= ~SCTPCB_FLAG_NACK;
 				/* RFC 2960 7.2.4 */
-				if (!(cb->flags & SCTPCB_FLAG_RETRANS)
+				if (!growth && !(cb->flags & SCTPCB_FLAG_RETRANS)
 				    && ++(cb->sacks) == 4) {
 					size_t dlen = cb->dlen;
 					struct sctp_daddr *sd = cb->daddr;
@@ -8938,7 +8970,7 @@ sctp_recv_sack(sp, mp)
 					cb->sacks = 0;	/* ??? do we clear the sack count */
 					if (sd) {
 						/* RFC 2960 7.2.4 (2) */
-						sd->flags |= SCTP_DESTF_DROP;
+						sd->flags |= SCTP_DESTF_DROPPING;
 						/* credit destination (now) */
 						normal(sd->in_flight >= dlen);
 						sd->in_flight =
@@ -9320,6 +9352,24 @@ sctp_recv_init(sp, mp)
 			/* Ensure that address types supported includes IPv4.  Actually address
 			   types must include IPv4 so we just ignore. */
 			break;
+#ifdef SCTP_CONFIG_ECN
+		case SCTP_PTYPE_ECN_CAPABLE:
+			sp->p_caps |= SCTP_CAPS_ECN;
+			INET_ECN_xmit(sp);
+			break;
+#endif				/* SCTP_CONFIG_ECN */
+#if defined SCTP_CONFIG_ADD_IP || defined SCTP_CONFIG_ADAPTATION_LAYER_INFO
+		case SCTP_PTYPE_ALI:
+			sp->p_ali = ntohl(ph->ali.ali);
+			sp->p_caps |= SCTP_CAPS_ALI;
+			break;
+#endif				/* defined SCTP_CONFIG_ADD_IP || defined
+				   SCTP_CONFIG_ADAPTATION_LAYER_INFO */
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+		case SCTP_PTYPE_PR_SCTP:
+			sp->p_caps |= SCTP_CAPS_PR;
+			break;
+#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
 		default:
 		      init_bad_parm:
 			/* SCTP IG 2.27 */
@@ -9749,6 +9799,7 @@ sctp_recv_cookie_echo(sp, mp)
 	case SCTP_SHUTDOWN_RECEIVED:
 	case SCTP_SHUTDOWN_RECVWAIT:
 		rare();
+		/* XXX this is rather different from current sockets version */
 		/* We trash all existing data in queue. */
 		sctp_disconnect(sp);
 		/* Notify user of reset or disconnect */

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/02/17 06:30:25 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/02/22 07:30:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/17 06:30:25 $ by $Author: brian $
+# Last Modified $Date: 2004/02/22 07:30:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -569,7 +569,9 @@ fi
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc doc/manual/*.texi
-#%doc doc/manual/*.pdf
+%doc doc/drafts/*/*.txt
+%doc doc/drafts/*/*.pdf
+%{_datadir}/doc/%{name}-%{version}/*
 %{_infodir}/*
 %endif
 
@@ -723,9 +725,12 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.4  2004/02/17 06:30:25  brian
-# - Added public release option.
+# Revision 0.9.2.5  2004/02/22 07:30:09  brian
+# - Added documentation.
 #
+* Tue Feb 17 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.4  2004/02/17 06:30:25  brian
+- Added public release option.
 
 * Wed Jan 21 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.3  2004/01/21 23:25:47  brian

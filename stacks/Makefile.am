@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/02/17 06:32:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/02/22 07:27:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/02/17 06:32:11 $ by $Author: brian $
+# Last Modified $Date: 2004/02/22 07:27:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1105,8 +1105,6 @@ man_MANS = \
 	doc/man/man8/uaconfd.8 doc/man/man8/voipconfd.8
 
 nobase_include_HEADERS = \
-	src/include/os7/allocb.h src/include/os7/bufpool.h src/include/os7/bufq.h src/include/os7/debug.h \
-	src/include/os7/lock.h src/include/os7/priv.h src/include/os7/queue.h src/include/os7/timer.h \
 	src/include/ss7/capi.h src/include/ss7/capi_ioctl.h src/include/ss7/cci.h src/include/ss7/cdi.h \
 	src/include/ss7/chi.h src/include/ss7/chi_ioctl.h src/include/ss7/devi.h src/include/ss7/devi_ioctl.h \
 	src/include/ss7/dl.h src/include/ss7/dl_ioctl.h src/include/ss7/dlpi_ioctl.h \
@@ -1146,6 +1144,9 @@ nobase_include_HEADERS = \
 	src/include/sys/xti_sccp.h src/include/sys/xti_sctp.h src/include/sys/xti_sl.h \
 	src/include/sys/xti_ss7.h src/include/sys/xti_sscop.h src/include/sys/xti_tcap.h \
 	src/include/sys/xti_tcp.h src/include/sys/xti_udp.h
+
+#	src/include/os7/allocb.h src/include/os7/bufpool.h src/include/os7/bufq.h src/include/os7/debug.h \
+#	src/include/os7/lock.h src/include/os7/priv.h src/include/os7/queue.h src/include/os7/timer.h
 
 noinst_SCRIPTS = \
 	$(auxdir)/strconf-sh
@@ -1263,9 +1264,46 @@ ss7_source_FILES		= $(mods_source_FILES) \
 				  $(tua_source_FILES) \
 				  $(tali_source_FILES)
 
+EXTRA_DOCS = \
+	doc/drafts/isua/draft-bidulock-sigtran-isua-02.pdf \
+	doc/drafts/isua/draft-bidulock-sigtran-isua-02.ps \
+	doc/drafts/isua/draft-bidulock-sigtran-isua-02.txt \
+	doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.pdf \
+	doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.ps \
+	doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-05.txt \
+	doc/drafts/m2pa/draft-george-sigtran-m2pa-interop-01.txt \
+	doc/drafts/m2pa/draft-ietf-sigtran-m2pa-11.txt \
+	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.pdf \
+	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.ps \
+	doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-01.txt \
+	doc/drafts/sctp/rfc2126.txt \
+	doc/drafts/sctp/rfc2960.txt \
+	doc/drafts/tua/draft-bidulock-sigtran-tua-03.pdf \
+	doc/drafts/tua/draft-bidulock-sigtran-tua-03.ps \
+	doc/drafts/tua/draft-bidulock-sigtran-tua-03.txt \
+	doc/drafts/ua/draft-bidulock-sigtran-aspext-03.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-aspext-03.ps \
+	doc/drafts/ua/draft-bidulock-sigtran-aspext-03.txt \
+	doc/drafts/ua/draft-bidulock-sigtran-corid-03.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-corid-03.ps \
+	doc/drafts/ua/draft-bidulock-sigtran-corid-03.txt \
+	doc/drafts/ua/draft-bidulock-sigtran-datamodel-00.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.ps \
+	doc/drafts/ua/draft-bidulock-sigtran-loadgrp-03.txt \
+	doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.ps \
+	doc/drafts/ua/draft-bidulock-sigtran-loadsel-03.txt \
+	doc/drafts/ua/draft-bidulock-sigtran-regext-03.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-regext-03.ps \
+	doc/drafts/ua/draft-bidulock-sigtran-regext-03.txt \
+	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.pdf \
+	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.ps \
+	doc/drafts/ua/draft-bidulock-sigtran-sginfo-04.txt
+
 EXTRA_DIST = openss7.spec openss7-logo-small.gif $(man_MANS) $(noinst_SCRIPTS) \
 	     doc/man/openss7.macros doc/man/openss7.refs $(strconf_FILES) \
-	     src/include/xti_inet.h $(ss7_source_FILES)
+	     src/include/xti_inet.h $(ss7_source_FILES) $(EXTRA_DOCS)
 
 SUBDIRS = doc
 

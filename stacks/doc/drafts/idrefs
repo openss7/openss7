@@ -762,6 +762,23 @@
 %D September, 2002
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K sua-16
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T SS7 SCCP-User Adaptation Layer (SUA)
+%R draft-ietf-sigtran-sua-16.txt
+%D December 11, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sua-16.txt
+
 %K sua-15
 %L SUA
 %A John Loughney
@@ -878,6 +895,17 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K isua-02
+%L ISUA
+%A Brian Bidulock
+%E Brian Bidulock, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T SS7 ISUP-User Adaptation Layer (ISUA)
+%R <draft-bidulock-sigtran-isua-02.txt>
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K isua-01
 %L ISUA
 %A Brian Bidulock
@@ -897,6 +925,17 @@
 %T SS7 ISUP-User Adaptation Layer (ISUA)
 %R <draft-bidulock-sigtran-isua-00.txt>
 %D January 5, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%K tua-03
+%L TUA
+%A Brian Bidulock
+%E Brian Bidulock, (ed)
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T SS7 TCAP-User Adaptation Layer (TUA)
+%R <draft-bidulock-sigtran-tua-03.txt>
+%D February 21, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1064,6 +1103,16 @@
 %O Work In Progress
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K sginfo-03
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R <draft-bidulock-sigtran-sginfo-03.txt>
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K sginfo-02
 %L SGINFO
 %A Brian Bidulock
@@ -1091,6 +1140,16 @@
 %T Signalling Gateway (SG) Information Support
 %R <draft-bidulock-sigtran-sginfo-00.txt>
 %D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%K aspext-03
+%L ASPEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R <draft-bidulock-sigtran-aspext-03.txt>
+%D February 21, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1124,6 +1183,16 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K corid-03
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R <draft-bidulock-sigtran-corid-03.txt>
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K corid-02
 %L CORID
 %A Brian Bidulock
@@ -1151,6 +1220,16 @@
 %T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
 %R <draft-bidulock-sigtran-corid-00.txt>
 %D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%K sessid-03
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R <draft-bidulock-sigtran-sessid-03.txt>
+%D February 21, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1184,13 +1263,23 @@
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
+%K regext-03
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R <draft-bidulock-sigtran-regext-03.txt>
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
 %K regext-02
 %L REGEXT
 %A Brian Bidulock
 %Q Internet Engineering Task Force - Signalling Transport Working Group
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
 %R <draft-bidulock-sigtran-regext-02.txt>
-%D July 26 2003
+%D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1211,6 +1300,16 @@
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
 %R <draft-bidulock-sigtran-regext-00.txt>
 %D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%K loadsel-03
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R <draft-bidulock-sigtran-loadsel-03.txt>
+%D February 21, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
@@ -1241,6 +1340,16 @@
 %T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
 %R <draft-bidulock-sigtran-loadsel-00.txt>
 %D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force - Signalling Transport Working Group
+
+%K loadgrp-03
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force - Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R <draft-bidulock-sigtran-loadgrp-03.txt>
+%D February 21, 2004
 %O Work In Progress.
 %I Internet Engineering Task Force - Signalling Transport Working Group
 
